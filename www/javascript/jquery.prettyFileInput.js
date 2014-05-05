@@ -23,10 +23,15 @@
  + fakeFileHolderClass: this is the class for the element that holds the filename like "chimpney.jpg"
  + defaultText: This is the text on the button
  + defaultFileSelectedText: This is the text that the button transforms to.
+
+ Known bug: if this is applied to an input within a <label> tag, the open file
+            dialog triggers twice. I haven't found a way around this.
+            This doesn't happen to elements with an external <label>.
  
  *******/
 
 (function($) {
+    "use strict";
     $.fn.prettyFileInput = function(options) {
         var defaults = {
             inputHolderClass: 'file-input',
@@ -39,30 +44,54 @@
             callback: false
 
         };
-        var options = $.extend(defaults, options);
+        options = $.extend({}, defaults, options);
 
         return this.each(function() {
 
             var obj = $(this);
 
-            obj.wrap('<span class="' + options.inputHolderClass + '"></span>');
-            obj.after('<span class="' + options.buttonClass + ' ' + options.additionalButtonClasses + '">' + options.defaultText + '</span>');
+            obj.wrap(
+                $('<span />')
+                    .addClass(options.inputHolderClass)
+                    .on('click', function() {
+                        if ($(this).closest('label').length > 0) {
+                            console.warn('This pretty file input is inside a label. If the file input is opening twice, that\'s why.')
+                        }
+                        // Trigger the click event on the DOM element directly,
+                        // because it doesn't work when I trigger it via jQuery.
+                        // Works in everything I've tested
+                        obj[0].click();
+                    })
+            );
+            obj.after(
+                $('<span />')
+                    .addClass(options.buttonClass + ' ' + options.additionalButtonClasses)
+                    .html(options.defaultText)
+            );
 
-            obj.bind('change focus click', function() {
+            // Shrink the file input to nothingness without actually hiding it,
+            // so that click events can still be triggered.
+            obj.width(0).height(0);
 
-                $val = obj.val();
+            obj.bind('change.prettyFileInput focus.prettyFileInput click.prettyFileInput', function() {
 
-                valArray = $val.split('\\');
-                newVal = valArray[valArray.length - 1];
-                $button = obj.siblings('.' + options.buttonClass.replace(' ', '.') + '');
-                $fakeHolder = obj.siblings('.' + options.fakeFileHolderClass + '');
+                var $val = obj.val();
+
+                var valArray = $val.split('\\');
+                var newVal = valArray[valArray.length - 1];
+                var $button = obj.siblings('.' + options.buttonClass.replace(' ', '.') + '');
+                var $fakeHolder = obj.siblings('.' + options.fakeFileHolderClass + '');
 
                 if (newVal !== '') {
                     $button.addClass(options.buttonActiveClass).html(options.defaultFileSelectedText);
                 }
 
                 if ($fakeHolder.length === 0) {
-                    obj.parent().append('<span class="'+options.fakeFileHolderClass+'">' + newVal + '</span>');
+                    obj.parent().append(
+                        $('<span />')
+                            .addClass(options.fakeFileHolderClass)
+                            .text(newVal)
+                    )
                 } else {
                     $fakeHolder.text(newVal);
                 }
