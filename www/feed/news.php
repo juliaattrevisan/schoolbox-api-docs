@@ -35,9 +35,7 @@ if (is_array($newsList)) {
 } else
 	$page->setVar('rss_item_block', '');
 
-header('Content-type: application/rss+xml');
+header('Content-type: application/rss+xml; charset=UTF-8');
 $page->outputPage(true);
 
 exit;
-
-?>
