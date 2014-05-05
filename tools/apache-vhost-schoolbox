@@ -84,6 +84,8 @@
         #RewriteCond %{SERVER_PORT} !^443$
         #RewriteCond %{REQUEST_URI} ^/login [OR]
         #RewriteCond %{REQUEST_URI} ^/login/.* [OR]
+        #RewriteCond %{REQUEST_URI} ^/adminv2/.* [OR]
+        #RewriteCond %{REQUEST_URI} ^/login/.* [OR]
         #RewriteCond %{REQUEST_URI} ^/saml [OR]
         #RewriteCond %{REQUEST_URI} ^/saml/.* [OR]
         #RewriteCond %{REQUEST_URI} ^/account/modify [OR]
@@ -94,6 +96,8 @@
         #RewriteCond %{SERVER_PORT} ^443$
         #RewriteCond %{REQUEST_URI} !^/login
         #RewriteCond %{REQUEST_URI} !^/login/.*
+        #RewriteCond %{REQUEST_URI} !^/adminv2/.*
+        #RewriteCond %{REQUEST_URI} !^/m/.*
         #RewriteCond %{REQUEST_URI} !^/saml
         #RewriteCond %{REQUEST_URI} !^/saml/.*
         #RewriteCond %{REQUEST_URI} !^/account/modify
