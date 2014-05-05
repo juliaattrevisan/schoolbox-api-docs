@@ -663,6 +663,7 @@ class Calendar extends DeprecatedModel {
 
             // Ensure that requested group is included in filter
             // (as long as user has at least read permission on that group)
+            // Note that this checks the logged-in user, not the calendar user!
             if ($filter['group']) {
                 if ($this->groupHandler->getPermission($filter['group']) >= READ_ACCESS) {
                     $groupList[] = intval($filter['group']);
@@ -679,9 +680,12 @@ class Calendar extends DeprecatedModel {
         $this->groupHandler->setService(CALENDAR_SERVICE);
 
         /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
+         * This check is done against the calendar user, not the logged-in user,
+         * because we don't want to pollute a user's calendar if viewing it as
+         * an admin.
          */
         if ($user->getCampusCollection()->count()) {
-            if ($this->groupHandler->getPermission($firstCampus->getId()) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > WRITE_ACCESS) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND eventGroup.groupID = {$user->getRole()->getId()}";
