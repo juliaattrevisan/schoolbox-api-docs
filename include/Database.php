@@ -10,6 +10,7 @@
  */
 
 use Alaress\DebugBar\Instance as DebugBar;
+use DebugBar\DataCollector\PDO as DebugPDO;
 
 class Database implements Serializable {
     /**
@@ -134,8 +135,8 @@ class Database implements Serializable {
      * @return \DebugBar\DataCollector\PDO\PDOCollector
      */
     public function getCollector() {
-        $this->connection = new DebugBar\DataCollector\PDO\TraceablePDO($this->connection);
-        return new DebugBar\DataCollector\PDO\PDOCollector($this->connection);
+        $this->connection = new DebugPDO\TraceablePDO($this->connection);
+        return new DebugPDO\PDOCollector($this->connection);
     }
 
     /**
