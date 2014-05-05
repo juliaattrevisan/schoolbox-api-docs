@@ -1,6 +1,3 @@
-
-INSERT INTO `lu_config_type` (`type`) VALUES ('LMS Policy');
-
 update `config` set `title` = 'Display Grade Graph on Student Grade Card', 
   `description` = 'This will show the grade graph on the student grade card to all users', `type_id` = (SELECT `id` FROM lu_config_type WHERE `type` like 'LMS Policy')
 where `name` = 'display_grade_graph';

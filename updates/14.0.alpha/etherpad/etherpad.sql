@@ -1,6 +1,6 @@
 /* Add API key
  */
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('etherpad_api_token', 'xbxs&e#sa8@$2@k73^f32!7wz2djy%', 'Etherpad API Token', 'Used to access Etherpad documents', '1', '10', 'true');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`) VALUES ('etherpad_api_token', 'xbxs&e#sa8@$2@k73^f32!7wz2djy%', 'Etherpad API Token', 'Used to access Etherpad documents', '1', (SELECT `id` FROM lu_config_type WHERE `type` like 'LMS Policy'), 'false', 'true');
 
 /* Etherpad Pads
  * Add relation table

@@ -17,7 +17,7 @@ VALUES (
   'Is the resource booking system enabled?',
   3, -- boolean
   '',
-  11, -- modules
+  (SELECT `id` FROM lu_config_type WHERE `type` like 'Modules'),
   'false',
   'false',
   'false'
