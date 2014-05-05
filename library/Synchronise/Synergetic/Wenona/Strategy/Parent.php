@@ -90,7 +90,9 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         return $newUser;
     }
 
-    /**
+
+
+                /**
      * If the users exist in Synergy but not in Schoolbox, create an account for
      * them
      *
@@ -117,53 +119,25 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         foreach ($this->getList() as $currentUser) {
             $newUser = $this->setupUserDetails($currentUser);
 
-            /* First iteration
-                */
-            if ($previousUser == null) {
-                if (is_array($newUser['campus'])) {
-                    $compiledCampus = $newUser['campus'];
-                }
-
-                $previousUser = $newUser;
-            } /* Previous was different person to Current
-                */
-            else if ($previousUser['username'] != $newUser['username']) {
-                $previousUser['campus'] = $compiledCampus;
-
-                /* Uniquify campus list
-                */
-                $previousUser['campus'] = array_unique($previousUser['campus']);
-
-                /* Update previous user
-                */
-                $this->executeCreateUpdate($previousUser);
-
-                $user = $userHandler->getBySynergy($previousUser['synergy_id']);
-
-                // map parents into their WPA categories
-                foreach ($previousUser['WPA'] as $wpa) {
-                    if ($this->getPerformUpdate() === true && isset($user['id'])) {
-                        echo "^  Adding parent to $wpa\n";
-                        $groupHandler->addUser($wpaCats[$wpa], $user['id']);
-                    } else {
-                        echo "^  Planning to add parent to $wpa\n";
-                    }
-                }
-
-                /* Recompile
-                */
-                $compiledCampus = $newUser['campus'];
-
-                $previousUser = $newUser;
-            } /* They are the same person
+            /* Update previous user
             */
-            else {
-                $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
+            $this->executeCreateUpdate($newUser);
+
+            $user = $userHandler->getBySynergy($newUser['synergy_id']);
+
+            // map parents into their WPA categories
+            foreach ($newUser['WPA'] as $wpa) {
+                if ($this->getPerformUpdate() === true && isset($user['id'])) {
+                    echo "^  Adding parent to $wpa\n";
+                    $groupHandler->addUser($wpaCats[$wpa], $user['id']);
+                } else {
+                    echo "^  Planning to add parent to $wpa\n";
+                }
             }
         }
 
 
-        // As of SB-3199, Wenona no longer wants passwords to be created for users.
+                // As of SB-3199, Wenona no longer wants passwords to be created for users.
 //        // retrieve all parent records from the user table where passwords are blank, and apply passwords
 //        $db = DeprecatedDatabase::getInstance();
 //        $users = $db->getAll(
