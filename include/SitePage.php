@@ -190,9 +190,13 @@ class SitePage extends Page {
      * @param mixed $output         Variable contents to output
      * @param bool  $keepProcessing True if processing continues after output.
      *                              Exits after output if false.
+     * @param int   $responseCode   If set, output this response code.
      */
-    public function outputJson($output, $keepProcessing = false) {
+    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
         header('Content-Type: application/json');
+        if (isset($responseCode)) {
+            header(':', true, $responseCode);
+        }
         $jsonOutput = json_encode($output);
         if (!$keepProcessing) {
             echo $jsonOutput;
@@ -827,6 +831,7 @@ class SitePage extends Page {
      * @static
      * @param  string $file
      * @param  bool   $keepProcessing True if processing continues in background
+     * @param  int    $responseCode   If set, output this response code.
      * @return void
      */
     static public function localRedir($file, $keepProcessing = false, $responseCode = null) {

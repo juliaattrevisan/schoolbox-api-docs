@@ -78,22 +78,22 @@ if (!$permission_denied) {
 }
 
 if ($isAjax) {
+	$code   = 500;
 	$result = array(
 		'success' => false,
-		'error'   => 500,
 		'message' => 'Unknown Error',
 	);
 	if ($permission_denied) {
-		$result['error']   = 403;
+		$code              = 403;
 		$result['message'] = 'Permission Denied';
 	}
 	else {
+		$code              = 200;
 		$result['success'] = true;
-		$result['error']   = 200;
 		$result['message'] = 'OK';
 		$result['id']      = $submission->getId();
 	}
-	$page->outputJson($result, true);
+	$page->outputJson($result, true, $code);
 }
 else {
 	if ($permission_denied) {
