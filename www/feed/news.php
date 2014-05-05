@@ -8,7 +8,7 @@ $page->setFile(TEMPLATE_body, 'feed/rss.xml');
 $page->setBlock(TEMPLATE_body, 'rss_item', 'rss_item_block');
 
 $output = array(
-    'TITLE'       => Scrub::xml(Cfg::get('school_name'). ' - News'),
+    'TITLE'       => Scrub::xml(Cfg::get('school_name') . ' - News'),
     'DESCRIPTION' => Scrub::xml('Recent news items from the portal'),
     'DATE'        => Scrub::xml(date('r')),
     'LINK'        => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . '/news/'),
@@ -42,5 +42,4 @@ else {
 
 header('Content-type: application/rss+xml; charset=UTF-8');
 $page->outputPage(true);
-
 exit;
