@@ -23,6 +23,10 @@
  + fakeFileHolderClass: this is the class for the element that holds the filename like "chimpney.jpg"
  + defaultText: This is the text on the button
  + defaultFileSelectedText: This is the text that the button transforms to.
+
+ Known bug: if this is applied to an input within a <label> tag, the open file
+            dialog triggers twice. I haven't found a way around this.
+            This doesn't happen to elements with an external <label>.
  
  *******/
 
