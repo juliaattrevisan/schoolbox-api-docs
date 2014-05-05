@@ -54,6 +54,9 @@
                 $('<span />')
                     .addClass(options.inputHolderClass)
                     .on('click', function() {
+                        if ($(this).closest('label').length > 0) {
+                            console.warn('This pretty file input is inside a label. If the file input is opening twice, that\'s why.')
+                        }
                         // Trigger the click event on the DOM element directly,
                         // because it doesn't work when I trigger it via jQuery.
                         // Works in everything I've tested
