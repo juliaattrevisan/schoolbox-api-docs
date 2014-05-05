@@ -30,11 +30,11 @@ var ImageDialog = {
 			selectByValue(f, 'align', this.getAttrib(n, 'align'));
 			selectByValue(f, 'class_list', dom.getAttrib(n, 'class'), true, true);
 			nl.style.value = dom.getAttrib(n, 'style');
-			nl.id.value = dom.getAttrib(n, 'id');
-			nl.dir.value = dom.getAttrib(n, 'dir');
-			nl.lang.value = dom.getAttrib(n, 'lang');
-			nl.usemap.value = dom.getAttrib(n, 'usemap');
-			nl.longdesc.value = dom.getAttrib(n, 'longdesc');
+			//nl.id.value = dom.getAttrib(n, 'id');
+			//nl.dir.value = dom.getAttrib(n, 'dir');
+			//nl.lang.value = dom.getAttrib(n, 'lang');
+			//nl.usemap.value = dom.getAttrib(n, 'usemap');
+			//nl.longdesc.value = dom.getAttrib(n, 'longdesc');
 			nl.insert.value = ed.getLang('update');
 
 			if (/^\s*this.src\s*=\s*\'([^\']+)\';?\s*$/.test(dom.getAttrib(n, 'onmouseover')))
