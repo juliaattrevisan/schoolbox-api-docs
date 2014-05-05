@@ -568,7 +568,9 @@ class StudentReportCard {
 				$existingShowcasedItem = null;
 
 				if($object instanceof SubmissionBox) {
-					$page->setVar($this->outputDueWorkRow($object, $marks));
+					$rowData = $this->outputDueWorkRow($object, $marks);
+
+					$page->setVar($rowData);
 
 					/* Hide related buttons if eportfolio is not enabled
 					 */
@@ -620,7 +622,9 @@ class StudentReportCard {
 					}
 				}
 				elseif($object instanceof OnlineAssessment) {
-					$page->setVar($this->outputOnlineAssessRow($object, $marks));
+					$rowData = $this->outputOnlineAssessRow($object, $marks);
+
+					$page->setVar($rowData);
 
 					// OA's cannot be published at the moment, refactor DueWork publish code if they become publishable
 					$page->setVar('action_publish_block', '');
@@ -630,21 +634,26 @@ class StudentReportCard {
 				}
 
 				// if work actions are available, render the block
-				if($page->getVar('WORK_BTN_ICON')) {
-					$page->parse('work_actionable_block', 'work_actionable');
-				}
-				// otherwise hide it
-				else {
-					$page->setVar('work_actionable_block', '');
+				$page->setVar('work_actionable_block', '');
+
+				foreach($rowData['buttons'] as $currentButton) {
+					$page->setVar($currentButton);
+
+					$page->parse('work_actionable_block', 'work_actionable', true);
 				}
 
 				$page->parse('work_block', 'work', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$page->setVar(array(
+					'work_actionable_block' => ''
+				));
 			}
 		}
 		else {
 			$page->setVar('work_block', '<td colspan="5">No assessments for this subject</td>');
 		}
-
 	}
 
 	/**
@@ -663,6 +672,19 @@ class StudentReportCard {
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
 			'WORK_HREF'    => 'submission/submissionHistory/',
+			'buttons' => array()
+		);
+
+		$buttonResubmit = array(
+			'WORK_BTN_HREF' => 'submission/submissionHistory/' . $box->getId() . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'up-arrow',
+			'WORK_BTN_LABEL' => 'Resubmit'
+		);
+
+		$buttonSubmit = array(
+			'WORK_BTN_HREF' => 'submission/submissionHistory/' . $box->getId() . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'up-arrow',
+			'WORK_BTN_LABEL' => 'Submit'
 		);
 
         // marks have been returned
@@ -678,8 +700,6 @@ class StudentReportCard {
 
 		// if the viewing user does not have permission to submit, blank out the actions
 		if(!$this->checkPermission(self::CAN_SUBMIT)) {
-			$output['WORK_BTN_ICON']  = '';
-			$output['WORK_BTN_LABEL'] = '';
 		}
         // is the box still open?
         elseif($box->getLateDate()->getUnixTimestamp() > time()) {
@@ -692,25 +712,19 @@ class StudentReportCard {
                 // is this multisubmit?
                 if($box->getAcceptMultiple()) {
                     // is multi: offer REsubmission
-                    $output['WORK_BTN_ICON']  = 'up-arrow';
-                    $output['WORK_BTN_LABEL'] = 'Resubmit';
+					$output['buttons'][] = $buttonResubmit;
                 }
                 else {
                     // is single-submit: offer no action
-                    $output['WORK_BTN_ICON']  = '';
-                    $output['WORK_BTN_LABEL'] = '';
                 }
             }
             else {
                 // work not submitted: offer submission
-                $output['WORK_BTN_ICON']  = 'up-arrow';
-                $output['WORK_BTN_LABEL'] = 'Submit';
+				$output['buttons'][] = $buttonSubmit;
             }
         }
         else {
             // cannot submit: offer no action
-            $output['WORK_BTN_ICON']  = '';
-            $output['WORK_BTN_LABEL'] = '';
         }
 
 		return $output;
@@ -734,13 +748,24 @@ class StudentReportCard {
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
-			'WORK_HREF'    => $marks ? "assess/studentReview/" : 'assess/intro/',
+			'WORK_HREF' => 'assess/intro/',
+			'buttons' => array()
+		);
+
+		$buttonSeePreviousAttempts = array(
+			'WORK_BTN_HREF' => 'assess/attempts/' . $oa->getId() . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'list',
+			'WORK_BTN_LABEL' => 'See previous attempts'
+		);
+
+		$buttonStudentReview = array(
+			'WORK_BTN_HREF' => "assess/studentReview/" . $oa->getId() . '/' . $marks['section_id'] . '/' . $marks['attempt_id'] . '/' . $this->targetUserId,
+			'WORK_BTN_ICON' => 'statistics',
+			'WORK_BTN_LABEL' => 'Review'
 		);
 
 		// if the viewing user does not have permission to submit, blank out the actions
 		if(!$this->checkPermission(self::CAN_SUBMIT)) {
-			$output['WORK_BTN_ICON']  = '';
-			$output['WORK_BTN_LABEL'] = '';
 		}
 		// is the OA still open?
 		elseif($oa->getFinish()->getUnixTimestamp() > time()) {
@@ -752,32 +777,41 @@ class StudentReportCard {
 
                 // does the student have attempts left?
                 if($oa->getMaxAttempts() == 0 || $oa->getMaxAttempts() > $marks['attempts']) {
-                    // attempts remaining: offer REsit action
-                    $output['WORK_BTN_ICON']  = 'modify';
-                    $output['WORK_BTN_LABEL'] = 'Resit';
+
+					/* Offer review for a previous attempt
+					 * Offer list of previous attempts
+					 */
+					if ($marks) {
+						$output['buttons'][] = $buttonStudentReview;
+					}
+
+					$output['buttons'][] = $buttonSeePreviousAttempts;
                 }
                 else {
                     // no attempts remaining: offer no action
-                    $output['WORK_BTN_ICON']  = '';
-                    $output['WORK_BTN_LABEL'] = '';
+					$output['buttons'][] = $buttonSeePreviousAttempts;
+
+					if ($marks) {
+						$output['buttons'][] = $buttonStudentReview;
+					}
                 }
-            }
-            else {
-                // student has not attempted: offer sit action
-                $output['WORK_BTN_ICON']  = 'modify';
-                $output['WORK_BTN_LABEL'] = 'Sit';
             }
         }
         else {
             // is closed: offer no action
-            $output['WORK_BTN_ICON']  = '';
-            $output['WORK_BTN_LABEL'] = '';
+			if($marks['attempts'] > 0) {
+				$output['buttons'][] = $buttonSeePreviousAttempts;
+			}
 
+			if ($marks) {
+				$output['buttons'][] = $buttonStudentReview;
+			}
         }
 
 		if($marks['attempts'] > 0) {
 			$output['WORK_URGENCY']  = 'none';
 		}
+
 		if($marks) {
 			$output['WORK_GRADIENT'] = (isset($marks['mark']) ? (int)($marks['mark'] / 10) : '');
 			$output['WORK_GRADE']    = $marks['display_mark'];

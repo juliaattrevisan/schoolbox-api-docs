@@ -171,7 +171,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             // determine actions available
             if($item['kind'] == 0) {
                 // duework
-                $output['UPCOMING_HREF'] = 'submission/submissionHistory/';
+                $output['UPCOMING_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
+				$output['UPCOMING_BUTTON_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
                 $output['UPCOMING_BTN_ICON']  = 'up-arrow';
 
                 if($item['submittable']) {
@@ -191,14 +192,48 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             }
             else {
                 // assess
-                $output['UPCOMING_HREF'] = 'assess/intro/';
-                $output['UPCOMING_UID']  = '';
-                $output['UPCOMING_BTN_ICON']  = 'modify';
 
-                if($item['attempt_count']) {
-                    $output['UPCOMING_BTN_LABEL'] = 'Resit';
+				/* Provide option to see previous attempts if any have been made
+				 * Otherwise people should use the link in the title to resit/resume
+				 * an attempt for this particular Quiz
+				 */
+				$attemptHandler = new \Assess_Attempt();
+				$attempt = $attemptHandler->getLatestForUser($item['id'], $this->userID);
+				$attemptStartTime = strtotime($attempt['start']);
+
+				$assessMapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+				$assess = $assessMapper->findById($item['id']);
+				$attemptTimeRemaining = $attemptStartTime + $assess->getDuration() - time();
+
+				$resumeAttempt = false;
+
+				if (is_array($attempt)) {
+					if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $assess->getDuration() == Assess_Main::UNLIMITED_DURATION)) {
+						$resumeAttempt = true;
+					}
+				}
+
+                if ($item['attempt_count']) {
+					if ($resumeAttempt) {
+						$sectionHandler = new \Assess_Section();
+						$firstSection = $sectionHandler->getFirst($assess->getId());
+
+						$output['UPCOMING_HREF'] = '/assess/attempt/' . $item['id'] . '/' . $firstSection['section_id'];
+					}
+					else {
+						$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
+					}
+
+					$output['UPCOMING_BUTTON_HREF'] = '/assess/attempts/' . $item['id'] . '/' . $this->userID;
+					$output['UPCOMING_UID'] = '';
+					$output['UPCOMING_BTN_ICON']  = 'list';
+					$output['UPCOMING_BTN_LABEL'] = 'See previous attempts';
                 }
                 else {
+					$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
+					$output['UPCOMING_BUTTON_HREF'] = '/assess/intro/' . $item['id'];
+					$output['UPCOMING_UID'] = '';
+					$output['UPCOMING_BTN_ICON']  = 'list';
                     $output['UPCOMING_BTN_LABEL'] = 'Sit';
                 }
             }

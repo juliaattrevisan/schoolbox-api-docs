@@ -37,6 +37,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
         $this->setBlock('assess', 'assessDue', 'assessDue_block');
 	    $this->setBlock('assess', 'studentLink', 'studentLink_block');
+		$this->setBlock('assess', 'has_previous_attempts', 'has_previous_attempts_block');
 
         /* Remove resumeLink by default
         */
@@ -65,15 +66,15 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             foreach ($allAssess as $currentAssess) {
 
                 /* Hide it from students if the start date hasn't passed yet
-             */
+             	 */
                 if (($this->permission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
                     $createdTime = new Alaress_Date_Relative($currentAssess['created_at']);
 
                     $author = $userHandler->getByID($currentAssess['user_id']);
 
                     /* Note that Assess Descriptions can now contain html, so we decode them
-                  * and remove the html from the short description in homepage components
-                  */
+					 * and remove the html from the short description in homepage components
+					 */
                     $this->setVar(
                         array(
                             'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
@@ -107,21 +108,25 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     }
 
                     /* Check if you have completed an assessment already
-                  *
-                  * Set up Attempt vars
-                  */
+					 *
+					 * Set up Attempt vars
+					 */
+					$this->setVar(array(
+						'has_previous_attempts_block' => ''
+					));
+
                     $attempt = $attemptHandler->getLatestForUser($currentAssess['assess_id'], $_SESSION['id']);
                     $attemptStartTime = strtotime($attempt['start']);
                     $attemptTimeRemaining = $attemptStartTime + $currentAssess['duration'] - time();
                     $attemptEndTime = $attemptStartTime + $currentAssess['duration'];
 
                     /* Tests can be undertaken if:
-                  *
-                  * 1. The assessment allows resit and the assessment hasn't expired
-                  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
-                  * 3. The current time has passed the test's starting time
-                  * 4. You aren't the owner of the test
-                  */
+					 *
+					 * 1. The assessment allows resit and the assessment hasn't expired
+					 * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
+					 * 3. The current time has passed the test's starting time
+					 * 4. You aren't the owner of the test
+					 */
                     if (is_array($attempt)) {
                         $numAttempts = $attemptHandler->userHasAttempted($currentAssess['assess_id'], $_SESSION['id']);
 
@@ -153,8 +158,17 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                                 $this->setVar('resumeLink_block', '');
                                 $this->setVar('ASSESS_FINISH_DATE', 'Completed');
                             }
-                        }
+						}
 
+						/* See previous attempts
+						 */
+						if ($numAttempts) {
+							$this->setVar(array(
+								'ASSESS_RESPONDENT_ID' => $attempt['user_id']
+							));
+
+							$this->parse('has_previous_attempts_block', 'has_previous_attempts');
+						}
 
 	                    // user has attempted, so show results page
 	                    $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
@@ -209,12 +223,9 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     }
 
                     /* Modified this check so that only the owner or a superuser can get
-                  * these links which allow you to modify the assessment
-                  */
-                    if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission(
-                        $currentAssess['category_id']
-                    ) >= WRITE_ACCESS
-                    ) {
+                   	 * these links which allow you to modify the assessment
+                  	 */
+                    if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission($currentAssess['category_id']) >= WRITE_ACCESS) {
                         $this->parse('teacherLink_block', 'teacherLink');
                     } else {
                         $this->setVar('teacherLink_block', '');
@@ -227,5 +238,4 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
         return true; // everything went according to plan
     }
-
 }

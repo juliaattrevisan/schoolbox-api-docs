@@ -389,20 +389,20 @@ h2 {
         text-align: left;
         font-weight: bold;
     }
+    th.text-align-right {
+    	text-align: right;
+    }
     tr {
         border-bottom: 1px solid @border-color;
     }
 }
 
 
-table.ruler {
+table.tablesorter {
   width: 100%;
   margin-bottom: 10px;
 
   th {
-    text-align: left;
-    font-weight: bold;
-    background: @dark;
     padding: 0 !important;
     .tablesorter-header-inner{ padding: 7px 7px 7px 18px; }
     &.sortable:not(.sorter-false) {
@@ -421,25 +421,31 @@ table.ruler {
   }
   tr {
     border-bottom: 1px solid @border-color;
-    td{
-      .no-text{
-        .transition(all 0.2s);
-        opacity: 0.3;
-        background-color: transparent;
-        border-color: transparent;
-      }
     }
-  }
   tr:hover > td .no-text {
     opacity: 1;
     border-color: @lgrey;
     background: @dark;
   }
-  tr:nth-child(even) td{ background: @dark; }
-  tr:hover td{background: lighten(@highlight-color,@lighten-value); }
-
 }
 
+table.ruler {
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 0 0 0 16px !important;
+
+	th {
+		text-align: left;
+		font-weight: bold;
+		background: @dark;
+	}
+
+	tr:nth-child(even) td{ background: @dark; }
+	tr:hover td{background: lighten(@highlight-color,@lighten-value); }
+}
+
+table.ruler-fix.tablesorter .tablesorter {
+}
 
 /*--------------------------------------------------------------
 Notifications
@@ -1623,27 +1629,6 @@ Notifications
 		max-width: 64px;
 	}
 
-	// Actions are the buttons to interact with the list item, such as edit, delete
-	.actions {
-		position: relative;
-		z-index: 1;
-		float: right;
-		// Put all buttons on the one row
-		.btn {
-			background-color: transparent;
-			border-color: transparent;
-			opacity: 0.3;
-			.transition(all 0.2s);
-			float: none;
-			display: inline-block;
-		}
-	}
-	// Obsfucate buttons unless hovering over the line
-	li:hover > .actions .btn {
-		border-color: @lgrey;
-		background: @dark;
-		opacity: 1;
-	}
 	// Because LI has padding, we can remove it from wysiwyg. Add spacing from meta
 	.wysiwyg {
 		padding: 0;
@@ -1676,8 +1661,52 @@ Notifications
 	}
 }
 
+/* span.actions outside a td should be floated right always, as this typically represents
+ * action buttons in the bottom right corner, or floated to the right of a component
+ * Actions are the buttons to interact with the list item, such as edit, delete
+ */
+.actions {
+	position: relative;
+	z-index: 1;
+	float: right;
+	// Put all buttons on the one row
+	.btn {
+		background-color: transparent;
+		border-color: transparent;
+		opacity: 0.3;
+		.transition(all 0.2s);
+		float: none;
+		display: inline-block;
+	}
+}
 
+/* span.actions inside a td should be floated left always, as this typically represents
+ * action buttons in the rightmost-column
+ */
+td .actions {
+	float: left;
 
+	&.one-button {
+    	min-width: 39px;
+    }
+
+	&.two-buttons {
+		min-width: 78px;
+	}
+
+	&.three-buttons {
+    	min-width: 117px;
+    }
+}
+
+// Obsfucate buttons unless hovering over the line
+tr:hover td > .actions .btn,
+li:hover > .actions .btn
+{
+	border-color: @lgrey;
+	background: @dark;
+	opacity: 1;
+}
 
 /*--------------------------------------------------------------
  PROFILES
@@ -2409,6 +2438,7 @@ input.timeField {
     overflow: visible;
     margin-top: 4px;
     font-family: Arial, Helvetica, sans-serif;
+	white-space: nowrap;
 	&.no-marg {
 		margin: 0 8px 0 0;
 	}
@@ -11379,4 +11409,18 @@ textarea.event-detail {
 	border: 1px solid @mgrey;
 	width: 100%;
 	height: 100%;
+}
+
+/* Avatar Card: a 32x32 icon with a name
+ * This can be used in any context for a student/teacher/etc
+ */
+.avatar-card {
+	img {
+		margin-right: 8px;
+		float: left;
+	}
+	span {
+		float: left;
+		display: block;
+	}
 }

@@ -1,0 +1,49 @@
+<h1>Attempts for {SURVEY_NAME}</h1>
+
+<div class="header_option clearfix">
+	<!--<a href="/homepage/{CID}" class="btn go-back"><span></span>Back to Homepage</a>-->
+    <!--<a href="/survey/results/{SURVEY_ID}" class="btn go-back"><span></span>Back to Survey Results</a>-->
+</div>
+
+<form action='/survey/deleteAttempt' method='post'>
+	<table class="table ruler">
+		<colgroup>
+			<col />
+			<col />
+			<col />
+			<col width="150"/>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Student</th>
+				<th>Start</th>
+				<th>Finish</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN attempt -->
+			<tr>
+				<td class="nowrap">
+					<a href='/search/user/{ATTEMPT_USER_ID}' class="avatar-card">
+						<img src="/portrait.php?userId={ATTEMPT_USER_EXTERNAL_ID}&amp;size=square32">
+						<span>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</span>
+					</a>
+				</td>
+				<td>{ATTEMPT_START}</td>
+				<td>{ATTEMPT_FINISH}</td>
+				<td>
+					<span class="actions one-button">
+						<!-- BEGIN attempt_review -->
+						<a href='/assess/studentReview/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="btn no-text statistics float-left" alt="Review" title="Review"><span></span></a>
+						<!-- END attempt_review -->
+						<!-- BEGIN attempt_resume -->
+						<a href='/assess/attempt/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}' class="btn no-text go-to float-left" alt="Resume" title="Resume"><span></span></a>
+						<!-- END attempt_resume -->
+					</span>
+				</td>
+			</tr>
+			<!-- END attempt -->
+		</tbody>
+	</table>
+</form>
