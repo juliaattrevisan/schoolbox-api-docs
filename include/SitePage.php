@@ -211,6 +211,7 @@ class SitePage extends Page {
         $templateVar = array(
             'TEMPLATE_YEAR' => date('Y'),
             'SITE_NAME' => Cfg::get('school_name'),
+            'SITE_TITLE' => Cfg::get('title'),
             'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
             'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
             'SITE_USERNAME' => $_SESSION['username'],
