@@ -97,6 +97,11 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
 				$this->parse('attempt_review_block', 'attempt_review');
 			}
+			else {
+				$this->setVar(array(
+					'attempt_review_block' => ''
+				));
+			}
         }
 		else {
             $finishDateValue = 'Unfinished';
