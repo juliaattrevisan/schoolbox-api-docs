@@ -31,10 +31,10 @@ if (is_numeric($catID) && !empty($token)) {
     $page->setBlock(TEMPLATE_body, 'feed', 'feed_block');
 
     $output = array(
-        'HOMEPAGE_NAME' => $category['name'],
-        'SITE_DOMAIN' => $_SERVER['HTTP_HOST'],
-        'HOMEPAGE_URL' => 'homepage/' . $category['id'],
-        'BUILD_DATE' => date('r'),
+        'HOMEPAGE_NAME' => Scrub::xml($category['name']),
+        'SITE_DOMAIN'   => Scrub::xml($_SERVER['HTTP_HOST']),
+        'HOMEPAGE_URL'  => Scrub::xml('homepage/' . $category['id']),
+        'BUILD_DATE'    => Scrub::xml(date('r')),
     );
 
     $page->setVar($output);
@@ -44,8 +44,8 @@ if (is_numeric($catID) && !empty($token)) {
     if (is_array($feedList) && count($feedList)) {
         foreach ($feedList as $feed) {
             $output = array(
-                'TITLE' => $feed['message'],
-                'UPLOADED_DATE' => date('r', $feed['date']),
+                'TITLE'         => Scrub::xml($feed['message']),
+                'UPLOADED_DATE' => Scrub::xml(date('r', $feed['date'])),
             );
 
             $page->setVar($output);
@@ -58,6 +58,3 @@ if (is_numeric($catID) && !empty($token)) {
 
     exit;
 }
-
-
-?>
