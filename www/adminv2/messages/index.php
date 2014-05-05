@@ -85,6 +85,11 @@ if($enabled) {
 				break;
 		}
 
+		// Only attempt to parse crontab if it's valid, don't create a fake one.
+		// This prevents an issue where the check against
+		// \Schoolbox\Realtime\Digest\DigestScheduler::NEVER takes forever.
+		$datecron = null;
+		$timecron = null;
 		try {
 			$datecron = \Cron\CronExpression::factory($schedule)
 				->setPart(\Cron\CronExpression::MINUTE, '*')
@@ -98,18 +103,17 @@ if($enabled) {
 		}
 		catch(InvalidArgumentException $e) {
 			// no schedule for group
-			$datecron = \Cron\CronExpression::factory(\Schoolbox\Realtime\Digest\DigestScheduler::NEVER);
-			$timecron = \Cron\CronExpression::factory(\Schoolbox\Realtime\Digest\DigestScheduler::NEVER);
 		}
 
 		foreach($dayTests as $i => $date) {
+			$checked = false;
 			try {
-				$checked = $datecron->isDue($date);
+				if ($datecron instanceof \Cron\CronExpression) {
+					$checked = $datecron->isDue($date);
+				}
 			}
 			catch(RuntimeException $e) {
 				$checked = false;
-	//			print_r($datecron->getExpression());
-	//			echo $e;
 			}
 			$char = substr($date->format('D'), 0, 1);
 
@@ -122,11 +126,16 @@ if($enabled) {
 			$this->parse('day_check_block', 'day_check', true);
 		}
 
+		$valid = false;
+		$hr = '00';
+		$mi = '00';
 		try {
-			$nextTime = $timecron->getNextRunDate();
-			$hr = $nextTime->format('H');
-			$mi = $nextTime->format('i');
-			$valid = true;
+			if ($timecron instanceof \Cron\CronExpression) {
+				$nextTime = $timecron->getNextRunDate();
+				$hr = $nextTime->format('H');
+				$mi = $nextTime->format('i');
+				$valid = true;
+			}
 		}
 		catch(RuntimeException $e) {
 			$valid = false;
