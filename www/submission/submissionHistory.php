@@ -15,6 +15,7 @@ $this->setBlock(TEMPLATE_content, 'legacy_download', 'legacy_download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'action_publish', 'action_publish_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
+$this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
@@ -245,6 +246,23 @@ $teacher_details = array(
 	'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
 );
 $this->setVar($teacher_details);
+
+
+/* Output student submission terms, only if they actually have them.
+ */
+$policy    = Config::get('lms_student_policy');
+$html2text = new \Html2Text\Html2Text($policy);
+// Ensure that a policy that contains ONLY an image still displays,
+// by allowing img tags through unmolested
+$html2text->set_allowed_tags('<img>');
+if (strlen(trim($html2text->get_text())) > 0) {
+    $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
+    $this->parse('confirm_terms_block','confirm_terms');
+}
+else {
+    $this->setVar('confirm_terms_block','');
+}
+unset($html2text, $policy);
 
 $usersList = array();
 

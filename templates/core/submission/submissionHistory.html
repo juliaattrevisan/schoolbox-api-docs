@@ -27,6 +27,34 @@
             }
         });
         $j('#closebox').remove();
+
+
+
+        $( "#confirmDialog" ).dialog({
+            autoOpen: false,
+            modal: true,
+            dialogClass: "no-close"
+        });
+
+
+        $("input[type='submit']").click(function(e) {
+            if($( "#confirmDialog" ).length) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                $("#confirmDialog").dialog({
+                    buttons: {
+                        "Yes, I agree": function() {
+                            form.submit();
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+
+                $("#confirmDialog").dialog("open");
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -108,6 +136,11 @@
             </ul>
             <!-- END returned_work -->
 
+            <!-- BEGIN confirm_terms -->
+            <div id="confirmDialog" title="Submit Work Terms">
+                <p>{STUDENT_SUBMIT_TERMS}</p>
+            </div>
+            <!-- END confirm_terms -->
             <!-- BEGIN recent_submission -->
             <h2>Your most recent submission</h2>
             <ul class="file-list">
