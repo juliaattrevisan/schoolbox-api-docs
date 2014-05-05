@@ -1,0 +1,1 @@
+ALTER TABLE `allowedFileExtension` CHANGE `extension` `extension` VARCHAR(48) CHARSET utf8 COLLATE utf8_general_ci NULL;
