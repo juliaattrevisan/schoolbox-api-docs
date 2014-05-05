@@ -5522,12 +5522,6 @@ CALENDAR
             height: 14px;
             width: 12px;
         }
-        &.current, &:hover {
-            color: @tab-color;
-            background: @admin-nav;
-            border-color: @admin-nav;
-            text-decoration: underline;
-        }
         &.list span {
             background: url(/images/core/icons/btn-icons.png) no-repeat;
             .btn-icon(16);
@@ -5536,6 +5530,16 @@ CALENDAR
         &.list:hover span {
             .btn-icon(17);
         }
+    }
+    .fc-state-hover {
+      color: @link;
+      text-decoration: underline;
+    }
+    .fc-state-active{
+        color: @tab-color;
+        background: @admin-nav;
+        border-color: @admin-nav;
+      &:hover{ text-decoration: underline; }
     }
     .filters {
         float: none;
@@ -5552,7 +5556,7 @@ CALENDAR
         position: relative;
         padding: 0 8px 0 27px;
         &:hover {
-            text-decoration: underline;
+            text-decoration: none;
             border: 1px solid @lgrey;
             background: @dark;
         }
@@ -10056,9 +10060,6 @@ table img { max-width: none; }
         .fc-button {
             z-index: 4;
             margin: 5px 3px;
-            &.fc-state-hover {
-                color: @white;
-            }
             &.fc-button-today {
                 color: @black;
                 &:hover{ color: @white; }
@@ -10072,11 +10073,6 @@ table img { max-width: none; }
                     }
                 }
             }
-        }
-        .fc-state-active{
-            color: @tab-color;
-            background: @admin-nav;
-            border-color: @admin-nav;
         }
         .filter-change {
             text-transform: capitalize;
