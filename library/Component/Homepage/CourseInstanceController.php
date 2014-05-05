@@ -157,6 +157,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('course_selector_block',  '');
         $this->setVar('course_unit_list_block', '');
         $this->setVar('course_modify_block',    '');
+        $this->setVar('UNIT_READONLY',          ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
@@ -233,7 +234,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->setVar(
             array(
-                'UNIT_READONLY'            => ($this->readOnly ? 'true' : 'false'),
                 'UNIT_ID'                  => Scrub::text($unit->getId()),
                 'UNIT_HOMEPAGE_ID'         => Scrub::text($unit->getUnitCategory()->getId()),
                 'UNIT_NAME'                => Scrub::text($unit->getTitle()),
@@ -279,7 +279,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         if ($is_completed) {
             $completion_status = 'Completed';
-            $rel_time          = new Alaress_Date_Format(max($completion_date_list));
+            $rel_time          = new Alaress_Date_Relative(max($completion_date_list));
             $urgency           = 10;
         }
         else {
