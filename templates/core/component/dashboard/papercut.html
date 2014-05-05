@@ -1,0 +1,50 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<h2>Papercut</h2>
+
+	<div>
+		<table>
+			<tr>
+				<th>Balance:</th>
+				<td id="userBalance"></td>
+			</tr>
+			<tr>
+				<th>Jobs:</th>
+				<td id="userJobs"></td>
+			</tr>
+			<tr>
+				<th>Pages:</th>
+				<td id="userPages"></td>
+			</tr>
+			<tr>
+				<th>CO2:</th>
+				<td id="userCO2"></td>
+			</tr>
+			<tr>
+				<th>Trees:</th>
+				<td id="userTrees"></td>
+			</tr>
+			<tr>
+				<th>Since Date:</th>
+				<td id="userSinceDate"></td>
+			</tr>
+		</table>
+	</div>
+
+	<script type="text/javascript">
+		var pcUsername = '{PAPERCUT_USERNAME}';
+		var pcServerURL = '{PAPERCUT_SERVER}';
+
+		var url = '{PAPERCUT_SERVER}/rpc/api/web/user/' + pcUsername + '/details.js';
+
+		$j.getScript(url, function(script, textStatus, jqXHR) {
+			if (pcUserDetails.balanceFormatted != undefined) {
+				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
+				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
+				document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
+				document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
+				document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
+				document.getElementById('userSinceDate').innerHTML = pcUserDetails.printStats.sinceDateFormatted;
+			}
+		});
+	</script>
+</div>
