@@ -17,5 +17,5 @@ if (strlen($samlLogoutUrl)>0) {
     exit;
 }
 else {
-    SitePage::localRedir("/");
+    SitePage::localRedir("/login/");
 }
