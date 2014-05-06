@@ -85,6 +85,7 @@ $categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
 );
 if (count($categoryWithUnitList) > 0) {
     $this->parse('exportable_block', 'exportable');
+    $this->parse('submit_block', 'submit');
     $this->setVar('class_block', '');
     /** @var Category[]|Collection $categoryWithUnitList */
     $count = 0;
