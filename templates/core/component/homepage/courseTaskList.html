@@ -19,30 +19,51 @@
                 });
             })(jQuery);
         </script>
-		<ul class="breadcrumb">
-			<!-- BEGIN category_breadcrumb -->
-			<li>
+
+        This unit is part of course:
+        <ul class="breadcrumb">
+            <!-- BEGIN category_breadcrumb -->
+            <li>
                 <a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a>
             </li>
-			<!-- END category_breadcrumb -->
-		</ul>
+            <!-- END category_breadcrumb -->
+        </ul>
+
+        <div class="category_with_unit_list">
+            <!-- BEGIN category_with_unit_header -->
+            The following classes have imported this unit:
+            <!-- END category_with_unit_header -->
+            <!-- BEGIN no_category_with_unit_header -->
+            No classes have imported this unit yet.
+            <!-- END no_category_with_unit_header -->
+            <!-- BEGIN category_with_unit -->
+            <ul class="breadcrumb">
+                <!-- BEGIN category_with_unit_breadcrumb -->
+                <li>
+                    <a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a>
+                </li>
+                <!-- END category_with_unit_breadcrumb -->
+            </ul>
+            <!-- END category_with_unit -->
+        </div>
+
         <ul class="information-list task-list">
             <!-- BEGIN task -->
             <li class="{DARK} task" data-task_id="{TASK_ID}">
-				<!-- BEGIN edit_task -->
+                <!-- BEGIN edit_task -->
                 <span class="actions">
                     <a href="#" class="btn delete no-text" title="Delete this task"><span></span></a>
                     <a href="/task/modify/{TASK_ID}" class="btn modify no-text" title="Modify this task"><span></span></a>
                 </span>
-				<!-- END edit_task -->
+                <!-- END edit_task -->
 
-				<span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
+                <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
 
                 <!-- BEGIN task_link -->
-				<h4><a href="{TASK_LINK}">{TASK_TITLE}</a></h4>
+                <h4><a href="{TASK_LINK}">{TASK_TITLE}</a></h4>
                 <!-- END task_link -->
                 <!-- BEGIN task_no_link -->
-				<h4>{TASK_TITLE}</h4>
+                <h4>{TASK_TITLE}</h4>
                 <!-- END task_no_link -->
 
                 <div class="delete_task_form_container">
@@ -99,24 +120,6 @@
         </p>
     </div>
 
-    <div class="category_with_unit_list">
-        <!-- BEGIN category_with_unit_header -->
-        The following classes have imported this unit:
-        <!-- END category_with_unit_header -->
-        <!-- BEGIN no_category_with_unit_header -->
-        No classes have imported this unit yet.
-        <!-- END no_category_with_unit_header -->
-        <!-- BEGIN category_with_unit -->
-        <ul class="breadcrumb">
-            <!-- BEGIN category_with_unit_breadcrumb -->
-            <li>
-                <a href="/homepage/{PARENT_CATEGORY_ID}/">{PARENT_CATEGORY_NAME}</a>
-            </li>
-            <!-- END category_with_unit_breadcrumb -->
-        </ul>
-        <!-- END category_with_unit -->
-    </div>
-
     <!-- This is the form for inline creation of tasks -->
     <div class="create_task_form_container for_task">
         <form action="/task/saveForm.php" method="post" class="create_task_form" data-form_type="task">
@@ -132,9 +135,9 @@
                 <dd>
                     <input id="link-new_task" name="link" type="text" value="" />
                     <p class="interact">
-						<a href='#' data-function='link' class='btn links'><span></span>Link</a>
-						<a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload</a>
-						<a href="#" data-function="browse" class="btn folder"><span></span>Browse Resources</a>
+                        <a href='#' data-function='link' class='btn links'><span></span>Link</a>
+                        <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload</a>
+                        <a href="#" data-function="browse" class="btn folder"><span></span>Browse Resources</a>
                     </p>
                 </dd>
 
