@@ -11,6 +11,8 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract {
 
@@ -30,6 +32,20 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     protected $task_list;
 
     /**
+     * The list of instances of this unit.
+     *
+     * @var UnitInstance[]
+     */
+    protected $unitList;
+
+    /**
+     * The list of categories this unit is on. Derived from $this->unitList.
+     *
+     * @var Category[]
+     */
+    protected $categoryWithUnitList;
+
+    /**
      * {@inheritdoc}
      */
     public function execute() {
@@ -39,6 +55,16 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->category = CategoryMapper::getInstance()->findById($categoryId);
         }
         $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
+
+        // What pages have this course?
+        $this->unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
+        $this->categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
+            'id',
+            $this->unitList->map(function($unit) {
+                /** @var UnitInstance $unit */
+                return $unit->getComponent()->getIdentifier();
+            })
+        );
     }
 
     /**
@@ -58,6 +84,10 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         $this->setBlock($templateHandle, 'task', 'task_block');
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
+        $this->setBlock($templateHandle, 'category_with_unit_header', 'category_with_unit_header_block');
+        $this->setBlock($templateHandle, 'no_category_with_unit_header', 'no_category_with_unit_header_block');
+        $this->setBlock($templateHandle, 'category_with_unit', 'category_with_unit_block');
+        $this->setBlock('category_with_unit', 'category_with_unit_breadcrumb', 'category_with_unit_breadcrumb_block');
         $this->setBlock('task', 'edit_task', 'edit_task_block');
         $this->setBlock('task', 'task_link', 'task_link_block');
         $this->setBlock('task', 'task_no_link', 'task_no_link_block');
@@ -116,6 +146,26 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                 $this->setVar('TASK_TYPE', 'assessment');
             }
             $this->parse('task_block', 'task', true);
+        }
+
+        // Spam out blocks for categories that contain this course
+        $this->setVar('category_with_unit_block', '');
+        $this->setVar('category_with_unit_header_block', '');
+        $this->setVar('no_category_with_unit_header_block', '');
+        if (count($this->categoryWithUnitList)) {
+            $this->parse('category_with_unit_header_block', 'category_with_unit_header');
+            foreach ($this->categoryWithUnitList as $category) {
+                $this->setVar('category_with_unit_breadcrumb_block', '');
+                foreach (CategoryMapper::getInstance()->findParents($category) as $parent) {
+                    $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
+                    $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
+                    $this->parse('category_with_unit_breadcrumb_block', 'category_with_unit_breadcrumb', true);
+                }
+                $this->parse('category_with_unit_block', 'category_with_unit', true);
+            }
+        }
+        else {
+            $this->parse('no_category_with_unit_header_block', 'category_with_unit_header_block');
         }
 
         return true;

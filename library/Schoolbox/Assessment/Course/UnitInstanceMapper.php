@@ -246,6 +246,40 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * Finds all unit instances that are based off a category.
+     *
+     * @param  int $categoryId
+     * @return Collection|UnitInstance[]
+     */
+    public function findByUnitCategoryId($categoryId) {
+        $query = "
+            SELECT
+                {$this->getColumnString('ui')},
+                {$this->getJoinColumnString('component', 'ci')}
+            FROM `{$this->getTable()}` `ui`
+            INNER JOIN {$this->getJoinSql('component', 'ui', 'ci')}
+            -- INNER JOIN `category` `c` ON `ci`.`module` = 'homepage' AND `ci`.`identifier` = `c`.`id`
+            WHERE `ui`.`unit_category_id` = :categoryId
+            AND `ci`.`module` = 'homepage'
+            AND `ui`.`deleted_at` IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('categoryId', $categoryId);
+        $statement->execute();
+        return $this->hydrateList(
+            $statement, 'ui',
+            function($mapper, $model, $row) {
+                /**
+                 * @var UnitInstanceMapper $mapper
+                 * @var UnitInstance       $model
+                 */
+                $model->setComponent($mapper->getJoinMapper('component')->hydrate($row, 'ci'));
+                return $model;
+            }
+        );
+    }
+
+    /**
      * Post-save callback:
      * * if a new item, save a new task instance for each task in this unit.
      * * if not, update existing task instances for this course.
