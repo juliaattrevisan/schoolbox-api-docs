@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Collection;
 
 $page = new SitePage();
 
@@ -83,23 +82,17 @@ else {
 
         // Copy this task into each component, if requested.
         if (!$task_id && $_POST['copy']) {
-            $task
-                ->setAssessment(new \Schoolbox\Assessment\Component\OnlineAssessment())
-                ->setSubmissionBox(new \Schoolbox\Assessment\Component\SubmissionBox());
             /** @var UnitInstance[] $unitList */
             $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId(
                 $task->getCategory()->getId()
             );
-            $taskList = new Collection();
             foreach ($unitList as $unit) {
-                $taskInstance = new Task\Instance();
-                $taskInstance
-                    ->setUnitInstance($unit)
-                    ->setTask($task)
-                    ->setOwner($_SESSION['user']);
-                $taskList->add($taskInstance);
+                UnitInstanceMapper::getInstance()->saveTaskIntoUnitInstance(
+                    $unit,
+                    $task,
+                    $_SESSION['user']
+                );
             }
-            Task\InstanceMapper::getInstance()->save($taskList);
         }
     }
 }
