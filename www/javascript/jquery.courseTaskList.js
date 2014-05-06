@@ -24,6 +24,24 @@
             modal: true
         });
 
+        /**
+         * Submit save task callback.
+         * @param form The form element to save (wrapped in a jQuery object)
+         * @param copy Is this new task copied across to all classes which use
+         *             this unit?
+         */
+        var submitSaveTaskForm = function(form, copy) {
+            var formData = form.serializeArray()
+            // Booleans in data get passed as string 'true' or 'false', wtf?
+            formData.push({name: 'copy', value: (copy ? 1 : 0)})
+            $.post(form.attr('action'), formData, function(data) {
+                if (form.hasClass("create_task_form")) {
+                    form.get(0).reset();
+                }
+                postCallback(form, data);
+            }, 'json');
+        }
+
         // Post-AJAX form event
         var postCallback = function(form, data) {
             var container = form.closest('.edit_task_form_container, .create_task_form_container, .delete_task_form_container');
@@ -190,28 +208,12 @@
 
         // Event - save new item, no copy
         component.on('submitNoCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-            var form     = $(this);
-            var formData = form.serializeArray()
-            formData.push({name: 'copy', value: false})
-            $.post(form.attr('action'), formData, function(data) {
-                if (form.hasClass("create_task_form")) {
-                    form.get(0).reset();
-                }
-                postCallback(form, data);
-            }, 'json');
+            submitSaveTaskForm($(this), false)
         })
 
         // Event - save new item, copy it across
         component.on('submitCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-            var form     = $(this);
-            var formData = form.serializeArray()
-            formData.push({name: 'copy', value: true})
-            $.post(form.attr('action'), formData, function(data) {
-                if (form.hasClass("create_task_form")) {
-                    form.get(0).reset();
-                }
-                postCallback(form, data);
-            }, 'json');
+            submitSaveTaskForm($(this), true)
         })
 
     }
