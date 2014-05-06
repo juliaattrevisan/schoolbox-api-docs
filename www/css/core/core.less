@@ -1568,6 +1568,13 @@ Notifications
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
 .information-list {
+  .ui-sortable{
+    .unit-task{
+      &:hover{
+        background-color: lighten(@highlight-color,@lighten-value);
+      }
+    }
+  }
 	// List clear and rule between list items
 	li {
 		border-bottom: 1px solid @border-color;
@@ -11153,13 +11160,16 @@ th.rotate {
 
 .ui-sortable {
 	&> li {
-		background: #fff;
+		background-color: #fff;
 		background-image: url('/images/core/tablesorter/sort.gif');
 		background-repeat: no-repeat;
 		background-position: left center;
 		border-bottom: 1px solid @border-color;
 		cursor: move;
 		padding-left: 21px;
+        &:hover{
+          background-color: lighten(@highlight-color,@lighten-value);
+        }
 		&.ui-sortable-helper {
 			border: 1px solid @border-color;
 			box-shadow: 1px 1px 2px @border-color;
@@ -11173,6 +11183,7 @@ th.rotate {
 			.gradient(lighten(@positive-color,@lighten-value * 2),lighten(@positive-color,@lighten-value));
 		}
 	}
+  }
 }
 
 textarea.event-detail {
