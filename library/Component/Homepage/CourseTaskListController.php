@@ -13,6 +13,7 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Collection;
 
 class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract {
 
@@ -34,14 +35,14 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     /**
      * The list of instances of this unit.
      *
-     * @var UnitInstance[]
+     * @var UnitInstance[]|Collection
      */
     protected $unitList;
 
     /**
      * The list of categories this unit is on. Derived from $this->unitList.
      *
-     * @var Category[]
+     * @var Category[]|Collection
      */
     protected $categoryWithUnitList;
 
@@ -94,9 +95,17 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
         $this->setVar(array(
-            'SESSION_NAME' => session_name(),
-            'SESSION_ID'   => session_id(),
+            'SESSION_NAME'   => session_name(),
+            'SESSION_ID'     => session_id(),
             'COMPONENT_NAME' => $this->getConfig('componentname'),
+            'UNIT_LIST'      => json_encode(
+                $this->unitList->map(
+                    function($unit) {
+                        /** @var UnitInstance $unit */
+                        return $unit->getComponent()->getIdentifier();
+                    }
+                )->getAll()
+            ),
         ));
 
         // Start spamming out tasks into the template
@@ -168,7 +177,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             }
         }
         else {
-            $this->parse('no_category_with_unit_header_block', 'category_with_unit_header_block');
+            $this->parse('no_category_with_unit_header_block', 'no_category_with_unit_header');
         }
 
         return true;

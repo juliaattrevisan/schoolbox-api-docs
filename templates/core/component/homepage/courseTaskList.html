@@ -14,7 +14,8 @@
                 $(function() {
                     $('#component{COMPONENT_INSTANCE_ID}').setupCourseTaskList({
                         session_name: '{SESSION_NAME}',
-                        session_id:   '{SESSION_ID}'
+                        session_id:   '{SESSION_ID}',
+                        units:        {UNIT_LIST}
                     });
                 });
             })(jQuery);
@@ -31,10 +32,10 @@
 
         <div class="category_with_unit_list">
             <!-- BEGIN category_with_unit_header -->
-            The following classes have imported this unit:
+            The following classes are currently using this unit:
             <!-- END category_with_unit_header -->
             <!-- BEGIN no_category_with_unit_header -->
-            No classes have imported this unit yet.
+            No classes are using this unit yet.
             <!-- END no_category_with_unit_header -->
             <!-- BEGIN category_with_unit -->
             <ul class="breadcrumb">
@@ -173,6 +174,14 @@
 
     <!-- Dialog for resource browser -->
     <div class="resource_browser hide">
+    </div>
+
+    <!--
+        Dialog for asking:
+        When adding a new task - does it get copied into classes that use this unit?
+    -->
+    <div class="dialog copy_new_task hide">
+        Do you want to add this task to the classes which are currently using this unit?
     </div>
 
 </div>
