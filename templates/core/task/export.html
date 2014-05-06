@@ -67,7 +67,8 @@
                         <td>Class</td>
                         <td>Open Date</td>
                         <td>Due Date</td>
-                        <td>Import?</td>
+                        <td>Status</td>
+                        <td>&nbsp;</td>
                     </tr>
                     <!--
                         The same class can actually be imported onto the same
@@ -77,30 +78,33 @@
                     <!-- BEGIN class -->
                     <tr data-type="unit_row" data-enabled="{CLASS_ENABLED}" data-class_id="{CLASS_ID}">
                         <td>
-
                             <ul class="breadcrumb">
                                 <!-- BEGIN class_breadcrumb -->
                                 <li><a href="/homepage/{UNIT_CATEGORY_ID}/">{UNIT_CATEGORY_NAME}</a></li>
                                 <!-- END class_breadcrumb -->
                             </ul>
-
-                            <input name="class[{CLASS_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
-                            <input name="class[{CLASS_COUNT}][import]" type="hidden" value="0" />
                         </td>
-                        <td>{CLASS_OPEN_DATE}</td>
-                        <td>{CLASS_DUE_DATE}</td>
+                        <td><time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">{CLASS_OPEN_DATE}</time></td>
+                        <td><time title="{CLASS_DUE_TITLE}" datetime="{CLASS_DUE_DATETIME}">{CLASS_DUE_DATE}</time></td>
                         <td>
                             <!-- BEGIN class_import_allowed -->
-                            <input id="import-{CLASS_COUNT}" name="class[{CLASS_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" checked />
+                            This task does not exist in this class.
                             <!-- END class_import_allowed -->
 
                             <!-- BEGIN class_import_forbidden -->
-                            You don't have write permission for this category.
+                            You don't have write permission for this class.
                             <!-- END class_import_forbidden -->
 
                             <!-- BEGIN class_import_exists -->
                             This task already exists in this class.
                             <!-- END class_import_exists -->
+                        </td>
+                        <td>
+                            <!-- BEGIN class_import_checkbox -->
+                            <input name="class[{CLASS_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                            <input name="class[{CLASS_COUNT}][import]" type="hidden" value="0" />
+                            <input id="import-{CLASS_COUNT}" name="class[{CLASS_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" checked />
+                            <!-- END class_import_checkbox -->
                         </td>
                     </tr>
                     <!-- END class -->
