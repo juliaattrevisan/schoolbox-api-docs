@@ -153,15 +153,18 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setVar('category_with_unit_header_block', '');
         $this->setVar('no_category_with_unit_header_block', '');
         if (count($this->categoryWithUnitList)) {
-            $this->parse('category_with_unit_header_block', 'category_with_unit_header');
+            $this->parse('category_with_unit_header_block', 'category_with_unit_header', true);
             foreach ($this->categoryWithUnitList as $category) {
+                $this->parse('category_with_unit_block', 'category_with_unit', true);
                 $this->setVar('category_with_unit_breadcrumb_block', '');
                 foreach (CategoryMapper::getInstance()->findParents($category) as $parent) {
                     $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
                     $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
                     $this->parse('category_with_unit_breadcrumb_block', 'category_with_unit_breadcrumb', true);
                 }
-                $this->parse('category_with_unit_block', 'category_with_unit', true);
+                $this->setVar('PARENT_CATEGORY_ID',   $category->getId());
+                $this->setVar('PARENT_CATEGORY_NAME', $category->getName());
+                $this->parse('category_with_unit_breadcrumb_block', 'category_with_unit_breadcrumb', true);
             }
         }
         else {
