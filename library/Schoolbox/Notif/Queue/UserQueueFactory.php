@@ -213,7 +213,7 @@ class UserQueueFactory {
 		}
 
 		// parental bindings TODO can this be more lightweight
-		if($roleType == Role::PARENT) {
+		if($roleType == Role::PARENT && $user->getExternalId() > 0 ) {
 			$childrenArray = $this->GET_DEPRECATED_EXT_USER()->getEnrolledStudents($user->getExternalId());
 			if(is_array($childrenArray)) {
 				$childIds = array();
