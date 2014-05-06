@@ -68,6 +68,7 @@ $this->setVar(
 );
 
 // Fill in unit breadcrumb
+// TODO do this in a Twig template
 foreach (CategoryMapper::getInstance()->findParents($category) as $parent) {
     /** @var Category $parent */
     $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
@@ -80,58 +81,63 @@ $this->parse('unit_breadcrumb_block', 'unit_breadcrumb', true);
 
 // Get each class which uses the unit already.
 $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
-$categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
+$classWithUnitList = CategoryMapper::getInstance()->findByColumn(
     'id',
     $unitList->map(function($unit) {
         /** @var UnitInstance $unit */
         return $unit->getComponent()->getIdentifier();
     })
 );
-if (count($categoryWithUnitList) > 0) {
+
+if (count($classWithUnitList) > 0) {
     $this->parse('exportable_block', 'exportable');
     $this->setVar('class_block', '');
-    /** @var Category[]|Collection $categoryWithUnitList */
+    /** @var Category[]|Collection $classWithUnitList */
     $count = 0;
     $exportableCount = 0;
-    foreach ($categoryWithUnitList as $categoryWithUnit) {
-        /** @var UnitInstance[] $categoryUnitList */
-        $categoryUnitList = $unitList->filter(function($unit) use($categoryWithUnit) {
-            /** @var UnitInstance $unit */
-            return $unit->getComponent()->getIdentifier() == $categoryWithUnit->getId();
-        });
-        foreach ($categoryUnitList as $categoryUnit) {
+    foreach ($classWithUnitList as $classWithUnit) {
 
-            // Fill in breadcrumb
+        // Get the units that apply to this class.
+        /** @var UnitInstance[] $unitListForClass */
+        $unitListForClass = $unitList->filter(function($unit) use($classWithUnit) {
+            /** @var UnitInstance $unit */
+            return $unit->getComponent()->getIdentifier() == $classWithUnit->getId();
+        });
+        foreach ($unitListForClass as $unit) {
+            // Block setup
             $this->setVar('class_breadcrumb_block', '');
             $this->setVar('class_import_allowed_block', '');
             $this->setVar('class_import_forbidden_block', '');
             $this->setVar('class_import_exists_block', '');
             $this->setVar('class_import_checkbox_block', '');
-            foreach (CategoryMapper::getInstance()->findParents($categoryWithUnit) as $parent) {
+
+            // Fill in breadcrumb
+            foreach (CategoryMapper::getInstance()->findParents($classWithUnit) as $parent) {
                 /** @var Category $parent */
                 $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
                 $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
                 $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
             }
-            $this->setVar('UNIT_CATEGORY_ID',   $categoryWithUnit->getId());
-            $this->setVar('UNIT_CATEGORY_NAME', $categoryWithUnit->getName());
+            $this->setVar('UNIT_CATEGORY_ID',   $classWithUnit->getId());
+            $this->setVar('UNIT_CATEGORY_NAME', $classWithUnit->getName());
             $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 
+            // Variable setup
             $vars = array(
-                'UNIT_ID'             => $categoryUnit->getId(),
+                'UNIT_ID'             => $unit->getId(),
                 'CLASS_COUNT'         => $count++,
-                'CLASS_NAME'          => $categoryWithUnit->getName(),
-                'CLASS_OPEN_DATE'     => $categoryUnit->getRelativeOpenDate()->getRelativeTime(),
-                'CLASS_DUE_DATE'      => $categoryUnit->getRelativeDueDate()->getRelativeTime(),
-                'CLASS_OPEN_DATETIME' => $categoryUnit->getOpenDate()->getDatabaseDate(),
-                'CLASS_DUE_DATETIME'  => $categoryUnit->getDueDate()->getDatabaseDate(),
-                'CLASS_OPEN_TITLE'    => $categoryUnit->getOpenDate()->getLongDateOnly(),
-                'CLASS_DUE_TITLE'     => $categoryUnit->getDueDate()->getLongDateOnly(),
+                'CLASS_NAME'          => $classWithUnit->getName(),
+                'CLASS_OPEN_DATE'     => $unit->getRelativeOpenDate()->getRelativeTime(),
+                'CLASS_DUE_DATE'      => $unit->getRelativeDueDate()->getRelativeTime(),
+                'CLASS_OPEN_DATETIME' => $unit->getOpenDate()->getDatabaseDate(),
+                'CLASS_DUE_DATETIME'  => $unit->getDueDate()->getDatabaseDate(),
+                'CLASS_OPEN_TITLE'    => $unit->getOpenDate()->getLongDateOnly(),
+                'CLASS_DUE_TITLE'     => $unit->getDueDate()->getLongDateOnly(),
             );
             $this->setVar(array_map(array('Scrub', 'html'), $vars));
 
             // Does the requested task already exist for this class?
-            if ($group->getPermission($categoryWithUnit->getId()) < WRITE_ACCESS) {
+            if ($group->getPermission($classWithUnit->getId()) < WRITE_ACCESS) {
                 $this->parse('class_import_forbidden_block', 'class_import_forbidden');
             }
             else {
@@ -139,7 +145,7 @@ if (count($categoryWithUnitList) > 0) {
                     Task\InstanceMapper::getInstance()->findOneByColumnList(
                         array(
                             'task_id'                 => $task->getId(),
-                            'course_unit_instance_id' => $categoryUnit->getId(),
+                            'course_unit_instance_id' => $unit->getId(),
                         )
                     );
                     $this->parse('class_import_exists_block', 'class_import_exists');
