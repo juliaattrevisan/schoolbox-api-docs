@@ -32,7 +32,7 @@ catch (\Schoolbox\Mapper\Exception $e) {
 
 // Shitty permission handling
 $group = new Group();
-if ($group->getPermission($category_id) < WRITE_ACCESS) {
+if ($group->getPermission($categoryId) < WRITE_ACCESS) {
     error(6);
     exit;
 }
