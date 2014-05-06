@@ -1,0 +1,110 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.courseImport.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript">
+    (function($) {
+        $(function() {
+            $('form#importForm').setupCourseImport();
+        });
+    })(jQuery);
+</script>
+<!-- END custom_head -->
+
+<h1>Export a task</h1>
+
+<form method="post" action="/course/importForm.php" id="importForm">
+
+    <input type="hidden" name="task" value="{TASK_ID}" />
+
+    <table class="standardForm table">
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Task</h4>
+                <em>The task that is being exported.</em>
+            </td>
+            <td>
+                <!-- Task (with assessment, etc) -->
+            </td>
+        </tr>
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Unit</h4>
+                <em>The unit that this task belongs to.</em>
+            </td>
+            <td>
+                <ul class="breadcrumb">
+                    <!-- BEGIN unit_breadcrumb -->
+                    <li><a href="/homepage/{UNIT_CATEGORY_ID}/">{UNIT_CATEGORY_NAME}</a></li>
+                    <!-- END unit_breadcrumb -->
+                </ul>
+            </td>
+        </tr>
+
+        <!-- BEGIN unexportable -->
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Classes</h4>
+            </td>
+            <td>
+                <em>
+                    There are no open classes that currently use this unit.
+                </em>
+                <em><a href="/homepage/{UNIT_HOMEPAGE_ID}">Return to the unit page</a></em>
+            </td>
+        </tr>
+        <!-- END unexportable -->
+
+        <!-- BEGIN exportable -->
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Classes</h4>
+            </td>
+            <td>
+                <table class="table">
+                    <tr>
+                        <td>Class</td>
+                        <td>Open Date</td>
+                        <td>Due Date</td>
+                        <td>Import?</td>
+                    </tr>
+                    <!--
+                        The same class can actually be imported onto the same
+                        page more than once.
+                        Don't know why anyone would do this though!
+                    -->
+                    <!-- BEGIN class -->
+                    <tr data-type="unit_row" data-enabled="{CLASS_ENABLED}" data-class_id="{CLASS_ID}">
+                        <td>
+
+                            <ul class="breadcrumb">
+                                <!-- BEGIN class_breadcrumb -->
+                                <li><a href="/homepage/{UNIT_CATEGORY_ID}/">{UNIT_CATEGORY_NAME}</a></li>
+                                <!-- END class_breadcrumb -->
+                            </ul>
+
+                            <input name="class[{CLASS_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
+                            <input name="class[{CLASS_COUNT}][import]" type="hidden" value="0" />
+                        </td>
+                        <td>{CLASS_OPEN_DATE}</td>
+                        <td>{CLASS_DUE_DATE}</td>
+                        <td>
+                            <input id="import-{CLASS_COUNT}" name="class[{CLASS_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {CLASS_ENABLED_CHECKED} />
+                            <!--
+                            Already imported?
+                            Don't have permissions to write to this class.
+                            -->
+                        </td>
+                    </tr>
+                    <!-- END class -->
+                </table>
+            </td>
+        </tr>
+        <!-- END exportable -->
+    </table>
+
+    <!-- BEGIN submit -->
+    <input type="submit" value="Export" class="submit-btn-plain" />
+    <!-- END submit -->
+</form>
