@@ -1,5 +1,10 @@
 #!/bin/bash
-for vhost in `ls -1 /etc/apache2/sites-available/*schoolbox* | grep -v dav`;
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*};
+instdir=`readlink -f $fullpath/../`;
+package=${instdir##*/};
+
+for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,-*} | grep -v dav`;
 do
 	# Check if already updated
 	if [ `grep 'favicon.ico.php' $vhost | wc -l` -eq 0 ];
