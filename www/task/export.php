@@ -124,7 +124,7 @@ if (count($classWithUnitList) > 0) {
 
             // Variable setup
             $vars = array(
-                'UNIT_ID'             => $unit->getId(),
+                'UNIT_COMPONENT_ID'   => $unit->getComponent()->getId(),
                 'CLASS_COUNT'         => $count++,
                 'CLASS_NAME'          => $classWithUnit->getName(),
                 'CLASS_OPEN_DATE'     => $unit->getRelativeOpenDate()->getRelativeTime(),
