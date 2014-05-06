@@ -45,13 +45,21 @@ $this->setBlock(TEMPLATE_content, 'unexportable',     'unexportable_block');
 $this->setBlock('exportable',     'class',            'class_block');
 $this->setBlock('class',          'class_breadcrumb', 'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'submit',           'submit_block');
-
 $this->setVar(
     array(
         'unit_breadcrumb_block' => '',
         'exportable_block'      => '',
         'submit_block'          => '',
         'unexportable_block'    => '',
+    )
+);
+
+// Fill in task
+$this->setVar(
+    array(
+        'TASK_ID'         => $task->getId(),
+        'TASK_TITLE'      => Scrub::text($task->getTitle()),
+        'TASK_TYPE_LABEL' => Scrub::text($task->getLabel()),
     )
 );
 
@@ -110,6 +118,9 @@ if (count($categoryWithUnitList) > 0) {
                     'CLASS_DUE_DATE'        => $categoryUnit->getRelativeDueDate()->getRelativeTime(),
                 )
             );
+
+            // Does the requested task already exist for this class?
+
             $this->parse('class_block', 'class', true);
         }
     }
