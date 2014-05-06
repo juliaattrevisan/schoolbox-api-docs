@@ -11,9 +11,12 @@ namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
 use Component_InstanceMapper;
+use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class UnitInstanceMapper extends Mapper {
 
@@ -339,5 +342,29 @@ class UnitInstanceMapper extends Mapper {
                 $object->getId()
             )
         );
+    }
+
+    /**
+     * Saves a instance of $task into unit instance $unit.
+     *
+     * @param UnitInstance $unit
+     * @param Task         $task
+     * @param User         $owner
+     */
+    public function saveTaskIntoUnitInstance(UnitInstance $unit, Task $task, User $owner) {
+        // Protection for if the assessment or box aren't objects at all.
+        // TODO: make the hydrator at least hydrate null objects?
+        if (!($task->getAssessment() instanceof OnlineAssessment)) {
+            $task->setAssessment(new OnlineAssessment());
+        }
+        if (!($task->getSubmissionBox() instanceof SubmissionBox)) {
+            $task->setSubmissionBox(new SubmissionBox());
+        }
+        $taskInstance = new Task\Instance();
+        $taskInstance
+            ->setUnitInstance($unit)
+            ->setTask($task)
+            ->setOwner($owner);
+        $this->getJoinMapper('task')->save($taskInstance);
     }
 }
