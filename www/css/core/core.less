@@ -10964,9 +10964,6 @@ form.comment-form label {
 @slanty-header-width: ~`@{slanty-header-width-raw} + 'px'`;
 @slanty-header-angle: ~`@{slanty-header-angle-raw} + 'deg'`;
 
-#mark-sheet-context {
-}
-
 .mark-sheet input {
 	width: 30px;
 	font-size: 1em;
@@ -11012,27 +11009,27 @@ form.comment-form label {
           span {
             background-image: url('/images/core/icons/ticks.png');
             height: 24px;
-            width: 26px;
+            width: 28px;
           }
           &.incomplete span {
             background-position: 0 0;
           }
           &.incomplete:hover span {
-            background-position: 0 0;
+            background-position: 0 -24px;
           }
           &.pending span {
-            background-position: 0 -24px;
+            background-position: 0 -48px;
             width: 28px;
           }
           &.pending:hover span {
-            background-position: 0 -24px;
+            background-position: 0 -48px;
             width: 28px;
           }
           &.complete span {
-            background-position: 0 -48px;
+            background-position: 0 -72px;
           }
           &.complete:hover span {
-            background-position: 0 -48px;
+            background-position: 0 -72px;
           }
         }
         &.pending{ left: -7px; }
