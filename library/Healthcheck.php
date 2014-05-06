@@ -126,6 +126,7 @@ class Healthcheck {
         $list[] = 'vStudentContactAllAddress';
         $list[] = 'vStudents';
         $list[] = 'vSubjectClassesStaff';
+        $list[] = 'vStudentClasses';
         sort($list);
 
         foreach($list as $view){
