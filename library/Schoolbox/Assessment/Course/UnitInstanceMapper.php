@@ -248,21 +248,25 @@ class UnitInstanceMapper extends Mapper {
     /**
      * Finds all unit instances that are based off a category.
      *
-     * @param  int $categoryId
+     * @param  int  $categoryId
+     * @param  bool $excludeClosed If true, don't include unit instances whose
+     *                             due date has passed.
      * @return Collection|UnitInstance[]
      */
-    public function findByUnitCategoryId($categoryId) {
+    public function findByUnitCategoryId($categoryId, $excludeClosed = true) {
         $query = "
             SELECT
                 {$this->getColumnString('ui')},
                 {$this->getJoinColumnString('component', 'ci')}
             FROM `{$this->getTable()}` `ui`
             INNER JOIN {$this->getJoinSql('component', 'ui', 'ci')}
-            -- INNER JOIN `category` `c` ON `ci`.`module` = 'homepage' AND `ci`.`identifier` = `c`.`id`
             WHERE `ui`.`unit_category_id` = :categoryId
             AND `ci`.`module` = 'homepage'
             AND `ui`.`deleted_at` IS NULL
         ";
+        if ($excludeClosed) {
+            $query .= ' AND `ui`.`due_date` >= CURDATE()';
+        }
         $statement = $this->database->prepare($query);
         $statement->bindValue('categoryId', $categoryId);
         $statement->execute();
