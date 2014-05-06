@@ -90,11 +90,17 @@
                         <td>{CLASS_OPEN_DATE}</td>
                         <td>{CLASS_DUE_DATE}</td>
                         <td>
-                            <input id="import-{CLASS_COUNT}" name="class[{CLASS_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {CLASS_ENABLED_CHECKED} />
-                            <!--
-                            Already imported?
-                            Don't have permissions to write to this class.
-                            -->
+                            <!-- BEGIN class_import_allowed -->
+                            <input id="import-{CLASS_COUNT}" name="class[{CLASS_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" checked />
+                            <!-- END class_import_allowed -->
+
+                            <!-- BEGIN class_import_forbidden -->
+                            You don't have write permission for this category.
+                            <!-- END class_import_forbidden -->
+
+                            <!-- BEGIN class_import_exists -->
+                            This task already exists in this class.
+                            <!-- END class_import_exists -->
                         </td>
                     </tr>
                     <!-- END class -->

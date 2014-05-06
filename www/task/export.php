@@ -44,6 +44,9 @@ $this->setBlock(TEMPLATE_content, 'exportable',       'exportable_block');
 $this->setBlock(TEMPLATE_content, 'unexportable',     'unexportable_block');
 $this->setBlock('exportable',     'class',            'class_block');
 $this->setBlock('class',          'class_breadcrumb', 'class_breadcrumb_block');
+$this->setBlock('class',          'class_import_allowed', 'class_import_allowed_block');
+$this->setBlock('class',          'class_import_forbidden', 'class_import_forbidden_block');
+$this->setBlock('class',          'class_import_exists', 'class_import_exists_block');
 $this->setBlock(TEMPLATE_content, 'submit',           'submit_block');
 $this->setVar(
     array(
@@ -99,6 +102,9 @@ if (count($categoryWithUnitList) > 0) {
 
             // Fill in breadcrumb
             $this->setVar('class_breadcrumb_block', '');
+            $this->setVar('class_import_allowed_block', '');
+            $this->setVar('class_import_forbidden_block', '');
+            $this->setVar('class_import_exists_block', '');
             foreach (CategoryMapper::getInstance()->findParents($categoryWithUnit) as $parent) {
                 /** @var Category $parent */
                 $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
@@ -111,17 +117,32 @@ if (count($categoryWithUnitList) > 0) {
 
             $this->setVar(
                 array(
-                    'UNIT_ID'              => $categoryUnit->getId(),
-                    'CLASS_COUNT'           => $count++,
-                    'CLASS_ENABLED_CHECKED' => 'checked',
-                    'CLASS_NAME'            => $categoryWithUnit->getName(),
-                    'CLASS_OPEN_DATE'       => $categoryUnit->getRelativeOpenDate()->getRelativeTime(),
-                    'CLASS_DUE_DATE'        => $categoryUnit->getRelativeDueDate()->getRelativeTime(),
+                    'UNIT_ID'         => $categoryUnit->getId(),
+                    'CLASS_COUNT'     => $count++,
+                    'CLASS_NAME'      => $categoryWithUnit->getName(),
+                    'CLASS_OPEN_DATE' => $categoryUnit->getRelativeOpenDate()->getRelativeTime(),
+                    'CLASS_DUE_DATE'  => $categoryUnit->getRelativeDueDate()->getRelativeTime(),
                 )
             );
 
             // Does the requested task already exist for this class?
-
+            if ($group->getPermission($categoryWithUnit->getId()) < WRITE_ACCESS) {
+                $this->parse('class_import_forbidden_block', 'class_import_forbidden');
+            }
+            else {
+                try {
+                    Task\InstanceMapper::getInstance()->findOneByColumnList(
+                        array(
+                            'task_id' => $task->getId(),
+                            'course_unit_instance_id' => $categoryUnit->getId(),
+                        )
+                    );
+                    $this->parse('class_import_exists_block', 'class_import_exists');
+                }
+                catch (Exception $e) {
+                    $this->parse('class_import_allowed_block', 'class_import_allowed');
+                }
+            }
             $this->parse('class_block', 'class', true);
         }
     }
