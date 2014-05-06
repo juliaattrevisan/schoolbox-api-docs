@@ -190,11 +190,11 @@
 
         // Event - save new item, no copy
         component.on('submitNoCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-            var form   = $(this);
-            var is_new = form.hasClass("create_task_form");
-            $.post(form.attr('action'), form.serialize(), function(data) {
-                // Do validation stuff here eventually, but for now validate.
-                if (is_new) {
+            var form     = $(this);
+            var formData = form.serializeArray()
+            formData.push({name: 'copy', value: false})
+            $.post(form.attr('action'), formData, function(data) {
+                if (form.hasClass("create_task_form")) {
                     form.get(0).reset();
                 }
                 postCallback(form, data);
@@ -203,11 +203,11 @@
 
         // Event - save new item, copy it across
         component.on('submitCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
-            var form   = $(this);
-            var is_new = form.hasClass("create_task_form");
-            $.post(form.attr('action'), form.serialize(), function(data) {
-                // Do validation stuff here eventually, but for now validate.
-                if (is_new) {
+            var form     = $(this);
+            var formData = form.serializeArray()
+            formData.push({name: 'copy', value: true})
+            $.post(form.attr('action'), formData, function(data) {
+                if (form.hasClass("create_task_form")) {
                     form.get(0).reset();
                 }
                 postCallback(form, data);
