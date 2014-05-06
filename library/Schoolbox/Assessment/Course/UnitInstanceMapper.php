@@ -222,6 +222,7 @@ class UnitInstanceMapper extends Mapper {
             LEFT JOIN {$this->getJoinSql('component', 'ui', 'ci')}
             WHERE `ui`.`id` = :id
             AND `ci`.`identifier` = :category_id
+            AND `ci`.`module` = 'homepage'
             LIMIT 1
         ";
         $statement = $this->getDatabase()->prepare($query);
