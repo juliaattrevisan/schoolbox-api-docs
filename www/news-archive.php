@@ -67,7 +67,7 @@ $newsHandler = new News();
 // determine whether to show archive or current context, and setup filters accordingly
 $archive = true;
 $filter = array(
-    'topic' => $this->arg[0],
+    'topicSlug' => $this->arg[0],
     'year' => $this->arg[1],
     'month' => $this->arg[2],
     'page' => $this->arg[3]
@@ -83,18 +83,20 @@ $this->setVar('PAGE_TITLE', $title);
 $visibleList = $newsHandler->getNewsListing($archive);
 
 // get list of visibly populated topics
-$allTopics = array('all' => 1);
+$topicSlugList = array('all' => 'all');
 
 if (is_array($visibleList) && count($visibleList)) {
     foreach ($visibleList as $article) {
-        $allTopics[strtolower($article['topicName'])] = 1;
+        $url = new Url($article['topicName']);
+        $topicSlugList[$url->getSlug()] = $article['topicName'];
     }
 }
 
 // sanitise filter inputs
-if (!in_array($filter['topic'], array_keys($allTopics))) {
-    $filter['topic'] = 'all';
+if (!array_key_exists($filter['topicSlug'], $topicSlugList)) {
+    $filter['topicSlug'] = 'all';
 }
+$filter['topic'] = $topicSlugList[$filter['topicSlug']];
 
 // if year/month/page are null or something stupid, set to default
 $defaults = array(
@@ -151,7 +153,7 @@ if ($occupiedDateList) {
                 'MONTH' => $format->getUsingFormat('F'),
                 'MONTH_NUMBER' => $date['month'],
                 'MONTH_CLASS' => $monthClass,
-                'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topic']
+                'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topicSlug']
             )
         );
 
@@ -188,7 +190,7 @@ if ($filter['page'] >= $totalPages) {
 }
 
 // set pagination button destinations
-$pageSlug = "${filter['archive']}${filter['topic']}/${filter['year']}/${filter['month']}/";
+$pageSlug = "${filter['archive']}${filter['topicSlug']}/${filter['year']}/${filter['month']}/";
 
 if ($totalPages > 1) {
     for ($j = 1; $j <= $totalPages; $j++) {
@@ -222,7 +224,7 @@ if ($archive) {
     $this->setVar(
         array(
             'ARCH_CURRENT' => 'Archived',
-            'ARCH_CURRENT_CLEAN' => "archive/${filter['topic']}/",
+            'ARCH_CURRENT_CLEAN' => "archive/${filter['topicSlug']}/",
         )
     );
     $this->parse('archive_button_block', 'archive_button');
@@ -373,16 +375,13 @@ if (is_array($items)) {
         $this->setVar('year_block', 'No news items found.');
     }
 
-
     // output tabs
-    if (is_array($allTopics)) {
-        foreach ($allTopics as $topic => $i) {
-            $url = new Url($topic);
-
+    if (is_array($topicSlugList)) {
+        foreach ($topicSlugList as $slug => $topic) {
             $output = array(
-                'TOPIC_CLASS' => strtolower($topic) == $filter['topic'] ? 'class="current"' : '',
+                'TOPIC_CLASS' => strtolower($topic) == strtolower($filter['topic']) ? 'class="current"' : '',
                 'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
-                'TOPIC_CLEAN' => $filter['archive'] . strtolower($url->getSlug())
+                'TOPIC_CLEAN' => $filter['archive'] . $slug
             );
 
             $this->setVar($output);
