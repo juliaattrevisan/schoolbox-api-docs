@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC\Calendar;
+namespace Schoolbox\Calendar;
 use Schoolbox;
 
 
@@ -19,7 +19,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('event');
-		$this->hasModel('\\EOTC\\Calendar\Event');
+		$this->hasModel('\\Schoolbox\\Calendar\\Event');
 		$this->hasMap(array(
 			'column' => 'id',
 			'property' => 'id',
@@ -124,7 +124,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'other_key' => 'id',
 		));
 		$this->hasJoin('eventType', array(
-			'mapper'    => '\\EOTC\\Calendar\\EventTypeMapper',
+			'mapper'    => '\\Schoolbox\\Calendar\\EventTypeMapper',
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
@@ -328,7 +328,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @param Schoolbox\User $user
 	 * @return int
 	 */
-	private function getPerm(\EOTC\Calendar\Event $event, \Schoolbox\User $user) {
+	private function getPerm(\Schoolbox\Calendar\Event $event, \Schoolbox\User $user) {
 
 		/* Superuser exit
 		 */

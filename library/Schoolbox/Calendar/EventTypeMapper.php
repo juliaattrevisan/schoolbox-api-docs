@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC\Calendar;
+namespace Schoolbox\Calendar;
 use Schoolbox;
 
 
@@ -16,7 +16,7 @@ class EventTypeMapper extends Schoolbox\External\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('luEventType');
-		$this->hasModel('\\EOTC\\Calendar\EventType');
+		$this->hasModel('\\Schoolbox\\Calendar\EventType');
 		$this->hasMap(array(
 			'column' => 'eventTypeID',
 			'property' => 'id',

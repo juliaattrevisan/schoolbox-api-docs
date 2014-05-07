@@ -16,7 +16,7 @@ use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\ResourceBooking\Item;
-use EOTC\Calendar;
+use Schoolbox\Calendar;
 use External_Timetable;
 use Schoolbox\CampusMapper;
 

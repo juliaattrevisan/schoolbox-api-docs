@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox\ResourceBooking\Booking;
-use EOTC\Calendar\Event;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -35,9 +35,7 @@ class Mapper extends BaseMapper {
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'event',
                 'join_def' => array(
-                    // For now, this is the event mapper.
-                    // TODO move the event mapper outside of EOTC
-                    'mapper'    => '\\EOTC\\Calendar\\EventMapper',
+                    'mapper'    => '\\Schoolbox\\Calendar\\EventMapper',
                     'other_key' => 'id',
                 ),
             )

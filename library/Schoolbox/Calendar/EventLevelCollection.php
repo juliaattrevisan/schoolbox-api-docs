@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC\Calendar;
+namespace Schoolbox\Calendar;
 
 
 class EventLevelCollection extends \Schoolbox\Collection {
@@ -20,14 +20,14 @@ class EventLevelCollection extends \Schoolbox\Collection {
 	 * @param $campusList
 	 */
 	public function __construct($groupList, $campusList) {
-		$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_PERSONAL, 'Personal'));
+		$this->add(new EventLevel(\Schoolbox\Calendar\EventMapper::ACCESS_PERSONAL, 'Personal'));
 
 		if (is_array($groupList) && count($groupList)) {
-			$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_GROUP, 'Group'));
+			$this->add(new EventLevel(\Schoolbox\Calendar\EventMapper::ACCESS_GROUP, 'Group'));
 		}
 
 		if ($campusList->count()) {
-			$this->add(new EventLevel(\EOTC\Calendar\EventMapper::ACCESS_CAMPUS, 'Campus'));
+			$this->add(new EventLevel(\Schoolbox\Calendar\EventMapper::ACCESS_CAMPUS, 'Campus'));
 		}
 	}
 } 

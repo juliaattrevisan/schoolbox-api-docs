@@ -8,14 +8,14 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC\Calendar;
+namespace Schoolbox\Calendar;
 
 use DateTime;
 
 class EventRecurrenceMapper {
 
 	/**
-	 * An instance of \EOTC\Calendar\EventMapper
+	 * An instance of \Schoolbox\Calendar\EventMapper
 	 *
 	 * @var EventMapper
 	 */

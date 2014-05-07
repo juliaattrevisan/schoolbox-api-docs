@@ -12,7 +12,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
-use EOTC\Calendar;
+use Schoolbox\Calendar;
 use Alaress_Date_Format;
 use Schoolbox\User;
 //use JsonSerializable;
