@@ -96,5 +96,5 @@ foreach ($classWithUnitList as $classWithUnit) {
 }
 
 // May as well redirect back to the export for this item!
-$sitePage->localRedir('/homepage/'.$categoryId);
+$sitePage->localRedir('/task/export/'.$taskId);
 exit;
