@@ -81,7 +81,9 @@ $this->setVar('UNIT_CATEGORY_NAME', $category->getName());
 $this->parse('unit_breadcrumb_block', 'unit_breadcrumb', true);
 
 // Get each class which uses the unit already.
+/** @var UnitInstance[]|Collection $unitList */
 $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
+/** @var Category[]|Collection $classWithUnitList */
 $classWithUnitList = CategoryMapper::getInstance()->findByColumn(
     'id',
     $unitList->map(function($unit) {
@@ -90,75 +92,85 @@ $classWithUnitList = CategoryMapper::getInstance()->findByColumn(
     })
 );
 
-if (count($classWithUnitList) > 0) {
+// Store a list of category hierarchies, so they don't need to be generated
+// every time.
+$classList = array();
+foreach ($classWithUnitList as $classWithUnit) {
+    $classList[$classWithUnit->getId()] = array(
+        'category'  => $classWithUnit,
+        'hierarchy' => CategoryMapper::getInstance()->findParents($classWithUnit),
+    );
+}
+
+if (count($unitList) > 0) {
     $this->parse('exportable_block', 'exportable');
     $this->setVar('class_block', '');
-    /** @var Category[]|Collection $classWithUnitList */
     $count = 0;
     $exportableCount = 0;
-    foreach ($classWithUnitList as $classWithUnit) {
+    foreach ($unitList as $unit) {
 
-        // Get the units that apply to this class.
-        /** @var UnitInstance[] $unitListForClass */
-        $unitListForClass = $unitList->filter(function($unit) use($classWithUnit) {
-            /** @var UnitInstance $unit */
-            return $unit->getComponent()->getIdentifier() == $classWithUnit->getId();
-        });
-        foreach ($unitListForClass as $unit) {
-            // Block setup
-            $this->setVar('class_breadcrumb_block', '');
-            $this->setVar('class_import_allowed_block', '');
-            $this->setVar('class_import_forbidden_block', '');
-            $this->setVar('class_import_exists_block', '');
-            $this->setVar('class_import_checkbox_block', '');
-
-            // Fill in breadcrumb
-            foreach (CategoryMapper::getInstance()->findParents($classWithUnit) as $parent) {
-                /** @var Category $parent */
-                $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
-                $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
-                $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-            }
-            $this->setVar('UNIT_CATEGORY_ID',   $classWithUnit->getId().'#component'.$unit->getComponent()->getId());
-            $this->setVar('UNIT_CATEGORY_NAME', $classWithUnit->getName());
-            $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-
-            // Variable setup
-            $vars = array(
-                'UNIT_INSTANCE_ID'    => $unit->getId(),
-                'CLASS_COUNT'         => $count++,
-                'CLASS_NAME'          => $classWithUnit->getName(),
-                'CLASS_OPEN_DATE'     => $unit->getRelativeOpenDate()->getRelativeTime(),
-                'CLASS_DUE_DATE'      => $unit->getRelativeDueDate()->getRelativeTime(),
-                'CLASS_OPEN_DATETIME' => $unit->getOpenDate()->getDatabaseDate(),
-                'CLASS_DUE_DATETIME'  => $unit->getDueDate()->getDatabaseDate(),
-                'CLASS_OPEN_TITLE'    => $unit->getOpenDate()->getLongDateOnly(),
-                'CLASS_DUE_TITLE'     => $unit->getDueDate()->getLongDateOnly(),
-            );
-            $this->setVar(array_map(array('Scrub', 'html'), $vars));
-
-            // Does the requested task already exist for this class?
-            if ($group->getPermission($classWithUnit->getId()) < WRITE_ACCESS) {
-                $this->parse('class_import_forbidden_block', 'class_import_forbidden');
-            }
-            else {
-                try {
-                    Task\InstanceMapper::getInstance()->findOneByColumnList(
-                        array(
-                            'task_id'                 => $task->getId(),
-                            'course_unit_instance_id' => $unit->getId(),
-                        )
-                    );
-                    $this->parse('class_import_exists_block', 'class_import_exists');
-                }
-                catch (Exception $e) {
-                    $exportableCount++;
-                    $this->parse('class_import_allowed_block', 'class_import_allowed');
-                    $this->parse('class_import_checkbox_block', 'class_import_checkbox');
-                }
-            }
-            $this->parse('class_block', 'class', true);
+        // Load category and hierarchy for this unit
+        $unitCategoryId = $unit->getComponent()->getIdentifier();
+        if (!isset($classList[$unitCategoryId])) {
+            continue;
         }
+        /** @var Category $unitCategory */
+        /** @var Category[] $unitHierarchy */
+        $unitCategory  = $classList[$unitCategoryId]['category'];
+        $unitHierarchy = $classList[$unitCategoryId]['hierarchy'];
+
+        // Block setup
+        $this->setVar('class_breadcrumb_block', '');
+        $this->setVar('class_import_allowed_block', '');
+        $this->setVar('class_import_forbidden_block', '');
+        $this->setVar('class_import_exists_block', '');
+        $this->setVar('class_import_checkbox_block', '');
+
+        // Fill in breadcrumb
+        foreach ($unitHierarchy as $parent) {
+            $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
+            $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
+            $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
+        }
+        $this->setVar('UNIT_CATEGORY_ID',   $unitCategory->getId().'#component'.$unit->getComponent()->getId());
+        $this->setVar('UNIT_CATEGORY_NAME', $unitCategory->getName());
+        $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
+
+        // Variable setup
+        $vars = array(
+            'UNIT_INSTANCE_ID'    => $unit->getId(),
+            'CLASS_COUNT'         => $count++,
+            'CLASS_NAME'          => $unitCategory->getName(),
+            'CLASS_OPEN_DATE'     => $unit->getRelativeOpenDate()->getRelativeTime(),
+            'CLASS_DUE_DATE'      => $unit->getRelativeDueDate()->getRelativeTime(),
+            'CLASS_OPEN_DATETIME' => $unit->getOpenDate()->getDatabaseDate(),
+            'CLASS_DUE_DATETIME'  => $unit->getDueDate()->getDatabaseDate(),
+            'CLASS_OPEN_TITLE'    => $unit->getOpenDate()->getLongDateOnly(),
+            'CLASS_DUE_TITLE'     => $unit->getDueDate()->getLongDateOnly(),
+        );
+        $this->setVar(array_map(array('Scrub', 'html'), $vars));
+
+        // Does the requested task already exist for this class?
+        if ($group->getPermission($unitCategory->getId()) < WRITE_ACCESS) {
+            $this->parse('class_import_forbidden_block', 'class_import_forbidden');
+        }
+        else {
+            try {
+                Task\InstanceMapper::getInstance()->findOneByColumnList(
+                    array(
+                        'task_id'                 => $task->getId(),
+                        'course_unit_instance_id' => $unit->getId(),
+                    )
+                );
+                $this->parse('class_import_exists_block', 'class_import_exists');
+            }
+            catch (Exception $e) {
+                $exportableCount++;
+                $this->parse('class_import_allowed_block', 'class_import_allowed');
+                $this->parse('class_import_checkbox_block', 'class_import_checkbox');
+            }
+        }
+        $this->parse('class_block', 'class', true);
     }
     if ($exportableCount) {
         $this->parse('submit_block', 'submit');
