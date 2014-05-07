@@ -64,6 +64,7 @@ $this->setVar(
         'TASK_ID'         => Scrub::html($task->getId()),
         'TASK_TITLE'      => Scrub::text($task->getTitle()),
         'TASK_TYPE_LABEL' => Scrub::text($task->getLabel()),
+        'CATEGORY_ID'     => Scrub::html($categoryId),
     )
 );
 
@@ -118,13 +119,13 @@ if (count($classWithUnitList) > 0) {
                 $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
                 $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
             }
-            $this->setVar('UNIT_CATEGORY_ID',   $classWithUnit->getId());
+            $this->setVar('UNIT_CATEGORY_ID',   $classWithUnit->getId().'#component'.$unit->getComponent()->getId());
             $this->setVar('UNIT_CATEGORY_NAME', $classWithUnit->getName());
             $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 
             // Variable setup
             $vars = array(
-                'UNIT_COMPONENT_ID'   => $unit->getComponent()->getId(),
+                'UNIT_INSTANCE_ID'    => $unit->getId(),
                 'CLASS_COUNT'         => $count++,
                 'CLASS_NAME'          => $classWithUnit->getName(),
                 'CLASS_OPEN_DATE'     => $unit->getRelativeOpenDate()->getRelativeTime(),

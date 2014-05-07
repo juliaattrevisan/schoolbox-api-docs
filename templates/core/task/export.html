@@ -1,15 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.courseImport.js"></script>
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
-<script type="text/javascript">
-    (function($) {
-        $(function() {
-            $('form#importForm').setupCourseImport();
-        });
-    })(jQuery);
-</script>
-<!-- END custom_head -->
-
 <h1>Export a task</h1>
 
 <form method="post" action="/task/exportForm.php" id="importForm">
@@ -36,32 +24,25 @@
             <td>
                 <ul class="breadcrumb">
                     <!-- BEGIN unit_breadcrumb -->
-                    <li><a href="/homepage/{UNIT_CATEGORY_ID}/">{UNIT_CATEGORY_NAME}</a></li>
+                    <li><a href="/homepage/{UNIT_CATEGORY_ID}">{UNIT_CATEGORY_NAME}</a></li>
                     <!-- END unit_breadcrumb -->
                 </ul>
             </td>
         </tr>
 
-        <!-- BEGIN unexportable -->
         <tr>
             <td class="formLabelWidth">
                 <h4>Classes</h4>
+                <em>Only classes that have not closed yet are displayed.</em>
             </td>
             <td>
+                <!-- BEGIN unexportable -->
                 <em>
                     There are no open classes that currently use this unit.
                 </em>
-                <em><a href="/homepage/{UNIT_HOMEPAGE_ID}">Return to the unit page</a></em>
-            </td>
-        </tr>
-        <!-- END unexportable -->
-
-        <!-- BEGIN exportable -->
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Classes</h4>
-            </td>
-            <td>
+                <em><a href="/homepage/{CATEGORY_ID}">Return to the unit page</a></em>
+                <!-- END unexportable -->
+                <!-- BEGIN exportable -->
                 <table class="table">
                     <tr>
                         <td>Class</td>
@@ -76,11 +57,11 @@
                         Don't know why anyone would do this though!
                     -->
                     <!-- BEGIN class -->
-                    <tr data-type="unit_row" data-enabled="{CLASS_ENABLED}" data-class_id="{CLASS_ID}">
+                    <tr>
                         <td>
                             <ul class="breadcrumb">
                                 <!-- BEGIN class_breadcrumb -->
-                                <li><a href="/homepage/{UNIT_CATEGORY_ID}/">{UNIT_CATEGORY_NAME}</a></li>
+                                <li><a href="/homepage/{UNIT_CATEGORY_ID}">{UNIT_CATEGORY_NAME}</a></li>
                                 <!-- END class_breadcrumb -->
                             </ul>
                         </td>
@@ -101,19 +82,20 @@
                         </td>
                         <td>
                             <!-- BEGIN class_import_checkbox -->
-                            <input name="component[{UNIT_COMPONENT_ID}]" type="hidden" value="0" />
-                            <input id="import-{UNIT_COMPONENT_ID}" name="component[{UNIT_COMPONENT_ID}]" type="checkbox" value="1" data-interaction="enable" checked />
+                            <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                            <input id="import-{UNIT_INSTANCE_ID}" name="unit_instance[{UNIT_INSTANCE_ID}]" type="checkbox" value="1" data-interaction="enable" checked />
                             <!-- END class_import_checkbox -->
                         </td>
                     </tr>
                     <!-- END class -->
                 </table>
+                <!-- END exportable -->
             </td>
         </tr>
-        <!-- END exportable -->
     </table>
 
     <!-- BEGIN submit -->
     <input type="submit" value="Export" class="submit-btn-plain" />
     <!-- END submit -->
+    <a href="/homepage/{CATEGORY_ID}" class="submit-btn-plain">Cancel</a>
 </form>
