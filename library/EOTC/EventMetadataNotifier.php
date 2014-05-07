@@ -86,16 +86,22 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		);
 
 		/* Find a bunch of people to whom this notification should be sent
+		 * At the moment I am electing to notify all EOTC permission holders
+		 * whenever the status of any event changes
 		 */
-		$allPeople = $this->mapper->findStaffAttendees($metadata->getId());
+		$mapper = new \EOTC\EventPermissionMapper();
+		$allUserIds = $mapper->findUserIds();
 
-		foreach ($allPeople as $currentPeople) {
-			$msgr->targetToUser($currentPeople->getId(), $msg, "eotc.metadata.{$metadata->getId()}.changed", Logger::INFO, array(
+		$mapper = new \Schoolbox\UserMapper();
+		$allUsers = $mapper->findByColumn('id', $allUserIds);
+
+		foreach ($allUsers as $currentUser) {
+			$msgr->targetToUser($currentUser->getId(), $msg, "eotc.metadata.{$metadata->getId()}.changed", Logger::INFO, array(
 				// map your params to values, if you use an array: 0 => label, 1 => href
 				'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
 			));
 
-			$this->chimp("{$currentPeople->getId()} {$currentPeople->getFullname()}\n");
+			$this->chimp("{$currentUser->getId()} {$currentUser->getFullname()}\n");
 		}
 
 		return $msgr;
