@@ -32,20 +32,11 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	protected $roleMapper;
 
 	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleId
-	 * @param int $topicId
-	 * @param int $articleId
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleId, $topicId = 0, $articleId = 0) {
-		return "notify.role.$roleId.news.topic.$topicId.article.$articleId.$eventLabel";
+	protected function getSlug() {
+		return 'news';
 	}
-
 
 	/**
 	 * Instantiate all your dependencies within yourself.
