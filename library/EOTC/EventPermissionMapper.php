@@ -57,6 +57,11 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'property' => 'deletedAt',
 			'type'     => self::TYPE_DATETIME,
 		));
+		$this->hasJoin('user', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'user_id',
+			'other_key' => 'id',
+		));
 		$this->hasJoin('campus', array(
 			'mapper'    => '\\Schoolbox\\CampusMapper',
 			'this_key'  => 'campus_id',
