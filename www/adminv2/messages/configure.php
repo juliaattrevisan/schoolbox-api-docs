@@ -122,8 +122,6 @@ if(!$groupHandler->isSuperuser()) {
 
 /** @var SitePage $this */
 
-$editable = isset($this->arg[0]) && $this->arg[0] == 'edit';
-
 $this->setFile(TEMPLATE_content, '/adminv2/messages/configure.html');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'messages');
@@ -131,7 +129,11 @@ $this->setTitle('Admin - Messages');
 
 $db = Database::getInstance();
 
-if(isset($this->arg[0]) && in_array($this->arg[0], array('parent','student','staff'))) {
+// if arg[0] is set and is a valid roletype, put $filter, otherwise null
+$roletypes = array('parent','student','staff');
+$filter = isset($this->arg[0]) && in_array($this->arg[0], $roletypes) ? $this->arg[0] : null;
+
+if($filter) {
 	$stmt = $db->prepare("
 		SELECT *
 		FROM msg_namespace ns
@@ -141,7 +143,7 @@ if(isset($this->arg[0]) && in_array($this->arg[0], array('parent','student','sta
 		WHERE g.group_type = ?
 		ORDER BY slug, src.key, g.id
 	");
-	$stmt->execute(array($this->arg[0]));
+	$stmt->execute(array($filter));
 }
 else {
 	$stmt = $db->prepare("
@@ -153,6 +155,9 @@ else {
 		ORDER BY slug, src.key, g.id
 	");
 	$stmt->execute();
+
+	// override blank to the string 'all' for display
+	$filter = 'all';
 }
 
 $data = array();
@@ -217,6 +222,7 @@ $methods = array(
 );
 
 
+$this->setBlock(TEMPLATE_content, 'filter', 'filter_block');
 $this->setBlock(TEMPLATE_content, 'namespace', 'namespace_block');
 $this->setBlock('namespace', 'source', 'source_block');
 $this->setBlock('source', 'existing_source', 'existing_source_block');
@@ -227,6 +233,24 @@ $this->setBlock('role', 'perm', 'perm_block');
 $this->setBlock('role', 'perm_enabled', 'perm_enabled_block');
 $this->setBlock('role', 'perm_option', 'perm_option_block');
 
+
+foreach(array_merge(array('all'), $roletypes) as $type) {
+	$output = array(
+		'FILTER_NAME' => ucfirst($type),
+		'FILTER_SLUG' => $type == 'all' ? '' : $type,
+	);
+
+	// if this is the currently selected filter
+	if($filter == $type) {
+		$output['FILTER_CLASS'] = 'current';
+	}
+	else {
+		$output['FILTER_CLASS'] = '';
+	}
+
+	$this->setVar($output);
+	$this->parse('filter_block', 'filter', true);
+}
 
 foreach($data['namespace'] as $namespace) {
 	$this->setVar(array(
@@ -294,23 +318,11 @@ foreach($data['namespace'] as $namespace) {
 			$this->parse('existing_source_block', 'existing_source');
 		}
 		else {
-			if($editable) {
-				$this->setVar('existing_source_block','<input class="submit-btn-plain float-remove" type="submit" value="Create Source" />');
-			}
-			else {
-				$this->setVar('existing_source_block','');
-			}
-
+			$this->setVar('existing_source_block','');
 		}
-		if($editable) {
-			$this->parse('source_editable_block','source_editable');
-			$this->setVar('source_readonly_block');
-		}
-		else {
-			$this->parse('source_readonly_block','source_readonly');
-			$this->setVar('source_editable_block');
-		}
-		if($source['key'] || $editable) {
+		$this->parse('source_readonly_block','source_readonly');
+		$this->setVar('source_editable_block');
+		if($source['key']) {
 			$this->parse('source_block', 'source', true);
 		}
 		else {
