@@ -73,6 +73,8 @@ foreach ($classWithUnitList as $classWithUnit) {
         // Did I actually select this item?
         if (!empty($_POST['unit_instance'][$unit->getId()])) {
             try {
+                // If this search succeeds, the task is already in the class.
+                // Don't try to import it again.
                 Task\InstanceMapper::getInstance()->findOneByColumnList(
                     array(
                         'task_id'                 => $task->getId(),
@@ -83,19 +85,11 @@ foreach ($classWithUnitList as $classWithUnit) {
             }
             catch (Exception $e) {
                 // Run the import
-//                if (!$task_id && $_POST['copy']) {
-//                    /** @var UnitInstance[] $unitList */
-//                    $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId(
-//                        $task->getCategory()->getId()
-//                    );
-//                    foreach ($unitList as $unit) {
-//                        UnitInstanceMapper::getInstance()->saveTaskIntoUnitInstance(
-//                            $unit,
-//                            $task,
-//                            $_SESSION['user']
-//                        );
-//                    }
-//                }
+                UnitInstanceMapper::getInstance()->saveTaskIntoUnitInstance(
+                    $unit,
+                    $task,
+                    $_SESSION['user']
+                );
             }
         }
     }
