@@ -270,6 +270,7 @@ class UnitInstanceMapper extends Mapper {
         if ($excludeClosed) {
             $query .= ' AND `ui`.`due_date` >= CURDATE()';
         }
+        $query .= ' ORDER BY `ui`.`open_date` ASC, `ui`.`due_date` ASC';
         $statement = $this->database->prepare($query);
         $statement->bindValue('categoryId', $categoryId);
         $statement->execute();
