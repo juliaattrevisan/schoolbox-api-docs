@@ -1,3 +1,19 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function() {
+        // Greenerized checkbox
+        $('input[data-interaction="checkAll"]').on('change', function() {
+            var element         = $(this);
+            var otherCheckboxes = $('input[type="checkbox"]')
+                .not(element)
+                .filter(function() {
+                    return $(this).data('group') === element.data('group');
+                })
+            otherCheckboxes.prop('checked', element.prop('checked'));
+        });
+    });
+</script>
+<!-- END custom_head -->
 <h1>Export a task</h1>
 
 <form method="post" action="/task/exportForm.php" id="importForm">
@@ -49,7 +65,10 @@
                         <td>Open Date</td>
                         <td>Due Date</td>
                         <td>Status</td>
-                        <td>Export?</td>
+                        <td>
+                            <!-- check all button -->
+                            <input type="checkbox" data-interaction="checkAll" data-group="unit_instance" />
+                        </td>
                     </tr>
                     <!--
                         The same class can actually be imported onto the same
@@ -83,7 +102,12 @@
                         <td>
                             <!-- BEGIN class_import_checkbox -->
                             <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                            <input id="import-{UNIT_INSTANCE_ID}" name="unit_instance[{UNIT_INSTANCE_ID}]" type="checkbox" value="1" data-interaction="enable" checked />
+                            <input type="checkbox"
+                                   id="import-{UNIT_INSTANCE_ID}"
+                                   name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                   value="1"
+                                   data-group="unit_instance"
+                            />
                             <!-- END class_import_checkbox -->
                         </td>
                     </tr>
