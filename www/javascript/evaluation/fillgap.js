@@ -83,6 +83,6 @@
 	 *
 	 * @returns {{element: string, rules: {required: boolean, minlength: number}, errorContainer: string}}
 	 */
-	$.fn.evaluationMultipleChoice.getValidationRules = function() {
+	$.fn.evaluationFillGap.getValidationRules = function() {
 	}
 }(jQuery));
