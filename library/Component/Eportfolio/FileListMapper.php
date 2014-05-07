@@ -80,6 +80,7 @@ class FileListMapper extends Schoolbox\Mapper {
             FROM `{$this->table}`
             LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
             WHERE myFile.mime_type LIKE '%image/%'
+            AND myFile.deleted IS FALSE
             AND {$this->table}.page_id = :pageId
 		";
 
@@ -108,6 +109,7 @@ class FileListMapper extends Schoolbox\Mapper {
             LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
             WHERE myFile.mime_type LIKE '%image/%'
             AND myFile.owner = :uid
+            AND myFile.deleted IS FALSE
             GROUP BY {$this->table}.file_id
             ORDER BY created_at DESC
             LIMIT :limit
