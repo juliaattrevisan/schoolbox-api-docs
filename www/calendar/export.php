@@ -30,6 +30,8 @@ try {
 	// places that need a token.
 	try {
 		$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
+		// Rehydrate with campus collection
+		$user = Schoolbox\UserMapper::getInstance()->findById($user->getId());
 	}
 	catch (Exception $ex) {
 		throw new Exception_Schoolbox('Invalid token', 401);
