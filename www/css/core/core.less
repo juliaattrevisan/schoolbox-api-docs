@@ -1540,7 +1540,7 @@ Notifications
     }
     .information-list {
         .no-expand {
-            padding-left: 15px;
+            display: none;
         }
         .expand-link {
             text-decoration: none;
@@ -1552,8 +1552,7 @@ Notifications
             margin-right: 4px;
             display: inline-block;
             background-color: transparent;
-            background-position-x: -2px;
-            background-position-y: -6px;
+            background-position: -2px -6px;
             background-repeat: no-repeat;
         }
         .unit.collapsed .expand-button {
@@ -1568,19 +1567,55 @@ Notifications
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
 .information-list {
-  .ui-sortable{
-    .unit-task{
-      &:hover{
-        background-color: lighten(@highlight-color,@lighten-value);
-      }
+    //Hover cover on .dark elements to override inline styles for 'Customise Page' custom colours
+    .ui-sortable{
+        .dark:hover{ background-color: lighten(@highlight-color,@lighten-value); }
     }
-  }
 	// List clear and rule between list items
 	li {
 		border-bottom: 1px solid @border-color;
 		clear: both;
         line-height: 16px;
 		.clearfix;
+
+		.ticks {
+			.transition(background-color 0.2s linear);
+			background-color: transparent;
+			border: 0;
+			position: relative;
+			float: right;
+			right: 10px;
+			top: 4px;
+			width: 29px;
+			height: 25px;
+			span {
+				background-image: url('/images/core/icons/ticks.png');
+				height: 24px;
+				width: 26px;
+				float: right;
+			}
+			&.incomplete span {
+				background-position: 0 0;
+			}
+			&.incomplete:hover span {
+				background-position: 0 0;
+			}
+			&.pending span {
+				background-position: 0 -24px;
+				width: 28px;
+			}
+			&.pending:hover span {
+				background-position: 0 -24px;
+				width: 28px;
+			}
+			&.complete span {
+				background-position: 0 -48px;
+			}
+			&.complete:hover span {
+				background-position: 0 -48px;
+			}
+			&.pending{ left: -7px; }
+		}
 	}
 	// Tigerstripe
 	.dark {
@@ -10971,6 +11006,9 @@ form.comment-form label {
 @slanty-header-width: ~`@{slanty-header-width-raw} + 'px'`;
 @slanty-header-angle: ~`@{slanty-header-angle-raw} + 'deg'`;
 
+#mark-sheet-context {
+}
+
 .mark-sheet input {
 	width: 30px;
 	font-size: 1em;
@@ -11016,27 +11054,27 @@ form.comment-form label {
           span {
             background-image: url('/images/core/icons/ticks.png');
             height: 24px;
-            width: 28px;
+            width: 26px;
           }
           &.incomplete span {
             background-position: 0 0;
           }
           &.incomplete:hover span {
-            background-position: 0 -24px;
+            background-position: 0 0;
           }
           &.pending span {
-            background-position: 0 -48px;
+            background-position: 0 -24px;
             width: 28px;
           }
           &.pending:hover span {
-            background-position: 0 -48px;
+            background-position: 0 -24px;
             width: 28px;
           }
           &.complete span {
-            background-position: 0 -72px;
+            background-position: 0 -48px;
           }
           &.complete:hover span {
-            background-position: 0 -72px;
+            background-position: 0 -48px;
           }
         }
         &.pending{ left: -7px; }

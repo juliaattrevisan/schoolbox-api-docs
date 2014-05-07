@@ -84,6 +84,7 @@
                 <ul class="task-list information-list {UNIT_LIST_CLASS}">
                     <!-- BEGIN unit_task -->
                     <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
+
 						<span class="actions">
 							<!-- BEGIN unit_task_delete -->
                             <a href="#" class="btn delete no-text" title="Delete this task" data-interaction="open_delete_task_form"><span></span></a>
@@ -94,7 +95,11 @@
                             <!-- END unit_task_modify -->
 
                             <!-- BEGIN unit_task_start -->
-                            <a href="/task/start/{UNIT_TASK_ID}" class="btn go-to no-text" title="Mark completed"><span></span></a>
+                            <a href="#"
+                               class="ticks {STUDENT_UNIT_TASK_STATUS_CLASS}"
+                               title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
+                               data-interaction="update_progress"><span></span>
+                            </a>
                             <!-- END unit_task_start -->
                         </span>
 
