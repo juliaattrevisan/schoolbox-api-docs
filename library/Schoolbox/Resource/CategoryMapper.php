@@ -11,6 +11,7 @@
 namespace Schoolbox\Resource;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
 use Schoolbox\UserAccess;
 use \External_UserInterface;
@@ -85,8 +86,28 @@ class CategoryMapper extends Mapper {
 			'other_key' => 'id',
 		));
 
+		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
+
 	}
 
+	/**
+	 * @param Category $model
+	 * @return bool
+	 */
+	public function preSave($model) {
+
+		// iterate codes given; if any already exist, error 136
+		$codeList = $model->getCodes()->getColumnValues('code');
+
+		$collisions = CategoryCodeMapper::getInstance()->findByColumn('code', $codeList);
+
+		if($collisions->count()) {
+			error(136);
+		}
+
+		// persist Category object
+		return true;
+	}
 
 	/**
 	 * Get a list of categorys which belong to a particular parent
