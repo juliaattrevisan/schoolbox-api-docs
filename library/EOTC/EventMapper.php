@@ -103,6 +103,8 @@ class EventMapper extends Calendar\EventMapper {
 			'this_key'  => 'teacher_in_charge_id',
 			'other_key' => 'id',
 		));
+
+		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
