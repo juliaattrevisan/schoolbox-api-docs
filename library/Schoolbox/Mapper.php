@@ -69,6 +69,12 @@ class Mapper {
 	const PDO_RESULT_INSERT = 1;
 	const PDO_RESULT_UPDATE = 2;
 
+	// Valid points are preSave, postSave, preDelete, postDelete
+	const CALLBACK_PRESAVE    = 'preSave';
+	const CALLBACK_POSTSAVE   = 'postSave';
+	const CALLBACK_PREDELETE  = 'preDelete';
+	const CALLBACK_POSTDELETE = 'postDelete';
+
 	/**
 	 * @var Database
 	 */
