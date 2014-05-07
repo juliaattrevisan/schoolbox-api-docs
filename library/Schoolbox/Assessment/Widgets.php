@@ -11,56 +11,71 @@
  */
 
 namespace Schoolbox\Assessment;
-
+use Schoolbox\Assessment\Component\SubmissionBox;
 
 class Widgets {
 
+    /**
+     * Outputs the visibility dropdown for this page.
+     *
+     * @param \SitePage $page
+     * @param int $value The value of the dropdown to show.
+     */
+    public function outputVisibilityDropdown(\SitePage $page, $value) {
+        $page->dropDown(
+            'mark_visibility_drop',
+            $this->getAvailableOptions(),
+            $value,
+            'marktype',
+            array(
+                'name' => 'MARK_VISIBILITY_TEXT',
+                'id'   => 'MARK_VISIBILITY_VALUE'
+            )
+        );
+    }
 
-	/**
-	 * Outputs the visibility dropdown for this page.
-	 *
-	 * @param \SitePage $page
-	 * @param $value The value of the dropdown to show.
-	 */
-	public function outputVisibilityDropdown(\SitePage $page, $value) {
-
-		/* Remove elements from list based on max setting
-		   Note this cascades popping elements as it goes, so case 0 pops 2, case 1 pops 1, case 3 pops 0*/
+    /**
+     * Gets the available options for the visibility dropdown.
+     *
+     * @return array
+     */
+    public static function getAvailableOptions() {
         $options = self::getOptions();
+        switch (\Cfg::get('submission_visibility_max')) {
+            case SubmissionBox::MARK_VISIBILITY_PRIVATE:
+                // drop MARK_VISIBILITY_PARENT_STUDENT, MARK_VISIBILITY_STUDENT
+                array_pop($options);
+                array_pop($options);
+                break;
+            case SubmissionBox::MARK_VISIBILITY_STUDENT:
+                // drop MARK_VISIBILITY_PARENT_STUDENT
+                array_pop($options);
+                break;
+            case SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT:
+            default:
+                // drop nothing
+                break;
+        }
+        return $options;
+    }
 
-		switch(\Cfg::get('submission_visibility_max')) {
-			case '0' :
-				array_pop($options);
-
-			case '1' :
-				array_pop($options);
-
-		}
-
-		$page->dropDown(
-			'mark_visibility_drop',
-            $options,
-			$value,
-			'marktype',
-			array(
-				'name' => 'MARK_VISIBILITY_TEXT',
-				'id'   => 'MARK_VISIBILITY_VALUE'
-			)
-		);
-	}
-
+    /**
+     * Gets all options for the visibility dropdown.
+     *
+     * @return array
+     */
     static public function getOptions() {
         $options = array(
             array(
-                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE,
+                'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
                 'name' => 'Staff Only',
             ),
             array(
-                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT,
+                'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
                 'name' => 'Staff and Students',
             ),
             array(
-                'id'   => \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+                'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
                 'name' => 'Staff, Students and their Parents',
             ),
         );
