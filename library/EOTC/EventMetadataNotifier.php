@@ -85,18 +85,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 			'/turtle/'.$metadata->getId()
 		);
 
+		/* Find a bunch of people to whom this notification should be sent
+		 */
+		$allPeople = $this->mapper->findStaffAttendees($metadata->getId());
 
-		$mapper = new \EOTC\EventMapper();
+		foreach ($allPeople as $currentPeople) {
+			$msgr->targetToUser($currentPeople->getId(), $msg, "eotc.metadata.{$metadata->getId()}.changed", Logger::INFO, array(
+				// map your params to values, if you use an array: 0 => label, 1 => href
+				'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
+			));
 
-//		$allPeople = new \Schoolbox\Collection();
-//
-//		foreach ($allPeople as $currentPeople) {
-//		}
-
-		$msgr->targetToUser(151, $msg, "eotc.metadata.{$metadata->getId()}.changed", Logger::INFO, array(
-			// map your params to values, if you use an array: 0 => label, 1 => href
-			'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
-		));
+			$this->chimp("{$currentPeople->getId()} {$currentPeople->getFullname()}\n");
+		}
 
 		return $msgr;
 	}
@@ -106,7 +106,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	 *
 	 * @param $message
 	 */
-	private function log($message) {
+	private function chimp($message) {
 		$filepointer = fopen('/vagrant/data/mort.log', 'a+');
 		fputs($filepointer, $message);
 		fclose($filepointer);
