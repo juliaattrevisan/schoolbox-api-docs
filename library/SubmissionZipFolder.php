@@ -54,27 +54,31 @@ class SubmissionZipFolder {
                 $dataFile = $file['id'].'.dat';
 
                 $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
-                $fileName = $currentDir . '/' . sprintf("%s-%s_%s_%s",
+                $fileName = sprintf("%s-%s_%s_%s",
                     $file['lastname'], $file['firstname'],          // student name
                     date("md-Hi", strtotime($file['submitted'])),   // datetime
                     $file['realname']                               // filename
                 );
                 if (is_file($fileLocation)) {
                     $this->size = $this->size + filesize($fileLocation);
-                    $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
-                    copy(Cfg::get('submission_dir') .'/'.$dataFile, $this->uniqueFileName($fileName));
+                    copy(
+                        Cfg::get('submission_dir') .'/'. $dataFile,
+                        $this->uniqueFileName($currentDir . '/' . $fileName)
+                    );
                 }
                 elseif (strlen($file['body']) > 0) {
                     // This might be an online submission.
                     // Copy the file's contents to the filename.
-                    $fileName .= '.html';
                     $wrapper
-                        ->setTitle($file['realname'])
+                        ->setTitle($fileName)
                         ->setBody($file['body'])
                         ->loadBaseHrefFromServerVars($_SERVER);
                     $content = $wrapper->render();
                     $this->size = $this->size + strlen($content);
-                    file_put_contents($this->uniqueFileName($fileName), $content);
+                    file_put_contents(
+                        $this->uniqueFileName($currentDir . '/' . $fileName . '.html'),
+                        $content
+                    );
                 }
             }
         }
