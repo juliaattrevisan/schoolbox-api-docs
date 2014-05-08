@@ -41,7 +41,6 @@
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @banner-height:     			72px;
-
 // Modules
 @module-heading: 				#003366;
 @module-background: 			#d5e5f8;
@@ -69,6 +68,8 @@
 @footer-color:					#797979;
 @footer-links:					@footer-color;
 
+// Optional featu
+
 // =============================================================================
 // 3. Load core
 // =============================================================================
@@ -78,16 +79,20 @@
 // 4. Any overrides for styles can be specified below
 // =============================================================================
 
-body{ background: #ffffff url('/images/bialik/bg.png') top left repeat-x; }
+body{ background: #fff url('/images/bialik/bg.png') top left repeat-x; }
 
 body.login{
   #container{
+    background: #fff;
     top: 120px;
     position: relative;
 
     .logo img{
       margin: 6px 0 15px 0;
     }
+    a{ color: @link; }
+    p,label{ color: @black; }
+	input{ border: 1px solid #cccccc; }
   }
 
   .submit-btn-plain{
