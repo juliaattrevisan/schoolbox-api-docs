@@ -10,11 +10,15 @@
 namespace Schoolbox;
 
 
+use Monolog\Logger;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 
@@ -25,9 +29,11 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	const TRIGGER_REQUESTED = 'requested';
 	const TRIGGER_APPROVED  = 'approved';
 
+
 	protected function buildTopic($eventLabel, $roleType) {
 		// noop
 	}
+
 
 	/**
 	 * Instantiate all your dependencies within yourself.
@@ -39,6 +45,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_GROUP);
 	}
 
+
 	/**
 	 * @param TriggerBundle $bundle
 	 * @return void
@@ -48,6 +55,11 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 
 		/** @var UserAccess $userAccess */
 		$userAccess = $bundle->getEvent()->getObject();
+
+		// at least at present, we're not interested in anything other than homepage access changes
+		if($userAccess->getService() != UserAccess::SERVICE_HOMEPAGE) {
+			return;
+		}
 
 		try {
 			/** @var Group $group */
@@ -84,13 +96,40 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	/* ASYNC METHODS */
 
 	/**
+	 * @param string $body
+	 * @param string $label
+	 * @param UserAccess $userAccess
+	 * @param User $user
+	 * @return Messenger
+	 */
+	protected function notifyAdmin($body, $label, $userAccess, $user) {
+		$msgr = new Messenger();
+
+		/** @var Category $cat */
+		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
+
+		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
+			"/homepage/".$cat->getId()
+		);
+
+		$msgr->broadcastToCategoryAdmin($cat->getId(), $msg, "group.{$cat->getId()}.$label", Logger::NOTICE, array(
+			'user' => array($user->formatName(), '/search/user/'.$user->getId()),
+			'groupname' => array($cat->getName(), '/homepage/'.$cat->getId())
+		));
+
+		return $msgr;
+	}
+
+
+	/**
 	 * @param UserAccess $userAccess
 	 * @param User $user
 	 * @return Messenger
 	 */
 	public function notifyStaffJoined($userAccess, $user) {
-
+		return $this->notifyAdmin(':user has joined :groupname', self::TRIGGER_JOINED, $userAccess, $user);
 	}
+
 
 	/**
 	 * @param UserAccess $userAccess
@@ -98,8 +137,9 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyStaffLeft($userAccess, $user) {
-
+		return $this->notifyAdmin(':user has left :groupname', self::TRIGGER_LEFT, $userAccess, $user);
 	}
+
 
 	/**
 	 * @param UserAccess $userAccess
@@ -107,19 +147,63 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyStaffRequested($userAccess, $user) {
-
+		return $this->notifyAdmin(":user has asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess, $user);
 	}
 
 
 	/**
-	 * @param string $roleType
 	 * @param UserAccess $userAccess
 	 * @param User $user
 	 * @param array $diff
 	 * @return Messenger
 	 */
-	protected function notifyApproved($roleType, $userAccess, $user, $diff = null) {
+	protected function notifyApproved($userAccess, $user, $diff = null) {
+		$msgr = new Messenger();
 
+		// no diff in access level, this isn't something we're interested in
+		if(!isset($diff['accessLevel'])) {
+			return $msgr;
+		}
+
+		// new is [0], old is [1]
+		$newAccess = $diff['accessLevel'][0];
+		$oldAccess = $diff['accessLevel'][1];
+
+		/** @var Category $cat */
+		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
+
+
+		// moderation approved
+		if($oldAccess == UserAccess::ACCESS_DENY && $newAccess > UserAccess::ACCESS_DENY) {
+			$body = ":moderator has approved your request to join :groupname";
+		}
+		// elevated privileges
+		elseif($oldAccess < $newAccess) {
+			$map = array(
+				UserAccess::ACCESS_DENY  => 'no',
+				UserAccess::ACCESS_READ  => 'read',
+				UserAccess::ACCESS_WRITE => 'write',
+				UserAccess::ACCESS_FULL  => 'full'
+			);
+
+			$body = ":moderator has given you {$map[$newAccess]} access to :groupname";
+		}
+		else {
+			return $msgr;
+		}
+
+		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
+			"/homepage/".$cat->getId()
+		);
+
+		$msgr->targetToUser($userAccess->getUser()->getId(), $msg, "group.{$cat->getId()}.approved", Logger::NOTICE,
+			array(
+				'moderator' => array($user->formatName(), '/search/user/'.$user->getId()),
+				'groupname' => array('/homepage/'.$cat->getId())
+			)
+		);
+
+		return $msgr;
 	}
 
 
@@ -130,7 +214,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyStaffApproved($userAccess, $user, $diff = null) {
-
+		return $this->notifyApproved($userAccess, $user, $diff);
 	}
 
 
@@ -141,7 +225,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyStudentApproved($userAccess, $user, $diff = null) {
-
+		return $this->notifyApproved($userAccess, $user, $diff);
 	}
 
 
@@ -152,8 +236,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyParentApproved($userAccess, $user, $diff = null) {
-
+		return $this->notifyApproved($userAccess, $user, $diff);
 	}
-
 
 }
