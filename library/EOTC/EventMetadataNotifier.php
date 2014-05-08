@@ -24,12 +24,19 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	const TRIGGER_CHANGED = 'changed';
 
 	/**
+	 * Namespace slug, as defined in msg_namespace
+	 *
+	 * @var string
+	 */
+	private $msgNamespaceSlug = 'eotcmetadatastatus';
+
+	/**
 	 * Get le slug
 	 *
 	 * @return string
 	 */
 	protected function getSlug() {
-		return 'eotcmetadatastatus';
+		return $this->getMsgNamespaceSlug();
 	}
 
 	/**
@@ -96,12 +103,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		$allUsers = $mapper->findByColumn('id', $allUserIds);
 
 		foreach ($allUsers as $currentUser) {
-			$msgr->targetToUser($currentUser->getId(), $msg, "eotc.metadata.{$metadata->getId()}.changed", Logger::INFO, array(
+			$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
 				// map your params to values, if you use an array: 0 => label, 1 => href
 				'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
 			));
-
-			$this->chimp("{$currentUser->getId()} {$currentUser->getFullname()}\n");
 		}
 
 		return $msgr;
@@ -113,8 +118,26 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	 * @param $message
 	 */
 	private function chimp($message) {
-		$filepointer = fopen('/vagrant/data/mort.log', 'a+');
+		$filepointer = fopen('/vagrant/data/eotcmetadatastatus.log', 'a+');
 		fputs($filepointer, $message);
 		fclose($filepointer);
+	}
+
+	/**
+	 * Set msg namespace slug
+	 *
+	 * @param string $msgNamespaceSlug
+	 */
+	private function setMsgNamespaceSlug($msgNamespaceSlug) {
+		$this->msgNamespaceSlug = $msgNamespaceSlug;
+	}
+
+	/**
+	 * Get msg namespace slug
+	 *
+	 * @return string
+	 */
+	private function getMsgNamespaceSlug() {
+		return $this->msgNamespaceSlug;
 	}
 }
