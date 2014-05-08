@@ -87,26 +87,36 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	public function notifyStaffChanged($metadata, $creator, $diff = null) {
 		$msgr = new Messenger();
 
-		$msg = new Message(":someone changed the EOTC event status.",	// paramaterised, PDO-style
-			'/portrait.php?size=square32&userId='.$creator->getExternalId(),
-			'/turtle/'.$metadata->getId()
-		);
-
 		/* Find a bunch of people to whom this notification should be sent
 		 * At the moment I am electing to notify all EOTC permission holders
 		 * whenever the status of any event changes
 		 */
-		$mapper = new \EOTC\EventPermissionMapper();
-		$allUserIds = $mapper->findUserIds();
+		$permissionMapper = new \EOTC\EventPermissionMapper();
+		$allUserIds = $permissionMapper->findUserIds();
 
-		$mapper = new \Schoolbox\UserMapper();
-		$allUsers = $mapper->findByColumn('id', $allUserIds);
+		$userMapper = new \Schoolbox\UserMapper();
+		$allUsers = $userMapper->findByColumn('id', $allUserIds);
 
-		foreach ($allUsers as $currentUser) {
-			$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
-				// map your params to values, if you use an array: 0 => label, 1 => href
-				'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
-			));
+		/* Only get the first event belonging to this metadata
+		 * In series events, multiple events share the same metadata
+		 * but we only need to use the name of the event
+		 */
+		$allEvents = $this->mapper->findEventsForMetadata($metadata);
+
+		if ($allEvents->count()) {
+			$url = "/modules/eotc/status/modify/{$allEvents->first()->getId()}";
+
+			$msg = new Message(":someone changed the EOTC event status.",	// paramaterised, PDO-style
+				'/portrait.php?size=square32&userId='.$creator->getExternalId(),
+				$url
+			);
+
+			foreach ($allUsers as $currentUser) {
+				$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
+					// map your params to values, if you use an array: 0 => label, 1 => href
+					'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
+				));
+			}
 		}
 
 		return $msgr;
