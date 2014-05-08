@@ -22,6 +22,7 @@ class NSMapper extends Mapper {
 	const NS_CALENDAR       = 'calendar';
 	const NS_BOARDER_LEAVE  = 'leave';
 	const NS_WIKI           = 'wiki';
+	const NS_GROUP          = 'group';
 
 	protected function mapping() {
 		$this->hasTable('msg_namespace');
