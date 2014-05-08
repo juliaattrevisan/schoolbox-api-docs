@@ -22,6 +22,53 @@ $(document).ready(function() {
         endDate: $('input[name="end_datetime[date]"]')
     })
 
+    // Timetable selector
+    var days           = {{ dayCount|json_encode|raw }}
+    var periods        = {{ periodList|json_encode|raw }}
+    var campusSelector = $('select[name="timetable[campus]"]')
+    var daySelector    = $('select[name="timetable[day]"]')
+    var periodSelector = $('select[name="timetable[period]"]')
+    campusSelector.on('change', function() {
+        daySelector.find('option[value]').remove()
+        periodSelector.find('option[value]').remove()
+        var campusId      = $(this).val()
+        var campusDays    = days[campusId]
+        var campusPeriods = periods[campusId]
+        if (campusDays) {
+            daySelector.prop('disabled', false)
+            for (var i = 1; i <= campusDays; i++) {
+                var label = 'Day '+String(i)
+                daySelector
+                    .append(
+                        $('<option />')
+                            .attr('label', label)
+                            .attr('value', i)
+                            .text(label)
+                    )
+            }
+        }
+        else {
+            daySelector.prop('disabled', true)
+        }
+        if (campusPeriods) {
+            periodSelector.prop('disabled', false)
+            campusPeriods.forEach(function(period, index) {
+                periodSelector
+                    .append(
+                        $('<option />')
+                            .attr('label', period.desc)
+                            .attr('value', index)
+                            .data('start', period.start)
+                            .data('end',   period.end)
+                            .text(period.desc)
+                    )
+            })
+        }
+        else {
+            periodSelector.prop('disabled', true)}
+    })
+    campusSelector.trigger('change')
+
     // remote validation rules
     // Have some sort of helper for creating remote validations.
     var getValidatorRemoteMethod = function(code, key) {
@@ -231,27 +278,23 @@ $(document).ready(function() {
                 <em>You may select a timetable period to book this item for here.</em>
             </td>
             <td>
-                {# Simplest option: optgroups #}
-                {# Add some way of selecting next/previous occurence #}
-                <select name="timetable">
-                    <option>-- select --</option>
+                {# Select campus, day, period #}
+                {# on change campus: deselect day and period#}
+                <select name="timetable[campus]">
+                    <option disabled>-- select campus --</option>
                     {% for campus in campusList %}
-                        <optgroup label="Campus: {{ campus.name }}">
-                            {% for day in 1..dayCount[campus.id] %}
-                                {% for period in periodList[campus.id] %}
-                                    <option value="{{ campus.id|e('html_attr') }}_{{ day|e('html_attr') }}_{{ loop.index|e('html_attr') }}"
-                                            data-campus="{{ campus.id|e('html_attr') }}"
-                                            data-day="{{ day|e('html_attr') }}"
-                                            data-period="{{ loop.index|e('html_attr') }}"
-                                            data-periodStart="{{ period.start|e('html_attr') }}"
-                                            data-periodEnd="{{ period.end|e('html_attr') }}"
-                                            label="Day {{ day|e('html_attr') }}: {{ period.desc|e('html_attr') }}"
-                                    >Day {{ day }}: {{ period.desc }}</option>
-                                {% endfor %}
-                                <option disabled>---</option>
-                            {% endfor %}
-                        </optgroup>
+                        <option value="{{ campus.id }}"
+                                label="{{ campus.name }}"
+                                >{{ campus.name }}</option>
                     {% endfor %}
+                </select>
+
+                <select name="timetable[day]" disabled>
+                    <option disabled>-- select day --</option>
+                </select>
+
+                <select name="timetable[period]" disabled>
+                    <option disabled>-- select period --</option>
                 </select>
             </td>
         </tr>
