@@ -48,24 +48,33 @@ class SubmissionZipFolder {
     }
 
     function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
+        $wrapper = new Alaress\Html\Wrapper();
         if(is_array($fileList)) {
             foreach($fileList as $file) {
                 $dataFile = $file['id'].'.dat';
 
                 $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
-
-                if(is_file($fileLocation)) {
+                $fileName = $currentDir . '/' . sprintf("%s-%s_%s_%s",
+                    $file['lastname'], $file['firstname'],          // student name
+                    date("md-Hi", strtotime($file['submitted'])),   // datetime
+                    $file['realname']                               // filename
+                );
+                if (is_file($fileLocation)) {
                     $this->size = $this->size + filesize($fileLocation);
-
-                    $fileName = $currentDir . '/' . sprintf("%s-%s_%s_%s",
-                            $file['lastname'], $file['firstname'],          // student name
-                            date("md-Hi", strtotime($file['submitted'])),   // datetime
-                            $file['realname']                               // filename
-                        );
-
                     $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
-
-                    copy(Cfg::get('submission_dir') .'/'.$dataFile, $fileName);
+                    copy(Cfg::get('submission_dir') .'/'.$dataFile, $this->uniqueFileName($fileName));
+                }
+                elseif (strlen($file['body']) > 0) {
+                    // This might be an online submission.
+                    // Copy the file's contents to the filename.
+                    $fileName .= '.html';
+                    $wrapper
+                        ->setTitle($file['realname'])
+                        ->setBody($file['body'])
+                        ->loadBaseHrefFromServerVars($_SERVER);
+                    $content = $wrapper->render();
+                    $this->size = $this->size + strlen($content);
+                    file_put_contents($this->uniqueFileName($fileName), $content);
                 }
             }
         }
