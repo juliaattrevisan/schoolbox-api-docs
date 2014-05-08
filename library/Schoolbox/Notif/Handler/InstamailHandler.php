@@ -14,6 +14,7 @@ use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Decorator;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\User;
@@ -47,7 +48,7 @@ class InstamailHandler extends MailHandler {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
-        $this->email = new TwigEmail('instamail.twig');
+        $this->email = new TwigEmail('instantmail.twig');
 	}
 
 
@@ -71,31 +72,40 @@ class InstamailHandler extends MailHandler {
 				continue;
 			}
 
-			$user = $this->userMapper->findById(substr($record['channel'], strrpos($record['channel'], '.')));
+			preg_match('`instant.user.([0-9]+)`', $record['channel'], $matches);
 
-			if(isset($record['context']['user'])) {
-				/** @var User $sender */
-				$sender = $this->userMapper->findById($record['context']['user']);
-				$this->email->setFrom($sender->getEmail(), $sender->formatName());
+			try {
+				$user = $this->userMapper->findById($matches[1]);
+
+				if(isset($record['context']['user'])) {
+					/** @var User $sender */
+					$sender = $this->userMapper->findById($record['context']['user']);
+					$this->email->setFrom($sender->getEmail(), $sender->formatName());
+				}
+
+				/** @var TargetedMessage $message */
+				$message = unserialize($record['message']);
+				$decor->setMessage($message);
+
+				$this->email->setSubject($decor->formatPlain());
+
+				$context = array(
+					'text' => $decor->formatMail($uribase, $coreContext['colours']['link']),
+					'date' => $decor->getAlaressDateFormat()->getAustralian(),
+					'icon' => $uribase . $decor->getIcon(),
+					'href' => $uribase . $decor->getHref(),
+				);
+
+				$this->email->setContext($context)->send(array(
+					'name' => $user->formatName(),
+					'email' => $user->getEmail()
+				));
+
+			}
+			catch(Exception $e) {
+				echo "Could not find user $matches[1]\n";
 			}
 
-			/** @var TargetedMessage $message */
-			$message = unserialize($record['message']);
-			$decor->setMessage($message);
-
-			$this->email->setSubject($decor->formatPlain());
-
-			$context = array(
-				'text' => $decor->formatMail($uribase, $coreContext['colours']['link']),
-				'date' => $decor->getAlaressDateFormat()->getAustralian(),
-				'icon' => $uribase . $decor->getIcon(),
-				'href' => $uribase . $decor->getHref(),
-			);
-
-			$this->email->setContext($context)->send(array(
-				'name' => $user->formatName(),
-				'email' => $user->getEmail()
-			));
 		}
 	}
 
