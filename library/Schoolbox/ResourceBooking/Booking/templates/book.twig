@@ -29,11 +29,13 @@ $(document).ready(function() {
     var daySelector    = $('select[name="timetable[day]"]')
     var periodSelector = $('select[name="timetable[period]"]')
     campusSelector.on('change', function() {
+
+        var campusId = $(this).val()
+
+        // Repopulate campus days list, attempting to preserve last selected
+        var daySelected = daySelector.val()
         daySelector.find('option[value]').remove()
-        periodSelector.find('option[value]').remove()
-        var campusId      = $(this).val()
         var campusDays    = days[campusId]
-        var campusPeriods = periods[campusId]
         if (campusDays) {
             daySelector.prop('disabled', false)
             for (var i = 1; i <= campusDays; i++) {
@@ -46,10 +48,18 @@ $(document).ready(function() {
                             .text(label)
                     )
             }
+            if (daySelected !== null) {
+                daySelector.val(daySelected)
+            }
         }
         else {
             daySelector.prop('disabled', true)
         }
+
+        // Repopulate campus period list, attempting to preserve last selected
+        var periodSelected = periodSelector.val()
+        periodSelector.find('option[value]').remove()
+        var campusPeriods = periods[campusId]
         if (campusPeriods) {
             periodSelector.prop('disabled', false)
             campusPeriods.forEach(function(period, index) {
@@ -63,6 +73,9 @@ $(document).ready(function() {
                             .text(period.desc)
                     )
             })
+            if (periodSelected !== null) {
+                periodSelector.val(periodSelected)
+            }
         }
         else {
             periodSelector.prop('disabled', true)}
