@@ -36,18 +36,32 @@ class Factory {
 	 * @return External\TargetedMessage
 	 */
 	public function build() {
-		return new External\TargetedMessage(
-			null,
-			new Message(
-				$this->msgBody, $this->icon, $this->href, $this->meta
-			),
-			new Instance\Instance(
-				$this->params, 0, array()
-			),
-			new InstantTrigger(
-				'', $this->timestamp, null, $this->notifier
-			)
-		);
+		if($this->notifier) {
+			return new External\TargetedMessage(
+				null,
+				new Message(
+					$this->msgBody, $this->icon, $this->href, $this->meta
+				),
+				new Instance\Instance(
+					$this->params, 0, array()
+				),
+				new InstantTrigger(
+					'', $this->timestamp, null, $this->notifier
+				)
+			);
+		}
+		else {
+			return new External\TargetedMessage(
+				null,
+				new Message(
+					$this->msgBody, $this->icon, $this->href, $this->meta
+				),
+				new Instance\Instance(
+					$this->params, 0, array()
+				)
+			);
+		}
+
 	}
 
 
