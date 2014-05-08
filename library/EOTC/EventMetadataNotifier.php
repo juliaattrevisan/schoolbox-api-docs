@@ -106,7 +106,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		if ($allEvents->count()) {
 			$url = "/modules/eotc/status/modify/{$allEvents->first()->getId()}";
 
-			$msg = new Message(":someone changed the EOTC event status.",	// paramaterised, PDO-style
+			$msg = new Message(":someone changed the status for the EOTC event {$allEvents->first()->getNote()}",	// paramaterised, PDO-style
 				'/portrait.php?size=square32&userId='.$creator->getExternalId(),
 				$url
 			);
