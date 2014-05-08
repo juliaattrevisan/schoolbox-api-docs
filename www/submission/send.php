@@ -127,17 +127,9 @@ if (is_numeric($_GET['id'])) {
 			// Always show online submissions as inline - don't offer for
 			// download, because they may include uploaded images.
 			$attach   = '';
-			$contents = <<<HTML
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>%s</title>
-</head>
-<body>%s</body>
-</html>
-HTML
-			;
-			$contents = sprintf($contents, htmlspecialchars($filename), Scrub::html($studentSub->getBody()));
+			$wrapper  = new Alaress\Html\Wrapper($filename, $studentSub->getBody());
+			$wrapper->loadBaseHrefFromServerVars($_SERVER);
+			$contents = $wrapper->render();
 			$size     = strlen($contents);
 			if ($size === 0) {
 				error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
