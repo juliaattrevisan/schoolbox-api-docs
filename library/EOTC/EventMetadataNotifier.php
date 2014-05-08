@@ -87,35 +87,55 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	public function notifyStaffChanged($metadata, $creator, $diff = null) {
 		$msgr = new Messenger();
 
-		/* Find a bunch of people to whom this notification should be sent
-		 * At the moment I am electing to notify all EOTC permission holders
-		 * whenever the status of any event changes
-		 */
-		$permissionMapper = new \EOTC\EventPermissionMapper();
-		$allUserIds = $permissionMapper->findUserIds();
-
-		$userMapper = new \Schoolbox\UserMapper();
-		$allUsers = $userMapper->findByColumn('id', $allUserIds);
-
 		/* Only get the first event belonging to this metadata
 		 * In series events, multiple events share the same metadata
 		 * but we only need to use the name of the event
 		 */
 		$allEvents = $this->mapper->findEventsForMetadata($metadata);
 
+		/* If the metadata can't be matched to an event, just ignore everything
+		 */
 		if ($allEvents->count()) {
-			$url = "/modules/eotc/status/modify/{$allEvents->first()->getId()}";
 
-			$msg = new Message(":someone changed the status for the EOTC event {$allEvents->first()->getNote()}",	// paramaterised, PDO-style
-				'/portrait.php?size=square32&userId='.$creator->getExternalId(),
-				$url
-			);
+			/* Find a bunch of people to whom this notification should be sent
+			 * This is based on the EOTC permissions given to users
+			 */
+			$permissionMapper = new \EOTC\EventPermissionMapper();
+			$allPermissions = $permissionMapper->findByColumnList(array(
+				'status_id' => $metadata->getStatus()->getId()
+			));
 
-			foreach ($allUsers as $currentUser) {
-				$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
-					// map your params to values, if you use an array: 0 => label, 1 => href
-					'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
-				));
+			/* Find all the users who can modify the EOTC event in its
+			 * current status
+			 */
+			$userIds = array();
+
+			foreach($allPermissions as $currentPermission) {
+				$userIds[] = $currentPermission->getUserId();
+			}
+
+			$userMapper = new \Schoolbox\UserMapper();
+			$allUsers = $userMapper->findByColumn('id', $userIds);
+
+			/* Send a notification to each of those people if any
+			 * were actually found
+			 */
+			if ($allUsers->count()) {
+				$url = "/modules/eotc/status/modify/{$allEvents->first()->getId()}";
+
+				$msg = new Message(":someone changed the status for the EOTC event {$allEvents->first()->getNote()}",	// paramaterised, PDO-style
+					'/portrait.php?size=square32&userId='.$creator->getExternalId(),
+					$url
+				);
+
+				foreach($allUsers as $currentUser) {
+					$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
+						// map your params to values, if you use an array: 0 => label, 1 => href
+						'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
+					));
+
+					$this->chimp($currentUser->getFullname() . "\n");
+				}
 			}
 		}
 
