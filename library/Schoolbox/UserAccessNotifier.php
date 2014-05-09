@@ -109,7 +109,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
 
 		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
-			"/homepage/".$cat->getId()
+			"/group/modify/".$cat->getId()
 		);
 
 		$msgr->broadcastToCategoryAdmin($cat->getId(), $msg, "group.{$cat->getId()}.$label", Logger::NOTICE, array(
@@ -160,25 +160,27 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	protected function notifyApproved($userAccess, $user, $diff = null) {
 		$msgr = new Messenger();
 
-		// no diff in access level, this isn't something we're interested in
-		if(!isset($diff['accessLevel'])) {
-			return $msgr;
-		}
 
-		// new is [0], old is [1]
-		$newAccess = $diff['accessLevel'][0];
-		$oldAccess = $diff['accessLevel'][1];
+		// TODO uncomment these bits of the method to make it more informative once the Mapper can handle composite IDs
+//		// no diff in access level, this isn't something we're interested in
+//		if(!isset($diff['accessLevel'])) {
+//			return $msgr;
+//		}
+//
+//		// new is [0], old is [1]
+//		$newAccess = $diff['accessLevel'][0];
+//		$oldAccess = $diff['accessLevel'][1];
 
 		/** @var Category $cat */
 		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
 
 
-		// moderation approved
-		if($oldAccess == UserAccess::ACCESS_DENY && $newAccess > UserAccess::ACCESS_DENY) {
-			$body = ":moderator has approved your request to join :groupname";
-		}
-		// elevated privileges
-		elseif($oldAccess < $newAccess) {
+//		// moderation approved
+//		if($oldAccess == UserAccess::ACCESS_DENY && $newAccess > UserAccess::ACCESS_DENY) {
+//			$body = ":moderator has approved your request to join :groupname";
+//		}
+//		// elevated privileges
+//		elseif($oldAccess < $newAccess) {
 			$map = array(
 				UserAccess::ACCESS_DENY  => 'no',
 				UserAccess::ACCESS_READ  => 'read',
@@ -186,20 +188,22 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 				UserAccess::ACCESS_FULL  => 'full'
 			);
 
-			$body = ":moderator has given you {$map[$newAccess]} access to :groupname";
-		}
-		else {
-			return $msgr;
-		}
+//			$body = ":moderator has given you {$map[$newAccess]} access to :groupname";
+//		}
+//		else {
+//			return $msgr;
+//		}
 
-		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
+		$msg = new Message(
+			":moderator has given you {$map[$userAccess->getAccessLevel()]} access to :groupname",
+			"/portrait.php?size=square32&userId=".$user->getExternalId(),
 			"/homepage/".$cat->getId()
 		);
 
 		$msgr->targetToUser($userAccess->getUser()->getId(), $msg, "group.{$cat->getId()}.approved", Logger::NOTICE,
 			array(
 				'moderator' => array($user->formatName(), '/search/user/'.$user->getId()),
-				'groupname' => array('/homepage/'.$cat->getId())
+				'groupname' => array($cat->getName(), '/homepage/'.$cat->getId())
 			)
 		);
 
