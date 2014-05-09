@@ -586,6 +586,83 @@ class Mapper {
 		return true;
 	}
 
+
+	/**
+	 * Deletes (whether hard or soft) all records that match the given column value
+	 * Returns the number of records deleted.
+	 *
+	 * @param $columnName
+	 * @param $columnValue
+	 * @return int
+	 */
+	public function deleteByColumn($columnName, $columnValue) {
+		return $this->deleteByColumnList(array($columnName => $columnValue));
+	}
+
+
+	/**
+	 * Deletes (whether hard or soft) all records that match the given set of column values
+	 * Returns the number of records deleted.
+	 *
+	 * @param array $columnList
+	 * @return int
+	 */
+	public function deleteByColumnList($columnList) {
+		$quoted_table = $this->database->quoteIdentifier($this->table);
+
+		// only soft-delete if this is a soft-deletable model
+		if($softDelete = $this->getSoftDeleteUpdateSql()) {
+			$query = "UPDATE $quoted_table SET $softDelete WHERE ";
+		}
+		else {
+			$query = "DELETE FROM $quoted_table WHERE ";
+		}
+
+		// Build WHERE part
+		$where_parts = array();
+		$params      = array();
+
+		// as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
+		if(empty($columnList)) {
+			return 0;
+		}
+
+		foreach ($columnList as $columnName => $columnValue) {
+			$escaped_name = $this->database->quoteIdentifier($columnName);
+			if (!isset($columnValue)) {
+				$where_parts[] = "$escaped_name IS NULL";
+			}
+			else {
+				// This method is smart enough to work with arrays and IN statements
+				// If the list of values is empty, though: there's no way
+				// that the query could ever return anything, so just return
+				// an empty collection.
+				if (is_array($columnValue)) {
+					if (count($columnValue) === 0) {
+						return 0;
+					}
+					$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+					$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
+				}
+				else {
+					$where_parts[]            = "$escaped_name = :{$columnName}_0";
+					$params[$columnName.'_0'] = $columnValue;
+				}
+			}
+		}
+		$query .= implode(' AND ', $where_parts);
+
+		$statement = $this->database->prepare($query);
+		foreach ($params as $name => $value) {
+			$statement->bindValue($name, $value);
+		}
+
+		$statement->execute();
+
+		return $statement->rowCount();
+	}
+
+
 	/**
 	 * Restores one or more models that were soft deleted.
 	 *
@@ -1474,14 +1551,14 @@ class Mapper {
 	}
 
 	/**
-	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 * Retrieves an SQL fragment for filtering out or setting soft-deleted items.
 	 *
+	 * @param $value
 	 * @param  string $alias The alias used for this table, if any.
 	 * @return string
 	 */
-	protected function getSoftDeleteFilterSql($alias = null) {
+	protected function getSoftDeleteSql($value, $alias = null) {
 		if (isset($this->soft_delete_column)) {
-			$value = $this->soft_delete_undeleted_value;
 			$column = "`{$this->soft_delete_column}`";
 			if (isset($alias)) {
 				$column = "`$alias`.$column";
@@ -1498,9 +1575,30 @@ class Mapper {
 			return "$column = ".$this->database->quote($value);
 		}
 		return null;
+
 	}
 
 	/**
+	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 *
+	 * @param  string $alias The alias used for this table, if any.
+	 * @return string
+	 */
+	protected function getSoftDeleteFilterSql($alias = null) {
+		return $this->getSoftDeleteSql($this->soft_delete_undeleted_value, $alias);
+	}
+
+	/**
+	 * Retrieves an SQL fragment for updating soft-deleted items.
+	 *
+	 * @param string $alias
+	 * @return string
+	 */
+	protected function getSoftDeleteUpdateSql($alias = null) {
+		return $this->getSoftDeleteSql($this->soft_delete_deleted_value, $alias);
+	}
+
+		/**
 	 * Creates a new instance of class with name passed in $this->hasModel().
 	 *
 	 * @throws Mapper\Exception
