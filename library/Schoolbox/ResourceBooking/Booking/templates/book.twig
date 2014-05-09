@@ -1,5 +1,6 @@
 <!-- BEGIN custom_header -->
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -23,187 +24,45 @@ $(document).ready(function() {
     })
 
     // Timetable selector
-    var campusList         = {{ campusList|json_encode|raw }}
-    var timetableSelector  = $('[data-interaction="timetableSelector"]')
-    var campusSelector     = timetableSelector.find('select[name="timetable[campus]"]')
-    var daySelector        = timetableSelector.find('select[name="timetable[day]"]')
-    var periodSelector     = timetableSelector.find('select[name="timetable[period]"]')
-    var previousDateButton = timetableSelector.find('a[data-interaction="previousDate"]')
-    var nextDateButton     = timetableSelector.find('a[data-interaction="nextDate"]')
-    var useDateButton      = timetableSelector.find('a[data-interaction="useDate"]')
-    var dateDisplay        = timetableSelector.find('time[data-role="selectedDate"]')
-    var startTimeDisplay   = timetableSelector.find('time[data-role="selectedTimeStart"]')
-    var endTimeDisplay     = timetableSelector.find('time[data-role="selectedTimeEnd"]')
-    campusSelector.on('change', function() {
-
-        var campusId = $(this).val()
-
-        // Repopulate campus days list, attempting to preserve last selected
-        var daySelected = daySelector.val()
-        daySelector.find('option[value]').remove()
-        var campusDays = campusList[campusId].days
-        if (campusDays) {
-            daySelector.prop('disabled', false)
-            for (var i = 1; i <= campusDays; i++) {
-                var label = 'Day '+String(i)
-                daySelector
-                    .append(
-                        $('<option />')
-                            .attr('label', label)
-                            .attr('value', i)
-                            .text(label)
-                    )
+    {#var campusList         = {{ campusList|json_encode|raw }}#}
+    $('[data-interaction="timetableSelector"]')
+        .timetableDaySelector({
+            campusList: {{ campusList|json_encode|raw }},
+            getChangeDateAjax: function(campus, day, date, previous) {
+                return {
+                    url:      {{ routeLookup('resourceBooking.dateForTimetableDay')|json_encode|raw }},
+                    dataType: 'json',
+                    data:     {
+                        campus:   campus,
+                        day:      day,
+                        previous: (previous ? 1 : 0),
+                        date:     date
+                    }
+                }
             }
-            if (daySelected !== null) {
-                daySelector.val(daySelected)
+        })
+        .on('useDate.timetableDaySelector', function(event, date, startTime, endTime) {
+            date = moment(date)
+            if (date.isValid()) {
+                var dateOutput = date.format('DD/MM/YYYY')
+                $('input[name="start_datetime[date]"]').val(dateOutput)
+                $('input[name="end_datetime[date]"]').val(dateOutput)
             }
-        }
-        else {
-            daySelector.prop('disabled', true)
-        }
-        daySelector.trigger('change')
 
-        // Repopulate campus period list, attempting to preserve last selected
-        var periodSelected = periodSelector.val()
-        periodSelector.find('option[value]').remove()
-        var campusPeriods = campusList[campusId].periodList
-        if (campusPeriods) {
-            periodSelector.prop('disabled', false)
-            campusPeriods.forEach(function(period, index) {
-                periodSelector
-                    .append(
-                        $('<option />')
-                            .attr('label', period.desc)
-                            .attr('value', index)
-                            .data('start', period.start)
-                            .data('end',   period.end)
-                            .text(period.desc)
-                    )
-            })
-            if (periodSelected !== null) {
-                periodSelector.val(periodSelected)
+            startTime = moment(startTime, 'HH:mm')
+            if (startTime.isValid()) {
+                $('input[name="start_datetime[hour]"]').val(startTime.format('h'))
+                $('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
+                $('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
             }
-        }
-        else {
-            periodSelector.prop('disabled', true)
-        }
-        periodSelector.trigger('change')
-    })
-    campusSelector.trigger('change')
 
-    // Selecting a day or period: update begin and end?
-    // Either that, or clear begin and end?
-    var changeDate = function(campus, day, date, previous) {
-        var buttons = $()
-            .add(previousDateButton)
-            .add(nextDateButton)
-            .add(useDateButton)
-        buttons.prop('disabled', true).addClass('disabled')
-        dateDisplay
-            .removeAttr('datetime')
-            .text('Loading date...')
-            .removeClass('error')
-        var data = {
-            campus:   campus,
-            day:      day,
-            previous: 0
-        }
-        if (date) {
-            data.date = date
-        }
-        if (previous) {
-            data.previous = 1
-        }
-        $.ajax({
-            url:      {{ routeLookup('resourceBooking.dateForTimetableDay')|json_encode|raw }},
-            data:     data,
-            dataType: 'json'
+            endTime = moment(endTime, 'HH:mm')
+            if (endTime.isValid()) {
+                $('input[name="end_datetime[hour]"]').val(endTime.format('h'))
+                $('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
+                $('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
+            }
         })
-        .done(function(data) {
-            var date = moment(data.date)
-            dateDisplay
-                .attr('datetime', date.format('YYYY-MM-DD'))
-                .text(date.format('DD/MM/YYYY'))
-            buttons.prop('disabled', false).removeClass('disabled')
-        })
-        .fail(function() {
-            dateDisplay
-                .text('error')
-                .addClass('error')
-        })
-    }
-
-    daySelector.on('change', function() {
-        changeDate(campusSelector.val(), daySelector.val())
-    })
-
-    periodSelector.on('change', function() {
-        var selected  = $(this).find(':selected')
-        var startTime = moment(selected.data('start'), 'ha')
-        var endTime   = moment(selected.data('end'),   'ha')
-        if (startTime.isValid()) {
-            startTimeDisplay
-                .attr('datetime', startTime.format('HH:mm'))
-                .text(startTime.format('h:mmA'))
-        }
-        else {
-            startTimeDisplay
-                .removeAttr('datetime')
-                .text('')
-        }
-        if (endTime.isValid()) {
-            endTimeDisplay
-                .attr('datetime', endTime.format('HH:mm'))
-                .text(endTime.format('h:mmA'))
-        }
-        else {
-            endTimeDisplay
-                .removeAttr('datetime')
-                .text('')
-        }
-    })
-
-    // Event for selecting a date.
-    useDateButton.on('click', function(event) {
-        event.preventDefault()
-
-        var date = moment(dateDisplay.attr('datetime'))
-        if (date.isValid()) {
-            var dateOutput = date.format('DD/MM/YYYY')
-            $('input[name="start_datetime[date]"]').val(dateOutput)
-            $('input[name="end_datetime[date]"]').val(dateOutput)
-        }
-
-        var startTime = moment(startTimeDisplay.attr('datetime'), 'HH:mm')
-        if (startTime.isValid()) {
-            $('input[name="start_datetime[hour]"]').val(startTime.format('h'))
-            $('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
-            $('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
-        }
-
-        var endTime = moment(endTimeDisplay.attr('datetime'), 'HH:mm')
-        if (endTime.isValid()) {
-            $('input[name="end_datetime[hour]"]').val(endTime.format('h'))
-            $('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
-            $('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
-        }
-    })
-
-    // Events for selecting previous/next date.
-    nextDateButton.on('click', function(event) {
-        event.preventDefault()
-        var date = moment(dateDisplay.attr('datetime')).add('d', 1)
-        if (date.isValid()) {
-            changeDate(campusSelector.val(), daySelector.val(), date.format('YYYY-MM-DD'), false)
-        }
-    })
-    previousDateButton.on('click', function(event) {
-        event.preventDefault()
-        var date = moment(dateDisplay.attr('datetime'))
-        if (date.isValid()) {
-            changeDate(campusSelector.val(), daySelector.val(), date.format('YYYY-MM-DD'), true)
-        }
-    })
 
     // remote validation rules
     // Have some sort of helper for creating remote validations.
@@ -419,7 +278,7 @@ $(document).ready(function() {
                 <dl class="timetableSelector" data-interaction="timetableSelector">
                     <dt><label for="timetableCampus">Campus</label></dt>
                     <dd>
-                        <select id="timetableCampus" name="timetable[campus]">
+                        <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
                             <option disabled>-- select campus --</option>
                             {% for campus in campusList %}
                                 <option value="{{ campus.id }}"
@@ -430,13 +289,13 @@ $(document).ready(function() {
                     </dd>
                     <dt><label for="timetableDay">Day</label></dt>
                     <dd>
-                        <select id="timetableDay" name="timetable[day]" disabled>
+                        <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
                             <option disabled>-- select day --</option>
                         </select>
                     </dd>
                     <dt><label for="timetablePeriod">Period</label></dt>
                     <dd>
-                        <select id="timetablePeriod" name="timetable[period]" disabled>
+                        <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
                             <option disabled>-- select period --</option>
                         </select>
                     </dd>
