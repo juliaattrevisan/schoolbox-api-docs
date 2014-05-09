@@ -65,7 +65,7 @@ class Notifier extends AbstractModuleNotifier {
         $message = new Message(
             ':user booked :resource for :date',
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/item/'.$object->getId()
+            '/resource-booking/item/'.$object->getResource()->getId()
         );
         $messenger->broadcastToRoleType(
             'staff',
@@ -95,7 +95,7 @@ class Notifier extends AbstractModuleNotifier {
         $message = new Message(
             ':user updated booking for :resource for :date',
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/item/'.$object->getId()
+            '/resource-booking/item/'.$object->getResource()->getId()
         );
         $messenger->broadcastToRoleType(
             'staff',
