@@ -4,9 +4,10 @@ require_once('../../include/Bootstrap.php');
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
+$response = 'error';
+
 if (is_numeric($_GET['join'])) {
 	$group = $groupHandler->getByID($_GET['join']);
-	$response = 'error';
 
 	$ua = new \Schoolbox\UserAccess();
 	$ua
@@ -27,30 +28,25 @@ if (is_numeric($_GET['join'])) {
 		$response = 'pending';
 	}
 
-
-
-	// if there is an ajax flag, return a json response
-	if(is_numeric($_GET['ajax'])) {
-		header($_SERVER['SERVER_PROTOCOL'] . ' 202 Accepted');
-		header('Content-Type: application/json');
-		die(json_encode(array('status' => $response)));
-	}
-
 }
 else if ($_GET['leave']) {
-	try {
-		// retrieve it so we can delete it!
-		$ua = \Schoolbox\UserAccessMapper::getInstance()->findOneByColumnList(array(
-			'service' => \Schoolbox\UserAccess::SERVICE_HOMEPAGE,
-			'uid'     => $_SESSION['user']->getId(),
-			'sid'     => $_GET['leave']
-		));
+	// delete the record that matches the given params
+	$count = \Schoolbox\UserAccessMapper::getInstance()->deleteByColumnList(array(
+		'service' => \Schoolbox\UserAccess::SERVICE_HOMEPAGE,
+		'uid'     => $_SESSION['user']->getId(),
+		'sid'     => $_GET['leave']
+	));
 
-		\Schoolbox\UserAccessMapper::getInstance()->delete($ua);
+	if($count) {
+		$response = 'left';
 	}
-	catch(\Schoolbox\Mapper\Exception $e) {
-		// noop
-	}
+}
+
+// if there is an ajax flag, return a json response
+if(is_numeric($_GET['ajax'])) {
+	header($_SERVER['SERVER_PROTOCOL'] . ' 202 Accepted');
+	header('Content-Type: application/json');
+	die(json_encode(array('status' => $response)));
 }
 
 /* If the Return parameter is set, go back to the referring page.
