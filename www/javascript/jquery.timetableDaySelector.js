@@ -54,6 +54,13 @@
         self.startTimeDisplay   = element.find(self.options.startTimeDisplay)
         self.endTimeDisplay     = element.find(self.options.endTimeDisplay)
 
+        // Generic selector for all buttons
+        self.buttons = $()
+            .add(self.previousDateButton)
+            .add(self.nextDateButton)
+            .add(self.useDateButton)
+        self.buttons.hide()
+
         /**
          * Event for when campus changes: change the list of available periods
          * and days, based on what is in self.options.campusList for the
@@ -213,12 +220,8 @@
      * @param previous
      */
     TimetableDaySelector.prototype.changeDate = function(campus, day, date, previous) {
-        var self    = this
-        var buttons = $()
-            .add(self.previousDateButton)
-            .add(self.nextDateButton)
-            .add(self.useDateButton)
-        buttons.prop('disabled', true).addClass('disabled')
+        var self = this
+        self.buttons.prop('disabled', true).addClass('disabled')
         self.dateDisplay
             .removeAttr('datetime')
             .text('Loading date...')
@@ -230,12 +233,13 @@
             self.dateDisplay
                 .attr('datetime', date.format('YYYY-MM-DD'))
                 .text(date.format('DD/MM/YYYY'))
-            buttons.prop('disabled', false).removeClass('disabled')
+            self.buttons.prop('disabled', false).removeClass('disabled').show('fast')
         })
         .fail(function() {
             self.dateDisplay
                 .text('error')
                 .addClass('error')
+            self.buttons.hide('fast')
         })
     }
 
