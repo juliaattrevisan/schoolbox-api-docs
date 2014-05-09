@@ -153,6 +153,26 @@ class EventConnector extends EventMapper {
 
 		$collection = new \Calendar_Event_Collection();
 
+		/* Anyone in the EOTC permissions sytem can also see it
+		 * We don't need to iterate with this, since $user doesn't
+		 * actually change between iterations
+		 *
+		 * EOTC managers and superusers always see events
+		 */
+		$isEOTCManager = false;
+
+		if ($user->isSuperuser()) {
+			$isEOTCManager = true;
+		}
+		else {
+			$permissionMapper = new EventPermissionMapper();
+			$allPermissions = $permissionMapper->findByUser($user);
+
+			if ($allPermissions->count()) {
+				$isEOTCManager = true;
+			}
+		}
+
 		foreach ($statement as $row) {
 			$eventItem = $this->hydrate($row, 'e');
 
@@ -222,57 +242,63 @@ class EventConnector extends EventMapper {
 
 			/* Only present this event for a particular user if they are
 			 * superuser or attendee (teacher in charge, staff, student)
+			 * or are in the EOTC permissions system
+			 *
+			 * Save some hassle if you're already an EOTC manager, skip all
+			 * this other mapper stuff
 			 */
-			$isAttendee = false;
+			if (!$isEOTCManager) {
+				$isAttendee = false;
 
-			/* Superusers can always see it
-			 */
-			if (!$isAttendee) {
-				if ($user->isSuperuser()) {
-					$isAttendee = true;
-				}
-			}
-
-			/* Creators can always see it
-			 */
-			if (!$isAttendee) {
-				if ($eventItem->getAuthor()->getId() == $user->getId()) {
-					$isAttendee = true;
-				}
-			}
-
-			/* Teachers in Charge should see it in translucent form
-			 */
-			if (!$isAttendee) {
-				$isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
-			}
-
-			/* Staff members should see it in translucent form
-			 */
-			if (!$isAttendee) {
-				foreach($eventItem->getMetadata()->getStaffAttendees() as $currentStaff) {
-					if ($currentStaff->getId() == $user->getId()) {
+				/* Superusers can always see it
+				 */
+				if (!$isAttendee) {
+					if ($user->isSuperuser()) {
 						$isAttendee = true;
-						break;
 					}
 				}
-			}
 
-			/* Students should only see this event if it's Approved and
-			 * if they are assigned to it as an attendee
-			 */
-			if (!$isAttendee) {
-				if ($eventItem->getMetadata()->getStatus()->isApproved()) {
-					foreach($eventItem->getMetadata()->getStudentAttendees() as $currentStudent) {
-						if ($currentStudent->getId() == $user->getId()) {
+				/* Creators can always see it
+				 */
+				if (!$isAttendee) {
+					if ($eventItem->getAuthor()->getId() == $user->getId()) {
+						$isAttendee = true;
+					}
+				}
+
+				/* Teachers in Charge should see it in translucent form
+				 */
+				if (!$isAttendee) {
+					$isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
+				}
+
+				/* Staff members should see it in translucent form
+				 */
+				if (!$isAttendee) {
+					foreach($eventItem->getMetadata()->getStaffAttendees() as $currentStaff) {
+						if ($currentStaff->getId() == $user->getId()) {
 							$isAttendee = true;
 							break;
 						}
 					}
 				}
+
+				/* Students should only see this event if it's Approved and
+				 * if they are assigned to it as an attendee
+				 */
+				if (!$isAttendee) {
+					if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+						foreach($eventItem->getMetadata()->getStudentAttendees() as $currentStudent) {
+							if ($currentStudent->getId() == $user->getId()) {
+								$isAttendee = true;
+								break;
+							}
+						}
+					}
+				}
 			}
 
-			if ($isAttendee) {
+			if ($isEOTCManager || $isAttendee) {
 
 				/* Translate an \EOTC\Event type into a
 				 * Calendar_Event_Type_Abstract type
