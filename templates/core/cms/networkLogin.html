@@ -1,0 +1,28 @@
+<h1>Network Drives Login</h1>
+
+<p>
+	Please enter your password to access Network Drives.
+</p>
+
+<form action="/cms/networkLogin" method="post">
+	<table class="standardForm table">
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Username</h4>
+			</td>
+			<td>
+				{NETWORK_DRIVES_USERNAME}
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Password</h4>
+			</td>
+			<td>
+				<input type="password" name="password" value="" />
+			</td>
+		</tr>
+	</table>
+
+	<input type="submit" class='submit-btn-plain' value="Submit" />
+</form>

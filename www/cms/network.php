@@ -5,6 +5,13 @@ if (!Cfg::get('webdav_enable')) {
     error(2);
 }
 
+/* Check if password is set; if not, the user was authenticated via saml
+ * and we never knew their password, so ask them to provide it
+ */
+if (!strlen($_SESSION['password'])) {
+	$this->localRedir('/cms/networkLogin');
+}
+
 $this->setFile(TEMPLATE_content, 'cms/network.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
