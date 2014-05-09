@@ -36,9 +36,7 @@ class Module extends BaseModule {
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
 
         // JSON route for getting next/previous day
-        $router->add('resourceBooking.nextDateForTimetableDay', $basePath.'/nextDateForTimetableDay')
-               ->addValues(array('format' => '.json'));
-        $router->add('resourceBooking.previousDateForTimetableDay', $basePath.'/previousDateForTimetableDay')
+        $router->add('resourceBooking.dateForTimetableDay', $basePath.'/dateForTimetableDay')
                ->addValues(array('format' => '.json'));
 
         // Approving or rejecting a single booking

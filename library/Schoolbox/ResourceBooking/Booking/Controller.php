@@ -125,54 +125,22 @@ class Controller extends Base {
     }
 
     /**
-     * Action for finding the next date for a timetable day.
-     *
-     * Query parameters:
-     * * campus: the ID of the campus to get timetable day for
-     * * day:    the day number to get
-     * * date:   If provided, finds the next occurrence after this date.
-     *           Defaults to current date.
-     */
-    public function nextDateForTimetableDay() {
-        $this->getTimetableDay(
-            $this->request->query['campus'],
-            $this->request->query['day'],
-            $this->request->query['date'],
-            false
-        );
-    }
-
-    /**
-     * Action for finding the previous date for a timetable day.
-     *
-     * Query parameters:
-     * * campus: the ID of the campus to get timetable day for
-     * * day:    the day number to get
-     * * date:   If provided, finds the previous occurrence before this date.
-     *           Defaults to current date.
-     */
-    public function previousDateForTimetableDay() {
-        $this->getTimetableDay(
-            $this->request->query['campus'],
-            $this->request->query['day'],
-            $this->request->query['date'],
-            true
-        );
-    }
-
-    /**
      * Outputs a response for getting the next or previous occurence of a
      * timetable day.
      *
-     * @param int  $campus    The campus to get the date for
-     * @param int  $dayNumber The day number to get the date for
-     * @param int  $date      If provided, find next/previous occurrence after
-     *                        this date. Defaults to current date.
-     * @param bool $previous  If true, get occurrence before $date - otherwise,
-     *                        get occurrence on or after $date.
+     * Query parameters:
+     * * campus:   the ID of the campus to get timetable day for
+     * * day:      the day number to get
+     * * date:     Date to get next or previous occurence in relation to.
+     *             Defaults to current date.
+     * * previous: If true, gets previous date - otherwise, gets next date.
      *
      */
-    protected function getTimetableDay($campus, $dayNumber, $date = null, $previous = false) {
+    public function dateForTimetableDay() {
+        $campus    = $this->request->query['campus'];
+        $dayNumber = $this->request->query['day'];
+        $date      = $this->request->query['date'];
+        $previous  = $this->request->query['previous'];
         // Try to create a datetime out of the requested start date, if there
         // was one.
         $code     = 200;
