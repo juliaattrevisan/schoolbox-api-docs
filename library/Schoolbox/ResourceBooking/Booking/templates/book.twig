@@ -23,8 +23,7 @@ $(document).ready(function() {
     })
 
     // Timetable selector
-    var days    = {{ dayCount|json_encode|raw }}
-    var periods = {{ periodList|json_encode|raw }}
+    var campusList         = {{ campusList|json_encode|raw }}
     var timetableSelector  = $('[data-interaction="timetableSelector"]')
     var campusSelector     = timetableSelector.find('select[name="timetable[campus]"]')
     var daySelector        = timetableSelector.find('select[name="timetable[day]"]')
@@ -42,7 +41,7 @@ $(document).ready(function() {
         // Repopulate campus days list, attempting to preserve last selected
         var daySelected = daySelector.val()
         daySelector.find('option[value]').remove()
-        var campusDays = days[campusId]
+        var campusDays = campusList[campusId].days
         if (campusDays) {
             daySelector.prop('disabled', false)
             for (var i = 1; i <= campusDays; i++) {
@@ -67,7 +66,7 @@ $(document).ready(function() {
         // Repopulate campus period list, attempting to preserve last selected
         var periodSelected = periodSelector.val()
         periodSelector.find('option[value]').remove()
-        var campusPeriods = periods[campusId]
+        var campusPeriods = campusList[campusId].periodList
         if (campusPeriods) {
             periodSelector.prop('disabled', false)
             campusPeriods.forEach(function(period, index) {

@@ -12,6 +12,7 @@ use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use Alaress_Date_Format;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
@@ -93,32 +94,39 @@ class Controller extends Base {
         }
 
         // Load campus and timetable selectors
-        $campusList   = $this->campusMapper->getAvailableCampusesForUser($this->getUser());
-        $periodList   = array();
-        $dayCountList = array();
-        foreach ($campusList as $campus) {
-            $campusId  = $campus->getId();
+        $campusList = array();
+        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
+            /** @var Campus $campus */
+            $campusId    = $campus->getId();
+            $campusArray = array(
+                'id'         => $campusId,
+                'name'       => $campus->getName(),
+                'days'       => 0,
+                'periodList' => array(),
+            );
+
             $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
             // Somehow parse $timetable into a list of names, start and end, and
             // the next day they occur.
-            $dayCountList[$campusId] = $timetable['dayCount'];
+            $campusArray['days'] = $timetable['dayCount'];
             foreach ($timetable['desc'] as $i => $name) {
-                $periodList[$campusId][] = array(
+                $campusArray['periodList'][] = array(
+                    'index' => $i,
                     'desc'  => $name,
                     'start' => $timetable['start'][$i],
                     'end'   => $timetable['end'][$i],
                 );
             }
+            $campusList[$campusId] = $campusArray;
         }
 
+        // Populate into a campus list instead.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
                     'item' => $item,
                     'campusList' => $campusList,
-                    'periodList' => $periodList,
-                    'dayCount'   => $dayCountList,
                 ),
             )
         );
