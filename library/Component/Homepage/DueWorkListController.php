@@ -31,7 +31,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
     public function execute() {
         $this->groupHandler = new Group();
         $options = array(
-            'order' => array('date' => 'desc'),
+            'order' => array('date' => 'asc'),
         );
         $size = $this->getConfig('size');
         if ($size > 0) {
@@ -107,6 +107,12 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             if (!$isTask && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
                 continue;
             }
+
+			/* If something was submitted to this box, hide it from the component
+			 */
+			if ($submission_counts[$submission->getId()]) {
+				continue;
+			}
 
             $box_id = $submission->getId();
 
@@ -228,7 +234,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar("submit_dw_block", "");
         }
         else {
-
             $this->parse("submit_dw_block", "submit_dw");
         }
 
