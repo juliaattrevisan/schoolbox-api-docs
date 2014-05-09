@@ -12,6 +12,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Monolog\Logger;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
@@ -28,7 +29,9 @@ class Notifier extends AbstractModuleNotifier {
     /**
      * {@inheritdoc}
      */
-    public function loadDependencies($dependencies = null) {}
+    public function loadDependencies($dependencies = null) {
+        $this->namespace = NSMapper::getInstance()->findOneBySlug('resource_booking');
+    }
 
     /**
      * @param TriggerBundle $bundle
