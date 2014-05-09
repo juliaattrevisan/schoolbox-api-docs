@@ -59,6 +59,10 @@ class Mapper {
 	const METHOD_UPDATE = 'update';
 	const METHOD_DELETE = 'delete';
 
+	// as per http://www.php.net/manual/en/pdostatement.rowcount.php#109891
+	const PDO_RESULT_INSERT = 1;
+	const PDO_RESULT_UPDATE = 2;
+
 	/**
 	 * @var Database
 	 */
@@ -1123,6 +1127,7 @@ class Mapper {
 			ON DUPLICATE KEY UPDATE $updString;
 		");
 		$affectedIDs = array();
+		$pdoMethods = array();
 
 		//
 		// Trigger all on collection before attempting to run?
@@ -1145,9 +1150,23 @@ class Mapper {
 		}
 
 		$this->database->beginTransaction();
-		foreach ($collection as $model) {
+		foreach ($collection as $i => $model) {
 			$this->bindParamsForSave($model, $statement);
 			if ($statement->execute()) {
+				// take note of whether this was an insert or update
+				$m = $statement->rowCount();
+				switch($m) {
+					case self::PDO_RESULT_INSERT:
+						$pdoMethods[$i] = self::METHOD_CREATE;
+						break;
+					case self::PDO_RESULT_UPDATE:
+						$pdoMethods[$i] = self::METHOD_UPDATE;
+						break;
+					default:
+						$pdoMethods[$i] = null;
+						break;
+				}
+
 				if ($id_property) {
 					if (!$this->getModelProperty($model, $id_property)) {
 						$new_id = $this->database->lastInsertId();
@@ -1209,26 +1228,25 @@ class Mapper {
 		}
 		$this->database->commit();
 
-		foreach ($collection as $model) {
+		foreach ($collection as $i => $model) {
+			$previous = null;
+
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
 				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
 				$this->triggerCallbacks('postSave', $model, $previous);
+			}
 
-				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
-				if(isset($this->sessionData['user'])) {
+			// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
+			if(isset($this->sessionData['user'])) {
+				// create a new event, and send it to the scheduler
+				$event = new Event(
+					$this->sessionData['user'],
+					$pdoMethods[$i],
+					$model,
+					$previous ? $this->diff($model, $previous) : null
+				);
 
-                    // create a new event, and send it to the scheduler
-                    $event = new Event(
-                        $this->sessionData['user'],
-                        $previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
-                        $model,
-                        $previous ? $this->diff($model, $previous) : null
-                    );
-
-                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
-
-				}
-
+				$this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
 			}
 		}
 
