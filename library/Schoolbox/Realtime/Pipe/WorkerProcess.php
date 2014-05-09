@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\Notif\Message\Decorator;
+use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
@@ -85,8 +86,34 @@ class WorkerProcess extends AbstractProcess {
 					throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
 				}
 
+				$this->v->v("Executing ".$this->callable2string($callback));
+
 				// this call SHOULD return a Messenger object
-				return serialize(call_user_func($callback, $model, $userId, $diff));
+				ob_start();
+				$return = call_user_func($callback, $model, $userId, $diff);
+				if($buffer = ob_get_contents()) {
+					$this->v->v($buffer);
+				}
+				ob_end_clean();
+
+				$this->v->v("Callback complete");
+
+				if(is_null($return)) {
+					$this->v->v("Response is NULL");
+					return serialize(null);
+				}
+
+				if(!$return instanceof Messenger) {
+					throw new InvalidArgumentException("Async method response must be an instance of Messenger");
+				}
+
+				$this->v->v("Got Messenger: ". ($return->hasMessages() ? 'contains messages' : 'does not contain messages'));
+
+				$serial = serialize($return);
+				if($serial === false) {
+					throw new RuntimeException("Failed to serialize Messenger");
+				}
+				return $serial;
 
 			// process interceptions
 			case DefaultDispatchStrategy::TASK_INTERCEPT:
@@ -106,4 +133,14 @@ class WorkerProcess extends AbstractProcess {
 		throw new InvalidArgumentException("Can't process '$command'.");
 	}
 
+	/**
+	 * @param callable $callable
+	 * @return string
+	 */
+	protected function callable2string($callable) {
+		if(is_array($callable)) {
+			return get_class($callable[0]) . '::' . $callable[1];
+		}
+		return (string)$callable;
+	}
 }

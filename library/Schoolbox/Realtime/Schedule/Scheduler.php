@@ -217,7 +217,7 @@ class Scheduler extends StompScheduler {
 
 		// check that an array was returned
 		if(!$msgr instanceof Messenger) {
-			throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\MessageCollection");
+			throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\Messenger");
 		}
 
 		// if there are no messages, just ignore this callback and move on
