@@ -40,6 +40,7 @@ $di->set(
 // Authorization
 $di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
 
+// Web request/response factory
 $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
 $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
@@ -71,6 +72,15 @@ $di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('
 $di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 $di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 $di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
+
+// Mapper notifications:
+// They rely upon the session being injected into them, so do that.
+$di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
+    /** @var \Alaress\Session\Session $session */
+    $session = $di->get('session');
+    $session->start();
+    return isset($_SESSION) ? $_SESSION : array();
+});
 
 // Template engine and functions
 // Template loader: sets up link to templates without a namespace.
