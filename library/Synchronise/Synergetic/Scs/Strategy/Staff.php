@@ -16,7 +16,6 @@ class Synchronise_Synergetic_Scs_Strategy_Staff extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
 			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
-			->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
 			->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
 			->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_StaffCampus())
 			->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Group_Staff())
