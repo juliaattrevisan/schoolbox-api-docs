@@ -27,9 +27,8 @@ class Leave_Request {
     /* These really shouldn't be public - and now they aren't, rejoice!
       */
     protected $id;
-    protected $userId;
     protected $user;
-	protected $authorId;
+    protected $author;
     protected $start;
     protected $finish;
     protected $hostType;
@@ -525,8 +524,8 @@ class Leave_Request {
 	 *
 	 * @param mixed $authorId
 	 */
-	public function setAuthorId($authorId) {
-		$this->authorId = $authorId;
+	public function setAuthor($authorId) {
+		$this->author = $authorId;
 	}
 
 	/**
@@ -534,8 +533,8 @@ class Leave_Request {
 	 *
 	 * @return mixed
 	 */
-	public function getAuthorId() {
-		return $this->authorId;
+	public function getAuthor() {
+		return $this->author;
 	}
 
 	/**

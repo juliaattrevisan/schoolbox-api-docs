@@ -38,7 +38,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasMap(
 			array(
 				'column' => 'author_id',
-				'property' => 'authorId',
+				'property' => 'author',
 				'type' => self::TYPE_MODEL,
 				'join' => 'author',
 			)
@@ -582,7 +582,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 					$request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
 				}
 				if (!empty($row['a.id'])) {
-					$request->setAuthorId($mapper->getUserMapper()->hydrate($row, 'a'));
+					$request->setAuthor($mapper->getUserMapper()->hydrate($row, 'a'));
 				}
 				/* Hydrate authorized user */
 				if (!empty($row['au.id'])) {
