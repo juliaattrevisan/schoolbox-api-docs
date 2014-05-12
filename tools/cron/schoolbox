@@ -24,3 +24,7 @@ MAILTO="support@schoolbox.com.au"
 
 # Run notifications binder nightly
 0 21 * * *	root	php /usr/share/schoolbox/tools/mq/binder.php -v >> /var/log/schoolbox/binder.log 2>&1
+
+# Restart daemons after binder run
+50 21 * * *	root	service schoolbox-scheduled restart >/dev/null 2>&1
+50 21 * * *	root	service schoolbox-digestd restart >/dev/null 2>&1
