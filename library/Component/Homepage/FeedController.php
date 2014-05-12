@@ -31,7 +31,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 				new \Schoolbox\Wiki\RevisionNotifier($conf),
 				new \Schoolbox\Resource\CategoryNotifier($conf),
 				new \Schoolbox\Resource\FileNotifier($conf),
-				new \Schoolbox\Resource\LinkNotifier($conf)
+				new \Schoolbox\Resource\LinkNotifier($conf),
+				new \Schoolbox\Resource\TextboxNotifier($conf)
 			),
 			$this->getContext('id'), $_SESSION['user']->getRole()->getType(), $this->getConfig('size')
 		);
