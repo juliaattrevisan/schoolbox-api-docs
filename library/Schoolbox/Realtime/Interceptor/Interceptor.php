@@ -27,6 +27,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -138,6 +139,11 @@ class Interceptor implements TaskResponseHandlerInterface {
 		}
 
 		$newLevel = $this->getReroutedLevel($user, $formatted['channel']);
+
+		// if the user in question has no digest schedule and digest level is selected, escalate to instant
+		if((string)$user->getRole()->getDigestSchedule() == Role::DIGEST_NEVER && $newLevel == Logger::INFO) {
+			$newLevel = Logger::NOTICE;
+		}
 
 		switch($newLevel) {
 			// total suppression
