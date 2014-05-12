@@ -96,6 +96,10 @@ class Log {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_FOLDER;
 		}
+		elseif($object instanceof Textbox) {
+			$this->objectId = $object->getId();
+			$this->objectKind = LogMapper::KIND_CONTENT;
+		}
 		else {
 			// TODO support for MyFile and MyFolder
 		}
@@ -114,6 +118,8 @@ class Log {
 				return FileMapper::getInstance()->findById($this->objectId);
 			case LogMapper::KIND_FOLDER:
 				return CategoryMapper::getInstance()->findById($this->objectId);
+			case LogMapper::KIND_CONTENT:
+				return TextboxMapper::getInstance()->findById($this->objectId);
 		}
 		return null;
 	}
