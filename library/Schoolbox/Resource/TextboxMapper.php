@@ -28,7 +28,7 @@ class TextboxMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'categoryID',
 			'property'   => 'category',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
 			'join'       => 'category'
 		));
 
@@ -47,10 +47,10 @@ class TextboxMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'deleted',
 			'property'   => 'deleted',
-			'type'       => self::TYPE_BOOLEAN
+			'type'       => self::TYPE_BOOL_ENUM
 		));
 
-		$this->hasMap('category', array(
+		$this->hasJoin('category', array(
 			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
 			'this_key'  => 'categoryID',
 			'other_key' => 'id'
