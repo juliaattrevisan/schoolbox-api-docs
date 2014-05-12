@@ -370,7 +370,7 @@ class PortfolioWebDAV
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
-                'password' => $_SESSION['password'],
+                'password' => 'e3IRS043UdNis',
             );
 
             $paths = array('/');
