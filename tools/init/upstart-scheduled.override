@@ -2,4 +2,4 @@
 env SBHOME=/vagrant/tools/mq
 env SBLOGS=/vagrant/data
 env SBVERBOSITY=' -v'
-pre-start exec sleep 5
+start on mounted MOUNTPOINT=/vagrant
