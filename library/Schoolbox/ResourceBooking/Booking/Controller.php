@@ -147,69 +147,33 @@ class Controller extends Base {
     public function dateForTimetableDay() {
         $campus    = $this->request->query['campus'];
         $dayNumber = $this->request->query['day'];
-        $date      = $this->request->query['date'];
+        $date      = strtotime($this->request->query['date']);
         $previous  = $this->request->query['previous'];
-        // Try to create a datetime out of the requested start date, if there
-        // was one.
-        $code     = 200;
-        $error    = '';
-        $thisDate = new DateTime();
-        if (!empty($date)) {
-            try {
-                $thisDate = new DateTime($date);
-            }
-            catch (\Exception $e) {
-                $code  = 400;
-                $error = 'Invalid format for start date';
-            }
+        $code      = 200;
+        $error     = '';
+        if ($date === false) {
+            $date = null;
         }
-
-        // Checking previous occurence? Start one day before
-        if ($previous) {
-            $thisDate = $thisDate->modify('-1 day');
-        }
-
-        // Check campus exists
         try {
-            $this->campusMapper->findById($campus);
+            $nearestDate = $previous ?
+                $this->externalTimetableHandler->getPreviousDateForDayNumber($campus, $dayNumber, $date):
+                $this->externalTimetableHandler->getNextDateForDayNumber($campus, $dayNumber, $date);
         }
-        catch (\Exception $e) {
+        catch (\InvalidArgumentException $e) {
             $code  = 400;
-            $error = 'Invalid campus requested';
+            $error = $e->getMessage();
         }
-
-        if (!$error) {
-            $isFound = false;
-            if ($dayNumber > 0) {
-                // Start at today, and get number of days
-                // Try for a month, that's long enough.
-                $i = 0;
-                while ($i++ < 30) {
-                    $thisDayNumber = $this->externalTimetableHandler->getDayNumber(
-                        $campus,
-                        $thisDate->getTimestamp()
-                    );
-                    if ($thisDayNumber == $dayNumber) {
-                        $isFound = true;
-                        break;
-                    }
-                    $thisDate = $thisDate->modify(
-                        $previous ? '-1 day' : '+1 day'
-                    );
-                }
-            }
-            if (!$isFound) {
-                $code  = 400;
-                $error = 'No date found for requested timetable day';
-            }
+        catch (\RangeException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
         }
 
         $data = array();
         if ($error) {
             $data['error'] = $error;
         }
-        else {
-            $data['date'] = $thisDate->format('Y-m-d');
+        elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
+            $data['date'] = $nearestDate->format('Y-m-d');
         }
         $this->response->status->setCode($code);
         $this->response->content->set(
