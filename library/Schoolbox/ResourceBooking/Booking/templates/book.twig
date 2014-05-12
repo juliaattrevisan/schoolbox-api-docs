@@ -271,6 +271,8 @@ $(document).ready(function() {
             <td class="formLabelWidth">
                 <h4>Timetable</h4>
                 <em>You may select a timetable period to book this item for here.</em>
+                <em>If you want this booking to recur every timetable day, then
+                    make sure you select the "Timetable Based" option in "Repeat".</em>
             </td>
             <td>
                 {# Select campus, day, period #}
@@ -344,10 +346,13 @@ $(document).ready(function() {
         <td>
             <select name="repeat" id="repeatUntilSelect">
                 <option value="">Single Booking</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="monthly">Monthly</option>
+                <optgroup label="Recurring">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="timetable">Timetable Based</option>
+                </optgroup>
             </select>
         </td>
         </tr>
