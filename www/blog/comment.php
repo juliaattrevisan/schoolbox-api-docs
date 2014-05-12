@@ -38,6 +38,7 @@ elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
 	try {
 		/** @var \Schoolbox\Blog\Comment $comment */
 		$comment = \Schoolbox\Blog\CommentMapper::getInstance()->findById($this->arg[1]);
+		$comment->setBlog(\Schoolbox\Blog\BlogMapper::getInstance()->findById($comment->getBlog()->getId()));
 	}
 	catch(\Schoolbox\Mapper\Exception $e) {
 		error(19);
