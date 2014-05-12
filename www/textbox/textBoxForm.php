@@ -22,13 +22,15 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 	$textbox
 		->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
 		->setHeading($_POST['textBoxHeading'])
-		->setBody($_POST['textBoxBody']);
+		->setBody($_POST['textBoxBody'])
+		->setDeleted(false);
 
 	if (is_numeric($_POST['textBoxID'])) {
 		$textbox->setId($_POST['textBoxID']);
 	}
 
-	\Schoolbox\Resource\TextboxMapper::getInstance()->save($textbox);
+	$affected = \Schoolbox\Resource\TextboxMapper::getInstance()->save($textbox);
+	$textbox->setId($affected[0]);
 
 	// select this textBox
     $cim = Component_InstanceMapper::getInstance();
@@ -41,7 +43,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
     $config
         ->setInstanceId($instance->getId())
         ->setConfigDefinitionId($instance->getConfig('textbox')->getBy('key', 'textbox')->getId())
-        ->setValue($textBox['textBoxID']);
+        ->setValue($textbox->getId());
     $ccm->save($config);
 
     SitePage::localRedir('/homepage/' . $_POST['originID']);
