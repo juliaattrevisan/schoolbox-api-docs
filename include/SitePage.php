@@ -516,6 +516,14 @@ class SitePage extends Page {
 
                 break;
 
+                case 'oakburn':
+                    if ($this->groupHandler->isStaff()) {
+                        $location = 'https://mail.soc.tas.edu.au/owa/';
+                    } else if ($this->groupHandler->isStudent()) {
+                        $location = 'https://www.outlook.com/my.soc.tas.edu.au';
+                    }
+                break;
+
                 default:
                     $location = Cfg::get('mail_webmail');
                 break;
