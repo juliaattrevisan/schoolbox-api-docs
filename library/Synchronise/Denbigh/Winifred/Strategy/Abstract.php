@@ -19,10 +19,12 @@ abstract class Synchronise_Denbigh_Winifred_Strategy_Abstract extends Synchronis
     // Winifred has two campuses: Frensham (1) and Gib Gate (2), Gib Gate isn't
     // used.
     const DEFAULT_CAMPUS_ID = 1;
+    const FRENSHAM_CAMPUS_ID = 1;
+    const GIBGATE_CAMPUS_ID = 2;
 
     // default ePortfolio states
-    const EPORTFOLIO_STUDENT_ENABLED = true;
-    const EPORTFOLIO_STAFF_ENABLED = true;
+    const EPORTFOLIO_STUDENT_ENABLED = false;
+    const EPORTFOLIO_STAFF_ENABLED = false;
     const EPORTFOLIO_PARENT_ENABLED = false;
 
     protected $verbosityFilter = null;
@@ -40,7 +42,16 @@ abstract class Synchronise_Denbigh_Winifred_Strategy_Abstract extends Synchronis
 
     protected function getCampusFromYearLevel($yearLevel) {
         // single campus
-        return $this::DEFAULT_CAMPUS_ID;
+        if($yearLevel > 6) {
+            return $this::FRENSHAM_CAMPUS_ID;
+        }
+        else if($yearLevel <= 6 && $yearLevel > 0) {
+            return $this::GIBGATE_CAMPUS_ID;
+        }
+        else {
+            return $this::DEFAULT_CAMPUS_ID;
+        }
+
     }
 
     protected function getHouse($house) {
