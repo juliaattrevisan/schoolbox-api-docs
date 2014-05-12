@@ -35,12 +35,12 @@ class TextboxNotifier extends ResourceNotifier {
 		$category = $resource->getCategory();
 
 		$msg = new Message(
-			":author created content on :homepage",
+			":author created content in :homepage",
 			"/portrait.php?size=square32&userId=".$author->getExternalId(),
 			"/homepage/".$category->getId()
 		);
 
-		$msgr->broadcastToCategory($category->getId(), $msg, "textbox.$resourceId.created", Logger::INFO, array(
+		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.created", Logger::INFO, array(
 			'author'   => array($author->formatName(), '/search/user/'.$author->getId()),
 			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
 		), array(
@@ -65,12 +65,12 @@ class TextboxNotifier extends ResourceNotifier {
 		$category = $resource->getCategory();
 
 		$msg = new Message(
-			":author updated content on :homepage",
+			":author updated content in :homepage",
 			"/portrait.php?size=square32&userId=".$effector->getExternalId(),
 			"/homepage/".$category->getId()
 		);
 
-		$msgr->broadcastToCategory($category->getId(), $msg, "textbox.$resourceId.updated", Logger::INFO, array(
+		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.updated", Logger::INFO, array(
 			'author'   => array($effector->formatName(), '/search/user/'.$effector->getId()),
 			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
 		), array(
@@ -100,7 +100,7 @@ class TextboxNotifier extends ResourceNotifier {
 			"/homepage/".$category->getId()
 		);
 
-		$msgr->broadcastToCategory($category->getId(), $msg, "textbox.$resourceId.deleted", Logger::INFO, array(
+		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.deleted", Logger::INFO, array(
 			'author'   => array($effector->formatName(), '/search/user/'.$effector->getId()),
 			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
 		), array(
