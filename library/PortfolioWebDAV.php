@@ -422,6 +422,9 @@ class PortfolioWebDAV
                 1);
         } /* Handle Sabre_DAV_Exception specifically
          */
+        catch (Sabre\DAV\Exception\NotAuthenticated $e) {
+            Sitepage::localRedir('/cms/networkLogin');
+        }
         catch (Sabre\DAV\Exception $e) {
             error(141, $e->getMessage() );
         }
