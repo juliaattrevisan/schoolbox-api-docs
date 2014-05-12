@@ -54,9 +54,9 @@
         <span class="visibility-btn visibility_{WORK_STAT_VALUE}"></span><span class="down-arrow"></span>
         </div></a>
         <ul id="visibility_menu_{WORK_ID}" class="flyout-menu">
-            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=0" rel="flyout-option">Staff Only</a></li>
-            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=1" rel="flyout-option">Staff and Students</a></li>
-            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility=2" rel="flyout-option">Staff, Students and Parents</a></li>
+            <!-- BEGIN stat_visibility_drop -->
+            <li><a href="{ASSESS_MODIFY_URL}&mark_visibility={MARK_VISIBILITY_VALUE}" rel="flyout-option">{MARK_VISIBILITY_TEXT}</a></li>
+            <!-- END stat_visibility_drop -->
         </ul>
         <!-- END stat_visible -->
       <!-- BEGIN stat_readonly -->

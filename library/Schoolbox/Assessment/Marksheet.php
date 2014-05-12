@@ -497,6 +497,7 @@ class Marksheet {
 		$page->setBlock('stat_item', 'stat_editable', 'stat_editable_block');
         $page->setBlock('stat_item', 'stat_visible', 'stat_visible_block');
         $page->setBlock('stat_item', 'stat_readonly', 'stat_readonly_block');
+        $page->setBlock('stat_visible', 'stat_visibility_drop', 'stat_visibility_drop_block');
 
 		$page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
 		$page->setBlock('student_row', 'student_work', 'student_work_block');
@@ -577,6 +578,12 @@ class Marksheet {
 				}
                 else if($name == 'visibility') {
                     $page->parse('stat_visible_block', 'stat_visible');
+                    $page->setVar('stat_visibility_drop_block', '');
+                    foreach (Widgets::getAvailableOptions() as $option) {
+                        $page->setVar('MARK_VISIBILITY_VALUE', \Scrub::text($option['id']));
+                        $page->setVar('MARK_VISIBILITY_TEXT',  \Scrub::text($option['name']));
+                        $page->parse('stat_visibility_drop_block', 'stat_visibility_drop', true);
+                    }
                     $page->setVar('stat_editable_block', '');
                     $page->setVar('stat_readonly_block', '');
                 }
