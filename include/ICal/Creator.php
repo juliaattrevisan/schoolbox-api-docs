@@ -143,6 +143,8 @@ class ICal_Creator {
 	public function load() {
 		$eventArray = $this->getAllEvents();
 
+		$eventTypeList = $this->calendarHandler->getTypeList();
+
 		foreach($eventArray as $year => $yearArray) {
 			foreach($yearArray as $month => $monthArray) {
 				foreach($monthArray as $day => $dailyEventsArray) {
@@ -170,13 +172,25 @@ class ICal_Creator {
 						$start = $this->decideTimes($year, $month, $day, $dtstart);
 						$end = $this->decideTimes($year, $month, $day, $dtend);
 
+						// Match the category against event type
+						$categoryList = explode(';', "{$vevent->getProperty('categories')}");
+						$eventTypeId  = 1;
+						foreach ($categoryList as $category) {
+							foreach ($eventTypeList as $eventType) {
+								if (strcasecmp($eventType['eventType'], $category) === 0) {
+									$eventTypeId = $eventType['eventTypeID'];
+									break;
+								}
+							}
+						}
+
 						$event = array(
 							'owner' => $this->getCreator(),
                             'author_id' => $this->getUid(),
 							'access' => 3,
 							'groupList' => array_map(array('Scrub', 'text'), $this->getGroupList()),
 							'campusList' => array_map(array('Scrub', 'text'), $this->getCampusList()),
-							'type' => 1,
+							'type' => $eventTypeId,
 							'note' => $summary,
 							'detail' => $description,
 							'location' => $location,
