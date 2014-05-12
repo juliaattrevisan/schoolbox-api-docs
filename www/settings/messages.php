@@ -134,6 +134,11 @@ foreach($data as $namespace => $routes) {
 			$onlyLevel = false;
 		}
 
+		// if digest specified, but digest is unavailable, escalate to instant
+		if($myLevel == Logger::INFO && empty($methods[Logger::INFO])) {
+			$myLevel = Logger::NOTICE;
+		}
+
 //		var_dump(array( $r['min_level'], $myLevel, $r['max_level'] ));
 
 		$this->setVar('box_block', '');
