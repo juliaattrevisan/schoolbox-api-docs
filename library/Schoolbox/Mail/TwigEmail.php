@@ -68,8 +68,8 @@ class TwigEmail extends TwigMailer {
         $possibleLogos = array(
             'email-logo',
             "$site-logo",
+	        'logo',
             'hercules',
-            'logo'
         );
 
         foreach($possibleLogos as $filename) {
