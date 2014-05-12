@@ -101,6 +101,13 @@ class CategoryMapper extends Mapper {
 
 		$collisions = CategoryCodeMapper::getInstance()->findByColumn('code', $codeList);
 
+		// retain any codes that do NOT match the given model
+		$id = $model->getId();
+		$collisions->filterByCallback(function($code) use ($id) {
+			/** @var CategoryCode $code */
+			return $code->getCategory()->getId() != $id;
+		});
+
 		if($collisions->count()) {
 			error(136);
 		}
