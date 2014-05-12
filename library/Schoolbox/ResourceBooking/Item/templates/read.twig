@@ -202,37 +202,41 @@ $(document).ready(function() {
 
 
 <h1>Resource - {{ item.name }}</h1>
-
-<p class="description">
-    {% if item.image.hash %}
-        <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
-    {% endif %}
-    {{ item.description|e|nl2br }}
-</p>
-
-<p class="category">
-    Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
-</p>
-
-{# Resource manager: could be set in the edit form, or the default resource manager #}
-<p class="management">
-    Resource moderated by:
-    <ul>
-        {% if defaultModeratorList is empty and item.moderatorList is empty %}
-            <li>Nobody</li>
-        {% else %}
-            {% for moderator in defaultModeratorList %}
-                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
-            {% endfor %}
-            {% for moderator in item.moderatorList %}
-                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
-            {% endfor %}
+<div class="resource-info">
+    <div class="resource-img">
+        {% if item.image.hash %}
+            <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
         {% endif %}
-    </ul>
-</p>
+    </div>
+    <div class="resource-detail">
 
-<h2>Rules</h2>
-{% include '@resourceItem/sub/rules.twig' with {item: item} %}
+        {# Resource manager: could be set in the edit form, or the default resource manager #}
+        <div class="management">
+            Managed by:
+            <ul>
+                {% if defaultModeratorList is empty and item.moderatorList is empty %}
+                    <li>Nobody</li>
+                {% else %}
+                    {% for moderator in defaultModeratorList %}
+                        <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+                    {% endfor %}
+                    {% for moderator in item.moderatorList %}
+                        <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+        <p class="category">
+            Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+        </p>
+
+        {{ item.description|e|nl2br }}
+    </div>
+    <div class="rules">
+        <h1>Rules</h1>
+        {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+    </div>
+</div>
 
 <div id="calendar-loading">
     <p><strong>Loading events...</strong></p>
