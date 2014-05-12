@@ -16,6 +16,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
+use Schoolbox\UserAccess;
 
 class Notifier extends AbstractModuleNotifier {
 
@@ -133,17 +134,17 @@ class Notifier extends AbstractModuleNotifier {
             );
         }
 
-//        // Broadcast to all resource booking moderators
-//        // TODO create a channel for services
-//        $messenger->broadcastToService(
-//            UserAccess::SERVICE_RESOURCE_BOOKING,
-//            '*', // resource booking currently has no campus
-//            UserAccess::ACCESS_FULL,
-//            $message,
-//            $key,
-//            $level,
-//            $params
-//        );
+        // Broadcast to all resource booking moderators
+        $messenger->broadcastToService(
+            UserAccess::SERVICE_RESOURCE_BOOKING,
+            '*', // resource booking currently has no campus
+            UserAccess::ACCESS_FULL,
+            $message,
+            $key,
+            $level,
+            $params
+        );
+
         return $messenger;
     }
 
