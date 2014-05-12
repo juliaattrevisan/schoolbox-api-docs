@@ -41,25 +41,20 @@ class Synchronise_Denbigh_Winifred_Strategy_Student extends Synchronise_Denbigh_
 
         // set attributes
         $newUser['username']             = $currentUser['username'];
-//        $newUser['password']             = 'abc123';
         $newUser['group_id']             = $this->getGroupIDFromYearLevel($currentUser['academicYear']);
         $newUser['title']                = '';
         $newUser['firstname']            = $currentUser['firstname'];
         $newUser['lastname']             = $currentUser['surname'];
-//        $newuser['email_pass']           = 'abc123';
         $newUser['synergy_id']           = $currentUser['denbighID'];
         $newUser['campus']               = array($this->getCampusFromYearLevel($currentUser['academicYear']));
         $newUser['year']                 = $currentUser['academicYear'];
         $newUser['house']                = $this->getHouse($currentUser['house']);
         $newUser['residential_house_id'] = $this->getResidentialHouse($currentUser['cateringHouse']);
-        $newUser['alt_email']            = $this->convertEmail($currentUser['email']);
-        $newUser['local_email']          = 1;
-        $newUser['su']                   = false;
-        $newUser['defaultCampus']        = $this->getCampusFromYearLevel($currentUser['academicYear']);
+        $newUser['alt_email']            = $currentUser['username'] . ($newUser['campus'][0] == self::GIBGATE_CAMPUS_ID ? '@gibgate.nsw.edu.au':'@frensham.nsw.edu.au');
+        $newUser['local_email']          = 0;
+        $newUser['defaultCampus']        = $newUser['campus'][0];
         $newUser['eportfolio_enabled']   = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
-//        if (Cfg::get('boarder_leave_enabled')) {
-//            $newUser['boarding_status']  = $currentUser['boardingStatus'];
-//        }
+
 
         return $newUser;
     }
