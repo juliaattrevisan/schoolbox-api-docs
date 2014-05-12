@@ -104,7 +104,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * Notify the system that a CMS event occurred (will be sent to cmsLog table)
 	 *
 	 * @param string $action
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @throws ScheduleException
 	 * @return bool
@@ -222,7 +222,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/* ASYNC METHODS */
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return bool
 	 */
@@ -231,7 +231,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return bool
@@ -241,7 +241,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return bool
 	 */
@@ -252,7 +252,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roleType
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -347,7 +347,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
 	 */
@@ -355,7 +355,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
 	 */
@@ -365,7 +365,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/* ASYNC METHODS */
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -374,7 +374,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -384,7 +384,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -393,7 +393,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -402,7 +402,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -412,7 +412,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -421,7 +421,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -430,7 +430,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -440,7 +440,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
