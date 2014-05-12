@@ -26,5 +26,5 @@ MAILTO="support@schoolbox.com.au"
 0 21 * * *	root	php /usr/share/schoolboxdev/tools/mq/binder.php -v >> /var/log/schoolboxdev/binder.log 2>&1
 
 # Restart daemons after binder run
-50 21 * * *     root    service schoolboxdev-scheduled restart >/dev/null 2>&1
-50 21 * * *     root    service schoolboxdev-digestd restart >/dev/null 2>&1
+50 21 * * *     root    /usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1
+50 21 * * *     root    /usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1
