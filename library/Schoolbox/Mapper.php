@@ -59,6 +59,10 @@ class Mapper {
 	const METHOD_UPDATE = 'update';
 	const METHOD_DELETE = 'delete';
 
+	// as per http://www.php.net/manual/en/pdostatement.rowcount.php#109891
+	const PDO_RESULT_INSERT = 1;
+	const PDO_RESULT_UPDATE = 2;
+
 	/**
 	 * @var Database
 	 */
@@ -586,6 +590,83 @@ class Mapper {
 		return true;
 	}
 
+
+	/**
+	 * Deletes (whether hard or soft) all records that match the given column value
+	 * Returns the number of records deleted.
+	 *
+	 * @param $columnName
+	 * @param $columnValue
+	 * @return int
+	 */
+	public function deleteByColumn($columnName, $columnValue) {
+		return $this->deleteByColumnList(array($columnName => $columnValue));
+	}
+
+
+	/**
+	 * Deletes (whether hard or soft) all records that match the given set of column values
+	 * Returns the number of records deleted.
+	 *
+	 * @param array $columnList
+	 * @return int
+	 */
+	public function deleteByColumnList($columnList) {
+		$quoted_table = $this->database->quoteIdentifier($this->table);
+
+		// only soft-delete if this is a soft-deletable model
+		if($softDelete = $this->getSoftDeleteUpdateSql()) {
+			$query = "UPDATE $quoted_table SET $softDelete WHERE ";
+		}
+		else {
+			$query = "DELETE FROM $quoted_table WHERE ";
+		}
+
+		// Build WHERE part
+		$where_parts = array();
+		$params      = array();
+
+		// as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
+		if(empty($columnList)) {
+			return 0;
+		}
+
+		foreach ($columnList as $columnName => $columnValue) {
+			$escaped_name = $this->database->quoteIdentifier($columnName);
+			if (!isset($columnValue)) {
+				$where_parts[] = "$escaped_name IS NULL";
+			}
+			else {
+				// This method is smart enough to work with arrays and IN statements
+				// If the list of values is empty, though: there's no way
+				// that the query could ever return anything, so just return
+				// an empty collection.
+				if (is_array($columnValue)) {
+					if (count($columnValue) === 0) {
+						return 0;
+					}
+					$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+					$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
+				}
+				else {
+					$where_parts[]            = "$escaped_name = :{$columnName}_0";
+					$params[$columnName.'_0'] = $columnValue;
+				}
+			}
+		}
+		$query .= implode(' AND ', $where_parts);
+
+		$statement = $this->database->prepare($query);
+		foreach ($params as $name => $value) {
+			$statement->bindValue($name, $value);
+		}
+
+		$statement->execute();
+
+		return $statement->rowCount();
+	}
+
+
 	/**
 	 * Restores one or more models that were soft deleted.
 	 *
@@ -1046,6 +1127,7 @@ class Mapper {
 			ON DUPLICATE KEY UPDATE $updString;
 		");
 		$affectedIDs = array();
+		$pdoMethods = array();
 
 		//
 		// Trigger all on collection before attempting to run?
@@ -1068,9 +1150,23 @@ class Mapper {
 		}
 
 		$this->database->beginTransaction();
-		foreach ($collection as $model) {
+		foreach ($collection as $i => $model) {
 			$this->bindParamsForSave($model, $statement);
 			if ($statement->execute()) {
+				// take note of whether this was an insert or update
+				$m = $statement->rowCount();
+				switch($m) {
+					case self::PDO_RESULT_INSERT:
+						$pdoMethods[$i] = self::METHOD_CREATE;
+						break;
+					case self::PDO_RESULT_UPDATE:
+						$pdoMethods[$i] = self::METHOD_UPDATE;
+						break;
+					default:
+						$pdoMethods[$i] = null;
+						break;
+				}
+
 				if ($id_property) {
 					if (!$this->getModelProperty($model, $id_property)) {
 						$new_id = $this->database->lastInsertId();
@@ -1132,26 +1228,25 @@ class Mapper {
 		}
 		$this->database->commit();
 
-		foreach ($collection as $model) {
+		foreach ($collection as $i => $model) {
+			$previous = null;
+
 			if ($id_property && ($id = $this->getModelProperty($model, $id_property))) {
 				$previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
 				$this->triggerCallbacks('postSave', $model, $previous);
+			}
 
-				// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
-				if(isset($this->sessionData['user'])) {
+			// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
+			if(isset($this->sessionData['user'])) {
+				// create a new event, and send it to the scheduler
+				$event = new Event(
+					$this->sessionData['user'],
+					$pdoMethods[$i],
+					$model,
+					$previous ? $this->diff($model, $previous) : null
+				);
 
-                    // create a new event, and send it to the scheduler
-                    $event = new Event(
-                        $this->sessionData['user'],
-                        $previous ? self::METHOD_UPDATE : self::METHOD_CREATE,
-                        $model,
-                        $previous ? $this->diff($model, $previous) : null
-                    );
-
-                    $this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
-
-				}
-
+				$this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
 			}
 		}
 
@@ -1474,14 +1569,14 @@ class Mapper {
 	}
 
 	/**
-	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 * Retrieves an SQL fragment for filtering out or setting soft-deleted items.
 	 *
+	 * @param $value
 	 * @param  string $alias The alias used for this table, if any.
 	 * @return string
 	 */
-	protected function getSoftDeleteFilterSql($alias = null) {
+	protected function getSoftDeleteSql($value, $alias = null) {
 		if (isset($this->soft_delete_column)) {
-			$value = $this->soft_delete_undeleted_value;
 			$column = "`{$this->soft_delete_column}`";
 			if (isset($alias)) {
 				$column = "`$alias`.$column";
@@ -1498,9 +1593,30 @@ class Mapper {
 			return "$column = ".$this->database->quote($value);
 		}
 		return null;
+
 	}
 
 	/**
+	 * Retrieves an SQL fragment for filtering out soft-deleted items.
+	 *
+	 * @param  string $alias The alias used for this table, if any.
+	 * @return string
+	 */
+	protected function getSoftDeleteFilterSql($alias = null) {
+		return $this->getSoftDeleteSql($this->soft_delete_undeleted_value, $alias);
+	}
+
+	/**
+	 * Retrieves an SQL fragment for updating soft-deleted items.
+	 *
+	 * @param string $alias
+	 * @return string
+	 */
+	protected function getSoftDeleteUpdateSql($alias = null) {
+		return $this->getSoftDeleteSql($this->soft_delete_deleted_value, $alias);
+	}
+
+		/**
 	 * Creates a new instance of class with name passed in $this->hasModel().
 	 *
 	 * @throws Mapper\Exception

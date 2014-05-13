@@ -61,6 +61,10 @@ class Messenger {
 		$this->bind($message, $severity, $topic, "category.$catId", $params, $filter);
 	}
 
+	public function broadcastToCategoryAdmin($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "category.$catId.admin", $params, $filter);
+	}
+
 	public function broadcastToCampus($campusId, $message, $topic, $severity, $params = array(), $filter = array()) {
 		$this->bind($message, $severity, $topic, "campus.$campusId", $params, $filter);
 	}

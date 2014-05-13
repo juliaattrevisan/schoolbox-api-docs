@@ -2,16 +2,19 @@
 <script type="text/javascript">
     $j(document).ready(function () {
         $j('.greenCheck').click(function () {
+            var data;
             if ($j(this).is(':checked')) {
-                var data = {
-                    join:$j(this).attr('rel')
+                data = {
+                    join : $j(this).attr('rel'),
+                    ajax : 1
                 }
 
                 $j(this).prop('checked', true);
             }
             else {
-                var data = {
-                    leave:$j(this).attr('rel')
+                data = {
+                    leave : $j(this).attr('rel'),
+                    ajax : 1
                 }
 
                 $j(this).prop('checked', false);

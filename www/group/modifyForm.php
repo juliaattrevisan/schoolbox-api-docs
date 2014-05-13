@@ -57,7 +57,14 @@ else if (isset($_REQUEST['accept'])) {
 
 	for ($i = 0; $i < $total; $i++) {
 		if (is_numeric($_REQUEST['accept'][$i])) {
-			$groupHandler->setUserPermission($_REQUEST['categoryID'], $_REQUEST['accept'][$i], READ_ACCESS);
+			$user = \Schoolbox\UserMapper::getInstance()->findById($_REQUEST['accept'][$i]);
+
+			$ua = new \Schoolbox\UserAccess();
+			$ua ->setAccessLevel(\Schoolbox\UserAccess::ACCESS_READ)
+				->setService(\Schoolbox\UserAccess::SERVICE_HOMEPAGE)
+				->setUser($user)
+				->setItemId($_REQUEST['categoryID']);
+			\Schoolbox\UserAccessMapper::getInstance()->save($ua);
 		}
 	}
 
