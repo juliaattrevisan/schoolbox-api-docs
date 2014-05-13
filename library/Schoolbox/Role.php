@@ -9,9 +9,14 @@
 namespace Schoolbox;
 
 class Role {
+
+	/** @var int */
     private $id;
+	/** @var string */
     private $name;
+	/** @var string */
     private $type;          //Type of user group, guest, student, parent, staff
+	/** @var bool */
     private $canChangePassword;  //Users can change passwords (bool)
 
     /**
@@ -58,35 +63,67 @@ class Role {
         return $this->type == self::PARENT;
     }
 
-    public function setCanChangePassword($canChangePassword) {
+	/**
+	 * @param bool $canChangePassword
+	 * @return self
+	 */
+	public function setCanChangePassword($canChangePassword) {
         $this->canChangePassword = $canChangePassword;
+	    return $this;
     }
 
-    public function getCanChangePassword() {
+	/**
+	 * @return bool
+	 */
+	public function getCanChangePassword() {
         return $this->canChangePassword;
     }
 
-    public function setId($id) {
+	/**
+	 * @param int $id
+	 * @return self
+	 */
+	public function setId($id) {
         $this->id = $id;
+	    return $this;
     }
 
-    public function getId() {
+	/**
+	 * @return int
+	 */
+	public function getId() {
         return $this->id;
     }
 
-    public function setName($name) {
+	/**
+	 * @param string $name
+	 * @return self
+	 */
+	public function setName($name) {
         $this->name = $name;
+	    return $this;
     }
 
-    public function getName() {
+	/**
+	 * @return string
+	 */
+	public function getName() {
         return $this->name;
     }
 
-    public function setType($type) {
+	/**
+	 * @param string $type
+	 * @return self
+	 */
+	public function setType($type) {
         $this->type = $type;
+	    return $this;
     }
 
-    public function getType() {
+	/**
+	 * @return string
+	 */
+	public function getType() {
         return $this->type;
     }
 
