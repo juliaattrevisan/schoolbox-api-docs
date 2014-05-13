@@ -95,39 +95,14 @@ class Controller extends Base {
         }
 
         // Load campus and timetable selectors
-        $campusList = array();
-        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
-            /** @var Campus $campus */
-            $campusId    = $campus->getId();
-            $campusArray = array(
-                'id'         => $campusId,
-                'name'       => $campus->getName(),
-                'days'       => 0,
-                'periodList' => array(),
-            );
-
-            $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
-            // Somehow parse $timetable into a list of names, start and end, and
-            // the next day they occur.
-            $campusArray['days'] = $timetable['dayCount'];
-            foreach ($timetable['desc'] as $i => $name) {
-                $campusArray['periodList'][] = array(
-                    'index' => $i,
-                    'desc'  => $name,
-                    'start' => $timetable['start'][$i],
-                    'end'   => $timetable['end'][$i],
-                );
-            }
-            $campusList[$campusId] = $campusArray;
-        }
 
         // Populate into a campus list instead.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item' => $item,
-                    'campusList' => $campusList,
+                    'item'       => $item,
+                    'campusList' => $this->getCampusList(),
                 ),
             )
         );
@@ -625,6 +600,7 @@ class Controller extends Base {
                 'data'     => array(
                     'item'       => $item,
                     'recurrence' => $recurrence,
+                    'campusList' => $this->getCampusList(),
                 ),
             )
         );
@@ -710,6 +686,40 @@ class Controller extends Base {
             // Consider storing redirect URL in form or GET?
             $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
         }
+    }
+
+    /**
+     * Helper method for getting list of campuses and their periods and days.
+     *
+     * @return array
+     */
+    protected function getCampusList() {
+        $campusList = array();
+        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
+            /** @var Campus $campus */
+            $campusId    = $campus->getId();
+            $campusArray = array(
+                'id'         => $campusId,
+                'name'       => $campus->getName(),
+                'days'       => 0,
+                'periodList' => array(),
+            );
+
+            $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
+            // Somehow parse $timetable into a list of names, start and end, and
+            // the next day they occur.
+            $campusArray['days'] = $timetable['dayCount'];
+            foreach ($timetable['desc'] as $i => $name) {
+                $campusArray['periodList'][] = array(
+                    'index' => $i,
+                    'desc'  => $name,
+                    'start' => $timetable['start'][$i],
+                    'end'   => $timetable['end'][$i],
+                );
+            }
+            $campusList[$campusId] = $campusArray;
+        }
+        return $campusList;
     }
 
     /**
