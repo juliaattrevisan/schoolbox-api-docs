@@ -103,7 +103,7 @@ class CategoryMapper extends Mapper {
 
 		// retain any codes that do NOT match the given model
 		$id = $model->getId();
-		$collisions->filterByCallback(function($code) use ($id) {
+		$collisions = $collisions->filterByCallback(function($code) use ($id) {
 			/** @var CategoryCode $code */
 			return $code->getCategory()->getId() != $id;
 		});
