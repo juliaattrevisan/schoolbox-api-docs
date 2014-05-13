@@ -9,7 +9,7 @@ $groupHandler = new Group();
 if (is_numeric($_GET['eventID'])) {
     $page->setFile(TEMPLATE_content, 'calendar/modify.html');
     $page->setTab("calendar");
-    $page->setTitle('Update Calender Event');
+    $page->setTitle('Update Calendar Event');
 
     $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
     $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
