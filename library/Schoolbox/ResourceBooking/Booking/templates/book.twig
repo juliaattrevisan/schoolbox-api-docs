@@ -270,15 +270,15 @@ $(document).ready(function() {
         <tr>
             <td class="formLabelWidth">
                 <h4>Timetable</h4>
-                <em>You may select a timetable period to book this item for here.</em>
-                <em>If you want this booking to recur every timetable day, then
+                <em>You may select a timetable day and period to book this item for here.</em>
+                <em>If you want this booking to recur for a timetable period, then
                     make sure you select the "Timetable Based" option in "Repeat".</em>
             </td>
             <td>
                 {# Select campus, day, period #}
                 {# on change campus: deselect day and period#}
                 <dl class="timetableSelector" data-interaction="timetableSelector">
-                    <dt><label for="timetableCampus">Campus</label></dt>
+                    <dt>Campus</dt>
                     <dd>
                         <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
                             <option disabled>-- select campus --</option>
@@ -289,13 +289,13 @@ $(document).ready(function() {
                             {% endfor %}
                         </select>
                     </dd>
-                    <dt><label for="timetableDay">Day</label></dt>
+                    <dt>Day</dt>
                     <dd>
                         <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
                             <option disabled>-- select day --</option>
                         </select>
                     </dd>
-                    <dt><label for="timetablePeriod">Period</label></dt>
+                    <dt>Period</dt>
                     <dd>
                         <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
                             <option disabled>-- select period --</option>
