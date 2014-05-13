@@ -2059,6 +2059,31 @@ li:hover > .actions .btn
 /*--------------------------------------------------------------
  RESOURCE BOOKING
 --------------------------------------------------------------*/
+.resource-list{
+    li{
+        .meta{
+                img{ display: none; }
+            }
+    }
+    li:nth-child(odd){ background: @dark; }
+}
+
+.resourcecategory-list{
+    margin-top: 8px;
+}
+
+#resource-search-term{
+    float: left;
+    margin: 4px 8px 0 0;
+}
+
+.resourcecategory{
+    margin: 4px 0px;
+}
+
+#resource-create{
+    margin: 15px 0;
+}
 
 .resource-info{
     overflow: auto;
@@ -2075,16 +2100,31 @@ li:hover > .actions .btn
         float: left;
         margin: 0 0 0 0.99%;
         width: 50%;
-        .management{
+        .meta{
+            color: @dgrey;
             margin: 10px 0;
             img{ display: none; }
         }
     }
 
     .rules{
+        border-left: 1px solid @body-background;
         float: right;
+        padding: 0 0 0 0.99%;
         margin: 0 0 0 0.99%;
-        width: 26%;
+        width: 24%;
+    }
+}
+
+#calendar{
+    .fc-event{
+        border: none;
+    }
+    .pending{
+        background: lighten(@highlight-color,@lighten-value);
+    }
+    .approved{
+        background: lighten(@positive-color,@lighten-value);
     }
 }
 
