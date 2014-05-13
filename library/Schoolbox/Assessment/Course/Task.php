@@ -289,7 +289,7 @@ class Task implements ISoftDeletable {
             default:
                 break;
         }
-        return 'tick';
+        return 'task';
     }
 
     /**
