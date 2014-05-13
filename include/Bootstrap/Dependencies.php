@@ -108,6 +108,7 @@ $di->set(
                 array('cache' => $config->get('stream_dir').'/templates/', 'debug' => true,)
             );
             $twig->addExtension(new Twig_Extension_Debug());
+            $twig->addExtension(new Twig_Extensions_Extension_Text());
 
             // Add the route lookup and authorization methods
             $twig->addFunction(
