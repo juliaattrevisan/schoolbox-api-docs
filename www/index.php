@@ -2,11 +2,6 @@
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
-// Initialise module configuration
-foreach (glob(SITE_root.'/conf/modules/*.php') as $routePath) {
-    require $routePath;
-}
-
 // Run router with requested path
 $path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $route = $di->get('router')->match($path, $_SERVER);
