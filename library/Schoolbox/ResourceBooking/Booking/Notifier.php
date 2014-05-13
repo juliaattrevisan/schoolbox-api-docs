@@ -105,19 +105,25 @@ class Notifier extends AbstractModuleNotifier {
         $key            = 'resource_booking.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $user->getId();
+        $startDate      = new \Alaress_Date_Format(
+            $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime()
+        );
         $messageParams  = array(
             'user'     => array(
                 $user->formatName(),
-                '/search/user/'.$user->getId()
+                '/search/user/'.$user->getId(),
             ),
-            'resource' => array($object->getResource()->getName()),
-            'date'     => $object->getEvent()->getStartDate(),
+            'resource' => array(
+                $object->getResource()->getName(),
+                $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
+            ),
+            'date'     => array(
+                '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
+                $startDate->getLocal(),
+            ),
         );
         if (!$isOwnerCreator) {
-            $messageParams['owner'] = array(
-                $owner->formatName(),
-                '/search/user/'.$owner->getId(),
-            );
+            $messageParams['owner'] = array($owner->formatName(), '/search/user/'.$owner->getId(),);
         }
         switch ($event) {
             case 'created':
@@ -160,7 +166,7 @@ class Notifier extends AbstractModuleNotifier {
         $message = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/item/'.$object->getResource()->getId()
+            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
         );
 
         // Notify the owner of the booking that someone booked for them
