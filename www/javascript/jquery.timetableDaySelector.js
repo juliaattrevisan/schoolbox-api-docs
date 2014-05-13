@@ -141,7 +141,7 @@
             if (startTime.isValid()) {
                 self.startTimeDisplay
                     .attr('datetime', startTime.format('HH:mm'))
-                    .text(startTime.format('h:mmA'))
+                    .text(startTime.format('h:mm A'))
             }
             else {
                 self.startTimeDisplay
@@ -151,7 +151,7 @@
             if (endTime.isValid()) {
                 self.endTimeDisplay
                     .attr('datetime', endTime.format('HH:mm'))
-                    .text(endTime.format('h:mmA'))
+                    .text(endTime.format('h:mm A'))
             }
             else {
                 self.endTimeDisplay
