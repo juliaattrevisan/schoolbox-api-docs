@@ -57,7 +57,8 @@ INSERT INTO `msg_namespace`(`id`,`slug`,`label`) VALUES
   (7,'leave','Boarder Leave'),
   (8,'wiki','Wiki'),
   /* 9 is reserved for EOTC */
-  (10, 'group', 'Groups');
+  (10, 'group', 'Groups'),
+  (11, 'cms', 'Content Management');
 
 
 /* Data for `msg_source` */
@@ -123,4 +124,139 @@ INSERT INTO `msg_source` (`id`,`namespace`,`key`,`role_type`,`description`) VALU
   (NULL,10,'approved','staff','your request to join a moderated group is approved'),
   (NULL,10,'approved','student','your request to join a moderated group is approved'),
   (NULL,10,'approved','parent','your request to join a moderated group is approved'),
+
+  (NULL,11,'created','staff',  'someone creates homepage content'),
+  (NULL,11,'created','student','someone creates homepage content'),
+  (NULL,11,'created','parent', 'someone creates homepage content'),
+  (NULL,11,'updated','staff',  'someone updates homepage content'),
+  (NULL,11,'updated','student','someone updates homepage content'),
+  (NULL,11,'updated','parent', 'someone updates homepage content'),
+  (NULL,11,'deleted','staff',  'someone deletes homepage content'),
+  (NULL,11,'deleted','student','someone deletes homepage content'),
+  (NULL,11,'deleted','parent', 'someone deletes homepage content')
 );
+
+
+/* DUEWORK AND QUIZ */
+/* Students, all but upcoming and overdue are     min digest,      max email,       default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 200 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (1, 2)
+AND role_type = 'student'
+AND `key` NOT IN ('overdue');
+
+/* Students, upcoming and overdue are          min instant,     max email,       default email */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 250 `min_level`, 300 `max_level`, 300 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (1, 2)
+AND role_type = 'student'
+AND `key` IN ('overdue');
+
+/* Staff, everything                           min off,       max email,       default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (1, 2)
+AND role_type = 'staff';
+
+/* Parents, everything                         min off        max email        default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (1, 2)
+AND role_type = 'parent';
+
+
+/* BLOG, FORUM */
+/* Staff and Student, everything               min off,       max email,       default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (3, 4)
+AND role_type IN ('student', 'staff');
+
+/* NEWS */
+/* Everyone, everything                        min digest,      max email,       default digest */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 200 `min_level`, 300 `max_level`, 200 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (5);
+
+/* CALENDAR */
+/* Everyone, upcoming                          min off        max email        default off */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 0 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (6)
+AND `key` = 'upcoming';
+
+/* Everyone, upcoming                          min off        max email        default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (6)
+AND `key` = 'updated';
+
+
+/* BOARDER LEAVE */
+/* Everyone, everything                        min off        max email        default email */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 300 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (7);
+
+
+/* MEMBERSHIP */
+/* Everyone, joined                            min off        max email        default instant */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 250 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (10)
+AND `key` IN ('joined', 'approved');
+
+/* Everyone, left                              min off        max email        default off */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 0 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (10)
+AND `key` = 'left';
+
+/* Everyone, requested                         min off        max email        default email */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 300 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (10)
+AND `key` = 'requested';
+
+/* CMS */
+/* Everyone, requested                         min off        max email        default digest */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 200 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (11)
+AND `key` IN ('created','updated');
+
+/* Everyone, requested                         min off        max email        default off */
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `min_level`, `max_level`, `default_level`)
+SELECT src.id `msg_source_id`, g.id `role_id`, 0 `min_level`, 300 `max_level`, 0 `default_level`
+FROM msg_source src
+LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+WHERE namespace IN (11)
+AND `key` IN ('deleted');
+
+
