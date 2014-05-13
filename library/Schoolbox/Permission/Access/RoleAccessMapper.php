@@ -29,7 +29,6 @@ class RoleAccessMapper extends Mapper {
 			'column'     => 'cid',
 			'property'   => 'category',
 			'type'       => self::TYPE_MODEL,
-			'identifier' => true,
 			'join'       => 'category'
 		));
 
@@ -37,7 +36,6 @@ class RoleAccessMapper extends Mapper {
 			'column'     => 'gid',
 			'property'   => 'role',
 			'type'       => self::TYPE_MODEL,
-			'identifier' => true,
 			'join'       => 'role'
 		));
 
