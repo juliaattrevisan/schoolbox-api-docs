@@ -408,6 +408,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         if ($this->readOnly) {
             if ($unit_task_status) {
                 $this->parse('unit_task_completion_block', 'unit_task_completion');
+
             }
             if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
                 $this->parse('unit_task_start_block', 'unit_task_start');
