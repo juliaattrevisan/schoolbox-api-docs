@@ -23,15 +23,20 @@ if ($_POST['name']) {
 		'recursive' => $_POST['recursive'] ? '1' : '0',
 	);
 
+	$codeCollection = new \Schoolbox\Collection();
+	foreach(explode(',', $_POST['code']) as $code) {
+		$codeModel = new \Schoolbox\Resource\CategoryCode();
+		$codeModel->setCode(trim($code));
+		$codeCollection->add($codeModel);
+	}
+
 	/** @var \Schoolbox\Resource\Category $model */
 	$model = CategoryMapper::getInstance()->createModel()
 		->setName($_POST['name'])
 		->setParent(CategoryMapper::getInstance()->createModel()
 			->setId($_POST['parent'])
 		)
-		->setCodes(CategoryMapper::getInstance()->createCollection(array(CategoryCodeMapper::getInstance()->createModel()
-			->setCode($_POST['code'])
-		)));
+		->setCodes($codeCollection);
 
 	if (is_numeric($_POST['categoryID'])) {
 		if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
