@@ -72,7 +72,7 @@ class Category {
 	}
 
 	/**
-	 * @return Collection
+	 * @return Collection|CategoryCode[]
 	 */
 	public function getCodes() {
 		return $this->codes;
