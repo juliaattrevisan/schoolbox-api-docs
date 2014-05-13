@@ -110,10 +110,18 @@ $di->set(
             $twig->addExtension(new Twig_Extension_Debug());
             $twig->addExtension(new Twig_Extensions_Extension_Text());
 
-            // Add my text filters
+            // HTML Purifier escape strategy
             $twig->getExtension('core')->setEscaper('purify', function($twig, $string) {
                 return Scrub::html($string);
             });
+
+            // HTML2Text filter
+            $twig->addFilter(
+                new Twig_SimpleFilter(
+                    'html2text',
+                    array('Scrub', 'html2text')
+                )
+            );
 
             // Add the route lookup and authorization methods
             $twig->addFunction(
