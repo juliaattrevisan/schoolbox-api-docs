@@ -123,6 +123,14 @@ $di->set(
                 )
             );
 
+            // Bytes to string filter
+            $twig->addFilter(
+                new Twig_SimpleFilter(
+                    'bytes',
+                    array('Alaress_Byte_Format', 'bytesToString')
+                )
+            );
+
             // Add the route lookup and authorization methods
             $twig->addFunction(
                 new Twig_SimpleFunction(
