@@ -17,8 +17,18 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
 use Schoolbox\UserAccess;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
 
 class Notifier extends AbstractModuleNotifier {
+
+    /**
+     * A router - injected for the purpose of generating URLs for resource
+     * booking related items.
+     *
+     * @var Router
+     */
+    protected $router;
 
     /**
      * {@inheritdoc}
@@ -31,7 +41,10 @@ class Notifier extends AbstractModuleNotifier {
      * {@inheritdoc}
      */
     public function loadDependencies($dependencies = null) {
+        /** @var ContainerInterface $di */
+        global $di;
         $this->namespace = NSMapper::getInstance()->findOneBySlug('resource_booking');
+        $this->router    = $di->get('router');
     }
 
     /**
