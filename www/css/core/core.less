@@ -1540,7 +1540,7 @@ Notifications
     }
     .information-list {
         .no-expand {
-            padding-left: 15px;
+            display: none;
         }
         .expand-link {
             text-decoration: none;
@@ -1552,8 +1552,7 @@ Notifications
             margin-right: 4px;
             display: inline-block;
             background-color: transparent;
-            background-position-x: -2px;
-            background-position-y: -6px;
+            background-position: -2px -6px;
             background-repeat: no-repeat;
         }
         .unit.collapsed .expand-button {
@@ -1568,12 +1567,55 @@ Notifications
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
 .information-list {
+    //Hover cover on .dark elements to override inline styles for 'Customise Page' custom colours
+    .ui-sortable{
+        .dark:hover{ background-color: lighten(@highlight-color,@lighten-value); }
+    }
 	// List clear and rule between list items
 	li {
 		border-bottom: 1px solid @border-color;
 		clear: both;
         line-height: 16px;
 		.clearfix;
+
+		.ticks {
+			.transition(background-color 0.2s linear);
+			background-color: transparent;
+			border: 0;
+			position: relative;
+			float: right;
+			right: 10px;
+			top: 4px;
+			width: 29px;
+			height: 25px;
+			span {
+				background-image: url('/images/core/icons/ticks.png');
+				height: 24px;
+				width: 26px;
+				float: right;
+			}
+			&.incomplete span {
+				background-position: 0 0;
+			}
+			&.incomplete:hover span {
+				background-position: 0 -24px;
+			}
+			&.pending span {
+				background-position: 0 -48px;
+				width: 28px;
+			}
+			&.pending:hover span {
+				background-position: 0 -48px;
+				width: 28px;
+			}
+			&.complete span {
+				background-position: 0 -72px;
+			}
+			&.complete:hover span {
+				background-position: 0 -72px;
+			}
+			&.pending{ left: -7px; }
+		}
 	}
 	// Tigerstripe
 	.dark {
@@ -8635,7 +8677,7 @@ ul.submission-list {
             &.overdue           { .activity-icon(0, 13) }
             &.submitted         { .activity-icon(0, 14) }
             &.wiki              { .activity-icon(0, 15) }
-            &.folder            { .activity-icon(0, 16) }
+            &.task              { .activity-icon(0, 16) }
         }
         .avatar {
             .inline-block;
@@ -10740,31 +10782,6 @@ body.login {
 	.loginPageVersion;
 }
 
-// Course builder
-.course_instance .information-list .no-expand {
-	padding-left: 15px;
-}
-.course_instance .information-list .expand-link {
-	text-decoration: none;
-}
-.course_instance .information-list .expand-button {
-	line-height: 11px;
-	width: 11px;
-	min-height: 11px;
-	margin-right: 4px;
-	display: inline-block;
-	background-color: transparent;
-	background-position-x: -2px;
-	background-position-y: -6px;
-	background-repeat: no-repeat;
-}
-.course_instance .information-list .unit.collapsed .expand-button {
-	background-image: url(/images/tree/elbow-collapsed.gif);
-}
-.course_instance .information-list .unit.expanded  .expand-button {
-	background-image: url(/images/tree/elbow-expanded.gif);
-}
-
 /**
  * Bar graphs which should be reusable everywhere
  * Used by the Bargraph plugin I maked
@@ -11164,13 +11181,16 @@ th.rotate {
 
 .ui-sortable {
 	&> li {
-		background: #fff;
+		background-color: #fff;
 		background-image: url('/images/core/tablesorter/sort.gif');
 		background-repeat: no-repeat;
 		background-position: left center;
 		border-bottom: 1px solid @border-color;
 		cursor: move;
 		padding-left: 21px;
+        &:hover{
+          background-color: lighten(@highlight-color,@lighten-value);
+        }
 		&.ui-sortable-helper {
 			border: 1px solid @border-color;
 			box-shadow: 1px 1px 2px @border-color;

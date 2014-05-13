@@ -338,7 +338,7 @@ class Instance implements ISoftDeletable {
             default:
                 break;
         }
-        return 'tick';
+        return 'task';
     }
 
     /**
