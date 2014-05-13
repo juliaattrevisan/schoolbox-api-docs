@@ -83,6 +83,7 @@ else {
     $this->setVar(array(
         'ACTION' => 'modify',
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_ACTION' => 'Modify Survey',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION' => $assess['description'],

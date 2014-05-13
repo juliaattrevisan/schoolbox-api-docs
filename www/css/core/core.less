@@ -1707,19 +1707,21 @@ Notifications
  * action buttons in the bottom right corner, or floated to the right of a component
  * Actions are the buttons to interact with the list item, such as edit, delete
  */
-.actions {
-	position: relative;
-	z-index: 1;
-	float: right;
-	// Put all buttons on the one row
-	.btn {
-		background-color: transparent;
-		border-color: transparent;
-		opacity: 0.3;
-		.transition(all 0.2s);
-		float: none;
-		display: inline-block;
-	}
+td,li,span {
+  .actions {
+    position: relative;
+    z-index: 1;
+    float: right;
+    // Put all buttons on the one row
+    .btn {
+      background-color: transparent;
+      border-color: transparent;
+      opacity: 0.3;
+      .transition(all 0.2s);
+      float: none;
+      display: inline-block;
+    }
+  }
 }
 
 /* span.actions inside a td should be floated left always, as this typically represents
