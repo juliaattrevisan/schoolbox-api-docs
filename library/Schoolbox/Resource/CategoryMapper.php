@@ -87,6 +87,7 @@ class CategoryMapper extends Mapper {
 		));
 
 		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
+		$this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
 
 	}
 
@@ -113,6 +114,33 @@ class CategoryMapper extends Mapper {
 		}
 
 		// persist Category object
+		return true;
+	}
+
+	/**
+	 * @param Category $model
+	 * @param Category $previous
+	 * @return bool
+	 */
+	public function postSave($model, $previous = null) {
+		// if no codes populated, no need to do anything
+		if(!$model->getCodes()->count()) {
+			return true;
+		}
+
+		// first drop the previous code(s) connected to this category
+		CategoryCodeMapper::getInstance()->delete(
+			CategoryCodeMapper::getInstance()->findById($model->getId())
+		);
+
+		// bind the given codes to this category
+		foreach($model->getCodes() as $code) {
+			$code->setCategory($model);
+		}
+
+		// persist the Code objects
+		CategoryCodeMapper::getInstance()->save($model->getCodes());
+
 		return true;
 	}
 
