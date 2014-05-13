@@ -1156,9 +1156,11 @@ class Mapper {
 		// retrieve the objects as they currently exist so we can perform a diff if we need to
 		$collectionIds = $collection->getColumnValues($id_property);
 		$existingObjects = array();
-		foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
-			// index by ID
-			$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+		if(isset($identifier['column'])) {
+			foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
+				// index by ID
+				$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+			}
 		}
 
 		$this->database->beginTransaction();
