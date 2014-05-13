@@ -110,6 +110,11 @@ $di->set(
             $twig->addExtension(new Twig_Extension_Debug());
             $twig->addExtension(new Twig_Extensions_Extension_Text());
 
+            // Add my text filters
+            $twig->getExtension('core')->setEscaper('purify', function($twig, $string) {
+                return Scrub::html($string);
+            });
+
             // Add the route lookup and authorization methods
             $twig->addFunction(
                 new Twig_SimpleFunction(
