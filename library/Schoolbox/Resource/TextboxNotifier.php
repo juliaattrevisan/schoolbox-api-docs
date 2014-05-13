@@ -32,7 +32,7 @@ class TextboxNotifier extends ResourceNotifier {
 		$msgr = new Messenger();
 
 		$resourceId = $resource->getId();
-		$category = $resource->getCategory();
+		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
 			":author created content in :homepage",
@@ -62,7 +62,7 @@ class TextboxNotifier extends ResourceNotifier {
 		$msgr = new Messenger();
 
 		$resourceId = $resource->getId();
-		$category = $resource->getCategory();
+		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
 			":author updated content in :homepage",
@@ -92,7 +92,7 @@ class TextboxNotifier extends ResourceNotifier {
 		$msgr = new Messenger();
 
 		$resourceId = $resource->getId();
-		$category = $resource->getCategory();
+		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
 			":author updated content from :homepage",
