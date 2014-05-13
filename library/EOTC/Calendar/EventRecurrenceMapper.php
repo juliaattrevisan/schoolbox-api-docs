@@ -16,7 +16,7 @@ class EventRecurrenceMapper {
 	/**
 	 * An instance of \EOTC\Calendar\EventMapper
 	 *
-	 * @var null
+	 * @var EventMapper
 	 */
 	protected $eventMapper = null;
 
@@ -180,7 +180,7 @@ class EventRecurrenceMapper {
 	/**
 	 * Set event mapper
 	 *
-	 * @param null $eventMapper
+	 * @param EventMapper $eventMapper
 	 */
 	protected function setEventMapper($eventMapper) {
 		$this->eventMapper = $eventMapper;
@@ -189,7 +189,7 @@ class EventRecurrenceMapper {
 	/**
 	 * Get event mapper
 	 *
-	 * @return null
+	 * @return EventMapper
 	 */
 	protected function getEventMapper() {
 		return $this->eventMapper;
