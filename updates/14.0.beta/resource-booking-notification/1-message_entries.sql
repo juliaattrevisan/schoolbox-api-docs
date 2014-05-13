@@ -28,6 +28,11 @@ INSERT INTO `msg_source` (
     'somebody approved a booking for a resource'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
+    'pending',
+    'staff',
+    'somebody set a booking for a resource as pending'
+  ), (
+    (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'rejected',
     'staff',
     'somebody rejected a booking for a resource'
