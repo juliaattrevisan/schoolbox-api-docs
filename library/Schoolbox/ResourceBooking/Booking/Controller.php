@@ -14,6 +14,7 @@ use DateTime;
 use Alaress_Date_Format;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
 use External_Timetable;
@@ -440,19 +441,22 @@ class Controller extends Base {
      * @param  Calendar\Event $event
      * @param  string         $recurrenceRule
      * @param  DateTime       $repeatUntil
+     * @param  int            $campusId
      * @return Collection|Calendar\Event[] The events that were created.
      */
     protected function createEventsFromRecurrence(
         Calendar\Event $event,
         $recurrenceRule,
-        $repeatUntil
+        $repeatUntil,
+        $campusId
     ) {
         /** @var Collection|Calendar\Event[] $eventList */
         $eventList = new Collection();
         switch ($recurrenceRule) {
-            case 'weekly':
-            case 'monthly':
             case 'daily':
+            case 'weekly':
+            case 'fortnightly':
+            case 'monthly':
                 if ($repeatUntil instanceof DateTime) {
                     $this->getEventRecurrenceMapper()->save(
                         $event,
@@ -462,6 +466,19 @@ class Controller extends Base {
                         new Alaress_Date_Format($event->getStartDateTime()),
                         new Alaress_Date_Format($event->getEndDateTime())
                     );
+                    // Create a whole set of bookings based on this event.
+                    $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
+                }
+                break;
+            case 'timetable':
+                if ($repeatUntil instanceof DateTime) {
+                    $period = new \External_TimetableDatePeriod(
+                        $event->getStartDateTime(),
+                        $repeatUntil->modify('+1 day'),
+                        $this->getExternalTimetableHandler(),
+                        $campusId
+                    );
+                    $this->getEventRecurrenceMapper()->createSequenceFromIterator($event, $period);
                     // Create a whole set of bookings based on this event.
                     $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
                 }
@@ -519,7 +536,8 @@ class Controller extends Base {
         $eventList = $this->createEventsFromRecurrence(
             $event,
             $this->getRequest()->post['repeat'],
-            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until'])
+            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+            $this->getRequest()->post['timetable']['campus']
         );
 
         // Build a list of bookings to return
