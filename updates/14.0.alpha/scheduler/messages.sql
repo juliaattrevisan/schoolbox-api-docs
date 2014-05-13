@@ -133,8 +133,7 @@ INSERT INTO `msg_source` (`id`,`namespace`,`key`,`role_type`,`description`) VALU
   (NULL,11,'updated','parent', 'someone updates homepage content'),
   (NULL,11,'deleted','staff',  'someone deletes homepage content'),
   (NULL,11,'deleted','student','someone deletes homepage content'),
-  (NULL,11,'deleted','parent', 'someone deletes homepage content')
-);
+  (NULL,11,'deleted','parent', 'someone deletes homepage content');
 
 
 /* DUEWORK AND QUIZ */
