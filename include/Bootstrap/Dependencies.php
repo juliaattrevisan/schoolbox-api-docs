@@ -111,9 +111,19 @@ $di->set(
             $twig->addExtension(new Twig_Extensions_Extension_Text());
 
             // HTML Purifier escape strategy
+            // Please use the filter below instead.
             $twig->getExtension('core')->setEscaper('purify', function($twig, $string) {
                 return Scrub::html($string);
             });
+
+            // HTML Purifier filter - known to output safe HTML
+            $twig->addFilter(
+                new Twig_SimpleFilter(
+                    'purify',
+                    array('Scrub', 'html'),
+                    array('is_safe' => array('html'))
+                )
+            );
 
             // HTML2Text filter
             $twig->addFilter(
