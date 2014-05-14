@@ -79,7 +79,12 @@ foreach($criterionCollection as $crit) {
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
     try {
-        $criteria = $criterionMapper->findByID($critID);
+        $criteria = $criterionMapper->findOneByColumnList(
+            array(
+                'id'        => $critID,
+                'parent_id' => $catID,
+            )
+        );
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
 
