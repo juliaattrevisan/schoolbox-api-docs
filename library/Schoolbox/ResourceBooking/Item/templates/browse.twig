@@ -42,7 +42,7 @@
                     {% endfor %}
                 {% endif %}
             </p>
-            {{ item.description|raw }}
+            {{ item.description|e("purify")|raw }}
         </li>
         {% else %}
         <li>There are no resources in the system.</li>

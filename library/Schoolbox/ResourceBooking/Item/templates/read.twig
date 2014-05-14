@@ -240,7 +240,7 @@ $(document).ready(function() {
             Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
         </p>
 
-        {{ item.description|raw }}
+        {{ item.description|e("purify")|raw }}
     </div>
     <div class="rules">
         <h1>Rules</h1>
