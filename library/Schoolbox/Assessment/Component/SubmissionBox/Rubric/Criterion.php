@@ -9,7 +9,10 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-class Criterion {
+use Schoolbox\ISoftDeletable;
+use Alaress_Date_Format;
+
+class Criterion implements ISoftDeletable {
 
     const PARENT_TYPE_CATEGORY   = 'category';
     const PARENT_TYPE_SUBMISSION = 'submission';
@@ -39,6 +42,11 @@ class Criterion {
      * @var string
      */
     protected $parent_type = self::PARENT_TYPE_CATEGORY;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $deletedAt;
 
     /**
      * @param  string $grouping
@@ -118,6 +126,29 @@ class Criterion {
      */
     public function getParentType() {
         return $this->parent_type;
+    }
+
+    /**
+     * @param  Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeletedAt($deletedAt) {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDeletedAt() {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof Alaress_Date_Format);
     }
 
 }
