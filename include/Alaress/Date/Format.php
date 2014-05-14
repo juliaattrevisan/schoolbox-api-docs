@@ -301,4 +301,18 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		}
 		return strcmp($this->getDatabaseDate(), $other->getDatabaseDate());
 	}
+
+	/**
+	 * Outputs this string as a recognisable string representation of a date,
+	 * including timezone data.
+	 *
+	 * This is mainly for Twig - this makes its date filter work intuitively
+	 * with Alaress_Date_Format objects.
+	 *
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->getUsingFormat('c');
+	}
+
 }

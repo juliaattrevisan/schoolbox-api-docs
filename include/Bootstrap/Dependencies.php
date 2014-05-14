@@ -108,6 +108,34 @@ $di->set(
                 array('cache' => $config->get('stream_dir').'/templates/', 'debug' => true,)
             );
             $twig->addExtension(new Twig_Extension_Debug());
+            $twig->addExtension(new Twig_Extensions_Extension_Text());
+
+            // HTML Purifier escape strategy
+            $twig->getExtension('core')->setEscaper('purify', function($twig, $string) {
+                return Scrub::html($string);
+            });
+
+            // HTML2Text filter
+            $twig->addFilter(
+                new Twig_SimpleFilter(
+                    'html2text',
+                    array('Scrub', 'html2text')
+                )
+            );
+
+            // Bytes to string filter
+            $twig->addFilter(
+                new Twig_SimpleFilter(
+                    'bytes',
+                    array('Alaress_Byte_Format', 'bytesToString')
+                )
+            );
+
+            // Global access to config object and a date locale object
+            $twig->addGlobal('config', $config);
+            $twig->addGlobal('locale', array(
+                'date' => new Alaress_Date_Locale_Australian()
+            ));
 
             // Add the route lookup and authorization methods
             $twig->addFunction(
