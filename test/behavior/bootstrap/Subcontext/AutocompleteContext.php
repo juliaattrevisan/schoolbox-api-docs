@@ -31,8 +31,7 @@ class Subcontext_AutocompleteContext extends BaseContext {
      * @throws Exception if the container wasn't found.
      */
     protected function getAutocompleteContainer($field) {
-        $this->preconfigureAutocompletes();
-        $container = $this->getSession()->getPage()->find('css', 'input[name="'.$field.'"]');
+        $container = $this->getSession()->getPage()->find('css', 'input[name="'.$field.'"], select[name="'.$field.'"]');
         if (!($container instanceof Element\NodeElement)) {
             throw new Exception('Could not find autocomplete for field named "'.$field.'"');
         }
@@ -46,7 +45,7 @@ class Subcontext_AutocompleteContext extends BaseContext {
      * @When /^(?:|I )fill in autocomplete "(?P<field>[^"]*)" with "(?P<value>[^"]*)"$/
      */
     public function fillInAutocomplete($field, $value) {
-        $typeInput = $this->getAutocompleteContainer($field)->find('css', 'input[type="text"]');
+        $typeInput = $this->getAutocompleteContainer($field)->find('css', '.selectize-input input[type="text"]');
         if (!($typeInput instanceof Element\NodeElement)) {
             throw new Exception('Could not find autocomplete input for field named "'.$field.'"');
         }
@@ -60,11 +59,11 @@ class Subcontext_AutocompleteContext extends BaseContext {
      */
     public function selectFromAutocomplete($option, $field) {
         // Wait for it to actually show
-        $this->getCoreContext()->waitForElementOnPage('.ms-res-ctn');
+        $this->getCoreContext()->waitForElementOnPage('.selectize-dropdown-content .option');
 
         // Iterate over each one, and try to select it.
         /** @var Element\NodeElement[] $optionList */
-        $optionList = $this->getSession()->getPage()->findAll('css', '.ms-res-ctn .ms-res-item');
+        $optionList = $this->getSession()->getPage()->findAll('css', '.selectize-dropdown-content .option');
         foreach ($optionList as $optionItem) {
             if (mb_strpos($optionItem->getText(), $option) !== false) {
                 $optionItem->click();
@@ -80,14 +79,14 @@ class Subcontext_AutocompleteContext extends BaseContext {
      * @When /^(?:|I )remove "(?P<option>[^"]*)" from autocomplete "(?P<field>[^"]*)"$/
      */
     public function removeFromAutocomplete($option, $field) {
-        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.selectize-input .item') as $item) {
             /** @var Element\NodeElement $item */
             if (mb_strpos($item->getText(), $option) !== false) {
-                $close = $item->find('css', '.ms-close-btn');
+                $close = $item->find('css', '.remove');
                 if (!($close instanceof Element\NodeElement)) {
                     throw new Exception('Could not remove button for autocomplete option "'.$option.'" for field named "'.$field.'"');
                 }
-                $item->find('css', '.ms-close-btn')->click();
+                $close->click();
                 return;
             }
         }
@@ -103,7 +102,7 @@ class Subcontext_AutocompleteContext extends BaseContext {
     public function assertAutocompleteOptionSelected($option, $field) {
         // find the autocomplete
         // Does $option exist within it?
-        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.selectize-input .item') as $item) {
             /** @var Element\NodeElement $item */
             if (mb_strpos($item->getText(), $option) !== false) {
                 return;
@@ -119,7 +118,7 @@ class Subcontext_AutocompleteContext extends BaseContext {
      * @Then /^(?:|I )should not see "(?P<option>[^"]*)" in the "(?P<field>[^"]*)" autocomplete"$/
      */
     public function assertAutocompleteOptionNotSelected($option, $field) {
-        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.ms-sel-item') as $item) {
+        foreach ($this->getAutocompleteContainer($field)->findAll('css', '.selectize-input .item') as $item) {
             /** @var Element\NodeElement $item */
             if (mb_strpos($item->getText(), $option) !== false) {
                 throw new Exception('Autocomplete option "'.$option.'" for field named "'.$field.'" exists when it should not');

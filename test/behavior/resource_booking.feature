@@ -58,7 +58,7 @@ Scenario: Manage resource categories
   And   I should see "Projectors" in the ".resourcecategory-list" element
   And   I should not see "To be deleted" in the ".resourcecategory-list" element
 
-@resource-management
+@resource-management @resource-management-create
 Scenario: Manage resources
   Given I do not wipe the slate clean
   And   I go to homepage
@@ -87,8 +87,8 @@ Scenario: Manage resources
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
   # Entering a user into a autocomplete field
-  And  I fill in autocomplete "moderator_id" with "Celia"
-  And  I select "Celia Glenn" from autocomplete "moderator_id"
+  And  I fill in autocomplete "moderator_id[]" with "Celia"
+  And  I select "Celia Glenn" from autocomplete "moderator_id[]"
   And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
@@ -102,12 +102,12 @@ Scenario: Manage resources
     | max_reservation_time[day] | 02                       |
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
-  And  I fill in autocomplete "moderator_id" with "Jenifer"
-  And  I select "Jenifer Shadbolt" from autocomplete "moderator_id"
-  And  I fill in autocomplete "moderator_id" with "Lovejoy"
-  And  I select "Peter Lovejoy" from autocomplete "moderator_id"
-  And  I fill in autocomplete "moderator_id" with "Scott"
-  And  I select "Scott Berryhill" from autocomplete "moderator_id"
+  And  I fill in autocomplete "moderator_id[]" with "Jenifer"
+  And  I select "Jenifer Shadbolt" from autocomplete "moderator_id[]"
+  And  I fill in autocomplete "moderator_id[]" with "Lovejoy"
+  And  I select "Peter Lovejoy" from autocomplete "moderator_id[]"
+  And  I fill in autocomplete "moderator_id[]" with "Scott"
+  And  I select "Scott Berryhill" from autocomplete "moderator_id[]"
   And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
@@ -119,7 +119,7 @@ Scenario: Manage resources
     | description | A projector made of gold |
   And   I select "Projectors" from "resource_category_id"
   And   I select "Managed" from "resource_moderation_type_id"
-  And   I remove "Scott Berryhill" from autocomplete "moderator_id"
+  And   I remove "Scott Berryhill" from autocomplete "moderator_id[]"
   And   I press "resource-save"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
@@ -127,9 +127,9 @@ Scenario: Manage resources
   And   I should not see "The special projector" in the ".resource-list" element
   # Check its users
   When  I edit resource "The good projector"
-  Then  the autocomplete "moderator_id" should not contain "Scott Berryhill"
-  And   the autocomplete "moderator_id" should contain "Jenifer Shadbolt"
-  And   the autocomplete "moderator_id" should contain "Peter Lovejoy"
+  Then  the autocomplete "moderator_id[]" should not contain "Scott Berryhill"
+  And   the autocomplete "moderator_id[]" should contain "Jenifer Shadbolt"
+  And   the autocomplete "moderator_id[]" should contain "Peter Lovejoy"
   # Delete a resource
   When  I move backward one page
   And   I follow "resource-create"
@@ -224,35 +224,35 @@ Scenario: Adding related resources to a resource
     | description               | A box for the English textbook |
     | max_reservation_time[day] | 168                            |
   And   I select "Textbooks" from "resource_category_id"
-  And   I fill in autocomplete "related_resource_id" with "English"
-  And   I select "English textbook" from autocomplete "related_resource_id"
-  And   I fill in autocomplete "related_resource_id" with "projector"
-  And   I select "A single projector" from autocomplete "related_resource_id"
+  And   I fill in autocomplete "related_resource_id[]" with "English"
+  And   I select "English textbook" from autocomplete "related_resource_id[]"
+  And   I fill in autocomplete "related_resource_id[]" with "projector"
+  And   I select "A single projector" from autocomplete "related_resource_id[]"
   And   I press "resource-save"
   # Check the related resources
   When  I edit resource "Book box"
-  Then  the autocomplete "related_resource_id" should contain "English textbook"
-  And   the autocomplete "related_resource_id" should contain "A single projector"
+  Then  the autocomplete "related_resource_id[]" should contain "English textbook"
+  And   the autocomplete "related_resource_id[]" should contain "A single projector"
   # Relations should be reciprocal too
   When  I move backward one page
   And   I edit resource "English textbook"
-  Then  the autocomplete "related_resource_id" should contain "Book box"
-  And   the autocomplete "related_resource_id" should not contain "A single projector"
+  Then  the autocomplete "related_resource_id[]" should contain "Book box"
+  And   the autocomplete "related_resource_id[]" should not contain "A single projector"
   # And reciprocally deleted
   When  I move backward one page
   And   I edit resource "A single projector"
-  And   I remove "Book box" from autocomplete "related_resource_id"
+  And   I remove "Book box" from autocomplete "related_resource_id[]"
   And   I press "resource-save"
   And   I edit resource "A single projector"
   Then  I should not see "Book box"
   When  I move backward one page
   And   I edit resource "English textbook"
-  Then  the autocomplete "related_resource_id" should contain "Book box"
-  And   the autocomplete "related_resource_id" should not contain "A single projector"
+  Then  the autocomplete "related_resource_id[]" should contain "Book box"
+  And   the autocomplete "related_resource_id[]" should not contain "A single projector"
   When  I move backward one page
   And   I edit resource "Book box"
-  Then  the autocomplete "related_resource_id" should contain "English textbook"
-  And   the autocomplete "related_resource_id" should not contain "A single projector"
+  Then  the autocomplete "related_resource_id[]" should contain "English textbook"
+  And   the autocomplete "related_resource_id[]" should not contain "A single projector"
 
 @resource-booking @resource-booking-open
 Scenario: Booking an open resource

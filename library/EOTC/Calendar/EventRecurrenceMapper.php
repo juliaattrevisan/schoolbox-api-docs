@@ -10,13 +10,14 @@
 
 namespace EOTC\Calendar;
 
+use DateTime;
 
 class EventRecurrenceMapper {
 
 	/**
 	 * An instance of \EOTC\Calendar\EventMapper
 	 *
-	 * @var null
+	 * @var EventMapper
 	 */
 	protected $eventMapper = null;
 
@@ -167,6 +168,37 @@ class EventRecurrenceMapper {
 	}
 
 	/**
+	 * Another totally custom recurrence save method - this one uses an iterable
+	 * date source to create dates.
+	 *
+	 * @param Event       $event
+	 * @param DateTime[] $dateSource
+	 */
+	public function createSequenceFromIterator(Event $event, $dateSource = null) {
+		if (!isset($dateSource)) {
+			// just save the single event
+			$this->getEventMapper()->save($event);
+		}
+		else {
+			// dateSource could be a datePeriod
+			// How many days are there between $start and $end?
+			$startDate = new DateTime($event->getStartDate().' 00:00:00');
+			$endDate   = new DateTime($event->getEndDate().' 00:00:00');
+			$diff      = $startDate->diff($endDate);
+			$dayDiff   = $diff->days;
+			$seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
+			foreach ($dateSource as $currentDate) {
+				// Save event in a sequence.
+				$event->setId(null);
+				$event->setSeriesId($seriesId);
+				$event->setStartDate($currentDate->format('Y-m-d'));
+				$event->setEndDate($currentDate->modify("+$dayDiff days")->format('Y-m-d'));
+				$this->getEventMapper()->save($event);
+			}
+		}
+	}
+
+	/**
 	 * Post-event save hook, for augmentation by subclasses
 	 *
 	 * @param Event $event
@@ -180,7 +212,7 @@ class EventRecurrenceMapper {
 	/**
 	 * Set event mapper
 	 *
-	 * @param null $eventMapper
+	 * @param EventMapper $eventMapper
 	 */
 	protected function setEventMapper($eventMapper) {
 		$this->eventMapper = $eventMapper;
@@ -189,7 +221,7 @@ class EventRecurrenceMapper {
 	/**
 	 * Get event mapper
 	 *
-	 * @return null
+	 * @return EventMapper
 	 */
 	protected function getEventMapper() {
 		return $this->eventMapper;

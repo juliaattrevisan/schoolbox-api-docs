@@ -35,6 +35,10 @@ class Module extends BaseModule {
                ->addValues(array('action' => 'update'));
         $router->add('resourceBooking.bookingCalendar', $basePath.'/itemCalendar/{id}');
 
+        // JSON route for getting next/previous day
+        $router->add('resourceBooking.dateForTimetableDay', $basePath.'/dateForTimetableDay')
+               ->addValues(array('format' => '.json'));
+
         // Approving or rejecting a single booking
         $router->add('resourceBooking.approve',    $basePath.'/{id}/approve');
         $router->add('resourceBooking.reject',     $basePath.'/{id}/reject');
@@ -109,6 +113,10 @@ class Module extends BaseModule {
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setResourceMapper']
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
+        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setExternalTimetableHandler']
+            = $injector->lazyNew('External_Timetable');
+        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setCampusMapper']
+            = $injector->lazyNew('Schoolbox\\CampusMapper');
         $injector->set(
             'controller:resourceBooking',
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')

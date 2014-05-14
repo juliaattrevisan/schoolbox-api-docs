@@ -55,7 +55,7 @@ if ($route instanceof Aura\Router\Route) {
     catch (\Alaress\Authorizer\Failure\Unauthorized $e) {
         // Really basic unauthorized response - redirect to a login page.
         $response = $di->get('webFactory')->newResponse();
-        $response->redirect->to('/?page='.urlencode($path));
+        $response->redirect->to('/login/?page='.urlencode($path));
     }
     catch (\Alaress\Authorizer\Failure\Forbidden $e) {
         // TODO replace the call to Sitepage::error() method

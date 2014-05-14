@@ -1,5 +1,6 @@
 <!-- BEGIN custom_header -->
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -21,6 +22,47 @@ $(document).ready(function() {
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
     })
+
+    // Timetable selector
+    {#var campusList         = {{ campusList|json_encode|raw }}#}
+    $('[data-interaction="timetableSelector"]')
+        .timetableDaySelector({
+            campusList: {{ campusList|json_encode|raw }},
+            getChangeDateAjax: function(campus, day, date, previous) {
+                return {
+                    url:      {{ routeLookup('resourceBooking.dateForTimetableDay')|json_encode|raw }},
+                    dataType: 'json',
+                    data:     {
+                        campus:   campus,
+                        day:      day,
+                        previous: (previous ? 1 : 0),
+                        date:     date
+                    }
+                }
+            }
+        })
+        .on('useDate.timetableDaySelector', function(event, date, startTime, endTime) {
+            date = moment(date)
+            if (date.isValid()) {
+                var dateOutput = date.format('DD/MM/YYYY')
+                $('input[name="start_datetime[date]"]').val(dateOutput)
+                $('input[name="end_datetime[date]"]').val(dateOutput)
+            }
+
+            startTime = moment(startTime, 'HH:mm')
+            if (startTime.isValid()) {
+                $('input[name="start_datetime[hour]"]').val(startTime.format('h'))
+                $('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
+                $('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
+            }
+
+            endTime = moment(endTime, 'HH:mm')
+            if (endTime.isValid()) {
+                $('input[name="end_datetime[hour]"]').val(endTime.format('h'))
+                $('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
+                $('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
+            }
+        })
 
     // remote validation rules
     // Have some sort of helper for creating remote validations.
@@ -226,6 +268,55 @@ $(document).ready(function() {
             </td>
         </tr>
         <tr>
+            <td class="formLabelWidth">
+                <h4>Timetable</h4>
+                <em>You may select a timetable day and period to book this item for here.</em>
+                <em>If you want this booking to recur for a timetable period, then
+                    make sure you select the "Timetable Based" option in "Repeat".</em>
+            </td>
+            <td>
+                {# Select campus, day, period #}
+                {# on change campus: deselect day and period#}
+                <dl class="timetableSelector" data-interaction="timetableSelector">
+                    <dt>Campus</dt>
+                    <dd>
+                        <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
+                            <option disabled>-- select campus --</option>
+                            {% for campus in campusList %}
+                                <option value="{{ campus.id }}"
+                                        label="{{ campus.name }}"
+                                        >{{ campus.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </dd>
+                    <dt>Day</dt>
+                    <dd>
+                        <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
+                            <option disabled>-- select day --</option>
+                        </select>
+                    </dd>
+                    <dt>Period</dt>
+                    <dd>
+                        <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
+                            <option disabled>-- select period --</option>
+                        </select>
+                    </dd>
+                    <dt>Date</dt>
+                    <dd>
+                        <time data-role="selectedDate"></time>
+                        <time data-role="selectedTimeStart"></time>
+                        <time data-role="selectedTimeEnd"></time>
+                    </dd>
+                    <dt>&nbsp;</dt>
+                    <dd>
+                        <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
+                        <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
+                        <a data-interaction="useDate" class="btn tick no-text float-left" title="Use this date" href="#"><span></span></a>
+                    </dd>
+                </dl>
+            </td>
+        </tr>
+        <tr>
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
                 {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
@@ -255,10 +346,13 @@ $(document).ready(function() {
         <td>
             <select name="repeat" id="repeatUntilSelect">
                 <option value="">Single Booking</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="monthly">Monthly</option>
+                <optgroup label="Recurring">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="timetable">Timetable Based</option>
+                </optgroup>
             </select>
         </td>
         </tr>

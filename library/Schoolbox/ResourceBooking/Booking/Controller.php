@@ -12,9 +12,13 @@ use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use DateTime;
 use Alaress_Date_Format;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\ResourceBooking\Item;
 use EOTC\Calendar;
+use External_Timetable;
+use Schoolbox\CampusMapper;
 
 class Controller extends Base {
 
@@ -37,6 +41,16 @@ class Controller extends Base {
      * @var Calendar\EventRecurrenceMapper
      */
     protected $eventRecurrenceMapper;
+
+    /**
+     * @var External_Timetable
+     */
+    protected $externalTimetableHandler;
+
+    /**
+     * @var CampusMapper
+     */
+    protected $campusMapper;
 
     /**
      * Creates a booking for an item.
@@ -79,12 +93,69 @@ class Controller extends Base {
                 $item->getEvent()->setEndDateTime($endDate);
             }
         }
+
+        // Load campus and timetable selectors
+
+        // Populate into a campus list instead.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'item'       => $item,
+                    'campusList' => $this->getCampusList(),
                 ),
+            )
+        );
+    }
+
+    /**
+     * Outputs a response for getting the next or previous occurence of a
+     * timetable day.
+     *
+     * Query parameters:
+     * * campus:   the ID of the campus to get timetable day for
+     * * day:      the day number to get
+     * * date:     Date to get next or previous occurence in relation to.
+     *             Defaults to current date.
+     * * previous: If true, gets previous date - otherwise, gets next date.
+     *
+     */
+    public function dateForTimetableDay() {
+        $campus    = $this->request->query['campus'];
+        $dayNumber = $this->request->query['day'];
+        $date      = strtotime($this->request->query['date']);
+        $previous  = $this->request->query['previous'];
+        $code      = 200;
+        $error     = '';
+        if ($date === false) {
+            $date = null;
+        }
+        try {
+            $nearestDate = $previous ?
+                $this->externalTimetableHandler->getPreviousDateForDayNumber($campus, $dayNumber, $date):
+                $this->externalTimetableHandler->getNextDateForDayNumber($campus, $dayNumber, $date);
+        }
+        catch (\InvalidArgumentException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        }
+        catch (\RangeException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        }
+
+        $data = array();
+        if ($error) {
+            $data['error'] = $error;
+        }
+        elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
+            $data['date'] = $nearestDate->format('Y-m-d');
+        }
+        $this->response->status->setCode($code);
+        $this->response->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
             )
         );
     }
@@ -345,19 +416,22 @@ class Controller extends Base {
      * @param  Calendar\Event $event
      * @param  string         $recurrenceRule
      * @param  DateTime       $repeatUntil
+     * @param  int            $campusId
      * @return Collection|Calendar\Event[] The events that were created.
      */
     protected function createEventsFromRecurrence(
         Calendar\Event $event,
         $recurrenceRule,
-        $repeatUntil
+        $repeatUntil,
+        $campusId
     ) {
         /** @var Collection|Calendar\Event[] $eventList */
         $eventList = new Collection();
         switch ($recurrenceRule) {
-            case 'weekly':
-            case 'monthly':
             case 'daily':
+            case 'weekly':
+            case 'fortnightly':
+            case 'monthly':
                 if ($repeatUntil instanceof DateTime) {
                     $this->getEventRecurrenceMapper()->save(
                         $event,
@@ -367,6 +441,19 @@ class Controller extends Base {
                         new Alaress_Date_Format($event->getStartDateTime()),
                         new Alaress_Date_Format($event->getEndDateTime())
                     );
+                    // Create a whole set of bookings based on this event.
+                    $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
+                }
+                break;
+            case 'timetable':
+                if ($repeatUntil instanceof DateTime) {
+                    $period = new \External_TimetableDatePeriod(
+                        $event->getStartDateTime(),
+                        $repeatUntil->modify('+1 day'),
+                        $this->getExternalTimetableHandler(),
+                        $campusId
+                    );
+                    $this->getEventRecurrenceMapper()->createSequenceFromIterator($event, $period);
                     // Create a whole set of bookings based on this event.
                     $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
                 }
@@ -424,7 +511,8 @@ class Controller extends Base {
         $eventList = $this->createEventsFromRecurrence(
             $event,
             $this->getRequest()->post['repeat'],
-            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until'])
+            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+            $this->getRequest()->post['timetable']['campus']
         );
 
         // Build a list of bookings to return
@@ -512,6 +600,7 @@ class Controller extends Base {
                 'data'     => array(
                     'item'       => $item,
                     'recurrence' => $recurrence,
+                    'campusList' => $this->getCampusList(),
                 ),
             )
         );
@@ -597,6 +686,40 @@ class Controller extends Base {
             // Consider storing redirect URL in form or GET?
             $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
         }
+    }
+
+    /**
+     * Helper method for getting list of campuses and their periods and days.
+     *
+     * @return array
+     */
+    protected function getCampusList() {
+        $campusList = array();
+        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
+            /** @var Campus $campus */
+            $campusId    = $campus->getId();
+            $campusArray = array(
+                'id'         => $campusId,
+                'name'       => $campus->getName(),
+                'days'       => 0,
+                'periodList' => array(),
+            );
+
+            $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
+            // Somehow parse $timetable into a list of names, start and end, and
+            // the next day they occur.
+            $campusArray['days'] = $timetable['dayCount'];
+            foreach ($timetable['desc'] as $i => $name) {
+                $campusArray['periodList'][] = array(
+                    'index' => $i,
+                    'desc'  => $name,
+                    'start' => $timetable['start'][$i],
+                    'end'   => $timetable['end'][$i],
+                );
+            }
+            $campusList[$campusId] = $campusArray;
+        }
+        return $campusList;
     }
 
     /**
@@ -903,6 +1026,38 @@ class Controller extends Base {
      */
     public function getResourceMapper() {
         return $this->resourceMapper;
+    }
+
+    /**
+     * @param  External_Timetable $externalTimetableHandler
+     * @return $this
+     */
+    public function setExternalTimetableHandler($externalTimetableHandler) {
+        $this->externalTimetableHandler = $externalTimetableHandler;
+        return $this;
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    public function getExternalTimetableHandler() {
+        return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @param  CampusMapper $campusMapper
+     * @return $this
+     */
+    public function setCampusMapper($campusMapper) {
+        $this->campusMapper = $campusMapper;
+        return $this;
+    }
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper() {
+        return $this->campusMapper;
     }
 
 }
