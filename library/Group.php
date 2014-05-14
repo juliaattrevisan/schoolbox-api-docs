@@ -92,7 +92,7 @@ class Group extends DeprecatedModel
 	 * of serializing/unserializing this result set.
 	 *
 	 * @param  $name
-	 * @return array|bool
+	 * @return array
 	 */
 	public function getGroupTypeIds($name)
 	{
@@ -125,7 +125,7 @@ class Group extends DeprecatedModel
 	/**
 	 * Alias for getting Staff Group Type IDs
 	 *
-	 * @return bool|int
+	 * @return array
 	 */
 	public function getStaffGroupTypeIds()
 	{
@@ -135,7 +135,7 @@ class Group extends DeprecatedModel
 	/**
 	 * Alias for getting Parent Group Type IDs
 	 *
-	 * @return bool|int
+	 * @return array
 	 */
 	public function getParentGroupTypeIds()
 	{
@@ -145,7 +145,7 @@ class Group extends DeprecatedModel
 	/**
 	 * Alias for getting Student Group Type IDs
 	 *
-	 * @return bool|int
+	 * @return array
 	 */
 	public function getStudentGroupTypeIds()
 	{
@@ -155,7 +155,7 @@ class Group extends DeprecatedModel
 	/**
 	 * Alias for getting Guest Group Type IDs
 	 *
-	 * @return bool|int
+	 * @return array
 	 */
 	public function getGuestGroupTypeIds()
 	{
