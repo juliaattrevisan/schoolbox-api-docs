@@ -131,6 +131,12 @@ $di->set(
                 )
             );
 
+            // Global access to config object and a date locale object
+            $twig->addGlobal('config', $config);
+            $twig->addGlobal('locale', array(
+                'date' => new Alaress_Date_Locale_Australian()
+            ));
+
             // Add the route lookup and authorization methods
             $twig->addFunction(
                 new Twig_SimpleFunction(
