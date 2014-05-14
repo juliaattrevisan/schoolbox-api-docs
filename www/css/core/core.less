@@ -2054,6 +2054,81 @@ li:hover > .actions .btn
   clear: both;
   margin: 30px 0 0 0;
 }
+
+
+/*--------------------------------------------------------------
+ RESOURCE BOOKING
+--------------------------------------------------------------*/
+.resource-list{
+    li{
+        .meta{
+                img{ display: none; }
+            }
+    }
+    li:nth-child(odd){ background: @dark; }
+}
+
+.resourcecategory-list{
+    margin-top: 8px;
+}
+
+#resource-search-term{
+    float: left;
+    margin: 4px 8px 0 0;
+}
+
+.resourcecategory{
+    margin: 4px 0px;
+}
+
+#resource-create{
+    margin: 15px 0;
+}
+
+.resource-info{
+    overflow: auto;
+    margin-bottom: 25px;
+    .resource-img {
+        background: @border-color;
+        float: left;
+        width: 22%;
+        max-height: 311px;
+        text-align: center;
+    }
+
+    .resource-detail{
+        float: left;
+        margin: 0 0 0 0.99%;
+        width: 50%;
+        .meta{
+            color: @dgrey;
+            margin: 10px 0;
+            img{ display: none; }
+        }
+        p{ word-wrap: break-word; }
+    }
+
+    .rules{
+        border-left: 1px solid @body-background;
+        float: right;
+        padding: 0 0 0 0.99%;
+        margin: 0 0 0 0.99%;
+        width: 24%;
+    }
+}
+
+#calendar{
+    .fc-event{
+        border: none;
+    }
+    .pending{
+        background: lighten(@highlight-color,@lighten-value);
+    }
+    .approved{
+        background: lighten(@positive-color,@lighten-value);
+    }
+}
+
 /*--------------------------------------------------------------
  SEARCH
 --------------------------------------------------------------*/
@@ -5790,96 +5865,85 @@ ul.js_happening {
         padding: 0;
         overflow: visible;
     }
-}
-
-.cal-bubble .middle {
-    min-height: 20px;
-    padding: 17px 24px 17px 16px;
-    position: relative;
-    -moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
-    line-height: 16px;
-    background: @white;
-    border: 1px solid @lgrey;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-
-}
-
-.cal-bubble .middle .close {
-    font-weight: bold;
-    z-index: 50000;
-    line-height: 16px;
-    position: absolute;
-    right: 24px;
-    top: 21px;
-    width: 19px;
-    height: 19px;
-    background: @lgrey;
-    color: @dgrey;
-    text-align: center;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.cal-bubble .middle h4 {
-    font-size: 12px;
-    margin: 0 0 16px 0;
-    width: 326px;
-    word-break: break-word;
-}
-
-.cal-bubble .middle h4 span {
-    margin: 0 0 5px 0;
-    padding: 2px;
-}
-
-.cal-bubble .middle p {
-    font-size: 12px;
-    margin: 0 0 16px 0;
-    padding: 0;
-}
-
-.cal-bubble .bottom {
-    width: 0px;
-    height: 0px;
-    border-bottom: 25px solid transparent; /* left arrow slant */
-    border-top: 0px solid transparent; /* right arrow slant */
-    border-right: 25px solid @lgrey; /* bottom, add background color here */
-    font-size: 0px;
-    line-height: 0px;
-    position: absolute;
-    bottom: -25px;
-    right: 30px;
-    z-index: 200002;
-}
-
-.cal-bubble .bottom strong {
-    width: 0px;
-    height: 0px;
-    border-bottom: 23px solid transparent; /* left arrow slant */
-    border-top: 0px solid transparent; /* right arrow slant */
-    border-right: 23px solid @white; /* bottom, add background color here */
-    font-size: 0px;
-    line-height: 0px;
-    display: block;
-    position: absolute;
-    bottom: -23px;
-    right: -24px;
-    z-index: 200001;
-}
-
-.cal-bubble h3 {
-    margin-bottom: 16px;
-    font-size: 16px;
-    color: @banner-background;
-    font-weight: bold;
-    width: 330px;
-}
-
-.cal-bubble h4 {
-    font-weight: bold;
+    h3{
+        margin-bottom: 16px;
+        font-size: 16px;
+        color: @banner-background;
+        font-weight: bold;
+        width: 330px;
+    }
+    h4{
+        font-weight: bold;
+    }
+    .middle{
+        min-height: 20px;
+        padding: 17px 24px 17px 16px;
+        position: relative;
+        .box-shadow(10px, 10px, 0px, rgba(0, 0, 0, 0.1));
+        line-height: 16px;
+        background: @white;
+        border: 1px solid @lgrey;
+        -moz-background-clip: padding;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        h4{
+            font-size: 12px;
+            margin: 0 0 16px 0;
+            width: 326px;
+            word-break: break-word;
+            span{
+                margin: 0 0 5px 0;
+                padding: 2px;
+            }
+        }
+        p{
+            font-size: 12px;
+            margin: 0 0 16px 0;
+            padding: 0;
+        }
+        .close{
+            font-weight: bold;
+            z-index: 50000;
+            line-height: 16px;
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            width: 19px;
+            height: 19px;
+            background: @lgrey;
+            color: @dgrey;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    }
+    .bottom{
+        width: 0px;
+        height: 0px;
+        border-bottom: 25px solid transparent; /* left arrow slant */
+        border-top: 0px solid transparent; /* right arrow slant */
+        border-right: 25px solid @lgrey; /* bottom, add background color here */
+        font-size: 0px;
+        line-height: 0px;
+        position: absolute;
+        bottom: -25px;
+        right: 30px;
+        z-index: 200002;
+        strong{
+            width: 0px;
+            height: 0px;
+            border-bottom: 23px solid transparent; /* left arrow slant */
+            border-top: 0px solid transparent; /* right arrow slant */
+            border-right: 23px solid @white; /* bottom, add background color here */
+            font-size: 0px;
+            line-height: 0px;
+            display: block;
+            position: absolute;
+            bottom: -23px;
+            right: -24px;
+            z-index: 200001;
+        }
+    }
 }
 
 .hidden-fields {

@@ -38,15 +38,15 @@
                                     </span>
                                 </span>
                             </div>
-                            <div class="booking-controls">
+                            <span class="actions booking-controls">
                                 {##
                                  # approve/reject selector
                                  #}
                                 <div class="status-selector">
                                     <span class="btn no-text
                                             {% if event.booking.status.approved %}tick
-                                            {% elseif event.booking.status.pending %}report
-                                            {% elseif event.booking.status.rejected %}translate
+                                            {% elseif event.booking.status.pending %}time-table
+                                            {% elseif event.booking.status.rejected %}cross
                                             {% endif %}"
                                           title="Current Status: {{ event.booking.status.name }}"><span></span></span>
                                     <ul class="status-buttons">
@@ -54,22 +54,22 @@
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                                                class="status-option">
-                                                <span class="status-label">Approved</span>
-                                                <span class="btn no-text tick"><span></span></span>
+                                                <span class="status-label">Approve</span>
+                                                <span class="actions btn no-text tick"><span></span></span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
                                                class="status-option">
                                                 <span class="status-label">Pending</span>
-                                                <span class="btn no-text report"><span></span></span>
+                                                <span class="actions btn no-text time-table"><span></span></span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
                                                class="status-option">
-                                                <span class="status-label">Rejected</span>
-                                                <span class="btn no-text translate"><span></span></span>
+                                                <span class="status-label">Deny</span>
+                                                <span class="actions btn no-text cross"><span></span></span>
                                             </a>
                                         </li>
                                     </ul>

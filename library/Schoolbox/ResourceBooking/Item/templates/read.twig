@@ -202,37 +202,51 @@ $(document).ready(function() {
 
 
 <h1>Resource - {{ item.name }}</h1>
-
-<p class="description">
-    {% if item.image.hash %}
-        <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+<span class="header_option">
+    {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
+        <a class="resource-name resource-edit-link btn modify float-left" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">
+            <span></span>
+            Modify Resource
+        </a>
     {% endif %}
-    {{ item.description|e|nl2br }}
-</p>
-
-<p class="category">
-    Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
-</p>
-
-{# Resource manager: could be set in the edit form, or the default resource manager #}
-<p class="management">
-    Resource moderated by:
-    <ul>
-        {% if defaultModeratorList is empty and item.moderatorList is empty %}
-            <li>Nobody</li>
-        {% else %}
-            {% for moderator in defaultModeratorList %}
-                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
-            {% endfor %}
-            {% for moderator in item.moderatorList %}
-                <li>{% include 'sub/userLink.twig' with {user: moderator} %}</li>
-            {% endfor %}
+    <form action="{{ routeLookup('resourceItem.browse') }}" method="get" class="float-left">
+        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
+    </form>
+</span>
+<div class="resource-info">
+    <div class="resource-img">
+        {% if item.image.hash %}
+            <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
         {% endif %}
-    </ul>
-</p>
+    </div>
+    <div class="resource-detail">
 
-<h2>Rules</h2>
-{% include '@resourceItem/sub/rules.twig' with {item: item} %}
+        {# Resource manager: could be set in the edit form, or the default resource manager #}
+        <p class="meta">
+            Managed by
+            {% if defaultModeratorList is empty and item.moderatorList is empty %}
+                <span>Nobody</span>
+            {% else %}
+                {% for moderator in defaultModeratorList %}
+                    <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
+                {% endfor %}
+                {% for moderator in item.moderatorList %}
+                    <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
+                {% endfor %}
+            {% endif %}
+        </p>
+        <p class="category">
+            Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+        </p>
+
+        {{ item.description|e("purify")|raw }}
+    </div>
+    <div class="rules">
+        <h1>Rules</h1>
+        {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+    </div>
+</div>
 
 <div id="calendar-loading">
     <p><strong>Loading events...</strong></p>

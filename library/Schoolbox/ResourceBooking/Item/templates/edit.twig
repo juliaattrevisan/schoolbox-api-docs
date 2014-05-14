@@ -4,7 +4,36 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/selectize/dist/css/selectize.default.css" />
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+
 <script type="text/javascript">
+
+    tinyMCE.init({
+        mode : "textareas",
+        theme : "advanced",
+        skin : "cirkuit",
+        plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+        browser_spellcheck : true,
+        content_css : "/css/core/tiny.css",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+        theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+        theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+        theme_advanced_buttons4 : "tablecontrols",
+        accessibility_warnings : false,
+        pdw_toggle_on : 1,
+        pdw_toggle_toolbars : '2, 3, 4',
+        extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+        theme_advanced_blockformats : "h3,h4,p,address,pre",
+        file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
+        file_browser_category_id : 0,
+        tabfocus_elements : ":prev,:next",
+        convert_urls : false
+    });
+
     (function($){
         $(function(){
 
@@ -38,9 +67,9 @@
             })
 
             form.find('input[type="file"].prettify').prettyFileInput({
-                additionalButtonClasses: 'no-marg float-left',
+                additionalButtonClasses: 'up-arrow no-marg float-right',
                 buttonActiveClass: 'tick',
-                defaultText: '<span></span>Choose file',
+                defaultText: '<span></span>Upload Image',
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
@@ -103,7 +132,7 @@
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>Description</h4></td>
-            <td><textarea name="description">{{ item.name }}</textarea></td>
+            <td><textarea name="description" style="width:100%;">{{ item.name }}</textarea></td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>Image</h4></td>
@@ -112,7 +141,7 @@
                     <input type="hidden" name="image" value="{{ item.image.id }}">
                     <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
                     <label><input type="checkbox" name="image" value="" /> Delete Image</label>
-                    or <input type="file" name="image" class="prettify">
+                    <input type="file" name="image" class="prettify">
                 {% else %}
                     <input type="file" name="image" class="prettify">
                 {% endif %}
@@ -124,9 +153,9 @@
                 <em>Somebody reserving this item must give this period of notice before their reservation.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes">
             </td>
         </tr>
         <tr>
@@ -135,9 +164,9 @@
                 <em>This item must be reserved for at least this period of time.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes">
             </td>
         </tr>
         <tr>
@@ -146,9 +175,9 @@
                 <em>This item cannot be reserved for longer than this period.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days"> days,
-                <input class="interval-input" value="{{ item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours"> hours,
-                <input class="interval-input" value="{{ item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes"> minutes
+                <input class="interval-input" value="{{ item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes">
             </td>
         </tr>
     </table>

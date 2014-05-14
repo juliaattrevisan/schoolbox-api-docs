@@ -1,20 +1,48 @@
-<div class="clearfix">
-    <h1>Resource List</h1>
-    <ul class="resource-list">
+<h1>Search Resources</h1>
+<span class="header_option">
+    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
+    </form>
+</span>
+<div class="news left clearfix">
+    <ul class="information-list resource-list">
         {% for item in list %}
         <li class="resource">
             {#
             Is there some more semantically correct way of saying that this is a
             resource, apart from adding classes?
             #}
-            <span class="resource-name">{{ item.name }}</span>
-            <a class="resource-read-link" id="resource-read-{{item.id}}" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">View</a>
-            {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
-                <a class="resource-book-link" id="resource-book-{{item.id}}" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">Book</a>
-            {% endif %}
-            {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
-                <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">Edit</a>
-            {% endif %}
+            <span class="actions">
+                <a class="resource-read-link btn no-text" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"><span></span></a>
+                {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
+                    <a class="resource-book-link btn report no-text" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"><span></span></a>
+                {% endif %}
+                {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
+                    <a class="resource-name resource-edit-link btn modify no-text" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><span></span></a>
+                {% endif %}
+            </span>
+            <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}" class="thumbnail">
+                {% if item.image.hash %}
+                    <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
+                {% endif %}
+            </a>
+            <h3 class="resource-name"><a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">{{ item.name }}</a></h3>
+            <p class="meta">
+                <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+                Managed by
+                {% if defaultModeratorList is empty and item.moderatorList is empty %}
+                    <span>Nobody</span>
+                {% else %}
+                    {% for moderator in defaultModeratorList %}
+                        <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
+                    {% endfor %}
+                    {% for moderator in item.moderatorList %}
+                        <span>{% include 'sub/userLink.twig' with {user: moderator} %} </span>
+                    {% endfor %}
+                {% endif %}
+            </p>
+            {{ item.description|e("purify")|raw }}
         </li>
         {% else %}
         <li>There are no resources in the system.</li>
@@ -22,21 +50,13 @@
     </ul>
     {# New item: only if I have the permission to do this #}
     {% if isRouteAuthorized('resourceItem.add') %}
-        <a id="resource-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceItem.add') }}">Add New</a>
+        <a id="resource-create" rel="create-form" class="btn add float-left" href="{{ routeLookup('resourceItem.add') }}"><span></span>Add New</a>
     {% endif %}
 </div>
 
-<div class="clearfix">
-    <h1>Search</h1>
-    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
-        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
-        <input type="submit" id="resource-search" value="Search" class="submit-btn-plain" />
-    </form>
-</div>
-
-<div class="clearfix">
-    <h1>Filter by Category</h1>
-    <ul class="resourcecategory-list">
+<div class="right">
+    <h2>Categories</h2>
+    <ul class="resourcecategory-list admin-nav vertical">
         <li class="resourcecategory">
             <a href="{{ routeLookup('resourceItem.browse') }}">All Categories</a>
         </li>
