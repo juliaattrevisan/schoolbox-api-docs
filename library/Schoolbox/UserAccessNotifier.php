@@ -29,9 +29,11 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	const TRIGGER_REQUESTED = 'requested';
 	const TRIGGER_APPROVED  = 'approved';
 
-
-	protected function buildTopic($eventLabel, $roleType) {
-		// noop
+	/**
+	 * @return string
+	 */
+	protected function getSlug() {
+		return NSMapper::NS_GROUP;
 	}
 
 
