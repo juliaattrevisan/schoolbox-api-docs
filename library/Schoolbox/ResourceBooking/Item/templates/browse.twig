@@ -6,7 +6,7 @@
     </form>
 </span>
 <div class="news left clearfix">
-    <ul class="resource-list information-list">
+    <ul class="information-list resource-list">
         {% for item in list %}
         <li class="resource">
             {#
@@ -22,6 +22,11 @@
                     <a class="resource-name resource-edit-link btn modify no-text" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><span></span></a>
                 {% endif %}
             </span>
+            <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}" class="thumbnail">
+                {% if item.image.hash %}
+                    <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
+                {% endif %}
+            </a>
             <h3 class="resource-name"><a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">{{ item.name }}</a></h3>
             <p class="meta">
                 <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>

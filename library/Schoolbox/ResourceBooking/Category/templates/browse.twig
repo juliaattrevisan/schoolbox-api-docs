@@ -6,5 +6,5 @@
 
 {# New item: only if I have the permission to do this #}
 {% if isRouteAuthorized('resourceCategory.add') %}
-    <a id="resourcecategory-create" rel="create-form" class="submit-btn-plain" href="{{ routeLookup('resourceCategory.add') }}">Add New</a>
+    <a id="resourcecategory-create" rel="create-form" class="btn add float-left" href="{{ routeLookup('resourceCategory.add') }}"><span></span>Add New</a>
 {% endif %}
