@@ -55,14 +55,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 
 		/* Campus permissions
 		 */
-		$campusList = $calendarHandler->getCampusList();
-
-		if (count($campusList) > 1) {
-			$page->checkList('campus_list', $campusList, $this->getCampus(), 'configFragment');
-		}
-		else {
-			$page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
-		}
+		$page->checkList('campus_list', $calendarHandler->getCampusList(), $this->getCampus(), 'configFragment');
 
 		/* Group permissions
 		 */
