@@ -23,6 +23,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -196,35 +197,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * @return User[]|Collection
 	 */
 	protected function getStudentsUnsubmittedList($submissionBox) {
-
-		// just fyi, make sure this has been hydrated
-		$cat = $submissionBox->getCategory();
-
-		// but first, MAGIC!
-		$this->categoryMapper->getExternalUser()->getCurrentSemester();
-
-		// TODO. This much code to get a classlist is ridiculous. Find an appropriate Mapper, refactor this into there.
-
-		// start with a list of students in this category
-		$studentArray = $this->_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($cat->getCodeString()) ?: array();
-		$memberArray = $this->_DEPRECATED_USER_HANDLER->getAllInCategory($cat->getId()) ?: array();
-
-		$synergyIdArray = array();
-
-		foreach($studentArray as $array) {
-			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
-		}
-
-		foreach($memberArray as $array) {
-			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
-		}
-
-		$userCollection = $this->userMapper->findByColumnList(array(
-			'synergy_id' => array_values($synergyIdArray),
-			'group_id'   => $this->roleMapper->findByColumn('group_type', Role::STUDENT)->getColumnValues('id')
-		));
-
-		// phew! we've got the classlist. Now we have to do a MINUS against students who HAVE submitted.
+		$userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($submissionBox->getCategory());
 
 		$submissionCollection = $this->submissionMapper->findByColumnList(array(
 			'box_id' => $submissionBox->getId()
