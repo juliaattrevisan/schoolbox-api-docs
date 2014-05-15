@@ -9,20 +9,51 @@ $emailObj = new Email();
 
 $result = $suggestions = $data = $return = array();
 
-$keyword = $_GET['query'];
-$groupID = $_GET['groupID'];
+$keyword    = $_GET['query'];
+$groupID    = $_GET['groupID'];
+$roleTypeID = $_GET['roleTypeID'];
 
-if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strlen($groupID)) {
+if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
+    && (strlen($groupID) || strlen($roleTypeID))
+) {
 
-    /* Allow for multiple groups search via autocompletes
-     */
-    if (strstr($groupID, ';')) {
+    if ($groupHandler->isParent() || $groupHandler->isStudent()) {
+        // Parents and students can only search for staff, no matter what.
+        $groupID = $groupHandler->getStaffGroupTypeIds();
+    }
+    elseif (strlen($roleTypeID)) {
+        // Search in a list of role types.
+        $groupID = array();
+        foreach (explode(';', strtolower($roleTypeID)) as $roleType) {
+            $thisRoleGroups = array();
+            switch ($roleType) {
+                case \Schoolbox\Role::STAFF:
+                case 'staff':
+                    $thisRoleGroups = $groupHandler->getStaffGroupTypeIds();
+                    break;
+                case \Schoolbox\Role::PARENT:
+                case 'parent':
+                    $thisRoleGroups = $groupHandler->getParentGroupTypeIds();
+                    break;
+                case \Schoolbox\Role::STUDENT:
+                case 'student':
+                    $thisRoleGroups = $groupHandler->getStudentGroupTypeIds();
+                    break;
+                case \Schoolbox\Role::GUEST:
+                case 'guest':
+                    $thisRoleGroups = $groupHandler->getGuestGroupTypeIds();
+                    break;
+            }
+            $groupID = array_merge($groupID, $thisRoleGroups);
+        }
+    }
+    elseif (strstr($groupID, ';')) {
+        // Search in a list of role types.
         $groupID = explode(';', $groupID);
     }
-
-    // requires session to know which group we're in
-    if ($groupHandler->isParent() || $groupHandler->isStudent()) {
-        $groupID = $groupHandler->getStaffGroupTypeIds();
+    else {
+        // Search group 0 (all groups)
+        $groupID = 0;
     }
 
     $userList = $userHandler->ajaxSearch($keyword, $groupID, 30);
