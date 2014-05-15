@@ -272,11 +272,13 @@ class Controller extends Base {
             if ($endDate < $earliestEnd) {
                 $errors['end_datetime'][] = 'too_short';
             }
-            // End date after latest possible end
-            $latestEnd = clone $startDate;
-            $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
-            if ($endDate > $latestEnd) {
-                $errors['end_datetime'][] = 'too_long';
+            // End date after latest possible end (Only if there is an actual max time)
+            if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
+                $latestEnd = clone $startDate;
+                $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
+                if ($endDate > $latestEnd) {
+                    $errors['end_datetime'][] = 'too_long';
+                }
             }
             // Check conflicting bookings as well for this item.
             // Only check approved bookings. Wow, the calendar population method
