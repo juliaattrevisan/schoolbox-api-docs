@@ -48,6 +48,10 @@ then
 		git checkout $1;
 		git branch -D master;
 		git checkout -b master;
+		# Download and include the cache file for browsercap
+		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browsercap-cache.php;
+		git add tools/browsercap-cache.php;
+		git commit -a -m "update changelog for building";
 		git branch -D upstream;
 		git branch upstream;
 		commitdate=`git log -n 1 | grep "Date:" | cut -c9-32`
@@ -71,8 +75,6 @@ then
 			done
 		fi
 		sed -i "s/`grep '\-\- vagrant' debian/changelog | cut -d' ' -f3`\ `grep '\-\- vagrant' debian/changelog | cut -d' ' -f4`/Alaress\ \(Schoolbox\ Signing\ Key\)\ <support@schoolbox.com.au>/g" debian/changelog;
-		# Download and include the cache file for browsercap
-		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browsercap-cache.php;
 		git add debian;
 		git commit -a -m "update changelog for building";
 		debver=`dpkg-parsechangelog | sed -n -e 's/^Version: //p'`;
