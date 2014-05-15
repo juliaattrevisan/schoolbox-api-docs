@@ -72,7 +72,7 @@ interface WorkerBundleInterface {
 	 *
 	 * @param int $status
 	 * @throws OutOfBoundsException
-	 * @return Worker
+	 * @return int
 	 */
 	public function getPidWhere($status);
 
