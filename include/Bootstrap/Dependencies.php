@@ -105,7 +105,10 @@ $di->set(
             $config = $di->get('config');
             $twig   = new Twig_Environment(
                 $di->get('templateEngine:loader'),
-                array('cache' => $config->get('stream_dir').'/templates/', 'debug' => true,)
+                array(
+                    'cache' => $config->get('stream_dir').'/templates/',
+                    'debug' => $config->get('debug_templates'),
+                )
             );
             $twig->addExtension(new Twig_Extension_Debug());
             $twig->addExtension(new Twig_Extensions_Extension_Text());

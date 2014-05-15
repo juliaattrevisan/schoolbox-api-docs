@@ -70,10 +70,10 @@ Scenario: Manage resources
   And   I follow "resource-create"
   And   I fill in the following:
     | name                      | A single projector                   |
-    | description               | A projector that can be moved around |
     | min_lead_time[day]        | 01                                   |
     | min_reservation_time[day] | 01                                   |
     | max_reservation_time[day] | 02                                   |
+  And  I fill in wysiwyg "description" with "A projector that can be moved around"
   And  I select "Projectors" from "resource_category_id"
   And  I select "Open" from "resource_moderation_type_id"
   And  I press "resource-save"
@@ -82,8 +82,8 @@ Scenario: Manage resources
   When  I follow "resource-create"
   And   I fill in the following:
     | name                      | English textbook            |
-    | description               | A Unit 1/2 English textbook |
     | max_reservation_time[day] | 168                         |
+  And  I fill in wysiwyg "description" with "A Unit 1/2 English textbook"
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
   # Entering a user into a autocomplete field
@@ -96,10 +96,10 @@ Scenario: Manage resources
   When  I follow "resource-create"
   And   I fill in the following:
     | name                      | The special projector    |
-    | description               | A projector made of gold |
     | min_lead_time[day]        | 24                       |
     | min_reservation_time[day] | 01                       |
     | max_reservation_time[day] | 02                       |
+  And  I fill in wysiwyg "description" with "A projector made of gold"
   And  I select "Textbooks" from "resource_category_id"
   And  I select "Moderated" from "resource_moderation_type_id"
   And  I fill in autocomplete "moderator_id[]" with "Jenifer"
@@ -116,7 +116,7 @@ Scenario: Manage resources
   When  I edit resource "The special projector"
   And   I fill in the following:
     | name        | The good projector       |
-    | description | A projector made of gold |
+  And   I fill in wysiwyg "description" with "A projector made of gold"
   And   I select "Projectors" from "resource_category_id"
   And   I select "Managed" from "resource_moderation_type_id"
   And   I remove "Scott Berryhill" from autocomplete "moderator_id[]"
@@ -135,10 +135,10 @@ Scenario: Manage resources
   And   I follow "resource-create"
   And   I fill in the following:
     | name                      | To be deleted |
-    | description               | To be deleted |
     | min_lead_time[day]        | 00            |
     | min_reservation_time[day] | 01            |
     | max_reservation_time[day] | 02            |
+  And   I fill in wysiwyg "description" with "To be deleted"
   And   I select "Projectors" from "resource_category_id"
   And   I select "Open" from "resource_moderation_type_id"
   And   I press "resource-save"
@@ -221,8 +221,8 @@ Scenario: Adding related resources to a resource
   And   I follow "resource-create"
   And   I fill in the following:
     | name                      | Book box                       |
-    | description               | A box for the English textbook |
     | max_reservation_time[day] | 168                            |
+  And   I fill in wysiwyg "description" with "A box for the English textbook"
   And   I select "Textbooks" from "resource_category_id"
   And   I fill in autocomplete "related_resource_id[]" with "English"
   And   I select "English textbook" from autocomplete "related_resource_id[]"

@@ -33,3 +33,9 @@ echo "$vag Generating data dir sql fixes";
 
 echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
+
+# Need to re-enable modules too, because they're off by default
+echo "$vag Enabling modules";
+/vagrant/tools/module.sh enable mobile;
+/vagrant/tools/module.sh enable leave;
+/vagrant/tools/module.sh enable resource;
