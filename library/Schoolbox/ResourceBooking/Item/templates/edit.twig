@@ -117,9 +117,15 @@
                     }
                 },
                 messages: {
-                    resource_category_id: {
-                        min: "Please select a category."
-                    }
+                    resource_category_id:           "Please select a category.",
+                    "min_reservation_time[day]":    "If entered, day count must be a number.",
+                    "max_reservation_time[day]":    "If entered, day count must be a number.",
+                    "min_lead_time[hour]":          "If entered, hour count must be a number from 0 to 23",
+                    "min_reservation_time[hour]":   "If entered, hour count must be a number from 0 to 23",
+                    "max_reservation_time[hour]":   "If entered, hour count must be a number from 0 to 23",
+                    "min_lead_time[minute]":        "If entered, minute count must be a number from 0 to 59",
+                    "min_reservation_time[minute]": "If entered, minute count must be a number from 0 to 59",
+                    "max_reservation_time[minute]": "If entered, minute count must be a number from 0 to 59"
                 },
                 errorPlacement: function(error, element) {
                     switch (element.attr('name')) {
