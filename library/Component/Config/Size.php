@@ -8,13 +8,20 @@
  */
 class Component_Config_Size extends Component_Config_Abstract {
 
+    protected $max           = 10;
+    protected $showAllOption = true;
+
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'sizes', 'sizes_block');
         $page->setVar('sizes_block', '');
 
-        for($i = 0; $i <= 10; $i++) {
+        for ($i = 0; $i <= $this->max; $i++) {
+            // Don't show "All" option if it's disabled
+            if ($i === 0 && !$this->showAllOption) {
+                continue;
+            }
             $page->setVar('COMPONENT_CONFIG_SIZE_NAME', $i == 0 ? 'All' : $i);
             $page->setVar('COMPONENT_CONFIG_SIZE_VALUE', $i);
             $page->setVar('COMPONENT_CONFIG_SIZE_SELECTED', $i == $configValue ? ' selected="selected"' : '');
