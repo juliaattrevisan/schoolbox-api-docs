@@ -23,7 +23,7 @@ class TextboxNotifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link|Textbox $resource
+	 * @param Textbox $resource
 	 * @param User $author
 	 * @param array $diff
 	 * @return Messenger
@@ -35,14 +35,15 @@ class TextboxNotifier extends ResourceNotifier {
 		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
-			":author created content in :homepage",
+			':author created content in :homepage: ":heading"',
 			"/portrait.php?size=square32&userId=".$author->getExternalId(),
 			"/homepage/".$category->getId()
 		);
 
 		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.created", Logger::INFO, array(
 			'author'   => array($author->formatName(), '/search/user/'.$author->getId()),
-			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
+			'homepage' => array($category->getName(), '/homepage/'.$category->getId()),
+			'heading'  => $resource->getHeading()
 		), array(
 			'roletype' => $roletype
 		));
@@ -53,7 +54,7 @@ class TextboxNotifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link|Textbox $resource
+	 * @param Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -65,14 +66,15 @@ class TextboxNotifier extends ResourceNotifier {
 		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
-			":author updated content in :homepage",
+			':author updated content in :homepage: ":heading"',
 			"/portrait.php?size=square32&userId=".$effector->getExternalId(),
 			"/homepage/".$category->getId()
 		);
 
 		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.updated", Logger::INFO, array(
 			'author'   => array($effector->formatName(), '/search/user/'.$effector->getId()),
-			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
+			'homepage' => array($category->getName(), '/homepage/'.$category->getId()),
+			'heading'  => $resource->getHeading()
 		), array(
 			'roletype' => $roletype
 		));
@@ -83,7 +85,7 @@ class TextboxNotifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link|Textbox $resource
+	 * @param Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -95,14 +97,15 @@ class TextboxNotifier extends ResourceNotifier {
 		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$msg = new Message(
-			":author updated content from :homepage",
+			':author deleted content from :homepage: ":heading"',
 			"/portrait.php?size=square32&userId=".$effector->getExternalId(),
 			"/homepage/".$category->getId()
 		);
 
 		$msgr->broadcastToCategory($category->getId(), $msg, "cms.textbox.$resourceId.deleted", Logger::INFO, array(
 			'author'   => array($effector->formatName(), '/search/user/'.$effector->getId()),
-			'homepage' => array($category->getName(), '/homepage/'.$category->getId())
+			'homepage' => array($category->getName(), '/homepage/'.$category->getId()),
+			'heading'  => $resource->getHeading()
 		), array(
 			'roletype' => $roletype
 		));
