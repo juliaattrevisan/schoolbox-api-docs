@@ -26,7 +26,7 @@ class Subcontext_ResourceBookingContext extends BaseContext {
         }
         foreach ($list->findAll('css', '.resource') as $resource) {
             /** @var Element\NodeElement $resource */
-            $nameElement = $resource->find('css', '.resource-name');
+            $nameElement = $resource->find('css', '.resource-name a');
             if ($nameElement instanceof Element\NodeElement && $nameElement->getText() === $name) {
                 return $resource;
             }
