@@ -48,11 +48,6 @@ class Controller extends Base {
     protected $externalTimetableHandler;
 
     /**
-     * @var CampusMapper
-     */
-    protected $campusMapper;
-
-    /**
      * Creates a booking for an item.
      */
     public function book($id) {
@@ -272,11 +267,13 @@ class Controller extends Base {
             if ($endDate < $earliestEnd) {
                 $errors['end_datetime'][] = 'too_short';
             }
-            // End date after latest possible end
-            $latestEnd = clone $startDate;
-            $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
-            if ($endDate > $latestEnd) {
-                $errors['end_datetime'][] = 'too_long';
+            // End date after latest possible end (Only if there is an actual max time)
+            if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
+                $latestEnd = clone $startDate;
+                $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
+                if ($endDate > $latestEnd) {
+                    $errors['end_datetime'][] = 'too_long';
+                }
             }
             // Check conflicting bookings as well for this item.
             // Only check approved bookings. Wow, the calendar population method
@@ -695,7 +692,7 @@ class Controller extends Base {
      */
     protected function getCampusList() {
         $campusList = array();
-        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
+        foreach ($this->getUser()->getCampusCollection() as $campus) {
             /** @var Campus $campus */
             $campusId    = $campus->getId();
             $campusArray = array(
@@ -1042,22 +1039,6 @@ class Controller extends Base {
      */
     public function getExternalTimetableHandler() {
         return $this->externalTimetableHandler;
-    }
-
-    /**
-     * @param  CampusMapper $campusMapper
-     * @return $this
-     */
-    public function setCampusMapper($campusMapper) {
-        $this->campusMapper = $campusMapper;
-        return $this;
-    }
-
-    /**
-     * @return CampusMapper
-     */
-    public function getCampusMapper() {
-        return $this->campusMapper;
     }
 
 }

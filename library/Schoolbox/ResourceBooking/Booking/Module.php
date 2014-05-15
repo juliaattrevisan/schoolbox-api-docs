@@ -84,8 +84,11 @@ class Module extends BaseModule {
         $authorizer
             ->addRule('/^resourceBooking(?:$|\.)/',                  new Rule\IsLoggedIn())
             ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
-            ->addRule('/^resourceBooking\.(?:approve|reject)$/',     $baseManageRule)
-            ->addRule('/^resourceBooking\.cancel$/',                 $bookingCancelRule)
+            ->addRule(
+                '/^resourceBooking\.(?:approve|reject|setPending|edit|update:post)$/',
+                $baseManageRule
+            )
+            ->addRule('/^resourceBooking\.cancel$/', $bookingCancelRule)
         ;
     }
 
@@ -115,8 +118,6 @@ class Module extends BaseModule {
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setExternalTimetableHandler']
             = $injector->lazyNew('External_Timetable');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setCampusMapper']
-            = $injector->lazyNew('Schoolbox\\CampusMapper');
         $injector->set(
             'controller:resourceBooking',
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')
