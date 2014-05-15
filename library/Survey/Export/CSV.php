@@ -34,48 +34,37 @@ class Survey_Export_CSV extends Evaluation_Export_CSV {
 	}
 
 	/**
+	 * Generic adjust row for anonymity method - chops off first 3 (4 if
+	 * external ID inluded) fields from row.
+	 *
+	 * Chops the following fields:
+	 * * External ID
+	 * * User ID
+	 * * Last Name
+	 * * First Name
+	 *
+	 * @param  array $row
+	 * @return array
+	 */
+	protected function adjustRowForAnonymity($row) {
+		return array_slice($row, $this->getIncludeExternalId() ? 4 : 3);
+	}
+
+	/**
 	 * Adjust headings for Anonymity
 	 */
 	private function adjustHeadings() {
-		$allHeadings = $this->getHeadings();
-
-		/* Adjust headings
-		 */
-		array_shift($allHeadings);
-		array_shift($allHeadings);
-
-		/* One more time if external_id is included
-		 */
-		if ($this->getIncludeExternalId()) {
-			array_shift($allHeadings);
-		}
-
-		$this->setHeadings($allHeadings);
+		$this->setHeadings($this->adjustRowForAnonymity($this->getHeadings()));
 	}
 
 	/**
 	 * Adjust responses for Anonymity
 	 */
 	private function adjustResponses() {
-		$allResponses = $this->getResponses();
-
 		$collection = array();
-
-		/* Adjust responses
-		 */
-		foreach($allResponses as $currentResponse) {
-			array_shift($currentResponse);
-			array_shift($currentResponse);
-
-			/* One more time if external_id is included
-			 */
-			if ($this->getIncludeExternalId()) {
-				array_shift($currentResponse);
-			}
-
-			$collection[] = $currentResponse;
+		foreach ($this->getResponses() as $currentResponse) {
+			$collection[] = $this->adjustRowForAnonymity($currentResponse);
 		}
-
 		$this->setResponses($collection);
 	}
 }
