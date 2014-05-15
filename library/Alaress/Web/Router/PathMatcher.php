@@ -71,14 +71,18 @@ class PathMatcher {
      *                        name, which may have been determined by a route
      *                        matched by Aura\Router\Router->match().
      * @param  array  $params Any params to pass as part of the route.
-     * @param  string $tag    If provided, run only actions added with this tag.
+     * @param  array  $tags   If provided, run only actions added with one of
+     *                        these tags.
      * @return array
      */
-    public function check($path, $params, $tag = '') {
-        $usesTags = strlen($tag) > 0;
+    public function check($path, $params, $tags = array()) {
+        if (!is_array($tags)) {
+            $tags = array($tags);
+        }
+        $usesTags = count($tags) > 0;
         foreach ($this->ruleList as $rule) {
             // Don't run this rule if we're only running items with a tag.
-            if ($usesTags && !in_array($tag, $rule['tags'])) {
+            if ($usesTags && count(array_intersect($tags, $rule['tags'])) === 0) {
                 continue;
             }
             if (preg_match($rule['pathMatch'], $path)) {
@@ -86,7 +90,7 @@ class PathMatcher {
 
                 // Did the callback return anything? update $params if it did
                 $result = $this->getActionResult($action, $params);
-                if (isset($result)) {
+                if (is_array($result)) {
                     $params = array_merge($params, $result);
                 }
             }
@@ -95,7 +99,7 @@ class PathMatcher {
     }
 
     /**
-     * Gets the result of calling a
+     * Gets the result of calling an action.
      *
      * @param  callable $callback
      * @param  array    $params
