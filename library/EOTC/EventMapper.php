@@ -9,6 +9,7 @@
  */
 
 namespace EOTC;
+use Schoolbox\Calendar;
 
 
 class EventMapper extends Calendar\EventMapper {
