@@ -22,12 +22,11 @@ class Authorizer extends PathMatcher {
     /**
      * Adds a rule for a path.
      *
-     * @param string                  $path       A regexp to match a path against
-     * @param Rule\IAuthorizationRule $rule       The rule to check against.
-     * @param int                     $statusCode (not yet implemented)
+     * @param string                  $path A regexp to match a path against
+     * @param Rule\IAuthorizationRule $rule The rule to check against.
      * @return $this
      */
-    public function addRule($path, Rule\IAuthorizationRule $rule, $statusCode = null) {
+    public function addRule($path, Rule\IAuthorizationRule $rule) {
         $this->add($path, $rule, array('auth'));
         return $this;
     }
