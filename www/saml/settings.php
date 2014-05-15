@@ -133,7 +133,14 @@ function useSAMLKerberos() {
     * 
     * Errs on the side of kerberos than non-kerberos
     */
-    $bc = new Browscap(Config::get('stream_dir'));
+    $bc = new Browscap(Config::get('file_dir'));
+    // Don't attempt to update
+    $bc->doAutoUpdate = false;
+    // Use local version of the browscap.ini file
+    $bc->updateMethod = 'local';
+    // really ensure we don't attemp to update the browscap.ini file (1 year)
+    $bc->updateInterval = '31536000';
+
     $current_browser = $bc->getBrowser();
     if ($current_browser->Device_Type == 'Desktop') {
         if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
