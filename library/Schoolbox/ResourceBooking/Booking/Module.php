@@ -115,8 +115,6 @@ class Module extends BaseModule {
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setExternalTimetableHandler']
             = $injector->lazyNew('External_Timetable');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setCampusMapper']
-            = $injector->lazyNew('Schoolbox\\CampusMapper');
         $injector->set(
             'controller:resourceBooking',
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')

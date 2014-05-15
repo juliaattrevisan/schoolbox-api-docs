@@ -48,11 +48,6 @@ class Controller extends Base {
     protected $externalTimetableHandler;
 
     /**
-     * @var CampusMapper
-     */
-    protected $campusMapper;
-
-    /**
      * Creates a booking for an item.
      */
     public function book($id) {
@@ -1044,22 +1039,6 @@ class Controller extends Base {
      */
     public function getExternalTimetableHandler() {
         return $this->externalTimetableHandler;
-    }
-
-    /**
-     * @param  CampusMapper $campusMapper
-     * @return $this
-     */
-    public function setCampusMapper($campusMapper) {
-        $this->campusMapper = $campusMapper;
-        return $this;
-    }
-
-    /**
-     * @return CampusMapper
-     */
-    public function getCampusMapper() {
-        return $this->campusMapper;
     }
 
 }
