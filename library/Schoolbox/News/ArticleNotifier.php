@@ -113,8 +113,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$authorId = $user->getId();
 
 		$topicName = $article->getTopic()->getName();
-//		$topicId = $article->getTopic()->getId();
-		$url = new Url($topicName);
+		$url = new Url($topicName, false);
 		$topicSlug = $url->getSlug();
 
 		$msg = new Message($text, $icon, $href);
