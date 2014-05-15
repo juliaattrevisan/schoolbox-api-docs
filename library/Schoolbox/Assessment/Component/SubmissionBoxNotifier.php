@@ -210,7 +210,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 		$unsubmittedCollection = new Collection();
 
 		foreach($userCollection as $user) {
-			/** @var User $user */
 			if(!in_array($user->getId(), $submittedIdArray)) {
 				$unsubmittedCollection->add($user);
 			}

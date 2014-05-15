@@ -10,15 +10,18 @@
 namespace Schoolbox\Assessment\Component;
 
 
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\Item;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -37,6 +40,11 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	// this should be configurable, but this will do for now
 	const UPCOMING_WINDOW     = 2;
 
+	/** @var CategoryMapper */
+	protected $catMapper;
+
+	/** @var AttemptMapper */
+	protected $attemptMapper;
 
 	/**
 	 * @return string
@@ -53,7 +61,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		// noop
+		$this->catMapper = CategoryMapper::getInstance();
+		$this->attemptMapper = AttemptMapper::getInstance();
 	}
 
 
@@ -146,6 +155,32 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function getChannelMetadata() {
 		// not implemented
 		return null;
+	}
+
+
+	/**
+	 * @param OnlineAssessment $quiz
+	 * @return User[]|Collection
+	 */
+	public function getStudentsUnattemptedList($quiz) {
+		$userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($quiz->getCategory());
+
+		$attemptCollection = $this->attemptMapper->findByColumnList(array(
+			'assess_id' => $quiz->getId(),
+		));
+
+		$attemptedCollection = new Collection($attemptCollection->getColumnValues('user'));
+		$attemptedIdArray = $attemptedCollection->getColumnValues('id');
+
+		$unattemptedCollection = new Collection();
+
+		foreach($userCollection as $user) {
+			if(!in_array($user->getId(), $attemptedIdArray)) {
+				$unattemptedCollection->add($user);
+			}
+		}
+
+		return $unattemptedCollection;
 	}
 
 
