@@ -8,11 +8,13 @@
  */
 
 namespace Schoolbox\Assessment\Component;
+use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
 
 
 class OnlineAssessmentMapper extends Schoolbox\Mapper {
@@ -247,7 +249,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 				$params['limit'] = $query['limit'];
 			}
 			foreach ($params as $key => $value) {
-				$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+				$statement->bindParam($key, intval($value), PDO::PARAM_INT);
 			}
 			$statement->execute();
 
@@ -285,7 +287,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 	 * @param array $categories
 	 * @param int   $year
 	 * @param int   $semester
-	 * @return \Schoolbox\Collection
+	 * @return Collection
 	 */
 	public function getAllAssessments($user_id, $categories, $year = 0, $semester = 0) {
 
@@ -391,10 +393,10 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			LIMIT :limit
 		";
 		$statement = $this->database->prepare($query);
-		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
-		$statement->bindValue('limit',   $limit,   \PDO::PARAM_INT);
+		$statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
+		$statement->bindValue('limit',   $limit,   PDO::PARAM_INT);
 		foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-			$statement->bindValue($param, $value, \PDO::PARAM_INT);
+			$statement->bindValue($param, $value, PDO::PARAM_INT);
 		}
 		$statement->execute();
 		$assessments = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
@@ -457,7 +459,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute(array('assess_id' => $assess_id));
 
-		return $stmt->fetch(\PDO::FETCH_ASSOC);
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 
 	}
 
@@ -498,6 +500,56 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$progress['return_count'] = $stmt->fetchColumn(0);
 
 		return $progress;
+	}
+
+	/**
+	 * @param int $categoryId
+	 * @param int $limit
+	 * @param int $offset
+	 * @param int $time
+	 * @return Collection|OnlineAssessment[]
+	 */
+	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+		$limit = (int)$limit;
+		$offset = (int)$offset;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('a')},
+				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('work_type', 't')},
+				{$this->getJoinColumnString('user', 'u')}
+			FROM
+				`{$this->getTable()}` `a`
+				LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
+				LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
+				LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
+			WHERE
+				`a`.`category_id` = :cat_id
+				AND ( `a`.`start` < :time OR `a`.`finish` < :time )
+				AND `a`.`deleted_at` IS NULL
+			ORDER BY `a`.`start` DESC, `a`.`finish` DESC
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'cat_id' => $categoryId,
+			'time'   => $time
+		));
+
+		$c = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var OnlineAssessment $quiz */
+			$quiz = $this->hydrate($r, 'a');
+			$quiz->setCategory($this->hydrateJoin($r, 'category',  'c'));
+			$quiz->setUser(    $this->hydrateJoin($r, 'user',      'u'));
+			$quiz->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
+			$c->add($quiz);
+		}
+
+		return $c;
 	}
 
 }
