@@ -120,6 +120,24 @@
                     resource_category_id: {
                         min: "Please select a category."
                     }
+                },
+                errorPlacement: function(error, element) {
+                    switch (element.attr('name')) {
+                        case "min_lead_time[day]":
+                        case "min_reservation_time[day]":
+                        case "max_reservation_time[day]":
+                        case "min_lead_time[hour]":
+                        case "min_reservation_time[hour]":
+                        case "max_reservation_time[hour]":
+                        case "min_lead_time[minute]":
+                        case "min_reservation_time[minute]":
+                        case "max_reservation_time[minute]":
+                            element.parent().append(error)
+                            break
+                        default:
+                            element.after(error)
+                            break
+                    }
                 }
             })
 
