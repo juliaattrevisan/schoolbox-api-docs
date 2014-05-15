@@ -150,34 +150,37 @@
         <tr>
             <td class="formLabelWidth">
                 <h4>Minimum Lead Time</h4>
-                <em>Somebody reserving this item must give this period of notice before their reservation.</em>
+                <em>If this is set, somebody reserving this item must give this period of notice before their reservation.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days">
-                <input class="interval-input" value="{{ item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours">
-                <input class="interval-input" value="{{ item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes">
+                {% set isEmpty = item.minLeadTime.secondTotal == 0 %}
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes">
             </td>
         </tr>
         <tr>
             <td class="formLabelWidth">
                 <h4>Minimum Reservation Time</h4>
-                <em>This item must be reserved for at least this period of time.</em>
+                <em>If this is set, this item must be reserved for at least this period of time.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days">
-                <input class="interval-input" value="{{ item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours">
-                <input class="interval-input" value="{{ item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes">
+                {% set isEmpty = item.minReservationTime.secondTotal == 0 %}
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes">
             </td>
         </tr>
         <tr>
             <td class="formLabelWidth">
                 <h4>Maximum Reservation Time</h4>
-                <em>This item cannot be reserved for longer than this period.</em>
+                <em>If this is set, this item cannot be reserved for longer than this period.</em>
             </td>
             <td>
-                <input class="interval-input" value="{{ item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days">
-                <input class="interval-input" value="{{ item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours">
-                <input class="interval-input" value="{{ item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes">
+                {% set isEmpty = item.maxReservationTime.secondTotal == 0 %}
+                <input class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours">
+                <input class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes">
             </td>
         </tr>
     </table>
