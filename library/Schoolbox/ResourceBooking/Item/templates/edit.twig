@@ -73,6 +73,56 @@
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
+            form.validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 2
+                    },
+                    resource_category_id: {
+                        min: 1
+                    },
+                    "min_lead_time[day]": {
+                        digits: true
+                    },
+                    "min_reservation_time[day]": {
+                        digits: true
+                    },
+                    "max_reservation_time[day]": {
+                        digits: true
+                    },
+                    "min_lead_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "min_reservation_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "max_reservation_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "min_lead_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    },
+                    "min_reservation_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    },
+                    "max_reservation_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    }
+                },
+                messages: {
+                    resource_category_id: {
+                        min: "Please select a category."
+                    }
+                }
+            })
+
         })
     })(jQuery);
 </script>
