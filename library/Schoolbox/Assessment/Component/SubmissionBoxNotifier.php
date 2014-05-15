@@ -166,6 +166,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context - most likely a category ID or ignored
+	 * @param string $roletype
 	 * @param int $limit - how many messages to retrieve
 	 * @param int $offset - by default, most recent
 	 * @return Collection|Item[]
