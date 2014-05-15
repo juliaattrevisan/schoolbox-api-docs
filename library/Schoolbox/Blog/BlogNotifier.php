@@ -21,6 +21,7 @@ use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -111,17 +112,14 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$authorExtId  = $author->getExternalId();
 
 		$categoryId   = $blog->getCategory()->getId();
-		$categoryName = $blog->getCategory()->getName();
+		$category     = CategoryMapper::getInstance()->findById($categoryId);
+		$categoryName = $category->getName();
 
 
 		$msg = new Message(
 			':author blogged about :title in :catname',
 			"/portrait.php?userId=$authorExtId&size=square32",
-			"/homepage/$categoryId",
-			array(
-				'subtitle',
-				'abstract'
-			)
+			"/homepage/$categoryId"
 		);
 
 		$msgr->broadcastToCategory($categoryId, $msg, "blog.$blogId.posted", Logger::INFO, array(
@@ -155,6 +153,16 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function notifyStudentPosted($blog, $author, $diff = null) {
 		return $this->notifyPosted(Role::STUDENT, $blog, $author);
+	}
+
+	/**
+	 * @param Blog $blog
+	 * @param User $author
+	 * @param array $diff
+	 * @return Messenger
+	 */
+	public function notifyParentPosted($blog, $author, $diff = null) {
+		return $this->notifyPosted(Role::PARENT, $blog, $author);
 	}
 
 } 

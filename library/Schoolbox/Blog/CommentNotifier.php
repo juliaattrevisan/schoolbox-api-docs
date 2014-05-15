@@ -21,6 +21,8 @@ use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Verboser;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -116,37 +118,79 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		$authorName   = $author->formatName();
 		$authorExtId  = $author->getExternalId();
 
+		/** @var Blog $blog */
+		$blog         = $this->blogMapper->findById($comment->getBlog()->getId());
+		$blogName     = $blog->getHeading();
+		$blogOwnerId  = $blog->getOwner()->getId();
+
 		$categoryId   = $comment->getBlog()->getCategory()->getId();
-		$categoryName = $comment->getBlog()->getCategory()->getName();
+		$category     = CategoryMapper::getInstance()->findById($categoryId);
+		$categoryName = $category->getName();
 
 		$msg = new Message(
-			':author commented on :title in :catname',
+			':author commented on :title in :catname: ":comment"',
 			"/portrait.php?userId=$authorExtId&size=square32",
-			"/homepage/$categoryId",
-			array(
-				'subtitle',
-				'abstract'
-			)
+			"/homepage/$categoryId"
 		);
 
-		$msgr->broadcastToCategory($categoryId, $msg, "blog.$commentId.commented", Logger::INFO, array(
+		// send this to the blog post author
+		$msgr->targetToUser($blogOwnerId, $msg, "blog.$commentId.commented", Logger::INFO, array(
 			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => $comment->getBlog()->getHeading(),
-			'catname' => array($categoryName, "/homepage/$categoryId")
-		), array(
-			'roletype' => $roletype
+			'title'   => $blogName,
+			'catname' => array($categoryName, "/homepage/$categoryId"),
+			'comment' => \TextFormatter::cutSentence($comment->getBody(), 48)
 		));
 
 		return $msgr;
 	}
 
 	/**
+	 * @param string $roletype
 	 * @param Comment $comment
 	 * @param User $author
 	 * @return Messenger
 	 */
 	protected function notifyFollowed($roletype, $comment, $author) {
+		$msgr = new Messenger();
 
+		$commentId    = $comment->getId();
+
+		$authorId     = $author->getId();
+		$authorName   = $author->formatName();
+		$authorExtId  = $author->getExternalId();
+
+		/** @var Blog $blog */
+		$blogId       = $comment->getBlog()->getId();
+		$blog         = $this->blogMapper->findById($blogId);
+		$blogName     = $blog->getHeading();
+
+		$categoryId   = $comment->getBlog()->getCategory()->getId();
+		$category     = CategoryMapper::getInstance()->findById($categoryId);
+		$categoryName = $category->getName();
+
+		$msg = new Message(
+			':author also commented on :title in :catname: ":comment"',
+			"/portrait.php?userId=$authorExtId&size=square32",
+			"/homepage/$categoryId"
+		);
+
+		/** @var Comment[]|Collection $commentCollection */
+		$commentCollection = $this->mapper->findByColumn('bid', $blogId);
+		/** @var User[]|Collection $userCollection */
+		$userCollection = new Collection($commentCollection->getColumnValues('owner'));
+		$userIds = array_unique($userCollection->getColumnValues('id'));
+
+		foreach($userIds as $id) {
+			// send this to anyone who has commented on the blog in question
+			$msgr->targetToUser($id, $msg, "blog.$commentId.followed", Logger::INFO, array(
+				'author'  => array($authorName, "/search/user/$authorId"),
+				'title'   => $blogName,
+				'catname' => array($categoryName, "/homepage/$categoryId"),
+				'comment' => \TextFormatter::cutSentence($comment->getBody(), 48)
+			));
+		}
+
+		return $msgr;
 	}
 
 	/**
@@ -189,9 +233,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 * @return Messenger
 	 */
 	public function notifyStudentFollowed($comment, $author, $diff = array()) {
-		$msgr = new Messenger();
-		return $msgr;
-
+		return $this->notifyFollowed(Role::STUDENT, $comment, $author);
 	}
 
 
@@ -202,9 +244,17 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 * @return Messenger
 	 */
 	public function notifyStaffFollowed($comment, $author, $diff = array()) {
-		$msgr = new Messenger();
-		return $msgr;
+		return $this->notifyFollowed(Role::STAFF, $comment, $author);
+	}
 
+	/**
+	 * @param Comment $comment
+	 * @param User $author
+	 * @param array $diff
+	 * @return Messenger
+	 */
+	public function notifyParentFollowed($comment, $author, $diff = array()) {
+		return $this->notifyFollowed(Role::PARENT, $comment, $author);
 	}
 
 }
