@@ -11,14 +11,14 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
         window.location.href='/';
     </script>
     <!-- <![endif]-->
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/demo/chrome.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/<?php echo Scrub::text(Cfg::get('site_location'));?>/chrome.css" />
 </head>
 <body>
 
   <div id="container" class="login" style="margin-left: 0">
     <div id="content" class="content clearfix">
 
-    <h1><?php echo Cfg::get('title');?> no longer supports Internet Explorer 8 and below</h1>
+    <h1><?php echo Scrub::text(Cfg::get('title'));?> no longer supports Internet Explorer 8 and below</h1>
 
     <p>
         If you are using Windows Vista or Windows 7 you are able to upgrade to a more
