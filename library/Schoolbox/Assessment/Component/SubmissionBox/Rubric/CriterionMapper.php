@@ -44,6 +44,11 @@ class CriterionMapper extends Schoolbox\Mapper {
             'property'   => 'parentType',
             'type'       => self::TYPE_STRING,
         ));
+        $this->hasMap(array(
+            'column'     => 'deleted_at',
+            'property'   => 'deletedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
         $this->hasSoftDeleteDateField('deleted_at');
     }

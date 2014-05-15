@@ -67,6 +67,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         $i = 0;
 
         /* Create group structure */
+        $criteriaList = array();
         foreach($this->criteria as $crit) {
             $criteriaList[$crit->getGrouping()][] = $crit;
         }
