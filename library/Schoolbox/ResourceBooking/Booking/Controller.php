@@ -697,7 +697,7 @@ class Controller extends Base {
      */
     protected function getCampusList() {
         $campusList = array();
-        foreach ($this->campusMapper->getAvailableCampusesForUser($this->getUser()) as $campus) {
+        foreach ($this->getUser()->getCampusCollection() as $campus) {
             /** @var Campus $campus */
             $campusId    = $campus->getId();
             $campusArray = array(
