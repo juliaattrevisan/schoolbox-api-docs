@@ -1,33 +1,58 @@
 <?php
 
-
 $groupHandle   = new Group();
-$blogHandle    = new Blog();
-$commentHandle = new Comment();
 
 if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-	$blog = $blogHandle->getByID($this->arg[1]);
-	
-	if($groupHandle->getPermission($blog['cid']) < READ_ACCESS)
-		error(19);
-	
-	if(!empty($blog) && !empty($_POST['body'])) {
-		$commentHandle->create(array(
-			'bid'  => $blog['id'],
-			'body' => $_POST['body']
-		));
-		
-		$this->backToTheFuture(1);
-	} else
-		error(29);
-} elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
-	$comment = $commentHandle->getByID($this->arg[1]);
-	if(isset($comment['id']) && $comment['owner'] != $_SESSION['id'] && $groupHandle->getPermission($comment['cid']) < WRITE_ACCESS)
-		error(19);
-		
-	$commentHandle->delete($this->arg[1]);
-	
-	$this->backToTheFuture(1);
-}
+	try {
+		/** @var \Schoolbox\Blog\Blog $blog */
+		$blog = \Schoolbox\Blog\BlogMapper::getInstance()->findById($this->arg[1]);
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
+		error(41);
+		exit;
+	}
 
-?>
+	$permission = $groupHandle->getPermission($blog->getCategory()->getId());
+
+	if($permission < READ_ACCESS) {
+		error(19);
+	}
+
+	if(!empty($blog) && !empty($_POST['body'])) {
+		$comment = new \Schoolbox\Blog\Comment();
+		$comment
+			->setBlog($blog)
+			->setCreated(new Alaress_Date_Format(time(), 'U'))
+			->setOwner($_SESSION['user'])
+			->setBody($_POST['body']);
+
+		\Schoolbox\Blog\CommentMapper::getInstance()->save($comment);
+		$this->backToTheFuture(1);
+	}
+	else {
+		error(29);
+	}
+}
+elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
+
+	try {
+		/** @var \Schoolbox\Blog\Comment $comment */
+		$comment = \Schoolbox\Blog\CommentMapper::getInstance()->findById($this->arg[1]);
+		$comment->setBlog(\Schoolbox\Blog\BlogMapper::getInstance()->findById($comment->getBlog()->getId()));
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
+		error(19);
+		exit;
+	}
+
+	$permission = $groupHandle->getPermission($comment->getBlog()->getCategory()->getId());
+
+	if($comment->getOwner()->getId() == $_SESSION['id'] || $permission == FULL_ACCESS) {
+		\Schoolbox\Blog\CommentMapper::getInstance()->delete($comment);
+		$this->backToTheFuture(1);
+	}
+	else {
+		error(19);
+	}
+
+}

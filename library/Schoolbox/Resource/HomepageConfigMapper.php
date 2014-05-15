@@ -11,6 +11,10 @@
  
 
 namespace Schoolbox\Resource;
+use Component_Config;
+use Component_ConfigMapper;
+use Component_Instance;
+use Component_InstanceMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Collection;
 
@@ -204,5 +208,101 @@ class HomepageConfigMapper extends Mapper {
 
 
 	}
+
+
+	/**
+	 * More or less a convenience method for ComponentMapper::delete()
+	 *
+	 * @param HomepageConfig $homepage
+	 * @return int the number of components deleted
+	 */
+	public function emptyHomepage($homepage) {
+		$cim = Component_InstanceMapper::getInstance();
+		$collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $homepage->getCategory()->getId()));
+		$cim->delete($collection);
+		return count($collection);
+	}
+
+
+	/**
+	 * Deletes all components from a homepage, then rebuilds from template
+	 *
+	 * @param HomepageConfig $homepage
+	 */
+	public function resetToTemplate($homepage) {
+		// kick all the components out
+		$this->emptyHomepage($homepage);
+
+		$homepageConfig = array();
+		$positions = array('top','left','right');
+		$opts = array('head_font', 'head_bg', 'font', 'bg_primary', 'bg_secondary', 'link', 'hover');
+
+		// prep colour resets
+		foreach($positions as $position) {
+			foreach($opts as $opt) {
+				$homepageConfig[$position.'_'.$opt] = $this->getConfigLoader()->get('homepage_colour_'.$opt);
+			}
+		}
+
+		// set colour resets
+		foreach($homepageConfig as $field => $colour) {
+			$this->setModelProperty($homepage, $this->toCamelcase($field), $colour);
+		}
+
+		// save
+		$this->save($homepage);
+
+		// no template, no homepage; don't try to add components
+		if(is_null($homepage->getTemplate()) || $homepage->getTemplate()->getId() == 0) {
+			return;
+		}
+
+		// add new components
+		// retrieve, rearrange and reinsert the componentry
+		$cim = Component_InstanceMapper::getInstance();
+		$ccm = Component_ConfigMapper::getInstance();
+
+		/** @var Component_Instance[] $instances */
+		$instances = $cim->findByContext('homepage_template', $homepage->getTemplate()->getId());
+
+		if(!count($instances)) {
+			return;
+		}
+
+		foreach($instances as $inst) {
+			// preserve the config
+
+			/** @var Component_Config[] $configs */
+			$configs = $inst->getConfig();
+
+			$inst
+				->setId(null)
+				->setConfig(new Collection())
+				->setModule('homepage')
+				->setIdentifier($homepage->getCategory()->getId());
+
+			$ids = $cim->save($inst);
+
+			if(!count($configs)) {
+				continue;
+			}
+
+			$id = $ids[0];
+
+			foreach($configs as $c) {
+				if($c->getId()) {
+					$conf = new Component_Config();
+					$conf
+						->setInstanceId($id)
+						->setValue($c->getValue())
+						->setConfigDefinitionId($c->getId());
+					$ccm->save($conf);
+				}
+			}
+
+		}
+
+	}
+
 
 }

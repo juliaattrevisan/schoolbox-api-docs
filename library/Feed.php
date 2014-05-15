@@ -7,16 +7,26 @@
 
 class Feed {
 
-    function Feed() {
+	/**
+	 * @deprecated use \Schoolbox\Feed
+	 */
+	function Feed() {
 	    $this->db = DeprecatedDatabase::getInstance();
     }
 
-    function getFeed($cid, $limit) {
+	/**
+	 * @deprecated use \Schoolbox\Feed::aggregate()
+	 * @param $cid
+	 * @param $limit
+	 * @return array
+	 */
+	function getFeed($cid, $limit) {
 
         if ($limit == 0 || $limit > 50) {
             $limit = 50;
         }
 
+		/* ALL THESE HELPER FUNCTIONS TO BE SYSTEMATICALLY DEPRECATED */
 
         $files = $this->getFiles($cid, $limit);
         $links = $this->getLinks($cid, $limit);
@@ -276,7 +286,13 @@ class Feed {
     }
 
 
-    function getNews($cid, $limit) {
+	/**
+	 * @deprecated use \Schoolbox\Resource\Category\NewsNotifier::getFeed()
+	 * @param $cid
+	 * @param $limit
+	 * @return array
+	 */
+	function getNews($cid, $limit) {
 
         $where = $this->getFilterFromCategoryId($cid);
 
@@ -396,7 +412,13 @@ class Feed {
 
     }
 
-    function getWiki($cid, $limit) {
+	/**
+	 * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
+	 * @param $cid
+	 * @param $limit
+	 * @return array
+	 */
+	function getWiki($cid, $limit) {
 
         $where = $this->getFilterFromCategoryId($cid);
 
@@ -439,6 +461,7 @@ class Feed {
     /**
      * Get a list of new blog entries to push into the feed.
      *
+     * @deprecated use \Schoolbox\Blog\BlogNotifier::getFeed()
      * @param  $cid
      * @param  $limit
      * @return
@@ -487,6 +510,7 @@ class Feed {
     /**
      * Get a list of new blog comments to push into the feed.
      *
+     * @deprecated use \Schoolbox\Blog\CommentNotifier::getFeed()
      * @param  $cid
      * @param  $limit
      * @return

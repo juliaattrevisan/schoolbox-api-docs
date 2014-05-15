@@ -10,12 +10,17 @@
 namespace Schoolbox\Assessment\Component;
 
 
+use Alaress\Scheduler\Trigger\BlankTrigger;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Feed\Feed;
+use Schoolbox\Feed\Item;
+use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -29,7 +34,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class SubmissionBoxNotifier extends AbstractModuleNotifier {
+class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	// list of triggers that can generate notifications
 
@@ -78,24 +83,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$this->_DEPRECATED_USER_HANDLER = new \User();
 		$this->_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_DUEWORK);
 	}
 
 	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleType
-	 * @param int $catId
-	 * @param int $boxId
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleType, $catId = 0, $boxId = 0) {
-		return SourceMapper::getInstance()->generateTopic($this->namespace->getId(), $eventLabel, $roleType, array(
-			$catId, $boxId
-		));
+	protected function getSlug() {
+		return NSMapper::NS_DUEWORK;
 	}
 
 
@@ -154,6 +148,45 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 				throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
 		}
 
+	}
+
+
+	/**
+	 * Returns the metadata pertaining to this source.
+	 * Useful to RSS
+	 *
+	 * @return mixed
+	 */
+	public function getChannelMetadata() {
+		return null;
+	}
+
+
+	/**
+	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 *
+	 * @param int $context - most likely a category ID or ignored
+	 * @param int $limit - how many messages to retrieve
+	 * @param int $offset - by default, most recent
+	 * @return Collection|Item[]
+	 */
+	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+		$c = new Collection();
+
+		// if parents aren't allowed to see due work, return an empty collection
+		if($roletype == Role::PARENT && !$this->conf->get('restrict_parent_duework_access')) {
+			return $c;
+		}
+
+		/** @var Collection|SubmissionBox[] $boxes */
+		$boxes = $this->mapper->findForFeed($context, $limit, $offset);
+
+		foreach($boxes as $box) {
+			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));
+			$c->merge(Feed::getItemsFromMessenger($this->notifyFeedClosed($box, $box->getOwner()), $box->getDueDate()->getUnixTimestamp()));
+		}
+
+		return $c;
 	}
 
 
@@ -228,9 +261,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	public function notifyStudentOpen($submissionBox, $user, $diff = null) {
-		// yep. self-hydration.
-		/** @var SubmissionBox $submissionBox */
-		$submissionBox = $this->mapper->findById($submissionBox->getId());
 		$boxId = $submissionBox->getId();
 		$boxType = $submissionBox->getWorkType()->getName();
 		$boxName = $submissionBox->getName();
@@ -426,7 +456,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '?';
+		$icon = '/images/icon.php?size=32&icon=work';
 		$href = "/submission/submissionHistory/$boxId";
 
 		$when = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
@@ -478,7 +508,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 			$childExtId = $student->getExternalId();
 
 			// target the parents of this particular student
-//			$topic = $this->buildTopic('upcoming', Role::PARENT, $catId, $boxId);
 
 			$icon = "/portrait?userId=$childExtId&size=square32";
 			$href = "/submission/submissionHistory/$boxId/$childId";
@@ -500,6 +529,43 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		return $msgr;
 	}
 
+	/**
+	 * Notify the feed of box closures
+	 *
+	 * @param SubmissionBox $submissionBox
+	 * @param User $user
+	 * @param array $diff
+	 * @return Messenger
+	 */
+	public function notifyFeedClosed($submissionBox, $user, $diff = null) {
+		$msgr = new Messenger();
+
+		// don't raise notifications if this box doesn't accept online submissions
+		if(!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimestamp() > time()) {
+			return $msgr;
+		}
+
+		$boxName = $submissionBox->getName();
+		$boxId = $submissionBox->getId();
+		// hyyydrate
+		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
+		$submissionBox->setCategory($cat);
+
+		$catId = $submissionBox->getCategory()->getId();
+		$catName = $submissionBox->getCategory()->getName();
+
+		$icon = '/images/icon.php?size=32&icon=cross';
+		$href = "/submission/submissionHistory/$boxId";
+
+		$msg = new Message("Submissions have closed for :boxname in :catname", $icon, $href);
+
+		$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.closed", Logger::NOTICE, array(
+			'boxname' => array($boxName, $href),
+			'catname' => array($catName, "/homepage/$catId"),
+		));
+
+		return $msgr;
+	}
 
 	/**
 	 * Student notified when a SubmissionBox is overdue AND they have not submitted
@@ -529,12 +595,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 
-		$icon = '?';
+		$icon = '/images/icon.php?size=32&icon=work';
 		$href = "/submission/submissionHistory/$boxId";
 
 		$msg = new Message(":boxname is now overdue in :catname", $icon, $href);
-
-		$topic = $this->buildTopic('upcoming', Role::STUDENT, $catId, $boxId);
 
 		$unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
@@ -574,7 +638,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 		$catId = $submissionBox->getCategory()->getId();
 		$catName = $submissionBox->getCategory()->getName();
 
-		$icon = '?';
+		$icon = '/images/icon.php?size=32&icon=work';
 		$href = "/submission/submissionHistory/$boxId";
 
 		$msg = new Message(":child did not submit work for :boxname in :catname", $icon, $href);
@@ -622,7 +686,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		$boxId = $submissionBox->getId();
 
-		$icon = '?';
+		$icon = '/images/icon.php?size=32&icon=work';
 		$href = "/submission/viewSubmission/$boxId";
 
 		$msg = new Message(":boxname has closed and :number did not submit work", $icon, $href);
@@ -634,46 +698,5 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier {
 
 		return $msgr;
 	}
-
-
-	/* TODO THESE NOTIFICATIONS BELONG IN DIFFERENT NOTIFIERS */
-
-//	/**
-//	 * Staff notified when a student submits to a SubmissionBox
-//	 *
-//	 * @param SubmissionBox $submissionBox
-//	 * @param User $user
-//	 * @param array $diff
-//	 * @return Messenger
-//	 */
-//	public function notifyStaffSubmitted($submissionBox, $user, $diff = null) {
-//
-//	}
-//
-//
-//	/**
-//	 * Staff notified when a student resubmits to a SubmissionBox
-//	 *
-//	 * @param SubmissionBox $submissionBox
-//	 * @param User $user
-//	 * @param array $diff
-//	 * @return Messenger
-//	 */
-//	protected function notifyStaffResubmitted($submissionBox, $user, $diff = null) {
-//
-//	}
-//
-//
-//	/**
-//	 * Student notified when a teacher returns a mark to them
-//	 *
-//	 * @param SubmissionBox $submissionBox
-//	 * @param User $user
-//	 * @param array $diff
-//	 * @return Messenger
-//	 */
-//	public function notifyStudentMarked($submissionBox, $user, $diff = null) {
-//
-//	}
 
 }

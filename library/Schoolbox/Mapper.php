@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
@@ -23,6 +24,11 @@ class Mapper {
 	 * Represents a boolean data type.
 	 */
 	const TYPE_BOOLEAN = 5;
+
+	/**
+	 * Represents an almost-boolean data type: enum('true','false') in the database
+	 */
+	const TYPE_BOOL_ENUM = 6;
 
 	/**
 	 * Represents the SQL NULL data type.
@@ -62,6 +68,12 @@ class Mapper {
 	// as per http://www.php.net/manual/en/pdostatement.rowcount.php#109891
 	const PDO_RESULT_INSERT = 1;
 	const PDO_RESULT_UPDATE = 2;
+
+	// Valid points are preSave, postSave, preDelete, postDelete
+	const CALLBACK_PRESAVE    = 'preSave';
+	const CALLBACK_POSTSAVE   = 'postSave';
+	const CALLBACK_PREDELETE  = 'preDelete';
+	const CALLBACK_POSTDELETE = 'postDelete';
 
 	/**
 	 * @var Database
@@ -1111,7 +1123,7 @@ class Mapper {
 	/**
 	 * @brief Saves an object to the database. Updates or inserts
 	 * @param $object
-	 * @return array<int>
+	 * @return array<int>|bool
 	 */
 	public function save($object) {
 		$collection = $this->getModelAsCollection($object);
@@ -1141,12 +1153,20 @@ class Mapper {
 		$identifier    = $this->getIdentifier();
 		$id_property   = $identifier['property'];
 
-		// retrieve the objects as they currently exist so we can perform a diff if we need to
-		$collectionIds = $collection->getColumnValues($id_property);
 		$existingObjects = array();
-		foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
-			// index by ID
-			$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+		if(isset($identifier['column'])) {
+			// retrieve the objects as they currently exist so we can perform a diff if we need to
+			$collectionIds = array();
+
+			// retrieve the IDs in a dehydrating fashion, in case they're models
+			foreach($collection as $object) {
+				$collectionIds[] = $this->getModelProperty($object, $id_property);
+			}
+
+			foreach($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
+				// index by ID
+				$existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
+			}
 		}
 
 		$this->database->beginTransaction();
@@ -1535,7 +1555,11 @@ class Mapper {
 	 * @return object
 	 */
 	public function hydrateJoin($row, $join, $alias, $callback = null) {
-		return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+		$mapper = $this->getJoinMapper($join);
+		if($mapper instanceof Mapper) {
+			return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+		}
+		return null;
 	}
 
 

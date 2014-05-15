@@ -15,6 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Message\NS;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -66,6 +67,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		}
 
 		$this->mapper = $m;
+
+		$this->namespace = NSMapper::getInstance()->findOneBySlug($this->getSlug());
 	}
 
 
@@ -136,14 +139,9 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	}
 
 	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleType
 	 * @return string
 	 */
-	protected abstract function buildTopic($eventLabel, $roleType);
+	protected abstract function getSlug();
+
 
 }

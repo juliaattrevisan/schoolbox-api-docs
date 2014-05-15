@@ -15,6 +15,7 @@ class Wiki extends DeprecatedModel
 	/**
 	 * Gets the latest revision record for the specified wiki.
 	 *
+	 * @deprecated use \Schoolbox\Wiki\Wiki::getLatestRevision()
 	 * @param <type> $wikiID
 	 * @return <type>
 	 */
@@ -71,6 +72,11 @@ class Wiki extends DeprecatedModel
 		return $this->db->getRow($query);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Wiki\RevisionMapper::findByColumn('wikiID')
+	 * @param $wikiID
+	 * @return array|bool
+	 */
 	function getRevisionList($wikiID)
 	{
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
@@ -84,6 +90,7 @@ class Wiki extends DeprecatedModel
 	/**
 	 * Get a wiki for a category
 	 *
+	 * @deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
 	 * @param  $categoryID
 	 * @param string $orderBy
 	 * @param string $sortDir
@@ -123,6 +130,11 @@ class Wiki extends DeprecatedModel
 		$this->db->query($query);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Wiki\RevisionMapper::save()
+	 * @param $data
+	 * @return int|string
+	 */
 	function createRevision($data)
 	{
 		$data['created'] = 'NOW()';
@@ -149,6 +161,7 @@ class Wiki extends DeprecatedModel
 	/**
 	 * Creates a wiki page and assigns latest revision
 	 *
+	 * @deprecated use \Schoolbox\Wiki\WikiMapper::save()
 	 * @param  $data
 	 * @return int
 	 */
@@ -186,6 +199,7 @@ class Wiki extends DeprecatedModel
 	 * Updates a wiki's data with the latest revision if applicable
 	 * Note that wikis now know whether they are stubs or not
 	 *
+	 * @deprecated use \Schoolbox\Wiki\WikiMapper::save()
 	 * @param  $data
 	 * @return void
 	 */
@@ -233,6 +247,11 @@ class Wiki extends DeprecatedModel
 		return $revisionID;
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Wiki\WikiMapper::delete()
+	 * @param $wikiID
+	 * @return bool|mysqli_result|resource
+	 */
 	function delete($wikiID)
 	{
 		$data = array('wikiID' => $wikiID,
@@ -286,6 +305,7 @@ class Wiki extends DeprecatedModel
 	 * Figure out if there are any empty links - these are assumed to be stubs.
 	 * If a title attribute is provided, use that as the stub wiki heading
 	 *
+	 * @deprecated use \Schoolbox\Wiki\RevisionMapper::createStubLinks()
 	 * @param  $data
 	 * @return
 	 */
@@ -329,6 +349,7 @@ class Wiki extends DeprecatedModel
 	/**
 	 * Get a wiki ID for the prescribed heading.
 	 *
+	 * @deprecated use \Schoolbox\Wiki\RevisionMapper::findOneByColumn('heading')
 	 * @param  $heading
 	 * @return array|bool
 	 */

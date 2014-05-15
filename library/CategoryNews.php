@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @deprecated use Schoolbox\Resource\Category\NewsMapper
+ * Class CategoryNews
+ */
 class CategoryNews extends DeprecatedModel {
 
 	function CategoryNews () {
@@ -10,6 +14,14 @@ class CategoryNews extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
+	/**
+	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::findByColumnList()->filterBy()
+	 * @param $categoryID
+	 * @param bool $config
+	 * @param bool $archive
+	 * @param int $userID
+	 * @return array|bool
+	 */
 	function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0) {
         $userID = $userID ? $userID : $_SESSION['id'];
 		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
@@ -35,16 +47,36 @@ class CategoryNews extends DeprecatedModel {
 		$this->db->delete('subject_news', 'code', $cid);
 	}
 
+	/**
+	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::save()
+	 * @param $news
+	 * @return int|string|void
+	 */
 	function create($news) {
 		$news['datetime_posted'] = 'NOW()';
 		parent::create($news);
 	}
 
+	/**
+	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::delete()
+	 * @param $id
+	 * @return bool|mysqli_result|resource|void
+	 */
 	function delete($id) {
 		$this->update(array('id'=>$id,'deleted'=>1));
 	}
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+	/**
+	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::search()
+	 * @param $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param null $count
+	 * @param string $sort_by
+	 * @param string $sort_dir
+	 * @return array|bool
+	 */
+	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
         $keyword = $this->db->quote($keyword);
 
         $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,

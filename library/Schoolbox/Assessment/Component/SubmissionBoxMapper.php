@@ -8,7 +8,9 @@
  */
 
 namespace Schoolbox\Assessment\Component;
+use PDO;
 use Schoolbox;
+use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -192,7 +194,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 
 			'this_property'  => 'category',
-			'this_property'  => 'category',
 			'other_property' => 'id',
 		));
 		$this->hasJoin('files', array(
@@ -227,14 +228,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		//
 		// TODO add Mapper->hasCollection?
-		$this->hasJoin('notify', array(
-			'multiple'  => true,
-			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationMapper',
-			'this_key'  => 'id',
-			'other_key' => 'box_id',
-		));
 		$this->hasJoin('submission', array(
 			'multiple'  => true,
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
@@ -275,7 +269,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
-		$notify_mapper   = $this->getJoinMapper('notify');
 		$worktype_mapper = $this->getJoinMapper('work_type');
 		$marktype_mapper = $this->getJoinMapper('mark_type');
 
@@ -304,11 +297,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 
 		if ($submission_box instanceof SubmissionBox) {
-			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
-				$submission_box->addNotification($notify);
-			}
-
-			//
 			// Get files? (This is more evidence separate file/link mapper isn't
 			// required.)
 			$query = "
@@ -323,12 +311,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			";
 			$statement = $this->database->prepare($query);
 			$statement->execute(array($id));
+
 			foreach ($statement as $row) {
 				$box_file     = $box_file_mapper->hydrate($row, 'sm');
 				$storage_file = $file_mapper->hydrate($row, 'f');
 				$storage_file->setMime($mime_mapper->hydrate($row, 'm'));
 				$box_file->setFile($storage_file);
 				$submission_box->addFileLink($box_file);
+
 			}
 		}
 		if (!($submission_box instanceof SubmissionBox)) {
@@ -375,26 +365,21 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Post-save method for submission boxes - saves new submission box files
-	 * and notifications.
 	 *
 	 * @param SubmissionBox $object
-	 * @param bool          $is_new Is this a new item that is being created?
+	 * @param SubmissionBox $previous
 	 *
 	 * @return void
 	 */
-	public function postSave(SubmissionBox $object, $is_new = false) {
+	public function postSave(SubmissionBox $object, $previous = null) {
 		foreach ($object->getFileLinks() as $box_file) {
 			if ($box_file->hasFile()) {
-				if ($is_new) {
+				if (!$previous) {
 					$box_file->setId(null);
 				}
 				$box_file->setSubmissionBoxId($object->getId());
 				$this->getJoinMapper('files')->save($box_file);
 			}
-		}
-		foreach ($object->getNotifications() as $notification) {
-			$notification->setSubmissionBoxId($object->getId());
-			$this->getJoinMapper('notify')->save($notification);
 		}
 	}
 
@@ -643,7 +628,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$params['user_id'] = $query['user_id'];
 			}
 			foreach ($params as $key => $value) {
-				$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+				$statement->bindParam($key, intval($value), PDO::PARAM_INT);
 			}
 			$statement->execute();
 
@@ -692,10 +677,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LIMIT :limit
 		";
 		$statement = $this->database->prepare($query);
-		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
-		$statement->bindValue('limit',   $limit,   \PDO::PARAM_INT);
+		$statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
+		$statement->bindValue('limit',   $limit,   PDO::PARAM_INT);
 		foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
-			$statement->bindValue($param, $value, \PDO::PARAM_INT);
+			$statement->bindValue($param, $value, PDO::PARAM_INT);
 		}
 		$statement->execute();
 		$boxes = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
@@ -719,7 +704,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @param User     $user     The user to filter submissions for
 	 * @param Category $category If set, restrict results to this category.
 	 *
-	 * @return \Schoolbox\Collection
+	 * @return Collection
 	 */
 	public function getSubmittable(User $user, Category $category = null) {
 		$cat_mapper = $this->getJoinMapper('category');
@@ -873,7 +858,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$stmt = $this->database->prepare($sql);
 		$stmt->execute(array('box_id' => $submission_box_id));
 
-		return $stmt->fetch(\PDO::FETCH_ASSOC);
+		return $stmt->fetch(PDO::FETCH_ASSOC);
 
 	}
 
@@ -916,6 +901,57 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		return $progress;
 
+	}
+
+
+	/**
+	 * @param int $categoryId
+	 * @param int $limit
+	 * @param int $offset
+	 * @param int $time
+	 * @return Collection|SubmissionBox[]
+	 */
+	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
+		$time = date('Y-m-d H:i:s', $time ?: time());
+		$limit = (int)$limit;
+		$offset = (int)$offset;
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('sb')},
+				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('work_type', 't')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `sb`
+				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+				LEFT JOIN {$this->getJoinSql('work_type', 'sb', 't')}
+				LEFT JOIN {$this->getJoinSql('owner', 'sb', 'u')}
+			WHERE
+				`sb`.`category` = :cat_id
+				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
+				AND `sb`.`deleted` IS NULL
+			ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
+			LIMIT $offset, $limit
+		");
+
+		$stmt->execute(array(
+			'cat_id' => $categoryId,
+			'time'   => $time
+		));
+
+		$c = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			/** @var SubmissionBox $box */
+			$box = $this->hydrate($r, 'sb');
+			$box->setCategory($this->hydrateJoin($r, 'category',  'c'));
+			$box->setOwner(   $this->hydrateJoin($r, 'owner',     'u'));
+			$box->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
+			$c->add($box);
+		}
+
+		return $c;
 	}
 
 }

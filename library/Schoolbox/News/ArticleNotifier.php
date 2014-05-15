@@ -11,7 +11,9 @@ namespace Schoolbox\News;
 
 
 use Monolog\Logger;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -30,20 +32,11 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	protected $roleMapper;
 
 	/**
-	 * At minimum, this method should accept the label and role for which to build a topic.
-	 * If more parameters are required in an implementation, PHP will allow you to include optional parameters to the
-	 * method signature.
-	 *
-	 * @param string $eventLabel
-	 * @param string $roleId
-	 * @param int $topicId
-	 * @param int $articleId
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleId, $topicId = 0, $articleId = 0) {
-		return "notify.role.$roleId.news.topic.$topicId.article.$articleId.$eventLabel";
+	protected function getSlug() {
+		return 'news';
 	}
-
 
 	/**
 	 * Instantiate all your dependencies within yourself.
@@ -53,7 +46,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->roleMapper = RoleMapper::getInstance();
-		$this->namespace = NSMapper::getInstance()->findByColumn('slug', 'news')->first();
+		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_NEWS);
 	}
 
 

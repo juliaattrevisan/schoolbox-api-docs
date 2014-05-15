@@ -23,6 +23,10 @@ class Factory implements IFactory {
 				$column = new Boolean();
 				break;
 
+			case Mapper::TYPE_BOOL_ENUM:
+				$column = new BoolEnum();
+				break;
+
 			case Mapper::TYPE_STRING:
 			case Mapper::TYPE_LOB:
 				$column = new Base();

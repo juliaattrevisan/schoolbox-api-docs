@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -37,14 +38,14 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	/** @var SubmissionBoxMapper */
 	protected $boxMapper;
 
+
 	/**
-	 * @param string $eventLabel
-	 * @param string $roleType
 	 * @return string
 	 */
-	protected function buildTopic($eventLabel, $roleType) {
-		// noop, deprecated
+	protected function getSlug() {
+		return NSMapper::NS_DUEWORK;
 	}
+
 
 	/**
 	 * Instantiate all your dependencies within yourself.

@@ -13,6 +13,10 @@
 
 use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
 
+/**
+ * @deprecated
+ * Class DeprecatedDatabase
+ */
 class DeprecatedDatabase implements Serializable
 {
 
@@ -40,7 +44,13 @@ static private $instance = false;
  */
 protected $collector;
 
-/* Constuctor sets up variables and connects to database */
+/**
+ * Constuctor sets up variables and connects to database
+ *
+ * @deprecated use \Schoolbox\Mapper
+ * @param string $db
+ * @param int $debug
+ */
 function DeprecatedDatabase($db = SQL_db, $debug = 1)
 {
 	$this->host = SQL_host;
@@ -51,6 +61,10 @@ function DeprecatedDatabase($db = SQL_db, $debug = 1)
 	$this->connect();
 }
 
+/**
+ * @deprecated
+ * @return bool|DeprecatedDatabase
+ */
 static public function getInstance() {
         if (!self::$instance) {
                 self::$instance = new self();
@@ -58,10 +72,17 @@ static public function getInstance() {
         return self::$instance;
 }
 
+/**
+ * @deprecated
+ */
 static public function reinitialise() {
 	self::$instance->reconnect();
 }
 
+/**
+ * @deprecated
+ * @return bool
+ */
 function reconnect()
 {
 	$closure = mysqli_close($this->dbf);
@@ -70,7 +91,11 @@ function reconnect()
 	return $closure;
 }
 
-	/* Estabilishes a connection to the database */
+/**
+ * Estabilishes a connection to the database
+ *
+ * @deprecated
+ */
 function connect()
 {
 	if(!isset($this->dbf)) {
@@ -85,13 +110,24 @@ function connect()
 		print "Unable to access ".$this->db.", check the permissions";
 }
 
-/* Closes the connection to the database */
+/**
+ * Closes the connection to the database
+ *
+ * @deprecated
+ * @return bool
+ */
 function close()
 {
 	return mysqli_close($this->dbf);
 }
 
-/* Changes the current selected database */
+/**
+ * Changes the current selected database
+ *
+ * @deprecated
+ * @param $db
+ * @return bool
+ */
 function changeDb($db)
 {
 	if(mysqli_select_db($this->dbf, $db))
@@ -103,8 +139,14 @@ function changeDb($db)
 		return false;
 }
 
-/* Executes query on the database and handles any errors */
-/* Returns the result resource for the query, also saves the result resource as a object var */
+/**
+ * Executes query on the database and handles any errors
+ * Returns the result resource for the query, also saves the result resource as a object var
+ *
+ * @deprecated
+ * @param $sql_q
+ * @return bool|mysqli_result|resource
+ */
 function query($sql_q)
 {
 	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
@@ -126,14 +168,25 @@ function query($sql_q)
 	return $this->result;
 }
 
-/* Returns the current result resource */
+/**
+ * Returns the current result resource
+ *
+ * @deprecated
+ * @return mysqli_result
+ */
 function getResult()
 {
 	return $this->result;
 }
 
-/* Gets the first result returned by the query */
-/* Returns an associative array of row, false if none exists */
+/**
+ * Gets the first result returned by the query
+ * Returns an associative array of row, false if none exists
+ *
+ * @deprecated
+ * @param $sql_q
+ * @return array|bool|null
+ */
 function getRow($sql_q)
 {
 	$result = $this->query($sql_q);
@@ -141,8 +194,14 @@ function getRow($sql_q)
 	return $row;
 }
 
-/* Gets the first value of the first result returned by the query */
-/* Returns an associative array of row, false if none exists */
+/**
+ * Gets the first value of the first result returned by the query
+ * Returns an associative array of row, false if none exists
+ *
+ * @deprecated
+ * @param $sql_q
+ * @return mixed
+ */
 function getOne($sql_q)
 {
 	$result = $this->query($sql_q);
@@ -150,8 +209,13 @@ function getOne($sql_q)
 	return $row[0];
 }
 
-/* Gets an 3 dimensional associative array of all rows returned by query, */
-/*	returns false if no rows */
+/**
+ * Gets an 3 dimensional associative array of all rows returned by query,
+ * returns false if no rows
+ *
+ * @param $sql_q
+ * @return array|bool
+ */
 function getAll($sql_q)
 {
 	$result = $this->query($sql_q);
@@ -169,8 +233,14 @@ function getAll($sql_q)
 		return false;
 }
 
-/* Returns the next result from a query result resource */
-/* Can be optionally passed a result resource otherwise it uses current result resource */
+/**
+ * Returns the next result from a query result resource
+ * Can be optionally passed a result resource otherwise it uses current result resource
+ *
+ * @deprecated
+ * @param int $result
+ * @return array|bool|null
+ */
 function getNextArray($result = 0)
 {
 	if($result)
@@ -183,8 +253,13 @@ function getNextArray($result = 0)
 	return $return_array;
 }
 
-
-/* Returns the number of rows returned by the query */
+/**
+ * Returns the number of rows returned by the query
+ *
+ * @deprecated
+ * @param int $result
+ * @return bool|int
+ */
 function countRows($result = 0)
 {
 	if($result)
@@ -196,7 +271,14 @@ function countRows($result = 0)
 	return $return_count;
 }
 
-/* Inserts an array into table (does all proper security checks to ensure safe) */
+/**
+ * Inserts an array into table (does all proper security checks to ensure safe)
+ *
+ * @deprecated use \Schoolbox\Mapper::save()
+ * @param $table
+ * @param $array
+ * @return bool|mysqli_result|resource
+ */
 function insert($table, $array)
 {
 	if(!($table && is_array($array)))
@@ -224,7 +306,15 @@ function insert($table, $array)
 	return $this->query($query);
 }
 
-/* Inserts a multidimension array into table (does all proper security checks to ensure safe) */
+/**
+ * Inserts a multidimension array into table (does all proper security checks to ensure safe)
+ *
+ * @deprecated use \Schoolbox\Mapper::save()
+ * @param $table
+ * @param $array
+ * @param bool $names
+ * @return bool|mysqli_result|resource
+ */
 function insertMultiRow($table, $array, $names=false)
 {
 	if(!($table && is_array($array)))
@@ -258,7 +348,15 @@ function insertMultiRow($table, $array, $names=false)
 	return $this->query($query);
 }
 
-/* Updates a row */
+	/**
+	 * Updates a row
+	 *
+	 * @deprecated use \Schoolbox\Mapper::save()
+	 * @param $table
+	 * @param $identifier
+	 * @param $array
+	 * @return bool|mysqli_result|resource
+	 */
 function update($table, $identifier, $array)
 {
 	if(!$table)
@@ -299,6 +397,13 @@ function update($table, $identifier, $array)
 	return $this->query($query);
 }
 
+/**
+ * @deprecated use \Schoolbox\Mapper::delete()
+ * @param $table
+ * @param $identifier
+ * @param $value
+ * @return bool|mysqli_result|resource
+ */
 function delete($table, $identifier, $value)
 {
 	$query = "DELETE FROM `$table` WHERE 1 != 1 ";
@@ -313,21 +418,37 @@ function delete($table, $identifier, $value)
 }
 
 
-/* Returns the id of the last record inserted */
+/**
+ * Returns the id of the last record inserted
+ *
+ * @deprecated use \Schoolbox\Mapper::getDatabase()->lastInsertId()
+ * @return int|string
+ */
 function insertID()
 {
 	$return_id = mysqli_insert_id($this->dbf);
 	return $return_id;
 }
 
-/* Returns the number of rows affected by the last update */
+/**
+ * Returns the number of rows affected by the last update
+ *
+ * @deprecated
+ * @return int
+ */
 function affectedRows()
 {
 	$return_count = mysqli_affected_rows($this->dbf);
 	return $return_count;
 }
 
-/* Free the result resource */
+/**
+ * Free the result resource
+ *
+ * @deprecated
+ * @param int $result
+ * @return bool
+ */
 function endQuery($result = 0)
 {
 	if ($result)
@@ -340,12 +461,15 @@ function endQuery($result = 0)
 
 /**
  * Installs the PHP debug bar collector into this object, and returns it.
+ *
+ * @deprecated
  */
 public function installCollector() {
     $this->collector = new DeprecatedDatabaseCollector($this->dbf);
 }
 
 /**
+ * @deprecated
  * @return DeprecatedDatabaseCollector
  */
 public function getCollector() {
@@ -354,7 +478,13 @@ public function getCollector() {
 
 /* PRIVATE FUNCTIONS */
 
-// Quote variable to make safe for sql use
+/**
+ * Quote variable to make safe for sql use
+ *
+ * @deprecated
+ * @param $value
+ * @return string
+ */
 function smartQuote($value) {
 
 // Stripslashes
@@ -382,6 +512,7 @@ function smartQuote($value) {
  * Escapes for safe input into database. Unlike smartQuote(), doesn't coerce
  * 'null' to NULL or wrap values in quote marks.
  *
+ * @deprecated
  * @param  string $string
  * @return string
  */
@@ -393,6 +524,7 @@ public function quote($string) {
  * Escapes _ and % characters within $string, so they don't have unintended
  * effects in LIKE queries.
  *
+ * @deprecated
  * @param  string $string
  * @return string
  */

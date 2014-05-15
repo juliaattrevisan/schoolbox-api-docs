@@ -10,8 +10,10 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Serializable;
@@ -60,4 +62,5 @@ interface ModuleNotifierInterface extends Serializable {
 	 * @return NS
 	 */
 	public function getNamespace();
+
 }

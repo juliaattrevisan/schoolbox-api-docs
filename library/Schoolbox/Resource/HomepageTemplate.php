@@ -14,6 +14,10 @@ namespace Schoolbox\Resource;
 
 
 class HomepageTemplate {
+
+	const HOMEPAGE_REMOVE = -1;
+	const HOMEPAGE_KEEP_EXISTING = 0;
+
 	/**
      * Template identifier
      *

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @deprecated
+ * Class User_ServiceController
+ */
 class User_ServiceController {
     private $sitePage;
 

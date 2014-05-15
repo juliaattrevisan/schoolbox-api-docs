@@ -11,6 +11,7 @@
 namespace Schoolbox\Resource;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
 use Schoolbox\UserAccess;
 use \External_UserInterface;
@@ -85,14 +86,69 @@ class CategoryMapper extends Mapper {
 			'other_key' => 'id',
 		));
 
+		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
+		$this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+
 	}
 
+	/**
+	 * @param Category $model
+	 * @return bool
+	 */
+	public function preSave($model) {
+
+		// iterate codes given; if any already exist, error 136
+		$codeList = $model->getCodes()->getColumnValues('code');
+
+		$collisions = CategoryCodeMapper::getInstance()->findByColumn('code', $codeList);
+
+		// retain any codes that do NOT match the given model
+		$id = $model->getId();
+		$collisions = $collisions->filterByCallback(function($code) use ($id) {
+			/** @var CategoryCode $code */
+			return $code->getCategory()->getId() != $id;
+		});
+
+		if($collisions->count()) {
+			error(136);
+		}
+
+		// persist Category object
+		return true;
+	}
+
+	/**
+	 * @param Category $model
+	 * @param Category $previous
+	 * @return bool
+	 */
+	public function postSave($model, $previous = null) {
+		// if no codes populated, no need to do anything
+		if(!$model->getCodes()->count()) {
+			return true;
+		}
+
+		// first drop the previous code(s) connected to this category
+		CategoryCodeMapper::getInstance()->delete(
+			CategoryCodeMapper::getInstance()->findById($model->getId())
+		);
+
+		// bind the given codes to this category
+		foreach($model->getCodes() as $code) {
+			$code->setCategory($model);
+		}
+
+		// persist the Code objects
+		CategoryCodeMapper::getInstance()->save($model->getCodes());
+
+		return true;
+	}
 
 	/**
 	 * Get a list of categorys which belong to a particular parent
 	 *
 	 * @param $id
-	 * @return Category
+	 * @return Collection|Category[]
 	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	public function findByParent($id) {

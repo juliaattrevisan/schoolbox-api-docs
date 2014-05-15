@@ -119,6 +119,8 @@ class ArticleMapper extends Mapper implements Searchable {
 			'join' => 'users'
 		));
 
+		$this->hasSoftDeleteBooleanField('item_deleted');
+
 
 		$this->hasJoin('topic', array(
 			'mapper'    => '\\Schoolbox\\News\\TopicMapper',
@@ -281,6 +283,7 @@ class ArticleMapper extends Mapper implements Searchable {
 	/**
 	 * Performs a search with the given parameters, and returns a Collection of the resultant set.
 	 *
+	 * @param User $user
 	 * @param string $keyword
 	 * @param int $offset
 	 * @param int $limit
@@ -288,7 +291,7 @@ class ArticleMapper extends Mapper implements Searchable {
 	 * @param string $sortDirection
 	 * @return Collection
 	 */
-	public function search($keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC') {
+	public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC') {
 
 		$campusMapper = $this->getJoinMapper('campuses');
 		$userMapper = $this->getJoinMapper('users');
@@ -305,10 +308,10 @@ class ArticleMapper extends Mapper implements Searchable {
 				MATCH(a.item_heading,a.item_body) AGAINST (:keyword) AS `score`
 			FROM
 				`{$this->getTable()}`
-				{$this->getJoinSql('topic', 'a', 't')},
-				{$this->getJoinSql('users', 'a', 'u')},
-				{$this->getJoinSql('campuses', 'a', 'c')},
-				{$this->getJoinSql('groups', 'a', 'r')}
+				LEFT JOIN {$this->getJoinSql('topic', 'a', 't')}
+				LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
+				LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
+				LEFT JOIN {$this->getJoinSql('groups', 'a', 'r')}
 			WHERE
 				a.item_owner != :user_id
 				AND a.item_deleted = 0
@@ -322,9 +325,6 @@ class ArticleMapper extends Mapper implements Searchable {
 			GROUP BY a.item_id
 			ORDER BY newsTopic.newsTopicID ASC, news_items.item_datetime_posted DESC
 		");
-
-		/** @var User $user */
-		$user = $_SESSION['user'];
 
 		$records = array();
 		// if you're a superuser, set the publish date filter to a few hundred years in the future

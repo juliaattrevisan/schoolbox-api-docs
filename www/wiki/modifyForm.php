@@ -5,145 +5,144 @@ $page = new SitePage();
 $wikiHandler = new Wiki();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
+$wikiMapper = \Schoolbox\Wiki\WikiMapper::getInstance();
+$revisionMapper = \Schoolbox\Wiki\RevisionMapper::getInstance();
+
+$now = new Alaress_Date_Format(time(), 'U');
+
+// posting a revision - wiki may or may not exist
+if(isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
+
+	// generate the revision object regardless of whether or not the wiki exists
+	$revision = new \Schoolbox\Wiki\Revision();
+	$revision
+		->setHeading($_POST['heading'])
+		->setCreated($now)
+		->setBody($revisionMapper->createStubLinks($_POST['body']))
+		->setUser($_SESSION['user']);
+
+	// wiki ostensibly already exists: retrieve if possible
+	if(is_numeric($_POST['wikiID']) && strlen($_POST['slug'])) {
+		try {
+			/** @var Schoolbox\Wiki\Wiki $wiki */
+			$wiki = $wikiMapper->findOneByColumnList(array(
+				'categoryID' => $_POST['categoryID'],
+				'slug'       => $_POST['slug']
+			));
+
+			// ok we got a wiki, but if it's not the one you were looking for, freak out
+			if($_POST['wikiID'] != $wiki->getId()) {
+				throw new \Schoolbox\Mapper\Exception("Not the droid you're looking for");
+			}
+		}
+		catch(\Schoolbox\Mapper\Exception $e) {
+			error(2);
+			exit;
+		}
+	}
+	// request to create new wiki
+	else {
+		$cat = new \Schoolbox\Resource\Category();
+		$cat->setId($_POST['categoryID']);
+		$url = new Url($_POST['heading']);
+		$wiki = new \Schoolbox\Wiki\Wiki();
+		$wiki
+			->setCategory($cat)
+			->setLatestRevision(new \Schoolbox\Wiki\Revision())
+			->setCreated($now)
+			->setSlug(strlen($_POST['slug']) ? $_POST['slug'] : $url->getSlug())
+			->setLocked(false)
+			->setDeleted(false);
+	}
+
+	// check category permission
+	if(($permission = $groupHandler->getPermission($wiki->getCategory()->getId())) < READ_ACCESS) {
+		error(19);
+	}
+
+	// check locked-ness
+	if($wiki->getLocked() && $permission < WRITE_ACCESS) {
+		error(19);
+	}
+
+	/* at this juncture, $revision has no ID; $wiki *may* have an ID */
+
+	// persist our revision, and update with the resultant ID
+	$revisionIds = $revisionMapper->save($revision);
+	$revision->setId($revisionIds[0]);
+
+	// is there a previous revision that's snuck in and caused merge conflicts?
+	if($_POST['revision'] < $wiki->getLatestRevision()->getId()) {
+		SitePage::localRedir("/wiki/merge/".$wiki->getId());
+		exit;
+	}
+
+	// no merge conflict? ok, persist the wiki entity with the latest revision
+	$wiki->setLatestRevision($revision);
+	$wikiIds = $wikiMapper->save($wiki);
+
+	// update the revision with this wiki ID (if wiki previously existed, this won't change anything)
+	$revision->setWiki($wiki->setId($wikiIds[0]));
+	$revisionMapper->save($revision);
+
+	SitePage::localRedir('/wiki/' . $wiki->getCategory()->getId() . '/' . $wiki->getSlug());
+}
+
+// applying a reversion
+elseif(is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
+	$wiki = $wikiHandler->getByID($_GET['wikiID']);
+
+	// Check permission
+	if(($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
+		error(19);
+	}
+
+	$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
+
+	SitePage::localRedir('/wiki/' . $wiki['categoryID'] . '/' . $wiki['slug']);
+}
+
+// deleting a wiki
+elseif (is_numeric($_GET['delete'])) {
+	$wiki = $wikiHandler->getByID($_GET['delete']);
+
+	// Check permission
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
+		error(19);
+	}
+
+	$wikiHandler->delete($wiki['wikiID']);
+
+	SitePage::localRedir('/homepage/' . $wiki['categoryID']);
+}
+
+// [un]locking the wiki
+elseif (is_numeric($_GET['toggleLock'])) {
+
+	// Wiki exists
+	$wiki = $wikiHandler->getByID($_GET['toggleLock']);
+
+	if (!isset($wiki['wikiID'])) {
+		error(2);
+	}
+
+	// Check permissions
+	if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS) {
+		error(19);
+	}
+
 	$data = array(
-		'heading' => $_POST['heading'],
-		'body' => $_POST['body'],
+		'wikiID' => $wiki['wikiID'],
+		'locked' => $wiki['locked'] == 'true' ? 'false' : 'true',
 	);
 
-	if (is_numeric($_POST['wikiID']) && strlen($_POST['slug'])) {
+	$wikiHandler->update($data);
 
-		/* Wiki exists
-		 */
-		$wiki = $wikiHandler->getByCategoryAndSlug($_POST['categoryID'], $_POST['slug']);
-
-		if (!isset($wiki['wikiID'])) {
-			error(2);
-		}
-
-		if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
-			error(19);
-		}
-
-		/* Check locked
-		 */
-		if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
-			error(19);
-		}
-
-		$data['wikiID'] = $wiki['wikiID'];
-		$data['categoryID'] = $wiki['categoryID'];
-
-		$data = $wikiHandler->createStubLinks($data);
-
-		/* Check if there has been a revision added for this wiki since you
-		 * last received a lastRevision id.
-		 */
-		$latestRevision = $wikiHandler->getLatestRevision($wiki['wikiID']);
-
-		/* Save your version regardless
-		 */
-		$wikiHandler->update($data);
-
-		/* If there was a version between the one you were editing and the one
-		 * you just submitted, compare them
-		 */
-		if ($_POST['revision'] < $latestRevision['revisionID']) {
-			SitePage::localRedir("/wiki/merge/$wiki[wikiID]");
-		}
-		else {
-			$redir = '/wiki/' . $wiki['categoryID'] . '/' . $_POST['slug'];
-		}
-	}
-	else if ($_POST['categoryID']) {
-
-		/* Check permission
-		 */
-		if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS) {
-			error(19);
-		}
-
-		$data['categoryID'] = $_POST['categoryID'];
-
-		/* If a slug was already provided, don't modify it
-		 * Otherwise determine a slug
-		 */
-		if (strlen($_POST['slug'])) {
-			$data['slug'] = $_POST['slug'];
-		}
-		else {
-			$url = new Url($_POST['heading']);
-
-			$data['slug'] = $url->getSlug();
-		}
-
-		$data = $wikiHandler->createStubLinks($data);
-
-		$wikiHandler->create($data);
-
-		$redir = '/wiki/' . $data['categoryID'] . '/' . $data['slug'];
-	}
-
-	SitePage::localRedir($redir);
+	$page->backToTheFuture(1);
 }
+
+// le fail
 else {
-	if (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
-		$wiki = $wikiHandler->getByID($_GET['wikiID']);
-
-		/* Check permission
-		 */
-		if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
-			error(19);
-		}
-
-		$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
-
-		SitePage::localRedir('/wiki/' . $wiki['categoryID'] . '/' . $wiki['slug']);
-	}
-	else {
-		if (is_numeric($_GET['delete'])) {
-			$wiki = $wikiHandler->getByID($_GET['delete']);
-
-			/* Check permission
-			 */
-			if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
-				error(19);
-			}
-
-			$wikiHandler->delete($wiki['wikiID']);
-
-			SitePage::localRedir('/homepage/' . $wiki['categoryID']);
-		}
-		else {
-			if (is_numeric($_GET['toggleLock'])) {
-
-				/* Wiki exists
-				 */
-				$wiki = $wikiHandler->getByID($_GET['toggleLock']);
-
-				if (!isset($wiki['wikiID'])) {
-					error(2);
-				}
-
-				/* Check permissions
-				 */
-				if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS) {
-					error(19);
-				}
-
-				$data = array(
-					'wikiID' => $wiki['wikiID'],
-					'locked' => $wiki['locked'] == 'true' ? 'false' : 'true',
-				);
-
-				$wikiHandler->update($data);
-
-				$page->backToTheFuture(1);
-			}
-			else {
-				error(2);
-			}
-		}
-	}
+	error(2);
 }
 

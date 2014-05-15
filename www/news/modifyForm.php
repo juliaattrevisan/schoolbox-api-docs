@@ -29,7 +29,7 @@ if ($_POST['heading']) {
 		try {
 			$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($_POST['newsID']);
 			// permission check
-			if($article->getOwner() != $_SESSION['id'] && $permission < FULL_ACCESS) {
+			if($article->getOwner()->getId() != $_SESSION['id'] && $permission < FULL_ACCESS) {
 				 error(23);
 				 exit;
 			}
@@ -152,7 +152,7 @@ elseif (is_numeric($_GET['delete'])) {
 	}
 
 	// permission check
-	if($article->getOwner() != $_SESSION['id'] && $permission < FULL_ACCESS) {
+	if($article->getOwner()->getId() != $_SESSION['id'] && $permission < FULL_ACCESS) {
 		error(23);
 	}
 

@@ -52,6 +52,14 @@ class Message implements Serializable {
 		return $this->body->getTokenList();
 	}
 
+	public function getIcon() {
+		return $this->icon;
+	}
+
+	public function getHref() {
+		return $this->href;
+	}
+
 	/**
 	 * Return metadata from this message
 	 *
@@ -73,12 +81,17 @@ class Message implements Serializable {
 		return json_encode($this->toArray());
 	}
 
+	/**
+	 * Provide the array representation of this message
+	 *
+	 * @return array
+	 */
 	public function toArray() {
 		return array(
 			'body' => $this->body->getMessageString(),
 			'icon' => $this->icon,
 			'href' => $this->href,
-			'abstract' => $this->abstract
+			'meta' => $this->meta
 		);
 	}
 
@@ -93,7 +106,7 @@ class Message implements Serializable {
 		$this->body = new MessageBody($data['body']);
 		$this->icon = $data['icon'];
 		$this->href = $data['href'];
-		$this->abstract = $data['abstract'];
+		$this->meta = $data['meta'];
 	}
 
     /**

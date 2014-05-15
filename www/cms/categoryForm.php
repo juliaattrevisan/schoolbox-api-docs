@@ -1,4 +1,12 @@
 <?php
+
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Resource\CategoryCodeMapper;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplate;
+use Schoolbox\Resource\HomepageTemplateMapper;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
@@ -12,24 +20,64 @@ if ($_POST['name']) {
 		'template' => $_POST['template'],
 		'code' => $_POST['code'],
 		'group' => $_POST['group'],
-        'recursive' => $_POST['recursive'] ? '1' : '0',
+		'recursive' => $_POST['recursive'] ? '1' : '0',
 	);
+
+	$codeCollection = new \Schoolbox\Collection();
+	foreach(explode(',', $_POST['code']) as $code) {
+		$codeModel = new \Schoolbox\Resource\CategoryCode();
+		$codeModel->setCode(trim($code));
+		$codeCollection->add($codeModel);
+	}
+
+	/** @var \Schoolbox\Resource\Category $model */
+	$model = CategoryMapper::getInstance()->createModel()
+		->setName($_POST['name'])
+		->setParent(CategoryMapper::getInstance()->createModel()
+			->setId($_POST['parent'])
+		)
+		->setCodes($codeCollection);
 
 	if (is_numeric($_POST['categoryID'])) {
 		if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
 			error(6);
 		}
 
-		$category['id'] = $_POST['categoryID'];
-		$categoryHandler->update($category);
-	}
-	else {
-		if ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS) {
-			error(6);
-		}
+		$model->setId($_POST['categoryID']);
 
-		$category['id'] = $categoryHandler->create($category);
+		$category['id'] = $_POST['categoryID'];
+		$model->setId($_POST['categoryID']);
 	}
+	elseif ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS) {
+		error(6);
+	}
+
+	$affectedIds = CategoryMapper::getInstance()->save($model);
+
+	if($affectedIds === false) {
+		// something went wrong
+		error(2);
+	}
+
+	$model->setId($affectedIds[0]);
+
+	// if rolepermission collection is defined, reapply permissions (possibly recursively)
+	$rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'], $_POST['recursive']);
+
+
+	// if homepage is to be removed
+	if($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
+		HomepageConfigMapper::getInstance()->resetToTemplate($model->getHomepage());
+	}
+	// if template defined
+	elseif($_POST['template'] > 0) {
+		$model->setHomepage(HomepageConfigMapper::getInstance()->createModel()
+			->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']))
+		);
+	}
+	// no changes in "KEEP_EXISTING" case
+
+
 
 	if ($_POST['groupcheck']) {
 
@@ -83,7 +131,10 @@ else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 		exit;
 	}
 
-	$categoryHandler->update(array('id'=>$_POST['move'], 'parent'=> $_POST['categoryID']));
+	CategoryMapper::getInstance()->save(
+		CategoryMapper::getInstance()->findById($_POST['move'])
+			->setParent(CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
+	);
 }
 else if (is_numeric($_GET['delete'])) {
 	if (!$category = $categoryHandler->getByID($_GET['delete'])) {
@@ -94,10 +145,11 @@ else if (is_numeric($_GET['delete'])) {
 		error(8);
 	}
 
-	$categoryHandler->delete($_GET['delete']);
+	CategoryMapper::getInstance()->delete(
+		CategoryMapper::getInstance()->findById($_GET['delete'])
+	);
 
 	$_SESSION['resourcesID'] = $category['parent'];
-	$page->backToTheFuture(1);
 }
 else if (is_numeric($_GET['deleteAll'])) {
 	if (!$category = $categoryHandler->getByID($_GET['deleteAll'])) {
@@ -106,9 +158,9 @@ else if (is_numeric($_GET['deleteAll'])) {
 
 	$categoryHandler->recursiveDelete($_GET['deleteAll']);
 	$_SESSION['resourcesID'] = $category['parent'];
-	$page->backToTheFuture(1);
 }
 else {
 	error(2);
 }
 
+$page->backToTheFuture(1);

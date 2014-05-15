@@ -24,3 +24,6 @@ Autoloader::initialise();
 // need DB connection in the main daemon processes
 $database = Database::getInstance();
 $database->connect(SQL_dsn, SQL_user, SQL_passwd);
+
+/* Set default time zone */
+date_default_timezone_set(\Schoolbox\Config\ConfigMapper::getInstance()->get('date_timezone'));

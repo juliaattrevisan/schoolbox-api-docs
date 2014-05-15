@@ -8,63 +8,74 @@
  */
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract {
 
-    /**
-     * @var Activity_ListArray
-     */
-    private $activityList;
+	/** @var \Schoolbox\Collection|\Schoolbox\Feed\Item[] */
+	protected $items;
 
-    /**
+	/**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+	public function execute() {
 
-        $feedHandler = new Feed;
-        $feedList = $feedHandler->getFeed($this->getContext('id'), $this->getConfig('size'));
+		$conf = \Schoolbox\Config\ConfigMapper::getInstance();
+		$feed = new \Schoolbox\Feed\Feed($conf);
 
-        $feed = array();
+		$this->items = $feed->aggregate(
+			array(
+				new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+				new \Schoolbox\Resource\Category\NewsNotifier($conf),
+				new \Schoolbox\Blog\BlogNotifier($conf),
+				new \Schoolbox\Blog\CommentNotifier($conf),
+				new \Schoolbox\Wiki\WikiNotifier($conf),
+				new \Schoolbox\Wiki\RevisionNotifier($conf),
+				new \Schoolbox\Resource\CategoryNotifier($conf),
+				new \Schoolbox\Resource\FileNotifier($conf),
+				new \Schoolbox\Resource\LinkNotifier($conf)
+			),
+			$this->getContext('id'), $_SESSION['user']->getRole()->getType(), $this->getConfig('size')
+		);
+	}
 
-        if (count($feedList)) {
-            foreach ($feedList as $f) {
-                $feedTime = new Alaress_Date_Relative($f['date']);
-                $feedTime->setPrefix('');
-                $feed[] = array(
-                    'icon' => $f['type'],
-                    'content' => $f['messageHTML'],
-                    'time' => $feedTime->getRelativeTime(),
-                    'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square32' : '',
-                    'avatar_title' => $f['user_name'] != false ? $f['user_name'] : '',
-                    'has_grade' => 'no-grade',
-                    'gradeiant' => '',
-                    'grade' => '',
-                );
-            }
-        }
+	/**
+	 * Renders the data into the SitePage. Presentation logic.
+	 * @param String $templateHandle
+	 * @return boolean
+	 */
+	public function renderTemplate($templateHandle) {
+		if (!parent::loadTemplate($templateHandle, 'feed')) {
+			return false;
+		}
+		$this->parseConfig();
 
-        $this->activityList = new Activity_ListArray($feed);
-    }
+		$this->setVar('USER_TOKEN', $_SESSION['key']);
 
-    /**
-     * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
-     * @return boolean
-     */
-    public function renderTemplate($templateHandle) {
-        if (!parent::loadTemplate($templateHandle, 'feed')) {
-            return false;
-        }
-        $this->parseConfig();
+		$this->setBlock($templateHandle, 'event', 'event_block');
 
-	    $this->setVar('USER_TOKEN', $_SESSION['key']);
+		if(!$this->items->count()) {
+			$this->setVar('event_block', '');
+			return true;
+		}
 
-        $this->activityList->setShowAvatars(true);
-        $this->activityList->setTarget($this->sitepage, 'ACTIVITY_LIST');
-        foreach ($this->activityList as $a) {
-            // iterates the set
-        }
+		$decor = new \Schoolbox\Notif\Message\Decorator(null);
 
-        return true;
-    }
+		$j = 0;
+		foreach($this->items as $item) {
+			$decor->setMessage($item);
+			$date = new Alaress_Date_Format($item->getTimestamp(), 'U');
+
+			$this->setVar(array(
+				'EVENT_HREF'     => $item->getBody()->getHref(),
+				'EVENT_ICON'     => $item->getBody()->getIcon(),
+				'EVENT_TIME'     => $date->getShort(),
+				'EVENT_LONGTIME' => $date->getLong(),
+				'EVENT_BODY'     => $decor->formatHtml(),
+				'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
+			));
+			$this->parse('event_block', 'event', true);
+		}
+
+		return true;
+	}
 
 }

@@ -1,6 +1,10 @@
 <?php
 
 class Blog extends DeprecatedModel {
+
+	/**
+	 * @deprecated
+	 */
 	function Blog () {
 		$this->_table = "blog";
 		$this->_index = "id";
@@ -11,6 +15,9 @@ class Blog extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::findById()
+	 */
 	function getByID($id) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, user.synergy_id
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
@@ -24,6 +31,7 @@ class Blog extends DeprecatedModel {
     /**
      * Get all the blogs for a category.
      *
+     * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')
      * @param <type> $cid
      * @return <type>
      */
@@ -40,6 +48,7 @@ class Blog extends DeprecatedModel {
     /**
      * Get all the blogs for a category in a particular year.
      *
+     * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
      * @param <type> $cid
      * @return <type>
      */
@@ -55,6 +64,13 @@ class Blog extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
+	 * @param $cid
+	 * @param $year
+	 * @param $month
+	 * @return array|bool
+	 */
 	public function getByYearAndMonth ($cid, $year, $month) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
@@ -70,6 +86,7 @@ class Blog extends DeprecatedModel {
 	/**
 	 * Returns a list of years and months which have blog posts
 	 *
+	 * deprecated use \Schoolbox\Blog\BlogMapper::getOccupiedDateList()
 	 * @param Integer $categoryId
 	 * @return Array|Bool
 	 */
@@ -82,6 +99,11 @@ class Blog extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::save()
+	 * @param $blog
+	 * @return int|string
+	 */
 	function create($blog) {
 		$blog = array_merge(array(
 			'owner'   => $_SESSION['id'],
@@ -91,10 +113,20 @@ class Blog extends DeprecatedModel {
 		return parent::create($blog);
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::save()
+	 * @param $blog
+	 * @return bool|mysqli_result|resource
+	 */
 	function update($blog) {
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
 	}
 
+	/**
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::delete()
+	 * @param $id
+	 * @return bool|mysqli_result|resource
+	 */
 	function delete($id) {
 		$blog = array(
 			'id'      => $id,
@@ -104,6 +136,11 @@ class Blog extends DeprecatedModel {
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
 	}
 
+	/**
+	 * @deprecated (why does this event exist?)
+	 * @param $id
+	 * @return bool
+	 */
 	function permission($id) {
 		$blog = $this->getByID($id);
 		if(is_array($blog)) {
@@ -117,13 +154,28 @@ class Blog extends DeprecatedModel {
 			false;
 	}
 
+	/**
+	 * @deprecated (...what?)
+	 * @param null $config
+	 * @return null
+	 */
 	function config($config = null) {
 		if($config)
 			$this->_config = $config;
 		return $this->_config;
 	}
 
-        function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+	/**
+	 *
+	 * @param $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param null $count
+	 * @param string $sort_by
+	 * @param string $sort_dir
+	 * @return array|bool
+	 */
+	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
             $keyword = $this->db->quote($keyword);
 
             $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
@@ -167,6 +219,7 @@ class Blog extends DeprecatedModel {
 	 *
 	 * TODO: Refactor
 	 *
+	 * @deprecated use \Schoolbox\Blog\BlogMapper::delete()
 	 * @param  $cid
 	 * @return void
 	 */
