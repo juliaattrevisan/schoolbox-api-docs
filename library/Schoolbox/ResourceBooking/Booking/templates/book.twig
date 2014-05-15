@@ -238,10 +238,12 @@ $(document).ready(function() {
                 range: [0, 59]
             },
             'start_datetime[meridien]': {
-                length: 2
+                required: true,
+                selected: true
             },
             'end_datetime[meridien]': {
-                length: 2
+                required: true,
+                selected: true
             }
         },
         errorPlacement: function(label, element) {

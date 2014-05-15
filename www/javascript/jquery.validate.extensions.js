@@ -107,4 +107,15 @@
         var form = item.closest('form');
         return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
     }, 'Please enter a date that is after');
+
+    /**
+     * selected extension - checks that you've selected something.
+     */
+    $.validator.addMethod('selected', function(value, element, other_date_field) {
+        if (this.optional(element)) {
+            return true
+        }
+        var selected = $(element).find(':selected[value]')
+        return (selected.length > 0)
+    }, 'Please select a value');
 }(jQuery));
