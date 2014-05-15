@@ -21,7 +21,7 @@ $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_bloc
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
-	$mapper = new \EOTC\Calendar\EventMapper();
+	$mapper = new \Schoolbox\Calendar\EventMapper();
 
 	try {
 		$event = $mapper->findById($_GET['eventID']);
@@ -87,7 +87,7 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_dates_block', 'recurring_dates');
 	}
 	else {
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+		$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
 		$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
 
 		$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
@@ -105,7 +105,7 @@ else {
 
 	/* Set up default dates
 	 */
-	$event = new \EOTC\Calendar\Event();
+	$event = new \Schoolbox\Calendar\Event();
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
@@ -157,7 +157,7 @@ else {
 
 /* Event Types
  */
-$calendarEventTypeMapper = new \EOTC\Calendar\EventTypeMapper();
+$calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
 $allEventTypes = $calendarEventTypeMapper->findAll();
 
 $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
@@ -181,7 +181,7 @@ $campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
 /* Event Access Levels
  * Requires both $groupList and $campusList for optional values
  */
-$page->dropDown('event_level_drop', new \EOTC\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
+$page->dropDown('event_level_drop', new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
 	'id' => 'EVENT_EVENTLEVEL_ID',
 	'name' => 'EVENT_EVENTLEVEL_NAME',
 ));

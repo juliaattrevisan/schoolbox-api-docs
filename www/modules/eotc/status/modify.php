@@ -56,7 +56,7 @@ if ($event->getSeriesId() == null) {
 	));
 }
 else {
-	$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+	$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
 	$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
 
 	$this->setVar(array(

@@ -39,7 +39,7 @@ switch($_POST['action']) {
 		 */
 		$publishDate = null;
 		$until = null;
-		$eventMapper = new \EOTC\Calendar\EventMapper();
+		$eventMapper = new \Schoolbox\Calendar\EventMapper();
 
 		/* Spawn an existing event if id provided
 		 * Otherwise spawn a new one
@@ -53,7 +53,7 @@ switch($_POST['action']) {
 			}
 		}
 		else {
-			$event = new \EOTC\Calendar\Event();
+			$event = new \Schoolbox\Calendar\Event();
 		}
 
 		/* Events aren't visible until this date
@@ -122,7 +122,7 @@ switch($_POST['action']) {
 
 		/* Save this event and any recurring incidents too
 		 */
-		$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($eventMapper);
+		$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
 
 		/* If you were editing an event on someone else's calendar, don't
@@ -150,7 +150,7 @@ switch($_POST['action']) {
 		break;
 
 	case 'Delete':
-		$eventMapper = new \EOTC\Calendar\EventMapper();
+		$eventMapper = new \Schoolbox\Calendar\EventMapper();
 
 		try {
 			$event = $eventMapper->findById($_POST['id']);
