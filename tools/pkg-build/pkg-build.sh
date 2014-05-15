@@ -70,7 +70,9 @@ then
 				mv $i `echo $i | sed "s/schoolbox/schoolboxdev/g"`;
 			done
 		fi
-		sed -i "s/`grep '\-\- vagrant' debian/changelog | cut -d' ' -f3`\ `grep '\-\- vagrant' debian/changelog | cut -d' ' -f4`/Alaress\ \(Schoolbox\ Signing\ Key\)\ <support@schoolbox.com.au>/g" debian/changelog;\
+		sed -i "s/`grep '\-\- vagrant' debian/changelog | cut -d' ' -f3`\ `grep '\-\- vagrant' debian/changelog | cut -d' ' -f4`/Alaress\ \(Schoolbox\ Signing\ Key\)\ <support@schoolbox.com.au>/g" debian/changelog;
+		# Download and include the cache file for browsercap
+		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browsercap-cache.php;
 		git add debian;
 		git commit -a -m "update changelog for building";
 		debver=`dpkg-parsechangelog | sed -n -e 's/^Version: //p'`;
