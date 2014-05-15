@@ -22,6 +22,7 @@ use React\Stomp\Protocol\Frame;
 
 abstract class StompScheduler extends AbstractScheduler {
 
+	/** @var string */
     protected $queue;
 
     /**
@@ -57,6 +58,7 @@ abstract class StompScheduler extends AbstractScheduler {
     public function onConnect($client) {
         $this->debug->v("Connected to STOMP", '+');
         $client->subscribeWithAck($this->queue, 'client', array($this, 'onMessage'));
+	    $client->on('error', array($this, 'onException'));
     }
 
 

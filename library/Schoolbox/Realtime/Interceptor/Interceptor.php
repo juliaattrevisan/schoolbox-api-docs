@@ -118,23 +118,25 @@ class Interceptor implements TaskResponseHandlerInterface {
 	 */
 	public function reroute($user, $frame) {
 
+		// echoes in this method are caught in an output buffer and piped to the log
+
 		$formatted = json_decode($frame->body, true);
 		$message = unserialize($formatted['message']);
 
 		if(!$message instanceof TargetedMessage) {
-//			echo "INCORRECT FORMAT: DISMISS!\n";
+			echo 'Message must be an instanceof Schoolbox\Notif\Message\External\TargetedMessage: rejecting';
 			return false;
 		}
 
 		// fail fast: if it's already been rerouted, don't try again
 		if(isset($formatted['extra']['rerouted'])) {
-//			echo "ALREADY REROUTED, SHOULDN'T HAVE ENDED UP BACK HERE!\n";
+			echo 'Message has already been rerouted: rejecting';
 			return false;
 		}
 
 		// yes we are "rerouting" this message...rerouting it to /dev/null! *mwa ha ha*
 		if($this->canDismiss($user, $message, $formatted['context'])) {
-//			echo "SELF-SEND: DISMISS!\n";
+			echo "Message not relevant to user: routing to /dev/null";
 			return true;
 		}
 
@@ -148,7 +150,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 		switch($newLevel) {
 			// total suppression
 			case 0:
-//				echo "NEW LEVEL IS ZERO: DISMISS!\n";
+				echo "Reroute level is zero: routing to /dev/null";
 				return true;
 
 			// digest
@@ -168,18 +170,18 @@ class Interceptor implements TaskResponseHandlerInterface {
 				break;
 
 			default:
-//				echo "UNACCEPTABLE LEVEL: DISMISS!\n";
+				echo "Reroute level is unacceptable ($newLevel): reouting to /dev/null";
 				return true;
 		}
 
 		try {
 			/** @var TargetedMessage $message */
 			$message->setTargets(array($method));
-//			echo "I REROUTED YOUR MESSAGE to '$method.user.{$user->getId()}' at level $newLevel!\n";
+			echo "Message rerouted to '$method.user.{$user->getId()}' at level $newLevel!";
 			return $message->resend($this->notif, $newLevel, "user.{$user->getId()}");
 		}
 		catch(\Exception $e) {
-//			echo $e;
+			echo "Exception occurred during rerouting: $e";
 			return false;
 		}
 
@@ -302,7 +304,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 	 * @param bool
 	 * @return self
 	 */
-	protected function setPatience($patient) {
+	public function setPatience($patient) {
 		$this->patient = $patient;
 		return $this;
 	}

@@ -54,9 +54,6 @@ class Scheduler extends StompScheduler {
     /** @var SplObjectStorage */
     protected $resolvers;
 
-	/** @var IConfigLoader */
-	protected $conf;
-
 
     /**
      * @param LoopInterface $loop
@@ -98,6 +95,7 @@ class Scheduler extends StompScheduler {
 
         // prepare the interceptor
         $interceptor = new Interceptor($this->debug, $this->loop);
+	    $dbg = $this->debug;
 
         // perform the subscription
         parent::onConnect($client);
@@ -107,10 +105,12 @@ class Scheduler extends StompScheduler {
             /** @var User $user - self hydration */
             $user = UserMapper::getInstance()->findById($user->getId());
             $queue = UserQueue::getUserToSortQueueName($user->getId());
-            $client->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user) {
+            $client->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $dbg) {
                 // this closure is executed every time a message is sent to the client based on the given subscription
+				$dbg->v("Got a subscribed message for ".$user->getUsername());
                 $interceptor->process($user, $frame);
             });
+
         }
 
     }
@@ -121,6 +121,7 @@ class Scheduler extends StompScheduler {
      * @return void
      */
     public function onException($e) {
+	    $this->debug->v($e->getMessage(), "!");
         $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
     }
 
@@ -131,7 +132,8 @@ class Scheduler extends StompScheduler {
      * @return void
      */
     public function onMessage($frame, $resolver) {
-		try {
+		$this->debug->v("Received message from instance".self::QUEUE_SCHEDULE);
+	    try {
 
 			$formatted = CompressedFormatter::uncompress($frame->body);
             $event = unserialize($formatted['message']);
@@ -146,10 +148,13 @@ class Scheduler extends StompScheduler {
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
+		    $this->debug->v("Building trigger factory from ".get_class($event->getObject()));
 			$triggerFactory = new TriggerFactory($this->getModule($event->getObject()), $event);
 
 			// retrieve, populate, and schedule this bundle of triggers
+		    $this->debug->v("Scheduling triggers");
 			$this->scheduleNotifications($triggerFactory->buildTriggers($event->getAction())->getTriggers(), $resolver);
+		    // notice that we don't ACK the resolver here before returning
 			return;
 
 		}
@@ -184,8 +189,12 @@ class Scheduler extends StompScheduler {
     public function scheduleNotification($trigger, $resolver = null) {
         parent::scheduleNotification($trigger);
         if($resolver instanceof AckResolver) {
+	        $this->debug->v("Attaching resolver");
             $this->attachResolverTrigger($resolver, $trigger);
         }
+	    else {
+		    $this->debug->v("No resolver supplied for attaching trigger", '*');
+	    }
     }
 
 
@@ -217,7 +226,10 @@ class Scheduler extends StompScheduler {
 
 		// check that an array was returned
 		if(!$msgr instanceof Messenger) {
-			throw new ScheduleException("Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\Messenger");
+			throw new ScheduleException(
+				"Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\Messenger, got "
+				. (is_object($msgr) ? get_class($msgr) : gettype($msgr))
+			);
 		}
 
 		// if there are no messages, just ignore this callback and move on
@@ -273,6 +285,7 @@ class Scheduler extends StompScheduler {
         }
         $triggers->attach($trigger);
         $this->resolvers->attach($ackResolver, $triggers);
+	    $this->debug->v("Attached trigger, resolver contains ".$triggers->count()." triggers", '+');
     }
 
     /**
@@ -301,6 +314,7 @@ class Scheduler extends StompScheduler {
                 return $triggers->count();
             }
         }
+        $this->debug->v("Trigger ". $this->generateTriggerIdString($trigger) ." not on record, nothing to detach");
 
         return null;
     }
@@ -317,5 +331,13 @@ class Scheduler extends StompScheduler {
 
         return null;
     }
+
+	/**
+	 * @param TriggerInterface $trigger
+	 * @return string
+	 */
+	protected function generateTriggerIdString($trigger) {
+		return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
+	}
 
 } 

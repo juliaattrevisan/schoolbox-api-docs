@@ -75,12 +75,14 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      */
     public function scheduleNotification($trigger) {
         if($trigger instanceof CancelTrigger) {
+	        $this->debug->v("Unscheduling CancelTrigger");
             $this->unschedule($trigger);
             return;
         }
         $interval = $trigger->getTimestamp() - time();
 
         if($interval <= self::IMMEDIATELY) {
+	        $this->debug->v("Immediately dispatching trigger");
             $this->dispatchTrigger($trigger);
             return;
         }

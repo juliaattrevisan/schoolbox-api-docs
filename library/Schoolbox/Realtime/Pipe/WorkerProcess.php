@@ -21,6 +21,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Verboser;
+use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
 
@@ -50,87 +51,130 @@ class WorkerProcess extends AbstractProcess {
 	 * @return mixed
 	 */
 	protected function process($command, $args) {
+		$this->v->v("Received $command command");
+
 		switch($command) {
 
 			// retrieve messages
 			case DefaultDispatchStrategy::TASK_FETCH:
 				list($userId, $count) = $args;
-				$decor = new Decorator(null);
+				return $this->fetch($userId, $count);
 
-				$queue = $this->mqf->buildUserQueue($userId, $count, false);
-				$output = array();
-
-				// make messages pretty
-				foreach($queue->getMessages($count, false, true) as $msgId => $targetedMessage) {
-					$decor->setMessage($targetedMessage);
-					$output[$msgId] = $decor->formatArray(false);
-					$output[$msgId]['id'] = $msgId;
-				}
-
-				// wrap in an array to preserve keys
-				return array($output);
-
-			// push or digest messages
+			// publish or digest messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:
 			case DefaultDispatchStrategy::TASK_DIGEST:
 				$data = unserialize($args[0]);
-
 				if(!(is_array($data) && count($data) == 4)) {
-					throw new RuntimeException("Datacount should be 4, is ".count($data));
+					throw new RuntimeException("Data should be array of size 4; is ".gettype($data)." (".count($data).")");
 				}
-
-				// making a certain assumption that the callable survives the serialization process
-				list($callback, $model, $userId, $diff) = $data;
-
-				if(!is_callable($callback)) {
-					throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
-				}
-
-				$this->v->v("Executing ".$this->callable2string($callback));
-
-				// this call SHOULD return a Messenger object
-				ob_start();
-				$return = call_user_func($callback, $model, $userId, $diff);
-				if($buffer = ob_get_contents()) {
-					$this->v->v($buffer);
-				}
-				ob_end_clean();
-
-				$this->v->v("Callback complete");
-
-				if(is_null($return)) {
-					$this->v->v("Response is NULL");
-					return serialize(null);
-				}
-
-				if(!$return instanceof Messenger) {
-					throw new InvalidArgumentException("Async method response must be an instance of Messenger");
-				}
-
-				$this->v->v("Got Messenger: ". ($return->hasMessages() ? 'contains messages' : 'does not contain messages'));
-
-				$serial = serialize($return);
-				if($serial === false) {
-					throw new RuntimeException("Failed to serialize Messenger");
-				}
-				return $serial;
+				list($callback, $model, $user, $diff) = $data;
+				$this->v->v(sprintf("%sing model %s for user %s", ucfirst($command), get_class($model), $user->getId()));
+				return $this->publish($callback, $model, $user, $diff);
 
 			// process interceptions
 			case DefaultDispatchStrategy::TASK_INTERCEPT:
-				$count = 0;
-				foreach($args as $v) {
-					list($user, $frame) = $v;
-					ob_start();
-					$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
-					if($output = ob_get_contents()) {
-						$this->v->v($output);
-					}
-					ob_end_clean();
-				}
-				return $count;
+				return $this->reroute($args);
 		}
 
 		throw new InvalidArgumentException("Can't process '$command'.");
+	}
+
+
+	/**
+	 * Process fetch
+	 *
+	 * @param $userId
+	 * @param $count
+	 * @return array
+	 */
+	protected function fetch($userId, $count) {
+		$this->v->v("Fetching $count for user $userId");
+		$decor = new Decorator(null);
+
+		$queue = $this->mqf->buildUserQueue($userId, $count, false);
+		$output = array();
+
+		// make messages pretty
+		foreach($queue->getMessages($count, false, true) as $msgId => $targetedMessage) {
+			$decor->setMessage($targetedMessage);
+			$output[$msgId] = $decor->formatArray(false);
+			$output[$msgId]['id'] = $msgId;
+		}
+
+		// wrap in an array to preserve keys
+		return array($output);
+	}
+
+	/**
+	 * Process publish/digest
+	 *
+	 * @param callable $callback
+	 * @param object $model
+	 * @param User $user
+	 * @param array $diff
+	 * @return string
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 */
+	protected function publish($callback, $model, $user, $diff) {
+
+		if(!is_callable($callback)) {
+			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
+		}
+
+		$this->v->v("Executing ".$this->callable2string($callback));
+
+		// this call SHOULD return a Messenger object
+		ob_start();
+		$return = call_user_func($callback, $model, $user, $diff);
+		if($buffer = ob_get_contents()) {
+			$this->v->v($buffer);
+		}
+		ob_end_clean();
+
+		$this->v->v("Callback complete");
+
+		if(is_null($return)) {
+			$this->v->v("Response is NULL, casting to empty Messenger");
+			$return = new Messenger();
+		}
+
+		if(!$return instanceof Messenger) {
+			throw new InvalidArgumentException("Async method response must be an instance of Messenger; got "
+				. (is_object($return) ? get_class($return) : gettype($return))
+			);
+		}
+
+		$this->v->v("Messenger ". ($return->hasMessages() ? 'contains messages' : 'does not contain messages'));
+
+		$serial = serialize($return);
+		if($serial === false) {
+			throw new RuntimeException("Failed to serialize Messenger");
+		}
+		return $serial;
+	}
+
+
+	/**
+	 * Process reroute/intercept/whatever you want to call it
+	 *
+	 * @param array $args
+	 * @return int
+	 */
+	protected function reroute($args) {
+		$count = 0;
+		$this->v->v("Iterating frames provided");
+		foreach($args as $v) {
+			list($user, $frame) = $v;
+			ob_start();
+			$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
+			if($output = ob_get_contents()) {
+				$this->v->v("Iteration result (user {$user->getId()}): $output");
+			}
+			ob_end_clean();
+		}
+		$this->v->v("Rerouted $count message".($count == 1 ? '' : 's'));
+		return $count;
 	}
 
 	/**
