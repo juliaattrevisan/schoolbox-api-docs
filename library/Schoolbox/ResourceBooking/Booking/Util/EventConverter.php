@@ -15,8 +15,8 @@ namespace Schoolbox\ResourceBooking\Booking\Util;
 
 use Alaress_Date_Format;
 use Calendar_Event_Type_ResourceBooking;
-use EOTC\Calendar\Event;
-use EOTC\Calendar\EventType;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter {
@@ -29,7 +29,7 @@ class EventConverter {
     protected $bookingEventType;
 
     /**
-     * Converts an instance of EOTC\Calendar\Event into Calendar_Event_Type_Abstract
+     * Converts an instance of Schoolbox\Calendar\Event into Calendar_Event_Type_Abstract
      *
      * @param Event         $eventItem
      * @param Booking\Model $booking
@@ -57,7 +57,7 @@ class EventConverter {
 //            $campusIds[] = $currentCampus->getId();
 //        }
 
-        /* Translate an \EOTC\Event type into a
+        /* Translate a \Schoolbox\Event type into a
          * Calendar_Event_Type_Abstract type
          */
         $event = new \Calendar_Event_Type_ResourceBooking();
@@ -73,9 +73,6 @@ class EventConverter {
         $event->setPublishDate($eventItem->getPublishDateTime());
 //        $event->setCampusList(implode(',', $campusIds));
 
-        /* EOTC Events are always of the type "EOTC" for usage
-         * in calendar filters
-         */
 //        $event->setType($eventItem->getEventType()->getId());
         $event->setNote($eventItem->getNote());
         $event->setAccess($eventItem->getAccess());

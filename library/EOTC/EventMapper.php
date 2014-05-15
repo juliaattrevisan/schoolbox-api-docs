@@ -9,6 +9,7 @@
  */
 
 namespace EOTC;
+use Schoolbox\Calendar;
 
 
 class EventMapper extends Calendar\EventMapper {
@@ -94,7 +95,7 @@ class EventMapper extends Calendar\EventMapper {
 			'other_key' => 'id',
 		));
 		$this->hasJoin('eventType', array(
-			'mapper'    => '\\EOTC\\Calendar\\EventTypeMapper',
+			'mapper'    => '\\Schoolbox\\Calendar\\EventTypeMapper',
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));

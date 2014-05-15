@@ -140,7 +140,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$page->parse('recurring_dates_block', 'recurring_dates');
 		}
 		else {
-			$eventRecurrenceMapper = new \EOTC\Calendar\EventRecurrenceMapper($mapper);
+			$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
 			$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
 
 			$page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));

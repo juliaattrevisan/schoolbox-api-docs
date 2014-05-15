@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-namespace EOTC\Calendar;
+namespace Schoolbox\Calendar;
 
 
 class EventLevel {

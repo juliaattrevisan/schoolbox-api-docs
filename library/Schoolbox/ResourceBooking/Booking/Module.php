@@ -106,12 +106,12 @@ class Module extends BaseModule {
      */
     public function initControllers(ContainerInterface $injector) {
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventMapper']
-            = $injector->lazyNew('EOTC\\Calendar\\EventMapper');
-        $injector->params['EOTC\\Calendar\\EventRecurrenceMapper'] = array(
-            'eventMapper' => $injector->lazyNew('EOTC\\Calendar\\EventMapper')
+            = $injector->lazyNew('Schoolbox\\Calendar\\EventMapper');
+        $injector->params['Schoolbox\\Calendar\\EventRecurrenceMapper'] = array(
+            'eventMapper' => $injector->lazyNew('Schoolbox\\Calendar\\EventMapper')
         );
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventRecurrenceMapper']
-            = $injector->lazyNew('EOTC\\Calendar\\EventRecurrenceMapper');
+            = $injector->lazyNew('Schoolbox\\Calendar\\EventRecurrenceMapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setBookingMapper']
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setResourceMapper']

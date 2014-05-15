@@ -9,7 +9,7 @@
 
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\Mapper;
-use EOTC\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract {
 
