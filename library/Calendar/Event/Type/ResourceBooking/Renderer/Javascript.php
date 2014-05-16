@@ -75,12 +75,14 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 //        }
 
         // Show booking butonyes I have permission to view
-        $bookingId      = $currentEvent->getBooking()->getId();
+        $booking        = $currentEvent->getBooking();
+        $bookingId      = $booking->getId();
         $bookingButtons = array();
 
         // Modify butonye
         $editUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.edit', array('id' => $bookingId)
+            'resourceBooking.edit',
+            array('id' => $bookingId, 'item' => $booking,)
         );
         if ($editUrl !== false) {
             $bookingButtons[] = array(
@@ -92,7 +94,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 
         // Cancel butonye
         $cancelUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.cancel', array('id' => $bookingId)
+            'resourceBooking.cancel',
+            array('id' => $bookingId, 'item' => $booking,)
         );
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
@@ -106,7 +109,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         $status = $currentEvent->getBooking()->getStatus()->getId();
         if ($status != Booking\Status\Model::STATUS_APPROVED) {
             $approveUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.approve', array('id' => $bookingId)
+                'resourceBooking.approve',
+                array('id' => $bookingId, 'item' => $booking,)
             );
             if ($approveUrl !== false) {
                 $bookingButtons[] = array(
@@ -120,7 +124,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         // Rejected butonye (if not already rejected)
         if ($status != Booking\Status\Model::STATUS_REJECTED) {
             $rejectUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.reject', array('id' => $bookingId)
+                'resourceBooking.reject',
+                array('id' => $bookingId, 'item' => $booking,)
             );
             if ($rejectUrl !== false) {
                 $bookingButtons[] = array(
