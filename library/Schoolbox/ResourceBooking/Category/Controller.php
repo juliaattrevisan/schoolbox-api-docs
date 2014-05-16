@@ -70,10 +70,9 @@ class Controller extends Base {
     /**
      * Views an existing category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function read($id) {
-        $item = $this->getMapper()->findById($id);
+    public function read(Model $item) {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/read.twig',
@@ -87,10 +86,9 @@ class Controller extends Base {
     /**
      * Displays form for editing an existing category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function edit($id) {
-        $item = $this->getMapper()->findById($id);
+    public function edit(Model $item) {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/edit.twig',
@@ -104,10 +102,9 @@ class Controller extends Base {
     /**
      * Backend for updating an existing category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function update($id) {
-        $item = $this->getMapper()->findById($id);
+    public function update(Model $item) {
         $post = $this->getRequest()->post;
         $item->setName($post['name']);
         $this->getMapper()->save($item);
@@ -122,10 +119,9 @@ class Controller extends Base {
     /**
      * Backend for deleting a category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function delete($id) {
-        $item = $this->getMapper()->findById($id);
+    public function delete(Model $item) {
         $this->getMapper()->delete($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
