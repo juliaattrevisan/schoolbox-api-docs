@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\UserAccess;
@@ -44,6 +45,30 @@ class Module extends BaseModule {
         $router->add('resourceBooking.reject',     $basePath.'/{id}/reject');
         $router->add('resourceBooking.setPending', $basePath.'/{id}/setPending');
         $router->add('resourceBooking.cancel',     $basePath.'/{id}/cancel');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher) {
+        // Add the booking item to params, if ID is in the route.
+        $matcher->add(
+            '/^resourceBooking\.(?:edit|update|approve|reject|setPending|cancel)/',
+            function($params) {
+                return array(
+                    'item' => Mapper::getInstance()->findById($params['id']),
+                );
+            }
+        );
+        // Add the resource item to params, if item ID is in the route.
+        $matcher->add(
+            '/^resourceBooking\.(?:book|createBooking|bookingCalendar)/',
+            function($params) {
+                return array(
+                    'item' => ItemMapper::getInstance()->findById($params['id']),
+                );
+            }
+        );
     }
 
     /**
