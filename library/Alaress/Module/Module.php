@@ -12,6 +12,7 @@ namespace Alaress\Module;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
+use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 
 class Module {
@@ -35,6 +36,7 @@ class Module {
     public function init($basePath) {
         $injector = $this->getInjector();
         $this->initRoutes($injector->get('router'), $basePath);
+        $this->initRoutePreloads($injector->get('preloader'));
         $this->initRoutePermissions($injector->get('authorizer'));
         $this->initTemplatePaths($injector->get('templateEngine:loader'));
         $this->initControllers($injector);
@@ -47,6 +49,17 @@ class Module {
      * @param string $basePath The base route for this module
      */
     public function initRoutes(Router $router, $basePath) {}
+
+    /**
+     * Initializes any preloads on routes for this module.
+     *
+     * Preloads adjust route params before they are passed to the controller.
+     * Usually, they're used to load a single item into the route's params,
+     * which is then passed directly as a parameter to the action.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher) {}
 
     /**
      * Initializes any permissions on routes for this module.

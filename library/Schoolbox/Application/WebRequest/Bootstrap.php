@@ -197,6 +197,9 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
+		// Preload of route parameters
+		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
+
 		// Authorization
 		$di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
 
