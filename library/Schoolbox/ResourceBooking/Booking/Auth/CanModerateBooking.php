@@ -14,6 +14,7 @@ namespace Schoolbox\ResourceBooking\Booking\Auth;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
+use Schoolbox\ResourceBooking\Booking\Model;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Booking\Mapper;
 
@@ -37,6 +38,14 @@ class CanModerateBooking implements Rule\IAuthorizationRule {
         // Authorize results should be cached, as hitting DB for each perm
         // check is expensive.
         if ($user instanceof User) {
+            if ($params['item'] instanceof Model) {
+                // search for item
+                foreach ($params['item']->getResource()->getModeratorList() as $moderator) {
+                    if ($moderator->getId() == $user->getId()) {
+                        return;
+                    }
+                }
+            }
             if ($this->getMapper()->isUserModeratorOfBookingItem($params['id'], $user->getId())) {
                 return;
             }
