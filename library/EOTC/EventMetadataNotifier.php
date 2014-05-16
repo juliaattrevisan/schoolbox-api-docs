@@ -119,6 +119,36 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	public function notifySubmitted($eventMetadata, $applicant) {
 		$msgr = new Messenger();
 
+		// retrieve the event that this metadata object is connected to
+		$eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
+		// no event? no messages
+		if(!$eventCollection->count()) {
+			return $msgr;
+		}
+
+		/** @var Event $relEvent */
+		$relEvent = $eventCollection->first();
+
+		// inform approved in principle moderator(s)
+		/** @var Collection|User[] $moderatorCollection */
+		$moderatorCollection = new Collection(EventPermissionMapper::getInstance()->findByColumnList(array(
+			'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
+			'status_id' => $eventMetadata->getStatus()
+		))->getColumnValues('userId'));
+
+		$icon = "/portrait.php?size=square32&userId=".$applicant->getExternalId();
+		$href = "/modules/eotc/status/modify/".$relEvent->getId();
+
+		$msg = new Message(":applicant submitted new EOTC, :event", $icon, $href);
+
+		foreach($moderatorCollection as $mod) {
+			$msgr->targetToUser($mod->getId(), $msg, "eotc.{$relEvent->getId()}.submitted", Logger::WARNING, array(
+				'applicant' => array($applicant->formatName(), "/search/user/".$applicant->getId()),
+				'event'     => $relEvent->getNote()
+			));
+		}
+
 		return $msgr;
 	}
 
