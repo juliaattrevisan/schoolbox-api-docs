@@ -258,9 +258,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		$effectorName = $effector->formatName();
 		$effectorExtId = $effector->getExternalId();
 
+		$informMod = array();
+		$informOwn = array();
+		$informReg = array();
 
 		$icon = "/portrait.php?size=square32&userId=$effectorExtId";
-		$href = "/modules/eotc/status/modify/$relEventId";
+		$hrefMod = "/modules/eotc/status/modify/$relEventId";
+		$hrefOwn = "/modules/eotc/manage/modify.php?eventID=$relEventId";
+		$hrefReg = "/calendar/full/".$relEvent->getStartDateTime()->getUsingFormat('d-m-Y');
 
 		$params = array(
 			'moderator' => array($effectorName, "/search/user/$effectorId"),
@@ -272,8 +277,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 			case EventStatusMapper::STATUS_INPRINCIPLE:
 				$text = ":moderator has approved :event in principle";
 				// tell applicant and TiC
-				$inform = array($teacherInChargeId, $applicantId);
-				$href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
+				$informOwn = array($teacherInChargeId, $applicantId);
 				break;
 
 			case EventStatusMapper::STATUS_RAMSAPPROVED:
@@ -284,15 +288,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					'status_id' => EventStatusMapper::STATUS_APPROVED
 				))->getColumnValues('userId'));
 
-				$inform = $moderatorCollection->getColumnValues('id');
+				$informMod = $moderatorCollection->getAll();
 				break;
 
 			case EventStatusMapper::STATUS_APPROVED:
 				$text = ":moderator has given final approval for :event";
 				// tell applicant, TiC, relevant staff, Attendance Officer and Operations Officer
-				$inform = $this->mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id');
-				$inform[] = $teacherInChargeId;
-				$inform[] = $applicantId;
+				$informReg = $this->mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id');
+				$informOwn = array($teacherInChargeId, $applicantId);
 
 				// TODO who are the AO and OO? Don't know where they're defined...
 				break;
@@ -304,7 +307,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				// in this case, tell. freaking. everybody. run. fun fast.
 				if($oldStatus == EventStatusMapper::STATUS_APPROVED) {
 					// include relevant staff
-					$inform = $this->mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id');
+					$informReg = $this->mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id');
 
 					// include Attendance Officer and Operations Officer
 					// TODO who are the AO and OO? Don't know where they're defined...
@@ -315,22 +318,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					// if RAMS, inform RAMS Approval Moderator(s)
 					if($eventMetadata->getRamsRequired()) {
 						/** @var Collection|User[] $moderatorCollection */
-						$moderatorCollection = new Collection(EventPermissionMapper::getInstance()->findByColumnList(array(
+						$informMod = EventPermissionMapper::getInstance()->findByColumnList(array(
 							'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
 							'status_id' => EventStatusMapper::STATUS_RAMSAPPROVED
-						))->getColumnValues('userId'));
+						))->getColumnValues('userId');
 
 						foreach($moderatorCollection as $user) {
-							$inform[] = $user->getId();
+							$inform[] = $user;
 						}
 					}
-
 				}
-
 				// in any case, the teacher in charge and applicant will be informed
-				$inform[] = $teacherInChargeId;
-				$inform[] = $applicantId;
-
+				$informOwn = array($teacherInChargeId, $applicantId);
 				break;
 
 			default:
@@ -338,10 +337,24 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				return $msgr;
 		}
 
-		$msg = new Message($text, $icon, $href);
-
-		foreach($inform as $userId) {
-			$msgr->targetToUser($userId, $msg, "eotc.$relEventId.statuschanged",Logger::WARNING, $params);
+		// bind the messages to their various contexts
+		if(count($informMod)) {
+			$msgMod = new Message($text, $icon, $hrefMod);
+			foreach($informMod as $userId) {
+				$msgr->targetToUser($userId, $msgMod, "eotc.$relEventId.statuschanged",Logger::WARNING, $params);
+			}
+		}
+		if(count($informOwn)) {
+			$msgOwn = new Message($text, $icon, $hrefOwn);
+			foreach($informOwn as $userId) {
+				$msgr->targetToUser($userId, $msgOwn, "eotc.$relEventId.statuschanged",Logger::WARNING, $params);
+			}
+		}
+		if(count($informReg)) {
+			$msgReg = new Message($text, $icon, $hrefReg);
+			foreach($informReg as $userId) {
+				$msgr->targetToUser($userId, $msgReg, "eotc.$relEventId.statuschanged",Logger::WARNING, $params);
+			}
 		}
 
 		return $msgr;
