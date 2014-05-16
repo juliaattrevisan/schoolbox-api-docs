@@ -943,32 +943,19 @@ class Mapper implements Serializable {
 		$where_parts = array();
 		$params      = array();
 		if (!empty($columnList)) {
-			$query .= ' WHERE ';
-			foreach ($columnList as $columnName => $columnValue) {
-				$escaped_name = $this->database->quoteIdentifier($columnName);
-				if (!isset($columnValue)) {
-					$where_parts[] = "$escaped_name IS NULL";
-				}
-				else {
-					// This method is smart enough to work with arrays and IN statements
-					// If the list of values is empty, though: there's no way
-					// that the query could ever return anything, so just return
-					// an empty collection.
-					if (is_array($columnValue)
-						|| ($columnValue instanceof \Traversable && $columnValue instanceof \Countable)
-					) {
-						if (count($columnValue) === 0) {
-							return $this->hydrateList(array());
-						}
-						$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
-						$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
-					}
-					else {
-						$where_parts[]            = "$escaped_name = :{$columnName}_0";
-						$params[$columnName.'_0'] = $columnValue;
-					}
-				}
+			// Build WHERE part
+			// If it underflows, someone passed an empty column value - return an
+			// empty set.
+			try {
+				$where = $this->buildWherePart($columnList);
 			}
+			catch (\UnderflowException $e) {
+				return $this->hydrateList(array());
+			}
+
+			$where_parts = $where['where'];
+			$params      = $where['params'];
+			$query .= ' WHERE ';
 			$query .= implode(' AND ', $where_parts);
 		}
 		if (!$options['deleted'] && ($delete_part = $this->getSoftDeleteFilterSql())) {
@@ -1027,6 +1014,123 @@ class Mapper implements Serializable {
 		$rowset = $statement->fetchAll();
 
 		return $this->hydrateList($rowset);
+	}
+
+    /**
+     * @see $this->findAll()
+     *
+     * @param  array $options
+     * @return int
+     */
+    public function countAll($options = array()) {
+        return $this->countByColumnList(array(), $options);
+    }
+
+	/**
+	 * @see $this->findByColumn()
+	 *
+	 * @param string $columnName
+	 * @param string $columnValue
+	 * @param array  $options
+	 *
+	 * @return int
+	 */
+	public function countByColumn($columnName, $columnValue, $options = array()) {
+		return $this->countByColumnList(array($columnName => $columnValue), $options);
+	}
+
+	/**
+	 * @see $this->findByColumnList()
+	 *
+	 * @param  array $columnList
+	 * @param  array $options
+	 * @return int
+	 */
+	public function countByColumnList($columnList, $options = array()) {
+		// set options (deleted is the only relevant one)
+		if (!is_array($options)) {
+			$options = array('deleted' => $options,);
+		}
+		$defaults = array(
+			'deleted' => false,
+		);
+		$options = array_merge($defaults, $options);
+
+		$quotedTable = $this->database->quoteIdentifier($this->table);
+		$query       = "SELECT COUNT(*) FROM $quotedTable";
+		$params      = array();
+
+		// Build WHERE part
+		// If it underflows, someone passed an empty column value - return an
+		// empty set.
+		if (!empty($columnList)) {
+			try {
+				$where = $this->buildWherePart($columnList);
+			}
+			catch (\UnderflowException $e) {
+				return 0;
+			}
+
+			$whereParts = $where['where'];
+			$params     = $where['params'];
+			$query .= ' WHERE ';
+			$query .= implode(' AND ', $whereParts);
+		}
+
+		// Include soft delete filter
+		if (!$options['deleted'] && ($deletePart = $this->getSoftDeleteFilterSql())) {
+			$query .= (empty($columnList) ? ' WHERE ' : ' AND ').$deletePart;
+		}
+
+		// Build query and bind parameters to it
+		$statement = $this->database->prepare($query);
+		foreach ($params as $name => $value) {
+			$statement->bindValue($name, $value);
+		}
+		$statement->execute();
+		return intval($statement->fetchColumn());
+	}
+
+	/**
+	 * Builds a where part and params for this query out of a column list
+	 *
+	 * @param  array $columnList
+	 * @return array where:  The where parts of the query
+	 *               params: the parameters
+	 * @throws \UnderflowException
+	 */
+	protected function buildWherePart($columnList) {
+		$where_parts = array();
+		$params      = array();
+		foreach ($columnList as $columnName => $columnValue) {
+			$escaped_name = $this->database->quoteIdentifier($columnName);
+			if (!isset($columnValue)) {
+				$where_parts[] = "$escaped_name IS NULL";
+			}
+			else {
+				// This method is smart enough to work with arrays and IN statements
+				// If the list of values is empty, though: there's no way
+				// that the query could ever return anything, so just return
+				// an empty collection.
+			    if (is_array($columnValue)
+					|| ($columnValue instanceof \Traversable && $columnValue instanceof \Countable)
+				) {
+					if (count($columnValue) === 0) {
+						throw new \UnderflowException('List of column values is empty');
+					}
+					$where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+					$params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
+				}
+				else {
+					$where_parts[]            = "$escaped_name = :{$columnName}_0";
+					$params[$columnName.'_0'] = $columnValue;
+				}
+			}
+		}
+		return array(
+			'where'  => $where_parts,
+			'params' => $params,
+		);
 	}
 
 	/**
