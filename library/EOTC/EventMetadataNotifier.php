@@ -40,7 +40,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	 * @return string
 	 */
 	protected function getSlug() {
-		return 'eotc';
+		return $this->msgNamespaceSlug;
 	}
 
 	/**
@@ -128,10 +128,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		}
 
 		/** @var Event $relEvent */
-		$relEvent = $eventCollection->first();
+		$relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 
 		// inform approved in principle moderator(s)
-		/** @var Collection|User[] $moderatorCollection */
+		/** @var Collection|int[] $moderatorCollection */
 		$moderatorCollection = new Collection(EventPermissionMapper::getInstance()->findByColumnList(array(
 			'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
 			'status_id' => $eventMetadata->getStatus()
@@ -143,7 +143,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		$msg = new Message(":applicant submitted new EOTC, :event", $icon, $href);
 
 		foreach($moderatorCollection as $mod) {
-			$msgr->targetToUser($mod->getId(), $msg, "eotc.{$relEvent->getId()}.submitted", Logger::WARNING, array(
+			$msgr->targetToUser($mod, $msg, "eotc.{$relEvent->getId()}.submitted", Logger::WARNING, array(
 				'applicant' => array($applicant->formatName(), "/search/user/".$applicant->getId()),
 				'event'     => $relEvent->getNote()
 			));
@@ -170,7 +170,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		}
 
 		/** @var Event $relEvent */
-		$relEvent = $eventCollection->first();
+		$relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 		$relEventId = $relEvent->getId();
 		$relEventNote = $relEvent->getNote();
 
@@ -198,9 +198,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		$icon = "/portrait.php?size=square32&userId=$effectorExtId";
 		$href = "/modules/eotc/status/modify/$relEventId";
 
-		// TODO should this message be less generic by reading the diff?
-		$msg = new Message(":user updated the EOTC event :note", $icon, $href);
-
 		// change was made by applicant or TiC: inform moderators
 		if($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
 			$inform = $moderatorIds;
@@ -208,10 +205,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		// change was made by moderator: inform applicant and TiC
 		elseif(in_array($effectorId, array($teacherInChargeId, $applicantId))) {
 			$inform = array($teacherInChargeId, $applicantId);
+			$href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
 		}
 		else {
 			$inform = array();
 		}
+
+		// TODO should this message be less generic by reading the diff?
+		$msg = new Message(":user updated the EOTC event :note", $icon, $href);
 
 		// iterate those who should be informed and bind a message for them
 		foreach($inform as $id) {
@@ -242,7 +243,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		}
 
 		/** @var Event $relEvent */
-		$relEvent = $eventCollection->first();
+		$relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 		$relEventId = $relEvent->getId();
 		$relEventNote = $relEvent->getNote();
 
@@ -272,6 +273,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				$text = ":moderator has approved :event in principle";
 				// tell applicant and TiC
 				$inform = array($teacherInChargeId, $applicantId);
+				$href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
 				break;
 
 			case EventStatusMapper::STATUS_RAMSAPPROVED:
@@ -345,102 +347,4 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		return $msgr;
 	}
 
-
-
-
-
-//	/**
-//	 * GOTCHA! METHOD MUST MATCH: 'notify' . strtoupper(`msg_source`.`role_type`) . strtoupper(`msg_source`.`key`)
-//	 *
-//	 * @param \EOTC\EventMetadata $metadata
-//	 * @param $creator
-//	 * @param array $diff
-//	 * @return Messenger
-//	 */
-//	public function notifyStaffChanged($metadata, $creator, $diff = null) {
-//		$msgr = new Messenger();
-//
-//		/* Only get the first event belonging to this metadata
-//		 * In series events, multiple events share the same metadata
-//		 * but we only need to use the name of the event
-//		 */
-//		$allEvents = $this->mapper->findEventsForMetadata($metadata);
-//
-//		/* If the metadata can't be matched to an event, just ignore everything
-//		 */
-//		if ($allEvents->count()) {
-//
-//			/* Find a bunch of people to whom this notification should be sent
-//			 * This is based on the EOTC permissions given to users
-//			 */
-//			$permissionMapper = new \EOTC\EventPermissionMapper();
-//			$allPermissions = $permissionMapper->findByColumnList(array(
-//				'status_id' => $metadata->getStatus()->getId()
-//			));
-//
-//			/* Find all the users who can modify the EOTC event in its
-//			 * current status
-//			 */
-//			$userIds = array();
-//
-//			foreach($allPermissions as $currentPermission) {
-//				$userIds[] = $currentPermission->getUserId();
-//			}
-//
-//			$userMapper = new \Schoolbox\UserMapper();
-//			$allUsers = $userMapper->findByColumn('id', $userIds);
-//
-//			/* Send a notification to each of those people if any
-//			 * were actually found
-//			 */
-//			if ($allUsers->count()) {
-//				$url = "/modules/eotc/status/modify/{$allEvents->first()->getId()}";
-//
-//				$msg = new Message(":someone changed the status for the EOTC event {$allEvents->first()->getNote()}",	// paramaterised, PDO-style
-//					'/portrait.php?size=square32&userId='.$creator->getExternalId(),
-//					$url
-//				);
-//
-//				foreach($allUsers as $currentUser) {
-//					$msgr->targetToUser($currentUser->getId(), $msg, "{$this->getMsgNamespaceSlug()}.{$metadata->getId()}.changed", Logger::INFO, array(
-//						// map your params to values, if you use an array: 0 => label, 1 => href
-//						'someone' => array($creator->formatName(), '/search/user/'.$creator->getId())
-//					));
-//
-//					$this->chimp($currentUser->getFullname() . "\n");
-//				}
-//			}
-//		}
-//
-//		return $msgr;
-//	}
-
-//	/**
-//	 * Log stuff to a file due to asynchronous nature
-//	 *
-//	 * @param $message
-//	 */
-//	private function chimp($message) {
-//		$filepointer = fopen('/vagrant/data/eotcmetadatastatus.log', 'a+');
-//		fputs($filepointer, $message);
-//		fclose($filepointer);
-//	}
-
-	/**
-	 * Set msg namespace slug
-	 *
-	 * @param string $msgNamespaceSlug
-	 */
-	private function setMsgNamespaceSlug($msgNamespaceSlug) {
-		$this->msgNamespaceSlug = $msgNamespaceSlug;
-	}
-
-	/**
-	 * Get msg namespace slug
-	 *
-	 * @return string
-	 */
-	private function getMsgNamespaceSlug() {
-		return $this->msgNamespaceSlug;
-	}
 }
