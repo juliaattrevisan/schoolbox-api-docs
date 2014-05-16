@@ -265,7 +265,7 @@
            class="submit-btn-plain"
     />
 
-    {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id}) %}
+    {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id, item: item}) %}
     <input id="resource-delete"
            type="submit"
            value="Delete"

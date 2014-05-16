@@ -15,10 +15,10 @@
             #}
             <span class="actions">
                 <a class="resource-read-link btn no-text" id="resource-read-{{item.id}}" title="View" href="{{ routeLookup('resourceItem.read', {id: item.id}) }}"><span></span></a>
-                {% if isRouteAuthorized('resourceBooking.book', {id: item.id}) %}
+                {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
                     <a class="resource-book-link btn report no-text" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"><span></span></a>
                 {% endif %}
-                {% if isRouteAuthorized('resourceItem.edit', {id: item.id}) %}
+                {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
                     <a class="resource-name resource-edit-link btn modify no-text" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><span></span></a>
                 {% endif %}
             </span>
