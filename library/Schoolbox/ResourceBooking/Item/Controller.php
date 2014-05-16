@@ -104,10 +104,9 @@ class Controller extends Base {
     /**
      * Views an existing category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function read($id) {
-        $item = $this->getMapper()->findById($id);
+    public function read(Model $item) {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/read.twig',
@@ -125,13 +124,9 @@ class Controller extends Base {
     /**
      * Display form for editing a category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function edit($id) {
-        // findById() ought to hydrate users as well.
-        /** @var Model $item */
-        $item = $this->getMapper()->findById($id);
-
+    public function edit(Model $item) {
         // Build list of moderators and related items (for BelgianSuggest)
         $moderatorList = array();
         foreach ($item->getModeratorList() as $moderator) {
@@ -184,16 +179,15 @@ class Controller extends Base {
     /**
      * Backend for updating an existing category
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function update($id) {
-        $model = $this->getMapper()->findById($id);
+    public function update(Model $item) {
         $this->updateItemWithFormValues(
-            $model,
+            $item,
             $this->getRequest()->post,
             $this->getRequest()->files
         );
-        $this->getMapper()->save($model);
+        $this->getMapper()->save($item);
         // Return something.
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
@@ -205,10 +199,9 @@ class Controller extends Base {
     /**
      * Deletes an item
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function delete($id) {
-        $item = $this->getMapper()->findById($id);
+    public function delete(Model $item) {
         $this->getMapper()->delete($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceItem.browse', array())
