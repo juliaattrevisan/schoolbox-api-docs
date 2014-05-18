@@ -8901,14 +8901,12 @@ ul.submission-list {
     }
     a {
         display: block;
-        padding: 5px 4px;
-        padding-left: 40px;
-        padding-right: 30px;
+        padding: 5px 30px 5px 40px;
         position: relative;
         color: @secondary-text;
         text-overflow: ellipsis;
         @white-space: nowrap;
-        overflow: hidden;
+        min-height: 30px;
         .icon { .action-icon(0,2) }
         .time { display: block; }
         .name { color: @body-text; }
