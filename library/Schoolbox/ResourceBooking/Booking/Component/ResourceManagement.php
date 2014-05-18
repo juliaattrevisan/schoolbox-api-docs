@@ -76,8 +76,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
                     'resource'      => $event->getBooking()->getResource(),
                     'bookingEvents' => array(),
                 );
-                $groupedBookings[$itemId]['bookingEvents'][] = $event;
             }
+            $groupedBookings[$itemId]['bookingEvents'][] = $event;
         }
         usort($groupedBookings, function($a, $b) {
             return strcmp($a['resource']->getName(), $b['resource']->getName());
