@@ -39,6 +39,10 @@ abstract class Synchronise_External_Stpatricks_Strategy_Abstract extends Synchro
                 if ($this->getPerformUpdate() === true) {
                     $newUser['id'] = $existing['uid'];
 
+                    /* Don't change staff groups */
+                    if($newUser['group'] == self::STAFF_GROUP_ID)
+                        unset($newUser['group']);
+
                     $this->getUserHandler()->update($newUser);
                     $this->getVerboseFilter()->performUpdate();
                     $this->getVerboseFilter()->incrementUpdated();
