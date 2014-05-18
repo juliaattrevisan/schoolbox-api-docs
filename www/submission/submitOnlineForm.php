@@ -2,7 +2,6 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -12,23 +11,38 @@ $page = new SitePage();
 
 $box_mapper        = new SubmissionBoxMapper();
 $submission_mapper = new SubmissionMapper();
-$user_mapper       = new UserMapper();
-
-$user = $user_mapper->findById($_SESSION['id']);
+/** @var Schoolbox\User $user */
+$user    = $_SESSION['user'];
+$boxId   = $_POST['box_id'];
+$isDraft = isset($_POST['save_draft']);
+$body    = $_POST['body'];
 if (!empty($_POST['submission_id'])) {
-	$submission     = $submission_mapper->findById($_POST['submission_id']);
-	$submission_box = $submission->getSubmissionBox();
+	$submission = $submission_mapper->findById($_POST['submission_id']);
+	$boxId      = $submission->getSubmissionBox()->getId();
 }
 else {
-	$submission     = new Submission();
-	$submission_box = $box_mapper->findById($_POST['box_id']);
-	$submission
-		->setFilename('Online Submission')
-		->setSubmissionBox($submission_box)
-		->setOwner($user)
-		->setMimetype('text/html')
-	;
+	// Find a draft submission for this box and user - override it if possible.
+	try {
+		$submission = $submission_mapper->findOneByColumnList(
+			array(
+				'box_id' => $_POST['box_id'],
+				'owner'  => $user->getId(),
+				'draft'  => true,
+			),
+			array('submitted' => 'desc')
+		);
+		$boxId = $submission->getSubmissionBox()->getId();
+	}
+	catch (Schoolbox\Mapper\Exception $e) {
+		$submission = new Submission();
+		$submission
+			->setFilename('Online Submission')
+			->setMimetype('text/html')
+		;
+	}
+	$submission->setOwner($user);
 }
+$submission->setSubmissionBox($box_mapper->findById($boxId));
 
 //
 // Why wouldn't I be able to edit this item?
@@ -36,27 +50,63 @@ else {
 // * I don't have permission to submit to this box
 // * It's past the box's expiry
 // * Hey, all this should be in SubmissionMapper->checkUploadablity
+$permission_denied = false;
 try {
 	$submission_mapper->checkUploadability($submission);
 }
 catch (Schoolbox\Resource\Exception $e) {
 	//
 	// what's access denied error?
-	error(17);
+	$permission_denied = true;
 }
-$body     = $_POST['body'];
-$is_draft = isset($_POST['save_draft']);
-$submission
-	->loadIsLate()
-	->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
-	->setBody($body)
-	->setDraft($is_draft)
-;
-$submission_mapper->save($submission);
+$isAjax = $page->detectAjax();
+if (!$permission_denied) {
+	$submission
+		->loadIsLate()
+		->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
+		->setBody($body)
+		->setDraft($isDraft)
+	;
+	// Is this a final copy? always create a new entry, don't save over an
+	// existing draft.
+	if (!$isDraft) {
+		$submission_mapper->create($submission);
+	}
+	else {
+		$submission_mapper->save($submission);
+	}
+}
 
-//
-// Draft? don't send to Plagscan yet.
-if (!$is_draft) {
+if ($isAjax) {
+	$code   = 500;
+	$result = array(
+		'success' => false,
+		'message' => 'Unknown Error',
+	);
+	if ($permission_denied) {
+		$code              = 403;
+		$result['message'] = 'Permission Denied';
+	}
+	else {
+		$code              = 200;
+		$result['success'] = true;
+		$result['message'] = 'OK';
+		$result['id']      = $submission->getId();
+	}
+	$page->outputJson($result, true, $code);
+}
+else {
+	if ($permission_denied) {
+		error(17);
+	}
+	else {
+		$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
+	}
+}
+
+// Send to Plagscan
+// This should be able to be handled thru the upcoming notification subsystem.
+if (!$permission_denied && !$isDraft) {
 	$plagscanApiKey   = Config::get('plagscan_api_key');
 	$plagscanUsername = Config::get('plagscan_username');
 	$submission_id    = $submission->getId();
@@ -77,12 +127,8 @@ if (!$is_draft) {
 			'file' => $tempfile,
 		));
 
-		// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
-		$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
+		// Plagscan service: this should be able to return AJAX and keep
+		// processing in the background.
 		Plagscan_DocumentMapper::getInstance()->save($document);
-		exit;
 	}
 }
-
-
-$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id']);

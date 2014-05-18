@@ -184,6 +184,28 @@ class SitePage extends Page {
         return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
 
+    /**
+     * Outputs a JSON response, with appropriate header.
+     *
+     * @param mixed $output         Variable contents to output
+     * @param bool  $keepProcessing True if processing continues after output.
+     *                              Exits after output if false.
+     * @param int   $responseCode   If set, output this response code.
+     */
+    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
+        header('Content-Type: application/json');
+        if (isset($responseCode)) {
+            header(':', true, $responseCode);
+        }
+        $jsonOutput = json_encode($output);
+        if (!$keepProcessing) {
+            echo $jsonOutput;
+        }
+        else {
+            $this->keepProcessingInBackground($jsonOutput);
+        }
+    }
+
     function outputPage($lite = false) {
         if ($this->ajax) {
             return true;
@@ -815,7 +837,9 @@ class SitePage extends Page {
      * Usage - SitePage::localRedir($url)
      *
      * @static
-     * @param  $file
+     * @param  string $file
+     * @param  bool   $keepProcessing True if processing continues in background
+     * @param  int    $responseCode   If set, output this response code.
      * @return void
      */
     static public function localRedir($file, $keepProcessing = false, $responseCode = null) {
@@ -823,19 +847,31 @@ class SitePage extends Page {
         self::disableXssProtectionAfterForm();
         // don't quit
         if ($keepProcessing) {
-            ob_end_clean();
-            header("Connection: close\r\n");
-            ignore_user_abort();
-            ob_start();
-            // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
-            header("Content-Length: 0");
-            ob_end_flush();
-            flush();
-            session_write_close();
+            self::keepProcessingInBackground();
         } // quit
         else {
             exit;
         }
+    }
+
+    /**
+     * Keeps the script running in the background, and switches off the ability
+     * for the user to terminate the script. After this, no more output is sent.
+     *
+     * @param string $output Final output to send, if any
+     */
+    public static function keepProcessingInBackground($output = '') {
+        ob_end_clean();
+        header("Connection: close\r\n");
+        ignore_user_abort();
+        ob_start();
+        echo $output;
+        $size = ob_get_length();
+        header("Content-Length: $size");
+//        // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
+        ob_end_flush();
+        flush();
+        session_write_close();
     }
 
     /**
