@@ -5,6 +5,15 @@ $page = new SitePage();
 $groupHandler = new Group();
 
 if ($groupHandler->isSuperuser()) {
+
+	/* Check that all the required fields were submitted
+	 */
+	foreach(array('description', 'mime', 'extension', 'inline') as $current) {
+		if (!strlen(trim($_POST[$current]))) {
+			error(2);
+		}
+	}
+
     $tableIndex = 'fileTypeID';
 
     /* Set up generic table handler thing.
