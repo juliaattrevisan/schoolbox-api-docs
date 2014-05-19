@@ -506,7 +506,7 @@ $j(function () {
 
 	/* Standardise both forms
 	 */
-	$('#create-comment, form.edit-comment').live('submit', function() {
+	$(document).on('submit', '#create-comment, form.edit-comment', function() {
 		event.preventDefault();
 
 		/* Will be empty if creating (nonexistent)
