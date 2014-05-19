@@ -474,7 +474,7 @@ $j(function () {
 				error: function (xhr) {
 					// on failure, indicate failure
 					row.removeClass('locked');
-					console.log(xhr.responseText);
+					alert.log(xhr.responseText);
 				}
 			});
 		}
@@ -534,8 +534,6 @@ $j(function () {
 
 			data = $.extend(data, create);
 		}
-
-		console.log(data);
 
 		// submit the form
 		$j.ajax({
