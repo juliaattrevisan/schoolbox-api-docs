@@ -112,10 +112,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return bool
 	 */
 	public function isCancelled($data) {
-		if(strlen($data)) {
-			return $data[0] == $this->cancel();
-		}
-		return false;
+		return $this->isStatus($data, $this->cancel());
 	}
 
 	/**
@@ -123,10 +120,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return bool
 	 */
 	public function isEnded($data) {
-		if(strlen($data)) {
-			return strpos($data, $this->end()) !== false;
-		}
-		return false;
+		return $this->isStatus($data, $this->end());
 	}
 
 	/**
@@ -134,10 +128,7 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return bool
 	 */
 	public function isRejected($data) {
-		if(strlen($data)) {
-			return $data[0] == $this->reject();
-		}
-		return false;
+		return $this->isStatus($data, $this->reject());
 	}
 
 	/**
@@ -145,8 +136,20 @@ class AlaressIPCProtocol implements ProtocolInterface {
 	 * @return bool
 	 */
 	public function isAccepted($data) {
+		return $this->isStatus($data, $this->accept());
+	}
+
+	/**
+	 * Helper function for determining worker status from response string
+	 *
+	 * @param string $data
+	 * @param string $status
+	 * @return bool
+	 */
+	protected function isStatus($data, $status) {
 		if(strlen($data)) {
-			return $data[0] == $this->accept();
+			// test against last, then first, char
+			return substr($data, -1, 1) === $status || substr($data, 0, 1) === $status;
 		}
 		return false;
 	}
