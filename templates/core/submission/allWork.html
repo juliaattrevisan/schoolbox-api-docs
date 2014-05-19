@@ -524,6 +524,8 @@ $j(function () {
 		 */
 		if (commentId == undefined) {
 			var create = {
+				studentVisibility: $('#vis-student').is(':checked') ? 1 : 0,
+				parentVisibility: $('#vis-parent').is(':checked') ? 1 : 0,
 				year: '{WORK_YEAR}',
 				semester: '{WORK_SEMESTER}',
 				studentId: '{WORK_USER_ID}',
@@ -532,6 +534,8 @@ $j(function () {
 
 			data = $.extend(data, create);
 		}
+
+		console.log(data);
 
 		// submit the form
 		$j.ajax({

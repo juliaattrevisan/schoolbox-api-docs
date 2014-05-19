@@ -48,10 +48,10 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	$forceStudentVisible = $sessionUser->getRole()->getType() == Role::STUDENT;
 	$forceParentVisible  = $sessionUser->getRole()->getType() == Role::PARENT;
 
-	if(array_key_exists('visibility', $_POST)) {
+	if(isset($_POST['studentVisibility']) || isset($_POST['parentVisibility'])) {
 		$visibility = array(
-			'student' => array_key_exists('student', $_POST['visibility']) || $forceStudentVisible,
-			'parent' => array_key_exists('parent', $_POST['visibility']) || $forceParentVisible
+			'student' => !!$_POST['studentVisibility'] || $forceStudentVisible,
+			'parent' => !!$_POST['parentVisibility'] || $forceParentVisible
 		);
 	}
 	else {
