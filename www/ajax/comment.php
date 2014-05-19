@@ -42,7 +42,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	$year = $_POST['year'];
 
 	if (!strlen(trim($body))) {
-		error(2);
+		respond('400 Bad Request', 'Comment cannot be blank.');
 	}
 
 	$forceStudentVisible = $sessionUser->getRole()->getType() == Role::STUDENT;
@@ -84,17 +84,17 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	switch($comment->getCommenter()->getRole()->getType()) {
 		case Role::PARENT:
 			if(!$gHandler->isParentOfChild($comment->getStudent()->getId())) {
-				error(14);
+				respond('400 Bad Request', 'You do not have permission to view this category.');
 			}
 			break;
 		case Role::STAFF:
 			if(!$gHandler->involvedInSubject($comment->getCategory()->getId())) {
-				error(14);
+				respond('400 Bad Request', 'You do not have permission to view this category.');
 			}
 			break;
 		case Role::STUDENT:
 			if($comment->getCommenter()->getId() != $comment->getStudent()->getId()) {
-				error(14);
+				respond('400 Bad Request', 'You do not have permission to view this category.');
 			}
 			break;
 	}
@@ -102,7 +102,7 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 	/** @var $commentMapper CommentMapper */
 	$commentMapper = CommentMapper::getInstance();
 	if(!$commentMapper->save($comment)) {
-		error(14);
+		respond('400 Bad Request', 'You do not have permission to view this category.');
 	}
 }
 

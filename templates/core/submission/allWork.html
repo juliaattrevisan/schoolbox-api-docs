@@ -509,46 +509,54 @@ $j(function () {
 	$(document).on('submit', '#create-comment, form.edit-comment', function() {
 		event.preventDefault();
 
-		/* Will be empty if creating (nonexistent)
+		/* Prevent empty comment
 		 */
-		var commentId = $(this).find('input[name=commentId]').val();
+//		if (!$(this).find('textarea').val().length) {
+//			alert('Comment cannot be blank.');
+//		}
+//		else {
 
-		var data = {
-			commentId: $(this).find('input[name=commentId]').val(),
-			commentBody: $(this).find('textarea').val(),
-			studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
-			parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
-		};
+			/* Will be empty if creating (nonexistent)
+			 */
+			var commentId = $(this).find('input[name=commentId]').val();
 
-		/* Additional stuff needed when creating
-		 */
-		if (commentId == undefined) {
-			var create = {
-				studentVisibility: $('#vis-student').is(':checked') ? 1 : 0,
-				parentVisibility: $('#vis-parent').is(':checked') ? 1 : 0,
-				year: '{WORK_YEAR}',
-				semester: '{WORK_SEMESTER}',
-				studentId: '{WORK_USER_ID}',
-				categoryId: '{SUBJ_ID}'
+			var data = {
+				commentId: $(this).find('input[name=commentId]').val(),
+				commentBody: $(this).find('textarea').val(),
+				studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
+				parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
+			};
+
+			/* Additional stuff needed when creating
+			 */
+			if (commentId == undefined) {
+				var create = {
+					studentVisibility: $('#vis-student').is(':checked') ? 1 : 0,
+					parentVisibility: $('#vis-parent').is(':checked') ? 1 : 0,
+					year: '{WORK_YEAR}',
+					semester: '{WORK_SEMESTER}',
+					studentId: '{WORK_USER_ID}',
+					categoryId: '{SUBJ_ID}'
+				}
+
+				data = $.extend(data, create);
 			}
 
-			data = $.extend(data, create);
-		}
-
-		// submit the form
-		$j.ajax({
-			type: 'POST',
-			url: '/ajax/comment.php',
-			data: data,
-			success: function (data, responseText, xhr) {
-				// later this will be a nice ajax visual update, but for now just reload the page
-				window.location.reload();
-			},
-			error: function (xhr) {
-				// inform the user that it failed
-				alert(xhr.responseText);
-			}
-		});
+			// submit the form
+			$j.ajax({
+				type: 'POST',
+				url: '/ajax/comment.php',
+				data: data,
+				success: function (data, responseText, xhr) {
+					// later this will be a nice ajax visual update, but for now just reload the page
+					window.location.reload();
+				},
+				error: function (xhr) {
+					// inform the user that it failed
+					alert(xhr.responseText);
+				}
+			});
+//		}
 
 		return false;
 	});
