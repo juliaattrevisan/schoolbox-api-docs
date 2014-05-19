@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
@@ -170,9 +171,10 @@ interface DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
+	 * @param Debug $debug
 	 * @return void
 	 */
-	public function handleException($exception);
+	public function handleException($exception, $debug);
 
 
 	/**

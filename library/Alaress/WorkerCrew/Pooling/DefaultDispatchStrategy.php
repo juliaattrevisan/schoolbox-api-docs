@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
@@ -277,10 +278,11 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
+	 * @param Debug $debug
 	 * @return void
 	 */
-	public function handleException($exception) {
-		echo '[!] ' . $exception->getMessage() . "\n";
+	public function handleException($exception, $debug) {
+		$debug->v(sprintf("%s: %s", get_class($exception), $exception->getMessage()), '!');
 	}
 
 
