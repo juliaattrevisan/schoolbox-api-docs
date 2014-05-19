@@ -63,8 +63,6 @@ class ResolutionManager {
 					$this->resolvers->detach($resolver);
 
 					try {
-						echo "ATTEMPTING ACK ".$resolver->getMessageId() . "\n";
-
 						$resolver->ack();
 					}
 					catch(RuntimeException $e) {
