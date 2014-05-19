@@ -13,10 +13,13 @@ namespace Alaress\Cli;
 
 class Debug {
 
+	/** @var resource */
     protected $stream;
 
+	/** @var string */
     protected $port = 'nill';
 
+	/** @var array */
     protected $formats = array(
         'pid'  => '{%4s}',
         'mem'  => '[%6.2f / %6.2f]',
@@ -24,14 +27,25 @@ class Debug {
         'time' => '[%s.%.8f]'
     );
 
+	/** @var array */
     protected $visible = array();
 
-    public function __construct($stream, $fields = array('pid','time')) {
+	/**
+	 * @param resource $stream
+	 * @param array $fields
+	 */
+	public function __construct($stream, $fields = array('pid','time')) {
         $this->stream = $stream;
         $this->setVisibleFields($fields);
     }
 
-    public function v($message, $char = ' ') {
+	/**
+	 * Verbose output
+	 *
+	 * @param string $message
+	 * @param string $char
+	 */
+	public function v($message, $char = ' ') {
         if(!is_null($this->stream)) {
 
             $c = '';
@@ -78,14 +92,24 @@ class Debug {
         }
     }
 
-    public function d($data) {
+	/**
+	 * Var dump
+	 *
+	 * @param mixed $data
+	 */
+	public function d($data) {
         ob_start();
         var_dump($data);
         $this->v(ob_get_contents(), 'd');
         ob_end_clean();
     }
 
-    protected function getValueFor($field) {
+
+	/**
+	 * @param $field
+	 * @return array|int|string
+	 */
+	protected function getValueFor($field) {
         switch($field) {
             case 'pid':  return getmypid();
             case 'mem':  return array(
@@ -106,11 +130,17 @@ class Debug {
         return '';
     }
 
-    public function setPort($port) {
+	/**
+	 * @param string $port
+	 */
+	public function setPort($port) {
         $this->port = $port;
     }
 
-    public function setVisibleFields($fields) {
+	/**
+	 * @param array $fields
+	 */
+	public function setVisibleFields($fields) {
         // cast that sucker
         $valid = array_keys($this->formats);
         $this->visible = array();
