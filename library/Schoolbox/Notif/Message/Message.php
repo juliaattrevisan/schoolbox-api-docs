@@ -106,7 +106,7 @@ class Message implements Serializable {
 		$this->body = new MessageBody($data['body']);
 		$this->icon = $data['icon'];
 		$this->href = $data['href'];
-		$this->meta = $data['meta'];
+		$this->meta = isset($data['meta']) ? $data['meta'] : array();
 	}
 
     /**
