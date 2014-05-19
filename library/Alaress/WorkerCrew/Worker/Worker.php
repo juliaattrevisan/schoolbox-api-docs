@@ -10,10 +10,10 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Schoolbox\Realtime\Verboser;
 
-class Worker {
+class Worker extends PipeWriter {
 
 	const READY = 0x1;
 	const BUSY  = 0x2;
@@ -34,16 +34,11 @@ class Worker {
 	protected $start;
 	/** @var Task */
 	protected $task;
-	/** @var DispatchStrategyInterface */
-	protected $strat;
-
 	/** @var Task[] */
 	protected $previousTasks = array();
 
+	/** @var int */
 	protected $taskRetainCount = 0;
-
-	/** @var Verboser */
-	protected $v;
 
 	/**
 	 * @param string $cmd
@@ -52,6 +47,7 @@ class Worker {
 	 * @param DispatchStrategyInterface $strat
 	 */
 	function __construct($cmd, $pp, $pipes, $strat) {
+		parent::__construct($strat, null, $pipes[0]);
 		$this->cmd = $cmd;
 		$this->pp = $pp;
 		$this->pipes = $pipes;
@@ -71,12 +67,18 @@ class Worker {
 		@pclose($this->pp);
 	}
 
+	/**
+	 * @param int $count
+	 */
 	public function setTaskRetention($count) {
 		$this->taskRetainCount = $count;
 	}
 
-	public function attachVerboser($v) {
-		$this->v = $v;
+	/**
+	 * @param Debug $debug
+	 */
+	public function attachDebug($debug) {
+		$this->debug = $debug;
 	}
 
 	/**
@@ -84,30 +86,6 @@ class Worker {
 	 */
 	public function getCommand() {
 		return $this->cmd;
-	}
-
-
-	public function write($string) {
-		$chunk = $this->strat->getProtocol()->chunkLength();
-		$strlen = strlen($string);
-		$end = $this->strat->getProtocol()->end();
-
-		for ($written = 0; $written < $strlen; $written += $fwrite) {
-			$shard = str_pad(substr($string, $written, $chunk), $chunk, $end);
-			$fwrite = fwrite($this->pipes[0], $shard);
-			if ($fwrite === false) {
-				$this->v->v("Broken pipe, could not write to worker", '!');
-				break;
-			}
-		}
-
-		$this->v->v("Sent $written bytes");
-
-		if($written < $strlen) {
-			$this->v->v("Worker pipe communication terminated prematurely after $written bytes, ", $strlen - $written, " unsent", '!');
-		}
-
-		return $this;
 	}
 
 	/**
@@ -181,9 +159,6 @@ class Worker {
 	 */
 	public function markTaskComplete() {
 		$this->task->setFinish(microtime(true));
-
-		$this->task->debug($this->v);
-
 		$this->setStatus(self::READY);
 		return $this;
 	}
