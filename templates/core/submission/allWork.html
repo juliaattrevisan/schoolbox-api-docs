@@ -184,7 +184,6 @@
 			</form>
 		</div>
 	</div>
-
 	<div id="subject-main">
 		<!-- BEGIN subject -->
 		<div class="current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg clearfix">
@@ -308,7 +307,7 @@
 							<span class="group">{SESSION_USER_BYLINE}</span>
 						</td>
 						<td colspan="2">
-							<form id="create-comment" class="comment-form" action="/submission/commentForm.php"
+							<form id="create-comment" class="comment-form" action="/ajax/comment.php"
 								  method="post">
 								<input type="hidden" name="year" value="{WORK_YEAR}"/>
 								<input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
@@ -360,172 +359,196 @@
 </div>
 
 <script type="text/javascript">
-  var displayGraph = {GRAPH_IS_DISPLAYED};
-  var options = {
-    series: {
-      points: {
-        show: true,
-        fill: true,
-        lineWidth: 6
-      },
-      lines: {
-        show: true,
-        lineWidth: 4
-      }
-    },
-    colors: {GRAPH_COLOURS},
-    xaxis:  {
-      mode: "time",
-      min: {GRAPH_XMIN},
-      max: {GRAPH_XMAX}
-    },
-    yaxis:  {
-      min: 0,
-      max: 100
-    },
-    grid:   {
-      borderWidth: 0,
-      show: true
-    }
-  };
+var displayGraph = {GRAPH_IS_DISPLAYED};
+var options = {
+	series: {
+		points: {
+			show: true,
+			fill: true,
+			lineWidth: 6
+		},
+		lines: {
+			show: true,
+			lineWidth: 4
+		}
+	},
+	colors: {GRAPH_COLOURS},
+	xaxis: {
+		mode: "time",
+		min: {GRAPH_XMIN},
+		max: {GRAPH_XMAX}
+	},
+	yaxis: {
+		min: 0,
+		max: 100
+	},
+	grid: {
+		borderWidth: 0,
+		show: true
+	}
+};
 
-  $j(function() {
+$j(function () {
 
-    // ensure there's a graph to plot
-    var graphElement = $j('#subject-graph');
-    if (graphElement.length) {
-        if (displayGraph) {
-            $j.plot(graphElement, {GRAPH_JSON}, options);
-        }
-        else {
-            graphElement.hide();
-        }
-    }
+	// ensure there's a graph to plot
+	var graphElement = $j('#subject-graph');
+	if (graphElement.length) {
+		if (displayGraph) {
+			$j.plot(graphElement, {GRAPH_JSON}, options);
+		}
+		else {
+			graphElement.hide();
+		}
+	}
 
-    $j('#enrolled-subjects').bind('change', function () {
-      var url = $j(this).val();
-      if (url) {
-        window.location = '/submission/allWork/' + url;
-      }
-      return false;
-    });
+	$j('#enrolled-subjects').bind('change', function () {
+		var url = $j(this).val();
+		if (url) {
+			window.location = '/submission/allWork/' + url;
+		}
+		return false;
+	});
 
-    $j('#semester').bind('change', function() {
-      var url = $j(this).val();
-      if(url) {
-        window.location = '/submission/allWork/' + url;
-      }
-      return false;
-    })
+	$j('#semester').bind('change', function () {
+		var url = $j(this).val();
+		if (url) {
+			window.location = '/submission/allWork/' + url;
+		}
+		return false;
+	})
 
-    $j('#comment-table').on('click', 'a.btn.no-text', function() {
-      // if a button on the table is clicked, find out its context and function, and execute
-      var btn = $j(this);
-      var row = btn.closest('tr');
-      var commentId = row.data('id');
+	$j('#comment-table').on('click', 'a.btn.no-text', function () {
+		// if a button on the table is clicked, find out its context and function, and execute
+		var btn = $j(this);
+		var row = btn.closest('tr');
+		var commentId = row.data('id');
 
-      if(btn.hasClass('modify')) {
-        row.addClass('locked');
-        // retrieve comment
-        $j.ajax({
-          type : 'GET',
-          url : '/ajax/comment.php',
-          data : { commentId : commentId },
-          success : function(data) {
-            // on success, replace row elements with form inputs
-            var editForm = $j('#create-comment').clone();
-            editForm.removeAttr('id');
-            editForm.addClass('edit-comment');
-            editForm.find('a.submit-this').html('<span></span>Update');
-            editForm.find('textarea').text(data.body);
-            $j.each(['vis-student','vis-parent'], function(k, v) {
-              editForm.find('#'+v).attr('id', v+'-'+commentId);
-              editForm.find('label[for='+v+']').attr('for', v+'-'+commentId);
-            });
-            editForm.prepend(
-                $j('<input type="hidden" />').attr('name', 'commentId').val(commentId)
-            );
+		if (btn.hasClass('modify')) {
+			row.addClass('locked');
 
-            // safety check
-            if(data.visibility) {
-              var svis = editForm.find('input[name=visibility\\[student\\]]');
-              var pvis = editForm.find('input[name=visibility\\[parent\\]]');
+			// retrieve comment
+			$j.ajax({
+				type: 'GET',
+				url: '/ajax/comment.php',
+				data: { commentId: commentId },
+				success: function (data) {
 
-              if(data.visibility.student) {
-                svis.prop('checked', true);
-              }
-              else {
-                svis.prop('checked', false);
-              }
+					// on success, replace row elements with form inputs
+					var editForm = $j('#create-comment').clone();
+					editForm.removeAttr('id');
+					editForm.addClass('edit-comment');
+					editForm.find('a.submit-this').html('<span></span>Update');
+					editForm.find('textarea').text(data.body);
+					$j.each(['vis-student', 'vis-parent'], function (k, v) {
+						editForm.find('#' + v).attr('id', v + '-' + commentId);
+						editForm.find('label[for=' + v + ']').attr('for', v + '-' + commentId);
+					});
+					editForm.prepend(
+						$j('<input type="hidden" />').attr('name', 'commentId').val(commentId)
+					);
 
-              if(data.visibility.parent) {
-                pvis.prop('checked', true);
-              }
-              else {
-                pvis.prop('checked', false);
-              }
-            }
+					// safety check
+					if (data.visibility) {
+						var svis = editForm.find('input[name=visibility\\[student\\]]');
+						var pvis = editForm.find('input[name=visibility\\[parent\\]]');
 
-            row.find('td.actions').remove();
-            row.find('td').last().attr('colspan', '2').html(editForm);
-            row.removeClass('locked');
-          },
-          error : function(xhr) {
-            // on failure, indicate failure
-            row.removeClass('locked');
-            alert(xhr.responseText);
-          }
-        });
-      }
-      else if(btn.hasClass('delete')) {
-        row.addClass('locked');
-        // confirm deletion
-        if(window.confirm('Are you sure you want to delete this comment?')) {
-          $j.ajax({
-            type : 'POST',
-            url : '/ajax/comment.php',
-            data : { commentId : commentId, deleteComment : true },
-            success : function() {
-              row.hide(500, function() { row.remove(); });
-            },
-            error : function(xhr) {
-              // inform the user that it failed
-              alert(xhr.responseText);
-              row.removeClass('locked');
-            }
-          });
-        }
-        else {
-          row.removeClass('locked');
-        }
-      }
-    });
+						if (data.visibility.student) {
+							svis.prop('checked', true);
+						}
+						else {
+							svis.prop('checked', false);
+						}
 
-    $j('#comment-table').on('click', 'form.edit-comment a.submit-this', function() {
-      var form = $j(this).closest('form');
-      var commentId = form.closest('tr').data('id');
+						if (data.visibility.parent) {
+							pvis.prop('checked', true);
+						}
+						else {
+							pvis.prop('checked', false);
+						}
+					}
 
-      var data = {
-        commentId : form.find('input[name=commentId]').val(),
-        commentBody : form.find('textarea').val(),
-        studentVisibility : form.find('#vis-student-'+commentId).is(':checked') ? 1 : 0,
-        parentVisibility : form.find('#vis-parent-'+commentId).is(':checked') ? 1 : 0
-      };
+					row.find('td.actions').remove();
+					row.find('td').last().attr('colspan', '2').html(editForm);
+					row.removeClass('locked');
+				},
+				error: function (xhr) {
+					// on failure, indicate failure
+					row.removeClass('locked');
+					console.log(xhr.responseText);
+				}
+			});
+		}
+		else if (btn.hasClass('delete')) {
+			row.addClass('locked');
+			// confirm deletion
+			if (window.confirm('Are you sure you want to delete this comment?')) {
+				$j.ajax({
+					type: 'POST',
+					url: '/ajax/comment.php',
+					data: { commentId: commentId, deleteComment: true },
+					success: function () {
+						row.hide(500, function () {
+							row.remove();
+						});
+					},
+					error: function (xhr) {
+						// inform the user that it failed
+						alert(xhr.responseText);
+						row.removeClass('locked');
+					}
+				});
+			}
+			else {
+				row.removeClass('locked');
+			}
+		}
+	});
 
-      // submit the form
-      $j.ajax({
-        type : 'POST',
-        url : '/ajax/comment.php',
-        data : data,
-        success : function() {
-          // later this will be a nice ajax visual update, but for now just reload the page
-          window.location.reload();
-        },
-        error : function(xhr) {
-          // inform the user that it failed
-          alert(xhr.responseText);
-        }
-      });
-    });
-  });
+	/* Standardise both forms
+	 */
+	$('#create-comment, form.edit-comment').live('submit', function() {
+		event.preventDefault();
+
+		/* Will be empty if creating (nonexistent)
+		 */
+		var commentId = $(this).find('input[name=commentId]').val();
+
+		var data = {
+			commentId: $(this).find('input[name=commentId]').val(),
+			commentBody: $(this).find('textarea').val(),
+			studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
+			parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
+		};
+
+		/* Additional stuff needed when creating
+		 */
+		if (commentId == undefined) {
+			var create = {
+				year: '{WORK_YEAR}',
+				semester: '{WORK_SEMESTER}',
+				studentId: '{WORK_USER_ID}',
+				categoryId: '{SUBJ_ID}'
+			}
+
+			data = $.extend(data, create);
+		}
+
+		// submit the form
+		$j.ajax({
+			type: 'POST',
+			url: '/ajax/comment.php',
+			data: data,
+			success: function (data, responseText, xhr) {
+				// later this will be a nice ajax visual update, but for now just reload the page
+				window.location.reload();
+			},
+			error: function (xhr) {
+				// inform the user that it failed
+				alert(xhr.responseText);
+			}
+		});
+
+		return false;
+	});
+});
 </script>
