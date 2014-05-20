@@ -94,7 +94,6 @@ class Factory {
 		/* Otherwise just download the file
 		 */
 		else {
-			echo $this->getSubmission()->getMimeType()->getMime();
 			return new Strategy\Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 
