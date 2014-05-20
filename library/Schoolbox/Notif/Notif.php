@@ -144,11 +144,8 @@ class Notif implements LoggerInterface {
 		$stack = array();
 
 		$mailfrom = array(
-			sprintf('notif@%s%s',
-				$this->conf->get('site_hostname') ? ($this->conf->get('site_hostname') . '.') : '',
-				$this->conf->get('site_domain')
-			),
-			$this->conf->get('title')
+			$this->conf->get('mail_from_address'),
+			$this->conf->get('mail_from_name')
 		);
 
 		// [0] top priority: system failure
