@@ -31,7 +31,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Interceptor\Interceptor;
-use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
+use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;

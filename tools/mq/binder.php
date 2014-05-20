@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
 
 /**
  * 
@@ -85,7 +84,7 @@ if($verbose) {
 	echo "[ ] Notifying scheduler.\n";
 }
 
-$cmdr = new SchedulerCommander();
+$cmdr = new \Schoolbox\Realtime\Schedule\SchedulerCommander();
 $cmdr->adviseReload();
 
 if($verbose) {

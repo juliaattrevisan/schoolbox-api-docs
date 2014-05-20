@@ -15,7 +15,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
+use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;

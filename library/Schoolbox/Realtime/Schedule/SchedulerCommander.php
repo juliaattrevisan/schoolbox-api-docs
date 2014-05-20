@@ -7,14 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule\Command;
+namespace Schoolbox\Realtime\Schedule;
 
 
 use Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Command\AbstractCommander;
-use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
