@@ -72,4 +72,8 @@ do
 		cp -vf $tfile $vhost;
 		rm -f $tfile;
 	fi
+  if [ `grep '512M' $vhost | wc -l` -eq 0 ];
+  then
+    sed -i 's/512M/1024M/g' $vhost;
+  fi
 done
