@@ -184,10 +184,11 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * @param Frame $frame
 	 */
 	public function onCommand($frame) {
-		$this->debug->v('Received command from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
+		$this->debug->v('Received command from '.INSTANCE_ID.self::QUEUE_COMMAND, '>');
 		$cmdr = new SchedulerCommander();
 		$body = CompressedFormatter::uncompress($frame->body);
-		$cmdr->exec($this, $body['message']);
+		$result = $cmdr->exec($this, $body['message']);
+		$this->debug->v("Command executed ".($result ? 'successfully' : 'unsuccessfully'), $result ? ' ' : '*');
 	}
 
 
