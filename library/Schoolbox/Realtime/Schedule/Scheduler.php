@@ -30,6 +30,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Interceptor\Interceptor;
+use Schoolbox\Realtime\Schedule\Command\Commander;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;
@@ -174,7 +175,8 @@ class Scheduler extends StompScheduler {
 	 */
 	public function onCommand($frame) {
 		$this->debug->v('Received command from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
-
+		$cmdr = new Commander($this);
+		$cmdr->exec($frame->body);
 	}
 
 
@@ -182,7 +184,7 @@ class Scheduler extends StompScheduler {
 	 * @param User $user
 	 * @param Interceptor $interceptor
 	 */
-	protected function subscribeUser($user, $interceptor) {
+	public function subscribeUser($user, $interceptor) {
 		/** @var User $user - unfortunately necessary self hydration */
 		$user = UserMapper::getInstance()->findById($user->getId());
 		$queue = UserQueue::getUserToSortQueueName($user->getId());
@@ -198,7 +200,7 @@ class Scheduler extends StompScheduler {
 	/**
 	 * @param User $user
 	 */
-	protected function unsubscribeUser($user) {
+	public function unsubscribeUser($user) {
 		$queue = UserQueue::getUserToSortQueueName($user->getId());
 		$this->unsubscribe($queue);
 	}
@@ -207,10 +209,10 @@ class Scheduler extends StompScheduler {
 	/**
 	 * Drops all user subscriptions currently held, and then reloads all from DB
 	 */
-	protected function reload() {
+	public function reload() {
 		// detach user subscriptions
 		foreach(array_keys($this->subscriptions) as $queue) {
-			// don't unsubscribe from the master queue
+			// don't unsubscribe from the master queues
 			if($queue == $this->scheduleQueue || $queue == $this->commandQueue) {
 				continue;
 			}
