@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Cli\Debug;
+use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -20,6 +21,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -43,10 +45,30 @@ use SplObjectStorage;
  * Class Scheduler
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends StompScheduler {
+class Scheduler extends StompScheduler implements CommandableInterface {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
 	const QUEUE_SCHEDULE = '.sb.sched';
+	const QUEUE_COMMAND  = '.sb.cmd.sched';
+
+
+	/**
+	 * Binds the queues that the Scheduler requires
+	 */
+	public static function bindQueues() {
+		// make sure our endpoints exist
+		$mqc = new Connector();
+		$queues = array(
+			INSTANCE_ID . Scheduler::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
+			INSTANCE_ID . self::QUEUE_COMMAND       => '*.' . Notif::TOPIC_CMD_SCHED
+		);
+
+		foreach($queues as $q => $route) {
+			$mqc->declareQueue($q);
+			$mqc->bindQueue($q, $route);
+		}
+	}
+
 
     /** @var Notif */
     protected $notif;
@@ -54,6 +76,8 @@ class Scheduler extends StompScheduler {
     /** @var SplObjectStorage */
     protected $resolvers;
 
+	/** @var Interceptor */
+	protected $interceptor;
 
     /**
      * @param LoopInterface $loop
@@ -62,10 +86,21 @@ class Scheduler extends StompScheduler {
      * @param IConfigLoader $conf
      */
     public function __construct($loop, $dispatchStrategy, $debug, $conf = null) {
+	    // cast optional param
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
-        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.Scheduler::QUEUE_SCHEDULE, $debug);
+
+	    // run construction
+        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
         $this->notif = new Notif();
 	    $this->resolvers = new SplObjectStorage();
+	    $this->interceptor = new Interceptor($this->debug, $this->loop);
+
+	    self::bindQueues();
+
+	    // register signal listeners
+	    $this->on(SIGHUP,  array($this, 'onHangup'));
+	    $this->on(SIGINT,  array($this, 'onInterrupt'));
+	    $this->on(SIGTERM, array($this, 'onTerminate'));
     }
 
 
@@ -85,38 +120,20 @@ class Scheduler extends StompScheduler {
 
 
     /**
-     * @param Client $client
+     * Callback executed when the STOMP client connects
      */
-    public function onConnect($client) {
-        // make sure our endpoint exists
-        $mqc = new Connector();
-        $mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
-        $mqc->bindQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
+    public function onConnect() {
+	    // perform the subscription
+        parent::onConnect();
 
-        // prepare the interceptor
-        $interceptor = new Interceptor($this->debug, $this->loop);
-	    $dbg = $this->debug;
-
-        // perform the subscription
-        parent::onConnect($client);
-
-        // subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-        foreach(UserMapper::getInstance()->findAll() as $user) {
-            /** @var User $user - self hydration */
-            $user = UserMapper::getInstance()->findById($user->getId());
-            $queue = UserQueue::getUserToSortQueueName($user->getId());
-            $client->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $dbg) {
-                // this closure is executed every time a message is sent to the client based on the given subscription
-				$dbg->v("Got a subscribed message for ".$user->getUsername());
-                $interceptor->process($user, $frame);
-            });
-
-        }
-
+	    // technically in this context it's only "load", but the outcome is the same
+		$this->reload();
     }
 
 
     /**
+     * Callback executed when an exception bubbles to the top of the loop
+     *
      * @param Exception $e
      * @return void
      */
@@ -127,12 +144,14 @@ class Scheduler extends StompScheduler {
 
 
     /**
+     * Callback executed when a message is received from RabbitMQ on the schedule queue
+     *
      * @param Frame $frame
      * @param AckResolver $resolver
      * @return void
      */
     public function onMessage($frame, $resolver) {
-		$this->debug->v("Received message from instance".self::QUEUE_SCHEDULE);
+	    $this->debug->v('Received message from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
 	    try {
 
 			$formatted = CompressedFormatter::uncompress($frame->body);
@@ -168,6 +187,101 @@ class Scheduler extends StompScheduler {
 		}
 
 		$resolver->ack();
+	}
+
+
+	/**
+	 * Callback executed when a command is received from RabbitMQ on the command queue
+	 *
+	 * @param Frame $frame
+	 */
+	public function onCommand($frame) {
+		$this->debug->v('Received command from '.INSTANCE_ID.self::QUEUE_COMMAND, '>');
+		$cmdr = new SchedulerCommander();
+		$body = CompressedFormatter::uncompress($frame->body);
+		$result = $cmdr->exec($this, $body['message']);
+		$this->debug->v("Command executed ".($result ? 'successfully' : 'unsuccessfully'), $result ? ' ' : '*');
+	}
+
+
+	/**
+	 * Callback executed when SIGHUP is received by the process
+	 */
+	public function onHangup() {
+		$this->debug->v("HUP received: reloading user queue subscriptions", ">");
+		$this->reload();
+	}
+
+
+	/**
+	 * Callback executed when SIGINT is received by the process
+	 */
+	public function onInterrupt() {
+		$this->debug->v("Interrupting starfish!", '>');
+		// for now, just treat as a termination request
+		$this->onTerminate();
+	}
+
+
+	/**
+	 * Callback executed when SIGTERM is received by the process
+	 */
+	public function onTerminate() {
+		$this->debug->v("Cleaning up and terminating", '*');
+		// die safely
+		exit;
+	}
+
+
+	/**
+	 * @param int $userId
+	 * @return bool
+	 */
+	public function subscribeUser($userId) {
+		/** @var User $user - unfortunately necessary self hydration */
+		$user = UserMapper::getInstance()->findById($userId);
+		$queue = UserQueue::getUserToSortQueueName($userId);
+		$debug = $this->debug;
+		$int = $this->interceptor;
+		return $this->subscribe("/amq/queue/$queue", function($frame) use ($int, $user, $debug) {
+			// this closure is executed every time a message is sent to the client based on the given subscription
+			$debug->v("Got a subscribed message for ".$user->getUsername());
+			$int->process($user, $frame);
+		});
+	}
+
+
+	/**
+	 * @param int $userId
+	 * @return bool
+	 */
+	public function unsubscribeUser($userId) {
+		$queue = UserQueue::getUserToSortQueueName($userId);
+		return $this->unsubscribe($queue);
+	}
+
+
+	/**
+	 * Drops all user subscriptions currently held, and then reloads all from DB
+	 */
+	public function reload() {
+		// detach user subscriptions
+		foreach(array_keys($this->subscriptions) as $queue) {
+			// don't unsubscribe from the master queues
+			if($queue == $this->scheduleQueue || $queue == $this->commandQueue) {
+				continue;
+			}
+			$this->unsubscribe($queue);
+		}
+
+		// reattach user subscriptions
+		// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
+		/** @var User[]|Collection $users */
+		$users = UserMapper::getInstance()->findAll();
+		foreach($users as $user) {
+			$this->subscribeUser($user->getId());
+		}
+		$this->debug->v("Subscribed to {$users->count()} user queues");
 	}
 
 
@@ -288,6 +402,7 @@ class Scheduler extends StompScheduler {
 	    $this->debug->v("Attached trigger, resolver contains ".$triggers->count()." triggers", '+');
     }
 
+
     /**
      * @param TriggerInterface $trigger
      * @return int|null the number of triggers left on the associated resolver, or null if not found
@@ -319,6 +434,7 @@ class Scheduler extends StompScheduler {
         return null;
     }
 
+
     /**
      * @param AckResolver $ackResolver
      * @return int|null
@@ -332,6 +448,7 @@ class Scheduler extends StompScheduler {
         return null;
     }
 
+
 	/**
 	 * @param TriggerInterface $trigger
 	 * @return string
@@ -340,4 +457,4 @@ class Scheduler extends StompScheduler {
 		return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
 	}
 
-} 
+}

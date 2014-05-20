@@ -23,23 +23,35 @@ use React\Stomp\Protocol\Frame;
 abstract class StompScheduler extends AbstractScheduler {
 
 	/** @var string */
-    protected $queue;
+    protected $scheduleQueue;
+
+	/** @var string */
+	protected $commandQueue;
+
+	/** @var array */
+	protected $subscriptions;
+
+	/** @var Client */
+	protected $stomp;
+
 
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param string $queue
+     * @param string $scheduleQueue
+     * @param string $commandQueue
      * @param Debug $debug
      */
-    public function __construct($loop, $dispatchStrategy, $queue, $debug) {
+    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $commandQueue, $debug) {
         parent::__construct($loop, $dispatchStrategy, $debug);
         $this->method = DefaultDispatchStrategy::TASK_PUBLISH;
-        $this->queue = $queue;
+        $this->scheduleQueue = $scheduleQueue;
+		$this->commandQueue = $commandQueue;
 
         try {
             // defer to implementing classes
-            $stompClient = $this->getStompConnection();
-            $stompClient->connect()->then(array($this, 'onConnect'));
+            $this->stomp = $this->getStompConnection();
+	        $this->stomp->connect()->then(array($this, 'onConnect'));
         }
         catch(ConnectionException $e) {
             // if the connection bugged out...
@@ -52,14 +64,57 @@ abstract class StompScheduler extends AbstractScheduler {
     /**
      * Subscribes, with ACKnowledgement, to the queue provided in construction
      *
-     * @param Client $client
      * @return void
      */
-    public function onConnect($client) {
+    public function onConnect() {
         $this->debug->v("Connected to STOMP", '+');
-        $client->subscribeWithAck($this->queue, 'client', array($this, 'onMessage'));
-	    $client->on('error', array($this, 'onException'));
+	    $this->subscribeAck($this->scheduleQueue, array($this, 'onMessage'));
+	    $this->subscribe($this->commandQueue, array($this, 'onCommand'));
+	    $this->stomp->on('error', array($this, 'onException'));
     }
+
+
+	/**
+	 * @param string $queue
+	 * @param callable $callback
+	 * @return bool
+	 */
+	protected function subscribe($queue, $callback) {
+		if(isset($this->subscriptions[$queue])) {
+			return false;
+		}
+		$this->subscriptions[$queue] = $this->stomp->subscribe($queue, $callback);
+		return true;
+	}
+
+
+	/**
+	 * @param string $queue
+	 * @param callable $callback
+	 * @param string $mode
+	 * @return bool
+	 */
+	protected function subscribeAck($queue, $callback, $mode = 'client-individual') {
+		if(isset($this->subscriptions[$queue])) {
+			return false;
+		}
+		$this->subscriptions[$queue] = $this->stomp->subscribeWithAck($queue, $mode, $callback);
+		return true;
+	}
+
+
+	/**
+	 * @param string $queue
+	 * @return bool
+	 */
+	protected function unsubscribe($queue) {
+		if(isset($this->subscriptions[$queue])) {
+			$this->stomp->unsubscribe($this->subscriptions[$queue]);
+			unset($this->subscriptions[$queue]);
+			return true;
+		}
+		return false;
+	}
 
 
     /**
@@ -73,6 +128,12 @@ abstract class StompScheduler extends AbstractScheduler {
      * @return void
      */
     public abstract function onMessage($frame, $resolver);
+
+	/**
+	 * @param Frame $frame
+	 * @return void
+	 */
+	public abstract function onCommand($frame);
 
     /**
      * @param Exception $e
