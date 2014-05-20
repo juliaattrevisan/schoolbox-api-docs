@@ -47,6 +47,7 @@ class Scheduler extends StompScheduler {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
 	const QUEUE_SCHEDULE = '.sb.sched';
+	const QUEUE_COMMAND  = '.sb.cmd.sched';
 
     /** @var Notif */
     protected $notif;
@@ -54,6 +55,8 @@ class Scheduler extends StompScheduler {
     /** @var SplObjectStorage */
     protected $resolvers;
 
+	/** @var Interceptor */
+	protected $interceptor;
 
     /**
      * @param LoopInterface $loop
@@ -62,10 +65,14 @@ class Scheduler extends StompScheduler {
      * @param IConfigLoader $conf
      */
     public function __construct($loop, $dispatchStrategy, $debug, $conf = null) {
+	    // cast optional param
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
-        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.Scheduler::QUEUE_SCHEDULE, $debug);
+
+	    // run construction
+        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
         $this->notif = new Notif();
 	    $this->resolvers = new SplObjectStorage();
+	    $this->interceptor = new Interceptor($this->debug, $this->loop);
     }
 
 
@@ -85,34 +92,25 @@ class Scheduler extends StompScheduler {
 
 
     /**
-     *
      */
     public function onConnect() {
-        // make sure our endpoint exists
+        // make sure our endpoints exist
         $mqc = new Connector();
-        $mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
-        $mqc->bindQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE, '*.' . Notif::TOPIC_APPLICATION);
+	    $queues = array(
+		    INSTANCE_ID . Scheduler::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
+		    INSTANCE_ID . self::QUEUE_COMMAND       => '#'
+	    );
 
-        // prepare the interceptor
-        $interceptor = new Interceptor($this->debug, $this->loop);
-	    $dbg = $this->debug;
+	    foreach($queues as $q => $route) {
+		    $mqc->declareQueue($q);
+		    $mqc->bindQueue($q, $route);
+	    }
 
-        // perform the subscription
+	    // perform the subscription
         parent::onConnect();
 
-        // subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-        foreach(UserMapper::getInstance()->findAll() as $user) {
-            /** @var User $user - self hydration */
-            $user = UserMapper::getInstance()->findById($user->getId());
-            $queue = UserQueue::getUserToSortQueueName($user->getId());
-	        $this->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $dbg) {
-                // this closure is executed every time a message is sent to the client based on the given subscription
-				$dbg->v("Got a subscribed message for ".$user->getUsername());
-                $interceptor->process($user, $frame);
-            });
-
-        }
-
+	    // technically in this context it's only "load", but the outcome is the same
+		$this->reload();
     }
 
 
@@ -132,7 +130,7 @@ class Scheduler extends StompScheduler {
      * @return void
      */
     public function onMessage($frame, $resolver) {
-		$this->debug->v("Received message from instance".self::QUEUE_SCHEDULE);
+	    $this->debug->v('Received message from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
 	    try {
 
 			$formatted = CompressedFormatter::uncompress($frame->body);
@@ -168,6 +166,62 @@ class Scheduler extends StompScheduler {
 		}
 
 		$resolver->ack();
+	}
+
+
+	/**
+	 * @param Frame $frame
+	 */
+	public function onCommand($frame) {
+		$this->debug->v('Received command from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
+
+	}
+
+
+	/**
+	 * @param User $user
+	 * @param Interceptor $interceptor
+	 */
+	protected function subscribeUser($user, $interceptor) {
+		/** @var User $user - unfortunately necessary self hydration */
+		$user = UserMapper::getInstance()->findById($user->getId());
+		$queue = UserQueue::getUserToSortQueueName($user->getId());
+		$debug = $this->debug;
+		$this->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $debug) {
+			// this closure is executed every time a message is sent to the client based on the given subscription
+			$debug->v("Got a subscribed message for ".$user->getUsername());
+			$interceptor->process($user, $frame);
+		});
+	}
+
+
+	/**
+	 * @param User $user
+	 */
+	protected function unsubscribeUser($user) {
+		$queue = UserQueue::getUserToSortQueueName($user->getId());
+		$this->unsubscribe($queue);
+	}
+
+
+	/**
+	 * Drops all user subscriptions currently held, and then reloads all from DB
+	 */
+	protected function reload() {
+		// detach user subscriptions
+		foreach(array_keys($this->subscriptions) as $queue) {
+			// don't unsubscribe from the master queue
+			if($queue == $this->scheduleQueue || $queue == $this->commandQueue) {
+				continue;
+			}
+			$this->unsubscribe($queue);
+		}
+
+		// reattach user subscriptions
+		// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
+		foreach(UserMapper::getInstance()->findAll() as $user) {
+			$this->subscribeUser($user, $this->interceptor);
+		}
 	}
 
 
@@ -288,6 +342,7 @@ class Scheduler extends StompScheduler {
 	    $this->debug->v("Attached trigger, resolver contains ".$triggers->count()." triggers", '+');
     }
 
+
     /**
      * @param TriggerInterface $trigger
      * @return int|null the number of triggers left on the associated resolver, or null if not found
@@ -319,6 +374,7 @@ class Scheduler extends StompScheduler {
         return null;
     }
 
+
     /**
      * @param AckResolver $ackResolver
      * @return int|null
@@ -331,6 +387,7 @@ class Scheduler extends StompScheduler {
 
         return null;
     }
+
 
 	/**
 	 * @param TriggerInterface $trigger

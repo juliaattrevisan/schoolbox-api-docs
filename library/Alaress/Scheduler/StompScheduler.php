@@ -23,7 +23,10 @@ use React\Stomp\Protocol\Frame;
 abstract class StompScheduler extends AbstractScheduler {
 
 	/** @var string */
-    protected $queue;
+    protected $scheduleQueue;
+
+	/** @var string */
+	protected $commandQueue;
 
 	/** @var array */
 	protected $subscriptions;
@@ -35,13 +38,15 @@ abstract class StompScheduler extends AbstractScheduler {
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param string $queue
+     * @param string $scheduleQueue
+     * @param string $commandQueue
      * @param Debug $debug
      */
-    public function __construct($loop, $dispatchStrategy, $queue, $debug) {
+    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $commandQueue, $debug) {
         parent::__construct($loop, $dispatchStrategy, $debug);
         $this->method = DefaultDispatchStrategy::TASK_PUBLISH;
-        $this->queue = $queue;
+        $this->scheduleQueue = $scheduleQueue;
+		$this->commandQueue = $commandQueue;
 
         try {
             // defer to implementing classes
@@ -63,7 +68,8 @@ abstract class StompScheduler extends AbstractScheduler {
      */
     public function onConnect() {
         $this->debug->v("Connected to STOMP", '+');
-	    $this->subscribeAck($this->queue, array($this, 'onMessage'));
+	    $this->subscribeAck($this->scheduleQueue, array($this, 'onMessage'));
+	    $this->subscribe($this->commandQueue, array($this, 'onCommand'));
 	    $this->stomp->on('error', array($this, 'onException'));
     }
 
@@ -107,6 +113,12 @@ abstract class StompScheduler extends AbstractScheduler {
      * @return void
      */
     public abstract function onMessage($frame, $resolver);
+
+	/**
+	 * @param Frame $frame
+	 * @return void
+	 */
+	public abstract function onCommand($frame);
 
     /**
      * @param Exception $e
