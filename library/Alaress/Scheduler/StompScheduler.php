@@ -77,9 +77,14 @@ abstract class StompScheduler extends AbstractScheduler {
 	/**
 	 * @param string $queue
 	 * @param callable $callback
+	 * @return bool
 	 */
 	protected function subscribe($queue, $callback) {
+		if(isset($this->subscriptions[$queue])) {
+			return false;
+		}
 		$this->subscriptions[$queue] = $this->stomp->subscribe($queue, $callback);
+		return true;
 	}
 
 
@@ -87,18 +92,28 @@ abstract class StompScheduler extends AbstractScheduler {
 	 * @param string $queue
 	 * @param callable $callback
 	 * @param string $mode
+	 * @return bool
 	 */
 	protected function subscribeAck($queue, $callback, $mode = 'client-individual') {
+		if(isset($this->subscriptions[$queue])) {
+			return false;
+		}
 		$this->subscriptions[$queue] = $this->stomp->subscribeWithAck($queue, $mode, $callback);
+		return true;
 	}
 
 
 	/**
 	 * @param string $queue
+	 * @return bool
 	 */
 	protected function unsubscribe($queue) {
-		$this->stomp->unsubscribe($this->subscriptions[$queue]);
-		unset($this->subscriptions[$queue]);
+		if(isset($this->subscriptions[$queue])) {
+			$this->stomp->unsubscribe($this->subscriptions[$queue]);
+			unset($this->subscriptions[$queue]);
+			return true;
+		}
+		return false;
 	}
 
 

@@ -11,7 +11,12 @@ namespace Schoolbox\Realtime\Schedule\Command;
 
 
 use Alaress\Cli\Debug;
+use Exception;
+use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Schedule\Scheduler;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Commander {
 
@@ -41,9 +46,9 @@ class Commander {
 	 *  - remove a subscription for a specific user (hooked from `user.deleted` event)
 	 *  - run binder for all users                  (hooked from sync script)
 	 *  - run binder for a specific user            (hooked from [User|Role]AccessNotifier)
+	 * @return bool
 	 */
 	public function exec($command) {
-
 		$cmds = array(
 			'reload'                => array($this, 'reload'),
 			'subscribe.([0-9]+)'    => array($this, 'subscribeUser'),
@@ -55,22 +60,27 @@ class Commander {
 		foreach($cmds as $regex => $callback) {
 			if(preg_match("`^$regex$`", $command, $matches)) {
 				if(isset($matches[1])) {
-					call_user_func($callback, $this, $matches[1]);
+					return call_user_func($callback, $this, $matches[1]);
 				}
 				else {
-					call_user_func($callback, $this);
+					return call_user_func($callback, $this);
 				}
-				break;
 			}
 		}
+		$this->scheduler->debug->v("Unrecognised command: $command", '!');
+		return false;
 	}
 
 
 	/**
 	 * Refresh all subscriptions (hooked from binder.all)
+	 *
+	 * @return bool
 	 */
 	protected function reload() {
 		$this->scheduler->debug->v("Reloading all subscriptions");
+		$this->scheduler->reload();
+		return true;
 	}
 
 
@@ -78,10 +88,11 @@ class Commander {
 	 * Add a subscription for a specific user (hooked from `user.created` event)
 	 *
 	 * @param int $id
+	 * @return bool
 	 */
 	protected function subscribeUser($id) {
 		$this->scheduler->debug->v("Subscribing user $id");
-
+		return $this->scheduler->subscribeUser($id);
 	}
 
 
@@ -89,10 +100,11 @@ class Commander {
 	 * Remove a subscription for a specific user (hooked from `user.deleted` event)
 	 *
 	 * @param int $id
+	 * @return bool
 	 */
 	protected function unsubscribeUser($id) {
 		$this->scheduler->debug->v("Unsubscribing user $id");
-
+		return $this->scheduler->unsubscribeUser($id);
 	}
 
 
@@ -100,19 +112,36 @@ class Commander {
 	 * Run binder for a specific user (hooked from [User|Role]AccessNotifier)
 	 *
 	 * @param int $id
+	 * @return bool
 	 */
 	protected function bindUser($id) {
 		$this->scheduler->debug->v("Resetting bindings for user $id");
-
+		try {
+			$uqf = new UserQueueFactory();
+			$uqf->destoryUserBindings($id);
+			$uqf->bindUserQueue($id);
+			return true;
+		}
+		catch(Exception $e) {
+			// catch any and all exceptions
+			$this->scheduler->debug->v(get_class($e) . ": ".$e->getMessage(), '!');
+			return false;
+		}
 	}
 
 
 	/**
 	 * Run binder for all users (hooked from sync script)
+	 * @return bool
 	 */
 	protected function bindAll() {
 		$this->scheduler->debug->v("Resetting bindings for all users");
-
+		$result = true;
+		foreach(UserMapper::getInstance()->findAll() as $user) {
+			/** @var User $user */
+			$result = $result && $this->bindUser($user->getId());
+		}
+		return $result;
 	}
 
 } 

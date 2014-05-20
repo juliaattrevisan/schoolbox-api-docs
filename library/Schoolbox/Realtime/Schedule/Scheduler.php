@@ -181,28 +181,30 @@ class Scheduler extends StompScheduler {
 
 
 	/**
-	 * @param User $user
-	 * @param Interceptor $interceptor
+	 * @param int $userId
+	 * @return bool
 	 */
-	public function subscribeUser($user, $interceptor) {
+	public function subscribeUser($userId) {
 		/** @var User $user - unfortunately necessary self hydration */
-		$user = UserMapper::getInstance()->findById($user->getId());
-		$queue = UserQueue::getUserToSortQueueName($user->getId());
+		$user = UserMapper::getInstance()->findById($userId);
+		$queue = UserQueue::getUserToSortQueueName($userId);
 		$debug = $this->debug;
-		$this->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $debug) {
+		$int = $this->interceptor;
+		return $this->subscribe("/amq/queue/$queue", function($frame) use ($int, $user, $debug) {
 			// this closure is executed every time a message is sent to the client based on the given subscription
 			$debug->v("Got a subscribed message for ".$user->getUsername());
-			$interceptor->process($user, $frame);
+			$int->process($user, $frame);
 		});
 	}
 
 
 	/**
-	 * @param User $user
+	 * @param int $userId
+	 * @return bool
 	 */
-	public function unsubscribeUser($user) {
-		$queue = UserQueue::getUserToSortQueueName($user->getId());
-		$this->unsubscribe($queue);
+	public function unsubscribeUser($userId) {
+		$queue = UserQueue::getUserToSortQueueName($userId);
+		return $this->unsubscribe($queue);
 	}
 
 
@@ -222,7 +224,8 @@ class Scheduler extends StompScheduler {
 		// reattach user subscriptions
 		// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
 		foreach(UserMapper::getInstance()->findAll() as $user) {
-			$this->subscribeUser($user, $this->interceptor);
+			/** @var User $user */
+			$this->subscribeUser($user->getId());
 		}
 	}
 
