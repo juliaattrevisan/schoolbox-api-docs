@@ -148,6 +148,9 @@ class DueWork_Detail {
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
+        $page->setBlock('submission_row', 'plag_deleted', 'plag_deleted_block');
+
+	    $page->setVar('plag_deleted_block', '');
 
         $closeADF = $this->getDueDate();
         $formatDateOnly = 'l, jS F Y';
@@ -281,7 +284,13 @@ class DueWork_Detail {
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
                         if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
-                            $page->parse('plag_enabled_block', 'plag_enabled');
+	                        if(!is_null($submission['plag_deleted'])) {
+		                        $page->parse('plag_deleted_block', 'plag_deleted');
+		                        $page->setVar('plag_enabled_block', '');
+	                        }
+	                        else {
+		                        $page->parse('plag_enabled_block', 'plag_enabled');
+	                        }
                         } // is this even a plagiarism document?
                         elseif (!$submission['plag_doc_id']) {
                             $page->setVar('plag_enabled_block', '');
