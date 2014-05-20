@@ -4,6 +4,7 @@ INSERT INTO `msg_namespace`(`id`,`slug`,`label`) VALUES
   (10, 'group', 'Groups'),
   (11, 'cms', 'Content Management');
 
+UPDATE `msg_namespace` SET `label` = 'Quiz' WHERE `slug` = 'assess';
 
 /* Data for `msg_source` */
 TRUNCATE `msg_source`;
