@@ -10,7 +10,9 @@
 namespace Schoolbox\Resource;
 
 
-class Textbox {
+use Schoolbox\ISoftDeletable;
+
+class Textbox implements ISoftDeletable{
 
 	/** @var int */
 	protected $id;
@@ -27,6 +29,18 @@ class Textbox {
 	/** @var bool */
 	protected $deleted;
 
+	/**
+	 * Find out if this textbox is deleted
+	 *
+	 * @return bool
+	 */
+	public function isDeleted() {
+		if ($this->getDeleted() == 1) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * @param int $id
@@ -116,6 +130,4 @@ class Textbox {
 	public function getDeleted() {
 		return $this->deleted;
 	}
-
-
 } 

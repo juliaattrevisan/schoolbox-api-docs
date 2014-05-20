@@ -11,44 +11,54 @@
 
 class Component_Dashboard_TextboxController extends Component_Dashboard_ControllerAbstract {
 
-    private $content;
-    private $hideHeader;
+	private $content;
+	private $hideHeader;
 
-    public function execute() {
-        $textBoxID = $this->getConfig('textboxSearch');
-        $this->hideHeader = $this->getConfig('compactMode');
+	public function execute() {
+		$textBoxID = $this->getConfig('textboxSearch');
+		$this->hideHeader = $this->getConfig('compactMode');
 
-        if ($textBoxID > 0) {
-            $tboxHandler = new TextBox();
-            $tbox = $tboxHandler->getByID($textBoxID);
+		if ($textBoxID > 0) {
+			$mapper = new \Schoolbox\Resource\TextboxMapper();
 
-            $this->content = array(
-                'BOX_TITLE' => Scrub::text($tbox['heading']),
-                'BOX_CONTENT' => Scrub::HTML($tbox['body'])
-            );
-            return true;
-        } else {
-            return false;
-        }
-    }
+			try {
+				$textbox = $mapper->findById($textBoxID);
 
-    public function renderTemplate($templateHandle) {
-        if (!$this->loadTemplate($templateHandle, 'textbox')) {
-            return false;
-        }
+				$this->content = array(
+					'BOX_TITLE' => Scrub::text($textbox->getHeading()),
+					'BOX_CONTENT' => Scrub::HTML($textbox->getBody())
+				);
+			}
+			catch(\Exception $e) {
+				$this->content = array(
+					'BOX_TITLE' => '',
+					'BOX_CONTENT' => ''
+				);
+			}
 
-        $this->setBlock($templateHandle, 'head', 'head_block');
+			return true;
+		}
 
-        $this->setVar($this->content);
+		return false;
+	}
 
-        if ($this->hideHeader) {
-            $this->setVar('head_block', '');
-        } else {
-            $this->parse('head_block', 'head');
-        }
+	public function renderTemplate($templateHandle) {
+		if (!$this->loadTemplate($templateHandle, 'textbox')) {
+			return false;
+		}
+
+		$this->setBlock($templateHandle, 'head', 'head_block');
+
+		$this->setVar($this->content);
+
+		if ($this->hideHeader) {
+			$this->setVar('head_block', '');
+		} else {
+			$this->parse('head_block', 'head');
+		}
 
 
-        return true;
-    }
+		return true;
+	}
 
 }
