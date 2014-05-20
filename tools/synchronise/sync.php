@@ -35,6 +35,9 @@ if (Cfg::get('external_sync_data') == 1) {
     } else {
         $sync->execute();
     }
+
+	// advise Scheduler that all bindings need to be rerun
+	\Schoolbox\Realtime\Schedule\Command\Commander::adviseBindAll();
 }
 else {
     die("Data synchronisation is not enabled.\n");
