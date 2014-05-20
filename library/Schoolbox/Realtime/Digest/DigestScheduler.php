@@ -20,6 +20,7 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
+use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
@@ -35,7 +36,7 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	const QUEUE_COMMAND  = '.sb.cmd.digest';
 
 	/** @var DigestTrigger[] */
-	protected $triggers;
+	protected $triggers = array();
 
 	/**
 	 * Binds the queues that the Scheduler requires
@@ -74,7 +75,7 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	    ));
 
 	    $self = $this;
-	    $client->on('connect', function($client) use ($self) {
+	    $client->connect()->then(function($client) use ($self) {
 		    /** @var Client $client */
 		    $client->subscribe(INSTANCE_ID.DigestScheduler::QUEUE_COMMAND, array($self, 'onCommand'));
 	    });
@@ -91,8 +92,9 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	 */
 	public function reload() {
 		// drop existing
-		foreach($this->triggers as $t) {
+		foreach($this->triggers as $k => $t) {
 			$this->unschedule($t);
+			unset($this->triggers[$k]);
 		}
 
 		// read each role entry, and schedule a cron based on it
@@ -145,8 +147,10 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	 * @param Frame $frame
 	 */
 	public function onCommand($frame) {
+		$this->debug->v("Received command");
 		$commander = new DigestCommander($this);
-		$commander->exec($frame->body);
+		$body = CompressedFormatter::uncompress($frame->body);
+		$commander->exec($this, $body['message']);
 	}
 
 } 

@@ -32,7 +32,7 @@ abstract class AbstractCommander implements CommanderInterface {
 		$n = new Notif($this->topic);
 
 		$message = $cmd . ($id ? $id : '');
-		$n->alert($message);
+		$n->warning($message);
 	}
 
 	/**
@@ -42,4 +42,4 @@ abstract class AbstractCommander implements CommanderInterface {
 	 */
 	protected abstract function bindQueues();
 
-} 
+}

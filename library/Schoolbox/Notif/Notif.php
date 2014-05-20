@@ -10,10 +10,8 @@
 namespace Schoolbox\Notif;
 
 
-use BadMethodCallException;
 use ConfigFallback;
 use Mailer;
-use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -26,7 +24,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
-use Schoolbox\Notif\Handler\DigestHandler;
 use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MessageHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
@@ -69,6 +66,11 @@ class Notif implements LoggerInterface {
 	/** @var HandlerInterface[] */
 	protected $handlers;
 
+
+	/**
+	 * @param string $topic
+	 * @param IConfigLoader $configLoader
+	 */
 	public function __construct($topic = self::TOPIC_SYSTEM, $configLoader = null) {
 		$this->topic = $topic;
 		$this->topicFactory = new TopicFactory();
@@ -104,10 +106,19 @@ class Notif implements LoggerInterface {
 
 	}
 
+
+	/**
+	 * @return string
+	 */
 	public function getTopic() {
 		return $this->topic;
 	}
 
+
+	/**
+	 * @param string $topic
+	 * @return self
+	 */
 	public function setTopic($topic) {
 		$this->topic = $topic;
 		return $this;
@@ -188,7 +199,7 @@ class Notif implements LoggerInterface {
 		if($this->isSystemTopic($this->topic)) {
 
 			// [3a] internal application message
-			if($this->topic == self::TOPIC_APPLICATION) {
+			if(in_array($this->topic, array(self::TOPIC_APPLICATION, self::TOPIC_CMD_SCHED, self::TOPIC_CMD_DIGEST))) {
 				try {
 					if(!isset($this->handlers['amqp'])) {
 						$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);

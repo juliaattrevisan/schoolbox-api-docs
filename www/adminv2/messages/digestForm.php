@@ -34,4 +34,8 @@ foreach($_POST['role'] as $roleId => $data) {
 	\Schoolbox\RoleMapper::getInstance()->save($role);
 }
 
+// advise digest daemon to reload
+$cmdr = new \Schoolbox\Realtime\Digest\DigestCommander();
+$cmdr->adviseReload();
+
 SitePage::localRedir('/adminv2/messages');

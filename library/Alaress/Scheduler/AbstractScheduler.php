@@ -21,6 +21,8 @@ use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHandlerInterface {
 
@@ -47,11 +49,13 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param \Alaress\Cli\Debug $cli
+     * @param IConfigLoader $conf
      */
-    public function __construct($loop, $dispatchStrategy, $cli) {
+    public function __construct($loop, $dispatchStrategy, $cli, $conf = null) {
         $this->loop = $loop;
         $this->debug = $cli;
         $this->dispatcher = new Dispatcher($loop, $this, $cli, $dispatchStrategy);
+	    $this->conf = $conf ?: ConfigMapper::getInstance();
     }
 
 

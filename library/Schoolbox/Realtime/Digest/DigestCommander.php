@@ -17,10 +17,9 @@ class DigestCommander extends AbstractCommander {
 	const CMD_RELOAD = 'reload';
 
 	/**
-	 * @param DigestScheduler $scheduler
 	 */
-	public function __construct($scheduler) {
-		parent::__construct($scheduler, Notif::TOPIC_CMD_DIGEST);
+	public function __construct() {
+		parent::__construct(Notif::TOPIC_CMD_DIGEST);
 	}
 
 
@@ -49,8 +48,11 @@ class DigestCommander extends AbstractCommander {
 	 */
 	public function exec($scheduler, $command) {
 		if($command == 'reload') {
-			$this->reload($scheduler);
+			$scheduler->debug->v("Received signal to reload");
+			return $this->reload($scheduler);
 		}
+		$scheduler->debug->v("Unrecognised command: $command");
+		return false;
 	}
 
 
