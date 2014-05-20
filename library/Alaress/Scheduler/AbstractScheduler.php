@@ -18,13 +18,14 @@ use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Evenement\EventEmitter;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
-abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHandlerInterface {
+abstract class AbstractScheduler extends EventEmitter implements SchedulerInterface, TaskResponseHandlerInterface {
 
     /** @var LoopInterface */
     protected $loop;
@@ -56,7 +57,28 @@ abstract class AbstractScheduler implements SchedulerInterface, TaskResponseHand
         $this->debug = $cli;
         $this->dispatcher = new Dispatcher($loop, $this, $cli, $dispatchStrategy);
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
+	    $this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
     }
+
+
+	/**
+	 * Receive signals
+	 *
+	 * @param int $event
+	 * @param callable $listener
+	 */
+	public function on($event, $listener) {
+		pcntl_signal($event, array($this, 'emit'));
+		parent::on($event, $listener);
+	}
+
+
+	/**
+	 * Check if a signal has been raised
+	 */
+	public function signalDispatch() {
+		pcntl_signal_dispatch();
+	}
 
 
     /**
