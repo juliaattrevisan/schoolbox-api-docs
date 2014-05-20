@@ -51,6 +51,9 @@ class Notif implements LoggerInterface {
 	const TOPIC_AUTH         = 'login';   //     "           "   authentication events
 	const TOPIC_CMS          = 'cms';     //     "           "   cms events to be logged
 
+	const TOPIC_CMD_SCHED    = 'cmd.sched';  //  "           "   async actions the scheduler needs to perform
+	const TOPIC_CMD_DIGEST   = 'cmd.digest'; //  "           "   async actions the digester needs to perform
+
 	/** @var IConfigLoader */
 	protected $conf;
 

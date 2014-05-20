@@ -50,6 +50,25 @@ class Scheduler extends StompScheduler {
 	const QUEUE_SCHEDULE = '.sb.sched';
 	const QUEUE_COMMAND  = '.sb.cmd.sched';
 
+
+	/**
+	 * Binds the queues that the Scheduler requires
+	 */
+	public static function bindQueues() {
+		// make sure our endpoints exist
+		$mqc = new Connector();
+		$queues = array(
+			INSTANCE_ID . Scheduler::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
+			INSTANCE_ID . self::QUEUE_COMMAND       => '*.' . Notif::TOPIC_CMD_SCHED
+		);
+
+		foreach($queues as $q => $route) {
+			$mqc->declareQueue($q);
+			$mqc->bindQueue($q, $route);
+		}
+	}
+
+
     /** @var Notif */
     protected $notif;
 
@@ -74,6 +93,7 @@ class Scheduler extends StompScheduler {
         $this->notif = new Notif();
 	    $this->resolvers = new SplObjectStorage();
 	    $this->interceptor = new Interceptor($this->debug, $this->loop);
+	    self::bindQueues();
     }
 
 
@@ -93,20 +113,9 @@ class Scheduler extends StompScheduler {
 
 
     /**
+     * Callback executed when the STOMP client connects
      */
     public function onConnect() {
-        // make sure our endpoints exist
-        $mqc = new Connector();
-	    $queues = array(
-		    INSTANCE_ID . Scheduler::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
-		    INSTANCE_ID . self::QUEUE_COMMAND       => '#'
-	    );
-
-	    foreach($queues as $q => $route) {
-		    $mqc->declareQueue($q);
-		    $mqc->bindQueue($q, $route);
-	    }
-
 	    // perform the subscription
         parent::onConnect();
 

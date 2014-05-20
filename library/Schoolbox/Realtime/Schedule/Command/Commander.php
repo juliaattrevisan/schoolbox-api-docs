@@ -10,15 +10,74 @@
 namespace Schoolbox\Realtime\Schedule\Command;
 
 
-use Alaress\Cli\Debug;
 use Exception;
-use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Commander {
+
+	const CMD_RELOAD        = 'reload';
+	const CMD_SUBSCRIBE     = 'subscribe.';   // note the trailing dot
+	const CMD_UNSUBSCRIBE   = 'unsubscribe.'; // note the trailing dot
+	const CMD_BIND          = 'bind.';        // note the trailing dot
+
+	/**
+	 * Helper function for sending async command
+	 *
+	 * @param string $cmd
+	 * @param mixed $id
+	 */
+	protected static function advise($cmd, $id = null) {
+		// ensure queue and binding exist
+		Scheduler::bindQueues();
+		$n = new Notif(Notif::TOPIC_CMD_SCHED);
+		$message = $cmd . ($id ? $id : '');
+		$n->alert($message);
+	}
+
+
+	/**
+	 * Alias of advise(self::CMD_RELOAD)
+	 */
+	public static function adviseReload() {
+		self::advise(self::CMD_RELOAD);
+	}
+
+
+	/**
+	 * Alias of advise(self::CMD_RELOAD)
+	 */
+	public static function adviseSubscribeUser($id) {
+		self::advise(self::CMD_SUBSCRIBE, $id);
+	}
+
+
+	/**
+	 * Alias of advise(self::CMD_RELOAD)
+	 */
+	public static function adviseUnsubscribeUser($id) {
+		self::advise(self::CMD_UNSUBSCRIBE, $id);
+	}
+
+
+	/**
+	 * Alias of advise(self::CMD_RELOAD)
+	 */
+	public static function adviseBindUser($id) {
+		self::advise(self::CMD_BIND, $id);
+	}
+
+
+	/**
+	 * Alias of advise(self::CMD_RELOAD)
+	 */
+	public static function adviseBindAll() {
+		self::advise(self::CMD_BIND, 'all');
+	}
+
 
 	/** @var Scheduler */
 	protected $scheduler;
@@ -50,11 +109,11 @@ class Commander {
 	 */
 	public function exec($command) {
 		$cmds = array(
-			'reload'                => array($this, 'reload'),
-			'subscribe.([0-9]+)'    => array($this, 'subscribeUser'),
-			'unsubscribe.([0-9]+)'  => array($this, 'unsubscribeUser'),
-			'bind.all'              => array($this, 'bindAll'),
-			'bind.([0-9]+)'         => array($this, 'bindUser')
+			self::CMD_RELOAD                    => array($this, 'reload'),
+			self::CMD_SUBSCRIBE.'([0-9]+)'      => array($this, 'subscribeUser'),
+			self::CMD_UNSUBSCRIBE.'([0-9]+)'    => array($this, 'unsubscribeUser'),
+			self::CMD_BIND.'all'                => array($this, 'bindAll'),
+			self::CMD_BIND.'([0-9]+)'           => array($this, 'bindUser')
 		);
 
 		foreach($cmds as $regex => $callback) {
@@ -144,4 +203,4 @@ class Commander {
 		return $result;
 	}
 
-} 
+}

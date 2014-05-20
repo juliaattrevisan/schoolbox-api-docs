@@ -37,7 +37,9 @@ $uMap = \Schoolbox\UserMapper::getInstance();
 
 $userCollection = $uMap->findAll();
 
-$qFactory = new \Schoolbox\Notif\Queue\UserQueueFactory();
+$mqConnector = new \Schoolbox\Notif\MQ\Connector();
+
+$qFactory = new \Schoolbox\Notif\Queue\UserQueueFactory($mqConnector);
 
 $userCount = $userCollection->count();
 $countLen = strlen("$userCount");
@@ -76,6 +78,12 @@ foreach($userCollection as $user) {
 		printf("  %02d added\n", count($uq->getBindings()));
 	}
 }
+
+if($verbose) {
+	echo "[ ] Notifying scheduler.\n";
+}
+
+\Schoolbox\Realtime\Schedule\Command\Commander::adviseReload();
 
 if($verbose) {
 	echo "[ ] Done.\n";
