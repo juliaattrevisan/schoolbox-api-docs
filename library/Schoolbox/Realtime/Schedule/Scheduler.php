@@ -85,9 +85,9 @@ class Scheduler extends StompScheduler {
 
 
     /**
-     * @param Client $client
+     *
      */
-    public function onConnect($client) {
+    public function onConnect() {
         // make sure our endpoint exists
         $mqc = new Connector();
         $mqc->declareQueue(INSTANCE_ID . Scheduler::QUEUE_SCHEDULE);
@@ -98,14 +98,14 @@ class Scheduler extends StompScheduler {
 	    $dbg = $this->debug;
 
         // perform the subscription
-        parent::onConnect($client);
+        parent::onConnect();
 
         // subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
         foreach(UserMapper::getInstance()->findAll() as $user) {
             /** @var User $user - self hydration */
             $user = UserMapper::getInstance()->findById($user->getId());
             $queue = UserQueue::getUserToSortQueueName($user->getId());
-            $client->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $dbg) {
+	        $this->subscribe("/amq/queue/$queue", function($frame) use ($interceptor, $user, $dbg) {
                 // this closure is executed every time a message is sent to the client based on the given subscription
 				$dbg->v("Got a subscribed message for ".$user->getUsername());
                 $interceptor->process($user, $frame);
@@ -340,4 +340,4 @@ class Scheduler extends StompScheduler {
 		return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
 	}
 
-} 
+}

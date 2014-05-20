@@ -25,6 +25,13 @@ abstract class StompScheduler extends AbstractScheduler {
 	/** @var string */
     protected $queue;
 
+	/** @var array */
+	protected $subscriptions;
+
+	/** @var Client */
+	protected $stomp;
+
+
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
@@ -38,8 +45,8 @@ abstract class StompScheduler extends AbstractScheduler {
 
         try {
             // defer to implementing classes
-            $stompClient = $this->getStompConnection();
-            $stompClient->connect()->then(array($this, 'onConnect'));
+            $this->stomp = $this->getStompConnection();
+	        $this->stomp->connect()->then(array($this, 'onConnect'));
         }
         catch(ConnectionException $e) {
             // if the connection bugged out...
@@ -52,14 +59,41 @@ abstract class StompScheduler extends AbstractScheduler {
     /**
      * Subscribes, with ACKnowledgement, to the queue provided in construction
      *
-     * @param Client $client
      * @return void
      */
-    public function onConnect($client) {
+    public function onConnect() {
         $this->debug->v("Connected to STOMP", '+');
-        $client->subscribeWithAck($this->queue, 'client', array($this, 'onMessage'));
-	    $client->on('error', array($this, 'onException'));
+	    $this->subscribeAck($this->queue, array($this, 'onMessage'));
+	    $this->stomp->on('error', array($this, 'onException'));
     }
+
+
+	/**
+	 * @param string $queue
+	 * @param callable $callback
+	 */
+	protected function subscribe($queue, $callback) {
+		$this->subscriptions[$queue] = $this->stomp->subscribe($queue, $callback);
+	}
+
+
+	/**
+	 * @param string $queue
+	 * @param callable $callback
+	 * @param string $mode
+	 */
+	protected function subscribeAck($queue, $callback, $mode = 'client-individual') {
+		$this->subscriptions[$queue] = $this->stomp->subscribeWithAck($queue, $mode, $callback);
+	}
+
+
+	/**
+	 * @param string $queue
+	 */
+	protected function unsubscribe($queue) {
+		$this->stomp->unsubscribe($this->subscriptions[$queue]);
+		unset($this->subscriptions[$queue]);
+	}
 
 
     /**
