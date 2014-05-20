@@ -14,14 +14,9 @@ use Monolog\Logger;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Message\Source;
-use Schoolbox\Realtime\Message\SourceMapper;
-use Schoolbox\Realtime\Schedule\Command\Commander;
+use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -276,7 +271,8 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 */
 	public function notifySystemApproved($userAccess, $user, $diff = null) {
 		// user access has changed: advise Scheduler to rebind for this user
-		Commander::adviseBindUser($userAccess->getUser()->getId());
+		$cmdr = new SchedulerCommander();
+		$cmdr->adviseBindUser($userAccess->getUser()->getId());
 	}
 
 }

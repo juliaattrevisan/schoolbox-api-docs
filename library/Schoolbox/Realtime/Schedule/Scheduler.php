@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Cli\Debug;
+use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -30,7 +31,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Interceptor\Interceptor;
-use Schoolbox\Realtime\Schedule\Command\Commander;
+use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;
@@ -44,7 +45,7 @@ use SplObjectStorage;
  * Class Scheduler
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends StompScheduler {
+class Scheduler extends StompScheduler implements CommandableInterface {
 
 	const MODULE_NS = 'Schoolbox\\Realtime\\Schedule\\Module\\';
 	const QUEUE_SCHEDULE = '.sb.sched';
@@ -184,8 +185,8 @@ class Scheduler extends StompScheduler {
 	 */
 	public function onCommand($frame) {
 		$this->debug->v('Received command from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
-		$cmdr = new Commander($this);
-		$cmdr->exec($frame->body);
+		$cmdr = new SchedulerCommander();
+		$cmdr->exec($this, $frame->body);
 	}
 
 

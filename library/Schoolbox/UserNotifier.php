@@ -10,7 +10,7 @@
 namespace Schoolbox;
 
 
-use Schoolbox\Realtime\Schedule\Command\Commander;
+use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\ResourceBooking\Booking\Mapper;
@@ -77,8 +77,9 @@ class UserNotifier extends AbstractModuleNotifier {
 	 * @param array $diff
 	 */
 	public function notifyCreated($user, $effector, $diff = null) {
-		Commander::adviseBindUser($user->getId());
-		Commander::adviseSubscribeUser($user->getId());
+		$cmdr = new SchedulerCommander();
+		$cmdr->adviseBindUser($user->getId());
+		$cmdr->adviseSubscribeUser($user->getId());
 	}
 
 
@@ -89,7 +90,8 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function notifyUpdated($user, $effector, $diff = null) {
 		// as above, only executed if externalId changed
-		Commander::adviseBindUser($user->getId());
+		$cmdr = new SchedulerCommander();
+		$cmdr->adviseBindUser($user->getId());
 	}
 
 

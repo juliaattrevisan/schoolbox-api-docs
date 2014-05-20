@@ -1,5 +1,7 @@
 #!/usr/bin/php
 <?php
+use Schoolbox\Realtime\Schedule\Command\SchedulerCommander;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -83,7 +85,8 @@ if($verbose) {
 	echo "[ ] Notifying scheduler.\n";
 }
 
-\Schoolbox\Realtime\Schedule\Command\Commander::adviseReload();
+$cmdr = new SchedulerCommander();
+$cmdr->adviseReload();
 
 if($verbose) {
 	echo "[ ] Done.\n";

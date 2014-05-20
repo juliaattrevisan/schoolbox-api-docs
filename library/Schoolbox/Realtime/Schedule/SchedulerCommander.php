@@ -13,92 +13,79 @@ namespace Schoolbox\Realtime\Schedule\Command;
 use Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Realtime\Command\AbstractCommander;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Commander {
+class SchedulerCommander extends AbstractCommander {
 
 	const CMD_RELOAD        = 'reload';
 	const CMD_SUBSCRIBE     = 'subscribe.';   // note the trailing dot
 	const CMD_UNSUBSCRIBE   = 'unsubscribe.'; // note the trailing dot
 	const CMD_BIND          = 'bind.';        // note the trailing dot
 
+
 	/**
-	 * Helper function for sending async command
+	 * Call through to scheduler to statically bind queues
 	 *
-	 * @param string $cmd
-	 * @param mixed $id
+	 * @return void
 	 */
-	protected static function advise($cmd, $id = null) {
-		// ensure queue and binding exist
+	protected function bindQueues() {
 		Scheduler::bindQueues();
-		$n = new Notif(Notif::TOPIC_CMD_SCHED);
-		$message = $cmd . ($id ? $id : '');
-		$n->alert($message);
 	}
 
 
 	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
-	public static function adviseReload() {
-		self::advise(self::CMD_RELOAD);
+	public function adviseReload() {
+		$this->advise(self::CMD_RELOAD);
 	}
 
 
 	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
-	public static function adviseSubscribeUser($id) {
-		self::advise(self::CMD_SUBSCRIBE, $id);
+	public function adviseSubscribeUser($id) {
+		$this->advise(self::CMD_SUBSCRIBE, $id);
 	}
 
 
 	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
-	public static function adviseUnsubscribeUser($id) {
-		self::advise(self::CMD_UNSUBSCRIBE, $id);
+	public function adviseUnsubscribeUser($id) {
+		$this->advise(self::CMD_UNSUBSCRIBE, $id);
 	}
 
 
 	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
-	public static function adviseBindUser($id) {
-		self::advise(self::CMD_BIND, $id);
+	public function adviseBindUser($id) {
+		$this->advise(self::CMD_BIND, $id);
 	}
 
 
 	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
-	public static function adviseBindAll() {
-		self::advise(self::CMD_BIND, 'all');
+	public function adviseBindAll() {
+		$this->advise(self::CMD_BIND, 'all');
 	}
 
 
-	/** @var Scheduler */
-	protected $scheduler;
+	/**
+	 * General construction
+	 */
+	public function __construct() {
+		parent::__construct(Notif::TOPIC_CMD_SCHED);
+	}
+
 
 	/**
 	 * @param Scheduler $scheduler
-	 */
-	public function __construct($scheduler) {
-		$this->scheduler = $scheduler;
-	}
-
-
-	/* available commands are:
-	 *  - refresh all subscriptions                 (hooked from binder.all)
-	 *  - add a subscription for a specific user    (hooked from `user.created` event)
-	 *  - remove a subscription for a specific user (hooked from `user.deleted` event)
-	 *  - run binder for all users                  (hooked from sync script)
-	 *  - run binder for a specific user            (hooked from [User|Role]AccessNotifier)
-	 */
-
-	/**
 	 * @param string $command - one of:
 	 *  - refresh all subscriptions                 (hooked from binder.all)
 	 *  - add a subscription for a specific user    (hooked from `user.created` event)
@@ -107,7 +94,7 @@ class Commander {
 	 *  - run binder for a specific user            (hooked from [User|Role]AccessNotifier)
 	 * @return bool
 	 */
-	public function exec($command) {
+	public function exec($scheduler, $command) {
 		$cmds = array(
 			self::CMD_RELOAD                    => array($this, 'reload'),
 			self::CMD_SUBSCRIBE.'([0-9]+)'      => array($this, 'subscribeUser'),
@@ -126,7 +113,7 @@ class Commander {
 				}
 			}
 		}
-		$this->scheduler->debug->v("Unrecognised command: $command", '!');
+		$scheduler->debug->v("Unrecognised command: $command", '!');
 		return false;
 	}
 
@@ -134,11 +121,12 @@ class Commander {
 	/**
 	 * Refresh all subscriptions (hooked from binder.all)
 	 *
+	 * @param Scheduler $scheduler
 	 * @return bool
 	 */
-	protected function reload() {
-		$this->scheduler->debug->v("Reloading all subscriptions");
-		$this->scheduler->reload();
+	protected function reload($scheduler) {
+		$scheduler->debug->v("Reloading all subscriptions");
+		$scheduler->reload();
 		return true;
 	}
 
@@ -146,35 +134,38 @@ class Commander {
 	/**
 	 * Add a subscription for a specific user (hooked from `user.created` event)
 	 *
+	 * @param Scheduler $scheduler
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function subscribeUser($id) {
-		$this->scheduler->debug->v("Subscribing user $id");
-		return $this->scheduler->subscribeUser($id);
+	protected function subscribeUser($scheduler, $id) {
+		$scheduler->debug->v("Subscribing user $id");
+		return $scheduler->subscribeUser($id);
 	}
 
 
 	/**
 	 * Remove a subscription for a specific user (hooked from `user.deleted` event)
 	 *
+	 * @param Scheduler $scheduler
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function unsubscribeUser($id) {
-		$this->scheduler->debug->v("Unsubscribing user $id");
-		return $this->scheduler->unsubscribeUser($id);
+	protected function unsubscribeUser($scheduler, $id) {
+		$scheduler->debug->v("Unsubscribing user $id");
+		return $scheduler->unsubscribeUser($id);
 	}
 
 
 	/**
 	 * Run binder for a specific user (hooked from [User|Role]AccessNotifier)
 	 *
+	 * @param Scheduler $scheduler
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function bindUser($id) {
-		$this->scheduler->debug->v("Resetting bindings for user $id");
+	protected function bindUser($scheduler, $id) {
+		$scheduler->debug->v("Resetting bindings for user $id");
 		try {
 			$uqf = new UserQueueFactory();
 			$uqf->destoryUserBindings($id);
@@ -183,7 +174,7 @@ class Commander {
 		}
 		catch(Exception $e) {
 			// catch any and all exceptions
-			$this->scheduler->debug->v(get_class($e) . ": ".$e->getMessage(), '!');
+			$scheduler->debug->v(get_class($e) . ": ".$e->getMessage(), '!');
 			return false;
 		}
 	}
@@ -191,14 +182,16 @@ class Commander {
 
 	/**
 	 * Run binder for all users (hooked from sync script)
+	 *
+	 * @param Scheduler $scheduler
 	 * @return bool
 	 */
-	protected function bindAll() {
-		$this->scheduler->debug->v("Resetting bindings for all users");
+	protected function bindAll($scheduler) {
+		$scheduler->debug->v("Resetting bindings for all users");
 		$result = true;
 		foreach(UserMapper::getInstance()->findAll() as $user) {
 			/** @var User $user */
-			$result = $result && $this->bindUser($user->getId());
+			$result = $result && $this->bindUser($scheduler, $user->getId());
 		}
 		return $result;
 	}

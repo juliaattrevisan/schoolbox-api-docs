@@ -1,0 +1,45 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Realtime\Command;
+
+
+use Schoolbox\Notif\Notif;
+
+abstract class AbstractCommander implements CommanderInterface {
+
+	/** @var string */
+	protected $topic;
+
+	/**
+	 * @param string $topic
+	 */
+	public function __construct($topic) {
+		$this->topic = $topic;
+	}
+
+	/**
+	 * @param string $cmd
+	 * @param mixed $id
+	 */
+	protected function advise($cmd, $id = null) {
+		$n = new Notif($this->topic);
+
+		$message = $cmd . ($id ? $id : '');
+		$n->alert($message);
+	}
+
+	/**
+	 * Call through to scheduler to statically bind queues
+	 *
+	 * @return void
+	 */
+	protected abstract function bindQueues();
+
+} 
