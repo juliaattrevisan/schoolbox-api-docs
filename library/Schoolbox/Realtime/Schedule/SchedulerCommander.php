@@ -105,10 +105,10 @@ class SchedulerCommander extends AbstractCommander {
 		foreach($cmds as $regex => $callback) {
 			if(preg_match("`^$regex$`", $command, $matches)) {
 				if(isset($matches[1])) {
-					return call_user_func($callback, $this, $matches[1]);
+					return call_user_func($callback, $scheduler, $matches[1]);
 				}
 				else {
-					return call_user_func($callback, $this);
+					return call_user_func($callback, $scheduler);
 				}
 			}
 		}
