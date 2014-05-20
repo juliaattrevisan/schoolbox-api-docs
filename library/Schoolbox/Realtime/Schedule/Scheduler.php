@@ -21,6 +21,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -31,7 +32,6 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Interceptor\Interceptor;
-use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;
@@ -94,7 +94,13 @@ class Scheduler extends StompScheduler implements CommandableInterface {
         $this->notif = new Notif();
 	    $this->resolvers = new SplObjectStorage();
 	    $this->interceptor = new Interceptor($this->debug, $this->loop);
+
 	    self::bindQueues();
+
+	    // register signal listeners
+	    $this->on(SIGHUP,  array($this, 'onHangup'));
+	    $this->on(SIGINT,  array($this, 'onInterrupt'));
+	    $this->on(SIGTERM, array($this, 'onTerminate'));
     }
 
 
@@ -126,6 +132,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 
     /**
+     * Callback executed when an exception bubbles to the top of the loop
+     *
      * @param Exception $e
      * @return void
      */
@@ -136,6 +144,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 
     /**
+     * Callback executed when a message is received from RabbitMQ on the schedule queue
+     *
      * @param Frame $frame
      * @param AckResolver $resolver
      * @return void
@@ -181,6 +191,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 
 	/**
+	 * Callback executed when a command is received from RabbitMQ on the command queue
+	 *
 	 * @param Frame $frame
 	 */
 	public function onCommand($frame) {
@@ -189,6 +201,35 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		$body = CompressedFormatter::uncompress($frame->body);
 		$result = $cmdr->exec($this, $body['message']);
 		$this->debug->v("Command executed ".($result ? 'successfully' : 'unsuccessfully'), $result ? ' ' : '*');
+	}
+
+
+	/**
+	 * Callback executed when SIGHUP is received by the process
+	 */
+	public function onHangup() {
+		$this->debug->v("HUP received: reloading user queue subscriptions", ">");
+		$this->reload();
+	}
+
+
+	/**
+	 * Callback executed when SIGINT is received by the process
+	 */
+	public function onInterrupt() {
+		$this->debug->v("Interrupting starfish!", '>');
+		// for now, just treat as a termination request
+		$this->onTerminate();
+	}
+
+
+	/**
+	 * Callback executed when SIGTERM is received by the process
+	 */
+	public function onTerminate() {
+		$this->debug->v("Cleaning up and terminating", '*');
+		// die safely
+		exit;
 	}
 
 
@@ -235,10 +276,12 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 		// reattach user subscriptions
 		// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-		foreach(UserMapper::getInstance()->findAll() as $user) {
-			/** @var User $user */
+		/** @var User[]|Collection $users */
+		$users = UserMapper::getInstance()->findAll();
+		foreach($users as $user) {
 			$this->subscribeUser($user->getId());
 		}
+		$this->debug->v("Subscribed to {$users->count()} user queues");
 	}
 
 
