@@ -14,8 +14,14 @@ use Monolog\Logger;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Message\Source;
+use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Schedule\Command\Commander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\ScheduleException;
+use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -92,6 +98,21 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 		elseif($method == Mapper::METHOD_UPDATE) {
 			$bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
 		}
+	}
+
+
+	/**
+	 * @param string $label
+	 * @return array
+	 */
+	public function retrieveCallbacks($label) {
+		$callbacks = parent::retrieveCallbacks($label);
+		// append system one too
+		$method = 'notifySystem'.ucfirst($label);
+		if(method_exists($this, $method)) {
+			$callbacks[] = array($this, $method);
+		}
+		return $callbacks;
 	}
 
 
@@ -243,6 +264,19 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 */
 	public function notifyParentApproved($userAccess, $user, $diff = null) {
 		return $this->notifyApproved($userAccess, $user, $diff);
+	}
+
+
+	/**
+	 * Intentionally does not return a Messenger
+	 *
+	 * @param UserAccess $userAccess
+	 * @param User $user
+	 * @param array $diff
+	 */
+	public function notifySystemApproved($userAccess, $user, $diff = null) {
+		// user access has changed: advise Scheduler to rebind for this user
+		Commander::adviseBindUser($userAccess->getUser()->getId());
 	}
 
 }
