@@ -102,7 +102,7 @@ class Mapper {
 	 *
 	 * @var array
 	 */
-	protected $joins;
+	protected $joins = array();
 
 	/**
 	 * @var array

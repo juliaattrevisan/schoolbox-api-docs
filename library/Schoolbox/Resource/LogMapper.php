@@ -24,6 +24,7 @@ class LogMapper extends Mapper {
 	const KIND_FILE     = 'file';
 	const KIND_FOLDER   = 'folder';
 	const KIND_LINK     = 'link';
+	const KIND_CONTENT  = 'content';
 	const KIND_MYFILE   = 'myfile';
 	const KIND_MYFOLDER = 'myfolder';
 
@@ -99,6 +100,12 @@ class LogMapper extends Mapper {
 			'other_key' => 'id'
 		));
 
+		$this->hasJoin('text', array(
+			'mapper'    => '\\Schoolbox\\Resource\\TextboxMapper',
+			'this_key'  => 'objectId',
+			'other_key' => 'textBoxID'
+		));
+
 	}
 
 	/**
@@ -132,18 +139,25 @@ class LogMapper extends Mapper {
 				AND object = 'folder'
 				AND c.parent = :ctxt
 			",
+			self::KIND_CONTENT => "
+				LEFT JOIN {$this->getJoinSql('text', 'log', 't')}
+				AND object = 'content'
+				AND t.categoryID = :ctxt
+			"
 		);
 
 		$selects = array(
-			self::KIND_LINK => $this->getJoinMapper('link')->getColumnString('l'),
-			self::KIND_FILE => $this->getJoinMapper('file')->getColumnString('f'),
-			self::KIND_FOLDER => $this->getJoinMapper('cat')->getColumnString('c'),
+			self::KIND_LINK    => $this->getJoinMapper('link')->getColumnString('l'),
+			self::KIND_FILE    => $this->getJoinMapper('file')->getColumnString('f'),
+			self::KIND_FOLDER  => $this->getJoinMapper('cat')->getColumnString('c'),
+			self::KIND_CONTENT => $this->getJoinMapper('text')->getColumnString('t'),
 		);
 
 		$wheres = array(
-			self::KIND_LINK   => "object = 'link'   AND l.id IS NOT NULL",
-			self::KIND_FILE   => "object = 'file'   AND f.id IS NOT NULL",
-			self::KIND_FOLDER => "object = 'folder' AND c.id IS NOT NULL",
+			self::KIND_LINK    => "object = 'link'   AND l.id IS NOT NULL",
+			self::KIND_FILE    => "object = 'file'   AND f.id IS NOT NULL",
+			self::KIND_FOLDER  => "object = 'folder' AND c.id IS NOT NULL",
+			self::KIND_CONTENT => "object = 'content' AND t.textBoxID IS NOT NULL"
 		);
 
 		// are we filtering? or just grabbing all the things?

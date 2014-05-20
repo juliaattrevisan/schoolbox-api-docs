@@ -104,7 +104,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * Notify the system that a CMS event occurred (will be sent to cmsLog table)
 	 *
 	 * @param string $action
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @throws ScheduleException
 	 * @return bool
@@ -121,6 +121,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 		elseif($resource instanceof Link) {
 			$id = $resource->getId();
 			$type = 'link';
+		}
+		elseif($resource instanceof Textbox) {
+			$id = $resource->getId();
+			$type = 'content';
 		}
 		else {
 			throw new ScheduleException("Invalid resource type given");
@@ -207,7 +211,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 		$message = new Message(":effector $action the $kind :resource in :category", $icon, $href);
 
-		$msgr->broadcastToCategory($categoryId, $message, "$kind.$id.$action", Logger::INFO, array(
+		$msgr->broadcastToCategory($categoryId, $message, "cms.$kind.$id.$action", Logger::INFO, array(
 			'effector' => array($effectorName, "/search/user/$effectorId"),
 			'resource' => $param,
 			'category' => array($categoryName, "/homepage/$categoryId")
@@ -222,7 +226,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/* ASYNC METHODS */
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return bool
 	 */
@@ -231,7 +235,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return bool
@@ -241,7 +245,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return bool
 	 */
@@ -252,7 +256,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roleType
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -302,7 +306,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 		if(isset($diff[$nameField])) {
 			$message = new Message(":user renamed the $resourceKind :oldname to :newname", $icon, $href);
 
-			$msgr->broadcastToCategory($categoryId, $message, "$resourceKind.$resourceId.renamed", Logger::INFO, array(
+			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.renamed", Logger::INFO, array(
 				'user'    => array($effectorName, "/search/user/$effectorId"),
 				'oldname' => $diff[$nameField][1],
 				'newname' => array($categoryName, "/homepage/$categoryId")
@@ -316,7 +320,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 		if(isset($diff[$categoryField])) {
 			$message = new Message(":user moved the $resourceKind :name into :category", $icon, $href);
 
-			$msgr->broadcastToCategory($categoryId, $message, "$resourceKind.$resourceId.moved", Logger::INFO, array(
+			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.moved", Logger::INFO, array(
 				'user'     => array($effectorName, "/search/user/$effectorId"),
 				'name'     => $resourceName,
 				'category' => array($categoryName, "/homepage/$categoryId")
@@ -334,7 +338,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 				"/homepage/$categoryId"
 			);
 
-			$msgr->broadcastToCategory($categoryId, $message, "$resourceKind.$resourceId.updated", Logger::INFO, array(
+			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.updated", Logger::INFO, array(
 				'user' => array($effectorName, "/search/user/$effectorId"),
 				'name' => array($categoryName, "/homepage/$categoryId")
 			), array(
@@ -347,7 +351,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
 	 */
@@ -355,7 +359,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 	/**
 	 * @param string $roletype
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
 	 */
@@ -365,7 +369,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/* ASYNC METHODS */
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -374,7 +378,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -384,7 +388,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -393,7 +397,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -402,7 +406,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -412,7 +416,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -421,7 +425,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */
@@ -430,7 +434,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Messenger
@@ -440,7 +444,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	}
 
 	/**
-	 * @param Category|File|Link $resource
+	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @return Messenger
 	 */

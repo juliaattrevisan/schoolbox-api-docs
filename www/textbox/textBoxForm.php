@@ -17,19 +17,20 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 		error(19);
 	}
 
-	$textBox = array(
-		'categoryID' => $_POST['categoryID'],
-		'heading' => $_POST['textBoxHeading'],
-		'body' => $_POST['textBoxBody'],
-	);
+	$textbox = new \Schoolbox\Resource\Textbox();
+
+	$textbox
+		->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
+		->setHeading($_POST['textBoxHeading'])
+		->setBody($_POST['textBoxBody'])
+		->setDeleted(false);
 
 	if (is_numeric($_POST['textBoxID'])) {
-		$textBox['textBoxID'] = $_POST['textBoxID'];
-		$textBoxHandler->update($textBox);
+		$textbox->setId($_POST['textBoxID']);
 	}
-	else {
-		$textBox['textBoxID'] = $textBoxHandler->create($textBox);
-	}
+
+	$affected = \Schoolbox\Resource\TextboxMapper::getInstance()->save($textbox);
+	$textbox->setId($affected[0]);
 
 	// select this textBox
     $cim = Component_InstanceMapper::getInstance();
@@ -42,23 +43,25 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
     $config
         ->setInstanceId($instance->getId())
         ->setConfigDefinitionId($instance->getConfig('textbox')->getBy('key', 'textbox')->getId())
-        ->setValue($textBox['textBoxID']);
+        ->setValue($textbox->getId());
     $ccm->save($config);
 
     SitePage::localRedir('/homepage/' . $_POST['originID']);
 }
 else if (is_numeric($_GET['delete'])) {
-	$textBox = $textBoxHandler->getByID($_GET['delete']);
-
-	if (!is_array($textBox)) {
+	try {
+		$textbox = \Schoolbox\Resource\TextboxMapper::getInstance()->findById($_GET['delete']);
+	}
+	catch(\Schoolbox\Mapper\Exception $e) {
 		error(2);
+		exit;
 	}
 
-	if ($groupHandler->getPermission($textBox['categoryID']) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($textbox->getCategory()->getId()) < WRITE_ACCESS) {
 		error(8);
 	}
 
-	$textBoxHandler->delete($_GET['delete']);
+	\Schoolbox\Resource\TextboxMapper::getInstance()->delete($textbox);
 
 	SitePage::localRedir('/homepage/' . $_GET['originID']);
 }
