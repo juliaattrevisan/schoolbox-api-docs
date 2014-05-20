@@ -19,6 +19,9 @@ set -e
 
 case "$1" in
     configure)
+        # start logging
+        date >> /var/log/schoolbox/upgrade.log;
+        echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
         # Test whether a2enmod is available (and thus also apache2ctl).
         if [ -x /usr/sbin/a2enmod ]; then
             # Enable the Apache2 rewrite module if not already enabled
@@ -31,16 +34,16 @@ case "$1" in
             chown root:www-data /etc/schoolbox/conf.php;
             chmod 0644 /etc/schoolbox/conf.php;
         fi
-        chown -R alaress:alaress /usr/share/schoolbox;
-        /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox;
-        cp -f /usr/share/schoolbox/tools/browsercap-cache.php /var/lib/schoolbox/files/cache.php;
-        /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox;
-        /usr/share/schoolbox/tools/update-sql.sh;
-        /usr/share/schoolbox/tools/clean-cache-dir.sh;
-        service apache2 restart;
-        service schoolbox-scheduled restart;
-        service schoolbox-socketd restart;
-        service schoolbox-digestd restart;
+        chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        cp -f /usr/share/schoolbox/tools/browsercap-cache.php /var/lib/schoolbox/files/cache.php 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        service apache2 restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        service schoolbox-scheduled restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        service schoolbox-socketd restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        service schoolbox-digestd restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

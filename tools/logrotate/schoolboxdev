@@ -20,6 +20,14 @@
 	compress
 }
 
+/var/log/schoolboxdev/upgrade.log {
+	monthly
+	missingok
+	rotate 6
+	compress
+}
+
+
 /var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log {
 	weekly
 	missingok
