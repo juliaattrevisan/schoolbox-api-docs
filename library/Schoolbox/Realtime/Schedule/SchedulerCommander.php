@@ -192,6 +192,7 @@ class SchedulerCommander extends AbstractCommander {
 			/** @var User $user */
 			$result = $result && $this->bindUser($scheduler, $user->getId());
 		}
+		$this->adviseReload();
 		return $result;
 	}
 
