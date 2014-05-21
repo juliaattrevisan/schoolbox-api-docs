@@ -662,12 +662,15 @@ class StudentReportCard {
 	 * @return array
 	 */
 	protected function outputDueWorkRow(SubmissionBox $box, $marks) {
+		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workType = $workTypeMapper->findById($box->getWorkType()->getId());
+
 		$due = new \Alaress_Date_Relative($box->getDueDate());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
 			'WORK_TITLE'   => $box->getName(),
 			'WORK_ID'      => $box->getId(),
-			'WORK_TYPE'    => $box->getWorkType()->getName(),
+			'WORK_TYPE'    => $workType->getName(),
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
@@ -736,6 +739,9 @@ class StudentReportCard {
 	 * @return array
 	 */
 	protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks) {
+		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workType = $workTypeMapper->findById($oa->getWorkType()->getId());
+
 		// marks are contained inside a single-element array, pull it out of itself
 		$marks = $marks[0];
 
@@ -744,7 +750,7 @@ class StudentReportCard {
 		$output = array(
 			'WORK_TITLE'   => $oa->getTitle(),
 			'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),
-			'WORK_TYPE'    => $oa->getWorkType()->getName(),
+			'WORK_TYPE'    => $workType->getName(),
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
