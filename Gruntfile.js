@@ -25,9 +25,6 @@ module.exports = function(grunt) {
             continue;
         }
         var cssDir = matches[1];
-        if (cssDir === 'core') {
-            continue;
-        }
         watchTasks[cssDir] = {
             options: {
                 interrupt: true,
@@ -40,7 +37,7 @@ module.exports = function(grunt) {
             files: [{
                 expand: true,
                 cwd: 'www/css',
-                src: [cssDir+'/{chrome,mchrome}.less'],
+                src: [cssDir+'/{chrome,mchrome,print}.less'],
                 dest: 'www/css/',
                 ext: '.css'
             }]
@@ -115,7 +112,7 @@ module.exports = function(grunt) {
         },
         clean: {
             js: ['www/javascript/components/schoolbox.{min,map}.js'],
-            css: ['www/css/*/{chrome,mchrome}.css']
+            css: ['www/css/*/{chrome,mchrome,print}.css']
         },
         less: buildTasks,
         watch: watchTasks

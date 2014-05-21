@@ -8562,16 +8562,6 @@ tr span.leave-pending {
     display: none;
 }
 
-@media print {
-    .leaveReportNoPrint {
-        display: none;
-        width: 0;
-        padding: 0;
-        overflow: hidden;
-        border: 0;
-    }
-}
-
 .homepage .active {
     background: @lgrey;
 }
@@ -10420,113 +10410,6 @@ table img { max-width: none; }
   #subject-graph      { height: 250px;
                         margin: 20px 0;
   }
-}
-
-@media print {
-/*********** CALENDAR WEEK VIEW
-******************************/
-
-	@page {size:landscape}
-
-	body{font-family:Arial, Helvetica, sans-serif;font-size:10px !important;}
-	#container{margin:0; width:100% !important; }
-	#calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
-	#calendar { height:100%; }
-	#calendar .table { vertical-align:top; font-size:10px; width:100%;}
-	#calendar .table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
-	#calendar .table td.dark{padding:4px; text-align:center; background-color:@black }
-
-	#nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created,
-	.calendar-controls .float-left, .calendar-controls .float-right
-	{display:none;}
-	.cal-mid h3{font-size:16px !important; font-weight:bold; margin-bottom:16px;}
-	.cal-bubble{display:none;}
-	.day-num{display:block; }
-	.day-block{border-right:1px solid @std-grey; width:14.2%;}
-	.otherMonth{background-color:black}
-	.day-block ul.js_happening{margin:0;margin-top:3px; padding:0; display:block;font-size:10px}
-	.calendar-controls h3{float:none;}
-	.day-block ul.js_happening li{
-		display:block;
-		padding:3px;
-		margin:0;
-	}
-
-	.clearfix:after {
-		display:none;
-	}
-
-	.dayWrap{height:auto; display:block;padding:3px;border:1px solid @black; border-left:0; border-right:0;}
-	.otherMonth .dayWrap{border-color:@std-grey;}
-	.day-block ul.js_happening li span{display:none}
-	.day-block ul.js_happening li h4 span.time{display:block;font-size:10px !important;}
-	.calTable, .calTableCurrent{}
-	.time{ font-weight:bold; }
-	.hidden-fields{display:block;font-size:10px !important;border:1px solid @dgrey;padding:4px; margin:0;}
-	.otherMonth .hidden-fields{border:1px dashed @std-grey}
-	p, li{margin:0;}
-	.meta, .modify-event{display:none;}
-	.noteWrap{display:block;  margin:0;}
-	h1, h2, h3, h4, h5, h6 {
-		font-weight: normal;
-		margin: 0;
-		position: relative;
-		width:100%;
-		font-size:10px;
-	}
-	h3{font-size:16px;}
-	h4{font-size:10px;}
-
-
-	/*********** DIRECTORY (PARENT AND STUDENT)
-	******************************/
-	.directory h1{
-		font-size:16px;
-		font-weight:bold;
-		border-bottom: 2px double black;
-	}
-
-	.directory h2{
-		font-size:12px;
-		padding:4px;
-		border-bottom:1px black solid;
-	}
-
-	.directory .private h2:after{
-		content: '    *Details have not been made available';
-		font-size:10px;
-		color:@lgrey;
-	}
-	.directory .contact {
-		page-break-inside: avoid;
-		margin-bottom:0px;
-	}
-
-	.directory .contact table{border-collapse: collapse;}
-	.directory .contact{ margin-bottom:16px; float:left; width:100%;}
-	.directory .contact td{border:1px solid @lgrey;}
-	.directory .primary,
-	.directory .spouse{
-		float:left;
-		width:45%;
-		margin:8px 8px 0 8px;
-		padding-bottom:4px;
-	}
-
-	/*********** SORTABLE TABLES (incl leave report)
-	******************************/
-	#letterhead img {
-		position:absolute;
-		top: 0;
-		left: 0;
-		height: 120px;
-		width:95px;
-	}
-
-	.leave-pending {
-		color: @std-grey;
-		font-style: italic;
-	}
 }
 
 /*
