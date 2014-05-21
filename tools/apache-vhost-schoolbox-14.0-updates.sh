@@ -4,15 +4,28 @@ fullpath=${filepath%/*};
 instdir=`readlink -f $fullpath/../`;
 package=${instdir##*/};
 
-for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,-*} | grep -v dav`;
+for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,.conf,-*} 2>/dev/null`;
+do
+	# Check if already updated
+	if [ `grep '512M' $vhost | wc -l` -gt 0 ];
+	then
+		echo "Fixing upload max size: $vhost";
+		sed -i 's/512M/1024M/g' $vhost;
+	fi
+done
+
+for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,.conf,-*} 2>/dev/null | grep -v dav`;
 do
 	# Check if already updated
 	if [ `grep 'favicon.ico.php' $vhost | wc -l` -eq 0 ];
 	then
+		echo "Fixing favicon: $vhost";
 		sed -i 's/# Force SSL/\n        RewriteCond \%\{REQUEST_URI\} \^\/favicon.ico\$\n        RewriteRule \^(.*)\$ \/favicon.ico.php [L,R=301]\n\n        # Force SSL/g' $vhost;
 	fi
+
 	if [ `grep '^/login' $vhost | wc -l` -eq 0 ];
 	then
+		echo "Fixing SSL'd areas: $vhost";
 		vfile=$vhost;
 		tfile="/tmp/vhostfix";
 		tempfile="/tmp/apache-vhost-test";
@@ -31,8 +44,8 @@ do
 		wcfile=`wc -l $tfile| awk {'print $1'}`;
 		if [ $pline -eq 0 ];
 		then
-			echo "Unable to locate 'RewriteCond %{REQUEST_URI} ^/$'";
-			exit 1;
+			echo "Unable to locate 'RewriteCond %{REQUEST_URI} ^/$' in: $vhost";
+			exit 0;
 		else
 			head -n `expr $tline - 1` $tfile > $tempfile;
 			echo "        $ishash""RewriteCond %{REQUEST_URI} ^/login [OR]" >> $tempfile;
@@ -56,8 +69,8 @@ do
 		wcfile=`wc -l $tfile| awk {'print $1'}`;
 		if [ $pline -eq 0 ];
 		then
-			echo "Unable to locate 'RewriteCond %{REQUEST_URI} !^/$'";
-			exit 1;
+			echo "Unable to locate 'RewriteCond %{REQUEST_URI} !^/$' in: $vhost";
+			exit 0;
 		else
 			head -n `expr $tline - 1` $tfile > $tempfile;
 			echo "        $ishash""RewriteCond %{REQUEST_URI} !^/login" >> $tempfile;
