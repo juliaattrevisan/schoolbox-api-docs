@@ -75,12 +75,14 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     /* Note that Assess Descriptions can now contain html, so we decode them
 					 * and remove the html from the short description in homepage components
 					 */
+					$finishRelative = new \Alaress_Date_Relative(strtotime($currentAssess['finish']), 'U');
+
                     $this->setVar(
                         array(
                             'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
                             'ASSESS_TITLE' => Scrub::Text($currentAssess['title']),
                             'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
-                            'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
+                            'ASSESS_FINISH_DATE' => $finishRelative->getRelativeTime(),
                             'ASSESS_DESCRIPTION' => Scrub::html($currentAssess['description']),
                             'ASSESS_CREATED' => $createdTime->getRelativeTime(),
                             'ASSESS_USER_ID' => $author['uid'],
@@ -90,7 +92,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                         )
                     );
 
-                    // Tasks have no due date
+					// Tasks have no due date
                     if (isset($currentAssess['task_id'])) {
                         $this->setVar('assessDue_block', '');
                     }
