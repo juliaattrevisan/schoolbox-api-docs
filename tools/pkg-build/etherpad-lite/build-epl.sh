@@ -30,6 +30,9 @@ npm install redis;
 # Install disable chat plugin
 npm install ep_disableChat;
 
+# Install disable author name change plugin
+npm install ep_disable_change_author_name;
+
 # Add in upstart init script and logrotate
 cd $builddir/etherpad-lite-$eplver;
 cp -fR $fullpath/schoolbox-epl.conf .;
