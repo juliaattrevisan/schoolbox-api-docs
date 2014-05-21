@@ -766,7 +766,7 @@ class StudentReportCard {
 
 		$buttonStudentReview = array(
 			'WORK_BTN_HREF' => "assess/studentReview/" . $oa->getId() . '/' . $marks['section_id'] . '/' . $marks['attempt_id'] . '/' . $this->targetUserId,
-			'WORK_BTN_ICON' => 'statistics',
+			'WORK_BTN_ICON' => 'eyeball',
 			'WORK_BTN_LABEL' => 'Review'
 		);
 
