@@ -227,13 +227,13 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 					$output['UPCOMING_BUTTON_HREF'] = '/assess/attempts/' . $item['id'] . '/' . $this->userID;
 					$output['UPCOMING_UID'] = '';
 					$output['UPCOMING_BTN_ICON']  = 'list';
-					$output['UPCOMING_BTN_LABEL'] = 'See previous attempts';
+					$output['UPCOMING_BTN_LABEL'] = '';
                 }
                 else {
 					$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
 					$output['UPCOMING_BUTTON_HREF'] = '/assess/intro/' . $item['id'];
 					$output['UPCOMING_UID'] = '';
-					$output['UPCOMING_BTN_ICON']  = 'list';
+					$output['UPCOMING_BTN_ICON']  = 'modify';
                     $output['UPCOMING_BTN_LABEL'] = 'Sit';
                 }
             }
