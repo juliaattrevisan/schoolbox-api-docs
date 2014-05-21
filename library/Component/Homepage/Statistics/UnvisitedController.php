@@ -130,6 +130,9 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
 					'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
 					'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i]),
 					'VISITOR_GROUP' => $this->unvisitors[$i]['gname'],
+					'VISITOR_TOOLTIP' => sprintf(
+						"%s", $userHandler->formatName($this->unvisitors[$i])
+					)
 				));
 				
                 $this->parse('unvisitor_block', 'unvisitor', true);
