@@ -670,24 +670,30 @@ class External_Maze_User implements External_UserInterface {
 		 */
 		$subjectList = array();
 
+		$processedIds = array();
+
 		/* Format it in a schoolbox-friendly way
+		 * Also uniqueify this list
 		 */
 		if (is_array($allSubjects) && count($allSubjects)) {
 			foreach($allSubjects as $currentSubject) {
+				if (!in_array($currentSubject['ClassCode'], $processedIds)) {
+					if (strlen($currentSubject['ClassNumber'])) {
+						$classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
+					}
+					else {
+						$classCode = $currentSubject['ClassCode'];
+					}
 
-				if (strlen($currentSubject['ClassNumber'])) {
-					$classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
-				}
-				else {
-					$classCode = $currentSubject['ClassCode'];
-				}
+					$subjectList[] = array(
+						'code' => $classCode,
+						'name' => $currentSubject['name'],
+						'classType' => $currentSubject['classType'],
+						'campusCode' => $currentSubject['ClassCampus']
+					);
 
-				$subjectList[] = array(
-					'code' => $classCode,
-					'name' => $currentSubject['name'],
-					'classType' => $currentSubject['classType'],
-					'campusCode' => $currentSubject['ClassCampus']
-				);
+					$processedIds[] = $currentSubject['ClassCode'];
+				}
 			}
 		}
 
