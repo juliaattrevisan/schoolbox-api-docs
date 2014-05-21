@@ -12,6 +12,7 @@ legacy.css
 variables.css
 mixins.css
 dr.css
+print.css
 *.log
 screen.css
 vendor/
