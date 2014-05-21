@@ -24,6 +24,8 @@ class NSMapper extends Mapper {
 	const NS_WIKI           = 'wiki';
 	const NS_GROUP          = 'group';
 	const NS_CMS            = 'cms';
+	const NS_SSTREAM        = 'sstream';
+
 
 	protected function mapping() {
 		$this->hasTable('msg_namespace');

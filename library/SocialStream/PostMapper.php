@@ -9,8 +9,11 @@
  */
 
 namespace SocialStream;
+use PDO;
 use Schoolbox;
+use Schoolbox\Collection;
 use SocialStream\Post\SocialStream_Post_Factory;
+use SocialStream_Post_Abstract;
 
 class PostMapper extends Schoolbox\Mapper {
 
@@ -21,6 +24,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('socialstream_post');
+		$this->hasModuleNotifier('\\SocialStream\\PostNotifier');
 
 		$this->hasMap(array(
 			'column'     => 'post_id',
@@ -194,7 +198,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @param $homepageId
 	 * @param $start
 	 * @param $offset
-	 * @return Schoolbox\Collection
+	 * @return Collection
 	 */
 	public function findLatestForHomepage($homepageId, $start, $offset) {
 		$user_mapper = $this->getJoinMapper('user');
@@ -232,7 +236,7 @@ class PostMapper extends Schoolbox\Mapper {
 
 		/* Manually construct hierarchy of posts and their users
 		 */
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		foreach ($statement as $row) {
 			$postItem = $this->hydrate($row, 'p');
@@ -253,7 +257,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @param $homepageId
 	 * @param $end
 	 * @param $offset
-	 * @return Schoolbox\Collection
+	 * @return Collection
 	 */
 	public function findLatestForHomepageSlow($homepageId, $end, $offset) {
 		$user_mapper = $this->getJoinMapper('user');
@@ -279,7 +283,7 @@ class PostMapper extends Schoolbox\Mapper {
 
 		/* Manually construct hierarchy of posts and their users
 		 */
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		foreach ($statement as $row) {
 			$postItem = $this->hydrate($row, 'p');
@@ -321,7 +325,7 @@ class PostMapper extends Schoolbox\Mapper {
 
 		/* Manually construct hierarchy of posts and their users
 		 */
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		foreach ($statement as $row) {
 			$postItem = $this->hydrate($row, 'p');
@@ -339,7 +343,7 @@ class PostMapper extends Schoolbox\Mapper {
 	 * Spawn a subclass of SocialStream_Post_Abstract
 	 *
 	 * @param $row
-	 * @return object
+	 * @return SocialStream_Post_Abstract
 	 */
 	public function createModel($row) {
 		$factory = new \SocialStream\Post\Factory\Display($row['p.type']);
@@ -373,5 +377,36 @@ class PostMapper extends Schoolbox\Mapper {
 		}
 
 		return $model;
+	}
+
+
+	/**
+	 * Returns a collection of posts that are immediate children of the given post
+	 *
+	 * @param SocialStream_Post_Abstract $post
+	 * @return Collection|SocialStream_Post_Abstract[]
+	 */
+	public function findChildren($post) {
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('p')}
+			FROM
+				`{$this->getTable()}` p
+			WHERE p.parent_id = :pid
+			AND p.deleted_at IS NULL
+		");
+
+		$stmt->execute(array(
+			'pid' => $post->getPostId()
+		));
+
+		$collection = new Collection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$collection->add($this->createModel($r));
+		}
+
+		return $collection;
 	}
 }

@@ -65,12 +65,34 @@ class UserAccessMapper extends Mapper {
 
 	}
 
+
+	/**
+	 * @param Category $category
+	 * @param bool $includeSynergy
+	 * @return Collection|User[]
+	 */
+	public function findStaffInCategory($category, $includeSynergy = true) {
+		return $this->findUsersInCategory($category, Role::STAFF, $includeSynergy);
+	}
+
+
 	/**
 	 * @param Category $category
 	 * @param bool $includeSynergy
 	 * @return Collection|User[]
 	 */
 	public function findStudentsInCategory($category, $includeSynergy = true) {
+		return $this->findUsersInCategory($category, Role::STUDENT, $includeSynergy);
+	}
+
+
+	/**
+	 * @param Category $category
+	 * @param string $roleType
+	 * @param bool $includeSynergy
+	 * @return Collection|User[]
+	 */
+	public function findUsersInCategory($category, $roleType, $includeSynergy = true) {
 		// union 3 sources: userAccess, and if synergy, external class and external user
 
 		// TODO get rid of these
@@ -99,7 +121,7 @@ class UserAccessMapper extends Mapper {
 			'service'   => UserAccess::SERVICE_HOMEPAGE,
 			'serviceId' => $category->getId(),
 			'minAccess' => UserAccess::ACCESS_READ,
-			'roleType'  => Role::STUDENT
+			'roleType'  => $roleType
 		));
 
 		$userCollection = $this->createCollection();
@@ -119,13 +141,23 @@ class UserAccessMapper extends Mapper {
 		// including synergy: intersect the existing collection with synergy-based collections
 
 		// start with a list of students in this category
-		$studentArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($category->getCodeString()) ?: array();
+		switch($roleType) {
+			case Role::STUDENT:
+				$classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($category->getCodeString()) ?: array();
+				break;
+			case Role::STAFF:
+				$classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getTeacherName($category->getCodeString()) ?: array();
+				break;
+			default:
+				$classListArray = array();
+		}
+
 		$memberArray = $_DEPRECATED_USER_HANDLER->getAllInCategory($category->getId()) ?: array();
 
 		$synergyIdArray = array();
 
 		// index by synid
-		foreach($studentArray as $array) {
+		foreach($classListArray as $array) {
 			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
 		}
 
@@ -135,7 +167,7 @@ class UserAccessMapper extends Mapper {
 
 		$extUserCollection = UserMapper::getInstance()->findByColumnList(array(
 			'synergy_id' => array_values($synergyIdArray),
-			'group_id'   => RoleMapper::getInstance()->findByColumn('group_type', Role::STUDENT)->getColumnValues('id')
+			'group_id'   => RoleMapper::getInstance()->findByColumn('group_type', $roleType)->getColumnValues('id')
 		));
 
 		// merge the two collections
