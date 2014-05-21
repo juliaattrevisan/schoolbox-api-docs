@@ -94,6 +94,13 @@ class Mapper implements Serializable {
 	protected $model;
 
 	/**
+	 * Class name of the module notifier to associate with this mapper.
+	 *
+	 * @var string
+	 */
+	protected $moduleNotifier;
+
+	/**
 	 * @var MappingCollection
 	 */
 	protected $map;
@@ -792,6 +799,14 @@ class Mapper implements Serializable {
 		return $this->model;
 	}
 
+
+	/**
+	 * @return string
+	 */
+	public function getModuleNotifier() {
+		return $this->moduleNotifier;
+	}
+
 	/**
 	 * Retrieves identifier for this mapper.
 	 *
@@ -1340,6 +1355,15 @@ class Mapper implements Serializable {
 
 		$this->model = $model;
 
+		return true;
+	}
+
+	protected function hasModuleNotifier($classname) {
+		if (!is_string($classname) || !class_exists($classname, true)) {
+			return false;
+		}
+
+		$this->moduleNotifier = $classname;
 		return true;
 	}
 
