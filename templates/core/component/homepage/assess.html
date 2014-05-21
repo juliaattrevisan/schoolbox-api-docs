@@ -35,7 +35,12 @@
 			<!-- END assessNoLink -->
 
 			<!-- BEGIN assessDue -->
-			<p class="meta">Due {ASSESS_FINISH_DATE}</p>
+			<p class="meta">
+				<span class="grade">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
+				<!-- BEGIN assess_finish_date -->
+				on {ASSESS_FINISH_DATE}
+				<!-- END assess_finish_date -->
+			</p>
 			<!-- END assessDue -->
 
 			<div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>

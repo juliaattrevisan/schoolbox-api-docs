@@ -36,6 +36,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'assessLink', 'assessLink_block');
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
         $this->setBlock('assess', 'assessDue', 'assessDue_block');
+		$this->setBlock('assessDue', 'assess_finish_date', 'assess_finish_date_block');
 	    $this->setBlock('assess', 'studentLink', 'studentLink_block');
 		$this->setBlock('assess', 'has_previous_attempts', 'has_previous_attempts_block');
 
@@ -82,7 +83,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
                             'ASSESS_TITLE' => Scrub::Text($currentAssess['title']),
                             'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
-                            'ASSESS_FINISH_DATE' => $finishRelative->getRelativeTime(),
+                            'ASSESS_FINISH_RELATIVE_DATE' => $finishRelative->getRelativeTime(),
                             'ASSESS_DESCRIPTION' => Scrub::html($currentAssess['description']),
                             'ASSESS_CREATED' => $createdTime->getRelativeTime(),
                             'ASSESS_USER_ID' => $author['uid'],
@@ -92,12 +93,36 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                         )
                     );
 
+					/* Use an additional date if finish date not yet reached
+					 */
+					$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+					$finish = new \Alaress_Date_Format(strtotime($currentAssess['finish']), 'U');
+
+					if ($now->getUnixTimestamp() < $finish->getUnixTimestamp()) {
+						$this->setVar(array(
+							'ASSESS_FINISH_DATE' => $finish->getShort()
+						));
+
+						$this->parse('assess_finish_date_block', 'assess_finish_date');
+					}
+					else {
+						$this->setVar(array(
+							'assess_finish_date_block' => ''
+						));
+					}
+
 					// Tasks have no due date
                     if (isset($currentAssess['task_id'])) {
                         $this->setVar('assessDue_block', '');
                     }
                     else {
                         $this->parse('assessDue_block', 'assessDue');
+
+						/* Clear children after parsing out the parent
+						 */
+						$this->setVar(array(
+							'assess_finish_date_block' => ''
+						));
                     }
 
                     // Only show results link if this assessment isn't a task,
