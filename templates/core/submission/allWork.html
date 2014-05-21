@@ -143,6 +143,12 @@
     opacity: 0.5;
   }
 
+  /* Vincent: some weird inconsistency
+   */
+  label.error {
+  	padding-left: 32px;
+  }
+
 </style>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
@@ -527,7 +533,7 @@ $j(function () {
 			var commentId = $(form).find('input[name=commentId]').val();
 
 			var data = {
-				commentId: $(form).find('input[name=commentId]').val(),
+				commentId: commentId,
 				commentBody: $(form).find('textarea').val(),
 				studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
 				parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
