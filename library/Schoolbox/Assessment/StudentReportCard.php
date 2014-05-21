@@ -701,35 +701,6 @@ class StudentReportCard {
 			$output['WORK_COMMENT']  = $marks['comment'];
 		}
 
-		// if the viewing user does not have permission to submit, blank out the actions
-		if(!$this->checkPermission(self::CAN_SUBMIT)) {
-		}
-        // is the box still open?
-        elseif($box->getLateDate()->getUnixTimestamp() > time()) {
-            // can potentially submit
-
-            // is work already submitted?
-            if($marks['attempts'] > 0) {
-                // work submitted
-
-                // is this multisubmit?
-                if($box->getAcceptMultiple()) {
-                    // is multi: offer REsubmission
-					$output['buttons'][] = $buttonResubmit;
-                }
-                else {
-                    // is single-submit: offer no action
-                }
-            }
-            else {
-                // work not submitted: offer submission
-				$output['buttons'][] = $buttonSubmit;
-            }
-        }
-        else {
-            // cannot submit: offer no action
-        }
-
 		return $output;
 	}
 
@@ -779,38 +750,13 @@ class StudentReportCard {
 
             // has the student attempted?
             if($marks['attempts'] > 0) {
-                // student has attempted at least once
-
-                // does the student have attempts left?
-                if($oa->getMaxAttempts() == 0 || $oa->getMaxAttempts() > $marks['attempts']) {
-
-					/* Offer review for a previous attempt
-					 * Offer list of previous attempts
-					 */
-					if ($marks) {
-						$output['buttons'][] = $buttonStudentReview;
-					}
-
-					$output['buttons'][] = $buttonSeePreviousAttempts;
-                }
-                else {
-                    // no attempts remaining: offer no action
-					$output['buttons'][] = $buttonSeePreviousAttempts;
-
-					if ($marks) {
-						$output['buttons'][] = $buttonStudentReview;
-					}
-                }
+				$output['buttons'][] = $buttonSeePreviousAttempts;
             }
         }
         else {
             // is closed: offer no action
 			if($marks['attempts'] > 0) {
 				$output['buttons'][] = $buttonSeePreviousAttempts;
-			}
-
-			if ($marks) {
-				$output['buttons'][] = $buttonStudentReview;
 			}
         }
 
