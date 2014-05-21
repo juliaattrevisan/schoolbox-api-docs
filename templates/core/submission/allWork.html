@@ -506,23 +506,29 @@ $j(function () {
 
 	/* Standardise both forms
 	 */
-	$(document).on('submit', '#create-comment, form.edit-comment', function() {
+	$(document).on('submit', '#create-comment, form.edit-comment', function(eventObject) {
 		event.preventDefault();
 
-		/* Prevent empty comment
+		var form = $(eventObject.target);
+
+		/* Don't use submitHandler in here, because that forces you to double-click
+		 * to actually perform an action - so do it programatically
 		 */
-//		if (!$(this).find('textarea').val().length) {
-//			alert('Comment cannot be blank.');
-//		}
-//		else {
+		$(form).validate({
+			rules: {
+				comment: 'required'
+			}
+		});
+
+		if ($(form).valid()) {
 
 			/* Will be empty if creating (nonexistent)
 			 */
-			var commentId = $(this).find('input[name=commentId]').val();
+			var commentId = $(form).find('input[name=commentId]').val();
 
 			var data = {
-				commentId: $(this).find('input[name=commentId]').val(),
-				commentBody: $(this).find('textarea').val(),
+				commentId: $(form).find('input[name=commentId]').val(),
+				commentBody: $(form).find('textarea').val(),
 				studentVisibility: $('#vis-student-' + commentId).is(':checked') ? 1 : 0,
 				parentVisibility: $('#vis-parent-' + commentId).is(':checked') ? 1 : 0
 			};
@@ -550,13 +556,9 @@ $j(function () {
 				success: function (data, responseText, xhr) {
 					// later this will be a nice ajax visual update, but for now just reload the page
 					window.location.reload();
-				},
-				error: function (xhr) {
-					// inform the user that it failed
-					alert(xhr.responseText);
 				}
 			});
-//		}
+		}
 
 		return false;
 	});
