@@ -86,8 +86,7 @@ if (is_numeric($_GET['id'])) {
             $showcase = Eportfolio\ShowcaseMapper::getInstance()->findOneByColumn('submission_box_id',$studentSub->getSubmissionBox()->getId());
             $published = true;
         }
-        catch (Schoolbox\Mapper\Exception $e) {
-            $published = false;
+        catch (Schoolbox\Mapper\Exception $e) {$published = false;
         }
 
         //Check if staff has permission
@@ -131,6 +130,7 @@ if (is_numeric($_GET['id'])) {
 			$wrapper->loadBaseHrefFromServerVars($_SERVER);
 			$contents = $wrapper->render();
 			$size     = strlen($contents);
+
 			if ($size === 0) {
 				error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
 			}
@@ -156,12 +156,27 @@ if (is_numeric($_GET['id'])) {
         echo $contents;
     }
     elseif (is_readable($file)) {
-        if (empty($size)) {
-            $size = filesize($file);
-        }
-        header ("Content-Length: ".$size);
-        readfile($file);
+
+		/* Scrub it, if option is specified in the querystring
+		 */
+		if ($_GET['scrub'] == 1) {
+			$contents = Scrub::html(file_get_contents($file));
+			$size = strlen($contents);
+
+			header ("Content-Length: ".$size);
+			echo $contents;
+			exit();
+		}
+		else {
+			if (empty($size)) {
+				$size = filesize($file);
+			}
+
+			header ("Content-Length: ".$size);
+			readfile($file);
+		}
     }
+
 	die(); // just in case
 }
 else {
