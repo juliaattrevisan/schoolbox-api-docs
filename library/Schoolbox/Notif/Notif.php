@@ -157,27 +157,40 @@ class Notif implements LoggerInterface {
 	protected function getHandlers() {
 		$stack = array();
 
+		$mailfrom = array(
+			$this->conf->get('mail_from_address'),
+			$this->conf->get('mail_from_name')
+		);
+
 		// [0] top priority: system failure
 		if(!isset($this->handlers['fatalMailer'])) {
 			$this->handlers['fatalMailer'] = $this->createMailHandler('Schoolbox is Down',
-				$this->conf->get('mail_support_address'), array('notif@alaress.com.au', $this->conf->get('title')),
-				Logger::EMERGENCY
+				$this->conf->get('mail_support_address'), $mailfrom, Logger::EMERGENCY, true
 			);
 		}
 
 		array_push($stack, $this->handlers['fatalMailer']);
 
+		if(!isset($this->handlers['fatalLogger'])) {
+			$this->handlers['fatalLogger'] = new StreamHandler(STDERR, Logger::EMERGENCY, false);
+		}
+
+		array_push($stack, $this->handlers['fatalLogger']);
 
 		// [1] system warning
 		if(!isset($this->handlers['sysMailer'])) {
 			$this->handlers['sysMailer'] = $this->createMailHandler('Schoolbox Requires Your Attention',
-				$this->conf->get('mail_support_address'), array('notif@alaress.com.au', $this->conf->get('title')),
-				Logger::ALERT
+				'webmaster+schoolboxnotif@alaress.com.au', $mailfrom, Logger::ALERT, true
 			);
 		}
 
 		array_push($stack, $this->handlers['sysMailer']);
 
+		if(!isset($this->handlers['sysLogger'])) {
+			$this->handlers['sysLogger'] = new StreamHandler(STDERR, Logger::ALERT, false);
+		}
+
+		array_push($stack, $this->handlers['sysLogger']);
 
 		// [2] exception warning (only is NewRelic isn't loaded)
 		if(extension_loaded('newrelic')) {
@@ -186,8 +199,7 @@ class Notif implements LoggerInterface {
 		else {
 			if(!isset($this->handlers['exceptionMailer'])) {
 				$this->handlers['exceptionMailer'] = $this->createMailHandler('Uncaught Exception in Schoolbox',
-					'matt.day+support@alaress.com.au', array('notif@alaress.com.au', $this->conf->get('title')),
-					Logger::CRITICAL
+					'webmaster+schoolboxnotif@alaress.com.au', $mailfrom, Logger::CRITICAL
 				);
 			}
 
