@@ -13,4 +13,4 @@ SELECT src.id `msg_source_id`, g.id `role_id`,            200 `min_level`, 300 `
 FROM msg_source src
 LEFT JOIN groups g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'sstream')
-AND role_type IN ('student', 'staff')
+AND role_type IN ('student', 'staff');
