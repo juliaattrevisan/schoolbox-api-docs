@@ -7,7 +7,6 @@
             secure:    'false',
             host:      '192.168.1.1',
             port:      '8080',
-            sslport:   '8081',
             path:      '/',
 
             counter:   '#go-msg',
@@ -354,7 +353,7 @@
                 + '://'
                 + settings.host
                 + ':'
-                + (settings.secure ? settings.sslport : settings.port )
+                + settings.port
                 + settings.path;
             var conn;
             var messages = {};
