@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Scheduler\Event\EventInterface;
+use Schoolbox\Mapper;
 use Schoolbox\User;
 
 class Event implements EventInterface {
@@ -25,6 +26,9 @@ class Event implements EventInterface {
     /** @var object */
     protected $object;
 
+	/** @var Mapper */
+	protected $mapper;
+
     /** @var array|null */
     protected $diff;
 
@@ -33,12 +37,14 @@ class Event implements EventInterface {
      * @param User $subject
      * @param string $verb
      * @param object $object
+     * @param Mapper $mapper
      * @param array $diff
      */
-    function __construct($subject, $verb, $object, $diff = null) {
+    function __construct($subject, $verb, $object, $mapper, $diff = null) {
         $this->effector = $subject;
         $this->action   = $verb;
         $this->object   = $object;
+	    $this->mapper   = $mapper;
         $this->diff     = $diff;
     }
 
@@ -71,6 +77,14 @@ class Event implements EventInterface {
     public function getObject() {
         return $this->object;
     }
+
+
+	/**
+	 * @return Mapper
+	 */
+	public function getMapper() {
+		return $this->mapper;
+	}
 
 
     /**

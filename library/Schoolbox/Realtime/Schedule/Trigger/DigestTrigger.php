@@ -25,7 +25,7 @@ class DigestTrigger extends RecurringTrigger {
 	 * @param Role $role
 	 */
 	function __construct($schedule, $role) {
-		parent::__construct($role->getName(), $schedule, new Event(null, '', $role));
+		parent::__construct($role->getName(), $schedule, new Event(null, '', $role, null));
 		$this->notifier = new MailNotifier();
 	}
 

@@ -18,8 +18,9 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Event;
+use Serializable;
 
-class Mapper {
+class Mapper implements Serializable {
 	/**
 	 * Represents a boolean data type.
 	 */
@@ -1263,6 +1264,7 @@ class Mapper {
 					$this->sessionData['user'],
 					$pdoMethods[$i],
 					$model,
+					$this,
 					$previous ? $this->diff($model, $previous) : null
 				);
 
@@ -1930,5 +1932,29 @@ class Mapper {
 		return $diff;
 
 	}
+
+
+	/**
+	 * String representation of object
+	 *
+	 * @return string the string representation of the object or null
+	 */
+	public function serialize() {
+		// we don't need to serialize anything other than the name of the class
+		return '';
+	}
+
+
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		// don't need to do anything but run the constructor
+		$this->__construct();
+	}
+
 
 }
