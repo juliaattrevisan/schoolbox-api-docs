@@ -1,0 +1,114 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\Scheduler\Stomp;
+
+
+use Alaress\Scheduler\Trigger\TriggerInterface;
+use React\Stomp\AckResolver;
+use RuntimeException;
+use SplObjectStorage;
+
+class ResolutionManager {
+
+	/** @var SplObjectStorage|AckResolver[] */
+	protected $resolvers;
+
+	/**
+	 * Instantiate members
+	 */
+	function __construct() {
+		$this->resolvers = new SplObjectStorage();
+	}
+
+
+	/**
+	 * Attach the given trigger to the given resolver, adding the resolver first if necessary.
+	 *
+	 * @param AckResolver $resolver
+	 * @param TriggerInterface $trigger
+	 * @return bool
+	 */
+	public function attachTriggerToResolver($resolver, $trigger) {
+		$data = $this->getData($resolver);
+		$data->attach($trigger);
+		$this->setData($resolver, $data);
+	}
+
+	/**
+	 * If the final trigger of a resolver is detached, the resolver will be ACK'd and unset
+	 * Returns the resultant trigger count for the resolver to which it was attached (or -1 otherwise)
+	 *
+	 * @param TriggerInterface $trigger
+	 * @return int
+	 */
+	public function detachTrigger($trigger) {
+		// iterate the currently-stored resolvers looking for this trigger
+		foreach($this->resolvers as $resolver) {
+			/** @var SplObjectStorage|TriggerInterface[] $triggers */
+			$triggers = $this->resolvers->offsetGet($resolver);
+
+			if($triggers->contains($trigger)) {
+				$triggers->detach($trigger);
+				$this->setData($resolver, $triggers);
+
+				if($this->getTriggerCount($resolver) === 0) {
+					// detach this first, so we're not dependent on whether it resolves or not
+					$this->resolvers->detach($resolver);
+
+					try {
+						$resolver->ack();
+					}
+					catch(RuntimeException $e) {
+						// noop: this message has already been acknowledged, so we can safely drop it
+					}
+				}
+
+				return $this->getTriggerCount($resolver);
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Gets the data for the given resolver, implicitly attaching it first if necessary
+	 *
+	 * @param AckResolver $resolver
+	 * @return SplObjectStorage|TriggerInterface[]
+	 */
+	protected function getData($resolver) {
+		if(!$this->resolvers->contains($resolver)) {
+			$this->resolvers->attach($resolver, new SplObjectStorage());
+		}
+		return $this->resolvers->offsetGet($resolver);
+	}
+
+	/**
+	 * @param AckResolver $resolver
+	 * @param SplObjectStorage|TriggerInterface[] $triggers
+	 */
+	protected function setData($resolver, $triggers) {
+		$this->resolvers->attach($resolver, $triggers);
+	}
+
+	/**
+	 * Returns the number of triggers attached to the given resolver. Does NOT implicitly attach.
+	 * Will return -1 if the resolver given is NOT attached.
+	 *
+	 * @param AckResolver $resolver
+	 * @return int
+	 */
+	public function getTriggerCount($resolver) {
+		if($this->resolvers->contains($resolver)) {
+			return $this->getData($resolver)->count();
+		}
+		return -1;
+	}
+
+} 

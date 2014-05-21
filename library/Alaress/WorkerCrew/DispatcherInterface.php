@@ -21,4 +21,10 @@ interface DispatcherInterface {
 	 */
 	public function enqueue($identifier, $command, $data);
 
+	/**
+	 * Returns the current status of the worker pool
+	 *
+	 * @return array
+	 */
+	public function getPoolStatus();
 } 

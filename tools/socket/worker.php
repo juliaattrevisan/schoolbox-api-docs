@@ -1,7 +1,10 @@
 #!/usr/bin/php
 <?php
 
-use Schoolbox\Realtime\Verboser;
+use Alaress\Cli\Debug;
+
+// this gets routed to err.log by the parent process
+error_reporting(E_ALL);
 
 /**
  * 
@@ -13,7 +16,8 @@ use Schoolbox\Realtime\Verboser;
 
 require_once "mini-bootstrap.php";
 
-$w = new \Schoolbox\Realtime\Pipe\WorkerProcess(null, new Verboser(fopen("proc_".getmypid().".log", 'w')));
+$logfile = \Schoolbox\Config\ConfigMapper::getInstance()->get('logs_dir')."/sched.worker.log";
+$w = new \Schoolbox\Realtime\Pipe\WorkerProcess(null, new Debug(fopen($logfile, 'a')));
 $w->run();
 
 // yup. that's all you need to do.

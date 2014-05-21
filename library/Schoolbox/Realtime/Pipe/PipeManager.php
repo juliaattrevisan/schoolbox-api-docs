@@ -96,7 +96,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		}
 		catch(CommunicationException $e) {
 			// couldn't talk to redis, send a retry back to the client
-			$this->v($e->getMessage(), '!');
+			$this->v("Communication Exception" . $e->getMessage(), '!');
 
 			$this->sendToPipe($pipe, json_encode(array(
 				'error' => 'Service Unavailable',

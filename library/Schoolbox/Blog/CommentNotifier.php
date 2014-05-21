@@ -21,7 +21,6 @@ use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Realtime\Verboser;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -34,6 +33,9 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	/** @var BlogMapper */
 	protected $blogMapper;
 
+	/** @var CategoryMapper */
+	protected $catMapper;
+
 	/**
 	 * Instantiate all your dependencies within yourself.
 	 *
@@ -42,6 +44,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->blogMapper = BlogMapper::getInstance();
+		$this->catMapper = CategoryMapper::getInstance();
 	}
 
 	/**
@@ -164,8 +167,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		$blog         = $this->blogMapper->findById($blogId);
 		$blogName     = $blog->getHeading();
 
-		$categoryId   = $comment->getBlog()->getCategory()->getId();
-		$category     = CategoryMapper::getInstance()->findById($categoryId);
+		$categoryId   = $blog->getCategory()->getId();
+		$category     = $this->catMapper->findById($categoryId);
 		$categoryName = $category->getName();
 
 		$msg = new Message(

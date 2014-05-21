@@ -11,6 +11,7 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Cli\Debug;
+use Alaress\Scheduler\Interactive\Interactor;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
@@ -118,6 +119,33 @@ abstract class StompScheduler extends AbstractScheduler {
 
 
     /**
+	/**
+	 * Accepts a command (from STDIN) to log data about the scheduler's current state
+	 *
+	 * @param string $data
+	 */
+	public function _stdincmd($data) {
+		$interactor = new Interactor($this);
+		$interactor->handle($data);
+	}
+
+
+	/**
+	 * Return the state-data requested
+	 *
+	 * @param array $fields
+	 * @return array
+	 */
+	public function getStatus($fields = array()) {
+		if(in_array('pool', $fields)) {
+			$status['pool'] = $this->getDispatcher()->getPoolStatus();
+		}
+
+		return $status;
+	}
+
+
+	/**
      * @return Client
      */
     protected abstract function getStompConnection();

@@ -136,4 +136,34 @@ class WorkerArray implements WorkerBundleInterface {
 		return ($a & $b) > 0;
 	}
 
-} 
+	/**
+	 * Return the status of the workers
+	 *
+	 * @return array
+	 */
+	public function getStatus() {
+		$status = array();
+
+		$list = array(
+			0x1  => 'READY',
+			0x2  => 'BUSY',
+			0x4  => 'DONE',
+			0x8  => 'ENDED',
+			0x10 => 'ERROR',
+		);
+
+		foreach($this->workers as $pid => $w) {
+			$status[$pid] = array(
+				'proc'    => $w->getCommand(),
+				'status'  => $list[$w->getStatus()],
+				'task'    => '(none)'
+			);
+			if($w->getTask() instanceof Task) {
+				$status[$pid]['task'] = $w->getTask()->getCommand();
+			}
+		}
+
+		return $status;
+	}
+
+}

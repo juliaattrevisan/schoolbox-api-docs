@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
@@ -17,9 +18,7 @@ use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Schoolbox\Realtime\Verboser;
 use SplObjectStorage;
 use UnexpectedValueException;
 
@@ -41,17 +40,22 @@ class Pool {
 	/** @var SplObjectStorage */
 	protected $listeners;
 
+	/** @var Debug */
+	protected $debug;
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param DispatchStrategyInterface $strat
+	 * @param Debug $debug
 	 */
-	public function __construct($loop, $msgHandler, $strat) {
+	public function __construct($loop, $msgHandler, $strat, $debug) {
 		$this->loop = $loop;
 		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
 		$this->listeners = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
+		$this->debug = $debug;
 	}
 
 
@@ -115,7 +119,7 @@ class Pool {
 
 		$this->workers->attach($pid, new Worker($status['command'], $pp, $pipes, $this->poolingStrat));
 
-		$this->workers->get($pid)->attachVerboser(new Verboser(fopen("proc_$pid.log",'w')));
+		$this->workers->get($pid)->attachDebug($this->debug);
 
 		// include the worker's write-stream into the react loop
 		$instream = new Stream($pipes[1], $this->loop);
@@ -153,6 +157,7 @@ class Pool {
 			$pid = $this->listeners->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
+			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
 			return;
 		}
 
@@ -161,18 +166,22 @@ class Pool {
 		// interpret the first character sent and determine the worker's state based on it
 		switch($this->poolingStrat->checkState($data)) {
 			case Worker::READY: // ready for another task
+				$this->debug->v("Worker $pid ready for new task");
 				$worker->setStatus(Worker::READY);
 				break;
 
 			case Worker::BUSY:  // data sent, but not finished yet
+				$this->debug->v("Worker $pid still working");
 				$worker->appendData($data);
 				break;
 
 			case Worker::ERROR: // still alive, but cannot accept more tasks
+				$this->debug->v("Worker $pid in error");
 				$worker->setStatus(Worker::BUSY);
 				break;
 
 			case Worker::DONE:  // job done, ready for another task
+				$this->debug->v("Worker $pid complete, ready for new task");
 				$worker
 					->appendData($data)
 					->markTaskComplete();
@@ -189,11 +198,12 @@ class Pool {
 				}
 				catch(Exception $e) {
 					// your reactor will explode if you don't catch exceptions coming from your response handler
-					$this->poolingStrat->handleException($e);
+					$this->poolingStrat->handleException($e, $this->debug);
 				}
 				break;
 
-			case Worker::ENDED: // process has closed. Not sure this will ever happen
+			case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
+				$this->debug->v("Worker $pid killed");
 				$worker->setStatus(Worker::ENDED);
 				break;
 		}
@@ -212,6 +222,18 @@ class Pool {
 		}
 
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
+	}
+
+
+	/**
+	 * Returns the current status of the pool
+	 *
+	 * @return array
+	 */
+	public function getStatus() {
+		return array(
+			'workers' => $this->workers->getStatus()
+		);
 	}
 
 

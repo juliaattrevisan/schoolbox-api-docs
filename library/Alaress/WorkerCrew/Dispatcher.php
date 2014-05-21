@@ -42,15 +42,15 @@ class Dispatcher implements DispatcherInterface {
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
-	 * @param Debug $verboser
+	 * @param Debug $debug
 	 * @param DispatchStrategyInterface $strat
 	 */
-	function __construct($loop, $msgHandler, $verboser, $strat = null) {
+	function __construct($loop, $msgHandler, $debug, $strat = null) {
 
 		$this->strat = $strat ?: new DefaultDispatchStrategy();
 
 		// pool of workers
-		$this->pool = new Pool($loop, $msgHandler, $this->strat);
+		$this->pool = new Pool($loop, $msgHandler, $this->strat, $debug);
 
 		// dispatcher depends on a react loop
 		$this->loop = $loop;
@@ -59,7 +59,7 @@ class Dispatcher implements DispatcherInterface {
 		$this->msgHandler = $msgHandler;
 
 		// for debugging output
-		$this->v = $verboser;
+		$this->v = $debug;
 
 		// build the queue, retrieving from storage if that's part of the strat, and execute if it contains stuff
 		$this->q = $this->strat->buildQueue();
@@ -170,5 +170,12 @@ class Dispatcher implements DispatcherInterface {
 			$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
 		}
 
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPoolStatus() {
+		return $this->pool->getStatus();
 	}
 } 

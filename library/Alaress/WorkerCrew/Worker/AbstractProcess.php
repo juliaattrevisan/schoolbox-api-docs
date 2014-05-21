@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
@@ -17,15 +18,9 @@ use InvalidArgumentException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
-use Schoolbox\Realtime\Verboser;
+use RuntimeException;
 
-abstract class AbstractProcess {
-
-	/** @var DispatchStrategyInterface */
-	protected $strat;
-
-	/** @var Verboser */
-	protected $v;
+abstract class AbstractProcess extends PipeWriter {
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -39,14 +34,21 @@ abstract class AbstractProcess {
 	/** @var string */
 	protected $buffer = '';
 
+	/** @var DispatchStrategyInterface */
+	protected $strat;
+
 
 	/**
 	 * @param DispatchStrategyInterface $strat
-	 * @param Verboser $verboser
+	 * @param Debug $debug
 	 */
-	public function __construct($strat = null, $verboser = null) {
-		$this->strat = $strat ?: new DefaultDispatchStrategy();
-		$this->v = $verboser ?: new Verboser(null);
+	public function __construct($strat = null, $debug = null) {
+		// cast optional args
+		$strat = $strat ?: new DefaultDispatchStrategy();
+		$debug = $debug ?: new Debug(null);
+
+		parent::__construct($strat, $debug, STDOUT);
+		$this->strat = $strat;
 
 		$this->loop = Factory::create();
 
@@ -59,6 +61,9 @@ abstract class AbstractProcess {
 	}
 
 
+	/**
+	 * Start the loop
+	 */
 	public function run() {
 		$this->loop->run();
 	}
@@ -86,14 +91,25 @@ abstract class AbstractProcess {
 
 			// if EOT received
 			if($this->strat->getProtocol()->isEnded($data)) {
-				$this->parseBuffer();
+				try {
+					$this->buffering = false;
+					$this->write($this->parseBuffer());
+					$this->debug->d("Task Complete");
+				}
+				catch(Exception $e) {
+					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
+					$this->debug->v($msg);
+					$this->write($msg, true);
+				}
 				$this->buffering = false;
 			}
 
 		}
 		catch(Exception $e) {
 			// all exceptions must be caught, otherwise the react loop explodes and this worker dies
-			$this->v->v("Worker exception: ".get_class($e)." ".$e->getMessage());
+			$msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
+			$this->debug->v($msg);
+			$this->write($msg, true);
 		}
 	}
 
@@ -107,7 +123,11 @@ abstract class AbstractProcess {
 		$this->loop->stop();
 	}
 
-
+	/**
+	 * @throws InvalidArgumentException
+	 * @throws RuntimeException
+	 * @return string
+	 */
 	protected function parseBuffer() {
 		try {
 			// split the datastring supplied
@@ -118,31 +138,24 @@ abstract class AbstractProcess {
 			}
 		}
 		catch(InvalidArgumentException $e) {
-			$this->v->v("Rejecting data '$this->buffer'", '*');
-//			ob_end_clean();
-			echo $this->strat->getProtocol()->reject();
-			return;
+			$this->debug->v("Rejecting data '$this->buffer'", '*');
+			throw $e;
 		}
 
-		// use ob_end_clean to clear any debugging printout that might have occurred while processing
-		try {
-			$response = $this->process($cmd, $args);
-//			ob_end_clean();
-			$this->v->v("Processing successful");
-			echo $this->strat->getProtocol()->flatten($response);
-			$this->v->d($response);
-			$this->v->d($this->strat->getProtocol()->flatten($response));
-		}
-		catch(Exception $e) {
-//			ob_end_clean();
-			$this->v->v(sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage()));
-			echo $this->strat->getProtocol()->reject();
-		}
+		$response = $this->process($cmd, $args);
+		$this->debug->v("Processing successful");
+		$this->debug->v("Responding with '$response'");
+		$flat = $this->strat->getProtocol()->flatten($response);
+		$this->debug->v("Flattened response: $flat");
+
+		return $flat;
 	}
 
 	/**
 	 * @param string $command
 	 * @param array $args
+	 * @throws RuntimeException
+	 * @throws InvalidArgumentException
 	 * @return mixed
 	 */
 	protected abstract function process($command, $args);

@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Cli\Debug;
+use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
@@ -36,7 +37,6 @@ use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use SplObjectStorage;
 
 /**
  * This class is meant to hold a list of notifications that are pending for broadcast, and at the appropriate time,
@@ -73,7 +73,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     /** @var Notif */
     protected $notif;
 
-    /** @var SplObjectStorage */
+    /** @var ResolutionManager */
     protected $resolvers;
 
 	/** @var Interceptor */
@@ -92,7 +92,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	    // run construction
         parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
         $this->notif = new Notif();
-	    $this->resolvers = new SplObjectStorage();
+	    $this->resolvers = new ResolutionManager();
 	    $this->interceptor = new Interceptor($this->debug, $this->loop);
 
 	    self::bindQueues();
@@ -151,7 +151,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @return void
      */
     public function onMessage($frame, $resolver) {
-	    $this->debug->v('Received message from '.INSTANCE_ID.'.'.self::QUEUE_SCHEDULE, '>');
+	    $this->debug->v('Received message from '.INSTANCE_ID.self::QUEUE_SCHEDULE, '>');
 	    try {
 
 			$formatted = CompressedFormatter::uncompress($frame->body);
@@ -179,11 +179,11 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		}
 		catch(ScheduleException $e) {
 			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-			$this->debug->v($e->getMessage(), '*');
+			$this->debug->v('Schedule Exception: ' . $e->getMessage(), '*');
 		}
 		catch(CompressionException $e) {
 			// this message is unparseable, so we'll eventually ACK it to make it go away
-			$this->debug->v($e->getMessage(), '!');
+			$this->debug->v('Compression Exception: ' . $e->getMessage(), '!');
 		}
 
 		$resolver->ack();
@@ -386,66 +386,39 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 
     /**
+     * Attach a trigger to a resolver
+     *
      * @param AckResolver $ackResolver
      * @param TriggerInterface $trigger
      */
     protected function attachResolverTrigger($ackResolver, $trigger) {
-        if($this->resolvers->contains($ackResolver)) {
-            /** @var SplObjectStorage $triggers */
-            $triggers = $this->resolvers->offsetGet($ackResolver);
-        }
-        else {
-            $triggers = new SplObjectStorage();
-        }
-        $triggers->attach($trigger);
-        $this->resolvers->attach($ackResolver, $triggers);
-	    $this->debug->v("Attached trigger, resolver contains ".$triggers->count()." triggers", '+');
+	    $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
+	    $this->debug->v("Attached trigger, resolver contains ".$this->resolvers->getTriggerCount($ackResolver)." triggers", '+');
     }
 
 
     /**
      * @param TriggerInterface $trigger
-     * @return int|null the number of triggers left on the associated resolver, or null if not found
+     * @return int the number of triggers left on the associated resolver, or -1 if not found
      */
     protected function detachTrigger($trigger) {
-        foreach($this->resolvers as $resolver) {
-            $triggers = $this->resolvers[$resolver];
+		$count = $this->resolvers->detachTrigger($trigger);
 
-            /**
-             * @var AckResolver $resolver
-             * @var SplObjectStorage $triggers
-             */
-            if($triggers->contains($trigger)) {
-                $this->debug->v("Detaching trigger from resolver", '-');
-                $triggers->detach($trigger);
-                if($triggers->count() == 0) {
-                    // this resolver's triggers have all fired, ACK the message
-                    $this->debug->v("Resolver empty, ACKnowledging", '-');
-                    $resolver->ack();
-                }
-                else {
-                    $this->debug->v('Resolver still contains ' . $triggers->count() . ' triggers');
-                }
-                return $triggers->count();
-            }
-        }
-        $this->debug->v("Trigger ". $this->generateTriggerIdString($trigger) ." not on record, nothing to detach");
+	    switch($count) {
+		    case -1:
+			    $msg = "resolver now empty; detached";
+			    break;
+		    case 0:
+			    $msg = "resolver now empty, but not detached...?";
+			    break;
+		    default:
+			    $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
+			    break;
+	    }
 
-        return null;
-    }
+	    $this->debug->v("Detaching trigger: $msg", '-');
 
-
-    /**
-     * @param AckResolver $ackResolver
-     * @return int|null
-     */
-    protected function checkResolver($ackResolver) {
-        if($this->resolvers->contains($ackResolver)) {
-            $triggers = $this->resolvers->offsetGet($ackResolver);
-            return count($triggers);
-        }
-
-        return null;
+	    return $count;
     }
 
 
@@ -457,4 +430,4 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
 	}
 
-}
+} 

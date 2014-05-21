@@ -92,4 +92,12 @@ interface WorkerBundleInterface {
 	 */
 	public function countWhere($status);
 
+
+	/**
+	 * Return the status of the workers
+	 *
+	 * @return array
+	 */
+	public function getStatus();
+
 } 

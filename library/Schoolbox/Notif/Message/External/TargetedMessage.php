@@ -11,9 +11,11 @@ namespace Schoolbox\Notif\Message\External;
 
 
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use InvalidArgumentException;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\InstantTrigger;
 use Serializable;
 
@@ -35,12 +37,13 @@ class TargetedMessage implements Serializable {
 	/** @var string */
 	protected $namespace = 'activity';
 
-    /**
-     * @param Notif $notif
-     * @param Message $body
-     * @param Instance $instance
-     * @param TriggerInterface $trigger
-     */
+	/**
+	 * @param Notif $notif
+	 * @param Message $body
+	 * @param Instance $instance
+	 * @param TriggerInterface $trigger
+	 * @throws InvalidArgumentException
+	 */
     public function __construct($notif, $body, $instance, $trigger = null) {
         $this->body = $body;
         $this->notif = $notif;
@@ -50,7 +53,13 @@ class TargetedMessage implements Serializable {
 		    if($trigger instanceof TriggerInterface) {
 			    $this->timestamp = $trigger->getTimestamp();
 			    if($trigger instanceof InstantTrigger) {
-				    $this->namespace = $trigger->getModuleNotifier()->getNamespace()->getSlug();
+				    $ns = $trigger->getModuleNotifier()->getNamespace();
+				    if($ns instanceof NS) {
+					    $this->namespace = $trigger->getModuleNotifier()->getNamespace()->getSlug();
+				    }
+				    else {
+					    throw new InvalidArgumentException("Namespace undefined for message");
+				    }
 			    }
 		    }
 	    }
