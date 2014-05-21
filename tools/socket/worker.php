@@ -16,7 +16,8 @@ error_reporting(E_ALL);
 
 require_once "mini-bootstrap.php";
 
-$w = new \Schoolbox\Realtime\Pipe\WorkerProcess(null, new Debug(fopen("proc.log", 'a')));
+$logfile = \Schoolbox\Config\ConfigMapper::getInstance()->get('logs_dir')."/sched.worker.log";
+$w = new \Schoolbox\Realtime\Pipe\WorkerProcess(null, new Debug(fopen($logfile, 'a')));
 $w->run();
 
 // yup. that's all you need to do.
