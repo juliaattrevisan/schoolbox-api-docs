@@ -338,6 +338,37 @@ class Collection implements ICollection, JsonSerializable {
 		return $this;
 	}
 
+
+	/**
+	 * Merges contents of another collection with this one where duplicate elements
+	 * are ignored. Preference is given to the collection on which the method is called.
+	 *
+	 * @param Collection $other - the second collection
+	 * @param string $column    - a column on which to test uniqueness (ie. an ID)
+	 *                            If omitted, the entire object will be tested
+	 * @return self
+	 */
+	public function mergeUnique(Collection $other, $column = null) {
+		if($column) {
+			$getColumn = $this->getGetMethodName($column);
+			$testValues = $this->getColumnValues($column);
+			foreach($other as $item) {
+				$value = $item->$getColumn();
+				if(!in_array($value, $testValues)) {
+					$this->add($item);
+				}
+			}
+		}
+		else {
+			foreach($other as $item) {
+				if(!in_array($item, $this->stack)) {
+					$this->add($item);
+				}
+			}
+		}
+		return $this;
+	}
+
 	/**
 	 * Put an object in a particular place in the stack
 	 *

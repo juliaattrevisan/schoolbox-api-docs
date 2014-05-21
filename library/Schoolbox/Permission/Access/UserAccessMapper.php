@@ -10,7 +10,15 @@
 namespace Schoolbox\Permission\Access;
 
 
+use PDO;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Category;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserAccess;
+use Schoolbox\UserMapper;
 
 class UserAccessMapper extends Mapper {
 
@@ -55,6 +63,84 @@ class UserAccessMapper extends Mapper {
 			'other_key' => 'id'
 		));
 
+	}
+
+	/**
+	 * @param Category $category
+	 * @param bool $includeSynergy
+	 * @return Collection|User[]
+	 */
+	public function findStudentsInCategory($category, $includeSynergy = true) {
+		// union 3 sources: userAccess, and if synergy, external class and external user
+
+		// TODO get rid of these
+		$_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
+		$_DEPRECATED_EXTERNAL_USER_HANDLER = new \External_User();
+		$_DEPRECATED_USER_HANDLER = new \User();
+
+		// but first, MAGIC!
+		$_DEPRECATED_EXTERNAL_USER_HANDLER->getCurrentSemester();
+
+		// acquire users from internal access definition
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getJoinColumnString('user', 'u')}
+			FROM
+				`{$this->table}` ua
+				LEFT JOIN {$this->getJoinSql('user', 'ua', 'u')}
+				LEFT JOIN groups g on u.group_id = g.id
+			WHERE ua.service = :service
+			AND ua.sid = :serviceId
+			AND ua.type >= :minAccess
+			AND g.group_type = :roleType
+		");
+
+		$stmt->execute(array(
+			'service'   => UserAccess::SERVICE_HOMEPAGE,
+			'serviceId' => $category->getId(),
+			'minAccess' => UserAccess::ACCESS_READ,
+			'roleType'  => Role::STUDENT
+		));
+
+		$userCollection = $this->createCollection();
+
+		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			// add the user represented by this row to the collection
+			$userCollection->add(
+				$this->hydrateJoin($r, 'user', 'u')
+			);
+		}
+
+		if(!$includeSynergy) {
+			// no synergy? ok, we're done here
+			return $userCollection;
+		}
+
+		// including synergy: intersect the existing collection with synergy-based collections
+
+		// start with a list of students in this category
+		$studentArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($category->getCodeString()) ?: array();
+		$memberArray = $_DEPRECATED_USER_HANDLER->getAllInCategory($category->getId()) ?: array();
+
+		$synergyIdArray = array();
+
+		// index by synid
+		foreach($studentArray as $array) {
+			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
+		}
+
+		foreach($memberArray as $array) {
+			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
+		}
+
+		$extUserCollection = UserMapper::getInstance()->findByColumnList(array(
+			'synergy_id' => array_values($synergyIdArray),
+			'group_id'   => RoleMapper::getInstance()->findByColumn('group_type', Role::STUDENT)->getColumnValues('id')
+		));
+
+		// merge the two collections
+		$extUserCollection->mergeUnique($userCollection, 'id');
+		return $extUserCollection;
 	}
 
 } 

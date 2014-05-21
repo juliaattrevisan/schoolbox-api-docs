@@ -24,6 +24,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 		$this->items = $feed->aggregate(
 			array(
 				new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+				new \Schoolbox\Assessment\Component\OnlineAssessmentNotifier($conf),
 				new \Schoolbox\Resource\Category\NewsNotifier($conf),
 				new \Schoolbox\Blog\BlogNotifier($conf),
 				new \Schoolbox\Blog\CommentNotifier($conf),
