@@ -247,6 +247,8 @@ class SitePage extends Page {
             'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
             'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
             'WEBSOCKET_PORT' => $this->getWebsocketPort(),
+	        'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
+	        'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?: '',
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 
