@@ -110,7 +110,7 @@ function getFolderMeta($folderId) {
 
 	// if it's the root node, return add-folder functions if admin
 	if($folderId == 0) {
-		$actions = $groupHandler->isSuperuser() ? array('folder', 'multi') : array();
+		$actions = $groupHandler->isSuperuser() ? array('folder') : array();
 		$folder = array(
 			'name' => 'Resources',
 			'id' => 0,
