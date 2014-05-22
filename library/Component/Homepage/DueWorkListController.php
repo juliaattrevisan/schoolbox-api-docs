@@ -153,7 +153,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
 
             // what to display if staff
-            elseif ($this->groupHandler->isSuperuser() || $this->groupHandler->isStaff()) {
+            elseif ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
                 if (!$isTask) {
                     $displayResults = true;
                 }
