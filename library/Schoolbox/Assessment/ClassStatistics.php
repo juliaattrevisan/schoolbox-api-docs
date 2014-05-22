@@ -238,25 +238,28 @@ class ClassStatistics {
 		$data = array();
 
 		foreach($this->workMap as $stamp => $work) {
+			$mark = null;
 
 			if($work['object'] instanceof SubmissionBox) {
 				$title = $work['object']->getName();
 				$visibility = $work['object']->getMarkVisibility();
+
+				// extract user mark if it exists
+				if(array_key_exists($id, $work['marks'])) {
+					$mark = $work['marks'][$id];
+				}
 			}
 			elseif($work['object'] instanceof OnlineAssessment) {
 				$title = $work['object']->getTitle();
 				$visibility = 2;
+
+				// extract user mark if it exists
+				if(array_key_exists($id, $work['marks'])) {
+					$mark = $work['marks'][$id][0];
+				}
 			}
 			else {
 				continue;
-			}
-
-			// extract user mark if it exists
-			if(array_key_exists($id, $work['marks'])) {
-				$mark = $work['marks'][$id];
-			}
-			else {
-				$mark = null;
 			}
 
 			// extract average mark if it exists
