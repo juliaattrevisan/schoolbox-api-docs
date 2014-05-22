@@ -152,8 +152,15 @@
                 var unreadTotal = $(settings.content).children('li.unread').length;
 
                 // set the counter
-
                 dom.attr('data-unread', unreadTotal).children(settings.counter).html(unreadTotal ? unreadTotal : '');
+                $.ajax({
+                    accepts  : 'application/json',
+                    async    : true,
+                    type     : 'POST',
+                    url      : '/ajax/msgcounter.php',
+                    dataType : 'json',
+                    data     : {c : unreadTotal}
+                });
 
                 clearInterval(ii);
                 ii = setInterval(updateRelativeTimes, 9000);
