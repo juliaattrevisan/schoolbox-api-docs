@@ -1,26 +1,45 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Due Work</h2>
 	{CONFIGURATION}
-	<ul class="information-list">
-		<!-- BEGIN duework -->
-		<li class="{ON_OFF}">
-			<span class="actions">
-			<!-- BEGIN duework_result_link -->
-				<a class="btn no-text go-to" href="/submission/viewSubmission/{DUE_ID}" title="View Results"><span></span></a>
-			<!-- END duework_result_link -->
-			<!-- BEGIN duework_actions -->
-				<a class="btn no-text {DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"><span></span></a>
-			<!-- END duework_actions -->
-			</span>
+	<table class="table ruler">
+		<tbody>
+			<!-- BEGIN duework -->
+			<tr>
+				<td>
+					<h4>
+						<span class="{COMPONENT_COMPACTMODE}">{DUE_TYPE} - </span>
+						<a href="/submission/submissionHistory/{DUE_ID}/{ID}">{DUE_NAME}</a>
+					</h4>
+				</td>
+				<td class="text-align-right">
+					<!-- BEGIN duework_due_date -->
+					Due {DUE_DATE}
+					<!-- END duework_due_date -->
+				</td>
+				<!-- BEGIN has_actions -->
+				<td width="1">
+					<span class="actions two-buttons">
+						<!-- BEGIN duework_result_link -->
+						<a class="btn no-text go-to" href="/submission/viewSubmission/{DUE_ID}" title="View Results"><span></span></a>
+						<!-- END duework_result_link -->
 
-			<h4><span class="{COMPONENT_COMPACTMODE}">{DUE_TYPE} - </span>{DUE_NAME}</h4>
-			<!-- BEGIN duework_due_date -->
-			<p class="meta">Due {DUE_DATE}</p>
-			<!-- END duework_due_date -->
-			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
-		</li>
-		<!-- END duework -->
-	</ul>
+						<!-- BEGIN duework_actions -->
+						<a class="btn no-text {DUE_ACTION_ICON}" href="{DUE_ACTION}" title="{DUE_ACTION_NAME}"><span></span></a>
+						<!-- END duework_actions -->
+					</span>
+				</td>
+				<!-- END has_actions -->
+			</tr>
+			<!-- END duework -->
+		</tbody>
+	</table>
+
+
+	<!--<ul class="information-list">-->
+		<!--<li class="{ON_OFF}">-->
+			<!--<div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>-->
+		<!--</li>-->
+	<!--</ul>-->
 
 	<p class="interact">
 		<!-- BEGIN allwork_button -->
