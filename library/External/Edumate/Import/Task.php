@@ -125,7 +125,7 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				/* Assign submission acceptance settings
 				 */
 				$submissionBox->setAcceptOnline($edumateTask->getAcceptSubmissions());
-				$submissionBox->setAcceptMultiple(false);
+				$submissionBox->setAcceptMultiple(true);
 
 				/* Assign marking rules
 				 */
