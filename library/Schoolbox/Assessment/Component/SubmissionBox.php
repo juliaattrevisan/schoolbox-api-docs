@@ -199,11 +199,11 @@ class SubmissionBox implements ISoftDeletable {
 	}
 
 	/**
-	 * Get index of urgency
+	 * Get index of gradient
 	 *
 	 * @return int
 	 */
-	public function getUrgencyIndex() {
+	public function getGradientIndex() {
 		$urgency = intval(($this->getDueDate()->getUnixTimestamp() - time()) / 86400);
 
 		return max(0, min(10, $urgency));

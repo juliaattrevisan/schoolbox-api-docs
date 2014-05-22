@@ -158,7 +158,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
 			// how many days left, 0 <= x <= 10
 			$dueWork = $mapper->findById($item['id']);
-			$urgency = $dueWork->getUrgencyIndex();
+			$urgency = $dueWork->getGradientIndex();
 
             // override the above manipulation of output (we don't need it)
             $output = array(

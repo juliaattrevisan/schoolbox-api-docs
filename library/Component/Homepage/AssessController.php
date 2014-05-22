@@ -230,7 +230,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 							$quizMapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 							$quiz = $quizMapper->findById($currentAssess['assess_id']);
 
-							$urgency = $quiz->getUrgencyIndex();
+							$urgency = $quiz->getGradientIndex();
 
 							$this->setVar(array(
 								'ASSESS_FINISH_URGENCY' => $urgency

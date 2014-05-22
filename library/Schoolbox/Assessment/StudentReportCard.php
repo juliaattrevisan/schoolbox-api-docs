@@ -666,7 +666,7 @@ class StudentReportCard {
 		$workType = $workTypeMapper->findById($box->getWorkType()->getId());
 
 		$due = new \Alaress_Date_Relative($box->getDueDate());
-		$urgency = $box->getUrgencyIndex();
+		$urgency = $box->getGradientIndex();
 
 		$output = array(
 			'WORK_TITLE'   => $box->getName(),
@@ -718,7 +718,7 @@ class StudentReportCard {
 		$marks = $marks[0];
 
 		$due = new \Alaress_Date_Relative($oa->getFinish());
-		$urgency = $oa->getUrgencyIndex();
+		$urgency = $oa->getGradientIndex();
 
 		$output = array(
 			'WORK_TITLE'   => $oa->getTitle(),

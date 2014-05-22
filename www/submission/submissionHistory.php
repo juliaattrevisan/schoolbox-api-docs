@@ -172,7 +172,7 @@ if ($is_mark_shown) {
 }
 $submission_history->sortBy('date', 'desc');
 
-$gradient = $submission->getUrgencyIndex();
+$gradient = $submission->getGradientIndex();
 
 $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($submission->getCategory()->getName()),
