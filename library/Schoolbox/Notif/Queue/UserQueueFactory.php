@@ -14,7 +14,6 @@ use Group;
 use Schoolbox\Campus;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
@@ -43,7 +42,7 @@ class UserQueueFactory {
 	/** @var RoleMapper */
 	protected $roleMapper;
 
-	/** @var \Group */
+	/** @var Group */
 	protected $_DEPRECATED_GROUP;
 
 	/** @var External_User */
@@ -55,19 +54,34 @@ class UserQueueFactory {
 	/** @var array */
 	protected $existingBindings = null;
 
+
+	/**
+	 * @param MQConnector $mqConnector
+	 */
 	public function __construct($mqConnector = null) {
 		$this->mqConnector = $mqConnector ?: new MQConnector();
 	}
 
+
+	/**
+	 * @param MQConnector $mqConnector
+	 * @return self
+	 */
 	public function setMessageQueueConnector($mqConnector) {
 		$this->mqConnector = $mqConnector;
 		return $this;
 	}
 
+
+	/**
+	 * @param UserMapper $userMapper
+	 * @return self
+	 */
 	public function setUserMapper($userMapper) {
 		$this->userMapper = $userMapper;
 		return $this;
 	}
+
 
 	/**
 	 * @return External_User
@@ -81,18 +95,20 @@ class UserQueueFactory {
 		return $this->_DEPRECATED_EXT_USER;
 	}
 
+
 	/**
-	 * @return \Group
+	 * @return Group
 	 */
 	public function GET_DEPRECATED_GROUP() {
 		if(!$this->_DEPRECATED_GROUP) {
-			$this->_DEPRECATED_GROUP = new \Group();
+			$this->_DEPRECATED_GROUP = new Group();
 		}
 		return $this->_DEPRECATED_GROUP;
 	}
 
+
 	/**
-	 * @return \Schoolbox\RoleMapper
+	 * @return RoleMapper
 	 */
 	public function getRoleMapper() {
 		if(!$this->roleMapper) {
@@ -112,13 +128,19 @@ class UserQueueFactory {
 		return $this->userMapper;
 	}
 
+
+	/**
+	 * @param CategoryMapper $categoryMapper
+	 * @return self
+	 */
 	public function setCategoryMapper($categoryMapper) {
 		$this->categoryMapper = $categoryMapper;
 		return $this;
 	}
 
+
 	/**
-	 * @return \Schoolbox\Resource\CategoryMapper
+	 * @return CategoryMapper
 	 */
 	public function getCategoryMapper() {
 		if(!$this->categoryMapper) {
@@ -126,7 +148,6 @@ class UserQueueFactory {
 		}
 		return $this->categoryMapper;
 	}
-
 
 
 	/**
@@ -295,6 +316,7 @@ class UserQueueFactory {
 		return $q;
 	}
 
+
 	/**
 	 * Destroy all routing bindings for the given user.
 	 * Returns the number of bindings deleted, or -1 on error.
@@ -316,16 +338,17 @@ class UserQueueFactory {
 		$count = 0;
 
 		if(!$simulate) {
-			$userExchange = Connector::getSecondaryExchangePrefix() . $userId;
+			$userExchange = $this->mqConnector->getSecondaryExchange($userId);
 
 			foreach($this->existingBindings[$userId] as $routingKey) {
-				$this->mqConnector->unbindExchange($userExchange, $routingKey);
+				$this->mqConnector->unbindExchange($userExchange->getName(), $routingKey);
 				++$count;
 			}
 		}
 
 		return $count;
 	}
+
 
 	/**
 	 * Retrieve all existing bindings from RabbitMQ and cache into an array, indexed by username
@@ -365,7 +388,7 @@ class UserQueueFactory {
 
 			list($exchange, $routingKey) = $xpl;
 
-			$prefix = Connector::getSecondaryExchangePrefix();
+			$prefix = $this->mqConnector->getSecondaryExchange('')->getName();
 
 			// only parse line if this is a user exchange
 			if(substr($exchange, 0, strlen($prefix)) != $prefix) {
@@ -381,6 +404,7 @@ class UserQueueFactory {
 
 		return $count;
 	}
+
 
 	/**
 	 * Returns whether or not a given message is sitting in the given user's listed and digest queues.
@@ -426,4 +450,5 @@ class UserQueueFactory {
 
 		return $result;
 	}
+
 }

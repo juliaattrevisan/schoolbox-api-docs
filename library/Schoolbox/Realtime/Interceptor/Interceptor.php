@@ -22,7 +22,6 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RerouteMapper;
@@ -246,7 +245,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 			}
 		}
 
-		$uqf = new UserQueueFactory(new Connector());
+		$uqf = new UserQueueFactory();
 
 		// only perform extra dedupe checks if we're in patient (aka boot) mode
 		return $this->isPatient() ? $uqf->userHasSeen($user->getId(), $message) && false : false;

@@ -16,7 +16,6 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
-use Schoolbox\Realtime\Verboser;
 use SplQueue;
 
 class Dispatcher implements DispatcherInterface {

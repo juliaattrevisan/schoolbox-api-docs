@@ -13,11 +13,13 @@ namespace Schoolbox\Notif\Handler;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use PhpAmqpLib\Channel\AMQPChannel;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\NotifException;
 
 class AMQPHandler extends AbstractProcessingHandler {
 
+	/** @var MQConnector */
 	protected $connection;
 
 	/**
@@ -40,10 +42,18 @@ class AMQPHandler extends AbstractProcessingHandler {
 		$this->setFormatter(new JsonFormatter());
 	}
 
+
+	/**
+	 * @return MQConnector
+	 */
 	public function getMQConnector() {
 		return $this->connection;
 	}
 
+
+	/**
+	 * @return AMQPChannel
+	 */
 	public function getChannel() {
 		return $this->connection->getChannel();
 	}

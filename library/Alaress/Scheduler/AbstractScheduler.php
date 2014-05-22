@@ -39,6 +39,7 @@ abstract class AbstractScheduler extends EventEmitter implements SchedulerInterf
     /** @var DispatcherInterface */
     protected $dispatcher;
 
+	// TODO release this dependency on the Schoolbox domain
     /** @var \Schoolbox\IConfigLoader */
     protected $conf;
 

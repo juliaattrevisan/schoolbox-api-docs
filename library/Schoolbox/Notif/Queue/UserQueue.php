@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif\Queue;
 
 
+use Alaress\Async\AMQP\AMQPExchange;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 
@@ -71,10 +72,10 @@ class UserQueue {
 			return;
 		}
 
-		$exchange = $this->getExchangeName();
-
 		// one connection to declare them all...
+		$exchange = $this->conn->getSecondaryExchange($this->userId);
 		$this->conn->declareExchange($exchange);
+		$exchangeName = $exchange->getName();
 
 		$this->conn->declareQueue($this->getToSortQueueName());
 		$this->conn->declareQueue($this->getDigestQueueName());
@@ -83,18 +84,22 @@ class UserQueue {
 
 		// ...and in the darkness bind them.
 		foreach($this->bindings as $key) {
-			$this->conn->bindExchange($exchange, $key);
+			$this->conn->bindExchange($exchangeName, $key);
 		}
-		$this->conn->bindExchange($exchange, "*.digest.user.$this->userId.#");
-		$this->conn->bindExchange($exchange, "*.instant.user.$this->userId.#");
+		$this->conn->bindExchange($exchangeName, "*.digest.user.$this->userId.#");
+		$this->conn->bindExchange($exchangeName, "*.instant.user.$this->userId.#");
 
-		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchange);
-		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchange);
-		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchange);
-		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchange);
+		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchangeName);
+		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchangeName);
+		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
+		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
 
 	}
 
+
+	/**
+	 * @return array
+	 */
 	public function getBindings() {
 		return $this->bindings;
 	}
@@ -164,6 +169,7 @@ class UserQueue {
 	/**
 	 * Returns the exchange that applies to this user
 	 *
+	 * @deprecated
 	 * @return string
 	 */
 	public function getExchangeName() {

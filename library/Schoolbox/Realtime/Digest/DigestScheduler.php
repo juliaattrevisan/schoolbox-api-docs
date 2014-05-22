@@ -49,8 +49,9 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 		);
 
 		foreach($queues as $q => $route) {
-			$mqc->declareQueue($q);
-			$mqc->bindQueue($q, $route);
+			$mqc
+				->declareQueue($q)
+				->bindQueue($q, $route);
 		}
 	}
 

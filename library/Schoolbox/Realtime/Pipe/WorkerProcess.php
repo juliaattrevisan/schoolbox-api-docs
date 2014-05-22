@@ -16,10 +16,8 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\Message\Decorator;
 use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\User;
@@ -39,7 +37,7 @@ class WorkerProcess extends AbstractProcess {
 	 */
 	public function __construct($strat = null, $debug = null) {
 		parent::__construct($strat, $debug);
-		$this->mqf = new UserQueueFactory(new Connector());
+		$this->mqf = new UserQueueFactory();
 		$this->interceptor = new Interceptor($debug);
 	}
 
