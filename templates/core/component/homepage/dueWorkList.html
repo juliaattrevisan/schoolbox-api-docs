@@ -1,15 +1,15 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Due Work</h2>
 	{CONFIGURATION}
-	<table class="table ruler">
+	<table class="upcoming-work table ruler">
 		<tbody>
 			<!-- BEGIN duework -->
 			<tr>
 				<td>
 					<h4>
-						<span class="{COMPONENT_COMPACTMODE}">{DUE_TYPE} - </span>
 						<a href="/submission/submissionHistory/{DUE_ID}/{ID}">{DUE_NAME}</a>
 					</h4>
+					{DUE_TYPE}
 
 					<div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
 				</td>

@@ -100,6 +100,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
         $time = new Alaress_Date_Format(new DateTime());
 
+		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+
         foreach ($this->submissionList as $submission) {
 
             // if the late date has passed, then don't display this item (to staff or students)
@@ -165,13 +167,15 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
 			$relative = new \Alaress_Date_Relative($submission->getDueDate(), 'y-m-d h:i:s');
 
+			$workType = $workTypeMapper->findById($submission->getWorkType()->getId());
+
             $output = array(
                 'DUE_ID'      => $box_id,
                 'DUE_ACTION'  => $actionURL,
                 'DUE_ACTION_NAME' => $dueActionName,
                 'DUE_ACTION_ICON' => $dueActionIcon,
                 'DUE_NAME'    => $nameHTML,
-                'DUE_TYPE'    => Scrub::text($submission->getWorkType()->getName()),
+                'DUE_TYPE'    => Scrub::text($workType->getName()),
                 'DUE_DATE'    => $dateHTML,
                 'DUE_COMMENT' => Scrub::html($submission->getDescription()),
                 'ON_OFF'      => ++$j % 2 ? '' : 'dark',
