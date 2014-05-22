@@ -14,12 +14,10 @@ if(isset($this)) {
 	exit;
 }
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
-
 header('Content-Type: application/json');
 
-// then, paradoxically, spawn a sitepage .... -_-
-new SitePage();
+// make sure we've got access to the session
+session_start();
 
 // only 1 var, must be 'c', must be a number >= 0
 $valid =
