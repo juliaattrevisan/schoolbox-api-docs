@@ -89,6 +89,9 @@ class Factory {
 		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
 			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
+		else if (preg_match('#^text/html#',($this->getSubmission()->getMimeType()->getMime()))) {
+			return new Strategy\Html($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+		}
 		/* Otherwise just download the file
 		 */
 		else {
