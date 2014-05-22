@@ -53,7 +53,7 @@ $this->setVar('attempt_block', '');
 
 /* Iterate
  */
-$allAttempts = $attemptHandler->getList($this->arg[0]);
+$allAttempts = $attemptHandler->getListForUser($this->arg[0], $this->arg[1]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
