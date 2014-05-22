@@ -5,7 +5,7 @@
        class="timeField"
        value="{{ value is empty ? "" : value|date("i") }}" />
 <select name="{{ name }}[meridien]">
-    <option value="">--</option>
+    <option>--</option>
     <option value="am" {% if value is not empty and value|date('A') == 'AM' %}selected{% endif %}>AM</option>
     <option value="pm" {% if value is not empty and value|date('A') == 'PM' %}selected{% endif %}>PM</option>
 </select>

@@ -73,6 +73,80 @@
                 defaultFileSelectedText: '<span></span>File selected'
             });
 
+            form.validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 2
+                    },
+                    resource_category_id: {
+                        min: 1
+                    },
+                    "min_lead_time[day]": {
+                        digits: true
+                    },
+                    "min_reservation_time[day]": {
+                        digits: true
+                    },
+                    "max_reservation_time[day]": {
+                        digits: true
+                    },
+                    "min_lead_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "min_reservation_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "max_reservation_time[hour]": {
+                        digits: true,
+                        range: [0,23]
+                    },
+                    "min_lead_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    },
+                    "min_reservation_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    },
+                    "max_reservation_time[minute]": {
+                        digits: true,
+                        range: [0,59]
+                    }
+                },
+                messages: {
+                    resource_category_id:           "Please select a category.",
+                    "min_reservation_time[day]":    "If entered, day count must be a number.",
+                    "max_reservation_time[day]":    "If entered, day count must be a number.",
+                    "min_lead_time[hour]":          "If entered, hour count must be a number from 0 to 23",
+                    "min_reservation_time[hour]":   "If entered, hour count must be a number from 0 to 23",
+                    "max_reservation_time[hour]":   "If entered, hour count must be a number from 0 to 23",
+                    "min_lead_time[minute]":        "If entered, minute count must be a number from 0 to 59",
+                    "min_reservation_time[minute]": "If entered, minute count must be a number from 0 to 59",
+                    "max_reservation_time[minute]": "If entered, minute count must be a number from 0 to 59"
+                },
+                errorPlacement: function(error, element) {
+                    switch (element.attr('name')) {
+                        case "min_lead_time[day]":
+                        case "min_reservation_time[day]":
+                        case "max_reservation_time[day]":
+                        case "min_lead_time[hour]":
+                        case "min_reservation_time[hour]":
+                        case "max_reservation_time[hour]":
+                        case "min_lead_time[minute]":
+                        case "min_reservation_time[minute]":
+                        case "max_reservation_time[minute]":
+                            element.parent().append(error)
+                            break
+                        default:
+                            element.after(error)
+                            break
+                    }
+                }
+            })
+
         })
     })(jQuery);
 </script>

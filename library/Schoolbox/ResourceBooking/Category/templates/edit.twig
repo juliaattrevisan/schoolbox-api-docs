@@ -7,6 +7,14 @@
                 event.preventDefault();
                 form.attr('action', $(this).data('action')).submit();
             })
+            form.validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 2
+                    }
+                }
+            })
         })
     })(jQuery);
 </script>

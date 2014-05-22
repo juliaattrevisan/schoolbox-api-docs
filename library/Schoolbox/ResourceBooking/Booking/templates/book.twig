@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -202,24 +203,65 @@ $(document).ready(function() {
     form.validate({
         rules: {
             'start_datetime[date]': {
+                required: true,
+                datepickerDate: true,
                 'remote.invalidStart': true,
                 'remote.tooEarly': true,
                 'remote.conflict': true
             },
             'end_datetime[date]': {
+                required: true,
+                datepickerDate: true,
                 'remote.invalidEnd': true,
                 'remote.beforeStart': true,
                 'remote.tooShort': true,
                 'remote.tooLong': true
+            },
+            'start_datetime[hour]': {
+                required: true,
+                digits: true,
+                range: [1, 12]
+            },
+            'end_datetime[hour]': {
+                required: true,
+                digits: true,
+                range: [1, 12]
+            },
+            'start_datetime[minute]': {
+                required: true,
+                digits: true,
+                range: [0, 59]
+            },
+            'end_datetime[minute]': {
+                required: true,
+                digits: true,
+                range: [0, 59]
+            },
+            'start_datetime[meridien]': {
+                required: true,
+                selected: true
+            },
+            'end_datetime[meridien]': {
+                required: true,
+                selected: true
             }
         },
         errorPlacement: function(label, element) {
             var name = element.attr('name')
-            if (name == 'start_datetime[date]' || name == 'end_datetime[date]') {
-                element.closest('td').append(label);
-            }
-            else {
-                label.insertAfter(element);
+            switch (element.attr('name')) {
+                case 'start_datetime[date]':
+                case 'start_datetime[hour]':
+                case 'start_datetime[minute]':
+                case 'start_datetime[meriden]':
+                case 'end_datetime[date]':
+                case 'end_datetime[hour]':
+                case 'end_datetime[minute]':
+                case 'end_datetime[meriden]':
+                    element.closest('td').append(label)
+                    break
+                default:
+                    label.insertAfter(element)
+                    break
             }
         },
         submitHandler: function() {
@@ -238,6 +280,22 @@ $(document).ready(function() {
             else {
                 callback()
             }
+        },
+        messages: {
+            'start_datetime[date]': {
+                required:       'Please enter a valid date.',
+                datepickerDate: 'Please enter a valid date.'
+            },
+            'end_datetime[date]': {
+                required:       'Please enter a valid date.',
+                datepickerDate: 'Please enter a valid date.'
+            },
+            'start_datetime[hour]':     "Please enter a valid hour value.",
+            'end_datetime[hour]':       "Please enter a valid hour value.",
+            'start_datetime[minute]':   "Please enter a valid minute value.",
+            'end_datetime[minute]':     "Please enter a valid minute value.",
+            'start_datetime[meridien]': "Please select AM or PM.",
+            'end_datetime[meridien]':   "Please select AM or PM."
         }
     })
 
