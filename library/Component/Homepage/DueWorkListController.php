@@ -74,9 +74,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
-        $this->setBlock('duework', 'duework_result_link', 'duework_result_link_block');
-        $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
-        $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
+		$this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
+		$this->setBlock('duework', 'has_actions', 'has_actions_block');
+        $this->setBlock('has_actions', 'duework_result_link', 'duework_result_link_block');
+		$this->setBlock('has_actions', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
         $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
 
@@ -140,53 +141,19 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar('duework_result_link_block', '');
             $this->setVar('duework_actions_block', '');
             $this->setVar('duework_due_date_block', '');
+
             if ($this->groupHandler->isStudent()) {
                 if (!$isTask) {
-                    $displayActions = true;
+                    $displayActions = false;
                     $actionURL = '/submission/submissionHistory/' . $box_id .'/'. $_SESSION['id'];
 
-                    // if a mark has been given, regardless of all other detail, display "View Mark"
-                    if (!empty($return_counts[$box_id])) {
-                        $dueActionName = 'View Mark';
-                        $dueActionIcon = 'go-to';
-                    }
-                    // no mark has been given
-                    else {
-                        // if dueWork is accepting submissions
-                        if ($submission->getAcceptOnline()) {
-                            // if something has been submitted
-                            if (!empty($submission_counts[$box_id])) {
-                                $dueActionName = 'Awaiting Mark';
-                                $dueActionIcon = 'go-to';
-                            }
-                            // nothing has been submitted
-                            else {
-                                // if the submission box is open
-                                // (Check submission number)
-                                if ($time->getDateTimeObject() > $submission->getOpenDate()->getDateTimeObject()
-                                    && $time->getDateTimeObject() < $submission->getLateDate()->getDateTimeObject()
-                                ) {
-                                    $dueActionName = 'Submit Work';
-                                    $dueActionIcon = 'go-to';
-                                }
-                                // if submission box is closed
-                                else {
-                                    $dueActionName = 'View Details';
-                                    $dueActionIcon = 'go-to';
-                                }
-                            }
-                        }
-                        // dueWork not accepting submissions
-                        else {
-                            $dueActionName = 'View Details';
-                            $dueActionIcon = 'go-to';
-                        }
-                    }
+					/* Button Gravestone
+					 */
                 }
             }
 
             // what to display if staff
-            elseif ($this->groupHandler->isSuperuser() || $submission->getOwner()->getId() == $_SESSION['id']) {
+            elseif ($this->groupHandler->isSuperuser() || $this->groupHandler->isStaff()) {
                 if (!$isTask) {
                     $displayResults = true;
                 }
@@ -196,16 +163,19 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 $displayActions = true;
             }
 
+			$relative = new \Alaress_Date_Relative($submission->getDueDate(), 'y-m-d h:i:s');
+
             $output = array(
                 'DUE_ID'      => $box_id,
                 'DUE_ACTION'  => $actionURL,
                 'DUE_ACTION_NAME' => $dueActionName,
                 'DUE_ACTION_ICON' => $dueActionIcon,
                 'DUE_NAME'    => $nameHTML,
-                'DUE_TYPE'    => Scrub::text($submission->getWorkType()->getName()),
                 'DUE_DATE'    => $dateHTML,
                 'DUE_COMMENT' => Scrub::html($submission->getDescription()),
                 'ON_OFF'      => ++$j % 2 ? '' : 'dark',
+				'WORK_URGENCY' => $submission->getGradientIndex(),
+				'DUE_DATE_RELATIVE' => $relative->getRelativeTime(),
             );
             $this->setVar($output);
             if ($displayDueDate) {
@@ -226,7 +196,26 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             else {
                 $this->setVar('duework_result_link_block', '');
             }
+
+			/* Display actions column if you have buttons
+			 * (you do, as superuser)
+			 */
+			if ($displayActions) {
+				$this->parse('has_actions_block', 'has_actions');
+			}
+			else {
+				$this->setVar(array(
+					'has_actions_block' => ''
+				));
+			}
+
             $this->parse("duework_block", "duework", true);
+
+			/* Clear children after parsing out the parent
+			 */
+			$this->setVar(array(
+				'has_actions_block' => ''
+			));
         }
 
         //setup block for submission button

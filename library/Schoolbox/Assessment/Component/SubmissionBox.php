@@ -198,6 +198,17 @@ class SubmissionBox implements ISoftDeletable {
 		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
 	}
 
+	/**
+	 * Get index of gradient
+	 *
+	 * @return int
+	 */
+	public function getGradientIndex() {
+		$urgency = intval(($this->getDueDate()->getUnixTimestamp() - time()) / 86400);
+
+		return max(0, min(10, $urgency));
+	}
+
 	/* Getters/Setters
 	 */
 

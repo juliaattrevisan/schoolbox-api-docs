@@ -666,7 +666,8 @@ class StudentReportCard {
 		$workType = $workTypeMapper->findById($box->getWorkType()->getId());
 
 		$due = new \Alaress_Date_Relative($box->getDueDate());
-		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
+		$urgency = $box->getGradientIndex();
+
 		$output = array(
 			'WORK_TITLE'   => $box->getName(),
 			'WORK_ID'      => $box->getId(),
@@ -717,7 +718,8 @@ class StudentReportCard {
 		$marks = $marks[0];
 
 		$due = new \Alaress_Date_Relative($oa->getFinish());
-		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
+		$urgency = $oa->getGradientIndex();
+
 		$output = array(
 			'WORK_TITLE'   => $oa->getTitle(),
 			'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),

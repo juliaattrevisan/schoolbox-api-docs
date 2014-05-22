@@ -36,8 +36,7 @@ $box_id  = $this->arg[0];
 $submission_box = $box_mapper->findById($this->arg[0]);
 $dueDate        = new Alaress_Date_Relative($submission_box->getDueDate(), 'y-m-d');
 $createdDate    = new Alaress_Date_Relative($submission_box->getCreated(), 'y-m-d');
-$urgency        = intval(($dueDate->getUnixTimestamp() - time()) / 86400);
-$gradient       = max(0, min(10, $urgency));
+$gradient       = $submission_box->getGradientIndex();
 
 //
 // Find most recent submissions for this user - later, consider showing drafts

@@ -121,6 +121,20 @@ class OnlineAssessment implements ISoftDeletable {
     protected $mark_visibility = 0;
 
 	/**
+	 * Get index of gradient
+	 *
+	 * @return int
+	 */
+	public function getGradientIndex() {
+		$urgency = intval(($this->getFinish()->getUnixTimestamp() - time()) / 86400);
+
+		return max(0, min(10, $urgency));
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
 	 * @param  boolean $anonymous_result
 	 *
 	 * @return $this
