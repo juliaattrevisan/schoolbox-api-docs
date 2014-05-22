@@ -227,7 +227,10 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 							));
 						}
 						else {
-							$urgency = max(0, min(10, (int)(($finish->getUnixTimestamp() - time()) / 86400)));
+							$quizMapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+							$quiz = $quizMapper->findById($currentAssess['assess_id']);
+
+							$urgency = $quiz->getUrgencyIndex();
 
 							$this->setVar(array(
 								'ASSESS_FINISH_URGENCY' => $urgency

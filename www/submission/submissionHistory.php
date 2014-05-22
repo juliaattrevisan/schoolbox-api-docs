@@ -172,8 +172,7 @@ if ($is_mark_shown) {
 }
 $submission_history->sortBy('date', 'desc');
 
-$urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
-$gradient = max(0, min(10, $urgency));
+$gradient = $submission->getUrgencyIndex();
 
 $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($submission->getCategory()->getName()),
