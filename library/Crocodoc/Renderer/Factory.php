@@ -28,7 +28,8 @@ class Factory {
 	private $allowedFileTypes = array(
 		'doc', 'docx',
 		'xls', 'xlsx',
-		'ppt', 'pptx'
+		'ppt', 'pptx',
+		'pdf'
 	);
 
 	/**
@@ -80,16 +81,13 @@ class Factory {
 			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Other special presentation methods for inline viewing of media
-		 * such as images, videos and htmls
+		 * such as images and videos
 		 */
 		else if (preg_match('#^image/*#',($this->getSubmission()->getMimeType()->getMime()))) {
 			return new Strategy\Image($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
 			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
-		}
-		else if (preg_match('#^text/html#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Html($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
 		}
 		/* Otherwise just download the file
 		 */
