@@ -215,6 +215,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 					$output['UPCOMING_BTN_LABEL'] = '';
                 }
 				else {
+					$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
 					$output['upcoming_work_actionable_block'] = '';
 				}
             }
