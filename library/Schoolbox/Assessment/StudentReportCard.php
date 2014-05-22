@@ -662,12 +662,15 @@ class StudentReportCard {
 	 * @return array
 	 */
 	protected function outputDueWorkRow(SubmissionBox $box, $marks) {
+		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workType = $workTypeMapper->findById($box->getWorkType()->getId());
+
 		$due = new \Alaress_Date_Relative($box->getDueDate());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
 			'WORK_TITLE'   => $box->getName(),
 			'WORK_ID'      => $box->getId(),
-			'WORK_TYPE'    => $box->getWorkType()->getName(),
+			'WORK_TYPE'    => $workType->getName(),
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
@@ -698,35 +701,6 @@ class StudentReportCard {
 			$output['WORK_COMMENT']  = $marks['comment'];
 		}
 
-		// if the viewing user does not have permission to submit, blank out the actions
-		if(!$this->checkPermission(self::CAN_SUBMIT)) {
-		}
-        // is the box still open?
-        elseif($box->getLateDate()->getUnixTimestamp() > time()) {
-            // can potentially submit
-
-            // is work already submitted?
-            if($marks['attempts'] > 0) {
-                // work submitted
-
-                // is this multisubmit?
-                if($box->getAcceptMultiple()) {
-                    // is multi: offer REsubmission
-					$output['buttons'][] = $buttonResubmit;
-                }
-                else {
-                    // is single-submit: offer no action
-                }
-            }
-            else {
-                // work not submitted: offer submission
-				$output['buttons'][] = $buttonSubmit;
-            }
-        }
-        else {
-            // cannot submit: offer no action
-        }
-
 		return $output;
 	}
 
@@ -736,6 +710,9 @@ class StudentReportCard {
 	 * @return array
 	 */
 	protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks) {
+		$workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
+		$workType = $workTypeMapper->findById($oa->getWorkType()->getId());
+
 		// marks are contained inside a single-element array, pull it out of itself
 		$marks = $marks[0];
 
@@ -744,7 +721,7 @@ class StudentReportCard {
 		$output = array(
 			'WORK_TITLE'   => $oa->getTitle(),
 			'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),
-			'WORK_TYPE'    => $oa->getWorkType()->getName(),
+			'WORK_TYPE'    => $workType->getName(),
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
@@ -760,7 +737,7 @@ class StudentReportCard {
 
 		$buttonStudentReview = array(
 			'WORK_BTN_HREF' => "assess/studentReview/" . $oa->getId() . '/' . $marks['section_id'] . '/' . $marks['attempt_id'] . '/' . $this->targetUserId,
-			'WORK_BTN_ICON' => 'statistics',
+			'WORK_BTN_ICON' => 'eyeball',
 			'WORK_BTN_LABEL' => 'Review'
 		);
 
@@ -773,38 +750,13 @@ class StudentReportCard {
 
             // has the student attempted?
             if($marks['attempts'] > 0) {
-                // student has attempted at least once
-
-                // does the student have attempts left?
-                if($oa->getMaxAttempts() == 0 || $oa->getMaxAttempts() > $marks['attempts']) {
-
-					/* Offer review for a previous attempt
-					 * Offer list of previous attempts
-					 */
-					if ($marks) {
-						$output['buttons'][] = $buttonStudentReview;
-					}
-
-					$output['buttons'][] = $buttonSeePreviousAttempts;
-                }
-                else {
-                    // no attempts remaining: offer no action
-					$output['buttons'][] = $buttonSeePreviousAttempts;
-
-					if ($marks) {
-						$output['buttons'][] = $buttonStudentReview;
-					}
-                }
+				$output['buttons'][] = $buttonSeePreviousAttempts;
             }
         }
         else {
             // is closed: offer no action
 			if($marks['attempts'] > 0) {
 				$output['buttons'][] = $buttonSeePreviousAttempts;
-			}
-
-			if ($marks) {
-				$output['buttons'][] = $buttonStudentReview;
 			}
         }
 

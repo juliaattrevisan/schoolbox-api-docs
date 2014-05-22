@@ -172,23 +172,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             if($item['kind'] == 0) {
                 // duework
                 $output['UPCOMING_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
-				$output['UPCOMING_BUTTON_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
-                $output['UPCOMING_BTN_ICON']  = 'up-arrow';
 
-                if($item['submittable']) {
-                    if($item['multi_submit'] && $item['submit_count']) {
-                        // allow resubmit
-                        $output['UPCOMING_BTN_LABEL'] = 'Resubmit';
-                        $output['UPCOMING_BTN_ICON']  = 'reply';
-                    }
-                    else {
-                        // no resubmit
-                        $output['UPCOMING_BTN_LABEL'] = 'Submit';
-                    }
-                }
-                else {
-                    $output['upcoming_work_actionable_block'] = 'No submissions';
-                }
+				$output['upcoming_work_actionable_block'] = '';
             }
             else {
                 // assess
@@ -227,15 +212,12 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 					$output['UPCOMING_BUTTON_HREF'] = '/assess/attempts/' . $item['id'] . '/' . $this->userID;
 					$output['UPCOMING_UID'] = '';
 					$output['UPCOMING_BTN_ICON']  = 'list';
-					$output['UPCOMING_BTN_LABEL'] = 'See previous attempts';
+					$output['UPCOMING_BTN_LABEL'] = '';
                 }
-                else {
+				else {
 					$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
-					$output['UPCOMING_BUTTON_HREF'] = '/assess/intro/' . $item['id'];
-					$output['UPCOMING_UID'] = '';
-					$output['UPCOMING_BTN_ICON']  = 'list';
-                    $output['UPCOMING_BTN_LABEL'] = 'Sit';
-                }
+					$output['upcoming_work_actionable_block'] = '';
+				}
             }
 
             // if the actionable flag is false, don't display the buttons
