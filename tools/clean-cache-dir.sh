@@ -74,6 +74,8 @@ if [ -d $streamdir ];
 then
 	rm -f $streamdir/*;
 	echo "File cache directory cleaned ($streamdir)";
+	rm -fR $streamdir/templates/*;
+	echo "Twig templates cache cleaned ($streamdir/templates)";
 else
 	echo "No cache directories cleaned";
 fi
