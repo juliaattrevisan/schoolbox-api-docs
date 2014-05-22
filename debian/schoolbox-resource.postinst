@@ -19,8 +19,11 @@ set -e
 
 case "$1" in
     configure)
-        chown -R alaress:alaress /usr/share/schoolbox;
-        /usr/share/schoolbox/tools/module.sh enable resource;
+        # start logging
+        date >> /var/log/schoolbox/upgrade.log;
+        echo "Schoolbox Resource Upgrade" >> /var/log/schoolbox/upgrade.log;
+        chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        /usr/share/schoolbox/tools/module.sh enable resource 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

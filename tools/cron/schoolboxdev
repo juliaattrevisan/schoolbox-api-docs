@@ -21,10 +21,3 @@ MAILTO="support@schoolbox.com.au"
 
 # Plagscan callback - every hour
 0 * * * *	root	php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolboxdev/plagscan.log 2>&1
-
-# Run notifications binder nightly
-0 21 * * *	root	php /usr/share/schoolboxdev/tools/mq/binder.php -v >> /var/log/schoolboxdev/binder.log 2>&1
-
-# Restart daemons after binder run
-50 21 * * *     root    /usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1
-50 21 * * *     root    /usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1
