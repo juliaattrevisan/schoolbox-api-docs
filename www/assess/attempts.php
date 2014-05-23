@@ -124,7 +124,14 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			$reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
 			$reviewed = $reviewedAt->getShort();
 
-			$marks = $currentAttempt['totalMarks'] . ' / ' . $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+			$available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+
+			if ($available) {
+				$marks = 100 * $currentAttempt['totalMarks']/$available;
+			}
+			else {
+				$marks = 0;
+			}
 		}
 		else {
 			$reviewed = 'Not reviewed';
