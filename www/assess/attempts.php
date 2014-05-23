@@ -133,9 +133,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         $this->setVar(array(
             'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
-			'ATTEMPT_USER_EXTERNAL_ID' => $user->getExternalId(),
-            'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
-            'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
             'ATTEMPT_START' => $startDate->getShort(),
             'ATTEMPT_FINISH' => $finishDateValue,
             'ATTEMPT_ASSESS_ID' => $this->arg[0],
