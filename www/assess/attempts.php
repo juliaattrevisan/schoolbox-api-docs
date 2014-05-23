@@ -65,8 +65,13 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* For attempts that are still in progress
          */
-        if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-            $finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+        if (($currentAttempt['finish'] != '0000-00-00 00:00:00') && strlen($currentAttempt['finish'])) {
+
+			/* Calculate time taken in hrs
+			 */
+			$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+
+			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
             $finishDateValue = $finishDate->getShort();
 
 			/* Parse review link
@@ -147,6 +152,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
 			'ATTEMPT_REVIEWED_AT' => $reviewed,
 			'ATTEMPT_MARKS' => $marks,
+			'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ON_OFF' => $i % 2 ? 'dark' : ''
         ));
 
