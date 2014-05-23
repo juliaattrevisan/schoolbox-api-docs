@@ -37,13 +37,12 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
         $this->setBlock('assess', 'assessDue', 'assessDue_block');
 		$this->setBlock('assessDue', 'assess_finish_date', 'assess_finish_date_block');
-	    $this->setBlock('assess', 'studentLink', 'studentLink_block');
 		$this->setBlock('assess', 'has_previous_attempts', 'has_previous_attempts_block');
 
         /* Remove resumeLink by default
         */
         $this->setVar('resumeLink_block', '');
-	    $this->setVar('studentLink_block', '');
+		$this->setVar('assess_block', '');
 
         $groupHandler = new Group();
         $assessHandler = new Assess_Main();
@@ -53,11 +52,10 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createAssessment_block', 'createAssessment');
-        } else {
+        }
+		else {
             $this->setVar('createAssessment_block', '');
         }
-
-        $this->setVar('assess_block', '');
 
         $allAssess = $assessHandler->getList($this->getContext('id'));
 
@@ -83,20 +81,18 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 					$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 					$finish = new \Alaress_Date_Format(strtotime($currentAssess['finish']), 'U');
 
-                    $this->setVar(
-                        array(
-                            'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-                            'ASSESS_TITLE' => Scrub::Text($currentAssess['title']),
-                            'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
-                            'ASSESS_FINISH_RELATIVE_DATE' => $finishRelative->getRelativeTime(),
-                            'ASSESS_DESCRIPTION' => Scrub::html($currentAssess['description']),
-                            'ASSESS_CREATED' => $createdTime->getRelativeTime(),
-                            'ASSESS_USER_ID' => $author['uid'],
-                            'ASSESS_USER_FIRSTNAME' => $author['firstname'],
-                            'ASSESS_USER_LASTNAME' => $author['lastname'],
-                            'ON_OFF' => $i++ % 2 ? 'dark' : '',
-                        )
-                    );
+                    $this->setVar(array(
+						'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+						'ASSESS_TITLE' => Scrub::Text($currentAssess['title']),
+						'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
+						'ASSESS_FINISH_RELATIVE_DATE' => $finishRelative->getRelativeTime(),
+						'ASSESS_DESCRIPTION' => Scrub::html($currentAssess['description']),
+						'ASSESS_CREATED' => $createdTime->getRelativeTime(),
+						'ASSESS_USER_ID' => $author['uid'],
+						'ASSESS_USER_FIRSTNAME' => $author['firstname'],
+						'ASSESS_USER_LASTNAME' => $author['lastname'],
+						'ON_OFF' => $i++ % 2 ? 'dark' : '',
+					));
 
 					/* Check if you have completed an assessment already
 					 *
@@ -159,17 +155,8 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
 							$this->parse('has_previous_attempts_block', 'has_previous_attempts');
 						}
-
-						// user has attempted, so show results page
-						$firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
-						$this->setVar(array(
-							'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-							'ASSESS_SECTION_ID' => $firstSection['section_id'],
-							'ASSESS_ATTEMPT_ID' => $attempt['attempt_id']
-						));
-						$this->parse('studentLink_block', 'studentLink');
-
-					} else {
+					}
+					else {
 						/* Do not show link if past finish date */
 						if ($assessHandler->isExpired($currentAssess['assess_id'])) {
 							$this->parse('assessNoLink_block', 'assessNoLink');
