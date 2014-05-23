@@ -1,0 +1,7 @@
+# Directories.
+bin /usr/share/mailcatcher
+cache /usr/share/mailcatcher
+gems /usr/share/mailcatcher
+specifications /usr/share/mailcatcher
+mailcatcher.conf /etc/init
+mailcatcher /etc/logrotate.d
