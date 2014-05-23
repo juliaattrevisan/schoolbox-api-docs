@@ -120,6 +120,17 @@ if (is_array($allAttempts) && count($allAttempts)) {
 		$userMapper = new \Schoolbox\UserMapper();
 		$user = $userMapper->findById($currentAttempt['user_id']);
 
+		if ($currentAttempt['reviewed_at'] != null) {
+			$reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
+			$reviewed = $reviewedAt->getShort();
+
+			$marks = $currentAttempt['totalMarks'] . ' / ' . $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+		}
+		else {
+			$reviewed = 'Not reviewed';
+			$marks = '';
+		}
+
         $this->setVar(array(
             'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
 			'ATTEMPT_USER_EXTERNAL_ID' => $user->getExternalId(),
@@ -130,6 +141,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_ASSESS_ID' => $this->arg[0],
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+			'ATTEMPT_REVIEWED_AT' => $reviewed,
+			'ATTEMPT_MARKS' => $marks,
             'ON_OFF' => $i % 2 ? 'dark' : ''
         ));
 
