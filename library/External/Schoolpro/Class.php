@@ -31,39 +31,44 @@ class External_Schoolpro_Class implements External_ClassInterface {
 	 * @return array|bool
 	 */
 	public function getStudents($classCode) {
-		$vars = array(
-			'sbGetStudents',
-			array(
-				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pClassID', $classCode, SQLINT4, false, false, -1),
-			)
-		);
+		$allStudents = array();
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		/* Class Codes, when combined, are joined by a comma
+		 * so split them out and combine request results
+		 */
+		$allClassCodes = explode(',', $classCode);
 
-		if ($result['success'] && count($result['result'])) {
-			$allStudents = array();
+		foreach($allClassCodes as $currentClassCode) {
+			$vars = array(
+				'sbGetStudents',
+				array(
+					array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+					array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+					array('@pClassID', trim($currentClassCode), SQLINT4, false, false, -1),
+				)
+			);
 
-			foreach($result['result'] as $currentStudent) {
-				$student = array(
-					'synergy_id' => $currentStudent['ID'],
-					'lastname' => $currentStudent['Firstname'],
-					'firstname' => $currentStudent['Surname'],
-					'yearlevel '=> $currentStudent['YearLevel'],
-					'house' => $currentStudent['House'],
-					'StudentMedicalAlert' => '',
-					'StudentSpecialNeedsFlag' => '',
-					'ClassCampus' => '',
-				);
+			$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
-				$allStudents[] = $student;
+			if ($result['success'] && count($result['result'])) {
+				foreach($result['result'] as $currentStudent) {
+					$student = array(
+						'synergy_id' => $currentStudent['ID'],
+						'lastname' => $currentStudent['Firstname'],
+						'firstname' => $currentStudent['Surname'],
+						'yearlevel '=> $currentStudent['YearLevel'],
+						'house' => $currentStudent['House'],
+						'StudentMedicalAlert' => '',
+						'StudentSpecialNeedsFlag' => '',
+						'ClassCampus' => '',
+					);
+
+					$allStudents[] = $student;
+				}
 			}
-
-			return $allStudents;
 		}
 
-		return false;
+		return $allStudents;
 	}
 
 	/**
