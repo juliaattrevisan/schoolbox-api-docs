@@ -113,7 +113,6 @@ class External_Edumate_Import_Marks extends External_Edumate_Connection {
 			$submissionReturn->setFilename(null);
 			$submissionReturn->setFilesize(null);
 			$submissionReturn->setMimetype(null);
-			$submissionReturn->setDeleted(0);
 			$submissionReturn->setSubmitted(null);
 
 			/* Save it

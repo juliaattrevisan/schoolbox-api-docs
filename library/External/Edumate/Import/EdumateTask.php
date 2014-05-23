@@ -150,7 +150,7 @@ class EdumateTask {
 		//$this->setAcceptSubmissions($row['ACCEPT_SUBMISSIONS']);
 		$this->setMarkType($row['MARK_TYPE']);
 		$this->setMarkVisibility($row['MARK_VISIBILITY']);
-		$this->setWeighting($row['WEIGHTING']);
+		$this->setWeighting($row['WEIGHTING'] ? $row['WEIGHTING'] : 0 );
 		$this->setTotalMark($row['TOTAL_MARK']);
 		$this->setLastUpdated($row['LAST_UPDATED']);
 	}

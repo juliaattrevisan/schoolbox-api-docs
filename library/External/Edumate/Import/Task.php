@@ -55,7 +55,12 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				 */
 				if ($taskMapper->isNeedUpdate($edumateTask)) {
 					$submissionBoxId = $taskMapper->findBoxFromTask($edumateTask);
-					$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+                    try{
+					    $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+                    } catch(Exception $e) {
+                        echo "-  Skipping {$edumateTask->getTaskId()} {$edumateTask->getTask()}: nothing to update \n";
+                        continue;
+                    }
 				}
 				else {
 					/* Skip everything, because this Edumate Task hasn't been updated
