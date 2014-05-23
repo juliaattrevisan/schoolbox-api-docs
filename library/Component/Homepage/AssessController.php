@@ -36,13 +36,13 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'assessLink', 'assessLink_block');
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
         $this->setBlock('assess', 'assessDue', 'assessDue_block');
-		$this->setBlock('assessDue', 'assess_finish_date', 'assess_finish_date_block');
-		$this->setBlock('assess', 'has_previous_attempts', 'has_previous_attempts_block');
+	$this->setBlock('assessDue', 'assess_finish_date', 'assess_finish_date_block');
+	$this->setBlock('assess', 'has_previous_attempts', 'has_previous_attempts_block');
 
         /* Remove resumeLink by default
         */
         $this->setVar('resumeLink_block', '');
-		$this->setVar('assess_block', '');
+	$this->setVar('assess_block', '');
 
         $groupHandler = new Group();
         $assessHandler = new Assess_Main();
