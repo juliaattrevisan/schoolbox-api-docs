@@ -16,20 +16,6 @@ $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
 
-/* This link only appears if the student is marked as absent (has the checkbox
- * ticked) as its purpose is to toggle the form into which you enter the details
- * regarding the absentee
- */
-$this->setBlock('student', 'has_attendance_options', 'has_attendance_options_block');
-
-/* The master sequence always exists now, but have retired this option for the moment
- */
-$this->setBlock('student', 'has_update', 'has_update_block');
-
-/* This is the standard button for saving the attendance, it now is always visible
- */
-$this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
-
 /* THE THREE MUSKETEERS
  */
 if (count($this->arg) < 3) {
@@ -85,8 +71,18 @@ $attendancePeriod = $this->arg[2];
  */
 if ($class) {
 
-	/* Get the attendance record for this class
-	 */
+
+    /* Cosmetic makeup for the masses
+    */
+    $this->setVar(array(
+            'CLASS_CODE' => $class['ClassCode'],
+            'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
+            'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
+            'ATTENDANCE_PERIOD' => $attendancePeriod,
+        ));
+
+    /* Get the attendance record for this class
+     */
 	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
 	$allStudents = $attendanceHandler->findAttendanceRecords();
 
@@ -113,8 +109,6 @@ if ($class) {
 				$this->setVar(array(
 					'STUDENT_SYNERGY_ID' => $currentStudent['ID']
 				));
-
-				$this->parse('has_attendance_options_block', 'has_attendance_options');
 			}
 			else {
 				$isAbsent = '';
@@ -122,12 +116,14 @@ if ($class) {
 				/* Clear this as we don't want it to display anything
 				 */
 				$attendanceRecord = array();
-
-				$this->setVar('has_attendance_options_block', '');
 			}
 
 			/* Replace everything with everything
 			 */
+
+            $arrivalTime = explode(' ',$currentStudent['LateArrivalTime']);
+            $deptTime = explode(' ',$currentStudent['EarlyDepartureTime']);
+
 			$this->setVar(array(
 				'STUDENT_UID' => $user['uid'],
 				'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
@@ -136,7 +132,9 @@ if ($class) {
 				'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
 				'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleReasonDescription']),
                 'STUDENT_ATTENDANCESTRING'  => Scrub::text($currentStudent['TodaysAttendanceString']),
-				'IS_ABSENT' => $isAbsent,
+                'STUDENT_ARRIVAL_TIME'  => date('g:ia',strtotime($arrivalTime[3])),
+                'STUDENT_DEPT_TIME'  =>date('g:ia',strtotime($deptTime[3])),
+                'IS_ABSENT' => $isAbsent,
 				'ON_OFF' => ++$i%2 ? 'dark' : '',
 			));
 
@@ -184,9 +182,6 @@ if ($class) {
 				$this->parse('reason_options_block', 'reason_options', true);
 			}
 
-			/* Update button in absentee reasons form, hiding for now
-			 */
-			$this->parse('has_update_block', 'has_update');
 
 			$this->parse('student_block', 'student', true);
 
@@ -194,39 +189,14 @@ if ($class) {
 			 */
 			$this->setVar('absence_options_block', '');
 			$this->setVar('reason_options_block', '');
-			$this->setVar('has_attendance_options_block', '');
-			$this->setVar('has_update_block', '');
 		}
 
-        /* Always show save button */
-		$this->parse('has_save_all_block', 'has_save_all');
 
 	}
 	else {
 		$this->setVar('student_block', '');
-		$this->setVar('has_save_all_block', '');
 	}
 }
 else {
 	error(148);
-
-	$this->setVar('student_block', '');
-	$this->setVar('has_save_all_block', '');
 }
-
-/* Synthesise a javascript cure!
- */
-$this->setVar(array(
-	'JS_CLASS_CODE' => $class['ClassCode'],
-	'JS_ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
-	'JS_ATTENDANCE_PERIOD' => $attendancePeriod,
-));
-
-/* Cosmetic makeup for the masses
- */
-$this->setVar(array(
-	'CLASS_CODE' => $class['ClassCode'],
-	'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
-	'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
-	'ATTENDANCE_PERIOD' => $attendancePeriod,
-));

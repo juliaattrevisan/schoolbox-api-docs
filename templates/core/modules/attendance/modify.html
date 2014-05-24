@@ -1,109 +1,35 @@
+<!-- BEGIN custom_head -->
+<script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
 <script type='text/javascript'>
 	$j(function() {
-
-		/* Update of absentees
-		 */
-		$j('.attendanceOptions').each(function(index, element) {
-			$j(element).click(function() {
-				var id = $j(element).val();
-
-				if ($j(element).is(':checked')) {
-					$j('#attendanceOptionsForm_' + id).show();
-				}
-				else {
-					/* TODO: Clear Existing Data
-					 * See modifyForm.php for related commentary
-					 */
-					var data = {
-						present: true,
-						externalId: id,
-						classCode: '{JS_CLASS_CODE}',
-						attendanceDate: '{JS_ATTENDANCE_DATE}',
-						attendancePeriod: '{JS_ATTENDANCE_PERIOD}'
-					};
-
-					$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-					});
-
-					/* Hide options form and remove link
-					 */
-					$j('#attendanceOptionsForm_' + id).hide();
-					$j('#viewAttendanceOptions_' + id).remove();
-				};
-			});
-		});
-
 		/* Make the input form available for absentees when
 		 * making individual modifications
 		 */
-		$j('.viewAttendanceOptions').click(function(event) {
-			event.preventDefault();
-
-			var id = $j(this).attr('id').replace(/viewAttendanceOptions_/, '');
-
-			if ($j('#attendanceOptions_' + id).is(':checked')) {
-				$j('#attendanceOptionsForm_' + id).toggle();
-			}
-
-			return false;
+        $j('.attendanceOptions').each(function(index, element) {
+            $j(element).click(function(event) {
+                var id = $j(element).val();
+                if ($j(element).is(':checked')) {
+                    $j('#attendanceOptionsForm_' + id).show();
+                }
+                else {
+                    /* Hide options form and remove link
+                     */
+                    $j('#attendanceOptionsForm_' + id).hide();
+                    $j('#viewAttendanceOptions_' + id).remove();
+                }
+            });
 		});
 
-		/* Save All (for the first time)
-		 *
-		 * I don't trust JSON Stringify or jquery serialize(), so I
-		 * do it the Long Way
-		 */
-		$j('#saveAll').click(function() {
-			var allPeople = new Array();
+        $j('.timepicker').timepicker({
+            'timeFormat':'g:ia',
+            'scrollDefaultNow': true,
+            'step':5,
+            'minTime': '5:00am',
+            'maxTime': '7:00pm'
 
-			/* Collect the contents of each form
-			 */
-			$j('.collectible').each(function(index, element) {
-				var currentPersonId = $j(element).find('input[name=updateOne]').val();
-				var AttendedFlag = 1;
-
-				/* Find out if they are marked as absent
-				 */
-				if ($j('#attendanceOptions_' + currentPersonId).is(':checked')) {
-					var AttendedFlag = 0;
-				}
-
-				/* Always save each guy's absentee info the first time
-				 *
-				 * This will allow you to fill in absentee info as you're doing it,
-				 * or modify existing info retroactively
-				 */
-				var currentPerson = {
-					externalId: currentPersonId,
-					classCode: $j(element).find('input[name=classCode]').val(),
-					attendanceDate: $j(element).find('input[name=attendanceDate]').val(),
-					attendancePeriod: $j(element).find('input[name=attendancePeriod]').val(),
-					PossibleAbsenceCode: $j(element).find('select[name=PossibleAbsenceCode]').val(),
-					PossibleReasonCode: $j(element).find('select[name=PossibleReasonCode]').val(),
-					PossibleReasonDescription: $j(element).find('input[name=PossibleReasonDescription]').val(),
-					AttendedFlag: AttendedFlag
-				}
-
-				allPeople.push(currentPerson);
-			});
-
-			/* Compile!
-			 */
-			var data = {
-				updateAll: 'true',
-				classCode: '{JS_CLASS_CODE}',
-				attendanceDate: '{JS_ATTENDANCE_DATE}',
-				attendancePeriod: '{JS_ATTENDANCE_PERIOD}',
-				data: allPeople
-			}
-
-			/* Send in the clones!
-			 */
-			$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-				//window.location.href = window.location.href;
-			});
-		});
+        });
 	});
+
 </script>
 <style type='text/css'>
 	label {
@@ -114,17 +40,30 @@
 		width: 200px;
 	}
 </style>
+<!-- END custom_head -->
 
 <h1>Student Attendances for {CLASS_CODE}</h1>
 <h2>{ATTENDANCE_DATE_FORMATTED}</h2>
-
-<table class="table">
-	<tr>
-		<th></th>
-		<th class='genericWidth'>Name</th>
-		<th class='genericWidth'>Attendance String</th>
-		<th>Absent</th>
-	</tr>
+<form method='post' action='/modules/attendance/modifyForm' class='collectible'>
+    <input name='classCode' type='hidden' value='{CLASS_CODE}' />
+    <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+    <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
+    <table class="table ruler">
+        <colgroup>
+            <col width="54px">
+            <col>
+            <col>
+            <col>
+        </colgroup>
+	<thead>
+        <tr>
+            <th></th>
+            <th class='genericWidth'>Name</th>
+            <th class='genericWidth'>Attendance String</th>
+            <th>Absent</th>
+        </tr>
+	</thead>
+        <tbody>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
 		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_FIRSTNAME} {STUDENT_LASTNAME}" /></td>
@@ -132,56 +71,46 @@
         <td><p style="font-size:12pt">{STUDENT_ATTENDANCESTRING}</p></td>
 		<td>
 			<input id='attendanceOptions_{STUDENT_SYNERGY_ID}' class='attendanceOptions' type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} />
-			<!-- BEGIN has_attendance_options -->
-			<a id='viewAttendanceOptions_{STUDENT_SYNERGY_ID}' class='viewAttendanceOptions' href=''>Edit</a>
-			<!-- END has_attendance_options -->
 		</td>
 	</tr>
 	<tr id='attendanceOptionsForm_{STUDENT_SYNERGY_ID}' class='{ON_OFF}' style='display:none;'>
-
 		<!-- Non-aligned columns ;( -->
 		<td colspan='4'>
-			<form method='post' action='/modules/attendance/modifyForm' class='collectible'>
-				<div>
-					<input name='updateOne' type='hidden' value='{STUDENT_SYNERGY_ID}' />
-					<input name='classCode' type='hidden' value='{CLASS_CODE}' />
-					<input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
-					<input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
-				</div>
-				<label>Absence Options<br />
-					<select name='PossibleAbsenceCode'>
-						<!-- BEGIN absence_options -->
-						<option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
-						<!-- END absence_options -->
-					</select>
-				</label>
+        <div>
+            <input name='studentID[]' type='hidden' value='{STUDENT_SYNERGY_ID}' />
+        </div>
+        <!--<label>Absence Options<br />
+            <select name='PossibleAbsenceCode[]'>
+                <!-- BEGIN absence_options -->
+            <!--    <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option> -->
+                <!-- END absence_options -->
+        <!--    </select>
+        </label> -->
 
-				<label>Reason Options<br />
-					<select name='PossibleReasonCode'>
-						<!-- BEGIN reason_options -->
-						<option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
-						<!-- END reason_options -->
-					</select>
-				</label>
+        <label>Reason Options<br />
+            <select name='PossibleReasonCode[]'>
+                <!-- BEGIN reason_options -->
+                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                <!-- END reason_options -->
+            </select>
+        </label>
 
-				<!-- Maximum length of this description is 100, as it's set in synergetic db -->
-				<label>Reason Description<br />
-					<input type='text' maxlength='100' name='PossibleReasonDescription' value="{STUDENT_REASON_DESCRIPTION}" />
-				</label>
+        <!-- Maximum length of this description is 100, as it's set in synergetic db -->
+        <label>Reason Description<br />
+            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
+        </label>
 
-				<!-- BEGIN has_update -->
-				<label><br />
-					<input class='btn' type='submit' value='Save' />
-				</label>
-				<!-- END has_update -->
-			</form>
-		</td>
+        <label>Arrival Time<br />
+            <input type='text' maxlength='10' name='PossibleReasonDescription[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
+        </label>
+        <label>Departure Time<br />
+            <input type='text' maxlength='10' name='PossibleReasonDescription[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
+        </label>
+
+    </td>
 	</tr>
 	<!-- END student -->
+    </tbody>
 </table>
-
-<!-- BEGIN has_save_all -->
-<div>
-	<a id='saveAll' class='btn add float-left'><span></span>Save All</a>
-</div>
-<!-- END has_save_all -->
+<input type="submit" value="Submit Attendances" class="submit-btn-plain"/>
+</form>
