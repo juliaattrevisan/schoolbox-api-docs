@@ -24,6 +24,10 @@ service mysql restart > /dev/null 2>&1;
 echo "$vag Stopping Apache";
 service apache2 stop > /dev/null 2>&1;
 
+echo "$vag Disabling php-fpm";
+service php5-fpm stop;
+rm -f /etc/init.d/php5-fpm;
+
 # Kill all old grunt processes, they're probably watches
 echo "$vag Stopping background Grunt processes";
 pkill grunt;
