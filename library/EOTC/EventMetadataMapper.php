@@ -389,4 +389,36 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			$statement->execute();
 		}
 	}
+
+	/**
+	 * Find all the events belonging to this metadata
+	 * There should be only one
+	 *
+	 * @param $metadata
+	 * @return mixed
+	 */
+	public function findEventsForMetadata($metadata) {
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_event_metadata',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $metadata->getId(),
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'event_id',
+					'key' => 'id',
+					'mapper' => new \EOTC\EventMapper(),
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
+	}
 }
