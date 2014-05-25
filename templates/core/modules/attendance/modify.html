@@ -6,8 +6,16 @@
 		 * making individual modifications
 		 */
         $j('.attendanceOptions').each(function(index, element) {
+
+            var id = $j(element).val();
+
+            /* Show form if prechecked on load */
+            if ($j(element).is(':checked')) {
+                $j('#attendanceOptionsForm_' + id).show();
+            }
+
+            /* Show form if checked by user */
             $j(element).click(function(event) {
-                var id = $j(element).val();
                 if ($j(element).is(':checked')) {
                     $j('#attendanceOptionsForm_' + id).show();
                 }
@@ -35,10 +43,6 @@
 	label {
 		float: left;
 	}
-
-	.genericWidth {
-		width: 200px;
-	}
 </style>
 <!-- END custom_head -->
 
@@ -58,31 +62,35 @@
 	<thead>
         <tr>
             <th></th>
-            <th class='genericWidth'>Name</th>
-            <th class='genericWidth'>Attendance String</th>
+            <th>Name</th>
+            <th>Attendance String</th>
+            <th>Arrival Time</th>
+            <th>Departure Time</th>
             <th>Absent</th>
         </tr>
 	</thead>
         <tbody>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
-		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_FIRSTNAME} {STUDENT_LASTNAME}" /></td>
+		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_NAME}" /></td>
 		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
         <td><p style="font-size:12pt">{STUDENT_ATTENDANCESTRING}</p></td>
-		<td>
-			<input id='attendanceOptions_{STUDENT_SYNERGY_ID}' class='attendanceOptions' type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} />
-		</td>
+        <td><input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" /></td>
+		<td><input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" /></td>
+        <td>
+            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
+        </td>
 	</tr>
 	<tr id='attendanceOptionsForm_{STUDENT_SYNERGY_ID}' class='{ON_OFF}' style='display:none;'>
 		<!-- Non-aligned columns ;( -->
-		<td colspan='4'>
+		<td colspan='6'>
         <div>
             <input name='studentID[]' type='hidden' value='{STUDENT_SYNERGY_ID}' />
         </div>
         <!--<label>Absence Options<br />
             <select name='PossibleAbsenceCode[]'>
                 <!-- BEGIN absence_options -->
-            <!--    <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option> -->
+            <!--    <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option> -->
                 <!-- END absence_options -->
         <!--    </select>
         </label> -->
@@ -90,7 +98,7 @@
         <label>Reason Options<br />
             <select name='PossibleReasonCode[]'>
                 <!-- BEGIN reason_options -->
-                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                 <!-- END reason_options -->
             </select>
         </label>
@@ -100,12 +108,6 @@
             <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
         </label>
 
-        <label>Arrival Time<br />
-            <input type='text' maxlength='10' name='PossibleReasonDescription[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" />
-        </label>
-        <label>Departure Time<br />
-            <input type='text' maxlength='10' name='PossibleReasonDescription[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" />
-        </label>
 
     </td>
 	</tr>

@@ -8,6 +8,7 @@
  * @version	 SVN: $Id$
  */
 
+
 /* THE THREE MUSKETEERS
  */
 $externalClass = new External_Synergetic_Class();
@@ -74,6 +75,7 @@ if (is_array($_POST['studentID'])) {
 
     /* Then if you could do that, save each person
      */
+
     for($i = 0; $_POST['studentID'][$i]; $i++) {
 
         /* Create a new record
@@ -84,16 +86,25 @@ if (is_array($_POST['studentID'])) {
             'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
             'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
             'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
-            'LateArrivalFlag' => trim($_POST['LateArrivalTime'][$i]) ? 1 : '',
-            'LateArrivalTime' => trim($_POST['LateArrivalTime'][$i]),
-            'EarlyDepartureFlag' => trim($_POST['EarlyDepartureTime'][$i]) ? 1 : '',
-            'EarlyDepartureTime' => trim($_POST['EarlyDepartureTime'][$i]),
-            'AttendedFlag' => $_POST['AttendedFlag'][$i],
+
+            'AttendedFlag' => in_array($_POST['studentID'][$i], $_POST['attending']) ? 0 : 1,
         );
 
+        if($_POST['LateArrivalTime'][$i]) {
+            $data['LateArrivalFlag'] = 1;
+            $data['LateArrivalTime'] = trim($_POST['LateArrivalTime'][$i]);
+        }
+
+        if($_POST['EarlyDepartureTime'][$i]) {
+            $data['EarlyDepartureFlag'] = 1;
+            $data['EarlyDepartureTime'] = trim($_POST['EarlyDepartureTime'][$i]);
+        }
+
+        print_R($data);
         $attendanceRecord->update($data);
 
     }
 
     $attendanceHandler->getAttendanceMaster()->save();
 }
+$this->backToTheFuture(-1);

@@ -101,86 +101,31 @@ if ($class) {
 		foreach($allStudents as $currentStudent) {
 			$user = $userHandler->getBySynergy($currentStudent['ID']);
 
-			/* Default setting for the checkbox and Edit link
-			 */
-			if ($currentStudent['AttendedFlag'] == 0) {
-				$isAbsent = "checked='checked'";
-
-				$this->setVar(array(
-					'STUDENT_SYNERGY_ID' => $currentStudent['ID']
-				));
-			}
-			else {
-				$isAbsent = '';
-
-				/* Clear this as we don't want it to display anything
-				 */
-				$attendanceRecord = array();
-			}
-
 			/* Replace everything with everything
 			 */
-
-            $arrivalTime = explode(' ',$currentStudent['LateArrivalTime']);
-            $deptTime = explode(' ',$currentStudent['EarlyDepartureTime']);
+            preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/',$currentStudent['LateArrivalTime'], $arrivalTime);
+            preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/',$currentStudent['EarlyDepartureTime'], $deptTime);
 
 			$this->setVar(array(
 				'STUDENT_UID' => $user['uid'],
 				'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
-				'STUDENT_SYNERGY_ID' => $user['synergy_id'],
+				'STUDENT_SYNERGY_ID' => $currentStudent['ID'],
 				'STUDENT_ABSENCE_CODE' => $currentStudent['PossibleAbsenceCode'],
 				'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
-				'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleReasonDescription']),
+				'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleDescription']),
                 'STUDENT_ATTENDANCESTRING'  => Scrub::text($currentStudent['TodaysAttendanceString']),
-                'STUDENT_ARRIVAL_TIME'  => date('g:ia',strtotime($arrivalTime[3])),
-                'STUDENT_DEPT_TIME'  =>date('g:ia',strtotime($deptTime[3])),
-                'IS_ABSENT' => $isAbsent,
+                'STUDENT_ARRIVAL_TIME'  => isset($arrivalTime[3]) ? date('g:ia',strtotime($arrivalTime[0])) : '',
+                'STUDENT_DEPT_TIME'  => isset($deptTime[3]) ? date('g:ia',strtotime($deptTime[0])) : '',
+                'IS_ABSENT' => $currentStudent['AttendedFlag'] == 0 ? 'checked="checked"' : '',
 				'ON_OFF' => ++$i%2 ? 'dark' : '',
 			));
 
-			/* Render dropdown options individually
-			 */
-			foreach($absenceDropdownOptions as $currentOption) {
 
-				/* Preselect
-				 */
-				if ($currentOption['Code'] == $currentStudent['PossibleAbsenceCode']) {
-					$isSelected = "selected='selected'";
-				}
-				else {
-					$isSelected = '';
-				}
+            $this->dropDown('absence_options', $absenceDropdownOptions, $currentStudent['PossibleAbsenceCode'],'student',
+                array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION'));
 
-				$this->setVar(array(
-					'ABSENCE_OPTIONS_VALUE' => $currentOption['Code'],
-					'ABSENCE_OPTIONS_DESCRIPTION' => $currentOption['Description'],
-					'ABSENCE_OPTIONS_SELECTED' => $isSelected,
-				));
-
-				$this->parse('absence_options_block', 'absence_options', true);
-			}
-
-			/* Render dropdown options individually
-			 */
-			foreach($reasonDropdownOptions as $currentOption) {
-
-				/* Preselect
-				 */
-				if ($currentOption['Code'] == $currentStudent['PossibleReasonCode']) {
-					$isSelected = "selected='selected'";
-				}
-				else {
-					$isSelected = '';
-				}
-
-				$this->setVar(array(
-					'REASON_OPTIONS_VALUE' => $currentOption['Code'],
-					'REASON_OPTIONS_DESCRIPTION' => $currentOption['Description'],
-					'REASON_OPTIONS_SELECTED' => $isSelected,
-				));
-
-				$this->parse('reason_options_block', 'reason_options', true);
-			}
+            $this->dropDown('reason_options', $reasonDropdownOptions, $currentStudent['PossibleReasonCode'], 'student',
+                array('Code' => 'REASON_OPTIONS_VALUE', 'Description'=>'REASON_OPTIONS_DESCRIPTION'));
 
 
 			$this->parse('student_block', 'student', true);
