@@ -2,31 +2,6 @@
 <script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
 <script type='text/javascript'>
 	$j(function() {
-		/* Make the input form available for absentees when
-		 * making individual modifications
-		 */
-        $j('.attendanceOptions').each(function(index, element) {
-
-            var id = $j(element).val();
-
-            /* Show form if prechecked on load */
-            if ($j(element).is(':checked')) {
-                $j('#attendanceOptionsForm_' + id).show();
-            }
-
-            /* Show form if checked by user */
-            $j(element).click(function(event) {
-                if ($j(element).is(':checked')) {
-                    $j('#attendanceOptionsForm_' + id).show();
-                }
-                else {
-                    /* Hide options form and remove link
-                     */
-                    $j('#attendanceOptionsForm_' + id).hide();
-                    $j('#viewAttendanceOptions_' + id).remove();
-                }
-            });
-		});
 
         $j('.timepicker').timepicker({
             'timeFormat':'g:ia',
@@ -64,8 +39,9 @@
             <th></th>
             <th>Name</th>
             <th>Attendance String</th>
-            <th>Arrival Time</th>
-            <th>Departure Time</th>
+            <th>Late Arrival</th>
+            <th>Early Departure</th>
+            <th>Reason</th>
             <th>Absent</th>
         </tr>
 	</thead>
@@ -78,38 +54,15 @@
         <td><input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" /></td>
 		<td><input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" /></td>
         <td>
-            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
-        </td>
-	</tr>
-	<tr id='attendanceOptionsForm_{STUDENT_SYNERGY_ID}' class='{ON_OFF}' style='display:none;'>
-		<!-- Non-aligned columns ;( -->
-		<td colspan='6'>
-        <div>
-            <input name='studentID[]' type='hidden' value='{STUDENT_SYNERGY_ID}' />
-        </div>
-        <!--<label>Absence Options<br />
-            <select name='PossibleAbsenceCode[]'>
-                <!-- BEGIN absence_options -->
-            <!--    <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option> -->
-                <!-- END absence_options -->
-        <!--    </select>
-        </label> -->
-
-        <label>Reason Options<br />
             <select name='PossibleReasonCode[]'>
                 <!-- BEGIN reason_options -->
                 <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                 <!-- END reason_options -->
             </select>
-        </label>
-
-        <!-- Maximum length of this description is 100, as it's set in synergetic db -->
-        <label>Reason Description<br />
-            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
-        </label>
-
-
-    </td>
+            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" /></td>
+        <td>
+            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
+        </td>
 	</tr>
 	<!-- END student -->
     </tbody>
