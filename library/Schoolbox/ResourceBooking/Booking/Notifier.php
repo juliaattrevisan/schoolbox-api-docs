@@ -106,7 +106,7 @@ class Notifier extends AbstractModuleNotifier {
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $user->getId();
         $startDate      = new \Alaress_Date_Format(
-            $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime()
+            $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
         );
         $messageParams  = array(
             'user'     => array(
@@ -118,8 +118,8 @@ class Notifier extends AbstractModuleNotifier {
                 $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
             ),
             'date'     => array(
+	            $startDate->getLocal(),
                 '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
-                $startDate->getLocal(),
             ),
         );
         if (!$isOwnerCreator) {
