@@ -520,16 +520,23 @@ updatetitle () {
 	newtitle="$titleprefix $tempsqltitle";
 	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "update config set value=\"$newtitle\" where name='title'";
 }
+setmailcatcher () {
+  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host'";
+  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1025' WHERE name='mail_smtp_port'";
+  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='mail_enable'";
+}
 titleprefix='';
 if [ "$package" = 'vagrant' ];
 then
 	titleprefix='[Vagrant]';
 	updatetitle;
+	setmailcatcher;
 fi
 if [ "$package" = 'schoolboxdev' ];
 then
 	titleprefix='[Dev]';
 	updatetitle;
+	setmailcatcher;
 fi
 
 # Restart apache
