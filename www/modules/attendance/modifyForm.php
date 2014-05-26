@@ -100,7 +100,6 @@ if (is_array($_POST['studentID'])) {
             $data['EarlyDepartureTime'] = trim($_POST['EarlyDepartureTime'][$i]);
         }
 
-        print_R($data);
         $attendanceRecord->update($data);
 
     }

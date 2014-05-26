@@ -61,6 +61,7 @@
             </select>
             <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" /></td>
         <td>
+            <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
             <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" class="attendanceOptions" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
         </td>
 	</tr>
