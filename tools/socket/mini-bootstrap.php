@@ -21,6 +21,14 @@ set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include
 require_once __DIR__ . '/../../include/Autoloader.php';
 Autoloader::initialise();
 
+/* Load the Dependency Injector */
+require_once __DIR__.'/../../include/Bootstrap/Dependencies.php';
+
+// Initialise module configuration
+foreach (glob(SITE_root.'/conf/modules/*.php') as $routePath) {
+	require $routePath;
+}
+
 // need DB connection in the main daemon processes
 $database = Database::getInstance();
 $database->connect(SQL_dsn, SQL_user, SQL_passwd);
