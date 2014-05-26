@@ -2,6 +2,7 @@
 updates/sql_updates.sql
 data/
 www/conf/conf.php
+www/test.php
 .vagrant
 Vagrantfile
 core.css
