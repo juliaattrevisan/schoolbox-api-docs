@@ -15,30 +15,30 @@ INSERT INTO `msg_source` (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'created',
     'staff',
-    'somebody booked a resource'
+    'somebody books a resource'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'updated',
     'staff',
-    'somebody updated a booking for a resource'
+    'somebody updates a booking for a resource'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'approved',
     'staff',
-    'somebody approved a booking for a resource'
+    'somebody approves a booking for a resource'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'pending',
     'staff',
-    'somebody set a booking for a resource as pending'
+    'somebody sets a booking for a resource as pending'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'rejected',
     'staff',
-    'somebody rejected a booking for a resource'
+    'somebody rejects a booking for a resource'
   ), (
     (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'resource_booking' LIMIT 1),
     'cancelled',
     'staff',
-    'somebody cancelled a booking for a resource'
+    'somebody cancels a booking for a resource'
   );
