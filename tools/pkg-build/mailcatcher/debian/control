@@ -1,0 +1,16 @@
+Source: mailcatcher
+Section: non-free/web
+Priority: optional
+Maintainer: Alaress Support <support@schoolbox.com.au>
+Build-Depends: debhelper (>= 8.0.0), ruby, rubygems, g++
+Standards-Version: 3.9.3
+Homepage: http://mailcatcher.me
+Vcs-Git: https://github.com/sj26/mailcatcher.git
+Vcs-Browser: https://github.com/sj26/mailcatcher
+
+Package: mailcatcher
+Architecture: all
+Depends: ruby, rubygems,
+ ${misc:Depends}
+Description: MailCatcher
+ Catches mail and serves it through a dream.

@@ -1,0 +1,7 @@
+/var/log/mailcatcher/*.log {
+  daily
+  rotate 7
+  missingok
+  compress
+  missingok
+}
