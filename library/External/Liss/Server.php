@@ -83,7 +83,14 @@ class External_Liss_Server {
 	 * @return xmlrpcresp
 	 */
 	public function publishClasses(xmlrpcmsg $message) {
-		External_Liss_Server::log($message);
+		$authenticationStatement = $message->params[0];
+		$mystery = $message->params[1];
+
+		$allData = $message->params[2]->me['array'];
+
+		foreach($allData as $currentData) {
+			External_Liss_Server::log($currentData);
+		}
 
 		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
