@@ -16,6 +16,12 @@ use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Notif;
 use Serializable;
 
+/**
+ * Class Message
+ *
+ * @deprecated this class continues to work, but use Alaress\Async\Notification\Instance for more flexibility
+ * @package Schoolbox\Notif\Message
+ */
 class Message implements Serializable {
 
 	/** @var MessageBody */
@@ -32,6 +38,7 @@ class Message implements Serializable {
 
 
 	/**
+	 * @deprecated this class continues to work, but use Alaress\Async\Notification\Instance for more flexibility
 	 * @param string $text
 	 * @param string $icon
 	 * @param string $href
@@ -108,17 +115,5 @@ class Message implements Serializable {
 		$this->href = $data['href'];
 		$this->meta = isset($data['meta']) ? $data['meta'] : array();
 	}
-
-    /**
-     * Wraps self inside a format that can be sent to a user
-     *
-     * @param Instance $instance
-     * @param Notif $notif
-     * @param TriggerInterface $trigger
-     * @return TargetedMessage
-     */
-    public function applyInstance($instance, $notif, $trigger = null) {
-        return new TargetedMessage($notif, $this, $instance, $trigger);
-    }
 
 }

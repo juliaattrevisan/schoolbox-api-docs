@@ -10,7 +10,12 @@
 
 namespace Schoolbox\Notif\Message\Instance;
 
-
+/**
+ * Class Instance
+ *
+ * @deprecated
+ * @package Schoolbox\Notif\Message\Instance
+ */
 class Instance {
 
     protected $params   = array();
@@ -20,6 +25,7 @@ class Instance {
     protected $context  = array();
 
     /**
+     * @deprecated
      * @param array $params
      * @param int $severity
      * @param array $topics

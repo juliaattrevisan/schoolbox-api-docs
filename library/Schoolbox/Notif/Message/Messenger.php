@@ -10,85 +10,144 @@
 namespace Schoolbox\Notif\Message;
 
 
-use Alaress\Scheduler\Trigger\BlankTrigger;
-use Alaress\Scheduler\Trigger\TriggerInterface;
-use Schoolbox\Collection;
-use Schoolbox\Feed\Item;
-use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\Message\Instance\Instance;
-use Schoolbox\Notif\Message\Instance\InstanceBundle;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\NotifException;
-use Schoolbox\User;
-use SplObjectStorage;
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\InstanceBundle;
+use Alaress\Async\Notification\Parameter\Param;
 
-class Messenger {
+/**
+ * Class Messenger
+ *
+ * @deprecated this will continue to work, but for more flexibility use Schoolbox\Realtime\Notification\Envelope
+ * @package Schoolbox\Notif\Message
+ */
+class Messenger extends InstanceBundle {
 
-	/** @var SplObjectStorage */
-	protected $splStore;
+	/** @var Builder */
+	protected $builder;
 
-
-    public function __construct() {
-		$this->splStore = new SplObjectStorage();
-	}
 
 	/**
-	 * @param Message $message
-	 * @param int $severity
-	 * @param array $topics
-	 * @param array $targets
-	 * @param array $params
-	 * @param array $context
-	 * @throws \Schoolbox\Notif\NotifException
+	 * Add builder to construction
+	 *
+	 * @deprecated this will continue to work, but for more flexibility use Schoolbox\Realtime\Notification\Envelope
 	 */
-	protected function bind($message, $severity, $topics = array(), $targets = array(), $params = array(), $context = array()) {
-		if(count(array_diff(array_keys($params), $message->getTokenList()))) {
-			throw new NotifException("Parameters supplied must exactly match the :tokens in the message string.");
-		}
-
-		// cast string to array if required
-		$topics = (array)$topics;
-		$targets = (array)$targets;
-		$context = (array)$context;
-
-		// insert the message object if it's not already in our collection
-		if(!$this->splStore->contains($message)) {
-			$this->splStore->attach($message, new InstanceBundle());
-		}
-
-        /** @var InstanceBundle $instances */
-		$instances = $this->splStore->offsetGet($message);
-        $instances->attach(new Instance($params, $severity, $topics, $targets, $context));
+	public function __construct() {
+		parent::__construct();
+		$this->builder = new Builder();
 	}
 
 
+	/**
+	 * @param string $target
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filters
+	 */
+	protected function bindMessage($target, $message, $topic, $severity, $params, $filters) {
+		$this->builder->clear()
+			->setTitle($message->getMessageString())
+			->setIcon($message->getIcon())
+			->setHref($message->getHref())
+			->setSeverity($severity)
+			->addTopic($topic);
+
+		foreach($params as $k => $p) {
+			if(is_array($p)) {
+				$this->builder->setParam($k, new Param($p[0], $p[1]));
+			}
+			else {
+				$this->builder->setParams($k, new Param($p));
+			}
+		}
+
+		foreach($filters as $k => $f) {
+			$this->builder->addFilter($k, $f);
+		}
+
+		$this->bind($target, $this->builder->build());
+	}
+
+	// MAINTAIN OLD API FUNCTION SIGNATURES
+
+	/**
+	 * @param int $catId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToCategory($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "category.$catId", $params, $filter);
+		$this->bindMessage("category.$catId", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $catId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToCategoryAdmin($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "category.$catId.admin", $params, $filter);
+		$this->bindMessage("category.$catId.admin", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $campusId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToCampus($campusId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "campus.$campusId", $params, $filter);
+		$this->bindMessage("campus.$campusId", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $roleId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToRole($roleId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "role.$roleId", $params, $filter);
+		$this->bindMessage("role.$roleId", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $roleType
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToRoleType($roleType, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "roletype.$roleType", $params, $filter);
+		$this->bindMessage("roletype.$roleType", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $houseId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToHouse($houseId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "house.$houseId", $params, $filter);
+		$this->bindMessage("house.$houseId", $message, $topic, $severity, $params, $filter);
 	}
 
-	public function broadcastToResidentialHouse($resHouseId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "reshouse.$resHouseId", $params, $filter);
-	}
 
 	/**
 	 * Broadcasts a message to all users with permissions on a particular
@@ -112,16 +171,53 @@ class Messenger {
 		$this->bind($message, $severity, $topic, "service.$service.$identifier.$accessLevel", $params, $filter);
 	}
 
+
+	/**
+	 * @param int $resHouseId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
+	public function broadcastToResidentialHouse($resHouseId, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bindMessage("reshouse.$resHouseId", $message, $topic, $severity, $params, $filter);
+	}
+
+
+	/**
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 * @param array $filter
+	 */
 	public function broadcastToSuperusers($message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "superuser", $params, $filter);
+		$this->bindMessage("superuser", $message, $topic, $severity, $params, $filter);
 	}
 
+
+	/**
+	 * @param int $studentId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 */
 	public function targetToParent($studentId, $message, $topic, $severity, $params = array()) {
-		$this->bind($message, $severity, $topic, "parent.$studentId", $params);
+		$this->bindMessage("parent.$studentId", $message, $topic, $severity, $params, array());
 	}
 
+
+	/**
+	 * @param int $userId
+	 * @param Message $message
+	 * @param string $topic
+	 * @param int $severity
+	 * @param array $params
+	 */
 	public function targetToUser($userId, $message, $topic, $severity, $params = array()) {
-		$this->bind($message, $severity, $topic, "user.$userId", $params);
+		$this->bindMessage("user.$userId", $message, $topic, $severity, $params, array());
 	}
 
 
@@ -130,109 +226,8 @@ class Messenger {
 	 *
 	 * @return bool
 	 */
-	public function hasMessages() {
-		return !!$this->splStore->count();
-	}
-
-
-	/**
-	 * @param Message $msg
-	 * @param Instance $instance
-	 * @param TriggerInterface $trigger
-	 * @param Notif $notif
-	 * @return TargetedMessage
-	 */
-	protected function applyInstance($msg, $instance, $trigger, $notif) {
-		if($trigger instanceof BlankTrigger) {
-			return new Item($msg, $instance, $trigger);
-		}
-
-		return $msg
-			->applyInstance($instance, $notif, $trigger)
-			->setTargets($instance->getTargets())
-			->setContext($instance->getContext());
-	}
-
-
-	/**
-	 * @param Notif $notif
-	 * @param TriggerInterface $trigger
-	 * @param callable $callback
-	 * @return void
-	 */
-	protected function applyInstances($notif, $trigger, $callback) {
-		if(!$this->hasMessages()) {
-			return;
-		}
-
-		foreach($this->splStore as $msg) {
-			/**
-			 * @var Message $msg
-			 * @var InstanceBundle $instanceBundle
-			 */
-			$instanceBundle = $this->splStore->offsetGet($msg);
-
-			foreach($instanceBundle->getInstances() as $instance) {
-				$messageInstance = $this->applyInstance($msg, $instance, $trigger, $notif);
-				// if we can filter out the user who effected this event in the first place, do so
-				if($trigger) {
-					$effector = $trigger->getEvent()->getEffector();
-					if($effector instanceof User) {
-						$messageInstance->setContext(array('user' => $effector->getId()));
-					}
-				}
-
-				call_user_func($callback, $messageInstance);
-			}
-		}
-	}
-
-    /**
-     * Send all the messages contained by this Messenger through the given Notif
-     *
-     * @param Notif $notif
-     * @param TriggerInterface $trigger
-     * @return array
-     */
-    public function send($notif, $trigger = null) {
-		$result = 0;
-
-		$this->applyInstances($notif, $trigger, function($instance) use (&$result) {
-			if($instance->send()) {
-				$result++;
-			}
-		});
-
-		return $result;
-    }
-
-
-	/**
-	 * Extracts all contained messages and instances into a collection of TargetedMessages
-	 *
-	 * @param Notif $notif
-	 * @param TriggerInterface $trigger
-	 * @return Collection|TargetedMessage[]
-	 */
-	public function extractMessages($notif, $trigger) {
-		$c = new Collection();
-
-		$this->applyInstances($notif, $trigger, function($instance) use (&$c) {
-			$c->add($instance);
-		});
-
-		return $c;
-	}
-
-
-	/**
-	 * Extracts all contained messages and instances into a collection of Feed\Items
-	 *
-	 * @param int $timestamp
-	 * @return Collection|Item[]
-	 */
-	public function extractItems($timestamp) {
-		return $this->extractMessages(null, new BlankTrigger($timestamp));
+	public function isEmpty() {
+		return !$this->count();
 	}
 
 } 

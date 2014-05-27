@@ -9,7 +9,12 @@
 
 namespace Schoolbox\Notif\Message;
 
+/**
+ * Class MessageBody
 
+ * @deprecated
+ * @package Schoolbox\Notif\Message
+ */
 class MessageBody {
 
 	/** @var string */
@@ -19,6 +24,7 @@ class MessageBody {
 	protected $tokens = array();
 
 	/**
+	 * @deprecated
 	 * @param string $messageString
 	 */
 	public function __construct($messageString) {
