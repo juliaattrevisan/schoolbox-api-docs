@@ -18,7 +18,7 @@ class External_Liss_Server {
 	 *
 	 * @var null
 	 */
-	private $logger = null;
+	static $logger = null;
 
 	/**
 	 * Constructor
@@ -31,8 +31,6 @@ class External_Liss_Server {
 	 * Setup
 	 */
 	private function setup() {
-		$logger = new \Alaress_Log_File(dirname(__FILE__) . '/../../../mort.log', 'liss');
-		$this->setLogger($logger);
 	}
 
 	/**
@@ -51,6 +49,14 @@ class External_Liss_Server {
 				'function' => 'External_Liss_Server::publishRooms',
 			)
 		));
+	}
+
+	/**
+	 * Spawn a log message
+	 */
+	static public function log($data) {
+		$logger = new \Alaress_Log_File(dirname(__FILE__) . '/../../../mort.log', 'liss');
+		$logger->log($data);
 	}
 
 	/**
@@ -77,7 +83,7 @@ class External_Liss_Server {
 	 * @return xmlrpcresp
 	 */
 	public function publishClasses(xmlrpcmsg $message) {
-		$this->getLogger()->log('mogp');
+		External_Liss_Server::log('mcclane');
 
 		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
@@ -90,26 +96,5 @@ class External_Liss_Server {
 	 */
 	public function publishRooms(xmlrpcmsg $message) {
 		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set logger
-	 *
-	 * @param null $logger
-	 */
-	private function setLogger($logger) {
-		$this->logger = $logger;
-	}
-
-	/**
-	 * Get logger
-	 *
-	 * @return null
-	 */
-	private function getLogger() {
-		return $this->logger;
 	}
 }
