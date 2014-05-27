@@ -14,10 +14,25 @@ require_once(dirname(__FILE__) . "/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrp
 class External_Liss_Server {
 
 	/**
+	 * A place for you to dump request data
+	 *
+	 * @var null
+	 */
+	private $logger = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->start();
+		$this->setup();
+	}
+
+	/**
+	 * Setup
+	 */
+	private function setup() {
+		$logger = new \Alaress_Log_File(dirname(__FILE__) . '/../../../mort.log', 'liss');
+		$this->setLogger($logger);
 	}
 
 	/**
@@ -62,6 +77,8 @@ class External_Liss_Server {
 	 * @return xmlrpcresp
 	 */
 	public function publishClasses(xmlrpcmsg $message) {
+		$this->getLogger()->log('mogp');
+
 		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
 
@@ -73,5 +90,26 @@ class External_Liss_Server {
 	 */
 	public function publishRooms(xmlrpcmsg $message) {
 		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set logger
+	 *
+	 * @param null $logger
+	 */
+	private function setLogger($logger) {
+		$this->logger = $logger;
+	}
+
+	/**
+	 * Get logger
+	 *
+	 * @return null
+	 */
+	private function getLogger() {
+		return $this->logger;
 	}
 }
