@@ -16,7 +16,7 @@ use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use RuntimeException;
 
-abstract class AMQPConnector {
+abstract class AMQPConnector implements AMQPInterface {
 
 	// default connection vars
 
@@ -100,7 +100,7 @@ abstract class AMQPConnector {
 		// can't use null as a key
 		$idkey = $id ?: '_';
 
-		if(!$this->channels[$idkey] instanceof AMQPChannel) {
+		if(!(isset($this->channels[$idkey]) && $this->channels[$idkey] instanceof AMQPChannel)) {
 			$this->channels[$idkey] = $this->getConnection()->channel($id);
 
 			// automatically declares the primary exchange
