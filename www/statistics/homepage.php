@@ -42,6 +42,12 @@ $homepageHandler = new Homepage($categoryID);
 $g = new Group();
 $permission = $g->getPermission($categoryID);
 
+/* Only write-access people can view statistics
+ */
+if ($permission < WRITE_ACCESS) {
+	error(19);
+}
+
 $this->setTab('resources');
 $this->setTitle($category['name'] . ' Statistics');
 $this->setFile(TEMPLATE_content, 'statistics/homepage.html');

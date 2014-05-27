@@ -97,16 +97,15 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->parse('unsubscribed_block', 'unsubscribed');
         }
 
-        if($this->groupHandler->isSuperuser() || $this->groupHandler->isStaff()) {
+		/* Only write-access people can view statistics
+		 */
+        if($this->groupHandler->isSuperuser() || $this->permission >= WRITE_ACCESS) {
             $this->parse('view_stats_block','view_stats');
         }
         else {
             $this->setVar('view_stats_block', '');
         }
 
-
         return true; // everything went according to plan
-
     }
-
 }
