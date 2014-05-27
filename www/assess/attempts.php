@@ -92,7 +92,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
 				$canReview = true;
 			}
-			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1]))) {
 				$canReview = true;
 			}
 
