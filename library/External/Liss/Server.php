@@ -83,7 +83,7 @@ class External_Liss_Server {
 	 * @return xmlrpcresp
 	 */
 	public function publishClasses(xmlrpcmsg $message) {
-		External_Liss_Server::log('mcclane');
+		External_Liss_Server::log($message);
 
 		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
