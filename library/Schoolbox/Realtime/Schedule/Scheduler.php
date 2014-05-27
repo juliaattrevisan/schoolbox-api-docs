@@ -10,6 +10,8 @@
 namespace Schoolbox\Realtime\Schedule;
 
 
+use Alaress\Async\Notification\Instance\InstanceBundle;
+use Alaress\Async\Notification\Postman;
 use Alaress\Cli\Debug;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\CommandableInterface;
@@ -28,7 +30,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
@@ -328,32 +329,34 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
 
-		/** @var Messenger $msgr */
-		$msgr = unserialize($data[0]);
+		/** @var InstanceBundle $bundle */
+		$bundle = unserialize($data[0]);
 
 		/* attempt some sort of type-safety */
 
 		// method not implemented or nothing to send, this is fine
-		if(is_null($msgr)) {
+		if(is_null($bundle)) {
 			$this->debug->v("No messages to broadcast");
 			return;
 		}
 
 		// check that an array was returned
-		if(!$msgr instanceof Messenger) {
+		if(!$bundle instanceof InstanceBundle) {
 			throw new ScheduleException(
-				"Invalid callback response, must be instance of Schoolbox\\Notif\\Message\\Messenger, got "
-				. (is_object($msgr) ? get_class($msgr) : gettype($msgr))
+				"Invalid callback response, must be instance of Alaress\\Async\\Notification\\InstanceBundle, got "
+				. (is_object($bundle) ? get_class($bundle) : gettype($bundle))
 			);
 		}
 
 		// if there are no messages, just ignore this callback and move on
-		if(!$msgr->hasMessages()) {
+		if($bundle->isEmpty()) {
 			$this->debug->v("No messages to broadcast");
 			return;
 		}
 
-        $count = $msgr->send($this->notif, $trigger);
+		$postman = new Postman($this->notif, $this->debug);
+
+		$count = $postman->deliver($bundle);
 
         if(is_null($count)) {
             $this->debug->d("No messages to broadcast");
