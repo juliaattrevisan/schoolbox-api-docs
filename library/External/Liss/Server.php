@@ -48,25 +48,30 @@ class External_Liss_Server {
 	 *
 	 * Discovered via apache mod_dumpio
 	 *
+	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function getRooms() {
+	public function getRooms(xmlrpcmsg $message) {
 		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
 	}
 
 	/**
 	 * Publish classes to the Schoolbox
 	 *
+	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishClasses() {
+	public function publishClasses(xmlrpcmsg $message) {
 		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
 
 	/**
+	 * Publish rooms to the Schoolbox
+	 * 
+	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishRooms() {
+	public function publishRooms(xmlrpcmsg $message) {
 		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
 	}
 }
