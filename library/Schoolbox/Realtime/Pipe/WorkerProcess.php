@@ -10,16 +10,16 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Notif\Message\Decorator;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
@@ -88,16 +88,17 @@ class WorkerProcess extends AbstractProcess {
 	 */
 	protected function fetch($userId, $count) {
 		$this->debug->v("Fetching $count for user $userId");
-		$decor = new Decorator(null);
+		$decorator = new Decorator();
 
 		$queue = $this->mqf->buildUserQueue($userId, $count, false);
 		$output = array();
 
 		// make messages pretty
-		foreach($queue->getMessages($count, false, true) as $msgId => $targetedMessage) {
-			$decor->setMessage($targetedMessage);
-			$output[$msgId] = $decor->formatArray(false);
-			$output[$msgId]['id'] = $msgId;
+		foreach($queue->getNotifications($count, false, true) as $notification) {
+			$id = $notification->getId();
+			$decorator->setNotification($notification);
+			$output[$id] = $decorator->formatAsSocketArray(false);
+			$output[$id]['id'] = $id;
 		}
 
 		// wrap in an array to preserve keys
@@ -123,7 +124,7 @@ class WorkerProcess extends AbstractProcess {
 
 		$this->debug->v("Executing ".$this->callable2string($callback));
 
-		// this call SHOULD return a Messenger object
+		// this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
 		ob_start();
 		$return = call_user_func($callback, $model, $user, $diff);
 		if($buffer = ob_get_contents()) {
@@ -134,21 +135,22 @@ class WorkerProcess extends AbstractProcess {
 		$this->debug->v("Callback complete");
 
 		if(is_null($return)) {
-			$this->debug->v("Response is NULL, casting to empty Messenger");
-			$return = new Messenger();
+			$this->debug->v("Response is NULL, casting to empty Envelope");
+			$return = new Envelope();
 		}
 
-		if(!$return instanceof Messenger) {
-			throw new InvalidArgumentException("Async method response must be an instance of Messenger; got "
+		if(!$return instanceof InstanceBundle) {
+			throw new InvalidArgumentException(
+				"Async method response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
 				. (is_object($return) ? get_class($return) : gettype($return))
 			);
 		}
 
-		$this->debug->v("Messenger ". ($return->hasMessages() ? 'contains messages' : 'does not contain messages'));
+		$this->debug->v("Envelope ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
 
 		$serial = serialize($return);
 		if($serial === false) {
-			throw new RuntimeException("Failed to serialize Messenger");
+			throw new RuntimeException("Failed to serialize Envelope");
 		}
 
 		$this->debug->d($serial);

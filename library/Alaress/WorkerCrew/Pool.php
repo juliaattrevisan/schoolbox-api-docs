@@ -271,7 +271,7 @@ class Pool {
 	 *   0 if none are available but it is permissible to create one, or
 	 *   -1 if none are available, and no more may be spawned right now.
 	 *
-	 * @param Worker[] $workers
+	 * @param WorkerBundleInterface $workers
 	 * @param int $remainingTaskCount
 	 * @return int
 	 */
