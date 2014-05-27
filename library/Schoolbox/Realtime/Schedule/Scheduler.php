@@ -167,8 +167,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-		    $this->debug->v("Building trigger factory from ".get_class($event->getObject()));
-			$triggerFactory = new TriggerFactory($this->getModule($event->getObject()), $event);
+		    $this->debug->v("Building trigger factory for ".get_class($event->getObject()));
+			$triggerFactory = new TriggerFactory($this->getModule($event), $event);
 
 			// retrieve, populate, and schedule this bundle of triggers
 		    $this->debug->v("Scheduling triggers");
@@ -366,19 +366,34 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     /**
      * Return the module to be working with, based on the model class (with additional safety checks)
      *
-     * @param object|string $modelClass
+     * @param Event $event
      * @throws ScheduleException
      * @return ModuleNotifierInterface
      */
-    public function getModule($modelClass) {
-        $modelClass = is_object($modelClass) ? get_class($modelClass) : $modelClass;
-        $class = $modelClass . "Notifier";
-        if(!class_exists($class)) {
-            throw new ScheduleException("No notifier for model '$modelClass'.");
-        }
-        $instance = new $class($this->conf);
+    public function getModule($event) {
+	    // setup for ifs
+	    $modelClass = get_class($event->getObject());
+		$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
+
+	    // first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
+		if($event->getMapper() instanceof Mapper && $event->getMapper()->getModuleNotifier()) {
+			$classname = $event->getMapper()->getModuleNotifier();
+		}
+		// next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
+	    elseif(class_exists($modelClass.'Notifier')) {
+		    $classname = $modelClass.'Notifier';
+	    }
+		// then, try for '\Schoolbox\User' => '\Schoolbox\Notifier'
+	    elseif(class_exists($pregClass)) {
+		    $classname = $pregClass;
+	    }
+	    else {
+		    throw new ScheduleException("No notifier for model '$modelClass'.");
+	    }
+
+        $instance = new $classname($this->conf);
         if(!$instance instanceof ModuleNotifierInterface) {
-            throw new ScheduleException("Notifer class '$class' found, but not an instance of ModuleNotifierInterface.");
+            throw new ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
         }
 
         return $instance;
