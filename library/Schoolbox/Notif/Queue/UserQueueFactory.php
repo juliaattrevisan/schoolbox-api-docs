@@ -9,10 +9,14 @@
 
 namespace Schoolbox\Notif\Queue;
 
+use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Notification\Instance\Instance;
 use External_User;
 use Group;
+use InvalidArgumentException;
 use Schoolbox\Campus;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Collection;
+use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -30,7 +34,7 @@ use Schoolbox\UserMapper;
  */
 class UserQueueFactory {
 
-	/** @var MQConnector */
+	/** @var AMQPInterface */
 	protected $mqConnector;
 
 	/** @var UserMapper */
@@ -48,7 +52,7 @@ class UserQueueFactory {
 	/** @var External_User */
 	protected $_DEPRECATED_EXT_USER;
 
-	/** @var array */
+	/** @var Collection[] */
 	protected $roleCache;
 
 	/** @var array */
@@ -56,15 +60,15 @@ class UserQueueFactory {
 
 
 	/**
-	 * @param MQConnector $mqConnector
+	 * @param AMQPInterface $mqConnector
 	 */
 	public function __construct($mqConnector = null) {
-		$this->mqConnector = $mqConnector ?: new MQConnector();
+		$this->setMessageQueueConnector($mqConnector ?: new MQConnector());
 	}
 
 
 	/**
-	 * @param MQConnector $mqConnector
+	 * @param AMQPInterface $mqConnector
 	 * @return self
 	 */
 	public function setMessageQueueConnector($mqConnector) {
@@ -247,6 +251,7 @@ class UserQueueFactory {
 					// cache roles
 					$this->roleCache = $this->getRoleMapper()->findAll()->groupBy('type')->getAll();
 					foreach($this->roleCache as $roleType => $roleCollection) {
+						/** @var $roleCollection Collection|Role[] */
 						$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
 					}
 				}
@@ -309,10 +314,10 @@ class UserQueueFactory {
 		}
 		else {
 			$q = new UserQueue(array('user' => array(
-				'id'       => $userId
+				'id' => $userId
 			)), $this->mqConnector);
 		}
-		$q->getMessages($limit);
+		$q->getNotifications($limit);
 		return $q;
 	}
 
@@ -411,11 +416,10 @@ class UserQueueFactory {
 	 * Use this method shrewdly - its expense is proportional to the length of the given user's queues.
 	 *
 	 * @param int $userId
-	 * @param TargetedMessage $message
+	 * @param Instance $instance
 	 * @return bool
 	 */
-	public function userHasSeen($userId, $message) {
-
+	public function userHasSeen($userId, $instance) {
 		$result = false;
 
 		$qs = array(
@@ -426,19 +430,25 @@ class UserQueueFactory {
 		foreach($qs as $q) {
 			$nack = array();
 			while($m = $this->mqConnector->readFromQueue($q)) {
+				// store list of retrieved messages to NACK later
 				$nack[] = $m;
-
 				$unjson = json_decode($m->body, true);
 
-				/** @var TargetedMessage $compare */
-				$compare = unserialize($unjson['message']);
+				try {
+					$compare = Instance::jsonUnserialize($unjson['message']);
+				}
+				catch(InvalidArgumentException $e) {
+					// TODO once TargetedMessage fully deprecated this catch can be removed
+					$conv = new TargetedConverter();
+					$compare = $conv->convert($unjson['message']);
+				}
 
-                if($message->matches($compare, TargetedMessage::MATCH_PARAMS)) {
-                    $result = true;
-                    // break out
-                    break;
-                }
+				if($instance->getParamHash() == $compare->getParamHash()) {
+					$result = true;
+					break;
+				}
 			}
+
 			// push any messages we retrieved back on the the queue
 			$this->mqConnector->rejectMessages($nack);
 
