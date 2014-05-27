@@ -20,6 +20,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserAccess;
 use Schoolbox\UserMapper;
 
 /**
@@ -247,6 +248,27 @@ class UserQueueFactory {
 		// role-type bindings
 		// *.notify.roletype.{name}.#
 		$bindings['roletype'] = array("$roleType.#");
+
+		// Bindings for services:
+		// *.notify.service.{service}.{itemId}.{level}.#
+		// Higher access levels get lower level bindings as well.
+		$bindings['service'] = array();
+		foreach ($user->getAccessList() as $access) {
+			if ($access->getService() == UserAccess::SERVICE_HOMEPAGE) {
+				continue;
+			}
+			$baseBinding = $access->getService().'.'.$access->getItemId();
+			$accessLevel = $access->getAccessLevel();
+			if ($accessLevel >= UserAccess::ACCESS_FULL) {
+				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_FULL.'.#';
+			}
+			if ($accessLevel >= UserAccess::ACCESS_WRITE) {
+				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_WRITE.'.#';
+			}
+			if ($accessLevel >= UserAccess::ACCESS_READ) {
+				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
+			}
+		}
 
 		return $bindings;
 	}

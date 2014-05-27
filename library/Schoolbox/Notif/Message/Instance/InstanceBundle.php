@@ -20,7 +20,11 @@ class InstanceBundle {
      * @param Instance $instance
      */
     public function attach($instance) {
-        $hash = sha1(json_encode($instance->getParams()));
+        $hash = sha1(json_encode(array(
+	        $instance->getParams(),
+	        $instance->getTopics(),
+	        $instance->getTargets()
+        )));
         $this->instances[$hash] = $instance;
     }
 

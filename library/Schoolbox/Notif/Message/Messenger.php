@@ -90,6 +90,28 @@ class Messenger {
 		$this->bind($message, $severity, $topic, "reshouse.$resHouseId", $params, $filter);
 	}
 
+	/**
+	 * Broadcasts a message to all users with permissions on a particular
+	 * service.
+	 *
+	 * @param int     $service     The service to broadcast to: one of the
+	 *                             UserAccess::SERVICE_* constants.
+	 * @param int     $identifier  The identifying key of the service: usually
+	 *                             this is a campus ID.
+	 * @param int     $accessLevel The access level to broadcast to: one of the
+	 *                             UserAccess::ACCESS_* constants.
+	 *                             Messages broadcast to lower access levels are
+	 *                             also sent to higher level users.
+	 * @param Message $message
+	 * @param string  $topic
+	 * @param string  $severity
+	 * @param array   $params
+	 * @param array   $filter
+	 */
+	public function broadcastToService($service, $identifier, $accessLevel, $message, $topic, $severity, $params = array(), $filter = array()) {
+		$this->bind($message, $severity, $topic, "service.$service.$identifier.$accessLevel", $params, $filter);
+	}
+
 	public function broadcastToSuperusers($message, $topic, $severity, $params = array(), $filter = array()) {
 		$this->bind($message, $severity, $topic, "superuser", $params, $filter);
 	}

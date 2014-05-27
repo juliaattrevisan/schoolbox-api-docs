@@ -367,6 +367,13 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * Return the module to be working with, based on the model class (with additional safety checks)
      *
      * @param Event $event
+     * Currently there are two strategies for finding the notifier class:
+     * * Add "Notifier" to the name of the model class
+     *   (so "\\Schoolbox\\User" becomes "\\Schoolbox\\UserNotifier")
+     * * Replace last word in namespace with "Notifier"
+     *   (so "\\Schoolbox\\User\\Model" becomes "\\Schoolbox\\User\\Notifier")
+     *
+     * @param Event $event
      * @throws ScheduleException
      * @return ModuleNotifierInterface
      */
