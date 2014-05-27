@@ -67,7 +67,7 @@ class External_Liss_Server {
 
 	/**
 	 * Publish rooms to the Schoolbox
-	 * 
+	 *
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
