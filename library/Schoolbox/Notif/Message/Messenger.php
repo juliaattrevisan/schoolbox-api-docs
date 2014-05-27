@@ -168,7 +168,7 @@ class Messenger extends InstanceBundle {
 	 * @param array   $filter
 	 */
 	public function broadcastToService($service, $identifier, $accessLevel, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bind($message, $severity, $topic, "service.$service.$identifier.$accessLevel", $params, $filter);
+		$this->bindMessage("service.$service.$identifier.$accessLevel", $message, $topic, $severity, $params, $filter);
 	}
 
 
