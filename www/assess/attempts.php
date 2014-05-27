@@ -15,6 +15,9 @@ $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$userMapper = new \Schoolbox\UserMapper();
+
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
@@ -54,6 +57,7 @@ $this->setVar('attempt_block', '');
 /* Iterate
  */
 $allAttempts = $attemptHandler->getListForUser($this->arg[0], $this->arg[1]);
+$user = $userMapper->findById($this->arg[1]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
@@ -122,25 +126,29 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
-		$userMapper = new \Schoolbox\UserMapper();
-		$user = $userMapper->findById($currentAttempt['user_id']);
+        $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
 
 		if ($currentAttempt['reviewed_at'] != null) {
 			$reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
 			$reviewed = $reviewedAt->getShort();
 
-			$available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
-
-			if ($available) {
-				$marks = 100 * $currentAttempt['totalMarks']/$available;
+			if ($available && $canReview) {
+				$marks = round($currentAttempt['totalMarks']).'/'.round($available);
 			}
 			else {
-				$marks = 0;
+				$marks = 'N/A';
 			}
 		}
 		else {
-			$reviewed = 'Not reviewed';
-			$marks = '';
+            $numMarkedQuestions = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
+            $numUnmarkedQuestions = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+            $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($currentAttempt['attempt_id']);
+
+            $reviewed = 'Not reviewed ('.(100 - round(($valueUnmarkedQuestions / $available ) * 100)).'% graded)';
+
+            if($canReview) {
+                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+            }
 		}
 
         $this->setVar(array(
