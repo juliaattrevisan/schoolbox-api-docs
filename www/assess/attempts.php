@@ -16,8 +16,6 @@ $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
-$userMapper = new \Schoolbox\UserMapper();
-
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
@@ -57,7 +55,6 @@ $this->setVar('attempt_block', '');
 /* Iterate
  */
 $allAttempts = $attemptHandler->getListForUser($this->arg[0], $this->arg[1]);
-$user = $userMapper->findById($this->arg[1]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
     $i = 0;
