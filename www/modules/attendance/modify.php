@@ -120,7 +120,7 @@ if ($class) {
 			));
 
 
-            $this->dropDown('reason_options', $absenceDropdownOptions, $currentStudent['PossibleReasonCode'], 'student',
+            $this->dropDown('absence_options', $absenceDropdownOptions, $currentStudent['PossibleAbsenceCode'], 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description'=>'REASON_OPTIONS_DESCRIPTION'));
 
 
