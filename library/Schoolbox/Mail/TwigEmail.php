@@ -231,6 +231,7 @@ class TwigEmail extends TwigMailer {
 	/**
 	 * Accepts an array of TargetedMessages and sets the context based on them
 	 *
+	 * @deprecated TODO write buildContextFromInstances() instead
 	 * @param TargetedMessage[] $messages
 	 * @return self
 	 */

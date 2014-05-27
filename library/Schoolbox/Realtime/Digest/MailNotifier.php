@@ -15,7 +15,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Message\Decorator;
 use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueue;
@@ -99,6 +98,8 @@ class MailNotifier implements Serializable {
 
 	/**
 	 * Convert a batch of AMQPMessages to TargetedMessages
+	 *
+	 * @deprecated TODO write amqp2instance() instead
 	 * @param AMQPMessage[] $messages
 	 * @return TargetedMessage[]
 	 */

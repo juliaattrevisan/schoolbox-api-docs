@@ -19,6 +19,7 @@ class Feed {
 
 
 	/**
+	 * @deprecated needs to be dependent on InstanceBundle, not Messenger
 	 * @param Messenger $messenger
 	 * @param int $timestamp
 	 * @return Collection|Item[]

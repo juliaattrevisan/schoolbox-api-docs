@@ -15,9 +15,16 @@ use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Instance\Instance;
 use Schoolbox\Notif\Message\Message;
 
+/**
+ * Class Item
+ *
+ * @deprecated
+ * @package Schoolbox\Feed
+ */
 class Item extends TargetedMessage {
 
 	/**
+	 * @deprecated
 	 * @param Message $body
 	 * @param Instance $instance
 	 * @param TriggerInterface $trigger

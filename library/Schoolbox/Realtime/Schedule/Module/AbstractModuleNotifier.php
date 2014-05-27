@@ -144,4 +144,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	protected abstract function getSlug();
 
 
+	/**
+	 * @return Mapper
+	 */
+	public function getMapper() {
+		return $this->mapper;
+	}
+
 }

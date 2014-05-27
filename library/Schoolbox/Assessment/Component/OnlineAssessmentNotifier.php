@@ -138,7 +138,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		}
 
 		/** @var OnlineAssessment[]|Collection $quizzes */
-		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
+		$quizzes = $this->getMapper()->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
 			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($quiz, $quiz->getUser()), $quiz->getStart()->getUnixTimestamp()));
@@ -505,7 +505,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 		// if none of the above apply, but there are changes, just be generic
-		if(count($diff) && !$msgr->hasMessages()) {
+		if(count($diff) && $msgr->isEmpty()) {
 			$msg = new Message(":author updated :quizname in :catname", $icon, $href);
 
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,

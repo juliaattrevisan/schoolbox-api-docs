@@ -1,4 +1,6 @@
 <?php
+use Alaress\Async\Notification\Parameter\Param;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -25,11 +27,8 @@ if(empty($this->arg[0])) {
 	$this->localRedir('/adminv2/messages/preview/digest');
 }
 
-$decor = new \Schoolbox\Notif\Message\Decorator(null);
-$msgFactory = new \Schoolbox\Notif\Message\Factory();
-
-/** @var \Schoolbox\Notif\Message\External\TargetedMessage[] $msgs */
-$msgs = array();
+$bob = new \Alaress\Async\Notification\Instance\Builder();
+$decorator = new \Schoolbox\Realtime\Notification\Decorator();
 
 switch($this->arg[0]) {
 	case 'instant':
@@ -40,16 +39,21 @@ switch($this->arg[0]) {
 
 		$cctx = $email->getCoreContext();
 
-		$msgs[] = $msgFactory
-			->setMsgBody(':author posted a Lab Report :name in :subj')
-				->bindParam('author', 'Mr Walter White', '#')
-				->bindParam('name', 'REDUX', '#')
-				->bindParam('subj','Yr 11 Chemistry B', '#')
+		$decorator->appendInstance($bob
+			->setTitle(':author posted a Lab Report :name in :subj')
+			->setParams(array(
+				'author' => new Param('Mr Walter White'),
+				'name'   => new Param('REDUX'),
+				'subj'   => new Param('Yr 11 Chemistry B'),
+			))
 			->setTimestamp(strtotime('today'))
-			->setMeta('subtitle', 'Due 24th April, 2014')
-			->setMeta('abstract', 'You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
-			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null))
-			->build();
+			->setNamespace('work')
+			->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
+			->setByline('Due 24th April, 2014')
+			->setHref('#')
+			->setIcon('/image/icon.php?size=square32&icon=work')
+			->build()
+		);
 		break;
 
 	case 'digest':
@@ -57,37 +61,51 @@ switch($this->arg[0]) {
 		$email = new \Schoolbox\Mail\TwigEmail('digestmail.twig');
 		$cctx = $email->getCoreContext();
 
-		$msgs[] = $msgFactory
-			->setMsgBody(':author posted a Lab Report :name in :subj')
-				->bindParam('author', 'Mr Walter White', '#')
-				->bindParam('name', 'REDUX', '#')
-				->bindParam('subj', 'Yr 11 Chemistry B', '#')
-			->setTimestamp(strtotime('now'))
-			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null))
-			->build();
+		$decorator->appendInstance($bob
+				->setTitle(':author posted a Lab Report :name in :subj')
+				->setParams(array(
+					'author' => new Param('Mr Walter White'),
+					'name'   => new Param('REDUX'),
+					'subj'   => new Param('Yr 11 Chemistry B'),
+				))
+				->setTimestamp(strtotime('today'))
+				->setNamespace('work')
+				->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
+				->setByline('Due 24th April, 2014')
+				->setHref('#')
+				->setIcon('/image/icon.php?size=square32&icon=work')
+				->build()
+		);
 
-		$msgFactory
-			->setMsgBody(':author extended :name to :date in :subj')
-				->bindParam('author', 'Mrs Celia Glenn', '#')
-				->bindParam('name', 'Shakespeare Essay', '#')
-				->bindParam('date', date('D, jS M', date('tomorrow')))
-				->bindParam('subj', 'Yr 10 English Literature', '#')
-			->setTimestamp(strtotime('-72 hours'))
-			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null));
+		$due = date('D, jS M', date('tomorrow'));
+		$decorator->appendInstance($bob
+				->setTitle(':author extended :name to :date in :subj')
+				->setParams(array(
+					'author' => new Param('Mrs Celia Glenn'),
+					'name'   => new Param('Shakespeare Essay'),
+					'date'   => new Param($due),
+					'subj'   => new Param('Yr 10 English Literature'),
+				))
+				->setTimestamp(strtotime('-72 hours'))
+				->setBody('')
+				->setByline($due)
+				->setIcon('/image/icon.php?size=square32&icon=work')
+				->build()
+		);
 
-		for($i = 0; $i < 6; ++$i) {
-			$msgFactory->setHref('/'.sha1(rand()));
-			$msgs[] = $msgFactory->build();
-		}
-
-		$msgs[] = $msgFactory
-			->setMsgBody(':name is due :when in :subj')
-				->bindParam('name', 'Shakespeare Essay', '#')
-				->bindParam('when', 'in 5 hours')
-				->bindParam('subj', 'Yr 11 Chemistry B', '#')
-			->setTimestamp(strtotime('-24 hours'))
-			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null))
-			->build();
+//		for($i = 0; $i < 6; ++$i) {
+//			$msgFactory->setHref('/'.sha1(rand()));
+//			$msgs[] = $msgFactory->build();
+//		}
+//
+//		$msgs[] = $msgFactory
+//			->setMsgBody(':name is due :when in :subj')
+//				->bindParam('name', 'Shakespeare Essay', '#')
+//				->bindParam('when', 'in 5 hours')
+//				->bindParam('subj', 'Yr 11 Chemistry B', '#')
+//			->setTimestamp(strtotime('-24 hours'))
+//			->setNotifier(new \Schoolbox\Assessment\Component\SubmissionBoxNotifier(null))
+//			->build();
 
 		/** @var \Schoolbox\News\Article[] $articles */
 		$articles = \Schoolbox\News\ArticleMapper::getInstance()->findAll(array('limit' => 3));
@@ -101,22 +119,26 @@ switch($this->arg[0]) {
 				$image = '/images/icon.php?size=64&icon=pin';
 			}
 
-			$msgs[] = $msgFactory
-				->setMsgBody(":title")
-					->bindParam('title', $article->getHeading(), '/news/item/'.$article->getId())
+			$decorator->appendInstance($bob
+				->setTitle(":user posted :name under :topic")
+				->setParams(array(
+						'user'  => new Param($article->getOwner()->formatName()),
+						'name'  => new Param($article->getHeading(), '/news/item/'.$article->getId()),
+						'topic' => new Param($article->getTopic()->getName())
+					))
 				->setHref('/news/item/'.$article->getId())
-				->setIcon($image)
-				->setMeta('abstract', TextFormatter::cutSentence(Scrub::html2text($article->getBody()), 300))
-				->setMeta('author', $article->getOwner()->formatName())
-				->setMeta('topic', $article->getTopic()->getName())
+				->setBody(TextFormatter::cutSentence(Scrub::html2text($article->getBody()), 300))
+				->setByline("By {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
 				->setTimestamp($article->getPostDate()->getUnixTimestamp())
-				->setNotifier(new \Schoolbox\News\ArticleNotifier(null))
-				->build();
+				->build()
+			);
 		}
 		break;
 }
 
-$email->buildContextFromMessageList($msgs);
+// TODO or should it be the Bundle (in this case Decorator)?
+$email->setNotifications($decorator->getAll());
+//$email->buildContextFromMessageList($msgs);
 
 if(isset($this->arg[1]) && $this->arg[1] == 'context') {
 	header('Content-Type: text/plain');

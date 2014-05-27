@@ -35,4 +35,11 @@ interface SourceInterface {
 	 * @return mixed
 	 */
 	public function getChannelMetadata();
-} 
+
+
+	/**
+	 * @return FeedableMapperInterface
+	 */
+	public function getMapper();
+
+}
