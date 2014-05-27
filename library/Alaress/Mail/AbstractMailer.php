@@ -10,7 +10,6 @@
 namespace Alaress\Mail;
 
 
-use Email;
 use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;

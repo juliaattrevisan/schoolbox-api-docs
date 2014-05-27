@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component;
 
 
-use Alaress\Scheduler\Trigger\BlankTrigger;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -20,12 +19,10 @@ use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\Item;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -387,7 +384,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
 		// if none of the above apply, but there are changes, just be generic
-		if(count($diff) && !$msgr->hasMessages()) {
+		if(count($diff) && $msgr->isEmpty()) {
 			$msg = new Message(":author updated :boxname in :catname", $icon, $href);
 
 			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,

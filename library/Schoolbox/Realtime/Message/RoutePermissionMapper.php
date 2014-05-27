@@ -10,7 +10,6 @@
 namespace Schoolbox\Realtime\Message;
 
 
-use DatabaseStatement;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;

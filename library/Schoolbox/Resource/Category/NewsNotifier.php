@@ -10,14 +10,12 @@
 namespace Schoolbox\Resource\Category;
 
 
-use Alaress\Scheduler\Trigger\BlankTrigger;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\Item;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
