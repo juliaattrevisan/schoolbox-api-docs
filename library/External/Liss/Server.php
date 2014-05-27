@@ -24,13 +24,16 @@ class External_Liss_Server {
 	 * Start the Liss server with the list of available methods
 	 * and signatures here
 	 */
-	private function start() {
+	public function start() {
 		new xmlrpc_server(array(
 			'liss.getRooms' => array(
-				'function' => 'Liss::getRooms'
+				'function' => 'External_Liss_Server::getRooms'
+			),
+			'liss.publishClasses' => array(
+				'function' => 'External_Liss_Server::publishClasses',
 			),
 			'liss.publishRooms' => array(
-				'function' => 'Liss::publishRooms',
+				'function' => 'External_Liss_Server::publishRooms',
 			)
 		));
 	}
@@ -41,12 +44,23 @@ class External_Liss_Server {
 	 * should be the first you implement, getRooms() is actually
 	 * called whenever you click Connect in the LissTester
 	 *
+	 * Don't delete it
+	 *
 	 * Discovered via apache mod_dumpio
 	 *
 	 * @return xmlrpcresp
 	 */
 	public function getRooms() {
 		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
+	}
+
+	/**
+	 * Publish classes to the Schoolbox
+	 *
+	 * @return xmlrpcresp
+	 */
+	public function publishClasses() {
+		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
 	}
 
 	/**
