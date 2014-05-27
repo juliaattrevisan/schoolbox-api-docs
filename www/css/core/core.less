@@ -7531,6 +7531,10 @@ li.bars {
 /* SUBMISSION MARK TABLE */
 .markForm {
     display: block;
+
+    >strong {
+        display: none;
+    }
 }
 
 .row-fix {
@@ -7791,11 +7795,8 @@ form.context {
                         height: 23px;
                         margin: 0 20px 0 0;
                     }
-                    strong {
-                      display:none;
-                    }
                     .twolines {
-                      display:none;
+                      display: none;
                     }
                 }
                 input, select {
@@ -9198,8 +9199,9 @@ td.name {
     	float: left;
     	height: 14px;
     	width: 14px;
+    	margin: 0 15px 10px 0;
     	position: relative;
-    	top: 0px;
+    	top: 3px;
     	left: 6px;
     	background: url(/images/core/icons/btn-icons.png) no-repeat;
     	background-position: 0 -308px;
