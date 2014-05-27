@@ -15,7 +15,7 @@ use Alaress\Async\AMQP\AMQPExchange;
 use PhpAmqpLib\Connection\AMQPConnection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Notif\Message\External\TargetedConverter;
 
 class Connector extends AMQPConnector {
 
@@ -81,28 +81,17 @@ class Connector extends AMQPConnector {
 	protected function hashMessage($message, $channelId) {
 		// attempt to extract the message body, so as to efficiently de-dupe resent messages
 		if($data = json_decode($message, true)) {
-			$string = ($data['message']);
-			if($obj = unserialize($string)) {
-				return self::deriveMessageId($obj, $channelId);
-			}
+			// TODO once TargetedMessage completely deprecated, replace this with Instance::jsonUnserialize()
+			$conv = new TargetedConverter();
+			$instance = $conv->convert($data['message']);
+
+			return $instance->getBaseHash();
 		}
 
-		// cast null to 0
+		// couldn't decode, so let's just hash what we got
 		$bits = array(is_null($channelId) ? 0 : $channelId);
 		$bits[] = $message;
 		return sha1(implode('.', $bits));
 	}
 
-
-	/**
-	 * @param TargetedMessage $msg
-	 * @param int $channelId
-	 * @return string
-	 */
-	public static function deriveMessageId($msg, $channelId = null) {
-		$body = $msg->getBody()->toArray();
-		$bits = array($channelId);
-		$bits[] = $body['body'].$body['href'];
-		return sha1(implode('.', $bits));
-	}
-} 
+}
