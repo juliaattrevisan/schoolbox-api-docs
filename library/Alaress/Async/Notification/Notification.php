@@ -77,16 +77,6 @@ class Notification {
 			$this->params[$token] = array();
 		}
 
-		// cache basic information
-		$array = $instance->jsonSerialize();
-		$this->info = array(
-			'title' => $array['title']['text'],
-			'namespace' => $array['namespace'],
-			'icon' => $array['icon'],
-			'href' => $array['href'],
-			'meta' => $array['meta']
-		);
-
 		return $this->appendInstance($instance);
 	}
 
@@ -102,17 +92,31 @@ class Notification {
 		if($instance->getBaseHash() != $this->hash) {
 			throw new InvalidArgumentException("Instance to append does not match initial hash");
 		}
-		if(isset($this->instances[$instance->getParamHash()])) {
+		$paramHash = $instance->getParamHash();
+		if(isset($this->instances[$paramHash])) {
 			// we already have this instance, dismiss
 			return $this;
 		}
 
 		// store instance
-		$this->instances[$instance->getParamHash()] = $instance;
+		$this->instances[$paramHash] = $instance;
 
 		// take timestamp if it's more recent than the one we have already
-		$this->timestamp = max($instance->getTime(), $this->timestamp);
+		if($instance->getTime() > $this->timestamp) {
+			$this->timestamp = $instance->getTime();
 
+			// cache basic information
+			$array = $instance->jsonSerialize();
+			$this->info = array(
+				'title' => $array['title']['text'],
+				'namespace' => $array['namespace'],
+				'icon' => $array['icon'],
+				'href' => $array['href'],
+				'meta' => $array['meta']
+			);
+		}
+
+		$this->timestamp = max($instance->getTime(), $this->timestamp);
 
 
 		// collate params with existing
