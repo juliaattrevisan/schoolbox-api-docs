@@ -51,6 +51,7 @@ class Messenger extends InstanceBundle {
 			->setIcon($message->getIcon())
 			->setHref($message->getHref())
 			->setSeverity($severity)
+			->setNamespace(substr($topic, 0, strpos($topic, '.')))
 			->addTopic($topic);
 
 		foreach($params as $k => $p) {
