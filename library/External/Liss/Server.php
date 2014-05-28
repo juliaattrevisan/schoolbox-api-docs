@@ -214,9 +214,52 @@ class External_Liss_Server {
 	 */
 	public function publishBellTimes(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
+		$ttStructure = $message->params[1];
 
 		if ($authenticator->isAuthenticated()) {
-			External_Liss_Server::log($message);
+			$allData = $message->params[2]->me['array'];
+
+			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+			$collection = new \Schoolbox\Collection();
+
+			foreach($allData as $currentData) {
+				$struct = $currentData->me['struct'];
+
+				$dayNumber = (string)$struct['DayNumber']->me['i4'];
+
+				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+				$timetablePeriod->setCycle(3);
+				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
+				$timetablePeriod->setDay($dayNumber);
+				$timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
+				$timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+				$timetablePeriod->setUsable(1);
+
+				/* Start a collection for a day
+				 */
+				if ($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection) {
+				}
+				else {
+					$collection->setOffset($dayNumber, new \Schoolbox\Collection());
+				}
+
+				$collection->getOffset($dayNumber)->add($timetablePeriod);
+
+				External_Liss_Server::log($collection);
+			}
+
+			$collection->reindex();
+
+			foreach($collection as $dayCollection) {
+				$i = 0;
+
+				foreach($dayCollection as $timetablePeriod) {
+					$timetablePeriod->setSequence($i);
+					$timetablePeriodMapper->save($timetablePeriod);
+
+					$i++;
+				}
+			}
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
 		}
