@@ -7,7 +7,7 @@
 
 {% block pretty %}
     {% set msg = row.messages | first %}
-    <strong>{{ msg.pretty | raw }}</strong>
+    {{ msg.title | raw }}
 {% endblock %}
 
 {% block meta %}
@@ -18,16 +18,13 @@
         <td>
             <p>
                 <em>
-                {% if msg.meta.topic %}
-                    {{ msg.meta.topic }} |
-                {% endif %}
-                    {{ msg.timestamp|date('jS M Y') }} by {{ msg.meta.author }}
+                    {{ msg.meta.byline }}
                 </em>
             </p>
         </td>
     </tr>
     <tr>
-        <td><p>{{ msg.meta.abstract | raw }}</p></td>
+        <td><p>{{ msg.meta.body | raw }}</p></td>
     </tr>
     {% endif %}
 {% endblock %}

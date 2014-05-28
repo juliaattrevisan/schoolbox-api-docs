@@ -30,7 +30,7 @@
         <td valign="middle">
             <table>
                 <tr>
-                    <td>{{ msg.pretty | raw }}</td>
+                    <td>{{ msg.title | raw }}</td>
                 </tr>
                 {% if msg.meta %}
                 <tr class="underline">{{ fn.spacer(8, 0) }}</tr>
@@ -38,12 +38,12 @@
                 <tr>
                     <td>
                         <p>
-                            <em>{{ msg.meta.subtitle | raw }}</em>
+                            <em>{{ msg.meta.byline | raw }}</em>
                         </p>
                     </td>
                 </tr>
                     <td>
-                        <p>{{ msg.meta.abstract | raw }}</p>
+                        <p>{{ msg.meta.body | raw }}</p>
                     </td>
                 {% endif %}
             </table>
