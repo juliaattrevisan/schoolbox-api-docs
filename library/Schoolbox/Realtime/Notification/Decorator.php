@@ -14,6 +14,9 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Collection;
+use Schoolbox\Realtime\Message\NS;
+use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 
 class Decorator extends NotificationBundle {
@@ -58,30 +61,91 @@ class Decorator extends NotificationBundle {
 		return $array;
 	}
 
+
 	/**
 	 * Render the stored array of notification instances as a Twig context array (for sending via email)
 	 *
-	 * @param array $coreContext - the base context of the template to be rendered, if any
-	 * @return array             - a context Twig can parse
+	 * @param array $coreContext    the base context of the template to be rendered, if any
+	 * @param int   $sortDirection  the direction in which to sort the messages, by timestamp
+	 * @return array                a context Twig can parse
 	 */
-	public function renderAsTwigContext($coreContext = array()) {
-		$context = $this->toArray();
+	public function renderAsTwigContext($coreContext = array(), $sortDirection = SORT_DESC) {
+		$array = $this->toArray();
 		$fqdn = isset($coreContext['config']['fqdn']) ? 'http://'.$coreContext['config']['fqdn'] : '';
 
-		foreach($context as $id => $n) {
+		foreach($this->notifications as $n) {
+			// compile the title
+			$array[$n->getId()]['title'] = $this->renderTitleAsHtml($n);
+
 			// icon cannot be a protected link
-			if(!strlen($n['icon']) || strpos($n['icon'], '/portrait') === 0) {
+			if(!strlen($n->getIcon()) || strpos($n->getIcon(), '/portrait') === 0) {
 				// change to be the generic icon for the namespace
-				$context[$id]['icon'] = '/images/icon.php?size=48&icon='.$n['namespace'];
+				$array[$n->getId()]['icon'] = '/images/icon.php?size=48&icon='.$n->getNamespace();
 			}
 
 			foreach(array('icon', 'href') as $field) {
+				$getField = 'get'.ucfirst($field);
+				$value = $n->$getField();
 				// leading slash needs FQDN prepended
-				if($n[$field][0] == '/') {
-					$context[$id][$field] = $fqdn . $n[$field];
+				if(strlen($value) && $value[0] == '/') {
+					$array[$n->getId()][$field] = $fqdn . $value;
 				}
 			}
 		}
+
+		$context = array();
+
+		foreach($array as $id => $msg) {
+			// create data structure for emails
+			switch($msg['namespace']) {
+				case NSMapper::NS_DUEWORK:
+				case NSMapper::NS_ONLINE_ASSESS:
+					$ns = 'work';
+					break;
+				case NSMapper::NS_NEWS:
+					$ns = 'news';
+					break;
+				default:
+					$ns = 'activity';
+					break;
+			}
+
+			// for work, aggregate by day; everything else, one row per item
+			if($ns == 'work') {
+				$daystamp = (int)($msg['time'] / 86400);
+				$context['groups'][$ns]['rows'][$daystamp]['messages'][$id] = $msg;
+			}
+			else {
+				$context['groups'][$ns]['rows'][/* blank on purpose */]['messages'][$id] = $msg;
+			}
+		}
+
+		// apply group headings as required
+		$headings = array(
+			'work'     => 'Schoolwork',
+			'news'     => 'News',
+			'activity' => 'Activity'
+		);
+
+		foreach($headings as $ns => $heading) {
+			if(isset($context['groups'][$ns])) {
+				$context['groups'][$ns]['heading'] = $heading;
+			}
+		}
+
+		// and now, the sorting
+		foreach($context['groups'] as &$g) {
+			foreach($g['rows'] as &$r) {
+				ksort($r['messages']);
+			}
+			if($sortDirection == SORT_DESC) {
+				krsort($g['rows']);
+			}
+			else {
+				ksort($g['rows']);
+			}
+		}
+		krsort($context['groups']);
 
 		return $context;
 	}
