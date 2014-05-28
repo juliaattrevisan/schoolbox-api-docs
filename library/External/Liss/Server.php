@@ -45,9 +45,18 @@ class External_Liss_Server {
 			'liss.publishClasses' => array(
 				'function' => 'External_Liss_Server::publishClasses',
 			),
-			'liss.publishRooms' => array(
-				'function' => 'External_Liss_Server::publishRooms',
-			)
+			'liss.publishTimetable' => array(
+				'function' => 'External_Liss_Server::publishTimetable',
+			),
+			'liss.publishDailyData' => array(
+				'function' => 'External_Liss_Server::publishDailyData',
+			),
+			'liss.publishCalendar' => array(
+				'function' => 'External_Liss_Server::publishCalendar',
+			),
+			'liss.publishBellTimes' => array(
+				'function' => 'External_Liss_Server::publishBellTimes',
+			),
 		));
 	}
 
@@ -110,12 +119,74 @@ class External_Liss_Server {
 	}
 
 	/**
-	 * Publish rooms to the Schoolbox
+	 * Publish timetable to the Schoolbox
 	 *
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishRooms(xmlrpcmsg $message) {
-		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
+	public function publishTimetable(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		if ($authenticator->isAuthenticated()) {
+			External_Liss_Server::log($message->params[1]);
+
+			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
+	 * Publish timetable to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	public function publishDailyData(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		if ($authenticator->isAuthenticated()) {
+			External_Liss_Server::log($message);
+
+			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
+	 * Publish timetable to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	public function publishCalendar(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		if ($authenticator->isAuthenticated()) {
+			External_Liss_Server::log($message);
+
+			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
+	 * Publish timetable to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	public function publishBellTimes(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		if ($authenticator->isAuthenticated()) {
+			External_Liss_Server::log($message);
+
+			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 }
