@@ -128,16 +128,57 @@ class External_Liss_Server {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
-			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
-			$classEntryMapper =  new \Schoolbox\External\ClassEntryMapper();
+			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+			$userMapper = new \Schoolbox\UserMapper();
+
+			/* TODO: Default user for testing
+			 */
+			$defaultUser = $userMapper->findById(19);
 
 			$allData = $message->params[1]->me['array'];
 
 			foreach($allData as $currentData) {
 				$struct = $currentData->me['struct'];
 
-				$classPeriod = new \Schoolbox\External\ClassPeriod();
-//				External_Liss_Server::log($struct);
+				/* Find the Period data
+				 */
+				$allPeriods = $timetablePeriodMapper->findByColumnList(array(
+					'day' => $struct['DayNumber']->me['i4'],
+					'title' => $struct['Period']->me['string']
+				));
+
+				/* Find the Class
+				 */
+				$allClasses = $classEntryMapper->findByColumn('code', $struct['ClassCode']->me['string']);
+
+				/* Find the Teacher
+				 */
+				$allTeachers = $userMapper->findByColumn('synergy_id', $struct['TeacherId']->me['string']);
+
+				/* TODO: Ram in a duff account for testing
+				 */
+				if (!$allTeachers->count()) {
+					$allTeachers->add($defaultUser);
+				}
+
+				/* Check that all three are provided
+				 * Save it!
+				 */
+				if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
+					$classPeriod = new \Schoolbox\External\ClassPeriod();
+					$classPeriod->setClass($allClasses->first()->getId());
+					$classPeriod->setPeriod($allPeriods->first()->getId());
+					$classPeriod->setTeacher($allTeachers->first()->getId());
+					$classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
+				}
+				/* These ones are broken
+				 */
+				else {
+					$counts = "{$allPeriods->count()} {$allClasses->count()} {$allTeachers->count()} for {$struct['ClassCode']->me['string']}\n";
+
+					External_Liss_Server::log($counts);
+				}
 			}
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
