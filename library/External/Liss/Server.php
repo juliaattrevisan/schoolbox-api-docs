@@ -128,7 +128,17 @@ class External_Liss_Server {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
-			External_Liss_Server::log($message->params[1]);
+			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
+			$classEntryMapper =  new \Schoolbox\External\ClassEntryMapper();
+
+			$allData = $message->params[1]->me['array'];
+
+			foreach($allData as $currentData) {
+				$struct = $currentData->me['struct'];
+
+				$classPeriod = new \Schoolbox\External\ClassPeriod();
+//				External_Liss_Server::log($struct);
+			}
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
 		}
@@ -146,7 +156,31 @@ class External_Liss_Server {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
-			External_Liss_Server::log($message);
+			$allData = $message->params[3]->me['array'];
+
+			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+
+			$i = 0;
+			foreach($allData as $currentData) {
+				External_Liss_Server::log($currentData);
+				$struct = $currentData->me['struct'];
+
+				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+				$timetablePeriod->setCycle(2);
+				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
+				$timetablePeriod->setStart((string)$struct['From']->me['string']);
+				$timetablePeriod->setFinish((string)$struct['To']->me['string']);
+
+				/* What populates this?
+				 */
+				$timetablePeriod->setDay(0);
+				$timetablePeriod->setSequence($i);
+				$timetablePeriod->setUsable(1);
+
+				$timetablePeriodMapper->save($timetablePeriod);
+
+				$i++;
+			}
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
 		}
