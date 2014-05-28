@@ -230,28 +230,31 @@ class Builder {
 	/**
 	 * Builds an instance from the construction given
 	 *
+	 * @param bool $validate - optionally build without validation (debug only), if validation fails exception thrown
 	 * @throws OutOfBoundsException
 	 * @throws InvalidArgumentException
 	 * @return Instance
 	 */
-	public function build() {
+	public function build($validate = true) {
 		// check things are right
 
-		// mandatory strings
-		$check = array('title', 'icon', 'namespace', 'href');
+		if($validate) {
+			// mandatory strings
+			$check = array('title', 'icon', 'namespace', 'href');
 
-		foreach($check as $prop) {
-			if(!(trim($this->$prop))) {
-				throw new InvalidArgumentException(ucfirst($prop)." has not been set");
+			foreach($check as $prop) {
+				if(!(trim($this->$prop))) {
+					throw new InvalidArgumentException(ucfirst($prop)." has not been set");
+				}
 			}
-		}
 
-		if($this->severity == 0) {
-			throw new OutOfBoundsException("Severity has not been set");
-		}
+			if($this->severity == 0) {
+				throw new OutOfBoundsException("Severity has not been set");
+			}
 
-		if(!count($this->topics)) {
-			throw new InvalidArgumentException("Topic has not been set");
+			if(!count($this->topics)) {
+				throw new InvalidArgumentException("Topic has not been set");
+			}
 		}
 
 		$meta = array();
