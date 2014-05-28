@@ -13,8 +13,6 @@ namespace Schoolbox\Mail;
 
 use Alaress\Mail\TwigMailer;
 use FM\CSSIN;
-use Schoolbox\Notif\Message\Decorator;
-use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\UserMapper;
 
 class TwigEmail extends TwigMailer {
@@ -226,66 +224,5 @@ class TwigEmail extends TwigMailer {
         parent::setSubject($subject);
         $this->coreContext['config']['subject'] = $subject;
     }
-
-
-	/**
-	 * Accepts an array of TargetedMessages and sets the context based on them
-	 *
-	 * @deprecated TODO write buildContextFromInstances() instead
-	 * @param TargetedMessage[] $messages
-	 * @return self
-	 */
-	public function buildContextFromMessageList($messages) {
-
-		$context = array();
-		$decor = new Decorator(null);
-
-		// iterate the messages and merge their results into a single array
-		foreach($messages as $msg) {
-			$context = array_merge_recursive($context, $decor->setMessage($msg)->formatContext($this->getCoreContext()));
-		}
-
-		$headings = array(
-			'work' => 'Schoolwork',
-			'news' => 'News'
-		);
-
-		foreach($headings as $ns => $heading) {
-			if(isset($context['groups'][$ns])) {
-				$context['groups'][$ns]['heading'] = $heading;
-			}
-		}
-
-		$oldestFirst = self::getConfig()->get('digest_oldest_first');
-
-		// sorting
-		foreach($context['groups'] as $ns => &$group) {
-			switch($ns) {
-				case 'work':
-					if($oldestFirst) {
-						ksort($group['rows']);
-					}
-					else {
-						krsort($group['rows']);
-					}
-					break;
-				default:
-					usort($group['rows'], function($a, $b) use ($oldestFirst) {
-						$i = $oldestFirst ? 1 : -1;
-
-						// use the timestamps of the first message in each row to decide ordering
-						$a = reset($a[0]['messages']);
-						$b = reset($b[0]['messages']);
-
-						return $a['timestamp'] == $b['timestamp']
-							? 0
-							: $a > $b ? ($i) : ($i * -1);
-					});
-			}
-			break;
-		}
-
-		return $this->setContext($context);
-	}
 
 }
