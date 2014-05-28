@@ -1,0 +1,145 @@
+<?php
+/**
+ * Authenticator
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+class External_Liss_Authenticator {
+
+	/**
+	 * An object containing username/password sent to us
+	 *
+	 * @var null
+	 */
+	private $dataObject = null;
+
+	/**
+	 * Username
+	 * This will probably come from Cfg at some point
+	 *
+	 * @var string
+	 */
+	private $username = 'alaress';
+
+	/**
+	 * Password
+	 * This will probably come from Cfg at some point
+	 *
+	 * @var string
+	 */
+	private $password = 'alaress';
+
+	/**
+	 * School code
+	 * This will probably come from Cfg at some point
+	 *
+	 * @var string
+	 */
+	private $schoolCode = 'EDVALHIGH';
+
+	/**
+	 * Constructor
+	 *
+	 * @param $dataObject
+	 */
+	public function __construct(xmlrpcval $dataObject) {
+		$this->setDataObject($dataObject);
+	}
+
+	/**
+	 * Determine whether the request contains a valid
+	 * authentication object (that is always 0th element)
+	 */
+	public function isAuthenticated() {
+		$struct = $this->getDataObject()->me['struct'];
+
+		$isUsernameCorrect = (string)$struct['UserName']->me['string'] == $this->getUsername();
+		$isPasswordCorrect = (string)$struct['Password']->me['string'] == $this->getPassword();
+		$isSchoolCorrect = (string)$struct['School']->me['string'] == $this->getSchoolCode();
+
+		if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCorrect) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set data object
+	 *
+	 * @param null $dataObject
+	 */
+	private function setDataObject($dataObject) {
+		$this->dataObject = $dataObject;
+	}
+
+	/**
+	 * Get data object
+	 *
+	 * @return null
+	 */
+	private function getDataObject() {
+		return $this->dataObject;
+	}
+
+	/**
+	 * Set password
+	 *
+	 * @param string $password
+	 */
+	private function setPassword($password) {
+		$this->password = $password;
+	}
+
+	/**
+	 * Get password
+	 *
+	 * @return string
+	 */
+	private function getPassword() {
+		return $this->password;
+	}
+
+	/**
+	 * Set username
+	 *
+	 * @param string $username
+	 */
+	private function setUsername($username) {
+		$this->username = $username;
+	}
+
+	/**
+	 * Get username
+	 *
+	 * @return string
+	 */
+	private function getUsername() {
+		return $this->username;
+	}
+
+	/**
+	 * Set school code
+	 *
+	 * @param string $schoolCode
+	 */
+	private function setSchoolCode($schoolCode) {
+		$this->schoolCode = $schoolCode;
+	}
+
+	/**
+	 * Get school code
+	 *
+	 * @return string
+	 */
+	private function getSchoolCode() {
+		return $this->schoolCode;
+	}
+}

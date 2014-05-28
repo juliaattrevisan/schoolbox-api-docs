@@ -83,16 +83,30 @@ class External_Liss_Server {
 	 * @return xmlrpcresp
 	 */
 	public function publishClasses(xmlrpcmsg $message) {
-		$authenticationStatement = $message->params[0];
-		$mystery = $message->params[1];
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
-		$allData = $message->params[2]->me['array'];
+		if ($authenticator->isAuthenticated()) {
+			$academicYear = $message->params[1];
 
-		foreach($allData as $currentData) {
-			External_Liss_Server::log($currentData);
+			$allData = $message->params[2]->me['array'];
+
+			$mapper = new \Schoolbox\External\ClassEntryMapper();
+
+			foreach($allData as $currentData) {
+				$actualInfo = $currentData->me['struct'];
+
+				$classEntry = new \Schoolbox\External\ClassEntry();
+				$classEntry->setName((string)$actualInfo['CourseName']->me['string']);
+				$classEntry->setCode((string)$actualInfo['ClassCode']->me['string']);
+				$classEntry->setDescription('');
+
+				$mapper->save($classEntry);
+			}
+
+			return new xmlrpcresp(new xmlrpcval('Classes imported', 'string'));
 		}
 
-		return new xmlrpcresp(new xmlrpcval('got classes', 'string'));
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
