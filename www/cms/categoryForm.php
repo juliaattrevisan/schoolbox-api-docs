@@ -25,9 +25,13 @@ if ($_POST['name']) {
 
 	$codeCollection = new \Schoolbox\Collection();
 	foreach(explode(',', $_POST['code']) as $code) {
-		$codeModel = new \Schoolbox\Resource\CategoryCode();
-		$codeModel->setCode(trim($code));
-		$codeCollection->add($codeModel);
+		$trimmedCode = trim($code);
+
+		if (strlen($trimmedCode)) {
+			$codeModel = new \Schoolbox\Resource\CategoryCode();
+			$codeModel->setCode($trimmedCode);
+			$codeCollection->add($codeModel);
+		}
 	}
 
 	/** @var \Schoolbox\Resource\Category $model */
@@ -64,20 +68,31 @@ if ($_POST['name']) {
 	// if rolepermission collection is defined, reapply permissions (possibly recursively)
 	$rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'], $_POST['recursive']);
 
+	/* HomepageConfig definition
+	 */
+	$homepageConfig = HomepageConfigMapper::getInstance()
+		->createModel()
+		->setCategory($model);
 
 	// if homepage is to be removed
 	if($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
-		HomepageConfigMapper::getInstance()->resetToTemplate($model->getHomepage());
+		HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
 	}
 	// if template defined
 	elseif($_POST['template'] > 0) {
-		$model->setHomepage(HomepageConfigMapper::getInstance()->createModel()
-			->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']))
-		);
+		$homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']));
+
+		/* Save homepage config
+		 */
+		HomepageConfigMapper::getInstance()->save($homepageConfig);
+		HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
 	}
+
+	/* Ram it back into its parent object where it belongs
+	 */
+	$model->setHomepage($homepageConfig);
+
 	// no changes in "KEEP_EXISTING" case
-
-
 
 	if ($_POST['groupcheck']) {
 
@@ -91,17 +106,16 @@ if ($_POST['name']) {
             $groupHandler->addUser($category['id'], $_SESSION['id'], 3);
 
             SitePage::localRedir('/group/modify/'.$category['id']);
-
 		}
-         error(20);
 
+        error(20);
 	}
 	else {
 		/* Redirect to / if the homepage was removed from a category
 		 * Otherwise go back to the category
 		 */
 		if ($_POST['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-			SitePage::localRedir('/resources/' . $category['id']);
+			SitePage::localRedir('/resources/' . $model->getId());
 		}
 		else {
 
@@ -114,7 +128,7 @@ if ($_POST['name']) {
 			/* Otherwise if you deleted the category code, redirect to
 			 * categoryId link instead
 			 */
-			SitePage::localRedir('/homepage/' . $category['id']);
+			SitePage::localRedir('/homepage/' . $model->getId());
 		}
 	}
 }

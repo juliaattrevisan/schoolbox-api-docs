@@ -123,15 +123,20 @@ class CategoryMapper extends Mapper {
 	 * @return bool
 	 */
 	public function postSave($model, $previous = null) {
+
 		// if no codes populated, no need to do anything
 		if(!$model->getCodes()->count()) {
 			return true;
 		}
 
 		// first drop the previous code(s) connected to this category
-		CategoryCodeMapper::getInstance()->delete(
-			CategoryCodeMapper::getInstance()->findById($model->getId())
-		);
+		try {
+			CategoryCodeMapper::getInstance()->delete(
+				CategoryCodeMapper::getInstance()->findById($model->getId())
+			);
+		}
+		catch (\Exception $e) {
+		}
 
 		// bind the given codes to this category
 		foreach($model->getCodes() as $code) {
@@ -139,6 +144,7 @@ class CategoryMapper extends Mapper {
 		}
 
 		// persist the Code objects
+
 		CategoryCodeMapper::getInstance()->save($model->getCodes());
 
 		return true;
