@@ -2,6 +2,10 @@
 /**
  * External_Liss_Server
  *
+ * publishBellTimes();
+ * publishClasses();
+ * publishTimetable();
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -31,6 +35,33 @@ class External_Liss_Server {
 	 * Setup
 	 */
 	private function setup() {
+
+	}
+
+	/**
+	 * Predefine a timetable_cycle record (this doesn't seem defined/accessible
+	 * via liss, for some reason - it might be in TimetableStructure ttStructure
+	 * which is not accessible to us)
+	 *
+	 * @return object|\Schoolbox\External\TimetableCycle
+	 */
+	static public function getCycle() {
+		$cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
+
+		try {
+			$cycle = $cycleMapper->findById(1);
+		}
+		catch (\Exception $e) {
+			$cycle = new \Schoolbox\External\TimetableCycle();
+			$cycle->setTitle('Main Timetable');
+			$cycle->setCycleLength(10);
+			$cycle->setDayLength(13);
+			$cycle->setRegular(1);
+
+			$cycleMapper->save($cycle);
+		}
+
+		return $cycle;
 	}
 
 	/**
@@ -91,7 +122,7 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishClasses(xmlrpcmsg $message) {
+	static public function publishClasses(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
@@ -124,12 +155,13 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishTimetable(xmlrpcmsg $message) {
+	static public function publishTimetable(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
 			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
 			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
 			$userMapper = new \Schoolbox\UserMapper();
 
 			/* TODO: Default user for testing
@@ -171,6 +203,7 @@ class External_Liss_Server {
 					$classPeriod->setPeriod($allPeriods->first()->getId());
 					$classPeriod->setTeacher($allTeachers->first()->getId());
 					$classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
+					$classPeriodMapper->save($classPeriod);
 				}
 				/* These ones are broken
 				 */
@@ -193,35 +226,35 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishDailyData(xmlrpcmsg $message) {
+	static public function publishDailyData(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
 			$allData = $message->params[3]->me['array'];
-
-			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-
-			$i = 0;
-			foreach($allData as $currentData) {
-				External_Liss_Server::log($currentData);
-				$struct = $currentData->me['struct'];
-
-				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
-				$timetablePeriod->setCycle(2);
-				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
-				$timetablePeriod->setStart((string)$struct['From']->me['string']);
-				$timetablePeriod->setFinish((string)$struct['To']->me['string']);
-
-				/* What populates this?
-				 */
-				$timetablePeriod->setDay(0);
-				$timetablePeriod->setSequence($i);
-				$timetablePeriod->setUsable(1);
-
-				$timetablePeriodMapper->save($timetablePeriod);
-
-				$i++;
-			}
+//
+//			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+//
+//			$i = 0;
+//			foreach($allData as $currentData) {
+//				External_Liss_Server::log($currentData);
+//				$struct = $currentData->me['struct'];
+//
+//				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+//				$timetablePeriod->setCycle(2);
+//				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
+//				$timetablePeriod->setStart((string)$struct['From']->me['string']);
+//				$timetablePeriod->setFinish((string)$struct['To']->me['string']);
+//
+//				/* What populates this?
+//				 */
+//				$timetablePeriod->setDay(0);
+//				$timetablePeriod->setSequence($i);
+//				$timetablePeriod->setUsable(1);
+//
+//				$timetablePeriodMapper->save($timetablePeriod);
+//
+//				$i++;
+//			}
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
 		}
@@ -235,7 +268,7 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishCalendar(xmlrpcmsg $message) {
+	static public function publishCalendar(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
@@ -253,9 +286,10 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	public function publishBellTimes(xmlrpcmsg $message) {
+	static public function publishBellTimes(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 		$ttStructure = $message->params[1];
+		$cycle = External_Liss_Server::getCycle();
 
 		if ($authenticator->isAuthenticated()) {
 			$allData = $message->params[2]->me['array'];
@@ -269,7 +303,7 @@ class External_Liss_Server {
 				$dayNumber = (string)$struct['DayNumber']->me['i4'];
 
 				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
-				$timetablePeriod->setCycle(3);
+				$timetablePeriod->setCycle($cycle->getId());
 				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
 				$timetablePeriod->setDay($dayNumber);
 				$timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
