@@ -54,11 +54,30 @@ class External_Liss_Server {
 		catch (\Exception $e) {
 			$cycle = new \Schoolbox\External\TimetableCycle();
 			$cycle->setTitle('Main Timetable');
+
+			/* TODO: Undo these hardcoded values at some point
+			 */
 			$cycle->setCycleLength(10);
 			$cycle->setDayLength(13);
 			$cycle->setRegular(1);
 
 			$cycleMapper->save($cycle);
+
+			/* Force a timetable_campus record
+			 */
+			$timetableCampusMapper = new \Schoolbox\External\TimetableCampusMapper();
+			$timetableCampus = new \Schoolbox\External\TimetableCampus();
+			$timetableCampus->setCycle($cycle->getId());
+
+			/* TODO: Undo these hardcoded values at some point
+			 */
+			$timetableCampus->setCampus(1);
+			$timetableCampus->setStart('2014-01-01');
+			$timetableCampus->setReset(null);
+			$timetableCampus->setFinish('2014-12-31');
+			$timetableCampus->setOffset(0);
+
+			$timetableCampusMapper->save($timetableCampus);
 		}
 
 		return $cycle;
@@ -291,6 +310,8 @@ class External_Liss_Server {
 		$ttStructure = $message->params[1];
 		$cycle = External_Liss_Server::getCycle();
 
+		External_Liss_Server::log($ttStructure);
+
 		if ($authenticator->isAuthenticated()) {
 			$allData = $message->params[2]->me['array'];
 
@@ -308,6 +329,9 @@ class External_Liss_Server {
 				$timetablePeriod->setDay($dayNumber);
 				$timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
 				$timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+
+				/* TODO: Undo these hardcoded values at some point
+ 				 */
 				$timetablePeriod->setUsable(1);
 
 				/* Start a collection for a day
@@ -319,8 +343,6 @@ class External_Liss_Server {
 				}
 
 				$collection->getOffset($dayNumber)->add($timetablePeriod);
-
-				External_Liss_Server::log($collection);
 			}
 
 			$collection->reindex();
