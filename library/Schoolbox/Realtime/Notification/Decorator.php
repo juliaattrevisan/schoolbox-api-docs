@@ -188,6 +188,8 @@ class Decorator extends NotificationBundle {
 			$result[$id] = array(
 				'id'        => $id,
 				'body'      => $notification->getTitle(),
+				'icon'      => $notification->getIcon(),
+				'href'      => $notification->getHref(),
 				'params'    => $this->renderParametersAsArray($notification),
 				'namespace' => $notification->getNamespace(),
 				'timestamp' => $notification->getTimestamp(),
@@ -210,8 +212,8 @@ class Decorator extends NotificationBundle {
 		$array = array();
 		foreach($notification->getParameters() as $token => $params) {
 			/** @var ParameterInterface[] $params */
-			foreach($params as $param) {
-				$array[$token][] = $param->jsonSerialize();
+			foreach($params as $time => $param) {
+				$array[$token][$time] = $param->jsonSerialize();
 			}
 		}
 		return $array;
