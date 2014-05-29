@@ -512,13 +512,13 @@ class SitePage extends Page {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.shore.nsw.edu.au/exchange/';
                         } else {
-                            $location = 'http://shorexch01/exchange';
+                            $location = 'http://shorexch01.shore.nsw.edu.au/exchange/';
                         }
                     } else if ($this->groupHandler->isStudent()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
                         } else {
-                            $location = 'http://cassandra/exchange';
+                            $location = 'http://cassandra.student.shore.nsw.edu.au/exchange/';
                         }
                     }
                 break;
@@ -588,7 +588,7 @@ class SitePage extends Page {
                 if (strpos(Session::getIP(), '192.168.') === false) {
                     $this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
                 } else {
-                    $this->setVar('MYFILES_LOCATION', 'http://shorexch01/fileway');
+                    $this->setVar('MYFILES_LOCATION', 'http://shorexch01.shore.nsw.edu.au/fileway');
                 }
 
                 $this->parse('mf_tab', 'myfiles_tab');
@@ -597,7 +597,7 @@ class SitePage extends Page {
                     if (strpos(Session::getIP(), '192.168.') === false) {
                         $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
                     } else {
-                        $this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
+                        $this->setVar('MYFILES_LOCATION', 'http://cassandra.student.shore.nsw.edu.au/fileway');
                     }
 
                     $this->parse('mf_tab', 'myfiles_tab');
