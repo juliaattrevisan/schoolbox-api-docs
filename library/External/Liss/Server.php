@@ -2,9 +2,17 @@
 /**
  * External_Liss_Server
  *
+ * Execute calls in this order (belltimes and classes must happen before timetable)
  * publishBellTimes();
  * publishClasses();
  * publishTimetable();
+ *
+ * Turn on the Schoolbox connector in External DB
+ *
+ * Handcraft a record in class_user with values (1, 424, 208)
+ * Handcraft a homepage for 11CHE 1
+ *
+ * You can now view 208's timetable
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
