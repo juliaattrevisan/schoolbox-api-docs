@@ -17,6 +17,18 @@ class WorkerArray implements WorkerBundleInterface {
 	/** @var Worker[] */
 	protected $workers = array();
 
+
+	/**
+	 * Will workers gracefully
+	 */
+	public function __destruct() {
+		foreach($this->workers as $pid => $worker) {
+			unset($this->workers[$pid]);
+		}
+		unset($this->workers);
+	}
+
+
 	/**
 	 * @param int $pid
 	 * @param Worker $worker

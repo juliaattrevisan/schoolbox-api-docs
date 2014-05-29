@@ -38,13 +38,14 @@ class Dispatcher implements DispatcherInterface {
 	/** @var DispatchStrategyInterface */
 	protected $strat;
 
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param Debug $debug
 	 * @param DispatchStrategyInterface $strat
 	 */
-	function __construct($loop, $msgHandler, $debug, $strat = null) {
+	public function __construct($loop, $msgHandler, $debug, $strat = null) {
 
 		$this->strat = $strat ?: new DefaultDispatchStrategy();
 
@@ -68,6 +69,14 @@ class Dispatcher implements DispatcherInterface {
 			$this->v->v("Queue is preloaded, draining: queue length is ".$this->q->count());
 			$this->drainQueue();
 		}
+	}
+
+
+	/**
+	 * Daemon is going down, try to make sure the pool dries up gracefully
+	 */
+	public function __destruct() {
+		unset($this->pool);
 	}
 
 
@@ -128,8 +137,6 @@ class Dispatcher implements DispatcherInterface {
 			return;
 		}
 
-//		$this->v->v("Dispatching...");
-
 		/**
 		 * @var object $identifier
 		 * @var string $cmd
@@ -140,6 +147,7 @@ class Dispatcher implements DispatcherInterface {
 		// decide whether to delegate this to a Worker, or return it straight into the handler
 		if(!in_array($cmd, $this->pool->getSupportedActions())) {
 			try {
+				// we obtained the data from q::bottom() so just drop the reference
 				$this->q->dequeue();
 				$this->v->v("Internally handling '$cmd'");
 				$this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
@@ -148,18 +156,20 @@ class Dispatcher implements DispatcherInterface {
 				// we need to catch any and all exception here, lest we explode our reactor
 				$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
 			}
+			// regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
+			$this->strat->pdequeue($identifier);
 			return;
 		}
 
 		// all workers are tied up and ceiling has been reached - please wait
 		if(!$this->pool->canAccept()) {
-//			$this->v->v("Cannot accept right now, will try again", '*');
+			// $this->v->v("Cannot accept right now, will try again", '*');
 			return;
 		}
 
-
 		// pop the task from the queue and run the next task
 		try {
+			// we obtained the data from q::bottom() so just drop the reference
 			$this->q->dequeue();
 			$pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
 			$this->v->v("Command '$cmd' pushed to worker {{$pid}}", '>');
@@ -171,10 +181,12 @@ class Dispatcher implements DispatcherInterface {
 
 	}
 
+
 	/**
 	 * @return array
 	 */
 	public function getPoolStatus() {
 		return $this->pool->getStatus();
 	}
-} 
+
+}

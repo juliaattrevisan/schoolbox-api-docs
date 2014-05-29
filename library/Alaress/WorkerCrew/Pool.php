@@ -43,6 +43,7 @@ class Pool {
 	/** @var Debug */
 	protected $debug;
 
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
@@ -56,6 +57,14 @@ class Pool {
 		$this->listeners = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
 		$this->debug = $debug;
+	}
+
+
+	/**
+	 * Kill workers gracefully
+	 */
+	public function __destruct() {
+		unset($this->workers);
 	}
 
 
@@ -186,20 +195,22 @@ class Pool {
 					->appendData($data)
 					->markTaskComplete();
 
+				// worker reports being finished, so handle the response it came back with
 				try {
+					// pass to the registered response handler
 					$this->msgHandler->handleResponse(
 						$worker->getTask()->getIdentifier(),
 						$worker->getTask()->getCommand(),
 						$this->poolingStrat->decodeRecords($worker->getTask()->getData(false))
 					);
-
-					$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
-
 				}
 				catch(Exception $e) {
 					// your reactor will explode if you don't catch exceptions coming from your response handler
 					$this->poolingStrat->handleException($e, $this->debug);
 				}
+
+				// regardless of whether or not the handling of the response succeeded, we need to ditch this message
+				$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
 				break;
 
 			case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
