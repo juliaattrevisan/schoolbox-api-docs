@@ -74,7 +74,8 @@ if ($_POST['name']) {
 	}
 	// if template defined
 	elseif($_POST['template'] > 0) {
-		$homepageConfig = HomepageConfigMapper::getInstance()->createModel()
+		$homepageConfig = HomepageConfigMapper::getInstance()
+			->createModel()
 			->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']))
 			->setCategory($model);
 
@@ -83,6 +84,7 @@ if ($_POST['name']) {
 		/* Save homepage config
 		 */
 		HomepageConfigMapper::getInstance()->save($model->getHomepage());
+		HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
 	}
 
 	// no changes in "KEEP_EXISTING" case
