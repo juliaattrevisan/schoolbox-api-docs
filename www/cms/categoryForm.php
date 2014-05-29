@@ -79,12 +79,14 @@ if ($_POST['name']) {
 			->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']))
 			->setCategory($model);
 
-		$model->setHomepage($homepageConfig);
-
 		/* Save homepage config
 		 */
-		HomepageConfigMapper::getInstance()->save($model->getHomepage());
+		HomepageConfigMapper::getInstance()->save($homepageConfig);
 		HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
+
+		/* Ram it back into its parent object where it belongs
+		 */
+		$model->setHomepage($homepageConfig);
 	}
 
 	// no changes in "KEEP_EXISTING" case
