@@ -98,12 +98,6 @@ class External_Liss_Server {
 			'liss.publishTimetable' => array(
 				'function' => 'External_Liss_Server::publishTimetable',
 			),
-			'liss.publishDailyData' => array(
-				'function' => 'External_Liss_Server::publishDailyData',
-			),
-			'liss.publishCalendar' => array(
-				'function' => 'External_Liss_Server::publishCalendar',
-			),
 			'liss.publishBellTimes' => array(
 				'function' => 'External_Liss_Server::publishBellTimes',
 			),
@@ -232,66 +226,6 @@ class External_Liss_Server {
 					External_Liss_Server::log($counts);
 				}
 			}
-
-			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
-		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
-	}
-
-	/**
-	 * Publish timetable to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishDailyData(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
-
-		if ($authenticator->isAuthenticated()) {
-			$allData = $message->params[3]->me['array'];
-//
-//			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-//
-//			$i = 0;
-//			foreach($allData as $currentData) {
-//				External_Liss_Server::log($currentData);
-//				$struct = $currentData->me['struct'];
-//
-//				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
-//				$timetablePeriod->setCycle(2);
-//				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
-//				$timetablePeriod->setStart((string)$struct['From']->me['string']);
-//				$timetablePeriod->setFinish((string)$struct['To']->me['string']);
-//
-//				/* What populates this?
-//				 */
-//				$timetablePeriod->setDay(0);
-//				$timetablePeriod->setSequence($i);
-//				$timetablePeriod->setUsable(1);
-//
-//				$timetablePeriodMapper->save($timetablePeriod);
-//
-//				$i++;
-//			}
-
-			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
-		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
-	}
-
-	/**
-	 * Publish timetable to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishCalendar(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
-
-		if ($authenticator->isAuthenticated()) {
-			External_Liss_Server::log($message);
 
 			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
 		}
