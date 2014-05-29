@@ -68,26 +68,29 @@ if ($_POST['name']) {
 	// if rolepermission collection is defined, reapply permissions (possibly recursively)
 	$rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'], $_POST['recursive']);
 
+	/* HomepageConfig definition
+	 */
+	$homepageConfig = HomepageConfigMapper::getInstance()
+		->createModel()
+		->setCategory($model);
+
 	// if homepage is to be removed
 	if($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
-		HomepageConfigMapper::getInstance()->resetToTemplate($model->getHomepage());
+		HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
 	}
 	// if template defined
 	elseif($_POST['template'] > 0) {
-		$homepageConfig = HomepageConfigMapper::getInstance()
-			->createModel()
-			->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']))
-			->setCategory($model);
+		$homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']));
 
 		/* Save homepage config
 		 */
 		HomepageConfigMapper::getInstance()->save($homepageConfig);
 		HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
-
-		/* Ram it back into its parent object where it belongs
-		 */
-		$model->setHomepage($homepageConfig);
 	}
+
+	/* Ram it back into its parent object where it belongs
+	 */
+	$model->setHomepage($homepageConfig);
 
 	// no changes in "KEEP_EXISTING" case
 
