@@ -124,7 +124,7 @@ class Notification {
 			switch($param->getMode()) {
 				// replace existing
 				case ParameterInterface::STACKING_REPLACE:
-					$this->params[$token] = array($param);
+					$this->params[$token] = array($instance->getTime() => $param);
 					break;
 
 				// append to existing, indexed by time
@@ -135,7 +135,7 @@ class Notification {
 				// already set, so only set IF NOT ALREADY SET
 				case ParameterInterface::STACKING_IGNORE:
 					if(!count($this->params[$token])) {
-						$this->params[$token] = array($param);
+						$this->params[$token] = array($instance->getTime() => $param);
 					}
 			}
 		}
