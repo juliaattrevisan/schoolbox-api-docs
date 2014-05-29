@@ -15,7 +15,6 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use InvalidArgumentException;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
@@ -39,10 +38,11 @@ abstract class AbstractProcess extends PipeWriter {
 
 
 	/**
+	 * @param LoopInterface $loop
 	 * @param DispatchStrategyInterface $strat
 	 * @param Debug $debug
 	 */
-	public function __construct($strat = null, $debug = null) {
+	public function __construct($loop, $strat = null, $debug = null) {
 		// cast optional args
 		$strat = $strat ?: new DefaultDispatchStrategy();
 		$debug = $debug ?: new Debug(null);
@@ -50,7 +50,7 @@ abstract class AbstractProcess extends PipeWriter {
 		parent::__construct($strat, $debug, STDOUT);
 		$this->strat = $strat;
 
-		$this->loop = Factory::create();
+		$this->loop = $loop;
 
 		// listen to STDIN for commands
 		$this->stream = new Stream(STDIN, $this->loop);
@@ -91,6 +91,8 @@ abstract class AbstractProcess extends PipeWriter {
 
 			// if EOT received
 			if($this->strat->getProtocol()->isEnded($data)) {
+				ob_start();
+
 				try {
 					$this->buffering = false;
 					$this->write($this->parseBuffer());
@@ -101,6 +103,12 @@ abstract class AbstractProcess extends PipeWriter {
 					$this->debug->v($msg);
 					$this->write($msg, true);
 				}
+
+				if($buffer = ob_get_contents()) {
+					$this->debug->v($buffer);
+				}
+				ob_end_clean();
+
 				$this->buffering = false;
 			}
 
@@ -144,7 +152,8 @@ abstract class AbstractProcess extends PipeWriter {
 
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
-		$this->debug->v("Responding with '$response'");
+		$this->debug->v("Responding with: ");
+		$this->debug->d($response);
 		$flat = $this->strat->getProtocol()->flatten($response);
 		$this->debug->v("Flattened response: $flat");
 
