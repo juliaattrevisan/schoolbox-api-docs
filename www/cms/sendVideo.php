@@ -8,7 +8,7 @@
  *
  */
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $type = $_GET['type'];
 $id   = $_GET['id'];

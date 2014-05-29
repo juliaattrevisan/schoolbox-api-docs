@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');

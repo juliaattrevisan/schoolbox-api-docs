@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/SitePage.php';
+require_once __DIR__ . '/../include/Bootstrap.php';
 session_start();
 
 if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && $_POST['username'])) {

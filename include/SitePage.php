@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
-
 class SitePage extends Page {
     private $ajax;
 

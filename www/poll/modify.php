@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);

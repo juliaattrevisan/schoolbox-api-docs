@@ -16,7 +16,7 @@ function error($ec, $message="", $code = 400) {
 	elseif (is_object($this))
 		$this->error($ec, $message, $code);
 	else {
-		require_once dirname(__FILE__) . '/../../include/SitePage.php';
+		require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 		$page = new SitePage;
 		$page->error($ec, $message, $code);
 	}

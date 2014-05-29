@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage;
 $page->template->set_file(TEMPLATE_body, dirname(__FILE__) . '/file_browser.html');
