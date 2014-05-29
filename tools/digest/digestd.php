@@ -1,11 +1,13 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Cli\Debug;
+use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use React\EventLoop\Factory;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Digest\DigestScheduler;
-use Schoolbox\Realtime\Verboser;
 
 /**
  * The Digest Daemon.
@@ -16,38 +18,35 @@ use Schoolbox\Realtime\Verboser;
  * @version     SVN: $Id$
  */
 
-require_once('../socket/mini-bootstrap.php');
 
 $opts = getopt('v');
 
-$verbose = isset($opts['v']);
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-if($verbose) {
-	echo <<<EOL
-
- ||
- || Schoolbox Digest Daemon
- ||
+$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', array(
+	'verbose' => isset($opts['v'])
+));
 
 
-EOL;
-}
 
-$verboser = new Verboser($verbose ? STDOUT : null);
+// CREATE DIGEST APP
+$kernel->run(function($di, $loop, $debug, $opts) {
+	/**
+	 * @var Di\Container $di
+	 * @var LoopInterface $loop
+	 * @var Debug $debug
+	 * @var array $opts
+	 */
 
-$loop = Factory::create();
+	try {
+		new DigestScheduler($loop, new DefaultDispatchStrategy(), $debug);
+	}
+	catch(AMQPRuntimeException $e) {
+		$debug->v("Unable to connect to RabbitMQ: server is offline.",'!');
+		$n = new Notif(Notif::TOPIC_NOTIFICATION);
+		$n->alert('RabbitMQ is offline');
+		throw $e;
+	}
 
-// CREATE SCHEDULER
-try {
-	$sched = new DigestScheduler($loop, new DefaultDispatchStrategy(), $verboser);
-}
-catch(AMQPRuntimeException $e) {
-	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');
-	$n = new \Schoolbox\Notif\Notif(\Schoolbox\Notif\Notif::TOPIC_NOTIFICATION);
-	$n->alert('RabbitMQ is offline');
-	exit;
-}
-
-$loop->run();
-
-$verboser->v("Digest daemon terminating.");
+});

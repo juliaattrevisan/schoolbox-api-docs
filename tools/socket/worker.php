@@ -14,10 +14,14 @@ error_reporting(E_ALL);
  * @version     SVN: $Id$
  */
 
-require_once "mini-bootstrap.php";
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$logfile = \Schoolbox\Config\ConfigMapper::getInstance()->get('logs_dir')."/sched.worker.log";
-$w = new \Schoolbox\Realtime\Pipe\WorkerProcess(null, new Debug(fopen($logfile, 'a')));
-$w->run();
+$kernel = new Schoolbox\Application\Daemon\Kernel('Worker');
+
+$kernel->run(function($di, $loop, $debug, $options) {
+	$logfile = \Schoolbox\Config\ConfigMapper::getInstance()->get('logs_dir')."/sched.worker.log";
+	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(fopen($logfile, 'a')));
+});
 
 // yup. that's all you need to do.

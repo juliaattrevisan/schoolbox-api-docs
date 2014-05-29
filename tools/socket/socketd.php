@@ -1,10 +1,13 @@
 #!/usr/bin/hhvm
-#!/usr/bin/php
 <?php
-use React\Socket\ConnectionException;
-use Schoolbox\Realtime\Pipe\PipeManager;
+
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
+use Aura\Di;
+use React\EventLoop\LoopInterface;
+use React\Socket\ConnectionException;
+use Schoolbox\Realtime\Pipe\PipeManager;
 
 /**
  * The Websocket Daemon.
@@ -15,89 +18,79 @@ use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
  * @version     SVN: $Id$
  */
 
-error_reporting(E_ALL ^ E_NOTICE);
-
-require_once "mini-bootstrap.php";
-
+pcntl_signal(SIGCHLD, SIG_IGN);
 $opts = getopt('vp::c::');
 
-$verbose = isset($opts['v']);
-$port = empty($opts['p']) ? 9081 : $opts['p'];
-$conf = empty($opts['c']) ? 'socketd.conf' : $opts['c'];
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-if($verbose) {
-	echo <<<EOL
+$kernel = new Schoolbox\Application\Daemon\Kernel('Socket', array(
+	'verbose' => isset($opts['v']),
+	'port'    => empty($opts['p']) ? 9081 : $opts['p'],
+	'conf'    => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
+));
 
- ||
- || Schoolbox WebSocket Daemon
- ||
+// CREATE WEBSOCKET APP
+$kernel->run(function($di, $loop, $debug, $opts) {
+	/**
+	 * @var Di\Container $di
+	 * @var LoopInterface $loop
+	 * @var Debug $debug
+	 * @var array $opts
+	 */
+	$redis = Alaress\Redis::getClientInstance();
+	$redis->connect();
 
-
-EOL;
-
-}
-
-
-
-$verboser = new \Schoolbox\Realtime\Verboser($verbose ? fopen("p$port.log", 'w') : null);
-
-$verboser->setPort($port);
-
-pcntl_signal(SIGCHLD, SIG_IGN);
-
-$loop = \React\EventLoop\Factory::create();
-
-// CREATE WEB SOCKET ASYNC
-Alaress\Redis::getInstance()->connect();
-$redis = Alaress\Redis::getClientInstance();
-$redis->connect();
-
-if(file_exists($conf) && is_readable($conf)) {
-	$fp = fopen($conf, 'r');
-	while($line = fgets($fp)) {
-		$xpl = explode('=',$line);
-		if(count($xpl) == 2) {
-			${$xpl[0]} = $xpl[1];
+	if(file_exists($opts['conf']) && is_readable($opts['conf'])) {
+		$fp = fopen($opts['conf'], 'r');
+		while($line = fgets($fp)) {
+			$xpl = explode('=',$line);
+			if(count($xpl) == 2) {
+				${$xpl[0]} = $xpl[1];
+			}
 		}
+		fclose($fp);
+
+		$poolStrat = new ConfiguredDispatchStrategy(
+			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
+			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
+		);
+
+		$debug->v(sprintf("Current strat: workers [%d - %d], queueing (%dms * %d)",
+			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
+			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
+			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
+			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL
+		));
 	}
-	fclose($fp);
-	$poolstrat = new ConfiguredDispatchStrategy(
-		isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-		isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-		isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
-		isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-		isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
-	);
+	else {
+		$poolStrat = new DefaultDispatchStrategy();
+		$debug->v("Using default strat");
+	}
 
-	$verboser->v(sprintf("Current strat: workers [%d - %d], queueing (%dms * %d)",
-		isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-		isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-		isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-		isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL
-	));
-}
-else {
-	$poolstrat = new DefaultDispatchStrategy();
-	$verboser->v("Using default strat");
-}
+	$pipeManager = new PipeManager($loop, $redis, $debug, $poolStrat);
 
-$pipeManager = new PipeManager($loop, $redis, $verboser, $poolstrat);
+	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
+	$wss->disableVersion(0);
 
-$wss = new Ratchet\WebSocket\WsServer($pipeManager);
-$wss->disableVersion(0);
+	$https = new Ratchet\Http\HttpServer($wss);
 
-$https = new Ratchet\Http\HttpServer($wss);
+	try {
+		$webSock = new React\Socket\Server($loop);
+		$webSock->listen($opts['port'], '0.0.0.0');
 
-try {
-	$webSock = new React\Socket\Server($loop);
-	$webSock->listen($port, '0.0.0.0');
+		new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-	$webServer = new Ratchet\Server\IoServer($https, $webSock, $loop);
+		$debug->v("Listening for incoming websockets on port {$opts['port']}...", '+');
+	}
+	catch(ConnectionException $e) {
+		$debug->v("Unable to launch: " . $e->getMessage(), '!');
+		throw $e;
+	}
 
-	$verboser->v("Listening for incoming websockets on port $port...", '+');
-	$loop->run();
-}
-catch(ConnectionException $e) {
-	$verboser->v("Unable to launch: " . $e->getMessage(), '!');
-}
+});
+
 
