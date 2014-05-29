@@ -24,6 +24,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
+use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -60,8 +61,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		// make sure our endpoints exist
 		$mqc = new Connector();
 		$queues = array(
-			INSTANCE_ID . Scheduler::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
-			INSTANCE_ID . self::QUEUE_COMMAND       => '*.' . Notif::TOPIC_CMD_SCHED
+			INSTANCE_ID . self::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
+			INSTANCE_ID . self::QUEUE_COMMAND  => '*.' . Notif::TOPIC_CMD_SCHED
 		);
 
 		foreach($queues as $q => $route) {
@@ -80,6 +81,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 	/** @var Interceptor */
 	protected $interceptor;
+
 
     /**
      * @param LoopInterface $loop
@@ -153,32 +155,28 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @return void
      */
     public function onMessage($frame, $resolver) {
-	    $this->debug->v('Received message from '.INSTANCE_ID.self::QUEUE_SCHEDULE, '>');
-	    try {
-
+		$this->debug->v('Received message from '.INSTANCE_ID.self::QUEUE_SCHEDULE, '>');
+		try {
 			$formatted = CompressedFormatter::uncompress($frame->body);
-            $event = unserialize($formatted['message']);
-
-            if(!$event instanceof Event) {
-	            $truncated = substr($frame->body, 0, 64);
-                $this->debug->v("Could not decode '$truncated...' to schedule event", '!');
-                // this message is unparseable, so we ACK it to make it go away
-                $resolver->ack();
-                return;
-            }
+			$event = unserialize($formatted['message']);
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-		    $this->debug->v("Building trigger factory for ".get_class($event->getObject()));
+			$this->debug->v("Building trigger factory for ".get_class($event->getObject()));
 			$triggerFactory = new TriggerFactory($this->getModule($event), $event);
 
 			// retrieve, populate, and schedule this bundle of triggers
-		    $this->debug->v("Scheduling triggers");
+			$this->debug->v("Scheduling triggers");
 			$this->scheduleNotifications($triggerFactory->buildTriggers($event->getAction())->getTriggers(), $resolver);
-		    // notice that we don't ACK the resolver here before returning
-			return;
 
+			// notice that we don't ACK the resolver here before returning
+			return;
 		}
+	    catch(RuntimeException $e) {
+		    $truncated = substr($frame->body, 0, 64);
+		    $this->debug->v("Could not decode '$truncated...' to schedule event", '!');
+		    // this message is can't be parsed, so we ACK it to make it go away
+	    }
 		catch(ScheduleException $e) {
 			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
 			$this->debug->v('Schedule Exception: ' . $e->getMessage(), '*');
@@ -231,6 +229,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	public function onTerminate() {
 		$this->debug->v("Cleaning up and terminating", '*');
 		// die safely
+		unset($this->dispatcher);
 		exit;
 	}
 

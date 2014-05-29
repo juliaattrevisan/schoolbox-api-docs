@@ -14,6 +14,7 @@ namespace Schoolbox\Notif\Message\External;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use InvalidArgumentException;
+use Zend\Loader\Exception\RuntimeException;
 
 /**
  * Class CompatibleMessage
@@ -40,11 +41,16 @@ class TargetedConverter {
 			}
 			else {
 				// could not json_decode the message, attempt to cast an old TargetedMessage
-				$tmsg = @unserialize($mixed);
-
-				if(!$tmsg instanceof TargetedMessage) {
-					throw new InvalidArgumentException("Conversion not from a TargetedMessage");
+				try {
+					$tmsg = unserialize($mixed);
+					if(!$tmsg instanceof TargetedMessage) {
+						throw new InvalidArgumentException("Conversion not from a TargetedMessage");
+					}
 				}
+				catch(RuntimeException $e) {
+					throw new InvalidArgumentException("Failed to unserialize data", 0, $e);
+				}
+
 			}
 
 			$body = $tmsg->getBody();
