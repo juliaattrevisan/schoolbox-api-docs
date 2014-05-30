@@ -43,7 +43,7 @@ class Kernel extends \Alaress\Application\Kernel {
 		$this->boot = new Bootstrap($this);
 		$this->boot();
 
-		error_reporting(E_ALL ^ E_NOTICE);
+		error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
 		$this->name = $name;
 		$this->opts = $opts;
 
@@ -125,21 +125,21 @@ EOL;
 	 * @throws ErrorException
 	 */
 	public function handleError($errNum, $errStr, $errFile, $errLine) {
-		if($this->debug instanceof Debug) {
-			$this->debug->v("$errStr - $errFile::$errLine", 'e');
-		}
-
 		if (!(error_reporting() & $errNum)) {
 			// This error code is not included in error_reporting
 			return true;
 		}
 
+		if($this->debug instanceof Debug) {
+			$this->debug->v("$errStr - $errFile::$errLine", 'e');
+		}
+
 		switch($errNum) {
 			case E_RECOVERABLE_ERROR:
-			case E_NOTICE:
 				// for any of these errors, we want an exception we can catch
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
+			case E_NOTICE:
 			case E_WARNING:
 				// this will throw an exception if it needs to
 				$this->handleWarning($errNum, $errStr, $errFile, $errLine);
