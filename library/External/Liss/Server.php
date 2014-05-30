@@ -3,7 +3,7 @@
  * External_Liss_Server
  *
  * In their SDK, configure it to connect to this place:
- * http://192.168.36.10/liss.php
+ * http://192.168.36.10/liss/liss.php
  *
  * You can accept their default schoolcode, but use alaress/alaress as
  * username/password tuple
