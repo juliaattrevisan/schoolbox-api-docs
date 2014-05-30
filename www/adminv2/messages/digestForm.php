@@ -38,4 +38,8 @@ foreach($_POST['role'] as $roleId => $data) {
 $cmdr = new \Schoolbox\Realtime\Digest\DigestCommander();
 $cmdr->adviseReload();
 
+// advise schedule daemon to reload as well
+$cmdr = new \Schoolbox\Realtime\Schedule\SchedulerCommander();
+$cmdr->adviseReload();
+
 SitePage::localRedir('/adminv2/messages');
