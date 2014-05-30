@@ -9,14 +9,14 @@
 
 namespace Schoolbox\Notif\Handler;
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Handler\MailHandler;
 use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Notif\Message\Decorator;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -48,7 +48,6 @@ class InstamailHandler extends MailHandler {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
-        $this->email = new TwigEmail('instantmail.twig');
 	}
 
 
@@ -57,56 +56,51 @@ class InstamailHandler extends MailHandler {
      * @param array $records
      */
     protected function send($content, array $records) {
+	    $this->email = new TwigEmail('instantmail.twig');
+	    $decorator = new Decorator();
 
-        $coreContext = $this->email->getCoreContext();
+	    if(count($records) != 1) {
+		    // handle multirecord message - TODO pretty sure this never happens
+		    echo "Number of records is ".count($records)."\n";
+	    }
 
-//		$contexts = array();
-	    $uribase = "http://" . $this->conf->get('site_domain');
+		// channel must indicate instant user notification
+		if(strpos($records[0]['channel'], 'instant.user.') !== 0) {
+			return;
+		}
 
-	    $decor = new Decorator(null);
+		preg_match('`instant.user.([0-9]+)`', $records[0]['channel'], $matches);
 
-		// index records by user and filter inappropriate ones
-		foreach($records as $record) {
-			// channel must indicate instant user notification
-			if(strpos($record['channel'], 'instant.user.') !== 0) {
-				continue;
+		try {
+			$user = $this->userMapper->findById($matches[1]);
+
+			if(isset($records[0]['context']['user'])) {
+				/** @var User $sender */
+				$sender = $this->userMapper->findById($records[0]['context']['user']);
+				$this->email->setFrom($sender->getEmail(), $sender->formatName());
 			}
 
-			preg_match('`instant.user.([0-9]+)`', $record['channel'], $matches);
+			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));
 
-			try {
-				$user = $this->userMapper->findById($matches[1]);
+			// there should only be one notification
+			$n = reset($decorator->getAll());
 
-				if(isset($record['context']['user'])) {
-					/** @var User $sender */
-					$sender = $this->userMapper->findById($record['context']['user']);
-					$this->email->setFrom($sender->getEmail(), $sender->formatName());
-				}
+			$this->email->setSubject($decorator->renderTitleAsPlaintext($n));
 
-				/** @var TargetedMessage $message */
-				$message = unserialize($record['message']);
-				$decor->setMessage($message);
+			$context = $decorator->renderAsTwigContext($this->email->getCoreContext());
+			$context['recipient'] = $user->getFirstname();
 
-				$this->email->setSubject($decor->formatPlain());
 
-				$context = array(
-					'text' => $decor->formatMail($uribase, $coreContext['colours']['link']),
-					'date' => $decor->getAlaressDateFormat()->getAustralian(),
-					'icon' => $uribase . $decor->getIcon(),
-					'href' => $uribase . $decor->getHref(),
-				);
-
-				$this->email->setContext($context)->send(array(
-					'name' => $user->formatName(),
-					'email' => $user->getEmail()
-				));
-
-			}
-			catch(Exception $e) {
-				echo "Could not find user $matches[1]\n";
-			}
+			$this->email->setContext($context)->send(array(
+				'name' => $user->formatName(),
+				'email' => $user->getEmail()
+			));
 
 		}
+		catch(MapperException $e) {
+			echo "Could not find user $matches[1]\n";
+		}
+
 	}
 
 }

@@ -73,18 +73,11 @@ class Decorator extends NotificationBundle {
 
 		foreach($this->notifications as $n) {
 			// compile the title
-			$array[$n->getId()]['title'] = $this->renderTitleAsHtml($n);
-
-			// icon cannot be a protected link
-			if(!strlen($n->getIcon()) || strpos($n->getIcon(), '/portrait') === 0) {
-				// change to be the generic icon for the namespace
-				$array[$n->getId()]['icon'] = '/images/icon.php?size=48&icon='.$n->getNamespace();
-			}
+			$array[$n->getId()]['title'] = $this->renderTitleAsHtml($n, $fqdn);
+			$array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
 
 			foreach(array('icon', 'href') as $field) {
-				$getField = 'get'.ucfirst($field);
-				$value = $n->$getField();
-				// leading slash needs FQDN prepended
+				$value = $array[$n->getId()][$field];
 				if(strlen($value) && $value[0] == '/') {
 					$array[$n->getId()][$field] = $fqdn . $value;
 				}
@@ -222,9 +215,10 @@ class Decorator extends NotificationBundle {
 	 * Translate a the :tokenised title of a notification into an HTML string
 	 *
 	 * @param Notification $notification
+	 * @param string $fqdn
 	 * @return string
 	 */
-	public function renderTitleAsHtml($notification) {
+	public function renderTitleAsHtml($notification, $fqdn = '') {
 		$text = $notification->getTitle();
 
 		foreach($notification->getParameters() as $token => $params) {
@@ -235,7 +229,7 @@ class Decorator extends NotificationBundle {
 
 			// probably a bit of a code smell, but retrieves first value.
 			// equivalent to $params[0] but where the keys are unknown
-			$subst = $this->param2html(reset($params));
+			$subst = $this->param2html(reset($params), $fqdn);
 
 			/** @var ParameterInterface[] $stack */
 			$stack = array();
@@ -243,7 +237,7 @@ class Decorator extends NotificationBundle {
 			foreach($params as $param) {
 				switch($param->getMode()) {
 					case ParameterInterface::STACKING_REPLACE:
-						$subst = $this->param2html($param);
+						$subst = $this->param2html($param, $fqdn);
 						break;
 					case ParameterInterface::STACKING_IGNORE:
 						// ignore? ok, ignored.
@@ -256,7 +250,7 @@ class Decorator extends NotificationBundle {
 
 			// use the stack if it was populated
 			if(count($stack)) {
-				$subst = $this->stack2html($stack);
+				$subst = $this->stack2html($stack, $fqdn);
 			}
 
 			$text = str_replace(":$token", $subst, $text);
@@ -267,14 +261,25 @@ class Decorator extends NotificationBundle {
 
 
 	/**
+	 * @param Notification $notification
+	 * @return string
+	 */
+	public function renderTitleAsPlaintext($notification) {
+		// this might be considered cheating
+		return strip_tags($this->renderTitleAsHtml($notification));
+	}
+
+
+	/**
 	 * Translate a parameter into an HTML anchor tag
 	 *
 	 * @param ParameterInterface $param
+	 * @param string $fqdn
 	 * @return string
 	 */
-	protected function param2html($param) {
+	protected function param2html($param, $fqdn = '') {
 		if($param->getHref()) {
-			return sprintf('<a href="%s">%s</a>', $param->getHref(), $param->getText());
+			return sprintf('<a href="%s%s">%s</a>', $fqdn, $param->getHref(), $param->getText());
 		}
 		return "<a>{$param->getText()}</a>";
 	}
@@ -284,9 +289,10 @@ class Decorator extends NotificationBundle {
 	 * Translate an array of parameters into "x, y, and n others..."
 	 *
 	 * @param ParameterInterface[] $params
+	 * @param string $fqdn
 	 * @return string
 	 */
-	protected function stack2html($params) {
+	protected function stack2html($params, $fqdn) {
 		$bits = array();
 
 		/** @var ParameterInterface[] $params */
@@ -295,7 +301,7 @@ class Decorator extends NotificationBundle {
 		// take the first n params, and tuck the rest away
 		for($i = 0; $i < self::STACK_LIMIT - 1; ++$i) {
 			if(isset($params[0])) {
-				$bits[] = $this->param2html(array_shift($params));
+				$bits[] = $this->param2html(array_shift($params), $fqdn);
 			}
 		}
 
@@ -305,7 +311,7 @@ class Decorator extends NotificationBundle {
 				break;
 			case 1:
 				// if it's just the one, include it
-				$bits[] = $this->param2html($params[0]);
+				$bits[] = $this->param2html($params[0], $fqdn);
 				break;
 			default:
 				// if there's anything more left over, aggregate it
@@ -330,5 +336,20 @@ class Decorator extends NotificationBundle {
 		return implode(' and ', $parts);
 	}
 
+
+	/**
+	 * Check a notification's icon and return a globally visible URL (ie. no portraits)
+	 *
+	 * @param Notification $notification
+	 * @return string
+	 */
+	protected function getUnprotectedIcon($notification) {
+		// icon cannot be a protected link
+		if(strpos($notification->getIcon(), '/portrait.php') === 0) {
+			// change to be the generic icon for the namespace
+			return '/images/icon.php?size=48&icon='.$notification->getNamespace();
+		}
+		return $notification->getIcon();
+	}
 
 } 
