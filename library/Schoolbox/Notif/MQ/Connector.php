@@ -12,6 +12,8 @@ namespace Schoolbox\Notif\MQ;
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
+use Alaress\Async\Notification\Instance\Instance;
+use InvalidArgumentException;
 use PhpAmqpLib\Connection\AMQPConnection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -79,13 +81,26 @@ class Connector extends AMQPConnector {
 	 * @return string
 	 */
 	protected function hashMessage($message, $channelId) {
+		$instance = null;
+
 		// attempt to extract the message body, so as to efficiently de-dupe resent messages
 		if($data = json_decode($message, true)) {
-			// TODO once TargetedMessage completely deprecated, replace this with Instance::jsonUnserialize()
-			$conv = new TargetedConverter();
-			$instance = $conv->convert($data['message']);
-
-			return $instance->getBaseHash();
+			try {
+				$instance = Instance::jsonUnserialize($data['message']);
+			}
+			catch(InvalidArgumentException $e) {
+				// TODO once TargetedMessage has been fully deprecated, this catch can be removed
+				$conv = new TargetedConverter();
+				try {
+					$instance = $conv->convert($data['message']);
+				}
+				catch(InvalidArgumentException $e) {
+					// that just failed completely
+				}
+			}
+			if($instance instanceof Instance) {
+				return $instance->getBaseHash();
+			}
 		}
 
 		// couldn't decode, so let's just hash what we got

@@ -282,7 +282,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return void
 	 */
 	public function handleException($exception, $debug) {
-		$debug->v(sprintf("%s: %s", get_class($exception), $exception->getMessage()), '!');
+		$debug->v(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), '!');
 	}
 
 

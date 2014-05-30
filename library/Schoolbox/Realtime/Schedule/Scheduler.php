@@ -328,7 +328,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
 
-		// will throw RangeException if unserialization fails
+		// will throw RuntimeException if unserialization fails
 		$bundle = unserialize($data[0]);
 
 		// method not implemented or nothing to send, this is fine

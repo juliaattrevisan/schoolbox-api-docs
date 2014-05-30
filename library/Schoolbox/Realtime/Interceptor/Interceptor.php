@@ -144,13 +144,13 @@ class Interceptor implements TaskResponseHandlerInterface {
 	protected function rerouteInstance($user, $instance, $formatted) {
 		// fail fast: if it's already been rerouted, don't try again
 		if(isset($formatted['extra']['rerouted'])) {
-			echo "Message has already been rerouted: rejecting\n";
+			$this->v->v("Message has already been rerouted: rejecting");
 			return false;
 		}
 
 		// yes we are "rerouting" this message...rerouting it to /dev/null! *mwa ha ha*
 		if($this->canDismiss($user, $instance, $formatted['context'])) {
-			echo "Message not relevant to user: routing to /dev/null\n";
+			$this->v->v("Message not relevant to user: routing to /dev/null");
 			return true;
 		}
 
@@ -158,14 +158,14 @@ class Interceptor implements TaskResponseHandlerInterface {
 
 		// if the user in question has no digest schedule and digest level is selected, escalate to instant
 		if((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && $newLevel == Logger::INFO) {
-			echo "User doesn't have digest schedule: upgrading to instant\n";
+			$this->v->v("User doesn't have digest schedule: upgrading to instant");
 			$newLevel = Logger::NOTICE;
 		}
 
 		switch($newLevel) {
 			// total suppression
 			case 0:
-				echo "Reroute level is zero: routing to /dev/null\n";
+				$this->v->v("Reroute level is zero: routing to /dev/null");
 				return true;
 
 			// digest
@@ -185,19 +185,19 @@ class Interceptor implements TaskResponseHandlerInterface {
 				break;
 
 			default:
-				echo "Reroute level is unacceptable ($newLevel): rerouting to /dev/null\n";
+				$this->v->v("Reroute level is unacceptable ($newLevel): rerouting to /dev/null");
 				return true;
 		}
 
 		$newTopic = "$method.user.{$user->getId()}";
 
 		try {
-			echo "Rerouting simple message to '$newTopic' at level $newLevel!\n";
+			$this->v->v("Rerouting simple message to '$newTopic' at level $newLevel!");
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
 			return true;
 		}
 		catch(\Exception $e) {
-			echo "Exception occurred during rerouting: $e\n";
+			$this->v->v("Exception occurred during rerouting: $e");
 			return false;
 		}
 
