@@ -14,8 +14,6 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Schoolbox\Collection;
-use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 
