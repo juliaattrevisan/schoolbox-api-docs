@@ -141,9 +141,12 @@ class External_Liss_Server {
 		if ($authenticator->isAuthenticated()) {
 			$academicYear = $message->params[1];
 
-			$allData = $message->params[2]->me['array'];
+			/* Truncate everything before re-adding
+			 */
+			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+			$classEntryMapper->truncate();
 
-			$mapper = new \Schoolbox\External\ClassEntryMapper();
+			$allData = $message->params[2]->me['array'];
 
 			foreach($allData as $currentData) {
 				$actualInfo = $currentData->me['struct'];
@@ -153,7 +156,7 @@ class External_Liss_Server {
 				$classEntry->setCode((string)$actualInfo['ClassCode']->me['string']);
 				$classEntry->setDescription('');
 
-				$mapper->save($classEntry);
+				$classEntryMapper->save($classEntry);
 			}
 
 			return new xmlrpcresp(new xmlrpcval('Classes imported', 'string'));
@@ -174,8 +177,12 @@ class External_Liss_Server {
 		if ($authenticator->isAuthenticated()) {
 			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
 			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
 			$userMapper = new \Schoolbox\UserMapper();
+
+			/* Truncate everything before re-adding
+			 */
+			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
+			$classPeriodMapper->truncate();
 
 			/* TODO: Default user for testing
 			 */
@@ -244,12 +251,14 @@ class External_Liss_Server {
 		$ttStructure = $message->params[1];
 		$cycle = External_Liss_Server::getCycle();
 
-		External_Liss_Server::log($ttStructure);
-
 		if ($authenticator->isAuthenticated()) {
 			$allData = $message->params[2]->me['array'];
 
+			/* Truncate everything before re-adding
+			 */
 			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+			$timetablePeriodMapper->truncate();
+
 			$collection = new \Schoolbox\Collection();
 
 			foreach($allData as $currentData) {
