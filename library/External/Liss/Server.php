@@ -118,6 +118,9 @@ class External_Liss_Server {
 			'liss.publishBellTimes' => array(
 				'function' => 'External_Liss_Server::publishBellTimes',
 			),
+			'liss.publishStudents' => array(
+				'function' => 'External_Liss_Server::publishStudents',
+			),
 		));
 	}
 
@@ -147,6 +150,74 @@ class External_Liss_Server {
 	}
 
 	/**
+	 * Publish students to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	static public function publishStudents(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		External_Liss_Server::log($message);
+
+		if ($authenticator->isAuthenticated()) {
+			$userMapper = new \Schoolbox\UserMapper();
+
+			$allData = $message->params[2]->me['array'];
+
+			foreach($allData as $currentData) {
+				$struct = $currentData->me['struct'];
+
+				$user = new \Schoolbox\User();
+				$user->setFirstname((string)$struct['FirstName']->me['string']);
+				$user->setLastname((string)$struct['Surname']->me['string']);
+				$user->setExternalId((string)$struct['StudentId']->me['string']);
+				$user->setYear((string)$struct['Form']->me['string']);
+
+				/* TODO: Add campus
+				 */
+				$campusMapper = new \Schoolbox\CampusMapper();
+				$campus = $campusMapper->findById(1);
+
+				$campusCollection = new \Schoolbox\Collection();
+				$campusCollection->add($campus);
+
+				$user->setCampusCollection($campusCollection);
+				$user->setDefaultCampus($campus);
+
+				/* TODO: Add role
+				 */
+				$roleMapper = new \Schoolbox\RoleMapper();
+				$role = $roleMapper->findById(3);
+
+				$user->setRole($role);
+
+				/* TODO: Emails
+				 */
+				$user->setLocalEmail(0);
+				$user->setWebmail(1);
+				$user->setUseInternalMail(0);
+
+				/* TODO: Eportfolio
+				 */
+				$user->setEportfolioEnable(1);
+
+				/* TODO: Mandatory other fields
+				 */
+				$user->setUsername(md5($user->getFirstname().$user->getLastname()));
+				$user->setSuperuser(0);
+				$user->setEnabled(1);
+
+				$userMapper->save($user);
+			}
+
+			return new xmlrpcresp(new xmlrpcval('Classes imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
 	 * Publish classes to the Schoolbox
 	 *
 	 * @param xmlrpcmsg $message
@@ -166,11 +237,11 @@ class External_Liss_Server {
 			$allData = $message->params[2]->me['array'];
 
 			foreach($allData as $currentData) {
-				$actualInfo = $currentData->me['struct'];
+				$struct = $currentData->me['struct'];
 
 				$classEntry = new \Schoolbox\External\ClassEntry();
-				$classEntry->setName((string)$actualInfo['CourseName']->me['string']);
-				$classEntry->setCode((string)$actualInfo['ClassCode']->me['string']);
+				$classEntry->setName((string)$struct['CourseName']->me['string']);
+				$classEntry->setCode((string)$struct['ClassCode']->me['string']);
 				$classEntry->setDescription('');
 
 				$classEntryMapper->save($classEntry);
