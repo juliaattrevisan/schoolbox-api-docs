@@ -19,14 +19,16 @@
     </li>
   </ul>
 </li>
+<script type="text/javascript" src="/javascript/jquery.notifier.js"></script>
 <script type="text/javascript">
   $j(function() {
     // launch the notifier
     $j('#infoPanel').children('li.bell').notifier({
-      host:   '{WEBSOCKET_HOST}',
-      port:   '{WEBSOCKET_PORT}',
-      path:   '{WEBSOCKET_PATH}',
-      secure: '{PAGE_SECURE}'
+      host:     '{WEBSOCKET_HOST}',
+      port:     '{WEBSOCKET_PORT}',
+      path:     '{WEBSOCKET_PATH}',
+      secure:   '{PAGE_SECURE}',
+      maxstack: '{WEBSOCKET_STACK_LIMIT}'
     });
   });
 </script>

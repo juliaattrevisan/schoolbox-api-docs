@@ -247,6 +247,7 @@ class SitePage extends Page {
             'WEBSOCKET_PORT' => $this->getWebsocketPort(),
 	        'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
 	        'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?: '',
+	        'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 
