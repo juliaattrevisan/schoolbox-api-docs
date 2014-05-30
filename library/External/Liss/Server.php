@@ -121,6 +121,9 @@ class External_Liss_Server {
 			'liss.publishStudents' => array(
 				'function' => 'External_Liss_Server::publishStudents',
 			),
+			'liss.publishClassMemberships' => array(
+				'function' => 'External_Liss_Server::publishClassMemberships',
+			),
 		));
 	}
 
@@ -155,10 +158,49 @@ class External_Liss_Server {
 	 * @param xmlrpcmsg $message
 	 * @return xmlrpcresp
 	 */
-	static public function publishStudents(xmlrpcmsg $message) {
+	static public function publishClassMemberships(xmlrpcmsg $message) {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
-		External_Liss_Server::log($message);
+		if ($authenticator->isAuthenticated()) {
+			$classInvolvementMapper = new \Schoolbox\External\ClassInvolvementMapper();
+			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+			$userMapper = new \Schoolbox\UserMapper();
+
+			$classInvolvementMapper->truncate();
+
+			$allData = $message->params[1]->me['array'];
+
+			foreach($allData as $currentData) {
+				$struct = $currentData->me['struct'];
+
+				try {
+					$user = $userMapper->findOneByColumn('synergy_id', (string)$struct['StudentId']->me['string']);
+					$class = $classEntryMapper->findOneByColumn('code', (string)$struct['ClassCode']->me['string']);
+
+					$classInvolvement = new \Schoolbox\External\ClassInvolvement();
+					$classInvolvement->setClass($class);
+					$classInvolvement->setUser($user);
+					$classInvolvementMapper->save($classInvolvement);
+				}
+				catch (\Exception $e) {
+					External_Liss_Server::log($e->getMessage());
+				}
+			}
+
+			return new xmlrpcresp(new xmlrpcval('', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
+	 * Publish students to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	static public function publishStudents(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
 			$userMapper = new \Schoolbox\UserMapper();
