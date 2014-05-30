@@ -105,7 +105,7 @@ abstract class AbstractProcess extends PipeWriter {
 				}
 
 				if($buffer = ob_get_contents()) {
-					$this->debug->v($buffer);
+					$this->debug->v("Captured output: $buffer", 'd');
 				}
 				ob_end_clean();
 
@@ -152,8 +152,8 @@ abstract class AbstractProcess extends PipeWriter {
 
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
-		$this->debug->v("Responding with: ");
-		$this->debug->d($response);
+//		$this->debug->v("Responding with: ");
+//		$this->debug->d($response);
 		$flat = $this->strat->getProtocol()->flatten($response);
 		$this->debug->v("Flattened response: $flat");
 

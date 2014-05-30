@@ -328,18 +328,15 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
 
-		/** @var InstanceBundle $bundle */
+		// will throw RangeException if unserialization fails
 		$bundle = unserialize($data[0]);
-
-		/* attempt some sort of type-safety */
 
 		// method not implemented or nothing to send, this is fine
 		if(is_null($bundle)) {
 			$this->debug->v("No messages to broadcast");
 			return;
 		}
-
-		// check that an array was returned
+		// check that a bundle was returned
 		if(!$bundle instanceof InstanceBundle) {
 			throw new ScheduleException(
 				"Invalid callback response, must be instance of Alaress\\Async\\Notification\\InstanceBundle, got "
