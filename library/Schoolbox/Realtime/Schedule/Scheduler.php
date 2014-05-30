@@ -355,7 +355,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 		$postman = new Postman($this->notif, $this->debug);
 
-		$count = $postman->deliver($bundle);
+		$count = $postman->deliver($bundle, array('user' => $trigger->getEvent()->getEffector()->getId()));
 
         if(is_null($count)) {
             $this->debug->d("No messages to broadcast");
