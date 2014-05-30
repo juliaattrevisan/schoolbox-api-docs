@@ -32,7 +32,7 @@ $selectstmt = Database::getInstance()->prepare("
 			:outgoingLevel `outgoing_level`, perm.min_level, perm.max_level
 	FROM `msg_source` src
 	LEFT JOIN msg_namespace ns ON src.namespace = ns.id
-	LEFT JOIN msg_route_perm perm ON perm.msg_source_id = src.id AND perm.role_id = :roleId
+	RIGHT JOIN msg_route_perm perm ON perm.msg_source_id = src.id AND perm.role_id = :roleId
 	WHERE ns.slug = :slug
 	AND `key` = :key
 ");
