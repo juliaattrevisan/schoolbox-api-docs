@@ -247,6 +247,8 @@ class Notif implements LoggerInterface {
 			}
 			catch(NotifException $e) {
 				// no connection to rabbit available. We should be able to safely ignore this
+				// stop propagation though
+				$this->handlers['instant'] = new NullHandler(Logger::INFO);
 			}
 		}
 
