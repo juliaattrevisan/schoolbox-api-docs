@@ -2,10 +2,19 @@
 /**
  * External_Liss_Server
  *
- * Execute calls in this order (belltimes and classes must happen before timetable)
+ * In their SDK, configure it to connect to this place:
+ * http://192.168.36.10/liss.php
+ *
+ * You can accept their default schoolcode, but use alaress/alaress as
+ * username/password tuple
+ *
+ * Execute calls in this order (belltimes and classes must happen before timetable,
+ * otherwise nothing matches up properly - belltimes and classes table gets truncated
+ * so you can run them as many times as you want before running timetable)
+ *
  * publishBellTimes();
  * publishClasses();
- * publishTimetable();
+ * publishTimetable(); (this one might take a little while)
  *
  * Turn on the Schoolbox connector in External DB
  *
@@ -285,11 +294,9 @@ class External_Liss_Server {
  				 */
 				$timetablePeriod->setUsable(1);
 
-				/* Start a collection for a day
+				/* Start a collection for a day, if it's not already a collection
 				 */
-				if ($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection) {
-				}
-				else {
+				if (!($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection)) {
 					$collection->setOffset($dayNumber, new \Schoolbox\Collection());
 				}
 
