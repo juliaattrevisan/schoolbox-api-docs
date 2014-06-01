@@ -104,12 +104,6 @@ class TwigEmail extends TwigMailer {
 			$colours = $this->parseLess($file, $colours);
 		}
 
-//		ksort($colours);
-
-//		echo " -- INITIAL SET -- \n";
-//		print_r($colours);
-
-//		echo "\n -- REFERENCES --\n";
 		$unresolved = array();
 
 		// collate references
@@ -117,19 +111,12 @@ class TwigEmail extends TwigMailer {
 			if($value[0] == '@') {
 				$ref = substr($value, 1);
 				$unresolved[$key] = $ref;
-//				echo "$key references $ref\n";
 			}
 		}
 
 		// resolve
 		while(count($unresolved)) {
-
-//			$count = count($unresolved);
-//			echo "\n -- RESOLVE $count REFERENCES --\n";
-//			print_r($unresolved);
-
 			foreach($unresolved as $key => $true) {
-
 				$ref = substr($colours[$key], 1);
 				if(isset($colours[$ref])) {
 					$colours[$key] = $colours[$ref];
@@ -144,11 +131,9 @@ class TwigEmail extends TwigMailer {
 			}
 		}
 
-//		print_r($colours);
-//		exit;
-
 		return $colours;
 	}
+
 
     /**
      * Accepts the filename of a LESS file and parses it for colour variables
@@ -208,7 +193,7 @@ class TwigEmail extends TwigMailer {
      */
     public function composeHTML() {
         $preformat = $this->twig->render($this->templateFilename,
-	        array_merge_recursive($this->coreContext, $this->context)
+            array_replace_recursive($this->coreContext, $this->context)
         );
 	    $this->rendercache = $this->cssIn->inlineCSS('', $preformat);
 	    // truncate all sequential whitespace characters
@@ -216,11 +201,23 @@ class TwigEmail extends TwigMailer {
 	    return $this->rendercache;
     }
 
-    public function getCoreContext() {
+
+	/**
+	 * Return the configuration elements of config for this email
+	 *
+	 * @return array
+	 */
+	public function getCoreContext() {
         return $this->coreContext;
     }
 
-    public function setSubject($subject) {
+
+	/**
+	 * Set the subject, both in the email header and the config
+	 *
+	 * @param $subject
+	 */
+	public function setSubject($subject) {
         parent::setSubject($subject);
         $this->coreContext['config']['subject'] = $subject;
     }
