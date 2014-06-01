@@ -10,14 +10,17 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use PhpAmqpLib\Message\AMQPMessage;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Cli\Debug;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -28,22 +31,34 @@ class MailNotifier implements Serializable {
     /** @var IConfigLoader */
     protected $conf;
 
-    /**
-     * @param IConfigLoader $configLoader
-     */
-    public function __construct($configLoader = null) {
+	/** @var Debug */
+	protected $debug;
+
+	/**
+	 * @param IConfigLoader $configLoader
+	 * @param Debug         $debug
+	 */
+    public function __construct($configLoader = null, $debug = null) {
         $this->conf = $configLoader ?: ConfigMapper::getInstance();
+	    $this->setDebug($debug ?: new Debug(null));
     }
+
+
+	/**
+	 * @param Debug $debug
+	 */
+	public function setDebug($debug) {
+		$this->debug = $debug;
+	}
+
 
 	/**
 	 * This method is executed by a worker using the 'digest' command
 	 *
 	 * @param Role $role - the role to digest
-	 * @param null $user - ignored
-	 * @param null $diff - ignored
 	 * @return int
 	 */
-	public function processDigest($role, $user, $diff) {
+	public function processDigest($role) {
 
 		// setup
 		$conn = new Connector();
@@ -52,69 +67,73 @@ class MailNotifier implements Serializable {
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
 
+		$this->debug->v("Preparing to digest {$role->getName()}: {$users->count()} users");
+
 		$result = 0;
 
-        $email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+		$decorator = new Decorator();
+		$dir = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
 		// iterate and digest
 		foreach($users as $user) {
+			$email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+			$this->debug->v("Digesting {$user->getUsername()}");
 			$q = UserQueue::getUserDigestQueueName($user->getId());
-			$sent = false;
 			$acks = array();
 
 			// collate list of messages
 			while($m = $conn->readFromQueue($q)) {
 				$acks[] = $m;
+				try {
+					if($formatted = json_decode($m->body, true)) {
+						try {
+							$inst = Instance::jsonUnserialize($formatted['message']);
+						}
+						catch(InvalidArgumentException $e) {
+							$conv = new TargetedConverter();
+							$inst = $conv->convert($formatted['message']);
+						}
+						$decorator->appendInstance($inst);
+					}
+				}
+				catch(InvalidArgumentException $e) {
+					// meh. just ignore this message then
+					$this->debug->v("Unparseable message instance detected", '*');
+				}
 			}
 
 			if(!count($acks)) {
 				// this user has nothing to digest
+				$this->debug->v("{$user->getUsername()} has nothing to digest");
 				continue;
 			}
 
-			$email->buildContextFromMessageList($this->amqp2targeted($acks));
+			$context = $decorator->renderAsTwigContext($email->getCoreContext(), $dir);
+			$this->debug->v(sprintf('Collated %s instances into %s notifications to digest', count($acks), count($decorator->getAll())));
 
-			if(count($email->getContext())) {
-				// explicitly an rfc822 email spec, so it sets, not adds
-				$email->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
-				// away she goes
-				$sent = $email->send();
-			}
+			// explicitly an rfc822 email spec, so it sets, not adds
+			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
+
+			// away she goes
+			$sent = $email->send();
 
             // if email sent successfully, ACK, otherwise NACK
-			if($sent && false) {
+			if($sent) {
+				$this->debug->v("Mail sent successfully");
 				$conn->acceptMessages($acks);
 				++$result;
 			}
 			else {
+				$this->debug->v("Failed to email, rejecting messages", '*');
 				$conn->rejectMessages($acks);
 			}
-			break;
 		}
 
 		// return the number of emails successfully sent
+		$this->debug->v("Finished digesting {$role->getName()}: $result emails sent");
 		return $result;
 	}
 
-	/**
-	 * Convert a batch of AMQPMessages to TargetedMessages
-	 *
-	 * @deprecated TODO write amqp2instance() instead
-	 * @param AMQPMessage[] $messages
-	 * @return TargetedMessage[]
-	 */
-	protected function amqp2targeted($messages) {
-		$result = array();
-
-		foreach($messages as $amqp) {
-			$formatted = json_decode($amqp->body, true);
-
-			/** @var TargetedMessage $message */
-			$result[] = unserialize($formatted['message']);
-		}
-
-		return $result;
-	}
 
 	/**
 	 * (PHP 5 &gt;= 5.1.0)<br/>
@@ -126,6 +145,7 @@ class MailNotifier implements Serializable {
 		// no serialization
 		return 'mailnotifier';
 	}
+
 
 	/**
 	 * (PHP 5 &gt;= 5.1.0)<br/>
@@ -140,4 +160,5 @@ class MailNotifier implements Serializable {
 		// no serialization
 		$this->__construct();
 	}
+
 }
