@@ -81,7 +81,7 @@ class Bootstrap implements BootstrapInterface {
 	 * @return void
 	 */
 	public function registerErrorHandling() {
-		set_error_handler(array($this->kernel, 'handleError'));
+		set_error_handler(array($this->kernel, 'onError'));
 	}
 
 
@@ -91,7 +91,7 @@ class Bootstrap implements BootstrapInterface {
 	 * @return void
 	 */
 	public function registerExceptionHandling() {
-		set_exception_handler(array($this->kernel, 'handleException'));
+		set_exception_handler(array($this->kernel, 'onException'));
 	}
 
 
@@ -101,7 +101,7 @@ class Bootstrap implements BootstrapInterface {
 	 * @return void
 	 */
 	public function registerShutdownHandling() {
-		// noop. daemon apps should take care of their own shutdown sequences
+		register_shutdown_function(array($this->kernel, 'onShutdown'));
 	}
 
 
@@ -148,6 +148,9 @@ class Bootstrap implements BootstrapInterface {
 				$obj->configure($this->kernel);
 			}
 		}
+
+		// Set correct timezone
+		date_default_timezone_set($di->get('config')->get('date_timezone'));
 
 	}
 

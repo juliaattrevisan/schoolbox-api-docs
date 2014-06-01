@@ -43,6 +43,7 @@ class Kernel extends \Alaress\Application\Kernel {
 		$this->boot = new Bootstrap($this);
 		$this->boot();
 
+		pcntl_signal(SIGCHLD, SIG_IGN);
 		error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
 		$this->name = $name;
 		$this->opts = $opts;
@@ -124,7 +125,7 @@ EOL;
 	 * @return bool
 	 * @throws ErrorException
 	 */
-	public function handleError($errNum, $errStr, $errFile, $errLine) {
+	public function onError($errNum, $errStr, $errFile, $errLine) {
 		if (!(error_reporting() & $errNum)) {
 			// This error code is not included in error_reporting
 			return true;
@@ -142,11 +143,14 @@ EOL;
 			case E_NOTICE:
 			case E_WARNING:
 				// this will throw an exception if it needs to
-				$this->handleWarning($errNum, $errStr, $errFile, $errLine);
+				$this->onWarning($errNum, $errStr, $errFile, $errLine);
 				return true;
 
 			default:
 				// we don't know how to deal with this, so let the stock error handler deal with it
+				if($this->debug instanceof Debug) {
+					$this->debug->v("Don't know how to handle $errStr", '*');
+				}
 				return false;
 		}
 	}
@@ -161,7 +165,7 @@ EOL;
 	 * @param int    $errLine
 	 * @throws Exception
 	 */
-	protected function handleWarning($errNum, $errStr, $errFile, $errLine) {
+	protected function onWarning($errNum, $errStr, $errFile, $errLine) {
 		if(strpos($errStr, 'stream_select') === 0) {
 			// this is fine to be let through
 			return;
@@ -181,8 +185,6 @@ EOL;
 			throw new RangeException($errStr, $errNum);
 		}
 
-
-
 		throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 	}
 
@@ -190,11 +192,44 @@ EOL;
 	/**
 	 * @param Exception $e
 	 */
-	public function handleException($e) {
+	public function onException($e) {
 		if($this->debug instanceof Debug) {
 			$this->debug->v('FATAL ' . get_class($e) . ': ' . $e->getMessage(), '!');
 		}
 		exit;
+	}
+
+
+	/**
+	 * Check if it was a fatal error that shut us down, and if it was, advise as such
+	 */
+	public function onShutdown() {
+		$error = error_get_last();
+
+		var_dump($error);
+		return;
+
+		// only report if the last error was one of these
+		$cases = array(
+			E_ERROR         => 'Fatal',
+			E_CORE_ERROR    => 'Core',
+			E_USER_ERROR    => 'Fatal user',
+			E_COMPILE_ERROR => 'Compilation'
+		);
+
+		// don't report anything
+		if(!isset($cases[$error['type']])) {
+			if($this->debug instanceof Debug) {
+				$this->debug->v('Exiting normally');
+			}
+			return;
+		}
+
+		// report if possible
+		if($this->debug instanceof Debug) {
+			$message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
+			$this->debug->v($message, '!');
+		}
 	}
 
 }

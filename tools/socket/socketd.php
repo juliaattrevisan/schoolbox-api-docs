@@ -18,7 +18,6 @@ use Schoolbox\Realtime\Pipe\PipeManager;
  * @version     SVN: $Id$
  */
 
-pcntl_signal(SIGCHLD, SIG_IGN);
 $opts = getopt('vp::c::');
 
 require_once __DIR__ . '/../../conf/core/require.php';
