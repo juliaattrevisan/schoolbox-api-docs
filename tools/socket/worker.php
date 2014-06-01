@@ -3,9 +3,6 @@
 
 use Alaress\Cli\Debug;
 
-// this gets routed to err.log by the parent process
-error_reporting(E_ALL);
-
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -17,11 +14,12 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Worker');
+$kernel = new Schoolbox\Application\Daemon\Kernel('Worker', array(
+	'errors' => E_ALL
+));
 
 $kernel->run(function($di, $loop, $debug, $options) {
-	$logfile = \Schoolbox\Config\ConfigMapper::getInstance()->get('logs_dir')."/sched.worker.log";
-	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(fopen($logfile, 'a')));
+	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(STDERR));
 });
 
 // yup. that's all you need to do.
