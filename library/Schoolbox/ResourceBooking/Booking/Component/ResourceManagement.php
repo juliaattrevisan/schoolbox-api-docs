@@ -53,7 +53,6 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         );
         $bookingApi->setStatus(
             array(
-                Booking\Status\Model::STATUS_APPROVED,
                 Booking\Status\Model::STATUS_PENDING,
                 Booking\Status\Model::STATUS_REJECTED,
             )
