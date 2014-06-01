@@ -22,6 +22,7 @@ use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
@@ -62,16 +63,22 @@ class WorkerProcess extends AbstractProcess {
 				list($userId, $count) = $args;
 				return $this->fetch($userId, $count);
 
-			// publish or digest messages
+			// publish messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:
-			case DefaultDispatchStrategy::TASK_DIGEST:
 				$data = unserialize($args[0]);
 				if(!(is_array($data) && count($data) == 4)) {
 					throw new RuntimeException("Data should be array(4); is ".gettype($data)."(".count($data).")");
 				}
 				list($callback, $model, $user, $diff) = $data;
-				$this->debug->v(sprintf("%sing model %s for user %s", ucfirst($command), get_class($model), $user->getId()));
 				return $this->publish($callback, $model, $user, $diff);
+
+			// digest messages
+			case DefaultDispatchStrategy::TASK_DIGEST:
+				$data = unserialize($args[0]);
+				if(!(is_array($data) && count($data) >= 2)) {
+					throw new RuntimeException("Data should be array(2+); is ".gettype($data)."(".count($data).")");
+				}
+				return $this->digest($data[0], $data[1]);
 
 			// process interceptions
 			case DefaultDispatchStrategy::TASK_INTERCEPT:
@@ -110,8 +117,8 @@ class WorkerProcess extends AbstractProcess {
 	 * @param User $user
 	 * @param array $diff
 	 * @return string
-	 * @throws \RuntimeException
-	 * @throws \InvalidArgumentException
+	 * @throws RuntimeException
+	 * @throws InvalidArgumentException
 	 */
 	protected function publish($callback, $model, $user, $diff) {
 
@@ -130,23 +137,60 @@ class WorkerProcess extends AbstractProcess {
 			$return = new Envelope();
 		}
 
-		if(!$return instanceof InstanceBundle) {
-			throw new InvalidArgumentException(
-				"Async method response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
-				. (is_object($return) ? get_class($return) : gettype($return))
-			);
+		if($return instanceof InstanceBundle) {
+			$this->debug->v("InstanceBundle ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+
+			$serial = serialize($return);
+			if($serial === false) {
+				throw new RuntimeException("Failed to serialize InstanceBundle");
+			}
+
+			return $serial;
 		}
 
-		$this->debug->v("Envelope ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+		throw new InvalidArgumentException(
+			"Async publish response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
+			. (is_object($return) ? get_class($return) : gettype($return))
+		);
+	}
 
-		$serial = serialize($return);
-		if($serial === false) {
-			throw new RuntimeException("Failed to serialize Envelope");
+
+	/**
+	 * @param callable $callback
+	 * @param Role $role
+	 * @throws RuntimeException
+	 * @throws InvalidArgumentException
+	 * @return string
+	 */
+	protected function digest($callback, $role) {
+		if(!is_callable($callback)) {
+			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
 		}
 
-		$this->debug->d($serial);
+		// inject the debugger into the notifier if possible
+		if(is_array($callback) && is_object($callback[0])) {
+			$setDebug = array($callback[0], 'setDebug');
+			if(is_callable($setDebug)) {
+				call_user_func($setDebug, $this->debug);
+			}
+		}
 
-		return $serial;
+		$this->debug->v("Executing ".$this->callable2string($callback));
+		// this call MUST return an integer
+		$return = call_user_func($callback, $role);
+		$this->debug->v("Callback complete");
+		// handle standard digest case
+
+		if(is_integer($return)) {
+			$this->debug->v("Response is numeric, returning as is");
+			$serial = serialize($return);
+			return $serial;
+		}
+
+		throw new InvalidArgumentException(
+			"Async digest response must be an integer; got "
+			. (is_object($return) ? get_class($return) : gettype($return))
+		);
 	}
 
 
