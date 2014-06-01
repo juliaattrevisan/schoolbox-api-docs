@@ -34,6 +34,16 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
 
 
 	/**
+	 * Get the name of the strategy currently being used
+	 *
+	 * @return string
+	 */
+	public function getName() {
+		return 'Schedule';
+	}
+
+
+	/**
 	 * @return SplQueue
 	 */
 	public function buildQueue() {
