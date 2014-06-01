@@ -246,7 +246,6 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		$int = $this->interceptor;
 		return $this->subscribe("/amq/queue/$queue", function($frame) use ($int, $user, $debug) {
 			// this closure is executed every time a message is sent to the client based on the given subscription
-			$debug->v("Got a subscribed message for ".$user->getUsername());
 			$int->process($user, $frame);
 		});
 	}
