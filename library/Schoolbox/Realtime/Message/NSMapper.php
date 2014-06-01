@@ -27,6 +27,7 @@ class NSMapper extends Mapper {
 	const NS_SSTREAM          = 'sstream';
 	const NS_EOTC             = 'eotc';
 	const NS_RESOURCE_BOOKING = 'resource_booking';
+	const NS_REPORT_CARD      = 'report_card';
 
 
 	protected function mapping() {
