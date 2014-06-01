@@ -13,6 +13,7 @@ namespace Alaress\WorkerCrew;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
+use Evenement\EventEmitter;
 use Exception;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
@@ -26,7 +27,7 @@ use UnexpectedValueException;
  * Class Pool
  * @package AlaressWorkerCrew
  */
-class Pool {
+class Pool extends EventEmitter {
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -38,7 +39,7 @@ class Pool {
 	protected $workers;
 
 	/** @var SplObjectStorage */
-	protected $listeners;
+	protected $instreams;
 
 	/** @var Debug */
 	protected $debug;
@@ -54,7 +55,7 @@ class Pool {
 		$this->loop = $loop;
 		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
-		$this->listeners = new SplObjectStorage();
+		$this->instreams = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
 		$this->debug = $debug;
 	}
@@ -103,6 +104,7 @@ class Pool {
 	 * @throws RuntimeException
 	 */
 	protected function attachWorker() {
+		$this->debug->v("Attaching worker to {$this->poolingStrat->getName()} pool", '+');
 		$cmd = $this->poolingStrat->getCommand();
 
 		$descriptorSpec = array(
@@ -135,7 +137,7 @@ class Pool {
 		$instream->on('data',  array($this, 'onData'));
 		$instream->on('close', array($this, 'onClose'));
 
-		$this->listeners->attach($instream, $pid);
+		$this->instreams->attach($instream, $pid);
 
 		return $pid;
 
@@ -163,7 +165,7 @@ class Pool {
 	 */
 	public function onData($data, $stream) {
 		try {
-			$pid = $this->listeners->offsetGet($stream);
+			$pid = $this->instreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
@@ -218,6 +220,11 @@ class Pool {
 				$worker->setStatus(Worker::ENDED);
 				break;
 		}
+
+		// if we can accept, emit READY (to be caught by dispatcher)
+		if($this->canAccept()) {
+			$this->emit('ready');
+		}
 	}
 
 
@@ -226,12 +233,13 @@ class Pool {
 	 */
 	public function onClose($stream) {
 		try {
-			$pid = $this->listeners->offsetGet($stream);
+			$pid = $this->instreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			return;
 		}
 
+		$this->debug->v("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
 	}
 
