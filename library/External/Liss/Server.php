@@ -59,6 +59,8 @@ class External_Liss_Server {
 		$cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
 
 		try {
+			/* TODO: Assume a particular cycle
+			 */
 			$cycle = $cycleMapper->findById(1);
 		}
 		catch (\Exception $e) {
