@@ -22,7 +22,7 @@ class External_Ping implements External_PingInterface {
 	 */
 	public function __construct($databaseName = '') {
 		$factory = new External_DatabaseFactory();
-		$this->setDatabase($factory->buildPingConnector($databaseName));
+		$this->database = $factory->buildPingConnector($databaseName);
 	}
 
 	public function isResponsive() {
