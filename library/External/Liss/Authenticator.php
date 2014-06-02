@@ -48,6 +48,17 @@ class External_Liss_Authenticator {
 	 */
 	public function __construct(xmlrpcval $dataObject) {
 		$this->setDataObject($dataObject);
+
+		$this->setup();
+	}
+
+	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setUsername(\Cfg::get('external_liss_username'));
+		$this->setPassword(\Cfg::get('external_liss_password'));
+		$this->setSchoolCode(\Cfg::get('external_liss_schoolcode'));
 	}
 
 	/**

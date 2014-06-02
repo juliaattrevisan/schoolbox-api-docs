@@ -193,10 +193,8 @@ class External_Liss_Server {
 				}
 			}
 
-			return new xmlrpcresp(new xmlrpcval('', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
@@ -275,10 +273,8 @@ class External_Liss_Server {
 				$userMapper->save($user);
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Teachers imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
@@ -353,10 +349,8 @@ class External_Liss_Server {
 				$userMapper->save($user);
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Students imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
@@ -389,10 +383,8 @@ class External_Liss_Server {
 				$classEntryMapper->save($classEntry);
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Classes imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Classes Imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
@@ -464,10 +456,8 @@ class External_Liss_Server {
 				}
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 
 	/**
@@ -529,9 +519,7 @@ class External_Liss_Server {
 				}
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Something imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
 		}
-
-		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
 	}
 }
