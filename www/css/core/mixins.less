@@ -45,10 +45,12 @@
 	column-rule: @column-rule;
 }
 .gradient (@startColor: black, @endColor: white) {
-	background-color: @endColor;
-	background-repeat: repeat-x;
-	background-image: -webkit-linear-gradient(@startColor, @endColor); // Safari? Really?
-	background-image: 		  linear-gradient(@startColor, @endColor);
+	background-color: @startColor;
+    background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+    background: -webkit-linear-gradient(top, @startColor, @endColor);
+    background: -moz-linear-gradient(top, @startColor, @endColor);
+    background: -ms-linear-gradient(top, @startColor, @endColor);
+    background: -o-linear-gradient(top, @startColor, @endColor);
 }
 .transform (@transform) {
 	-webkit-transform: @transform;
