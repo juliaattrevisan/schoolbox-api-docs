@@ -39,7 +39,10 @@ class Pool extends EventEmitter {
 	protected $workers;
 
 	/** @var SplObjectStorage */
-	protected $instreams;
+	protected $datastreams;
+
+	/** @var SplObjectStorage */
+	protected $logstreams;
 
 	/** @var Debug */
 	protected $debug;
@@ -55,7 +58,8 @@ class Pool extends EventEmitter {
 		$this->loop = $loop;
 		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
-		$this->instreams = new SplObjectStorage();
+		$this->datastreams = new SplObjectStorage();
+		$this->logstreams = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
 		$this->debug = $debug;
 	}
@@ -110,7 +114,7 @@ class Pool extends EventEmitter {
 		$descriptorSpec = array(
 			0 => array("pipe", "r"), // stdin is a pipe that the child will read from
 			1 => array("pipe", "w"), // stdout is a pipe that the child will write to
-			2 => array("file", 'err.log', 'a')  // stderr
+			2 => array("pipe", "w")  // stderr is a pipe that the child will write to
 		);
 
 		if(!($pp = proc_open($cmd, $descriptorSpec, $pipes))) {
@@ -118,8 +122,9 @@ class Pool extends EventEmitter {
 		}
 
 		// disable stream blocking for the proc IO
-		stream_set_blocking($pipes[0], 0);
-		stream_set_blocking($pipes[1], 0);
+		foreach(array_keys($pipes) as $i) {
+			stream_set_blocking($pipes[$i], 0);
+		}
 
 		$status = proc_get_status($pp);
 		$pid = $status['pid'];
@@ -132,12 +137,18 @@ class Pool extends EventEmitter {
 
 		$this->workers->get($pid)->attachDebug($this->debug);
 
-		// include the worker's write-stream into the react loop
-		$instream = new Stream($pipes[1], $this->loop);
-		$instream->on('data',  array($this, 'onData'));
-		$instream->on('close', array($this, 'onClose'));
+		// listen to worker's STDOUT for data
+		$datastream = new Stream($pipes[1], $this->loop);
+		$datastream->on('data',  array($this, 'onData'));
+		$datastream->on('close', array($this, 'onClose'));
 
-		$this->instreams->attach($instream, $pid);
+		$this->datastreams->attach($datastream, $pid);
+
+		// listen to worker's STDERR for logging
+		$logstream = new Stream($pipes[2], $this->loop);
+		$logstream->on('data', array($this, 'onLog'));
+
+		$this->logstreams->attach($logstream, $pid);
 
 		return $pid;
 
@@ -165,7 +176,7 @@ class Pool extends EventEmitter {
 	 */
 	public function onData($data, $stream) {
 		try {
-			$pid = $this->instreams->offsetGet($stream);
+			$pid = $this->datastreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
@@ -233,7 +244,7 @@ class Pool extends EventEmitter {
 	 */
 	public function onClose($stream) {
 		try {
-			$pid = $this->instreams->offsetGet($stream);
+			$pid = $this->datastreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			return;
@@ -241,6 +252,24 @@ class Pool extends EventEmitter {
 
 		$this->debug->v("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
+	}
+
+
+	/**
+	 * Push all worker logging to the daemon's log
+	 *
+	 * @param string $data
+	 * @param Stream $stream
+	 */
+	public function onLog($data, $stream) {
+		try {
+			$pid = $this->datastreams->offsetGet($stream);
+		}
+		catch(UnexpectedValueException $e) {
+			$this->debug->v("$data");
+			return;
+		}
+		$this->debug->v("{$pid} $data");
 	}
 
 
