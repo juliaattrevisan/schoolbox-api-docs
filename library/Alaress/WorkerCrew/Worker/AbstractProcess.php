@@ -159,6 +159,8 @@ abstract class AbstractProcess extends PipeWriter {
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
 		$flat = $this->strat->getProtocol()->flatten($response);
+		$size = strlen($flat);
+		$this->debug->v("Flattened response is $size bytes", 'd');
 
 		return $flat;
 	}
