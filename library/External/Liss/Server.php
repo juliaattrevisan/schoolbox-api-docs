@@ -216,12 +216,24 @@ class External_Liss_Server {
 			foreach($allData as $currentData) {
 				$struct = $currentData->me['struct'];
 
+				/* Update vs create
+				 * Try to find via external id - if one exists, update it
+				 * Otherwise create a new one
+				 */
+				try {
+					$externalId = (string)$struct['TeacherCode']->me['string'];
+
+					$user = $userMapper->findOneByColumn('synergy_id', $externalId);
+				}
+				catch (\Exception $e) {
+					$user = new \Schoolbox\User();
+				}
+
 				/* TODO: SDK doesn't match spec
 				 */
 				$name = (string)$struct['Name']->me['string'];
 				$bits = explode(' ', $name);
 
-				$user = new \Schoolbox\User();
 				$user->setFirstname($bits[0]);
 				$user->setLastname($bits[1]);
 				$user->setExternalId((string)$struct['TeacherCode']->me['string']);
@@ -286,7 +298,19 @@ class External_Liss_Server {
 			foreach($allData as $currentData) {
 				$struct = $currentData->me['struct'];
 
-				$user = new \Schoolbox\User();
+				/* Update vs create
+				 * Try to find via external id - if one exists, update it
+				 * Otherwise create a new one
+				 */
+				try {
+					$externalId = (string)$struct['StudentId']->me['string'];
+
+					$user = $userMapper->findOneByColumn('synergy_id', $externalId);
+				}
+				catch (\Exception $e) {
+					$user = new \Schoolbox\User();
+				}
+
 				$user->setFirstname((string)$struct['FirstName']->me['string']);
 				$user->setLastname((string)$struct['Surname']->me['string']);
 				$user->setExternalId((string)$struct['StudentId']->me['string']);
