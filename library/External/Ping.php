@@ -21,7 +21,10 @@ class External_Ping implements External_PingInterface {
 	 * @param String $databaseName
 	 */
 	public function __construct ($databaseName = '') {
-		if (empty($databaseName)) {
+		if (!Config::get('external_enable')) {
+			$databaseName = 'offline';
+		}
+		elseif (empty($databaseName)) {
 			$databaseName = Config::get('external_type');
 		}
 		$databaseClass = 'External_'.ucfirst($databaseName).'_Ping';

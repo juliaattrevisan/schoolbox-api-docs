@@ -17,7 +17,10 @@ class External_Timetable implements External_TimetableInterface {
 	 * @param String $databaseName
 	 */
 	public function __construct ($databaseName = '') {
-		if ( empty($databaseName) ) {
+		if (!Config::get('external_enable')) {
+			$databaseName = 'offline';
+		}
+		elseif (empty($databaseName)) {
 			$databaseName = Config::get('external_type');
 		}
 
