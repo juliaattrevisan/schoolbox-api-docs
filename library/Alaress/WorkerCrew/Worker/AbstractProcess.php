@@ -97,7 +97,7 @@ abstract class AbstractProcess extends PipeWriter {
 				try {
 					$this->buffering = false;
 					$this->write($this->parseBuffer());
-					$this->debug->d("Task Complete");
+					$this->debug->v("Task Complete");
 				}
 				catch(ErrorException $e) {
 					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
