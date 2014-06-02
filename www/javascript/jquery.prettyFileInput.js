@@ -1,21 +1,21 @@
-/******* 
- 
+/*******
+
  jQuery prettyFileInput
  Author: Tom Gordon
  Company: Alaress
  Release: 31/05/2011
- 
+
  "if ya needs thar a prettier file inputstick tharn come on doooown"
- 
+
  This changes file inputs to be prettier!
  I started with this basic converter
- 
+
  http://www.viget.com/inspire/custom-file-inputs-with-a-bit-of-jquery/
- 
+
  so thanks for that!
-  
+
  v. 0.1
- 
+
  + inputHolderClass: this wraps all the appended elements and the file input itself.
  + buttonClass: this is the class for the 'button', the thing underneath the invisible file input. how sneaky!
  + buttonActiveClass: for when a file has been selected.
@@ -27,7 +27,7 @@
  Known bug: if this is applied to an input within a <label> tag, the open file
             dialog triggers twice. I haven't found a way around this.
             This doesn't happen to elements with an external <label>.
- 
+
  *******/
 
 (function($) {
@@ -51,17 +51,8 @@
             var obj = $(this);
 
             obj.wrap(
-                $('<span />')
+                $('<label />')
                     .addClass(options.inputHolderClass)
-                    .on('click', function() {
-                        if ($(this).closest('label').length > 0) {
-                            console.warn('This pretty file input is inside a label. If the file input is opening twice, that\'s why.')
-                        }
-                        // Trigger the click event on the DOM element directly,
-                        // because it doesn't work when I trigger it via jQuery.
-                        // Works in everything I've tested
-                        obj[0].click();
-                    })
             );
             obj.after(
                 $('<span />')
@@ -73,7 +64,8 @@
             // so that click events can still be triggered.
             obj.width(0).height(0);
 
-            obj.bind('change.prettyFileInput focus.prettyFileInput click.prettyFileInput', function() {
+            // Change event for files
+            obj.bind('change.prettyFileInput', function() {
 
                 var $val = obj.val();
 
