@@ -32,9 +32,6 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . "/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc");
-require_once(dirname(__FILE__) . "/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc");
-
 class External_Liss_Server {
 
 	/**
