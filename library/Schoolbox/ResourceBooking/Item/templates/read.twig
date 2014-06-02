@@ -224,13 +224,8 @@ $(document).ready(function() {
 
         {# Resource manager: could be set in the edit form, or the default resource manager #}
         <p class="meta">
-            Managed by
-            {% if defaultModeratorList is empty and item.moderatorList is empty %}
-                <span>Nobody</span>
-            {% else %}
-                {% for moderator in defaultModeratorList %}
-                    <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
-                {% endfor %}
+            {% if item.moderatorList is not empty %}
+                Managed by
                 {% for moderator in item.moderatorList %}
                     <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
                 {% endfor %}
