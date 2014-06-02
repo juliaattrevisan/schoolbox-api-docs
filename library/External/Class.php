@@ -16,28 +16,9 @@ class External_Class implements External_ClassInterface{
 	 * @throws Exception
 	 * @param String $databaseName
 	 */
-	public function __construct ($databaseName = '') {
-		if (!Config::get('external_enable')) {
-			$databaseName = 'offline';
-		}
-		elseif (empty($databaseName)) {
-			$databaseName = Config::get('external_type');
-		}
-
-		$databaseClass = 'External_'.ucfirst($databaseName).'_Class';
-
-		if ( class_exists($databaseClass, true) ) {
-			try {
-				$database = new $databaseClass;
-				$this->setDatabase( $database );
-			}
-			catch(\Schoolbox\External\Exception $e) {
-				$this->setDatabase(new External_Offline_Class());
-			}
-		}
-		else {
-			$this->setDatabase(new External_Offline_Class());
-		}
+	public function __construct($databaseName = '') {
+		$factory = new External_DatabaseFactory();
+		$this->setDatabase($factory->buildClassConnector($databaseName));
 	}
 
 	public function getStudents ($classCode) {
