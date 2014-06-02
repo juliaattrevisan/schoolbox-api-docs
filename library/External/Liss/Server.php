@@ -12,9 +12,12 @@
  * otherwise nothing matches up properly - belltimes and classes table gets truncated
  * so you can run them as many times as you want before running timetable)
  *
- * publishBellTimes();
- * publishClasses();
- * publishTimetable(); (this one might take a little while)
+ * Proposed Extensions/publishTeachers();
+ * Proposed Extensions/publishStudents();
+ * Publish/publishBellTimes();
+ * Publish/publishClasses();
+ * Publish/publishClassMemberships();
+ * Publish/publishTimetable(); (this one might take a little while)
  *
  * Turn on the Schoolbox connector in External DB
  *
@@ -109,20 +112,23 @@ class External_Liss_Server {
 			'liss.getRooms' => array(
 				'function' => 'External_Liss_Server::getRooms'
 			),
-			'liss.publishClasses' => array(
-				'function' => 'External_Liss_Server::publishClasses',
+			'liss.publishStudents' => array(
+				'function' => 'External_Liss_Server::publishStudents',
 			),
-			'liss.publishTimetable' => array(
-				'function' => 'External_Liss_Server::publishTimetable',
+			'liss.publishTeachers' => array(
+				'function' => 'External_Liss_Server::publishTeachers',
 			),
 			'liss.publishBellTimes' => array(
 				'function' => 'External_Liss_Server::publishBellTimes',
 			),
-			'liss.publishStudents' => array(
-				'function' => 'External_Liss_Server::publishStudents',
+			'liss.publishClasses' => array(
+				'function' => 'External_Liss_Server::publishClasses',
 			),
 			'liss.publishClassMemberships' => array(
 				'function' => 'External_Liss_Server::publishClassMemberships',
+			),
+			'liss.publishTimetable' => array(
+				'function' => 'External_Liss_Server::publishTimetable',
 			),
 		));
 	}
@@ -194,6 +200,76 @@ class External_Liss_Server {
 	}
 
 	/**
+	 * Publish Teachers to the Schoolbox
+	 *
+	 * @param xmlrpcmsg $message
+	 * @return xmlrpcresp
+	 */
+	static public function publishTeachers(xmlrpcmsg $message) {
+		$authenticator = new External_Liss_Authenticator($message->params[0]);
+
+		if ($authenticator->isAuthenticated()) {
+			$userMapper = new \Schoolbox\UserMapper();
+
+			$allData = $message->params[2]->me['array'];
+
+			foreach($allData as $currentData) {
+				$struct = $currentData->me['struct'];
+
+				/* TODO: SDK doesn't match spec
+				 */
+				$name = (string)$struct['Name']->me['string'];
+				$bits = explode(' ', $name);
+
+				$user = new \Schoolbox\User();
+				$user->setFirstname($bits[0]);
+				$user->setLastname($bits[1]);
+				$user->setExternalId((string)$struct['TeacherCode']->me['string']);
+
+				/* TODO: Add campus
+				 */
+				$campusMapper = new \Schoolbox\CampusMapper();
+				$campus = $campusMapper->findById(1);
+
+				$campusCollection = new \Schoolbox\Collection();
+				$campusCollection->add($campus);
+
+				$user->setCampusCollection($campusCollection);
+				$user->setDefaultCampus($campus);
+
+				/* TODO: Add role
+				 */
+				$roleMapper = new \Schoolbox\RoleMapper();
+				$role = $roleMapper->findById(2);
+
+				$user->setRole($role);
+
+				/* TODO: Emails
+				 */
+				$user->setLocalEmail(0);
+				$user->setWebmail(1);
+				$user->setUseInternalMail(0);
+
+				/* TODO: Eportfolio
+				 */
+				$user->setEportfolioEnable(1);
+
+				/* TODO: Mandatory other fields
+				 */
+				$user->setUsername('teacher' . md5($user->getFirstname() . $user->getLastname()));
+				$user->setSuperuser(0);
+				$user->setEnabled(1);
+
+				$userMapper->save($user);
+			}
+
+			return new xmlrpcresp(new xmlrpcval('Teachers imported', 'string'));
+		}
+
+		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
+	}
+
+	/**
 	 * Publish students to the Schoolbox
 	 *
 	 * @param xmlrpcmsg $message
@@ -246,14 +322,14 @@ class External_Liss_Server {
 
 				/* TODO: Mandatory other fields
 				 */
-				$user->setUsername(md5($user->getFirstname().$user->getLastname()));
+				$user->setUsername('student' . md5($user->getFirstname() . $user->getLastname()));
 				$user->setSuperuser(0);
 				$user->setEnabled(1);
 
 				$userMapper->save($user);
 			}
 
-			return new xmlrpcresp(new xmlrpcval('Classes imported', 'string'));
+			return new xmlrpcresp(new xmlrpcval('Students imported', 'string'));
 		}
 
 		return new xmlrpcresp(new xmlrpcval('Not authenticated', 'string'));
