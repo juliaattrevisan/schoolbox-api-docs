@@ -287,7 +287,7 @@ class Mapper extends BaseMapper {
                       {$relatedModelMapper->getColumnString('m')}
                     FROM {$relationMapper->getTable()} `r`
                     INNER JOIN {$relationMapper->getJoinSql('related_resource', 'r', 'm')}
-                    WHERE r.resource_id=?
+                    WHERE r.resource_id=? AND m.deleted_at IS NULL
                 ";
                 $statement = $userMapper->getDatabase()->prepare($query);
                 $statement->execute(array($model->getId()));
