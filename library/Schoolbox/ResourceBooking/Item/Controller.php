@@ -107,18 +107,16 @@ class Controller extends Base {
      * @param int $id
      */
     public function read($id) {
-        // Loading default moderators:
-        //
         $item = $this->getMapper()->findById($id);
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/read.twig',
                 'data'     => array(
                     'item'                 => $item,
-                    'defaultModeratorList' => $this->getUserMapper()->findByAccess(
-                        UserAccess::SERVICE_RESOURCE_BOOKING,
-                        UserAccess::ACCESS_FULL
-                    ),
+//                    'defaultModeratorList' => $this->getUserMapper()->findByAccess(
+//                        UserAccess::SERVICE_RESOURCE_BOOKING,
+//                        UserAccess::ACCESS_FULL
+//                    ),
                 ),
             )
         );
