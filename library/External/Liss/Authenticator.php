@@ -19,7 +19,6 @@ class External_Liss_Authenticator {
 
 	/**
 	 * Username
-	 * This will probably come from Cfg at some point
 	 *
 	 * @var string
 	 */
@@ -27,7 +26,6 @@ class External_Liss_Authenticator {
 
 	/**
 	 * Password
-	 * This will probably come from Cfg at some point
 	 *
 	 * @var string
 	 */
@@ -35,7 +33,6 @@ class External_Liss_Authenticator {
 
 	/**
 	 * School code
-	 * This will probably come from Cfg at some point
 	 *
 	 * @var string
 	 */
