@@ -45,6 +45,13 @@ class Notifier extends AbstractModuleNotifier {
     protected $router;
 
     /**
+     * @return string
+     */
+    protected function getSlug() {
+        return NSMapper::NS_RESOURCE_BOOKING;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function buildTopic($eventLabel, $roleType) {
