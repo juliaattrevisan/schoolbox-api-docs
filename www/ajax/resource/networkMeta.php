@@ -90,7 +90,7 @@ function getFolderMeta($folderId) {
 			'type' => '',
 			'joinable' => 0,
 			'permissions' => array(),
-			'actions' => array('folder'),
+			'actions' => array(),
 		);
 		return $folder;
 	}
