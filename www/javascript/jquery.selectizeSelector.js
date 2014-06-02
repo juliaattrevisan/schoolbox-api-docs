@@ -83,9 +83,6 @@
             settings.value = [settings.value]
         }
 
-        // The plugin object
-        element.val('').selectize(settings.selectize)
-
         // For convenience: bind all selectize's events to the element, in the
         // selectize namespace.
         var selectizeEvents = [
@@ -102,13 +99,19 @@
 //            'load',
 //            'destroy'
         ]
-        $.each(selectizeEvents, function(i,event) {
-            element.data('selectize').on(
-                event,
-                function() {
-                    element.trigger('selectize.'+event, arguments)
-                }
-            )
+
+        // Set up selectize on all elements
+        element.each(function() {
+            var singleElement = $(this)
+            singleElement.val('').selectize(settings.selectize)
+            $.each(selectizeEvents, function(i,event) {
+                singleElement.data('selectize').on(
+                    event,
+                    function() {
+                        singleElement.trigger('selectize.'+event, arguments)
+                    }
+                )
+            })
         })
 
         // Chain me
