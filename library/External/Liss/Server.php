@@ -38,13 +38,6 @@ require_once(dirname(__FILE__) . "/../../../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrp
 class External_Liss_Server {
 
 	/**
-	 * A place for you to dump request data
-	 *
-	 * @var null
-	 */
-	static $logger = null;
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
