@@ -30,13 +30,8 @@
             <h3 class="resource-name"><a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">{{ item.name }}</a></h3>
             <p class="meta">
                 <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
-                Managed by
-                {% if defaultModeratorList is empty and item.moderatorList is empty %}
-                    <span>Nobody</span>
-                {% else %}
-                    {% for moderator in defaultModeratorList %}
-                        <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
-                    {% endfor %}
+                {% if item.moderatorList is not empty %}
+                    Managed by
                     {% for moderator in item.moderatorList %}
                         <span>{% include 'sub/userLink.twig' with {user: moderator} %} </span>
                     {% endfor %}
