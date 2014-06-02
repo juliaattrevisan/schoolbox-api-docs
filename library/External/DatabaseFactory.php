@@ -12,7 +12,8 @@ class External_DatabaseFactory {
     /**
      * Builds a database connector to a particular part of an external database.
      *
-     * If the external database is disabled, or an error occurs
+     * If the external database is disabled, or an error occurs, returns an
+     * offline class.
      *
      * @param string $databaseType The type of class to create. One of "Class",
      *                             "Timetable", "User", "Attendance" or "Ping".
@@ -21,9 +22,11 @@ class External_DatabaseFactory {
      *                             "offline" if it isn't enabled.
      * @return External_ClassInterface|External_AttendanceInterface|External_PingInterface|External_TimetableInterface|External_UserInterface
      *         Depends on value of $databaseType
-     * @throws LogicException if no class could be created
+     * @throws LogicException if even the offline class could be created.
+     *                        (This probably means you passed an invalid value
+     *                         for $databaseType.)
      */
-    public function buildConnector($databaseType, $databaseName = '') {
+    protected function buildConnector($databaseType, $databaseName = '') {
         $offlineClass = "External_Offline_$databaseType";
         if (!Config::get('external_enable')) {
             $databaseClass = $offlineClass;
@@ -56,7 +59,7 @@ class External_DatabaseFactory {
      * @return External_AttendanceInterface
      */
     public function buildAttendanceConnector($databaseName = '') {
-        return $this->buildConnector('attendance', $databaseName);
+        return $this->buildConnector('Attendance', $databaseName);
     }
 
     /**
@@ -66,7 +69,7 @@ class External_DatabaseFactory {
      * @return External_ClassInterface
      */
     public function buildClassConnector($databaseName = '') {
-        return $this->buildConnector('class', $databaseName);
+        return $this->buildConnector('Class', $databaseName);
     }
 
     /**
@@ -76,7 +79,7 @@ class External_DatabaseFactory {
      * @return External_PingInterface
      */
     public function buildPingConnector($databaseName = '') {
-        return $this->buildConnector('ping', $databaseName);
+        return $this->buildConnector('Ping', $databaseName);
     }
 
     /**
@@ -86,7 +89,7 @@ class External_DatabaseFactory {
      * @return External_TimetableInterface
      */
     public function buildTimetableConnector($databaseName = '') {
-        return $this->buildConnector('timetable', $databaseName);
+        return $this->buildConnector('Timetable', $databaseName);
     }
 
     /**
@@ -96,7 +99,7 @@ class External_DatabaseFactory {
      * @return External_UserInterface
      */
     public function buildUserConnector($databaseName = '') {
-        return $this->buildConnector('user', $databaseName);
+        return $this->buildConnector('User', $databaseName);
     }
 
 
