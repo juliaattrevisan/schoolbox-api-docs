@@ -14,7 +14,7 @@ namespace Schoolbox\Notif\Message\External;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use InvalidArgumentException;
-use Zend\Loader\Exception\RuntimeException;
+use RuntimeException;
 
 /**
  * Class CompatibleMessage
