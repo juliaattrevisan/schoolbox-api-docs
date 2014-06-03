@@ -23,6 +23,13 @@ use Aura\Router\Router;
 class Notifier extends AbstractModuleNotifier {
 
     /**
+     * Namespace slug, as defined in msg_namespace table.
+     *
+     * @var string
+     */
+    protected $msgNamespaceSlug = 'eotc';
+
+    /**
      * A router - injected for the purpose of generating URLs for resource
      * booking related items.
      *
@@ -35,6 +42,13 @@ class Notifier extends AbstractModuleNotifier {
      */
     protected function buildTopic($eventLabel, $roleType) {
         // noop, deprecated
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSlug() {
+        return $this->msgNamespaceSlug;
     }
 
     /**
