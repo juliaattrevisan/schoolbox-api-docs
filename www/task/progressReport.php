@@ -26,8 +26,23 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
-// URL: task/progressReport/$classId/$unitId
-list($class_id, $unit_id) = $this->arg;
+// URL: task/progressReport/$classId/($unitId)
+// Alternate: task/progressReport/$classId/($year/$semester)
+// If no year and semester are supplied, then the current year/semester are used.
+switch (count($this->arg)) {
+    case 2:
+        list($class_id, $unit_id) = $this->arg;
+        break;
+    case 3:
+        list($class_id, $year, $semester) = $this->arg;
+        break;
+    case 1:
+    default:
+        list($class_id) = $this->arg;
+        $year     = date('Y');
+        $semester = date('m') <= 6 ? 1 : 2;
+        break;
+}
 
 /** @var Category $category */
 try {
@@ -51,9 +66,27 @@ if (count($unit_list) === 0) {
     error(159, sprintf('<a href="/homepage/%d">Visit this subject\'s homepage</a>', $category->getId()));
 }
 if (!isset($unit_id)) {
-    // Redirect to first task in the list.
-    $unit_id = $unit_list->first()->getId();
-    $this->localRedir('/task/progressReport/'.$class_id.'/'.$unit_id);
+    // Redirect to first task in the list
+    // (that is in the requested year/semester) if any.
+    // If not, then just redir to the first one.
+    $firstId = null;
+    foreach ($unit_list as $unit) {
+        if (!isset($firstId)) {
+            $firstId = $unit->getId();
+        }
+        $unitYear     = $unit->getOpenDate()->getUsingFormat('Y');
+        $unitSemester = $unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
+        if ($year == $unitYear && $semester == $unitSemester) {
+            $unit_id = $unit->getId();
+            break;
+        }
+    }
+    if (isset($unit_id)) {
+        $this->localRedir('/task/progressReport/'.$class_id.'/'.$unit_id);
+    }
+    else {
+        $this->localRedir('/task/progressReport/'.$class_id.'/'.$firstId);
+    }
     exit;
 }
 else {
