@@ -168,7 +168,7 @@ class Kernel extends \Alaress\Application\Kernel {
 			$pageName = 'dashboard';
 		}
 
-		$page = new SitePage();
+		$page = $this->di->get('sitePage');
 
 		$page->loadContent($pageName);
 
