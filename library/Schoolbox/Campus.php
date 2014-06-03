@@ -9,39 +9,87 @@
 namespace Schoolbox;
 
 class Campus {
+
+	/** @var string */
     private $name;
+
+	/** @var int */
     private $id;
+
+	/** @var string */
 	private $extTimetableCode;
+
+	/** @var int */
 	private $timetableDay;
 
-    public function setId($id) {
+
+	/**
+	 * @param int $id
+	 * @return self
+	 */
+	public function setId($id) {
         $this->id = $id;
+	    return $this;
     }
 
-    public function getId() {
+
+	/**
+	 * @return int
+	 */
+	public function getId() {
         return $this->id;
     }
 
-    public function setName($name) {
+
+	/**
+	 * @param string $name
+	 * @return self
+	 */
+	public function setName($name) {
         $this->name = $name;
+	    return $this;
     }
 
-    public function getName() {
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
         return $this->name;
     }
 
+
+	/**
+	 * @param string $extTimetableCode
+	 * @return self
+	 */
 	public function setExtTimetableCode($extTimetableCode) {
 		$this->extTimetableCode = $extTimetableCode;
+		return $this;
 	}
 
+
+	/**
+	 * @return string
+	 */
 	public function getExtTimetableCode() {
 		return $this->extTimetableCode;
 	}
 
+
+	/**
+	 * @param int $timetableDay
+	 * @return self
+	 */
 	public function setTimetableDay($timetableDay) {
 		$this->timetableDay = $timetableDay;
+		return $this;
 	}
 
+
+	/**
+	 * @return int
+	 */
 	public function getTimetableDay() {
 		return $this->timetableDay;
 	}

@@ -129,7 +129,7 @@ class Role {
 
     /**
      * @param  string   $digestSchedule
-     * @return $this
+     * @return self
      */
     public function setDigestSchedule($digestSchedule) {
         $this->digestSchedule = $digestSchedule;

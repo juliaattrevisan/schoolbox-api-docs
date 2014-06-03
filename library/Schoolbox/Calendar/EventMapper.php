@@ -10,6 +10,11 @@
 
 namespace Schoolbox\Calendar;
 use Schoolbox;
+use Schoolbox\Campus;
+use Schoolbox\Collection;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\Mapper;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
@@ -17,6 +22,10 @@ class EventMapper extends Schoolbox\External\Mapper {
 	const ACCESS_GROUP = 2;
 	const ACCESS_CAMPUS = 3;
 
+
+	/**
+	 * @return void
+	 */
 	protected function mapping() {
 		$this->hasTable('event');
 		$this->hasModel('\\Schoolbox\\Calendar\\Event');
@@ -135,7 +144,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Custom findById
 	 *
 	 * @param mixed $identifier
-	 * @return object|Model
+	 * @return Event
 	 * @throws \Exception
 	 */
 	public function findById($identifier) {
@@ -199,7 +208,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Remove all attendance relations for $event
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
 	private function removeAttendanceByEvent($event) {
 		$query = "
@@ -215,7 +224,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Post-save hook method
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
 	protected function postSave($event) {
 
@@ -243,8 +252,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Get all the events in the series
 	 *
-	 * @param $event
-	 * @return Schoolbox\Collection
+	 * @param Event $event
+	 * @return Collection|Event[]
 	 */
 	public function getAllInSeries($event) {
 		return $this->findByColumnList(array(
@@ -261,7 +270,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Remove all role and campus associations to an event
 	 * Note that "eventGroup" means "eventRole"
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
 	private function deletePermissions($event) {
 		$query = "
@@ -283,40 +292,54 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement->execute();
 	}
 
+
 	/**
 	 * Assign roles to an event
 	 *
-	 * @param $event
+	 * @param Event $event
+	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	private function createRoles($event) {
-		foreach ($event->getRoleCollection() as $currentGroup) {
+		foreach ($event->getRoleCollection() as $role) {
+			if($role instanceof Role) {
+				$role = $role->getId();
+			}
+
 			$query = "
 				INSERT INTO eventGroup (eventID, groupID)
 				VALUES (:eventId, :groupId)
+				ON DUPLICATE KEY UPDATE eventID = :eventId, groupID = :groupId
 			";
 
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":groupId", $currentGroup);
+			$statement->bindParam(":groupId", $role);
 			$statement->execute();
 		}
 	}
 
+
 	/**
 	 * Assign campuses to an event
 	 *
-	 * @param $event
+	 * @param Event $event
+	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	private function createCampus($event) {
-		foreach ($event->getCampusCollection() as $currentCampus) {
+		foreach ($event->getCampusCollection() as $campus) {
+			if($campus instanceof Campus) {
+				$campus = $campus->getId();
+			}
+
 			$query = "
 				INSERT INTO eventCampus (eventID, campusID)
 				VALUES (:eventId, :campusId)
+				ON DUPLICATE KEY UPDATE eventID = :eventId, campusID = :campusId
 			";
 
 			$statement = $this->database->prepare($query);
 			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":campusId", $currentCampus);
+			$statement->bindParam(":campusId", $campus);
 			$statement->execute();
 		}
 	}
@@ -325,10 +348,10 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Get a permission level for a particular event and user combination
 	 *
 	 * @param Event $event
-	 * @param Schoolbox\User $user
+	 * @param User $user
 	 * @return int
 	 */
-	private function getPerm(\Schoolbox\Calendar\Event $event, \Schoolbox\User $user) {
+	private function getPerm($event, $user) {
 
 		/* Superuser exit
 		 */
@@ -388,7 +411,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Prevent overlap on default event table
 	 *
-	 * @return mixed
+	 * @return int
 	 */
 	public function getUpperSeriesIndex() {
 		$query = "

@@ -11,6 +11,13 @@
 namespace Schoolbox\Calendar;
 
 
+use Alaress_Date_Format;
+use Schoolbox\Campus;
+use Schoolbox\Collection;
+use Schoolbox\Resource\Category;
+use Schoolbox\Role;
+use Schoolbox\User;
+
 class Event {
 
 	/**
@@ -27,14 +34,14 @@ class Event {
 	/**
 	 * Event id
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $id = null;
 
 	/**
 	 * Series Id for recurring events, I think
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $seriesId = null;
 
@@ -43,7 +50,7 @@ class Event {
 	 *
 	 * The person who spawned the event in the first place
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $author = null;
 
@@ -53,14 +60,14 @@ class Event {
 	 * This denotes to whom the event is relevant for a particular
 	 * combination of sid and access (I don't remember/understand which)
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $owner = null;
 
 	/**
 	 * An instance of \Schoolbox\Resource\Category
 	 *
-	 * @var null
+	 * @var Category
 	 */
 	protected $category = null;
 
@@ -91,7 +98,7 @@ class Event {
 	 * eventType is a human-friendly description of an event's type;
 	 * e.g. Event, Excursion, Report etc. and comes from a lookup table
 	 *
-	 * @var string
+	 * @var EventType
 	 */
 	protected $eventType = '';
 
@@ -160,14 +167,14 @@ class Event {
 	/**
 	 * Any associated roles
 	 *
-	 * @var null
+	 * @var Collection|Role[]
 	 */
 	protected $roleCollection = null;
 
 	/**
 	 * Any associated campuses
 	 *
-	 * @var null
+	 * @var Collection|Campus[]
 	 */
 	protected $campusCollection = null;
 
@@ -175,14 +182,14 @@ class Event {
 	 * The date when the event was published (made visible to users)
 	 * An instance Alaress_Date_Format()
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $publishDateTime = null;
 
 	/**
 	 * The datetime when the event starts
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $startDateTime = null;
 
@@ -203,7 +210,7 @@ class Event {
 	/**
 	 * The datetime when the event ends
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $endDateTime = null;
 
@@ -290,8 +297,8 @@ class Event {
 			$selectedDate = time();
 		}
 
-		$startDate = new \Alaress_Date_Format($selectedDate, 'U');
-		$endDate = new \Alaress_Date_Format($selectedDate, 'U');
+		$startDate = new Alaress_Date_Format($selectedDate, 'U');
+		$endDate = new Alaress_Date_Format($selectedDate, 'U');
 
 		$this->setStartDateTime($startDate);
 		$this->setEndDateTime($endDate);
@@ -343,9 +350,11 @@ class Event {
 	 * Set access
 	 *
 	 * @param int $access
+	 * @return self
 	 */
 	public function setAccess($access) {
 		$this->access = $access;
+	 	return $this;
 	}
 
 	/**
@@ -361,9 +370,11 @@ class Event {
 	 * Set all day
 	 *
 	 * @param int $allDay
+	 * @return self
 	 */
 	public function setAllDay($allDay) {
 		$this->allDay = $allDay;
+	 	return $this;
 	}
 
 	/**
@@ -379,9 +390,11 @@ class Event {
 	 * Set attendance
 	 *
 	 * @param int $attendance
+	 * @return self
 	 */
 	public function setAttendance($attendance) {
 		$this->attendance = $attendance;
+	 	return $this;
 	}
 
 	/**
@@ -396,16 +409,18 @@ class Event {
 	/**
 	 * Set author
 	 *
-	 * @param null $author
+	 * @param User $author
+	 * @return self
 	 */
 	public function setAuthor($author) {
 		$this->author = $author;
+	 	return $this;
 	}
 
 	/**
 	 * Get author
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getAuthor() {
 		return $this->author;
@@ -414,16 +429,18 @@ class Event {
 	/**
 	 * Set category
 	 *
-	 * @param null $category
+	 * @param Category $category
+	 * @return self
 	 */
 	public function setCategory($category) {
 		$this->category = $category;
+	 	return $this;
 	}
 
 	/**
 	 * Get category
 	 *
-	 * @return null
+	 * @return Category
 	 */
 	public function getCategory() {
 		return $this->category;
@@ -433,9 +450,11 @@ class Event {
 	 * Set colour
 	 *
 	 * @param string $colour
+	 * @return self
 	 */
 	public function setColour($colour) {
 		$this->colour = $colour;
+	 	return $this;
 	}
 
 	/**
@@ -451,9 +470,11 @@ class Event {
 	 * Set completed
 	 *
 	 * @param int $completed
+	 * @return self
 	 */
 	public function setCompleted($completed) {
 		$this->completed = $completed;
+	 	return $this;
 	}
 
 	/**
@@ -469,9 +490,11 @@ class Event {
 	 * Set detail
 	 *
 	 * @param string $detail
+	 * @return self
 	 */
 	public function setDetail($detail) {
 		$this->detail = $detail;
+	 	return $this;
 	}
 
 	/**
@@ -486,16 +509,18 @@ class Event {
 	/**
 	 * Set end datetime
 	 *
-	 * @param null $endDateTime
+	 * @param Alaress_Date_Format $endDateTime
+	 * @return self
 	 */
 	public function setEndDateTime($endDateTime) {
 		$this->endDateTime = $endDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get end datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getEndDateTime() {
 		return $this->endDateTime;
@@ -504,16 +529,18 @@ class Event {
 	/**
 	 * Set event type
 	 *
-	 * @param string $eventType
+	 * @param EventType $eventType
+	 * @return self
 	 */
 	public function setEventType($eventType) {
 		$this->eventType = $eventType;
+	 	return $this;
 	}
 
 	/**
 	 * Get event type
 	 *
-	 * @return string
+	 * @return EventType
 	 */
 	public function getEventType() {
 		return $this->eventType;
@@ -522,16 +549,18 @@ class Event {
 	/**
 	 * Set id
 	 *
-	 * @param null $id
+	 * @param int $id
+	 * @return self
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	 	return $this;
 	}
 
 	/**
 	 * Get id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -541,9 +570,11 @@ class Event {
 	 * Set location
 	 *
 	 * @param string $location
+	 * @return self
 	 */
 	public function setLocation($location) {
 		$this->location = $location;
+	 	return $this;
 	}
 
 	/**
@@ -559,9 +590,11 @@ class Event {
 	 * Set note
 	 *
 	 * @param string $note
+	 * @return self
 	 */
 	public function setNote($note) {
 		$this->note = $note;
+	 	return $this;
 	}
 
 	/**
@@ -576,16 +609,18 @@ class Event {
 	/**
 	 * Set owner
 	 *
-	 * @param null $owner
+	 * @param User $owner
+	 * @return self
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
+	 	return $this;
 	}
 
 	/**
 	 * Get owner
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;
@@ -594,16 +629,18 @@ class Event {
 	/**
 	 * Set series id
 	 *
-	 * @param null $seriesId
+	 * @param int $seriesId
+	 * @return self
 	 */
 	public function setSeriesId($seriesId) {
 		$this->seriesId = $seriesId;
+	 	return $this;
 	}
 
 	/**
 	 * Get series id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getSeriesId() {
 		return $this->seriesId;
@@ -613,9 +650,11 @@ class Event {
 	 * Set sid
 	 *
 	 * @param int $sid
+	 * @return self
 	 */
 	public function setSid($sid) {
 		$this->sid = $sid;
+	 	return $this;
 	}
 
 	/**
@@ -630,16 +669,18 @@ class Event {
 	/**
 	 * Set start datetime
 	 *
-	 * @param null $startDateTime
+	 * @param Alaress_Date_Format $startDateTime
+	 * @return self
 	 */
 	public function setStartDateTime($startDateTime) {
 		$this->startDateTime = $startDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get start datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getStartDateTime() {
 		return $this->startDateTime;
@@ -649,9 +690,11 @@ class Event {
 	 * Set type
 	 *
 	 * @param int $type
+	 * @return self
 	 */
 	public function setType($type) {
 		$this->type = $type;
+	 	return $this;
 	}
 
 	/**
@@ -667,9 +710,11 @@ class Event {
 	 * Set end date
 	 *
 	 * @param string $endDate
+	 * @return self
 	 */
 	public function setEndDate($endDate) {
 		$this->endDate = $endDate;
+	 	return $this;
 	}
 
 	/**
@@ -685,9 +730,11 @@ class Event {
 	 * Set end time
 	 *
 	 * @param string $endTime
+	 * @return self
 	 */
 	public function setEndTime($endTime) {
 		$this->endTime = $endTime;
+	 	return $this;
 	}
 
 	/**
@@ -703,9 +750,11 @@ class Event {
 	 * Set start date
 	 *
 	 * @param string $startDate
+	 * @return self
 	 */
 	public function setStartDate($startDate) {
 		$this->startDate = $startDate;
+	 	return $this;
 	}
 
 	/**
@@ -721,9 +770,12 @@ class Event {
 	 * Set start time
 	 *
 	 * @param string $startTime
+	 * @return self
+	 *
 	 */
 	public function setStartTime($startTime) {
 		$this->startTime = $startTime;
+	 	return $this;
 	}
 
 	/**
@@ -738,16 +790,18 @@ class Event {
 	/**
 	 * Set publish datetime
 	 *
-	 * @param null $publishDateTime
+	 * @param Alaress_Date_Format $publishDateTime
+	 * @return self
 	 */
 	public function setPublishDateTime($publishDateTime) {
 		$this->publishDateTime = $publishDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get publish datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getPublishDateTime() {
 		return $this->publishDateTime;
@@ -756,16 +810,18 @@ class Event {
 	/**
 	 * Set campus collection
 	 *
-	 * @param null $campusCollection
+	 * @param Collection $campusCollection
+	 * @return self
 	 */
 	public function setCampusCollection($campusCollection) {
 		$this->campusCollection = $campusCollection;
+	 	return $this;
 	}
 
 	/**
 	 * Get campus collection
 	 *
-	 * @return null
+	 * @return Collection|Campus[]
 	 */
 	public function getCampusCollection() {
 		return $this->campusCollection;
@@ -774,16 +830,18 @@ class Event {
 	/**
 	 * Set role collection
 	 *
-	 * @param null $roleCollection
+	 * @param Collection|Role[] $roleCollection
+	 * @return self
 	 */
 	public function setRoleCollection($roleCollection) {
 		$this->roleCollection = $roleCollection;
+	 	return $this;
 	}
 
 	/**
 	 * Get role collection
 	 *
-	 * @return null
+	 * @return Collection|Role[]
 	 */
 	public function getRoleCollection() {
 		return $this->roleCollection;
@@ -793,9 +851,11 @@ class Event {
 	 * Set attendance dirty bit
 	 *
 	 * @param boolean $attendanceDirty
+	 * @return self
 	 */
 	public function setAttendanceDirty($attendanceDirty) {
 		$this->attendanceDirty = $attendanceDirty;
+	 	return $this;
 	}
 
 	/**
