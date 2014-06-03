@@ -37,9 +37,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
     protected $bookings;
 
     public function execute() {
-        /** @var Di\ContainerInterface $di */
-        global $di;
-        $this->templateEngine = $di->get('templateEngine');
+        $this->templateEngine = $this->sitepage->getDi()->get('templateEngine');
         $this->bookingMapper  = Booking\Mapper::getInstance();
 
         // Get next few days of bookings
