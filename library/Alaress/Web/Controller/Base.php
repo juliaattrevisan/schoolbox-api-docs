@@ -9,6 +9,7 @@
 
 namespace Alaress\Web\Controller;
 
+use Aura\Di;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
@@ -26,6 +27,11 @@ abstract class Base {
      * @var Response
      */
     protected $response;
+
+    /**
+     * @var Di\Container
+     */
+    protected $di;
 
     /**
      * @var Router
@@ -72,6 +78,22 @@ abstract class Base {
      */
     public function getResponse() {
         return $this->response;
+    }
+
+    /**
+     * @param  Di\Container $di
+     * @return $this
+     */
+    public function setDi($di) {
+        $this->di = $di;
+        return $this;
+    }
+
+    /**
+     * @return Di\Container
+     */
+    public function getDi() {
+        return $this->di;
     }
 
     /**

@@ -220,6 +220,7 @@ class Bootstrap implements BootstrapInterface {
 			'setSession'    => $di->lazyGet('session'),
 			'setRouter'     => $di->lazyGet('router'),
 			'setAuthorizer' => $di->lazyGet('authorizer'),
+			'setDi'         => $di,
 		);
 
 		// inject web params (yep, even Sitepage!)
