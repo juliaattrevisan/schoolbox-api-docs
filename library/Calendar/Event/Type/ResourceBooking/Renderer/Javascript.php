@@ -31,9 +31,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      * up URLs relating to actions on an event.
      */
     protected function setup() {
-        global $di;
-        $this->router     = $di->get('router');
-        $this->authorizer = $di->get('authorizer');
+        $this->router     = $this->getPage()->getDi()->get('router');
+        $this->authorizer = $this->getPage()->getDi()->get('authorizer');
     }
 
     /**
