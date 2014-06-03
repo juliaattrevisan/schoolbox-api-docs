@@ -156,6 +156,14 @@
   margin: 40px 0 0 0;
 }
 
+h1, .cal-bubble h3 { color: @navigation-color; }
+
+.submit-btn-plain,
+.btn.submit{
+    background: @link;
+    &:hover{ background: @link; text-decoration: underline; }
+}
+
 #container {
   -webkit-box-shadow: -2px 0px 6px 0px rgba(0, 0, 0, 0.10);
   -moz-box-shadow:    -2px 0px 6px 0px rgba(0, 0, 0, 0.10);
@@ -163,16 +171,7 @@
   border-top: 4px solid @link;
   margin-left: 208px;
 
-  h1 { color: #4d4d4d; }
-  h2, .calendar-controls{ border-bottom: 1px solid #cdcdcd; }
-
-  .submit-btn-plain,
-  .btn.submit{
-    background: @link;
-    &:hover{ text-decoration: underline; }
-  }
-
-  .cal-bubble h3{ color: @navigation-color; }
+  h2, h2.calendar-controls{ border-bottom: 1px solid #cdcdcd; }
 
   .admin-nav{
     a{
