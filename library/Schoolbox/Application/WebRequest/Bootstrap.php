@@ -223,12 +223,13 @@ class Bootstrap implements BootstrapInterface {
 		);
 
 		// inject web params (yep, even Sitepage!)
-		$di->params['SitePage']['login'] = false;
-		$di->set('sitePage', $di->lazyNew('SitePage'));
+		$di->setters['SitePage']['setDi'] = $di;
+		$di->set('layoutEngine', $di->lazyNew('SitePage', array('login' => false)));
+		$di->set('sitePage',     $di->lazyNew('SitePage'));
 
 		// Web output class - currently uses Sitepage
 		$di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('templateEngine');
-		$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('sitePage');
+		$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('layoutEngine');
 		$di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
 		$di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 		$di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
