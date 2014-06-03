@@ -6,6 +6,13 @@ class SitePage extends Page {
     private $lite;
 
     /**
+     * The dependency injection container, injected into SitePage!
+     *
+     * @var Aura\Di\Container
+     */
+    protected $di;
+
+    /**
      * List of arguments passed in URL
      *
      * @var array
@@ -22,6 +29,22 @@ class SitePage extends Page {
         }
 
         $this->setSite();
+    }
+
+    /**
+     * @param  Aura\Di\Container $di
+     * @return $this
+     */
+    public function setDi($di) {
+        $this->di = $di;
+        return $this;
+    }
+
+    /**
+     * @return Aura\Di\Container
+     */
+    public function getDi() {
+        return $this->di;
     }
 
     /**
