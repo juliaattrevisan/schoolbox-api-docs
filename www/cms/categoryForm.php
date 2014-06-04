@@ -56,6 +56,15 @@ if ($_POST['name']) {
 		error(6);
 	}
 
+	// Delete cat codes here, allowing them to be recreated when the category
+	// gets saved.
+	// (I'm not confident that deleting cat codes in the postSave method
+	//  regardless of whether there are any won't break somewhere else)
+	if (count($codeCollection) === 0) {
+		CategoryCodeMapper::getInstance()->delete(
+			CategoryCodeMapper::getInstance()->findById($model->getId())
+		);
+	}
 	$affectedIds = CategoryMapper::getInstance()->save($model);
 
 	if($affectedIds === false) {
