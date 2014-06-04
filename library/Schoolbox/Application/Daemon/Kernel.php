@@ -174,6 +174,12 @@ EOL;
 			// this is fine to be let through
 			return;
 		}
+		if(strpos($errStr, 'Undefined index') === 0) {
+			if($this->debug instanceof Debug) {
+				$this->debug->v("$errStr in $errFile:$errLine", '*');
+			}
+			return;
+		}
 		if(strpos($errStr, 'unserialize') === 0) {
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);

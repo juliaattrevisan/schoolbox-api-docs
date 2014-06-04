@@ -136,7 +136,9 @@ class Instance implements JsonSerializable {
 
 		// test template vs tokens
 		if(count(array_diff(array_keys($params), $this->tokens))) {
-			throw new OutOfBoundsException("Parameters supplied must exactly match the :tokens in the message string.");
+			$a = json_encode($this->tokens);
+			$b = json_encode(array_keys($params));
+			throw new OutOfBoundsException("Parameters supplied must exactly match the :tokens in the message string: expected $a, got $b");
 		}
 
 		$this->messageString = (string)$text;
