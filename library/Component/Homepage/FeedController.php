@@ -73,7 +73,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 			$this->setVar(array(
 				'EVENT_HREF'     => $n['href'],
 				'EVENT_ICON'     => $n['icon'],
-				'EVENT_BODY'     => $n['body'],
+				'EVENT_BODY'     => $n['title'],
 				'EVENT_TIME'     => $date->getShort(),
 				'EVENT_LONGTIME' => $date->getLong(),
 				'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
