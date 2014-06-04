@@ -135,7 +135,7 @@ class RoutePermissionMapper extends Mapper {
 				// literal leftness, wildcard rightness, applied level
 
 				$leftness = $matches[0][1];
-				$rightness = $matches[1][1] ?: PHP_INT_MAX;
+				$rightness = isset($matches[1][1]) ? $matches[1][1] : PHP_INT_MAX;
 
 				$precedence[$r['user_id']][$leftness][$rightness] = $r['outgoing_level'];
 			}
