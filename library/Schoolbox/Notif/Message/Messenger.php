@@ -59,7 +59,7 @@ class Messenger extends InstanceBundle {
 				$this->builder->setParam($k, new Param($p[0], $p[1]));
 			}
 			else {
-				$this->builder->setParams($k, new Param($p));
+				$this->builder->setParam($k, new Param($p));
 			}
 		}
 
