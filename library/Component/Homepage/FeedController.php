@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\Feed\Feed;
+use Schoolbox\User;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,8 +11,10 @@
  */
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract {
 
-	/** @var \Schoolbox\Collection|\Schoolbox\Feed\Item[] */
-	protected $items;
+	/**
+	 * @var Feed
+	 */
+	protected $feed;
 
 	/**
      * Prepares data for the render function. Business logic.
@@ -18,24 +23,27 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
      */
 	public function execute() {
 
-		$conf = \Schoolbox\Config\ConfigMapper::getInstance();
-		$feed = new \Schoolbox\Feed\Feed($conf);
+		/** @var User $user */
+		$user = $_SESSION['user'];
 
-		$this->items = $feed->aggregate(
+		$conf = \Schoolbox\Config\ConfigMapper::getInstance();
+
+		$this->feed = new Feed();
+		$this->feed->aggregate(
 			array(
-				new \Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
-				new \Schoolbox\Assessment\Component\OnlineAssessmentNotifier($conf),
-				new \Schoolbox\Resource\Category\NewsNotifier($conf),
-				new \Schoolbox\Blog\BlogNotifier($conf),
-				new \Schoolbox\Blog\CommentNotifier($conf),
-				new \Schoolbox\Wiki\WikiNotifier($conf),
-				new \Schoolbox\Wiki\RevisionNotifier($conf),
-				new \Schoolbox\Resource\CategoryNotifier($conf),
-				new \Schoolbox\Resource\FileNotifier($conf),
-				new \Schoolbox\Resource\LinkNotifier($conf),
-				new \Schoolbox\Resource\TextboxNotifier($conf)
+				new Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
+				new Schoolbox\Assessment\Component\OnlineAssessmentNotifier($conf),
+				new Schoolbox\Resource\Category\NewsNotifier($conf),
+				new Schoolbox\Blog\BlogNotifier($conf),
+				new Schoolbox\Blog\CommentNotifier($conf),
+				new Schoolbox\Wiki\WikiNotifier($conf),
+				new Schoolbox\Wiki\RevisionNotifier($conf),
+				new Schoolbox\Resource\CategoryNotifier($conf),
+				new Schoolbox\Resource\FileNotifier($conf),
+				new Schoolbox\Resource\LinkNotifier($conf),
+				new Schoolbox\Resource\TextboxNotifier($conf)
 			),
-			$this->getContext('id'), $_SESSION['user']->getRole()->getType(), $this->getConfig('size')
+			$this->getContext('id'), $user->getRole()->getType(), $this->getConfig('size')
 		);
 	}
 
@@ -54,24 +62,20 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
 		$this->setBlock($templateHandle, 'event', 'event_block');
 
-		if(!$this->items->count()) {
+		if(!$this->feed->count()) {
 			$this->setVar('event_block', '');
 			return true;
 		}
 
-		$decor = new \Schoolbox\Notif\Message\Decorator(null);
-
 		$j = 0;
-		foreach($this->items as $item) {
-			$decor->setMessage($item);
-			$date = new Alaress_Date_Format($item->getTimestamp(), 'U');
-
+		foreach($this->feed->renderAsSitePageArray() as $n) {
+			$date = new Alaress_Date_Format($n['timestamp'], 'U');
 			$this->setVar(array(
-				'EVENT_HREF'     => $item->getBody()->getHref(),
-				'EVENT_ICON'     => $item->getBody()->getIcon(),
+				'EVENT_HREF'     => $n['href'],
+				'EVENT_ICON'     => $n['icon'],
+				'EVENT_BODY'     => $n['body'],
 				'EVENT_TIME'     => $date->getShort(),
 				'EVENT_LONGTIME' => $date->getLong(),
-				'EVENT_BODY'     => $decor->formatHtml(),
 				'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
 			));
 			$this->parse('event_block', 'event', true);
