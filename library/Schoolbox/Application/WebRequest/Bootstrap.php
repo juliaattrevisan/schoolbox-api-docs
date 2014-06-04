@@ -169,7 +169,7 @@ class Bootstrap implements BootstrapInterface {
 		$di = new Di\Container(new Di\Factory());
 
 		// Configuration
-		$di->set('config', $di->lazyNew('Schoolbox\\Config\\ConfigMapper'));
+		$di->set('config', $di->lazyNew('Schoolbox\\Config\\Loader'));
 
 		// Web router
 		$di->set(
