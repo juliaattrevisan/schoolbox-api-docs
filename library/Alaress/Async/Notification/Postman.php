@@ -43,7 +43,7 @@ class Postman {
 		$i = 0;
 		foreach($bundle->getAll() as $destination => $instance) {
 			$this->logger->setTopic($destination)->log($instance->getSeverity(), "$instance", $instance->getContext() + $appendContext);
-			$this->debug->v("Broadcast a message to '$destination' at level {$instance->getSeverity()}: '$instance'");
+			$this->debug->v("Broadcast a message to '$destination' at level {$instance->getSeverity()}", '<');
 			++$i;
 		}
 		return $i;

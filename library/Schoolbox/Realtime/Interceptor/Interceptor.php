@@ -192,7 +192,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 		$newTopic = "$method.user.{$user->getId()}";
 
 		try {
-			$this->v->v("Rerouting simple message to '$newTopic' at level $newLevel!");
+			$this->v->v("Rerouting message to '$newTopic' at level $newLevel!");
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
 			return true;
 		}

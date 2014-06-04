@@ -166,7 +166,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 			$triggerFactory = new TriggerFactory($this->getModule($event), $event);
 
 			// retrieve, populate, and schedule this bundle of triggers
-			$this->debug->v("Scheduling triggers");
+			$this->debug->v("Retrieving triggers");
 			$this->scheduleNotifications($triggerFactory->buildTriggers($event->getAction())->getTriggers(), $resolver);
 
 			// notice that we don't ACK the resolver here before returning
@@ -290,7 +290,13 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @param AckResolver $resolver
      */
     public function scheduleNotifications($triggers, $resolver = null) {
-        foreach($triggers as $trigger) {
+        $c = count($triggers);
+	    if($c == 0) {
+	        $this->debug->v("No triggers to schedule");
+	        return;
+        }
+	    $this->debug->v(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
+	    foreach($triggers as $trigger) {
             $this->scheduleNotification($trigger, $resolver);
         }
     }
@@ -414,7 +420,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      */
     protected function attachResolverTrigger($ackResolver, $trigger) {
 	    $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
-	    $this->debug->v("Attached trigger, resolver contains ".$this->resolvers->getTriggerCount($ackResolver)." triggers", '+');
+	    $relTime = $trigger->getTimestamp() - time();
+	    $this->debug->v("Attached trigger [{$trigger->getLabel()}, {$trigger->getEvent()->getAction()} : T-$relTime], resolver contains ".$this->resolvers->getTriggerCount($ackResolver)." triggers", '+');
     }
 
 

@@ -13,6 +13,7 @@ namespace Alaress\WorkerCrew\Worker;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use ErrorException;
 use Exception;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
@@ -98,6 +99,11 @@ abstract class AbstractProcess extends PipeWriter {
 					$this->write($this->parseBuffer());
 					$this->debug->d("Task Complete");
 				}
+				catch(ErrorException $e) {
+					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
+					$this->debug->v($msg);
+					$this->write($msg, true);
+				}
 				catch(Exception $e) {
 					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
 					$this->debug->v($msg);
@@ -152,10 +158,7 @@ abstract class AbstractProcess extends PipeWriter {
 
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
-//		$this->debug->v("Responding with: ");
-//		$this->debug->d($response);
 		$flat = $this->strat->getProtocol()->flatten($response);
-		$this->debug->v("Flattened response: $flat");
 
 		return $flat;
 	}

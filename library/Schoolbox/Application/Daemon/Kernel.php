@@ -191,6 +191,10 @@ EOL;
 			throw new RangeException($errStr, $errNum);
 		}
 
+		if($this->debug instanceof Debug) {
+			$this->debug->v("$errStr in $errFile:$errLine [$errNum]");
+		}
+
 		throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 	}
 
@@ -211,9 +215,6 @@ EOL;
 	 */
 	public function onShutdown() {
 		$error = error_get_last();
-
-		var_dump($error);
-		return;
 
 		// only report if the last error was one of these
 		$cases = array(
