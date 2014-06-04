@@ -219,74 +219,7 @@ setupCustomise = {
 				$j('#currentColour').val(color);
 				$j('#currentColour').css('background-color', color);
 				pickers[current.attr('ID')] = color;
-
-				switch (current.attr('ID')) {
-
-					case 'top_bg_primary':
-						return $j('.top .text, .top .listing').css('background-color', color);
-					break;
-					case 'top_bg_secondary':
-						return $j('.top .dark').css('background-color', color);
-					break;
-					case 'top_head_font':
-						return $j('.top h2').css('color', color);
-					break;
-					case 'top_head_bg':
-						return $j('.top h2').css('background-color', color)
-					break;
-					case 'top_font':
-						return $j('.top, .top p').css('color', color)
-					break;
-					case 'top_link':
-						return $j('.top a').css('color', color);
-					break;
-
-					case 'left_bg_primary':
-						return $j('.left .text, .left .listing').css('background-color', color);
-					break;
-					case 'left_bg_secondary':
-						return $j('.left .dark').css('background-color', color);
-					break;
-					case 'left_head_font':
-						return $j('.left h2').css('color', color);
-					break;
-					case 'left_head_bg':
-						return $j('.left h2').css('background-color', color)
-					break;
-					case 'left_font':
-						return $j('.left, .left p').css('color', color)
-					break;
-					case 'left_link':
-						return $j('.left a').css('color', color);
-					break;
-					case 'left_hover':
-						return $j('.right a:hover').css('color', color);
-					break;
-					case 'right_bg_primary':
-						return $j('.right .text, .right .listing').css('background-color', color);
-					break;
-					case 'right_bg_secondary':
-						return $j('.right .dark').css('background-color', color);
-					break;
-					case 'right_head_font':
-						return $j('.right h2').css('color', color);
-					break;
-					case 'right_head_bg':
-						return $j('.right h2').css('background-color', color);
-					break;
-					case 'right_font':
-						return $j('.right, .right p').css('color', color);
-					break;
-					case 'right_link':
-						return $j('.right a').css('color', color);
-					break;
-					case 'right_hover':
-						return $j('.right a:hover').css('color', color);
-					break;
-					default:
-						return $j('.left .text').css('background-color', color);
-					break;
-				}
+				setupCustomise.updateColor(current.attr('ID'), color)
 			}
 
 
@@ -503,6 +436,11 @@ setupCustomise = {
 				$j.post(setupCustomise.ajaxURL, data);
 
 				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
+
+				// Reapply colors as well.
+				$.each(pickers, function(element, color) {
+					setupCustomise.updateColor(element, color)
+				})
 			},
 			sort: function (event, ui) {
 				var leftOffset = $j('.homepage div.left').offset();
@@ -614,5 +552,78 @@ setupCustomise = {
 			event.preventDefault();
 			$j(this).closest('.delete-it').slideUp();
 		});
+	},
+
+	/**
+	 * Updates colors for the given element
+	 * @param element Element to update
+	 * @param color   Color to update to
+	 */
+	updateColor: function(element, color) {
+		switch (element) {
+			case 'top_bg_primary':
+				return $j('.top .text, .top .listing').css('background-color', color);
+				break;
+			case 'top_bg_secondary':
+				return $j('.top .dark').css('background-color', color);
+				break;
+			case 'top_head_font':
+				return $j('.top h2').css('color', color);
+				break;
+			case 'top_head_bg':
+				return $j('.top h2').css('background-color', color)
+				break;
+			case 'top_font':
+				return $j('.top, .top p').css('color', color)
+				break;
+			case 'top_link':
+				return $j('.top a').css('color', color);
+				break;
+			case 'left_bg_primary':
+				return $j('.left .text, .left .listing').css('background-color', color);
+				break;
+			case 'left_bg_secondary':
+				return $j('.left .dark').css('background-color', color);
+				break;
+			case 'left_head_font':
+				return $j('.left h2').css('color', color);
+				break;
+			case 'left_head_bg':
+				return $j('.left h2').css('background-color', color)
+				break;
+			case 'left_font':
+				return $j('.left, .left p').css('color', color)
+				break;
+			case 'left_link':
+				return $j('.left a').css('color', color);
+				break;
+			case 'left_hover':
+				return $j('.right a:hover').css('color', color);
+				break;
+			case 'right_bg_primary':
+				return $j('.right .text, .right .listing').css('background-color', color);
+				break;
+			case 'right_bg_secondary':
+				return $j('.right .dark').css('background-color', color);
+				break;
+			case 'right_head_font':
+				return $j('.right h2').css('color', color);
+				break;
+			case 'right_head_bg':
+				return $j('.right h2').css('background-color', color);
+				break;
+			case 'right_font':
+				return $j('.right, .right p').css('color', color);
+				break;
+			case 'right_link':
+				return $j('.right a').css('color', color);
+				break;
+			case 'right_hover':
+				return $j('.right a:hover').css('color', color);
+				break;
+			default:
+				return $j('.left .text').css('background-color', color);
+				break;
+		}
 	}
 };
