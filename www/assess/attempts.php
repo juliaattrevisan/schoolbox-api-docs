@@ -15,6 +15,7 @@ $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
@@ -65,8 +66,13 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* For attempts that are still in progress
          */
-        if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-            $finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+        if (($currentAttempt['finish'] != '0000-00-00 00:00:00') && strlen($currentAttempt['finish'])) {
+
+			/* Calculate time taken in hrs
+			 */
+			$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+
+			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
             $finishDateValue = $finishDate->getShort();
 
 			/* Parse review link
@@ -86,7 +92,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			else if ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
 				$canReview = true;
 			}
-			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1]))) {
 				$canReview = true;
 			}
 
@@ -117,19 +123,41 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
-		$userMapper = new \Schoolbox\UserMapper();
-		$user = $userMapper->findById($currentAttempt['user_id']);
+        $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
+
+		if ($currentAttempt['reviewed_at'] != null) {
+			$reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
+			$reviewed = $reviewedAt->getShort();
+
+			if ($available && $canReview) {
+				$marks = round($currentAttempt['totalMarks']).'/'.round($available);
+			}
+			else {
+				$marks = 'N/A';
+			}
+		}
+		else {
+            $numMarkedQuestions = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
+            $numUnmarkedQuestions = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+            $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($currentAttempt['attempt_id']);
+
+            $reviewed = 'Not reviewed ('.(100 - round(($valueUnmarkedQuestions / $available ) * 100)).'% graded)';
+
+            if($canReview) {
+                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+            }
+		}
 
         $this->setVar(array(
             'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
-			'ATTEMPT_USER_EXTERNAL_ID' => $user->getExternalId(),
-            'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
-            'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
             'ATTEMPT_START' => $startDate->getShort(),
             'ATTEMPT_FINISH' => $finishDateValue,
             'ATTEMPT_ASSESS_ID' => $this->arg[0],
             'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+			'ATTEMPT_REVIEWED_AT' => $reviewed,
+			'ATTEMPT_MARKS' => $marks,
+			'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ON_OFF' => $i % 2 ? 'dark' : ''
         ));
 

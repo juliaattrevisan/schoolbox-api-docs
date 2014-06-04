@@ -15,8 +15,12 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\External\UserProfile;
 use Schoolbox\External\UserProfileMapper;
+use Schoolbox\External\UserRelation;
+use Schoolbox\External\UserRelationMapper;
 
 class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
 
@@ -83,28 +87,137 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
     }
 
     /**
-     * Doesn't do anything, but always returns 1 so that executePostCreateUpdate
-     * runs.
+     * For a user which contains both contact and spouse: return nothing for
+     * first name, and "$surname Family" for surname.
      *
-     * @param  array $newUser
-     * @return int
+     * For a user which doesn't: fall back to standard implementation.
+     *
+     * @param  array  $currentUser
+     * @return string
      */
-    protected function executeCreateUpdate($newUser) {
-        return 1;
+    public function getFirstNameFromUser($currentUser) {
+        if (!empty($currentUser['StudentContactSpouseName'])) {
+            return '';
+        }
+        return parent::getFirstNameFromUser($currentUser);
     }
 
+    /**
+     * @see $this->getFirstNameFromUser()
+     *
+     * @param  array  $currentUser
+     * @return string
+     */
+    public function getLastNameFromUser($currentUser) {
+        if (!empty($currentUser['StudentContactSpouseName'])) {
+            return $currentUser['StudentContactSurname'] . ' Family';
+        }
+        return $currentUser['StudentContactSurname'];
+    }
 
+    /**
+     * Create parent accounts, user relations and user profiles.
+     */
     public function createIfExists() {
-        $this->verbose_filter->intro();
 
+        // Create parent accounts
+        parent::createIfExists();
+
+        // Fill in user profile and relations
         foreach ($this->list as $currentUser) {
             $parent_details = $this->setupUserDetails($currentUser);
             $this->verbose_filter->setNewUser($parent_details);
 
+            // Clear relations for this parent.
+            /** @var User $parentAccount */
+            $parentAccount = null;
+            try {
+                $parentAccount = UserMapper::getInstance()->findOneByColumn(
+                    'synergy_id', $parent_details['synergy_id']
+                );
+            }
+            catch (Exception $e) {}
+            if ($parentAccount instanceof User) {
+                if ($this->perform_update) {
+                    UserRelationMapper::getInstance()->deleteForUser($parentAccount);
+                    $this->verbose_filter->outputMessage(
+                        sprintf('Clearing relations for parent "%s"', $parent_details['synergy_id'])
+                    );
+                }
+                else {
+                    $this->verbose_filter->outputMessage(
+                        sprintf('Planning to clear relations for parent "%s"', $parent_details['synergy_id'])
+                    );
+                }
+            }
+            else {
+                // Nothing found, do something else.
+                $this->verbose_filter->outputSkipMessage(
+                    sprintf('relations for parent "%s", because user was not found', $parent_details['synergy_id'])
+                );
+            }
+
+
             // Get this parent's children, and link to each of those children.
             if (!empty($this->relation_list[$parent_details['synergy_id']])) {
                 foreach ($this->relation_list[$parent_details['synergy_id']] as $child_id => $type) {
+
                     $message = sprintf('info for student "%s"', $child_id);
+
+                    // Setup user relations
+                    if ($parentAccount instanceof User) {
+                        $childAccount = null;
+                        try {
+                            $childAccount = UserMapper::getInstance()->findOneByColumn(
+                                'synergy_id', $child_id
+                            );
+                        }
+                        catch (Exception $e) {}
+                        if ($childAccount instanceof User) {
+                            if (intval($type) !== 0) {
+                                $this->verbose_filter->outputSkipMessage(
+                                    sprintf(
+                                        'parent relation for parent "%s" to child "%s", because user is not primary guardian',
+                                        $parentAccount->getExternalId(),
+                                        $childAccount->getExternalId()
+                                    )
+                                );
+                            }
+                            elseif ($this->perform_update) {
+                                $userRelation = new UserRelation();
+                                $userRelation
+                                    ->setUser($parentAccount)
+                                    ->setRelation($childAccount)
+                                    ->setRelationType(UserRelation::RELATION_TYPE_PARENT);
+                                UserRelationMapper::getInstance()->save($userRelation);
+                                $this->verbose_filter->outputPerformCreateMessage(
+                                    sprintf(
+                                        'parent relation for parent "%s" to child "%s"',
+                                        $parentAccount->getExternalId(),
+                                        $childAccount->getExternalId()
+                                    )
+                                );
+                            }
+                            else {
+                                $this->verbose_filter->outputPlanCreateMessage(
+                                    sprintf(
+                                        'parent relation for parent "%s" to child "%s"',
+                                        $parentAccount->getExternalId(),
+                                        $childAccount->getExternalId()
+                                    )
+                                );
+                            }
+                        }
+                        else {
+                            // Nothing found, do something else.
+                            $this->verbose_filter->outputMessage(
+                                'parent '.$message.', because child\'s account was not found'
+                            );
+                            $this->verbose_filter->incrementSkipped();
+                        }
+                    }
+
+                    // Now save the profile.
                     $profile = null;
                     try {
                         $profile = UserProfileMapper::getInstance()->findByExternalId($child_id);

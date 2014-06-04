@@ -1,168 +1,177 @@
-<div style="width:50%;float:left;">
-	<h1>{EVENT_NOTE}</h1>
-	<p>
-		{EVENT_START}&ndash;{EVENT_END}
-	</p>
+<div class="eotc">
+    <div class="left">
+        <h1>{EVENT_NOTE}</h1>
+        <p>
+            {EVENT_START}&ndash;{EVENT_END}
+        </p>
 
-	<!-- BEGIN recurring_reminder -->
-	<p>
-		Recurring:
-		{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-	</p>
-	<!-- END recurring_reminder -->
+        <!-- BEGIN recurring_reminder -->
+        <p>
+            Recurring:
+            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+        </p>
+        <!-- END recurring_reminder -->
 
-	<p>
-		Location: {EVENT_LOCATION}
-	</p>
-	<p>
-		{EVENT_DETAIL}
-	</p>
-	<p>
-		Created by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
-		on {EVENT_CREATED_AT}
-	</p>
+        <p>
+            Location: {EVENT_LOCATION}
+        </p>
+        <p>
+            {EVENT_DETAIL}
+        </p>
+        <p>
+            Created by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+            on {EVENT_CREATED_AT}
+        </p>
 
-	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn modify"><span></span>Modify Event</a>
+        <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn modify float-left"><span></span>Modify Event</a>
+    </div>
+    <div class="right">
+        <div class="box clearfix">
+            <h2>Related Campuses</h2>
+            <ul class="listing">
+                <!-- BEGIN event_campus -->
+                <li>{EVENT_CAMPUS_NAME}</li>
+                <!-- END event_campus -->
+            </ul>
+        </div>
+
+        <!-- BEGIN has_rams -->
+        <div class="box clearfix">
+            <h2>RAMS Requirement</h2>
+            <ul class="listing">
+                <li>
+                    <span class="actions">
+                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
+                    </span>
+                    <h4><img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}</h4>
+                </li>
+            </ul>
+        </div>
+        <!-- END has_rams -->
+    </div>
+
+    <div class="full">
+        <h2>Teacher In Charge</h2>
+        <p>
+            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                <img width="32" height="32" src="/portrait.php?userId={EVENT_TEACHER_IN_CHARGE_EXTERNAL_ID}&size=square32" />
+                {EVENT_TEACHER_IN_CHARGE_NAME}
+            </a>
+        </p>
+
+        <div class="clearfix"></div>
+
+        <div class="box clearfix">
+            <h2>Staff Attendees ({EVENT_STAFF_COUNT})</h2>
+            <ul class="listing grid">
+                <!-- BEGIN event_staff -->
+                <li>
+                    <a href="/search/user/{EVENT_STAFF_ID}">
+                        <img width="32" height="32" src="/portrait.php?userId={EVENT_STAFF_EXTERNAL_ID}&size=square32" />
+                        {EVENT_STAFF_NAME}
+                    </a>
+                </li>
+                <!-- END event_staff -->
+            </ul>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="box clearfix">
+            <h2>Student Attendees ({EVENT_STUDENT_COUNT})</h2>
+            <ul class="listing grid">
+                <!-- BEGIN event_student -->
+                <li>
+                    <a href="/search/user/{EVENT_STUDENT_ID}">
+                        <img width="32" height="32" src="/portrait.php?userId={EVENT_STUDENT_EXTERNAL_ID}&size=square32" />
+                        {EVENT_STUDENT_NAME}
+                    </a>
+                </li>
+                <!-- END event_student -->
+            </ul>
+            <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn go-to"><span></span>Download CSV</a>
+            <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="btn go-to"><span></span>View List</a>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+
+    <div class='clearfix'></div>
+
+    <!-- BEGIN has_event_activity_log -->
+    <h2>Activity Log</h2>
+    <table class="standardForm">
+        <tbody>
+        <!-- BEGIN event_activity_log -->
+        <tr>
+            <td class="formLabelWidth">{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
+            <td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
+        </tr>
+        <!-- END event_activity_log -->
+        </tbody>
+    </table>
+    <!-- END has_event_activity_log -->
+
+    <div class='clearfix'></div>
+
+    <h2>Current Status</h2>
+    <table class="standardForm">
+        <tbody>
+            <tr>
+                <td class="formLabelWidth">
+                    <h4>Current Status</h4>
+                </td>
+                <td>
+                    {EVENT_STATUS}
+                </td>
+            </tr>
+            <tr>
+                <td class="formLabelWidth">
+                    <h4>Comment</h4>
+                </td>
+                <td>
+                    {EVENT_COMMENT}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- BEGIN has_change_event_status -->
+    <h2>Change Event Status</h2>
+    <form action="/modules/eotc/status/modifyForm.php" method="post">
+        <input name='eventId' type="hidden" value="{EVENT_ID}">
+
+        <table class="standardForm">
+            <tbody>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Change Status</h4>
+                        <em>Change the status of the event</em>
+                    </td>
+                    <td>
+                        <select name="statusId">
+                            <!-- BEGIN event_status -->
+                            <option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
+                            <!-- END event_status -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Comment</h4>
+                        <em>Add a comment</em>
+                    </td>
+                    <td>
+                        <textarea name="comment" style="width:100%;height:80px;"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <input class='submit-btn-plain' type="submit" value="Update" />
+    </form>
+    <!-- END has_change_event_status -->
+
+    <a href="/modules/eotc/review" class="btn go-to"><span></span>Back to Review EOTC Events</a>
 </div>
-<div style="width:50%;float:right;">
-	<h2>Related Campuses</h2>
-	<ul>
-		<!-- BEGIN event_campus -->
-		<li>{EVENT_CAMPUS_NAME}</li>
-		<!-- END event_campus -->
-	</ul>
-
-	<!-- BEGIN has_rams -->
-	<h2>RAMS Requirement</h2>
-	<ul class="information-list">
-		<li>
-			<span class="actions">
-				<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
-			</span>
-			<h4><img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}</h4>
-		</li>
-	</ul>
-	<!-- END has_rams -->
-</div>
-
-<div style="width:100%;float:left;clear:both">
-	<h2>Teacher In Charge</h2>
-	<p>
-		<a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
-			<img width="32" height="32" src="/portrait.php?userId={EVENT_TEACHER_IN_CHARGE_EXTERNAL_ID}&size=square32" />
-			{EVENT_TEACHER_IN_CHARGE_NAME}
-		</a>
-	</p>
-
-	<div class="clearfix"></div>
-
-	<h2>Staff Attendees ({EVENT_STAFF_COUNT})</h2>
-
-	<ul class="information-list grid">
-		<!-- BEGIN event_staff -->
-		<li>
-			<a href="/search/user/{EVENT_STAFF_ID}">
-				<img width="32" height="32" src="/portrait.php?userId={EVENT_STAFF_EXTERNAL_ID}&size=square32" />
-				{EVENT_STAFF_NAME}
-			</a>
-		</li>
-		<!-- END event_staff -->
-	</ul>
-
-	<div class="clearfix"></div>
-
-	<h2>Student Attendees ({EVENT_STUDENT_COUNT})</h2>
-	<ul class="information-list grid">
-		<!-- BEGIN event_student -->
-		<li>
-			<a href="/search/user/{EVENT_STUDENT_ID}">
-				<img width="32" height="32" src="/portrait.php?userId={EVENT_STUDENT_EXTERNAL_ID}&size=square32" />
-				{EVENT_STUDENT_NAME}
-			</a>
-		</li>
-		<!-- END event_student -->
-	</ul>
-
-	<div class="clearfix"></div>
-	
-	<a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn go-to"><span></span>Download CSV</a>
-	<a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="btn go-to"><span></span>View List</a>
-</div>
-
-<div class='clearfix'></div>
-
-<!-- BEGIN has_event_activity_log -->
-<h2>Activity Log</h2>
-<table class="standardForm">
-	<tbody>
-	<!-- BEGIN event_activity_log -->
-	<tr>
-		<td class="formLabelWidth">{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
-		<td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
-	</tr>
-	<!-- END event_activity_log -->
-	</tbody>
-</table>
-<!-- END has_event_activity_log -->
-
-<div class='clearfix'></div>
-
-<h2>Current Status</h2>
-<table class="standardForm">
-	<tbody>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Current Status</h4>
-			</td>
-			<td>
-				{EVENT_STATUS}
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Comment</h4>
-			</td>
-			<td>
-				{EVENT_COMMENT}
-			</td>
-		</tr>
-	</tbody>
-</table>
-
-<!-- BEGIN has_change_event_status -->
-<h2>Change Event Status</h2>
-<form action="/modules/eotc/status/modifyForm.php" method="post">
-	<input name='eventId' type="hidden" value="{EVENT_ID}">
-
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Change Status</h4>
-					<em>Change the status of the event</em>
-				</td>
-				<td>
-					<select name="statusId">
-						<!-- BEGIN event_status -->
-						<option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
-						<!-- END event_status -->
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Comment</h4>
-					<em>Add a comment</em>
-				</td>
-				<td>
-					<textarea name="comment" style="width:100%;height:80px;"></textarea>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-	<input class='submit-btn-plain' type="submit" value="Update" />
-</form>
-<!-- END has_change_event_status -->
-
-<a href="/modules/eotc/review" class="btn go-to"><span></span>Back to Review EOTC Events</a>

@@ -11,27 +11,28 @@
 			<col />
 			<col />
 			<col />
+			<col />
+			<col />
 			<col width="150"/>
 		</colgroup>
 		<thead>
 			<tr>
-				<th>Student</th>
 				<th>Start</th>
-				<th>Finish</th>
+                <th>Finish</th>
+				<th>Time Taken</th>
+				<th>Reviewed</th>
+				<th>Grade</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 			<!-- BEGIN attempt -->
 			<tr>
-				<td class="nowrap">
-					<a href='/search/user/{ATTEMPT_USER_ID}' class="avatar-card">
-						<img src="/portrait.php?userId={ATTEMPT_USER_EXTERNAL_ID}&amp;size=square32">
-						<span>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</span>
-					</a>
-				</td>
 				<td>{ATTEMPT_START}</td>
-				<td>{ATTEMPT_FINISH}</td>
+                <td>{ATTEMPT_FINISH}</td>
+				<td>{ATTEMPT_TIME_TAKEN}</td>
+				<td>{ATTEMPT_REVIEWED_AT}</td>
+				<td>{ATTEMPT_MARKS}</td>
 				<td>
 					<span class="actions one-button">
 						<!-- BEGIN attempt_review -->
