@@ -12,9 +12,10 @@ namespace Schoolbox\Blog;
 
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-class CommentMapper extends Mapper {
+class CommentMapper extends Mapper implements FeedableMapperInterface {
 
 	/**
 	 * @return void

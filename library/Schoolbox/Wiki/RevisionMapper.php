@@ -12,9 +12,10 @@ namespace Schoolbox\Wiki;
 
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-class RevisionMapper extends Mapper {
+class RevisionMapper extends Mapper implements FeedableMapperInterface {
 
 	/**
 	 * @return void
