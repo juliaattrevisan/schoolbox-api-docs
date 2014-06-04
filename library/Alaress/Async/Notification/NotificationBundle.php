@@ -95,4 +95,24 @@ class NotificationBundle {
 		return count($this->notifications);
 	}
 
+
+	/**
+	 * Sort the contained notifications
+	 *
+	 * @param int $dir
+	 */
+	protected function sort($dir = SORT_DESC) {
+		usort($this->notifications, function($a, $b) use ($dir) {
+			/**
+			 * @var Notification $a
+			 * @var Notification $b
+			 */
+			$dir = $dir == SORT_DESC ? -1 : 1;
+			$atime = $a->getTimestamp();
+			$btime = $b->getTimestamp();
+
+			return $dir * ($atime == $btime ? 0 : $atime > $btime ? 1 : -1);
+		});
+	}
+
 } 
