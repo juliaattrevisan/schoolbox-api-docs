@@ -11,6 +11,10 @@
 namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
+use Schoolbox\Campus;
+use Schoolbox\Resource\Category;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserAccess;
 
 /**
@@ -36,28 +40,37 @@ class Envelope extends InstanceBundle {
 	}
 
 	/**
-	 * @param int $catId
-	 * @param int $accessLevel
-	 * @param Instance $instance
+	 * @param Category|int $catId
+	 * @param int          $accessLevel
+	 * @param Instance     $instance
 	 */
 	public function broadcastToCategory($catId, $accessLevel, $instance) {
+		if($catId instanceof Category) {
+			$catId = $catId->getId();
+		}
 		$this->broadcastToService(UserAccess::SERVICE_HOMEPAGE, $catId, $accessLevel, $instance);
 	}
 
 
 	/**
-	 * @param int $campusId
-	 * @param Instance $instance
+	 * @param Campus|int $campusId
+	 * @param Instance   $instance
 	 */
 	public function broadcastToCampus($campusId, $instance) {
+		if($campusId instanceof Campus) {
+			$campusId = $campusId->getId();
+		}
 		$this->bind("campus.$campusId", $instance);
 	}
 
 	/**
-	 * @param int $roleId
+	 * @param Role|int $roleId
 	 * @param Instance $instance
 	 */
 	public function broadcastToRole($roleId, $instance) {
+		if($roleId instanceof Role) {
+			$roleId = $roleId->getId();
+		}
 		$this->bind("role.$roleId", $instance);
 	}
 
@@ -93,18 +106,24 @@ class Envelope extends InstanceBundle {
 	}
 
 	/**
-	 * @param int $userId
+	 * @param User|int $userId
 	 * @param Instance $instance
 	 */
 	public function targetToUser($userId, $instance) {
+		if($userId instanceof User) {
+			$userId = $userId->getId();
+		}
 		$this->bind("user.$userId", $instance);
 	}
 
 	/**
-	 * @param int $studentId
+	 * @param User|int $studentId
 	 * @param Instance $instance
 	 */
 	public function targetToParent($studentId, $instance) {
+		if($studentId instanceof User) {
+			$studentId = $studentId->getId();
+		}
 		$this->bind("parent.$studentId", $instance);
 	}
 
