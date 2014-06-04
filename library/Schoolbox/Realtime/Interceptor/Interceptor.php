@@ -15,6 +15,7 @@ use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
+use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -24,6 +25,7 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\External\TargetedConverter;
+use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RerouteMapper;
@@ -55,31 +57,38 @@ class Interceptor implements TaskResponseHandlerInterface {
 	/** @var Debug  */
 	protected $v;
 
-	/** @var bool */
-	protected $patient = true;
+	/** @var UserQueueFactory */
+	protected $uqf;
+
+	/** @var Connector */
+	protected $conn;
+
 
 	/**
 	 * @param Debug $debug
 	 * @param LoopInterface $loop
 	 */
 	function __construct($debug, $loop = null) {
-		$this->loop = $loop;
-		$this->v = $debug;
-
-		$this->rerouteMapper = RerouteMapper::getInstance();
-		$this->permissionMapper = RoutePermissionMapper::getInstance();
-		$this->userMapper = UserMapper::getInstance();
+		$this->loop  = $loop;
+		$this->v     = $debug;
 		$this->notif = new Notif();
+		$this->conn  = new Connector();
+		$this->uqf   = new UserQueueFactory($this->conn);
+
+		$this->rerouteMapper    = RerouteMapper::getInstance();
+		$this->permissionMapper = RoutePermissionMapper::getInstance();
+		$this->userMapper       = UserMapper::getInstance();
 
 		// optional construction in case null was passed for $loop
 		if($loop instanceof LoopInterface) {
 			$d = $this->dispatcher = new Dispatcher($loop, $this, $debug, new InterceptorDispatchStrategy());
-			$this->transaction = new Transaction($loop, function($timer) use ($d) {
+			$this->transaction     = new Transaction($loop, function($timer) use ($d) {
 				/** @var $timer TimerInterface */
 				$d->enqueue($timer, InterceptorDispatchStrategy::TASK_INTERCEPT, $timer->getData());
 			}, self::TRANSACTION_CACHE_TIMEOUT);
 		}
 	}
+
 
 	/**
 	 * Handles a response from a Worker
@@ -92,13 +101,8 @@ class Interceptor implements TaskResponseHandlerInterface {
 	public function handleResponse($identifier, $command, $data) {
 		// nothing to do, the worker did the work
 		$this->v->v("Reroute count: $data[0]");
-		// after receiving the first batch, disable patience and enforce cache limits
-		if($this->isPatient()) {
-			$this->v->v("Moving out of patient mode");
-			$this->setPatience(false);
-			$this->transaction->setSize(self::TRANSACTION_COUNT_LIMIT);
-		}
 	}
+
 
 	/**
 	 * Adds the frame to a loop cache, and dispatches appropriately
@@ -111,8 +115,9 @@ class Interceptor implements TaskResponseHandlerInterface {
 		$this->transaction->put(sha1($frame->dump()), array($user, $frame));
 	}
 
+
 	/**
-     * @apc called from WorkerProcess::process()
+	 * @apc called from WorkerProcess::process()
 	 * @param User $user
 	 * @param Frame $frame
 	 * @throws InvalidArgumentException
@@ -125,23 +130,12 @@ class Interceptor implements TaskResponseHandlerInterface {
 		try {
 			$instance = Instance::jsonUnserialize($formatted['message']);
 		}
-		catch(\InvalidArgumentException $e) {
+		catch(InvalidArgumentException $e) {
 			// TODO once TargetedMessage has been fully deprecated, this catch can be removed
 			$conv = new TargetedConverter();
 			$instance = $conv->convert($formatted['message']);
 		}
 
-		return $this->rerouteInstance($user, $instance, $formatted);
-	}
-
-
-	/**
-	 * @param User $user
-	 * @param Instance $instance
-	 * @param array $formatted
-	 * @return bool
-	 */
-	protected function rerouteInstance($user, $instance, $formatted) {
 		// fail fast: if it's already been rerouted, don't try again
 		if(isset($formatted['extra']['rerouted'])) {
 			$this->v->v("Message has already been rerouted: rejecting");
@@ -196,7 +190,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
 			return true;
 		}
-		catch(\Exception $e) {
+		catch(Exception $e) {
 			$this->v->v("Exception occurred during rerouting: $e");
 			return false;
 		}
@@ -231,7 +225,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 	 *
 	 * @param User $user
 	 * @param Instance $message
-	 * @param array$context
+	 * @param array $context
 	 * @return bool
 	 */
 	protected function canDismiss($user, $message, $context) {
@@ -262,20 +256,8 @@ class Interceptor implements TaskResponseHandlerInterface {
 			}
 		}
 
-		$uqf = new UserQueueFactory();
-
-		// only perform extra dedupe checks if we're in patient (aka boot) mode
-		return $this->isPatient() ? $uqf->userHasSeen($user->getId(), $message) && false : false;
-	}
-
-
-	/**
-     * @deprecated
-	 * @param AMQPMessage $m
-	 * @return array
-	 */
-	public function unwrapMessageBody($m) {
-		return json_decode($m->body, true);
+		// if we've got this far, check for duplicates
+		return $this->uqf->userHasSeen($user->getId(), $message);
 	}
 
 
@@ -287,9 +269,6 @@ class Interceptor implements TaskResponseHandlerInterface {
 	 * @return bool
 	 */
 	protected function testContextValue($contextValue, $comparisonValue) {
-
-//		echo "Comparing ", json_encode($contextValue), " to ", json_encode($comparisonValue), "\n";
-
 		if(is_array($contextValue)) {
 			if(is_array($comparisonValue)) {
 				return !!count(array_intersect($contextValue, $comparisonValue));
@@ -301,28 +280,6 @@ class Interceptor implements TaskResponseHandlerInterface {
 			return in_array($contextValue, $comparisonValue);
 		}
 		return $contextValue == $comparisonValue;
-	}
-
-
-
-	/**
-	 * Are we being patient and doing extra dedupe checks?
-	 *
-	 * @return bool
-	 */
-	public function isPatient() {
-		return $this->patient;
-	}
-
-	/**
-	 * Set patience.
-	 *
-	 * @param bool
-	 * @return self
-	 */
-	public function setPatience($patient) {
-		$this->patient = $patient;
-		return $this;
 	}
 
 }

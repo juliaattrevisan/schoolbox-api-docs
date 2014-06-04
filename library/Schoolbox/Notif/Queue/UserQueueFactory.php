@@ -11,6 +11,7 @@ namespace Schoolbox\Notif\Queue;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
+use Exception;
 use External_User;
 use Group;
 use InvalidArgumentException;
@@ -412,11 +413,12 @@ class UserQueueFactory {
 
 
 	/**
-	 * Returns whether or not a given message is sitting in the given user's listed and digest queues.
+	 * Returns whether or not a given message is sitting in the given user's listed or digest queues.
 	 * Use this method shrewdly - its expense is proportional to the length of the given user's queues.
 	 *
 	 * @param int $userId
 	 * @param Instance $instance
+	 * @throws InvalidArgumentException
 	 * @return bool
 	 */
 	public function userHasSeen($userId, $instance) {
@@ -429,28 +431,34 @@ class UserQueueFactory {
 
 		foreach($qs as $q) {
 			$nack = array();
-			while($m = $this->mqConnector->readFromQueue($q)) {
-				// store list of retrieved messages to NACK later
-				$nack[] = $m;
-				$unjson = json_decode($m->body, true);
+			try {
+				while($m = $this->mqConnector->readFromQueue($q)) {
+					// store list of retrieved messages to NACK later
+					$nack[] = $m;
+					$unjson = json_decode($m->body, true);
 
-				try {
-					$compare = Instance::jsonUnserialize($unjson['message']);
-				}
-				catch(InvalidArgumentException $e) {
-					// TODO once TargetedMessage fully deprecated this catch can be removed
-					$conv = new TargetedConverter();
-					$compare = $conv->convert($unjson['message']);
-				}
+					try {
+						$compare = Instance::jsonUnserialize($unjson['message']);
+					}
+					catch(InvalidArgumentException $e) {
+						// TODO once TargetedMessage fully deprecated this catch can be removed
+						$conv = new TargetedConverter();
+						$compare = $conv->convert($unjson['message']);
+					}
 
-				if($instance->getParamHash() == $compare->getParamHash()) {
-					$result = true;
-					break;
+					if($instance->getParamHash() == $compare->getParamHash()) {
+						$result = true;
+						break;
+					}
 				}
+				// push any messages we retrieved back onto the queue
+				$this->mqConnector->rejectMessages($nack);
 			}
-
-			// push any messages we retrieved back on the the queue
-			$this->mqConnector->rejectMessages($nack);
+			catch(InvalidArgumentException $e) {
+				// regardless of anything else, you MUST reject the messages you retrieved
+				$this->mqConnector->rejectMessages($nack);
+				throw $e;
+			}
 
 			// if we returned true, don't bother continuing
 			if($result) {
