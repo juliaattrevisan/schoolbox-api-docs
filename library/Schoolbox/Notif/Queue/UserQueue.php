@@ -11,8 +11,10 @@ namespace Schoolbox\Notif\Queue;
 
 
 use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
+use Exception;
 use InvalidArgumentException;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 
@@ -150,21 +152,34 @@ class UserQueue {
 		$nacks = array();
 		$bundle = new NotificationBundle();
 
-		while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
-			$nacks[] = $m;
+		try {
+			while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
+				$nacks[] = $m;
 
-			// unwrap the formatting
-			$body = json_decode($m->body, true);
+				// unwrap the formatting
+				$body = json_decode($m->body, true);
 
-			$conv = new TargetedConverter();
-
-			try {
-				// attempt to unserialize the message
-				$bundle->appendInstance($conv->convert($body['message']));
+				try {
+					// attempt to unserialize the message
+					$bundle->appendInstance(Instance::jsonUnserialize($body['message']));
+				}
+				catch(InvalidArgumentException $e) {
+					// TODO: once TargetedMessage is fully deprecated, this catch can be removed
+					$conv = new TargetedConverter();
+					try {
+						$bundle->appendInstance($conv->convert($body['message']));
+					}
+					catch(InvalidArgumentException $e) {
+						// nothing we can do, message was unparseable
+					}
+				}
 			}
-			catch(InvalidArgumentException $e) {
-				// nothing we can do, message was unparseable
-			}
+		}
+		catch(Exception $e) {
+			// regardless of what happens above, it's imperative that we reject the messages we pulled
+			$this->conn->rejectMessages($nacks);
+			// *now* you can freak out
+			throw $e;
 		}
 
 		// now we've collected messages, reject all
