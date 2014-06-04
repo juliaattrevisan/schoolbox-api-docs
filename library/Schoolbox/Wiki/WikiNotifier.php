@@ -68,7 +68,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param int $offset - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		/** @var Wiki[]|Collection $wikis */
 		$wikis = $this->mapper->findForFeed($context, $limit, $offset);
 

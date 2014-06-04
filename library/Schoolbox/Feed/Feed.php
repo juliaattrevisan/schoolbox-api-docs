@@ -19,16 +19,6 @@ class Feed {
 
 
 	/**
-	 * @deprecated needs to be dependent on InstanceBundle, not Messenger
-	 * @param Messenger $messenger
-	 * @param int $timestamp
-	 * @return Collection|Item[]
-	 */
-	public static function getItemsFromMessenger($messenger, $timestamp) {
-		return $messenger->extractItems($timestamp);
-	}
-
-	/**
 	 * @param IConfigLoader $conf
 	 */
 	function __construct($conf = null) {
@@ -44,11 +34,11 @@ class Feed {
 	 * @param string $roleType
 	 * @param int $limit
 	 * @param int $offset
-	 * @return Collection|Item[]
+	 * @return Collection
 	 */
-	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::SOFT_LIMIT, $offset = 0) {
-		if ($limit <= 0 || $limit > SourceInterface::SOFT_LIMIT) {
-			$limit = SourceInterface::SOFT_LIMIT;
+	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::HARD_LIMIT, $offset = 0) {
+		if ($limit <= 0 || $limit > SourceInterface::HARD_LIMIT) {
+			$limit = SourceInterface::HARD_LIMIT;
 		}
 
 		$messages = new Collection();

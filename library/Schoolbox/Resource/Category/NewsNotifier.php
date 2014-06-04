@@ -92,7 +92,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param int $offset      - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roleType, $limit = self::HARD_LIMIT, $offset = 0) {
 
 		$newses = $this->mapper->findForFeed($context, $limit, $offset);
 

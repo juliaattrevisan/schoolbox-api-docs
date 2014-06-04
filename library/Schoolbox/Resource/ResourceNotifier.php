@@ -151,7 +151,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param string $filter   - optionally limit to a particular kind of resource
 	 * @return Collection|Item[]
 	 */
-	protected function getFeedInternal($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0, $filter) {
+	protected function getFeedInternal($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0, $filter) {
 		$logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
 
 		$c = new Collection();

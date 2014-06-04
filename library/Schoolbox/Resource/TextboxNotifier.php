@@ -123,7 +123,7 @@ class TextboxNotifier extends ResourceNotifier {
 	 * @param int $offset       - by default, most recent
 	 * @return Collection|Item[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		return $this->getFeedInternal($context, $roletype, $limit, $offset, LogMapper::KIND_CONTENT);
 	}
 

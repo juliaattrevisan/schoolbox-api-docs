@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 
 interface SourceInterface {
 
-	const SOFT_LIMIT = 50;
+	const HARD_LIMIT = 50;
 
 	/**
 	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
@@ -23,9 +23,9 @@ interface SourceInterface {
 	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
-	 * @return Collection|Item[]
+	 * @return Collection
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0);
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0);
 
 
 	/**
