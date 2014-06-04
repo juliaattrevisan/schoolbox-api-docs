@@ -34,7 +34,7 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @var string
      */
-    protected $msgNamespaceSlug = 'eotc';
+    protected $slug = 'resource_booking';
 
     /**
      * A router - injected for the purpose of generating URLs for resource
@@ -55,7 +55,7 @@ class Notifier extends AbstractModuleNotifier {
      * @return string
      */
     protected function getSlug() {
-        return $this->msgNamespaceSlug;
+        return $this->slug;
     }
 
     /**
@@ -64,7 +64,7 @@ class Notifier extends AbstractModuleNotifier {
     public function loadDependencies($dependencies = null) {
 //        /** @var ContainerInterface $di */
 //        global $di;
-        $this->namespace = NSMapper::getInstance()->findOneBySlug('resource_booking');
+        $this->namespace = NSMapper::getInstance()->findOneBySlug($this->slug);
 //        $this->router    = $di->get('router');
     }
 
@@ -123,7 +123,7 @@ class Notifier extends AbstractModuleNotifier {
     protected function buildMessenger(Model $object, User $user, $event) {
         $messenger      = new Messenger();
         $owner          = $object->getEvent()->getOwner();
-        $key            = 'resource_booking.'.$object->getId().'.'.$event;
+        $key            = $this->slug.'.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $user->getId();
         $startDate      = new \Alaress_Date_Format(
