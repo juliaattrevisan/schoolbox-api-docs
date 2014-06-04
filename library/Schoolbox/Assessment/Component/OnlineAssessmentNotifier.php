@@ -10,12 +10,12 @@
 namespace Schoolbox\Assessment\Component;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -121,13 +121,13 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
+	 * @param int $context     - most likely a category ID or ignored
 	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
 	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
@@ -137,12 +137,16 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $c;
 		}
 
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
+
 		/** @var OnlineAssessment[]|Collection $quizzes */
-		$quizzes = $this->getMapper()->findForFeed($context, $limit, $offset);
+		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($quiz, $quiz->getUser()), $quiz->getStart()->getUnixTimestamp()));
-			$c->merge(Feed::getItemsFromMessenger($this->notifyFeedClosed($quiz, $quiz->getUser()), $quiz->getFinish()->getUnixTimestamp()));
+			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll()));
+			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll()));
 		}
 
 		return $c;

@@ -10,8 +10,8 @@
 namespace Schoolbox\Resource;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Item;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -28,13 +28,13 @@ class CategoryNotifier extends ResourceNotifier {
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
+	 * @param int $context     - most likely a category ID or ignored
 	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
 	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		return $this->getFeedInternal($context, $roletype, $limit, $offset, LogMapper::KIND_FOLDER);

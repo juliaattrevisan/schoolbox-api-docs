@@ -10,10 +10,10 @@
 namespace Schoolbox\Resource\Category;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -84,24 +84,28 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
-	 * @return Collection|Item[]
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roleType, $limit = self::HARD_LIMIT, $offset = 0) {
-
-		$newses = $this->mapper->findForFeed($context, $limit, $offset);
-
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
-		foreach($newses as $news) {
-			$messenger = $this->notifyStudentPublished($news, $news->getOwner());
-			$timestamp = $news->getPublishDate()->getUnixTimestamp();
-			$c->merge(Feed::getItemsFromMessenger($messenger, $timestamp));
+
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
 		}
+
+		/** @var Collection|News[] $articles */
+		$articles = $this->mapper->findForFeed($context, $limit, $offset);
+
+		foreach($articles as $news) {
+			$c->merge(new Collection($this->generateNotification($roletype, $news, $news->getOwner())->getAll()));
+		}
+
 		return $c;
 	}
 

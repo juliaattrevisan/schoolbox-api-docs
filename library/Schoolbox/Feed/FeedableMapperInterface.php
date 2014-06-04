@@ -10,6 +10,7 @@
 namespace Schoolbox\Feed;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Column\Collection;
 
 interface FeedableMapperInterface {
@@ -19,7 +20,7 @@ interface FeedableMapperInterface {
 	 * @param int $limit
 	 * @param int $offset
 	 * @param int $time
-	 * @return Collection
+	 * @return Collection|Instance[]
 	 */
 	public function findForFeed($context, $limit, $offset = 0, $time = 0);
 

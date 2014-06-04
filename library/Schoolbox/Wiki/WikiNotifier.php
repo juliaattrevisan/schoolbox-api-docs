@@ -10,10 +10,10 @@
 namespace Schoolbox\Wiki;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -61,24 +61,31 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	}
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
 	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+		$c = new Collection();
+
+		// be sure the target method exists
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
+
 		/** @var Wiki[]|Collection $wikis */
 		$wikis = $this->mapper->findForFeed($context, $limit, $offset);
 
-		$c = new Collection();
 		foreach($wikis as $wiki) {
-			$c->merge(Feed::getItemsFromMessenger(
-				$this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser()),
-				$wiki->getCreated()->getUnixTimestamp()
-			));
+			$c->merge(
+				new Collection($this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser())->getAll())
+			);
 		}
+
 		return $c;
 	}
 

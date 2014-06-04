@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -17,8 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -169,13 +169,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param string $roletype
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
 	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
@@ -185,12 +185,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			return $c;
 		}
 
+		// be sure the target method exists
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
+
 		/** @var Collection|SubmissionBox[] $boxes */
 		$boxes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($boxes as $box) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));
-			$c->merge(Feed::getItemsFromMessenger($this->notifyFeedClosed($box, $box->getOwner()), $box->getDueDate()->getUnixTimestamp()));
+			$c->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll()));
+			$c->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll()));
 		}
 
 		return $c;
