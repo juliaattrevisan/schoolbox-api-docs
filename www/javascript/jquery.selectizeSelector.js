@@ -22,7 +22,7 @@
             },
             selectize: {
                 dropdownParent: 'body',
-                plugins: ['remove_button'],
+                plugins: [],
                 create: false,
                 hideSelected: true,
                 createOnBlur: true,
@@ -74,8 +74,13 @@
         }
         settings = $.extend(true, {}, defaults, options)
 
+        // Only add the remove button plugin for multiple selections, because
+        // the extra padding it adds screws up the cursor position.
         // No multiple selections? set maxItems to 1
-        if (!settings.multiple) {
+        if (settings.multiple) {
+            settings.selectize.plugins.push('remove_button')
+        }
+        else {
             settings.selectize.maxItems = 1
         }
 
