@@ -64,7 +64,10 @@ switch($_POST['action']) {
 		 */
 		if (strlen($_POST['publishDate'])) {
 			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
-			$publishDate = $pubDateObject->getDatabaseDate();
+		}
+		else {
+			// make visible immediately
+			$pubDateObject = new Alaress_Date_Format(time(), 'U');
 		}
 
 		/* Events recur until this time
@@ -99,13 +102,15 @@ switch($_POST['action']) {
 		$event->setSid($_POST['group']);
 		$event->setType($_POST['type']);
 		$event->setNote($_POST['note']);
+		$event->setStartDateTime($startDate);
 		$event->setStartDate($startDate->getDatabaseDate());
 		$event->setStartTime($startDate->getDatabaseTime());
+		$event->setEndDateTime($endDate);
 		$event->setEndDate($endDate->getDatabaseDate());
 		$event->setEndTime($endDate->getDatabaseTime());
 		$event->setLocation($_POST['location']);
 		$event->setDetail($_POST['detail']);
-		$event->setPublishDateTime($publishDate);
+		$event->setPublishDateTime($pubDateObject);
 
 		/* Collections of ids
 		 */
