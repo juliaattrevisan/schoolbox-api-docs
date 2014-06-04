@@ -21,6 +21,7 @@
                 dataType: 'json'
             },
             selectize: {
+                dropdownParent: 'body',
                 plugins: ['remove_button'],
                 create: false,
                 hideSelected: true,
