@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
 
 class ReturnedWorkNotifier extends AbstractModuleNotifier {
 
-	const TRIGGER_MARKED = 'marked';
+	const TRIGGER_RETURNED = 'returned';
 
 	/** @var UserMapper */
 	protected $userMapper;
@@ -68,13 +68,24 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 */
 	public function bundleTriggers($bundle) {
 
+		/** @var ReturnedWork $mark */
+		$mark = $bundle->getEvent()->getObject();
+
+		/** @var SubmissionBox $box */
+		$box = $this->boxMapper->findById($mark->getSubmissionBox()->getId());
+
+		if($box->getMarkVisibility() == SubmissionBox::MARK_VISIBILITY_PRIVATE) {
+			// don't. even. bother.
+			return;
+		}
+
 		switch($bundle->getMethod()) {
 			case Mapper::METHOD_CREATE: // when returned work is generated
-				$bundle->attach(self::TRIGGER_MARKED, self::IMMEDIATELY);
+			case Mapper::METHOD_UPDATE: // when returned work is updated:
+				$bundle->attach(self::TRIGGER_RETURNED, self::IMMEDIATELY);
 				break;
 
 			case Mapper::METHOD_READ:
-			case Mapper::METHOD_UPDATE: // when returned work is updated:
 			case Mapper::METHOD_DELETE: // when returned work is...uh, un-returned...
 				break;
 
@@ -124,7 +135,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		$href = "/submission/submissionHistory/$boxId/$studentId";
 
 		// if student, 2nd-person language
-		if($target == 'student') {
+		if($target == 'student' && $box->getMarkVisibility() >= SubmissionBox::MARK_VISIBILITY_STUDENT) {
 			$msg = new Message(":teacher has marked your work for :boxname in :catname", $icon, $href);
 
 			$params = array(
@@ -137,7 +148,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		}
 
 		// if parent, 3rd-person language
-		elseif($target == 'parent') {
+		elseif($target == 'parent' && $box->getMarkVisibility() >= SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
 			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
 
 			$params = array(
@@ -162,7 +173,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @param array|null $diff
 	 * @return Messenger
 	 */
-	public function notifyStudentMarked($returnedWork, $user, $diff = null) {
+	public function notifyStudentReturned($returnedWork, $user, $diff = null) {
 		return $this->generateMessage('student', $returnedWork, $user, $diff);
 	}
 
