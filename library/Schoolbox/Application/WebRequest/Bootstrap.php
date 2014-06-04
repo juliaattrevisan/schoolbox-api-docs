@@ -237,12 +237,12 @@ class Bootstrap implements BootstrapInterface {
 
 		// Mapper notifications:
 		// They rely upon the session being injected into them, so do that.
-		//		$di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
-		//			/** @var \Alaress\Session\Session $session */
-		//			$session = $di->get('session');
-		//			$session->start();
-		//			return isset($_SESSION) ? $_SESSION : array();
-		//		});
+		$di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
+			/** @var \Alaress\Session\Session $session */
+			$session = $di->get('session');
+			$session->start();
+			return isset($_SESSION) ? $_SESSION : array();
+		});
 
 		// Template engine and functions
 		// Template loader: sets up link to templates without a namespace.
