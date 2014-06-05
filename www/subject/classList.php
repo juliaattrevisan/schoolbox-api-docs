@@ -131,7 +131,7 @@ if ($groupHandler->isStaff()) {
 			$emailObj = new Email();
 			$email = $emailObj->formatEmailFromArray($_SESSION);
 
-			if ($email) {
+			if ($email && \Cfg::get('mail_enable')) {
 				$this->setVar("REPLYTO", $email);
 				$this->setVar("CLASSEMAIL", $classEmail);
 				$this->parse('email_class_block', 'email_class');
@@ -142,7 +142,7 @@ if ($groupHandler->isStaff()) {
 
 			/* Emailing parents is a configuration
 			 */
-			if (Cfg::get('email_all_parents') == 1) {
+			if ((Cfg::get('email_all_parents') == 1) && \Cfg::get('mail_enable')) {
 				$this->setVar(array(
 					'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
 				));

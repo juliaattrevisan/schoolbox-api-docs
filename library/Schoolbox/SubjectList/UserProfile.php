@@ -172,7 +172,7 @@ class UserProfile extends SubjectListAbstract {
                     }
 
                     /* Output email all subject teachers */
-                    if ($this->getGroupHandler()->isStaff()) {
+                    if ($this->getGroupHandler()->isStaff() && \Cfg::get('mail_enable')) {
                         $this->getPage()->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                         $this->getPage()->setVar("EMAILALL", implode(',', $emailAll));
                         $this->getPage()->parse("subject_mail_block", "subject_mail");

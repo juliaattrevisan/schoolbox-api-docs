@@ -93,7 +93,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 ));
 
 				/* Don't display images in list view
-			   */
+			  	 */
 				if ($this->getConfig('displayPortraits') == 'grid') {
 					$this->parse('has_thumbnail_block', 'has_thumbnail');
 					$this->setVar('has_icon_block', '');
@@ -105,14 +105,14 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 				$this->parse('person_block', 'person', true);
 
 				/* Clear children after parsing out the parent
-			   */
+			   	 */
 				$this->setVar('has_thumbnail_block', '');
 				$this->setVar('has_icon_block', '');
 
 			}
             /* Student bulk email
-        */
-            if ($this->groupHandler->isStaff() && isset($emailall)) {
+        	 */
+            if ($this->groupHandler->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(',',$emailall));
                 $this->parse("member_email_block", "member_email");
