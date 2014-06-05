@@ -213,32 +213,6 @@ class UserQueueFactory {
 			);
 		}
 
-
-		// category bindings
-
-		// TODO REFACTOR: THIS METHOD TAKES ABOUT 400MS TO EXECUTE
-		$cats = $this->getCategoryMapper()->findForUser($user);
-
-		foreach($cats as $cat) {
-			/** @var Category $cat */
-			// category general participation
-			// *.notify.category.{id}.#
-			$bindings['category'][] = $cat->getId() . ".#";
-
-			// category admin
-			// *.notify.category.{id}.admin
-			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
-
-			if($catOwner['uid'] == $user->getId()) {
-				$bindings['category'][] = $cat->getId() . ".admin.#";
-			}
-
-			// category component bindings
-			// TODO this one is more complicated
-
-
-		}
-
 		// parental bindings TODO can this be more lightweight
 		if($roleType == Role::PARENT && $user->getExternalId() > 0 ) {
 			$childrenArray = $this->GET_DEPRECATED_EXT_USER()->getEnrolledStudents($user->getExternalId());
@@ -281,9 +255,6 @@ class UserQueueFactory {
 		// Higher access levels get lower level bindings as well.
 		$bindings['service'] = array();
 		foreach ($user->getAccessList() as $access) {
-			if ($access->getService() == UserAccess::SERVICE_HOMEPAGE) {
-				continue;
-			}
 			$baseBinding = $access->getService().'.'.$access->getItemId();
 			$accessLevel = $access->getAccessLevel();
 			if ($accessLevel >= UserAccess::ACCESS_FULL) {
@@ -296,6 +267,23 @@ class UserQueueFactory {
 				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
 			}
 		}
+
+		// Additional service bindings: pull homepage service access from synergy as well
+
+		/** @var Collection|Category[] $cats */
+		$cats = $this->getCategoryMapper()->findForUser($user);
+
+		foreach($cats as $cat) {
+			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
+
+			// it doesn't matter if any of these duplicate any created above
+			$baseBinding = UserAccess::SERVICE_HOMEPAGE.'.'.$cat->getId();
+			if($catOwner['uid'] == $user->getId()) {
+				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_FULL.'.#';
+			}
+			$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
+		}
+
 
 		return $bindings;
 	}
