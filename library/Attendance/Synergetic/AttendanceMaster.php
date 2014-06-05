@@ -236,6 +236,7 @@ class Attendance_Synergetic_AttendanceMaster {
         $result = $this->getDatabase()->executeProcedure(
                        'sptwkAttendances', array(
                                                 array('@wkAttendanceMasterSeq',$this->getAttendanceMasterSeq(), SQLINT4),
+                                                array('@HoldFlag', 0, SQLINT1),
                                                 array('@AttendanceMasterSeq', 'seq', SQLINT4, true),
                                             )
 
