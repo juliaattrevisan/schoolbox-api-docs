@@ -43,4 +43,20 @@ class Feed extends Decorator {
 		$this->sort();
 	}
 
+
+	/**
+	 * Attempt to strip the " in category" suffix from the title if it exists, since this is used in the context of the page itself
+	 *
+	 * @return array
+	 */
+	public function renderAsFeedArray() {
+		$context = $this->renderAsSitePageArray();
+		foreach($context as $id => $n) {
+			if(preg_match("`,? in <a.+</a>$`", $n['title'], $matches, PREG_OFFSET_CAPTURE)) {
+				$context[$id]['title'] = substr($n['title'], 0, $matches[0][1]);
+			}
+		}
+		return $context;
+	}
+
 } 
