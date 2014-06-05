@@ -33,8 +33,8 @@ class Synchronise_Edumate_Tigs_Strategy_Student extends Synchronise_Edumate_Tigs
 
 		// user attributes
 		$newUser['title']         = '';
-		$newUser['firstname']     = html_entity_decode($currentUser['StudentPreferred']);
-		$newUser['lastname']      = html_entity_decode($currentUser['StudentSurname']);
+		$newUser['firstname']     = html_entity_decode($currentUser['StudentPreferred'], ENT_QUOTES);
+		$newUser['lastname']      = html_entity_decode($currentUser['StudentSurname'],   ENT_QUOTES);
 		$newUser['alt_email']     = $currentUser['StudentEmail'];
 		$newUser['synergy_id']    = $currentUser['StudentID'];
 		$newUser['local_email']   = 0;
