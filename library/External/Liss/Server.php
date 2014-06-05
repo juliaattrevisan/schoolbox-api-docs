@@ -420,7 +420,7 @@ class External_Liss_Server {
 
 				/* Find the Teacher
 				 */
-				$allTeachers = $userMapper->findByColumn('synergy_id', $struct['TeacherId']->me['string']);
+				$allTeachers = $userMapper->findByColumn('synergy_id', $struct['TeacherCode']->me['string']);
 
 				/* TODO: Ram in a duff account for testing
 				 */
