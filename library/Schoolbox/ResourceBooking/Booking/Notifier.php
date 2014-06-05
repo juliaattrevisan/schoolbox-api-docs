@@ -34,7 +34,7 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @var string
      */
-    protected $slug = 'resource_booking';
+    protected $slug = NSMapper::NS_RESOURCE_BOOKING;
 
     /**
      * A router - injected for the purpose of generating URLs for resource
@@ -43,13 +43,6 @@ class Notifier extends AbstractModuleNotifier {
      * @var Router
      */
     protected $router;
-
-    /**
-     * @return string
-     */
-    protected function getSlug() {
-        return NSMapper::NS_RESOURCE_BOOKING;
-    }
 
     /**
      * {@inheritdoc}
