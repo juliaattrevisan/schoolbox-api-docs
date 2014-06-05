@@ -37,6 +37,7 @@ class Alaress_Image_Transformation_Icon extends Alaress_Image_Transformation_Abs
 			NSMapper::NS_SSTREAM            => 'chat',
 			NSMapper::NS_EOTC               => 'clock',
 			NSMapper::NS_RESOURCE_BOOKING   => 'clock',
+			NSMapper::NS_REPORT_CARD        => 'chat'
 		);
 
 		if(!in_array($size, $validSizes)) {

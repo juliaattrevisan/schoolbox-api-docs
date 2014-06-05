@@ -141,8 +141,6 @@ class CommentMapper extends Mapper {
 		));
 
 		$this->hasSoftDeleteDateField('deleted');
-		$this->registerCallback('preSave', array($this, 'preSave'));
-		$this->registerCallback('postSave', array($this, 'postSave'));
 
 	}
 
@@ -215,6 +213,11 @@ class CommentMapper extends Mapper {
 
 	}
 
+
+	/**
+	 * @deprecated why is this here?
+	 * @param $comment
+	 */
 	public function preSave($comment) {
 		// for now, nothing
 	}
@@ -222,8 +225,7 @@ class CommentMapper extends Mapper {
 	/**
 	 * Post-save callback. Send emails.
 	 *
-	 * @todo move this to pub/sub system once that is implemented
-	 *
+	 * @deprecated in favour of CommentNotifier
 	 * @param Comment $comment
 	 */
 	public function postSave($comment) {

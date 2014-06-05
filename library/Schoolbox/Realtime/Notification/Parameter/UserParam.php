@@ -19,11 +19,12 @@ class UserParam extends Param {
 	/**
 	 * Use standard vars from the user object, and default to the append stacking mode
 	 *
-	 * @param User $user
-	 * @param int $stacking
+	 * @param User   $user
+	 * @param int    $stacking
+	 * @param string $format
 	 */
-	public function __construct($user, $stacking = self::STACKING_APPEND) {
-		parent::__construct($user->formatName(), "/search/user/{$user->getId()}", $stacking);
+	public function __construct($user, $stacking = self::STACKING_APPEND, $format = null) {
+		parent::__construct($user->formatName($format), "/search/user/{$user->getId()}", $stacking);
 	}
 
 
