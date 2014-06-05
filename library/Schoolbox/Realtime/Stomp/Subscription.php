@@ -56,7 +56,7 @@ class Subscription {
 		$this->destination = "/amq/queue/".UserQueue::getUserUnreadQueueName($userId);
 
 		// subscribe to the user's unread queue and push these immediately to the Pipe Manager
-		$this->id = $this->client->subscribeWithAck($this->destination, 'client',
+		$this->id = $this->client->subscribeWithAck($this->destination, 'client-individual',
 			function ($frame, $ackResolver) use ($self, $pipeManager, $userId) {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
