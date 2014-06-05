@@ -343,6 +343,39 @@ class PortfolioWebDAV
             }
 
         }
+        else if ($site_location=='oakburn') {
+            $settings = array(
+                'baseUri' => 'http://davusers.soc.tas.edu.au/',
+                'userName' => "soc/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                if ($_SESSION['campus'][0] == '1'){
+                  $paths = array(
+                      $settings['baseUri'].'penquitestaff/' . $_SESSION['username'] . '/Documents/',
+                  );
+                } else {
+                  $paths = array(
+                      $settings['baseUri'].'elphinstaff/' . $_SESSION['username'] . '/Documents/',
+                  );
+                }
+            } else if ($groupHandler->isStudent()) {
+                if($_SESSION['year']>='6') {
+                  $paths = array(
+                      $settings['baseUri'].'penquitestudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
+                  );
+                } else {
+                  $paths = array(
+                      $settings['baseUri'].'elphinstudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
+                  );
+                }
+
+            } else {
+                return false;
+            }
+
+        }
         else if ($site_location == 'iggs'){
 
             $settings = array(
