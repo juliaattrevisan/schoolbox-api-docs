@@ -16,25 +16,9 @@ class External_User implements External_UserInterface {
 	 * @throws Exception
 	 * @param String $databaseName
 	 */
-	public function __construct ($databaseName = '') {
-		if ( empty($databaseName) ) {
-			$databaseName = Config::get('external_type');
-		}
-
-		$databaseClass = 'External_'.ucfirst($databaseName).'_User';
-
-		if ( class_exists($databaseClass, true) ) {
-			try {
-				$database = new $databaseClass;
-				$this->setDatabase( $database );
-			}
-			catch(\Schoolbox\External\Exception $e) {
-				$this->setDatabase(new External_Offline_User());
-			}
-		}
-		else {
-			$this->setDatabase(new External_Offline_User());
-		}
+	public function __construct($databaseName = '') {
+		$factory = new External_DatabaseFactory();
+		$this->setDatabase($factory->buildUserConnector($databaseName));
 	}
 
     /**

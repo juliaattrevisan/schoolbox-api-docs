@@ -20,22 +20,9 @@ class External_Ping implements External_PingInterface {
 	 * @throws Exception
 	 * @param String $databaseName
 	 */
-	public function __construct ($databaseName = '') {
-		if (empty($databaseName)) {
-			$databaseName = Config::get('external_type');
-		}
-		$databaseClass = 'External_'.ucfirst($databaseName).'_Ping';
-		if ( class_exists($databaseClass, true) ) {
-			try {
-				$this->database = new $databaseClass();
-			}
-			catch(\Schoolbox\External\Exception $e) {
-				$this->database(new External_Offline_Ping());
-			}
-		}
-		else {
-			$this->database = new External_Offline_Ping();
-		}
+	public function __construct($databaseName = '') {
+		$factory = new External_DatabaseFactory();
+		$this->database = $factory->buildPingConnector($databaseName);
 	}
 
 	public function isResponsive() {

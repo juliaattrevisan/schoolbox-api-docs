@@ -16,24 +16,9 @@ class External_Timetable implements External_TimetableInterface {
 	 * @throws Exception
 	 * @param String $databaseName
 	 */
-	public function __construct ($databaseName = '') {
-		if ( empty($databaseName) ) {
-			$databaseName = Config::get('external_type');
-		}
-
-		$databaseClass = 'External_'.ucfirst($databaseName).'_Timetable';
-
-		if ( class_exists($databaseClass, true) ) {
-			try {
-				$database = new $databaseClass;
-				$this->setDatabase( $database );
-			}
-			catch(\Schoolbox\External\Exception $e) {
-				$this->setDatabase(new External_Offline_Timetable());
-			}
-		} else {
-			$this->setDatabase(new External_Offline_Timetable());
-		}
+	public function __construct($databaseName = '') {
+		$factory = new External_DatabaseFactory();
+		$this->setDatabase($factory->buildTimetableConnector($databaseName));
 	}
 
 	/**
