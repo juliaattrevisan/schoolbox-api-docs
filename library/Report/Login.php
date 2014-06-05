@@ -14,7 +14,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $pageNum;
     private $perPage;
     private $filter;
-    private $dataResource;
 
     // visible field mapping: index => humanreadable
     private $fields = array(
@@ -48,6 +47,10 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         'before' => 'eg. July 1, 3 days ago'
     );
 
+    /**
+     * @var Database
+     */
+    protected $db;
 
     public function __construct($page) {
         $this->setGroupHandler(new Group());
@@ -64,6 +67,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
     protected function setup() {
         // set blocks
+        $this->db = Database::getInstance();
         $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
         $this->getPage()->setTitle('Login Report');
@@ -138,54 +142,70 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         $this->filter = $resultFilter;
 
         $sqlFilter = array();
-
+        $params    = array();
         foreach($resultFilter as $key => $value) {
             if(in_array($key, $this->getFilterFields())) {
-                $key = $this->db->quote($key);
-                $value = $this->db->quote($value);
-
                 // custom filter by user
-                if($key == 'user') {
-                    $sqlFilter[] = "user.username LIKE '%$value%' OR user.firstname LIKE '%$value%' OR user.lastname LIKE '%$value%'";
+                if ($key == 'user') {
+                    $sqlFilter[]     = "user.username LIKE :value OR user.firstname LIKE :value OR user.lastname LIKE :value";
+                    $params['value'] = '%'.$this->db->quoteForLike($value).'%';
                 }
-                elseif($key == 'after') {
-                    if($date = strtotime($value)) {
-                        $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "`date` >= '$date'";
+                elseif ($key == 'after') {
+                    if ($date = strtotime($value)) {
+                        $date            = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[]     = "`date` >= :after";
+                        $params['after'] = $date;
                     }
                 }
-                elseif($key == 'before') {
-                    if($date = strtotime($value)) {
-                        $date = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[] = "`date` <= '$date'";
+                elseif ($key == 'before') {
+                    if ($date = strtotime($value)) {
+                        $date             = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[]      = "`date` >= :before";
+                        $params['before'] = $date;
                     }
                 }
-                // default filter
                 else {
-                    $sqlFilter[] = "$key LIKE '%$value%'";
+                    $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
+                    $params[$key] = '%'.$this->db->quoteForLike($value).'%';
                 }
             }
         }
 
-        $sqlFilterString = count($sqlFilter) ? sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) : '';
-
-        $handler = DeprecatedDatabase::getInstance();
+        $sqlFilterString = count($sqlFilter) ?
+            sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
+            '';
 
         $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
                       FROM login_log
                       LEFT JOIN `user` ON `user`.`username` = login_log.username
                       $sqlFilterString
-                      ORDER BY $orderBy $orderDir";
+                      ORDER BY $orderBy $orderDir
+                      ";
+        if ($limit > 0) {
+            $dataQuery .= ' LIMIT :limit';
+        }
+        if ($offset > 0) {
+            $dataQuery .= ' OFFSET :offset';
+        }
+        $statement = $this->db->prepare($dataQuery);
+        foreach ($params as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+        if ($limit > 0) {
+            $statement->bindValue('limit',  $limit,  PDO::PARAM_INT);
+        }
+        if ($offset > 0) {
+            $statement->bindValue('offset', $offset, PDO::PARAM_INT);
+        }
+        $statement->execute();
 
-        $this->dataResource = $handler->query($dataQuery);
-        $this->dataCount = mysqli_num_rows($this->dataResource);
-
+        $this->dataCount = $statement->rowCount();
         if(!$this->dataCount) {
             return 0;
         }
 
         // get limited records from the resource, rather than in bulk
-        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
+        $this->dataSet = $statement;
 
         return $this->dataCount;
     }
@@ -257,7 +277,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->csvFields);
-        $exporter->setData($this->dataResource);
+        $exporter->setData($this->dataSet);
         $exporter->export('CSV');
     }
 
