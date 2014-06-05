@@ -219,7 +219,7 @@ class Notifier extends AbstractModuleNotifier {
         // Broadcast to all resource booking moderators
         $messenger->broadcastToService(
             UserAccess::SERVICE_RESOURCE_BOOKING,
-            '*',
+            0,
             UserAccess::ACCESS_FULL,
             $message,
             $key,
