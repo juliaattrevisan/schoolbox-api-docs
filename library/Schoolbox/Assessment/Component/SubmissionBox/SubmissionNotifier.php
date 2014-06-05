@@ -85,6 +85,9 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 		$studentId = $submission->getOwner()->getId();
 		$boxId = $submission->getSubmissionBox()->getId();
 
+		/** @var SubmissionMapper $mapper */
+		$mapper = $this->mapper;
+
 		switch($method) {
 			case Mapper::METHOD_CREATE: // new submission created
 
@@ -94,7 +97,7 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				}
 
 				// is this the first? or a resubmit?
-				$counts = $this->getMapper()->findCountsForSubmissionBoxes(array($boxId), $studentId);
+				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
 				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 0) {
 					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
 					break;
@@ -119,7 +122,7 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				// if we've gone from draft to not, notify submission
 				if(array_key_exists('draft', $diff) && $diff['draft'] == true) {
 					// is this the first? or a resubmit?
-					$counts = $this->getMapper()->findCountsForSubmissionBoxes(array($boxId), $studentId);
+					$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
 					if(array_key_exists($boxId, $counts) && $counts[$boxId] > 0) {
 						$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
 						break;
@@ -131,14 +134,6 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 			default:
 				throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
 		}
-	}
-
-
-	/**
-	 * @return SubmissionMapper
-	 */
-	protected function getMapper() {
-		return $this->mapper;
 	}
 
 
