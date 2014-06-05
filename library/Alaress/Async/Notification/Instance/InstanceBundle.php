@@ -80,11 +80,15 @@ class InstanceBundle {
 	/**
 	 * Returns all instances contained, indexed by destination
 	 *
+	 * @param bool $timestampOverride
 	 * @return Instance[]
 	 */
-	public function getAll() {
+	public function getAll($timestampOverride = null) {
 		$instances = array();
 		foreach($this->splStore as $instance) {
+			if(!is_null($timestampOverride)) {
+				$instance->setTime($timestampOverride);
+			}
 			$destinations = $this->splStore->offsetGet($instance);
 			foreach($destinations as $destination) {
 				// index by destination

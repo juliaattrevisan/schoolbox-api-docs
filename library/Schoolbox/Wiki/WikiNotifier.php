@@ -82,7 +82,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		foreach($wikis as $wiki) {
 			$c->merge(
-				new Collection($this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser())->getAll())
+				new Collection($this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser())->getAll($wiki->getCreated()->getUnixTimestamp()))
 			);
 		}
 

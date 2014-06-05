@@ -931,7 +931,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			WHERE
 				`sb`.`category` = :cat_id
 				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )
-				AND `sb`.`deleted` IS NULL
+				AND `sb`.`deleted` = 0
 			ORDER BY `sb`.`open_date` DESC, `sb`.`date` DESC
 			LIMIT $offset, $limit
 		");

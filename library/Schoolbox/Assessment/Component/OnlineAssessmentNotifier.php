@@ -145,8 +145,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$quizzes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($quizzes as $quiz) {
-			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll()));
-			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll()));
+			$c->merge(new Collection($this->notifyStudentOpen($quiz, $quiz->getUser())->getAll($quiz->getStart()->getUnixTimestamp())));
+			$c->merge(new Collection($this->notifyFeedClosed($quiz, $quiz->getUser())->getAll($quiz->getFinish()->getUnixTimestamp())));
 		}
 
 		return $c;
