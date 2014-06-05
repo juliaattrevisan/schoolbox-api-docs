@@ -73,7 +73,7 @@ if (is_numeric($this->arg[0])) {
 
 	//
 	// Set up the email all block (PHPLib sucks)
-	if (!empty($all_emails)) {
+	if (!empty($all_emails) && \Cfg::get('mail_enable')) {
 		$this->setVar(array(
 			'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
 			'EMAILALL' => implode(',', $all_emails),
