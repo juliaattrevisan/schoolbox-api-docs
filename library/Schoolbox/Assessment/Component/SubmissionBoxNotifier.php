@@ -10,7 +10,10 @@
 namespace Schoolbox\Assessment\Component;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -26,6 +29,9 @@ use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -34,6 +40,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserAccess;
 use Schoolbox\UserMapper;
 
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface {
@@ -240,41 +247,46 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * @var SubmissionBox $submissionBox
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentOpen($submissionBox, $user, $diff = null) {
+		$envelope = new Envelope();
+		$bob = new Builder();
+
+		// re-hydrate, because manual hydration, because fail -_-
 		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		$boxType = $submissionBox->getWorkType()->getName();
 		$boxName = $submissionBox->getName();
 
-		$authorId = $user->getId();
-		$authorName = $user->formatName();
 		$authorExtId = $user->getExternalId();
 
 		$cat = $submissionBox->getCategory();
 		$catId = $cat->getId();
-		$catName = $cat->getName();
 
 		$indefArticle = in_array(strtolower($boxType[0]), array('a','e','i','o','u')) ? 'an' : 'a';
 
-		$msg = new Message(
-			":username opened $indefArticle $boxType, :boxname, in :catname",
-			"/portrait?userId=$authorExtId&size=square32", "/submission/submissionHistory/$boxId"
-		);
+		$bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
+			->setParams(array(
+				'user' => new UserParam($user, ParameterInterface::STACKING_REPLACE),
+				'box'  => new Param($boxName, "/submission/submissionHistory/$boxId"),
+				'cat'  => new CategoryParam($cat)
+			))
+			->setHref("/submission/submissionHistory/$boxId")
+			->setIcon("/portrait?userId=$authorExtId&size=square32")
+			->setNamespace($this->getSlug())
+			->addTopic("duework.$boxId.open")
+			->addFilter('roletype', array(Role::STUDENT))
+			->setBody($submissionBox->getDescription())
+			->setByline("Due ".$submissionBox->getDueDate()->getCalendarDateTime())
+			->setSeverity(Logger::NOTICE);
 
-		$params = array(
-			'username' => array($authorName, "/search/user/$authorId"),
-			'boxname'  => array($boxName, "/submission/submissionHistory/$boxId"),
-			'catname'  => array($catName, "/homepage/$catId")
-		);
+		$envelope->broadcastToCategory($catId, UserAccess::ACCESS_READ, $bob->build());
 
-		$msgr = new Messenger();
-
-		$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.open", Logger::NOTICE, $params,
-			array('roletype' => Role::STUDENT)
-		);
-
-		return $msgr;
+		return $envelope;
 	}
 
 
