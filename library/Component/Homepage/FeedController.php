@@ -68,8 +68,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 		}
 
 		$j = 0;
-		foreach($this->feed->renderAsSitePageArray() as $n) {
-			$date = new Alaress_Date_Format($n['timestamp'], 'U');
+		foreach($this->feed->renderAsFeedArray() as $n) {
+			$date = new Alaress_Date_Format($n['time'], 'U');
 			$this->setVar(array(
 				'EVENT_HREF'     => $n['href'],
 				'EVENT_ICON'     => $n['icon'],
