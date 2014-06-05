@@ -261,6 +261,16 @@ class Instance implements JsonSerializable {
 
 
 	/**
+	 * @param int $time
+	 * @return self
+	 */
+	public function setTime($time) {
+		$this->time = (int)$time;
+		return $this;
+	}
+
+
+	/**
 	 * @return ParameterInterface[]
 	 */
 	public function getParameters() {
