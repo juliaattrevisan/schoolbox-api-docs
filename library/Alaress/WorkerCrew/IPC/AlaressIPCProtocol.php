@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew\IPC;
 
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use RuntimeException;
 
 class AlaressIPCProtocol implements ProtocolInterface {
 
@@ -69,7 +70,12 @@ class AlaressIPCProtocol implements ProtocolInterface {
 		$xpl = explode(DispatchStrategyInterface::STR_UNIT_SEPARATOR, $string);
 
 		foreach($xpl as $k => $v) {
-			$xpl[$k] = unserialize(base64_decode($v));
+			try {
+				$xpl[$k] = unserialize(base64_decode($v));
+			}
+			catch(RuntimeException $e) {
+				$xpl[$k] = '';
+			}
 		}
 
 		if(isset($command)) {

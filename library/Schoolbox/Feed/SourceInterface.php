@@ -10,29 +10,22 @@
 namespace Schoolbox\Feed;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Collection;
 
 interface SourceInterface {
 
-	const SOFT_LIMIT = 50;
+	const HARD_LIMIT = 50;
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context     - most likely a category ID or ignored
 	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
-	 * @return Collection|Item[]
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0);
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0);
 
-
-	/**
-	 * Returns the metadata pertaining to this source.
-	 * Useful to RSS
-	 *
-	 * @return mixed
-	 */
-	public function getChannelMetadata();
-} 
+}

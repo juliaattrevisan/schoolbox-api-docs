@@ -11,9 +11,23 @@
 namespace Schoolbox\Notif\Message\Instance;
 
 
+/**
+ * Class InstanceBundle
+ *
+ * @deprecated
+ * @package Schoolbox\Notif\Message\Instance
+ */
 class InstanceBundle {
 
-    /** @var Instance[] */
+	/**
+	 * @deprecated
+	 */
+	function __construct() {
+		// TODO: Implement __construct() method.
+	}
+
+
+	/** @var Instance[] */
     protected $instances;
 
     /**

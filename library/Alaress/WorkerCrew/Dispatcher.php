@@ -16,16 +16,12 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
-use Schoolbox\Realtime\Verboser;
 use SplQueue;
 
 class Dispatcher implements DispatcherInterface {
 
 	/** @var SplQueue */
 	protected $q;
-
-	/** @var int */
-	protected $qDelay;
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -39,13 +35,14 @@ class Dispatcher implements DispatcherInterface {
 	/** @var DispatchStrategyInterface */
 	protected $strat;
 
+
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param Debug $debug
 	 * @param DispatchStrategyInterface $strat
 	 */
-	function __construct($loop, $msgHandler, $debug, $strat = null) {
+	public function __construct($loop, $msgHandler, $debug, $strat = null) {
 
 		$this->strat = $strat ?: new DefaultDispatchStrategy();
 
@@ -63,12 +60,19 @@ class Dispatcher implements DispatcherInterface {
 
 		// build the queue, retrieving from storage if that's part of the strat, and execute if it contains stuff
 		$this->q = $this->strat->buildQueue();
-		$this->qDelay = $this->strat->getQueueDelay();
 
 		if($this->q->count()) {
 			$this->v->v("Queue is preloaded, draining: queue length is ".$this->q->count());
-			$this->drainQueue();
+			$this->attach($this->strat->getQueueDelay());
 		}
+	}
+
+
+	/**
+	 * Daemon is going down, try to make sure the pool dries up gracefully
+	 */
+	public function __destruct() {
+		unset($this->pool);
 	}
 
 
@@ -86,7 +90,7 @@ class Dispatcher implements DispatcherInterface {
 		$this->q->enqueue(array($identifier, $command, $data));
 		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
 
-		$this->drainQueue();
+		$this->attach($this->strat->getQueueDelay());
 	}
 
 
@@ -94,14 +98,34 @@ class Dispatcher implements DispatcherInterface {
 	 * Attempts to dequeue and dispatch all elements in the queue.
 	 * Nothing will happen if the queue is empty.
 	 */
-	protected function drainQueue() {
+	public function attach($rate = null) {
 		// notify the pool that we're engaged
 		$this->pool->dispatcherEngage();
 
+		// this came from the pool emitting ready
+		if(is_null($rate)) {
+			$rate = $this->strat->getQueueDelay();
+			$this->detach();
+		}
+
 		// if there's a timer, use it, otherwise create it
 		if(!($this->timer instanceof TimerInterface)) {
-			$this->v->v("Creating timer to fire at {$this->qDelay}ms intervals", '+');
-			$this->timer = $this->loop->addPeriodicTimer($this->qDelay / 1000, array($this, 'dispatch'));
+			$this->v->v("Creating timer to fire at {$rate}ms intervals", '+');
+			$this->timer = $this->loop->addPeriodicTimer($rate / 1000, array($this, 'dispatch'));
+		}
+	}
+
+
+	/**
+	 * Detaches the Dispatcher from the loop
+	 */
+	protected function detach() {
+		// don't try to remove a timer that isn't there
+		if($this->timer instanceof TimerInterface) {
+			$this->v->v("Detaching dispatcher (queue length is {$this->q->count()})",'-');
+			$this->pool->dispatcherIdle();
+			$this->loop->cancelTimer($this->timer);
+			$this->timer = null;
 		}
 	}
 
@@ -129,8 +153,6 @@ class Dispatcher implements DispatcherInterface {
 			return;
 		}
 
-//		$this->v->v("Dispatching...");
-
 		/**
 		 * @var object $identifier
 		 * @var string $cmd
@@ -141,6 +163,7 @@ class Dispatcher implements DispatcherInterface {
 		// decide whether to delegate this to a Worker, or return it straight into the handler
 		if(!in_array($cmd, $this->pool->getSupportedActions())) {
 			try {
+				// we obtained the data from q::bottom() so just drop the reference
 				$this->q->dequeue();
 				$this->v->v("Internally handling '$cmd'");
 				$this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
@@ -149,18 +172,23 @@ class Dispatcher implements DispatcherInterface {
 				// we need to catch any and all exception here, lest we explode our reactor
 				$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
 			}
+			// regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
+			$this->strat->pdequeue($identifier);
 			return;
 		}
 
 		// all workers are tied up and ceiling has been reached - please wait
 		if(!$this->pool->canAccept()) {
-//			$this->v->v("Cannot accept right now, will try again", '*');
+			// detach and wait for pool to notify us of a free worker
+			$this->detach();
+			$this->pool->once('ready', array($this, 'attach'));
+			$this->attach($this->strat->getWorkerIdleTimeout());
 			return;
 		}
 
-
 		// pop the task from the queue and run the next task
 		try {
+			// we obtained the data from q::bottom() so just drop the reference
 			$this->q->dequeue();
 			$pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
 			$this->v->v("Command '$cmd' pushed to worker {{$pid}}", '>');
@@ -172,10 +200,12 @@ class Dispatcher implements DispatcherInterface {
 
 	}
 
+
 	/**
 	 * @return array
 	 */
 	public function getPoolStatus() {
 		return $this->pool->getStatus();
 	}
-} 
+
+}

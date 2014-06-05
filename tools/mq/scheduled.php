@@ -1,11 +1,13 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Cli\Debug;
+use Aura\Di;
+use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use React\EventLoop\Factory;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
-use Schoolbox\Realtime\Verboser;
 
 /**
  * The Schedule Daemon.
@@ -16,48 +18,42 @@ use Schoolbox\Realtime\Verboser;
  * @version     SVN: $Id$
  */
 
-require_once('../socket/mini-bootstrap.php');
 
 $opts = getopt('v');
 
-$verbose = isset($opts['v']);
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-if($verbose) {
-	error_reporting(E_ALL);
-
-	echo <<<EOL
-
- ||
- || Schoolbox Schedule Daemon
- ||
+$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
+	'verbose' => isset($opts['v']),
+	'errors'  => E_ALL
+));
 
 
-EOL;
-}
 
-$verboser = new Verboser($verbose ? STDOUT : null);
+// CREATE SCHEDULER APP
+$kernel->run(function($di, $loop, $debug, $opts) {
+	/**
+	 * @var Di\Container $di
+	 * @var LoopInterface $loop
+	 * @var Debug $debug
+	 * @var array $opts
+	 */
 
-$loop = Factory::create();
+	try {
+		$sched = new Scheduler($loop, new SchedulerDispatchStrategy(), $debug);
 
-// CREATE SCHEDULER
-try {
-	$sched = new Scheduler($loop, new SchedulerDispatchStrategy(), $verboser);
+		// read STDIN in the stream loop so we can communicate with it in dev mode
+		$stdin = new \React\Stream\Stream(STDIN, $loop);
+		$stdin->on('data', function($data) use ($sched) {
+			$sched->_stdincmd($data);
+		});
+	}
+	catch(AMQPRuntimeException $e) {
+		$debug->v("Unable to connect to RabbitMQ: server is offline.",'!');
+		$n = new Notif(Notif::TOPIC_NOTIFICATION);
+		$n->alert('RabbitMQ is offline');
+		throw $e;
+	}
 
-	// read STDIN in the stream loop so we can communicate with it in dev mode
-	$stdin = new \React\Stream\Stream(STDIN, $loop);
-	$stdin->on('data', function($data) use ($sched) {
-		$sched->_stdincmd($data);
-	});
-
-}
-catch(AMQPRuntimeException $e) {
-	$verboser->v("Unable to connect to RabbitMQ: server is offline.",'!');
-	$n = new \Schoolbox\Notif\Notif(\Schoolbox\Notif\Notif::TOPIC_NOTIFICATION);
-	$n->alert('RabbitMQ is offline');
-	exit;
-}
-
-
-$loop->run();
-
-$verboser->v("Schedule daemon terminating.");
+});

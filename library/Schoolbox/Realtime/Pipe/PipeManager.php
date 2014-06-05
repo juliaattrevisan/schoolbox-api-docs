@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\ClientInterface as PredisClientInterface;
@@ -21,7 +22,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
-use Schoolbox\Notif\Message\Decorator;
+use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
 use Schoolbox\Realtime\Stomp\SubscriptionException;
@@ -216,21 +217,20 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 					/** @var Timer $timer */
 					// the timer contains the data to be processed
 					$self->v("Spawning worker to push cache", '>');
-					$data = $timer->getData();
-					$self->taskDispatcher->enqueue($pipe, 'push', $data);
+					// run the instances through a decorator
+					$decorator = new Decorator();
+					$decorator->appendInstances($timer->getData());
+					// enqueue to be dispatched
+					$self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
 				}
 			);
 		}
 
 		$formatted = json_decode($message->body, true);
+		$instance = Instance::jsonUnserialize($formatted['message']);
+		$hash = sha1($formatted['message']);
 
-		$targeted = unserialize($formatted['message']);
-		$decor = new Decorator($targeted);
-
-		$output = $decor->formatArray(true);
-		$output['id'] = $message->get('message_id');
-
-		$this->pushTransactions[$userId]->put($output['id'], $output);
+		$this->pushTransactions[$userId]->put($hash, $instance);
 
 		return true;
 	}

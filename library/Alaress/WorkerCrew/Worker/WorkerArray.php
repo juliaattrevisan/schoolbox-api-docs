@@ -11,17 +11,34 @@ namespace Alaress\WorkerCrew\Worker;
 
 
 use OutOfBoundsException;
+use RuntimeException;
 
 class WorkerArray implements WorkerBundleInterface {
 
 	/** @var Worker[] */
 	protected $workers = array();
 
+
 	/**
-	 * @param int $pid
+	 * Will workers gracefully
+	 */
+	public function __destruct() {
+		foreach($this->workers as $pid => $worker) {
+			unset($this->workers[$pid]);
+		}
+		unset($this->workers);
+	}
+
+
+	/**
+	 * @param int    $pid
 	 * @param Worker $worker
+	 * @throws RuntimeException
 	 */
 	public function attach($pid, $worker) {
+		if(isset($this->workers[$pid])) {
+			throw new RuntimeException("Cannot redeclare PID $pid");
+		}
 		$this->workers[$pid] = $worker;
 	}
 
@@ -29,6 +46,7 @@ class WorkerArray implements WorkerBundleInterface {
 	 * @param int $pid
 	 */
 	public function detach($pid) {
+//		echo "MORTON REPORTS DETACHMENT OF $pid\n";
 		unset($this->workers[$pid]);
 	}
 
@@ -39,7 +57,7 @@ class WorkerArray implements WorkerBundleInterface {
 		foreach($this->workers as $pid => $worker) {
 			// use bitwise comparison so $status can be things like (Worker::ENDED | Worker::ERROR)
 			if($this->bitwiseMatch($worker->getStatus(), $status)) {
-				unset($pid);
+				$this->detach($pid);
 			}
 		}
 	}
@@ -145,11 +163,11 @@ class WorkerArray implements WorkerBundleInterface {
 		$status = array();
 
 		$list = array(
-			0x1  => 'READY',
-			0x2  => 'BUSY',
-			0x4  => 'DONE',
-			0x8  => 'ENDED',
-			0x10 => 'ERROR',
+			Worker::READY => 'READY',
+			Worker::BUSY  => 'BUSY',
+			Worker::DONE  => 'DONE',
+			Worker::ENDED => 'ENDED',
+			Worker::ERROR => 'ERROR',
 		);
 
 		foreach($this->workers as $pid => $w) {

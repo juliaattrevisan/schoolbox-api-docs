@@ -13,6 +13,7 @@ namespace Alaress\WorkerCrew;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
+use Evenement\EventEmitter;
 use Exception;
 use InvalidArgumentException;
 use React\EventLoop\LoopInterface;
@@ -26,7 +27,7 @@ use UnexpectedValueException;
  * Class Pool
  * @package AlaressWorkerCrew
  */
-class Pool {
+class Pool extends EventEmitter {
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -38,10 +39,11 @@ class Pool {
 	protected $workers;
 
 	/** @var SplObjectStorage */
-	protected $listeners;
+	protected $instreams;
 
 	/** @var Debug */
 	protected $debug;
+
 
 	/**
 	 * @param LoopInterface $loop
@@ -53,9 +55,17 @@ class Pool {
 		$this->loop = $loop;
 		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
-		$this->listeners = new SplObjectStorage();
+		$this->instreams = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
 		$this->debug = $debug;
+	}
+
+
+	/**
+	 * Kill workers gracefully
+	 */
+	public function __destruct() {
+		unset($this->workers);
 	}
 
 
@@ -94,6 +104,7 @@ class Pool {
 	 * @throws RuntimeException
 	 */
 	protected function attachWorker() {
+		$this->debug->v("Attaching worker to {$this->poolingStrat->getName()} pool", '+');
 		$cmd = $this->poolingStrat->getCommand();
 
 		$descriptorSpec = array(
@@ -126,7 +137,7 @@ class Pool {
 		$instream->on('data',  array($this, 'onData'));
 		$instream->on('close', array($this, 'onClose'));
 
-		$this->listeners->attach($instream, $pid);
+		$this->instreams->attach($instream, $pid);
 
 		return $pid;
 
@@ -154,7 +165,7 @@ class Pool {
 	 */
 	public function onData($data, $stream) {
 		try {
-			$pid = $this->listeners->offsetGet($stream);
+			$pid = $this->instreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
@@ -186,26 +197,33 @@ class Pool {
 					->appendData($data)
 					->markTaskComplete();
 
+				// worker reports being finished, so handle the response it came back with
 				try {
+					// pass to the registered response handler
 					$this->msgHandler->handleResponse(
 						$worker->getTask()->getIdentifier(),
 						$worker->getTask()->getCommand(),
 						$this->poolingStrat->decodeRecords($worker->getTask()->getData(false))
 					);
-
-					$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
-
 				}
 				catch(Exception $e) {
 					// your reactor will explode if you don't catch exceptions coming from your response handler
 					$this->poolingStrat->handleException($e, $this->debug);
 				}
+
+				// regardless of whether or not the handling of the response succeeded, we need to ditch this message
+				$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
 				break;
 
 			case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
 				$this->debug->v("Worker $pid killed");
 				$worker->setStatus(Worker::ENDED);
 				break;
+		}
+
+		// if we can accept, emit READY (to be caught by dispatcher)
+		if($this->canAccept()) {
+			$this->emit('ready');
 		}
 	}
 
@@ -215,12 +233,13 @@ class Pool {
 	 */
 	public function onClose($stream) {
 		try {
-			$pid = $this->listeners->offsetGet($stream);
+			$pid = $this->instreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
 			return;
 		}
 
+		$this->debug->v("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
 	}
 
@@ -271,7 +290,7 @@ class Pool {
 	 *   0 if none are available but it is permissible to create one, or
 	 *   -1 if none are available, and no more may be spawned right now.
 	 *
-	 * @param Worker[] $workers
+	 * @param WorkerBundleInterface $workers
 	 * @param int $remainingTaskCount
 	 * @return int
 	 */

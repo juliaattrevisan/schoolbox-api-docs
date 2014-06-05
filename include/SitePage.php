@@ -1,11 +1,16 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
-
 class SitePage extends Page {
     private $ajax;
 
     private $lite;
+
+    /**
+     * The dependency injection container, injected into SitePage!
+     *
+     * @var Aura\Di\Container
+     */
+    protected $di;
 
     /**
      * List of arguments passed in URL
@@ -24,6 +29,22 @@ class SitePage extends Page {
         }
 
         $this->setSite();
+    }
+
+    /**
+     * @param  Aura\Di\Container $di
+     * @return $this
+     */
+    public function setDi($di) {
+        $this->di = $di;
+        return $this;
+    }
+
+    /**
+     * @return Aura\Di\Container
+     */
+    public function getDi() {
+        return $this->di;
     }
 
     /**
@@ -249,6 +270,7 @@ class SitePage extends Page {
             'WEBSOCKET_PORT' => $this->getWebsocketPort(),
 	        'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
 	        'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?: '',
+	        'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 

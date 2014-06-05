@@ -543,9 +543,10 @@ class Controller extends Base {
         );
 
         // Pass event to the resource outputter, and deal with its peculiarities
-        // No you do not need a sitepage, go away
         // TODO make Calendar_Event_Collection and Calendar_Event_Type_Abstract implement JsonSerializable
-        $renderer = new \Calendar_Event_Type_ResourceBooking_Renderer_Javascript(null);
+        $renderer = new \Calendar_Event_Type_ResourceBooking_Renderer_Javascript(
+            $this->getDi()->get('sitePage')
+        );
         ob_start();
         foreach ($events as $event) {
             $renderer->visit($event);

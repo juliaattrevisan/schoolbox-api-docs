@@ -39,4 +39,4 @@ $msgr = $n->$method(
 	\Schoolbox\UserMapper::getInstance()->findById('151')
 );
 
-echo $msgr->hasMessages() ? "Messages returned\n" : "No messages returned\n";
+echo $msgr->isEmpty() ? "No messages returned\n" : "Messages returned\n";

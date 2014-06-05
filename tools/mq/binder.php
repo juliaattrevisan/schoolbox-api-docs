@@ -38,9 +38,7 @@ $uMap = \Schoolbox\UserMapper::getInstance();
 
 $userCollection = $uMap->findAll();
 
-$mqConnector = new \Schoolbox\Notif\MQ\Connector();
-
-$qFactory = new \Schoolbox\Notif\Queue\UserQueueFactory($mqConnector);
+$qFactory = new \Schoolbox\Notif\Queue\UserQueueFactory();
 
 $userCount = $userCollection->count();
 $countLen = strlen("$userCount");

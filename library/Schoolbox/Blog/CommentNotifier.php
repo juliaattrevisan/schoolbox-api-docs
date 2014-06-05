@@ -10,10 +10,10 @@
 namespace Schoolbox\Blog;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -73,22 +73,27 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	}
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
-	 * @return Collection|Item[]
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+		$c = new Collection();
+
+		// be sure the target method exists
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
 
 		/** @var Collection|Comment[] $comments */
 		$comments = $this->mapper->findForFeed($context, $limit, $offset);
 
-		$c = new Collection();
 		foreach($comments as $comment) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyCommented($roleType, $comment, $comment->getOwner()), $comment->getCreated()->getUnixTimestamp()));
+			$c->merge(new Collection($this->notifyCommented($roletype, $comment, $comment->getOwner())->getAll()));
 		}
 		return $c;
 	}

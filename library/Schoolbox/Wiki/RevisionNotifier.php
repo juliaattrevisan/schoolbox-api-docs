@@ -10,10 +10,10 @@
 namespace Schoolbox\Wiki;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -60,24 +60,30 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	}
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
 	 * @param int $context     - most likely a category ID or ignored
-	 * @param string $roleType - the roletype of the user for whom this feed is being generated
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
-	 * @return Collection|Item[]
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roleType, $limit = self::SOFT_LIMIT, $offset = 0) {
-		/** @var Revision[]|Collection $revisions */
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
+		$c = new Collection();
+
+		// be sure the target method exists
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
+
+		/** @var Collection|Revision[] $revisions */
 		$revisions = $this->mapper->findForFeed($context, $limit, $offset);
 
 		$c = new Collection();
 		foreach($revisions as $revision) {
-			$c->merge(Feed::getItemsFromMessenger(
-				$this->notifyStudentRevised($revision, $revision->getUser()),
-				$revision->getCreated()->getUnixTimestamp()
-			));
+			$c->merge(
+				new Collection($this->notifyRevised($roletype, $revision, $revision->getUser())->getAll())
+			);
 		}
 		return $c;
 	}
@@ -118,11 +124,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		$msg = new Message(
 			':author revised the wiki :title in :catname',
 			"/portrait.php?userId=$authorExtId&size=square32",
-			"/homepage/$categoryId",
-			array(
-				'subtitle',
-				'abstract'
-			)
+			"/homepage/$categoryId"
 		);
 
 		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$revisionId.created", Logger::INFO, array(

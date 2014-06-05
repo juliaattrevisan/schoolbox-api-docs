@@ -10,22 +10,23 @@
 namespace Schoolbox\Assessment\Component;
 
 
-use Alaress\Scheduler\Trigger\BlankTrigger;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -63,6 +64,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	/** @var RoleMapper */
 	protected $roleMapper;
 
+	/** @var ReturnedWorkMapper */
+	protected $returnedWorkMapper;
+
 	/** @var \User */
 	protected $_DEPRECATED_USER_HANDLER;
 
@@ -81,6 +85,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 		$this->submissionMapper = SubmissionMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
 		$this->roleMapper = RoleMapper::getInstance();
+		$this->returnedWorkMapper = ReturnedWorkMapper::getInstance();
 
 		$this->_DEPRECATED_USER_HANDLER = new \User();
 		$this->_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
@@ -164,15 +169,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context - most likely a category ID or ignored
-	 * @param string $roletype
-	 * @param int $limit - how many messages to retrieve
-	 * @param int $offset - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		$c = new Collection();
 
 		// if parents aren't allowed to see due work, return an empty collection
@@ -180,12 +185,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			return $c;
 		}
 
+		// be sure the target method exists
+		if(!$this->mapper instanceof FeedableMapperInterface) {
+			return $c;
+		}
+
 		/** @var Collection|SubmissionBox[] $boxes */
 		$boxes = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($boxes as $box) {
-			$c->merge(Feed::getItemsFromMessenger($this->notifyStudentOpen($box, $box->getOwner()), $box->getOpenDate()->getUnixTimestamp()));
-			$c->merge(Feed::getItemsFromMessenger($this->notifyFeedClosed($box, $box->getOwner()), $box->getDueDate()->getUnixTimestamp()));
+			$c->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll()));
+			$c->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll()));
 		}
 
 		return $c;
@@ -216,7 +226,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 		}
 
 		return $unsubmittedCollection;
-
 	}
 
 
@@ -280,17 +289,38 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyStudentUpdated($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
-		// discard all update notifications if the submissionbox isn't open
+		// discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
 		$openStamp = $submissionBox->getOpenDate()->getUnixTimestamp();
 		$closeStamp = $submissionBox->getDueDate()->getUnixTimestamp();
 		$now = time();
 
-		if($openStamp > $now || $closeStamp < $now) {
+		// if the box hasn't even opened yet, we don't want to know about it at all
+		if($openStamp > $now) {
 			return $msgr;
 		}
 
-		// if there's no actual difference
-		if(!count($diff)) {
+		// INCREASE in mark visibility (box can be closed in this instance)
+		// doesn't actually create messages, just triggers for others to be created
+		if(isset($diff['markVisibility'])) {
+			list($new, $old) = $diff['markVisibility'];
+			if($new > $old) {
+				// for anyone who has marks given, raise the duework.returned notification
+				/** @var Collection|ReturnedWork[] $returns */
+				$returns = $this->returnedWorkMapper->findByColumn('box_id', $submissionBox->getId());
+				foreach($returns as $return) {
+					// simulate a save event, so as to spawn notifications for returned work
+					$n = new Notif(Notif::TOPIC_APPLICATION);
+					$n->notice(serialize(new Event(
+						$return->getMarker(), Mapper::METHOD_CREATE,
+						$return, $this->returnedWorkMapper, null
+					)));
+				}
+			}
+			unset($diff['markVisibility']);
+		}
+
+		// if the box is closed, or there's no remaining diff, we're done here
+		if($closeStamp < $now || !count($diff)) {
 			return $msgr;
 		}
 
@@ -309,10 +339,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 		/* use the diff to establish what changed */
 
-
 		// renamed
 		if(isset($diff['name'])) {
-
 			// parameterised text, link and icon
 			$msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
 
@@ -330,8 +358,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 			unset($diff['name']);
 		}
-
-
 
 		// extended or shortened
 		if(isset($diff['dueDate'])) {
@@ -359,8 +385,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			unset($diff['dueDate']);
 		}
 
-
-
 		// changed accepting online submissions
 		if(isset($diff['acceptOnline'])) {
 			if($submissionBox->getAcceptOnline()) {
@@ -385,9 +409,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			unset($diff['acceptOnline']);
 		}
 
-
 		// if none of the above apply, but there are changes, just be generic
-		if(count($diff) && !$msgr->hasMessages()) {
+		if(count($diff) && $msgr->isEmpty()) {
 			$msg = new Message(":author updated :boxname in :catname", $icon, $href);
 
 			$msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,

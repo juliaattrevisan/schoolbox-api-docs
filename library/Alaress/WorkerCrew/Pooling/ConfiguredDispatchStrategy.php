@@ -39,6 +39,16 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
 
 
 	/**
+	 * Get the name of the strategy currently being used
+	 *
+	 * @return string
+	 */
+	public function getName() {
+		return 'Configured';
+	}
+
+
+	/**
 	 * Return:
 	 *   the PID of an available worker,
 	 *   0 if none are available but it is permissible to create one, or

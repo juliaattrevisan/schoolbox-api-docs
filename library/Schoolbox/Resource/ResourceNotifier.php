@@ -10,10 +10,9 @@
 namespace Schoolbox\Resource;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\Item;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
@@ -149,9 +148,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param int $limit       - how many messages to retrieve
 	 * @param int $offset      - by default, most recent
 	 * @param string $filter   - optionally limit to a particular kind of resource
-	 * @return Collection|Item[]
+	 * @return Collection|Instance[]
 	 */
-	protected function getFeedInternal($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0, $filter) {
+	protected function getFeedInternal($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0, $filter) {
 		$logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
 
 		$c = new Collection();
@@ -160,18 +159,17 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 			try {
 				$resource = $log->getObject();
-				$stamp = $log->getTimestamp()->getUnixTimestamp();
 				$user = $log->getUser();
 
 				switch($log->getAction()) {
 					case LogMapper::ACTION_CREATE:
-						$c->merge(Feed::getItemsFromMessenger($this->notifyCreated($roletype, $resource, $user), $stamp));
+						$c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll()));
 						break;
 					case LogMapper::ACTION_UPDATE:
-						$c->merge(Feed::getItemsFromMessenger($this->notifyUpdated($roletype, $resource, $user), $stamp));
+						$c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll()));
 						break;
 					case LogMapper::ACTION_DELETE:
-						$c->merge(Feed::getItemsFromMessenger($this->notifyDeleted($roletype, $resource, $user), $stamp));
+						$c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll()));
 						break;
 				}
 			}
@@ -354,6 +352,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
+	 * @return Messenger
 	 */
 	public abstract function notifyCreated($roletype, $resource, $author, $diff = null);
 
@@ -362,6 +361,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
+	 * @return Messenger
 	 */
 	public abstract function notifyDeleted($roletype, $resource, $author, $diff = null);
 

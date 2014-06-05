@@ -1,0 +1,111 @@
+<?php
+ /**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+
+namespace Schoolbox\Realtime\Notification;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Instance\InstanceBundle;
+use Schoolbox\UserAccess;
+
+/**
+ * An envelope contains notifications...right?
+ * Why is naming things so hard -_-
+ *
+ * This class supersedes Messenger
+ *
+ * Class Envelope
+ *
+ * @package Schoolbox\Realtime\Notification
+ */
+class Envelope extends InstanceBundle {
+
+	/**
+	 * @param int $service
+	 * @param int $id
+	 * @param int $accessLevel
+	 * @param Instance $instance
+	 */
+	public function broadcastToService($service, $id, $accessLevel, $instance) {
+		$this->bind("service.$service.$id.$accessLevel", $instance);
+	}
+
+	/**
+	 * @param int $catId
+	 * @param int $accessLevel
+	 * @param Instance $instance
+	 */
+	public function broadcastToCategory($catId, $accessLevel, $instance) {
+		$this->broadcastToService(UserAccess::SERVICE_HOMEPAGE, $catId, $accessLevel, $instance);
+	}
+
+
+	/**
+	 * @param int $campusId
+	 * @param Instance $instance
+	 */
+	public function broadcastToCampus($campusId, $instance) {
+		$this->bind("campus.$campusId", $instance);
+	}
+
+	/**
+	 * @param int $roleId
+	 * @param Instance $instance
+	 */
+	public function broadcastToRole($roleId, $instance) {
+		$this->bind("role.$roleId", $instance);
+	}
+
+	/**
+	 * @param string $roleType
+	 * @param Instance $instance
+	 */
+	public function broadcastToRoleType($roleType, $instance) {
+		$this->bind("roletype.$roleType", $instance);
+	}
+
+	/**
+	 * @param int $houseId
+	 * @param Instance $instance
+	 */
+	public function broadcastToHouse($houseId, $instance) {
+		$this->bind("house.$houseId", $instance);
+	}
+
+	/**
+	 * @param int $resHouseId
+	 * @param Instance $instance
+	 */
+	public function broadcastToResidentialHouse($resHouseId, $instance) {
+		$this->bind("reshouse.$resHouseId", $instance);
+	}
+
+	/**
+	 * @param Instance $instance
+	 */
+	public function broadcastToSuperusers($instance) {
+		$this->bind("superuser", $instance);
+	}
+
+	/**
+	 * @param int $userId
+	 * @param Instance $instance
+	 */
+	public function targetToUser($userId, $instance) {
+		$this->bind("user.$userId", $instance);
+	}
+
+	/**
+	 * @param int $studentId
+	 * @param Instance $instance
+	 */
+	public function targetToParent($studentId, $instance) {
+		$this->bind("parent.$studentId", $instance);
+	}
+
+} 

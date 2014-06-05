@@ -76,17 +76,6 @@ class TwigMailer extends AbstractMailer {
 	 * @return string
 	 */
 	protected function composeHTML() {
-		// dump render to file
-//		$data = $this->twig->render($this->templateFilename, $this->context);
-//		$fp = fopen(SITE_root.'/data/cache/latest.html', 'w');
-//		fputs($fp, $data);
-//		fclose($fp);
-
-		// dump context to file
-//		$fp = fopen(SITE_root . '/data/cache/context.json', 'w');
-//		fputs($fp, json_encode($this->context));
-//		fclose($fp);
-
 		return $this->rendercache = $this->twig->render($this->templateFilename, $this->context);
 	}
 

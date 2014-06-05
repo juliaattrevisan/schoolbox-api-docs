@@ -19,6 +19,12 @@ use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\InstantTrigger;
 use Serializable;
 
+/**
+ * Class TargetedMessage
+ *
+ * @deprecated
+ * @package Schoolbox\Notif\Message\External
+ */
 class TargetedMessage implements Serializable {
 
     const MATCH_PARAMS     = 0;
@@ -38,6 +44,7 @@ class TargetedMessage implements Serializable {
 	protected $namespace = 'activity';
 
 	/**
+	 * @deprecated
 	 * @param Notif $notif
 	 * @param Message $body
 	 * @param Instance $instance

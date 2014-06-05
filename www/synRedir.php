@@ -1,6 +1,6 @@
 <?php
 /* Script to automatically login to synergetic portal based on existing login creditials */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
 $page = new SitePage;
 $userHandler = new User;
 $groupHandler = new Group;

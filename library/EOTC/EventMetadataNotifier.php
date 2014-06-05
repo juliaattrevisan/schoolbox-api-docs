@@ -61,7 +61,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		// subconstructor: load any mapper dependencies etc. here
-		$this->namespace = NSMapper::getInstance()->findOneBySlug($this->getSlug());
 	}
 
 	/**
@@ -134,7 +133,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		/** @var Collection|int[] $moderatorCollection */
 		$moderatorCollection = new Collection(EventPermissionMapper::getInstance()->findByColumnList(array(
 			'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-			'status_id' => $eventMetadata->getStatus()
+			'status_id' => $eventMetadata->getStatus() instanceof EventStatus ? $eventMetadata->getStatus()->getId() : $eventMetadata->getStatus()
 		))->getColumnValues('userId'));
 
 		$icon = "/portrait.php?size=square32&userId=".$applicant->getExternalId();
@@ -189,7 +188,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		// TODO this does not presently cover resource booking moderators or final approvers (they don't exist in the table)
 		$moderatorCollection = new Collection(EventPermissionMapper::getInstance()->findByColumnList(array(
 			'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-			'status_id' => $eventMetadata->getStatus()
+			'status_id' => $eventMetadata->getStatus() instanceof EventStatus ? $eventMetadata->getStatus()->getId() : $eventMetadata->getStatus()
 		))->getColumnValues('userId'));
 
 		$moderatorIds = $moderatorCollection->getColumnValues('id');

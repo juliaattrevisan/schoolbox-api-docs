@@ -15,6 +15,7 @@
             readall:   '#msg-mar',
 
             prefetch:  5,
+            maxstack:  3,
             debug:     false,
             domwait:   1000,
             transport: 'socket',
@@ -120,11 +121,11 @@
                         var data = toInsert[i];
                         id = data.id;
 
-                        var icon = data.body.icon;
-                        var href = data.body.href;
+                        var icon = data.icon;
+                        var href = data.href;
 
                         var status = data.status;
-                        var message = applyTokens(data.body.body, data.params);
+                        var message = applyTokens(data.body, data.params);
                         var timestamp = data.timestamp;
 
                         var li = msgLiTpl.clone();
@@ -187,12 +188,47 @@
              */
             function applyTokens(string, tokens) {
                 $.each(tokens, function(token, value) {
-                    if(typeof value == 'object') {
-                        value = value[0];
+
+                    // arrange instance into an array so they can be sorted
+                    var instances = [];
+
+                    // insert instances into temp array to allow sorting by time
+                    var time;
+                    for(time in value) {
+                        var v = value[time];
+                        v.time = time;
+                        instances.push(v);
                     }
-                    string = string.replace(':'+token, '<b>'+value+'</b>');
+
+                    instances.sort(function(a,b) {
+                        // sort descending by timestamp (which will give highest precedence to most recent)
+                        return (a.time == b.time ? 0 : (a.time < b.time ? 1 : -1));
+                    });
+
+                    var i, stack = [];
+                    for(i = 0; i < instances.length; ++i) {
+                        if(instances[i].mode < 0) {
+                            if(i == 0) {
+                                stack = [instances[i].text];
+                            }
+                        }
+                        else if(instances[i].mode > 0) {
+                            stack.push(instances[i].text);
+                        }
+                        else {
+                            stack = [instances[i].text];
+                        }
+                    }
+
+                    if(stack.length > settings.maxstack) {
+                        // trim
+                        var excess = stack.length - settings.maxstack + 1;
+                        stack = [stack[0], stack[1], excess + ' others'];
+                    }
+
+                    string = string.replace(':'+token, '<b>' + stack.join('</b>, <b>') + '</b>');
                 });
-                return string;
+                return string.replaceLast('</b>,', '</b> and');
             }
 
 
@@ -286,7 +322,46 @@
                 if(settings.debug) { console.log('Message from server: parsing fetch'); }
                 $.each(data, function(msgId, amqpMsg) {
                     // put message in messages object, override if message already existed (ensure uniqueness)
-                    messages[msgId] = amqpMsg;
+                    if(typeof messages[msgId] == 'undefined') {
+                        // not previously set, just insert
+                        messages[msgId] = amqpMsg;
+                    }
+                    // check the titles match
+                    else if(messages[msgId].body == amqpMsg.body) {
+                        // get the existing params and status
+                        var params = messages[msgId].params;
+                        var status = messages[msgId].status;
+
+                        // override the base message data
+                        messages[msgId] = amqpMsg;
+
+                        // deal with param stacking
+                        $.each(amqpMsg.params, function(token, paramSet) {
+                            $.each(paramSet, function(time, param) {
+                                switch(param.mode) {
+                                    case -1:
+                                        // IGNORE: do nothing
+                                        break;
+                                    case 0:
+                                        // REPLACE: overwrite
+                                        params[token] = {};
+                                        params[token][time] = param;
+                                        break;
+                                    case 1:
+                                        // APPEND: stack
+                                        params[token][time] = param;
+                                        break;
+                                }
+                            });
+                        });
+
+                        // reinsert revised param list
+                        messages[msgId].params = params;
+
+                        // preserve previous status (since this is fetch, not push)
+                        messages[msgId].status = status;
+
+                    }
                 });
                 $(self).data('message-count', messages.length);
                 clearTimeout(domTimeout);
@@ -483,5 +558,19 @@
         onopen    : function(e) {},
         onclose   : function(e) {}
     };
+
+
+    // declare string functions (courtesy of http://stackoverflow.com/a/2729694/1877343)
+    if(!String.prototype.reverse) {
+        String.prototype.reverse = function () {
+            return this.split('').reverse().join('');
+        };
+    }
+
+    if(!String.prototype.replaceLast) {
+        String.prototype.replaceLast = function (what, replacement) {
+            return this.reverse().replace(new RegExp(what.reverse()), replacement.reverse()).reverse();
+        };
+    }
 
 } (jQuery));

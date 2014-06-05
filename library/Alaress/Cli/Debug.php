@@ -47,48 +47,52 @@ class Debug {
 	 */
 	public function v($message, $char = ' ') {
         if(!is_null($this->stream)) {
+	        try {
+	            $c = '';
 
-            $c = '';
+	            switch($char) {
+	                case '!': $c = '1;31'; break;
+	                case '?': $c = '0;33'; break;
+	                case '+': $c = '0;32'; break;
+	                case '-': $c = '0;34'; break;
+	                case '*': $c = '0;31'; break;
+	                case '>':
+	                case '<': $c = '1;37'; break;
+	            }
 
-            switch($char) {
-                case '!': $c = '1;31'; break;
-                case '?': $c = '0;33'; break;
-                case '+': $c = '0;32'; break;
-                case '-': $c = '0;34'; break;
-                case '*': $c = '0;31'; break;
-                case '>':
-                case '<': $c = '1;37'; break;
-            }
+	            $str = array(
+	                '[%s]' => $char
+	            );
 
-            $str = array(
-                '[%s]' => $char
-            );
+	            foreach($this->visible as $field) {
+	                $str[$this->formats[$field]] = $this->getValueFor($field);
+	            }
 
-            foreach($this->visible as $field) {
-                $str[$this->formats[$field]] = $this->getValueFor($field);
-            }
+	            $format = sprintf("%s%s => %s%s\n",
+	                $c ? "\033[{$c}m" : '',
+	                implode(array_keys($str)),
+	                $message,
+	                $c ? "\033[0m" : ''
+	            );
 
-            $format = sprintf("%s%s => %s%s\n",
-                $c ? "\033[{$c}m" : '',
-                implode(array_keys($str)),
-                $message,
-                $c ? "\033[0m" : ''
-            );
+	            $args = array($format);
 
-            $args = array($format);
+	            foreach($str as $val) {
+	                if(is_array($val)) {
+	                    foreach($val as $v) {
+	                        $args[] = $v;
+	                    }
+	                }
+	                else {
+	                    $args[] = $val;
+	                }
+	            }
 
-            foreach($str as $val) {
-                if(is_array($val)) {
-                    foreach($val as $v) {
-                        $args[] = $v;
-                    }
-                }
-                else {
-                    $args[] = $val;
-                }
-            }
-
-            fputs($this->stream, call_user_func_array('sprintf', $args));
+	            fputs($this->stream, call_user_func_array('sprintf', $args));
+	        }
+	        catch(\ErrorException $e) {
+				// sprintf too few args
+	        }
         }
     }
 

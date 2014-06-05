@@ -28,9 +28,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	/** @var IConfigLoader */
 	protected $conf;
 
-	/** @var TopicFactory */
-	protected $topics;
-
 	/** @var Mapper */
 	protected $mapper;
 
@@ -44,7 +41,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 */
 	public function __construct($configLoader) {
 		$this->conf = $configLoader;
-		$this->topics = new TopicFactory();
 		$this->instantiateMapper();
 		$this->loadDependencies();
 	}
@@ -143,5 +139,12 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 */
 	protected abstract function getSlug();
 
+
+	/**
+	 * @return Mapper
+	 */
+	public function getMapper() {
+		return $this->mapper;
+	}
 
 }

@@ -66,21 +66,33 @@ else {
 $body = array_pop($argv);
 $topic = array_pop($argv);
 
-$factory = new \Schoolbox\Notif\Message\Factory();
-$factory
-	->setTimestamp(time())
+$builder = new \Alaress\Async\Notification\Instance\Builder();
+
+$instance = $builder
+	->setTitle($body)
 	->setIcon($values['icon'])
 	->setHref($values['href'])
-	->setMsgBody($body);
-
-$msg = $factory->build();
-
-$msg->getInstance()
+	->setTimestamp(time())
+	->setNamespace('debug')
 	->setSeverity($values['severity'])
-	->setTopics((array)$topic);
+	->addTopic($topic)
+	->build();
+
+//$factory = new \Schoolbox\Notif\Message\Factory();
+//$factory
+//	->setTimestamp(time())
+//	->setIcon($values['icon'])
+//	->setHref($values['href'])
+//	->setMsgBody($body);
+//
+//$msg = $factory->build();
+//
+//$msg->getInstance()
+//	->setSeverity($values['severity'])
+//	->setTopics((array)$topic);
 
 $n = new \Schoolbox\Notif\Notif($topic);
 
-$n->log($values['severity'], serialize($msg));
+$n->log($values['severity'], "$instance");
 
 echo "Message '$body' sent via '$topic' at severity {$values['severity']}\n";

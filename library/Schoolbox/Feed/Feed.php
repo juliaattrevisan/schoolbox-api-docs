@@ -10,30 +10,9 @@
 namespace Schoolbox\Feed;
 
 
-use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Notification\Decorator;
 
-class Feed {
-
-
-	/**
-	 * @param Messenger $messenger
-	 * @param int $timestamp
-	 * @return Collection|Item[]
-	 */
-	public static function getItemsFromMessenger($messenger, $timestamp) {
-		return $messenger->extractItems($timestamp);
-	}
-
-	/**
-	 * @param IConfigLoader $conf
-	 */
-	function __construct($conf = null) {
-		$this->conf = $conf instanceof IConfigLoader ? $conf : ConfigMapper::getInstance();
-	}
-
+class Feed extends Decorator {
 
 	/**
 	 * Aggregates data from the given sources, returning it as a Collection of Feed\Items
@@ -43,14 +22,12 @@ class Feed {
 	 * @param string $roleType
 	 * @param int $limit
 	 * @param int $offset
-	 * @return Collection|Item[]
 	 */
-	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::SOFT_LIMIT, $offset = 0) {
-		if ($limit <= 0 || $limit > SourceInterface::SOFT_LIMIT) {
-			$limit = SourceInterface::SOFT_LIMIT;
+	public function aggregate($sources, $context, $roleType, $limit = SourceInterface::HARD_LIMIT, $offset = 0) {
+		if ($limit <= 0 || $limit > SourceInterface::HARD_LIMIT) {
+			$limit = SourceInterface::HARD_LIMIT;
 		}
 
-		$messages = new Collection();
 		foreach($sources as $channel) {
 			if($channel instanceof SourceInterface) {
 
@@ -59,11 +36,11 @@ class Feed {
 				 * the most up-to-date data. As such, there is an inherent (unavoidable?) performance hit, since
 				 * the maximum number of items that might be retrieved can be up to count($sources) times the $limit
 				 */
-				$messages->merge($channel->getFeed($context, $roleType, $limit, $offset));
+				$this->appendInstances($channel->getFeed($context, $roleType, $limit, $offset)->getAll());
 			}
 		}
 
-		return $messages->sortBy('timestamp', 'desc')->slice($limit, $offset);
+		$this->sort();
 	}
 
 } 

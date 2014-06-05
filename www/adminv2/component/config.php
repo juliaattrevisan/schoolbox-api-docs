@@ -31,7 +31,7 @@ if($method == 'GET') {
 // update the config for the specified component
 elseif($method == 'POST') {
     checkFields($_POST);
-    writeConfig($_POST);
+    writeConfig($_POST, $this);
 }
 else {
     // method not recognised
@@ -88,7 +88,7 @@ function readConfig($vars, SitePage $page) {
 /**
  * @param $vars
  */
-function writeConfig($vars) {
+function writeConfig($vars, SitePage $page) {
     $groupHandler = new Group();
     if(!$groupHandler->getPermission($vars['cid'])) {
         // lack permission to see configuration details
@@ -113,7 +113,7 @@ function writeConfig($vars) {
 
     // Create a controller object for the config class to use when dehydrating
     // config values
-    $factory    = new Component_Dashboard_Factory(new \Schoolbox\User(), new SitePage());
+    $factory    = new Component_Dashboard_Factory(new \Schoolbox\User(), $page);
     $controller = $factory->buildComponent($instance);
     $controller->execute();
 

@@ -10,13 +10,14 @@
 namespace Schoolbox\Notif\Handler;
 
 
-use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
 /**
  * Handler for passing messages to be broadcast immediately
  *
  * Class MessageHandler
+ *
+ * @deprecated TODO verify that this class is needed beyond the functionality of AMQPHandler
  * @package Schoolbox\Notif\Handler
  */
 class MessageHandler extends AMQPHandler {

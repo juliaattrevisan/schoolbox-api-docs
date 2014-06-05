@@ -6,12 +6,12 @@
         <tr>{{ fn.spacer(8, 0, 3) }}</tr>
         <tr>
             {{ fn.spacer(0, 8) }}
-            <td class="work-month">{{ msg.timestamp|date('M') }}</td>
+            <td class="work-month">{{ msg.time|date('M') }}</td>
             {{ fn.spacer(0, 8) }}
         </tr>
         <tr>
             {{ fn.spacer(0, 8) }}
-            <td class="work-day">{{ msg.timestamp|date('j') }}</td>
+            <td class="work-day">{{ msg.time|date('j') }}</td>
             {{ fn.spacer(0, 8) }}
         </tr>
         {#<tr>{{ fn.spacer(8, 0, 3) }}</tr>#}
@@ -23,7 +23,7 @@
         <tr>{{ fn.spacer(8, 0) }}</tr>
         {% for msg in row.messages %}
             <tr>
-                <td><p>{{ msg.pretty | raw }}</p></td>
+                <td><p>{{ msg.title | raw }}</p></td>
             </tr>
         {% endfor %}
     </table>

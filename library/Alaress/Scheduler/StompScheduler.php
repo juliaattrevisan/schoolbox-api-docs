@@ -118,7 +118,6 @@ abstract class StompScheduler extends AbstractScheduler {
 	}
 
 
-    /**
 	/**
 	 * Accepts a command (from STDIN) to log data about the scheduler's current state
 	 *
@@ -137,6 +136,7 @@ abstract class StompScheduler extends AbstractScheduler {
 	 * @return array
 	 */
 	public function getStatus($fields = array()) {
+		$status = array();
 		if(in_array('pool', $fields)) {
 			$status['pool'] = $this->getDispatcher()->getPoolStatus();
 		}

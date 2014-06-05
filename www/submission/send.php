@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 //includes
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $groupHandler = new Group;
 
 if (is_numeric($_GET['id'])) {

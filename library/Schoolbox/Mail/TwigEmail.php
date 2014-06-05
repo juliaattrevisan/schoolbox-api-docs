@@ -13,8 +13,6 @@ namespace Schoolbox\Mail;
 
 use Alaress\Mail\TwigMailer;
 use FM\CSSIN;
-use Schoolbox\Notif\Message\Decorator;
-use Schoolbox\Notif\Message\External\TargetedMessage;
 use Schoolbox\UserMapper;
 
 class TwigEmail extends TwigMailer {
@@ -106,12 +104,6 @@ class TwigEmail extends TwigMailer {
 			$colours = $this->parseLess($file, $colours);
 		}
 
-//		ksort($colours);
-
-//		echo " -- INITIAL SET -- \n";
-//		print_r($colours);
-
-//		echo "\n -- REFERENCES --\n";
 		$unresolved = array();
 
 		// collate references
@@ -119,19 +111,12 @@ class TwigEmail extends TwigMailer {
 			if($value[0] == '@') {
 				$ref = substr($value, 1);
 				$unresolved[$key] = $ref;
-//				echo "$key references $ref\n";
 			}
 		}
 
 		// resolve
 		while(count($unresolved)) {
-
-//			$count = count($unresolved);
-//			echo "\n -- RESOLVE $count REFERENCES --\n";
-//			print_r($unresolved);
-
 			foreach($unresolved as $key => $true) {
-
 				$ref = substr($colours[$key], 1);
 				if(isset($colours[$ref])) {
 					$colours[$key] = $colours[$ref];
@@ -146,11 +131,9 @@ class TwigEmail extends TwigMailer {
 			}
 		}
 
-//		print_r($colours);
-//		exit;
-
 		return $colours;
 	}
+
 
     /**
      * Accepts the filename of a LESS file and parses it for colour variables
@@ -210,7 +193,7 @@ class TwigEmail extends TwigMailer {
      */
     public function composeHTML() {
         $preformat = $this->twig->render($this->templateFilename,
-	        array_merge_recursive($this->coreContext, $this->context)
+            array_replace_recursive($this->coreContext, $this->context)
         );
 	    $this->rendercache = $this->cssIn->inlineCSS('', $preformat);
 	    // truncate all sequential whitespace characters
@@ -218,73 +201,25 @@ class TwigEmail extends TwigMailer {
 	    return $this->rendercache;
     }
 
-    public function getCoreContext() {
-        return $this->coreContext;
-    }
 
-    public function setSubject($subject) {
-        parent::setSubject($subject);
-        $this->coreContext['config']['subject'] = $subject;
+	/**
+	 * Return the configuration elements of config for this email
+	 *
+	 * @return array
+	 */
+	public function getCoreContext() {
+        return $this->coreContext;
     }
 
 
 	/**
-	 * Accepts an array of TargetedMessages and sets the context based on them
+	 * Set the subject, both in the email header and the config
 	 *
-	 * @param TargetedMessage[] $messages
-	 * @return self
+	 * @param $subject
 	 */
-	public function buildContextFromMessageList($messages) {
-
-		$context = array();
-		$decor = new Decorator(null);
-
-		// iterate the messages and merge their results into a single array
-		foreach($messages as $msg) {
-			$context = array_merge_recursive($context, $decor->setMessage($msg)->formatContext($this->getCoreContext()));
-		}
-
-		$headings = array(
-			'work' => 'Schoolwork',
-			'news' => 'News'
-		);
-
-		foreach($headings as $ns => $heading) {
-			if(isset($context['groups'][$ns])) {
-				$context['groups'][$ns]['heading'] = $heading;
-			}
-		}
-
-		$oldestFirst = self::getConfig()->get('digest_oldest_first');
-
-		// sorting
-		foreach($context['groups'] as $ns => &$group) {
-			switch($ns) {
-				case 'work':
-					if($oldestFirst) {
-						ksort($group['rows']);
-					}
-					else {
-						krsort($group['rows']);
-					}
-					break;
-				default:
-					usort($group['rows'], function($a, $b) use ($oldestFirst) {
-						$i = $oldestFirst ? 1 : -1;
-
-						// use the timestamps of the first message in each row to decide ordering
-						$a = reset($a[0]['messages']);
-						$b = reset($b[0]['messages']);
-
-						return $a['timestamp'] == $b['timestamp']
-							? 0
-							: $a > $b ? ($i) : ($i * -1);
-					});
-			}
-			break;
-		}
-
-		return $this->setContext($context);
-	}
+	public function setSubject($subject) {
+        parent::setSubject($subject);
+        $this->coreContext['config']['subject'] = $subject;
+    }
 
 }

@@ -15,9 +15,11 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Mapper;
 
 
-class OnlineAssessmentMapper extends Schoolbox\Mapper {
+class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 
 	protected function mapping () {
 		$this->hasTable('assess');

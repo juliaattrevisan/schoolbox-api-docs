@@ -15,7 +15,7 @@ use Schoolbox\Resource\CategoryMapper;
 
 // not in SitePage context, redirect to equivalent
 if(!isset($this)) {
-    require_once('../../include/SitePage.php');
+    require_once('../../include/Bootstrap.php');
     SitePage::localRedir('/submission/rubricCriteria');
     die();
 }

@@ -12,7 +12,6 @@ namespace Schoolbox\Realtime\Pipe;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Header;
 use Ratchet\ConnectionInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 
 /**

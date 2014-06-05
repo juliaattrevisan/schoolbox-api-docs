@@ -12,6 +12,7 @@ use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Exception;
 use \External_User;
 

@@ -13,9 +13,9 @@ namespace Alaress\WorkerCrew\Worker;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use ErrorException;
 use Exception;
 use InvalidArgumentException;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
@@ -39,10 +39,11 @@ abstract class AbstractProcess extends PipeWriter {
 
 
 	/**
+	 * @param LoopInterface $loop
 	 * @param DispatchStrategyInterface $strat
 	 * @param Debug $debug
 	 */
-	public function __construct($strat = null, $debug = null) {
+	public function __construct($loop, $strat = null, $debug = null) {
 		// cast optional args
 		$strat = $strat ?: new DefaultDispatchStrategy();
 		$debug = $debug ?: new Debug(null);
@@ -50,7 +51,7 @@ abstract class AbstractProcess extends PipeWriter {
 		parent::__construct($strat, $debug, STDOUT);
 		$this->strat = $strat;
 
-		$this->loop = Factory::create();
+		$this->loop = $loop;
 
 		// listen to STDIN for commands
 		$this->stream = new Stream(STDIN, $this->loop);
@@ -91,16 +92,29 @@ abstract class AbstractProcess extends PipeWriter {
 
 			// if EOT received
 			if($this->strat->getProtocol()->isEnded($data)) {
+				ob_start();
+
 				try {
 					$this->buffering = false;
 					$this->write($this->parseBuffer());
 					$this->debug->d("Task Complete");
+				}
+				catch(ErrorException $e) {
+					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
+					$this->debug->v($msg);
+					$this->write($msg, true);
 				}
 				catch(Exception $e) {
 					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
 					$this->debug->v($msg);
 					$this->write($msg, true);
 				}
+
+				if($buffer = ob_get_contents()) {
+					$this->debug->v("Captured output: $buffer", 'd');
+				}
+				ob_end_clean();
+
 				$this->buffering = false;
 			}
 
@@ -144,9 +158,7 @@ abstract class AbstractProcess extends PipeWriter {
 
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
-		$this->debug->v("Responding with '$response'");
 		$flat = $this->strat->getProtocol()->flatten($response);
-		$this->debug->v("Flattened response: $flat");
 
 		return $flat;
 	}

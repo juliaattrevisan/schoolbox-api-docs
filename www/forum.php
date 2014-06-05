@@ -1,6 +1,6 @@
 <?php
 
-require_once SITE_root . '/include/SitePage.php';
+require_once SITE_root . '/include/Bootstrap.php';
 
 $categoryHandler = new Category();
 $forumHandler = new Forum();

@@ -24,10 +24,10 @@ use SplQueue;
 class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	const MIN_WORKERS  = 1;
-	const MAX_WORKERS  = 4;
+	const MAX_WORKERS  = 6;
 	const MAX_FLYWHEEL = 0;
 	const QUEUE_DELAY  = 1;
-	const IDLE_TIMEOUT = 5;
+	const IDLE_TIMEOUT = 2000;
 
 	const TASK_FETCH     = 'fetch';
 	const TASK_PUBLISH   = 'publish';
@@ -40,6 +40,16 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	public function __construct() {
 		$this->flywheelSpins = self::MAX_FLYWHEEL;
 		$this->protocol = new AlaressIPCProtocol();
+	}
+
+
+	/**
+	 * Get the name of the strategy currently being used
+	 *
+	 * @return string
+	 */
+	public function getName() {
+		return 'Default';
 	}
 
 
@@ -85,25 +95,32 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return int
 	 */
 	public function getAvailableWorker($workers, $remainingTaskCount) {
+//		echo "LEMMY REPORTS THE TOTAL ATTACHED WORKER COUNT AS {$workers->count()}\n";
 
 		// if we haven't got the min number of workers, favour starting a new one
-		if($workers->count() < self::MIN_WORKERS) {
+		if($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MIN_WORKERS) {
+//			echo "WENDY REPORTS MIN WORKERS NOT YET REACHED\n";
 			return 0;
 		}
 
 		// if a worker is free, yes we can accept
 		try {
-			return $workers->getPidWhere(Worker::READY);
+			$free = $workers->getPidWhere(Worker::READY);
+//			echo "JUNIOR REPORTS $free AS A FREE WORKER\n";
+			return $free;
 		}
 		catch(OutOfBoundsException $e) {
 			// ok, so there's none of those
+//			echo "LUDWIG REPORTS ALL EXISTING WORKERS ARE TIED UP\n";
 		}
 
 		// if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
 		if($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MAX_WORKERS) {
+//			echo "ROY REPORTS STILL BELOW MAX WORKER CAP\n";
 			return 0;
 		}
 
+//		echo "IGGY REPORTS NO MORE WORKERS ARE ALLOWED\n";
 		return -1;
 	}
 
@@ -282,7 +299,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return void
 	 */
 	public function handleException($exception, $debug) {
-		$debug->v(sprintf("%s: %s", get_class($exception), $exception->getMessage()), '!');
+		$debug->v(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), '!');
 	}
 
 

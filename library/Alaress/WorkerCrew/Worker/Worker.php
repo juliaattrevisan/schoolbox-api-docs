@@ -12,6 +12,7 @@ namespace Alaress\WorkerCrew\Worker;
 
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use RangeException;
 
 class Worker extends PipeWriter {
 
@@ -62,9 +63,19 @@ class Worker extends PipeWriter {
 	function __destruct() {
 		// if the process has already terminated, these closures won't do anything (so suppress warnings)
 		foreach($this->pipes as &$p) {
-			@fclose($p);
+			try {
+				fclose($p);
+			}
+			catch(RangeException $e) {
+				// ignore
+			}
 		}
-		@pclose($this->pp);
+		try {
+			pclose($this->pp);
+		}
+		catch(RangeException $e) {
+			// ignore
+		}
 	}
 
 	/**

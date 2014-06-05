@@ -10,13 +10,13 @@
 namespace Schoolbox\News;
 
 
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
+use Html2Text\Html2Text;
 use Monolog\Logger;
-use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
@@ -46,7 +46,6 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->roleMapper = RoleMapper::getInstance();
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_NEWS);
 	}
 
 
@@ -87,27 +86,29 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @param string $roleType
 	 * @param Article $article
 	 * @param User $user
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function generateNotification($roleType, $article, $user) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
 		// self hydration -_-
 		/** @var Article $article */
 		$article = $this->mapper->findById($article->getId());
 
 		if($article->getImage()->getId()) {
-			$icon = sprintf("/storage/image.php?hash=%s&size=square64", $article->getImage()->getHash());
+			$icon = "/storage/image.php?hash={$article->getImage()->getHash()}&size=square64";
 		}
 		else {
-			$icon = sprintf("/portrait.php?userId=%s&size=square32", $user->getExternalId());
+			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
 		}
 
+		// TODO some schools don't like the "who" and want only the "what"
 		$text = ":user posted :title under :topic";
 		$href = '/news/item/' . $article->getId();
 
 		$articleId = $article->getId();
 		$heading = $article->getHeading();
+		$shortDate = $article->getPostDate()->getDateOnly();
 
 		$authorName = $user->formatName();
 		$authorId = $user->getId();
@@ -116,30 +117,47 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$url = new Url($topicName, false);
 		$topicSlug = $url->getSlug();
 
-		$msg = new Message($text, $icon, $href);
-
 		$roleIds = $article->getRoles()->filterBy('type', $roleType)->getColumnValues('id');
 		$campusIds = $article->getCampuses()->getColumnValues('id');
 
 		// if there's no overlap, nobody can theoretically receive this message, so don't send it
 		if(!(count($roleIds) && count($campusIds))) {
-			return $msgr;
+			return $envelope;
 		}
 
-		// tell everyone that article $articleId has been posted
-		$msgr->broadcastToRoleType($roleType, $msg, "news.$articleId.posted", Logger::INFO,
-			array(
-				'user'     => array($authorName, "/search/user/$authorId"),
-				'title'    => array($heading,    "/news/item/$articleId"),
-				'topic'    => array($topicName,  "/news/$topicSlug")
-			),
-			array(
-				'role'   => $roleIds,
-				'campus' => $campusIds,
-			)
+		$bob = new Builder();
+
+		$html2text = new Html2Text($article->getBody());
+
+        $envelope->broadcastToRoleType($roleType,
+			// title, params (if title :tokenised), icon, href, namespace, severity and topic are mandatory
+
+			$bob->setTitle(":user posted :title under :topic")
+				->setParams(array(
+					'user'  => new UserParam($user, Param::STACKING_REPLACE),
+					'title' => new Param($heading,   "/news/item/$articleId", Param::STACKING_APPEND),
+					'topic' => new Param($topicName, "/news/$topicSlug")
+				))
+				->setIcon($icon)
+				->setHref($href)
+				->setNamespace($this->getSlug())
+				->setSeverity(Logger::INFO)
+				->addTopic("news.$articleId.posted")
+
+				// body and byline are optional, but recommended since they render out in emails
+				->setBody($html2text->get_text())
+				->setByline("$shortDate by $authorName in $topicName")
+
+				// timestamp and filters are optional
+				->setTimestamp(time())
+				->addFilter('role', $roleIds)
+				->addFilter('campus', $campusIds)
+
+				// and then you build
+				->build()
 		);
 
-		return $msgr;
+		return $envelope;
 	}
 
 

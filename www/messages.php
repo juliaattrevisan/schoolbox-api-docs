@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\Notif\Message\External\TargetedMessage;
 
 /**
  * 
@@ -23,6 +22,7 @@ $this->setBlock(TEMPLATE_content, 'days', 'days_block');
 $this->setBlock('days', 'day', 'day_block');
 $this->setBlock('day', 'events', 'events_block');
 $this->setBlock('events', 'event', 'event_block');
+$this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
@@ -30,22 +30,24 @@ $this->setTitle('All Messages');
 $qf = new \Schoolbox\Notif\Queue\UserQueueFactory();
 $q = $qf->bindUserQueue($_SESSION['user']);
 
-$messageArray = $q->getMessages(100, true, true);
+// load the 20 most recent notifications into a decorator
+$decorator = new \Schoolbox\Realtime\Notification\Decorator();
+$decorator->appendNotifications($q->getNotifications(20, true, true));
+
+$notifications = $decorator->renderAsSitePageArray();
 
 $msgsByDay = array();
 
-foreach($messageArray as $msgId => $message) {
-	$timestamp = $message->getTimestamp();
+foreach($notifications as $id => $notification) {
+	$timestamp = $notification['time'];
 	$day = date('Y-m-d', $timestamp);
-	$msgsByDay[$day][$timestamp][$msgId] = $message;
+	$msgsByDay[$day][$timestamp][$id] = $notification;
 
 }
 
 krsort($msgsByDay);
 
 $this->setVar('day_block', '');
-
-$decor = new \Schoolbox\Notif\Message\Decorator(null);
 
 foreach($msgsByDay as $day => $timestamps) {
 	$i = 0;
@@ -67,21 +69,27 @@ foreach($msgsByDay as $day => $timestamps) {
 	$this->setVar('DAY', ucfirst($fday));
 
 	$this->setVar('events_block', '');
-	foreach($timestamps as $timestamp => $messages) {
+	foreach($timestamps as $timestamp => $notifs) {
 		$this->setVar('event_block', '');
-
-		foreach($messages as $message) {
-			/** @var TargetedMessage $message */
-			$decor->setMessage($message);
-
+		foreach($notifs as $n) {
 			$this->setVar(array(
-				'EVENT_BODY' => $decor->formatHtml(),
-				'EVENT_HREF' => $decor->getHref(),
-				'EVENT_DARK' => ++$i % 2 ? '' : 'dark',
-				'EVENT_TIME' =>  $decor->getAlaressDateFormat()->getUsingFormat('g:ia'),
-				'EVENT_LONGTIME' => $decor->getAlaressDateFormat()->getLong(),
-				'EVENT_ICON'  => $decor->getIcon()
+				'EVENT_BODY'     => $n['title'],
+				'EVENT_HREF'     => $n['href'],
+				'EVENT_ICON'     => $n['icon'],
+				'EVENT_TIME'     => $n['timeonly'],
+				'EVENT_LONGTIME' => $n['longtime'],
+				'EVENT_DARK'     => ++$i % 2 ? '' : 'dark',
 			));
+
+			if(isset($n['meta']['body']) && strlen($n['meta']['body'])) {
+				$this->setVar('EVENT_ABSTRACT', TextFormatter::cutSentence($n['meta']['body'], 48));
+				$this->parse('abstract_block', 'abstract');
+			}
+			else {
+				$this->setVar('abstract_block', '');
+			}
+
+
 			$this->parse('event_block', 'event', true);
 		}
 		$this->parse('events_block', 'events', true);
@@ -90,7 +98,7 @@ foreach($msgsByDay as $day => $timestamps) {
 
 }
 
-if(count($messageArray)) {
+if(count($notifications)) {
 	$this->parse('days_block', 'days');
 }
 else {

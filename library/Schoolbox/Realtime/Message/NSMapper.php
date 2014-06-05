@@ -14,17 +14,19 @@ use Schoolbox\Mapper;
 
 class NSMapper extends Mapper {
 
-	const NS_DUEWORK        = 'duework';
-	const NS_ONLINE_ASSESS  = 'assess';
-	const NS_BLOG           = 'blog';
-	const NS_FORUM          = 'forum';
-	const NS_NEWS           = 'news';
-	const NS_CALENDAR       = 'calendar';
-	const NS_BOARDER_LEAVE  = 'leave';
-	const NS_WIKI           = 'wiki';
-	const NS_GROUP          = 'group';
-	const NS_CMS            = 'cms';
-	const NS_SSTREAM        = 'sstream';
+	const NS_DUEWORK          = 'duework';
+	const NS_ONLINE_ASSESS    = 'assess';
+	const NS_BLOG             = 'blog';
+	const NS_FORUM            = 'forum';
+	const NS_NEWS             = 'news';
+	const NS_CALENDAR         = 'calendar';
+	const NS_BOARDER_LEAVE    = 'leave';
+	const NS_WIKI             = 'wiki';
+	const NS_GROUP            = 'group';
+	const NS_CMS              = 'cms';
+	const NS_SSTREAM          = 'sstream';
+	const NS_EOTC             = 'eotc';
+	const NS_RESOURCE_BOOKING = 'resource_booking';
 
 
 	protected function mapping() {

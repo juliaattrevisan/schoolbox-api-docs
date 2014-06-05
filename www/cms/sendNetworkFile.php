@@ -9,7 +9,7 @@
 //rather than just octet stream
 
 //includes
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
     $page = new SitePage;

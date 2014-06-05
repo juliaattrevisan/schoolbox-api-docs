@@ -9,12 +9,16 @@
 
 namespace Schoolbox\Notif\Queue;
 
+use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Notification\Instance\Instance;
+use Exception;
 use External_User;
 use Group;
+use InvalidArgumentException;
 use Schoolbox\Campus;
-use Schoolbox\Notif\Message\External\TargetedMessage;
+use Schoolbox\Collection;
+use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
@@ -31,7 +35,7 @@ use Schoolbox\UserMapper;
  */
 class UserQueueFactory {
 
-	/** @var MQConnector */
+	/** @var AMQPInterface */
 	protected $mqConnector;
 
 	/** @var UserMapper */
@@ -43,31 +47,46 @@ class UserQueueFactory {
 	/** @var RoleMapper */
 	protected $roleMapper;
 
-	/** @var \Group */
+	/** @var Group */
 	protected $_DEPRECATED_GROUP;
 
 	/** @var External_User */
 	protected $_DEPRECATED_EXT_USER;
 
-	/** @var array */
+	/** @var Collection[] */
 	protected $roleCache;
 
 	/** @var array */
 	protected $existingBindings = null;
 
+
+	/**
+	 * @param AMQPInterface $mqConnector
+	 */
 	public function __construct($mqConnector = null) {
-		$this->mqConnector = $mqConnector ?: new MQConnector();
+		$this->setMessageQueueConnector($mqConnector ?: new MQConnector());
 	}
 
+
+	/**
+	 * @param AMQPInterface $mqConnector
+	 * @return self
+	 */
 	public function setMessageQueueConnector($mqConnector) {
 		$this->mqConnector = $mqConnector;
 		return $this;
 	}
 
+
+	/**
+	 * @param UserMapper $userMapper
+	 * @return self
+	 */
 	public function setUserMapper($userMapper) {
 		$this->userMapper = $userMapper;
 		return $this;
 	}
+
 
 	/**
 	 * @return External_User
@@ -81,18 +100,20 @@ class UserQueueFactory {
 		return $this->_DEPRECATED_EXT_USER;
 	}
 
+
 	/**
-	 * @return \Group
+	 * @return Group
 	 */
 	public function GET_DEPRECATED_GROUP() {
 		if(!$this->_DEPRECATED_GROUP) {
-			$this->_DEPRECATED_GROUP = new \Group();
+			$this->_DEPRECATED_GROUP = new Group();
 		}
 		return $this->_DEPRECATED_GROUP;
 	}
 
+
 	/**
-	 * @return \Schoolbox\RoleMapper
+	 * @return RoleMapper
 	 */
 	public function getRoleMapper() {
 		if(!$this->roleMapper) {
@@ -112,13 +133,19 @@ class UserQueueFactory {
 		return $this->userMapper;
 	}
 
+
+	/**
+	 * @param CategoryMapper $categoryMapper
+	 * @return self
+	 */
 	public function setCategoryMapper($categoryMapper) {
 		$this->categoryMapper = $categoryMapper;
 		return $this;
 	}
 
+
 	/**
-	 * @return \Schoolbox\Resource\CategoryMapper
+	 * @return CategoryMapper
 	 */
 	public function getCategoryMapper() {
 		if(!$this->categoryMapper) {
@@ -126,7 +153,6 @@ class UserQueueFactory {
 		}
 		return $this->categoryMapper;
 	}
-
 
 
 	/**
@@ -226,6 +252,7 @@ class UserQueueFactory {
 					// cache roles
 					$this->roleCache = $this->getRoleMapper()->findAll()->groupBy('type')->getAll();
 					foreach($this->roleCache as $roleType => $roleCollection) {
+						/** @var $roleCollection Collection|Role[] */
 						$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
 					}
 				}
@@ -288,12 +315,13 @@ class UserQueueFactory {
 		}
 		else {
 			$q = new UserQueue(array('user' => array(
-				'id'       => $userId
+				'id' => $userId
 			)), $this->mqConnector);
 		}
-		$q->getMessages($limit);
+		$q->getNotifications($limit);
 		return $q;
 	}
+
 
 	/**
 	 * Destroy all routing bindings for the given user.
@@ -316,16 +344,17 @@ class UserQueueFactory {
 		$count = 0;
 
 		if(!$simulate) {
-			$userExchange = Connector::getSecondaryExchangePrefix() . $userId;
+			$userExchange = $this->mqConnector->getSecondaryExchange($userId);
 
 			foreach($this->existingBindings[$userId] as $routingKey) {
-				$this->mqConnector->unbindExchange($userExchange, $routingKey);
+				$this->mqConnector->unbindExchange($userExchange->getName(), $routingKey);
 				++$count;
 			}
 		}
 
 		return $count;
 	}
+
 
 	/**
 	 * Retrieve all existing bindings from RabbitMQ and cache into an array, indexed by username
@@ -365,7 +394,7 @@ class UserQueueFactory {
 
 			list($exchange, $routingKey) = $xpl;
 
-			$prefix = Connector::getSecondaryExchangePrefix();
+			$prefix = $this->mqConnector->getSecondaryExchange('')->getName();
 
 			// only parse line if this is a user exchange
 			if(substr($exchange, 0, strlen($prefix)) != $prefix) {
@@ -382,16 +411,17 @@ class UserQueueFactory {
 		return $count;
 	}
 
+
 	/**
-	 * Returns whether or not a given message is sitting in the given user's listed and digest queues.
+	 * Returns whether or not a given message is sitting in the given user's listed or digest queues.
 	 * Use this method shrewdly - its expense is proportional to the length of the given user's queues.
 	 *
 	 * @param int $userId
-	 * @param TargetedMessage $message
+	 * @param Instance $instance
+	 * @throws InvalidArgumentException
 	 * @return bool
 	 */
-	public function userHasSeen($userId, $message) {
-
+	public function userHasSeen($userId, $instance) {
 		$result = false;
 
 		$qs = array(
@@ -401,22 +431,34 @@ class UserQueueFactory {
 
 		foreach($qs as $q) {
 			$nack = array();
-			while($m = $this->mqConnector->readFromQueue($q)) {
-				$nack[] = $m;
+			try {
+				while($m = $this->mqConnector->readFromQueue($q)) {
+					// store list of retrieved messages to NACK later
+					$nack[] = $m;
+					$unjson = json_decode($m->body, true);
 
-				$unjson = json_decode($m->body, true);
+					try {
+						$compare = Instance::jsonUnserialize($unjson['message']);
+					}
+					catch(InvalidArgumentException $e) {
+						// TODO once TargetedMessage fully deprecated this catch can be removed
+						$conv = new TargetedConverter();
+						$compare = $conv->convert($unjson['message']);
+					}
 
-				/** @var TargetedMessage $compare */
-				$compare = unserialize($unjson['message']);
-
-                if($message->matches($compare, TargetedMessage::MATCH_PARAMS)) {
-                    $result = true;
-                    // break out
-                    break;
-                }
+					if($instance->getParamHash() == $compare->getParamHash()) {
+						$result = true;
+						break;
+					}
+				}
+				// push any messages we retrieved back onto the queue
+				$this->mqConnector->rejectMessages($nack);
 			}
-			// push any messages we retrieved back on the the queue
-			$this->mqConnector->rejectMessages($nack);
+			catch(InvalidArgumentException $e) {
+				// regardless of anything else, you MUST reject the messages you retrieved
+				$this->mqConnector->rejectMessages($nack);
+				throw $e;
+			}
 
 			// if we returned true, don't bother continuing
 			if($result) {
@@ -426,4 +468,5 @@ class UserQueueFactory {
 
 		return $result;
 	}
+
 }

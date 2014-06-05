@@ -8,8 +8,8 @@
  */
 
 namespace Schoolbox;
+use Alaress\Async\Notification\LoggerInterface;
 use PDO;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
@@ -274,7 +274,7 @@ class Mapper implements Serializable {
 	}
 
 	/**
-	 * @return LoggerInterface|Notif
+	 * @return LoggerInterface
 	 */
 	public function getNotifier() {
 		// load on demand, so that we don't get infinite loops

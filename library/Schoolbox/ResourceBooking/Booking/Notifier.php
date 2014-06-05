@@ -2,6 +2,13 @@
 /**
  * A notifier for bookings.
  *
+ * TODO: Reintroduce the router into this class, and use it to generate URLs
+ * I've removed it for now because it's no longer possible to get the DI
+ * container as a global variable (fair enough), and actually requiring the
+ * router as part of this class would realistically require that this object and
+ * its dependencies be defined in the DI container - and that should be done as
+ * part of a wider effort.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -23,6 +30,13 @@ use Aura\Router\Router;
 class Notifier extends AbstractModuleNotifier {
 
     /**
+     * Namespace slug, as defined in msg_namespace table.
+     *
+     * @var string
+     */
+    protected $slug = 'resource_booking';
+
+    /**
      * A router - injected for the purpose of generating URLs for resource
      * booking related items.
      *
@@ -38,13 +52,20 @@ class Notifier extends AbstractModuleNotifier {
     }
 
     /**
+     * @return string
+     */
+    protected function getSlug() {
+        return $this->slug;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function loadDependencies($dependencies = null) {
-        /** @var ContainerInterface $di */
-        global $di;
-        $this->namespace = NSMapper::getInstance()->findOneBySlug('resource_booking');
-        $this->router    = $di->get('router');
+//        /** @var ContainerInterface $di */
+//        global $di;
+        $this->namespace = NSMapper::getInstance()->findOneBySlug($this->slug);
+//        $this->router    = $di->get('router');
     }
 
     /**
@@ -102,7 +123,7 @@ class Notifier extends AbstractModuleNotifier {
     protected function buildMessenger(Model $object, User $user, $event) {
         $messenger      = new Messenger();
         $owner          = $object->getEvent()->getOwner();
-        $key            = 'resource_booking.'.$object->getId().'.'.$event;
+        $key            = $this->slug.'.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $user->getId();
         $startDate      = new \Alaress_Date_Format(
@@ -115,7 +136,8 @@ class Notifier extends AbstractModuleNotifier {
             ),
             'resource' => array(
                 $object->getResource()->getName(),
-                $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
+                '/resource-booking/item/'.$object->getResource()->getId()
+//                $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
             ),
             'date'     => array(
 	            $startDate->getLocal(),
@@ -166,7 +188,8 @@ class Notifier extends AbstractModuleNotifier {
         $message = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
+            '/resource-booking/booking/'.$object->getId().'/edit'
+//            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
         );
 
         // Notify the owner of the booking that someone booked for them

@@ -10,9 +10,9 @@
 namespace Schoolbox\Resource;
 
 
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\Feed\Item;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Resource\Category;
@@ -115,15 +115,15 @@ class TextboxNotifier extends ResourceNotifier {
 
 
 	/**
-	 * Generate n Feed\Items, from the perspective of casual observation (rather than targeted at a particular user).
+	 * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
 	 *
-	 * @param int $context      - most likely a category ID or ignored
-	 * @param string $roletype  - the roletype of the user for whom this feed is being retrieved
-	 * @param int $limit        - how many messages to retrieve
-	 * @param int $offset       - by default, most recent
-	 * @return Collection|Item[]
+	 * @param int $context     - most likely a category ID or ignored
+	 * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+	 * @param int $limit       - how many messages to retrieve
+	 * @param int $offset      - by default, most recent
+	 * @return Collection|Instance[]
 	 */
-	public function getFeed($context, $roletype, $limit = self::SOFT_LIMIT, $offset = 0) {
+	public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0) {
 		return $this->getFeedInternal($context, $roletype, $limit, $offset, LogMapper::KIND_CONTENT);
 	}
 

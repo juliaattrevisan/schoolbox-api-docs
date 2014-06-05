@@ -10,8 +10,13 @@
 namespace Schoolbox\Notif\Queue;
 
 
-use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Notification;
+use Alaress\Async\Notification\NotificationBundle;
+use Exception;
+use InvalidArgumentException;
+use Schoolbox\Notif\Message\External\TargetedConverter;
 
 /**
  * This class abstracts several AMQP queues, one for each of 'digest', 'listed', 'unread' and 'to be sorted'.
@@ -33,10 +38,10 @@ class UserQueue {
 	// queue of messages that are pending to be sent by Digest
 	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
 
-	/** @var TargetedMessage[] */
-	protected $messages = array();
+	/** @var Notification[] */
+	protected $notifications = array();
 
-	/** @var MQConnector */
+	/** @var AMQPInterface */
 	protected $conn;
 
 	/** @var array */
@@ -48,7 +53,7 @@ class UserQueue {
 
 	/**
 	 * @param array $bindings
-	 * @param MQConnector $mqConnector
+	 * @param AMQPInterface $mqConnector
 	 * @param bool $simulate
 	 */
 	public function __construct($bindings, $mqConnector, $simulate = false) {
@@ -71,10 +76,10 @@ class UserQueue {
 			return;
 		}
 
-		$exchange = $this->getExchangeName();
-
 		// one connection to declare them all...
+		$exchange = $this->conn->getSecondaryExchange($this->userId);
 		$this->conn->declareExchange($exchange);
+		$exchangeName = $exchange->getName();
 
 		$this->conn->declareQueue($this->getToSortQueueName());
 		$this->conn->declareQueue($this->getDigestQueueName());
@@ -83,18 +88,22 @@ class UserQueue {
 
 		// ...and in the darkness bind them.
 		foreach($this->bindings as $key) {
-			$this->conn->bindExchange($exchange, $key);
+			$this->conn->bindExchange($exchangeName, $key);
 		}
-		$this->conn->bindExchange($exchange, "*.digest.user.$this->userId.#");
-		$this->conn->bindExchange($exchange, "*.instant.user.$this->userId.#");
+		$this->conn->bindExchange($exchangeName, "*.digest.user.$this->userId.#");
+		$this->conn->bindExchange($exchangeName, "*.instant.user.$this->userId.#");
 
-		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchange);
-		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchange);
-		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchange);
-		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchange);
+		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchangeName);
+		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchangeName);
+		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
+		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
 
 	}
 
+
+	/**
+	 * @return array
+	 */
 	public function getBindings() {
 		return $this->bindings;
 	}
@@ -102,72 +111,93 @@ class UserQueue {
 
 	/**
 	 * Retrieve messages from the queue
+	 *
+	 * @deprecated use getNotifications() instead
 	 * @param int $limit - how many messages to retrieve, from most recent backward
 	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
 	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
-	 * @return TargetedMessage[]
+	 * @return Notification[]
 	 */
 	public function getMessages($limit = 10, $forceRefresh = false, $preserveKeys = false) {
+		return $this->getNotifications($limit, $forceRefresh, $preserveKeys);
+	}
+
+
+	/**
+	 * Collate notifications from the messages in the queue
+	 *
+	 * @param int $limit - how many messages to retrieve, from most recent backward
+	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
+	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
+	 * @return Notification[]
+	 */
+	public function getNotifications($limit = 10, $forceRefresh = false, $preserveKeys = false) {
 
 		// retrieve messages and sort
-		if(!count($this->messages) || $forceRefresh) {
-			$this->retrieveMessages();
+		if(!count($this->notifications) || $forceRefresh) {
+			$this->retrieveNotifications();
 		}
 
 		if($limit) {
-			return array_slice($this->messages, 0, $limit, $preserveKeys);
+			return array_slice($this->notifications, 0, $limit, $preserveKeys);
 		}
-		return $this->messages;
-
+		return $this->notifications;
 	}
 
 
 	/**
 	 * Populate this user's notification list (idempotent)
 	 */
-	protected function retrieveMessages() {
-
-		// this method replaces the entire array with the entire set of unexpired messages
-		$this->messages = array();
-
+	protected function retrieveNotifications() {
 		$nacks = array();
+		$bundle = new NotificationBundle();
 
-		while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
-			$nacks[] = $m;
+		try {
+			while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
+				$nacks[] = $m;
 
-            $msgId = $m->get('message_id');
+				// unwrap the formatting
+				$body = json_decode($m->body, true);
 
-			// unwrap the formatting
-			$body = json_decode($m->body, true);
-
-            // insert the unserialized TargetedMessage into our list
-			$this->messages[$msgId] = unserialize($body['message']);
+				try {
+					// attempt to unserialize the message
+					$bundle->appendInstance(Instance::jsonUnserialize($body['message']));
+				}
+				catch(InvalidArgumentException $e) {
+					// TODO: once TargetedMessage is fully deprecated, this catch can be removed
+					$conv = new TargetedConverter();
+					try {
+						$bundle->appendInstance($conv->convert($body['message']));
+					}
+					catch(InvalidArgumentException $e) {
+						// nothing we can do, message was unparseable
+					}
+				}
+			}
+		}
+		catch(Exception $e) {
+			// regardless of what happens above, it's imperative that we reject the messages we pulled
+			$this->conn->rejectMessages($nacks);
+			// *now* you can freak out
+			throw $e;
 		}
 
 		// now we've collected messages, reject all
 		$this->conn->rejectMessages($nacks);
 
+		$this->notifications = $bundle->getAll();
+
 		// sort descending
-		uasort($this->messages, function($a, $b) {
+		uasort($this->notifications, function($a, $b) {
             /**
-             * @var TargetedMessage $a
-             * @var TargetedMessage $b
+             * @var Notification $a
+             * @var Notification $b
              */
             $at = $a->getTimestamp();
 			$bt = $b->getTimestamp();
 			return $at == $bt ? 0 : $at > $bt ? -1 : 1;
 		});
 
-	}
-
-
-	/**
-	 * Returns the exchange that applies to this user
-	 *
-	 * @return string
-	 */
-	public function getExchangeName() {
-		return MQConnector::getSecondaryExchangePrefix() . $this->userId;
 	}
 
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once '../../include/SitePage.php';
+require_once '../../include/Bootstrap.php';
 
 $page = new SitePage;
 

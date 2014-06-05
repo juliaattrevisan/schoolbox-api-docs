@@ -12,6 +12,7 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
@@ -19,7 +20,7 @@ use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
 
-class SubmissionBoxMapper extends Schoolbox\Mapper {
+class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface {
 
 	/**
 	 * @var IConfigLoader

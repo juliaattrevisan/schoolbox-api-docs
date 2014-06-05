@@ -12,12 +12,13 @@ namespace Schoolbox\Blog;
 
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
 use Schoolbox\UserAccess;
 
-class BlogMapper extends Mapper implements Searchable {
+class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
 	/**
 	 * @return void

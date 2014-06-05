@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Realtime\Message\NSMapper;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -20,19 +22,41 @@ class Alaress_Image_Transformation_Icon extends Alaress_Image_Transformation_Abs
 			'pin','doc','clock','tick','link','bolt','grade','poll','chat','comment','cross','reload','work','alert','upload','wiki'
 		);
 
+		// map namespaces to appropriate icons
+		$namespaceMap = array(
+			NSMapper::NS_DUEWORK            => 'work',
+			NSMapper::NS_ONLINE_ASSESS      => 'work',
+			NSMapper::NS_BLOG               => 'chat',
+			NSMapper::NS_FORUM              => 'chat',
+			NSMapper::NS_NEWS               => 'pin',
+			NSMapper::NS_CALENDAR           => 'clock',
+			NSMapper::NS_BOARDER_LEAVE      => 'tick',
+			NSMapper::NS_WIKI               => 'wiki',
+			NSMapper::NS_GROUP              => 'chat',
+			NSMapper::NS_CMS                => 'link',
+			NSMapper::NS_SSTREAM            => 'chat',
+			NSMapper::NS_EOTC               => 'clock',
+			NSMapper::NS_RESOURCE_BOOKING   => 'clock',
+		);
+
 		if(!in_array($size, $validSizes)) {
 			throw new InvalidArgumentException("Invalid size given: $size");
 		}
 
-		if(!in_array($icon, $validCrops)) {
+		$crops = array_flip($validCrops);
+
+		if(isset($crops[$icon])) {
+			$index = $crops[$icon];
+		}
+		elseif(isset($namespaceMap[$icon])) {
+			$index = $crops[$namespaceMap[$icon]];
+		}
+		else {
 			throw new InvalidArgumentException("Invalid icon given: $icon");
 		}
 
-		$crops = array_flip($validCrops);
-		$index = $crops[$icon];
 		$count = count($crops);
 		$step  = 100 / $count;
-
 
 		$top = ($index * $step);
 		$bottom = (($index + 1) * $step);

@@ -10,18 +10,19 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use InvalidArgumentException;
+use React\EventLoop\LoopInterface;
 use RuntimeException;
-use Schoolbox\Notif\Formatter\CompressionException;
-use Schoolbox\Notif\Message\Decorator;
-use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Interceptor\Interceptor;
+use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess {
@@ -34,12 +35,13 @@ class WorkerProcess extends AbstractProcess {
 
 
 	/**
+	 * @param LoopInterface $loop
 	 * @param DispatchStrategyInterface $strat
 	 * @param Debug $debug
 	 */
-	public function __construct($strat = null, $debug = null) {
-		parent::__construct($strat, $debug);
-		$this->mqf = new UserQueueFactory(new Connector());
+	public function __construct($loop, $strat = null, $debug = null) {
+		parent::__construct($loop, $strat, $debug);
+		$this->mqf = new UserQueueFactory();
 		$this->interceptor = new Interceptor($debug);
 	}
 
@@ -61,16 +63,22 @@ class WorkerProcess extends AbstractProcess {
 				list($userId, $count) = $args;
 				return $this->fetch($userId, $count);
 
-			// publish or digest messages
+			// publish messages
 			case DefaultDispatchStrategy::TASK_PUBLISH:
-			case DefaultDispatchStrategy::TASK_DIGEST:
 				$data = unserialize($args[0]);
 				if(!(is_array($data) && count($data) == 4)) {
-					throw new RuntimeException("Data should be array of size 4; is ".gettype($data)." (".count($data).")");
+					throw new RuntimeException("Data should be array(4); is ".gettype($data)."(".count($data).")");
 				}
 				list($callback, $model, $user, $diff) = $data;
-				$this->debug->v(sprintf("%sing model %s for user %s", ucfirst($command), get_class($model), $user->getId()));
 				return $this->publish($callback, $model, $user, $diff);
+
+			// digest messages
+			case DefaultDispatchStrategy::TASK_DIGEST:
+				$data = unserialize($args[0]);
+				if(!(is_array($data) && count($data) >= 2)) {
+					throw new RuntimeException("Data should be array(2+); is ".gettype($data)."(".count($data).")");
+				}
+				return $this->digest($data[0], $data[1]);
 
 			// process interceptions
 			case DefaultDispatchStrategy::TASK_INTERCEPT:
@@ -90,21 +98,16 @@ class WorkerProcess extends AbstractProcess {
 	 */
 	protected function fetch($userId, $count) {
 		$this->debug->v("Fetching $count for user $userId");
-		$decor = new Decorator(null);
+		$decorator = new Decorator();
 
 		$queue = $this->mqf->buildUserQueue($userId, $count, false);
-		$output = array();
 
 		// make messages pretty
-		foreach($queue->getMessages($count, false, true) as $msgId => $targetedMessage) {
-			$decor->setMessage($targetedMessage);
-			$output[$msgId] = $decor->formatArray(false);
-			$output[$msgId]['id'] = $msgId;
-		}
-
+		$decorator->appendNotifications($queue->getNotifications($count, true, true));
 		// wrap in an array to preserve keys
-		return array($output);
+		return array($decorator->renderAsSocketArray(false));
 	}
+
 
 	/**
 	 * Process publish/digest
@@ -114,8 +117,8 @@ class WorkerProcess extends AbstractProcess {
 	 * @param User $user
 	 * @param array $diff
 	 * @return string
-	 * @throws \RuntimeException
-	 * @throws \InvalidArgumentException
+	 * @throws RuntimeException
+	 * @throws InvalidArgumentException
 	 */
 	protected function publish($callback, $model, $user, $diff) {
 
@@ -125,37 +128,69 @@ class WorkerProcess extends AbstractProcess {
 
 		$this->debug->v("Executing ".$this->callable2string($callback));
 
-		// this call SHOULD return a Messenger object
-		ob_start();
+		// this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
 		$return = call_user_func($callback, $model, $user, $diff);
-		if($buffer = ob_get_contents()) {
-			$this->debug->v($buffer);
-		}
-		ob_end_clean();
-
 		$this->debug->v("Callback complete");
 
 		if(is_null($return)) {
-			$this->debug->v("Response is NULL, casting to empty Messenger");
-			$return = new Messenger();
+			$this->debug->v("Response is NULL, casting to empty Envelope");
+			$return = new Envelope();
 		}
 
-		if(!$return instanceof Messenger) {
-			throw new InvalidArgumentException("Async method response must be an instance of Messenger; got "
-				. (is_object($return) ? get_class($return) : gettype($return))
-			);
+		if($return instanceof InstanceBundle) {
+			$this->debug->v("InstanceBundle ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+
+			$serial = serialize($return);
+			if($serial === false) {
+				throw new RuntimeException("Failed to serialize InstanceBundle");
+			}
+
+			return $serial;
 		}
 
-		$this->debug->v("Messenger ". ($return->hasMessages() ? 'contains messages' : 'does not contain messages'));
+		throw new InvalidArgumentException(
+			"Async publish response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
+			. (is_object($return) ? get_class($return) : gettype($return))
+		);
+	}
 
-		$serial = serialize($return);
-		if($serial === false) {
-			throw new RuntimeException("Failed to serialize Messenger");
+
+	/**
+	 * @param callable $callback
+	 * @param Role $role
+	 * @throws RuntimeException
+	 * @throws InvalidArgumentException
+	 * @return string
+	 */
+	protected function digest($callback, $role) {
+		if(!is_callable($callback)) {
+			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
 		}
 
-		$this->debug->d($serial);
+		// inject the debugger into the notifier if possible
+		if(is_array($callback) && is_object($callback[0])) {
+			$setDebug = array($callback[0], 'setDebug');
+			if(is_callable($setDebug)) {
+				call_user_func($setDebug, $this->debug);
+			}
+		}
 
-		return $serial;
+		$this->debug->v("Executing ".$this->callable2string($callback));
+		// this call MUST return an integer
+		$return = call_user_func($callback, $role);
+		$this->debug->v("Callback complete");
+		// handle standard digest case
+
+		if(is_integer($return)) {
+			$this->debug->v("Response is numeric, returning as is");
+			$serial = serialize($return);
+			return $serial;
+		}
+
+		throw new InvalidArgumentException(
+			"Async digest response must be an integer; got "
+			. (is_object($return) ? get_class($return) : gettype($return))
+		);
 	}
 
 
@@ -170,12 +205,7 @@ class WorkerProcess extends AbstractProcess {
 		$this->debug->v("Iterating frames provided");
 		foreach($args as $v) {
 			list($user, $frame) = $v;
-			ob_start();
 			$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
-			if($output = ob_get_contents()) {
-				$this->debug->v("Iteration result (user {$user->getId()}): $output");
-			}
-			ob_end_clean();
 		}
 		$this->debug->v("Rerouted $count message".($count == 1 ? '' : 's'));
 		return $count;
