@@ -93,7 +93,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		$comments = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($comments as $comment) {
-			$c->merge(new Collection($this->notifyCommented($roletype, $comment, $comment->getOwner())->getAll()));
+			$c->merge(new Collection($this->notifyCommented($roletype, $comment, $comment->getOwner())->getAll($comment->getCreated()->getUnixTimestamp())));
 		}
 		return $c;
 	}

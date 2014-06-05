@@ -103,7 +103,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$articles = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($articles as $news) {
-			$c->merge(new Collection($this->generateNotification($roletype, $news, $news->getOwner())->getAll()));
+			$c->merge(new Collection($this->generateNotification($roletype, $news, $news->getOwner())->getAll($news->getPostDate()->getUnixTimestamp())));
 		}
 
 		return $c;
