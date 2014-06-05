@@ -156,7 +156,7 @@ class PortfolioWebDAV
 
         }
 
-        $this->cache[$rootPath]['file'][] = true;
+        $this->cache[$rootPath]['file'] = array();
 
 
     }
