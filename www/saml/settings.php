@@ -29,10 +29,10 @@ $settings->idpSingleSignOnUrl = Config::get('saml_sso_url');
 $settings->idpPublicCertificate = preg_replace("/\r/m", "", Config::get('saml_idp_certificate'));
 
 // The URL where to the SAML Response/SAML Assertion will be posted
-$settings->spReturnUrl = 'https://'.$_SERVER['HTTP_HOST'].'/saml/consume.php';
+$settings->spReturnUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain').'/saml/consume.php';
 
 // Name of this application
-$settings->spIssuer = 'schoolbox';
+$settings->spIssuer = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain');
 
 // Tells the IdP to return the email address of the current user
 #$settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_EMAIL_ADDRESS;
