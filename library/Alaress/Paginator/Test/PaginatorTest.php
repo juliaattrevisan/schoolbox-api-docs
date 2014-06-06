@@ -70,33 +70,33 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
      */
     public function getTestItemsOnPageData() {
         return array(
-            array($this->buildPaginator(1,  0),  0, 0, 0),
+            array($this->buildPaginator(1,  0),  0, -1, 0, 0),
 
-            array($this->buildPaginator(1,  9),  1, 1, 1),
-            array($this->buildPaginator(1,  9),  2, 2, 2),
-            array($this->buildPaginator(1,  9),  8, 8, 8),
-            array($this->buildPaginator(1,  9),  9, 9, 9),
+            array($this->buildPaginator(1,  9),  1, 0, 1, 1),
+            array($this->buildPaginator(1,  9),  2, 1, 2, 2),
+            array($this->buildPaginator(1,  9),  8, 7, 8, 8),
+            array($this->buildPaginator(1,  9),  9, 8, 9, 9),
 
-            array($this->buildPaginator(10, 9),  1, 1, 9),
-            array($this->buildPaginator(10, 10), 1, 1, 10),
-            array($this->buildPaginator(10, 11), 1, 1, 10),
-            array($this->buildPaginator(10, 11), 2, 11, 11),
+            array($this->buildPaginator(10, 9),  1, 0,  1, 9),
+            array($this->buildPaginator(10, 10), 1, 0,  1, 10),
+            array($this->buildPaginator(10, 11), 1, 0,  1, 10),
+            array($this->buildPaginator(10, 11), 2, 10, 11, 11),
 
-            array($this->buildPaginator(10, 19), 1, 1,  10),
-            array($this->buildPaginator(10, 19), 2, 11, 19),
-            array($this->buildPaginator(10, 20), 1, 1,  10),
-            array($this->buildPaginator(10, 20), 2, 11, 20),
-            array($this->buildPaginator(10, 21), 1, 1,  10),
-            array($this->buildPaginator(10, 21), 2, 11, 20),
-            array($this->buildPaginator(10, 21), 3, 21, 21),
+            array($this->buildPaginator(10, 19), 1, 0,  1,  10),
+            array($this->buildPaginator(10, 19), 2, 10, 11, 19),
+            array($this->buildPaginator(10, 20), 1, 0,  1,  10),
+            array($this->buildPaginator(10, 20), 2, 10, 11, 20),
+            array($this->buildPaginator(10, 21), 1, 0,  1,  10),
+            array($this->buildPaginator(10, 21), 2, 10, 11, 20),
+            array($this->buildPaginator(10, 21), 3, 20, 21, 21),
 
-            array($this->buildPaginator(50, 19), 1, 1,  19),
-            array($this->buildPaginator(50, 20), 1, 1,  20),
-            array($this->buildPaginator(50, 21), 1, 1,  21),
-            array($this->buildPaginator(50, 49), 1, 1,  49),
-            array($this->buildPaginator(50, 50), 1, 1,  50),
-            array($this->buildPaginator(50, 51), 1, 1,  50),
-            array($this->buildPaginator(50, 51), 2, 51, 51),
+            array($this->buildPaginator(50, 19), 1, 0,  1,  19),
+            array($this->buildPaginator(50, 20), 1, 0,  1,  20),
+            array($this->buildPaginator(50, 21), 1, 0,  1,  21),
+            array($this->buildPaginator(50, 49), 1, 0,  1,  49),
+            array($this->buildPaginator(50, 50), 1, 0,  1,  50),
+            array($this->buildPaginator(50, 51), 1, 0,  1,  50),
+            array($this->buildPaginator(50, 51), 2, 50, 51, 51),
         );
     }
 
@@ -105,9 +105,10 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
      *
      * @dataProvider getTestItemsOnPageData
      */
-    public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedFirst, $expectedLast) {
-        $this->assertEquals($expectedFirst, $paginator->getFirstOnPage($pageNumber));
-        $this->assertEquals($expectedLast,  $paginator->getLastOnPage($pageNumber));
+    public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedOffset, $expectedFirst, $expectedLast) {
+        $this->assertEquals($expectedOffset, $paginator->getOffset($pageNumber));
+        $this->assertEquals($expectedFirst,  $paginator->getFirstOnPage($pageNumber));
+        $this->assertEquals($expectedLast,   $paginator->getLastOnPage($pageNumber));
     }
 
 

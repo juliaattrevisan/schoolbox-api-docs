@@ -23,34 +23,6 @@ class Paginator implements IPaginator {
      */
     protected $total;
 
-//    /**
-//     * @param int $pageSize Number of items per page
-//     * @param int $total    Total number of items
-//     */
-//    public function __construct($pageSize, $total) {
-//        $this->setPageSize($pageSize)->setTotal($total);
-//    }
-
-//    /**
-//     * Gets the offset
-//     *
-//     * @param  int $pageNumber
-//     * @return int
-//     */
-//    public function getOffset($pageNumber) {
-//        return ($pageNumber - 1) * $this->pageSize;
-//    }
-//
-//    /**
-//     * Gets the limit
-//     *
-//     * @param  int $pageNumber
-//     * @return int
-//     */
-//    public function getLimit($pageNumber) {
-//        return $this->pageSize;
-//    }
-
     /**
      * Ensures that $pageNumber is between the first and last pages.
      *
