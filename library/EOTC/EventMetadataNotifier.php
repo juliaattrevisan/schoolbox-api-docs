@@ -193,18 +193,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 
 		// get list of moderators relevant to the current status
 		$currentStatus = $eventMetadata->getStatus();
+
 		$moderatorIds = $this->getModerators($relEvent, $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus);
 
 		// prep msg data
 		$bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId");
 		$bob->setHref("/modules/eotc/status/modify/$relEventId");
-
-		$fp = fopen('w.err.log', 'a');
-		fputs($fp, print_r(array(
-			$effectorId, $teacherInChargeId, $applicantId, $moderatorIds, $currentStatus
-		), true));
-		fclose($fp);
-
 
 		// change was made by applicant or TiC: inform moderators
 		if($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
@@ -235,10 +229,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		}
 
 		$instance = $bob->build();
-
-		$fp = fopen('w.err.log', 'a');
-		fputs($fp, "$instance\n");
-		fclose($fp);
 
 		// iterate those who should be informed and bind a message for them
 		foreach($inform as $id) {
@@ -321,13 +311,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 			case EventStatusMapper::STATUS_RAMSAPPROVED:
 				$bob->setTitle(":moderator has approved RAMs for :event")
 					->setHref($hrefMod);
+				break;
 
-				// tell Final Approval moderator(s)
-				$moderatorIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_APPROVED);
-
-				foreach($moderatorIds as $userId) {
-					$envelope->targetToUser($userId, $bob->build());
-				}
+			case EventStatusMapper::STATUS_RAMSCONFIRMED:
+				$bob->setTitle(":moderator has confirmed RAMs for :event")
+				    ->setHref($hrefMod);
 				break;
 
 			case EventStatusMapper::STATUS_APPROVED:
@@ -370,9 +358,9 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					if($eventMetadata->getRamsRequired()) {
 						$bob->setHref($hrefMod);
 
-						$moderatorIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_RAMSAPPROVED);
+						$ramsModIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_RAMSAPPROVED);
 
-						foreach($moderatorIds as $userId) {
+						foreach($ramsModIds as $userId) {
 							$envelope->targetToUser($userId, $bob->build());
 						}
 					}
@@ -385,6 +373,16 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				}
 				break;
 
+		}
+
+		// get list of moderators relevant to the current status
+		$currentStatus = $eventMetadata->getStatus();
+		$moderatordIds = $this->getModerators($relEvent, $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus);
+
+		// inform them
+		$bob->setHref($hrefMod);
+		foreach($moderatordIds as $modId) {
+			$envelope->targetToUser($modId, $bob->build());
 		}
 
 		return $envelope;
