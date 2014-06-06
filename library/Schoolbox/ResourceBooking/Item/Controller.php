@@ -9,7 +9,7 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
-use Alaress\Paginator\IPaginator;
+use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -29,7 +29,7 @@ class Controller extends Base {
     protected $userMapper;
 
     /**
-     * @var IPaginator
+     * @var IUrlPaginator
      */
     protected $paginator;
 
@@ -82,6 +82,7 @@ class Controller extends Base {
                     'list'         => $list,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'search'       => $search,
+                    'paginator'    => $this->paginator,
                 ),
             )
         );
@@ -333,7 +334,7 @@ class Controller extends Base {
     }
 
     /**
-     * @param  IPaginator $paginator
+     * @param  IUrlPaginator $paginator
      * @return $this
      */
     public function setPaginator($paginator) {
@@ -342,7 +343,7 @@ class Controller extends Base {
     }
 
     /**
-     * @return IPaginator
+     * @return IUrlPaginator
      */
     public function getPaginator() {
         return $this->paginator;

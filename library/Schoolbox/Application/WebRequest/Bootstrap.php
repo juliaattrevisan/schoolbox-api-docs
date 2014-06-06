@@ -346,6 +346,8 @@ class Bootstrap implements BootstrapInterface {
 			)
 		);
 
+		// Paginator internal object
+		$di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
 
 		// load dependencies into the kernel itself
 		$this->kernel->setDependencyInjector($di);

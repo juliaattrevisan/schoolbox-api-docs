@@ -82,9 +82,12 @@ class Module extends BaseModule {
         // Paginator needs the count per page and amount set.
         $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setPaginator']
             = $injector->lazyNew(
-                'Alaress\\Paginator\\Paginator',
+                'Alaress\\Paginator\\UrlPaginator',
                 array(),
-                array('setPageSize' => 3,)
+                array(
+                    'setPageSize' => 3,
+                    'setParam'    => 'page',
+                )
         );
         $injector->set(
             'controller:resourceItem',
