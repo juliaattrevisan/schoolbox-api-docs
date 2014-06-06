@@ -98,7 +98,7 @@ class EventNotifier extends AbstractModuleNotifier {
 		    ->setHref('/calendar/'.$event->getStartDateTime()->getUsingFormat('d-m-Y'))
 		    ->setBody($plain->get_text())
 		    ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-		    ->addTopic("calendar.{$event->getEventType()->getType()}.{$event->getId()}.$trigger")
+		    ->addTopic("calendar.{$event->getType()->getType()}.{$event->getId()}.$trigger")
 		    ->addFilter('roletype', array($roleType))
 			->setSeverity(Logger::INFO);
 

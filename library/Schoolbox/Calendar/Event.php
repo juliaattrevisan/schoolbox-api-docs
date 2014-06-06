@@ -20,16 +20,9 @@ use Schoolbox\User;
 
 class Event {
 
-	/**
-	 * Event Access Levels
-	 *
-	 * @var array
-	 */
-	private $accessLevels = array(
-		'personal' => 1,
-		'group' => 2,
-		'campus' => 3,
-	);
+	const ACCESS_PERSONAL = 1;
+	const ACCESS_GROUP    = 2;
+	const ACCESS_CAMPUS   = 3;
 
 	/**
 	 * Event id
@@ -83,7 +76,7 @@ class Event {
 	 *
 	 * @var int
 	 */
-	protected $sid = 0;
+	protected $serviceId = 0;
 
 	/**
 	 * A hex string representing the colour of this event
@@ -100,14 +93,7 @@ class Event {
 	 *
 	 * @var EventType
 	 */
-	protected $eventType = '';
-
-	/**
-	 * An int from the event table corresponding to $eventType
-	 *
-	 * @var int
-	 */
-	protected $type = 0;
+	protected $type = null;
 
 	/**
 	 * Title of the event
@@ -194,40 +180,12 @@ class Event {
 	protected $startDateTime = null;
 
 	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $startDate = '';
-
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $startTime = '';
-	
-	/**
 	 * The datetime when the event ends
 	 *
 	 * @var Alaress_Date_Format
 	 */
 	protected $endDateTime = null;
 
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $endDate = '';
-
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $endTime = '';
-	
 	/**
 	 * Constructor
 	 */
@@ -247,11 +205,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isPersonalLevel() {
-		if ($this->getAccess() == $this->accessLevels['personal']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_PERSONAL;
 	}
 
 	/**
@@ -260,11 +214,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isGroupLevel() {
-		if ($this->getAccess() == $this->accessLevels['group']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_GROUP;
 	}
 
 	/**
@@ -273,11 +223,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isCampusLevel() {
-		if ($this->getAccess() == $this->accessLevels['campus']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_CAMPUS;
 	}
 
 	/* Auxiliary methods which don't belong anywhere else
@@ -305,6 +251,8 @@ class Event {
 	}
 
 	/**
+	 * TODO: move this. it doesn't belong here.
+	 *
 	 * Ensure that the user hasn't modified the URL in an untoward manner.
 	 * If they have, or it's somehow absent, default to week view.
 	 *
@@ -369,11 +317,11 @@ class Event {
 	/**
 	 * Set all day
 	 *
-	 * @param int $allDay
+	 * @param bool|int $allDay
 	 * @return self
 	 */
 	public function setAllDay($allDay) {
-		$this->allDay = $allDay;
+		$this->allDay = (int)$allDay;
 	 	return $this;
 	}
 
@@ -449,6 +397,7 @@ class Event {
 	/**
 	 * Set colour
 	 *
+	 * @deprecated
 	 * @param string $colour
 	 * @return self
 	 */
@@ -460,6 +409,7 @@ class Event {
 	/**
 	 * Get colour
 	 *
+	 * @deprecated
 	 * @return string
 	 */
 	public function getColour() {
@@ -469,11 +419,11 @@ class Event {
 	/**
 	 * Set completed
 	 *
-	 * @param int $completed
+	 * @param bool|int $completed
 	 * @return self
 	 */
 	public function setCompleted($completed) {
-		$this->completed = $completed;
+		$this->completed = (int)$completed;
 	 	return $this;
 	}
 
@@ -524,26 +474,6 @@ class Event {
 	 */
 	public function getEndDateTime() {
 		return $this->endDateTime;
-	}
-
-	/**
-	 * Set event type
-	 *
-	 * @param EventType $eventType
-	 * @return self
-	 */
-	public function setEventType($eventType) {
-		$this->eventType = $eventType;
-	 	return $this;
-	}
-
-	/**
-	 * Get event type
-	 *
-	 * @return EventType
-	 */
-	public function getEventType() {
-		return $this->eventType;
 	}
 
 	/**
@@ -652,8 +582,8 @@ class Event {
 	 * @param int $sid
 	 * @return self
 	 */
-	public function setSid($sid) {
-		$this->sid = $sid;
+	public function setServiceId($sid) {
+		$this->serviceId = $sid;
 	 	return $this;
 	}
 
@@ -662,8 +592,8 @@ class Event {
 	 *
 	 * @return int
 	 */
-	public function getSid() {
-		return $this->sid;
+	public function getServiceId() {
+		return $this->serviceId;
 	}
 
 	/**
@@ -689,7 +619,7 @@ class Event {
 	/**
 	 * Set type
 	 *
-	 * @param int $type
+	 * @param EventType $type
 	 * @return self
 	 */
 	public function setType($type) {
@@ -700,7 +630,7 @@ class Event {
 	/**
 	 * Get type
 	 *
-	 * @return int
+	 * @return EventType
 	 */
 	public function getType() {
 		return $this->type;
@@ -709,12 +639,15 @@ class Event {
 	/**
 	 * Set end date
 	 *
-	 * @param string $endDate
+	 * @param string $endDate in the format Y-m-d
 	 * @return self
 	 */
 	public function setEndDate($endDate) {
-		$this->endDate = $endDate;
-	 	return $this;
+		// preserve time if already set
+		$time = $this->getFormattedDate($this->endDateTime, "H:i:s");
+		$this->endDateTime = new Alaress_Date_Format("$endDate $time", 'Y-m-d H:i:s');
+
+		return $this;
 	}
 
 	/**
@@ -723,17 +656,20 @@ class Event {
 	 * @return string
 	 */
 	public function getEndDate() {
-		return $this->endDate;
+		return $this->getFormattedDate($this->endDateTime, 'Y-m-d');
 	}
 
 	/**
 	 * Set end time
 	 *
-	 * @param string $endTime
+	 * @param string $endTime in the format H:i:s
 	 * @return self
 	 */
 	public function setEndTime($endTime) {
-		$this->endTime = $endTime;
+		// preserve date if already set
+		$date = $this->getFormattedDate($this->endDateTime, 'Y-m-d');
+		$this->endDateTime = new Alaress_Date_Format("$date $endTime", 'Y-m-d H:i:s');
+
 	 	return $this;
 	}
 
@@ -743,7 +679,7 @@ class Event {
 	 * @return string
 	 */
 	public function getEndTime() {
-		return $this->endTime;
+		return $this->getFormattedDate($this->endDateTime, 'H:i:s');
 	}
 
 	/**
@@ -753,7 +689,10 @@ class Event {
 	 * @return self
 	 */
 	public function setStartDate($startDate) {
-		$this->startDate = $startDate;
+		// preserve time if set
+		$time = $this->getFormattedDate($this->startDateTime, 'H:i:s');
+		$this->startDateTime = new Alaress_Date_Format("$startDate $time", 'Y-m-d H:i:s');
+
 	 	return $this;
 	}
 
@@ -763,7 +702,7 @@ class Event {
 	 * @return string
 	 */
 	public function getStartDate() {
-		return $this->startDate;
+		return $this->getFormattedDate($this->startDateTime, 'Y-m-d');
 	}
 
 	/**
@@ -774,7 +713,10 @@ class Event {
 	 *
 	 */
 	public function setStartTime($startTime) {
-		$this->startTime = $startTime;
+		// preserve date if set
+		$date = $this->getFormattedDate($this->startDateTime, 'Y-m-d');
+		$this->startDateTime = new Alaress_Date_Format("$date $startTime", 'Y-m-d H:i:s');
+
 	 	return $this;
 	}
 
@@ -784,7 +726,22 @@ class Event {
 	 * @return string
 	 */
 	public function getStartTime() {
-		return $this->startTime;
+		return $this->getFormattedDate($this->startDateTime, 'H:i:s');
+	}
+
+
+	/**
+	 * Format a date, with type-safety
+	 *
+	 * @param \Alaress_Date_Format $object
+	 * @param string $format
+	 * @return string
+	 */
+	protected function getFormattedDate($object, $format) {
+		if($object instanceof Alaress_Date_Format) {
+			return $object->getUsingFormat($format);
+		}
+		return date($format, 0);
 	}
 
 	/**

@@ -386,7 +386,7 @@ class Controller extends Base {
         // bookings for other people.
         $event->setOwner($this->getUser());
         $event->setAuthor($this->getUser());
-        $event->setSid($this->getUser()->getId());
+        $event->setServiceId($this->getUser()->getId());
         $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
         // Currently role and campus must be set to empty collections.
         $event->setRoleCollection(new Collection());

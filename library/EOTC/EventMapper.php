@@ -9,111 +9,46 @@
  */
 
 namespace EOTC;
+
 use Schoolbox\Calendar;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 
 
 class EventMapper extends Calendar\EventMapper {
 
 	/**
-	 * This is a direct clone with less functionality
+	 * Calls for the core mapping of events, then extends it
 	 */
 	protected function mapping() {
+		$this->coreMapping();
+
 		$this->hasTable('eotc_event');
 		$this->hasModel('\\EOTC\\Event');
 
-		$this->hasMap(array(
-			'column' => 'id',
-			'property' => 'id',
-			'type' => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column' => 'series_id',
-			'property' => 'seriesId',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'author_id',
-			'property' => 'author',
-			'type' => self::TYPE_MODEL,
-			'join' => 'author',
-		));
 		$this->hasMap(array(
 			'column' => 'teacher_in_charge_id',
 			'property' => 'teacherInCharge',
 			'type' => self::TYPE_MODEL,
 			'join' => 'teacherInCharge',
 		));
-		$this->hasMap(array(
-			'column' => 'type',
-			'property' => 'type',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'note',
-			'property' => 'note',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'detail',
-			'property' => 'detail',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'location',
-			'property' => 'location',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'   => 'startDate',
-			'property' => 'startDate',
-			'type'     => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'   => 'startTime',
-			'property' => 'startTime',
-			'type'     => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'   => 'endDate',
-			'property' => 'endDate',
-			'type'     => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'   => 'endTime',
-			'property' => 'endTime',
-			'type'     => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'allday',
-			'property' => 'allday',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasJoin('author', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'author_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('eventType', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\EventTypeMapper',
-			'this_key'  => 'type',
-			'other_key' => 'eventTypeID',
-		));
 		$this->hasJoin('teacherInCharge', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'teacher_in_charge_id',
 			'other_key' => 'id',
 		));
-
-		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
 	 * Custom findById
 	 *
-	 * @param mixed $identifier
-	 * @return object|Model
-	 * @throws \Exception
+	 * @param int $identifier
+	 * @return Event
+	 * @throws Exception
 	 */
 	public function findById($identifier) {
 		$authorMapper = $this->getJoinMapper('author');
@@ -137,35 +72,25 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
-		$row = $statement->fetch();
+		;
 
 		/* Hydrate or die
 		 */
-		if ($row != false) {
+		if ($row = $statement->fetch()) {
+			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/* Author
-			 */
+			/** @var User $authorItem */
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
-			/* Teacher In Charge
-			 */
+			/** @var User $teacherInChargeItem */
 			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
 			$eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/* Event Type
-			 */
+			/** @var EventType $eventTypeItem */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
-
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
-
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
-			$eventItem->setEndDateTime($endDateTime);
+			$eventItem->setType($eventTypeItem);
 
 			/* Accumulate the metadata for this event
 			 * Only use the first record
@@ -209,19 +134,17 @@ class EventMapper extends Calendar\EventMapper {
 
 				$eventItem->getMetadata()->setActivityLog($allActivityLogs);
 			}
-		}
 
-		if ($eventItem) {
 			return $eventItem;
 		}
 
-		throw new \Exception('Instance of object not found');
+		throw new Exception('Instance of object not found');
 	}
 
 	/**
 	 * Custom findAllByListGroups
 	 *
-	 * @return object|Model
+	 * @return object
 	 */
 	public function findAllByListGroups() {
 		$authorMapper = $this->getJoinMapper('author');
@@ -261,26 +184,17 @@ class EventMapper extends Calendar\EventMapper {
 		/* Hydrate or die
 		 */
 		foreach($statement as $row) {
+			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/* Teacher In Charge
-			 */
+			/** @var User $teacherInChargeItem */
 			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
 			$eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/* Event Type
-			 */
+			/** @var EventType $eventTypeItem */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
+			$eventItem->setType($eventTypeItem);
 
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
-
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
-			$eventItem->setEndDateTime($endDateTime);
-			
 			/* Accumulate campuses for this event
 			 */
 			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
@@ -319,10 +233,10 @@ class EventMapper extends Calendar\EventMapper {
 	 *
 	 * This is used on the My EOTC screen
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @return ListGroup\Collection
 	 */
-	public function findAllByListGroupsForUser(\Schoolbox\User $user) {
+	public function findAllByListGroupsForUser($user) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -353,28 +267,22 @@ class EventMapper extends Calendar\EventMapper {
 		$statement->bindParam(":userId", $user->getId());
 		$statement->execute();
 
-		$allEvents = new \Schoolbox\Collection();
+		$allEvents = new Collection();
 		$processedSeriesIds = array();
 
 		/* Hydrate or die
 		 */
 		foreach($statement as $row) {
+			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/* Teacher In Charge
-			 */
+			/** @var User $teacherInChargeItem */
 			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
 			$eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/* Event Type
-			 */
+			/** @var EventType $eventTypeItem */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
-
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
+			$eventItem->setType($eventTypeItem);
 
 			/* Accumulate the metadata for this event
 			 * Only use the first record
@@ -415,7 +323,7 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Postsave hook
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
 	protected function postSave($event) {
 		$metadataMapper = new EventMetadataMapper();
@@ -438,8 +346,8 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Find metadata for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|EventMetadata[]
 	 */
 	protected function findMetadata($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -470,8 +378,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * Deletes metadata relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $event
-	 * @return bool|void
+	 * @param Event $event
 	 */
 	public function deleteMetadataRelations($event) {
 		$query = "
@@ -487,7 +394,7 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Assign campuses to an event
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
 	private function createCampus($event) {
 		$query = "
@@ -506,8 +413,8 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Find campuses for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|Campus[]
 	 */
 	protected function findCampuses($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -526,7 +433,7 @@ class EventMapper extends Calendar\EventMapper {
 				'relation' => array(
 					'column' => 'campus_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\CampusMapper()
+					'mapper' => new CampusMapper()
 				),
 			)
 		);
@@ -538,8 +445,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * Deletes campus relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $event
-	 * @return bool|void
+	 * @param Event $event
 	 */
 	public function deleteCampusRelations($event) {
 		$query = "

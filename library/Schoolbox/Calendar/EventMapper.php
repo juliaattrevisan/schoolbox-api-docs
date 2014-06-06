@@ -12,9 +12,11 @@ namespace Schoolbox\Calendar;
 use Schoolbox;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Mapper;
+use Schoolbox\UserAccess;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
@@ -27,8 +29,54 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @return void
 	 */
 	protected function mapping() {
+		$this->coreMapping();
+
 		$this->hasTable('event');
 		$this->hasModel('\\Schoolbox\\Calendar\\Event');
+
+		$this->hasMap(array(
+			'column' => 'owner',
+			'property' => 'owner',
+			'type' => self::TYPE_MODEL,
+			'join' => 'owner',
+		));
+		$this->hasMap(array(
+			'column' => 'access',
+			'property' => 'access',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'sid',
+			'property' => 'serviceId',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'attendance',
+			'property' => 'attendance',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'completed',
+			'property' => 'completed',
+			'type' => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column' => 'publish_date',
+			'property' => 'publishDateTime',
+			'type' => self::TYPE_DATETIME,
+		));
+		$this->hasJoin('owner', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'owner',
+			'other_key' => 'id',
+		));
+	}
+
+
+	/**
+	 * Mapping common to extending classes
+	 */
+	protected function coreMapping() {
 		$this->hasMap(array(
 			'column' => 'id',
 			'property' => 'id',
@@ -41,31 +89,16 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'type' => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
-			'column' => 'owner',
-			'property' => 'owner',
-			'type' => self::TYPE_MODEL,
-			'join' => 'owner',
-		));
-		$this->hasMap(array(
 			'column' => 'author_id',
 			'property' => 'author',
 			'type' => self::TYPE_MODEL,
 			'join' => 'author',
 		));
 		$this->hasMap(array(
-			'column' => 'access',
-			'property' => 'access',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'sid',
-			'property' => 'sid',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
 			'column' => 'type',
 			'property' => 'type',
-			'type' => self::TYPE_INTEGER,
+			'type' => self::TYPE_MODEL,
+			'join' => 'eventType'
 		));
 		$this->hasMap(array(
 			'column' => 'note',
@@ -103,29 +136,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'type'     => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
-			'column' => 'attendance',
-			'property' => 'attendance',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'completed',
-			'property' => 'completed',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
 			'column' => 'allday',
 			'property' => 'allDay',
 			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'publish_date',
-			'property' => 'publishDateTime',
-			'type' => self::TYPE_DATETIME,
-		));
-		$this->hasJoin('owner', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'owner',
-			'other_key' => 'id',
 		));
 		$this->hasJoin('author', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
@@ -137,7 +150,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
+
 		$this->registerCallback('postSave', array($this, 'postSave'));
+
 	}
 
 	/**
@@ -189,20 +204,12 @@ class EventMapper extends Schoolbox\External\Mapper {
 			/* Event Type
 			 */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
-
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
-
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
-			$eventItem->setEndDateTime($endDateTime);
+			$eventItem->setType($eventTypeItem);
 
 			return $eventItem;
 		}
 
-		throw new \Exception('Instance of object not found');
+		throw new Exception('Instance of object not found');
 	}
 
 	/**
@@ -297,7 +304,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Assign roles to an event
 	 *
 	 * @param Event $event
-	 * @throws \Schoolbox\Mapper\Exception
+	 * @throws Exception
 	 */
 	private function createRoles($event) {
 		foreach ($event->getRoleCollection() as $role) {
@@ -323,7 +330,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * Assign campuses to an event
 	 *
 	 * @param Event $event
-	 * @throws \Schoolbox\Mapper\Exception
+	 * @throws Exception
 	 */
 	private function createCampus($event) {
 		foreach ($event->getCampusCollection() as $campus) {
@@ -347,6 +354,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 	/**
 	 * Get a permission level for a particular event and user combination
 	 *
+	 * @deprecated is this function even used?
 	 * @param Event $event
 	 * @param User $user
 	 * @return int
@@ -356,7 +364,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		/* Superuser exit
 		 */
 		if ($user->isSuperuser()) {
-			return FULL_ACCESS;
+			return UserAccess::ACCESS_FULL;
 		}
 
 		/* Personal events
@@ -366,13 +374,13 @@ class EventMapper extends Schoolbox\External\Mapper {
 			/* If you personally spawned this event, you can modify it
 			 */
 			if ($event->getAuthor()->getId() == $user->getId()) {
-				return WRITE_ACCESS;
+				return UserAccess::ACCESS_WRITE;
 			}
 			/* Otherwise, if this event is just related to you in some way,
 			 * you can only read it unless you are a staff member
 			 */
 			else if ($event->getOwner() == $user->getId()) {
-				return $user->getRole()->getType() === 'staff' ? WRITE_ACCESS : READ_ACCESS;
+				return $user->getRole()->getType() === 'staff' ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_READ;
 			}
 		}
 		/* Group events
@@ -380,7 +388,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		else if ($event->isGroupLevel()) {
 			$groupHandler = new \Group();
 
-			return $groupHandler->getPermission($event->getSid());
+			return $groupHandler->getPermission($event->getServiceId());
 		}
 		/* Campus events
 		 */
@@ -389,7 +397,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 			/* Find the highest permission level
 			 */
-			$maxPermission = DENY_ACCESS;
+			$maxPermission = UserAccess::ACCESS_DENY;
 
 			foreach ($event->getCampusCollection() as $currentCampus) {
 				$permission = $groupHandler->getPermission($currentCampus);
@@ -405,7 +413,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		/* If you somehow don't fit into any of the above,
 		 * you just...don't get anything.
 		 */
-		return DENY_ACCESS;
+		return UserAccess::ACCESS_DENY;
 	}
 
 	/**
