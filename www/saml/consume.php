@@ -21,7 +21,7 @@ try {
         $sessionHandler = new Session();
         if ($sessionHandler->create($samlResponse->getNameId())) {
             $page = '/';
-            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'])) {
+            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'] && substr($_GET['page'],0,6) != '/login')) {
                 $page = $_GET['page'];
             }
             SitePage::localRedir($page);
