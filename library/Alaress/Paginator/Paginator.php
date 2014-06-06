@@ -71,6 +71,18 @@ class Paginator implements IPaginator {
     }
 
     /**
+     * Gets the 0-indexed offset of the first item on page $pageNumber.
+     *
+     * @param  int $pageNumber
+     * @return int
+     * @throws OutOfRangeException if $pageNumber is outside valid page range
+     */
+    public function getOffset($pageNumber) {
+        $this->assertPageNumberWithinRange($pageNumber);
+        return (($pageNumber - 1) * $this->pageSize);
+    }
+
+    /**
      * Gets the first item on the page
      *
      * @param  int $pageNumber
@@ -78,8 +90,7 @@ class Paginator implements IPaginator {
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
     public function getFirstOnPage($pageNumber) {
-        $this->assertPageNumberWithinRange($pageNumber);
-        return (($pageNumber - 1) * $this->pageSize) + 1;
+        return $this->getOffset($pageNumber) + 1;
     }
 
     /**
@@ -112,6 +123,13 @@ class Paginator implements IPaginator {
      */
     public function getLastPage() {
         return intval(ceil($this->total / $this->pageSize));
+    }
+
+    /**
+     * @return int
+     */
+    public function getPageSize() {
+        return $this->pageSize;
     }
 
     /**
