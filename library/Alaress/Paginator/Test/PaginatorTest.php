@@ -13,32 +13,188 @@ use PHPUnit_Framework_TestCase;
 
 class PaginatorTest extends PHPUnit_Framework_TestCase {
 
-
-    public function testZeroPagesize() {
-        $this->setExpectedException('OutOfRangeException');
-        new Paginator(0, 0);
+    /**
+     * Simple factory for a test Paginator object.
+     *
+     * @param  int $pageSize
+     * @param  int $total
+     * @return Paginator
+     */
+    protected function buildPaginator($pageSize, $total) {
+        $paginator = new Paginator();
+        $paginator->setPageSize($pageSize)->setTotal($total);
+        return $paginator;
     }
 
+    /**
+     * @return array
+     */
+    public function getTestFirstLastPageData() {
+        return array(
+            array($this->buildPaginator(1,  0),  0, 0),
+            array($this->buildPaginator(1,  9),  1, 9),
+
+            array($this->buildPaginator(10, 9),  1, 1),
+            array($this->buildPaginator(10, 10), 1, 1),
+            array($this->buildPaginator(10, 11), 1, 2),
+
+            array($this->buildPaginator(10, 19), 1, 2),
+            array($this->buildPaginator(10, 20), 1, 2),
+            array($this->buildPaginator(10, 21), 1, 3),
+
+            array($this->buildPaginator(10, 59), 1, 6),
+            array($this->buildPaginator(10, 60), 1, 6),
+            array($this->buildPaginator(10, 61), 1, 7),
+
+            array($this->buildPaginator(50, 19), 1, 1),
+            array($this->buildPaginator(50, 20), 1, 1),
+            array($this->buildPaginator(50, 21), 1, 1),
+            array($this->buildPaginator(50, 49), 1, 1),
+            array($this->buildPaginator(50, 50), 1, 1),
+            array($this->buildPaginator(50, 51), 1, 2),
+        );
+    }
+
+    /**
+     * Tests first and last page numbers.
+     *
+     * @dataProvider getTestFirstLastPageData
+     */
+    public function testPageNumbers(Paginator $paginator, $expectedFirst, $expectedLast) {
+        $this->assertEquals($expectedFirst, $paginator->getFirstPage());
+        $this->assertEquals($expectedLast,  $paginator->getLastPage());
+    }
+
+    /**
+     * @return array
+     */
+    public function getTestItemsOnPageData() {
+        return array(
+            array($this->buildPaginator(1,  0),  0, 0, 0),
+
+            array($this->buildPaginator(1,  9),  1, 1, 1),
+            array($this->buildPaginator(1,  9),  2, 2, 2),
+            array($this->buildPaginator(1,  9),  8, 8, 8),
+            array($this->buildPaginator(1,  9),  9, 9, 9),
+
+            array($this->buildPaginator(10, 9),  1, 1, 9),
+            array($this->buildPaginator(10, 10), 1, 1, 10),
+            array($this->buildPaginator(10, 11), 1, 1, 10),
+            array($this->buildPaginator(10, 11), 2, 11, 11),
+
+            array($this->buildPaginator(10, 19), 1, 1,  10),
+            array($this->buildPaginator(10, 19), 2, 11, 19),
+            array($this->buildPaginator(10, 20), 1, 1,  10),
+            array($this->buildPaginator(10, 20), 2, 11, 20),
+            array($this->buildPaginator(10, 21), 1, 1,  10),
+            array($this->buildPaginator(10, 21), 2, 11, 20),
+            array($this->buildPaginator(10, 21), 3, 21, 21),
+
+            array($this->buildPaginator(50, 19), 1, 1,  19),
+            array($this->buildPaginator(50, 20), 1, 1,  20),
+            array($this->buildPaginator(50, 21), 1, 1,  21),
+            array($this->buildPaginator(50, 49), 1, 1,  49),
+            array($this->buildPaginator(50, 50), 1, 1,  50),
+            array($this->buildPaginator(50, 51), 1, 1,  50),
+            array($this->buildPaginator(50, 51), 2, 51, 51),
+        );
+    }
+
+    /**
+     * Tests first and last items on a given page number.
+     *
+     * @dataProvider getTestItemsOnPageData
+     */
+    public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedFirst, $expectedLast) {
+        $this->assertEquals($expectedFirst, $paginator->getFirstOnPage($pageNumber));
+        $this->assertEquals($expectedLast,  $paginator->getLastOnPage($pageNumber));
+    }
+
+
+    /**
+     * Invalid item tests
+     */
+
+    /**
+     * Tests that zero pagesize is invalid.
+     */
+    public function testZeroPagesize() {
+        $this->setExpectedException('OutOfRangeException');
+        $this->buildPaginator(0, 0);
+    }
+
+    /**
+     * Tests that negative pagesize is invalid.
+     */
     public function testNegativePagesize() {
         $this->setExpectedException('OutOfRangeException');
-        new Paginator(-1, 0);
+        $this->buildPaginator(-1, 0);
+    }
+
+    /**
+     * Tests that negative total is invalid.
+     */
+    public function testNegativeTotal() {
+        $this->setExpectedException('OutOfRangeException');
+        $this->buildPaginator(10, -1);
     }
 
 
     /**
      * @return array
      */
-    public function getTestOffestData() {
+    public function getTestPageNumberLowerBoundData() {
         return array(
-            array(new Paginator(1, 0), 0),
-            array(new Paginator(1, 10), ),
+            array($this->buildPaginator(1,  0),  -1),
+
+            array($this->buildPaginator(1,  9),   0),
+            array($this->buildPaginator(1,  9),  -1),
+
+            array($this->buildPaginator(10, 9),   0),
+            array($this->buildPaginator(10, 9),  -1),
+            array($this->buildPaginator(10, 10),  0),
+            array($this->buildPaginator(10, 10), -1),
+            array($this->buildPaginator(10, 11),  0),
+            array($this->buildPaginator(10, 11), -1),
         );
     }
 
     /**
-     * @dataProvider getTestOffestData
+     * Tests that requesting a page number below the minimum range is invalid.
+     *
+     * @dataProvider getTestPageNumberLowerBoundData
      */
-    public function testOffset(Paginator $paginator, $page, $expected) {
+    public function testPageNumberLowerBound(Paginator $paginator, $pageNumber) {
+        $this->setExpectedException('OutOfRangeException');
+        $paginator->getFirstOnPage($pageNumber);
     }
 
+
+    /**
+     * @return array
+     */
+    public function getTestPageNumberUpperBoundData() {
+        return array(
+            array($this->buildPaginator(1,  0),  1),
+
+            array($this->buildPaginator(1,  9),  10),
+
+            array($this->buildPaginator(10, 9),  2),
+            array($this->buildPaginator(10, 9),  4),
+            array($this->buildPaginator(10, 10), 2),
+            array($this->buildPaginator(10, 10), 5),
+            array($this->buildPaginator(10, 11), 3),
+            array($this->buildPaginator(10, 11), 5),
+        );
+    }
+
+    /**
+     * Tests that requesting a page number below the minimum range is invalid.
+     *
+     * @dataProvider getTestPageNumberUpperBoundData
+     */
+    public function testPageNumberUpperBound(Paginator $paginator, $pageNumber) {
+        $this->setExpectedException('OutOfRangeException');
+        $paginator->getFirstOnPage($pageNumber);
+    }
 }
