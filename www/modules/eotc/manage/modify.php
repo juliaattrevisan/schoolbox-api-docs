@@ -30,6 +30,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$mapper = new \EOTC\EventMapper();
 
 		try {
+			/** @var EOTC\Event $event */
 			$event = $mapper->findById($_GET['eventID']);
 		}
 		catch (\Exception $e) {
@@ -44,7 +45,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 		/* Default values
 		 */
-		$defaultTypeId = $event->getEventType()->getId();
+		$defaultTypeId = $event->getType()->getId();
 		$defaultCampusId = array();
 
 		$allCampuses = $event->getCampusCollection()->getAll();

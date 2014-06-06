@@ -1,11 +1,17 @@
 <?php
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Collection;
+use Schoolbox\UserMapper;
+
 /**
  * ${NAME}
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
@@ -33,36 +39,34 @@ if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->i
  */
 else {
 	error(19);
+	exit;
 }
 
-$event = array(
-	'owner' => $ownerId,
-	'author_id' => $user->getId(),
-	'access' => 1,
-	'sid' => $ownerId,
-	'campusList' => array(),
-	'groupList' => array(),
-	'type' => $_POST['type'],
-	'note' => $_POST['note'],
-	'startDate' => $dateObj->getDatabaseDate(),
-	'endDate' => $dateObj->getDatabaseDate(),
-	//
-	// No time is given by default. I'm going to assume any event created here
-	// is an all day one.
-	'startTime' => '00:00:00',
-	'endTime' => '00:00:00',
-	'allday' => true,
-	'location' => $_POST['location'],
-	'attendance' => $_POST['attendance'],
-	'detail' => $_POST['detail'],
-	'publish_date' => $publish_date->getDatabaseDate(),
-	'completed' => $_POST['completed'],
-);
+$event = new Event();
 
-if ($eventId = $calendarHandler->create($event)) {
-	$json =  array(
-		'title' => $event['note'],
-		'start' => strtotime($event['startDate'] . ' ' . $event['startTime']),
+$event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
+	  ->setAuthor($user)
+	  ->setAccess(Event::ACCESS_PERSONAL)
+	  ->setServiceId($ownerId)
+	  ->setCampusCollection(new Collection())
+	  ->setRoleCollection(new Collection())
+	  ->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
+	  ->setNote($_POST['note'])
+	  ->setStartDateTime($dateObj)
+	  ->setEndDateTime($dateObj)
+	  ->setAllDay(true)
+	  ->setLocation($_POST['location'])
+	  ->setAttendance($_POST['attendance'])
+	  ->setDetail($_POST['detail'])
+	  ->setPublishDateTime($publish_date)
+	  ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
+
+$affectedIds = EventMapper::getInstance()->save($event);
+
+if (count($affectedIds) == 1) {
+	$json = array(
+		'title' => $event->getNote(),
+		'start' => $event->getStartDateTime()->getUnixTimestamp(),
 
 		/* Whether you can edit this event or not
 		 */
@@ -71,7 +75,7 @@ if ($eventId = $calendarHandler->create($event)) {
 		/* Whether it's an all-day event or not
 		 * If allDay is true, then you can't resize it
 		 */
-		'allDay' => $event['allday'],
+		'allDay' => $event->getAllDay(),
 
 		/* Colour of the event
 		 */
@@ -81,31 +85,31 @@ if ($eventId = $calendarHandler->create($event)) {
 		 */
 		'data' => array(
 			'meta' => array(
-				'eventId' => $eventId,
-				'detail' => $event['detail'],
-				'location' => $event['location'],
-				'eventType' => '',
-				'eventTypeId' => $event['type'],
-				'type' => $event['type'],
-				'author' => '',
-				'authorId' => $event['owner'],
-				'level' => '',
-				'completed' => $event['completed'],
+				'eventId'       => $affectedIds[0],
+				'detail'        => $event->getDetail(),
+				'location'      => $event->getLocation(),
+				'eventType'     => '',
+				'eventTypeId'   => $event->getType()->getId(),
+				'type'          => $event->getType()->getId(),
+				'author'        => '',
+				'authorId'      => $event->getOwner()->getId(),
+				'level'         => '',
+				'completed'     => $event->getCompleted(),
 			),
 			'links' => array(
-				'category' => array(
-					'id' => '',
-					'name' => '',
+				'category'  => array(
+					'id'    => '',
+					'name'  => '',
 				)
 			),
 			'styles' => array(
 				'visible' => '',
 			),
-			'attendance' => array(
-				'icon' => false,
-				'status' => false,
+			'attendance'        => array(
+				'icon'          => false,
+				'status'        => false,
 				'requestButton' => false,
-				'listButton' => false,
+				'listButton'    => false,
 			)
 		)
 	);

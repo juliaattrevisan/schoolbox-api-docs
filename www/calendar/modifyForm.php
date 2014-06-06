@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventTypeMapper;
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -28,6 +31,7 @@ try {
 	 */
 	else {
 		error(19);
+		exit;
 	}
 }
 catch(\Schoolbox\Mapper\Exception $e) {
@@ -53,10 +57,11 @@ switch($_POST['action']) {
 			}
 			catch (\Schoolbox\Mapper\Exception $e) {
 				error(160);
+				exit;
 			}
 		}
 		else {
-			$event = new \Schoolbox\Calendar\Event();
+			$event = new Event();
 		}
 
 		/* Events aren't visible until this date
@@ -92,6 +97,7 @@ switch($_POST['action']) {
 		}
 		catch(\Schoolbox\Mapper\Exception $e) {
 			error(19);
+			exit;
 		}
 
 		/* Spawned further up
@@ -99,8 +105,8 @@ switch($_POST['action']) {
 		$event->setOwner($owner);
 		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
-		$event->setSid($_POST['group']);
-		$event->setType($_POST['type']);
+		$event->setServiceId($_POST['group']);
+		$event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
 		$event->setNote($_POST['note']);
 		$event->setStartDateTime($startDate);
 		$event->setStartDate($startDate->getDatabaseDate());
@@ -111,6 +117,7 @@ switch($_POST['action']) {
 		$event->setLocation($_POST['location']);
 		$event->setDetail($_POST['detail']);
 		$event->setPublishDateTime($pubDateObject);
+		$event->setAllDay($_POST['allday']);
 
 		/* Collections of ids
 		 */

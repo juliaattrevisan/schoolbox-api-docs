@@ -28,12 +28,13 @@ if (is_numeric($_GET['eventID'])) {
 	}
 	catch (\Exception $e) {
 		error(160);
+		exit;
 	}
 
 	/* Default values
 	 */
-	$defaultTypeId = $event->getEventType()->getId();
-	$defaultSid = $event->getSid();
+	$defaultTypeId = $event->getType()->getId();
+	$defaultSid = $event->getServiceId();
 	$defaultAccessLevel = $event->getAccess();
 
 	/* Only provide publish date if one was provided and if it
