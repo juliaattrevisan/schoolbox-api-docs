@@ -13,7 +13,7 @@ namespace Alaress\Paginator;
 use OutOfRangeException;
 use Zend\Uri\UriInterface;
 
-class UrlPaginator implements IPaginator {
+class UrlPaginator implements IUrlPaginator {
 
     /**
      * The URL to use to generate page URLs.
@@ -124,14 +124,9 @@ class UrlPaginator implements IPaginator {
     }
 
 
-
-
-
-
     /**
      * IPaginator method implementations - all passed to the internal paginator.
      */
-
 
     /**
      * Gets the 0-indexed offset of the first item on page $pageNumber.
