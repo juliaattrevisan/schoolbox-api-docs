@@ -97,7 +97,7 @@ abstract class AbstractProcess extends PipeWriter {
 				try {
 					$this->buffering = false;
 					$this->write($this->parseBuffer());
-					$this->debug->d("Task Complete");
+					$this->debug->v("Task Complete");
 				}
 				catch(ErrorException $e) {
 					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
@@ -159,6 +159,8 @@ abstract class AbstractProcess extends PipeWriter {
 		$response = $this->process($cmd, $args);
 		$this->debug->v("Processing successful");
 		$flat = $this->strat->getProtocol()->flatten($response);
+		$size = strlen($flat);
+		$this->debug->v("Flattened response is $size bytes", 'd');
 
 		return $flat;
 	}

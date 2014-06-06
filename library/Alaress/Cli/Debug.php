@@ -47,6 +47,14 @@ class Debug {
 	 */
 	public function v($message, $char = ' ') {
         if(!is_null($this->stream)) {
+
+	        // if this is already formatted like a log, don't reformat it
+	        if(preg_match("`\[.\].+ => `", $message)) {
+		        fputs($this->stream, $message);
+		        return;
+	        }
+
+
 	        try {
 	            $c = '';
 
