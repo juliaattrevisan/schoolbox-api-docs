@@ -1,17 +1,17 @@
 <?php
 /**
- * Class description here
+ * Implementation of a simple paginator.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
 
 namespace Alaress\Paginator;
 
+use OutOfRangeException;
 
-class Paginator {
+class Paginator implements IPaginator {
 
     /**
      * @var int
@@ -23,32 +23,51 @@ class Paginator {
      */
     protected $total;
 
-    /**
-     * @param int $pageSize Number of items per page
-     * @param int $total    Total number of items
-     */
-    public function __construct($pageSize, $total) {
-        $this->setPageSize($pageSize)->setTotal($total);
-    }
+//    /**
+//     * @param int $pageSize Number of items per page
+//     * @param int $total    Total number of items
+//     */
+//    public function __construct($pageSize, $total) {
+//        $this->setPageSize($pageSize)->setTotal($total);
+//    }
+
+//    /**
+//     * Gets the offset
+//     *
+//     * @param  int $pageNumber
+//     * @return int
+//     */
+//    public function getOffset($pageNumber) {
+//        return ($pageNumber - 1) * $this->pageSize;
+//    }
+//
+//    /**
+//     * Gets the limit
+//     *
+//     * @param  int $pageNumber
+//     * @return int
+//     */
+//    public function getLimit($pageNumber) {
+//        return $this->pageSize;
+//    }
 
     /**
-     * Gets the offset
+     * Ensures that $pageNumber is between the first and last pages.
      *
      * @param  int $pageNumber
-     * @return int
+     * @throws OutOfRangeException if not $this->getFirstPage() > $pageNumber > $this->getLastPage()
      */
-    public function getOffset($pageNumber) {
-        return ($pageNumber - 1) * $this->pageSize;
-    }
-
-    /**
-     * Gets the limit
-     *
-     * @param  int $pageNumber
-     * @return int
-     */
-    public function getLimit($pageNumber) {
-        return $this->pageSize;
+    protected function assertPageNumberWithinRange($pageNumber) {
+        if ($pageNumber < ($first = $this->getFirstPage())) {
+            throw new OutOfRangeException(
+                sprintf('Requested page number "%d" less than first page "%d"', $pageNumber, $first)
+            );
+        }
+        if ($pageNumber > ($last = $this->getLastPage())) {
+            throw new OutOfRangeException(
+                sprintf('Requested page number "%d" greater than last page "%d"', $pageNumber, $last)
+            );
+        }
     }
 
     /**
@@ -56,18 +75,22 @@ class Paginator {
      *
      * @param  int $pageNumber
      * @return int
+     * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
     public function getFirstOnPage($pageNumber) {
-        return max(1 + ($pageNumber - 1) * $this->pageSize);
+        $this->assertPageNumberWithinRange($pageNumber);
+        return (($pageNumber - 1) * $this->pageSize) + 1;
     }
 
     /**
-     * Gets the first item on the page
+     * Gets the last item on the page
      *
      * @param  int $pageNumber
      * @return int
+     * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
     public function getLastOnPage($pageNumber) {
+        $this->assertPageNumberWithinRange($pageNumber);
         return min($this->total, $pageNumber * $this->pageSize);
     }
 
@@ -79,7 +102,7 @@ class Paginator {
      * @return int
      */
     public function getFirstPage() {
-        return max(1, $this->getLastPage());
+        return min(1, $this->getLastPage());
     }
 
     /**
@@ -94,38 +117,29 @@ class Paginator {
     /**
      * @param  int   $pageSize
      * @return $this
-     * @throws \OutOfRangeException if page size <= 0
+     * @throws OutOfRangeException if $pageSize <= 0
      */
     public function setPageSize($pageSize) {
         $pageSize = intval($pageSize);
         if ($pageSize <= 0) {
-            throw new \OutOfRangeException('Page size must be at least 1');
+            throw new OutOfRangeException('Page size must be at least 1');
         }
         $this->pageSize = $pageSize;
         return $this;
     }
 
     /**
-     * @return int
-     */
-    public function getPageSize() {
-        return $this->pageSize;
-    }
-
-    /**
      * @param  int   $total
      * @return $this
+     * @throws OutOfRangeException if $total <= 0
      */
     public function setTotal($total) {
+        $total = intval($total);
+        if ($total < 0) {
+            throw new OutOfRangeException('Total must be at least 0');
+        }
         $this->total = $total;
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotal() {
-        return $this->total;
-    }
-
-} 
+}
