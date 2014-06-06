@@ -161,8 +161,8 @@ abstract class Evaluation_Export_Xml {
 	 * Render headers and xml data
 	 */
 	public function render() {
-//		header('Content-type: text/xml');
-//		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
+		header('Content-type: text/xml');
+		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
 
 		$this->getPage()->template->pparse('finaloutput', 'xml');
 
