@@ -8,6 +8,8 @@
  */
 
 namespace Schoolbox\ResourceBooking\Item;
+
+use Alaress\Paginator\IPaginator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -27,6 +29,11 @@ class Controller extends Base {
     protected $userMapper;
 
     /**
+     * @var IPaginator
+     */
+    protected $paginator;
+
+    /**
      * Browses the list of items.
      */
     public function browse() {
@@ -35,14 +42,37 @@ class Controller extends Base {
         $query  = array();
         $catId  = $this->getRequest()->query['category'];
         $search = trim($this->getRequest()->query['search']);
+
+        // Use the paginator to limit searches
+        $list = array();
         if (strlen($search) > 0) {
-            $list = $this->getMapper()->search($search);
+            $total = $this->mapper->searchCount($search);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->getMapper()->search(
+                    $search,
+                    $this->paginator->getOffset($this->paginator->getFirstPage()),
+                    $this->paginator->getPageSize()
+                );
+            }
         }
         else {
             if ($catId) {
                 $query['resource_category_id'] = $catId;
             }
-            $list = $this->getMapper()->findByColumnList($query);
+
+            // Get count before running list
+            $total = $this->mapper->countByColumnList($query);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->mapper->findByColumnList(
+                    $query,
+                    array(
+                        'limit'  => $this->paginator->getPageSize(),
+                        'offset' => $this->paginator->getOffset($this->paginator->getFirstPage()),
+                    )
+                );
+            }
         }
 
         $this->getResponse()->content->set(
@@ -300,6 +330,22 @@ class Controller extends Base {
      */
     public function getUserMapper() {
         return $this->userMapper;
+    }
+
+    /**
+     * @param  IPaginator $paginator
+     * @return $this
+     */
+    public function setPaginator($paginator) {
+        $this->paginator = $paginator;
+        return $this;
+    }
+
+    /**
+     * @return IPaginator
+     */
+    public function getPaginator() {
+        return $this->paginator;
     }
 
 }
