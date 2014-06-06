@@ -135,9 +135,12 @@ abstract class Evaluation_Export_Xml {
 
 							/* Clear children after parsing out the parent
 							 */
-							$this->getPage()->setVar('answerFormFragment', '');
-							$this->getPage()->setVar('answerInputs_block', '');
-							$this->getPage()->setVar('answer_configuration_block', '');
+							$this->getPage()->setVar(array(
+								'answerFormFragment' => '',
+								'answerInputs_block' => '',
+								'answerCorrect_block' => '',
+								'answer_configuration_block' => '',
+							));
 						}
 					}
 				}
@@ -158,8 +161,8 @@ abstract class Evaluation_Export_Xml {
 	 * Render headers and xml data
 	 */
 	public function render() {
-		header('Content-type: text/xml');
-		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
+//		header('Content-type: text/xml');
+//		header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
 
 		$this->getPage()->template->pparse('finaloutput', 'xml');
 
