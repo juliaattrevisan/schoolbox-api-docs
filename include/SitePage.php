@@ -915,8 +915,8 @@ class SitePage extends Page {
     /**
      * Redirects to a broken image with a given transform.
      *
-     * @param string $transform_type Width of image to show
-     * @param string $transform      Height of image to show
+     * @param string $transform_type A string corresponding to an Alaress_Image_Transformation_Abstract instance
+     * @param string $transform      A key associated with a list of transforms to execute upon an image
      * @param int    $code           The HTTP error number
      */
     public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500) {
