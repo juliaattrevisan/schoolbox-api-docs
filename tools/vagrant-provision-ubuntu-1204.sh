@@ -1,9 +1,20 @@
 #!/bin/bash
 vag="[schoolbox]";
 cd /home/vagrant;
-
 echo "$vag Retrieving latest Demo Data files";
-wget -c http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt 2>/dev/null || echo "$vag Unable to retrive latest sha1 list, continuing with current";
+curl http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt > schoolboxdemo-latest-sha1.txt 2>/dev/null
+if [ $? -eq 0 ];
+then
+	mv -f schoolboxdemo-latest-sha1.txt schoolboxdemo-latest-sha1-cached.txt;
+	rm -f schoolboxdemo-latest-sha1.txt;
+else
+	echo "$vag Unable to retrive latest sha1 list, continuing with current";
+fi
+if [ ! -f schoolboxdemo-latest-sha1-cached.txt ];
+then
+	echo "$vag Unable to retrieve demo data. Halting provisioning.";
+	exit 1;
+fi
 while read line;
 do
 	demofile=`echo "$line" | awk {'print $2'}`;
@@ -14,9 +25,9 @@ do
 		echo "$vag No change to $demofile";
 	else
 		echo "$vag Downloading $demofile";
-		curl -L --progress-bar http://vagrant.alaress-dev.com.au/$demofile > $demofile;
+		curl -L http://vagrant.alaress-dev.com.au/$demofile > $demofile;
 	fi
-done < schoolboxdemo-latest-sha1.txt;
+done < schoolboxdemo-latest-sha1-cached.txt;
 
 echo "$vag Restarting MySQL";
 service mysql restart > /dev/null 2>&1;
@@ -25,8 +36,11 @@ echo "$vag Stopping Apache";
 service apache2 stop > /dev/null 2>&1;
 
 echo "$vag Disabling php-fpm";
-service php5-fpm stop;
-rm -f /etc/init.d/php5-fpm;
+if [ -f /etc/init.d/php5-fpm ];
+then
+	service php5-fpm stop;
+	rm -f /etc/init.d/php5-fpm;
+fi
 
 # Kill all old grunt processes, they're probably watches
 echo "$vag Stopping background Grunt processes";
