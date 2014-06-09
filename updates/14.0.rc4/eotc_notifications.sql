@@ -14,6 +14,6 @@ SELECT src.id `msg_source_id`, g.id `role_id`,            0 `min_level`, 300 `ma
 FROM msg_source src
 LEFT JOIN groups g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eotc')
-AND role_type = 'staff';
+AND role_type = 'staff'
 ON DUPLICATE KEY
   UPDATE `msg_source_id` = `msg_source_id`;
