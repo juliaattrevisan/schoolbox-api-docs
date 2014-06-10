@@ -40,7 +40,7 @@
            class="submit-btn-plain"
     />
 
-    {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id}) %}
+    {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id, item: item}) %}
     <input id="resourcecategory-delete"
            type="submit"
            value="Delete"

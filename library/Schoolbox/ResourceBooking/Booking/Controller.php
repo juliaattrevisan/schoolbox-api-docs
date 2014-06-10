@@ -49,11 +49,13 @@ class Controller extends Base {
 
     /**
      * Creates a booking for an item.
+     *
+     * @param Item\Model $item
      */
-    public function book($id) {
+    public function book(Item\Model $item) {
         /** @var Model $item */
         /** @var Item\Model $resource */
-        $resource = $this->getResourceMapper()->findById($id);
+        $resource = $item;
         $item     = $this->getBookingMapper()->createModel();
         $item
             ->setResource($resource)
@@ -158,26 +160,24 @@ class Controller extends Base {
     /**
      * Creates a booking for this resource.
      *
-     * @param int $id The resource to create a booking for.
+     * @param Item\Model $item The resource to create a booking for.
      */
-    public function createBooking($id) {
-        /** @var Item\Model $resource */
-        $resource    = $this->getResourceMapper()->findById($id);
+    public function createBooking(Item\Model $item) {
         $bookingList = null;
 
         // Validate this item.
         $code   = 200;
-        $errors = $this->validateBookingFromPostData($resource);
+        $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
             // Create the booking (or series of bookings) for the base item.
-            $bookingList = $this->createBookingFromPostData($resource);
+            $bookingList = $this->createBookingFromPostData($item);
 
             // Create the related bookings:
             // one for each combination of related item and booking in series.
             $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
             if (!empty($relatedSelections)) {
                 $relatedBookingList = new Collection();
-                foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                foreach ($item->getRelatedResourceList() as $relatedResource) {
                     if (in_array($relatedResource->getId(), $relatedSelections)) {
                         foreach ($bookingList as $booking) {
                             // Related bookings share same event as base booking.
@@ -524,8 +524,10 @@ class Controller extends Base {
 
     /**
      * Outputs the calendar for this item.
+     *
+     * @param Item\Model $item
      */
-    public function bookingCalendar($id) {
+    public function bookingCalendar($item) {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
         // the find method should receive:
@@ -535,7 +537,7 @@ class Controller extends Base {
             $this->getUser(), array()
         );
         $source
-            ->setResourceId($id)
+            ->setResourceId($item->getId())
             ->setStatus($this->getRequest()->query['status']);
         $events = $source->getEvents(
             $this->getRequest()->query['start'],
@@ -579,10 +581,9 @@ class Controller extends Base {
     /**
      * Stub for edit action.
      *
-     * @param int $id
+     * @param Model $item
      */
-    public function edit($id) {
-        $item = $this->getBookingMapper()->findById($id);
+    public function edit(Model $item) {
         $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         // Set start and end date
         $event = $item->getEvent();
@@ -607,11 +608,9 @@ class Controller extends Base {
     /**
      * Stub for update method
      *
-     * @param $id
+     * @param Model $item
      */
-    public function update($id) {
-        $item = $this->getBookingMapper()->findById($id);
-
+    public function update(Model $item) {
         // Perform validation, but leave this booking out of calculations.
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
 
@@ -867,37 +866,31 @@ class Controller extends Base {
     /**
      * Marks a booking as approved.
      *
-     * @param int $id The ID of the booking to approve.
+     * @param Model $item The booking to approve.
      */
-    public function approve($id) {
-        /** @var Model $booking */
-        $booking = $this->getBookingMapper()->findById($id);
-        $this->changeStatus($booking, Status\Model::STATUS_APPROVED);
-        $this->setUpdateStatusResponse($booking);
+    public function approve(Model $item) {
+        $this->changeStatus($item, Status\Model::STATUS_APPROVED);
+        $this->setUpdateStatusResponse($item);
     }
 
     /**
      * Marks a booking as rejected.
      *
-     * @param int $id The ID of the booking to reject.
+     * @param Model $item The booking to reject.
      */
-    public function reject($id) {
-        /** @var Model $booking */
-        $booking = $this->getBookingMapper()->findById($id);
-        $this->changeStatus($booking, Status\Model::STATUS_REJECTED);
-        $this->setUpdateStatusResponse($booking);
+    public function reject(Model $item) {
+        $this->changeStatus($item, Status\Model::STATUS_REJECTED);
+        $this->setUpdateStatusResponse($item);
     }
 
     /**
      * Marks a booking as pending.
      *
-     * @param int $id The ID of the booking to set pending.
+     * @param Model $item The booking to set pending.
      */
-    public function setPending($id) {
-        /** @var Model $booking */
-        $booking = $this->getBookingMapper()->findById($id);
-        $this->changeStatus($booking, Status\Model::STATUS_PENDING);
-        $this->setUpdateStatusResponse($booking);
+    public function setPending(Model $item) {
+        $this->changeStatus($item, Status\Model::STATUS_PENDING);
+        $this->setUpdateStatusResponse($item);
     }
 
     /**
@@ -910,17 +903,15 @@ class Controller extends Base {
      * * Users may cancel their own bookings
      * * Moderators for an object may cancel anyone's bookings
      *
-     * @param int $id The ID of the booking to reject.
+     * @param Model $item The booking to reject.
      */
-    public function cancel($id) {
-        /** @var Model $booking */
-        $booking = $this->getBookingMapper()->findById($id);
-        $this->getBookingMapper()->delete($booking);
-        $series = $this->getSeriesBookings($booking);
+    public function cancel(Model $item) {
+        $this->getBookingMapper()->delete($item);
+        $series = $this->getSeriesBookings($item);
         if (count($series)) {
             $this->getBookingMapper()->delete($series);
         }
-        $this->setUpdateStatusResponse($booking);
+        $this->setUpdateStatusResponse($item);
     }
 
     /**

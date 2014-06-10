@@ -32,11 +32,18 @@ class UserOwnsBooking implements Rule\IAuthorizationRule {
      * @throws Failure\Forbidden if the request isn't authorized.
      */
     public function authorize(array $params = array(), User $user = null) {
-        // Booking owner: same person as event owner
-        /** @var Model $item */
+        // Hopefully, the item has been loaded in the module's preloader.
+        // Otherwise, we must fetch it again.
+        if ($params['item'] instanceof Model) {
+            $item  = $params['item'];
+            $event = $item->getEvent();
+        }
+        else {
+            $item  = $this->getMapper()->findById($params['id']);
+            $event = $this->getMapper()->getJoinMapper('event')->findById($item->getEvent()->getId());
+        }
+
         // findById() should hydrate the event join as well
-        $item  = $this->getMapper()->findById($params['id']);
-        $event = $this->getMapper()->getJoinMapper('event')->findById($item->getEvent()->getId());
         if ($user->getId() == $event->getOwner()->getId()) {
             return;
         }

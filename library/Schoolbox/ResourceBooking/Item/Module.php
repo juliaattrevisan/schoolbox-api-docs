@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\UserAccess;
@@ -27,6 +28,24 @@ class Module extends BaseModule {
         $router->attachResource('resourceItem', $basePath);
         $router->attachResourcePostAlias('resourceItem', $basePath);
         $router->add('resourceItem.search', $basePath.'/search');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher) {
+        // Add the item to params, if ID is in the route.
+        $matcher->add(
+            '/^resourceItem\./',
+            function($params) {
+                if (array_key_exists('id', $params)) {
+                    return array(
+                        'item' => Mapper::getInstance()->findById($params['id']),
+                    );
+                }
+                return array();
+            }
+        );
     }
 
     /**

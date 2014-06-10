@@ -54,7 +54,12 @@ class CanBookItem implements Rule\IAuthorizationRule {
      */
     public function authorize(array $params = array(), User $user = null) {
         // TODO simplify this rule, and define it as separate ones
-        $item = $this->getMapper()->findById($params['id']);
+        if ($params['item'] instanceof Item\Model) {
+            $item = $params['item'];
+        }
+        else {
+            $item = $this->getMapper()->findById($params['id']);
+        }
         $moderateRule = new Item\Auth\CanModerateItem();
         $moderateRule->setMapper($this->getMapper());
         $auth = new Rule\Any(

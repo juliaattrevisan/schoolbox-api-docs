@@ -90,19 +90,23 @@ class Kernel extends \Alaress\Application\Kernel {
 					$session->updateLastTime();
 				}
 
+				/** @var \Alaress\Web\Router\PathMatcher $preloader */
+				$preloader = $this->di->get('preloader');
+				$params    = $preloader->check($route->name, $route->params);
+
 				/** @var \Alaress\Authorizer\Authorizer $authorizer */
 				$authorizer = $this->di->get('authorizer');
-				$authorizer->authorizePathForUser($route->name, $route->params, $user);
+				$authorizer->authorizePathForUser($route->name, $params, $user);
 
 				// If authorizePathForUser() threw no exception, authorization passed!
 
 				// Call the controller method.
 				// Ensure that the parameters match up with the names used.
-				$method = new ReflectionMethod($controller, $route->params['action']);
+				$method = new ReflectionMethod($controller, $params['action']);
 				$args   = array();
 				foreach ($method->getParameters() as $parameter) {
 					$name   = $parameter->getName();
-					$args[] = (array_key_exists($name, $route->params)) ? $route->params[$name] : null;
+					$args[] = (array_key_exists($name, $params)) ? $params[$name] : null;
 				}
 				$method->invokeArgs($controller, $args);
 				$response = $controller->getResponse();
@@ -130,7 +134,7 @@ class Kernel extends \Alaress\Application\Kernel {
 			$format   = $content['format'];
 			if (empty($format)) {
 				// Strip leading . from format
-				$format = preg_replace('/^\\./', '', $route->params['format']);
+				$format = preg_replace('/^\\./', '', $params['format']);
 				if (empty($format)) {
 					$format = 'html';
 				}

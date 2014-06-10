@@ -9,31 +9,25 @@
  
 
 namespace Alaress\Authorizer;
+use Alaress\Web\Router\PathMatcher;
 use Schoolbox\User;
 
-class Authorizer {
+class Authorizer extends PathMatcher {
 
     /**
-     * A list of rules that have been defined.
-     *
-     * @var array
+     * @var User
      */
-    protected $ruleList = array();
+    protected $user;
 
     /**
      * Adds a rule for a path.
      *
-     * @param string                  $path       A regexp to match a path against
-     * @param Rule\IAuthorizationRule $rule       The rule to check against.
-     * @param int                     $statusCode (not yet implemented)
+     * @param string                  $path A regexp to match a path against
+     * @param Rule\IAuthorizationRule $rule The rule to check against.
      * @return $this
      */
-    public function addRule($path, Rule\IAuthorizationRule $rule, $statusCode = null) {
-        $this->ruleList[] = array(
-            'path'       => $path,
-            'rule'       => $rule,
-            'statusCode' => $statusCode,
-        );
+    public function addRule($path, Rule\IAuthorizationRule $rule) {
+        $this->add($path, $rule, array('auth'));
         return $this;
     }
 
@@ -48,13 +42,20 @@ class Authorizer {
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
     public function authorizePathForUser($path, $params = array(), User $user = null) {
-        foreach ($this->ruleList as $rule) {
-            if (preg_match($rule['path'], $path)) {
-                /** @var Rule\IAuthorizationRule $authRule */
-                $authRule = $rule['rule'];
-                $authRule->authorize($params, $user);
-            }
-        }
+        $this->setUser($user);
+        $this->check($path, $params);
+    }
+
+
+    /**
+     * Gets the result of calling an action.
+     *
+     * @param  Rule\IAuthorizationRule $callback
+     * @param  array                   $params
+     * @return array
+     */
+    protected function getActionResult($callback, $params) {
+        return $callback->authorize($params, $this->getUser());
     }
 
     /**
@@ -74,10 +75,26 @@ class Authorizer {
         try {
             $this->authorizePathForUser($path, $params, $user);
         }
-        catch (\Alaress\Authorizer\Failure\Base $e) {
+        catch (Failure\Base $e) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param  User $user
+     * @return $this
+     */
+    public function setUser($user) {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser() {
+        return $this->user;
     }
 
 }
