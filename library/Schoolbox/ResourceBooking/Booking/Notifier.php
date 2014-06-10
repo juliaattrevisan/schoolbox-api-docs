@@ -34,7 +34,7 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @var string
      */
-    protected $slug = 'resource_booking';
+    protected $slug = NSMapper::NS_RESOURCE_BOOKING;
 
     /**
      * A router - injected for the purpose of generating URLs for resource
@@ -219,7 +219,7 @@ class Notifier extends AbstractModuleNotifier {
         // Broadcast to all resource booking moderators
         $messenger->broadcastToService(
             UserAccess::SERVICE_RESOURCE_BOOKING,
-            '*',
+            0,
             UserAccess::ACCESS_FULL,
             $message,
             $key,
