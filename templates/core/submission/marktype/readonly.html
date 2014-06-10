@@ -4,6 +4,11 @@
 <!-- END mark_type_percent -->
 <!-- BEGIN mark_type_letter -->
 <span class="mark-input">{GRADE_TEXT}</span>
+<select id="mark" class="mark-input" name="mark[{OWNER_ID}]" disabled>
+	<!-- BEGIN grade_drop -->
+	<option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+	<!-- END grade_drop -->
+</select>
 <!-- END mark_type_letter -->
 <!-- BEGIN mark_type_raw -->
 <span class="mark-input out-of">{MARK}&nbsp;/&nbsp;{MAX_MARK}</span>
