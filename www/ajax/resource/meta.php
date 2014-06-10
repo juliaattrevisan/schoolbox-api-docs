@@ -111,6 +111,7 @@ function getFolderMeta($folderId) {
 	// if it's the root node, return add-folder functions if admin
 	if($folderId == 0) {
 		$actions = $groupHandler->isSuperuser() ? array('folder') : array();
+
 		$folder = array(
 			'name' => 'Resources',
 			'id' => 0,
@@ -191,12 +192,21 @@ function getFolderMeta($folderId) {
 		case WRITE_ACCESS:
 			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download', 'multi'));
 			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
+			
+			/* Allow teachers to upload a zip file
+			 */
+			if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
+				$actions[] = 'zip';
+			}
+
+			
 			// no break
 		case READ_ACCESS:
 		default:
 			// no actions available
 			break;
 	}
+
 
 	if($cat->hasHomepage()) {
 		$actions[] = 'homepage';
