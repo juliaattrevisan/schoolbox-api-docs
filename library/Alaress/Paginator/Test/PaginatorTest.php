@@ -10,6 +10,7 @@
 namespace Alaress\Paginator\Test;
 use Alaress\Paginator\Paginator;
 use PHPUnit_Framework_TestCase;
+use OutOfRangeException;
 
 class PaginatorTest extends PHPUnit_Framework_TestCase {
 
@@ -115,52 +116,58 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
 
     /**
      * Tests that zero pagesize is invalid.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testZeroPagesize() {
-        $this->setExpectedException('OutOfRangeException');
         $this->buildPaginator(0, 0);
     }
 
     /**
      * Tests that negative pagesize is invalid.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testNegativePagesize() {
-        $this->setExpectedException('OutOfRangeException');
         $this->buildPaginator(-1, 0);
     }
 
     /**
      * Tests for zero total - any method that expects a page number should fail.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testZeroTotalOffset() {
         $paginator = $this->buildPaginator(10, 0);
-        $this->setExpectedException('OutOfRangeException');
         $paginator->getOffset(1);
     }
 
     /**
      * Tests for zero total - any method that expects a page number should fail.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testZeroTotalFirstOnPage() {
         $paginator = $this->buildPaginator(10, 0);
-        $this->setExpectedException('OutOfRangeException');
         $paginator->getFirstOnPage(1);
     }
 
     /**
      * Tests for zero total - any method that expects a page number should fail.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testZeroTotalLastOnPage() {
         $paginator = $this->buildPaginator(10, 0);
-        $this->setExpectedException('OutOfRangeException');
         $paginator->getLastOnPage(1);
     }
 
     /**
      * Tests that negative total is invalid.
+     *
+     * @expectedException OutOfRangeException
      */
     public function testNegativeTotal() {
-        $this->setExpectedException('OutOfRangeException');
         $this->buildPaginator(10, -1);
     }
 
@@ -187,10 +194,10 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
     /**
      * Tests that requesting a page number below the minimum range is invalid.
      *
-     * @dataProvider getTestPageNumberLowerBoundData
+     * @dataProvider      getTestPageNumberLowerBoundData
+     * @expectedException OutOfRangeException
      */
     public function testPageNumberLowerBound(Paginator $paginator, $pageNumber) {
-        $this->setExpectedException('OutOfRangeException');
         $paginator->getFirstOnPage($pageNumber);
     }
 
@@ -214,12 +221,12 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Tests that requesting a page number below the minimum range is invalid.
+     * Tests that requesting a page number above the minimum range is invalid.
      *
-     * @dataProvider getTestPageNumberUpperBoundData
+     * @dataProvider      getTestPageNumberUpperBoundData
+     * @expectedException OutOfRangeException
      */
     public function testPageNumberUpperBound(Paginator $paginator, $pageNumber) {
-        $this->setExpectedException('OutOfRangeException');
         $paginator->getFirstOnPage($pageNumber);
     }
 }
