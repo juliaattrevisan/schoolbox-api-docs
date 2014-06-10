@@ -1,0 +1,9 @@
+{% if paginator.pageCount > 1 %}
+    <ul class="admin-nav foot">
+        <li><a href="{{ paginator.urlForPage(1) }}">&lt;</a></li>
+        {% for currentPage, url in paginator.pageUrls %}
+            <li><a href="{{ url }}" {% if currentPage == page %}class="current"{% endif %}>{{ currentPage }}</a></li>
+        {% endfor %}
+        <li><a href="{{ paginator.urlForPage(paginator.pageCount) }}">&gt;</a></li>
+    </ul>
+{% endif %}
