@@ -6,6 +6,9 @@
 	padding: 2px 7px 3px;
 	zoom:1;
 }
+#tree a {
+    color: inherit;
+}
 #tree span {
 	margin: 0;
 	padding: 0;

@@ -361,6 +361,11 @@
 		var initialize = function (node) {
 			
 			var lastBranch = false;
+
+            // Links in the tree should not raise the default click event.
+            $(node).on('click', 'a', function(event) {
+                event.preventDefault();
+            });
 			
 			/* mark last row */
 			$(node).find(options.node + '.' + options.childPrefix + options.idPrefix + '0:last').addClass('last');

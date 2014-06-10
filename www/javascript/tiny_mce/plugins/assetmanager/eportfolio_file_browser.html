@@ -193,9 +193,15 @@ $(function () {
     <ul id="tree">
       <li id="node-0" class="server"><span class="root">Resources</span></li>
       <!-- BEGIN folder_list -->
-      <li id="node-{CATEGORY_ID}" class="{CLASS}"><span class="elbow"></span><span class="file">{TITLE}</span></li>
+      <li id="node-{CATEGORY_ID}" class="{CLASS}">
+          <span class="elbow"></span>
+          <a href="#"><span class="file">{TITLE}</span></a>
+      </li>
       <!-- END folder_list -->
-      <li class="dir-template"><span class="elbow"></span><span class="file"></span></li>
+      <li class="dir-template">
+          <span class="elbow"></span>
+          <a href="#"><span class="file"></span></a>
+      </li>
     </ul>
   </div>
 
