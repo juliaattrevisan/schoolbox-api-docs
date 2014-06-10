@@ -85,7 +85,7 @@ class Module extends BaseModule {
                 'Alaress\\Paginator\\UrlPaginator',
                 array(),
                 array(
-                    'setPageSize' => 3,
+                    'setPageSize' => 10,
                     'setParam'    => 'page',
                 )
         );
