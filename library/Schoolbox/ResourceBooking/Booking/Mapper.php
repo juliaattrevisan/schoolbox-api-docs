@@ -80,7 +80,15 @@ class Mapper extends BaseMapper {
             )
         );
 
-        // Created/Modified/Deleted
+		$this->hasMap(
+			array(
+				'column' => 'name',
+				'property' => 'name',
+				'type' => self::TYPE_STRING,
+			)
+		);
+
+		// Created/Modified/Deleted
         $this->hasMap(
             array(
                 'column'            => 'created_at',

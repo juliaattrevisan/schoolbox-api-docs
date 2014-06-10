@@ -631,9 +631,10 @@ class Controller extends Base {
                 $item->getEvent()->getEndDateTime(), $endDate
             );
             $notes = $this->getRequest()->post['notes'];
+			$name = $this->getRequest()->post['name'];
 
             // Update this item.
-            $this->updateBookingFromPostData($item, $startDelta, $endDelta, $notes);
+            $this->updateBookingFromPostData($item, $startDelta, $endDelta, $notes, $name);
 
             // Has the time changed? If so:
             // * If this is a single item, just set status back to pending.
@@ -653,7 +654,7 @@ class Controller extends Base {
                     if ($seriesEvent->getStartDateTime() < new DateTime()) {
                         continue;
                     }
-                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta, $notes);
+                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta, $notes, $name);
                 }
             }
 
@@ -720,21 +721,23 @@ class Controller extends Base {
         return $campusList;
     }
 
-    /**
-     * Attempts to update a booking based on what was passed through post data.
-     *
-     * @param Model    $item
-     * @param Interval $startDelta
-     * @param Interval $endDelta
-     * @param string   $notes
-     */
+	/**
+	 * Attempts to update a booking based on what was passed through post data.
+	 *
+	 * @param Model $item
+	 * @param Interval $startDelta
+	 * @param Interval $endDelta
+	 * @param string $notes
+	 * @param $name
+	 */
     protected function updateBookingFromPostData(
         Model $item,
         Interval $startDelta,
         Interval $endDelta,
-        $notes
+        $notes,
+		$name
     ) {
-        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta, $notes);
+        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta, $notes, $name);
 
         // Related bookings:
         // Item wasn't selected and is now: add booking and relation
@@ -756,7 +759,8 @@ class Controller extends Base {
                     $relatedBooking,
                     $startDelta,
                     $endDelta,
-                    $notes
+                    $notes,
+					$name
                 );
                 $relatedEventList->add($relatedBooking->getEvent());
             }
@@ -796,20 +800,22 @@ class Controller extends Base {
         $this->getBookingMapper()->delete($deletedBookingList);
     }
 
-    /**
-     * Attempts to update a booking based on what was passed through post data.
-     *
-     * @param  Model    $item
-     * @param  Interval $startDelta
-     * @param  Interval $endDelta
-     * @param  string   $notes
-     * @return Model
-     */
+	/**
+	 * Attempts to update a booking based on what was passed through post data.
+	 *
+	 * @param  Model $item
+	 * @param  Interval $startDelta
+	 * @param  Interval $endDelta
+	 * @param  string $notes
+	 * @param $name
+	 * @return Model
+	 */
     protected function updateBookingFieldsFromPostData(
         Model $item,
         Interval $startDelta,
         Interval $endDelta,
-        $notes
+        $notes,
+		$name
     ) {
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
@@ -826,6 +832,7 @@ class Controller extends Base {
             $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
             $event->setEndDate($newEnd->format('Y-m-d'));
             $event->setEndTime($newEnd->format('H:i:s'));
+
             if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
                 $item->setStatus(Status\Model::STATUS_APPROVED);
             }
@@ -835,6 +842,8 @@ class Controller extends Base {
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());
         $item->setEvent($event);
+		$item->setName($name);
+
         return $item;
     }
 

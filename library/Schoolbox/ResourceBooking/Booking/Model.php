@@ -24,6 +24,14 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
      */
     protected $id;
 
+	/**
+	 * Name of the booking, which can be used to identify this booking
+	 * when using beavis suggests etc.
+	 *
+	 * @var
+	 */
+	protected $name;
+
     /**
      * @var Item\Model
      */
@@ -246,5 +254,21 @@ class Model implements ISoftDeletable /*, JsonSerializable */{
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
     }
 
+	/**
+	 * Set name
+	 *
+	 * @param mixed $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
 
+	/**
+	 * Get name
+	 *
+	 * @return mixed
+	 */
+	public function getName() {
+		return $this->name;
+	}
 }
