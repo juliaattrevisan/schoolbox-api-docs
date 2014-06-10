@@ -1097,7 +1097,15 @@ class StudentReportCard {
 		return $this->targetCategoryId ? true : false;
 	}
 
+	/**
+	 * Find all the subjects a student is involved with for a given
+	 * year and semester
+	 */
 	protected function findSubjectsForSemester() {
+		$categoryList = array();
+
+		/* Subjects involved with currently
+		 */
 		if($this->targetYear == $this->currentYear && $this->targetSemester == $this->currentSemester) {
 			$categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
 
@@ -1116,19 +1124,39 @@ class StudentReportCard {
 				}
 			}
 		}
-		else {
-			$categoryList = $this->submissionMapper->submittedToCategoryList(
-				$this->targetUserId,
-				$this->targetYear,
-				$this->targetSemester
-			);
-		}
+
+		/* Always merge with a list of subjects that the student has submitted to
+		 * to allow them access to work completed in classes in which they may no
+		 * longer be participating
+		 */
+		$submittedList = $this->submissionMapper->submittedToCategoryList(
+			$this->targetUserId,
+			$this->targetYear,
+			$this->targetSemester
+		);
+
+		/* Combine lists alphabetically
+		 */
+		$categoryList = array_merge($categoryList, $submittedList);
+		usort($categoryList, array($this, 'sort'));
 
 		if (is_array($categoryList)) {
 			foreach($categoryList as $category) {
 				$this->categoriesInSemester[$category['id']] = $category;
 			}
 		}
+	}
+
+	/**
+	 * For sorting arrays of subjects returned by involvedInCategoryList()
+	 * and submittedToCategoryList()
+	 *
+	 * @param $a
+	 * @param $b
+	 * @return bool
+	 */
+	private function sort($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
 	}
 
 	/**
