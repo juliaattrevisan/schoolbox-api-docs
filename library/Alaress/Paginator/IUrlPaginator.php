@@ -10,21 +10,18 @@
 
 namespace Alaress\Paginator;
 
-use OutOfRangeException;
-use Zend\Uri\UriInterface;
-
 interface IUrlPaginator extends IPaginator {
 
     /**
      * Creates a URL out of whatever the URL I passed is.
      *
      * @param  int $page
-     * @return UriInterface
+     * @return string
      */
     public function getUrlForPage($page);
 
     /**
-     * @return array|UriInterface[]
+     * @return array|string[]
      */
     public function getPageUrls();
 
@@ -32,7 +29,7 @@ interface IUrlPaginator extends IPaginator {
      * @param int $from
      * @param int $to
      *
-     * @return array|UriInterface[]
+     * @return array|string[]
      */
     public function getPageUrlsBetween($from, $to);
 
@@ -43,7 +40,7 @@ interface IUrlPaginator extends IPaginator {
     public function setParam($param);
 
     /**
-     * @param  UriInterface $url
+     * @param  string $url
      * @return $this
      */
     public function setUrl($url);

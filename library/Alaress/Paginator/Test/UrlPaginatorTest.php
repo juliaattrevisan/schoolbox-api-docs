@@ -35,13 +35,22 @@ class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
         return $urlPaginator;
     }
 
+    protected function getPathFromUrl($url) {
+        return parse_url($url, PHP_URL_PATH);
+    }
+
+    protected function getQueryFromUrl($url) {
+        parse_str(parse_url($url, PHP_URL_QUERY), $query);
+        return $query;
+    }
+
     /**
      * Tests for basic URL generation
      */
     public function testBasicUrl() {
         $paginator = $this->buildPaginator(50, 300, 'https://www.google.com', 'p');
-        $this->assertEquals('https://www.google.com/?p=1', $paginator->getUrlForPage(1)->toString());
-        $this->assertEquals('https://www.google.com/?p=2', $paginator->getUrlForPage(2)->toString());
+        $this->assertEquals('https://www.google.com/?p=1', $paginator->getUrlForPage(1));
+        $this->assertEquals('https://www.google.com/?p=2', $paginator->getUrlForPage(2));
     }
 
     /**
@@ -51,12 +60,12 @@ class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
         $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b', 'page');
 
         $url = $paginator->getUrlForPage(1);
-        $this->assertEquals('/resource-booking/item', $url->getPath());
-        $this->assertEquals(array('search' => 'b', 'page' => 1), $url->getQueryAsArray());
+        $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+        $this->assertEquals(array('search' => 'b', 'page' => 1), $this->getQueryFromUrl($url));
 
         $url = $paginator->getUrlForPage(2);
-        $this->assertEquals('/resource-booking/item', $url->getPath());
-        $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
+        $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+        $this->assertEquals(array('search' => 'b', 'page' => 2), $this->getQueryFromUrl($url));
     }
 
     /**
@@ -66,12 +75,12 @@ class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
         $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b&page=3', 'page');
 
         $url = $paginator->getUrlForPage(1);
-        $this->assertEquals('/resource-booking/item', $url->getPath());
-        $this->assertEquals(array('search' => 'b', 'page' => 1), $url->getQueryAsArray());
+        $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+        $this->assertEquals(array('search' => 'b', 'page' => 1), $this->getQueryFromUrl($url));
 
         $url = $paginator->getUrlForPage(2);
-        $this->assertEquals('/resource-booking/item', $url->getPath());
-        $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
+        $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+        $this->assertEquals(array('search' => 'b', 'page' => 2), $this->getQueryFromUrl($url));
     }
 
     /**
@@ -85,8 +94,8 @@ class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
         $urlsBetween = $paginator->getPageUrlsBetween(3, 5);
         $this->assertCount(3, $urlsBetween);
         foreach ($urlsBetween as $page => $url) {
-            $this->assertEquals('/resource-booking/item', $url->getPath());
-            $this->assertEquals(array('search' => 'b', 'page' => $page), $url->getQueryAsArray());
+            $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+            $this->assertEquals(array('search' => 'b', 'page' => $page), $this->getQueryFromUrl($url));
         }
     }
 
@@ -100,7 +109,7 @@ class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
 
         // Generating URLs for pages that don't exist should still work
         $url = $paginator->getUrlForPage(2);
-        $this->assertEquals('/resource-booking/item', $url->getPath());
-        $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
+        $this->assertEquals('/resource-booking/item', $this->getPathFromUrl($url));
+        $this->assertEquals(array('search' => 'b', 'page' => 2), $this->getQueryFromUrl($url));
     }
 }

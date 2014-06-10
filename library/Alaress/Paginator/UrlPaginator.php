@@ -11,14 +11,14 @@
 namespace Alaress\Paginator;
 
 use OutOfRangeException;
-use Zend\Uri\UriInterface;
+use Zend\Uri\Uri;
 
 class UrlPaginator implements IUrlPaginator {
 
     /**
      * The URL to use to generate page URLs.
      *
-     * @var UriInterface
+     * @var string
      */
     protected $url;
 
@@ -41,18 +41,21 @@ class UrlPaginator implements IUrlPaginator {
      * Creates a URL out of whatever the URL I passed is.
      *
      * @param  int $page
-     * @return UriInterface
+     * @return string
      */
     public function getUrlForPage($page) {
-        $url = clone $this->url;
+        // Building a URL using PHP builtins is a complete pain!
+        // (There's no http_build_str equivalent for parse_str)
+        // That's why I use Zend\Uri internally.
+        $url = new Uri($this->url);
         $query = $url->getQueryAsArray();
         $query[$this->param] = $page;
         $url->setQuery($query);
-        return $url;
+        return $url->toString();
     }
 
     /**
-     * @return array|UriInterface[]
+     * @return array|string[]
      */
     public function getPageUrls() {
         return $this->getPageUrlsBetween(1, $this->getPageCount());
@@ -62,7 +65,7 @@ class UrlPaginator implements IUrlPaginator {
      * @param int $from
      * @param int $to
      *
-     * @return array|UriInterface[]
+     * @return array|string[]
      */
     public function getPageUrlsBetween($from, $to) {
         $from   = max($from, 1);
@@ -110,7 +113,7 @@ class UrlPaginator implements IUrlPaginator {
     }
 
     /**
-     * @param  UriInterface $url
+     * @param  string $url
      * @return $this
      */
     public function setUrl($url) {
@@ -119,7 +122,7 @@ class UrlPaginator implements IUrlPaginator {
     }
 
     /**
-     * @return UriInterface
+     * @return string
      */
     public function getUrl() {
         return $this->url;
