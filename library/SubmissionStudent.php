@@ -72,7 +72,8 @@ class SubmissionStudent extends DeprecatedModel {
                          local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
                          DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, realname, late, marked,
                          (student_submission.body IS NOT NULL) AS is_online_submission,
-                         user.synergy_id as synergy_id, pd.score, pd.status plag_status, pd.plagscan_id plag_doc_id
+                         user.synergy_id as synergy_id, pd.score, pd.status plag_status, pd.plagscan_id plag_doc_id,
+                         pd.deleted plag_deleted
                   FROM (student_submission, user)
                   LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
                   WHERE $conditional
