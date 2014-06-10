@@ -5,7 +5,10 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $groupHandler = new Group();
 $categoryHandler = new Category();
 
-if ($groupHandler->isSuperuser() && is_numeric($this->arg[0])) {
+$isSuperuser = $groupHandler->isSuperuser();
+$isAllowedTeacher = ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
+
+if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/zipFile.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 
@@ -39,5 +42,3 @@ if ($groupHandler->isSuperuser() && is_numeric($this->arg[0])) {
 else {
 	error(19);
 }
-
-?>

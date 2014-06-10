@@ -5,7 +5,13 @@ $page = new SitePage();
 $fileHandler = new File();
 $groupHandler = new Group();
 
-if ($groupHandler->isSuperuser()) {
+$isSuperuser = $groupHandler->isSuperuser();
+$isAllowedTeacher = ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
+
+/* Superusers and allowed teachers (via config option) are the only
+ * permitted user types to upload zip folder hierarchies
+ */
+if ($isSuperuser || $isAllowedTeacher) {
 
 	/* Force session usage due to flash uploader
 	 * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
