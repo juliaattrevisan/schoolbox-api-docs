@@ -1156,7 +1156,7 @@ class StudentReportCard {
 	 * @return bool
 	 */
 	private function sort($a, $b) {
-		return ($a['name'] > $b['name']);
+		return strcasecmp($a['name'], $b['name']);
 	}
 
 	/**
