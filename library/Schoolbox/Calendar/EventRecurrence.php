@@ -11,6 +11,9 @@
 namespace Schoolbox\Calendar;
 
 
+use Alaress_Date_Format;
+use Schoolbox\Collection;
+
 class EventRecurrence {
 
 	/**
@@ -28,7 +31,7 @@ class EventRecurrence {
 	/**
 	 * A calendar handler
 	 *
-	 * @var null
+	 * @var EventMapper
 	 */
 	private $calendarHandler = null;
 
@@ -50,7 +53,7 @@ class EventRecurrence {
 	 * An array of Alaress_Date_Format objects which indicate when a
 	 * recurring event incident begins and ends
 	 *
-	 * @var array
+	 * @var Alaress_Date_Format[]
 	 */
 	private $dateCollection = array();
 
@@ -80,37 +83,37 @@ class EventRecurrence {
 	 * Recur events until this date
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var string
+	 * @var Alaress_Date_Format
 	 */
 	private $until = null;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	private $startDate = null;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	private $endDate = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param $mapper
-	 * @param $efficacy
-	 * @param $repeatSetting
-	 * @param $until
-	 * @param \Alaress_Date_Format $startDate
-	 * @param \Alaress_Date_Format $endDate
+	 * @param EventMapper $mapper
+	 * @param string $efficacy
+	 * @param string $repeatSetting
+	 * @param Alaress_Date_Format $until
+	 * @param Alaress_Date_Format $startDate
+	 * @param Alaress_Date_Format $endDate
 	 */
-	public function __construct($mapper, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function __construct($mapper, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate) {
 		$this->setCalendarHandler($mapper);
-		$this->setDateCollection(new \Schoolbox\Collection());
+		$this->setDateCollection(new Collection());
 		$this->setRepeatSetting($repeatSetting);
 		$this->setUntil($until);
 		$this->setStartDate($startDate);
@@ -142,8 +145,8 @@ class EventRecurrence {
 			// Repeat of events: repeat until the start date is after the until
 			// date (or x100, whatever is less)
 			for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimestamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
-				$this_start_date = new \Alaress_Date_Format($start_timestamp, 'U');
-				$this_end_date = new \Alaress_Date_Format($end_timestamp, 'U');
+				$this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
+				$this_end_date = new Alaress_Date_Format($end_timestamp, 'U');
 
 				$this->getDateCollection()->add(array(
 					'start' => $this_start_date->getDatabaseDate(),
@@ -202,7 +205,7 @@ class EventRecurrence {
 	/**
 	 * Set calendar handler
 	 *
-	 * @param null $calendarHandler
+	 * @param EventMapper $calendarHandler
 	 */
 	private function setCalendarHandler($calendarHandler) {
 		$this->calendarHandler = $calendarHandler;
@@ -211,7 +214,7 @@ class EventRecurrence {
 	/**
 	 * Get calendar handler
 	 *
-	 * @return null
+	 * @return EventMapper
 	 */
 	private function getCalendarHandler() {
 		return $this->calendarHandler;
@@ -274,7 +277,7 @@ class EventRecurrence {
 	/**
 	 * Set date collection
 	 *
-	 * @param array $dateCollection
+	 * @param Collection|Alaress_Date_Format[] $dateCollection
 	 */
 	private function setDateCollection($dateCollection) {
 		$this->dateCollection = $dateCollection;
@@ -283,7 +286,7 @@ class EventRecurrence {
 	/**
 	 * Get date collection
 	 *
-	 * @return array
+	 * @return Collection|Alaress_Date_Format[]
 	 */
 	public function getDateCollection() {
 		return $this->dateCollection;
@@ -337,7 +340,7 @@ class EventRecurrence {
 	/**
 	 * Get until
 	 *
-	 * @return string
+	 * @return Alaress_Date_Format
 	 */
 	private function getUntil() {
 		return $this->until;
@@ -346,7 +349,7 @@ class EventRecurrence {
 	/**
 	 * Set start date
 	 *
-	 * @param null $startDate
+	 * @param Alaress_Date_Format $startDate
 	 */
 	private function setStartDate($startDate) {
 		$this->startDate = $startDate;
@@ -355,7 +358,7 @@ class EventRecurrence {
 	/**
 	 * Get start date
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	private function getStartDate() {
 		return $this->startDate;
@@ -364,7 +367,7 @@ class EventRecurrence {
 	/**
 	 * Set end date
 	 *
-	 * @param null $endDate
+	 * @param Alaress_Date_Format $endDate
 	 */
 	private function setEndDate($endDate) {
 		$this->endDate = $endDate;
@@ -373,7 +376,7 @@ class EventRecurrence {
 	/**
 	 * Get end date
 	 * 
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	private function getEndDate() {
 		return $this->endDate;

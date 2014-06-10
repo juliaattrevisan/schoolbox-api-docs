@@ -39,6 +39,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				}
 				catch (\Exception $e) {
 					error(160);
+					exit;
 				}
 			}
 			else {
@@ -64,18 +65,35 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$userMapper = new \Schoolbox\UserMapper();
 
 			try {
+				/** @var \Schoolbox\User $author */
 				$author = $userMapper->findById($_POST['authorId']);
 			}
-			catch (\Exception $e) {
+			catch (Schoolbox\Mapper\Exception $e) {
+				error(2);
+				exit;
 			}
 
 			/* Teacher in charge
 			 */
 			try {
+				/** @var \Schoolbox\User $teacherInCharge */
 				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
 			}
-			catch (\Exception $e) {
+			catch (Schoolbox\Mapper\Exception $e) {
+				error(2);
+				exit;
 			}
+
+			// EventType
+			try {
+				/** @var \Schoolbox\Calendar\EventType $eventType */
+				$eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById($_POST['type']);
+			}
+			catch (Schoolbox\Mapper\Exception $e) {
+				error(2);
+				exit;
+			}
+
 
 			/* Events recur until this time
 			 */
@@ -118,12 +136,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$event->setAuthor($author);
 			$event->setTeacherInCharge($teacherInCharge);
-			$event->setType($_POST['type']);
+			$event->setType($eventType);
 			$event->setNote($_POST['note']);
-			$event->setStartDate($startDate->getDatabaseDate());
-			$event->setStartTime($startDate->getDatabaseTime());
-			$event->setEndDate($endDate->getDatabaseDate());
-			$event->setEndTime($endDate->getDatabaseTime());
+			$event->setStartDateTime($startDate);
+			$event->setEndDateTime($endDate);
 			$event->setLocation($_POST['location']);
 			$event->setDetail($_POST['detail']);
 			$event->setAllDay($_POST['allday']);

@@ -89,7 +89,7 @@ switch($_POST['action']) {
 		$event->setOwner($owner);
 		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
-		$event->setSid($_POST['group']);
+		$event->setServiceId($_POST['group']);
 		$event->setType($_POST['type']);
 		$event->setNote($_POST['note']);
 		$event->setStartDate($startDate->getDatabaseDate());

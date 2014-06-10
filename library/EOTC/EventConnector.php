@@ -11,6 +11,9 @@
 namespace EOTC;
 
 
+use Schoolbox\Calendar\EventType;
+use Schoolbox\User;
+
 class EventConnector extends EventMapper {
 
 	/**
@@ -42,25 +45,16 @@ class EventConnector extends EventMapper {
 		$collection = new \Calendar_Event_Collection();
 
 		if ($row) {
+			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/* Author
-			 */
+			/** @var User $authorItem */
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
-			/* Event Type
-			 */
+			/** @var EventType $eventTypeItem */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
-
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
-
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
-			$eventItem->setEndDateTime($endDateTime);
+			$eventItem->setType($eventTypeItem);
 
 			/* Accumulate campuses for this event
 			 */
@@ -88,11 +82,11 @@ class EventConnector extends EventMapper {
 			/* EOTC Events are always of the type "EOTC" for usage
 			 * in calendar filters
 			 */
-			$event->setType($eventItem->getEventType()->getId());
+			$event->setType($eventItem->getType()->getId());
 			$event->setNote($eventItem->getNote());
 			$event->setAccess($eventItem->getAccess());
-			$event->setEventType($eventItem->getEventType()->getType());
-			$event->setColour($eventItem->getEventType()->getColor());
+			$event->setEventType($eventItem->getType()->getType());
+			$event->setColour($eventItem->getType()->getColor());
 			$event->setDetail($eventItem->getDetail());
 			$event->setLocation($eventItem->getLocation());
 			$event->setAllDay(0);
@@ -119,7 +113,7 @@ class EventConnector extends EventMapper {
 	/**
 	 * Get events within a particular time span
 	 *
-	 * @param $user
+	 * @param User $user
 	 * @param $startTimestamp
 	 * @param $endTimestamp
 	 * @return \Calendar_Event_Collection
@@ -174,30 +168,20 @@ class EventConnector extends EventMapper {
 		}
 
 		foreach ($statement as $row) {
+			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/* Author
-			 */
+			/** @var User $authorItem */
 			$authorItem = $authorMapper->hydrate($row, 'a');
 			$eventItem->setAuthor($authorItem);
 
-			/* Teacher In Charge
-			 */
+			/** @var User $teacherInChargeItem */
 			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
 			$eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/* Event Type
-			 */
+			/** @var EventType $eventTypeItem */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setEventType($eventTypeItem);
-
-			/* Convert dates ;(
-			 */
-			$startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
-			$eventItem->setStartDateTime($startDateTime);
-
-			$endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
-			$eventItem->setEndDateTime($endDateTime);
+			$eventItem->setType($eventTypeItem);
 
 			/* Accumulate campuses for this event
 			 */
@@ -315,11 +299,11 @@ class EventConnector extends EventMapper {
 				/* EOTC Events are always of the type "EOTC" for usage
 				 * in calendar filters
 				 */
-				$event->setType($eventItem->getEventType()->getId());
+				$event->setType($eventItem->getType()->getId());
 				$event->setNote($eventItem->getNote());
 				$event->setAccess($eventItem->getAccess());
-				$event->setEventType($eventItem->getEventType()->getType());
-				$event->setColour($eventItem->getEventType()->getColor());
+				$event->setEventType($eventItem->getType()->getType());
+				$event->setColour($eventItem->getType()->getColor());
 				$event->setDetail($eventItem->getDetail());
 				$event->setLocation($eventItem->getLocation());
 

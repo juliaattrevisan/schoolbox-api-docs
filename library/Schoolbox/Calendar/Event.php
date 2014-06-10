@@ -11,30 +11,30 @@
 namespace Schoolbox\Calendar;
 
 
+use Alaress_Date_Format;
+use Schoolbox\Campus;
+use Schoolbox\Collection;
+use Schoolbox\Resource\Category;
+use Schoolbox\Role;
+use Schoolbox\User;
+
 class Event {
 
-	/**
-	 * Event Access Levels
-	 *
-	 * @var array
-	 */
-	private $accessLevels = array(
-		'personal' => 1,
-		'group' => 2,
-		'campus' => 3,
-	);
+	const ACCESS_PERSONAL = 1;
+	const ACCESS_GROUP    = 2;
+	const ACCESS_CAMPUS   = 3;
 
 	/**
 	 * Event id
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $id = null;
 
 	/**
 	 * Series Id for recurring events, I think
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $seriesId = null;
 
@@ -43,7 +43,7 @@ class Event {
 	 *
 	 * The person who spawned the event in the first place
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $author = null;
 
@@ -53,14 +53,14 @@ class Event {
 	 * This denotes to whom the event is relevant for a particular
 	 * combination of sid and access (I don't remember/understand which)
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $owner = null;
 
 	/**
 	 * An instance of \Schoolbox\Resource\Category
 	 *
-	 * @var null
+	 * @var Category
 	 */
 	protected $category = null;
 
@@ -76,7 +76,7 @@ class Event {
 	 *
 	 * @var int
 	 */
-	protected $sid = 0;
+	protected $serviceId = 0;
 
 	/**
 	 * A hex string representing the colour of this event
@@ -91,16 +91,9 @@ class Event {
 	 * eventType is a human-friendly description of an event's type;
 	 * e.g. Event, Excursion, Report etc. and comes from a lookup table
 	 *
-	 * @var string
+	 * @var EventType
 	 */
-	protected $eventType = '';
-
-	/**
-	 * An int from the event table corresponding to $eventType
-	 *
-	 * @var int
-	 */
-	protected $type = 0;
+	protected $type = null;
 
 	/**
 	 * Title of the event
@@ -160,14 +153,14 @@ class Event {
 	/**
 	 * Any associated roles
 	 *
-	 * @var null
+	 * @var Collection|Role[]
 	 */
 	protected $roleCollection = null;
 
 	/**
 	 * Any associated campuses
 	 *
-	 * @var null
+	 * @var Collection|Campus[]
 	 */
 	protected $campusCollection = null;
 
@@ -175,52 +168,24 @@ class Event {
 	 * The date when the event was published (made visible to users)
 	 * An instance Alaress_Date_Format()
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $publishDateTime = null;
 
 	/**
 	 * The datetime when the event starts
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $startDateTime = null;
 
 	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $startDate = '';
-
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $startTime = '';
-	
-	/**
 	 * The datetime when the event ends
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	protected $endDateTime = null;
 
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $endDate = '';
-
-	/**
-	 * For mappers
-	 *
-	 * @var string
-	 */
-	protected $endTime = '';
-	
 	/**
 	 * Constructor
 	 */
@@ -240,11 +205,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isPersonalLevel() {
-		if ($this->getAccess() == $this->accessLevels['personal']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_PERSONAL;
 	}
 
 	/**
@@ -253,11 +214,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isGroupLevel() {
-		if ($this->getAccess() == $this->accessLevels['group']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_GROUP;
 	}
 
 	/**
@@ -266,11 +223,7 @@ class Event {
 	 * @return bool
 	 */
 	public function isCampusLevel() {
-		if ($this->getAccess() == $this->accessLevels['campus']) {
-			return true;
-		}
-
-		return false;
+		return $this->getAccess() == self::ACCESS_CAMPUS;
 	}
 
 	/* Auxiliary methods which don't belong anywhere else
@@ -290,14 +243,16 @@ class Event {
 			$selectedDate = time();
 		}
 
-		$startDate = new \Alaress_Date_Format($selectedDate, 'U');
-		$endDate = new \Alaress_Date_Format($selectedDate, 'U');
+		$startDate = new Alaress_Date_Format($selectedDate, 'U');
+		$endDate = new Alaress_Date_Format($selectedDate, 'U');
 
 		$this->setStartDateTime($startDate);
 		$this->setEndDateTime($endDate);
 	}
 
 	/**
+	 * TODO: move this. it doesn't belong here.
+	 *
 	 * Ensure that the user hasn't modified the URL in an untoward manner.
 	 * If they have, or it's somehow absent, default to week view.
 	 *
@@ -343,9 +298,11 @@ class Event {
 	 * Set access
 	 *
 	 * @param int $access
+	 * @return self
 	 */
 	public function setAccess($access) {
 		$this->access = $access;
+	 	return $this;
 	}
 
 	/**
@@ -360,10 +317,12 @@ class Event {
 	/**
 	 * Set all day
 	 *
-	 * @param int $allDay
+	 * @param bool|int $allDay
+	 * @return self
 	 */
 	public function setAllDay($allDay) {
-		$this->allDay = $allDay;
+		$this->allDay = (int)$allDay;
+	 	return $this;
 	}
 
 	/**
@@ -379,9 +338,11 @@ class Event {
 	 * Set attendance
 	 *
 	 * @param int $attendance
+	 * @return self
 	 */
 	public function setAttendance($attendance) {
 		$this->attendance = $attendance;
+	 	return $this;
 	}
 
 	/**
@@ -396,16 +357,18 @@ class Event {
 	/**
 	 * Set author
 	 *
-	 * @param null $author
+	 * @param User $author
+	 * @return self
 	 */
 	public function setAuthor($author) {
 		$this->author = $author;
+	 	return $this;
 	}
 
 	/**
 	 * Get author
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getAuthor() {
 		return $this->author;
@@ -414,16 +377,18 @@ class Event {
 	/**
 	 * Set category
 	 *
-	 * @param null $category
+	 * @param Category $category
+	 * @return self
 	 */
 	public function setCategory($category) {
 		$this->category = $category;
+	 	return $this;
 	}
 
 	/**
 	 * Get category
 	 *
-	 * @return null
+	 * @return Category
 	 */
 	public function getCategory() {
 		return $this->category;
@@ -432,15 +397,19 @@ class Event {
 	/**
 	 * Set colour
 	 *
+	 * @deprecated
 	 * @param string $colour
+	 * @return self
 	 */
 	public function setColour($colour) {
 		$this->colour = $colour;
+	 	return $this;
 	}
 
 	/**
 	 * Get colour
 	 *
+	 * @deprecated
 	 * @return string
 	 */
 	public function getColour() {
@@ -450,10 +419,12 @@ class Event {
 	/**
 	 * Set completed
 	 *
-	 * @param int $completed
+	 * @param bool|int $completed
+	 * @return self
 	 */
 	public function setCompleted($completed) {
-		$this->completed = $completed;
+		$this->completed = (int)$completed;
+	 	return $this;
 	}
 
 	/**
@@ -469,9 +440,11 @@ class Event {
 	 * Set detail
 	 *
 	 * @param string $detail
+	 * @return self
 	 */
 	public function setDetail($detail) {
 		$this->detail = $detail;
+	 	return $this;
 	}
 
 	/**
@@ -486,52 +459,38 @@ class Event {
 	/**
 	 * Set end datetime
 	 *
-	 * @param null $endDateTime
+	 * @param Alaress_Date_Format $endDateTime
+	 * @return self
 	 */
 	public function setEndDateTime($endDateTime) {
 		$this->endDateTime = $endDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get end datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getEndDateTime() {
 		return $this->endDateTime;
 	}
 
 	/**
-	 * Set event type
-	 *
-	 * @param string $eventType
-	 */
-	public function setEventType($eventType) {
-		$this->eventType = $eventType;
-	}
-
-	/**
-	 * Get event type
-	 *
-	 * @return string
-	 */
-	public function getEventType() {
-		return $this->eventType;
-	}
-
-	/**
 	 * Set id
 	 *
-	 * @param null $id
+	 * @param int $id
+	 * @return self
 	 */
 	public function setId($id) {
 		$this->id = $id;
+	 	return $this;
 	}
 
 	/**
 	 * Get id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -541,9 +500,11 @@ class Event {
 	 * Set location
 	 *
 	 * @param string $location
+	 * @return self
 	 */
 	public function setLocation($location) {
 		$this->location = $location;
+	 	return $this;
 	}
 
 	/**
@@ -559,9 +520,11 @@ class Event {
 	 * Set note
 	 *
 	 * @param string $note
+	 * @return self
 	 */
 	public function setNote($note) {
 		$this->note = $note;
+	 	return $this;
 	}
 
 	/**
@@ -576,16 +539,18 @@ class Event {
 	/**
 	 * Set owner
 	 *
-	 * @param null $owner
+	 * @param User $owner
+	 * @return self
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
+	 	return $this;
 	}
 
 	/**
 	 * Get owner
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;
@@ -594,16 +559,18 @@ class Event {
 	/**
 	 * Set series id
 	 *
-	 * @param null $seriesId
+	 * @param int $seriesId
+	 * @return self
 	 */
 	public function setSeriesId($seriesId) {
 		$this->seriesId = $seriesId;
+	 	return $this;
 	}
 
 	/**
 	 * Get series id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getSeriesId() {
 		return $this->seriesId;
@@ -613,9 +580,11 @@ class Event {
 	 * Set sid
 	 *
 	 * @param int $sid
+	 * @return self
 	 */
-	public function setSid($sid) {
-		$this->sid = $sid;
+	public function setServiceId($sid) {
+		$this->serviceId = $sid;
+	 	return $this;
 	}
 
 	/**
@@ -623,23 +592,25 @@ class Event {
 	 *
 	 * @return int
 	 */
-	public function getSid() {
-		return $this->sid;
+	public function getServiceId() {
+		return $this->serviceId;
 	}
 
 	/**
 	 * Set start datetime
 	 *
-	 * @param null $startDateTime
+	 * @param Alaress_Date_Format $startDateTime
+	 * @return self
 	 */
 	public function setStartDateTime($startDateTime) {
 		$this->startDateTime = $startDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get start datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getStartDateTime() {
 		return $this->startDateTime;
@@ -648,16 +619,18 @@ class Event {
 	/**
 	 * Set type
 	 *
-	 * @param int $type
+	 * @param EventType $type
+	 * @return self
 	 */
 	public function setType($type) {
 		$this->type = $type;
+	 	return $this;
 	}
 
 	/**
 	 * Get type
 	 *
-	 * @return int
+	 * @return EventType
 	 */
 	public function getType() {
 		return $this->type;
@@ -666,10 +639,15 @@ class Event {
 	/**
 	 * Set end date
 	 *
-	 * @param string $endDate
+	 * @param string $endDate in the format Y-m-d
+	 * @return self
 	 */
 	public function setEndDate($endDate) {
-		$this->endDate = $endDate;
+		// preserve time if already set
+		$time = $this->getFormattedDate($this->endDateTime, "H:i:s");
+		$this->endDateTime = new Alaress_Date_Format("$endDate $time", 'Y-m-d H:i:s');
+
+		return $this;
 	}
 
 	/**
@@ -678,16 +656,21 @@ class Event {
 	 * @return string
 	 */
 	public function getEndDate() {
-		return $this->endDate;
+		return $this->getFormattedDate($this->endDateTime, 'Y-m-d');
 	}
 
 	/**
 	 * Set end time
 	 *
-	 * @param string $endTime
+	 * @param string $endTime in the format H:i:s
+	 * @return self
 	 */
 	public function setEndTime($endTime) {
-		$this->endTime = $endTime;
+		// preserve date if already set
+		$date = $this->getFormattedDate($this->endDateTime, 'Y-m-d');
+		$this->endDateTime = new Alaress_Date_Format("$date $endTime", 'Y-m-d H:i:s');
+
+	 	return $this;
 	}
 
 	/**
@@ -696,16 +679,21 @@ class Event {
 	 * @return string
 	 */
 	public function getEndTime() {
-		return $this->endTime;
+		return $this->getFormattedDate($this->endDateTime, 'H:i:s');
 	}
 
 	/**
 	 * Set start date
 	 *
 	 * @param string $startDate
+	 * @return self
 	 */
 	public function setStartDate($startDate) {
-		$this->startDate = $startDate;
+		// preserve time if set
+		$time = $this->getFormattedDate($this->startDateTime, 'H:i:s');
+		$this->startDateTime = new Alaress_Date_Format("$startDate $time", 'Y-m-d H:i:s');
+
+	 	return $this;
 	}
 
 	/**
@@ -714,16 +702,22 @@ class Event {
 	 * @return string
 	 */
 	public function getStartDate() {
-		return $this->startDate;
+		return $this->getFormattedDate($this->startDateTime, 'Y-m-d');
 	}
 
 	/**
 	 * Set start time
 	 *
 	 * @param string $startTime
+	 * @return self
+	 *
 	 */
 	public function setStartTime($startTime) {
-		$this->startTime = $startTime;
+		// preserve date if set
+		$date = $this->getFormattedDate($this->startDateTime, 'Y-m-d');
+		$this->startDateTime = new Alaress_Date_Format("$date $startTime", 'Y-m-d H:i:s');
+
+	 	return $this;
 	}
 
 	/**
@@ -732,22 +726,39 @@ class Event {
 	 * @return string
 	 */
 	public function getStartTime() {
-		return $this->startTime;
+		return $this->getFormattedDate($this->startDateTime, 'H:i:s');
+	}
+
+
+	/**
+	 * Format a date, with type-safety
+	 *
+	 * @param \Alaress_Date_Format $object
+	 * @param string $format
+	 * @return string
+	 */
+	protected function getFormattedDate($object, $format) {
+		if($object instanceof Alaress_Date_Format) {
+			return $object->getUsingFormat($format);
+		}
+		return date($format, 0);
 	}
 
 	/**
 	 * Set publish datetime
 	 *
-	 * @param null $publishDateTime
+	 * @param Alaress_Date_Format $publishDateTime
+	 * @return self
 	 */
 	public function setPublishDateTime($publishDateTime) {
 		$this->publishDateTime = $publishDateTime;
+	 	return $this;
 	}
 
 	/**
 	 * Get publish datetime
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getPublishDateTime() {
 		return $this->publishDateTime;
@@ -756,16 +767,18 @@ class Event {
 	/**
 	 * Set campus collection
 	 *
-	 * @param null $campusCollection
+	 * @param Collection $campusCollection
+	 * @return self
 	 */
 	public function setCampusCollection($campusCollection) {
 		$this->campusCollection = $campusCollection;
+	 	return $this;
 	}
 
 	/**
 	 * Get campus collection
 	 *
-	 * @return null
+	 * @return Collection|Campus[]
 	 */
 	public function getCampusCollection() {
 		return $this->campusCollection;
@@ -774,16 +787,18 @@ class Event {
 	/**
 	 * Set role collection
 	 *
-	 * @param null $roleCollection
+	 * @param Collection|Role[] $roleCollection
+	 * @return self
 	 */
 	public function setRoleCollection($roleCollection) {
 		$this->roleCollection = $roleCollection;
+	 	return $this;
 	}
 
 	/**
 	 * Get role collection
 	 *
-	 * @return null
+	 * @return Collection|Role[]
 	 */
 	public function getRoleCollection() {
 		return $this->roleCollection;
@@ -793,9 +808,11 @@ class Event {
 	 * Set attendance dirty bit
 	 *
 	 * @param boolean $attendanceDirty
+	 * @return self
 	 */
 	public function setAttendanceDirty($attendanceDirty) {
 		$this->attendanceDirty = $attendanceDirty;
+	 	return $this;
 	}
 
 	/**

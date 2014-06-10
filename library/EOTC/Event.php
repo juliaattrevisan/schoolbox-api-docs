@@ -10,6 +10,8 @@
 
 namespace EOTC;
 use Schoolbox\Calendar;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 
 class Event extends Calendar\Event {
@@ -19,14 +21,14 @@ class Event extends Calendar\Event {
 	 *
 	 * An instance of EventMetadata
 	 *
-	 * @var null
+	 * @var EventMetadata
 	 */
 	protected $metadata = null;
 
 	/**
 	 * A User object
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $teacherInCharge = null;
 
@@ -36,7 +38,7 @@ class Event extends Calendar\Event {
 	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-		$this->setMetadata(new \Schoolbox\Collection());
+		$this->setMetadata(new Collection());
 	}
 
 	/* Getters/Setters
@@ -45,16 +47,18 @@ class Event extends Calendar\Event {
 	/**
 	 * Set metadata
 	 *
-	 * @param null $metadata
+	 * @param EventMetadata $metadata
+	 * @return self
 	 */
 	public function setMetadata($metadata) {
 		$this->metadata = $metadata;
+		return $this;
 	}
 
 	/**
 	 * Get metadata
 	 *
-	 * @return null
+	 * @return EventMetadata
 	 */
 	public function getMetadata() {
 		return $this->metadata;
@@ -63,16 +67,18 @@ class Event extends Calendar\Event {
 	/**
 	 * Set teacher in charge
 	 *
-	 * @param null $teacherInCharge
+	 * @param User $teacherInCharge
+	 * @return self
 	 */
 	public function setTeacherInCharge($teacherInCharge) {
 		$this->teacherInCharge = $teacherInCharge;
+		return $this;
 	}
 
 	/**
 	 * Get teacher in charge
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getTeacherInCharge() {
 		return $this->teacherInCharge;

@@ -82,7 +82,7 @@ private $enabled;               //Bool
      * @return boolean
      */
     public function isInCampus(Campus $campus) {
-        return $this->campusCollection->find($campus);
+        return $this->getCampusCollection()->find($campus);
     }
 
     /**
@@ -96,7 +96,7 @@ private $enabled;               //Bool
 
     /**
      * Returns a list of collections the user belongs in
-     * @return CampusCollection
+     * @return CampusCollection|Campus[]
      */
     public function getCampusCollection() {
         return $this->campusCollection;
@@ -119,7 +119,8 @@ private $enabled;               //Bool
 
     public function setRole($role) {
         $this->role = $role;
-    }
+    	return $this;
+	}
 
     public function getEmail() {
         if($this->localEmail == true) {
@@ -132,13 +133,13 @@ private $enabled;               //Bool
         return $this->formatName();
     }
 
-    /**
-     * Format a name from a user object
-     *
-     * @param  $userInfo
-     * @param null $format
-     * @return mixed|null|string
-     */
+
+	/**
+	 * Format a name from a user object
+	 *
+	 * @param null $format
+	 * @return string
+	 */
     public function formatName($format = null) {
 
         // Check for custom format
@@ -171,7 +172,8 @@ private $enabled;               //Bool
 
     public function setAltEmail($altEmail) {
         $this->altEmail = $altEmail;
-    }
+    	return $this;
+	}
 
     public function getAltEmail() {
         return $this->altEmail;
@@ -179,11 +181,13 @@ private $enabled;               //Bool
 
     /**
      * @param int $webmail
+     * @return self
      */
     public function setWebmail($webmail)
     {
         $this->webmail = $webmail;
-    }
+    	return $this;
+	}
 
     /**
      * @return int
@@ -197,7 +201,8 @@ private $enabled;               //Bool
 
     public function setCalendarView($calendarView) {
         $this->calendarView = $calendarView;
-    }
+    	return $this;
+	}
 
     public function getCalendarView() {
         return $this->calendarView;
@@ -205,7 +210,8 @@ private $enabled;               //Bool
 
     public function setEportfolioEnable($eportfolioEnable) {
         $this->eportfolioEnable = $eportfolioEnable;
-    }
+    	return $this;
+	}
 
     public function getEportfolioEnable() {
         return $this->eportfolioEnable;
@@ -213,7 +219,8 @@ private $enabled;               //Bool
 
     public function setExternalId($externalId) {
         $this->externalId = $externalId;
-    }
+    	return $this;
+	}
 
     public function getExternalId() {
         return $this->externalId;
@@ -221,7 +228,8 @@ private $enabled;               //Bool
 
     public function setFirstname($firstname) {
         $this->firstname = $firstname;
-    }
+    	return $this;
+	}
 
     public function getFirstname() {
         return $this->firstname;
@@ -229,7 +237,8 @@ private $enabled;               //Bool
 
     public function setHash($hash) {
         $this->hash = $hash;
-    }
+    	return $this;
+	}
 
     public function getHash() {
         return $this->hash;
@@ -237,7 +246,8 @@ private $enabled;               //Bool
 
     public function setId($id) {
         $this->id = $id;
-    }
+    	return $this;
+	}
 
     public function getId() {
         return $this->id;
@@ -245,7 +255,8 @@ private $enabled;               //Bool
 
     public function setKey($key) {
         $this->key = $key;
-    }
+    	return $this;
+	}
 
     public function getKey() {
         return $this->key;
@@ -253,7 +264,8 @@ private $enabled;               //Bool
 
     public function setLastname($lastname) {
         $this->lastname = $lastname;
-    }
+    	return $this;
+	}
 
     public function getLastname() {
         return $this->lastname;
@@ -261,7 +273,8 @@ private $enabled;               //Bool
 
     public function setLocalEmail($localEmail) {
         $this->localEmail = $localEmail;
-    }
+    	return $this;
+	}
 
     public function getLocalEmail() {
         return $this->localEmail;
@@ -269,7 +282,8 @@ private $enabled;               //Bool
 
     public function setPassword($password) {
         $this->password = $password;
-    }
+    	return $this;
+	}
 
     public function getPassword() {
         return $this->password;
@@ -277,7 +291,8 @@ private $enabled;               //Bool
 
     public function setResidentialHouse($residentialHouse) {
         $this->residentialHouse = $residentialHouse;
-    }
+    	return $this;
+	}
 
     public function getResidentialHouse() {
         return $this->residentialHouse;
@@ -285,7 +300,8 @@ private $enabled;               //Bool
 
     public function setSchoolHouse($schoolHouse) {
         $this->schoolHouse = $schoolHouse;
-    }
+    	return $this;
+	}
 
     public function getSchoolHouse() {
         return $this->schoolHouse;
@@ -293,7 +309,8 @@ private $enabled;               //Bool
 
     public function setSuperuser($superuser) {
         $this->superuser = $superuser;
-    }
+    	return $this;
+	}
 
     public function getSuperuser() {
         return $this->superuser;
@@ -301,7 +318,8 @@ private $enabled;               //Bool
 
     public function setTitle($title) {
         $this->title = $title;
-    }
+    	return $this;
+	}
 
     public function getTitle() {
         return $this->title;
@@ -309,7 +327,8 @@ private $enabled;               //Bool
 
     public function setUseInternalMail($useInternalMail) {
         $this->useInternalMail = $useInternalMail;
-    }
+    	return $this;
+	}
 
     public function getUseInternalMail() {
         return $this->useInternalMail;
@@ -317,7 +336,8 @@ private $enabled;               //Bool
 
     public function setUsername($username) {
         $this->username = $username;
-    }
+    	return $this;
+	}
 
     public function getUsername() {
         return $this->username;
@@ -325,7 +345,8 @@ private $enabled;               //Bool
 
     public function setYear($year) {
         $this->year = $year;
-    }
+    	return $this;
+	}
 
     public function getYear() {
         return $this->year;
@@ -334,6 +355,7 @@ private $enabled;               //Bool
 	public function setEnabled($enabled) {
 		// explicit cast
 		$this->enabled = $enabled ? true : false;
+		return $this;
 	}
 
 	public function getEnabled() {
@@ -343,11 +365,13 @@ private $enabled;               //Bool
 
     public function setCampusCollection($campusCollection) {
         $this->campusCollection = $campusCollection;
-    }
+    	return $this;
+	}
 
     public function setDefaultCampus($defaultCampus) {
         $this->defaultCampus = $defaultCampus;
-    }
+    	return $this;
+	}
 
     /**
      * Set boarding status (only if boarder leave is enabled)
@@ -380,10 +404,12 @@ private $enabled;               //Bool
 
     /**
      * @param \Schoolbox\External\SubjectCollection $subject_collection
+     * @return self
      */
     public function setSubjectCollection($subject_collection) {
         $this->subject_collection = $subject_collection;
-    }
+    	return $this;
+	}
 
     /**
      * @return \Schoolbox\External\SubjectCollection
@@ -395,10 +421,12 @@ private $enabled;               //Bool
 
     /**
      * @param \Schoolbox\IConfigLoader $config_loader
+     * @return self
      */
     public function setConfigLoader(IConfigLoader $config_loader) {
         $this->config_loader = $config_loader;
-    }
+    	return $this;
+	}
 
     /**
      * @param  Collection|UserAccess[] $accessList
@@ -546,9 +574,11 @@ private $enabled;               //Bool
 	 * Set recipients
 	 *
 	 * @param \Schoolbox\Collection $emailRecipients
+	 * @return self
 	 */
 	private function setEmailRecipients($emailRecipients) {
 		$this->emailRecipients = $emailRecipients;
+		return $this;
 	}
 
 	/**

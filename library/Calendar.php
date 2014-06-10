@@ -614,7 +614,7 @@ class Calendar extends DeprecatedModel {
 	/**
 	 * Get all events occurring across the specified date span.
 	 *
-	 * @param $user
+	 * @param \Schoolbox\User $user
 	 * @param int   $startTimestamp
 	 * @param int   $endTimestamp
 	 * @param array $filter         A filter to put on the list of results.

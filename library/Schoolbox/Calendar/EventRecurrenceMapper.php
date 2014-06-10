@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Calendar;
 
+use Alaress_Date_Format;
 use DateTime;
 
 class EventRecurrenceMapper {
@@ -45,9 +46,9 @@ class EventRecurrenceMapper {
 	public function getSeriesRecurrence($event) {
 		$series = $this->getEventMapper()->getAllInSeries($event);
 
-		$dateFirst = new \Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
-		$dateNext = new \Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
-		$dateLast = new \Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
+		$dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
+		$dateNext = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
+		$dateLast = new Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
 
 		$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
 
@@ -80,13 +81,13 @@ class EventRecurrenceMapper {
 	 * Totally custom save method
 	 *
 	 * @param Event $event
-	 * @param $efficacy
-	 * @param $repeatSetting
-	 * @param $until
-	 * @param \Alaress_Date_Format $startDate
-	 * @param \Alaress_Date_Format $endDate
+	 * @param string $efficacy
+	 * @param string $repeatSetting
+	 * @param Alaress_Date_Format $until
+	 * @param Alaress_Date_Format $startDate
+	 * @param Alaress_Date_Format $endDate
 	 */
-	public function save(Event $event, $efficacy, $repeatSetting, $until, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate) {
+	public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
@@ -105,17 +106,7 @@ class EventRecurrenceMapper {
 				$series = $this->getEventMapper()->getAllInSeries($event);
 
 				foreach($series as $seriesEvent) {
-
-					/* Copy date from $event to each thingy in the series
-					 * to preserve other series -related data
-					 */
-					$seriesEvent->setNote($event->getNote());
-					$seriesEvent->setDetail($event->getDetail());
-					$seriesEvent->setLocation($event->getLocation());
-					$seriesEvent->setAllDay($event->getAllDay());
-					$seriesEvent->setCampusCollection($event->getCampusCollection());
-					$seriesEvent->setMetadata($event->getMetadata());
-
+					$this->setSeriesEventData($seriesEvent, $event);
 					$this->getEventMapper()->save($seriesEvent);
 				}
 			}
@@ -196,6 +187,23 @@ class EventRecurrenceMapper {
 				$this->getEventMapper()->save($event);
 			}
 		}
+	}
+
+
+	/**
+	 * @param Event $seriesEvent
+	 * @param Event $coreEvent
+	 */
+	protected function setSeriesEventData($seriesEvent, $coreEvent) {
+		/* Copy date from $event to each thingy in the series
+		 * to preserve other series -related data
+		 */
+		$seriesEvent->setNote($coreEvent->getNote());
+		$seriesEvent->setDetail($coreEvent->getDetail());
+		$seriesEvent->setLocation($coreEvent->getLocation());
+		$seriesEvent->setAllDay($coreEvent->getAllDay());
+		$seriesEvent->setCampusCollection($coreEvent->getCampusCollection());
+		$seriesEvent->setRoleCollection($coreEvent->getRoleCollection());
 	}
 
 	/**

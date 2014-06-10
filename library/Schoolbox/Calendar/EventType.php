@@ -50,6 +50,7 @@ class EventType {
 	 */
 	public function setColor($color) {
 		$this->color = $color;
+		return $this;
 	}
 
 	/**
@@ -68,6 +69,7 @@ class EventType {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
 	}
 
 	/**
@@ -86,6 +88,7 @@ class EventType {
 	 */
 	public function setType($type) {
 		$this->type = $type;
+		return $this;
 	}
 
 	/**
