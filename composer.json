@@ -27,6 +27,7 @@
         }
     ],
     "require": {
+		"phpxmlrpc/phpxmlrpc": "dev-php53",
         "zendframework/zend-http": "2.2.*",
         "zendframework/zend-log": "2.2.*",
         "sabre/dav": "~1.8.7",

@@ -799,7 +799,6 @@ class Mapper implements Serializable {
 		return $this->model;
 	}
 
-
 	/**
 	 * @return string
 	 */
@@ -1957,7 +1956,6 @@ class Mapper implements Serializable {
 
 	}
 
-
 	/**
 	 * String representation of object
 	 *
@@ -1967,7 +1965,6 @@ class Mapper implements Serializable {
 		// we don't need to serialize anything other than the name of the class
 		return '';
 	}
-
 
 	/**
 	 * Constructs the object
@@ -1980,5 +1977,13 @@ class Mapper implements Serializable {
 		$this->__construct();
 	}
 
+	/**
+	 * Truncate
+	 */
+	public function truncate() {
+		$query = "TRUNCATE `{$this->table}`";
 
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+	}
 }
