@@ -47,18 +47,11 @@ interface IPaginator {
      */
 
     /**
-     * Gets the first page number.
+     * Gets the number of pages.
      *
      * @return int
      */
-    public function getFirstPage();
-
-    /**
-     * Gets the last page number.
-     *
-     * @return int
-     */
-    public function getLastPage();
+    public function getPageCount();
 
 
     /**

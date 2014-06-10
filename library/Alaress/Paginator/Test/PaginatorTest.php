@@ -29,40 +29,39 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
     /**
      * @return array
      */
-    public function getTestFirstLastPageData() {
+    public function getTestPageCountData() {
         return array(
-            array($this->buildPaginator(1,  0),  0, 0),
-            array($this->buildPaginator(1,  9),  1, 9),
+            array($this->buildPaginator(1,  0),  0),
+            array($this->buildPaginator(1,  9),  9),
 
-            array($this->buildPaginator(10, 9),  1, 1),
-            array($this->buildPaginator(10, 10), 1, 1),
-            array($this->buildPaginator(10, 11), 1, 2),
+            array($this->buildPaginator(10, 9),  1),
+            array($this->buildPaginator(10, 10), 1),
+            array($this->buildPaginator(10, 11), 2),
 
-            array($this->buildPaginator(10, 19), 1, 2),
-            array($this->buildPaginator(10, 20), 1, 2),
-            array($this->buildPaginator(10, 21), 1, 3),
+            array($this->buildPaginator(10, 19), 2),
+            array($this->buildPaginator(10, 20), 2),
+            array($this->buildPaginator(10, 21), 3),
 
-            array($this->buildPaginator(10, 59), 1, 6),
-            array($this->buildPaginator(10, 60), 1, 6),
-            array($this->buildPaginator(10, 61), 1, 7),
+            array($this->buildPaginator(10, 59), 6),
+            array($this->buildPaginator(10, 60), 6),
+            array($this->buildPaginator(10, 61), 7),
 
-            array($this->buildPaginator(50, 19), 1, 1),
-            array($this->buildPaginator(50, 20), 1, 1),
-            array($this->buildPaginator(50, 21), 1, 1),
-            array($this->buildPaginator(50, 49), 1, 1),
-            array($this->buildPaginator(50, 50), 1, 1),
-            array($this->buildPaginator(50, 51), 1, 2),
+            array($this->buildPaginator(50, 19), 1),
+            array($this->buildPaginator(50, 20), 1),
+            array($this->buildPaginator(50, 21), 1),
+            array($this->buildPaginator(50, 49), 1),
+            array($this->buildPaginator(50, 50), 1),
+            array($this->buildPaginator(50, 51), 2),
         );
     }
 
     /**
      * Tests first and last page numbers.
      *
-     * @dataProvider getTestFirstLastPageData
+     * @dataProvider getTestPageCountData
      */
-    public function testPageNumbers(Paginator $paginator, $expectedFirst, $expectedLast) {
-        $this->assertEquals($expectedFirst, $paginator->getFirstPage());
-        $this->assertEquals($expectedLast,  $paginator->getLastPage());
+    public function testPageCount(Paginator $paginator, $expectedPageCount) {
+        $this->assertEquals($expectedPageCount, $paginator->getPageCount());
     }
 
     /**

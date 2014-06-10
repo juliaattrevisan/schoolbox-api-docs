@@ -30,14 +30,16 @@ class Paginator implements IPaginator {
      * @throws OutOfRangeException if not $this->getFirstPage() > $pageNumber > $this->getLastPage()
      */
     protected function assertPageNumberWithinRange($pageNumber) {
-        if ($pageNumber < ($first = $this->getFirstPage())) {
+        $pageCount = $this->getPageCount();
+        $firstPage = min($pageCount, 1);
+        if ($pageNumber < $firstPage) {
             throw new OutOfRangeException(
-                sprintf('Requested page number "%d" less than first page "%d"', $pageNumber, $first)
+                sprintf('Requested page number "%d" less than first page "%d"', $pageNumber, $firstPage)
             );
         }
-        if ($pageNumber > ($last = $this->getLastPage())) {
+        if ($pageNumber > $pageCount) {
             throw new OutOfRangeException(
-                sprintf('Requested page number "%d" greater than last page "%d"', $pageNumber, $last)
+                sprintf('Requested page number "%d" greater than last page "%d"', $pageNumber, $pageCount)
             );
         }
     }
@@ -78,22 +80,11 @@ class Paginator implements IPaginator {
     }
 
     /**
-     * Gets the first page number.
-     *
-     * Usually 1, but will be 0 if $this->total is 0.
+     * Gets the number of pages.
      *
      * @return int
      */
-    public function getFirstPage() {
-        return min(1, $this->getLastPage());
-    }
-
-    /**
-     * Gets the last page number.
-     *
-     * @return int
-     */
-    public function getLastPage() {
+    public function getPageCount() {
         return intval(ceil($this->total / $this->pageSize));
     }
 

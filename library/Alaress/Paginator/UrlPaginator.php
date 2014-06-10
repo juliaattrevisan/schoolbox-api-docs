@@ -55,7 +55,7 @@ class UrlPaginator implements IUrlPaginator {
      * @return array|UriInterface[]
      */
     public function getPageUrls() {
-        return $this->getPageUrlsBetween($this->getFirstPage(), $this->getLastPage());
+        return $this->getPageUrlsBetween(1, $this->getPageCount());
     }
 
     /**
@@ -65,8 +65,8 @@ class UrlPaginator implements IUrlPaginator {
      * @return array|UriInterface[]
      */
     public function getPageUrlsBetween($from, $to) {
-        $from   = max($from, $this->getFirstPage());
-        $to     = min($to,   $this->getLastPage());
+        $from   = max($from, 1);
+        $to     = min($to,   $this->getPageCount());
         $result = array();
         foreach (range($from, $to) as $page) {
             $result[$page] = $this->getUrlForPage($page);
@@ -162,23 +162,12 @@ class UrlPaginator implements IUrlPaginator {
     }
 
     /**
-     * Gets the first page number.
-     *
-     * Usually 1, but will be 0 if $this->total is 0.
+     * Gets the number of pages.
      *
      * @return int
      */
-    public function getFirstPage() {
-        return $this->paginator->getFirstPage();
-    }
-
-    /**
-     * Gets the last page number.
-     *
-     * @return int
-     */
-    public function getLastPage() {
-        return $this->paginator->getLastPage();
+    public function getPageCount() {
+        return $this->paginator->getPageCount();
     }
 
     /**
