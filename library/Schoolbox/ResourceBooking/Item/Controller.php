@@ -38,12 +38,14 @@ class Controller extends Base {
      */
     public function browse() {
 
-        // Get the list of categories
+        // Get the list of categories.
         $query  = array();
         $catId  = $this->getRequest()->query['category'];
         $search = trim($this->getRequest()->query['search']);
+        $page   = max(intval($this->getRequest()->query['page']), 1);
 
         // Use the paginator to limit searches
+        $this->paginator->setUrl($this->request->url->get());
         $list = array();
         if (strlen($search) > 0) {
             $total = $this->mapper->searchCount($search);
@@ -51,7 +53,7 @@ class Controller extends Base {
             if ($total > 0) {
                 $list = $this->getMapper()->search(
                     $search,
-                    $this->paginator->getOffset($this->paginator->getFirstPage()),
+                    $this->paginator->getOffset($page),
                     $this->paginator->getPageSize()
                 );
             }
@@ -69,7 +71,7 @@ class Controller extends Base {
                     $query,
                     array(
                         'limit'  => $this->paginator->getPageSize(),
-                        'offset' => $this->paginator->getOffset($this->paginator->getFirstPage()),
+                        'offset' => $this->paginator->getOffset($page),
                     )
                 );
             }
