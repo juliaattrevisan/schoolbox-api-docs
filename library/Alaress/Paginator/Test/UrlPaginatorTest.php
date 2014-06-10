@@ -16,43 +16,91 @@ use PHPUnit_Framework_TestCase;
 class UrlPaginatorTest extends PHPUnit_Framework_TestCase {
 
     /**
-     * Tests basic URL generation.
+     * Simple factory for a test UrlPaginator object.
+     *
+     * @param  int    $pageSize
+     * @param  int    $total
+     * @param  string $url
+     * @param  string $param
+     * @return UrlPaginator
      */
-    public function testUrlPaginator() {
-        $basePaginator = new Paginator();
-        $basePaginator->setPageSize(50)->setTotal(300);
-
-        // Basic URL
+    protected function buildPaginator($pageSize, $total, $url, $param) {
+        $paginator = new Paginator();
+        $paginator->setPageSize($pageSize)->setTotal($total);
         $urlPaginator = new UrlPaginator();
         $urlPaginator
-            ->setPaginator($basePaginator)
-            ->setUrl(new Uri('https://www.google.com'))
-            ->setParam('p');
+            ->setPaginator($paginator)
+            ->setUrl(new Uri($url))
+            ->setParam($param);
+        return $urlPaginator;
+    }
 
-        $this->assertEquals('https://www.google.com/?p=1', $urlPaginator->getUrlForPage(1)->toString());
-        $this->assertEquals('https://www.google.com/?p=2', $urlPaginator->getUrlForPage(2)->toString());
+    /**
+     * Tests for basic URL generation
+     */
+    public function testBasicUrl() {
+        $paginator = $this->buildPaginator(50, 300, 'https://www.google.com', 'p');
+        $this->assertEquals('https://www.google.com/?p=1', $paginator->getUrlForPage(1)->toString());
+        $this->assertEquals('https://www.google.com/?p=2', $paginator->getUrlForPage(2)->toString());
+    }
 
-        // A more complicated but incomplete URL
-        $urlPaginator = new UrlPaginator();
-        $urlPaginator
-            ->setPaginator($basePaginator)
-            ->setUrl(new Uri('/resource-booking/item?search=b'))
-            ->setParam('page');
+    /**
+     * Tests for URL generation from an incomplete URL
+     */
+    public function testIncompleteUrl() {
+        $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b', 'page');
 
-        $url = $urlPaginator->getUrlForPage(1);
+        $url = $paginator->getUrlForPage(1);
         $this->assertEquals('/resource-booking/item', $url->getPath());
         $this->assertEquals(array('search' => 'b', 'page' => 1), $url->getQueryAsArray());
 
-        $url = $urlPaginator->getUrlForPage(2);
+        $url = $paginator->getUrlForPage(2);
         $this->assertEquals('/resource-booking/item', $url->getPath());
         $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
+    }
 
-        // Test iteration
-        $urlsBetween = $urlPaginator->getPageUrlsBetween(3, 5);
+    /**
+     * Tests for URL generation from a URL which already has a page number
+     */
+    public function testUrlWithPageAlready() {
+        $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b&page=3', 'page');
+
+        $url = $paginator->getUrlForPage(1);
+        $this->assertEquals('/resource-booking/item', $url->getPath());
+        $this->assertEquals(array('search' => 'b', 'page' => 1), $url->getQueryAsArray());
+
+        $url = $paginator->getUrlForPage(2);
+        $this->assertEquals('/resource-booking/item', $url->getPath());
+        $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
+    }
+
+    /**
+     * Tests for checking that getPageUrls() and getPageUrlsBetween() creates
+     * the correct number of pages, and correct URLs
+     */
+    public function testPageUrlCount() {
+        $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b', 'page');
+        $this->assertCount(6, $paginator->getPageUrls());
+
+        $urlsBetween = $paginator->getPageUrlsBetween(3, 5);
         $this->assertCount(3, $urlsBetween);
         foreach ($urlsBetween as $page => $url) {
             $this->assertEquals('/resource-booking/item', $url->getPath());
             $this->assertEquals(array('search' => 'b', 'page' => $page), $url->getQueryAsArray());
         }
+    }
+
+    /**
+     * Tests for checking that getPageUrls() and getPageUrlsBetween() work as
+     * expected for empty paginators
+     */
+    public function testEmptyPaginatorPageUrlCount() {
+        $paginator = $this->buildPaginator(50, 0, '/resource-booking/item?search=b', 'page');
+        $this->assertCount(0, $paginator->getPageUrls());
+
+        // Generating URLs for pages that don't exist should still work
+        $url = $paginator->getUrlForPage(2);
+        $this->assertEquals('/resource-booking/item', $url->getPath());
+        $this->assertEquals(array('search' => 'b', 'page' => 2), $url->getQueryAsArray());
     }
 }
