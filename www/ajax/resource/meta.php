@@ -192,6 +192,14 @@ function getFolderMeta($folderId) {
 		case WRITE_ACCESS:
 			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download', 'multi'));
 			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
+			
+			/* Allow teachers to upload a zip file
+			 */
+			if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
+				$actions[] = 'zip';
+			}
+
+			
 			// no break
 		case READ_ACCESS:
 		default:
@@ -199,11 +207,6 @@ function getFolderMeta($folderId) {
 			break;
 	}
 
-	/* Allow teachers to upload a zip file
-	 */
-	if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
-		$actions = array_merge($actions, array('zip'));
-	}
 
 	if($cat->hasHomepage()) {
 		$actions[] = 'homepage';
