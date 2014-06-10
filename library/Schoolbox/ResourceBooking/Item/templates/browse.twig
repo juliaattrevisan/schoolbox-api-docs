@@ -44,11 +44,11 @@
         {% endfor %}
     </ul>
 
-    {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage} %}
+    {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage, class:'admin-nav'} %}
 
     {# New item: only if I have the permission to do this #}
     {% if isRouteAuthorized('resourceItem.add') %}
-        <a id="resource-create" rel="create-form" class="btn add float-left" href="{{ routeLookup('resourceItem.add') }}"><span></span>Add New</a>
+        <a id="resource-create" rel="create-form" class="btn add clear float-left" href="{{ routeLookup('resourceItem.add') }}"><span></span>Add New</a>
     {% endif %}
 </div>
 
