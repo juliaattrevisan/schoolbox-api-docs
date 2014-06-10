@@ -171,11 +171,14 @@
              * @private
              */
             function updateRelativeTimes() {
+                // don't render a future time if server clock happens to be ahead of client
+                var now = Math.floor(new Date().getTime() / 1000);
+
                 $('#messages').children('li.message').each(function(k, v) {
                     var msgId = this.id.split('-')[1];
                     if(typeof messages[msgId] !== 'undefined') {
                         var timestamp = messages[msgId].timestamp;
-                        $(this).find('time').text(moment.unix(timestamp).fromNow());
+                        $(this).find('time').text(moment.unix(Math.min(timestamp, now)).fromNow());
                     }
                 });
             }
