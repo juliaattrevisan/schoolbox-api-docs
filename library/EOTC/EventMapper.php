@@ -197,6 +197,11 @@ class EventMapper extends Calendar\EventMapper {
 				$allFiles = $metadataMapper->findFiles($eventItem->getMetadata()->getId());
 				$eventItem->getMetadata()->setRamsFiles($allFiles);
 
+				/* Accumulate resource bookings for this event
+				 */
+				$allResourceBookings = $metadataMapper->findResourceBookings($eventItem->getMetadata()->getId());
+				$eventItem->getMetadata()->setResourceBookings($allResourceBookings);
+
 				/* Activity logs
 				 */
 				$activityLogMapper = new ActivityLog\Mapper();
@@ -433,6 +438,9 @@ class EventMapper extends Calendar\EventMapper {
 
 		$metadataMapper->deleteFilesRelations($event->getMetadata());
 		$metadataMapper->createFiles($event->getMetadata());
+
+		$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
+		$metadataMapper->createResourceBookings($event->getMetadata());
 	}
 
 	/**

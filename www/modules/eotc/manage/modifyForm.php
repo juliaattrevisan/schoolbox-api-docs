@@ -36,7 +36,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			if (is_numeric($_POST['id'])) {
 				try {
 					$event = $eventMapper->findById($_POST['id']);
-				}
+					}
 				catch (\Exception $e) {
 					error(160);
 				}
@@ -113,6 +113,17 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			}
 
 			$metadata->setStaffAttendees($staffCollection);
+
+			/* All the resources that were selected
+			 */
+			$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+			$resourceBookingCollection = new \Schoolbox\Collection();
+
+			if (is_array($_POST['resourcebooking']) && count($_POST['resourcebooking'])) {
+				$resourceBookingCollection = $resourceBookingMapper->findByColumn('id', $_POST['resourcebooking']);
+			}
+
+			$metadata->setResourceBookings($resourceBookingCollection);
 
 			/* Spawned further up
 			 */
@@ -198,6 +209,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
 					$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
 					$metadataMapper->deleteFilesRelations($event->getMetadata());
+					$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
 					$metadataMapper->delete($event->getMetadata());
 
 					foreach($allEvents as $currentEvent) {
@@ -218,6 +230,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
 					$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
 					$metadataMapper->deleteFilesRelations($event->getMetadata());
+					$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
 					$eventMapper->deleteMetadataRelations($event);
 					$eventMapper->deleteCampusRelations($event);
 					$eventMapper->delete($event);
@@ -233,6 +246,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
 				$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
 				$metadataMapper->deleteFilesRelations($event->getMetadata());
+				$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
 				$metadataMapper->delete($event->getMetadata());
 				$eventMapper->deleteMetadataRelations($event);
 				$eventMapper->deleteCampusRelations($event);

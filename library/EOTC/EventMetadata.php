@@ -77,6 +77,13 @@ class EventMetadata {
 	protected $ramsFiles = null;
 
 	/**
+	 * A collection of resource bookings
+	 *
+	 * @var null
+	 */
+	protected $resourceBookings = null;
+
+	/**
 	 * Created at
 	 *
 	 * @var null
@@ -104,6 +111,7 @@ class EventMetadata {
 		$this->setStaffAttendees(new \Schoolbox\Collection());
 		$this->setStudentAttendees(new \Schoolbox\Collection());
 		$this->setRamsFiles(new \Schoolbox\Collection());
+		$this->setResourceBookings(new \Schoolbox\Collection());
 	}
 
 	/* Getters/Setters
@@ -323,5 +331,22 @@ class EventMetadata {
 	 */
 	public function getRamsFiles() {
 		return $this->ramsFiles;
+	}
+
+	/**
+	 * Set resource bookings
+	 * @param null $resourceBookings
+	 */
+	public function setResourceBookings($resourceBookings) {
+		$this->resourceBookings = $resourceBookings;
+	}
+
+	/**
+	 * Get resource bookings
+	 *
+	 * @return null
+	 */
+	public function getResourceBookings() {
+		return $this->resourceBookings;
 	}
 }
