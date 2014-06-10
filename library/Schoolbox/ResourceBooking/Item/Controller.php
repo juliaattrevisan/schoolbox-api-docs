@@ -85,6 +85,7 @@ class Controller extends Base {
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'search'       => $search,
                     'paginator'    => $this->paginator,
+                    'page'         => $page,
                 ),
             )
         );
