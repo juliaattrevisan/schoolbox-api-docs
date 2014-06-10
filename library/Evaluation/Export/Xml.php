@@ -135,9 +135,12 @@ abstract class Evaluation_Export_Xml {
 
 							/* Clear children after parsing out the parent
 							 */
-							$this->getPage()->setVar('answerFormFragment', '');
-							$this->getPage()->setVar('answerInputs_block', '');
-							$this->getPage()->setVar('answer_configuration_block', '');
+							$this->getPage()->setVar(array(
+								'answerFormFragment' => '',
+								'answerInputs_block' => '',
+								'answerCorrect_block' => '',
+								'answer_configuration_block' => '',
+							));
 						}
 					}
 				}
