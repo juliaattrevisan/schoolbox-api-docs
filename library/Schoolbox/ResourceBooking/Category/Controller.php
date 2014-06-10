@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\ResourceBooking\Category;
+use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 
 class Controller extends Base {
@@ -18,19 +19,33 @@ class Controller extends Base {
     protected $mapper;
 
     /**
+     * @var IUrlPaginator
+     */
+    protected $paginator;
+
+    /**
      * Browses the list of categories.
      */
     public function browse() {
 
-        // How am i going to paginate this list?
-        $list = $this->getMapper()->findAll();
+        $page  = max(intval($this->getRequest()->query['page']), 1);
+        $total = $this->mapper->countAll();
+        $this->paginator->setTotal($total);
+        $list  = $this->getMapper()->findAll(
+            array(
+                'limit'  => $this->paginator->getPageSize(),
+                'offset' => $this->paginator->getOffset($page),
+            )
+        );
 
         $response = $this->getResponse();
         $response->content->set(
             array(
                 'template' => '@resourceCategory/browse.twig',
                 'data'     => array(
-                    'list' => $list,
+                    'list'      => $list,
+                    'paginator' => $this->paginator,
+                    'page'      => $page,
                 ),
             )
         );
@@ -142,6 +157,22 @@ class Controller extends Base {
      */
     public function getMapper() {
         return $this->mapper;
+    }
+
+    /**
+     * @param  IUrlPaginator $paginator
+     * @return $this
+     */
+    public function setPaginator($paginator) {
+        $this->paginator = $paginator;
+        return $this;
+    }
+
+    /**
+     * @return IUrlPaginator
+     */
+    public function getPaginator() {
+        return $this->paginator;
     }
 
 }

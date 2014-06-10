@@ -4,6 +4,8 @@
 <h1>Resource Category List</h1>
 {% include '@resourceCategory/sub/list.twig' %}
 
+{% include 'sub/paginator.twig' with {paginator: paginator, currentPage: currentPage} %}
+
 {# New item: only if I have the permission to do this #}
 {% if isRouteAuthorized('resourceCategory.add') %}
     <a id="resourcecategory-create" rel="create-form" class="btn add float-left" href="{{ routeLookup('resourceCategory.add') }}"><span></span>Add New</a>

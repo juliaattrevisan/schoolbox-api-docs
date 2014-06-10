@@ -76,6 +76,15 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector) {
         $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setMapper']
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Mapper');
+        $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setPaginator']
+            = $injector->lazyNew(
+            'Alaress\\Paginator\\UrlPaginator',
+            array(),
+            array(
+                'setPageSize' => 10,
+                'setParam'    => 'page',
+            )
+        );
         $injector->set(
             'controller:resourceCategory',
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Controller')
