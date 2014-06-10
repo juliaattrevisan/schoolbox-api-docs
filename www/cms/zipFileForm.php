@@ -13,6 +13,12 @@ $isAllowedTeacher = ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_u
  */
 if ($isSuperuser || $isAllowedTeacher) {
 
+	/* Check if a file was selected!
+	 */
+	if (!strlen($_FILES['file']['tmp_name'])) {
+		error(2);
+	}
+
 	/* Force session usage due to flash uploader
 	 * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
 	 */
