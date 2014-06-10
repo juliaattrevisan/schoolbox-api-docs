@@ -43,6 +43,17 @@
         <li>There are no resources in the system.</li>
         {% endfor %}
     </ul>
+
+    {% if paginator.pageCount > 1 %}
+        <ul class="admin-nav foot">
+            <li><a href="{{ paginator.urlForPage(1) }}">&lt;</a></li>
+            {% for page, url in paginator.pageUrls %}
+                <li><a href="{{ url }}">{{ page }}</a></li>
+            {% endfor %}
+            <li><a href="{{ paginator.urlForPage(paginator.pageCount) }}">&gt;</a></li>
+        </ul>
+    {% endif %}
+
     {# New item: only if I have the permission to do this #}
     {% if isRouteAuthorized('resourceItem.add') %}
         <a id="resource-create" rel="create-form" class="btn add float-left" href="{{ routeLookup('resourceItem.add') }}"><span></span>Add New</a>
