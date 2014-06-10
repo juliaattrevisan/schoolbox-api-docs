@@ -69,8 +69,6 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
      */
     public function getTestItemsOnPageData() {
         return array(
-            array($this->buildPaginator(1,  0),  0, -1, 0, 0),
-
             array($this->buildPaginator(1,  9),  1, 0, 1, 1),
             array($this->buildPaginator(1,  9),  2, 1, 2, 2),
             array($this->buildPaginator(1,  9),  8, 7, 8, 8),
@@ -129,6 +127,33 @@ class PaginatorTest extends PHPUnit_Framework_TestCase {
     public function testNegativePagesize() {
         $this->setExpectedException('OutOfRangeException');
         $this->buildPaginator(-1, 0);
+    }
+
+    /**
+     * Tests for zero total - any method that expects a page number should fail.
+     */
+    public function testZeroTotalOffset() {
+        $paginator = $this->buildPaginator(10, 0);
+        $this->setExpectedException('OutOfRangeException');
+        $paginator->getOffset(1);
+    }
+
+    /**
+     * Tests for zero total - any method that expects a page number should fail.
+     */
+    public function testZeroTotalFirstOnPage() {
+        $paginator = $this->buildPaginator(10, 0);
+        $this->setExpectedException('OutOfRangeException');
+        $paginator->getFirstOnPage(1);
+    }
+
+    /**
+     * Tests for zero total - any method that expects a page number should fail.
+     */
+    public function testZeroTotalLastOnPage() {
+        $paginator = $this->buildPaginator(10, 0);
+        $this->setExpectedException('OutOfRangeException');
+        $paginator->getLastOnPage(1);
     }
 
     /**
