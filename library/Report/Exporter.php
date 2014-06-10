@@ -85,7 +85,7 @@ class Report_Exporter {
         }
 
         // use array iteratively
-        elseif(is_array($this->getData())) {
+        elseif (is_array($this->getData()) || $this->getData() instanceof Traversable) {
             foreach($this->getData() as $row) {
                 $this->parseRow($outstream, $row);
             }

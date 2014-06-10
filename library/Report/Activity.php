@@ -14,7 +14,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
     private $pageNum;
     private $perPage;
     private $filter;
-    private $dataResource;
 
     // visible field mapping: index => humanreadable
     private $fields = array(
@@ -39,6 +38,11 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
     private $filterable = array('keyword', 'user');
     private $defaultOrderBy = 'time';
 
+    /**
+     * @var Database
+     */
+    protected $db;
+
     public function __construct($page) {
         $this->setGroupHandler(new Group());
 
@@ -54,6 +58,7 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
 
     protected function setup() {
         // set blocks
+        $this->db = Database::getInstance();
         $this->getPage()->setFile('activity_t', 'adminv2/report/activity.html');
         $this->getPage()->setBlock('activity_t', 'activity', 'activity_block');
         $this->getPage()->setTitle('Activity Report');
@@ -125,68 +130,85 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
 
         $this->filter = $resultFilter;
 
-        $sqlFilter = "";
+        $sqlFilter = array();
+        $params    = array();
 
         foreach($resultFilter as $key => $value) {
             if(in_array($key, $this->filterable)) {
-                $key = $this->db->quote($key);
-                $value = $this->db->quote($value);
-                $sqlFilter .= $sqlFilter == "" ? " WHERE" : " AND";
                 // custom filter by user
-                if($key == 'user') {
-                    $sqlFilter .= " ( username LIKE '%$value%' OR firstname LIKE '%$value%' OR lastname LIKE '%$value%' ) ";
+                if ($key == 'user') {
+                    $sqlFilter[]    = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
+                    $params['user'] = $value;
                 }
                 // custom filter by keyword
-                elseif($key == 'keyword') {
-                    $sqlFilter .=
-" (
-   c.name         LIKE '%$value%'
-OR f.description  LIKE '%$value%'
-OR f.realname     LIKE '%$value%'
-OR l.description  LIKE '%$value%'
-OR l.url          LIKE '%$value%'
-OR mf.description LIKE '%$value%'
-OR mf.realname    LIKE '%$value%'
-OR ml.name        LIKE '%$value%'
-) ";
+                elseif ($key == 'keyword') {
+                    $sqlFilter[] =
+"(
+   c.name         LIKE :keyword
+OR f.description  LIKE :keyword
+OR f.realname     LIKE :keyword
+OR l.description  LIKE :keyword
+OR l.url          LIKE :keyword
+OR mf.description LIKE :keyword
+OR mf.realname    LIKE :keyword
+OR ml.name        LIKE :keyword
+)";
+                    $params['keyword'] = '%'.$this->db->quoteForLike($value).'%';
                 }
                 // default filter key
                 else {
-                    $sqlFilter .= " $key LIKE '%$value%'";
+                    $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
+                    $params[$key] = '%'.$this->db->quoteForLike($value).'%';
                 }
             }
         }
 
-        $handler = new DeprecatedModel();
+        $sqlFilterString = count($sqlFilter) ?
+            sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
+            '';
 
-                $query =
-"SELECT
-cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
-u.username, u.title, u.firstname, u.lastname,
-c.id AS c_id, c.name AS c_name,
-f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description,
-l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,
-mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
-ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name
-FROM cmsLog cl
-LEFT JOIN `user` u    ON u.id = cl.user
-LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
-LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
-LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
-LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
-LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
-$sqlFilter
-ORDER BY $orderBy $orderDir";
+        $dataQuery = "SELECT
+            cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
+            u.username, u.title, u.firstname, u.lastname,
+            c.id AS c_id, c.name AS c_name,
+            f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description,
+            l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,
+            mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
+            ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name
+            FROM cmsLog cl
+            LEFT JOIN `user` u    ON u.id = cl.user
+            LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
+            LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
+            LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
+            LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
+            LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
+            $sqlFilterString
+            ORDER BY $orderBy $orderDir";
+        if ($limit > 0) {
+            $dataQuery .= ' LIMIT :limit';
+        }
+        if ($offset > 0) {
+            $dataQuery .= ' OFFSET :offset';
+        }
+        $statement = $this->db->prepare($dataQuery);
+        foreach ($params as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+        if ($limit > 0) {
+            $statement->bindValue('limit',  $limit,  PDO::PARAM_INT);
+        }
+        if ($offset > 0) {
+            $statement->bindValue('offset', $offset, PDO::PARAM_INT);
+        }
+        $statement->execute();
 
-        $this->dataResource = $handler->db->query($query);
-        $this->dataCount = mysqli_num_rows($this->dataResource);
-
+        $this->dataCount = $statement->rowCount();
         if(!$this->dataCount) {
             return 0;
         }
 
         // get limited records from the resource, rather than in bulk
-        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
+        $this->dataSet = $statement;
 
         return $this->dataCount;
     }
@@ -287,7 +309,7 @@ ORDER BY $orderBy $orderDir";
         $exporter->setHeadings($this->csvFields);
 
         // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
-        $exporter->setData($this->dataResource, array($this, 'dataManipulator'));
+        $exporter->setData($this->dataSet, array($this, 'dataManipulator'));
         $exporter->export('CSV');
     }
 
