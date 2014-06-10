@@ -54,19 +54,19 @@ class ArticleMapper extends Mapper implements Searchable {
 		$this->hasMap(array(
 			'column' => 'item_datetime_published',
 			'property' => 'publishDate',
-			'type' => Mapper::TYPE_DATETIME,
+			'type' => Mapper::TYPE_DATE,
 		));
 
 		$this->hasMap(array(
 			'column' => 'item_datetime_expires',
 			'property' => 'expiryDate',
-			'type' => Mapper::TYPE_DATETIME,
+			'type' => Mapper::TYPE_DATE,
 		));
 
 		$this->hasMap(array(
 			'column' => 'item_datetime_modified',
 			'property' => 'modifiedDate',
-			'type' => Mapper::TYPE_DATETIME,
+			'type' => Mapper::TYPE_DATE,
 		));
 
 		$this->hasMap(array(

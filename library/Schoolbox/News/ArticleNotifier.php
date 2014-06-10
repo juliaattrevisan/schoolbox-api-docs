@@ -102,8 +102,6 @@ class ArticleNotifier extends AbstractModuleNotifier {
 			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
 		}
 
-		// TODO some schools don't like the "who" and want only the "what"
-		$text = ":user posted :title under :topic";
 		$href = '/news/item/' . $article->getId();
 
 		$articleId = $article->getId();
@@ -111,7 +109,6 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$shortDate = $article->getPostDate()->getDateOnly();
 
 		$authorName = $user->formatName();
-		$authorId = $user->getId();
 
 		$topicName = $article->getTopic()->getName();
 		$url = new Url($topicName, false);
@@ -127,9 +124,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
 		$bob = new Builder();
 
-		$html2text = new Html2Text($article->getBody());
-
-        $envelope->broadcastToRoleType($roleType,
+		$envelope->broadcastToRoleType($roleType,
 			// title, params (if title :tokenised), icon, href, namespace, severity and topic are mandatory
 
 			$bob->setTitle(":user posted :title under :topic")
@@ -145,11 +140,11 @@ class ArticleNotifier extends AbstractModuleNotifier {
 				->addTopic("news.$articleId.posted")
 
 				// body and byline are optional, but recommended since they render out in emails
-				->setBody($html2text->get_text())
+				->setBody($article->getBody())
 				->setByline("$shortDate by $authorName in $topicName")
 
 				// timestamp and filters are optional
-				->setTimestamp(time())
+				->setTimestamp($article->getPostDate()->getUnixTimestamp())
 				->addFilter('role', $roleIds)
 				->addFilter('campus', $campusIds)
 
@@ -167,7 +162,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @param Article $article
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentPosted($article, $user, $diff = array()) {
 		return $this->generateNotification(Role::STUDENT, $article, $user);
@@ -179,7 +174,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @param Article $article
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffPosted($article, $user, $diff = array()) {
 		return $this->generateNotification(Role::STAFF, $article, $user);
@@ -191,7 +186,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @param Article $article
 	 * @param User $user
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentPosted($article, $user, $diff = array()) {
 		return $this->generateNotification(Role::PARENT, $article, $user);
