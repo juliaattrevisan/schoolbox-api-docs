@@ -54,6 +54,17 @@
 			multiple: false
 		})
 
+		$j('#resourcebooking-suggest').selectizeSelector({
+			ajax: {
+				url:      '/ajax/resourebooking.php',
+				type:     'GET',
+				data:     {userID: '{EVENT_AUTHOR_ID}'},
+				dataType: 'json'
+			},
+			value: {EVENT_RESOURCEBOOKING},
+			multiple: true
+		})
+
 		/* Confirmation when removing RAMS requirement
 		 */
 		$('[data-ramscheckbox="true"]').change(function(event) {
@@ -300,7 +311,7 @@
 					<em>Resources allocated to this event</em>
 				</td>
 				<td>
-					Resource List
+					<select id="resourcebooking-suggest" name="resourcebooking[]" multiple></select>
 				</td>
 			</tr>
 		</tbody>

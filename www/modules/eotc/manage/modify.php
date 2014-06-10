@@ -77,6 +77,17 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$teacherInCharge = array();
 		}
 
+		/* Default magicsuggest values
+		 */
+		$resourceBookingSelected = array();
+
+//		foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
+//			$staffSelected[] = array(
+//				'id' => $currentStaff->getId(),
+//				'name' => $currentStaff->getFullname()
+//			);
+//		}
+
 		/* Miscellaneous setvarring
 		 * Hide advanced options by default
 		 */
@@ -105,6 +116,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_RAMS_FILE' => $filename,
 			'EVENT_CURRENT_STUDENTS' => $event->getMetadata()->getStudentAttendees()->count(),
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
+			'EVENT_RESOURCEBOOKING' => json_encode($resourceBookingSelected),
 			'EVENT_STAFF' => json_encode($staffSelected),
 			'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
 			'EVENT_STATUS_CLASS' => $event->getMetadata()->getStatus()->getStyle(),
