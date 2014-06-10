@@ -23,6 +23,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
 	$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
 	$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
+	$page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
 
 	/* Modify existing event
 	 */
@@ -191,6 +192,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		/* Cannot add students until an event is created
 		 */
 		$page->parse('can_add_students_block', 'can_add_students');
+
+		/* Cannot add resources until an event is created
+		 */
+		$page->parse('can_add_resources_block', 'can_add_resources');
 	}
 	/* Create new event
 	 */
@@ -290,6 +295,13 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$page->setVar(array(
 			'can_add_students_block' => ''
 		));
+
+		/* Cannot add resources until an event is created
+ 		 */
+		$page->setVar(array(
+			'can_add_resources_block' => ''
+		));
+
 	}
 
 	/* Event Types
