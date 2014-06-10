@@ -68,8 +68,10 @@ class UrlPaginator implements IUrlPaginator {
         $from   = max($from, 1);
         $to     = min($to,   $this->getPageCount());
         $result = array();
-        foreach (range($from, $to) as $page) {
-            $result[$page] = $this->getUrlForPage($page);
+        if ($to > 0) {
+            foreach (range($from, $to) as $page) {
+                $result[$page] = $this->getUrlForPage($page);
+            }
         }
         return $result;
     }
