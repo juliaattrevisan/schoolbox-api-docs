@@ -301,6 +301,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyStudentUpdated($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
 		$openStamp = $submissionBox->getOpenDate()->getUnixTimestamp();
 		$closeStamp = $submissionBox->getDueDate()->getUnixTimestamp();
@@ -336,7 +341,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			return $msgr;
 		}
 
-		$boxId = $submissionBox->getId();
 		$boxName = $submissionBox->getName();
 
 		$cat = $submissionBox->getCategory();
@@ -452,12 +456,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyStudentUpcoming($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
 			return $msgr;
 		}
 
-		$boxId = $submissionBox->getId();
 		$boxName = $submissionBox->getName();
 
 		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
@@ -493,17 +501,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyParentUpcoming($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
 			return $msgr;
 		}
 
 		$boxName = $submissionBox->getName();
-		$boxId = $submissionBox->getId();
-		// hyyydrate
-		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
-		$submissionBox->setCategory($cat);
-
 		$catId = $submissionBox->getCategory()->getId();
 		$catName = $submissionBox->getCategory()->getName();
 
@@ -548,17 +556,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyFeedClosed($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimestamp() > time()) {
 			return $msgr;
 		}
 
 		$boxName = $submissionBox->getName();
-		$boxId = $submissionBox->getId();
-		// hyyydrate
-		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
-		$submissionBox->setCategory($cat);
-
 		$catId = $submissionBox->getCategory()->getId();
 		$catName = $submissionBox->getCategory()->getName();
 
@@ -586,6 +594,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyStudentOverdue($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
 			return $msgr;
@@ -596,10 +609,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 			return $msgr;
 		}
 
-		$boxId = $submissionBox->getId();
 		$boxName = $submissionBox->getName();
 
-		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
+		$cat = $submissionBox->getCategory();
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 
@@ -632,17 +644,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	public function notifyParentOverdue($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
 			return $msgr;
 		}
 
 		$boxName = $submissionBox->getName();
-		$boxId = $submissionBox->getId();
-		// hyyydrate
-		$cat = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
-		$submissionBox->setCategory($cat);
-
 		$catId = $submissionBox->getCategory()->getId();
 		$catName = $submissionBox->getCategory()->getName();
 
@@ -680,6 +692,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	protected function notifyStaffClosed($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
+		$boxId = $submissionBox->getId();
+
+		/** @var SubmissionBox $submissionBox */
+		$submissionBox = $this->mapper->findById($boxId);
+
 		// don't raise notifications if this box doesn't accept online submissions
 		if(!$submissionBox->getAcceptOnline()) {
 			return $msgr;
@@ -691,8 +708,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 		if($totalUnsubmitted == 0) {
 			return $msgr;
 		}
-
-		$boxId = $submissionBox->getId();
 
 		$icon = '/images/icon.php?size=32&icon=work';
 		$href = "/submission/viewSubmission/$boxId";
