@@ -81,12 +81,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$resourceBookingSelected = array();
 
-//		foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
-//			$staffSelected[] = array(
-//				'id' => $currentStaff->getId(),
-//				'name' => $currentStaff->getFullname()
-//			);
-//		}
+		foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
+			$resourceBookingSelected[] = array(
+				'id' => $currentResourceBooking->getId(),
+				'name' => $currentResourceBooking->getName()
+			);
+		}
 
 		/* Miscellaneous setvarring
 		 * Hide advanced options by default
