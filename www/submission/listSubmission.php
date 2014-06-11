@@ -121,6 +121,8 @@ if (Cfg::get('external_enable')) {
     $synHandler = new External_Class();
 }
 
+$this->setVar(array('category_block' => ''));
+
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
