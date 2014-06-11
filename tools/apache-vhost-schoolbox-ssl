@@ -44,6 +44,12 @@ NameVirtualHost 192.168.1.1:443
         Alias /debugbar /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources/
         #Alias /xhprof /usr/share/schoolbox/vendor/facebook/xhprof/xhprof_html/
 
+        # LISS Exceptions
+        <Directory /vagrant/www/liss>
+                php_value memory_limit 512M
+                php_value max_execution_time 300
+        </Directory>
+
         # MGS Sport Module Exceptions
         <Directory /usr/share/schoolbox/www/modules/sport>
                 php_flag apc.enabled off

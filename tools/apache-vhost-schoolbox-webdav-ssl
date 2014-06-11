@@ -1,5 +1,4 @@
 <IfModule mod_ssl.c>
-NameVirtualHost 192.168.1.1:443
 <VirtualHost 192.168.1.1:443>
         ServerName schoolboxdav.schoolname.edu
         DocumentRoot /usr/share/schoolbox/dav
