@@ -11,6 +11,9 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Collection;
 
 class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract {
 
@@ -30,6 +33,20 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     protected $task_list;
 
     /**
+     * The list of instances of this unit.
+     *
+     * @var UnitInstance[]|Collection
+     */
+    protected $unitList;
+
+    /**
+     * The list of categories this unit is on. Derived from $this->unitList.
+     *
+     * @var Category[]|Collection
+     */
+    protected $categoryWithUnitList;
+
+    /**
      * {@inheritdoc}
      */
     public function execute() {
@@ -39,6 +56,16 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->category = CategoryMapper::getInstance()->findById($categoryId);
         }
         $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
+
+        // What pages have this course?
+        $this->unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
+        $this->categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
+            'id',
+            $this->unitList->map(function($unit) {
+                /** @var UnitInstance $unit */
+                return $unit->getComponent()->getIdentifier();
+            })
+        );
     }
 
     /**
@@ -64,9 +91,17 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
         $this->setVar(array(
-            'SESSION_NAME' => session_name(),
-            'SESSION_ID'   => session_id(),
+            'SESSION_NAME'   => session_name(),
+            'SESSION_ID'     => session_id(),
             'COMPONENT_NAME' => $this->getConfig('componentname'),
+            'UNIT_LIST'      => json_encode(
+                $this->unitList->map(
+                    function($unit) {
+                        /** @var UnitInstance $unit */
+                        return $unit->getComponent()->getIdentifier();
+                    }
+                )->getAll()
+            ),
         ));
 
         // Start spamming out tasks into the template

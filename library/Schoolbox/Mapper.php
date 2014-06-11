@@ -954,7 +954,9 @@ class Mapper implements Serializable {
 					// If the list of values is empty, though: there's no way
 					// that the query could ever return anything, so just return
 					// an empty collection.
-					if (is_array($columnValue)) {
+					if (is_array($columnValue)
+						|| ($columnValue instanceof \Traversable && $columnValue instanceof \Countable)
+					) {
 						if (count($columnValue) === 0) {
 							return $this->hydrateList(array());
 						}

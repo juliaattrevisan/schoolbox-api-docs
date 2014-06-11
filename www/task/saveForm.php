@@ -11,6 +11,8 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
@@ -77,6 +79,21 @@ else {
             ;
         }
         TaskMapper::getInstance()->save($task);
+
+        // Copy this task into each component, if requested.
+        if (!$task_id && $_POST['copy']) {
+            /** @var UnitInstance[] $unitList */
+            $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId(
+                $task->getCategory()->getId()
+            );
+            foreach ($unitList as $unit) {
+                UnitInstanceMapper::getInstance()->saveTaskIntoUnitInstance(
+                    $unit,
+                    $task,
+                    $_SESSION['user']
+                );
+            }
+        }
     }
 }
 

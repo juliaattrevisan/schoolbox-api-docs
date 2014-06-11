@@ -5,17 +5,42 @@
     $.fn.setupCourseTaskList = function(options) {
         var defaults = {
             session_name: '',
-            session_id:   ''
+            session_id:   '',
+            units:        []
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
-        var dialog    = component.find('.file_uploader');
-        dialog.ajaxUploadDialog({
+        var fileDialog = component.find('.file_uploader');
+        fileDialog.ajaxUploadDialog({
             session: {
                 name: settings.session_name,
                 id:   settings.session_id
             }
         });
+
+        var copyTaskDialog = component.find('.dialog.copy_new_task');
+        copyTaskDialog.dialog({
+            autoOpen: false,
+            modal: true
+        });
+
+        /**
+         * Submit save task callback.
+         * @param form The form element to save (wrapped in a jQuery object)
+         * @param copy Is this new task copied across to all classes which use
+         *             this unit?
+         */
+        var submitSaveTaskForm = function(form, copy) {
+            var formData = form.serializeArray()
+            // Booleans in data get passed as string 'true' or 'false', wtf?
+            formData.push({name: 'copy', value: (copy ? 1 : 0)})
+            $.post(form.attr('action'), formData, function(data) {
+                if (form.hasClass("create_task_form")) {
+                    form.get(0).reset();
+                }
+                postCallback(form, data);
+            }, 'json');
+        }
 
         // Post-AJAX form event
         var postCallback = function(form, data) {
@@ -83,7 +108,7 @@
 			
             // Set the form that this dialog was triggered from.
             var source_form = $(this).closest('form');
-            dialog.ajaxUploadDialog('open', function(output) {
+            fileDialog.ajaxUploadDialog('open', function(output) {
                 var result = JSON.parse(output);
                 var link   = '/storage/fetch.php?hash='+result.hash+'&save=1';
                 source_form.find(':input[name="link"]').val(link);
@@ -115,15 +140,29 @@
         component.on('submit.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
             var form = $(this);
             event.preventDefault();
-            // Is this a new form?
-            var is_new = form.hasClass("create_task_form");
-            $.post(form.attr('action'), form.serialize(), function(data) {
-                // Do validation stuff here eventually, but for now validate.
-                if (is_new) {
-                    form.get(0).reset();
-                }
-                postCallback(form, data);
-            }, 'json');
+            if (form.hasClass("create_task_form")) {
+                copyTaskDialog
+                    .dialog(
+                        'option', 'buttons',
+                        [{
+                            text: "Yes",
+                            click: function() {
+                                form.trigger('submitCopy.courseTaskList');
+                                copyTaskDialog.dialog('close');
+                            }
+                        }, {
+                            text: "No",
+                            click: function() {
+                                form.trigger('submitNoCopy.courseTaskList');
+                                copyTaskDialog.dialog('close');
+                            }
+                        }]
+                    )
+                    .dialog('open');
+            }
+            else {
+                form.trigger('submitNoCopy.courseTaskList');
+            }
         });
 
         // Modify task: if there's a modify form inline, show/hide it.
@@ -166,5 +205,16 @@
                 }
             }
         });
+
+        // Event - save new item, no copy
+        component.on('submitNoCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
+            submitSaveTaskForm($(this), false)
+        })
+
+        // Event - save new item, copy it across
+        component.on('submitCopy.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
+            submitSaveTaskForm($(this), true)
+        })
+
     }
 })(jQuery);
