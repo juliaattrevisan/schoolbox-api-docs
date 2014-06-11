@@ -79,6 +79,7 @@ foreach ($_POST['unit'] as $unit_data) {
         $unit_instance
             ->setComponent($component)
             ->setTitle($unit_homepage->getName())
+            ->setCategory($component->getIdentifier())
             ->setUnitCategory($unit_homepage)
             ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
             ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))
