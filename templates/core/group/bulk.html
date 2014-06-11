@@ -47,7 +47,7 @@ $j(document).ready(function() {
     <tr>
         <td class="formLabelWidth"><h4>User Groups</h4><em>Add all users that belong to another group</em></td><td>
         <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-            <input id="addUsersByIndividualGroup" type="text" size="30" />
+            <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
             <input type="hidden" name="individualGroupID" id="individualGroupID" />
             <input type="submit" value="Add Individual Group" class="submit-btn-plain" />
         </form>
@@ -57,7 +57,7 @@ $j(document).ready(function() {
     <tr>
         <td class="formLabelWidth"><h4>User Roles</h4><em>Add all users of a particular role in the system</em></td><td>
         <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-            <input id="addUsersBySystemGroup" type="text" size="30" />
+            <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
             <input type="hidden" name="systemGroupID" id="systemGroupID" />
             <input type="submit" value="Add System Role" class="submit-btn-plain" />
         </form>
