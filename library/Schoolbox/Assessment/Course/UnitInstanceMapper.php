@@ -156,17 +156,11 @@ class UnitInstanceMapper extends Mapper {
      * @return UnitInstance[]|Collection
      */
     public function findForCategoryId($category_id) {
-        /** @var Component_Instance[] $component_list */
-        $component_list    = Component_InstanceMapper::getInstance()->findByContext('homepage', $category_id);
-        $component_id_list = array();
-        foreach ($component_list as $component) {
-            $component_id_list[] = $component->getId();
-        }
 
         /** @var UnitInstance[] $unit_instance_list */
         $unit_instance_list = $this->findByColumn(
-            'component_id',
-            $component_id_list,
+            'category_id',
+            $category_id,
             array(
                 'order' => array('open_date' => 'desc')
             )
