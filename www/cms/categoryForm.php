@@ -60,7 +60,7 @@ if ($_POST['name']) {
 	// gets saved.
 	// (I'm not confident that deleting cat codes in the postSave method
 	//  regardless of whether there are any won't break somewhere else)
-	if (count($codeCollection) === 0) {
+	if ($model->getId() && count($codeCollection) === 0) {
 		CategoryCodeMapper::getInstance()->delete(
 			CategoryCodeMapper::getInstance()->findById($model->getId())
 		);
