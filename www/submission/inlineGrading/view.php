@@ -75,7 +75,7 @@ for ($i=0; $i < count($stack); $i++) {
 				/* Apply mime type
 				 */
 				$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-				$mime = $mimetypeMapper->getByFilename($submission->getFilename());
+				$mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
 				$submission->setMimetype($mime);
 
 				/* Stack it
