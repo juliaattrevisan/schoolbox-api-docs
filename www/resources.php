@@ -140,9 +140,9 @@ if (is_array($categoryList)) {
 			}
 
 			/* append code to name */
-			$name = Scrub::text($category['name']);
+			$name = $category['name'];
 			if ($category['code'] != '' && $category['code'] != $category['name']) {
-				$name .= ' (' . Scrub::text($category['code']) . ')';
+				$name .= ' (' . $category['code'] . ')';
 			}
 			// This is duplicated in ajax/tree.php - wouldn't it be nice to have
 			// it not be duplicated?
@@ -150,7 +150,7 @@ if (is_array($categoryList)) {
 
 			$output = array(
 				'CATEGORY_ID' => $category['id'],
-				'CATEGORY_NAME' => htmlspecialchars_decode($name),
+				'CATEGORY_NAME' => $name,
 				'CLASS' => implode(" ", $class),
 			);
 			$this->setVar($output);

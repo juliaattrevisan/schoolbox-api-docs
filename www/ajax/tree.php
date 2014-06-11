@@ -26,9 +26,10 @@ if (is_numeric($_POST['relationID'])) {
 					$category['permission'] = "full";
 
 				/* append code to name */
-				$name = htmlspecialchars_decode(Scrub::text($category['name']), ENT_QUOTES);
-				if($category['code'] != '' && $category['code'] != $category['name'])
-					$name .= ' ('.Scrub::text($category['code']).')';
+				$name = $category['name'];
+				if ($category['code'] != '' && $category['code'] != $category['name']) {
+					$name .= ' ('.$category['code'].')';
+				}
 
 				$category['name'] = TextFormatter::cutString($name, 32);
 
