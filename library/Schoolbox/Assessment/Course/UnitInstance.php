@@ -285,13 +285,13 @@ class UnitInstance implements ISoftDeletable {
     /**
      * Retrieves a time relative to whenever the course unit closes.
      *
-     * It closes on 12am of the day after the due date.
+     * It closes on the last second of the due date.
      *
      * @return Alaress_Date_Relative
      */
     public function getRelativeDueDate() {
         $date = clone $this->getDueDate()->getDateTimeObject();
-        $date->modify('00:00:00 +1 day');
+        $date->modify('23:59:59');
         return new Alaress_Date_Relative($date);
     }
 }
