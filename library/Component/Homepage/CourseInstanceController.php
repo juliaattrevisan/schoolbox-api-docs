@@ -194,9 +194,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * Renders the unit list template for this component.
      */
     protected function renderTemplateForUnitList() {
-
-        $this->parse('course_unit_list_block', 'course_unit_list');
-
         // unit list will be a collection of Unit models
         $this->setVar('unit_block', '');
         $i = 0;
@@ -204,6 +201,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $this->setVar('UNIT_BACKGROUND', ($i++%2 === 1 ? 'dark' : ''));
             $this->renderUnitInUnitList($unit);
         }
+        $this->parse('course_unit_list_block', 'course_unit_list');
     }
 
     /**
