@@ -53,7 +53,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 			/* Future events are visible to superusers, event owners, group members with write access
 			 */
-			if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
+			if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
 				$cssClass = 'translucent';
 			}
 			else {
