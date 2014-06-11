@@ -81,7 +81,7 @@ class Messenger extends InstanceBundle {
 	 * @param array $filter
 	 */
 	public function broadcastToCategory($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bindMessage("category.$catId", $message, $topic, $severity, $params, $filter);
+		$this->bindMessage("service.1.$catId.1", $message, $topic, $severity, $params, $filter);
 	}
 
 
@@ -94,7 +94,7 @@ class Messenger extends InstanceBundle {
 	 * @param array $filter
 	 */
 	public function broadcastToCategoryAdmin($catId, $message, $topic, $severity, $params = array(), $filter = array()) {
-		$this->bindMessage("category.$catId.admin", $message, $topic, $severity, $params, $filter);
+		$this->bindMessage("service.1.$catId.3", $message, $topic, $severity, $params, $filter);
 	}
 
 
