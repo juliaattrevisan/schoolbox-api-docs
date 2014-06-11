@@ -513,7 +513,7 @@ $j(function () {
 	/* Standardise both forms
 	 */
 	$(document).on('submit', '#create-comment, form.edit-comment', function(eventObject) {
-		event.preventDefault();
+		eventObject.preventDefault();
 
 		var form = $(eventObject.target);
 
