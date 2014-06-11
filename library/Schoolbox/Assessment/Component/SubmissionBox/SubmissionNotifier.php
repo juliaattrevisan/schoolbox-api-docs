@@ -10,6 +10,8 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -17,6 +19,9 @@ use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -97,11 +102,13 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				}
 
 				// is this the first? or a resubmit?
-				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
-				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 0) {
-					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
-					break;
-				}
+//				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
+				// TODO 'resubmitted' is not a known source, so this does nothing
+				// because '1' would be the first submission
+//				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
+//					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
+//					break;
+//				}
 				$bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
 				break;
 
@@ -123,7 +130,7 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				if(array_key_exists('draft', $diff) && $diff['draft'] == true) {
 					// is this the first? or a resubmit?
 					$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
-					if(array_key_exists($boxId, $counts) && $counts[$boxId] > 0) {
+					if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
 						$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
 						break;
 					}
@@ -145,32 +152,33 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 	 * @return Messenger
 	 */
 	protected function submissionNotification($type, $submission, $user, $diff = null) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
-		$studentId = $user->getId();
 		$studentExtId = $user->getExternalId();
 
 		$box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
 		$cat = $this->categoryMapper->findById($box->getCategory()->getId());
 
 		$boxId = $box->getId();
-		$catId = $cat->getId();
 
-		$icon = "/portrait?userId=$studentExtId&size=square32";
-		$href = "/submission/submissionHistory/$boxId/$studentId";
+		$bob = new Builder();
 
-		$msg = new Message(":student $type work to :boxname in :catname", $icon, $href);
-
-		$params = array(
-			'student' => array($user->formatName(), "/search/user/$studentId"),
-			'boxname' => array($box->getName(),     "/submission/submissionHistory/$boxId"),
-			'catname' => array($cat->getName(),     "/homepage/$catId")
-		);
+		$bob->setTitle(":student $type work to :boxname in :catname")
+			->setParams(array(
+				'student' => new UserParam($user),
+				'boxname' => new Param($box->getName(), "/submission/viewSubmission/$boxId"),
+				'catname' => new CategoryParam($cat)
+			))
+			->setIcon("/portrait?userId=$studentExtId&size=square32")
+			->setHref("/submission/viewSubmission/$boxId")
+			->setNamespace($this->getSlug())
+			->setSeverity(Logger::NOTICE)
+			->addTopic("duework.$boxId.$type");
 
 		// send this message to the owner of the submission box
-		$msgr->targetToUser($box->getOwner()->getId(), $msg, "duework.$boxId.submitted", Logger::NOTICE, $params);
+		$envelope->targetToUser($box->getOwner(), $bob->build());
 
-		return $msgr;
+		return $envelope;
 	}
 
 
