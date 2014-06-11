@@ -475,7 +475,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
 
         case 'overdue':
             $stringDesc = sprintf(
-                '<span class="overdue">"%s" in %s is now overdue</span>', $boxUrl, $categoryName
+                '<span class="overdue">"%s" in %s is due</span>', $boxUrl, $categoryName
             );
             break;
 
