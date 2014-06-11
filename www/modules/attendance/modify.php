@@ -67,6 +67,14 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode
  */
 $attendancePeriod = $this->arg[2];
 
+/* Get Period Definition */
+$externalTimetable = new External_Synergetic_Timetable();
+
+$definition = $externalTimetable->getTimetableDefinition($_SESSION['campus'], $externalTimetable->getDayNumber($_SESSION['campus'],$attendanceDate->getUnixTimestamp()));
+$periods = array_keys($definition['number'], $attendancePeriod);
+$startTime = $definition['start'][$periods[0]];
+$endTime = $definition['end'][$periods[0]];
+
 /* Let's do it
  */
 if ($class) {
@@ -76,6 +84,8 @@ if ($class) {
     */
     $this->setVar(array(
             'CLASS_CODE' => $class['ClassCode'],
+            'ATTENDANCE_START' => $startTime,
+            'ATTENDANCE_END' => $endTime,
             'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
             'ATTENDANCE_PERIOD' => $attendancePeriod,
@@ -85,7 +95,6 @@ if ($class) {
      */
 	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
 	$allStudents = $attendanceHandler->findAttendanceRecords();
-
 	/* Dish out each row
 	 */
 	if (is_array($allStudents) && count($allStudents)) {

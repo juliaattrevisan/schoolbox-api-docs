@@ -76,6 +76,13 @@ if (is_array($_POST['studentID'])) {
     /* Then if you could do that, save each person
      */
 
+    if(is_array($_POST['attending'])) {
+        $attending = $_POST['attending'];
+    }
+    else {
+        $attending = array();
+    }
+
     for($i = 0; $_POST['studentID'][$i]; $i++) {
 
         /* Create a new record
@@ -87,7 +94,7 @@ if (is_array($_POST['studentID'])) {
             'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
             'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
 
-            'AttendedFlag' => in_array($_POST['studentID'][$i], $_POST['attending']) ? 0 : 1,
+            'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
         );
 
         if($_POST['LateArrivalTime'][$i]) {
