@@ -132,7 +132,7 @@ class CategoryMapper extends Mapper {
 		// first drop the previous code(s) connected to this category
 		try {
 			CategoryCodeMapper::getInstance()->delete(
-				CategoryCodeMapper::getInstance()->findById($model->getId())
+				CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
 			);
 		}
 		catch (\Exception $e) {
