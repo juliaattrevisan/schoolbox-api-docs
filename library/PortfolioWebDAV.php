@@ -289,11 +289,23 @@ class PortfolioWebDAV
         }
         else if ($site_location=='seymour') {
             $settings = array(
-                'baseUri' => 'https://netstorage.seymour.sa.edu.au/',
-                'userName' => $_SESSION['username'],
+                'baseUri' => 'https://webdav.seymour.sa.edu.au/',
+                'userName' => "sccampus/" . $_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
-            $paths = array('/oneNet/NetStorage/');
+
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'] . 'staffhome/' . ucwords($_SESSION['username']) . '/',
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'] .'studenthome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
         }
         else if ($site_location == 'mggs'){
 
