@@ -70,10 +70,6 @@ switch($_POST['action']) {
 		if (strlen($_POST['publishDate'])) {
 			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
 		}
-		else {
-			// make visible immediately
-			$pubDateObject = new Alaress_Date_Format(time(), 'U');
-		}
 
 		/* Events recur until this time
 		 */

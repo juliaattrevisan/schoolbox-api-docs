@@ -102,7 +102,7 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     if (count($campusList) > 0) {
-        $levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'Campus');
+        $levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'School');
     }
 
     $page->dropDown('level_drop', $levelList, $event['access']);
@@ -124,7 +124,7 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar('recurring_dates_block', '');
     }
 
-    if ($event['series_id'] || $event['publish_date'] != '0000-00-00 00:00:00') {
+    if ($event['series_id'] || ($event['publish_date'] != '')) {
         // set the advanced options to be shown by default since there is information in there
         $page->setVar(
             array(
@@ -258,7 +258,7 @@ else {
         $levelList[] = array('LEVEL_ID' => 2, 'LEVEL_NAME' => 'Group');
     }
     if (count($campusList) > 0) {
-        $levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'Campus');
+        $levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'School');
     }
 
     $page->dropDown('level_drop', $levelList, $_GET['level']);

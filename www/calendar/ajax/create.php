@@ -23,7 +23,6 @@ $page = new SitePage();
  * startDate and endDate are the same.
  */
 $dateObj      = new Alaress_Date_Format($_POST['date']/1000, 'U');
-$publish_date = new Alaress_Date_Format(new DateTime(), 'U');
 
 $groupHandler = new Group();
 
@@ -58,7 +57,7 @@ $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	  ->setLocation($_POST['location'])
 	  ->setAttendance($_POST['attendance'])
 	  ->setDetail($_POST['detail'])
-	  ->setPublishDateTime($publish_date)
+	  ->setPublishDateTime(null)
 	  ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 
 $affectedIds = EventMapper::getInstance()->save($event);
