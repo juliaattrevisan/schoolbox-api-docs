@@ -91,6 +91,7 @@ if (!$permission_denied) {
                     $course_instance
                         ->setComponent($component)
                         ->setTitle($unit_homepage->getName())
+                        ->setCategory($component->getIdentifier())
                         ->setUnitCategory($unit_homepage)
                         ->setOpenDate($open_date)
                         ->setDueDate($due_date)
