@@ -45,6 +45,7 @@ mv -f $fullpath/init/upstart-socketd.conf $fullpath/init/$1-socketd.conf;
 mv -f $fullpath/init/upstart-digestd.conf $fullpath/init/$1-digestd.conf;
 mv -f $fullpath/init/$1-upstart-socketd.override $fullpath/init/$1-socketd.override;
 rm -vf `$fullpath/init/$cronjob-upstart-socketd.override`;
+rm -f $fullpath/init/upstart*.override;
 
 rm -vf `readlink -f $fullpath/cron/$cronjob`;
 rm -vf `readlink -f $fullpath/logrotate/$cronjob`;
