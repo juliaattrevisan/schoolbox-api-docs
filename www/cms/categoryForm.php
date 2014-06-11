@@ -62,7 +62,7 @@ if ($_POST['name']) {
 	//  regardless of whether there are any won't break somewhere else)
 	if ($model->getId() && count($codeCollection) === 0) {
 		CategoryCodeMapper::getInstance()->delete(
-			CategoryCodeMapper::getInstance()->findById($model->getId())
+			CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
 		);
 	}
 	$affectedIds = CategoryMapper::getInstance()->save($model);
