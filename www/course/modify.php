@@ -50,11 +50,11 @@ $course_list = UnitInstanceMapper::getInstance()->findByColumn(
         )
     )
 );
-//var_dump($component, $course_list);exit;
 
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/modify.html");
-$this->setBlock(TEMPLATE_content, 'course_breadcrumb', 'course_breadcrumb_block');
+$this->setBlock(TEMPLATE_content, 'course',            'course_block');
+$this->setBlock('course',         'course_breadcrumb', 'course_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
 $this->setBlock('unit', 'task', 'task_block');
@@ -62,7 +62,7 @@ $this->setBlock('unit', 'task', 'task_block');
 $this->setVar(
     array(
         'class_breadcrumb_block'  => '',
-        'course_breadcrumb_block' => '',
+        'course_block'            => '',
         'HOMEPAGE_ID'             => '',
         'COURSE_HOMEPAGE_ID'      => '',
         'COMPONENT_ID'            => Scrub::text($component_id),
@@ -80,18 +80,38 @@ foreach ($homepage_path as $parent) {
     $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 }
 
-$component_config     = $component->getConfigArray();
-$course_homepage_id   = $component_config['courseHomepage']['value'];
-$course_homepage      = CategoryMapper::getInstance()->findById($course_homepage_id);
-$course_base_homepage = new Category();
-$course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
-$course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
-$course_homepage_path->add($course_homepage);
-foreach ($course_homepage_path as $parent) {
-    /** @var Category $parent */
-    $this->setVar('COURSE_CATEGORY_ID',   Scrub::text($parent->getId()));
-    $this->setVar('COURSE_CATEGORY_NAME', Scrub::text($parent->getName()));
-    $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
+// Output course breadcrumbs (for every course that is in this outline)
+$courseBaseHomepage = new Category();
+$courseBaseHomepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
+
+// Keep a list of the units that have already been shown
+$unitCategoryIdList = array();
+$courseIdList       = array();
+foreach ($course_list as $unit) {
+    $this->setVar('course_breadcrumb_block', '');
+
+    // Has this unit category had its breadcrumb shown already? Don't show it again
+    $unitCategoryId = $unit->getUnitCategory()->getId();
+    if (array_key_exists($unitCategoryId, $unitCategoryIdList)) {
+        continue;
+    }
+    $unitCategoryIdList[$unitCategoryId] = $unitCategoryId;
+
+    // Find the course for this unit, and show its breadcrumb if it isn't shown
+    $unitCategory = CategoryMapper::getInstance()->findById($unitCategoryId);
+    $courseId     = $unitCategory->getParent()->getId();
+    if (array_key_exists($courseId, $courseIdList)) {
+        continue;
+    }
+    $courseIdList[$courseId] = $courseId;
+
+    // Now, finally show the breadcrumb.
+    foreach (CategoryMapper::getInstance()->findParents($unitCategory, $courseBaseHomepage) as $parent) {
+        $this->setVar('COURSE_CATEGORY_ID',   Scrub::text($parent->getId()));
+        $this->setVar('COURSE_CATEGORY_NAME', Scrub::text($parent->getName()));
+        $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
+    }
+    $this->parse('course_block', 'course', true);
 }
 
 $this->setVar('unit_block', '');
@@ -119,7 +139,7 @@ foreach ($course_list as $unit) {
 
 // Output any items that aren't in the existing block, too.
 /** @var Category[]|Collection $child_list */
-$child_list    = CategoryMapper::getInstance()->findByColumn('parent', $course_homepage_id);
+$child_list    = CategoryMapper::getInstance()->findByColumn('parent', $courseIdList);
 $child_id_list = $child_list->getColumnValues('id');
 $task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($child_id_list);
 foreach ($child_list as $unit) {
