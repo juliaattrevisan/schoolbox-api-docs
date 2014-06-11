@@ -53,7 +53,7 @@ switch($this->arg[0]) {
 			->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
 			->setByline('Due 24th April, 2014')
 			->setHref('#')
-			->setIcon('/image/icon.php?size=square32&icon=work')
+			->setIcon('/images/icon.php?size=32&icon=work')
 			->build(false)
 		);
 		break;
@@ -75,7 +75,7 @@ switch($this->arg[0]) {
 				->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
 				->setByline('Due 24th April, 2014')
 				->setHref('#')
-				->setIcon('/image/icon.php?size=square32&icon=work')
+				->setIcon('/images/icon.php?size=32&icon=work')
 				->build(false)
 		);
 
@@ -91,7 +91,7 @@ switch($this->arg[0]) {
 				->setTimestamp(strtotime('-3 days'))
 				->setBody('')
 				->setByline("Due $due")
-				->setIcon('/image/icon.php?size=square32&icon=work')
+				->setIcon('/images/icon.php?size=32&icon=work')
 				->build(false)
 		);
 
