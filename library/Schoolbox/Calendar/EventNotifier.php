@@ -94,7 +94,7 @@ class EventNotifier extends AbstractModuleNotifier {
 		$plain = new Html2Text($event->getDetail());
 		$bob = new Builder();
 		$bob->setNamespace(NSMapper::NS_CALENDAR)
-		    ->setIcon('/images/icon.php?size=square32&icon=clock')
+		    ->setIcon('/images/icon.php?size=32&icon=clock')
 		    ->setHref('/calendar/'.$event->getStartDateTime()->getUsingFormat('d-m-Y'))
 		    ->setBody($plain->get_text())
 		    ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
