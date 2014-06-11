@@ -23,7 +23,7 @@ $emailString = array();
  */
 $allStudents = $externalClass->getStudents($_POST['classCode']);
 
-if ($allStudents && count($allStudents)) {
+if ($allStudents && count($allStudents) && is_array($_POST['allIds']) && count($_POST['allIds'])) {
 	foreach ($allStudents as $currentStudent) {
 		if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
 			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);

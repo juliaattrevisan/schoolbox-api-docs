@@ -49,20 +49,17 @@
 	}
 
 	$j.fn.emailSelected = function(options) {
-		var config;
 
 		/* Stop the form submitting so we can do some
 		 * special manipulation, inject the results,
 		 * and then submit normally. This submit handler
 		 * is cleared in redirect();
 		 */
-		$j(this).submit(function(event) {
-			event.preventDefault();
+		event.preventDefault();
 
-			config = init(options, this);
+		var config = init(options, this);
 
-			fetchEmails();
-		});
+		fetchEmails();
 
 		/**
 		 * Init
@@ -132,10 +129,12 @@
 			$j.post(config.url, payload, function(responseText) {
 				var allEmails = JSON.parse(responseText);
 
-				/* Inject and redirect
+				/* Inject and redirect only if emails were found
 				 */
-				inject(allEmails);
-				redirect();
+				if (allEmails.length) {
+					inject(allEmails);
+					redirect();
+				}
 			});
 		}
 

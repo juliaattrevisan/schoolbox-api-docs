@@ -1,89 +1,117 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
 <script type="text/javascript">
+$j(function() {
+
 	/* Add "select all" functionality
 	 */
-	$j(function() {
-		$j('#select-all').addSelectAll({
-			source: $j('#contact-table')
-		});
+	$j('#select-all').addSelectAll({
+		source: $j('#contact-table')
 	});
+
+	/* Validate checkbox selections
+	 */
+	$j('#contact-table-form').validate({
+		rules: {
+			"selected[]": {
+				required: true,
+				minlength: 1
+			}
+		},
+		messages: {
+			"selected[]": "Please select at least one student before sending email"
+		},
+		errorPlacement: function(error, element) {
+			$j('#errors').html(error);
+		}
+	});
+});
 </script>
 <!-- END custom_head -->
 
 <h1>{SUBJECTNAME}</h1>
-<table id='contact-table' class="table">
-	<thead>
-		<tr>
-			<th width="16px"><input type="checkbox" id='select-all' value="" /></th>
-			<th width="60px"></th>
-			<th>Name</th>
-			<th>Student ID</th>
-			<th>Year Level</th>
-			<th>House</th>
-			<th>Last Visited</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN student_list -->
-		<tr class="no-bdr {ON_OFF}">
-			<td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
-			<td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
-			<!-- BEGIN name_with_link -->
-			<td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
-			<!-- END name_with_link -->
-			<!-- BEGIN name_without_link -->
-			<td class="firstrow">{SURNAME}, {FIRSTNAME}</td>
-			<!-- END name_without_link -->
-			<td class="firstrow">{SYNERGYID}</td>
-			<td class="firstrow">{YEARLEVEL}</td>
-			<td class="firstrow">{HOUSE}</td>
-			<td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
-		</tr>
-		<tr class="{ON_OFF}">
-			<td>&nbsp;</td>
-			<td colspan="4" valign="top" style="vertical-align:top;">
-				<!-- BEGIN actions -->
-				<div class="clearfix action-wrap">
-					<!-- BEGIN eportfolio -->
-					<a href="/eportfolio/{ID}/profile" title="View ePortfolio" class="btn eportfolio float-left">
-						<span></span>ePortfolio
-					</a>
-					<!-- END eportfolio -->
-					<a href="/submission/dueWork/{ID}" title="View due work" class="btn time-table float-left">
-						<span></span>Due Work
-					</a>
-					<a href="/submission/allWork/{ID}" class="btn tick float-left" title="View grades" ><span></span>Grades</a>
+<form id="contact-table-form">
+	<table id='contact-table' class="table">
+		<thead>
+			<tr>
+				<th width="16px"><input type="checkbox" id='select-all' value="" /></th>
+				<th width="60px"></th>
+				<th>Name</th>
+				<th>Student ID</th>
+				<th>Year Level</th>
+				<th>House</th>
+				<th>Last Visited</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN student_list -->
+			<tr class="no-bdr {ON_OFF}">
+				<td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
+				<td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
+				<!-- BEGIN name_with_link -->
+				<td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
+				<!-- END name_with_link -->
+				<!-- BEGIN name_without_link -->
+				<td class="firstrow">{SURNAME}, {FIRSTNAME}</td>
+				<!-- END name_without_link -->
+				<td class="firstrow">{SYNERGYID}</td>
+				<td class="firstrow">{YEARLEVEL}</td>
+				<td class="firstrow">{HOUSE}</td>
+				<td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
+			</tr>
+			<tr class="{ON_OFF}">
+				<td>&nbsp;</td>
+				<td colspan="4" valign="top" style="vertical-align:top;">
+					<!-- BEGIN actions -->
+					<div class="clearfix action-wrap">
+						<!-- BEGIN eportfolio -->
+						<a href="/eportfolio/{ID}/profile" title="View ePortfolio" class="btn eportfolio float-left">
+							<span></span>ePortfolio
+						</a>
+						<!-- END eportfolio -->
+						<a href="/submission/dueWork/{ID}" title="View due work" class="btn time-table float-left">
+							<span></span>Due Work
+						</a>
+						<a href="/submission/allWork/{ID}" class="btn tick float-left" title="View grades" ><span></span>Grades</a>
 
-					{EMAIL_BTN}
-				</div>
-				<!-- END actions -->
-			</td>
-			<td valign="top" style="vertical-align:top;">
-				<div class="alert-wrap">
-					<!-- BEGIN special -->
-					<img src="/images/famicons/bell.png" title="Special Needs"/>
-					<!-- END special -->
-					<!-- BEGIN medical -->
-					<img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
-					<!-- END medical -->
-				</div>
-			</td>
-		</tr>
-		<!-- END student_list -->
-	</tbody>
-</table>
+						{EMAIL_BTN}
+					</div>
+					<!-- END actions -->
+				</td>
+				<td valign="top" style="vertical-align:top;">
+					<div class="alert-wrap">
+						<!-- BEGIN special -->
+						<img src="/images/famicons/bell.png" title="Special Needs"/>
+						<!-- END special -->
+						<!-- BEGIN medical -->
+						<img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/>
+						<!-- END medical -->
+					</div>
+				</td>
+			</tr>
+			<!-- END student_list -->
+		</tbody>
+	</table>
+</form>
+
+<div id="errors"></div>
 
 <!-- BEGIN email_class -->
 <script type="text/javascript">
-	$j(function() {
-		$j('#email-selected-students').emailSelected({
-			source: $j('#contact-table'),
-			url: '/subject/classList/ajax/emailStudentsById.php',
-			classCode: '{CLASS_CODE}',
-			target: $j(this).find('input[name=bcc]')
-		});
+$j(function() {
+	$j('#email-selected-students').click(function(event) {
+		event.preventDefault();
+
+		if ($j('#contact-table-form').valid()) {
+			$j('#email-selected-students').emailSelected({
+				source: $j('#contact-table'),
+				url: '/subject/classList/ajax/emailStudentsById.php',
+				classCode: '{CLASS_CODE}',
+				target: $j(this).find('input[name=bcc]')
+			});
+		}
 	});
+});
 </script>
 <form id="email-selected-students" action="/mail/createMail.php" method="post">
 	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
@@ -94,14 +122,20 @@
 
 <!-- BEGIN parent_email -->
 <script type="text/javascript">
-	$j(function() {
-		$j('#email-selected-parents').emailSelected({
-			source: $j('#contact-table'),
-			url: '/subject/classList/ajax/emailParentsById.php',
-			classCode: '{CLASS_CODE}',
-			target: $j(this).find('input[name=bcc]')
-		});
+$j(function() {
+	$j('#email-selected-parents').click(function(event) {
+		event.preventDefault();
+
+		if ($j('#contact-table-form').valid()) {
+			$j('#email-selected-parents').emailSelected({
+				source: $j('#contact-table'),
+				url: '/subject/classList/ajax/emailParentsById.php',
+				classCode: '{CLASS_CODE}',
+				target: $j(this).find('input[name=bcc]')
+			});
+		}
 	});
+});
 </script>
 <form id="email-selected-parents" action="/mail/createMail.php" method="post">
 	<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
