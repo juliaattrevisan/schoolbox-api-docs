@@ -24,10 +24,10 @@
         Alias /debugbar /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources/
         #Alias /xhprof /usr/share/schoolbox/vendor/facebook/xhprof/xhprof_html/
 
-        # Minify Exceptions
-        <Directory /usr/share/schoolbox/www/min>
-                RewriteEngine on
-                RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
+        # LISS Exceptions
+        <Directory /vagrant/www/liss>
+                php_value memory_limit 512M
+                php_value max_execution_time 300
         </Directory>
 
         # MGS Sport Module Exceptions
@@ -68,7 +68,7 @@
         php_flag session.cookie_httponly On
         php_value session.save_handler redis
         php_value session.save_path "tcp://127.0.0.1:6379"
-        php_value newrelic.appname "Schoolbox 13.5"
+        php_value newrelic.appname "Schoolbox 14.0"
 
         # Assess uses JSON arrays to transfer data in multi-choice/matching pairs
         # JSON arrays don't like being escaped!!

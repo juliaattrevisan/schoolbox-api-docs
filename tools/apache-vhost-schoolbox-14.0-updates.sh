@@ -12,6 +12,8 @@ do
 		echo "Fixing upload max size: $vhost";
 		sed -i 's/512M/1024M/g' $vhost;
 	fi
+
+	sed -i 's/Schoolbox\ 13.5/Schoolbox\ 14.0/g' $vhost;
 done
 
 for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,.conf,-*} 2>/dev/null | grep -v dav`;
@@ -21,6 +23,39 @@ do
 	then
 		echo "Fixing favicon: $vhost";
 		sed -i 's/# Force SSL/\n        RewriteCond \%\{REQUEST_URI\} \^\/favicon.ico\$\n        RewriteRule \^(.*)\$ \/favicon.ico.php [L,R=301]\n\n        # Force SSL/g' $vhost;
+	fi
+
+	if [ `grep '/www/liss' $vhost | wc -l` -eq 0 ];
+	then
+		echo "Adding LISS exceptions: $vhost";
+		vfile=$vhost;
+		tfile="/tmp/vhostfix";
+		tempfile="/tmp/apache-vhost-test";
+		rm -f $tempfile;
+		cp -f $vfile $tfile;
+
+		tline=`grep -n '# MGS Sport' $tfile | cut -d':' -f1`;
+		pline=`grep -n '# MGS Sport' $tfile | cut -d':' -f1 | wc -l`;
+		 wcfile=`wc -l $tfile| awk {'print $1'}`;
+		if [ $pline -eq 0 ];
+		then
+			echo "Unable to locate '# MGS Sport' in: $vhost";
+			exit 0;
+		else
+			head -n `expr $tline - 1` $tfile > $tempfile;
+			echo "        # LISS Exceptions" >> $tempfile;
+			echo "        <Directory /vagrant/www/liss>" >> $tempfile;
+			echo "                php_value memory_limit 512M" >> $tempfile;
+			echo "                php_value max_execution_time 300" >> $tempfile;
+			echo "        </Directory>" >> $tempfile;
+			echo "" >> $tempfile;
+			tail -n `expr $wcfile - $tline + 1` $tfile >> $tempfile;
+			cp -f $tempfile $tfile;
+			rm -f $tempfile;
+		fi;
+
+		cp -vf $tfile $vhost;
+		rm -f $tfile;
 	fi
 
 	if [ `grep '^/login' $vhost | wc -l` -eq 0 ];
