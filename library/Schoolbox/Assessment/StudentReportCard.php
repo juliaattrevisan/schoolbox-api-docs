@@ -503,38 +503,43 @@ class StudentReportCard {
 		$page->setBlock('subject_crit', 'subject_crit_group', 'subject_crit_group_block');
 		$page->setBlock('subject_crit_group', 'subject_crit_item', 'subject_crit_item_block');
 
-		// list of criteria in this category
-		$criteria = $this->subjectData->getCriteria();
+		if (\Cfg::get('enable_grades_criteria')) {
 
-		if(count($criteria)) {
+			// list of criteria in this category
+			$criteria = $this->subjectData->getCriteria();
 
-			// there are criteria, retrieve the criterion-grouped scores for the student, map, and output
-			$rubricHandler = new \DueWork_Rubric_Handler();
-			$returnHandler = new \SubmissionReturn();
-			$results = $rubricHandler->getStudentMarksByCriteriaInCategory($this->targetUserId, $this->targetCategoryId);
+			if(count($criteria)) {
 
-			$page->setVar('subject_crit_group_block', '');
-			foreach($criteria as $group => $items) {
-				$page->setVar('subject_crit_item_block', '');
-				$page->setVar('CRIT_GROUP_NAME', \Scrub::text($group));
-				foreach($items as $item) {
-					$score = isset($results[$item->getId()])
-						? $returnHandler->percent2letter($results[$item->getId()])
-						: 'Not Assessed';
-					$page->setVar(array(
-						'CRIT_ITEM_NAME' => \Scrub::text($item->getName()),
-						'CRIT_ITEM_SCORE' => $score
-					));
-					$page->parse('subject_crit_item_block', 'subject_crit_item', true);
+				// there are criteria, retrieve the criterion-grouped scores for the student, map, and output
+				$rubricHandler = new \DueWork_Rubric_Handler();
+				$returnHandler = new \SubmissionReturn();
+				$results = $rubricHandler->getStudentMarksByCriteriaInCategory($this->targetUserId, $this->targetCategoryId);
+
+				$page->setVar('subject_crit_group_block', '');
+				foreach($criteria as $group => $items) {
+					$page->setVar('subject_crit_item_block', '');
+					$page->setVar('CRIT_GROUP_NAME', \Scrub::text($group));
+					foreach($items as $item) {
+						$score = isset($results[$item->getId()])
+							? $returnHandler->percent2letter($results[$item->getId()])
+							: 'Not Assessed';
+						$page->setVar(array(
+							'CRIT_ITEM_NAME' => \Scrub::text($item->getName()),
+							'CRIT_ITEM_SCORE' => $score
+						));
+						$page->parse('subject_crit_item_block', 'subject_crit_item', true);
+					}
+					$page->parse('subject_crit_group_block', 'subject_crit_group', true);
 				}
-				$page->parse('subject_crit_group_block', 'subject_crit_group', true);
+				$page->parse('subject_crit_block', 'subject_crit', false);
 			}
-			$page->parse('subject_crit_block', 'subject_crit', false);
+			else {
+				$page->setVar('subject_crit_block', '');
+			}
 		}
 		else {
 			$page->setVar('subject_crit_block', '');
 		}
-
 	}
 
 	protected function renderAssessments(\SitePage $page) {
