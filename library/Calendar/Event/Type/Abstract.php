@@ -602,7 +602,7 @@ abstract class Calendar_Event_Type_Abstract {
 	 * @param $publishDate
 	 */
 	public function setPublishDate($publishDate) {
-		$this->publishDate = new Alaress_Date_Format($publishDate, 'y-m-d h:i:s');
+		$this->publishDate = new Alaress_Date_Format($publishDate ?: '1970-01-01 00:00:00', 'y-m-d h:i:s');
 	}
 
 	/**
