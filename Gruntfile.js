@@ -87,9 +87,10 @@ module.exports = function(grunt) {
             main: {
                 // Bower files
                 src:  [
+
                     // jQuery
                     'www/javascript/components/jquery/jquery.js',
-                    'www/javascript/components/jquery/jquery-migrate.js',
+                    'www/javascript/components/jquery/jquery-migrate.min.js',
                     // jQuery placeholder shim
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
                     // jQuery Validation
