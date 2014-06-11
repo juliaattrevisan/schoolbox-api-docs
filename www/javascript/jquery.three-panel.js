@@ -66,7 +66,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 return
             }
 
-            threePanel.folderDetail.find('.name').html(meta.name)
+            threePanel.folderDetail.find('.name').text(meta.name)
 
             if(meta.template) {
                 threePanel.folderDetail.find('.template').html(meta.template).show()
@@ -85,7 +85,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
             if(meta.type) {
                 threePanel.folderDetail.find('p.type').show()
-                threePanel.folderDetail.find('span.type').html(meta.type + ' Group')
+                threePanel.folderDetail.find('span.type').text(meta.type + ' Group')
                 var pending_element = threePanel.folderDetail.find('.pending');
                 var join_element    = threePanel.folderDetail.find('.join-btn');
                 switch(meta.joinable) {
@@ -180,7 +180,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             // show multi
             if(typeof(meta.name) == 'undefined') {
 
-                threePanel.multiFileDetail.find('.count').html($j('#file-list tr.selected').length + ' files selected')
+                threePanel.multiFileDetail.find('.count').text($j('#file-list tr.selected').length + ' files selected')
                 threePanel.multiFileDetail.find('.actions').data('id', idList)
                 threePanel.multiFileDetail.find('img').attr('src', '/images/mime/128x128/multi.png')
 
@@ -192,7 +192,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             // show single
             else {
 
-                threePanel.fileDetail.find('.name').html(meta.name)
+                threePanel.fileDetail.find('.name').text(meta.name)
 
                 if(meta.description) {
                     threePanel.fileDetail.find('.description').html(meta.description).show()
@@ -202,9 +202,9 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 }
 
 
-                threePanel.fileDetail.find('.meta-who').html(meta.posted_by)
-                threePanel.fileDetail.find('.meta-when').html(meta.posted_date)
-                threePanel.fileDetail.find('.meta-modified-when').html(meta.modified)
+                threePanel.fileDetail.find('.meta-who').text(meta.posted_by)
+                threePanel.fileDetail.find('.meta-when').text(meta.posted_date)
+                threePanel.fileDetail.find('.meta-modified-when').text(meta.modified)
 
                 // link, display link icon
                 if(meta.kind == 'link') {
@@ -237,10 +237,10 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
                 // show filesize if available
                 if(typeof(meta.filesize) == 'undefined') {
-                    threePanel.fileDetail.find('.filesize').html('')
+                    threePanel.fileDetail.find('.filesize').text('')
                 }
                 else {
-                    threePanel.fileDetail.find('.filesize').html('('+meta.filesize+')')
+                    threePanel.fileDetail.find('.filesize').text('('+meta.filesize+')')
                 }
 
                 // does the hidden warning show?
@@ -273,12 +273,12 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                     frm.find('input[name=userId]').val(meta.publish[0].userId)
                     frm.find('input[name=fileId]').val(meta.id)
 
-                    var sel = frm.find('select[name=pageId]').html('')
+                    var sel = frm.find('select[name=pageId]').text('')
                     threePanel.fileDetail.find('form.unpublish').find('input[name=fileId]').val(meta.id)
                     $j.each(meta.publish, function(i, dest) {
                         sel.append(
                             $j('<option/>').val(dest.pageId + '&componentInstanceId=' + dest.componentInstanceId)
-                                .html(dest.pageTitle)
+                                .text(dest.pageTitle)
                         )
                     })
                     frm.attr('action','/eportfolio/component/filelist/modifyForm.php').show()
