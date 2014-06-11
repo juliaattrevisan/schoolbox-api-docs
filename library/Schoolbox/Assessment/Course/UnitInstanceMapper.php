@@ -157,30 +157,15 @@ class UnitInstanceMapper extends Mapper {
      */
     public function findOrphanedForCategoryId($categoryId) {
         $query = "
-            SELECT
-                {$this->getColumnString('ui')},
-                {$this->getJoinColumnString('unit_category', 'uc')}
+            SELECT {$this->getColumnString('ui')}
             FROM {$this->getTable()} `ui`
-            INNER JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
-            LEFT  JOIN {$this->getJoinSql('component',     'ui', 'c')}
+            LEFT JOIN {$this->getJoinSql('component', 'ui', 'co')}
             WHERE `ui`.`category_id` = :category
-            AND `c`.`identifier` IS NULL
+            AND `co`.`identifier` IS NULL
         ";
         $statement = $this->database->prepare($query);
         $statement->execute(array('category' => $categoryId));
-        return $this->hydrateList(
-            $statement,
-            'ui',
-            function($mapper, $model, $row) {
-                /**
-                 * @var UnitInstanceMapper $mapper
-                 * @var UnitInstance       $model
-                 * @var array              $row
-                 */
-                $model->setUnitCategory($mapper->hydrateJoin($row, 'unit_category', 'ui'));
-                return $model;
-            }
-        );
+        return $this->hydrateList($statement, 'ui');
     }
 
     /**
