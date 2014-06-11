@@ -159,7 +159,6 @@
                     async    : true,
                     type     : 'POST',
                     url      : '/ajax/msgcounter.php',
-                    dataType : 'json',
                     data     : {c : unreadTotal}
                 });
 
