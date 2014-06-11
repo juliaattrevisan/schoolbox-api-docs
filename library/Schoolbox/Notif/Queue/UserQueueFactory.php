@@ -434,9 +434,11 @@ class UserQueueFactory {
 						$compare = $conv->convert($unjson['message']);
 					}
 
-					if($instance->getParamHash() == $compare->getParamHash()) {
-						$result = true;
-						break;
+					if($instance->getBaseHash() == $compare->getBaseHash()) {
+						if($instance->getParamHash() == $compare->getParamHash()) {
+							$result = true;
+							break;
+						}
 					}
 				}
 				// push any messages we retrieved back onto the queue

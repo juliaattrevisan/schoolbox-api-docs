@@ -37,8 +37,8 @@ class Builder {
 	/** @var string */
 	protected $title;
 
-	/** @var string */
-	protected $body;
+	/** @var array */
+	protected $meta;
 
 	/** @var string */
 	protected $icon;
@@ -51,9 +51,6 @@ class Builder {
 
 	/** @var string */
 	protected $namespace;
-
-	/** @var string */
-	protected $byline;
 
 
 	/**
@@ -72,11 +69,10 @@ class Builder {
 		$this->context   = array();
 		$this->topics    = array();
 		$this->params    = array();
+		$this->meta      = array();
 
 		$this->namespace = '';
 		$this->title     = '';
-		$this->byline    = '';
-		$this->body      = '';
 		$this->icon      = '';
 		$this->href      = '';
 
@@ -112,8 +108,7 @@ class Builder {
 	 * @return self
 	 */
 	public function setBody($body) {
-		$this->body = $body;
-		return $this;
+		return $this->putMeta('body', $body);
 	}
 
 
@@ -172,7 +167,27 @@ class Builder {
 	 * @return self
 	 */
 	public function setByline($byline) {
-		$this->byline = $byline;
+		return $this->putMeta('byline', $byline);
+	}
+
+
+	/**
+	 * @param $name
+	 * @param $value
+	 * @return self
+	 */
+	public function putMeta($name, $value) {
+		$this->meta[$name] = $value;
+		return $this;
+	}
+
+
+	/**
+	 * @param array $meta
+	 * @return self
+	 */
+	public function setMeta($meta) {
+		$this->meta = $meta;
 		return $this;
 	}
 
@@ -257,21 +272,12 @@ class Builder {
 			}
 		}
 
-		$meta = array();
-		$metas = array('byline', 'body');
-
-		foreach($metas as $prop) {
-			if($this->$prop) {
-				$meta[$prop] = $this->$prop;
-			}
-		}
-
 		return new Instance(
 			// mandatory args
 			$this->title, $this->namespace, $this->icon, $this->href,
 			$this->params, $this->severity, $this->topics,
 			// optional args
-			$this->time, $meta, $this->context
+			$this->time, $this->meta, $this->context
 		);
 	}
 
