@@ -31,6 +31,11 @@ class UnitInstance implements ISoftDeletable {
     /**
      * @var Category
      */
+    protected $category;
+
+    /**
+     * @var Category
+     */
     protected $unit_category;
 
     /**
@@ -177,6 +182,22 @@ class UnitInstance implements ISoftDeletable {
      */
     public function getTitle() {
         return $this->title;
+    }
+
+    /**
+     * @param  \Schoolbox\Resource\Category $category
+     * @return $this
+     */
+    public function setCategory($category) {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Resource\Category
+     */
+    public function getCategory() {
+        return $this->category;
     }
 
     /**

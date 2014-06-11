@@ -26,6 +26,18 @@ class UnitInstanceMapper extends Mapper {
             'type'       => self::TYPE_INTEGER,
             'identifier' => true,
         ));
+        // Category: the category that the component is on
+        $this->hasMap(array(
+            'column'     => 'category_id',
+            'property'   => 'category',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'category',
+            'join_def'   => array(
+                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'this_key'  => 'category_id',
+                'other_key' => 'id',
+            ),
+        ));
         // Unit category: the category that this unit was created from, not the
         // one that the component is on
         $this->hasMap(array(
