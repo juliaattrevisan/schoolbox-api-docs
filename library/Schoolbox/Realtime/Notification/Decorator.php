@@ -14,6 +14,7 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Html2Text\Html2Text;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 
@@ -182,12 +183,15 @@ class Decorator extends NotificationBundle {
 				'icon'      => $notification->getIcon(),
 				'href'      => $notification->getHref(),
 				'params'    => $this->renderParametersAsArray($notification),
-				'namespace' => $notification->getNamespace(),
+				'meta'      => $notification->getMeta(),
 				'timestamp' => $notification->getTimestamp(),
 				'status'    => $asUnread ? 'unread' : 'read'
 			);
-			if($body = $notification->getMeta('body')) {
-				$result[$id]['abstract'] = TextFormatter::cutSentence($body, 48);
+
+			// if meta.body is set, convert it to plaintext and truncate it
+			if(isset($result[$id]['meta']['body'])) {
+				$plain = new Html2Text($result[$id]['meta']['body']);
+				$result[$id]['meta']['body'] = TextFormatter::cutSentence($plain->get_text(), 48);
 			}
 		}
 
@@ -203,8 +207,17 @@ class Decorator extends NotificationBundle {
 		$array = array();
 		foreach($notification->getParameters() as $token => $params) {
 			/** @var ParameterInterface[] $params */
+
+			// perform deduping here: we only want the latest of each distinct param
+			$latest = array();
 			foreach($params as $time => $param) {
-				$array[$token][$time] = $param->jsonSerialize();
+				$serial = $param->jsonSerialize();
+				$hash = sha1(json_encode($serial));
+
+				if(!isset($latest[$hash]) || $time >= $latest[$hash]) {
+					$latest[$hash] = $time;
+					$array[$token][$hash] = $serial;
+				}
 			}
 		}
 		return $array;
