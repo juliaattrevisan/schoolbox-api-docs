@@ -12,6 +12,8 @@ do
 		echo "Fixing upload max size: $vhost";
 		sed -i 's/512M/1024M/g' $vhost;
 	fi
+
+	sed -i 's/Schoolbox\ 13.5/Schoolbox\ 14.0/g' $vhost;
 done
 
 for vhost in `ls -1 /etc/apache2/sites-available/apache-vhost-$package{,.conf,-*} 2>/dev/null | grep -v dav`;
