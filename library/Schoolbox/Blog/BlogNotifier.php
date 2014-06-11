@@ -10,20 +10,25 @@
 namespace Schoolbox\Blog;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserAccess;
 
 class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
@@ -104,37 +109,38 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param string $roletype
 	 * @param Blog $blog
 	 * @param User $author
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function notifyPosted($roletype, $blog, $author) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
 		$blogId       = $blog->getId();
 
-		$authorId     = $author->getId();
-		$authorName   = $author->formatName();
 		$authorExtId  = $author->getExternalId();
 
 		$categoryId   = $blog->getCategory()->getId();
 		$category     = CategoryMapper::getInstance()->findById($categoryId);
-		$categoryName = $category->getName();
 
+		$bob = new Builder();
 
-		$msg = new Message(
-			':author blogged about :title in :catname',
-			"/portrait.php?userId=$authorExtId&size=square32",
-			"/homepage/$categoryId"
-		);
+		$bob->setTitle(':author blogged about :title in :catname')
+			->setParams(array(
+				'author' => new UserParam($author, ParameterInterface::STACKING_REPLACE),
+				'title'  => new Param($blog->getHeading()),
+				'catname' => new CategoryParam($category)
+			))
+			->setIcon("/portrait.php?userId=$authorExtId&size=square32")
+			->setHref("/homepage/$categoryId")
+			->setSeverity(Logger::INFO)
+			->setNamespace($this->getSlug())
+			->addTopic("blog.$blogId.posted")
+			->setTimestamp($blog->getCreated()->getUnixTimestamp())
+			->addFilter('roletype', $roletype)
+			->setBody($blog->getBody());
 
-		$msgr->broadcastToCategory($categoryId, $msg, "blog.$blogId.posted", Logger::INFO, array(
-			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => $blog->getHeading(),
-			'catname' => array($categoryName, "/homepage/$categoryId")
-		), array(
-			'roletype' => $roletype
-		));
+		$envelope->broadcastToCategory($categoryId, UserAccess::ACCESS_READ, $bob->build());
 
-		return $msgr;
+		return $envelope;
 	}
 
 
@@ -142,7 +148,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Blog $blog
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffPosted($blog, $author, $diff = null) {
 		return $this->notifyPosted(Role::STAFF, $blog, $author);
@@ -153,7 +159,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Blog $blog
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentPosted($blog, $author, $diff = null) {
 		return $this->notifyPosted(Role::STUDENT, $blog, $author);
@@ -163,7 +169,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Blog $blog
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentPosted($blog, $author, $diff = null) {
 		return $this->notifyPosted(Role::PARENT, $blog, $author);
