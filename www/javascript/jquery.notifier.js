@@ -301,6 +301,63 @@
                 pollReconnect();
             }
 
+            /**
+             * Stores notification instances in a stacked fashion
+             *
+             * @private
+             * @param msgId
+             * @param amqpMsg
+             * @param mode
+             */
+            var storeMessage = function(msgId, amqpMsg, mode) {
+                // if no message set for this ID, just set it
+                if(typeof messages[msgId] == 'undefined') {
+                    // not previously set, just insert
+                    messages[msgId] = amqpMsg;
+                    return;
+                }
+
+                // check the titles match; discard the new one if they don't
+                if(messages[msgId].body != amqpMsg.body) {
+                    if(settings.debug) { console.log('Messages with matching IDs have conflicting titles'); }
+                    return;
+                }
+
+                // get the existing params and status
+                var params = messages[msgId].params;
+                var status = messages[msgId].status;
+
+                // override the base message data if newer
+                if(amqpMsg.timestamp >= messages[msgId].timestamp) {
+                    messages[msgId] = amqpMsg;
+                }
+
+                // deal with param stacking
+                $.each(amqpMsg.params, function(token, paramSet) {
+                    $.each(paramSet, function(hash, param) {
+                        switch(param.mode) {
+                            case -1:
+                                // IGNORE: do nothing
+                                break;
+                            case 0:
+                                // REPLACE: overwrite
+                                params[token] = {};
+                                params[token][hash] = param;
+                                break;
+                            case 1:
+                                // APPEND: stack
+                                params[token][hash] = param;
+                                break;
+                        }
+                    });
+                });
+
+                // reinsert revised param list
+                messages[msgId].params = params;
+
+                // determine status (if push, allow override; if not, preserve previous)
+                messages[msgId].status = mode == 'push' ? amqpMsg.status : status;
+            }
 
             /**
              * Response Event
@@ -324,47 +381,7 @@
             this.pipeFetch = function(data) {
                 if(settings.debug) { console.log('Message from server: parsing fetch'); }
                 $.each(data, function(msgId, amqpMsg) {
-                    // put message in messages object, override if message already existed (ensure uniqueness)
-                    if(typeof messages[msgId] == 'undefined') {
-                        // not previously set, just insert
-                        messages[msgId] = amqpMsg;
-                    }
-                    // check the titles match
-                    else if(messages[msgId].body == amqpMsg.body) {
-                        // get the existing params and status
-                        var params = messages[msgId].params;
-                        var status = messages[msgId].status;
-
-                        // override the base message data
-                        messages[msgId] = amqpMsg;
-
-                        // deal with param stacking
-                        $.each(amqpMsg.params, function(token, paramSet) {
-                            $.each(paramSet, function(time, param) {
-                                switch(param.mode) {
-                                    case -1:
-                                        // IGNORE: do nothing
-                                        break;
-                                    case 0:
-                                        // REPLACE: overwrite
-                                        params[token] = {};
-                                        params[token][time] = param;
-                                        break;
-                                    case 1:
-                                        // APPEND: stack
-                                        params[token][time] = param;
-                                        break;
-                                }
-                            });
-                        });
-
-                        // reinsert revised param list
-                        messages[msgId].params = params;
-
-                        // preserve previous status (since this is fetch, not push)
-                        messages[msgId].status = status;
-
-                    }
+                    storeMessage(msgId, amqpMsg, 'fetch');
                 });
                 $(self).data('message-count', messages.length);
                 clearTimeout(domTimeout);
@@ -379,8 +396,7 @@
             this.pipePush = function(data) {
                 if(settings.debug) { console.log('Message from server: parsing push'); }
                 $.each(data, function(msgId, amqpMsg) {
-                    // put message in messages object, override if message already existed (ensure uniqueness)
-                    messages[msgId] = amqpMsg;
+                    storeMessage(msgId, amqpMsg, 'push');
                 });
                 $(self).data('message-count', messages.length);
                 clearTimeout(domTimeout);
