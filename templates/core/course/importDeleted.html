@@ -33,10 +33,22 @@
             </td>
         </tr>
 
+        <!-- BEGIN unimportable -->
         <tr>
             <td class="formLabelWidth">
                 <h4>Units</h4>
-                <em>The following units are attached to courses that have been removed from the class.</em>
+            </td>
+            <td>
+                <em>This class contains no units that belong to deleted courses.</em>
+                <em><a href="/homepage/{HOMEPAGE_ID}#component{COMPONENT_ID}">Return to the class page</a></em>
+            </td>
+        </tr>
+        <!-- END unimportable -->
+        <!-- BEGIN importable -->
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Units</h4>
+                <em>The following units are attached to courses that have been removed from the class page.</em>
             </td>
             <td>
                 <table class="table">
@@ -62,7 +74,10 @@
                 </table>
             </td>
         </tr>
+        <!-- END importable -->
     </table>
 
+    <!-- BEGIN submit -->
     <input type="submit" value="Import" class="submit-btn-plain" />
+    <!-- END submit -->
 </form>
