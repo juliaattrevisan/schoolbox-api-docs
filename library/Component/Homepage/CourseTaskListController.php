@@ -85,10 +85,6 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         $this->setBlock($templateHandle, 'task', 'task_block');
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
-        $this->setBlock($templateHandle, 'category_with_unit_header', 'category_with_unit_header_block');
-        $this->setBlock($templateHandle, 'no_category_with_unit_header', 'no_category_with_unit_header_block');
-        $this->setBlock($templateHandle, 'category_with_unit', 'category_with_unit_block');
-        $this->setBlock('category_with_unit', 'category_with_unit_breadcrumb', 'category_with_unit_breadcrumb_block');
         $this->setBlock('task', 'edit_task', 'edit_task_block');
         $this->setBlock('task', 'task_link', 'task_link_block');
         $this->setBlock('task', 'task_no_link', 'task_no_link_block');
@@ -155,29 +151,6 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                 $this->setVar('TASK_TYPE', 'assessment');
             }
             $this->parse('task_block', 'task', true);
-        }
-
-        // Spam out blocks for categories that contain this course
-        $this->setVar('category_with_unit_block', '');
-        $this->setVar('category_with_unit_header_block', '');
-        $this->setVar('no_category_with_unit_header_block', '');
-        if (count($this->categoryWithUnitList)) {
-            $this->parse('category_with_unit_header_block', 'category_with_unit_header', true);
-            foreach ($this->categoryWithUnitList as $category) {
-                $this->parse('category_with_unit_block', 'category_with_unit', true);
-                $this->setVar('category_with_unit_breadcrumb_block', '');
-                foreach (CategoryMapper::getInstance()->findParents($category) as $parent) {
-                    $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
-                    $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
-                    $this->parse('category_with_unit_breadcrumb_block', 'category_with_unit_breadcrumb', true);
-                }
-                $this->setVar('PARENT_CATEGORY_ID',   $category->getId());
-                $this->setVar('PARENT_CATEGORY_NAME', $category->getName());
-                $this->parse('category_with_unit_breadcrumb_block', 'category_with_unit_breadcrumb', true);
-            }
-        }
-        else {
-            $this->parse('no_category_with_unit_header_block', 'no_category_with_unit_header');
         }
 
         return true;
