@@ -43,7 +43,6 @@ $this->setBlock(TEMPLATE_content, 'unit_breadcrumb',  'unit_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'exportable',       'exportable_block');
 $this->setBlock(TEMPLATE_content, 'unexportable',     'unexportable_block');
 $this->setBlock('exportable',     'class',            'class_block');
-$this->setBlock('class',          'class_breadcrumb', 'class_breadcrumb_block');
 $this->setBlock('class',          'class_import_allowed', 'class_import_allowed_block');
 $this->setBlock('class',          'class_import_forbidden', 'class_import_forbidden_block');
 $this->setBlock('class',          'class_import_exists', 'class_import_exists_block');
@@ -92,15 +91,6 @@ $classWithUnitList = CategoryMapper::getInstance()->findByColumn(
     })
 );
 
-// Store a list of category hierarchies, so they don't need to be generated
-// every time.
-$classList = array();
-foreach ($classWithUnitList as $classWithUnit) {
-    $classList[$classWithUnit->getId()] = array(
-        'category'  => $classWithUnit,
-        'hierarchy' => CategoryMapper::getInstance()->findParents($classWithUnit),
-    );
-}
 
 if (count($unitList) > 0) {
     $this->parse('exportable_block', 'exportable');
@@ -110,31 +100,17 @@ if (count($unitList) > 0) {
     foreach ($unitList as $unit) {
 
         // Load category and hierarchy for this unit
-        $unitCategoryId = $unit->getComponent()->getIdentifier();
-        if (!isset($classList[$unitCategoryId])) {
-            continue;
-        }
-        /** @var Category $unitCategory */
-        /** @var Category[] $unitHierarchy */
-        $unitCategory  = $classList[$unitCategoryId]['category'];
-        $unitHierarchy = $classList[$unitCategoryId]['hierarchy'];
+        $unitCategory = CategoryMapper::getInstance()->findById($unit->getComponent()->getIdentifier());
 
         // Block setup
-        $this->setVar('class_breadcrumb_block', '');
         $this->setVar('class_import_allowed_block', '');
         $this->setVar('class_import_forbidden_block', '');
         $this->setVar('class_import_exists_block', '');
         $this->setVar('class_import_checkbox_block', '');
 
-        // Fill in breadcrumb
-        foreach ($unitHierarchy as $parent) {
-            $this->setVar('UNIT_CATEGORY_ID',   $parent->getId());
-            $this->setVar('UNIT_CATEGORY_NAME', $parent->getName());
-            $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
-        }
+
         $this->setVar('UNIT_CATEGORY_ID',   $unitCategory->getId().'#component'.$unit->getComponent()->getId());
-        $this->setVar('UNIT_CATEGORY_NAME', $unitCategory->getName());
-        $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
+        $this->setVar('UNIT_CATEGORY_NAME', $unitCategory->getCodeString() ? $unitCategory->getName().' ('.$unitCategory->getCodeString().')' : $unitCategory->getName() );
 
         // Variable setup
         $vars = array(
