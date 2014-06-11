@@ -38,29 +38,6 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS
 /** @var Component_Instance $component */
 $component = Component_InstanceMapper::getInstance()->findById($component_id);
 
-// Get the config option called "courseHomepage" and save it.
-$definition = Component_ConfigDefinitionMapper::getInstance()->findOneByColumnList(array(
-    'component_definition_id' => $component->getDefinitionId(),
-    'key'                     => 'courseHomepage',
-));
-
-$config_mapper = Component_ConfigMapper::getInstance();
-try {
-    $config = $config_mapper->findOneByColumnList(array(
-        'component_config_definition_id' => $definition->getId(),
-        'component_instance_id'          => $component->getId(),
-    ));
-}
-catch (Schoolbox\Mapper\Exception $e) {
-    $config = new Component_Config();
-    $config
-        ->setConfigDefinitionId($definition->getId())
-        ->setInstanceId($component->getId())
-    ;
-}
-$config->setValue($course_homepage_id);
-$config_mapper->save($config);
-
 // Merge rubrics from course into this homepage.
 CriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_id);
 
@@ -79,6 +56,7 @@ foreach ($_POST['unit'] as $unit_data) {
         $unit_instance
             ->setComponent($component)
             ->setTitle($unit_homepage->getName())
+            ->setCategory($component->getIdentifier())
             ->setUnitCategory($unit_homepage)
             ->setOpenDate(new Alaress_Date_Format($unit_data['open_date'], 'd/m/y'))
             ->setDueDate(new Alaress_Date_Format($unit_data['due_date'], 'd/m/y'))

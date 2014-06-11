@@ -29,6 +29,18 @@ class UnitInstanceMapper extends Mapper {
             'type'       => self::TYPE_INTEGER,
             'identifier' => true,
         ));
+        // Category: the category that the component is on
+        $this->hasMap(array(
+            'column'     => 'category_id',
+            'property'   => 'category',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'category',
+            'join_def'   => array(
+                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'this_key'  => 'category_id',
+                'other_key' => 'id',
+            ),
+        ));
         // Unit category: the category that this unit was created from, not the
         // one that the component is on
         $this->hasMap(array(
@@ -141,23 +153,36 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * Gets all units that belong to deleted components for the given category.
+     *
+     * @param  int $categoryId
+     * @return UnitInstance[]|Collection
+     */
+    public function findOrphanedForCategoryId($categoryId) {
+        $query = "
+            SELECT {$this->getColumnString('ui')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('component', 'ui', 'co')}
+            WHERE `ui`.`category_id` = :category
+            AND `co`.`identifier` IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array('category' => $categoryId));
+        return $this->hydrateList($statement, 'ui');
+    }
+
+    /**
      * Gets all units and tasks for the given category.
      *
      * @param  int $category_id The category to get units for
      * @return UnitInstance[]|Collection
      */
     public function findForCategoryId($category_id) {
-        /** @var Component_Instance[] $component_list */
-        $component_list    = Component_InstanceMapper::getInstance()->findByContext('homepage', $category_id);
-        $component_id_list = array();
-        foreach ($component_list as $component) {
-            $component_id_list[] = $component->getId();
-        }
 
         /** @var UnitInstance[] $unit_instance_list */
         $unit_instance_list = $this->findByColumn(
-            'component_id',
-            $component_id_list,
+            'category_id',
+            $category_id,
             array(
                 'order' => array('open_date' => 'desc')
             )

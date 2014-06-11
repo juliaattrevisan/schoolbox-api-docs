@@ -19,16 +19,22 @@ use Schoolbox\Assessment\Course\Task;
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract {
 
     /**
+     * A list of units within this course.
+     *
      * @var Collection|UnitInstance[]
      */
     protected $unit_list;
 
     /**
+     * A list of students who have completed the tasks within the course.
+     *
      * @var Collection|Task\InstanceCompletion[]
      */
     protected $completion_list;
 
     /**
+     * A list of students for this category.
+     *
      * @var array
      */
     protected $student_list = array();
@@ -46,74 +52,76 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $group_handler = new Group();
         $code = $this->getContext('code');
 
-        // Read-only access?
-        // Show nothing if course isn't selected
-        $this->readOnly = $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS;
-        if ($this->readOnly && !$this->getConfig('courseHomepage')) {
-            return false;
-        }
-
-        // Build student list
-        $classStudentIdList = array();
-        $groupStudentIdList = array();
-        if ($code && Config::get('external_enable')) {
-            $class_handler = new External_Class();
-            $classStudentList = $class_handler->getStudents($code);
-            if (is_array($classStudentList)) {
-                $externalIdList = array_map(
-                    function($student) { return $student['synergy_id']; },
-                    $classStudentList
-                );
-                $classStudentIdList = \Schoolbox\UserMapper::getInstance()
-                    ->findByColumn('synergy_id', $externalIdList)
-                    ->getColumnValues('id');
-            }
-        }
-        $groupStudentList = $group_handler->getMemberList($this->getContext('id'));
-        if (is_array($groupStudentList)) {
-            $groupStudentIdList = array_unique(
-                array_map(
-                    function($student) { return $student['uid']; },
-                    $groupStudentList
-                )
-            );
-        }
-        /** @var User[] $userCollection */
-        $userCollection = UserMapper::getInstance()->findByColumn(
-            'id', array_merge($classStudentIdList, $groupStudentIdList),
-            array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
-        );
-        foreach ($userCollection as $userObject) {
-            $this->student_list[] = array(
-                'uid'        => $userObject->getId(),
-                'synergy_id' => $userObject->getExternalId(),
-                'firstname'  => $userObject->getFirstname(),
-                'lastname'   => $userObject->getLastname(),
-            );
-        }
-
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
+        $this->readOnly  = $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS;
 
-        // Get task instance IDs out of unit list.
-        // Then, retrieve for: current user if a student, or all students if a
-        // teacher.
-        $task_list = array_reduce(
-            array_map(
-                function($v) { return $v->getColumnValues('id'); },
-                $this->unit_list->getColumnValues('tasks')
-            ),
-            'array_merge',
-            array()
-        );
-        $this_student_id = null;
-        if ($this->readOnly) {
-            $this_student_id = $_SESSION['id'];
+        // Build student list
+        if (count($this->unit_list)) {
+            $classStudentIdList = array();
+            $groupStudentIdList = array();
+            if ($code && Config::get('external_enable')) {
+                $class_handler = new External_Class();
+                $classStudentList = $class_handler->getStudents($code);
+                if (is_array($classStudentList)) {
+                    $externalIdList = array_map(
+                        function($student) { return $student['synergy_id']; },
+                        $classStudentList
+                    );
+                    $classStudentIdList = \Schoolbox\UserMapper::getInstance()
+                        ->findByColumn('synergy_id', $externalIdList)
+                        ->getColumnValues('id');
+                }
+            }
+            $groupStudentList = $group_handler->getMemberList($this->getContext('id'));
+            if (is_array($groupStudentList)) {
+                $groupStudentIdList = array_unique(
+                    array_map(
+                        function($student) { return $student['uid']; },
+                        $groupStudentList
+                    )
+                );
+            }
+            /** @var User[] $userCollection */
+            $userCollection = UserMapper::getInstance()->findByColumn(
+                'id', array_merge($classStudentIdList, $groupStudentIdList),
+                array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
+            );
+            foreach ($userCollection as $userObject) {
+                $this->student_list[] = array(
+                    'uid'        => $userObject->getId(),
+                    'synergy_id' => $userObject->getExternalId(),
+                    'firstname'  => $userObject->getFirstname(),
+                    'lastname'   => $userObject->getLastname(),
+                );
+            }
+
+            // Get task instance IDs out of unit list.
+            // Then, retrieve for: current user if a student, or all students if a
+            // teacher.
+            $task_list = array_reduce(
+                array_map(
+                    function($v) { return $v->getColumnValues('id'); },
+                    $this->unit_list->getColumnValues('tasks')
+                ),
+                'array_merge',
+                array()
+            );
+            $this_student_id = null;
+            if ($this->readOnly) {
+                $this_student_id = $_SESSION['id'];
+            }
+            $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
+                $task_list, $this_student_id
+            );
         }
-        $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
-            $task_list, $this_student_id
-        );
+        else {
+            if ($this->readOnly) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -133,7 +141,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
         ));
 
-        $this->setBlock($templateHandle,    'course_selector',      'course_selector_block');
+        // Course selector blocks
+        $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
+
+        // Unit list blocks
         $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
         $this->setBlock('course_unit_list', 'unit',                 'unit_block');
         $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
@@ -162,11 +173,11 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
-        if ($this->getConfig('courseHomepage')) {
+        if (count($this->unit_list)) {
             $this->renderTemplateForUnitList();
         }
         else {
-            $this->parse('course_selector_block', 'course_selector');
+            $this->renderTemplateForCourseSelector();
         }
 
         return true;
@@ -176,9 +187,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * Renders the unit list template for this component.
      */
     protected function renderTemplateForUnitList() {
-
-        $this->parse('course_unit_list_block', 'course_unit_list');
-
         // unit list will be a collection of Unit models
         $this->setVar('unit_block', '');
         $i = 0;
@@ -186,6 +194,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $this->setVar('UNIT_BACKGROUND', ($i++%2 === 1 ? 'dark' : ''));
             $this->renderUnitInUnitList($unit);
         }
+        $this->parse('course_unit_list_block', 'course_unit_list');
+    }
+
+    /**
+     * Renders the course selector template for this component.
+     */
+    protected function renderTemplateForCourseSelector() {
+        $this->parse('course_selector_block', 'course_selector');
     }
 
     /**
