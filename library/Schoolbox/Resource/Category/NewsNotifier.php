@@ -128,7 +128,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$articleId = $news->getId();
 		$heading = $news->getHeading();
 
-		$cat = $news->getCategory();
+		$cat = $this->categoryMapper->findById($news->getCategory()->getId());
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 
