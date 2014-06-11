@@ -8,6 +8,7 @@
  * @version	 SVN: $Id$
  */
 
+
 /* THE THREE MUSKETEERS
  */
 $externalClass = new External_Synergetic_Class();
@@ -65,99 +66,51 @@ $attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate,
 
 /* Create everyone's attendance initially
  */
-if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
-
-	/* Save a record for everyone the first time you mark the roll
-	 * After that, just hide this button
-	 */
-	if (is_array($_POST['data']) && count($_POST['data'])) {
-
-		/* This is a pretty hollow shell of a class, it just contains the mssql
-		 * instance and a query to insert/update
-		 */
-		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
-
-		/* Then if you could do that, save each person
-		 */
-		foreach($_POST['data'] as $currentPerson) {
-
-			/* Create a new record
-			 */
-			$data = array(
-				'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-				'ID' => $currentPerson['externalId'],
-				'PossibleAbsenceCode' => trim($currentPerson['PossibleAbsenceCode']),
-				'PossibleReasonCode' => trim($currentPerson['PossibleReasonCode']),
-				'PossibleDescription' => trim($currentPerson['PossibleReasonDescription']),
-				'AttendedFlag' => $currentPerson['AttendedFlag'],
-			);
-
-			$attendanceRecord->update($data);
-
-		}
-
-        $attendanceHandler->getAttendanceMaster()->save();
-	}
-}
-/* Update an individual person's attendance details individually
- *
- * This is supposed to happen only when altering the contents for
- * someone who's already marked absent
- *
- * Find out if they already have one in the tAttendances table;
- * if they do, just update it - otherwise create a new one
- */
-else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
-
-	/* Update what's already in there, leaving other settings untarnished
-	 * You'll need to scrub to allow double-quotes (mssql seems to hate those)
-	 */
-    $data = array(
-        'ID' => $_POST['updateOne'],
-        'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-        'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode']),
-        'PossibleReasonCode' => trim($_POST['PossibleReasonCode']),
-        'PossibleDescription' => trim($_POST['PossibleReasonDescription']),
-        'AttendedFlag' => 0,
-    );
+if (is_array($_POST['studentID'])) {
 
     /* This is a pretty hollow shell of a class, it just contains the mssql
      * instance and a query to insert/update
      */
     $attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
-    $attendanceRecord->update($data);
-    $attendanceHandler->getAttendanceMaster()->save();
 
-    SitePage::localRedir($redirect);
-}
-/* Mark this person as present (non-absent)
- * Should occur when a checkbox went from ticked to unticked states.
- */
-else if (isset($_POST['present']) && is_numeric($_POST['externalId'])) {
-
-	/* Update what's already in there, leaving other settings untarnished
-	 */
-    //$data['PossibleDescription'] = $data['PossibleDescription'];
-    $data = array(
-        'ID' => $_POST['externalId'],
-        'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-        'AttendedFlag' => 1,
-    );
-
-    /* TODO: Clear Existing Data
-     * I don't know if you want to clear out whatever was in the PossibleAbsenceCode,
-     * PossibleDescription and PossibleReasonCode if someone who was formerly marked
-     * Absent gets put back into Present. At the moment it's non-destructive so you
-     * can "undo" an accidental change in state.
-     *
-     * If you want to ditch it all, just set these three fields to empty string.
+    /* Then if you could do that, save each person
      */
 
-    /* This is a pretty hollow shell of a class, it just contains the mssql
-     * instance and a query to insert/update
-     */
-    $attendanceRecord = new Attendance_Synergetic_AttendanceRecord(MSSQL::getInstance());
-    $attendanceRecord->update($data);
+    if(is_array($_POST['attending'])) {
+        $attending = $_POST['attending'];
+    }
+    else {
+        $attending = array();
+    }
+
+    for($i = 0; $_POST['studentID'][$i]; $i++) {
+
+        /* Create a new record
+         */
+        $data = array(
+            'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
+            'ID' => $_POST['studentID'][$i],
+            'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
+            'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
+            'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
+
+            'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
+        );
+
+        if($_POST['LateArrivalTime'][$i]) {
+            $data['LateArrivalFlag'] = 1;
+            $data['LateArrivalTime'] = trim($_POST['LateArrivalTime'][$i]);
+        }
+
+        if($_POST['EarlyDepartureTime'][$i]) {
+            $data['EarlyDepartureFlag'] = 1;
+            $data['EarlyDepartureTime'] = trim($_POST['EarlyDepartureTime'][$i]);
+        }
+
+        $attendanceRecord->update($data);
+
+    }
+
     $attendanceHandler->getAttendanceMaster()->save();
 }
-exit;
+$this->backToTheFuture(-1);
