@@ -45,11 +45,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     protected $readOnly;
 
     /**
-     * @var bool
-     */
-    protected $isCourseSelected;
-
-    /**
      * {@inheritdoc}
      */
     public function execute() {
@@ -57,11 +52,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $group_handler = new Group();
         $code = $this->getContext('code');
 
-        $this->isCourseSelected = $this->getConfig('courseHomepage');
-        $this->readOnly         = $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS;
+        // Get the list of units for this course, as well as who has actually
+        // completed each unit.
+        $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
+        $this->readOnly  = $group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS;
 
         // Build student list
-        if ($this->isCourseSelected) {
+        if (count($this->unit_list)) {
             $classStudentIdList = array();
             $groupStudentIdList = array();
             if ($code && Config::get('external_enable')) {
@@ -99,10 +96,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                     'lastname'   => $userObject->getLastname(),
                 );
             }
-
-            // Get the list of units for this course, as well as who has actually
-            // completed each unit.
-            $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
 
             // Get task instance IDs out of unit list.
             // Then, retrieve for: current user if a student, or all students if a
@@ -180,7 +173,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
-        if ($this->isCourseSelected) {
+        if (count($this->unit_list)) {
             $this->renderTemplateForUnitList();
         }
         else {

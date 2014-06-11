@@ -2,6 +2,9 @@
 /**
  * Homepage configuration for course instance component
  *
+ * @deprecated The course homepage setting isn't used anymore - each unit in a
+ *             course has its own homepage.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/

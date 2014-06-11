@@ -29,30 +29,6 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS) {
 /** @var Component_Instance $component */
 $component = Component_InstanceMapper::getInstance()->findById($component_id);
 
-// Get the config option called "courseHomepage" and save it.
-// (Technically not necessary because you can load the list of tasks instead)
-$definition = Component_ConfigDefinitionMapper::getInstance()->findOneByColumnList(array(
-    'component_definition_id' => $component->getDefinitionId(),
-    'key'                     => 'courseHomepage',
-));
-
-$config_mapper = Component_ConfigMapper::getInstance();
-try {
-    $config = $config_mapper->findOneByColumnList(array(
-        'component_config_definition_id' => $definition->getId(),
-        'component_instance_id'          => $component->getId(),
-    ));
-}
-catch (Schoolbox\Mapper\Exception $e) {
-    $config = new Component_Config();
-    $config
-        ->setConfigDefinitionId($definition->getId())
-        ->setInstanceId($component->getId())
-    ;
-}
-$config->setValue(1);
-$config_mapper->save($config);
-
 // Change the component for each selected unit.
 $deletedUnitList = UnitInstanceMapper::getInstance()->findOrphanedForCategoryId($homepage_id);
 foreach ($deletedUnitList as $unit) {
