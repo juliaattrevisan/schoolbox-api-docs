@@ -205,6 +205,19 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 		$fileModifiedTime = new Alaress_Date_Relative($file['modified']);
 
+		/* Detect which icon to display
+		 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+		 */
+		if (isset($file['url'])) {
+			$fileListType = 'link';
+		}
+		else if (!empty($file['iconFile'])) {
+			$fileListType = $allowedFiles->getClass($file["iconFile"]);
+		}
+		else {
+			$fileListType = "textfile";
+		}
+
 		$output = array(
 			'FILE_ID' => $file['id'],
 			'TYPE' => $file['url'] ? 'link' : 'file',
@@ -212,11 +225,11 @@ if (is_array($fileList) && count($fileList) > 0) {
 			'FILE_SIZE' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
 			'CATEGORY_ID' => $file['category'],
 			'CLASS' => implode(" ", $class),
+			'FILE_LIST_TYPE' => $fileListType
 		);
 
 		$this->setVar($output);
 		$this->parse('file_list_block', 'file_list', true);
-
 	}
 }
 else
