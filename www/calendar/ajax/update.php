@@ -51,6 +51,7 @@ $updatedEvent['id']        = $event['id'];
 $updatedEvent['owner']     = $event['owner'];
 $updatedEvent['author_id'] = $event['author_id'];
 $updatedEvent['access']    = $event['access'];
+$updatedEvent['sid']       = $event['sid'];
 $updatedEvent['startDate'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endDate']   = $endTime->getDatabaseDate();
