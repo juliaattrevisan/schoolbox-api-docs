@@ -40,21 +40,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     protected $student_list = array();
 
     /**
-     * A list of units that have been deleted from this component's category,
-     * grouped by their category ID.
-     *
-     * @var UnitInstance[][]
-     */
-    protected $deletedComponentList = array();
-
-    /**
-     * Does this homepage have deleted course instance components?
-     *
-     * @var bool
-     */
-    protected $hasDeletedCourses;
-
-    /**
      * @var bool
      */
     protected $readOnly;
@@ -142,16 +127,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if ($this->readOnly) {
                 return false;
             }
-
-            // Get previously removed components, and have all of these as
-            // option to import into this component
-            $removedUnitList = UnitInstanceMapper::getInstance()
-                ->findOrphanedForCategoryId($this->getContext('id'));
-            $this->hasDeletedCourses = count($removedUnitList) > 0;
-
-            foreach ($removedUnitList as $unit) {
-                $this->deletedComponentList[$unit->getComponent()->getId()][] = $unit;
-            }
         }
         return true;
     }
@@ -174,10 +149,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         ));
 
         // Course selector blocks
-        $this->setBlock($templateHandle,          'course_selector',        'course_selector_block');
-        $this->setBlock('course_selector',        'deleted_component_list', 'deleted_component_list_block');
-        $this->setBlock('deleted_component_list', 'deleted_component',      'deleted_component_block');
-        $this->setBlock('deleted_component',      'deleted_unit',           'deleted_unit_block');
+        $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
 
         // Unit list blocks
         $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
@@ -238,21 +210,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * Renders the course selector template for this component.
      */
     protected function renderTemplateForCourseSelector() {
-        $this->setVar('deleted_component_list_block', '');
-        if (!empty($this->deletedComponentList)) {
-            $this->parse('deleted_component_list_block', 'deleted_component_list');
-            $this->setVar('deleted_component_block', '');
-            foreach ($this->deletedComponentList as $componentId => $unitList) {
-                $this->parse('deleted_component_block', 'deleted_component', true);
-                $this->setVar('deleted_unit_block', '');
-                $this->setVar('DELETED_COMPONENT_ID', $componentId);
-                /** @var UnitInstance[] $unitList */
-                foreach ($unitList as $unit) {
-                    $this->parse('deleted_unit_block', 'deleted_unit', true);
-                    $this->setVar('DELETED_UNIT_NAME', $unit->getTitle());
-                }
-            }
-        }
         $this->parse('course_selector_block', 'course_selector');
     }
 
