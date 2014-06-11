@@ -31,7 +31,38 @@
             <a href="#" class="btn float-right folder" data-interaction="homepage_selector">
                 <span></span>Select Source
             </a>
+            <a href="/course/importDeleted/{ID}" class="btn float-right export">
+                <span></span>Import Deleted Courses
+            </a>
         </p>
+
+
+        <!-- List of deleted course unit components -->
+
+        <!-- BEGIN deleted_component_list -->
+        <!--<h3>You may also add the following deleted courses:</h3>-->
+        <ul class="information-list">
+            <!-- BEGIN deleted_component -->
+            <li class="unit">
+                Units:
+                <ul>
+                    <!-- BEGIN deleted_unit -->
+                    <li>{DELETED_UNIT_NAME}</li>
+                    <!-- END deleted_unit -->
+                </ul>
+                <span class="actions">
+                    <!--
+                    <a href="/task/progressReport/{ID}" class="btn line-graph no-text" title="View progress report"><span></span></a>
+                    -->
+                    <a href="/course/importDeleted/{ID}/{DELETED_COMPONENT_ID}"
+                       class="btn export no-text"
+                       title="Re-add this course"><span></span></a>
+                </span>
+            </li>
+            <!-- END deleted_component -->
+        </ul>
+        <!-- END deleted_component_list -->
+
         <!-- END course_selector -->
 
 
