@@ -35,7 +35,8 @@ class API extends Generic\API {
                 'class'   => 'about',
                 'icon'    => 'settings',
                 'content' => array('site_version' => Cfg::get('site_version'),
-                                    'site_name' => Cfg::get('title')),
+                                    'site_title' => Cfg::get('title'),
+                                    'school_name' => Cfg::get('school_name'),)
             )
         ));
         return $response;
