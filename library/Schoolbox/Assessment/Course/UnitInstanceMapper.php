@@ -150,6 +150,40 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * Gets all units that belong to deleted components for the given category.
+     *
+     * @param  int $categoryId
+     * @return UnitInstance[]|Collection
+     */
+    public function findOrphanedForCategoryId($categoryId) {
+        $query = "
+            SELECT
+                {$this->getColumnString('ui')},
+                {$this->getJoinColumnString('unit_category', 'uc')}
+            FROM {$this->getTable()} `ui`
+            INNER JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT  JOIN {$this->getJoinSql('component',     'ui', 'c')}
+            WHERE `ui`.`category_id` = :category
+            AND `c`.`identifier` IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute(array('category' => $categoryId));
+        return $this->hydrateList(
+            $statement,
+            'ui',
+            function($mapper, $model, $row) {
+                /**
+                 * @var UnitInstanceMapper $mapper
+                 * @var UnitInstance       $model
+                 * @var array              $row
+                 */
+                $model->setUnitCategory($mapper->hydrateJoin($row, 'unit_category', 'ui'));
+                return $model;
+            }
+        );
+    }
+
+    /**
      * Gets all units and tasks for the given category.
      *
      * @param  int $category_id The category to get units for
