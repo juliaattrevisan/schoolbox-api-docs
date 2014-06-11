@@ -52,6 +52,17 @@
 			multiple: false
 		})
 
+		$j('#resourcebooking-suggest').selectizeSelector({
+			ajax: {
+				url:      '/ajax/resourcebooking.php',
+				type:     'GET',
+				data:     {userID: '{EVENT_AUTHOR_ID}'},
+				dataType: 'json'
+			},
+			value: {EVENT_RESOURCEBOOKING},
+			multiple: true
+		})
+
 		/* Confirmation when removing RAMS requirement
 		 */
 		$('[data-ramscheckbox="true"]').change(function(event) {
@@ -287,6 +298,25 @@
 			<!-- END can_add_students -->
 		</tbody>
 	</table>
+
+	<!-- BEGIN can_add_resources -->
+	<h2>Resources</h2>
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Resources</h4>
+					<em>Resources allocated to this event</em>
+				</td>
+				<td>
+					<select id="resourcebooking-suggest" name="resourcebooking[]" multiple></select>
+
+					<a href="/resource-booking/category" class="btn modify"><span></span>Manage Resource Bookings</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<!-- END can_add_resources -->
 
 	<!-- BEGIN has_activity_log -->
 	<h2>Activity Log</h2>

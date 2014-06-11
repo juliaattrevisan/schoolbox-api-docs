@@ -94,11 +94,13 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 
 		/* Include the associated files as well
 		 * Include the associated students as well
+		 * Include the associated resource bookings as well
 		 */
 		if (count($allMetadataIds)) {
 			$metadata = $this->findByColumn('id', $allMetadataIds)->first();
 			$metadata->setRamsFiles($this->findFiles($metadata->getId()));
 			$metadata->setStudentAttendees($this->findStudentAttendees($metadata->getId()));
+			$metadata->setResourceBookings($this->findResourceBookings($metadata->getId()));
 
 			return $metadata;
 		}
@@ -388,6 +390,74 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			$statement->bindParam(":metadataId", $metadata->getId());
 			$statement->execute();
 		}
+	}
+
+	/**
+	 * Assign resource bookings to an event
+	 *
+	 * @param $metadata
+	 */
+	public function createResourceBookings($metadata) {
+		$query = "
+			INSERT IGNORE INTO `eotc_metadata_resourcebooking` (metadata_id, booking_id)
+			VALUES (:metadataId, :bookingId)
+		";
+
+		foreach ($metadata->getResourceBookings() as $currentResourceBooking) {
+			$statement = $this->database->prepare($query);
+			$statement->bindParam(":metadataId", $metadata->getId());
+			$statement->bindParam(":bookingId", $currentResourceBooking->getId());
+			$statement->execute();
+		}
+	}
+
+	/**
+	 * Find resource bookings for a particular event
+	 *
+	 * @param $identifier
+	 * @return \Schoolbox\Collection
+	 */
+	public function findResourceBookings($identifier) {
+		$manyManyRelation = new ManyManyRelation();
+		$manyManyRelation->setup(
+			array(
+				'name' => 'eotc_metadata_resourcebooking',
+			),
+			array(
+				/* Find things to join to this...
+				 */
+				'column' => 'metadata_id',
+				'value' => $identifier,
+
+				/* ...using this relation, such that column = key
+				 */
+				'relation' => array(
+					'column' => 'booking_id',
+					'key' => 'id',
+					'mapper' => new \Schoolbox\ResourceBooking\Booking\Mapper()
+				),
+			)
+		);
+
+		return $manyManyRelation->find();
+	}
+
+	/**
+	 * Deletes resource booking relations if there are no remaining
+	 * events in the series
+	 *
+	 * @param $metadata
+	 * @return bool|void
+	 */
+	public function deleteResourceBookingsRelations($metadata) {
+		$query = "
+			DELETE FROM `eotc_metadata_resourcebooking`
+			WHERE metadata_id = :metadataId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":metadataId", $metadata->getId());
+		$statement->execute();
 	}
 
 	/**

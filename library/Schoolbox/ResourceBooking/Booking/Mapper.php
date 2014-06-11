@@ -80,7 +80,15 @@ class Mapper extends BaseMapper {
             )
         );
 
-        // Created/Modified/Deleted
+		$this->hasMap(
+			array(
+				'column' => 'name',
+				'property' => 'name',
+				'type' => self::TYPE_STRING,
+			)
+		);
+
+		// Created/Modified/Deleted
         $this->hasMap(
             array(
                 'column'            => 'created_at',
@@ -129,6 +137,38 @@ class Mapper extends BaseMapper {
             )
         );
     }
+
+	/**
+	 * Find a booking matching a partial name
+	 *
+	 * @param $column
+	 * @param $value
+	 * @return Collection
+	 */
+	public function findColumnLike($column, $value) {
+		$searchTerm = '%' . $this->getDatabase()->quoteForLike($value) .'%';
+
+		$query = "
+			SELECT {$this->getColumnString('b')}
+			FROM {$this->table} b
+			WHERE b.{$column} LIKE :like
+		";
+
+		$statement = $this->getDatabase()->prepare($query);
+		$statement->execute(array(
+			'like' => $searchTerm
+		));
+
+		$mapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+
+		$collection = new \Schoolbox\Collection();
+
+		while ($row = $statement->fetch()) {
+			$collection->add($mapper->hydrate($row, 'b'));
+		}
+
+		return $collection;
+	}
 
     /**
      * Retrieves all bookings between a given timespan.
