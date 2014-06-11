@@ -18,6 +18,15 @@ input,select,td {
     display:none!important;
 }
 
+.menuDiv{
+    background-color: #eee;
+}
+
+.dxmMenu_PortalMenu a{
+    background-color: #eee;
+    color: #054B93;
+}
+
 .floatMenuDiv {
     background: #fff;
     height:28px;
@@ -25,10 +34,22 @@ input,select,td {
 }
 
 #ctl00_MenuDiv table tr{
-    background: #f7f7f7;
+    background: #F0F7FE;
     padding: 10px;
     height: 38px;
 }
+
+.dxmMenu_PortalMenu .dxmMenuItemSelected_PortalMenu a,
+.dxmMenuItemSelected_PortalMenu{
+    background: #F0F7FE;
+    border: none;
+    color: #054B93;
+}
+
+.dxmMenu_PortalMenu .dxmMenuItemSelected_PortalMenu,
+.dxmMenuItem_PortalMenu{
+    background: #eee;
+}   
 
 h2,.headerDiv,.heading_cell {
     background-color:#002c76;
@@ -171,7 +192,7 @@ a,a:hover {
 }
 
 .floatUnderlay,.upperBody {
-    height:38px;
+    height:129px;
 }
 
 .mnu_btn_cell /* lnk_drk_row */,.mnu_btn_cell_top /* lnk_drk_row_top */,.time_wtc_cell,.time_wdc_cell,.fin_ReceiptDateHeader,.fin_ReceiptNumberHeader,.fin_ReceiptAmountHeader,.fin_ReceiptDescriptionHeader,.fin_ReceiptPrintHeader,.fin_StatementDateHeader,.fin_StatementNumberHeader,.fin_StatementDueDateHeader,.fin_StatementBalanceHeader,.fin_StatementDescriptionHeader,.fin_StatementPrintHeader {
@@ -200,3 +221,4 @@ a,a:hover {
 .ulSideMenu li .selected,.ulSideMenu li a.selected {
     color:#006c56!important;
 }
+
