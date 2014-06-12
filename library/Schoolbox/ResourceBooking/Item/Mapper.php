@@ -71,6 +71,13 @@ class Mapper extends BaseMapper {
         );
         $this->hasMap(
             array(
+                'column'   => 'room_code',
+                'property' => 'roomCode',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'description',
                 'property' => 'description',
                 'type'     => self::TYPE_STRING,

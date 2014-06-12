@@ -48,6 +48,11 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @var string
      */
+    protected $roomCode;
+
+    /**
+     * @var string
+     */
     protected $description;
 
     /**
@@ -259,6 +264,22 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
+     * @param  string $roomCode
+     * @return $this
+     */
+    public function setRoomCode($roomCode) {
+        $this->roomCode = $roomCode;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoomCode() {
+        return $this->roomCode;
+    }
+
+    /**
      * @param  ModerationType\Model $moderationType
      * @return $this
      */
@@ -357,6 +378,7 @@ class Model implements ISoftDeletable, JsonSerializable {
         return array(
             'id'                   => $this->getId(),
             'name'                 => $this->getName(),
+            'room_code'            => $this->getRoomCode(),
             'description'          => $this->getDescription(),
             'max_reservation_time' => $this->getMaxReservationTime(),
             'min_reservation_time' => $this->getMinReservationTime(),
