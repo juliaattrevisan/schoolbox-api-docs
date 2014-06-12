@@ -185,6 +185,7 @@ class Controller extends Base {
                                 $relatedResource,
                                 $booking->getEvent()
                             );
+                            $relatedBooking->setName($this->request->post['name']);
                             $relatedBooking->addRelatedBooking($booking);
                             $relatedBookingList->add($relatedBooking);
                         }
@@ -516,7 +517,9 @@ class Controller extends Base {
         /** @var Collection|Model[] $bookingList */
         $bookingList = new Collection();
         foreach ($eventList as $event) {
-            $bookingList->add($this->getBookingFromEvent($resource, $event));
+            $booking = $this->getBookingFromEvent($resource, $event);
+            $booking->setName($this->request->post['name']);
+            $bookingList->add($booking);
         }
         $this->getBookingMapper()->save($bookingList);
         return $bookingList;
@@ -781,6 +784,7 @@ class Controller extends Base {
                         $relatedResource,
                         $item->getEvent()
                     );
+                    $relatedBooking->setName($this->request->post['name']);
                     // Ensure that the base and related booking are related.
                     $insertedBookingList->add($relatedBooking);
                 }
