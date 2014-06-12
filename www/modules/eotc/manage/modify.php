@@ -260,6 +260,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_RAMS_FILE' => '',
 			'EVENT_CURRENT_STUDENTS' => 0,
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
+			'EVENT_RESOURCEBOOKING' => json_encode(array()),
 			'EVENT_STAFF' => json_encode(array()),
 			'EVENT_STATUS' => $status->getName(),
 			'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
