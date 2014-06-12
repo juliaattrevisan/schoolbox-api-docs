@@ -598,6 +598,36 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	}
 
+    /**
+     * Gets the timetable for the given room.
+     *
+     * @param  string $roomCode
+     * @return array
+     */
+    public function getRoomTimetable($roomCode) {
+        $query = "
+            SELECT
+                Timetable.Description,
+                Timetable.DayNumber, Timetable.PeriodNumber,
+                Timetable.TimetableGroup, Timetable.ClassCampus, Timetable.ClassCode,
+                Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname
+            FROM SynergyOne.dbo.Timetable Timetable
+            LEFT JOIN SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
+            WHERE Timetable.FileSemester=:semester
+            AND   Timetable.FileYear=:year
+            AND   Timetable.Room=:room
+        ";
+        $query = strtr(
+            $query,
+            array(
+                ':semester' => $this->database->quote($_SESSION['FileSemester']),
+                ':year'     => $this->database->quote($_SESSION['FileYear']),
+                ':room'     => $this->database->quote($roomCode),
+            )
+        );
+        return $this->database->getAll($query);
+    }
+
 	function getSubjectName($code) {
 	
 			$query = "SELECT SubjectClasses.Description 
