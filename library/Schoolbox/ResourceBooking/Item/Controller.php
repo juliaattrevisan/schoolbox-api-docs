@@ -251,6 +251,7 @@ class Controller extends Base {
     protected function updateItemWithFormValues(Model $model, $post, $files) {
         $model
             ->setName($post['name'])
+            ->setRoomCode($post['room_code'])
             ->setDescription($post['description'])
             ->setCategory($post['resource_category_id'])
             ->setModerationType($post['resource_moderation_type_id'])
