@@ -48,7 +48,8 @@ abstract class AbstractProcess extends PipeWriter {
 		$strat = $strat ?: new DefaultDispatchStrategy();
 		$debug = $debug ?: new Debug(null);
 
-		parent::__construct($strat, $debug, STDOUT);
+		// we open stream(3) as our data output stream
+		parent::__construct($strat, $debug, fopen("php://fd/3", 'w'));
 		$this->strat = $strat;
 
 		$this->loop = $loop;
