@@ -36,6 +36,55 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
         $dayTimetable = array();
         $currentTimestamp = $startTimestamp;
 
+        // Colors come from the timetable color mapper.
+        // Associate them the same way they would be in the timetable screen.
+        $colorList  = Timetable_ColourMapper::getInstance()->findAll();
+        $colorMap   = array();
+        $colorIndex = 0;
+
+        // For efficiency - fetch the full timetable, and build its color list
+        foreach ($this->getUser()->getCampusCollection() as $campus) {
+            $campusId  = $campus->getId();
+            $timetable = $this->getExternalTimetable()->getFullTimetable(
+                $this->getUser()->getExternalId(),
+                $this->getUser()->getId(),
+                $campusId
+            );
+            foreach ($timetable as $periodDetail) {
+                foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
+                    // Build the day timetable detail.
+                    $period = $periodDetail + $dayDetail;
+                    $period['staff']    = null;
+                    $period['category'] = null;
+                    try {
+                        $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                            'synergy_id', $period['staffID']
+                        );
+                    }
+                    catch (Exception $e) {}
+                    try {
+                        $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode($period['code']);
+                    }
+                    catch (Exception $e) {}
+
+                    // And set the color map as well.
+                    if ($dayDetail['periodOn']) {
+                        // Set this into the color map
+                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+                            // not enough colors: loop around to index 0.
+                            if (!$colorList->offsetExists($colorIndex)) {
+                                $colorIndex = 0;
+                            }
+                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                            $colorIndex++;
+                        }
+                        $period['color'] = $colorMap[$period['code']];
+                    }
+                    $dayTimetable[$dayNumber][$campusId][] = $period;
+                }
+            }
+        }
+
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp <= $endTimestamp) {
@@ -45,38 +94,13 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                 if ($dayNumber <= 0) {
                     continue;
                 }
-                // Cache timetable for this campus/day combination
-                if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->getExternalTimetable()->getDayTimetable(
-                        $this->getUser()->getExternalId(),
-                        $this->getUser()->getId(),
-                        $campusId,
-                        $dayNumber
-                    );
-                    // Load teacher and homepage for each class.
-                    foreach ($dayTimetable[$dayNumber][$campusId] as &$period) {
-                        $period['staff']    = null;
-                        $period['category'] = null;
-                        try {
-                            $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                                'synergy_id', $period['staffID']
-                            );
-                        }
-                        catch (Exception $e) {}
-                        try {
-                            $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode($period['code']);
-                        }
-                        catch (Exception $e) {}
-                    }
-                    unset($period);
-                }
                 // Load events for this campus
                 foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
                     if (isset($period['description'])) {
                         $event = new Calendar_Event_Type_Day();
                         // Make this up as type: campus for now
                         // It also has a category.
-                        $event->setType(3);
+                        $event->setType(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                         $event->setAllday(false);
                         $event->setLocation($period['room']);
                         $event->setStartTime(new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U'));
@@ -93,6 +117,7 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                             $event->setCategoryId($period['category']->getId());
                             $event->setCategoryName($period['category']->getName());
                         }
+                        $event->setColour($period['color']);
                         $stack->add($event);
                     }
                 }

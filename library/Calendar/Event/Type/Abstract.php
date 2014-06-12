@@ -13,6 +13,7 @@ abstract class Calendar_Event_Type_Abstract {
      */
     const CAMPUS_ACCESS = 3;
     const GROUP_ACCESS = 2;
+    const PERSONAL_ACCESS = 1;
 
     /* Inheritable class vars
      */
