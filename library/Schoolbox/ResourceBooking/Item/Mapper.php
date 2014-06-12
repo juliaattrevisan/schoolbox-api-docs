@@ -325,7 +325,7 @@ class Mapper extends BaseMapper {
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
             WHERE
-              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search OR `re`.`room_code` LIKE :search)
               AND {$this->getSoftDeleteFilterSql('re')}
             LIMIT :limit OFFSET :offset
         ";
