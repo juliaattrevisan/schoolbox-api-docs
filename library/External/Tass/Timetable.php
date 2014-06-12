@@ -342,6 +342,11 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $this->getDatabase()->getOne($query);
     }
 
+    public function getRoomTimetable($roomCode) {
+        // TODO: Implement getRoomTimetable() method.
+        return array();
+    }
+
     private function setDatabase($database)
     {
         $this->database = $database;

@@ -178,8 +178,17 @@ class External_Timetable implements External_TimetableInterface {
 		return $this->getDatabase()->getSubjectName($classCode);
 	}
 
+	/**
+	 * Gets the timetable for the given room.
+	 *
+	 * @param  string $roomCode
+	 * @return array
+	 */
+	public function getRoomTimetable($roomCode) {
+		return $this->getDatabase()->getRoomTimetable($roomCode);
+	}
 
-	public function __call ($methodName, $argumentList) {
+    public function __call ($methodName, $argumentList) {
 		$database = $this->getDatabase();
 
 		$methodReflection = new ReflectionMethod($database, $methodName);

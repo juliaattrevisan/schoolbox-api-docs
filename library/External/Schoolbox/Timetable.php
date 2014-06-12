@@ -267,8 +267,13 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 	public function getSubjectName($classCode) {
 		
 	}
-	
-	/**
+
+    public function getRoomTimetable($roomCode) {
+        // TODO: Implement getRoomTimetable() method.
+        return array();
+    }
+
+    /**
 	 * @param Database $database
 	 * @return void
 	 */

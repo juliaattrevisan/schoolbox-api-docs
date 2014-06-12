@@ -378,4 +378,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $stmt->fetchColumn(0);
     }
 
+    public function getRoomTimetable($roomCode) {
+        // TODO: Implement getRoomTimetable() method.
+        return array();
+    }
+
 }
