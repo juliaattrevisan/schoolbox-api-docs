@@ -316,8 +316,6 @@
 				return false;
 			}
 
-			console.log($(config.element));
-
 			$(config.element).validate({
 				rules: {
 					'campus[]': {
