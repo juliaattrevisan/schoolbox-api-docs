@@ -110,6 +110,16 @@ function Calendar(id, bubbleId, opts) {
                     data.modifyLink = '';
                 }
 
+                // Group events: have a go to homepage link
+                data.homepageLink = '';
+                try {
+                    if (calEvent.data.links.category.id) {
+                        data.homepageLink =
+                            $('<a class="btn float-right"><span></span>Go to homepage</a>')
+                                .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
+                    }
+                }
+                catch (e) {}
 
                 $j.each(calEvent.data.attendance, function(k, v) {
                     data['attendance' + k.capitalise()] = v
