@@ -608,9 +608,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
         $query = "
             SELECT
                 SubjectClasses.Description,
-                Timetable.DayNumber, Timetable.PeriodNumber,
-                Timetable.TimetableGroup, Timetable.ClassCampus, Timetable.ClassCode,
-                Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname
+                Timetable.DayNumber,
+                Timetable.PeriodNumber,
+                Timetable.TimetableGroup,
+                Timetable.ClassCampus,
+                Timetable.ClassCode,
+                Timetable.StaffID,
+                vStaff.StaffTitle,
+                vStaff.StaffPreferredName,
+                vStaff.StaffSurname,
+                TimetableDefinition.PeriodNumberSeq,
+                TimetableDefinition.TimeFrom,
+                TimetableDefinition.TimeTo
             FROM SynergyOne.dbo.Timetable Timetable
             LEFT JOIN SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
             LEFT JOIN SynergyOne.dbo.SubjectClasses SubjectClasses ON
@@ -619,6 +628,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
                 Timetable.FileSemester = SubjectClasses.FileSemester AND
                 Timetable.FileType = SubjectClasses.FileType AND
                 Timetable.FileYear = SubjectClasses.FileYear
+            LEFT JOIN SynergyOne.dbo.TimetableDefinition TimetableDefinition ON
+                Timetable.TimetableGroup = TimetableDefinition.TimetableGroup AND
+                Timetable.FileSemester = TimetableDefinition.FileSemester AND
+                Timetable.FileType = TimetableDefinition.FileType AND
+                Timetable.FileYear = TimetableDefinition.FileYear
             WHERE Timetable.FileSemester=:semester
             AND   Timetable.FileYear=:year
             AND   Timetable.Room=:room
