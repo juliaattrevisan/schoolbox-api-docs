@@ -343,7 +343,7 @@ $(document).ready(function() {
 </script>
 <!-- END custom_header -->
 
-<h1>{% if item.id is empty %}Book Item{% else %}Update Booking{% endif %}: {{ item.resource.name }}</h1>
+<h1>{% if item.id is empty %}Book Item{% else %}Update Booking{% endif %}: {% include '@resourceItem/sub/itemName.twig' with {item: item.resource} %}</h1>
 
 {# booking form #}
 {% set saveAction = item.id is empty ?

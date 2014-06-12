@@ -29,8 +29,7 @@
             </a>
             <h3 class="resource-name">
                 <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
-                    {{ item.name }}
-                    {% if item.roomCode %}[{{ item.roomCode }}]{% endif %}
+                    {% include '@resourceItem/sub/itemName.twig' with {item: item} %}
                 </a>
             </h3>
             <p class="meta">
