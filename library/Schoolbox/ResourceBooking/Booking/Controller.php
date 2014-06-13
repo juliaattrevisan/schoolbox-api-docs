@@ -534,7 +534,7 @@ class Controller extends Base {
      *
      * @param Item\Model $item
      */
-    public function bookingCalendar($item) {
+    public function bookingCalendar(Item\Model $item) {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
         // the find method should receive:
@@ -560,6 +560,26 @@ class Controller extends Base {
         foreach ($events as $event) {
             $renderer->visit($event);
         }
+
+        // Get timetabled classes for this room, if there are any.
+        $roomCode = $item->getRoomCode();
+        if (strlen($roomCode)) {
+            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(), array()
+            );
+            $roomSource->setRoomCode($item->getRoomCode());
+            $roomEvents = $roomSource->getEvents(
+                $this->getRequest()->query['start'],
+                $this->getRequest()->query['end']
+            );
+            $roomRenderer = new \Calendar_Event_Type_Day_Renderer_Javascript(
+                $this->getDi()->get('sitePage')
+            );
+            foreach ($roomEvents as $event) {
+                $roomRenderer->visit($event);
+            }
+        }
+
         $output = ob_get_clean();
         $output = json_decode('['.$output.'{}]');
 
