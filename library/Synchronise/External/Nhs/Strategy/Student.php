@@ -102,6 +102,16 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
     }
 
     /**
+     * The "email address from username" field is enabled for NHS students.
+     *
+     * @param  array $currentUser
+     * @return string
+     */
+    public function getLocalEmailFromUser($currentUser) {
+        return 1;
+    }
+
+    /**
      * Sticks stuff into the Schoolbox connector.
      *
      * @param array $newUser
