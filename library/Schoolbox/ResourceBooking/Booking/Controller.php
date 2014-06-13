@@ -310,6 +310,20 @@ class Controller extends Base {
             if (count($conflictingBookings)) {
                 $errors['start_datetime'][] = 'conflict';
             }
+            elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+                // Check if there's a timetabled class here, too.
+                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                    $this->getUser(), array()
+                );
+                $roomSource->setRoomCode($roomCode);
+                $roomEvents = $roomSource->getEvents(
+                    $startDate->getTimestamp(),
+                    $endDate->getTimestamp()
+                );
+                if (count($roomEvents)) {
+                    $errors['start_datetime'][] = 'timetabled_class';
+                }
+            }
         }
 
         // If updating a booking and its timespan hasn't changed:
