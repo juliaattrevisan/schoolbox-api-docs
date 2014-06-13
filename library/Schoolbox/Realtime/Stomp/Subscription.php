@@ -61,6 +61,8 @@ class Subscription {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
 
+				$pipeManager->v("Received message to push to user $userId", '+');
+
 				if($pipeManager->onAMQP($self->frame2amqp($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
