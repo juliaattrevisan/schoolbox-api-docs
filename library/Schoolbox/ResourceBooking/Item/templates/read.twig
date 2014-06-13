@@ -111,14 +111,16 @@ $(document).ready(function() {
 
                 // Add booking styles
                 element.addClass('booking');
-                if (event.data.booking.status.isRejected) {
-                    element.addClass('rejected');
-                }
-                if (event.data.booking.status.isApproved) {
-                    element.addClass('approved');
-                }
-                if (event.data.booking.status.isPending) {
-                    element.addClass('pending');
+                if ('booking' in event.data) {
+                    if (event.data.booking.status.isRejected) {
+                        element.addClass('rejected');
+                    }
+                    if (event.data.booking.status.isApproved) {
+                        element.addClass('approved');
+                    }
+                    if (event.data.booking.status.isPending) {
+                        element.addClass('pending');
+                    }
                 }
                 return element
             },
