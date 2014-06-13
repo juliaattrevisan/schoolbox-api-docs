@@ -17,7 +17,7 @@ try {
 	$etherpad = $etherpadMapper->findById($this->arg[0]);
 }
 catch (\Exception $e) {
-	error(2);
+	error(164);
 }
 
 if ($authenticator->canCreate($etherpad->getHomepageId())) {
