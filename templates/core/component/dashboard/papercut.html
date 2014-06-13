@@ -23,10 +23,6 @@
 				<th>Trees:</th>
 				<td id="userTrees"></td>
 			</tr>
-			<tr>
-				<th>Since Date:</th>
-				<td id="userSinceDate"></td>
-			</tr>
 		</table>
 	</div>
 
@@ -38,12 +34,12 @@
 
 		$j.getScript(url, function(script, textStatus, jqXHR) {
 			if (pcUserDetails.balanceFormatted != undefined) {
+				console.log(pcUserDetails);
 				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
 				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
 				document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
 				document.getElementById('userCO2').innerHTML = pcUserDetails.environmentalImpact.gramsCO2Formatted;
 				document.getElementById('userTrees').innerHTML = pcUserDetails.environmentalImpact.treesFormatted;
-				document.getElementById('userSinceDate').innerHTML = pcUserDetails.printStats.sinceDateFormatted;
 			}
 		});
 	</script>
