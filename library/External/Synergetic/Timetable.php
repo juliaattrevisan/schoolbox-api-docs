@@ -271,10 +271,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	}
 
-	//returns the period number for the current time
+	/**
+	 * Returns the period number for the current time.
+	 *
+	 * @todo campus object should be passed instead of campus ID
+	 *       Either that, or a timetable group code, as all other external DB
+	 *       calls use the key in the external DB, instead of the Schoolbox key.
+	 *
+	 * @param  int   $campus A campus ID (internal, not Synergetic)
+	 * @return array
+	 */
 	function getPeriodNumber($campus)
 	{
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		$campusModel = $this->campusMapper->findById($campus);
 		if (!($campusModel instanceof \Schoolbox\Campus)) {
 			return false;
 		}
