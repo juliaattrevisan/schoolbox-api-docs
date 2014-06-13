@@ -12,6 +12,7 @@ namespace Schoolbox\Calendar;
 
 
 use Alaress_Date_Format;
+use DateTime;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category;
@@ -463,6 +464,10 @@ class Event {
 	 * @return self
 	 */
 	public function setEndDateTime($endDateTime) {
+		// enforce casting to ADF
+		if($endDateTime instanceof DateTime) {
+			$endDateTime = new Alaress_Date_Format($endDateTime);
+		}
 		$this->endDateTime = $endDateTime;
 	 	return $this;
 	}
@@ -603,6 +608,10 @@ class Event {
 	 * @return self
 	 */
 	public function setStartDateTime($startDateTime) {
+		// enforce casting to ADF
+		if($startDateTime instanceof DateTime) {
+			$startDateTime = new Alaress_Date_Format($startDateTime);
+		}
 		$this->startDateTime = $startDateTime;
 	 	return $this;
 	}
