@@ -34,7 +34,6 @@
 
 		$j.getScript(url, function(script, textStatus, jqXHR) {
 			if (pcUserDetails.balanceFormatted != undefined) {
-				console.log(pcUserDetails);
 				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
 				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;
 				document.getElementById('userJobs').innerHTML = pcUserDetails.printStats.jobs;
