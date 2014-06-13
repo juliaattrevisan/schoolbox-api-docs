@@ -59,12 +59,12 @@ else if (isset($_REQUEST['accept'])) {
 		if (is_numeric($_REQUEST['accept'][$i])) {
 			$user = \Schoolbox\UserMapper::getInstance()->findById($_REQUEST['accept'][$i]);
 
-			$ua = new \Schoolbox\UserAccess();
-			$ua ->setAccessLevel(\Schoolbox\UserAccess::ACCESS_READ)
-				->setService(\Schoolbox\UserAccess::SERVICE_HOMEPAGE)
+			$ua = new \Schoolbox\Permission\Access\UserAccess();
+			$ua ->setAccessLevel(\Schoolbox\Permission\Access\UserAccess::ACCESS_READ)
+				->setService(\Schoolbox\Permission\Access\UserAccess::SERVICE_HOMEPAGE)
 				->setUser($user)
-				->setItemId($_REQUEST['categoryID']);
-			\Schoolbox\UserAccessMapper::getInstance()->save($ua);
+				->setServiceIdentifier($_REQUEST['categoryID']);
+			\Schoolbox\Permission\Access\UserAccessMapper::getInstance()->save($ua);
 		}
 	}
 

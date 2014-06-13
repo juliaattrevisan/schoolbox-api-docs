@@ -155,7 +155,7 @@ class UserMapper extends Mapper {
 		$this->hasJoin(
 			'userAccess',
 			array(
-				'mapper'    => '\\Schoolbox\\UserAccessMapper',
+				'mapper'    => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
 				'this_key'  => 'id',
 				'other_key' => 'uid',
 				'multiple'  => true,

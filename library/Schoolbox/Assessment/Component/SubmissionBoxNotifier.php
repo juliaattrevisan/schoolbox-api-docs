@@ -40,7 +40,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface {

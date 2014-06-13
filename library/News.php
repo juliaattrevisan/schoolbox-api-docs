@@ -353,8 +353,8 @@ class News extends DeprecatedModel {
             $user_access = $userHandler->getAllUserAccess($_SESSION['id']);
             if (is_array($user_access)) {
                 foreach ($user_access as $access) {
-                    if ($access['service'] == \Schoolbox\UserAccess::SERVICE_NEWS
-                        && $access['type'] >= \Schoolbox\UserAccess::ACCESS_FULL
+                    if ($access['service'] == \Schoolbox\Permission\Access\UserAccess::SERVICE_NEWS
+                        && $access['type'] >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
                     ) {
                         $campus_list[] = $access['sid'];
                     }

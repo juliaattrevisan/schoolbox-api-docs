@@ -11,7 +11,6 @@ namespace Schoolbox\ResourceBooking\Item;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\StorageMapper;
 

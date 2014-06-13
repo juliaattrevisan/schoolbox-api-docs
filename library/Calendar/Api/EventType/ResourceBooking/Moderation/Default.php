@@ -9,7 +9,7 @@
 
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking;
 
 class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base {

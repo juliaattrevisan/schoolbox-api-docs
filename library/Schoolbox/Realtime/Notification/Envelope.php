@@ -15,7 +15,7 @@ use Schoolbox\Campus;
 use Schoolbox\Resource\Category;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * An envelope contains notifications...right?

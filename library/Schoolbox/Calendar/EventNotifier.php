@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class EventNotifier extends AbstractModuleNotifier {
 
