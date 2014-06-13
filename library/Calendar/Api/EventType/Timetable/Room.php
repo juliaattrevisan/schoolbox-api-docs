@@ -49,6 +49,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         // out that day's timetable day number for each of the user's campuses.
 
         $campusList       = array();
+        $userList         = array();
+        $categoryList     = array();
         $currentTimestamp = $startTimestamp;
         while ($currentTimestamp <= $endTimestamp) {
 
@@ -80,14 +82,37 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setPublishDate($event->getStartTime());
                 $event->setNote($room['Description']);
                 $event->setCampusList($campusId);
-//                if ($period['staff'] instanceof Schoolbox\User) {
-//                    $event->setAuthorId($period['staff']->getId());
-//                    $event->setAuthorName($period['staff']->formatName());
-//                }
-//                if ($period['category'] instanceof Schoolbox\Resource\Category) {
-//                    $event->setCategoryId($period['category']->getId());
-//                    $event->setCategoryName($period['category']->getName());
-//                }
+
+                // Load room and category if they aren't already there.
+                $userExternalId = $room['StaffID'];
+                if (!(array_key_exists($userExternalId, $userList))) {
+                    try {
+                        $userList[$userExternalId] = Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                            'synergy_id', $userExternalId
+                        );
+                    }
+                    catch (Schoolbox\Mapper\Exception $e) {
+                        $userList[$userExternalId] = null;
+                    }
+                }
+                if ($userList[$userExternalId] instanceof \Schoolbox\User) {
+                    $event->setAuthorId($userList[$userExternalId]->getId());
+                    $event->setAuthorName($userList[$userExternalId]->formatName());
+                }
+
+                $categoryCode = $room['ClassCode'];
+                if (!(array_key_exists($categoryCode, $categoryList))) {
+                    try {
+                        $categoryList[$categoryCode] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                            $categoryCode
+                        );
+                    }
+                    catch (Schoolbox\Mapper\Exception $e) {
+                        $categoryList[$categoryCode] = null;
+                    }
+                }
+                $event->setCategoryId($categoryList[$categoryCode]->getId());
+                $event->setCategoryName($categoryList[$categoryCode]->getName());
 //                $event->setColour($period['color']);
                 $stack->add($event);
             }
