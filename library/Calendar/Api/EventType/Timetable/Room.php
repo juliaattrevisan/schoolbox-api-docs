@@ -54,7 +54,6 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $currentTimestamp = $startTimestamp;
         while ($currentTimestamp <= $endTimestamp) {
 
-
             // Get the definition for this day only.
             foreach ($roomTimetable as $room) {
 
@@ -70,14 +69,24 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                     continue;
                 }
 
+                // Does this event overlap timespan $startTimestamp to $endTimestamp?
+                $classStart = strtotime($room['PeriodStart'], $currentTimestamp);
+                $classEnd   = strtotime($room['PeriodEnd'],   $currentTimestamp);
+                if ($classEnd < $startTimestamp) {
+                    continue;
+                }
+                if ($classStart > $endTimestamp) {
+                    continue;
+                }
+
                 $event = new Calendar_Event_Type_Day();
                 // Make this up as type: campus for now
                 // It also has a category.
                 $event->setType(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                 $event->setAllday(false);
                 $event->setLocation($this->roomCode);
-                $event->setStartTime(new Alaress_Date_Format(strtotime($room['PeriodStart'], $currentTimestamp), 'U'));
-                $event->setEndTime(new Alaress_Date_Format(strtotime($room['PeriodEnd'], $currentTimestamp), 'U'));
+                $event->setStartTime(new Alaress_Date_Format($classStart, 'U'));
+                $event->setEndTime(new Alaress_Date_Format($classEnd, 'U'));
                 // Currently event needs a publish date.
                 $event->setPublishDate($event->getStartTime());
                 $event->setNote($room['Description']);
