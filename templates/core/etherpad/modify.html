@@ -1,0 +1,26 @@
+<script type="text/javascript">
+$(function() {
+	$j('#collabdoc-form').validate();
+});
+</script>
+<h1><span>Create Collab Doc</span></h1>
+
+<form id='collabdoc-form' action="/collabdoc/editForm" method="post">
+    <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
+
+	<table class="standardForm table">
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Name</h4>
+                <!--[if lt IE 10]><em>The name of the Collab Doc<em><![endif]-->
+			</td>
+			<td>
+				<label>
+					<input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
+				</label>
+			</td>
+		</tr>
+	</table>
+
+    <input type="submit" value="Update Collab Doc" class="submit-btn-plain no-marg" />
+</form>
