@@ -164,6 +164,29 @@ class Controller extends Base {
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
+
+//            // Get the base booking
+//            $baseBooking = $this->createBookingFromPostData($item);
+//
+//            // Expand into related items
+//            if (!empty($this->request->post['related_item'])) {
+//                $baseBooking = $this->expandBookingForRelatedItems(
+//                    $baseBooking, $this->request->post['related_item']
+//                );
+//            }
+//
+//            // Expand into bookings for recurrence
+//            if (!empty($this->request->post['related_item'])) {
+//                $baseBooking = $this->expandBookingForRecurrence(
+//                    $baseBooking,
+//                    $this->getRequest()->post['repeat'],
+//                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+//                    $this->getRequest()->post['timetable']['campus']
+//                );
+//            }
+//
+//            $this->bookingMapper->save($baseBooking);
+
             // Create the booking (or series of bookings) for the base item.
             $bookingList = $this->createBookingFromPostData($item);
 
@@ -642,6 +665,34 @@ class Controller extends Base {
 
         $code = 200;
         if (empty($errors)) {
+
+            $bookingList = $item;
+
+            // Load related items
+            $newBookingList = $this->expandBookingForRelatedItems(
+                $item, $this->request->post['related_item']
+            );
+
+            // Calculate diff between generated list and list in DB.
+            // Create ones in $newBookingList and not in $existingBookingList
+            // Update ones in both
+            // Remove ones in $existingBookingList and not in $newBookingList
+            $existingBookingList = $this->getBookingsForRelatedItems($item);
+            foreach ($newBookingList as $booking) {
+                // Is there an entry in $existingBooking?
+            }
+
+            // Load recurrences (if the entire series is being edited)
+            $bookingList = $this->expandBookingForRecurrences(
+                $bookingList,
+                $this->request->post['repeat'],
+                DateTime::createFromFormat('d/m/Y', $this->request->post['repeat_until']),
+                $this->request->post['timetable']['campus']
+            );
+
+            // Figure out the diff between generated list and the list in DB.
+
+
 
             // Have the date and time changed?
             // If so, set the date and time for each event, and invalidate
