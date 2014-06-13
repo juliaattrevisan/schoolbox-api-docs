@@ -7,10 +7,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox;
+namespace Schoolbox\Permission\Access;
 
 
 use Monolog\Logger;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
@@ -22,6 +23,7 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\User;
 
 class UserAccessNotifier extends AbstractModuleNotifier {
 
@@ -66,7 +68,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 
 		try {
 			/** @var Group $group */
-			$group = GroupMapper::getInstance()->findOneByColumn('cid', $userAccess->getItemId());
+			$group = GroupMapper::getInstance()->findOneByColumn('cid', $userAccess->getServiceIdentifier());
 		}
 		catch(Exception $e) {
 			// no group, do nothing
@@ -124,7 +126,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 		$msgr = new Messenger();
 
 		/** @var Category $cat */
-		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
+		$cat = CategoryMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
 		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
 			"/group/modify/".$cat->getId()
@@ -190,7 +192,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 //		$oldAccess = $diff['accessLevel'][1];
 
 		/** @var Category $cat */
-		$cat = CategoryMapper::getInstance()->findById($userAccess->getItemId());
+		$cat = CategoryMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
 
 //		// moderation approved
