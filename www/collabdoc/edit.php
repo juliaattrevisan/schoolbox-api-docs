@@ -28,7 +28,7 @@ catch (\Exception $e) {
  * Loade le pahde in le olde ifrayme
  */
 if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->getId())) {
-	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
+	$this->setFile(TEMPLATE_content, 'etherpad/edit.html');
 
 	$this->setBlock(TEMPLATE_content, 'etherpad_lock', 'etherpad_lock_block');
 	$this->setBlock(TEMPLATE_content, 'etherpad_unlock', 'etherpad_unlock_block');

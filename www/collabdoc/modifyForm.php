@@ -16,4 +16,4 @@ $newPad = $spawn->spawn($name, $homepageId);
 
 /* Go to edit screen for now
  */
-$this->localRedir("/collabdoc/modify/{$newPad->getId()}/{$homepageId}");
+$this->localRedir("/collabdoc/edit/{$newPad->getId()}/{$homepageId}");
