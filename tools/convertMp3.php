@@ -13,13 +13,13 @@ $query = "SELECT * FROM file WHERE mime_type like 'audio/%' AND mime_type != 'au
 $result = \Database::getInstance()->query($query);
 
 foreach($result as $row) {
-    exec( "avconv -i {$dataDir}/{$row['id']}.dat -ar 44100 -ac 2 -ab 128 -f mp3 {$dataDir}/{$row['id']}.mp3");
+    exec( "avconv -i {$dataDir}/{$row['id']}.dat -ar 44100 -ac 2 -ab 128 -f mp3 {$dataDir}/{$row['id']}.mp3", $info_message, $info_return);
 
-    $query = "UPDATE file SET mime_type = 'audio/mpeg', realname = CONCAT(realname,'.mp3') WHERE id = :id";
-    $update = \Database::getInstance()->prepare($query);
-    $update->execute(array(':id'=>$row['id']));
+    if (($info_return == 0)) {
+        $query = "UPDATE file SET mime_type = 'audio/mpeg', realname = CONCAT(realname,'.mp3') WHERE id = :id";
+        $update = \Database::getInstance()->prepare($query);
+        $update->execute(array(':id'=>$row['id']));
 
-    rename("{$dataDir}/{$row['id']}.mp3", "{$dataDir}/{$row['id']}.dat" );
-
-
+        rename("{$dataDir}/{$row['id']}.mp3", "{$dataDir}/{$row['id']}.dat" );
+    }
 }
