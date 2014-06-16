@@ -53,7 +53,12 @@ h2,.headerDiv,.heading_cell {
 }
 
 .leftColumn {
-    padding-left: 0;
+	padding: 0px 10px 10px 0px;
+	overflow: auto;
+}
+
+.leftColumn .customHTML{
+	width: 99%;
 }
 
 .tableBlackTopBorder,.res_tab,.fin_tab {
