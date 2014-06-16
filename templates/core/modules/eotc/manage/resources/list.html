@@ -15,7 +15,7 @@ $(function() {
 		event.preventDefault();
 
 		var id = $('#resourcebooking-suggest').val().pop();
-		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}';
+		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}';
 
 		window.location.href = url;
 

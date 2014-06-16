@@ -28,6 +28,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getNote(),
+		'EVENT_NAME_ENCODED' => urlencode($event->getNote()),
 		'EVENT_START_DATE' => $event->getStartDate(),
 		'EVENT_START_TIME' => $event->getStartDateTime()->getUsingFormat('H:i'),
 		'EVENT_END_DATE' => $event->getEndDate(),
