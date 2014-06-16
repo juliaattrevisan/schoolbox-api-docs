@@ -184,6 +184,10 @@ EOL;
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
 		}
+		if(strpos($errStr, 'Class __PHP_Incomplete_Class') === 0) {
+			// throw a specific kind of exception
+			throw new RuntimeException($errStr, $errNum);
+		}
 		if(strpos($errStr, 'fclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
