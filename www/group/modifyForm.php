@@ -1,89 +1,97 @@
 <?php
+use Schoolbox\Collection;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\User;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\UserMapper;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
-$categoryHandler = new Category();
 
-if (!is_numeric($_REQUEST['categoryID'])) {
+$uaMapper = UserAccessMapper::getInstance();
+$ua = new UserAccess();
+$ua->setService(UserAccess::SERVICE_HOMEPAGE);
+
+$catMapper = CategoryMapper::getInstance();
+$userMapper = UserMapper::getInstance();
+
+if(!is_numeric($_REQUEST['categoryID'])) {
 	error(2);
 }
 
-/* Check access
- */
-if ($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
+/* Check access */
+if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
 	error(19);
 }
 
-/* Change group type
- */
-if (is_numeric($_GET['type'])) {
+/* Change group type */
+if(is_numeric($_GET['type'])) {
 	$groupHandler->setType($_GET['categoryID'], $_GET['type']);
 }
-/* Change write permission
- */
-else if (is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
-	$groupHandler->setUserPermission($_GET['categoryID'], $_GET['userID'], $_GET['write']);
+
+/* Change write permission */
+elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
+	$ua->setServiceIdentifier($_GET['categoryID'])
+	   ->setUser($userMapper->findById($_GET['userID']))
+	   ->setAccessLevel($_GET['write']);
+	$uaMapper->save($ua);
 }
-/* Delete user
- */
-elseif (isset($_REQUEST['delete'])) {
-	if (!is_array($_REQUEST['delete'])) {
-		$_REQUEST['delete'] = array($_REQUEST['delete']);
+
+/* Delete user */
+elseif(isset($_REQUEST['delete'])) {
+	if(isset($_REQUEST['service'])) {
+		$groupHandler->setService($_REQUEST['service']);
 	}
 
-	if (isset($_REQUEST['service'])) {
-		$groupHandler = new Group($_REQUEST['service']);
-	}
-
-	$total = count($_REQUEST['delete']);
-
-	for ($i = 0; $i < $total; $i++) {
-		if (is_numeric($_REQUEST['delete'][$i])) {
-			$groupHandler->deleteUser($_REQUEST['categoryID'], $_REQUEST['delete'][$i]);
+	foreach((array)$_REQUEST['delete'] as $id) {
+		if(is_numeric($id)) {
+			$groupHandler->deleteUser($_REQUEST['categoryID'], $id);
 		}
 	}
 
 	$page->backToTheFuture(1);
 }
-/* Accept user
- */
-else if (isset($_REQUEST['accept'])) {
-	if (!is_array($_REQUEST['accept'])) {
-		$_REQUEST['accept'] = array($_REQUEST['accept']);
-	}
 
-	$total = count($_REQUEST['accept']);
-
-	for ($i = 0; $i < $total; $i++) {
-		if (is_numeric($_REQUEST['accept'][$i])) {
-			$user = \Schoolbox\UserMapper::getInstance()->findById($_REQUEST['accept'][$i]);
-
-			$ua = new \Schoolbox\Permission\Access\UserAccess();
-			$ua ->setAccessLevel(\Schoolbox\Permission\Access\UserAccess::ACCESS_READ)
-				->setService(\Schoolbox\Permission\Access\UserAccess::SERVICE_HOMEPAGE)
-				->setUser($user)
-				->setServiceIdentifier($_REQUEST['categoryID']);
-			\Schoolbox\Permission\Access\UserAccessMapper::getInstance()->save($ua);
+/* Accept user */
+elseif(isset($_REQUEST['accept'])) {
+	foreach((array)$_REQUEST['accept'] as $id) {
+		if (is_numeric($id)) {
+			$ua->setAccessLevel(UserAccess::ACCESS_READ)
+			   ->setUser($userMapper->findById($id))
+			   ->setServiceIdentifier($_REQUEST['categoryID']);
+			$uaMapper->save($ua);
 		}
 	}
 
 	SitePage::localRedir('/group/modify/' . $_REQUEST['categoryID']);
 }
-/* Add user
- */
-else if (isset($_POST['userID'])) {
-    $userList = \Schoolbox\UserMapper::getInstance()->findByColumn('id', $_POST['userID']);
-    foreach ($userList as $userObject) {
-        $groupHandler->addUser($_GET['categoryID'], $userObject->getId());
-    }
-    SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
-}
-else if (is_numeric($_GET['owner'])) {
-	$category = $categoryHandler->getByID($_REQUEST['categoryID']);
 
-	if (!isset($category['id'])) {
+/* Add user */
+elseif(isset($_POST['userID'])) {
+	$ua->setServiceIdentifier($_GET['categoryID']);
+
+	/** @var Collection|User[] $userList */
+	$userList = $userMapper->findByColumn('id', $_POST['userID']);
+
+	foreach ($userList as $userObject) {
+		$ua->setUser($userObject)
+		   ->setAccessLevel(UserAccess::ACCESS_READ);
+		$uaMapper->save($ua);
+	}
+	SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
+}
+
+/* Set new owner/administrator */
+elseif(is_numeric($_GET['owner'])) {
+	try {
+		$category = $catMapper->findById($_REQUEST['categoryID']);
+	}
+	catch(Schoolbox\Mapper\Exception $e) {
 		error(2);
+		exit;
 	}
 
 	//check if member is allowed to become a owner
@@ -97,12 +105,28 @@ else if (is_numeric($_GET['owner'])) {
 	}
 
 	// demote current owner
-	if (is_numeric($category['owner'])) {
-		$groupHandler->setUserPermission($_GET['categoryID'], $category['owner'], WRITE_ACCESS);
+	try {
+		/** @var UserAccess $ua */
+		$ua = $uaMapper->findOneByColumnList(array(
+			'service' => UserAccess::SERVICE_HOMEPAGE,
+			'sid'     => $category->getId(),
+			'type'    => UserAccess::ACCESS_FULL
+		));
+
+		$ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+		$uaMapper->save($ua);
+	}
+	catch(Schoolbox\Mapper\Exception $e) {
+		// just ignore it, this kingdom had no king
+		$ua->setUser(new User())
+		   ->setServiceIdentifier($category->getId());
 	}
 
 	// promote new owner
-	$groupHandler->setUserPermission($_GET['categoryID'], $_GET['owner'], FULL_ACCESS);
+	$ua->setAccessLevel(UserAccess::ACCESS_FULL)
+	   ->getUser()->setId($_GET['owner']);
+
+	$uaMapper->save($ua);
 
 	// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
 	$groupHandler->clearPermissionsCache();
@@ -113,33 +137,45 @@ else if (is_numeric($_GET['owner'])) {
 		SitePage::localRedir("/group/modify/" . $_GET['categoryID']);
 	}
 }
-else if (isset($_GET['disband'])) {
+
+/* Disband group */
+elseif(isset($_GET['disband'])) {
 	$groupHandler->disbandGroup($_GET['categoryID']);
 	SitePage::localRedir('/');
 }
-else if (isset($_POST['bulkAdd'])) {
-	$userHandler = new User();
 
+/* Bulk-add users */
+elseif(isset($_POST['bulkAdd'])) {
 	//get rid of newlines
 	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 
 	//split the list into an array
 	$list = preg_split('/[,; ]/', $string);
 
-	foreach ($list as $key) {
+	$ua->setServiceIdentifier($_REQUEST['categoryID'])
+	   ->setAccessLevel(UserAccess::ACCESS_READ);
+
+	foreach($list as $key) {
 		$key = trim($key);
 
-		if (!empty($key)) {
-			if (is_numeric($key)) {
-				$user = $userHandler->getBySynergy($key);
+		if(!empty($key)) {
+			try {
+				if(is_numeric($key)) {
+					$user = $userMapper->findOneByColumn('synergy_id', $key);
+				}
+				elseif(is_string($key)) {
+					$user = $userMapper->findOneByColumn('username', $key);
+				}
+				else {
+					continue;
+				}
 			}
-			else if (is_string($key)) {
-				$user = $userHandler->getByUsername($key);
+			catch(Schoolbox\Mapper\Exception $e) {
+				continue;
 			}
 
-			if (!empty($user) && is_numeric($user['uid'])) {
-				$groupHandler->addUser($_REQUEST['categoryID'], $user['uid']);
-			}
+			$ua->setUser($user);
+			$uaMapper->save($ua);
 		}
 	}
 
