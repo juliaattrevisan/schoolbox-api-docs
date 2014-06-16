@@ -28,43 +28,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getNote(),
+		'EVENT_START_DATE' => $event->getStartDate(),
+		'EVENT_START_TIME' => $event->getStartDateTime()->getUsingFormat('H:i'),
+		'EVENT_END_DATE' => $event->getEndDate(),
+		'EVENT_END_TIME' => $event->getEndDateTime()->getUsingFormat('H:i'),
 	));
-//
-//	$externalHandler = new \External_Synergetic_Class();
-//	$allFiletypes = $externalHandler->findFiletypes();
-//
-//	if (is_array($allFiletypes) && count($allFiletypes)) {
-//		foreach($allFiletypes as $currentFiletype) {
-//			$this->setVar(array(
-//				'FILETYPE_ID' => $currentFiletype['Code'],
-//				'FILETYPE_NAME' => $currentFiletype['Description']
-//			));
-//
-//			$this->parse('filetype_block', 'filetype', true);
-//		}
-//	}
-//
-//	if ($event->getMetadata()->getStudentAttendees()->count()) {
-//		$roleMapper = new \Schoolbox\RoleMapper();
-//
-//		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
-//			$role = $roleMapper->findById($currentStudent->getRole()->getId());
-//
-//			$this->setVar(array(
-//				'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
-//				'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
-//				'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
-//				'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
-//			));
-//
-//			$this->parse('student_attendee_block', 'student_attendee', true);
-//		}
-//	}
-//	else {
-//		$this->setVar(array(
-//			'student_attendee_block' => ''
-//		));
-//	}
 
 	/* Cannot add resources until an event is created
  	 */

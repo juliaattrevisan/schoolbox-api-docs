@@ -4,11 +4,22 @@
 $(function() {
 	$j('#resourcebooking-suggest').selectizeSelector({
 		ajax: {
-			url:      '/resource-booking/item/search',
-			type:     'GET',
+			url: '/resource-booking/item/search',
+			type: 'GET',
 			dataType: 'json'
 		},
 		multiple: false
+	});
+
+	$('#bookitem-form').find('input[type=submit]').click(function(event) {
+		event.preventDefault();
+
+		var id = $('#resourcebooking-suggest').val().pop();
+		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}';
+
+		window.location.href = url;
+
+		return false;
 	});
 });
 </script>
@@ -19,20 +30,21 @@ $(function() {
 </span>
 
 <!-- BEGIN has_resources -->
-<table class="standardForm">
-	<tbody>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Resources</h4>
-				<em>Search for a resource</em>
-			</td>
-			<td>
-				<select id="resourcebooking-suggest" name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
-			</td>
-		</tr>
-	</tbody>
-</table>
+<form id='bookitem-form' action='/resource-booking/booking/bookItem/' method="get">
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Resources</h4>
+					<em>Search for a resource</em>
+				</td>
+				<td>
+					<select id="resourcebooking-suggest" name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
-<input type="submit" value="Submit" class="submit-btn-plain"/>
+	<input type="submit" value="Submit" class="submit-btn-plain"/>
+</form>
 <!-- END has_resources -->
-
