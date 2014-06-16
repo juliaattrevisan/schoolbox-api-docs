@@ -100,6 +100,7 @@ class Controller extends Base {
                 'data'     => array(
                     'item'       => $item,
                     'campusList' => $this->getCampusList(),
+					'callbackUrl' => $this->getRequest()->query['callbackUrl'],
                 ),
             )
         );
@@ -199,12 +200,26 @@ class Controller extends Base {
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
+
+			/* Append the booking's id to the url, for the calling module to
+			 * process in whatever way it needs. This allows a decoupling between
+			 * Resource Booking any any modules that use it.
+			 *
+			 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+			 */
+			$callbackUrl = '';
+
+			if (strlen($this->getRequest()->post['callbackUrl'])) {
+				$callbackUrl = $this->getRequest()->post['callbackUrl'] . '/' . $item->getId();
+			}
+
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
                     'data'   => array(
                         'item'   => $bookingList,
                         'errors' => $errors,
+						'callbackUrl' => $callbackUrl
                     ),
                 )
             );
@@ -666,6 +681,18 @@ class Controller extends Base {
             $code = 400;
         }
 
+		/* Append the booking's id to the url, for the calling module to
+		 * process in whatever way it needs. This allows a decoupling between
+		 * Resource Booking any any modules that use it.
+		 *
+		 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+ 		 */
+		$callbackUrl = '';
+
+		if (strlen($this->getRequest()->post['callbackUrl'])) {
+			$callbackUrl = $this->getRequest()->post['callbackUrl'] . '/' . $item->getId();
+		}
+
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
@@ -674,6 +701,7 @@ class Controller extends Base {
                     'data'   => array(
                         'item'   => $item,
                         'errors' => $errors,
+						'callbackUrl' => $callbackUrl
                     ),
                 )
             );
@@ -682,24 +710,7 @@ class Controller extends Base {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-
-			if (strlen($this->getRequest()->query['callbackUrl'])) {
-
-				/* Append the booking's id to the url, for the calling module to
-				 * process in whatever way it needs. This allows a decoupling between
-				 * Resource Booking any any modules that use it.
-				 *
-				 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
-				 */
-				$callbackUrl = $this->getRequest()->query['callbackUrl'] . '/' . $item->getId();
-
-				/* Force calling module to deal with the outcome
-				 */
-				$this->getResponse()->redirect->afterPost($callbackUrl);
-			}
-			else {
-            	$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
-			}
+			$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
         }
     }
 

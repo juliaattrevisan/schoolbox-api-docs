@@ -188,9 +188,14 @@ $(document).ready(function() {
             data:     form.serializeArray(),
             dataType: 'json'
         }
-        var ajaxDone = function() {
+        var ajaxDone = function(data) {
             // Go back to bookings list for this item
-            window.location.href = $('#resource-booking-back').attr('href')
+            if (data.callbackUrl.length) {
+                window.location.href = data.callbackUrl;
+            }
+            else {
+                window.location.href = $('#resource-booking-back').attr('href');
+            }
         }
         var ajaxFail = function(jqXHR) {
             errors = jqXHR.responseJSON.errors
@@ -345,6 +350,7 @@ $(document).ready(function() {
       name="form" class="clearfix"
 >
     <input type="hidden" name="id" value="{{ item.id }}"/>
+    <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
     <table class="standardForm table">
         <tr>
             <td class="formLabelWidth"><h4>Rules</h4></td>
