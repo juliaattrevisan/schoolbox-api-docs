@@ -1,0 +1,38 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript">
+$(function() {
+	$j('#resourcebooking-suggest').selectizeSelector({
+		ajax: {
+			url:      '/resource-booking/item/search',
+			type:     'GET',
+			dataType: 'json'
+		},
+		multiple: false
+	});
+});
+</script>
+
+<h1>Allocate Resources to {EVENT_NAME}</h1>
+<span class="header_option">
+	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
+</span>
+
+<!-- BEGIN has_resources -->
+<table class="standardForm">
+	<tbody>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Resources</h4>
+				<em>Search for a resource</em>
+			</td>
+			<td>
+				<select id="resourcebooking-suggest" name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<input type="submit" value="Submit" class="submit-btn-plain"/>
+<!-- END has_resources -->
+
