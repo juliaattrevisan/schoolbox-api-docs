@@ -682,7 +682,24 @@ class Controller extends Base {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+
+			if (strlen($this->getRequest()->query['callbackUrl'])) {
+
+				/* Append the booking's id to the url, for the calling module to
+				 * process in whatever way it needs. This allows a decoupling between
+				 * Resource Booking any any modules that use it.
+				 *
+				 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+				 */
+				$callbackUrl = $this->getRequest()->query['callbackUrl'] . '/' . $item->getId();
+
+				/* Force calling module to deal with the outcome
+				 */
+				$this->getResponse()->redirect->afterPost($callbackUrl);
+			}
+			else {
+            	$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+			}
         }
     }
 
