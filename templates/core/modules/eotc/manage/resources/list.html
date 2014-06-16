@@ -29,7 +29,6 @@ $(function() {
 	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
 </span>
 
-<!-- BEGIN has_resources -->
 <form id='bookitem-form' action='/resource-booking/booking/bookItem/' method="get">
 	<table class="standardForm">
 		<tbody>
@@ -47,4 +46,43 @@ $(function() {
 
 	<input type="submit" value="Submit" class="submit-btn-plain"/>
 </form>
-<!-- END has_resources -->
+
+<div class="clearfix"></div>
+
+<h2>Current Resource Bookings</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				Resource Name
+			</th>
+			<th>
+				Booking Name
+			</th>
+			<th>
+				Start
+			</th>
+			<th>
+				End
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN resourcebooking -->
+		<tr>
+			<td>
+				<a href="/{RESOURCEBOOKING_ID}">{RESOURCE_NAME}</a>
+			</td>
+			<td>
+				<a href="/{RESOURCEBOOKING_ID}">{RESOURCEBOOKING_NAME}</a>
+			</td>
+			<td>
+				{RESOURCEBOOKING_START}
+			</td>
+			<td>
+				{RESOURCEBOOKING_END}
+			</td>
+		</tr>
+		<!-- END resourcebooking -->
+	</tbody>
+</table>

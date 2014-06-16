@@ -23,7 +23,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$groupHandler = new Group();
 
 	$this->setFile(TEMPLATE_content, 'modules/eotc/manage/resources/list.html');
-	$this->setBlock(TEMPLATE_content, 'has_resources', 'has_resources_block');
+	$this->setBlock(TEMPLATE_content, 'resourcebooking', 'resourcebooking_block');
 
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
@@ -35,9 +35,28 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		'EVENT_END_TIME' => $event->getEndDateTime()->getUsingFormat('H:i'),
 	));
 
-	/* Cannot add resources until an event is created
- 	 */
-	$this->parse('has_resources_block', 'has_resources');
+	/* Render a list of existing bookings for this EOTC Event
+	 */
+	$resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
+	$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+
+	foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
+
+		/* TODO: Optimise this!
+		 */
+		$resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+		$resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
+
+		$this->setVar(array(
+			'RESOURCEBOOKING_ID' => $resourceBooking->getId(),
+			'RESOURCEBOOKING_NAME' => $resourceBooking->getName(),
+			'RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
+			'RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
+			'RESOURCE_NAME' => $resource->getName()
+		));
+
+		$this->parse('resourcebooking_block', 'resourcebooking', true);
+	}
 }
 else {
 	error(19);
