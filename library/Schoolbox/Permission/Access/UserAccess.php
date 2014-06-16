@@ -14,6 +14,82 @@ use Schoolbox\User;
 
 class UserAccess {
 
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for homepage $this->itemId.
+	 */
+	const SERVICE_HOMEPAGE  = 1;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for the calendar for campus
+	 * $this->itemId.
+	 */
+	const SERVICE_CALENDAR = 2;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for the calendar for campus
+	 * $this->itemId.
+	 */
+	const SERVICE_NEWS = 3;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for tutorials for campus
+	 * $this->itemId.
+	 *
+	 * @todo check if this is actually used
+	 */
+	const SERVICE_TUTORIAL = 4;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for all homepages.
+	 *
+	 * @todo confirm if this is the case
+	 */
+	const SERVICE_CMS = 5;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for the leave management
+	 * system.
+	 */
+	const SERVICE_HOUSEMASTER = 6;
+
+	/**
+	 * Value for $this->service:
+	 * $this->user has $this->accessLevel permission for the resource booking
+	 * system.
+	 */
+	const SERVICE_RESOURCE_BOOKING = 7;
+
+	/**
+	 * Value for $this->accessLevel:
+	 * $this->user is denied access to resource in $this->service.
+	 */
+	const ACCESS_DENY  = 0;
+
+	/**
+	 * Value for $this->accessLevel:
+	 * $this->user has read access to resource in $this->service.
+	 */
+	const ACCESS_READ  = 1;
+
+	/**
+	 * Value for $this->accessLevel:
+	 * $this->user has write access to resource in $this->service.
+	 */
+	const ACCESS_WRITE = 2;
+
+	/**
+	 * Value for $this->accessLevel:
+	 * $this->user has moderate access to resource in $this->service.
+	 */
+	const ACCESS_FULL  = 3;
+
+
 	/** @var User */
 	protected $user;
 
@@ -24,7 +100,7 @@ class UserAccess {
 	protected $sid;
 
 	/** @var int */
-	protected $type;
+	protected $accessLevel;
 
 	/**
 	 * @param User $user
@@ -81,11 +157,11 @@ class UserAccess {
 
 
 	/**
-	 * @param int $type
+	 * @param int $level
 	 * @return self
 	 */
-	public function setType($type) {
-		$this->type = $type;
+	public function setAccessLevel($level) {
+		$this->accessLevel = $level;
 		return $this;
 	}
 
@@ -93,8 +169,8 @@ class UserAccess {
 	/**
 	 * @return int
 	 */
-	public function getType() {
-		return $this->type;
+	public function getAccessLevel() {
+		return $this->accessLevel;
 	}
 
 

@@ -24,7 +24,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 /**
@@ -255,7 +255,7 @@ class UserQueueFactory {
 		// Higher access levels get lower level bindings as well.
 		$bindings['service'] = array();
 		foreach ($user->getAccessList() as $access) {
-			$baseBinding = $access->getService().'.'.$access->getItemId();
+			$baseBinding = $access->getService().'.'.$access->getServiceIdentifier();
 			$accessLevel = $access->getAccessLevel();
 			if ($accessLevel >= UserAccess::ACCESS_FULL) {
 				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_FULL.'.#';

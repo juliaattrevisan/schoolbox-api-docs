@@ -23,7 +23,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 

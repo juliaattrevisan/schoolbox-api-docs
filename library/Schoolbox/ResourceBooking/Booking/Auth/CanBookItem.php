@@ -27,7 +27,7 @@ use Alaress\Authorizer\Failure;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class CanBookItem implements Rule\IAuthorizationRule {
 

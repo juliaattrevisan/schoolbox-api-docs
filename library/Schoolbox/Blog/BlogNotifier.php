@@ -28,7 +28,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 

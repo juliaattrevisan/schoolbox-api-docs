@@ -11,6 +11,7 @@
 namespace Schoolbox;
 
 use JsonSerializable;
+use Schoolbox\Permission\Access\UserAccess;
 
 class User implements JsonSerializable {
 

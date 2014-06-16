@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule {
 

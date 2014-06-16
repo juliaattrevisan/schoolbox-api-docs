@@ -16,7 +16,7 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface {
 

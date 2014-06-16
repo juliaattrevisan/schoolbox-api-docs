@@ -15,14 +15,14 @@ use Alaress\Authorizer\Failure\Forbidden;
 class HasServicePermission implements IAuthorizationRule {
 
     /**
-     * A value of Schoolbox\UserAccess::SERVICE_*
+     * A value of Schoolbox\Permission\Access\UserAccess::SERVICE_*
      *
      * @var int
      */
     protected $service;
 
     /**
-     * A value of Schoolbox\UserAccess::ACCESS_*
+     * A value of Schoolbox\Permission\Access\UserAccess::ACCESS_*
      *
      * The user must have at least this access level for $this->service to pass
      * this permission check.

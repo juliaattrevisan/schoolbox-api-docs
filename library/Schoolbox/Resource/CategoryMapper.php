@@ -11,9 +11,8 @@
 namespace Schoolbox\Resource;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use \External_UserInterface;
 
 

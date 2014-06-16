@@ -17,7 +17,6 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserAccess;
 use Schoolbox\UserMapper;
 
 class UserAccessMapper extends Mapper {
@@ -53,7 +52,7 @@ class UserAccessMapper extends Mapper {
 
 		$this->hasMap(array(
 			'column'     => 'type',
-			'property'   => 'type',
+			'property'   => 'accessLevel',
 			'type'       => self::TYPE_INTEGER
 		));
 

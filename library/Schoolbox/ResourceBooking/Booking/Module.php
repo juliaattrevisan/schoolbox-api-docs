@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Module extends BaseModule {

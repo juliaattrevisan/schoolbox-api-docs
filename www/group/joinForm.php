@@ -9,30 +9,30 @@ $response = 'error';
 if (is_numeric($_GET['join'])) {
 	$group = $groupHandler->getByID($_GET['join']);
 
-	$ua = new \Schoolbox\UserAccess();
+	$ua = new \Schoolbox\Permission\Access\UserAccess();
 	$ua
-		->setService(\Schoolbox\UserAccess::SERVICE_HOMEPAGE)
-		->setItemId($_GET['join'])
+		->setService(\Schoolbox\Permission\Access\UserAccess::SERVICE_HOMEPAGE)
+		->setServiceIdentifier($_GET['join'])
 		->setUser($_SESSION['user'])
-		->setAccessLevel(\Schoolbox\UserAccess::ACCESS_DENY);
+		->setAccessLevel(\Schoolbox\Permission\Access\UserAccess::ACCESS_DENY);
 
 	if ($group['type'] == GROUP_TYPE_FREE) {
 		// allow read access immediately for a free group
-		$ua->setAccessLevel(\Schoolbox\UserAccess::ACCESS_READ);
-		\Schoolbox\UserAccessMapper::getInstance()->save($ua);
+		$ua->setAccessLevel(\Schoolbox\Permission\Access\UserAccess::ACCESS_READ);
+		\Schoolbox\Permission\Access\UserAccessMapper::getInstance()->save($ua);
 		$response = 'joined';
 	}
 	else if ($group['type'] == GROUP_TYPE_MODERATED) {
 		// insert the user into the perms table, but deny them access (pending state)
-		\Schoolbox\UserAccessMapper::getInstance()->save($ua);
+		\Schoolbox\Permission\Access\UserAccessMapper::getInstance()->save($ua);
 		$response = 'pending';
 	}
 
 }
 else if ($_GET['leave']) {
 	// delete the record that matches the given params
-	$count = \Schoolbox\UserAccessMapper::getInstance()->deleteByColumnList(array(
-		'service' => \Schoolbox\UserAccess::SERVICE_HOMEPAGE,
+	$count = \Schoolbox\Permission\Access\UserAccessMapper::getInstance()->deleteByColumnList(array(
+		'service' => \Schoolbox\Permission\Access\UserAccess::SERVICE_HOMEPAGE,
 		'uid'     => $_SESSION['user']->getId(),
 		'sid'     => $_GET['leave']
 	));

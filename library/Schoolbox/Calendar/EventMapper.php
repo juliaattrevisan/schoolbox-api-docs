@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Mapper;
-use Schoolbox\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 
 class EventMapper extends Schoolbox\External\Mapper {
