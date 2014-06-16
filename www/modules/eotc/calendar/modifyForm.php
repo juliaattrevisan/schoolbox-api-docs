@@ -90,12 +90,10 @@ switch($_POST['action']) {
 		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
 		$event->setServiceId($_POST['group']);
-		$event->setType($_POST['type']);
+		$event->setType(\Schoolbox\Calendar\EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
 		$event->setNote($_POST['note']);
-		$event->setStartDate($startDate->getDatabaseDate());
-		$event->setStartTime($startDate->getDatabaseTime());
-		$event->setEndDate($endDate->getDatabaseDate());
-		$event->setEndTime($endDate->getDatabaseTime());
+		$event->setStartDateTime($startDate);
+		$event->setEndDateTime($endDate);
 		$event->setLocation($_POST['location']);
 		$event->setDetail($_POST['detail']);
 		$event->setPublishDateTime($publishDate);

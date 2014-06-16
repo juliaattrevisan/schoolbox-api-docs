@@ -14,11 +14,9 @@ use DateTime;
 use Alaress_Date_Format;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Calendar;
 use External_Timetable;
-use Schoolbox\CampusMapper;
 
 class Controller extends Base {
 
@@ -77,16 +75,12 @@ class Controller extends Base {
                 }
 
                 // Set the start and end date and time
-                $item->getEvent()->setStartDate($startDate->format('d/m/Y'));
-                $item->getEvent()->setStartTime($startDate->format('H:i'));
                 $item->getEvent()->setStartDateTime($startDate);
 
                 // Use the DateInterval object to adjust datetimes, to make days
                 // behave as expected over DST changes.
                 $endDate = clone $startDate;
                 $endDate->add($resource->getMinReservationTime()->getAsDateInterval());
-                $item->getEvent()->setEndDate($endDate->format('d/m/Y'));
-                $item->getEvent()->setEndTime($endDate->format('H:i'));
                 $item->getEvent()->setEndDateTime($endDate);
             }
         }
@@ -381,7 +375,7 @@ class Controller extends Base {
         // Possible Sources:
         // * My bookings (shows in my elements)
         // * Bookings for items I moderate?)
-        $event->setType(1);
+        $event->setType(Calendar\EventTypeMapper::getInstance()->createModel()->setId(1));
         // Owner and author could be separate - as a moderator I could create
         // bookings for other people.
         $event->setOwner($this->getUser());
@@ -392,14 +386,8 @@ class Controller extends Base {
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());
 
-        // Currently I can't setStartDateTime() and have that propogate to
-        // startDate and startTime.
-        $event->setStartDateTime($startDate);
-        $event->setStartDate($startDate->format('Y-m-d'));
-        $event->setStartTime($startDate->format('H:i:s'));
-        $event->setEndDateTime($endDate);
-        $event->setEndDate($endDate->format('Y-m-d'));
-        $event->setEndTime($endDate->format('H:i:s'));
+        $event->setStartDateTime(new Alaress_Date_Format($startDate));
+        $event->setEndDateTime(new Alaress_Date_Format($endDate));
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
         $event->setNote("Booking: ".$resource->getName());
         $event->setDetail($notes);
@@ -445,7 +433,7 @@ class Controller extends Base {
             case 'timetable':
                 if ($repeatUntil instanceof DateTime) {
                     $period = new \External_TimetableDatePeriod(
-                        $event->getStartDateTime(),
+                        $event->getStartDateTime()->getDateTimeObject(),
                         $repeatUntil->modify('+1 day'),
                         $this->getExternalTimetableHandler(),
                         $campusId
@@ -570,12 +558,12 @@ class Controller extends Base {
      * @param Calendar\Event $event
      */
     protected function loadDateTimesIntoEvent(Calendar\Event $event) {
-        $event->setStartDateTime(
+        $event->setStartDateTime(new Alaress_Date_Format(
             new DateTime($event->getStartDate().' '.$event->getStartTime())
-        );
-        $event->setEndDateTime(
+        ));
+        $event->setEndDateTime(new Alaress_Date_Format(
             new DateTime($event->getEndDate().' '.$event->getEndTime())
-        );
+        ));
     }
 
     /**
@@ -623,11 +611,11 @@ class Controller extends Base {
             $this->loadDateTimesIntoEvent($item->getEvent());
             $startDate  = $this->getDateFromForm('start_datetime');
             $endDate    = $this->getDateFromForm('end_datetime');
-            $startDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime(), $startDate
+            $startDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime()->getDateTimeObject(), $startDate
             );
-            $endDelta = \Alaress\Date\Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime(), $endDate
+            $endDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
             );
             $notes = $this->getRequest()->post['notes'];
 			$name = $this->getRequest()->post['name'];
@@ -824,13 +812,10 @@ class Controller extends Base {
         // Adjust the current item.
         if ($isTimeChanged) {
             $item->setStatus(Status\Model::STATUS_PENDING);
-            $newStart = $event->getStartDateTime()->add($startDelta->getAsDateInterval());
-            $event->setStartDateTime($newStart);
-            $event->setStartDate($newStart->format('Y-m-d'));
-            $event->setStartTime($newStart->format('H:i:s'));
-            $newEnd = $event->getEndDateTime()->add($endDelta->getAsDateInterval());
-            $event->setEndDate($newEnd->format('Y-m-d'));
-            $event->setEndTime($newEnd->format('H:i:s'));
+            $newStart = $event->getStartDateTime()->getDateTimeObject()->add($startDelta->getAsDateInterval());
+            $event->setStartDateTime(new Alaress_Date_Format($newStart));
+            $newEnd = $event->getEndDateTime()->getDateTimeObject()->add($endDelta->getAsDateInterval());
+	        $event->setEndDateTime(new Alaress_Date_Format($newEnd));
 
             if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
                 $item->setStatus(Status\Model::STATUS_APPROVED);

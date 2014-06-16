@@ -105,11 +105,7 @@ switch($_POST['action']) {
 		$event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
 		$event->setNote($_POST['note']);
 		$event->setStartDateTime($startDate);
-		$event->setStartDate($startDate->getDatabaseDate());
-		$event->setStartTime($startDate->getDatabaseTime());
 		$event->setEndDateTime($endDate);
-		$event->setEndDate($endDate->getDatabaseDate());
-		$event->setEndTime($endDate->getDatabaseTime());
 		$event->setLocation($_POST['location']);
 		$event->setDetail($_POST['detail']);
 		$event->setPublishDateTime($pubDateObject);
