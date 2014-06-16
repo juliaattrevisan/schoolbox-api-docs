@@ -142,10 +142,10 @@ class Subscription {
 					$stompMessage->ack();
 					$success[$msgId] = true;
 				}
-				else {
-					$this->pipeManager->v("Attempting NACK of $msgId");
-					$stompMessage->nack();
-				}
+//				else {
+//					$this->pipeManager->v("Attempting NACK of $msgId");
+//					$stompMessage->nack();
+//				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd
