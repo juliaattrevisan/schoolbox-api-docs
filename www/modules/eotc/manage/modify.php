@@ -103,6 +103,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$groupHandler = new Group();
 
 		$page->setVar(array(
+			'EVENT_TOTAL_BOOKINGS' => $event->getMetadata()->getResourceBookings()->count(),
 			'EVENT_RAMS_FILE' => $filename,
 			'EVENT_CURRENT_STUDENTS' => $event->getMetadata()->getStudentAttendees()->count(),
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
@@ -245,6 +246,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$groupHandler = new Group();
 
 		$page->setVar(array(
+			'EVENT_TOTAL_BOOKINGS' => 0,
 			'EVENT_RAMS_FILE' => '',
 			'EVENT_CURRENT_STUDENTS' => 0,
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
