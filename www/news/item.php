@@ -83,9 +83,11 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     }
 }
 
-$now = new Alaress_Date_Format(time(), 'U');
+// If expiry date has passed, mark news as expired
+// If today is the expiry date though, don't mark it
+$expiry        = new Alaress_Date_Format(strtotime('00:00:00', $_SERVER['REQUEST_TIME']), 'U');
 $articleExpiry = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
-$expired = $articleExpiry->getUnixTimestamp() < $now->getUnixTimestamp();
+$expired       = $articleExpiry->getUnixTimestamp() < $expiry->getUnixTimestamp();
 
 // generate news and topic lists
 $topicList = $newsHandler->getTopicList();
