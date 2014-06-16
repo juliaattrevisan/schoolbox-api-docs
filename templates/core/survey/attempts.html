@@ -2,12 +2,21 @@
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
 <script type="text/javascript">
 $(function() {
+	$j.tablesorter.addParser({
+		id: 'dataDate',
+		is: function() { return false },
+		format: function(value, table, cell) {
+			return $j(cell).data('timestamp')
+		},
+		type: 'numeric'
+	});
+
 	$j('.sort-it').tablesorter({
 		headers:{
 			0:{sorter:true},
 			1:{sorter:true},
-			2:{sorter:true},
-			3:{sorter:true},
+			2:{sorter:'dataDate'},
+			3:{sorter:'dataDate'},
 			4:{sorter:false},
 			5:{sorter:false}
 		},
@@ -48,8 +57,8 @@ $(function() {
 					<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
 					<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
 					<!-- END respondent_name -->
-					<td>{ATTEMPT_START}</td>
-					<td>{ATTEMPT_FINISH}</td>
+					<td data-timestamp="{ATTEMPT_START_TIMESTAMP}">{ATTEMPT_START}</td>
+					<td data-timestamp="{ATTEMPT_FINISH_TIMESTAMP}">{ATTEMPT_FINISH}</td>
 					<td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
 					<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
 				</tr>
