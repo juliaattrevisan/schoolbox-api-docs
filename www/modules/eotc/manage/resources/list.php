@@ -52,6 +52,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'RESOURCEBOOKING_NAME' => $resourceBooking->getName(),
 			'RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
 			'RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
+			'RESOURCE_ID' => $resource->getId(),
 			'RESOURCE_NAME' => $resource->getName()
 		));
 
