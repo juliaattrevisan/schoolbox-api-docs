@@ -5,13 +5,19 @@
 	<ul class="information-list">
 		<!-- BEGIN etherpad_pad -->
 		<li>
-			<h4>
-				<a href='/collabdoc/modify/{ETHERPAD_PAD_ID}/{ID}' class="icons txt">{ETHERPAD_NAME}</a>
-			</h4>
 			<span class="actions">
+				<!-- BEGIN etherpad_has_modify -->
+				<a class="btn no-text modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"><span></span></a>
+				<!-- END etherpad_has_modify -->
+			</span>
+
+			<h4>
+				<a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
+			</h4>
+			<p class="meta">
 				Last updated on
 				{ETHERPAD_UPDATED_AT}
-			</span>
+			</p>
 		</li>
 		<!-- END etherpad_pad -->
 	</ul>

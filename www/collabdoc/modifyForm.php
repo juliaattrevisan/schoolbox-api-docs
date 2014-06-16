@@ -1,6 +1,6 @@
 <?php
 /**
- * Create a new group pad
+ * ${NAME}
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,12 +8,26 @@
  * @version     SVN: $Id$
  */
 
-$homepageId = $_POST['homepageId'];
-$name = $_POST['name'];
-
-$spawn = new \Etherpad\Spawnpoint($this);
-$newPad = $spawn->spawn($name, $homepageId);
-
-/* Go to edit screen for now
+/* Check that you have write permissions
  */
-$this->localRedir("/collabdoc/modify/{$newPad->getId()}/{$homepageId}");
+$authenticator = new \Etherpad\Authenticator();
+
+try {
+	$etherpadMapper = new \Etherpad\PadMapper();
+	$etherpad = $etherpadMapper->findById($_POST['padId']);
+}
+catch (\Exception $e) {
+	error(164);
+}
+
+if ($authenticator->canCreate($etherpad->getHomepageId())) {
+	$etherpad->setName($_POST['name']);
+	$etherpadMapper->save($etherpad);
+
+	$this->backToTheFuture(2);
+}
+else {
+	error(19);
+}
+
+

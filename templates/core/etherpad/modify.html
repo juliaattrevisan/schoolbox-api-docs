@@ -1,40 +1,26 @@
-<style type='text/css'>
-	html, body, #wrap, #wrap-inner, #container, #content {
-		min-height: 100% !important;
-		height: 100% !important;
-	}
-</style>
-
 <script type="text/javascript">
-	$j(function() {
-		$j('[data-deleteButton="1"]').click(function(event) {
-			event.preventDefault();
-
-			if (confirm('Are you sure you want to delete this Collab Doc?')) {
-				window.location.href = $(this).attr('href');
-			}
-		});
-	});
+$(function() {
+	$j('#collabdoc-form').validate();
+});
 </script>
+<h1><span>Modify Collab Doc</span></h1>
 
-<h1>{ETHERPAD_NAME}</h1>
+<form id='collabdoc-form' action="/collabdoc/modifyForm" method="post">
+    <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
 
-<span class='header_option'>
-	<a href='/homepage/{HOMEPAGE_ID}' class='btn go-back'><span></span>Back to homepage</a>
+	<table class="standardForm table">
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Name</h4>
+                <!--[if lt IE 10]><em>The name of the Collab Doc<em><![endif]-->
+			</td>
+			<td>
+				<label>
+					<input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
+				</label>
+			</td>
+		</tr>
+	</table>
 
-	<!-- BEGIN etherpad_lock -->
-	<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='btn go-back'><span></span>Lock</a>
-	<!-- END etherpad_lock -->
-
-	<!-- BEGIN etherpad_unlock -->
-	<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='btn go-back'><span></span>Unlock</a>
-	<!-- END etherpad_unlock -->
-</span>
-
-<div class='etherpad-container'>
-	<iframe src='{ETHERPAD_URL}' class='etherpad-iframe'></iframe>
-</div>
-
-<!-- BEGIN etherpad_delete -->
-<a href='/collabdoc/delete/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' data-deletebutton="1" class='submit-btn-plain'>Delete Collab Doc</a>
-<!-- END etherpad_delete -->
+    <input type="submit" value="Update Collab Doc" class="submit-btn-plain no-marg" />
+</form>

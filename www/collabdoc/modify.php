@@ -8,62 +8,28 @@
  * @version     SVN: $Id$
  */
 
-/* Check if the currently logged in user can participate
+/* Check that you have write permissions
  */
 $authenticator = new \Etherpad\Authenticator();
 
-/* Load the pad from our db to get its groupId
- * Error out if you can't find it
- */
-$padMapper = new \Etherpad\PadMapper();
-
 try {
-	$pad = $padMapper->findById($this->arg[0]);
+	$etherpadMapper = new \Etherpad\PadMapper();
+	$etherpad = $etherpadMapper->findById($this->arg[0]);
 }
 catch (\Exception $e) {
-	error(19);
+	error(164);
 }
 
-/* If you can participate, create a session and off you go
- * Loade le pahde in le olde ifrayme
- */
-if ($authenticator->isParticipator($pad->getHomepageId(), $_SESSION['user']->getId())) {
+if ($authenticator->canCreate($etherpad->getHomepageId())) {
 	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
 
-	$this->setBlock(TEMPLATE_content, 'etherpad_lock', 'etherpad_lock_block');
-	$this->setBlock(TEMPLATE_content, 'etherpad_unlock', 'etherpad_unlock_block');
-	$this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
-
 	$this->setVar(array(
-		'etherpad_lock_block' => '',
-		'etherpad_unlock_block' => '',
-		'etherpad_delete_block' => '',
-	));
-
-	/* Set lock/unlock butonye
-	 * Provide buttons for those with Create powers
-	 * Otherwise hide them altogether
-	 */
-	if ($authenticator->canCreate($pad->getHomepageId())) {
-		if ($pad->isLocked()) {
-			$this->parse('etherpad_unlock_block', 'etherpad_unlock');
-		}
-		else {
-			$this->parse('etherpad_lock_block', 'etherpad_lock');
-		}
-
-		$this->parse('etherpad_delete_block', 'etherpad_delete');
-	}
-
-	/* The rest of the pad
-	 */
-	$this->setVar(array(
-		'HOMEPAGE_ID' => $this->arg[1],
-		'ETHERPAD_PAD_ID' => $pad->getId(),
-		'ETHERPAD_NAME' => $pad->getDisplayName(),
-		'ETHERPAD_URL' => "/collabdoc/load/{$pad->getId()}"
+		'ETHERPAD_PAD_ID' => $etherpad->getId(),
+		'ETHERPAD_PAD_NAME' => $etherpad->getName()
 	));
 }
 else {
 	error(19);
 }
+
+

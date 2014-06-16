@@ -1,14 +1,23 @@
-<form action="/collabdoc/modifyForm" method="post">
+<script type="text/javascript">
+$(function() {
+	$j('#collabdoc-form').validate();
+});
+</script>
+<h1><span>Create Collab Doc</span></h1>
+
+<form id='collabdoc-form' action="/collabdoc/editForm" method="post">
     <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
 
 	<table class="standardForm table">
 		<tr>
-			<td>
-				<h4>Collab Doc Name</h4>
+			<td class="formLabelWidth">
+				<h4>Name</h4>
                 <!--[if lt IE 10]><em>The name of the Collab Doc<em><![endif]-->
-                <label>
-                    <input type="text" maxlength='255' name='name' value="" placeholder="The name of the Collab Doc" />
-                </label>
+			</td>
+			<td>
+				<label>
+					<input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
+				</label>
 			</td>
 		</tr>
 	</table>

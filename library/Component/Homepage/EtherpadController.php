@@ -68,10 +68,12 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
 		$this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
 		$this->setBlock($templateHandle, 'etherpad_has_create', 'etherpad_has_create_block');
+		$this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
 
 		$this->setVar(array(
 			'etherpad_pad_block' => '',
 			'etherpad_has_create_block' => '',
+			'etherpad_has_modify_block' => '',
 		));
 
 		/* Decide which homepage to stream from
@@ -95,6 +97,17 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 			'limit' => $this->getConfig('size')
 		));
 
+		/* Only provide Modify Document button to those with write access
+		 */
+		$authenticator = new \Etherpad\Authenticator();
+
+		if ($authenticator->canCreate($homepageSource)) {
+			$isCreator = true;
+		}
+		else {
+			$isCreator = false;
+		}
+
 		foreach ($allPads as $currentPad) {
 			$this->setVar(array(
 				'HOMEPAGE_ID' => $this->instance->getIdentifier(),
@@ -103,14 +116,22 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 				'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
 			));
 
+			if ($isCreator) {
+				$this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+			}
+
 			$this->parse('etherpad_pad_block', 'etherpad_pad', true);
+
+			/* Clear children after parsing out the parent
+			 */
+			$this->setVar(array(
+				'etherpad_has_modify_block' => ''
+			));
 		}
 
 		/* Only provide Create Document button to those with write access
 		 */
-		$authenticator = new \Etherpad\Authenticator();
-
-		if ($authenticator->canCreate($homepageSource)) {
+		if ($isCreator) {
 			$this->parse('etherpad_has_create_block', 'etherpad_has_create');
 		}
 
