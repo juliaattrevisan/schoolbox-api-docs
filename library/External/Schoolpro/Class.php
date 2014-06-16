@@ -54,8 +54,8 @@ class External_Schoolpro_Class implements External_ClassInterface {
 				foreach($result['result'] as $currentStudent) {
 					$student = array(
 						'synergy_id' => $currentStudent['ID'],
-						'lastname' => $currentStudent['Firstname'],
-						'firstname' => $currentStudent['Surname'],
+						'firstname' => $currentStudent['Firstname'],
+						'lastname' => $currentStudent['Surname'],
 						'yearlevel '=> $currentStudent['YearLevel'],
 						'house' => $currentStudent['House'],
 						'StudentMedicalAlert' => '',
@@ -67,6 +67,18 @@ class External_Schoolpro_Class implements External_ClassInterface {
 				}
 			}
 		}
+
+		/* Sort by lastname then by firstname
+		 */
+		usort($allStudents, function($a, $b) {
+			$last = strcmp($a['lastname'], $b['lastname']);
+
+			if ($last == 0) {
+				return strcmp($a['firstname'],$b['firstname']);
+			}
+
+			return $last;
+		});
 
 		return $allStudents;
 	}
