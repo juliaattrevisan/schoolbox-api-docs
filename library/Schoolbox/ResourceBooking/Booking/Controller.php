@@ -210,7 +210,7 @@ class Controller extends Base {
 			$callbackUrl = '';
 
 			if (strlen($this->getRequest()->post['callbackUrl'])) {
-				$callbackUrl = $this->getRequest()->post['callbackUrl'] . '/' . $item->getId();
+				$callbackUrl = $this->getRequest()->post['callbackUrl'];
 			}
 
             $this->getResponse()->content->set(
@@ -690,7 +690,7 @@ class Controller extends Base {
 		$callbackUrl = '';
 
 		if (strlen($this->getRequest()->post['callbackUrl'])) {
-			$callbackUrl = $this->getRequest()->post['callbackUrl'] . '/' . $item->getId();
+			$callbackUrl = $this->getRequest()->post['callbackUrl'];
 		}
 
         if ($this->getRequest()->isXhr()) {

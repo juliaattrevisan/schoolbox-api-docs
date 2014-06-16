@@ -189,10 +189,16 @@ $(document).ready(function() {
             dataType: 'json'
         }
         var ajaxDone = function(data) {
-            // Go back to bookings list for this item
+
+            /* Use a calling module's callback url, pass it booking ids
+             * that were just created for it
+             */
             if (data.callbackUrl.length) {
-                window.location.href = data.callbackUrl;
+                var ids = data.item.join();
+
+                window.location.href = data.callbackUrl + '?ids=' + ids;
             }
+            // Go back to bookings list for this item
             else {
                 window.location.href = $('#resource-booking-back').attr('href');
             }
