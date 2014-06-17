@@ -20,6 +20,7 @@ foreach($result as $row) {
         $update = \Database::getInstance()->prepare($query);
         $update->execute(array(':id'=>$row['id']));
 
+        rename("{$dataDir}/{$row['id']}.dat", "{$dataDir}/{$row['id']}.old" );
         rename("{$dataDir}/{$row['id']}.mp3", "{$dataDir}/{$row['id']}.dat" );
     }
 }
