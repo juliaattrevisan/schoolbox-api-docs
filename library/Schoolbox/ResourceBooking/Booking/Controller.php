@@ -444,7 +444,7 @@ class Controller extends Base {
                     // Add related booking relation in both directions
                     $booking->addRelatedBooking($relatedBooking);
                     $relatedBooking->addRelatedBooking($booking);
-                    $bookingList->add($relatedBooking);
+                    $newList->add($relatedBooking);
                 }
             }
             $newList->add($booking);
