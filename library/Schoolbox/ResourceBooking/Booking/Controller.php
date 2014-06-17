@@ -490,7 +490,8 @@ class Controller extends Base {
         $booking
             ->setEvent($event)
             ->setResource($resource)
-            ->setStatus(Status\Model::STATUS_PENDING);
+            ->setStatus(Status\Model::STATUS_PENDING)
+			->setName($this->getRequest()->post['name'])
         ;
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
