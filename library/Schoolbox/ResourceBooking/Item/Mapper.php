@@ -331,6 +331,26 @@ class Mapper extends BaseMapper {
     }
 
     /**
+     * Gets count for a resource that matches a search term.
+     *
+     * @param  string $keyword
+     * @return int
+     */
+    public function searchCount($keyword) {
+        $query = "
+            SELECT COUNT(*)
+            FROM {$this->getTable()} `re`
+            WHERE
+              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+              AND {$this->getSoftDeleteFilterSql('re')}
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->execute();
+        return $statement->fetchColumn();
+    }
+
+    /**
      * Is the user a moderator of this item?
      *
      * @param  int $itemId

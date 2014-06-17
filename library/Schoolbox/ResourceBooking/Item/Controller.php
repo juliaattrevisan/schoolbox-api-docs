@@ -8,6 +8,8 @@
  */
 
 namespace Schoolbox\ResourceBooking\Item;
+
+use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -27,22 +29,52 @@ class Controller extends Base {
     protected $userMapper;
 
     /**
+     * @var IUrlPaginator
+     */
+    protected $paginator;
+
+    /**
      * Browses the list of items.
      */
     public function browse() {
 
-        // Get the list of categories
+        // Get the list of categories.
         $query  = array();
         $catId  = $this->getRequest()->query['category'];
         $search = trim($this->getRequest()->query['search']);
+        $page   = max(intval($this->getRequest()->query['page']), 1);
+
+        // Use the paginator to limit searches
+        $this->paginator->setUrl($this->request->url->get());
+        $list = array();
         if (strlen($search) > 0) {
-            $list = $this->getMapper()->search($search);
+            $total = $this->mapper->searchCount($search);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->getMapper()->search(
+                    $search,
+                    $this->paginator->getOffset($page),
+                    $this->paginator->getPageSize()
+                );
+            }
         }
         else {
             if ($catId) {
                 $query['resource_category_id'] = $catId;
             }
-            $list = $this->getMapper()->findByColumnList($query);
+
+            // Get count before running list
+            $total = $this->mapper->countByColumnList($query);
+            $this->paginator->setTotal($total);
+            if ($total > 0) {
+                $list = $this->mapper->findByColumnList(
+                    $query,
+                    array(
+                        'limit'  => $this->paginator->getPageSize(),
+                        'offset' => $this->paginator->getOffset($page),
+                    )
+                );
+            }
         }
 
         $this->getResponse()->content->set(
@@ -52,6 +84,8 @@ class Controller extends Base {
                     'list'         => $list,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'search'       => $search,
+                    'paginator'    => $this->paginator,
+                    'page'         => $page,
                 ),
             )
         );
@@ -300,6 +334,22 @@ class Controller extends Base {
      */
     public function getUserMapper() {
         return $this->userMapper;
+    }
+
+    /**
+     * @param  IUrlPaginator $paginator
+     * @return $this
+     */
+    public function setPaginator($paginator) {
+        $this->paginator = $paginator;
+        return $this;
+    }
+
+    /**
+     * @return IUrlPaginator
+     */
+    public function getPaginator() {
+        return $this->paginator;
     }
 
 }
