@@ -35,6 +35,7 @@ $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_
 $this->setBlock(TEMPLATE_content, 'has_change_event_status', 'has_change_event_status_block');
 $this->setBlock('has_change_event_status', 'event_status', 'event_status_block');
 $this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+$this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebooking_block');
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
@@ -155,6 +156,37 @@ foreach($event->getCampusCollection() as $currentCampus) {
 	));
 
 	$this->parse('event_campus_block', 'event_campus', true);
+}
+
+/* Resources
+ */
+$this->setVar(array(
+	'EVENT_RESOURCE_COUNT' => $event->getMetadata()->getResourceBookings()->count(),
+	'event_resourcebooking_block' => ''
+));
+
+if ($event->getMetadata()->getResourceBookings()->count()) {
+	$resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
+	$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+
+	foreach($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
+
+		/* TODO: Optimise this!
+		 */
+		$resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+		$resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
+
+		$this->setVar(array(
+			'EVENT_RESOURCEBOOKING_ID' => $resourceBooking->getId(),
+			'EVENT_RESOURCEBOOKING_NAME' => $resourceBooking->getName(),
+			'EVENT_RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
+			'EVENT_RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
+			'EVENT_RESOURCE_ID' => $resource->getId(),
+			'EVENT_RESOURCE_NAME' => $resource->getName()
+		));
+
+		$this->parse('event_resourcebooking_block', 'event_resourcebooking', true);
+	}
 }
 
 /* Activity Log

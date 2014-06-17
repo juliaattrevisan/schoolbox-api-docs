@@ -52,17 +52,6 @@
 			multiple: false
 		})
 
-		$j('#resourcebooking-suggest').selectizeSelector({
-			ajax: {
-				url:      '/ajax/resourcebooking.php',
-				type:     'GET',
-				data:     {userID: '{EVENT_AUTHOR_ID}'},
-				dataType: 'json'
-			},
-			value: {EVENT_RESOURCEBOOKING},
-			multiple: true
-		})
-
 		/* Confirmation when removing RAMS requirement
 		 */
 		$('[data-ramscheckbox="true"]').change(function(event) {
@@ -309,9 +298,15 @@
 					<em>Resources allocated to this event</em>
 				</td>
 				<td>
-					<select id="resourcebooking-suggest" name="resourcebooking[]" multiple></select>
+					<ul>
+						<!-- BEGIN resource -->
+						<li>
+							<a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
+						</li>
+						<!-- END resource -->
+					</ul>
 
-					<a href="/resource-booking/category" class="btn modify"><span></span>Manage Resource Bookings</a>
+					<a href="/modules/eotc/manage/resources/list/{EVENT_ID}" class="btn modify"><span></span>Manage Resource Bookings</a>
 				</td>
 			</tr>
 		</tbody>

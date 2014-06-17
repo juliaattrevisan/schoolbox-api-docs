@@ -188,9 +188,20 @@ $(document).ready(function() {
             data:     form.serializeArray(),
             dataType: 'json'
         }
-        var ajaxDone = function() {
+        var ajaxDone = function(data) {
+
+            /* Use a calling module's callback url, pass it booking ids
+             * that were just created for it
+             */
+            if (data.callbackUrl.length) {
+                var ids = data.item.join();
+
+                window.location.href = data.callbackUrl + '?ids=' + ids;
+            }
             // Go back to bookings list for this item
-            window.location.href = $('#resource-booking-back').attr('href')
+            else {
+                window.location.href = $('#resource-booking-back').attr('href');
+            }
         }
         var ajaxFail = function(jqXHR) {
             errors = jqXHR.responseJSON.errors
@@ -345,6 +356,7 @@ $(document).ready(function() {
       name="form" class="clearfix"
 >
     <input type="hidden" name="id" value="{{ item.id }}"/>
+    <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
     <table class="standardForm table">
         <tr>
             <td class="formLabelWidth"><h4>Rules</h4></td>
