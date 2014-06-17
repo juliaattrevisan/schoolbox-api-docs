@@ -15,7 +15,7 @@ $(function() {
 		event.preventDefault();
 
 		var id = $('#resourcebooking-suggest').val().pop();
-		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/booking/{EVENT_ID}';
+		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/bookingForm/{EVENT_ID}';
 
 		window.location.href = url;
 
@@ -87,7 +87,7 @@ $(function() {
 			</td>
 			<td>
 				<span class="actions one-button">
-					<a href="/modules/eotc/manage/resources/booking/delete/{RESOURCEBOOKING_ID}" class="btn no-text delete" alt="Remove Booking" title="Remove Booking"><span></span></a>
+					<a href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="btn no-text delete" alt="Remove Booking" title="Remove Booking"><span></span></a>
 				</span>
 			</td>
 		</tr>
