@@ -77,6 +77,13 @@ function shutdown_safely(Exception $e = null) {
                 }
             }
 
+            // Report to New Relic if not a RuntimeException
+            if (extension_loaded('newrelic')) {
+                if ($e instanceof Exception && !($e instanceof RuntimeException)) {
+                    newrelic_notice_error($e->getMessage(), get_class($e));
+                }
+            }
+
             // explain that something went cataclysmically wrong.
             $output =
                  "<p><b>$message $info</b></p>" .
