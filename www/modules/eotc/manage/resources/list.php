@@ -40,23 +40,30 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
 	$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
 
-	foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
+	if ($event->getMetadata()->getResourceBookings()->count()) {
+		foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
 
-		/* TODO: Optimise this!
-		 */
-		$resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
-		$resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
+			/* TODO: Optimise this!
+			 */
+			$resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+			$resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
 
+			$this->setVar(array(
+				'RESOURCEBOOKING_ID' => $resourceBooking->getId(),
+				'RESOURCEBOOKING_NAME' => $resourceBooking->getName(),
+				'RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
+				'RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
+				'RESOURCE_ID' => $resource->getId(),
+				'RESOURCE_NAME' => $resource->getName()
+			));
+
+			$this->parse('resourcebooking_block', 'resourcebooking', true);
+		}
+	}
+	else {
 		$this->setVar(array(
-			'RESOURCEBOOKING_ID' => $resourceBooking->getId(),
-			'RESOURCEBOOKING_NAME' => $resourceBooking->getName(),
-			'RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
-			'RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
-			'RESOURCE_ID' => $resource->getId(),
-			'RESOURCE_NAME' => $resource->getName()
+			'resourcebooking_block' => ''
 		));
-
-		$this->parse('resourcebooking_block', 'resourcebooking', true);
 	}
 }
 else {
