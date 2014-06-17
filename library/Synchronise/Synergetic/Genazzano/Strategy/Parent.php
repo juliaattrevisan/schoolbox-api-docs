@@ -15,15 +15,9 @@ class Synchronise_Synergetic_Genazzano_Strategy_Parent extends Synchronise_Base_
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
-            ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableEportfolio())
-            ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableLocalMail())
-            ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableWebmail())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
-            ->addSpouseHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableEportfolio())
-            ->addSpouseHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableLocalMail())
-            ->addSpouseHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_DisableWebmail())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
