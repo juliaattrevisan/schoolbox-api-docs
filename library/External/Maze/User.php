@@ -331,22 +331,15 @@ class External_Maze_User implements External_UserInterface {
 		$query = "
 			SELECT *
 			FROM KCY
-			WHERE KCYKEY = '{$student['SCHOOL_YEAR']}'
+			LEFT JOIN SF ON KCY.YEAR_COORD = SF.SFKEY
+			WHERE KCY.KCYKEY = '{$student['SCHOOL_YEAR']}'
 		";
 
-		$oneCoordinator = $this->getDb()->getRow($query);
+		$coordinator = $this->getDb()->getRow($query);
 
 		/* Find the actual name if he exists
 		 */
-		if ($oneCoordinator) {
-			$query = "
-				SELECT *
-				FROM SF
-				WHERE SFKEY = '{$oneCoordinator['YEAR_COORD']}'
-			";
-
-			$coordinator = $this->getDb()->getRow($query);
-
+		if ($coordinator) {
 			$student['StudentFormStaffName'] = $coordinator['FIRST_NAME'] . ' ' . $coordinator['SURNAME'];
 		}
 
@@ -355,22 +348,15 @@ class External_Maze_User implements External_UserInterface {
 		$query = "
 			SELECT *
 			FROM KCT
-			WHERE KCTKEY = '{$student['SCHOOL_YEAR']}'
+			LEFT JOIN SF ON KCT.SFLINK = SF.SFKEY
+			WHERE KCT.KCTKEY = '{$student['SCHOOL_YEAR']}'
 		";
 
-		$oneAdvisor = $this->getDb()->getRow($query);
+		$advisor = $this->getDb()->getRow($query);
 
 		/* Find the actual name if he exists
 		 */
-		if ($oneAdvisor) {
-			$query = "
-				SELECT *
-				FROM SF
-				WHERE SFKEY = '{$oneAdvisor['SFLINK']}'
-			";
-
-			$advisor = $this->getDb()->getRow($query);
-
+		if ($advisor) {
 			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
 		}
 
