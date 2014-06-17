@@ -164,52 +164,25 @@ class Controller extends Base {
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
+            // Get the base booking
+            // This method makes ONLY the base booking.
+            $bookingList = $this->createBaseBookingFromPostData($item);
 
-//            // Get the base booking
-//            $baseBooking = $this->createBookingFromPostData($item);
-//
-//            // Expand into related items
-//            if (!empty($this->request->post['related_item'])) {
-//                $baseBooking = $this->expandBookingForRelatedItems(
-//                    $baseBooking, $this->request->post['related_item']
-//                );
-//            }
-//
-//            // Expand into bookings for recurrence
-//            if (!empty($this->request->post['related_item'])) {
-//                $baseBooking = $this->expandBookingForRecurrence(
-//                    $baseBooking,
-//                    $this->getRequest()->post['repeat'],
-//                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
-//                    $this->getRequest()->post['timetable']['campus']
-//                );
-//            }
-//
-//            $this->bookingMapper->save($baseBooking);
+            // Expand into related items.
+            if (!empty($this->request->post['related_item'])) {
+                $bookingList = $this->expandBookingForRelatedItems(
+                    $bookingList, $this->request->post['related_item']
+                );
+            }
 
-            // Create the booking (or series of bookings) for the base item.
-            $bookingList = $this->createBookingFromPostData($item);
-
-            // Create the related bookings:
-            // one for each combination of related item and booking in series.
-            $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
-            if (!empty($relatedSelections)) {
-                $relatedBookingList = new Collection();
-                foreach ($item->getRelatedResourceList() as $relatedResource) {
-                    if (in_array($relatedResource->getId(), $relatedSelections)) {
-                        foreach ($bookingList as $booking) {
-                            // Related bookings share same event as base booking.
-                            $relatedBooking = $this->getBookingFromEvent(
-                                $relatedResource,
-                                $booking->getEvent()
-                            );
-                            $relatedBooking->setName($this->request->post['name']);
-                            $relatedBooking->addRelatedBooking($booking);
-                            $relatedBookingList->add($relatedBooking);
-                        }
-                    }
-                }
-                $this->getBookingMapper()->save($relatedBookingList);
+            // Expand into bookings for recurrence
+            if (!empty($this->request->post['related_item'])) {
+                $bookingList = $this->expandBookingForRecurrence(
+                    $bookingList,
+                    $this->getRequest()->post['repeat'],
+                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+                    $this->getRequest()->post['timetable']['campus']
+                );
             }
         }
         else {
@@ -247,6 +220,141 @@ class Controller extends Base {
             // (let's have a better interface than backToTheFuture too)
             $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
         }
+    }
+
+    /**
+     * Helper for creating base booking.
+     *
+     * The booking will be saved as part of this step.
+     *
+     * @param  Item\Model $resource
+     * @return Collection|Model[] A collection of bookings that were created.
+     *                            Only one will be created unless it was a
+     *                            recurring booking.
+     */
+    protected function createBaseBookingFromPostData(Item\Model $resource) {
+        // Create the base event from post data
+        $event = $this->getEventFromPostData(
+            $resource,
+            $this->getDateFromForm('start_datetime'),
+            $this->getDateFromForm('end_datetime'),
+            $this->getRequest()->post['notes']
+        );
+        $this->eventMapper->save($event);
+        $booking = $this->getBookingFromEvent($resource, $event);
+        $booking->setName($this->request->post['name']);
+        $bookingList = new Collection();
+        $bookingList->add($booking);
+        $this->bookingMapper->save($bookingList);
+        return $bookingList;
+    }
+
+    /**
+     * Expands each item in a list of bookings into a set of bookings for
+     * related items.
+     *
+     * The bookings are saved after this step.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param array              $relatedItems
+     *
+     * @return Collection
+     */
+    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems) {
+        if (empty($relatedItems)) {
+            return $bookingList;
+        }
+        $newList = new Collection();
+        foreach ($bookingList as $booking) {
+            foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+                if (in_array($relatedResource->getId(), $relatedItems)) {
+                    $relatedBooking = $this->getBookingFromEvent(
+                        $relatedResource,
+                        $booking->getEvent()
+                    );
+                    // Add related booking relation in both directions
+                    $booking->addRelatedBooking($relatedBooking);
+                    $relatedBooking->addRelatedBooking($booking);
+                    $bookingList->add($relatedBooking);
+                }
+            }
+            $newList->add($booking);
+        }
+        $this->bookingMapper->save($newList);
+        return $newList;
+    }
+
+    /**
+     * Expands each item in a list of bookings into a series of bookings.
+     *
+     * The events that are created are saved.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param string             $recurrenceRule
+     * @param DateTime           $repeatUntil
+     * @param int                $campus
+     *
+     * @return Collection
+     */
+    protected function expandBookingForRecurrence(
+        Collection $bookingList,
+        $recurrenceRule,
+        DateTime $repeatUntil,
+        $campus
+    ) {
+        $newList = new Collection();
+        foreach ($bookingList as $booking) {
+            $newList->add($booking);
+            $event = $booking->getEvent();
+            $eventList = new Collection();
+            switch ($recurrenceRule) {
+                case 'daily':
+                case 'weekly':
+                case 'fortnightly':
+                case 'monthly':
+                    if ($repeatUntil instanceof DateTime) {
+                        $this->eventRecurrenceMapper->save(
+                            $event,
+                            'series',
+                            $recurrenceRule,
+                            new Alaress_Date_Format($repeatUntil),
+                            new Alaress_Date_Format($event->getStartDateTime()),
+                            new Alaress_Date_Format($event->getEndDateTime())
+                        );
+                        // Create a whole set of bookings based on this event.
+                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
+                    }
+                    break;
+                case 'timetable':
+                    if ($repeatUntil instanceof DateTime) {
+                        $period = new \External_TimetableDatePeriod(
+                            $event->getStartDateTime()->getDateTimeObject(),
+                            $repeatUntil->modify('+1 day'),
+                            $this->getExternalTimetableHandler(),
+                            $campus
+                        );
+                        $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
+                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // Add a booking for each recurring event that was created.
+            if (count($eventList)) {
+                foreach ($eventList as $event) {
+                    $newBooking = clone $booking;
+                    $newBooking->setEvent($event);
+                    $newList->add($newBooking);
+                }
+            }
+        }
+        return $newList;
     }
 
     /**
@@ -558,9 +666,7 @@ class Controller extends Base {
         /** @var Collection|Model[] $bookingList */
         $bookingList = new Collection();
         foreach ($eventList as $event) {
-            $booking = $this->getBookingFromEvent($resource, $event);
-            $booking->setName($this->request->post['name']);
-            $bookingList->add($booking);
+            $bookingList->add($this->getBookingFromEvent($resource, $event));
         }
         $this->getBookingMapper()->save($bookingList);
         return $bookingList;
@@ -869,7 +975,6 @@ class Controller extends Base {
                         $relatedResource,
                         $item->getEvent()
                     );
-                    $relatedBooking->setName($this->request->post['name']);
                     // Ensure that the base and related booking are related.
                     $insertedBookingList->add($relatedBooking);
                 }
