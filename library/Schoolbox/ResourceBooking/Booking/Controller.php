@@ -556,20 +556,6 @@ class Controller extends Base {
     }
 
     /**
-     * Currently event datetimes aren't loaded - this method does that.
-     *
-     * @param Calendar\Event $event
-     */
-    protected function loadDateTimesIntoEvent(Calendar\Event $event) {
-        $event->setStartDateTime(new Alaress_Date_Format(
-            new DateTime($event->getStartDate().' '.$event->getStartTime())
-        ));
-        $event->setEndDateTime(new Alaress_Date_Format(
-            new DateTime($event->getEndDate().' '.$event->getEndTime())
-        ));
-    }
-
-    /**
      * Stub for edit action.
      *
      * @param Model $item
@@ -578,7 +564,6 @@ class Controller extends Base {
         $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         // Set start and end date
         $event = $item->getEvent();
-        $this->loadDateTimesIntoEvent($event);
         // Show event's recurrence
         $recurrence = array();
         if ($event->getSeriesId()) {
@@ -611,7 +596,6 @@ class Controller extends Base {
             // Have the date and time changed?
             // If so, set the date and time for each event, and invalidate
             // each event.
-            $this->loadDateTimesIntoEvent($item->getEvent());
             $startDate  = $this->getDateFromForm('start_datetime');
             $endDate    = $this->getDateFromForm('end_datetime');
             $startDelta = Interval::createFromDateTimeDifference(
@@ -621,7 +605,7 @@ class Controller extends Base {
                 $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
             );
             $notes = $this->getRequest()->post['notes'];
-			$name = $this->getRequest()->post['name'];
+			$name  = $this->getRequest()->post['name'];
 
             // Update this item.
             $this->updateBookingFromPostData($item, $startDelta, $endDelta, $notes, $name);
@@ -638,7 +622,6 @@ class Controller extends Base {
                 // update all of these, too
                 foreach ($series as $seriesBooking) {
                     $seriesEvent = $seriesBooking->getEvent();
-                    $this->loadDateTimesIntoEvent($seriesEvent);
                     // Don't adjust any items that have already started.
                     // It's too late for that!
                     if ($seriesEvent->getStartDateTime() < new DateTime()) {
@@ -811,7 +794,6 @@ class Controller extends Base {
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
         $event = $item->getEvent();
-        $this->loadDateTimesIntoEvent($event);
 
         // Adjust the current item.
         if ($isTimeChanged) {
