@@ -369,6 +369,33 @@ class External_Maze_User implements External_UserInterface {
 			$student['StudentTutorDescription'] = $homeroom['DESCRIPTION'];
 		}
 
+		/* Find one or more homeroom teachers and condense them
+		 */
+		$query = "
+			SELECT
+				SF.FIRST_NAME AS FIRSTNAME,
+				SF.SURNAME
+			FROM KGC
+			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY OR KGC.TEACHERB = SF.SFKEY
+			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
+		";
+
+		$allHomeroomTeachers = $this->getDb()->getAll($query);
+
+		if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
+			$processed = array();
+
+			foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
+				$processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
+			}
+
+			/* Uniques only
+			 */
+			$processed = array_values(array_unique($processed));
+
+			$student['StudentHeadOfHouse'] = implode(', ', $processed);
+		}
+
 		return $student;
 	}
 
