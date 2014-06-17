@@ -441,6 +441,7 @@ class Controller extends Base {
                         $relatedResource,
                         $booking->getEvent()
                     );
+                    $relatedBooking->setName($booking->getName());
                     // Add related booking relation in both directions
                     $booking->addRelatedBooking($relatedBooking);
                     $relatedBooking->addRelatedBooking($booking);
