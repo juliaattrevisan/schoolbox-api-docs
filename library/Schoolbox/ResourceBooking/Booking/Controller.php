@@ -168,13 +168,6 @@ class Controller extends Base {
             // This method makes ONLY the base booking.
             $bookingList = $this->createBaseBookingFromPostData($item);
 
-            // Expand into related items.
-            if (!empty($this->request->post['related_item'])) {
-                $bookingList = $this->expandBookingForRelatedItems(
-                    $bookingList, $this->request->post['related_item']
-                );
-            }
-
             // Expand into bookings for recurrence
             if (!empty($this->request->post['related_item'])) {
                 $bookingList = $this->expandBookingForRecurrence(
@@ -182,6 +175,13 @@ class Controller extends Base {
                     $this->getRequest()->post['repeat'],
                     DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
                     $this->getRequest()->post['timetable']['campus']
+                );
+            }
+
+            // Expand into related items.
+            if (!empty($this->request->post['related_item'])) {
+                $bookingList = $this->expandBookingForRelatedItems(
+                    $bookingList, $this->request->post['related_item']
                 );
             }
         }
