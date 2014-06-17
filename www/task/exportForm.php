@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 
 $sitePage = new SitePage();
 
@@ -85,6 +86,16 @@ foreach ($classWithUnitList as $classWithUnit) {
             }
             catch (Exception $e) {
                 // Run the import
+                // First import rubrics for both the course and unit that is
+                // being imported.
+                CriterionMapper::getInstance()->copyFromCategory(
+                    $category->getParent()->getId(),
+                    $unit->getCategory()->getId()
+                );
+                CriterionMapper::getInstance()->copyFromCategory(
+                    $category->getId(),
+                    $unit->getCategory()->getId()
+                );
                 UnitInstanceMapper::getInstance()->saveTaskIntoUnitInstance(
                     $unit,
                     $task,
