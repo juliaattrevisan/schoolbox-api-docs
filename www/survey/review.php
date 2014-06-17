@@ -81,6 +81,9 @@ if ($attempt['reviewed_at'] != '') {
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'survey/review.html');
+$this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
+$this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -106,8 +109,29 @@ $this->setVar(
         'ATTEMPT_USERNAME' => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
         'ATTEMPT_START_DATETIME' => $start->getShort(),
         'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
+        'attemptFinished_block' => '',
+        'attemptNotYetFinished_block' => '',
+        'attemptUnfinished_block' => '',
     )
 );
+
+// Parse finished/unfinished/not finished yet blockage
+// Finished: $attempt.finish is set to something other that 0000-00-etc
+// Otherwise:
+// not yet finished if survey is open, unfinished if closed
+if (!isset($attempt['finish']) || $attempt['finish'] === '0000-00-00 00:00:00') {
+    $close = new DateTime($assess['finish']);
+    if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
+        $this->parse('attemptUnfinished_block', 'attemptUnfinished');
+    }
+    else {
+        $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
+    }
+}
+else {
+    $this->parse('attemptFinished_block', 'attemptFinished');
+}
+
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
