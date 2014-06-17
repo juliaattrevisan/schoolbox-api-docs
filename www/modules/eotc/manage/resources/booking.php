@@ -24,7 +24,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$bookingMapper->delete($booking);
 
-		$this->backToTheFuture(2);
+		$this->backToTheFuture(1);
 	}
 	/* Create a new set of bookings for this event
 	 */
