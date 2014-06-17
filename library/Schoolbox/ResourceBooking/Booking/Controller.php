@@ -394,7 +394,7 @@ class Controller extends Base {
     /**
      * Helper for creating base booking.
      *
-     * The booking will be saved as part of this step.
+     * The booking will not be saved as part of this step.
      *
      * @param  Item\Model $resource
      * @return Collection|Model[] A collection of bookings that were created.
@@ -409,12 +409,10 @@ class Controller extends Base {
             $this->getDateFromForm('end_datetime'),
             $this->getRequest()->post['notes']
         );
-        $this->eventMapper->save($event);
         $booking = $this->getBookingFromEvent($resource, $event);
         $booking->setName($this->request->post['name']);
         $bookingList = new Collection();
         $bookingList->add($booking);
-        $this->bookingMapper->save($bookingList);
         return $bookingList;
     }
 
