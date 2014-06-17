@@ -18,6 +18,21 @@
             }
         },
         {
+            "type": "package",
+            "package": {
+                "name": "gggeek/phpxmlrpc",
+                "version": "0.1.0",
+                "source": {
+                    "url": "https://github.com/gggeek/phpxmlrpc",
+                    "type": "git",
+                    "reference": "f9dbab373a5ed33f7246daf2865ea2e2231a362e"
+                },
+                "autoload": {
+                    "classmap": ["lib/"]
+                }
+            }
+        },
+        {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
         },
@@ -27,7 +42,7 @@
         }
     ],
     "require": {
-		"phpxmlrpc/phpxmlrpc": "dev-php53",
+        "gggeek/phpxmlrpc": "0.1.0",
         "zendframework/zend-http": "2.2.*",
         "zendframework/zend-log": "2.2.*",
         "sabre/dav": "~1.8.7",
