@@ -106,8 +106,8 @@ Scenario: Manage resources
   And  I select "Jenifer Shadbolt" from autocomplete "moderator_id[]"
   And  I fill in autocomplete "moderator_id[]" with "Lovejoy"
   And  I select "Peter Lovejoy" from autocomplete "moderator_id[]"
-  And  I fill in autocomplete "moderator_id[]" with "Scott"
-  And  I select "Scott Berryhill" from autocomplete "moderator_id[]"
+  And  I fill in autocomplete "moderator_id[]" with "Ryan"
+  And  I select "Ryan Vollmer" from autocomplete "moderator_id[]"
   And  I press "resource-save"
   Then I should see "A single projector" in the ".resource-list" element
   And  I should see "English textbook" in the ".resource-list" element
@@ -119,7 +119,7 @@ Scenario: Manage resources
   And   I fill in wysiwyg "description" with "A projector made of gold"
   And   I select "Projectors" from "resource_category_id"
   And   I select "Managed" from "resource_moderation_type_id"
-  And   I remove "Scott Berryhill" from autocomplete "moderator_id[]"
+  And   I remove "Ryan Vollmer" from autocomplete "moderator_id[]"
   And   I press "resource-save"
   Then  I should see "A single projector" in the ".resource-list" element
   And   I should see "English textbook" in the ".resource-list" element
@@ -127,7 +127,7 @@ Scenario: Manage resources
   And   I should not see "The special projector" in the ".resource-list" element
   # Check its users
   When  I edit resource "The good projector"
-  Then  the autocomplete "moderator_id[]" should not contain "Scott Berryhill"
+  Then  the autocomplete "moderator_id[]" should not contain "Ryan Vollmer"
   And   the autocomplete "moderator_id[]" should contain "Jenifer Shadbolt"
   And   the autocomplete "moderator_id[]" should contain "Peter Lovejoy"
   # Delete a resource

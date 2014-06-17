@@ -50,6 +50,20 @@ class FeatureContext extends BaseContext {
     }
 
     /**
+     * Disables animation before a test step.
+     *
+     * @beforeStep
+     */
+    public function disableAnimationBeforeStep(Behat\Behat\Event\StepEvent $event) {
+        try {
+            $this->disableAnimation();
+        }
+        catch (Exception $e) {
+            // jQuery wasn't present, most likely. Forget I ever saw anything.
+        }
+    }
+
+    /**
      * Takes a screenshot and content dump of the error if the test failed.
      *
      * Now ignores UndefinedException and PendingException, as these aren't
