@@ -293,6 +293,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
+				ST.ROLL_GROUP,
 				ST.SCHOOL_YEAR,
 				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
@@ -351,6 +352,21 @@ class External_Maze_User implements External_UserInterface {
 
 		if ($advisor) {
 			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
+		}
+
+		/* Find the Homeroom
+		 */
+		$query = "
+			SELECT *
+			FROM KGC
+			LEFT JOIN ST ON KGC.ROLL_GROUP = ST.ROLL_GROUP
+			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
+		";
+
+		$homeroom = $this->getDb()->getRow($query);
+
+		if ($homeroom) {
+			$student['StudentTutorDescription'] = $homeroom['DESCRIPTION'];
 		}
 
 		return $student;
