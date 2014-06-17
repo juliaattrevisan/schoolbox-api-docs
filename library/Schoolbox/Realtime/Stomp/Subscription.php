@@ -61,6 +61,8 @@ class Subscription {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
 
+				$pipeManager->v("Received message to push to user $userId", '+');
+
 				if($pipeManager->onAMQP($self->frame2amqp($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
@@ -140,10 +142,10 @@ class Subscription {
 					$stompMessage->ack();
 					$success[$msgId] = true;
 				}
-				else {
-					$this->pipeManager->v("Attempting NACK of $msgId");
-					$stompMessage->nack();
-				}
+//				else {
+//					$this->pipeManager->v("Attempting NACK of $msgId");
+//					$stompMessage->nack();
+//				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd

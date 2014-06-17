@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use RuntimeException;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use SplQueue;
@@ -49,14 +50,20 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
 	public function buildQueue() {
 		$queue = new SplQueue();
 
-		/** @var QueueItem[] $qiColl */
-		$qiColl = $this->mapper->findAll();
+		try {
+			/** @var QueueItem[] $qiColl */
+			$qiColl = $this->mapper->findAll();
 
-		foreach($qiColl as $qi) {
-			$identifier = $qi->getIdentifier();
-			$command = $qi->getCommand();
-			$data = $qi->getData();
-			$queue->enqueue(array($identifier, $command, $data));
+			foreach($qiColl as $qi) {
+				$identifier = $qi->getIdentifier();
+				$command = $qi->getCommand();
+				$data = $qi->getData();
+				$queue->enqueue(array($identifier, $command, $data));
+			}
+		}
+		catch(RuntimeException $e) {
+			// could not unserialize the queue data, can't recover it
+			$this->mapper->truncate();
 		}
 
 		return $queue;
