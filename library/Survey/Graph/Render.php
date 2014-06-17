@@ -74,7 +74,10 @@ class Survey_Graph_Render {
 			}
 
 			$this->getPage()->setVar(array(
-				'GRAPH_ID' => 'surveyQuestion_' . md5($currentQuestion['question']),
+				'GRAPH_ID' => 'surveyQuestion_'
+					. intval($currentQuestion['question_id'])
+					. '_'
+					. md5($currentQuestion['question']),
 			));
 		}
 		else {
