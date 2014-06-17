@@ -187,7 +187,8 @@ class Controller extends Base {
             // Expand into related items.
             if (!empty($this->request->post['related_item'])) {
                 $bookingList = $this->expandBookingForRelatedItems(
-                    $bookingList, $this->request->post['related_item']
+                    $bookingList,
+                    $this->request->post['related_item'] ?: array()
                 );
             }
         }
