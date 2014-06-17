@@ -325,9 +325,6 @@ class External_Maze_User implements External_UserInterface {
 
 		/* Find coordinator
 		 */
-
-		/* Take the ST.SCHOOL_YEAR value to discover the Year Coordinator
-		 */
 		$query = "
 			SELECT *
 			FROM KCY
@@ -337,8 +334,6 @@ class External_Maze_User implements External_UserInterface {
 
 		$coordinator = $this->getDb()->getRow($query);
 
-		/* Find the actual name if he exists
-		 */
 		if ($coordinator) {
 			$student['StudentFormStaffName'] = $coordinator['FIRST_NAME'] . ' ' . $coordinator['SURNAME'];
 		}
@@ -354,8 +349,6 @@ class External_Maze_User implements External_UserInterface {
 
 		$advisor = $this->getDb()->getRow($query);
 
-		/* Find the actual name if he exists
-		 */
 		if ($advisor) {
 			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
 		}
