@@ -21,4 +21,4 @@ $key = md5($hash);
 
 $destination = "{$url}/?id={$userId}&key={$key}";
 
-header($url, false, 301);
+header('Location:'.$url, false, 301);
