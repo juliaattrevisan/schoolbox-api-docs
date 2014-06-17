@@ -272,6 +272,7 @@ class Controller extends Base {
                 $event->setCampusCollection(new Collection());
 
                 // Adjust the current event, if its time changed.
+                // If times changed, the event's status will need to change.
                 if ($isTimeChanged) {
                     $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
                         $startDelta->getAsDateInterval()
@@ -290,37 +291,54 @@ class Controller extends Base {
                 $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
                 foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
 
-                    $existingBooking = null;
+                    $relatedBooking = null;
                     foreach ($existingRelatedBookings as $existing) {
                         if ($existing->getResource()->getId() == $relatedResource->getId()) {
-                            $existingBooking = $existing;
+                            $relatedBooking = $existing;
                             break;
                         }
                     }
-                    $inNew = in_array($relatedResource->getId(), $this->request->post['related_item']);
+                    $inNew = in_array(
+                        $relatedResource->getId(),
+                        $this->request->post['related_item'] ?: array()
+                    );
 
                     if ($inNew) {
-                        if ($existingBooking instanceof Model) {
+                        if ($relatedBooking instanceof Model) {
                             // update
-                            $this->bookingMapper->save($existingBooking);
-                            $bookingList->add($existingBooking);
+
+                            // Has the booking time changed?
+                            // That invalidates existing bookings
+                            if ($isTimeChanged) {
+                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+                            }
                         }
                         else {
                             // create
-                            $newBooking = new Model();
-                            $newBooking
+                            $relatedBooking = new Model();
+                            $relatedBooking
                                 ->setEvent($event)
                                 ->setResource($relatedResource)
                                 ->setStatus(Status\Model::STATUS_PENDING);
-                            $newBooking->addRelatedBooking($booking);
-                            $booking->addRelatedBooking($newBooking);
-                            $this->bookingMapper->save($newBooking);
-                            $bookingList->add($newBooking);
                         }
+
+                        // Open resource: automatically confirm
+                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+                        }
+
+                        // Status:
+                        // pending if new, or time was changed
+                        $relatedBooking
+                            ->setName($this->request->post['name'])
+                            ->addRelatedBooking($booking);
+                        $booking->addRelatedBooking($relatedBooking);
+                        $this->bookingMapper->save($relatedBooking);
+                        $bookingList->add($relatedBooking);
                     }
-                    elseif ($existingBooking instanceof Model) {
+                    elseif ($relatedBooking instanceof Model) {
                         // delete
-                        $this->bookingMapper->delete($existingBooking);
+                        $this->bookingMapper->delete($relatedBooking);
                     }
                 }
 
