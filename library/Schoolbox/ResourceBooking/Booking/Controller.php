@@ -169,7 +169,7 @@ class Controller extends Base {
             $bookingList = $this->createBaseBookingFromPostData($item);
 
             // Expand into bookings for recurrence
-            if (!empty($this->request->post['related_item'])) {
+            if (!empty($this->request->post['repeat'])) {
                 $bookingList = $this->expandBookingForRecurrence(
                     $bookingList,
                     $this->getRequest()->post['repeat'],
