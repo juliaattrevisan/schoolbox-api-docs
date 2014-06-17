@@ -177,6 +177,12 @@ class Controller extends Base {
                     $this->getRequest()->post['timetable']['campus']
                 );
             }
+            else {
+                // Just save the event by itself.
+                foreach ($bookingList as $booking) {
+                    $this->eventMapper->save($booking->getEvent());
+                }
+            }
 
             // Expand into related items.
             if (!empty($this->request->post['related_item'])) {
