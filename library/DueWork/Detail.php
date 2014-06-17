@@ -283,25 +283,43 @@ class DueWork_Detail {
 
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
-                        if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
-	                        if(!is_null($submission['plag_deleted'])) {
-		                        $page->parse('plag_deleted_block', 'plag_deleted');
-		                        $page->setVar('plag_enabled_block', '');
-	                        }
-	                        else {
-		                        $page->parse('plag_enabled_block', 'plag_enabled');
-	                        }
-                        } // is this even a plagiarism document?
-                        elseif (!$submission['plag_doc_id']) {
+
+	                    // if it's deleted (pre- or post-completion) treat it as such
+	                    if(!is_null($submission['plag_deleted'])) {
+		                    $page->setVar('plag_enabled_block', '');
+
+							// do we have a number we can output for a score?
+		                    if($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+			                    $page->parse('plag_deleted_block', 'plag_deleted');
+		                    }
+
+		                    // no value returned, hide it
+		                    else {
+			                    $page->setVar('plag_deleted_block', '');
+		                    }
+	                    }
+
+	                    // not deleted? ok, is it completed?
+	                    elseif($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+	                        $page->parse('plag_enabled_block', 'plag_enabled');
+                        }
+
+                        // not complete? is this even a plagiarism document?
+                        elseif(!$submission['plag_doc_id']) {
                             $page->setVar('plag_enabled_block', '');
-                        } // is being checked, but is still pending, so tell the user
+                        }
+
+                        // it's a plag doc, but is being checked and still pending, so tell the user
                         else {
                             $page->setVar(
                                 'plag_enabled_block',
                                 '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
                             );
                         }
-                    } else {
+                    }
+
+                    // plagscan disabled, clear the indicator
+                    else {
                         $page->setVar('plag_enabled_block', '');
                     }
 
