@@ -50,7 +50,7 @@ $(function() {
 <div class="clearfix"></div>
 
 <h2>Current Resource Bookings</h2>
-<table class="table">
+<table class="table ruler">
 	<thead>
 		<tr>
 			<th>
@@ -86,7 +86,9 @@ $(function() {
 				{RESOURCEBOOKING_END}
 			</td>
 			<td>
-				<a href="/modules/eotc/manage/resources/booking/delete/{RESOURCEBOOKING_ID}">Remove</a>
+				<span class="actions one-button">
+					<a href="/modules/eotc/manage/resources/booking/delete/{RESOURCEBOOKING_ID}" class="btn no-text delete" alt="Remove Booking" title="Remove Booking"><span></span></a>
+				</span>
 			</td>
 		</tr>
 		<!-- END resourcebooking -->
