@@ -60,6 +60,7 @@ class External_Maze_Class implements External_ClassInterface {
 			WHERE SU.SUKEY = '{$ingredients['ClassCode']}'
 			AND STMA.CLASS = '{$ingredients['ClassNumber']}'
 			AND TTPERIOD = '{$ttPeriod}'
+			AND ST.STATUS != 'LEFT'
 		";
 
 		$part1 = $this->getDb()->getAll($query);
@@ -82,6 +83,7 @@ class External_Maze_Class implements External_ClassInterface {
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			AND ST.STATUS != 'LEFT'
 		";
 
 		$part2 = $this->getDb()->getAll($query);
