@@ -29,6 +29,12 @@ use UnexpectedValueException;
  */
 class Pool extends EventEmitter {
 
+	const DATA_IN   = 0;
+	const DEBUG_OUT = 1;
+	const DEBUG_ERR = 2;
+	const DATA_OUT  = 3;
+
+
 	/** @var LoopInterface */
 	protected $loop;
 
@@ -43,6 +49,9 @@ class Pool extends EventEmitter {
 
 	/** @var SplObjectStorage */
 	protected $logstreams;
+
+	/** @var SplObjectStorage */
+	protected $errstreams;
 
 	/** @var Debug */
 	protected $debug;
@@ -60,6 +69,7 @@ class Pool extends EventEmitter {
 		$this->workers = $this->poolingStrat->newWorkerBundle();
 		$this->datastreams = new SplObjectStorage();
 		$this->logstreams = new SplObjectStorage();
+		$this->errstreams = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
 		$this->debug = $debug;
 	}
@@ -112,9 +122,10 @@ class Pool extends EventEmitter {
 		$cmd = $this->poolingStrat->getCommand();
 
 		$descriptorSpec = array(
-			0 => array("pipe", "r"), // stdin is a pipe that the child will read from
-			1 => array("pipe", "w"), // stdout is a pipe that the child will write to
-			2 => array("pipe", "w")  // stderr is a pipe that the child will write to
+			self::DATA_IN   => array("pipe", "r"), // stdin     is a pipe that the child will read from
+			self::DATA_OUT  => array("pipe", "w"), // stream(3) is a pipe that the child will write to
+			self::DEBUG_OUT => array("pipe", "w"), // stdout    is a pipe that the child will write to
+			self::DEBUG_ERR => array("pipe", "w")  // stderr    is a pipe that the child will write to
 		);
 
 		if(!($pp = proc_open($cmd, $descriptorSpec, $pipes))) {
@@ -137,18 +148,24 @@ class Pool extends EventEmitter {
 
 		$this->workers->get($pid)->attachDebug($this->debug);
 
-		// listen to worker's STDOUT for data
-		$datastream = new Stream($pipes[1], $this->loop);
+		// listen to worker's output stream for data
+		$datastream = new Stream($pipes[self::DATA_OUT], $this->loop);
 		$datastream->on('data',  array($this, 'onData'));
 		$datastream->on('close', array($this, 'onClose'));
 
 		$this->datastreams->attach($datastream, $pid);
 
-		// listen to worker's STDERR for logging
-		$logstream = new Stream($pipes[2], $this->loop);
+		// listen to worker's debug output stream for general debugging
+		$logstream = new Stream($pipes[self::DEBUG_OUT], $this->loop);
 		$logstream->on('data', array($this, 'onLog'));
 
 		$this->logstreams->attach($logstream, $pid);
+
+		// listen to worker's debug error stream for critical errors
+		$errstream = new Stream($pipes[self::DEBUG_ERR], $this->loop);
+		$errstream->on('data', array($this, 'onError'));
+
+		$this->errstreams->attach($errstream, $pid);
 
 		return $pid;
 
@@ -266,10 +283,27 @@ class Pool extends EventEmitter {
 			$pid = $this->datastreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
-			$this->debug->v("$data");
+			$this->debug->v("$data",'w');
 			return;
 		}
-		$this->debug->v("{$pid} $data");
+		$this->debug->v("{{$pid}}$data",'w');
+	}
+
+
+	/**
+	 * Push all worker logging to the daemon's error log
+	 * @param $data
+	 * @param $stream
+	 */
+	public function onError($data, $stream) {
+		try {
+			$pid = $this->errstreams->offsetGet($stream);
+		}
+		catch(UnexpectedValueException $e) {
+			$this->debug->v("$data", '!');
+			return;
+		}
+		$this->debug->v("{{$pid}}$data", '!');
 	}
 
 
