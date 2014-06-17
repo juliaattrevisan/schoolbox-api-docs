@@ -164,9 +164,19 @@ class Controller extends Base {
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
-            // Get the base booking
-            // This method makes ONLY the base booking.
-            $bookingList = $this->createBaseBookingFromPostData($item);
+
+            // Get the event that all bookings are based off of.
+            $event = $this->getBaseEvent();
+            $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
+            $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
+            $event->setNote("Booking: ".$item->getName());
+            $event->setDetail($this->getRequest()->post['notes']);
+
+            // Build the booking
+            $booking = $this->getBookingFromEvent($item, $event);
+            $booking->setName($this->request->post['name']);
+            $bookingList = new Collection();
+            $bookingList->add($booking);
 
             // Expand into bookings for recurrence
             if (!empty($this->request->post['repeat'])) {
@@ -254,7 +264,8 @@ class Controller extends Base {
                 $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
             );
             $isTimeChanged =
-                $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+                $startDelta->getSecondTotal() !== 0
+                || $endDelta->getSecondTotal() !== 0;
 
             /** @var Collection|Model[] $series */
             if ($this->request->post['efficacy'] === 'series') {
@@ -389,31 +400,6 @@ class Controller extends Base {
             // Consider storing redirect URL in form or GET?
 			$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
         }
-    }
-
-    /**
-     * Helper for creating base booking.
-     *
-     * The booking will not be saved as part of this step.
-     *
-     * @param  Item\Model $resource
-     * @return Collection|Model[] A collection of bookings that were created.
-     *                            Only one will be created unless it was a
-     *                            recurring booking.
-     */
-    protected function createBaseBookingFromPostData(Item\Model $resource) {
-        // Create the base event from post data before creating the booking.
-        $event = $this->getEventFromPostData(
-            $resource,
-            $this->getDateFromForm('start_datetime'),
-            $this->getDateFromForm('end_datetime'),
-            $this->getRequest()->post['notes']
-        );
-        $booking = $this->getBookingFromEvent($resource, $event);
-        $booking->setName($this->request->post['name']);
-        $bookingList = new Collection();
-        $bookingList->add($booking);
-        return $bookingList;
     }
 
     /**
@@ -680,20 +666,9 @@ class Controller extends Base {
     /**
      * Helper for creating events for resource bookings.
      *
-     * Creates an event based on the resource, start and end date and notes.
-     *
-     * @param  Item\Model $resource
-     * @param  DateTime   $startDate
-     * @param  DateTime   $endDate
-     * @param  string     $notes
      * @return Calendar\Event
      */
-    protected function getEventFromPostData(
-        Item\Model $resource,
-        DateTime $startDate,
-        DateTime $endDate,
-        $notes
-    ) {
+    protected function getBaseEvent() {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
@@ -715,11 +690,7 @@ class Controller extends Base {
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());
 
-        $event->setStartDateTime(new Alaress_Date_Format($startDate));
-        $event->setEndDateTime(new Alaress_Date_Format($endDate));
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
-        $event->setNote("Booking: ".$resource->getName());
-        $event->setDetail($notes);
         return $event;
     }
 
