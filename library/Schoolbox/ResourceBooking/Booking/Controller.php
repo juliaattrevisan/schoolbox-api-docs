@@ -270,7 +270,7 @@ class Controller extends Base {
             }
             $series->add($item);
 
-
+            // Save the whole series
             $bookingList = new Collection();
             foreach ($series as $booking) {
                 $event = $booking->getEvent();
@@ -290,9 +290,11 @@ class Controller extends Base {
                     );
                     $event->setEndDateTime(new Alaress_Date_Format($newEnd));
                 }
+                $event->setDetail($this->request->post['notes']);
                 $this->eventMapper->save($event);
 
                 // Adjust $booking
+                $booking->setName($this->request->post['name']);
 
                 // Get all the related bookings for this event at this time.
                 $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
