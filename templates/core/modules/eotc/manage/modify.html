@@ -298,7 +298,14 @@
 					<em>Resources allocated to this event</em>
 				</td>
 				<td>
-					{EVENT_TOTAL_BOOKINGS}
+					<ul>
+						<!-- BEGIN resource -->
+						<li>
+							<a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
+						</li>
+						<!-- END resource -->
+					</ul>
+
 					<a href="/modules/eotc/manage/resources/list/{EVENT_ID}" class="btn modify"><span></span>Manage Resource Bookings</a>
 				</td>
 			</tr>

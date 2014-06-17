@@ -24,6 +24,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
 	$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 	$page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
+	$page->setBlock('can_add_resources', 'resource', 'resource_block');
 
 	/* Modify existing event
 	 */
@@ -103,7 +104,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$groupHandler = new Group();
 
 		$page->setVar(array(
-			'EVENT_TOTAL_BOOKINGS' => $event->getMetadata()->getResourceBookings()->count(),
 			'EVENT_RAMS_FILE' => $filename,
 			'EVENT_CURRENT_STUDENTS' => $event->getMetadata()->getStudentAttendees()->count(),
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
@@ -151,6 +151,33 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
 			$page->parse('recurring_reminder_block', 'recurring_reminder');
 			$page->setVar('recurring_dates_block', '');
+		}
+
+		/* Resources
+		 */
+		if ($event->getMetadata()->getResourceBookings()->count()) {
+			$resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
+			$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+
+			foreach($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
+
+				/* TODO: Optimise this!
+				 */
+				$resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+				$resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
+
+				$page->setVar(array(
+					'RESOURCE_ID' => $resource->getId(),
+					'RESOURCE_NAME' => $resource->getName()
+				));
+
+				$page->parse('resource_block', 'resource', true);
+			}
+		}
+		else {
+			$page->setVar(array(
+				'resource_block' => ''
+			));
 		}
 
 		/* Activity log
@@ -246,7 +273,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$groupHandler = new Group();
 
 		$page->setVar(array(
-			'EVENT_TOTAL_BOOKINGS' => 0,
 			'EVENT_RAMS_FILE' => '',
 			'EVENT_CURRENT_STUDENTS' => 0,
 			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
