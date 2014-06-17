@@ -46,7 +46,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 * relevant resource booking
 			 */
 			$eventMetadataMapper = new \EOTC\EventMetadataMapper();
-			$eventMetadataMapper->deleteResourceBookingsRelations($event->getMetadata());
 			$eventMetadataMapper->createResourceBookings($event->getMetadata());
 
 			$this->localRedir("/modules/eotc/manage/modify.php?eventID={$event->getId()}");
