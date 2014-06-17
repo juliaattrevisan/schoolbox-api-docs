@@ -293,6 +293,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
+				ST.SCHOOL_YEAR,
 				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
@@ -316,9 +317,38 @@ class External_Maze_User implements External_UserInterface {
 		";
 
 		$student = $this->getDb()->getRow($query);
-		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
 
+		/* Assign birthday
+		 */
+		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
 		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
+
+		/* Find coordinator
+		 */
+
+		/* Take the ST.SCHOOL_YEAR value to discover the Year Coordinator
+		 */
+		$query = "
+			SELECT *
+			FROM KCY
+			WHERE KCYKEY = '{$student['SCHOOL_YEAR']}'
+		";
+
+		$oneCoordinator = $this->getDb()->getRow($query);
+
+		/* Find the actual name of the year coordinator if he exists
+		 */
+		if ($oneCoordinator) {
+			$query = "
+				SELECT *
+				FROM SF
+				WHERE SFKEY = '{$oneCoordinator['YEAR_COORD']}'
+			";
+
+			$coordinator = $this->getDb()->getRow($query);
+
+			$student['StudentFormStaffName'] = $coordinator['FIRST_NAME'] . ' ' . $coordinator['SURNAME'];
+		}
 
 		return $student;
 	}
