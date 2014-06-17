@@ -489,8 +489,8 @@ class Controller extends Base {
                             'series',
                             $recurrenceRule,
                             new Alaress_Date_Format($repeatUntil),
-                            new Alaress_Date_Format($event->getStartDateTime()),
-                            new Alaress_Date_Format($event->getEndDateTime())
+                            $event->getStartDateTime(),
+                            $event->getEndDateTime()
                         );
                         // Create a whole set of bookings based on this event.
                         $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
