@@ -336,7 +336,7 @@ class External_Maze_User implements External_UserInterface {
 
 		$oneCoordinator = $this->getDb()->getRow($query);
 
-		/* Find the actual name of the year coordinator if he exists
+		/* Find the actual name if he exists
 		 */
 		if ($oneCoordinator) {
 			$query = "
@@ -348,6 +348,30 @@ class External_Maze_User implements External_UserInterface {
 			$coordinator = $this->getDb()->getRow($query);
 
 			$student['StudentFormStaffName'] = $coordinator['FIRST_NAME'] . ' ' . $coordinator['SURNAME'];
+		}
+
+		/* Find the Academic Advisor
+		 */
+		$query = "
+			SELECT *
+			FROM KCT
+			WHERE KCTKEY = '{$student['SCHOOL_YEAR']}'
+		";
+
+		$oneAdvisor = $this->getDb()->getRow($query);
+
+		/* Find the actual name if he exists
+		 */
+		if ($oneAdvisor) {
+			$query = "
+				SELECT *
+				FROM SF
+				WHERE SFKEY = '{$oneAdvisor['SFLINK']}'
+			";
+
+			$advisor = $this->getDb()->getRow($query);
+
+			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
 		}
 
 		return $student;
