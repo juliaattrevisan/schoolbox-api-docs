@@ -873,11 +873,11 @@ class External_Maze_User implements External_UserInterface {
 	public function getStudentUserAccountInfo() {
 		$query = "
 			SELECT
-				USER_NAME AS username,
-				FIRST_NAME AS firstname,
-				SURNAME AS lastname,
-				STKEY AS synergy_id,
-				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS year,
+				USER_NAME AS NetworkLogin,
+				FIRST_NAME AS StudentPreferred,
+				SURNAME AS StudentSurname,
+				STKEY AS StudentID,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				HOUSE AS house,
 				BOARDER AS boarding_status,
 				CAMPUS AS campus
