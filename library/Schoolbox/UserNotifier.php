@@ -13,7 +13,6 @@ namespace Schoolbox;
 use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\ResourceBooking\Booking\Mapper;
 
 class UserNotifier extends AbstractModuleNotifier {
 
