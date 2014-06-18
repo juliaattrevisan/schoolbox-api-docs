@@ -57,7 +57,9 @@ class Controller extends Base {
         $item     = $this->getBookingMapper()->createModel();
         $item
             ->setResource($resource)
-            ->setEvent(new Calendar\Event());
+            ->setEvent(new Calendar\Event())
+			->setName($this->getREquest()->query['name']);
+
         // Was the time set here? If so set it into the item.
         if (($startDate = $this->getRequest()->query['startDate'])) {
             // Convert format of startDate and startTime
