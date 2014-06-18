@@ -871,6 +871,21 @@ class External_Maze_User implements External_UserInterface {
 	 * Used in sync scripts
 	 */
 	public function getStudentUserAccountInfo() {
+		$query = "
+			SELECT
+				USER_NAME AS username,
+				FIRST_NAME AS firstname,
+				SURNAME AS lastname,
+				STKEY AS synergy_id,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS year,
+				HOUSE AS house,
+				BOARDER AS boarding_status
+			FROM ST
+		";
+
+		$result = $this->getDb()->getAll($query);
+
+		return $result;
 	}
 
 	/**
