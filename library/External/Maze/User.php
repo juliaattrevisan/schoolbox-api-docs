@@ -288,7 +288,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS HeadOfHouseID,
 				'' AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				'' AS StudentFormStaffName,
+				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -317,6 +317,8 @@ class External_Maze_User implements External_UserInterface {
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
+			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
+			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 
