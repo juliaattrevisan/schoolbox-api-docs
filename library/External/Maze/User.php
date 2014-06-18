@@ -282,7 +282,7 @@ class External_Maze_User implements External_UserInterface {
 				ST.SURNAME AS StudentSurname,
 				SUBSTRING(CONVERT(VARCHAR, ST.BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
 				'' AS StudentTutor,
-				'' AS StudentTutorName,
+				(ADVISOR.FIRST_NAME + ' ' + ADVISOR.SURNAME) AS StudentTutorName,
 				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,
 				'' AS HeadOfHouseID,
@@ -316,7 +316,7 @@ class External_Maze_User implements External_UserInterface {
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
-			LEFT JOIN SF ON KCT.SFLINK = SF.SFKEY
+			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 
@@ -329,39 +329,6 @@ class External_Maze_User implements External_UserInterface {
 
 		new \Alaress_ThreeProbe('a', $student, 'b');
 
-//		$query = "
-//			SELECT
-//				KCT.FIRST_NAME AS ADVISOR_FIRSTNAME,
-//				KCT.SURNAME AS ADVISOR_SURNAME,
-//				KGC.DESCRIPTION AS HOMEROOM_DESCRIPTION
-//			FROM SF
-//			LEFT JOIN KCY ON SF.SFKEY = KCY.YEAR_COORD
-//			LEFT JOIN KCT ON SF.SFKEY = KCT.SFLINK
-//
-//			WHERE KCY.KCYKEY = '{$student['SCHOOL_YEAR']}'
-//			AND KCT.KCTKEY = '{$student['SCHOOL_YEAR']}'
-//
-//		";
-//
-//		$auxiliary = $this->getDb()->getAll($query);
-//
-//		new \Alaress_ThreeProbe('a', $auxiliary, 'b');
-//		if ($coordinator) {
-//			$student['StudentFormStaffName'] = $coordinator['FIRST_NAME'] . ' ' . $coordinator['SURNAME'];
-//		}
-//
-//		/* Find the Academic Advisor
-//		 */
-//		$query = "
-//			SELECT *
-//			FROM KCT
-//			LEFT JOIN SF ON KCT.SFLINK = SF.SFKEY
-//			WHERE KCT.KCTKEY = '{$student['SCHOOL_YEAR']}'
-//		";
-//
-//		$advisor = $this->getDb()->getRow($query);
-//
-//		if ($advisor) {
 //			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
 //		}
 //
