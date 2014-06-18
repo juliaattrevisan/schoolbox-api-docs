@@ -879,13 +879,13 @@ class External_Maze_User implements External_UserInterface {
 				STKEY AS synergy_id,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS year,
 				HOUSE AS house,
-				BOARDER AS boarding_status
+				BOARDER AS boarding_status,
+				CAMPUS AS campus
 			FROM ST
+			WHERE STATUS != 'LEFT'
 		";
 
-		$result = $this->getDb()->getAll($query);
-
-		return $result;
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
