@@ -31,7 +31,7 @@ class Alaress_Image_Processor_Strategy_RotateOrientation extends Alaress_Image_P
      */
     public function manipulate($image) {
 
-        $exif = exif_read_data($this->filePath);
+        $exif = @exif_read_data($this->filePath);
         if(!empty($exif['Orientation'])) {
             switch($exif['Orientation']) {
                 case 8:
