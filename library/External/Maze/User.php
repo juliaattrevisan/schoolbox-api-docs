@@ -874,9 +874,11 @@ class External_Maze_User implements External_UserInterface {
 		$query = "
 			SELECT
 				USER_NAME AS NetworkLogin,
+				NULL AS StudentTitle,
 				FIRST_NAME AS StudentPreferred,
 				SURNAME AS StudentSurname,
 				STKEY AS StudentID,
+				NULL AS StudentOccupEmail,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				HOUSE AS house,
 				BOARDER AS boarding_status,
