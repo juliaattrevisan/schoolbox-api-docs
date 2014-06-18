@@ -880,7 +880,7 @@ class External_Maze_User implements External_UserInterface {
 				STKEY AS StudentID,
 				NULL AS StudentOccupEmail,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-				HOUSE AS house,
+				HOUSE AS StudentHouse,
 				BOARDER AS boarding_status,
 				CAMPUS AS campus
 			FROM ST
