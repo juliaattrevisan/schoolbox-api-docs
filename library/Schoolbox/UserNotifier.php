@@ -13,7 +13,6 @@ namespace Schoolbox;
 use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 
 class UserNotifier extends AbstractModuleNotifier {
 
@@ -45,10 +44,10 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function bundleTriggers($bundle) {
 		switch($bundle->getMethod()) {
-			case BookingMapper::METHOD_CREATE:
+			case Mapper::METHOD_CREATE:
 				$bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
 				break;
-			case BookingMapper::METHOD_UPDATE:
+			case Mapper::METHOD_UPDATE:
 				// we're only interested if extId changed
 				if(array_key_exists('externalId', $bundle->getEvent()->getDiff())) {
 					$bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
