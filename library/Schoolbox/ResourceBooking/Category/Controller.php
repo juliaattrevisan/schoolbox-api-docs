@@ -31,12 +31,16 @@ class Controller extends Base {
         $page  = max(intval($this->getRequest()->query['page']), 1);
         $total = $this->mapper->countAll();
         $this->paginator->setTotal($total);
-        $list  = $this->getMapper()->findAll(
-            array(
-                'limit'  => $this->paginator->getPageSize(),
-                'offset' => $this->paginator->getOffset($page),
-            )
-        );
+
+        $list = array();
+        if ($total > 0) {
+            $list = $this->getMapper()->findAll(
+                array(
+                    'limit'  => $this->paginator->getPageSize(),
+                    'offset' => $this->paginator->getOffset($page),
+                )
+            );
+        }
 
         $response = $this->getResponse();
         $response->content->set(
