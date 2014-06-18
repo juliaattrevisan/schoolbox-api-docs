@@ -293,8 +293,6 @@ class External_Maze_User implements External_UserInterface {
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
-				ST.ROLL_GROUP,
-				ST.SCHOOL_YEAR,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
@@ -328,26 +326,6 @@ class External_Maze_User implements External_UserInterface {
 		 */
 		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
 		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
-
-		new \Alaress_ThreeProbe('a', $student, 'b');
-
-//			$student['StudentTutorName'] = $advisor['FIRST_NAME'] . ' ' . $advisor['SURNAME'];
-//		}
-//
-//		/* Find the Homeroom
-//		 */
-//		$query = "
-//			SELECT *
-//			FROM KGC
-//			LEFT JOIN ST ON KGC.ROLL_GROUP = ST.ROLL_GROUP
-//			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
-//		";
-//
-//		$homeroom = $this->getDb()->getRow($query);
-//
-//		if ($homeroom) {
-//			$student['StudentTutorDescription'] = $homeroom['DESCRIPTION'];
-//		}
 
 		/* Find one or more homeroom teachers and condense them
 		 */
