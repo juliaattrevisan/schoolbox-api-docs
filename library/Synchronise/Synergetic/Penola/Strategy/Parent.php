@@ -16,11 +16,11 @@ class Synchronise_Synergetic_Penola_Strategy_Parent extends Synchronise_Base_Str
 		$this
 			->addHydrator(new Synchronise_Base_Hydrator_Default())
 			->addHydrator(new Synchronise_Base_Hydrator_Parent())
-			->addHydrator(new Synchronise_Synergetic_Penola_Hydrator_ParentCampus())
+			->addHydrator(new Synchronise_Synergetic_Penola_Hydrator_Campus())
 			->addHydrator(new Synchronise_Base_Hydrator_Clear())
 			->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
 			->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
-			->addSpouseHydrator(new Synchronise_Synergetic_Penola_Hydrator_ParentCampus())
+			->addSpouseHydrator(new Synchronise_Synergetic_Penola_Hydrator_Campus())
 			->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear());
 	}
 }
