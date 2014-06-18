@@ -201,6 +201,10 @@ class Controller extends Base {
                     $this->request->post['related_item'] ?: array()
                 );
             }
+            else {
+                // Just save the booking.
+                $this->bookingMapper->save($bookingList);
+            }
         }
         else {
             $code = 400;
