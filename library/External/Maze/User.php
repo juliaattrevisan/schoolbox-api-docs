@@ -894,6 +894,57 @@ class External_Maze_User implements External_UserInterface {
 	 * Used in sync scripts
 	 */
 	public function getParentUserAccountInfo() {
+		$query = "
+			SELECT
+				DF.DFKEY AS DFKEY,
+				(DF.DFKEY + '0') AS ID,
+				DF.FTITLE AS Title,
+				DF.FNAME AS Preferred,
+				DF.FSURNAME AS Surname,
+				DF.F_EMAIL AS Email,
+				(DF.DFKEY + '1') AS SpouseID,
+				DF.MTITLE AS SpouseTitle,
+				DF.MNAME AS SpousePreferred,
+				DF.MSURNAME AS SpouseSurname,
+				DF.M_EMAIL AS SpouseDefaultEmail,
+				ST.SCHOOL_YEAR
+			FROM ST
+			LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+		";
+
+		$allFamilies = $this->getDb()->getAll($query);
+
+		$families = array();
+
+		foreach($allFamilies as $currentFamily) {
+			$newFamily = $this->recombine($currentFamily);
+			$newFamily['ID'] = $currentFamily['ID'];
+
+			/* Change the key names with "StudentContact" as a prefix
+			 * due to different interfaces from the original scenario
+			 * recombine() was built for
+			 */
+			$allKeys = array_keys($newFamily);
+
+			$updatedFamily = array();
+
+			foreach($allKeys as $currentKey) {
+				if ($currentKey == 'ContactID') {
+					$key = 'Student' . $currentKey;
+					$updatedFamily[$key] = $currentFamily[$currentKey];
+				}
+				else {
+					$key = 'StudentContact' . $currentKey;
+					$updatedFamily[$key] = $newFamily[$currentKey];
+				}
+			}
+
+			$families[$currentFamily['DFKEY']] = $updatedFamily;
+		}
+
+		$data = array_values($families);
+
+		return $data;
 	}
 
 	/**
