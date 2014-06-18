@@ -277,48 +277,83 @@ class External_Maze_User implements External_UserInterface {
 		 */
 		$query = "
 			SELECT
-				STKEY AS StudentID,
-				FIRST_NAME AS StudentGiven1,
-				SURNAME AS StudentSurname,
-				SUBSTRING(CONVERT(VARCHAR, BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
+				ST.STKEY AS StudentID,
+				ST.FIRST_NAME AS StudentGiven1,
+				ST.SURNAME AS StudentSurname,
+				SUBSTRING(CONVERT(VARCHAR, ST.BIRTHDATE, 120), 0, 11) AS StudentBirthDate,
 				'' AS StudentTutor,
-				'' AS StudentTutorName,
-				'' AS StudentTutorDescription,
+				(ADVISOR.FIRST_NAME + ' ' + ADVISOR.SURNAME) AS StudentTutorName,
+				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,
 				'' AS HeadOfHouseID,
 				'' AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				'' AS StudentFormStaffName,
+				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
-				REPLACE(REPLACE(SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
-				EMERGENCY_ONE_NAME AS StudentEmergencyName,
-				EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
-				EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,
-				EMERGENCY_TWO_NAME AS StudentEmergency2Name,
-				EMERGENCY_TWO_PHONE AS StudentEmergency2Phone,
-				EMERGENCY_TWO_MOBILE AS StudentEmergency2PhoneAlt,
+				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
+				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
+				ST.EMERGENCY_ONE_MOBILE AS StudentEmergencyPhoneAlt,
+				ST.EMERGENCY_TWO_NAME AS StudentEmergency2Name,
+				ST.EMERGENCY_TWO_PHONE AS StudentEmergency2Phone,
+				ST.EMERGENCY_TWO_MOBILE AS StudentEmergency2PhoneAlt,
 				'' AS StudentEmergency3Name,
 				'' AS StudentEmergency3Phone,
 				'' AS StudentEmergency3PhoneAlt,
-				MEDICAL AS StudentMedicalAlert,
+				ST.MEDICAL AS StudentMedicalAlert,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
-				'' AS StudentBoarder
+				'' AS StudentBoarder,
+				ST.ROLL_GROUP
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
+			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
+			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
+			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
+			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
+			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 
 		$student = $this->getDb()->getRow($query);
-		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
 
+		/* Assign birthday
+		 */
+		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
 		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
+
+		/* Find one or more homeroom teachers and condense them
+		 */
+		$query = "
+			SELECT
+				SF.FIRST_NAME AS FIRSTNAME,
+				SF.SURNAME
+			FROM KGC
+			LEFT JOIN SF ON KGC.TEACHER = SF.SFKEY OR KGC.TEACHERB = SF.SFKEY
+			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
+		";
+
+		$allHomeroomTeachers = $this->getDb()->getAll($query);
+
+		if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
+			$processed = array();
+
+			foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
+				$processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
+			}
+
+			/* Uniques only
+			 */
+			$processed = array_values(array_unique($processed));
+
+			$student['StudentHeadOfHouse'] = implode(', ', $processed);
+		}
 
 		return $student;
 	}
