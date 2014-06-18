@@ -174,16 +174,19 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
                         }
                         catch (Exception $e) {}
                         if ($childAccount instanceof User) {
-                            if (intval($type) !== 0) {
-                                $this->verbose_filter->outputSkipMessage(
-                                    sprintf(
-                                        'parent relation for parent "%s" to child "%s", because user is not primary guardian',
-                                        $parentAccount->getExternalId(),
-                                        $childAccount->getExternalId()
-                                    )
-                                );
-                            }
-                            elseif ($this->perform_update) {
+                            // SB-4936: whether parent is primary guardian or not
+                            // no longer matters
+//                            if (intval($type) !== 0) {
+//                                $this->verbose_filter->outputSkipMessage(
+//                                    sprintf(
+//                                        'parent relation for parent "%s" to child "%s", because user is not primary guardian',
+//                                        $parentAccount->getExternalId(),
+//                                        $childAccount->getExternalId()
+//                                    )
+//                                );
+//                            }
+//                            else
+                            if ($this->perform_update) {
                                 $userRelation = new UserRelation();
                                 $userRelation
                                     ->setUser($parentAccount)
@@ -230,10 +233,11 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
                         $this->verbose_filter->outputSkipMessage('parent '.$message.', because profile was not found');
                         $this->verbose_filter->incrementSkipped();
                     }
-                    elseif (intval($type) !== 0) {
-                        $this->verbose_filter->outputSkipMessage('parent '.$message.', because user is not primary guardian');
-                        $this->verbose_filter->incrementSkipped();
-                    }
+                    // SB-4936
+//                    elseif (intval($type) !== 0) {
+//                        $this->verbose_filter->outputSkipMessage('parent '.$message.', because user is not primary guardian');
+//                        $this->verbose_filter->incrementSkipped();
+//                    }
                     else {
                         $profile
                             ->setGuardian1Name($currentUser['StudentContactName'])
