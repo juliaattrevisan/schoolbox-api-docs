@@ -118,6 +118,11 @@ $(document).ready(function() {
         'This room is already timetabled for this time.'
     )
     $.validator.addMethod(
+        'remote.inPast',
+        getValidatorRemoteMethod('in_past', 'start_datetime'),
+        'Items may not be booked for the past.'
+    )
+    $.validator.addMethod(
         'remote.tooEarly',
         getValidatorRemoteMethod('too_early', 'start_datetime'),
         'This item must be booked at least ' + {{ include('sub/interval.twig', {interval: item.resource.minLeadTime})|json_encode|raw }} + ' in advance.'
@@ -222,6 +227,7 @@ $(document).ready(function() {
                 required: true,
                 datepickerDate: true,
                 'remote.invalidStart': true,
+                'remote.inPast': true,
                 'remote.tooEarly': true,
                 'remote.conflict': true,
                 'remote.timetabledClass': true

@@ -547,11 +547,19 @@ class Controller extends Base {
         if (isset($startDate)) {
             // Start date before present gets covered by too_early
             // Start time before earliest possible time
-            $earliest = new DateTime();
-            $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
-            if ($startDate < $earliest) {
-                $errors['start_datetime'][] = 'too_early';
+            $now = new DateTime();
+            $now->setTimestamp($this->request->server['REQUEST_TIME']);
+            if ($startDate < $now) {
+                $errors['start_datetime'][] = 'in_past';
             }
+            else {
+                $earliest = new DateTime();
+                $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
+                if ($startDate < $earliest) {
+                    $errors['start_datetime'][] = 'too_early';
+                }
+            }
+
         }
 
         // I need both start and end to check reservation span.
