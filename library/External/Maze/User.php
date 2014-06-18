@@ -900,6 +900,25 @@ class External_Maze_User implements External_UserInterface {
 	 * Used in sync scripts
 	 */
 	public function getStaffUserAccountInfo() {
+		$query = "
+			SELECT
+				SFKEY AS StaffID,
+				USER_NAME AS NetworkLogin,
+				STATUS AS ActiveFlag,
+				NULL AS StaffTitle,
+				FIRST_NAME AS StaffPreferredName,
+				SURNAME AS StaffSurname,
+				NULL AS DefaultEmailCode,
+				NULL AS OccupEmail,
+				NULL AS Email,
+				CAMPUS AS StaffCampus,
+				NULL AS StaffCategoryTye,
+				NULL AS StaffCategory,
+				NULL AS StaffDepartment
+			FROM SF
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
