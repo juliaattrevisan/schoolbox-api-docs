@@ -19,6 +19,6 @@ if (is_numeric($_GET['delete'])) {
 
 	$submissionStudent->delete($studentSub['id']);
 
-	SitePage::localRedir('/submission/viewSubmission/' . $studentSub['box_id']);
+	SitePage::localRedir("/submission/inlineGrading/view/{$studentSub['box_id']}/{$studentSub['owner']}");
 }
 
