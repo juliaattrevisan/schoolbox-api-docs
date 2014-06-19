@@ -897,7 +897,7 @@ class External_Maze_User implements External_UserInterface {
 		$query = "
 			SELECT
 				DF.DFKEY AS DFKEY,
-				(DF.DFKEY + '0') AS ID,
+				DF.DFKEY AS ID,
 				DF.FTITLE AS Title,
 				DF.FNAME AS Preferred,
 				DF.FSURNAME AS Surname,
