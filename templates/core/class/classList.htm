@@ -9,17 +9,40 @@ $j(function() {
 		source: $j('#contact-table')
 	});
 
+	var form = $j('#contact-table-form');
+
+	// Validators for if no student or parent emails were found
+	$.validator.addMethod(
+		'remote.noStudentEmails',
+		function() {
+			return !(form.data('noStudentEmails'));
+		},
+		'No email addresses were found for the selected students.'
+	)
+	$.validator.addMethod(
+		'remote.noParentEmails',
+		function() {
+			return !(form.data('noParentEmails'));
+		},
+		'No email addresses were found for the parents of the selected students.'
+	)
+
 	/* Validate checkbox selections
 	 */
-	$j('#contact-table-form').validate({
+	form.validate({
 		rules: {
 			"selected[]": {
 				required: true,
-				minlength: 1
+				minlength: 1,
+				'remote.noStudentEmails': true,
+				'remote.noParentEmails': true
 			}
 		},
 		messages: {
-			"selected[]": "Please select at least one student before sending email"
+			"selected[]": {
+				required: "Please select at least one student before sending email",
+				minlength: "Please select at least one student before sending email"
+			}
 		},
 		errorPlacement: function(error, element) {
 			$j('#errors').html(error);
@@ -102,13 +125,19 @@ $j(function() {
 	$j('#email-selected-students').click(function(event) {
 		event.preventDefault();
 
-		if ($j('#contact-table-form').valid()) {
+		var form = $j('#contact-table-form');
+		form.data('noStudentEmails', false).data('noParentEmails', false)
+		if (form.valid()) {
 			$j('#email-selected-students').emailSelected({
 				source: $j('#contact-table'),
 				url: '/subject/classList/ajax/emailStudentsById.php',
 				classCode: '{CLASS_CODE}',
 				target: $j(this).find('input[name=bcc]')
-			});
+			})
+			.on('emailSelected.noEmail', function() {
+				// Trigger the no student email error
+				form.data('noStudentEmails', true).valid();
+			})
 		}
 	});
 });
@@ -126,13 +155,19 @@ $j(function() {
 	$j('#email-selected-parents').click(function(event) {
 		event.preventDefault();
 
-		if ($j('#contact-table-form').valid()) {
+		var form = $j('#contact-table-form');
+		form.data('noStudentEmails', false).data('noParentEmails', false)
+		if (form.valid()) {
 			$j('#email-selected-parents').emailSelected({
 				source: $j('#contact-table'),
 				url: '/subject/classList/ajax/emailParentsById.php',
 				classCode: '{CLASS_CODE}',
 				target: $j(this).find('input[name=bcc]')
-			});
+			})
+			.on('emailSelected.noEmail', function() {
+				// Trigger the no parent email error
+				form.data('noParentEmails', true).valid();
+			})
 		}
 	});
 });
