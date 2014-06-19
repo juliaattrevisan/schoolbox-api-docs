@@ -131,7 +131,7 @@ if ($groupHandler->isStaff()) {
 			$emailObj = new Email();
 			$email = $emailObj->formatEmailFromArray($_SESSION);
 
-			if ($email && \Cfg::get('mail_enable')) {
+			if (\Cfg::get('mail_enable')) {
 				$this->setVar("REPLYTO", $email);
 				$this->setVar("CLASSEMAIL", $classEmail);
 				$this->parse('email_class_block', 'email_class');
