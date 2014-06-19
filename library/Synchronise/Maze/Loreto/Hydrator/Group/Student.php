@@ -16,7 +16,7 @@ class Synchronise_Maze_Loreto_Hydrator_Group_Student implements Synchronise_Base
     }
 
     /**
-     * Groups for Fintonians are based on year level:
+     * Groups for Loretions are based on year level:
      *
      * @param  array $externalUser
      * @return int
