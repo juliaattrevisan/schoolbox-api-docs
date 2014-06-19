@@ -58,7 +58,7 @@ class Controller extends Base {
         $item
             ->setResource($resource)
             ->setEvent(new Calendar\Event())
-			->setName($this->getREquest()->query['name']);
+			->setName($this->getRequest()->query['name']);
 
         // Was the time set here? If so set it into the item.
         if (($startDate = $this->getRequest()->query['startDate'])) {
