@@ -58,11 +58,23 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
             foreach ($roomTimetable as $room) {
 
                 // What's the day number for the campus that has booked this room?
+                // If for some reason I can't find it, get timetable for a null campus
                 $timetableCode = $room['TimetableGroup'];
                 if (!array_key_exists($timetableCode, $campusList)) {
-                    $campusList[$timetableCode] = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableCode);
+                    try {
+                        $campusList[$timetableCode] = Schoolbox\CampusMapper::getInstance()->findOneByColumn(
+                            'ext_timetable_code',
+                            $timetableCode
+                        );
+                    }
+                    catch (Schoolbox\Mapper\Exception $e) {
+                        $campusList[$timetableCode] = null;
+                    }
                 }
-                $campusId  = $campusList[$timetableCode]->getId();
+                $campusId = null;
+                if ($campusList[$timetableCode] instanceof Schoolbox\Campus) {
+                    $campusId = $campusList[$timetableCode]->getId();
+                }
                 $dayNumber = $this->getExternalTimetable()->getDayNumber($campusId, $currentTimestamp);
 
                 if ($room['DayNumber'] != $dayNumber) {
