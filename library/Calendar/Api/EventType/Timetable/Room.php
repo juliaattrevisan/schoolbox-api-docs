@@ -120,8 +120,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $categoryList[$categoryCode] = null;
                     }
                 }
-                $event->setCategoryId($categoryList[$categoryCode]->getId());
-                $event->setCategoryName($categoryList[$categoryCode]->getName());
+                if ($categoryList[$categoryCode] instanceof \Schoolbox\Resource\Category) {
+                    $event->setCategoryId($categoryList[$categoryCode]->getId());
+                    $event->setCategoryName($categoryList[$categoryCode]->getName());
+                }
 //                $event->setColour($period['color']);
                 $stack->add($event);
             }
