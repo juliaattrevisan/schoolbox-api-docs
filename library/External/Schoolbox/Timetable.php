@@ -274,7 +274,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
                 class.description AS Description,
                 timetable_period.day AS DayNumber,
                 timetable_period.sequence AS PeriodNumber,
-                timetable_period.cycle_id AS TimetableGroup,
+                luCampus.ext_timetable_code AS TimetableGroup,
                 timetable_campus.campus_id AS TimetableCampus,
                 class.code AS ClassCode,
                 user.synergy_id AS StaffID,
@@ -287,11 +287,13 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
             FROM class_period
             LEFT JOIN user ON
                 class_period.teacher_id = user.id
-            LEFT JOIN timetable_period ON
+            INNER JOIN timetable_period ON
                 class_period.period_id = timetable_period.id
-            LEFT JOIN timetable_campus ON
+            INNER JOIN timetable_campus ON
                 timetable_period.cycle_id = timetable_campus.cycle_id
-            LEFT JOIN class ON
+            INNER JOIN luCampus ON
+                timetable_campus.campus_id = luCampus.id
+            INNER JOIN class ON
                 class_period.class_id = class.id
             WHERE timetable_campus.start < NOW()
             AND   timetable_campus.finish > NOW()
