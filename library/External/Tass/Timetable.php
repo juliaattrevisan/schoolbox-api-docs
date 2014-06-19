@@ -343,8 +343,43 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     public function getRoomTimetable($roomCode) {
-        // TODO: Implement getRoomTimetable() method.
-        return array();
+        // Requires some weird stuff with TimetableGroup and ClassCode
+        $query = "
+            SELECT
+                subtab.sub_desc AS Description,
+                ttmast.day_code AS DayNumber,
+                ttmast.prd_code AS PeriodNumber,
+                ttmast.sub_code AS TimetableGroup,
+                ttmast.cmpy_code AS ClassCampus,
+                ttmast.sub_code AS ClassCode,
+                ttmast.tch_code AS StaffID,
+                '' AS StaffTitle,
+                '' AS StaffPreferredName,
+                teacher.tch_name AS StaffSurname
+            FROM ttmast
+            LEFT JOIN subtab ON
+                subtab.cmpy_code=ttmast.cmpy_code AND
+                subtab.sub_code=ttmast.sub_code
+            LEFT JOIN teacher ON
+                teacher.cmpy_code=ttmast.cmpy_code AND
+                teacher.tch_code=ttmast.tch_code
+            WHERE year_num = :year
+            AND   semester = :semester
+            -- AND   ttmast.cmpy_code = :campus
+            AND   room_code = :room
+            ORDER BY
+                ttmast.day_code ASC,
+                ttmast.prd_code ASC
+        ";
+        $query = strtr(
+            $query,
+            array(
+                ':semester' => "'".$this->database->quote($_SESSION['FileSemester'])."'",
+                ':year'     => "'".$this->database->quote($_SESSION['FileYear'])."'",
+                ':room'     => "'".$this->database->quote($roomCode)."'",
+            )
+        );
+        return $this->database->getAll($query);
     }
 
     private function setDatabase($database)
@@ -357,5 +392,3 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $this->database;
     }
 }
-
-?>
