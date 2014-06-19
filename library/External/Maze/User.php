@@ -961,7 +961,7 @@ class External_Maze_User implements External_UserInterface {
 				SURNAME AS StaffSurname,
 				NULL AS DefaultEmailCode,
 				NULL AS OccupEmail,
-				NULL AS Email,
+				SF_EMAIL AS Email,
 				CAMPUS AS StaffCampus,
 				NULL AS StaffCategoryTye,
 				NULL AS StaffCategory,
@@ -969,7 +969,15 @@ class External_Maze_User implements External_UserInterface {
 			FROM SF
 		";
 
-		return $this->getDb()->getAll($query);
+		$query = "
+			SELECT TOP 10 *
+			FROM SF
+		";
+
+		$data = $this->getDb()->getAll($query);
+
+		new \Alaress_Probe($data);
+		return $data;
 	}
 
 	/**
