@@ -282,7 +282,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
                 user.firstname AS StaffPreferredName,
                 user.lastname AS StaffSurname,
                 timetable_period.start AS PeriodStart,
-                timetable_period.end AS PeriodEnd,
+                timetable_period.finish AS PeriodEnd,
                 timetable_period.title AS PeriodName
             FROM class_period
             LEFT JOIN user ON
