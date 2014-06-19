@@ -128,6 +128,9 @@
 					inject(allEmails);
 					redirect();
 				}
+				else {
+					config.element.trigger('emailSelected.noEmail');
+				}
 			});
 		}
 
@@ -145,5 +148,8 @@
 			$j(config.element).unbind('submit');
 			config.element.submit();
 		}
+
+		// And chain
+		return this;
 	}
 }(jQuery));
