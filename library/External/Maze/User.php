@@ -969,15 +969,7 @@ class External_Maze_User implements External_UserInterface {
 			FROM SF
 		";
 
-		$query = "
-			SELECT TOP 10 *
-			FROM SF
-		";
-
-		$data = $this->getDb()->getAll($query);
-
-		new \Alaress_Probe($data);
-		return $data;
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
