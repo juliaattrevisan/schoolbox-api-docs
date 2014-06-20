@@ -392,7 +392,7 @@ $(document).ready(function() {
             </td>
         </tr>
 
-        <tr>
+        <tr data-interaction="bookingMethodSelectorContainer">
             <td class="formLabelWidth">
                 <h4>Book Via</h4>
                 <em>Select a time method.</em>
@@ -405,7 +405,7 @@ $(document).ready(function() {
             </td>
         </tr>
 
-        <tr>
+        <tr data-interaction="timetableSelectorContainer">
             <td class="formLabelWidth">
                 <h4>Timetable</h4>
                 <em>You may select a timetable day and period to book this item for here.</em>
@@ -454,7 +454,7 @@ $(document).ready(function() {
                 </dl>
             </td>
         </tr>
-        <tr>
+        <tr data-interaction="dateSelectorContainer">
             <td class="formLabelWidth"><h4>Begin</h4></td>
             <td>
                 {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
@@ -465,7 +465,7 @@ $(document).ready(function() {
                 } %}
             </td>
         </tr>
-        <tr>
+        <tr data-interaction="dateSelectorContainer">
             <td class="formLabelWidth"><h4>End</h4></td>
             <td>
                 {% include 'sub/datetimeInput.twig' with {
