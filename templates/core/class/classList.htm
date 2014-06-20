@@ -34,7 +34,9 @@ $j(function() {
 	<table id='contact-table' class="table">
 		<thead>
 			<tr>
+				<!-- BEGIN select_all -->
 				<th width="16px"><input type="checkbox" id='select-all' value="" /></th>
+				<!-- END select_all -->
 				<th width="60px"></th>
 				<th>Name</th>
 				<th>Student ID</th>
@@ -46,7 +48,9 @@ $j(function() {
 		<tbody>
 			<!-- BEGIN student_list -->
 			<tr class="no-bdr {ON_OFF}">
+                <!-- BEGIN select_student -->
 				<td class="check"><input type="checkbox" name="selected[]" value="{SYNERGYID}" /></td>
+                <!-- END select_student -->
 				<td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
 				<!-- BEGIN name_with_link -->
 				<td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
@@ -60,7 +64,9 @@ $j(function() {
 				<td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
 			</tr>
 			<tr class="{ON_OFF}">
+				<!-- BEGIN select_student_below -->
 				<td>&nbsp;</td>
+				<!-- END select_student_below -->
 				<td colspan="4" valign="top" style="vertical-align:top;">
 					<!-- BEGIN actions -->
 					<div class="clearfix action-wrap">
