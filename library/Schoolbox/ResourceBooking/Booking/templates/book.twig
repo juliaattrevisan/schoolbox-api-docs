@@ -391,6 +391,20 @@ $(document).ready(function() {
                 <input name="name" type="text" value="{{ item.name }}" />
             </td>
         </tr>
+
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Book Via</h4>
+                <em>Select a time method.</em>
+            </td>
+            <td>
+                <input type="radio" id="bookingMethodTimetable" name="booking_method" value="timetable" />
+                <label for="bookingMethodTimetable">Timetable</label>
+                <input type="radio" id="bookingMethodDate" name="booking_method" value="date" />
+                <label for="bookingMethodDate">Date</label>
+            </td>
+        </tr>
+
         <tr>
             <td class="formLabelWidth">
                 <h4>Timetable</h4>
