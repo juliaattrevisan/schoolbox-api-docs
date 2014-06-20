@@ -358,6 +358,10 @@ $(document).ready(function() {
             }
         })
         .change()
+
+    $('[data-interaction="tabs"]').tabs({
+        heightStyle: 'auto'
+    });
 })
 </script>
 <!-- END custom_header -->
@@ -391,88 +395,83 @@ $(document).ready(function() {
                 <input name="name" type="text" value="{{ item.name }}" />
             </td>
         </tr>
-
-        <tr data-interaction="bookingMethodSelectorContainer">
+        <tr>
             <td class="formLabelWidth">
-                <h4>Book Via</h4>
-                <em>Select a time method.</em>
+                <h4>Booking Time</h4>
             </td>
             <td>
-                <input type="radio" id="bookingMethodTimetable" name="booking_method" value="timetable" />
-                <label for="bookingMethodTimetable">Timetable</label>
-                <input type="radio" id="bookingMethodDate" name="booking_method" value="date" />
-                <label for="bookingMethodDate">Date</label>
-            </td>
-        </tr>
+                <div data-interaction="tabs">
+                    <ul>
+                        <li><a href="#timetableSelector">Choose From Timetable</a></li>
+                        <li><a href="#dateSelector">Set Time Directly</a></li>
+                    </ul>
+                    <div id="timetableSelector">
+                        <em>You may select a timetable day and period to book this item for here.</em>
+                        <em>If you want this booking to recur for a timetable period, then
+                            make sure you select the "Timetable Based" option in "Repeat".</em>
 
-        <tr data-interaction="timetableSelectorContainer">
-            <td class="formLabelWidth">
-                <h4>Timetable</h4>
-                <em>You may select a timetable day and period to book this item for here.</em>
-                <em>If you want this booking to recur for a timetable period, then
-                    make sure you select the "Timetable Based" option in "Repeat".</em>
-            </td>
-            <td>
+                        <dl class="clearfix" data-interaction="timetableSelector">
+                            <dt>Campus</dt>
+                            <dd>
+                                <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
+                                    <option disabled>-- select campus --</option>
+                                    {% for campus in campusList %}
+                                        <option value="{{ campus.id }}"
+                                                label="{{ campus.name }}"
+                                                >{{ campus.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </dd>
+                            <dt>Day</dt>
+                            <dd>
+                                <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
+                                    <option disabled>-- select day --</option>
+                                </select>
+                            </dd>
+                            <dt>Period</dt>
+                            <dd>
+                                <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
+                                    <option disabled>-- select period --</option>
+                                </select>
+                            </dd>
+                            <dt>Date</dt>
+                            <dd>
+                                <time data-role="selectedDate"></time>
+                                <time data-role="selectedTimeStart"></time>
+                                <time data-role="selectedTimeEnd"></time>
+                            </dd>
+                            <dt>&nbsp;</dt>
+                            <dd>
+                                <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
+                                <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
+                                <a data-interaction="useDate" class="btn tick no-text float-left" title="Use this date" href="#"><span></span></a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="clearfix" id="dateSelector">
+                        <dl>
+                            <dt>Start Time</dt>
+                            <dd>
+                                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
+                                {% include 'sub/datetimeInput.twig' with {
+                                    value: item.event.startDateTime,
+                                    name:  'start_datetime',
+                                    id:    'start_datetime'
+                                } %}
+                            </dd>
+                            <dt>End Time</dt>
+                            <dd>
+                                {% include 'sub/datetimeInput.twig' with {
+                                    value: item.event.endDateTime,
+                                    name:  'end_datetime',
+                                    id:    'end_datetime'
+                                } %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
                 {# Select campus, day, period #}
                 {# on change campus: deselect day and period#}
-                <dl class="timetableSelector" data-interaction="timetableSelector">
-                    <dt>Campus</dt>
-                    <dd>
-                        <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
-                            <option disabled>-- select campus --</option>
-                            {% for campus in campusList %}
-                                <option value="{{ campus.id }}"
-                                        label="{{ campus.name }}"
-                                        >{{ campus.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </dd>
-                    <dt>Day</dt>
-                    <dd>
-                        <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
-                            <option disabled>-- select day --</option>
-                        </select>
-                    </dd>
-                    <dt>Period</dt>
-                    <dd>
-                        <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
-                            <option disabled>-- select period --</option>
-                        </select>
-                    </dd>
-                    <dt>Date</dt>
-                    <dd>
-                        <time data-role="selectedDate"></time>
-                        <time data-role="selectedTimeStart"></time>
-                        <time data-role="selectedTimeEnd"></time>
-                    </dd>
-                    <dt>&nbsp;</dt>
-                    <dd>
-                        <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
-                        <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
-                        <a data-interaction="useDate" class="btn tick no-text float-left" title="Use this date" href="#"><span></span></a>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-        <tr data-interaction="dateSelectorContainer">
-            <td class="formLabelWidth"><h4>Booking Start Time</h4></td>
-            <td>
-                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
-                {% include 'sub/datetimeInput.twig' with {
-                    value: item.event.startDateTime,
-                    name:  'start_datetime',
-                    id:    'start_datetime'
-                } %}
-            </td>
-        </tr>
-        <tr data-interaction="dateSelectorContainer">
-            <td class="formLabelWidth"><h4>Booking End Time</h4></td>
-            <td>
-                {% include 'sub/datetimeInput.twig' with {
-                    value: item.event.endDateTime,
-                    name:  'end_datetime',
-                    id:    'end_datetime'
-                } %}
             </td>
         </tr>
         {% if item.event.id is empty %}
