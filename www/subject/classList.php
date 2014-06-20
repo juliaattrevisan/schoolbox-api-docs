@@ -135,7 +135,6 @@ if ($groupHandler->isStaff()) {
 			$this->setVar('parent_email_block', '');
 			if ($email && \Cfg::get('mail_enable')) {
 				$this->setVar("REPLYTO", $email);
-				$this->setVar("CLASSEMAIL", $classEmail);
 				$this->parse('email_class_block', 'email_class');
 
 				/* Emailing parents is a configuration
