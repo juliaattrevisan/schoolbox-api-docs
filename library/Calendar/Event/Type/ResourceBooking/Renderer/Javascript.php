@@ -136,8 +136,23 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
             }
         }
 
+        // Title: defaults to "Booking: $event.name",
+        // but could have been set in the booking itself.
+        // If it was, put a note in the detail that this is for a booking.
+        $title  = $currentEvent->getNote();
+        $detail = $currentEvent->getDetail();
+        if (strlen($title) === 0) {
+            $title = 'Booking: '.$currentEvent->getBooking()->getResource()->getName();
+        }
+        else {
+            $detail = sprintf(
+                "(Booking for: %s)<br />%s",
+                Scrub::text($currentEvent->getBooking()->getResource()->getName()),
+                $detail
+            );
+        }
         $event = array(
-            'title' => Scrub::text('Booking: '.$currentEvent->getBooking()->getResource()->getName()),
+            'title' => Scrub::text($title),
             'start' => "$start",
             'end' => "$end",
 
@@ -164,7 +179,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                 'meta' => array(
                     'eventId' => $currentEvent->getEventId(),
                     'time' => $currentEvent->getTime(),
-                    'detail' => Scrub::html($currentEvent->getDetail()),
+                    'detail' => Scrub::html($detail),
                     'location' => Scrub::text($currentEvent->getLocation()),
                     'eventTypeId' => $currentEvent->getType(),
                     'eventType' => 'type' . $currentEvent->getType(),
@@ -186,6 +201,10 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                     'listButton' => false,
                 ),
                 'booking' => array(
+                    'item'    => array(
+                        'id'   => $currentEvent->getBooking()->getResource()->getId(),
+                        'name' => $currentEvent->getBooking()->getResource()->getName(),
+                    ),
                     'status'  => $currentEvent->getBooking()->getStatus()->jsonSerialize(),
                     'buttons' => $bookingButtons,
                 ),
