@@ -131,26 +131,19 @@ if ($groupHandler->isStaff()) {
 			$emailObj = new Email();
 			$email = $emailObj->formatEmailFromArray($_SESSION);
 
-			if (\Cfg::get('mail_enable')) {
+			$this->setVar('email_class_block', '');
+			$this->setVar('parent_email_block', '');
+			if ($email && \Cfg::get('mail_enable')) {
 				$this->setVar("REPLYTO", $email);
 				$this->setVar("CLASSEMAIL", $classEmail);
 				$this->parse('email_class_block', 'email_class');
-			}
-			else {
-				$this->setVar('email_class_block', '');
-			}
 
-			/* Emailing parents is a configuration
-			 */
-			if ((Cfg::get('email_all_parents') == 1) && \Cfg::get('mail_enable')) {
-				$this->setVar(array(
-					'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
-				));
-
-				$this->parse('parent_email_block', 'parent_email');
-			}
-			else {
-				$this->setVar('parent_email_block', '');
+				/* Emailing parents is a configuration
+				 */
+				if ((Cfg::get('email_all_parents') == 1)) {
+					$this->setVar('REPLY_TO', $email);
+					$this->parse('parent_email_block', 'parent_email');
+				}
 			}
 		}
 		else {
