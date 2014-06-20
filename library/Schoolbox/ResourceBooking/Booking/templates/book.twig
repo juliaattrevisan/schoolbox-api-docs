@@ -455,7 +455,7 @@ $(document).ready(function() {
             </td>
         </tr>
         <tr data-interaction="dateSelectorContainer">
-            <td class="formLabelWidth"><h4>Begin</h4></td>
+            <td class="formLabelWidth"><h4>Booking Start Time</h4></td>
             <td>
                 {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
                 {% include 'sub/datetimeInput.twig' with {
@@ -466,7 +466,7 @@ $(document).ready(function() {
             </td>
         </tr>
         <tr data-interaction="dateSelectorContainer">
-            <td class="formLabelWidth"><h4>End</h4></td>
+            <td class="formLabelWidth"><h4>Booking End Time</h4></td>
             <td>
                 {% include 'sub/datetimeInput.twig' with {
                     value: item.event.endDateTime,
