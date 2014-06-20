@@ -19,6 +19,6 @@ $userId = $_SESSION['user']->getExternalId();
 $hash = "{$salt}{$userId}";
 $key = md5($hash);
 
-$destination = "{$url}/?id={$userId}&key={$key}";
+$destination = "{$url}/?id={$_SESSION['user']->getUsername()}&key={$key}";
 
 header('Location:'.$destination, false, 301);
