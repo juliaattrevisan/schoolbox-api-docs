@@ -465,6 +465,16 @@ class External_Denbigh_User implements External_UserInterface {
         return 'Day';
     }
 
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended() {
+        // TODO: Implement getStaffContactListExtended() method.
+        return array();
+    }
+
     /* Getters/Setters
       */
 

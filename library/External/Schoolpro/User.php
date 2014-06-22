@@ -495,6 +495,16 @@ class External_Schoolpro_User implements External_UserInterface {
 	public function getHousemasterByHouseId($houseID) {
 	}
 
+	/**
+	 * Get contact list for staff directory
+	 *
+	 * @return array
+	 */
+	public function getStaffContactListExtended() {
+		// TODO: Implement getStaffContactListExtended() method.
+		return array();
+	}
+
 	/* Getters/Setters
 	 */
 
