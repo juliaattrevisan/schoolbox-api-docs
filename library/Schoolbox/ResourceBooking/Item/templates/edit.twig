@@ -190,9 +190,18 @@
                 <div class="clearfix checkboxes groups">
                 {% for role in roleList %}
                     {# Default for new items: staff roles are selected, others are not #}
-                    <input type="hidden" value="0" name="role[{{ role.id }}]" />
+                    <input type="hidden" name="role[{{ role.id }}]" value="0" />
                     <label class="float-left clear">
-                        <input name="role[{{ role.id }}]" type="checkbox" value="1" />
+                        <input type="checkbox"
+                               name="role[{{ role.id }}]" value="1"
+                               {% if item.id %}
+                                   {% for resourceRole in item.roleList if resourceRole.role.id == role.id %}
+                                       {% if resourceRole.allowed %}checked{% endif %}
+                                   {% endfor %}
+                               {% else %}
+                                   {% if role.type == 'staff' %}checked{% endif %}
+                               {% endif %}
+                        />
                         {{ role.name }}
                     </label>
                 {% endfor %}
