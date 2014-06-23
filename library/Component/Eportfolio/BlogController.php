@@ -118,7 +118,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 						$this->setVar(array(
 							'COMMENT_ID' => $currentComment->getId(),
-							'COMMENT_AUTHOR_ID' => $currentComment->getAuthor()->getExternalId(),
+							'COMMENT_AUTHOR_ID' => $currentComment->getAuthor()->getId(),
 							'COMMENT_EXTERNAL_USER_ID' => $currentComment->getAuthor()->getExternalId(),
 							'COMMENT_AUTHOR_FULLNAME' => $currentComment->getAuthor()->getFullname(),
 							'COMMENT_CONTENT' => Scrub::text($currentComment->getContent()),
