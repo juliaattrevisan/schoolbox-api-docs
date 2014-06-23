@@ -369,9 +369,9 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
-				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryCode,
+				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentCountry.Description AS StudentContactCountryCode,
 				StudentContactHomeAddress1, StudentContactHomeAddress2, StudentContactHomeAddress3,
-				StudentContactHomeSuburb, StudentContactHomePostCode, StudentContactHomeState, StudentContactHomeCountryCode,
+				StudentContactHomeSuburb, StudentContactHomePostCode, StudentContactHomeState, StudentCountry.Description AS StudentContactHomeCountryCode,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
 				StudentContactSpouseID,
 				StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseLegalFullName,StudentContactSpouseSurname,
@@ -383,6 +383,8 @@ class External_Synergetic_User implements External_UserInterface {
 			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
 			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 			LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code AND StudentCampus = Year.Campus
+			LEFT JOIN SynergyOne.dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
+			LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION['FileYear'];
