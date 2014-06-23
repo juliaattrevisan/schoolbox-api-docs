@@ -638,12 +638,19 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    /**
-     * This function is similar to getAllForUsers, but returns aggregated results.
-     * Written for welcome component Most Recent Submissions
-     * @param $userID
-     */
+	/**
+	 * This function is similar to getAllForUsers, but returns aggregated results.
+	 * Written for welcome component Most Recent Submissions
+	 *
+	 * @param $userID
+	 * @return array|bool
+	 */
     public function getTotalSubmissionsByOwner($userID) {
+
+		/* Six month display threshold for Most Recent Submission
+		 */
+		$threshold = 6;
+
         $query = "(SELECT *, COUNT(id) AS `count` FROM (
                         SELECT  sb.id,
                             sb.name,
@@ -658,6 +665,7 @@ class Submission extends DeprecatedModel {
                         LEFT JOIN categoryCode co ON co.categoryID = c.id
                         WHERE sb.owner = '$userID'
                         AND sb.deleted = '0'
+                        AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= submitted)
                         ORDER BY datestamp DESC
                         ) submissions
                         GROUP BY id
@@ -681,6 +689,7 @@ class Submission extends DeprecatedModel {
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
                         AND a.deleted_at IS NULL
+                        AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= aa.finish)
                         ) attempts
                         GROUP BY id
                         ORDER BY aa.finish DESC
