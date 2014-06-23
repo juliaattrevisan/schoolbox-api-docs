@@ -302,7 +302,7 @@ class Controller extends Base {
         $model->setRoleList(new Collection());
         if (is_array($post['role'])) {
             foreach ($post['role'] as $roleId => $allowed) {
-                $resourceRole = new Role\Model();
+                $resourceRole = new RolePermission\Model();
                 $role         = new \Schoolbox\Role();
                 $role->setId($roleId);
                 $resourceRole

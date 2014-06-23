@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\ResourceBooking\Item\Role;
+namespace Schoolbox\ResourceBooking\Item\RolePermission;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper {
 
     public function mapping() {
         $this->hasTable('resource_role_permission');
-        $this->hasModel('Schoolbox\\ResourceBooking\\Item\\Role\\Model');
+        $this->hasModel('Schoolbox\\ResourceBooking\\Item\\RolePermission\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',

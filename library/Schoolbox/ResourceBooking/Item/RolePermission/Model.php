@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
  
-namespace Schoolbox\ResourceBooking\Item\Role;
+namespace Schoolbox\ResourceBooking\Item\RolePermission;
 
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Role;

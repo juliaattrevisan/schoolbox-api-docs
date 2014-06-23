@@ -154,7 +154,7 @@ class Mapper extends BaseMapper {
         $this->hasJoin(
             'role',
             array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\Role\\Mapper',
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RolePermission\\Mapper',
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
