@@ -16,6 +16,7 @@ class Synchronise_Maze_Loreto_Strategy_Student extends Synchronise_Base_Strategy
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
 			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
+			->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
 			->addHydrator(new Synchronise_Maze_Loreto_Hydrator_House())
 			->addHydrator(new Synchronise_Maze_Loreto_Hydrator_Group_Student())

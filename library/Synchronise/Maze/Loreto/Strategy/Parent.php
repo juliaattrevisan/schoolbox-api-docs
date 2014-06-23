@@ -15,7 +15,6 @@ class Synchronise_Maze_Loreto_Strategy_Parent extends Synchronise_Base_Strategy_
         $this->verbose_filter = new Synchronise_Maze_Loreto_Verbose();
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
-			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
