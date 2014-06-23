@@ -93,7 +93,29 @@
 		margin: 0;
 		background-image: url('/images/stk/bell.png');
 	}
-
+	.user {
+		a {
+//			transition: padding-left 0.1s ease-out, padding-right 0.1s ease-out;
+			padding: 6px 8px;
+		}
+		&.open {
+			&::after {
+				content: '';
+				display: none;
+			}
+			a {
+				background: #fff;
+				color: #1955ff;
+//				padding: 6px 8px;
+				border-bottom: solid 1px #eeeeee;
+			}
+			.flyout-menu {
+				width: 100%;
+				right: -8px;
+				top: 30px;
+			}
+		}
+	}
 }
 #nav h4{ padding: 0 0 0 32px; color: @navigation-links; }
 
