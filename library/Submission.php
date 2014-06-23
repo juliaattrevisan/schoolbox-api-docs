@@ -658,6 +658,7 @@ class Submission extends DeprecatedModel {
                             c.id as cid,
                             DATE_FORMAT(sb.date, '%a, %D %b %l:%i%p') AS `date`,
                             DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') AS datestamp,
+                            DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) AS temp,
                             '' AS availability
                         FROM student_submission ss
                         LEFT JOIN submission_box sb ON ss.box_id = sb.id
@@ -665,7 +666,7 @@ class Submission extends DeprecatedModel {
                         LEFT JOIN categoryCode co ON co.categoryID = c.id
                         WHERE sb.owner = '$userID'
                         AND sb.deleted = '0'
-                        AND (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(submitted, '%Y%m')) <= {$threshold})
+                        AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= submitted)
                         ORDER BY datestamp DESC
                         ) submissions
                         GROUP BY id
@@ -680,6 +681,7 @@ class Submission extends DeprecatedModel {
                             c.id as cid,
                             DATE_FORMAT(a.finish, '%a, %D %b %l:%i%p') AS `date`,
                             DATE_FORMAT(aa.finish, '%Y-%m-%d %H:%i') AS datestamp,
+                            DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) AS temp,
                             a.availability
                         FROM assess_attempt aa
                         LEFT JOIN assess a ON a.assess_id = aa.assess_id
@@ -689,7 +691,7 @@ class Submission extends DeprecatedModel {
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
                         AND a.deleted_at IS NULL
-                        AND (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(aa.finish, '%Y%m')) <= {$threshold})
+                        AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= aa.finish)
                         ) attempts
                         GROUP BY id
                         ORDER BY aa.finish DESC
