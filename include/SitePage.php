@@ -83,6 +83,11 @@ class SitePage extends Page {
             $this->pageNotFound();
         }
 
+        /* If you try to access the login screen but you are already logged in, just go home */
+        if($pageFile == '/login/' || $pageFile == '/login' ) {
+            $pageFile = '/home/';
+        }
+
         $this->arg = array();
         $path = explode('/', trim($pageFile, '/'));
 
@@ -971,7 +976,7 @@ class SitePage extends Page {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             // Redirect to base path, with current URI in page param, if not
             // currently on the base path.
-            if (!$page && $parts['path'] != '/login/') {
+            if (!$page && !($parts['path'] == '/login/' || $parts['path'] == '/login') ) {
                 if ($parts['path'] != '/' ) {
                      $this->localRedir('/login/?page='.urlencode($_SERVER['REQUEST_URI']));
                 }

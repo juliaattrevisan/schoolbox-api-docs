@@ -35,7 +35,12 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
             $message = 'The username or password you typed is incorrect, please try again.';
         }
         if ($authenticated) {
-            if (isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/' && $_POST['page'] != '/login/') {
+            if (isset($_POST['page'])
+                && $_POST['page']
+                && $_POST['page'] != '/'
+                && $_POST['page'] != '/login'
+                && $_POST['page'] != '/login/'
+            ) {
                 $page = rawurldecode($_POST['page']);
                 SitePage::localRedir($page);
             }
