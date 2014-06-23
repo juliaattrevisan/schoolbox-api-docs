@@ -382,7 +382,17 @@ class External_Tass_User implements External_UserInterface {
         return $list;
     }
 
-	private function setDatabase ($database) {
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended() {
+        // TODO: Implement getStaffContactListExtended() method.
+        return array();
+    }
+
+    private function setDatabase ($database) {
 		$this->database = $database;
 	}
 

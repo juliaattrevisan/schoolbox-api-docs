@@ -332,7 +332,17 @@ class External_Schoolbox_User implements External_UserInterface {
         }
     }
 
-	/**
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended() {
+        // TODO: Implement getStaffContactListExtended() method.
+        return array();
+    }
+
+    /**
 	 * @param Database $database
 	 * @return void
 	 */

@@ -79,4 +79,14 @@ class External_Offline_User implements External_UserInterface {
 		// TODO: Implement getHousemasterByHouseId() method.
 	}
 
+	/**
+	 * Get contact list for staff directory
+	 *
+	 * @return array
+	 */
+	public function getStaffContactListExtended() {
+		// TODO: Implement getStaffContactListExtended() method.
+		return array();
+	}
+
 }

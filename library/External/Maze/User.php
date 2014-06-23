@@ -871,6 +871,16 @@ class External_Maze_User implements External_UserInterface {
 	}
 
 	/**
+	 * Get contact list for staff directory
+	 *
+	 * @return array
+	 */
+	public function getStaffContactListExtended() {
+		// TODO: Implement getStaffContactListExtended() method.
+		return array();
+	}
+
+	/**
 	 * Stub method, probably not used
 	 */
 	public function getHousemasterByHouseId($houseID) {

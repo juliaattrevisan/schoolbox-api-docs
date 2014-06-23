@@ -197,7 +197,17 @@ class External_User implements External_UserInterface {
         return $this->getDatabase()->getHousemasterByHouseId($houseID);
     }
 
-	public function __call ($methodName, $argumentList) {
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended() {
+        // TODO: Implement getStaffContactListExtended() method.
+        return $this->getDatabase()->getStaffContactListExtended();
+    }
+
+    public function __call ($methodName, $argumentList) {
 		$database = $this->getDatabase();
 
 		$methodReflection = new ReflectionMethod($database, $methodName);

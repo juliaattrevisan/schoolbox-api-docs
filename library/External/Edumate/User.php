@@ -476,4 +476,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getHousemasterByHouseId($houseID) { }
 
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended() {
+        // TODO: Implement getStaffContactListExtended() method.
+        return array();
+    }
+
 }

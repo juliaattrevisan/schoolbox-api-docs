@@ -25,6 +25,13 @@ interface External_UserInterface {
 
     public function getStaff($externalUserId);
 
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended();
+
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 
     public function getStudentContactList($externalUserId);
