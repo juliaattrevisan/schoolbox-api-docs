@@ -689,7 +689,7 @@ class Submission extends DeprecatedModel {
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
                         AND a.deleted_at IS NULL
-                                                AND (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(aa.finish, '%Y%m')) <= {$threshold})
+                        AND (PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(aa.finish, '%Y%m')) <= {$threshold})
                         ) attempts
                         GROUP BY id
                         ORDER BY aa.finish DESC
