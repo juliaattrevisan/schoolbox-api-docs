@@ -126,6 +126,9 @@ cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 echo "$vag Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
+echo "$vag Installing Java for package build process";
+apt-get -y install openjdk-7-jre;
+
 echo "$vag Building CSS and JS";
 /vagrant/tools/pkg-build-css-js.sh;
 
