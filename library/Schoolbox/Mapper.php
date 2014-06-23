@@ -558,13 +558,20 @@ class Mapper implements Serializable {
 		if (!isset($this->soft_delete_column)) {
 			return false;
 		}
-		return $this->updateAll(
+		$success = $this->updateAll(
 			$object,
 			$this->soft_delete_column,
 			$this->soft_delete_deleted_value,
 			'preSoftDelete',
 			'postSoftDelete'
 		);
+
+		if($success) {
+			// raise delete notification
+			$this->raiseNotification($object, self::METHOD_DELETE);
+		}
+
+		return $success;
 	}
 
 	/**
@@ -606,6 +613,9 @@ class Mapper implements Serializable {
 		foreach ($collection as $model) {
 			$this->triggerCallbacks('postDelete', $model);
 		}
+
+		// raise delete notification
+		$this->raiseNotification($object, self::METHOD_DELETE);
 
 		return true;
 	}
@@ -1377,19 +1387,7 @@ class Mapper implements Serializable {
 				$this->triggerCallbacks('postSave', $model, $previous);
 			}
 
-			// if there's no session, don't try to raise a notification. TODO confirm this is correct behaviour.
-			if(isset($this->sessionData['user'])) {
-				// create a new event, and send it to the scheduler
-				$event = new Event(
-					$this->sessionData['user'],
-					$pdoMethods[$i],
-					$model,
-					$this,
-					$previous ? $this->diff($model, $previous) : null
-				);
-
-				$this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
-			}
+			$this->raiseNotification($model, $pdoMethods[$i], $previous);
 		}
 
 		return $affectedIDs;
@@ -2014,6 +2012,28 @@ class Mapper implements Serializable {
 		return true;
 	}
 
+
+	/**
+	 * If possible, raise a notification
+	 *
+	 * @param object $object
+	 * @param string $verb
+	 * @param object $previous
+	 * @return bool
+	 */
+	protected function raiseNotification($object, $verb, $previous = null) {
+		if(!isset($this->sessionData['user'])) {
+			return false;
+		}
+
+		$diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diff($object, $previous) : null;
+
+		// create a new event, and send it to the scheduler
+		$event = new Event($this->sessionData['user'], $verb, $object, $this, $diff);
+		$this->getNotifier()->setTopic(Notif::TOPIC_APPLICATION)->notice(serialize($event));
+
+		return true;
+	}
 
 	/**
 	 * Compares two objects mapped by this mapper and returns an array of the differences between.
