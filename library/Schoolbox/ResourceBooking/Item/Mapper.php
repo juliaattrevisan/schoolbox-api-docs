@@ -203,6 +203,14 @@ class Mapper extends BaseMapper {
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
+
+        // Add save of roles too
+        // If saving a new set of roles, this item's ID has to be attached
+        $roleList = $object->getRoleList();
+        foreach ($roleList as $role) {
+            $role->setResource($object);
+        }
+        $this->getJoinMapper('role')->save($roleList);
     }
 
     /**
