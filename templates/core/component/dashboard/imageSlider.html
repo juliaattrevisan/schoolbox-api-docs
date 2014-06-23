@@ -4,8 +4,26 @@
         $j("#imageSlider").AnySlider();
     });
 </script>
-<div id="imageSlider" class="box">
-    <!-- BEGIN image -->
-    <div><a href="{IMAGE_URL}"><img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" title="{IMAGE_NAME}" /><span>{IMAGE_NAME}</span></a></div>
-    <!-- END image -->
+
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <!-- BEGIN has_header -->
+    <h2>{COMPONENT_NAME}</h2>
+    <!-- END has_header -->
+    <div id="imageSlider" class="box clearfix">
+        <!-- BEGIN image_scroller -->
+        <div>
+            <a href="{IMAGE_URL}">
+                <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                <!-- BEGIN show_caption -->
+                <div class="caption-holder">{IMAGE_NAME}</div>
+            </a>
+            <!-- END show_caption -->
+        </div>
+        <!-- END image_scroller -->
+    </div>
+    <!-- BEGIN submit_image -->
+    <p class="interact clearfix">
+        <a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a>
+    </p>
+    <!-- END submit_image -->
 </div>
