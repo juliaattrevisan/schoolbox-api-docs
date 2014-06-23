@@ -16,6 +16,7 @@ use Schoolbox\Storage;
 use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use Schoolbox\User;
+use Schoolbox\Role;
 use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable {
@@ -92,8 +93,17 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $relatedResourceList;
 
+    /**
+     * @var Collection|Role[]
+     */
+    protected $roleList;
+
     public function __construct() {
-        $this->setModeratorList(new Collection());
+        $this
+            ->setModeratorList(new Collection())
+            ->setRelatedResourceList(new Collection())
+            ->setRoleList(new Collection())
+        ;
     }
 
     /**
@@ -336,6 +346,31 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function addRelatedResource($resource) {
         $this->getRelatedResourceList()->add($resource);
+        return $this;
+    }
+
+    /**
+     * @param  Collection|Role[] $roleList
+     * @return $this
+     */
+    public function setRoleList($roleList) {
+        $this->roleList = $roleList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Role[]
+     */
+    public function getRoleList() {
+        return $this->roleList;
+    }
+
+    /**
+     * @param  Role  $role
+     * @return $this
+     */
+    public function addRold($role) {
+        $this->getRoleList()->add($role);
         return $this;
     }
 

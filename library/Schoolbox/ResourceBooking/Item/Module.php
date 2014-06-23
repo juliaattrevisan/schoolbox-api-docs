@@ -79,6 +79,8 @@ class Module extends BaseModule {
             = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setUserMapper']
             = $injector->lazyNew('Schoolbox\\UserMapper');
+        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setRoleMapper']
+            = $injector->lazyNew('Schoolbox\\RoleMapper');
         // Paginator needs the count per page and amount set.
         $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setPaginator']
             = $injector->lazyNew(

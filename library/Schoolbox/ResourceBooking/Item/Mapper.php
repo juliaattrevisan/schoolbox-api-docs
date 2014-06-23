@@ -151,6 +151,15 @@ class Mapper extends BaseMapper {
                 'multiple'  => true,
             )
         );
+        $this->hasJoin(
+            'role',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\Role\\Mapper',
+                'this_key'  => 'id',
+                'other_key' => 'resource_id',
+                'multiple'  => true,
+            )
+        );
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
@@ -298,6 +307,12 @@ class Mapper extends BaseMapper {
                             return $model;
                         }
                     )
+                );
+
+                // populate role permissions
+                $roleMapper = $mapper->getJoinMapper('role');
+                $model->setRoleList(
+                    $roleMapper->findByColumn('resource_id', $model->getId())
                 );
 
                 return $model;

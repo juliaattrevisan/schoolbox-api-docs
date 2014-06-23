@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\StorageMapper;
 
 class Controller extends Base {
@@ -27,6 +28,11 @@ class Controller extends Base {
      * @var UserMapper
      */
     protected $userMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
 
     /**
      * @var IUrlPaginator
@@ -129,6 +135,7 @@ class Controller extends Base {
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => array(),
                     'relatedItemList' => array(),
+                    'roleList'        => $this->roleMapper->findAll(),
                 ),
             )
         );
@@ -185,6 +192,7 @@ class Controller extends Base {
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
+                    'roleList'        => $this->roleMapper->findAll(),
                 ),
             )
         );
@@ -334,6 +342,22 @@ class Controller extends Base {
      */
     public function getUserMapper() {
         return $this->userMapper;
+    }
+
+    /**
+     * @param  RoleMapper $roleMapper
+     * @return $this
+     */
+    public function setRoleMapper($roleMapper) {
+        $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
     }
 
     /**
