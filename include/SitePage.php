@@ -83,6 +83,11 @@ class SitePage extends Page {
             $this->pageNotFound();
         }
 
+        /* If you try to access the login screen but you are already logged in, just go home */
+        if($pageFile == '/login/' || $pageFile == '/login' ) {
+            $pageFile = '/home/';
+        }
+
         $this->arg = array();
         $path = explode('/', trim($pageFile, '/'));
 
