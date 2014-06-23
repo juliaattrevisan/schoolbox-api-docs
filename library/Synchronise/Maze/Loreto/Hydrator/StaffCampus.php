@@ -52,7 +52,7 @@ class Synchronise_Maze_Loreto_Hydrator_StaffCampus implements Synchronise_Base_I
 
 		$newUser['campus'] = $allCampuses;
 		$newUser['defaultCampus'] = 1;
-new \Alaress_Probe($newUser);
+
 		return $newUser;
 	}
 }
