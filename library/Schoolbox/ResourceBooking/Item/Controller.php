@@ -287,12 +287,29 @@ class Controller extends Base {
                 $model->addModerator($user);
             }
         }
+
+        // Do likewise with the related resource list
         $model->setRelatedResourceList(new Collection());
         if (is_array($post['related_resource_id'])) {
             foreach ($post['related_resource_id'] as $related_resource_id) {
                 $resource = new Model();
                 $resource->setId($related_resource_id);
                 $model->addRelatedResource($resource);
+            }
+        }
+
+        // Do likewise with the role list
+        $model->setRoleList(new Collection());
+        if (is_array($post['role'])) {
+            foreach ($post['role'] as $roleId => $allowed) {
+                $resourceRole = new Role\Model();
+                $role         = new \Schoolbox\Role();
+                $role->setId($roleId);
+                $resourceRole
+                    ->setResource($model)
+                    ->setRole($role)
+                    ->setAllowed($allowed);
+                $model->addRole($resourceRole);
             }
         }
 
