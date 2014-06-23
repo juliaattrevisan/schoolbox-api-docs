@@ -949,13 +949,16 @@ class External_Maze_User implements External_UserInterface {
 
 	/**
 	 * Used in sync scripts
+	 *
+	 * Staff members with a Finish date are ignored
+	 * Staff members with staff_type L (left/departed) are ignored
 	 */
 	public function getStaffUserAccountInfo() {
 		$query = "
 			SELECT
 				SFKEY AS StaffID,
 				USER_NAME AS NetworkLogin,
-				STATUS AS ActiveFlag,
+				STAFF_TYPE AS ActiveFlag,
 				NULL AS StaffTitle,
 				FIRST_NAME AS StaffPreferredName,
 				SURNAME AS StaffSurname,
@@ -963,10 +966,12 @@ class External_Maze_User implements External_UserInterface {
 				NULL AS OccupEmail,
 				SF_EMAIL AS Email,
 				CAMPUS AS StaffCampus,
-				NULL AS StaffCategoryTye,
+				NULL AS StaffCategoryType,
 				NULL AS StaffCategory,
 				NULL AS StaffDepartment
 			FROM SF
+			WHERE FINISH IS NULL
+			AND STAFF_TYPE != 'L'
 		";
 
 		return $this->getDb()->getAll($query);
