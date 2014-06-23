@@ -44,7 +44,7 @@ class CanBookItem implements Rule\IAuthorizationRule {
      *   on resource booking service
      *
      * If this item is not managed:
-     * * staff can book this item as well
+     * * any user in the item's role list can book this item
      *
      * @param  array $params Any parameters passed as part of the route.
      * @param  User  $user   The user to authorize, if any. Null value assumes
@@ -68,7 +68,25 @@ class CanBookItem implements Rule\IAuthorizationRule {
             $moderateRule
         );
         if (!($item->getModerationType()->getId() == Item\ModerationType\Model::TYPE_MANAGED)) {
-            $auth->prependRule(new Rule\HasRole(Role::STAFF));
+            // Add a callback rule:
+            // if $user's role is allowed in $item's list of role permissions,
+            // allow $user to book the item.
+            $auth->prependRule(
+                new Rule\Callback(
+                    function($params = array(), User $user = null) use($item) {
+                        if ($user instanceof User) {
+                            foreach ($item->getRoleList() as $rolePermission) {
+                                if ($rolePermission->getRole()->getId() == $user->getRole()->getId()) {
+                                    if ($rolePermission->getAllowed()) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                        throw new Failure\Forbidden();
+                    }
+                )
+            );
         }
         $auth->authorize($params, $user);
     }
