@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 
 <script type="text/javascript">
 
@@ -147,6 +148,7 @@
                 }
             })
 
+            $('div.checkboxes').greenerize();
         })
     })(jQuery);
 </script>
@@ -177,6 +179,28 @@
                         >{{ category.name }}</option>
                     {% endfor %}
                 </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Allowed Roles</h4>
+                <em>Users in the selected roles will be able to book this resource.</em>
+            </td>
+            <td>
+                <div class="clearfix checkboxes groups">
+                {% for role in roleList %}
+                    {# Default for new items: staff roles are selected, others are not #}
+                    <input type="hidden" value="0" name="role[{{ role.id }}]" />
+                    <label class="float-left clear">
+                        <input name="role[{{ role.id }}]" type="checkbox" value="1" />
+                        {{ role.name }}
+                    </label>
+                {% endfor %}
+                <label class="float-left clear">
+                    <input type="checkbox" value="1" class="select_all" />
+                    Select All
+                </label>
+                </div>
             </td>
         </tr>
         <tr>
