@@ -45,24 +45,11 @@ class EventConverter {
         $endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
         $eventItem->setEndDateTime($endDateTime);
 
-        /* Accumulate campuses for this event
-         */
-//        $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
-
-        /* For filters
-         */
-//        $campusIds = array();
-
-//        foreach($eventItem->getCampusCollection() as $currentCampus) {
-//            $campusIds[] = $currentCampus->getId();
-//        }
-
         /* Translate a \Schoolbox\Event type into a
          * Calendar_Event_Type_Abstract type
          */
         $event = new \Calendar_Event_Type_ResourceBooking();
         $event->setBooking($booking);
-//        $event->setAuthorName($eventItem->getAuthor()->getFullname());
         // Should be able to set owner ID too, but for now that has to be
         // referenced from the booking object.
         $event->setAuthorName($eventItem->getAuthor()->formatName());
@@ -71,10 +58,8 @@ class EventConverter {
         $event->setStartTime($eventItem->getStartDateTime());
         $event->setEndTime($eventItem->getEndDateTime());
         $event->setPublishDate($eventItem->getPublishDateTime());
-//        $event->setCampusList(implode(',', $campusIds));
 
-//        $event->setType($eventItem->getEventType()->getId());
-        $event->setNote($eventItem->getNote());
+        $event->setNote($booking->getName());
         $event->setAccess($eventItem->getAccess());
 
         // Set the event's type and color if there's a type for bookings
@@ -89,19 +74,6 @@ class EventConverter {
         $event->setAllDay($eventItem->getAllDay());
         // Resource booking events: not editable in the conventional way
         $event->setIsEditable(false);
-
-//        /* If you have write access to the event. Only superusers
-//         * and authors can modify an event
-//         */
-//        if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
-//            $event->setIsEditable(true);
-//        }
-//        else {
-//            $event->setIsEditable(false);
-//        }
-
-//        $event->setAttendance(0);
-//        $event->setCompleted(0);
         return $event;
     }
 
