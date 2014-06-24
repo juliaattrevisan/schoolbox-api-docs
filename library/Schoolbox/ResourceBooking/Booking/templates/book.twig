@@ -361,10 +361,16 @@ $(document).ready(function() {
 
     // Set up tabz for the projector.
     // Always default to setting a date and time directly, though.
-    $('[data-interaction="tabs"]').tabs({
-        heightStyle: 'auto',
-        active: 0
-    });
+    $('[data-interaction="tabs"]')
+        .tabs({
+            heightStyle: 'auto',
+            active: 0
+        })
+        .on('tabsbeforeactivate', function(event, ui) {
+            // Ensure that all inputs in inactive tabs are disabled
+            ui.oldPanel.find(':input').prop('disabled', true)
+            ui.newPanel.find(':input').prop('disabled', false)
+        })
 })
 </script>
 <!-- END custom_header -->
