@@ -25,7 +25,7 @@
 <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
     <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
     <input name="uid" type="hidden" id="uid" value="{UID}" />
-	<input name="redirect" type="hidden" value="/submission/returnWork/{BOX_ID}/{UID}" />
+	<input name="redirect" type="hidden" value="{REDIRECT}" />
 	
     <table class="standardForm table">
         <tr>
@@ -86,6 +86,14 @@
                 <!-- END mark_type_rubric -->
             </td>
         </tr>
+		<tr>
+			<td>
+				<h4>Comment</h4>
+			</td>
+			<td>
+				<textarea name="comment" style="width:100%;" rows="5">{COMMENT}</textarea>
+			</td>
+		</tr>
         <tr>
             <td>
                 <h4>Overall Grade</h4>

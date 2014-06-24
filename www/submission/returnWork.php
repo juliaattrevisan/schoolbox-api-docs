@@ -1,4 +1,6 @@
 <?php
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block');
 $this->setBlock(TEMPLATE_content, 'mark_type_letter', 'mark_type_letter_block');
@@ -26,6 +28,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 		'NAME' => $user->formatName(),
 		'SYN_ID' => $user->getExternalId(),
 		'UID' => $user->getId(),
+		'REDIRECT' => "/submission/viewSubmission/{$submissionBox->getId()}",
 	));
 
 	$marksheet = \Marksheet_Factory::build($submissionBox->getMarkType()->getSlug());
@@ -43,6 +46,22 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 	 */
 	$renderer = new \Rubric\Renderer\Horizontal($this, $submissionBox, $user);
 	$renderer->render();
+
+	/* Return
+	 */
+	$returnedWorkMapper = new ReturnedWorkMapper();
+	$return = $returnedWorkMapper->findByColumnList(array(
+		'box_id' => $submissionBox->getId(),
+		'owner' => $user->getId()
+	), array(
+		'order' => array(
+			'returned' => 'desc'
+		)
+	))->first();
+
+	$this->setVar(array(
+		'COMMENT' => $return->getComment()
+	));
 
 	/* Parse out everything
 	 */
