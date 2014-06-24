@@ -805,6 +805,8 @@ class Controller extends Base {
         if ($event->getSeriesId()) {
             $recurrence = $this->getEventRecurrenceMapper()->getSeriesRecurrence($event);
         }
+
+        // Cancel callback URL: point to the last page if it wasn't set.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
@@ -812,6 +814,7 @@ class Controller extends Base {
                     'item'       => $item,
                     'recurrence' => $recurrence,
                     'campusList' => $this->getCampusList(),
+                    'cancelCallbackUrl' => $this->session->getHistory(),
                 ),
             )
         );
@@ -878,13 +881,23 @@ class Controller extends Base {
     }
 
     /**
+     * Gets the callback URL out of the URL if it's there, otherwise gets the
+     * last history page.
+     *
+     * @return string
+     */
+    protected function getStatusChangeCallbackUrl() {
+        return $this->request->post['callbackUrl'] ?: $this->getSession()->getHistory();
+    }
+
+    /**
      * Marks a booking as approved.
      *
      * @param Model $item The booking to approve.
      */
     public function approve(Model $item) {
         $this->changeStatus($item, Status\Model::STATUS_APPROVED);
-        $this->setUpdateStatusResponse($item);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
 
     /**
@@ -894,7 +907,7 @@ class Controller extends Base {
      */
     public function reject(Model $item) {
         $this->changeStatus($item, Status\Model::STATUS_REJECTED);
-        $this->setUpdateStatusResponse($item);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
 
     /**
@@ -904,7 +917,7 @@ class Controller extends Base {
      */
     public function setPending(Model $item) {
         $this->changeStatus($item, Status\Model::STATUS_PENDING);
-        $this->setUpdateStatusResponse($item);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
 
     /**
@@ -925,7 +938,21 @@ class Controller extends Base {
         if (count($series)) {
             $this->getBookingMapper()->delete($series);
         }
-        $this->setUpdateStatusResponse($item);
+        $callbackUrl = $this->getStatusChangeCallbackUrl();
+
+        // The callback URL might point to the edit page for this booking.
+        // Until I implement redirects in route preloads, I'll have to check for
+        // that case here.
+        if ($callbackUrl === $this->router->generate(
+            'resourceBooking.edit',
+            array('id' => $item->getId())
+        )) {
+            $callbackUrl = $this->router->generate(
+                'resourceItem.read',
+                array('id' => $item->getResource()->getId())
+            );
+        }
+        $this->setUpdateStatusResponse($item, $callbackUrl);
     }
 
     /**
@@ -949,21 +976,27 @@ class Controller extends Base {
     /**
      * Processes a redirect after a booking's status is updated.
      *
-     * @param Model $booking
+     * @param Model  $booking
+     * @param string $callbackUrl
      */
-    protected function setUpdateStatusResponse(Model $booking) {
+    protected function setUpdateStatusResponse(Model $booking, $callbackUrl) {
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
-                    'data'   => array('item' => $booking,),
+                    'data'   => array(
+                        'item' => $booking,
+                        'callbackUrl' => $callbackUrl,
+                    ),
                 )
             );
         }
         else {
             // Is there a previous location to redirect to? if so use that.
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
+            $this->getResponse()->redirect->afterPost(
+                $callbackUrl ?: $this->getSession()->getHistory()
+            );
         }
     }
 
