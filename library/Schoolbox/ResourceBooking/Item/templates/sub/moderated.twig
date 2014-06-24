@@ -1,0 +1,6 @@
+{# Displays "moderated by" or "managed by" depending on moderation type. #}
+{% if item.moderationType.managed %}
+    Managed by
+{% else %}
+    Moderated by
+{% endif %}
