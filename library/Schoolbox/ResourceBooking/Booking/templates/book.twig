@@ -359,8 +359,11 @@ $(document).ready(function() {
         })
         .change()
 
+    // Set up tabz for the projector.
+    // Always default to setting a date and time directly, though.
     $('[data-interaction="tabs"]').tabs({
-        heightStyle: 'auto'
+        heightStyle: 'auto',
+        active: 0
     });
 })
 </script>
@@ -402,8 +405,8 @@ $(document).ready(function() {
             <td>
                 <div data-interaction="tabs">
                     <ul>
-                        <li><a href="#timetableSelector">Choose From Timetable</a></li>
-                        <li><a href="#dateSelector">Set Time Directly</a></li>
+                        <li><a href="#dateSelector">Choose a Time</a></li>
+                        <li><a href="#timetableSelector">Choose from Timetable</a></li>
                     </ul>
                     <div id="timetableSelector">
                         <em>You may select a timetable day and period to book this item for here.</em>
