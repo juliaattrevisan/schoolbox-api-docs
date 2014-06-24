@@ -225,7 +225,7 @@ $(document).ready(function() {
         {# Resource manager: could be set in the edit form, or the default resource manager #}
         <p class="meta">
             {% if item.moderatorList is not empty %}
-                Managed by
+                {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
                 {% for moderator in item.moderatorList %}
                     <span>{% include 'sub/userLink.twig' with {user: moderator} %}</span>
                 {% endfor %}
