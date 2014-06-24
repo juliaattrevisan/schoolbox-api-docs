@@ -403,78 +403,24 @@ $(document).ready(function() {
                 <h4>Booking Time</h4>
             </td>
             <td>
-                <div data-interaction="tabs">
-                    <ul>
-                        <li><a href="#dateSelector">Choose a Time</a></li>
-                        <li><a href="#timetableSelector">Choose from Timetable</a></li>
-                    </ul>
-                    <div id="timetableSelector">
-                        <em>You may select a timetable day and period to book this item for here.</em>
-                        <em>If you want this booking to recur for a timetable period, then
-                            make sure you select the "Timetable Based" option in "Repeat".</em>
-
-                        <dl class="clearfix" data-interaction="timetableSelector">
-                            <dt>Campus</dt>
-                            <dd>
-                                <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
-                                    <option disabled>-- select campus --</option>
-                                    {% for campus in campusList %}
-                                        <option value="{{ campus.id }}"
-                                                label="{{ campus.name }}"
-                                                >{{ campus.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </dd>
-                            <dt>Day</dt>
-                            <dd>
-                                <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
-                                    <option disabled>-- select day --</option>
-                                </select>
-                            </dd>
-                            <dt>Period</dt>
-                            <dd>
-                                <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
-                                    <option disabled>-- select period --</option>
-                                </select>
-                            </dd>
-                            <dt>Date</dt>
-                            <dd>
-                                <time data-role="selectedDate"></time>
-                                <time data-role="selectedTimeStart"></time>
-                                <time data-role="selectedTimeEnd"></time>
-                            </dd>
-                            <dt>&nbsp;</dt>
-                            <dd>
-                                <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
-                                <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
-                                <a data-interaction="useDate" class="btn tick no-text float-left" title="Use this date" href="#"><span></span></a>
-                            </dd>
-                        </dl>
+                {# Existing items - only show the date and time (for now) #}
+                {# New items - allow choice of timetable or date/time #}
+                {% if item.id %}
+                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                {% else %}
+                    <div data-interaction="tabs">
+                        <ul>
+                            <li><a href="#dateSelector">Choose a Time</a></li>
+                            <li><a href="#timetableSelector">Choose from Timetable</a></li>
+                        </ul>
+                        <div class="clearfix" id="timetableSelector">
+                            {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
+                        </div>
+                        <div class="clearfix" id="dateSelector">
+                            {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                        </div>
                     </div>
-                    <div class="clearfix" id="dateSelector">
-                        <dl>
-                            <dt>Start Time</dt>
-                            <dd>
-                                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
-                                {% include 'sub/datetimeInput.twig' with {
-                                    value: item.event.startDateTime,
-                                    name:  'start_datetime',
-                                    id:    'start_datetime'
-                                } %}
-                            </dd>
-                            <dt>End Time</dt>
-                            <dd>
-                                {% include 'sub/datetimeInput.twig' with {
-                                    value: item.event.endDateTime,
-                                    name:  'end_datetime',
-                                    id:    'end_datetime'
-                                } %}
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-                {# Select campus, day, period #}
-                {# on change campus: deselect day and period#}
+                {% endif %}
             </td>
         </tr>
         {% if item.event.id is empty %}
