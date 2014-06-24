@@ -166,6 +166,17 @@
             <td><input class="required" name="name" type="text" value="{{ item.name }}" size="30"/></td>
         </tr>
         <tr>
+            <td class="formLabelWidth">
+                <h4>Room Code</h4>
+                <em>
+                    If this resource is a room, enter its room code here.
+                    This will prevent the room from being booked when there is a
+                    class timetabled there.
+                </em>
+            </td>
+            <td><input name="room_code" type="text" value="{{ item.roomCode }}" size="64"/></td>
+        </tr>
+        <tr>
             <td class="formLabelWidth"><h4>Category</h4></td>
             <td>
                 <select name="resource_category_id">

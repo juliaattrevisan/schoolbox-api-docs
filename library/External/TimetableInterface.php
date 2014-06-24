@@ -23,4 +23,12 @@ interface External_TimetableInterface {
 	public function getSubjectPeriod ($classCode, $dayNumber);
 
 	public function getSubjectName ($classCode);
+
+	/**
+	 * Gets the timetable for the given room.
+	 *
+	 * @param  string $roomCode
+	 * @return array
+	 */
+	public function getRoomTimetable($roomCode);
 }

@@ -111,14 +111,16 @@ $(document).ready(function() {
 
                 // Add booking styles
                 element.addClass('booking');
-                if (event.data.booking.status.isRejected) {
-                    element.addClass('rejected');
-                }
-                if (event.data.booking.status.isApproved) {
-                    element.addClass('approved');
-                }
-                if (event.data.booking.status.isPending) {
-                    element.addClass('pending');
+                if ('booking' in event.data) {
+                    if (event.data.booking.status.isRejected) {
+                        element.addClass('rejected');
+                    }
+                    if (event.data.booking.status.isApproved) {
+                        element.addClass('approved');
+                    }
+                    if (event.data.booking.status.isPending) {
+                        element.addClass('pending');
+                    }
                 }
                 return element
             },
@@ -201,7 +203,7 @@ $(document).ready(function() {
 <!-- END custom_header -->
 
 
-<h1>Resource - {{ item.name }}</h1>
+<h1>Resource - {% include '@resourceItem/sub/itemName.twig' with {item: item} %}</h1>
 <span class="header_option">
     {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
         <a class="resource-name resource-edit-link btn modify float-left" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}">

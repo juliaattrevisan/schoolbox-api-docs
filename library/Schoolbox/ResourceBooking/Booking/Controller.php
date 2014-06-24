@@ -164,29 +164,46 @@ class Controller extends Base {
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
-            // Create the booking (or series of bookings) for the base item.
-            $bookingList = $this->createBookingFromPostData($item);
 
-            // Create the related bookings:
-            // one for each combination of related item and booking in series.
-            $relatedSelections = $this->getRequest()->post['related_item'] ?: array();
-            if (!empty($relatedSelections)) {
-                $relatedBookingList = new Collection();
-                foreach ($item->getRelatedResourceList() as $relatedResource) {
-                    if (in_array($relatedResource->getId(), $relatedSelections)) {
-                        foreach ($bookingList as $booking) {
-                            // Related bookings share same event as base booking.
-                            $relatedBooking = $this->getBookingFromEvent(
-                                $relatedResource,
-                                $booking->getEvent()
-                            );
-                            $relatedBooking->setName($this->request->post['name']);
-                            $relatedBooking->addRelatedBooking($booking);
-                            $relatedBookingList->add($relatedBooking);
-                        }
-                    }
+            // Get the event that all bookings are based off of.
+            $event = $this->getBaseEvent();
+            $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
+            $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
+            $event->setNote("Booking: ".$item->getName());
+            $event->setDetail($this->getRequest()->post['notes']);
+
+            // Build the booking
+            $booking = $this->getBookingFromEvent($item, $event);
+            $booking->setName($this->request->post['name']);
+            $bookingList = new Collection();
+            $bookingList->add($booking);
+
+            // Expand into bookings for recurrence
+            if (!empty($this->request->post['repeat'])) {
+                $bookingList = $this->expandBookingForRecurrence(
+                    $bookingList,
+                    $this->getRequest()->post['repeat'],
+                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+                    $this->getRequest()->post['timetable']['campus']
+                );
+            }
+            else {
+                // Just save the event by itself.
+                foreach ($bookingList as $booking) {
+                    $this->eventMapper->save($booking->getEvent());
                 }
-                $this->getBookingMapper()->save($relatedBookingList);
+            }
+
+            // Expand into related items.
+            if (!empty($this->request->post['related_item'])) {
+                $bookingList = $this->expandBookingForRelatedItems(
+                    $bookingList,
+                    $this->request->post['related_item'] ?: array()
+                );
+            }
+            else {
+                // Just save the booking.
+                $this->bookingMapper->save($bookingList);
             }
         }
         else {
@@ -227,6 +244,278 @@ class Controller extends Base {
     }
 
     /**
+     * Stub for update method
+     *
+     * @param Model $item
+     */
+    public function update(Model $item) {
+        $bookingList = null;
+
+        // Perform validation, but leave this booking out of calculations.
+        $code   = 200;
+        $errors = $this->validateBookingFromPostData($item->getResource(), $item);
+
+        if (empty($errors)) {
+
+            // Get the date and time changes.
+            // These will be applied to the whole series.
+            $startDate  = $this->getDateFromForm('start_datetime');
+            $endDate    = $this->getDateFromForm('end_datetime');
+            $startDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime()->getDateTimeObject(), $startDate
+            );
+            $endDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
+            );
+            $isTimeChanged =
+                $startDelta->getSecondTotal() !== 0
+                || $endDelta->getSecondTotal() !== 0;
+
+            /** @var Collection|Model[] $series */
+            if ($this->request->post['efficacy'] === 'series') {
+                // Load whole series
+                $series = $this->bookingMapper->findSeriesBookings(
+                    $item->getId(), $item->getEvent()->getSeriesId()
+                );
+            }
+            else {
+                // Divorce booking from its series
+                $series = new Collection();
+                $item->getEvent()->setSeriesId(null);
+            }
+            $series->add($item);
+
+            // Save the whole series
+            $bookingList = new Collection();
+            foreach ($series as $booking) {
+                $event = $booking->getEvent();
+                // Role and campus currently need to be set to something.
+                $event->setRoleCollection(new Collection());
+                $event->setCampusCollection(new Collection());
+
+                // Adjust the current event, if its time changed.
+                // If times changed, the event's status will need to change.
+                if ($isTimeChanged) {
+                    $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
+                        $startDelta->getAsDateInterval()
+                    );
+                    $event->setStartDateTime(new Alaress_Date_Format($newStart));
+                    $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
+                        $endDelta->getAsDateInterval()
+                    );
+                    $event->setEndDateTime(new Alaress_Date_Format($newEnd));
+                }
+                $event->setDetail($this->request->post['notes']);
+                $this->eventMapper->save($event);
+
+                // Adjust $booking
+                $booking->setName($this->request->post['name']);
+
+                // Get all the related bookings for this event at this time.
+                $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
+                foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+
+                    $relatedBooking = null;
+                    foreach ($existingRelatedBookings as $existing) {
+                        if ($existing->getResource()->getId() == $relatedResource->getId()) {
+                            $relatedBooking = $existing;
+                            break;
+                        }
+                    }
+                    $inNew = in_array(
+                        $relatedResource->getId(),
+                        $this->request->post['related_item'] ?: array()
+                    );
+
+                    if ($inNew) {
+                        if ($relatedBooking instanceof Model) {
+                            // update
+
+                            // Has the booking time changed?
+                            // That invalidates existing bookings
+                            if ($isTimeChanged) {
+                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+                            }
+                        }
+                        else {
+                            // create
+                            $relatedBooking = new Model();
+                            $relatedBooking
+                                ->setEvent($event)
+                                ->setResource($relatedResource)
+                                ->setStatus(Status\Model::STATUS_PENDING);
+                        }
+
+                        // Open resource: automatically confirm
+                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+                        }
+
+                        // Status:
+                        // pending if new, or time was changed
+                        $relatedBooking
+                            ->setName($this->request->post['name'])
+                            ->addRelatedBooking($booking);
+                        $booking->addRelatedBooking($relatedBooking);
+                        $this->bookingMapper->save($relatedBooking);
+                        $bookingList->add($relatedBooking);
+                    }
+                    elseif ($relatedBooking instanceof Model) {
+                        // delete
+                        $this->bookingMapper->delete($relatedBooking);
+                    }
+                }
+
+                $bookingList->add($booking);
+            }
+        }
+        else {
+            $code = 400;
+        }
+
+		/* Append the booking's id to the url, for the calling module to
+		 * process in whatever way it needs. This allows a decoupling between
+		 * Resource Booking any any modules that use it.
+		 *
+		 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+ 		 */
+		$callbackUrl = '';
+
+		if (strlen($this->getRequest()->post['callbackUrl'])) {
+			$callbackUrl = $this->getRequest()->post['callbackUrl'];
+		}
+
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item'   => $item,
+                        'errors' => $errors,
+						'callbackUrl' => $callbackUrl
+                    ),
+                )
+            );
+        }
+        else {
+            // Redirect back to previous page, or read page if not set.
+            // (let's have a better interface than backToTheFuture too)
+            // Consider storing redirect URL in form or GET?
+			$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+        }
+    }
+
+    /**
+     * Expands each item in a list of bookings into a set of bookings for
+     * related items.
+     *
+     * The bookings are saved after this step.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param array              $relatedItems
+     *
+     * @return Collection
+     */
+    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems) {
+        if (empty($relatedItems)) {
+            return $bookingList;
+        }
+        $newList = new Collection();
+        foreach ($bookingList as $booking) {
+            foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+                if (in_array($relatedResource->getId(), $relatedItems)) {
+                    $relatedBooking = $this->getBookingFromEvent(
+                        $relatedResource,
+                        $booking->getEvent()
+                    );
+                    $relatedBooking->setName($booking->getName());
+                    // Add related booking relation in both directions
+                    $booking->addRelatedBooking($relatedBooking);
+                    $relatedBooking->addRelatedBooking($booking);
+                    $newList->add($relatedBooking);
+                }
+            }
+            $newList->add($booking);
+        }
+        $this->bookingMapper->save($newList);
+        return $newList;
+    }
+
+    /**
+     * Expands each item in a list of bookings into a series of bookings.
+     *
+     * The events that are created are saved.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param string             $recurrenceRule
+     * @param DateTime           $repeatUntil
+     * @param int                $campus
+     *
+     * @return Collection
+     */
+    protected function expandBookingForRecurrence(
+        Collection $bookingList,
+        $recurrenceRule,
+        DateTime $repeatUntil,
+        $campus
+    ) {
+        $newList = new Collection();
+        foreach ($bookingList as $booking) {
+            $newList->add($booking);
+            $event = $booking->getEvent();
+            $eventList = new Collection();
+            switch ($recurrenceRule) {
+                case 'daily':
+                case 'weekly':
+                case 'fortnightly':
+                case 'monthly':
+                    if ($repeatUntil instanceof DateTime) {
+                        $this->eventRecurrenceMapper->save(
+                            $event,
+                            'series',
+                            $recurrenceRule,
+                            new Alaress_Date_Format($repeatUntil),
+                            $event->getStartDateTime(),
+                            $event->getEndDateTime()
+                        );
+                        // Create a whole set of bookings based on this event.
+                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
+                    }
+                    break;
+                case 'timetable':
+                    if ($repeatUntil instanceof DateTime) {
+                        $period = new \External_TimetableDatePeriod(
+                            $event->getStartDateTime()->getDateTimeObject(),
+                            $repeatUntil->modify('+1 day'),
+                            $this->getExternalTimetableHandler(),
+                            $campus
+                        );
+                        $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
+                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // Add a booking for each recurring event that was created.
+            if (count($eventList)) {
+                foreach ($eventList as $event) {
+                    $newBooking = clone $booking;
+                    $newBooking->setEvent($event);
+                    $newList->add($newBooking);
+                }
+            }
+        }
+        return $newList;
+    }
+
+    /**
      * Attempts to validate the creation or update of a booking from post data.
      *
      * @param  Item\Model $resource
@@ -258,11 +547,19 @@ class Controller extends Base {
         if (isset($startDate)) {
             // Start date before present gets covered by too_early
             // Start time before earliest possible time
-            $earliest = new DateTime();
-            $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
-            if ($startDate < $earliest) {
-                $errors['start_datetime'][] = 'too_early';
+            $now = new DateTime();
+            $now->setTimestamp($this->request->server['REQUEST_TIME']);
+            if ($startDate < $now) {
+                $errors['start_datetime'][] = 'in_past';
             }
+            else {
+                $earliest = new DateTime();
+                $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
+                if ($startDate < $earliest) {
+                    $errors['start_datetime'][] = 'too_early';
+                }
+            }
+
         }
 
         // I need both start and end to check reservation span.
@@ -309,6 +606,20 @@ class Controller extends Base {
             }
             if (count($conflictingBookings)) {
                 $errors['start_datetime'][] = 'conflict';
+            }
+            elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+                // Check if there's a timetabled class here, too.
+                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                    $this->getUser(), array()
+                );
+                $roomSource->setRoomCode($roomCode);
+                $roomEvents = $roomSource->getEvents(
+                    $startDate->getTimestamp(),
+                    $endDate->getTimestamp()
+                );
+                if (count($roomEvents)) {
+                    $errors['start_datetime'][] = 'timetabled_class';
+                }
             }
         }
 
@@ -367,20 +678,9 @@ class Controller extends Base {
     /**
      * Helper for creating events for resource bookings.
      *
-     * Creates an event based on the resource, start and end date and notes.
-     *
-     * @param  Item\Model $resource
-     * @param  DateTime   $startDate
-     * @param  DateTime   $endDate
-     * @param  string     $notes
      * @return Calendar\Event
      */
-    protected function getEventFromPostData(
-        Item\Model $resource,
-        DateTime $startDate,
-        DateTime $endDate,
-        $notes
-    ) {
+    protected function getBaseEvent() {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
@@ -402,69 +702,8 @@ class Controller extends Base {
         $event->setRoleCollection(new Collection());
         $event->setCampusCollection(new Collection());
 
-        $event->setStartDateTime(new Alaress_Date_Format($startDate));
-        $event->setEndDateTime(new Alaress_Date_Format($endDate));
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
-        $event->setNote("Booking: ".$resource->getName());
-        $event->setDetail($notes);
         return $event;
-    }
-
-    /**
-     * Creates events from the given recurrence rule (if there is one).
-     * If there isn't one, it just creates the event.
-     *
-     * @param  Calendar\Event $event
-     * @param  string         $recurrenceRule
-     * @param  DateTime       $repeatUntil
-     * @param  int            $campusId
-     * @return Collection|Calendar\Event[] The events that were created.
-     */
-    protected function createEventsFromRecurrence(
-        Calendar\Event $event,
-        $recurrenceRule,
-        $repeatUntil,
-        $campusId
-    ) {
-        /** @var Collection|Calendar\Event[] $eventList */
-        $eventList = new Collection();
-        switch ($recurrenceRule) {
-            case 'daily':
-            case 'weekly':
-            case 'fortnightly':
-            case 'monthly':
-                if ($repeatUntil instanceof DateTime) {
-                    $this->getEventRecurrenceMapper()->save(
-                        $event,
-                        'series',
-                        $recurrenceRule,
-                        new Alaress_Date_Format($repeatUntil),
-                        new Alaress_Date_Format($event->getStartDateTime()),
-                        new Alaress_Date_Format($event->getEndDateTime())
-                    );
-                    // Create a whole set of bookings based on this event.
-                    $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
-                }
-                break;
-            case 'timetable':
-                if ($repeatUntil instanceof DateTime) {
-                    $period = new \External_TimetableDatePeriod(
-                        $event->getStartDateTime()->getDateTimeObject(),
-                        $repeatUntil->modify('+1 day'),
-                        $this->getExternalTimetableHandler(),
-                        $campusId
-                    );
-                    $this->getEventRecurrenceMapper()->createSequenceFromIterator($event, $period);
-                    // Create a whole set of bookings based on this event.
-                    $eventList = $this->getEventMapper()->findByColumn('series_id', $event->getSeriesId());
-                }
-                break;
-            default:
-                $this->getEventMapper()->save($event);
-                $eventList->add($event);
-                break;
-        }
-        return $eventList;
     }
 
     /**
@@ -491,50 +730,11 @@ class Controller extends Base {
     }
 
     /**
-     * Helper for creating bookings out of a resource item and post data.
-     *
-     * @param  Item\Model $resource
-     * @return Collection|Model[] A collection of bookings that were created.
-     *                            Only one will be created unless it was a
-     *                            recurring booking.
-     */
-    protected function createBookingFromPostData(Item\Model $resource) {
-        // Create the booking, which in turn adds an event to the calendar.
-        // This action saves a connected event.
-        $event = $this->getEventFromPostData(
-            $resource,
-            $this->getDateFromForm('start_datetime'),
-            $this->getDateFromForm('end_datetime'),
-            $this->getRequest()->post['notes']
-        );
-
-        // I've built the event, now build recurrences if required.
-        /** @var Collection|Calendar\Event[] $eventList */
-        $eventList = $this->createEventsFromRecurrence(
-            $event,
-            $this->getRequest()->post['repeat'],
-            DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
-            $this->getRequest()->post['timetable']['campus']
-        );
-
-        // Build a list of bookings to return
-        /** @var Collection|Model[] $bookingList */
-        $bookingList = new Collection();
-        foreach ($eventList as $event) {
-            $booking = $this->getBookingFromEvent($resource, $event);
-            $booking->setName($this->request->post['name']);
-            $bookingList->add($booking);
-        }
-        $this->getBookingMapper()->save($bookingList);
-        return $bookingList;
-    }
-
-    /**
      * Outputs the calendar for this item.
      *
      * @param Item\Model $item
      */
-    public function bookingCalendar($item) {
+    public function bookingCalendar(Item\Model $item) {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
         // the find method should receive:
@@ -560,6 +760,26 @@ class Controller extends Base {
         foreach ($events as $event) {
             $renderer->visit($event);
         }
+
+        // Get timetabled classes for this room, if there are any.
+        $roomCode = $item->getRoomCode();
+        if (strlen($roomCode)) {
+            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(), array()
+            );
+            $roomSource->setRoomCode($item->getRoomCode());
+            $roomEvents = $roomSource->getEvents(
+                $this->getRequest()->query['start'],
+                $this->getRequest()->query['end']
+            );
+            $roomRenderer = new \Calendar_Event_Type_Day_Renderer_Javascript(
+                $this->getDi()->get('sitePage')
+            );
+            foreach ($roomEvents as $event) {
+                $roomRenderer->visit($event);
+            }
+        }
+
         $output = ob_get_clean();
         $output = json_decode('['.$output.'{}]');
 
@@ -598,98 +818,6 @@ class Controller extends Base {
     }
 
     /**
-     * Stub for update method
-     *
-     * @param Model $item
-     */
-    public function update(Model $item) {
-        // Perform validation, but leave this booking out of calculations.
-        $errors = $this->validateBookingFromPostData($item->getResource(), $item);
-
-        $code = 200;
-        if (empty($errors)) {
-
-            // Have the date and time changed?
-            // If so, set the date and time for each event, and invalidate
-            // each event.
-            $startDate  = $this->getDateFromForm('start_datetime');
-            $endDate    = $this->getDateFromForm('end_datetime');
-            $startDelta = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime()->getDateTimeObject(), $startDate
-            );
-            $endDelta = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
-            );
-            $notes = $this->getRequest()->post['notes'];
-			$name  = $this->getRequest()->post['name'];
-
-            // Update this item.
-            $this->updateBookingFromPostData($item, $startDelta, $endDelta, $notes, $name);
-
-            // Has the time changed? If so:
-            // * If this is a single item, just set status back to pending.
-            // * If this is a series booking, the rule is much more complicated.
-            //   Probably best to take each booking in the series, and adjust
-            //   its time by whatever the difference is between each.
-
-            // Update all of the items in the series.
-            $series = $this->getSeriesBookings($item);
-            if (count($series)) {
-                // update all of these, too
-                foreach ($series as $seriesBooking) {
-                    $seriesEvent = $seriesBooking->getEvent();
-                    // Don't adjust any items that have already started.
-                    // It's too late for that!
-                    if ($seriesEvent->getStartDateTime() < new DateTime()) {
-                        continue;
-                    }
-                    $this->updateBookingFromPostData($seriesBooking, $startDelta, $endDelta, $notes, $name);
-                }
-            }
-
-            // Update related bookings too.
-            // If an item was in the list but isn't now, remove bookings for it
-            // If it wasn't and is, add it.
-            // (It should be enough to add/remove from linked bookings)
-        }
-        else {
-            $code = 400;
-        }
-
-		/* Append the booking's id to the url, for the calling module to
-		 * process in whatever way it needs. This allows a decoupling between
-		 * Resource Booking any any modules that use it.
-		 *
-		 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
- 		 */
-		$callbackUrl = '';
-
-		if (strlen($this->getRequest()->post['callbackUrl'])) {
-			$callbackUrl = $this->getRequest()->post['callbackUrl'];
-		}
-
-        if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->status->setCode($code);
-            $this->getResponse()->content->set(
-                array(
-                    'format' => 'json',
-                    'data'   => array(
-                        'item'   => $item,
-                        'errors' => $errors,
-						'callbackUrl' => $callbackUrl
-                    ),
-                )
-            );
-        }
-        else {
-            // Redirect back to previous page, or read page if not set.
-            // (let's have a better interface than backToTheFuture too)
-            // Consider storing redirect URL in form or GET?
-			$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
-        }
-    }
-
-    /**
      * Helper method for getting list of campuses and their periods and days.
      *
      * @return array
@@ -721,129 +849,6 @@ class Controller extends Base {
             $campusList[$campusId] = $campusArray;
         }
         return $campusList;
-    }
-
-	/**
-	 * Attempts to update a booking based on what was passed through post data.
-	 *
-	 * @param Model $item
-	 * @param Interval $startDelta
-	 * @param Interval $endDelta
-	 * @param string $notes
-	 * @param $name
-	 */
-    protected function updateBookingFromPostData(
-        Model $item,
-        Interval $startDelta,
-        Interval $endDelta,
-        $notes,
-		$name
-    ) {
-        $this->updateBookingFieldsFromPostData($item, $startDelta, $endDelta, $notes, $name);
-
-        // Related bookings:
-        // Item wasn't selected and is now: add booking and relation
-        // Item was selected and isn't anymore: cancel booking and remove relation
-        // Item was selected and still is: preserve booking relation
-        $relatedEventList     = new Collection();
-        $insertedBookingList  = new Collection();
-        $deletedBookingList   = new Collection();
-        $updatedSelections    = array();
-        $relatedSelections    = $this->getRequest()->post['related_item'] ?: array();
-        $relatedBookingList   = $this->getBookingMapper()->findRelatedBookings($item->getId());
-        foreach ($relatedBookingList as $relatedBooking) {
-            $relatedResourceId = $relatedBooking->getResource()->getId();
-            if (in_array($relatedResourceId, $relatedSelections)) {
-                // Is the resource still selected?
-                // Make sure it's preserved, and the event is updated.
-                $updatedSelections[] = $relatedResourceId;
-                $relatedBooking = $this->updateBookingFieldsFromPostData(
-                    $relatedBooking,
-                    $startDelta,
-                    $endDelta,
-                    $notes,
-					$name
-                );
-                $relatedEventList->add($relatedBooking->getEvent());
-            }
-            else {
-                // Remove from the list if it isn't.
-                $deletedBookingList->add($relatedBooking);
-            }
-        }
-
-        // Are there any items that weren't selected, but now are?
-        // Add them to the list.
-        $insertedSelections = array_diff($relatedSelections, $updatedSelections);
-        if (!empty($insertedSelections)) {
-            $resource = $this->getResourceMapper()->findById($item->getResource()->getId());
-            foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                if (in_array($relatedResource->getId(), $insertedSelections)) {
-                    // New related booking: uses same event as base booking.
-                    $relatedBooking = $this->getBookingFromEvent(
-                        $relatedResource,
-                        $item->getEvent()
-                    );
-                    $relatedBooking->setName($this->request->post['name']);
-                    // Ensure that the base and related booking are related.
-                    $insertedBookingList->add($relatedBooking);
-                }
-            }
-            // Save the inserted bookings.
-            $this->getBookingMapper()->save($insertedBookingList);
-        }
-
-        // Apply the changes to the related booking as well.
-        $this->getEventMapper()->save($item->getEvent());
-        $this->getBookingMapper()->save($item);
-
-        // Save each of the related items and their events
-        $this->getEventMapper()->save($relatedEventList);
-        $this->getBookingMapper()->save($insertedBookingList);
-        $this->getBookingMapper()->delete($deletedBookingList);
-    }
-
-	/**
-	 * Attempts to update a booking based on what was passed through post data.
-	 *
-	 * @param  Model $item
-	 * @param  Interval $startDelta
-	 * @param  Interval $endDelta
-	 * @param  string $notes
-	 * @param $name
-	 * @return Model
-	 */
-    protected function updateBookingFieldsFromPostData(
-        Model $item,
-        Interval $startDelta,
-        Interval $endDelta,
-        $notes,
-		$name
-    ) {
-        $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
-
-        $event = $item->getEvent();
-
-        // Adjust the current item.
-        if ($isTimeChanged) {
-            $item->setStatus(Status\Model::STATUS_PENDING);
-            $newStart = $event->getStartDateTime()->getDateTimeObject()->add($startDelta->getAsDateInterval());
-            $event->setStartDateTime(new Alaress_Date_Format($newStart));
-            $newEnd = $event->getEndDateTime()->getDateTimeObject()->add($endDelta->getAsDateInterval());
-	        $event->setEndDateTime(new Alaress_Date_Format($newEnd));
-
-            if ($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                $item->setStatus(Status\Model::STATUS_APPROVED);
-            }
-        }
-        $event->setDetail($notes);
-        // Clear the role and campus collection
-        $event->setRoleCollection(new Collection());
-        $event->setCampusCollection(new Collection());
-        $item->setEvent($event);
-		$item->setName($name);
-
-        return $item;
     }
 
     /**

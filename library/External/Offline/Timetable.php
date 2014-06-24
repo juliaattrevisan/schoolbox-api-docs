@@ -43,4 +43,8 @@ class External_Offline_Timetable implements External_TimetableInterface {
 		// TODO: Implement getSubjectName() method.
 	}
 
+	public function getRoomTimetable($roomCode) {
+		// TODO: Implement getRoomTimetable() method.
+	}
+
 }

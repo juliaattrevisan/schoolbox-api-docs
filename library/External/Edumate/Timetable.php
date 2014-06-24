@@ -378,4 +378,64 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $stmt->fetchColumn(0);
     }
 
+    /**
+     * Gets the timetable for this room code.
+     *
+     * This implementation works with Edumate's peculiarities:
+     * * Timetable def is hardcoded
+     * * Timetable def ignores campus
+     * * Edumate appears to have no concept of campuses
+     * * getTimetableDefinition() returns DateTime objects
+     *
+     * @param  string $roomCode
+     * @return array
+     */
+    public function getRoomTimetable($roomCode) {
+        $statement = $this->getDatabase()->prepare('
+            SELECT
+                cl.CLASS AS "Description",
+                t.DAY AS "DayNumber",
+                t.PERIOD AS "PeriodNumber",
+                NULL AS "TimetableGroup",
+                NULL AS "TimetableCampus",
+                t.CLASS_CODE AS "ClassCode",
+                t.STAFF_NUMBER AS "StaffID",
+                st.SALUTATION AS "StaffTitle",
+                st.FIRSTNAME AS "StaffPreferredName",
+                st.SURNAME AS "StaffSurname"
+            FROM db2inst1.schoolbox_timetable AS t
+            INNER JOIN db2inst1.schoolbox_classes AS cl ON
+                t.CLASS_CODE = cl.CLASS_CODE
+            INNER JOIN db2inst1.schoolbox_staff AS st ON
+                t.STAFF_NUMBER = st.STAFF_NUMBER
+            WHERE t.ROOM = :room
+            ORDER BY
+                t.DAY ASC,
+                t.PERIOD ASC
+        ');
+        $statement->execute(array('room' => $roomCode));
+
+        // Join with Edumate's (currently hardcoded and campusless) timetable.
+        $campusTimetable = $this->getTimetableDefinition(1);
+        $result          = array();
+        foreach ($statement->fetchAll(DB2::FETCH_ASSOC) as $row) {
+
+            // Match day and period against a start and end.
+            for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
+                $periodNumber   = $campusTimetable['number'][$i];
+                $periodSequence = $campusTimetable['sequence'][$i];
+
+                // (Ignore period sequence 2, everyone else does)
+                if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
+                    $row['PeriodStart'] = $campusTimetable['start'][$i];
+                    $row['PeriodEnd']   = $campusTimetable['end'][$i];
+                    $row['PeriodName']  = $campusTimetable['desc'][$i];
+                    $result[] = $row;
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
 }

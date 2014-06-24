@@ -265,8 +265,85 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 	public function getSubjectName($classCode) {
 
 	}
-	
-	/**
+
+    /**
+     * This method cannot be implemented for Denbigh, because its timetable
+     * definition has no concept of the start and end time of periods.
+     *
+     * If it did, it would work around the following peculiarities:
+     * * Timetable def is in the internal Schoolbox database
+     * * Timetable def doesn't ignore campuses, but Edumate doesn't have them
+     *
+     * @param  string $roomCode
+     * @return array
+     */
+    public function getRoomTimetable($roomCode) {
+        return array();
+//        // First: $this->getFullTimetable() and pinch its query
+//        // Second: join to whatever is in External_*_User->getStaff
+//        // Third: join to the timetable implementation if at all possible
+//        $query = "
+//            SELECT
+//                co.subjectName AS Description,
+//                l.day AS DayNumber,
+//                l.period AS PeriodNumber,
+//                '' AS TimetableGroup,
+//                '' AS ClassCampus,
+//                l.classCode AS ClassCode,
+//                l.staffCode AS StaffID,
+//                p.title AS StaffTitle,
+//                p.preferred_name AS StaffPreferredName,
+//                p.surname AS StaffSurname
+//            FROM Lessons l
+//            LEFT JOIN Staff AS s ON
+//                l.staffCode = s.staffCode
+//            LEFT JOIN People AS p ON
+//                s.peopleDenbighId = p.denbighId
+//            INNER JOIN Classes AS cl ON
+//                l.classCode = cl.classCode
+//            INNER JOIN Courses co ON
+//                cl.courseCode = co.courseCode
+//            WHERE l.room = :room
+//            ORDER BY
+//                l.day ASC,
+//                l.period ASC
+//        ";
+//        $statement = $this->getExternalDatabase()->prepare($query);
+//        $statement->execute(array('room' => $roomCode));
+//
+//        // Denbigh doesn't seem to have any campus data for its timetables:
+//        // just link to the first campus.
+//        $campusId = $this->getInternalDatabase()->query("
+//            SELECT id
+//            FROM luCampus
+//            ORDER BY id ASC
+//            LIMIT 1
+//        ")->fetchColumn();
+//
+//        $campusTimetable = $this->getTimetableDefinition($campusId);
+//        new Alaress_Probe($campusTimetable);
+//        $result          = array();
+//        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+//
+//            // Match day and period against a start and end.
+//            for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
+//                $periodNumber   = $campusTimetable['number'][$i];
+//                $periodSequence = $campusTimetable['sequence'][$i];
+//
+//                // (Ignore period sequence 2, everyone else does)
+//                if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
+//                    $row['PeriodStart'] = $campusTimetable['start'][$i];
+//                    $row['PeriodEnd']   = $campusTimetable['end'][$i];
+//                    $row['PeriodName']  = $campusTimetable['desc'][$i];
+//                    $result[] = $row;
+//                    break;
+//                }
+//            }
+//        }
+//        return $result;
+    }
+
+    /**
 	 * @param Database $database
 	 * @return void
 	 */

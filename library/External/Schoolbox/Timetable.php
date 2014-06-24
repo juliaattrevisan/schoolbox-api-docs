@@ -267,8 +267,47 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 	public function getSubjectName($classCode) {
 		
 	}
-	
-	/**
+
+    public function getRoomTimetable($roomCode) {
+        $query = "
+            SELECT
+                class.description AS Description,
+                timetable_period.day AS DayNumber,
+                timetable_period.sequence AS PeriodNumber,
+                luCampus.ext_timetable_code AS TimetableGroup,
+                timetable_campus.campus_id AS TimetableCampus,
+                class.code AS ClassCode,
+                user.synergy_id AS StaffID,
+                user.title AS StaffTitle,
+                user.firstname AS StaffPreferredName,
+                user.lastname AS StaffSurname,
+                timetable_period.start AS PeriodStart,
+                timetable_period.finish AS PeriodEnd,
+                timetable_period.title AS PeriodName
+            FROM class_period
+            LEFT JOIN user ON
+                class_period.teacher_id = user.id
+            INNER JOIN timetable_period ON
+                class_period.period_id = timetable_period.id
+            INNER JOIN timetable_campus ON
+                timetable_period.cycle_id = timetable_campus.cycle_id
+            INNER JOIN luCampus ON
+                timetable_campus.campus_id = luCampus.id
+            INNER JOIN class ON
+                class_period.class_id = class.id
+            WHERE timetable_campus.start < NOW()
+            AND   timetable_campus.finish > NOW()
+            AND   class_period.room = :room
+            ORDER BY
+                timetable_period.day ASC,
+                timetable_period.sequence ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array('room' => $roomCode,));
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
 	 * @param Database $database
 	 * @return void
 	 */
@@ -298,5 +337,3 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		return $this->group;
 	}
 }
-
-?>

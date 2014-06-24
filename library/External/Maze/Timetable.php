@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_Maze_Timetable {
+class External_Maze_Timetable implements External_TimetableInterface {
 	/**
 	 * An instance of MSSQL
 	 *
@@ -648,6 +648,17 @@ class External_Maze_Timetable {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @todo Implement for MAZE connector
+	 *
+	 * @param  string $roomCode
+	 * @return array
+	 */
+	public function getRoomTimetable($roomCode) {
+		// I'm not even going to try navigating this MAZE
+		return array();
 	}
 
 	/* Getters/Setters

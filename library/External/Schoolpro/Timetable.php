@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_Schoolpro_Timetable {
+class External_Schoolpro_Timetable implements External_TimetableInterface {
 
 	/**
 	 * An instance of MSSQL
@@ -361,6 +361,16 @@ class External_Schoolpro_Timetable {
 	 * @param $classCode
 	 */
 	public function getSubjectName ($classCode) {
+	}
+
+	/**
+	 * TODO: No stored proc
+	 *
+	 * @param  string $roomCode
+	 * @return array
+	 */
+	public function getRoomTimetable($roomCode) {
+		return array();
 	}
 
 	/* Getters/Setters

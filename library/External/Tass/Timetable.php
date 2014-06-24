@@ -342,6 +342,57 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $this->getDatabase()->getOne($query);
     }
 
+    public function getRoomTimetable($roomCode) {
+        $query = "
+            SELECT
+                subtab.sub_desc AS Description,
+                ttmast.day_code AS DayNumber,
+                ttmast.prd_code AS PeriodNumber,
+                ttmast.sub_code AS TimetableGroup,
+                ttmast.cmpy_code AS ClassCampus,
+                RTRIM(CAST(ttmast.year_grp AS VARCHAR(20)))
+                    + '-'
+                    + RTRIM(CAST(ttmast.sub_code AS VARCHAR(20)))
+                    + '-'
+                    + RTRIM(CAST(ttmast.class AS VARCHAR(20)))
+                    AS ClassCode,
+                ttmast.tch_code AS StaffID,
+                '' AS StaffTitle,
+                '' AS StaffPreferredName,
+                teacher.tch_name AS StaffSurname,
+                ttperiod.prd_start AS PeriodStart,
+                ttperiod.prd_end AS PeriodEnd,
+                ttperiod.prd_desc AS PeriodName
+            FROM ttmast
+            LEFT JOIN subtab ON
+                subtab.cmpy_code=ttmast.cmpy_code AND
+                subtab.sub_code=ttmast.sub_code
+            LEFT JOIN teacher ON
+                teacher.cmpy_code=ttmast.cmpy_code AND
+                teacher.tch_code=ttmast.tch_code
+            LEFT JOIN ttperiod ON
+                ttperiod.cmpy_code=ttmast.cmpy_code AND
+                ttperiod.day_code=ttmast.day_code AND
+                ttperiod.prd_code=ttmast.prd_code AND
+                ttperiod.tt_id=ttmast.tt_id
+            WHERE year_num  = :year
+            AND   semester  = :semester
+            AND   room_code = :room
+            ORDER BY
+                ttmast.day_code ASC,
+                ttmast.prd_code ASC
+        ";
+        $query = strtr(
+            $query,
+            array(
+                ':semester' => "'".$this->database->quote($_SESSION['FileSemester'])."'",
+                ':year'     => "'".$this->database->quote($_SESSION['FileYear'])."'",
+                ':room'     => "'".$this->database->quote($roomCode)."'",
+            )
+        );
+        return $this->database->getAll($query);
+    }
+
     private function setDatabase($database)
     {
         $this->database = $database;
@@ -352,5 +403,3 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $this->database;
     }
 }
-
-?>

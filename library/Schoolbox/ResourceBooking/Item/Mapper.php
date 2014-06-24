@@ -71,6 +71,13 @@ class Mapper extends BaseMapper {
         );
         $this->hasMap(
             array(
+                'column'   => 'room_code',
+                'property' => 'roomCode',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'description',
                 'property' => 'description',
                 'type'     => self::TYPE_STRING,
@@ -318,12 +325,13 @@ class Mapper extends BaseMapper {
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
             WHERE
-              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
               AND {$this->getSoftDeleteFilterSql('re')}
             LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->bindValue('search',     $keyword);
+        $statement->bindValue('searchLike', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
         $statement->bindValue('limit',  intval($limit),  \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();

@@ -271,10 +271,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	}
 
-	//returns the period number for the current time
+	/**
+	 * Returns the period number for the current time.
+	 *
+	 * @todo campus object should be passed instead of campus ID
+	 *       Either that, or a timetable group code, as all other external DB
+	 *       calls use the key in the external DB, instead of the Schoolbox key.
+	 *
+	 * @param  int   $campus A campus ID (internal, not Synergetic)
+	 * @return array
+	 */
 	function getPeriodNumber($campus)
 	{
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+		$campusModel = $this->campusMapper->findById($campus);
 		if (!($campusModel instanceof \Schoolbox\Campus)) {
 			return false;
 		}
@@ -596,6 +605,78 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 		return $this->getDatabase()->getOne($query);
 
+	}
+
+	/**
+	 * Gets the timetable for the given room.
+	 *
+	 * @param  string $roomCode
+	 * @return array
+	 */
+	public function getRoomTimetable($roomCode) {
+		$query = "
+			SELECT
+				SubjectClasses.Description,
+				Timetable.DayNumber,
+				Timetable.PeriodNumber,
+				Timetable.TimetableGroup,
+				Timetable.ClassCampus,
+				Timetable.ClassCode,
+				Timetable.StaffID,
+				vStaff.StaffTitle,
+				vStaff.StaffPreferredName,
+				vStaff.StaffSurname
+			FROM SynergyOne.dbo.Timetable Timetable
+			LEFT JOIN SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
+			LEFT JOIN SynergyOne.dbo.SubjectClasses SubjectClasses ON
+				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+				Timetable.ClassCode = SubjectClasses.ClassCode AND
+				Timetable.FileSemester = SubjectClasses.FileSemester AND
+				Timetable.FileType = SubjectClasses.FileType AND
+				Timetable.FileYear = SubjectClasses.FileYear
+			WHERE Timetable.FileSemester=:semester
+			AND   Timetable.FileYear=:year
+			AND   Timetable.Room=:room
+			ORDER BY
+				Timetable.DayNumber ASC,
+				Timetable.PeriodNumber ASC
+		";
+		$query = strtr(
+			$query,
+			array(
+				':semester' => "'".$this->database->quote($_SESSION['FileSemester'])."'",
+				':year'     => "'".$this->database->quote($_SESSION['FileYear'])."'",
+				':room'     => "'".$this->database->quote($roomCode)."'",
+			)
+		);
+
+		// Jam the timetable definition in.
+		$campusTimetableList = array();
+		$result              = array();
+		foreach ($this->database->getAll($query) as $row) {
+			$timetableCode = $row['TimetableGroup'];
+			if (!array_key_exists($timetableCode, $campusTimetableList)) {
+				$campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableCode);
+				$campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
+			}
+			$campusTimetable = $campusTimetableList[$timetableCode];
+
+			// Match day and period against a start and end.
+			for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
+				$periodNumber   = $campusTimetable['number'][$i];
+				$periodSequence = $campusTimetable['sequence'][$i];
+
+				// (Ignore period sequence 2, everyone else does)
+				if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
+					$row['PeriodStart'] = $campusTimetable['start'][$i];
+					$row['PeriodEnd']   = $campusTimetable['end'][$i];
+					$row['PeriodName']  = $campusTimetable['desc'][$i];
+					$result[] = $row;
+					break;
+				}
+			}
+		}
+		return $result;
 	}
 
 	function getSubjectName($code) {

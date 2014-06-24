@@ -27,7 +27,11 @@
                     <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
                 {% endif %}
             </a>
-            <h3 class="resource-name"><a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">{{ item.name }}</a></h3>
+            <h3 class="resource-name">
+                <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
+                    {% include '@resourceItem/sub/itemName.twig' with {item: item} %}
+                </a>
+            </h3>
             <p class="meta">
                 <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
                 {% if item.moderatorList is not empty %}
