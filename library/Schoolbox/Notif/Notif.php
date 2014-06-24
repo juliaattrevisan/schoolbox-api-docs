@@ -232,28 +232,32 @@ class Notif implements LoggerInterface {
 			array_push($stack, $syslog);
 		}
 		else {
-
-			if(!isset($this->handlers['plusmail'])) {
-				$this->handlers['plusmail'] = new InstamailHandler(Logger::WARNING, true);
-			}
-			array_push($stack, $this->handlers['plusmail']);
-
 			try {
 				// [3d] instant user message (notice)
 				if(!isset($this->handlers['instant'])) {
-					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::INFO, false);
+					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::INFO, true);
 				}
 				array_push($stack, $this->handlers['instant']);
 			}
 			catch(NotifException $e) {
 				// no connection to rabbit available. We should be able to safely ignore this
-				// stop propagation though
-				$this->handlers['instant'] = new NullHandler(Logger::INFO);
 			}
+
+			// [3e] instant user email (warning)
+			if(!isset($this->handlers['plusmail'])) {
+				$this->handlers['plusmail'] = new InstamailHandler(Logger::WARNING, false);
+			}
+			array_push($stack, $this->handlers['plusmail']);
 		}
 
+		// [4a] suppress anything above debug that's not yet been dealt with
+		if(!isset($this->handlers['nullDebug'])) {
+			$this->handlers['nullDebug'] = new NullHandler(Logger::INFO);
+		}
+		array_push($stack, $this->handlers['nullDebug']);
 
-		// [4] bottom priority: debugger
+
+		// [4b] bottom priority: debugger
 		if(!isset($this->handlers['debugMailer'])) {
 			$debugEmail = new Swift_Message('Schoolbox Debug', null, 'text/plain', 'utf-8');
 			$debugEmail->setTo($this->conf->get('mail_support_address'));
