@@ -52,10 +52,18 @@
 						<p>
 							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
 							<span class="student-status {OWNER_CLASS}">{OWNER_STATUS}</span>
+							<!-- BEGIN submission_row -->
+							<!-- BEGIN plag_enabled -->
+							<!-- END plag_enabled -->
+							<!-- BEGIN delete_action -->
+							<!-- END delete_action -->
+							<!-- END submission_row -->
 						</p>
 					</td>
 					<td class="marking">
-						<div>{OWNER_MARKING}</div>
+						<div>
+							{OWNER_MARKING}
+						</div>
 					</td>
 					<td>
                         <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View Submission</a>
@@ -63,15 +71,11 @@
 					</td>
 				</tr>
 
-				<!-- BEGIN submission_row -->
-				<!-- BEGIN plag_enabled -->
-				<!-- END plag_enabled -->
-				<!-- BEGIN delete_action -->
-				<!-- END delete_action -->
-				<!-- END submission_row -->
-    	        <!-- END student_row -->
+				<!-- END student_row -->
 			</tbody>
         </table>
     </form>
 </div>
 <div id="rubric-lightbox"></div>
+
+
