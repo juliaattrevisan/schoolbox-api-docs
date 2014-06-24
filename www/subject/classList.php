@@ -16,6 +16,9 @@ if ($groupHandler->isStaff()) {
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
 	$this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
+	$this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
+	$this->setBlock('student_list', 'select_student', 'select_student_block');
+	$this->setBlock('student_list', 'select_student_below', 'select_student_below_block');
 	$this->setBlock('student_list', 'medical', 'medical_block');
 	$this->setBlock('student_list', 'special', 'special_block');
 	$this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
@@ -40,10 +43,25 @@ if ($groupHandler->isStaff()) {
 	}
 
 	if (is_array($category)) {
+
+		$canEmail = false;
+		$email    = '';
+		if (Cfg::get('mail_enable')) {
+			$emailObj = new Email();
+			$email = $emailObj->formatEmailFromArray($_SESSION);
+			if ($email) {
+				$canEmail = true;
+			}
+		}
+
 		$this->setVar(array(
 			'SUBJECTNAME' => $category['name'] . " ($code)",
-			'CLASS_CODE' => $code
+			'CLASS_CODE' => $code,
+			'select_all_block' => '',
 		));
+		if ($canEmail) {
+			$this->parse('select_all_block', 'select_all');
+		}
 
 		$classList = $synergeticClass->getStudents($code);
 
@@ -51,7 +69,6 @@ if ($groupHandler->isStaff()) {
 
 		if (is_array($classList) && !empty($classList)) {
 			foreach ($classList as $student) {
-				$email = '';
 				$emailaddr = '';
 
 				$user = $userHandler->getBySynergy($student['synergy_id']);
@@ -84,6 +101,13 @@ if ($groupHandler->isStaff()) {
 				);
 
 				$this->setVar($studentOutput);
+
+				$this->setVar('select_student_block', '');
+				$this->setVar('select_student_below_block', '');
+				if ($canEmail) {
+					$this->parse('select_student_block', 'select_student');
+					$this->parse('select_student_below_block', 'select_student_below');
+				}
 
 				$student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
 				$student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
@@ -128,29 +152,18 @@ if ($groupHandler->isStaff()) {
 				$this->parse("student_list_block", "student_list", true);
 			}
 
-			$emailObj = new Email();
-			$email = $emailObj->formatEmailFromArray($_SESSION);
-
-			if ($email && \Cfg::get('mail_enable')) {
-				$this->setVar("REPLYTO", $email);
-				$this->setVar("CLASSEMAIL", $classEmail);
+			// Show the email view/select forms
+			$this->setVar('email_class_block', '');
+			$this->setVar('parent_email_block', '');
+			if ($canEmail && $email) {
+				$this->setVar('REPLYTO', $email);
 				$this->parse('email_class_block', 'email_class');
-			}
-			else {
-				$this->setVar('email_class_block', '');
-			}
 
-			/* Emailing parents is a configuration
-			 */
-			if ((Cfg::get('email_all_parents') == 1) && \Cfg::get('mail_enable')) {
-				$this->setVar(array(
-					'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
-				));
-
-				$this->parse('parent_email_block', 'parent_email');
-			}
-			else {
-				$this->setVar('parent_email_block', '');
+				/* Emailing parents is a configuration
+				 */
+				if ((Cfg::get('email_all_parents') == 1)) {
+					$this->parse('parent_email_block', 'parent_email');
+				}
 			}
 		}
 		else {
