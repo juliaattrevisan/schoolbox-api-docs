@@ -217,7 +217,7 @@
 				<td>
 					<div class="clearfix checkboxes">
 						<!-- BEGIN event_campus_list -->
-						<label class="float-left clear">
+						<label>
 							<input type="checkbox" class="campusCheck" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} /> {EVENT_CAMPUS_NAME}
 						</label>
 						<!-- END event_campus_list -->
@@ -227,18 +227,21 @@
 			<tr>
 				<td>
 					<h4>RAMS Required</h4>
-					<em>Is RAMS documentation required?</em>
+					<em>Please confirm if RAMS is required for this event to take place.</em>
 				</td>
 				<td>
-					<label class="float-left clear">
-						<input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+					<input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+
+
 						<input type="hidden" name="ramsRequired" value="0" />
-						<input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} /> {EVENT_RAMS_FILE}
+                    <label><input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />RAMS Required?</label>
+
+                        {EVENT_RAMS_FILE}
 
 						<div data-ramsfile="true">
 							<input type="file" name="ramsFile" />
 						</div>
-					</label>
+
 				</td>
 			</tr>
 			<tr>

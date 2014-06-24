@@ -1,48 +1,52 @@
 <div class="eotc">
+
+    <div class="eotc-status status-in-principle">{EVENT_STATUS}</div>
+
     <div class="left">
         <h1>{EVENT_NOTE}</h1>
-        <p>
-            {EVENT_START}&ndash;{EVENT_END}
-        </p>
+        <p><b>{EVENT_START} &ndash; {EVENT_END}</b></p>
 
         <!-- BEGIN recurring_reminder -->
         <p>
-            Recurring:
+            <b>Recurring:</b>
             {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
         </p>
         <!-- END recurring_reminder -->
 
         <p>
-            Location: {EVENT_LOCATION}
+            <b>Related Campuses:</b>
+            <!-- BEGIN event_campus -->
+            {EVENT_CAMPUS_NAME}
+            <!-- END event_campus -->
         </p>
+
+
         <p>
-            {EVENT_DETAIL}
+            <b>Teacher in Charge:</b>
+            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                {EVENT_TEACHER_IN_CHARGE_NAME}
+            </a>
         </p>
+
+        <p><b>Location:</b> {EVENT_LOCATION}</p>
+        <p>{EVENT_DETAIL}</p>
         <p>
-            Created by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+            <b>Created by:</b> <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
             on {EVENT_CREATED_AT}
         </p>
 
         <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn modify float-left"><span></span>Modify Event</a>
     </div>
     <div class="right">
-        <div class="box clearfix">
-            <h2>Related Campuses</h2>
-            <ul class="listing">
-                <!-- BEGIN event_campus -->
-                <li>{EVENT_CAMPUS_NAME}</li>
-                <!-- END event_campus -->
-            </ul>
-        </div>
 
         <!-- BEGIN has_rams -->
         <div class="box clearfix">
-            <h2>RAMS Requirement</h2>
+            <h2>RAMS Required</h2>
             <ul class="listing">
                 <li>
-                    <span class="actions">
-                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
-                    </span>
+                <span class="actions">
+                    <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
+                </span>
                     <h4><img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}</h4>
                 </li>
             </ul>
@@ -50,91 +54,64 @@
         <!-- END has_rams -->
     </div>
 
-    <div class="full">
-        <h2>Teacher In Charge</h2>
-        <p>
-            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
-                <img width="32" height="32" src="/portrait.php?userId={EVENT_TEACHER_IN_CHARGE_EXTERNAL_ID}&size=square32" />
-                {EVENT_TEACHER_IN_CHARGE_NAME}
-            </a>
-        </p>
-
-        <div class="clearfix"></div>
-
-        <div class="box clearfix">
-            <h2>Staff Attendees ({EVENT_STAFF_COUNT})</h2>
-            <ul class="listing grid">
+    <div class="box clearfix">
+        <h2>People</h2>
+        <ul class="listing grid">
+            <li class="eotc-staff">
+                Staff:
                 <!-- BEGIN event_staff -->
-                <li>
-                    <a href="/search/user/{EVENT_STAFF_ID}">
-                        <img width="32" height="32" src="/portrait.php?userId={EVENT_STAFF_EXTERNAL_ID}&size=square32" />
-                        {EVENT_STAFF_NAME}
-                    </a>
-                </li>
+                <a class="" href="/search/user/{EVENT_STAFF_ID}">{EVENT_STAFF_NAME}</a>
                 <!-- END event_staff -->
-            </ul>
-        </div>
-
-        <div class="clearfix"></div>
-
-        <div class="box clearfix">
-            <h2>Student Attendees ({EVENT_STUDENT_COUNT})</h2>
-            <ul class="listing grid">
+            </li>
+            <li>
+                Students: {EVENT_STUDENT_COUNT}
                 <!-- BEGIN event_student -->
-                <li>
-                    <a href="/search/user/{EVENT_STUDENT_ID}">
-                        <img width="32" height="32" src="/portrait.php?userId={EVENT_STUDENT_EXTERNAL_ID}&size=square32" />
-                        {EVENT_STUDENT_NAME}
-                    </a>
-                </li>
                 <!-- END event_student -->
-            </ul>
-            <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn download"><span></span>Download CSV</a>
-            <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="btn list"><span></span>View List</a>
-        </div>
+            </li>
+        </ul>
+        <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn download"><span></span>Download CSV</a>
+        <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="btn list"><span></span>View List</a>
+    </div>
 
-        <div class="clearfix"></div>
+    <div class="box clearfix">
+        <h2>Resources ({EVENT_RESOURCE_COUNT})</h2>
 
-		<div class="box clearfix">
-			<h2>Resources ({EVENT_RESOURCE_COUNT})</h2>
-
-			<table class="table ruler">
-				<thead>
-					<tr>
-						<th>
-							Resource Name
-						</th>
-						<th>
-							Booking Name
-						</th>
-						<th>
-							Start
-						</th>
-						<th>
-							End
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN event_resourcebooking -->
-					<tr>
-						<td>
-							<a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a>
-						</td>
-						<td>
-							<a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a>
-						</td>
-						<td>
-							{EVENT_RESOURCEBOOKING_START}
-						</td>
-						<td>
-							{EVENT_RESOURCEBOOKING_END}
-						</td>
-					</tr>
-					<!-- END event_resourcebooking -->
-				</tbody>
-			</table>
-		</div>
+        <table class="table ruler">
+            <thead>
+            <tr>
+                <th>
+                    Resource Name
+                </th>
+                <th>
+                    Booking Name
+                </th>
+                <th>
+                    Start
+                </th>
+                <th>
+                    End
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN event_resourcebooking -->
+            <tr>
+                <td>
+                    <a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a>
+                </td>
+                <td>
+                    <a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a>
+                </td>
+                <td>
+                    {EVENT_RESOURCEBOOKING_START}
+                </td>
+                <td>
+                    {EVENT_RESOURCEBOOKING_END}
+                </td>
+            </tr>
+            <!-- END event_resourcebooking -->
+            </tbody>
+        </table>
     </div>
 
     <div class='clearfix'></div>
@@ -154,28 +131,6 @@
     <!-- END has_event_activity_log -->
 
     <div class='clearfix'></div>
-
-    <h2>Current Status</h2>
-    <table class="standardForm">
-        <tbody>
-            <tr>
-                <td class="formLabelWidth">
-                    <h4>Current Status</h4>
-                </td>
-                <td>
-                    {EVENT_STATUS}
-                </td>
-            </tr>
-            <tr>
-                <td class="formLabelWidth">
-                    <h4>Comment</h4>
-                </td>
-                <td>
-                    {EVENT_COMMENT}
-                </td>
-            </tr>
-        </tbody>
-    </table>
 
     <!-- BEGIN has_change_event_status -->
     <h2>Change Event Status</h2>

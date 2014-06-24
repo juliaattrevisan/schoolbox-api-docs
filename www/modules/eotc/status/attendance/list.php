@@ -42,7 +42,8 @@ if ($event->getMetadata()->getStudentAttendees()->count()) {
 		$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
 		$this->setVar(array(
-			'STUDENT_ATTENDEE_ID' => $currentStudent->getExternalId(),
+			'STUDENT_ATTENDEE_EXTERNAL_ID' => $currentStudent->getExternalId(),
+            'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
 			'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
 			'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
 			'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),

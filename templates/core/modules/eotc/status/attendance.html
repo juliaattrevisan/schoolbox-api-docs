@@ -1,26 +1,27 @@
 <h1>People attending {EVENT_NAME}</h1>
 
-<table class="table">
+<table class="table ruler">
 	<thead>
 		<tr>
-			<th>Synergy ID</th>
-			<th>Lastname</th>
-			<th>Firstname</th>
+
+            <th width="34px"></th>
+			<th>Name</th>
+            <th width="70px">Student ID</th>
 			<th>Group</th>
 		</tr>
 	</thead>
 	<tbody>
 		<!-- BEGIN student_attendee -->
 		<tr>
-			<td>{STUDENT_ATTENDEE_ID}</td>
-			<td>{STUDENT_ATTENDEE_LASTNAME}</td>
-			<td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
+			<td><img width="32" height="32" src="/portrait.php?userId={STUDENT_ATTENDEE_EXTERNAL_ID}&size=square32" /></td>
+            <td><a href="/search/user/{STUDENT_ATTENDEE_ID}">{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</a></td>
+            <td>{STUDENT_ATTENDEE_ID}</td>
 			<td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
 		</tr>
 		<!-- END student_attendee -->
 	</tbody>
 </table>
 
-<a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn go-to"><span></span>Download CSV</a>
-<a href="/modules/eotc/status/modify/{EVENT_ID}" class="btn goto"><span></span>Back</a>
+<a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="btn download"><span></span>Download CSV</a>
+<a href="/modules/eotc/status/modify/{EVENT_ID}" class="btn go-back"><span></span>Back</a>
 
