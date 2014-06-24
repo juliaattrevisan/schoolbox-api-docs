@@ -60,36 +60,45 @@ class Controller extends Base {
             ->setEvent(new Calendar\Event())
 			->setName($this->getRequest()->query['name']);
 
-        // Was the time set here? If so set it into the item.
-        if (($startDate = $this->getRequest()->query['startDate'])) {
-            // Convert format of startDate and startTime
-            if ($startDate = DateTime::createFromFormat('Y-m-d', $startDate)) {
-                // Was a time set? If so, add that time to the start date.
-                // Otherwise, default to start of next hour.
-                if (($time = $this->getRequest()->query['startTime'])
-                    && ($time = DateTime::createFromFormat('H:i', $time))
-                ) {
-                    $startDate->setTime($time->format('H'), $time->format('i'));
+        // Create datetime is unique to this method, so it can be a function.
+        $createDatetime = function($date, $time) {
+            if ($dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
+                if ($time && ($timeObject = DateTime::createFromFormat('H:i', $time))) {
+                    $dateObject->setTime($timeObject->format('H'), $timeObject->format('i'));
                 }
                 else {
-                    $startDate->modify('+1 hour');
-                    $startDate->setTime($startDate->format('H'), 0);
+                    $dateObject->modify('+1 hour');
+                    $dateObject->setTime($dateObject->format('H'), 0);
                 }
+                return $dateObject;
+            }
+            return null;
+        };
 
-                // Set the start and end date and time
-                $item->getEvent()->setStartDateTime($startDate);
+        // Was the time set here? If so set it into the booking.
+        $startDate = $createDatetime(
+            $this->request->query['startDate'],
+            $this->request->query['startTime']
+        );
+        $endDate = $createDatetime(
+            $this->request->query['endDate'],
+            $this->request->query['endTime']
+        );
+        if ($startDate instanceof DateTime) {
+            $item->getEvent()->setStartDateTime(new Alaress_Date_Format($startDate));
 
-                // Use the DateInterval object to adjust datetimes, to make days
-                // behave as expected over DST changes.
+            // No end date? Create one based on the minimum reservation time.
+            // Use the DateInterval object to adjust datetimes, to make days
+            // behave as expected over DST changes.
+            if (!($endDate instanceof DateTime)) {
                 $endDate = clone $startDate;
                 $endDate->add($resource->getMinReservationTime()->getAsDateInterval());
-                $item->getEvent()->setEndDateTime($endDate);
             }
         }
+        if ($endDate instanceof DateTime) {
+            $item->getEvent()->setEndDateTime(new Alaress_Date_Format($endDate));
+        }
 
-        // Load campus and timetable selectors
-
-        // Populate into a campus list instead.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
