@@ -585,6 +585,8 @@ class Controller extends Base {
         if ($event->getSeriesId()) {
             $recurrence = $this->getEventRecurrenceMapper()->getSeriesRecurrence($event);
         }
+
+        // Cancel callback URL: point to the last page if it wasn't set.
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceBooking/book.twig',
@@ -592,6 +594,7 @@ class Controller extends Base {
                     'item'       => $item,
                     'recurrence' => $recurrence,
                     'campusList' => $this->getCampusList(),
+                    'cancelCallbackUrl' => $this->session->getHistory(),
                 ),
             )
         );
@@ -947,18 +950,24 @@ class Controller extends Base {
      * @param Model $booking
      */
     protected function setUpdateStatusResponse(Model $booking) {
+        $callbackUrl = $this->request->query['callbackUrl'];
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
-                    'data'   => array('item' => $booking,),
+                    'data'   => array(
+                        'item' => $booking,
+                        'callbackUrl' => $callbackUrl,
+                    ),
                 )
             );
         }
         else {
             // Is there a previous location to redirect to? if so use that.
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
+            $this->getResponse()->redirect->afterPost(
+                $callbackUrl ?: $this->getSession()->getHistory()
+            );
         }
     }
 

@@ -326,6 +326,13 @@ $(document).ready(function() {
             form.data('action', 'cancel')
         })
 
+    // did I click the cancel button? If so, cancel this booking.
+    // This should be in a different form to everything else.
+    form.on('click', '#resource-booking-cancel', function(event) {
+        event.preventDefault();
+        $('#resource-booking-cancel-form').submit();
+    })
+
     // Show/hide the repeat until input, depending on if a repeat is chosen.
     form.find('#repeatUntilSelect')
         .change(function() {
@@ -540,6 +547,13 @@ $(document).ready(function() {
        class="submit-btn-plain"
        href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">Back to list</a>
 
+</form>
+
+{# Hidden form for cancelling a booking.
+ # This should redirect to the last page I was on.
+ #}
+<form id="resource-booking-cancel-form" action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}">
+    <input type="hidden" name="callbackUrl" value="{{ cancelCallbackUrl }}" />
 </form>
 
 {# Booking for bulk events #}
