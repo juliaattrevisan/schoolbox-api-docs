@@ -31,22 +31,21 @@
 	});
 </script>
 <h1>People attending {EVENT_NAME}</h1>
-
-<h2>Add individual students</h2>
-<form action="/modules/eotc/manage/attendance/add" method="post">
-	<input type="hidden" name="eventId" value="{EVENT_ID}" />
-	<select id="student-suggest" name="selected[]" multiple placeholder="Search Students"></select>
-	<input type="submit" class='submit-btn-plain' value="Add" />
-</form>
-
-<div class="clearfix"></div>
-
-<h2>Add by a particular course code</h2>
+<div class="left clearfix" style="width: 49%;">
+    <h2>Add Individual Student</h2>
+    <form action="/modules/eotc/manage/attendance/add" method="post">
+        <input type="hidden" name="eventId" value="{EVENT_ID}" />
+        <select id="student-suggest" name="selected[]" multiple placeholder="Search Students"></select>
+        <input type="submit" class='submit-btn-plain' value="Add" />
+    </form>
+</div>
+<div class="right clearfix" style="width: 49%">
+<h2>Add By Course Code</h2>
 <form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 
 	<fieldset>
-		<label>"Category"
+		<label>Category
 			<select data-selector name="filetype">
 				<option value="">Please select</option>
 				<!-- BEGIN filetype -->
@@ -64,30 +63,31 @@
 	</fieldset>
 	<input type="submit" class='submit-btn-plain' value="Add" />
 </form>
+</div>
 
 <div class="clearfix"></div>
 
 <h2>Current Attendees</h2>
 <form action="/modules/eotc/manage/attendance/remove" method="post">
 	<input type="hidden" name="eventId" value="{EVENT_ID}" />
-	<table class="table">
+	<table class="table ruler">
 		<thead>
 			<tr>
+                <th width="30px"><input data-selectall="true" type="checkbox" /></th>
 				<th>ID</th>
 				<th>Lastname</th>
 				<th>Firstname</th>
 				<th>Group</th>
-				<th><input data-selectall="true" type="checkbox" />
 			</tr>
 		</thead>
 		<tbody>
 			<!-- BEGIN student_attendee -->
 			<tr>
+                <td><input name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" /></td>
 				<td>{STUDENT_ATTENDEE_ID}</td>
 				<td>{STUDENT_ATTENDEE_LASTNAME}</td>
 				<td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
 				<td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
-				<td><input name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" /></td>
 			</tr>
 			<!-- END student_attendee -->
 		</tbody>

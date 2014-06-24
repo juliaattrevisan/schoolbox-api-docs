@@ -1,19 +1,21 @@
 <h1>People attending {EVENT_NAME}</h1>
 
-<table class="table">
+<table class="table ruler">
 	<thead>
 		<tr>
-			<th>Synergy ID</th>
+
+            <th width="34px"></th>
 			<th>Name</th>
+            <th width="70px">Student ID</th>
 			<th>Group</th>
 		</tr>
 	</thead>
 	<tbody>
 		<!-- BEGIN student_attendee -->
 		<tr>
-			<td>{STUDENT_ATTENDEE_ID}</td>
-			<td><img width="32" height="32" src="/portrait.php?userId={EVENT_STUDENT_EXTERNAL_ID}&size=square32" />
-                <a href="/search/user/{EVENT_STUDENT_ID}">{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</a></td>
+			<td><img width="32" height="32" src="/portrait.php?userId={STUDENT_ATTENDEE_EXTERNAL_ID}&size=square32" /></td>
+            <td><a href="/search/user/{STUDENT_ATTENDEE_ID}">{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</a></td>
+            <td>{STUDENT_ATTENDEE_ID}</td>
 			<td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
 		</tr>
 		<!-- END student_attendee -->
