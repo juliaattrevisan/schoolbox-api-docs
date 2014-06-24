@@ -50,13 +50,6 @@
 
 	$j.fn.emailSelected = function(options) {
 
-		/* Stop the form submitting so we can do some
-		 * special manipulation, inject the results,
-		 * and then submit normally. This submit handler
-		 * is cleared in redirect();
-		 */
-		event.preventDefault();
-
 		var config = init(options, this);
 
 		fetchEmails();
@@ -135,6 +128,9 @@
 					inject(allEmails);
 					redirect();
 				}
+				else {
+					config.element.trigger('emailSelected.noEmail');
+				}
 			});
 		}
 
@@ -152,5 +148,8 @@
 			$j(config.element).unbind('submit');
 			config.element.submit();
 		}
+
+		// And chain
+		return this;
 	}
 }(jQuery));
