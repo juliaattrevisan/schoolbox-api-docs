@@ -482,11 +482,11 @@ class Submission extends DeprecatedModel {
 
         if ($year) {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
-            $dateCondB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%Y') = $year";
         }
         if ($semester) {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
-            $dateCondB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
 	    if ($userID) {
 		    $ownerCondA = "AND sb.owner = '$userID'";
