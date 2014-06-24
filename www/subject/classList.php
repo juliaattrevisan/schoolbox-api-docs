@@ -155,7 +155,7 @@ if ($groupHandler->isStaff()) {
 			// Show the email view/select forms
 			$this->setVar('email_class_block', '');
 			$this->setVar('parent_email_block', '');
-			if ($canEmail) {
+			if ($canEmail && $email) {
 				$this->setVar('REPLYTO', $email);
 				$this->parse('email_class_block', 'email_class');
 
