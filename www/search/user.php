@@ -416,11 +416,11 @@ if (is_numeric($this->arg[0])) {
 	                                ),
 		                            'CONTACT_ID' => $parent['uid'],
 		                            'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
-	                                'CONTACT_ADDRESS' => Scrub::text(
+	                                'CONTACT_ADDRESS' => count($address_fields) ? Scrub::text(
 	                                    implode(' ', $address_fields)
 	                                ) . '<br>' . Scrub::text(
 	                                    $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
-	                                ),
+	                                ):'',
 	                                'CONTACT_HOME_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactPhoneActual']).'">'.Scrub::text($studentContact['StudentContactPhoneActual']).'</a>',
 	                                'CONTACT_MOBILE_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactMobilePhone']).'">'.Scrub::text($studentContact['StudentContactMobilePhone']).'</a>',
 	                                'CONTACT_OCCUP_PHONE' => '<a href="tel:'.Scrub::text($studentContact['StudentContactOccupPhone']).'">'.Scrub::text($studentContact['StudentContactOccupPhone']).'</a>',

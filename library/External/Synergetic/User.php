@@ -368,7 +368,7 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactID,
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
-				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+				ValidAddressFlag, StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
 				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentCountry.Description AS StudentContactCountryCode,
 				StudentContactHomeAddress1, StudentContactHomeAddress2, StudentContactHomeAddress3,
 				StudentContactHomeSuburb, StudentContactHomePostCode, StudentContactHomeState, StudentCountry.Description AS StudentContactHomeCountryCode,
@@ -457,8 +457,29 @@ class External_Synergetic_User implements External_UserInterface {
 			ORDER BY StudentSurname, StudentID, StudentContactType
 		";
 
+		$contactList = $this->getDatabase()->getAll($query);
+        foreach($contactList as &$row) {
+            if($row['ValidAddressFlag'] == 0 ) {
+                $row['StudentContactAddress1'] = '';
+                $row['StudentContactAddress2'] = '';
+                $row['StudentContactAddress3'] = '';
+                $row['StudentContactSuburb'] = '';
+                $row['StudentContactPostCode'] = '';
+                $row['StudentContactState'] = '';
+                $row['StudentContactCountryCode'] = '';
+                $row['StudentContactHomeAddress1'] = '';
+                $row['StudentContactHomeAddress2'] = '';
+                $row['StudentContactHomeAddress3'] = '';
+                $row['StudentContactHomeSuburb'] = '';
+                $row['StudentContactHomePostCode'] = '';
+                $row['StudentContactHomeState'] = '';
+                $row['StudentContactHomeCountryCode'] = '';
+            }
 
-		return $this->getDatabase()->getAll($query);
+            $row['StudentContactHomeCountryCode'] = $row['StudentContactHomeCountryCode'] == 'Not Selected' ? '' : $row['StudentContactHomeCountryCode'] ;
+            $row['StudentContactCountryCode'] = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
+        }
+        return $contactList;
 	}
 
 	/**
@@ -503,7 +524,8 @@ class External_Synergetic_User implements External_UserInterface {
 		$query = "
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+				ValidAddressFlag,StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+				StudentContactSuburb, StudentContactPostCode, StudentContactState,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,StudentContactRelation,
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
 				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,StudentContactSpouseRelation
@@ -515,7 +537,19 @@ class External_Synergetic_User implements External_UserInterface {
 				AND FileSemester = " . $_SESSION['FileSemester'] . "
 				AND FileYear = " . $_SESSION['FileYear'];
 
-		return $this->getDatabase()->getAll($query);
+		$contactList = $this->getDatabase()->getAll($query);
+        foreach($contactList as &$row) {
+            if($row['ValidAddressFlag'] == 0 ) {
+                $row['StudentContactAddress1'] = '';
+                $row['StudentContactAddress2'] = '';
+                $row['StudentContactAddress3'] = '';
+                $row['StudentContactSuburb'] = '';
+                $row['StudentContactPostCode'] = '';
+                $row['StudentContactState'] = '';
+            }
+        }
+
+        return $contactList;
 	}
 
 	function getCurrentSemester($externalUserId = null) {
