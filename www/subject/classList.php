@@ -69,7 +69,6 @@ if ($groupHandler->isStaff()) {
 
 		if (is_array($classList) && !empty($classList)) {
 			foreach ($classList as $student) {
-				$email = '';
 				$emailaddr = '';
 
 				$user = $userHandler->getBySynergy($student['synergy_id']);
@@ -157,13 +156,12 @@ if ($groupHandler->isStaff()) {
 			$this->setVar('email_class_block', '');
 			$this->setVar('parent_email_block', '');
 			if ($canEmail) {
-				$this->setVar("REPLYTO", $email);
+				$this->setVar('REPLYTO', $email);
 				$this->parse('email_class_block', 'email_class');
 
 				/* Emailing parents is a configuration
 				 */
 				if ((Cfg::get('email_all_parents') == 1)) {
-					$this->setVar('REPLY_TO', $email);
 					$this->parse('parent_email_block', 'parent_email');
 				}
 			}
