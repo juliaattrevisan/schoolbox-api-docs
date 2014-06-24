@@ -26,6 +26,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 		'NAME' => $user->formatName(),
 		'SYN_ID' => $user->getExternalId(),
 		'UID' => $user->getId(),
+		'REDIRECT' => "/submission/viewSubmission/{$submissionBox->getId()}",
 	));
 
 	$marksheet = \Marksheet_Factory::build($submissionBox->getMarkType()->getSlug());
