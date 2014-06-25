@@ -240,13 +240,13 @@
             self.dateDisplay
                 .attr('datetime', date.format('YYYY-MM-DD'))
                 .text(date.format('DD/MM/YYYY'))
-            self.buttons.prop('disabled', false).removeClass('disabled').show('fast')
+            self.buttons.prop('disabled', false).removeClass('disabled').show()
         })
         .fail(function() {
             self.dateDisplay
                 .text('error')
                 .addClass('error')
-            self.buttons.hide('fast')
+            self.buttons.hide()
         })
     }
 
