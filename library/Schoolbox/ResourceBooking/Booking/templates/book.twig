@@ -51,6 +51,19 @@ $(document).ready(function() {
         endDate: $('input[name="end_datetime[date]"]')
     })
 
+    // Set up tabz for the projector.
+    // Always default to setting a date and time directly, though.
+    var tabSelector = $('[data-interaction="tabs"]')
+            .tabs({
+                heightStyle: 'auto',
+                active: 0
+            })
+            .on('tabsbeforeactivate', function(event, ui) {
+                // Ensure that all inputs in inactive tabs are disabled
+                ui.oldPanel.find(':input').prop('disabled', true)
+                ui.newPanel.find(':input').prop('disabled', false)
+            })
+
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
     $('[data-interaction="timetableSelector"]')
@@ -69,7 +82,7 @@ $(document).ready(function() {
                 }
             }
         })
-        .on('useDate.timetableDaySelector', function(event, date, startTime, endTime) {
+        .on('selectDate.timetableDaySelector', function(event, date, startTime, endTime) {
             var timetableTab = $('#timetableSelector')
             date = moment(date)
             if (date.isValid()) {
@@ -82,14 +95,14 @@ $(document).ready(function() {
             if (startTime.isValid()) {
                 timetableTab.find('input[name="start_datetime[hour]"]').val(startTime.format('h'))
                 timetableTab.find('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
-                timetableTab.find('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
+                timetableTab.find('input[name="start_datetime[meridien]"]').val(startTime.format('a'))
             }
 
             endTime = moment(endTime, 'HH:mm')
             if (endTime.isValid()) {
                 timetableTab.find('input[name="end_datetime[hour]"]').val(endTime.format('h'))
                 timetableTab.find('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
-                timetableTab.find('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
+                timetableTab.find('input[name="end_datetime[meridien]"]').val(endTime.format('a'))
             }
         })
 
@@ -360,18 +373,6 @@ $(document).ready(function() {
         })
         .change()
 
-    // Set up tabz for the projector.
-    // Always default to setting a date and time directly, though.
-    $('[data-interaction="tabs"]')
-        .tabs({
-            heightStyle: 'auto',
-            active: 0
-        })
-        .on('tabsbeforeactivate', function(event, ui) {
-            // Ensure that all inputs in inactive tabs are disabled
-            ui.oldPanel.find(':input').prop('disabled', true)
-            ui.newPanel.find(':input').prop('disabled', false)
-        })
 })
 </script>
 <!-- END custom_header -->
