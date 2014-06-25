@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -236,6 +237,7 @@ $(document).ready(function() {
 
     // Submit resource booking form via AJAX
     form.validate({
+        ignore: ':disabled',
         rules: {
             'start_datetime[date]': {
                 required: true,
@@ -276,11 +278,11 @@ $(document).ready(function() {
             },
             'start_datetime[meridien]': {
                 required: true,
-                selected: true
+                pattern:  /^(?:am|pm)$/i
             },
             'end_datetime[meridien]': {
                 required: true,
-                selected: true
+                pattern:  /^(?:am|pm)$/i
             }
         },
         errorPlacement: function(label, element) {
