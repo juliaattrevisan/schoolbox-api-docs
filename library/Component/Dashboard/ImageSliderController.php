@@ -66,7 +66,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 	    }
 
 	    $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
-        $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 		$this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
@@ -121,20 +120,26 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         // Iterate
         if (is_array($allFiles)) {
             foreach ($allFiles as $currentFile) {
+
+	            $url = '#';
+
+	            // sanitise url
+	            if(filter_var($currentFile['comment'], FILTER_VALIDATE_URL)) {
+		            $url = $currentFile['comment'];
+	            }
+	            // it might be referencing inside schoolbox, so simulate that to the validator
+	            elseif(filter_var('http://localhost/'.$currentFile['comment'], FILTER_VALIDATE_URL)) {
+		            $url = $currentFile['comment'];
+	            }
+
                 $this->setVar(
                     array(
                         'IMAGE_ID' => $currentFile['id'],
                         'IMAGE_NAME' => $currentFile['description'],
+                        'IMAGE_URL' => $url,
                         'IMAGE_DIMENSION' => $pixel
                     )
                 );
-
-                // Display captions
-                if ($this->getConfig('captionState') == 'Active') {
-                    $this->parse('show_caption_block', 'show_caption');
-                } else {
-                    $this->setVar('show_caption_block', '');
-                }
 
                 $this->parse('image_scroller_block', 'image_scroller', true);
             }
