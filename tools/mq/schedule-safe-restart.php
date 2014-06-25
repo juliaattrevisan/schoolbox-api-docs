@@ -68,8 +68,10 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 			$loop->cancelTimer($timer);
 			$timer = $loop->addTimer(4, function() { exit(0); });
 
+			$date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
+
 			// do this for every message that comes in
-			$d->v('Processing message', '>');
+			$d->v("Processing message (arrived at $date)", '>');
 
 			Database::reinitialise();
 			DeprecatedDatabase::reinitialise();
