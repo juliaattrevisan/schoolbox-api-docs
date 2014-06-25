@@ -316,7 +316,7 @@ class SitePage extends Page {
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
         $this->setBlock('bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
-	    if(Cfg::get('instant_enabled') || 1) {
+	    if(Cfg::get('instant_enabled')) {
 		    $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
 	    }
 	    else {
