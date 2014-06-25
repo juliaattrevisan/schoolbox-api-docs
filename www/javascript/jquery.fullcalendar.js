@@ -126,20 +126,30 @@ function Calendar(id, bubbleId, opts) {
                     data.attendanceRequestButton = '<a class="btn no-icon float-right" href="#">' + calEvent.data.attendance.requestButton.toString() + '</a>'
                 }
 
-                // Booking butonyes (if available)
                 data.bookingActions = []
-                if (calEvent.data.booking && calEvent.data.booking.buttons) {
-                    $.each(calEvent.data.booking.buttons, function() {
-                        data.bookingActions.push(
-                            $('<a class="btn float-right" />')
-                                .data('seriesId', calEvent.data.meta.seriesId)
-                                .addClass(this.class)
-                                .attr('href', this.href)
-                                .text(this.label)
-                                .prepend('<span />')
-                        )
-                    })
+                if (calEvent.data.booking) {
+                    // Booking butonyes (if available)
+                    if (calEvent.data.booking.buttons) {
+                        $.each(calEvent.data.booking.buttons, function() {
+                            data.bookingActions.push(
+                                $('<a class="btn float-right" />')
+                                    .data('seriesId', calEvent.data.meta.seriesId)
+                                    .addClass(this.class)
+                                    .attr('href', this.href)
+                                    .text(this.label)
+                                    .prepend('<span />')
+                            )
+                        })
+                    }
+
+                    // Booking reviewer (if available)
+                    if (calEvent.data.booking.reviewer) {
+                        data.reviewer   = calEvent.data.booking.reviewer.name;
+                        data.reviewerId = calEvent.data.booking.reviewer.id;
+                    }
                 }
+
+
                 self.bubble.display('edit', data, jsEvent, this)
             }
         },
@@ -606,6 +616,14 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 	else {
 		$j('dd.post-by').show();
 	}
+
+    // Hide reviewed by as well
+    if (eventData.reviewerId == -1) {
+        $j('dd.reviewed-by').hide();
+    }
+    else {
+        $j('dd.reviewed-by').show();
+    }
 
     var xPos = mouseEvent.pageX
     var yPos = $j(targetElement).offset().top + 5
