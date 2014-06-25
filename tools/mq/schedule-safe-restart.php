@@ -193,6 +193,15 @@ function interrogate($event, $d) {
 	}, $d);
 
 
+	// test the bundle creation method
+	try {
+		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle());
+	}
+	catch(Exception $e) {
+		$d->v(sprintf("Caught exception - %s: %s", get_class($e), $e->getMessage()), '!');
+	}
+
+
 	$rf = new ReflectionObject($instance);
 	$methods = $rf->getMethods(ReflectionMethod::IS_PUBLIC);
 
