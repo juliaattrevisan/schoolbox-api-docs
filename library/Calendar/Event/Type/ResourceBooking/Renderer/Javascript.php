@@ -207,6 +207,10 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                     ),
                     'status'  => $currentEvent->getBooking()->getStatus()->jsonSerialize(),
                     'buttons' => $bookingButtons,
+                    'reviewer' => array(
+                        'id'   => $currentEvent->getBooking()->getReviewer()->getId() ?: -1,
+                        'name' => Scrub::text($currentEvent->getBooking()->getReviewer()->formatName()),
+                    ),
                 ),
             )
         );
