@@ -70,25 +70,26 @@ $(document).ready(function() {
             }
         })
         .on('useDate.timetableDaySelector', function(event, date, startTime, endTime) {
+            var timetableTab = $('#timetableSelector')
             date = moment(date)
             if (date.isValid()) {
                 var dateOutput = date.format('DD/MM/YYYY')
-                $('input[name="start_datetime[date]"]').val(dateOutput)
-                $('input[name="end_datetime[date]"]').val(dateOutput)
+                timetableTab.find('input[name="start_datetime[date]"]').val(dateOutput)
+                timetableTab.find('input[name="end_datetime[date]"]').val(dateOutput)
             }
 
             startTime = moment(startTime, 'HH:mm')
             if (startTime.isValid()) {
-                $('input[name="start_datetime[hour]"]').val(startTime.format('h'))
-                $('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
-                $('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
+                timetableTab.find('input[name="start_datetime[hour]"]').val(startTime.format('h'))
+                timetableTab.find('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
+                timetableTab.find('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
             }
 
             endTime = moment(endTime, 'HH:mm')
             if (endTime.isValid()) {
-                $('input[name="end_datetime[hour]"]').val(endTime.format('h'))
-                $('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
-                $('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
+                timetableTab.find('input[name="end_datetime[hour]"]').val(endTime.format('h'))
+                timetableTab.find('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
+                timetableTab.find('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
             }
         })
 
