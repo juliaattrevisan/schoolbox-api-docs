@@ -15,6 +15,21 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 
 class StubTriggerBundle implements TriggerBundleInterface {
 
+	/** @var Event */
+	protected $event;
+
+	/** @var string */
+	protected $method;
+
+	/**
+	 * @param Event $event
+	 * @param string $method
+	 */
+	public function __construct($event, $method) {
+		$this->event = $event;
+		$this->method = $method;
+	}
+
 	/**
 	 * @param string $label
 	 * @param int    $timestamp
@@ -52,7 +67,7 @@ class StubTriggerBundle implements TriggerBundleInterface {
 	 * @return string
 	 */
 	public function getMethod() {
-		// noop
+		return $this->method;
 	}
 
 
@@ -60,7 +75,7 @@ class StubTriggerBundle implements TriggerBundleInterface {
 	 * @return Event
 	 */
 	public function getEvent() {
-		// noop
+		return $this->event;
 	}
 
 } 

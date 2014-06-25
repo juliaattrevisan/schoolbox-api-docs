@@ -193,9 +193,11 @@ function interrogate($event, $d) {
 	}, $d);
 
 
-	// test the bundle creation method
+	// test trigger bundling
 	try {
-		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle());
+		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle($event, \Schoolbox\Mapper::METHOD_CREATE));
+		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle($event, \Schoolbox\Mapper::METHOD_UPDATE));
+		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle($event, \Schoolbox\Mapper::METHOD_DELETE));
 	}
 	catch(Exception $e) {
 		$d->v(sprintf("Caught exception - %s: %s", get_class($e), $e->getMessage()), '!');
