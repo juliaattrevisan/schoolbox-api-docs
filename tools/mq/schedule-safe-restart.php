@@ -18,13 +18,20 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$opts = getopt('','--perform');
+$opts = getopt('',array('perform'));
 $perform = isset($opts['perform']);
-
 
 $d = new \Alaress\Cli\Debug(STDOUT);
 
 $d->v("Starting schedule diagnostics...");
+
+if($perform) {
+	$d->v("Running with the safety off, you have 3 seconds to change your mind", '!');
+	sleep(3);
+}
+else {
+	$d->v("Doing diagnostic only, no data will be harmed (despite what messages say)");
+}
 
 $loop = \React\EventLoop\Factory::create();
 
@@ -39,6 +46,12 @@ $stomp = $stompFactory->createClient(array(
 ));
 
 $seen = new stdClass();
+
+$amqpConn = new \Schoolbox\Notif\MQ\Connector();
+$amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
+$amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
+$amqpConn->closeConnection();
+unset($amqpConn);
 
 /**
  * @var $stomp \React\Stomp\Client $stomp
@@ -67,8 +80,14 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 
 				// if the interrogation says to dismiss the message, we do
 				if(interrogate($event, $d)) {
-					$d->v("Message dismissed", '-');
+					$d->v("Message broken", '*');
+
 					if($perform) {
+						// split this message off onto a special queue
+						$amqpConn = new \Schoolbox\Notif\MQ\Connector();
+						$amqpConn->publish($frame->body, 'deadmessage');
+						$amqpConn->closeConnection();
+						unset($amqpConn);
 						$resolver->ack();
 					}
 				}
@@ -80,19 +99,20 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 				return;
 			}
 			catch(RuntimeException $e) {
-				$d->v("RuntimeException: ".$e->getMessage(), '!');
 				// this message is can't be parsed, so we ACK it to make it go away
+				$d->v("RuntimeException: ".$e->getMessage(), '!');
+				$d->v("Message unparseable", '-');
 			}
 			catch(\Schoolbox\Realtime\Schedule\ScheduleException $e) {
 				// we're happy to ignore this, it just means no scheduling strategy exists for this Model
 				$d->v('Schedule Exception: ' . $e->getMessage(), '*');
+				$d->v("Message ignorable", '-');
 			}
 			catch(\Schoolbox\Notif\Formatter\CompressionException $e) {
 				// this message is unparseable, so we'll eventually ACK it to make it go away
 				$d->v('Compression Exception: ' . $e->getMessage(), '!');
+				$d->v("Message unparseable", '-');
 			}
-
-			$d->v("Message dismissed", '-');
 
 			if($perform) {
 				$resolver->ack();
@@ -156,8 +176,8 @@ function interrogate($event, $d) {
 				return false;
 			}
 
-			// attempt repairs of known issues if you need to, and return true to dismiss the original, broken message
-			return repairSuccessful($event);
+			// message is borked
+			return true;
 	}
 
 	// YOU ARE IN CHILD CONTEXT HERE. DO NOT ATTEMPT TO RETURN. YOU MUST EXIT INSTEAD.
@@ -191,13 +211,4 @@ function interrogate($event, $d) {
 	}
 
 	exit(0);
-}
-
-/**
- * @param \Schoolbox\Realtime\Schedule\Event $event
- * @return bool whether or not to dismiss the original, broken message
- */
-function repairSuccessful($event) {
-	// so far, no repair attempts
-	return false;
 }
