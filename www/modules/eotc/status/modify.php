@@ -46,6 +46,7 @@ $this->setVar(array(
 	'EVENT_START' => $event->getStartDateTime()->getShort(),
 	'EVENT_END' => $event->getEndDateTime()->getShort(),
 	'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),
+	'EVENT_STATUS_CLASS' => $event->getMetadata()->getStatus()->getStyle(),
 ));
 
 /* Recurrence
