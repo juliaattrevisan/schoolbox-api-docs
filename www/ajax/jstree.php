@@ -8,23 +8,29 @@ use Schoolbox\Resource\CategoryMapper;
 $categoryMapper = CategoryMapper::getInstance();
 
 $output = array();
-$parentId  = $_GET['parent'] ?: '#';
+$parentId = $_GET['parent'];
 if ($parentId === '#') {
-    $list = $categoryMapper->findByParent(0);
-}
-else {
-    $list = $categoryMapper->findByParent($parentId);
-}
-
-foreach ($list as $category) {
-    // Does this item have categories?
+    // Root node
     $output[] = array(
-        'id'     => $category->getId(),
-        'parent' => $category->getParent()->getId() ?: '#',
-        'text'   => $category->getName(),
-        // I just need to know if there are children for this node.
-        'children' => count($categoryMapper->findByParent($category->getId())) > 0,
+        'id'       => '0',
+        'text'     => 'Resources',
+        'children' => count($categoryMapper->findByParent(0)) > 0,
     );
 }
+else {
+    // Children of root node
+    $list = $categoryMapper->findByParent($parentId);
+    foreach ($list as $category) {
+        // Does this item have categories?
+        $output[] = array(
+            'id'     => $category->getId(),
+            'parent' => $category->getParent()->getId() ?: '0',
+            'text'   => $category->getName(),
+            // I just need to know if there are children for this node.
+            'children' => count($categoryMapper->findByParent($category->getId())) > 0,
+        );
+    }
+}
+
 header('Content-Type: application/json');
 echo json_encode($output);
