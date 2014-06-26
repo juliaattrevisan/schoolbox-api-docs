@@ -73,9 +73,14 @@ class EventNotifier extends AbstractModuleNotifier {
 		}
 		elseif($bundle->getMethod() == Mapper::METHOD_UPDATE) {
 			// advise 10 minutes before start, and only advise updated once published
+
+			$pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
+				? $event->getPublishDateTime()->getUnixTimestamp()
+				: self::IMMEDIATELY;
+
 			$bundle->attachEach(array(
 				self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
-				self::TRIGGER_UPDATED  => $event->getPublishDateTime()->getUnixTimestamp()
+				self::TRIGGER_UPDATED  => $pubstamp
 			));
 		}
 	}

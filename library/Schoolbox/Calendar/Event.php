@@ -756,7 +756,7 @@ class Event {
 	/**
 	 * Set publish datetime
 	 *
-	 * @param Alaress_Date_Format $publishDateTime
+	 * @param Alaress_Date_Format|null $publishDateTime
 	 * @return self
 	 */
 	public function setPublishDateTime($publishDateTime) {
@@ -767,7 +767,7 @@ class Event {
 	/**
 	 * Get publish datetime
 	 *
-	 * @return Alaress_Date_Format
+	 * @return Alaress_Date_Format|null
 	 */
 	public function getPublishDateTime() {
 		return $this->publishDateTime;
