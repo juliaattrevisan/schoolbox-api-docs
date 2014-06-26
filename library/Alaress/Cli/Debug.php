@@ -1,6 +1,6 @@
 <?php
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,12 +16,15 @@ class Debug {
 	/** @var resource */
     protected $stream;
 
+	/** @var resource */
+	protected $estream;
+
 	/** @var string */
     protected $port = 'nill';
 
 	/** @var array */
     protected $formats = array(
-        'pid'  => '{%4s}',
+        'pid'  => '{%5s}',
         'mem'  => '[%6.2f / %6.2f]',
         'port' => '[%4d]',
         'time' => '[%s.%.8f]'
@@ -33,9 +36,11 @@ class Debug {
 	/**
 	 * @param resource $stream
 	 * @param array $fields
+	 * @param resource $estream
 	 */
-	public function __construct($stream, $fields = array('pid','time')) {
+	public function __construct($stream, $fields = array('pid','time'), $estream = STDERR) {
         $this->stream = $stream;
+		$this->estream = $estream;
         $this->setVisibleFields($fields);
     }
 
@@ -46,62 +51,79 @@ class Debug {
 	 * @param string $char
 	 */
 	public function v($message, $char = ' ') {
-        if(!is_null($this->stream)) {
 
-	        // if this is already formatted like a log, don't reformat it
-	        if(preg_match("`\[.\].+ => `", $message)) {
-		        fputs($this->stream, $message);
-		        return;
-	        }
+		$use = array();
 
+		// route to error stream if necessary
+		if($char == '!' && is_resource($this->estream)) {
+			$use[] = $this->estream;
+		}
 
-	        try {
-	            $c = '';
+		// route to std stream if declared
+		if(is_resource($this->stream)) {
+			$use[] = $this->stream;
+		}
 
-	            switch($char) {
-	                case '!': $c = '1;31'; break;
-	                case '?': $c = '0;33'; break;
-	                case '+': $c = '0;32'; break;
-	                case '-': $c = '0;34'; break;
-	                case '*': $c = '0;31'; break;
-	                case '>':
-	                case '<': $c = '1;37'; break;
-	            }
+		// no streams available? ok, don' do anything.
+		if(!count($use)) {
+			return;
+		}
 
-	            $str = array(
-	                '[%s]' => $char
-	            );
+		// if this is already formatted like a log, don't reformat it
+		if(preg_match("`\[.\].+ => `", $message)) {
+			fputs($this->stream, $message);
+			return;
+		}
 
-	            foreach($this->visible as $field) {
-	                $str[$this->formats[$field]] = $this->getValueFor($field);
-	            }
+		try {
+			$c = '';
 
-	            $format = sprintf("%s%s => %s%s\n",
-	                $c ? "\033[{$c}m" : '',
-	                implode(array_keys($str)),
-	                $message,
-	                $c ? "\033[0m" : ''
-	            );
+			switch($char) {
+				case '!': $c = '1;31'; break;
+				case '?': $c = '0;33'; break;
+				case '+': $c = '0;32'; break;
+				case '-': $c = '0;34'; break;
+				case '*': $c = '0;31'; break;
+				case '>':
+				case '<': $c = '1;37'; break;
+			}
 
-	            $args = array($format);
+			$str = array(
+				'[%s]' => $char
+			);
 
-	            foreach($str as $val) {
-	                if(is_array($val)) {
-	                    foreach($val as $v) {
-	                        $args[] = $v;
-	                    }
-	                }
-	                else {
-	                    $args[] = $val;
-	                }
-	            }
+			foreach($this->visible as $field) {
+				$str[$this->formats[$field]] = $this->getValueFor($field);
+			}
 
-	            fputs($this->stream, call_user_func_array('sprintf', $args));
-	        }
-	        catch(\ErrorException $e) {
-				// sprintf too few args
-	        }
-        }
+			$format = sprintf("%s%s => %s%s\n",
+				$c ? "\033[{$c}m" : '',
+				implode(array_keys($str)),
+				preg_replace('`%[^%]`','%%', $message), // escape any sprintf control characters in the output
+				$c ? "\033[0m" : ''
+			);
+
+			$args = array($format);
+
+			foreach($str as $val) {
+				if(is_array($val)) {
+					foreach($val as $v) {
+						$args[] = $v;
+					}
+				}
+				else {
+					$args[] = $val;
+				}
+			}
+
+			// print the message to the available streams
+			foreach($use as $stream) {
+				fputs($stream, call_user_func_array('sprintf', $args));
+			}
+		}
+		catch(\ErrorException $e) {
+			// sprintf too few args
+		}
     }
 
 	/**
