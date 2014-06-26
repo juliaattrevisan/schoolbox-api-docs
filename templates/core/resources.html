@@ -318,7 +318,7 @@ $j(function() {
 	$j("div.loading").hide();
 
 	/* auto scroll to open branch */
-	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
+//	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
 
   // retrieve meta for open branch
   threePanel.getMeta({OPEN});
@@ -478,29 +478,9 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
         </thead>
       </table>
       <div class="scroller">
-        <table id="tree" class="table">
-          <tbody>
-          <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
-            <td><span class="server label">Resources</span></td>
-          </tr>
+          <div id="test-tree"></div>
           <!-- BEGIN category_list -->
-          <tr id="node-{CATEGORY_ID}" class="{CLASS}">
-            <td>
-              <span class="elbow"></span>
-              <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
-            </td>
-          </tr>
           <!-- END category_list -->
-          </tbody>
-          <tfoot>
-          <tr id="node-template">
-            <td>
-              <span class="elbow"></span>
-              <a href="#"><span class="label"></span></a>
-            </td>
-          </tr>
-          </tfoot>
-        </table>
       </div>
     </div>
   </div>
