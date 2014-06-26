@@ -470,6 +470,11 @@ class PortfolioWebDAV
         catch (Sabre\DAV\Exception\NotAuthenticated $e) {
             Sitepage::localRedir('/cms/networkLogin');
         }
+        catch (Sabre\DAV\Exception\NotFound $e) {
+            /* In some cases we are told that something exists, only to be thrown a 404 error
+                Instead of reacting badly just return false and get on with life */
+            return false;
+        }
         catch (Sabre\DAV\Exception $e) {
             error(141, $e->getMessage() );
         }
