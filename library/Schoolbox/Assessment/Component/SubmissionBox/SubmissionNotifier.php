@@ -126,6 +126,10 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				break;
 
 			case Mapper::METHOD_UPDATE:
+				// if no diff, ignore
+				if(!is_array($diff)) {
+					break;
+				}
 				// if we've gone from draft to not, notify submission
 				if(array_key_exists('draft', $diff) && $diff['draft'] == true) {
 					// is this the first? or a resubmit?
