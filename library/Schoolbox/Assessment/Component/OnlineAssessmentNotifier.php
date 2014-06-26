@@ -236,6 +236,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msgr = new Messenger();
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizType = $quiz->getWorkType()->getName();
 		$quizName = $quiz->getTitle();
 
@@ -279,6 +282,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msgr = new Messenger();
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -313,6 +319,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msgr = new Messenger();
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -353,6 +362,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msgr = new Messenger();
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -388,6 +400,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msgr = new Messenger();
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -432,6 +447,10 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStudentUpdated($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
+		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		// discard all update notifications if the submissionbox isn't open
 		$openStamp = $quiz->getStart()->getUnixTimestamp();
 		$closeStamp = $quiz->getFinish()->getUnixTimestamp();
@@ -446,7 +465,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $msgr;
 		}
 
-		$quizId   = $quiz->getId();
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -544,6 +562,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		}
 
 		$quizId   = $quiz->getId();
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quizId);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
