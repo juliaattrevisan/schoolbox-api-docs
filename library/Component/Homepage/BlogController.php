@@ -75,6 +75,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'blog', 'blog_block');
         $this->setBlock($templateHandle, 'submit', 'submit_block');
         $this->setBlock('blog', 'comment', 'comment_block');
+		$this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
 
         /* Set up component name
          */
@@ -160,20 +161,31 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
                         $comment['name'] = $userHandler->formatName($comment);
                         $this->setVar(array(
-                            'COMMENT_BODY'    => Scrub::text($comment['body']),
-                            'COMMENT_AUTHOR_ID'   => $comment['owner'],
-                            'COMMENT_AUTHOR_NAME'   => $comment['name'],
-                            'COMMENT_CREATED' => $createdTime->getRelativeTime(),
-                            'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
-                            'ON_OFF'          => ++$j % 2 ? 'dark' : ''
+							'COMMENT_COMMENT_ID' => $comment['id'],
+							'COMMENT_BODY' => Scrub::text($comment['body']),
+							'COMMENT_AUTHOR_ID' => $comment['owner'],
+							'COMMENT_AUTHOR_NAME' => $comment['name'],
+							'COMMENT_CREATED' => $createdTime->getRelativeTime(),
+							'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+							'ON_OFF' => ++$j % 2 ? 'dark' : ''
                         ));
 
-                        if($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS)
-                            $this->setVar('DELETE_COMMENT', "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>");
-                        else
-                            $this->setVar('DELETE_COMMENT', '');
+                        if ($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
+                            $this->parse('has_comment_delete_block', 'has_comment_delete');
+						}
+                        else {
+							$this->setVar(array(
+								'has_comment_delete_block' => ''
+							));
+						}
 
                         $this->parse('comment_block', 'comment', true);
+
+						/* Clear children after parsing out the parent
+						 */
+						$this->setVar(array(
+							'has_comment_delete_block' => ''
+						));
                     }
                 } else {
                     $this->setVar('comment_block', '');

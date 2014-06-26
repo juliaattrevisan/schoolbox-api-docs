@@ -1,12 +1,10 @@
-<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $j(function(){
-
         $j('a.delete-comment').click(function(event) {
             event.preventDefault();
             $j(this).confirmDialog({text:'Delete this comment?'});
-        })
+        });
 
         $j(document).on('click', "#component{COMPONENT_INSTANCE_ID} a.show-comments", function(e) {
             $j(this).siblings('ul.comments').show(100);
@@ -16,7 +14,6 @@
         });
     });
 </script>
-<!-- END custom_head -->
 
 <div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
@@ -44,7 +41,11 @@
 			<ul class="comments" style="display: none;">
 				<!-- BEGIN comment -->
 				<li class="{ON_OFF}">
-					<span class="actions">{DELETE_COMMENT}</span>
+					<span class="actions">
+						<!-- BEGIN has_comment_delete -->
+						<a class="delete-comment btn delete no-text" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"><span></span></a>
+						<!-- END has_comment_delete -->
+					</span>
 
 					<p class="meta">
 						<a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
