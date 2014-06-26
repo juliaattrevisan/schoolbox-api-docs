@@ -73,4 +73,18 @@ class CategoryLogMapper extends Mapper {
 		$item->setUser($user)->setCategory($category)->setHitcount(1);
 		$this->save($item);
 	}
+
+
+	/**
+	 * Override default behaviour: this mapper does not raise any notifications.
+	 *
+	 * @param object $object
+	 * @param string $verb
+	 * @param null   $previous
+	 * @return bool
+	 */
+	protected function raiseNotification($object, $verb, $previous = null) {
+		return false;
+	}
+
 }
