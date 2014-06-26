@@ -14,37 +14,79 @@ $j(function() {
 
     // Select a node: update the second and third panels.
     $j('#test-tree')
-//        .on('select_node.jstree', function(event, jstree) {
-//            $j(this).trigger('selectFolder.threepanel', {folderId: jstree.selected[0]})
-//        })
-//        .on('selectFolder.threepanel', function(event, params) {
-//            // update 2nd panel
-//            $j.ajax(
-//                '/ajax/file.php', {
-//                    type: 'POST',
-//                    data: {categoryID: params.folderId},
-//                    dataType: 'json'
-//                }
-//            )
-//            .then(function(data) {
-//                var files = $j('#test-tree-files').empty();
-//                $j.each(data, function(i,v) {
-//                    files.append($j('<li />').text(v.description));
-//                })
-//            })
-//
-//            // update 3rd panel
-//            $j.ajax(
-//                '/ajax/resource/meta.php', {
-//                    type: 'POST',
-//                    data: {folderId: params.folderId},
-//                    dataType: 'json'
-//                }
-//            )
-//            .then(function(data) {
-//                $j('#test-tree-meta').text(data.name);
-//            })
-//        })
+        .on('select_node.jstree', function(event, jstree) {
+            var relationID = jstree.node.id;
+
+            // Special case for root node
+            if (relationID == 0) {
+                threePanel.getMeta(0);
+                $j('#file-list tbody tr').hide();
+                return;
+            }
+
+            /* hide and deselect all files */
+            $j('#file-list tbody tr').removeClass('selected').hide();
+
+            var files = $j('tr.category-' + relationID);
+
+            threePanel.getMeta(relationID);
+
+            if (files.length > 0) {
+                /* files exist, show them */
+                files.show();
+
+                /* re-apply on off */
+                $j('#file-list tbody tr').removeClass('dark');
+                $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+
+                /* remember tree branch */
+                $j.post('/ajax/tree.php', {resourcesID : relationID});
+
+            } else {
+
+                /* ajax load files */
+                $j.post('/ajax/file.php', {categoryID : relationID}, function (data) {
+
+                    if (data.error) {
+                        alert(data.error);
+                    } else if (data.length == 0) {
+                        /* display empty message */
+                        $j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+
+                    } else {
+                        var template = $j('#file-template');
+                        for (i in data) {
+                            var row = data[i];
+
+                            /* build new file (row) */
+                            var clone = template.clone();
+                            clone.attr('id', 'file-' + row.id);
+                            clone.find('span.file').text(row.description);
+                            clone.find('td:eq(1)').text(row.user);
+                            clone.find('td:eq(2)').text(row.relative);
+                            clone.addClass('category-' + relationID);
+                            clone.addClass(row.mimeClass);
+
+                            if (row.url)
+                                clone.addClass('link');
+
+                            if (row.hidden == 1)
+                                clone.addClass('hidden');
+
+                            clone.appendTo($j('#file-list')).show();
+                        }
+                    }
+
+                    /* re-apply on off */
+                    $j('#file-list tbody tr').removeClass('dark');
+                    $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+
+
+                    initialiseFiles(relationID);
+
+                }, 'json');
+            }
+        })
         .jstree({
             animation: 50,
             core: {
@@ -100,13 +142,6 @@ $j(function() {
 
   var threePanel = new ThreePanelView('/ajax/resource/meta.php', 'resources')
 
-	/* left tree navigation */
-	$j('#tree').tree({
-		type	 : 'table',
-		node 	 : 'tr',
-		onOff	 : 'dark',
-		sequencing	: false
-	});
 
 	/* load right panel file list */
 	$j(document).on('click', '#tree tr:not(.server)', function () {
