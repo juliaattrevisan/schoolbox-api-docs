@@ -14,6 +14,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Serializable;
 
 interface ModuleNotifierInterface extends Serializable {
@@ -39,7 +40,7 @@ interface ModuleNotifierInterface extends Serializable {
 
 
 	/**
-	 * @param TriggerBundle $bundle
+	 * @param TriggerBundleInterface $bundle
 	 * @return void
 	 */
 	public function bundleTriggers($bundle);

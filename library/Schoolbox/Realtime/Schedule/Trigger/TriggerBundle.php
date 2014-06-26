@@ -13,7 +13,7 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Event;
 
-class TriggerBundle {
+class TriggerBundle implements TriggerBundleInterface {
 
 	/** @var TriggerFactory */
 	protected $factory;
