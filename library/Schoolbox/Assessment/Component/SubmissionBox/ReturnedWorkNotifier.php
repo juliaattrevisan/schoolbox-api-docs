@@ -95,6 +95,14 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	}
 
 
+	/**
+	 * @param SubmissionBox $box
+	 * @return bool
+	 */
+	protected function parentCanView($box) {
+		return $box->getMarkVisibility() >= SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT && !$this->conf->get('restrict_parent_duework_access');
+	}
+
 	/* ----------------------------------------------------------------------------------------------------------
 	 *  ASYNC WORKER METHODS
 	 * ---------------------------------------------------------------------------------------------------------- */
@@ -148,7 +156,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		}
 
 		// if parent, 3rd-person language
-		elseif($target == 'parent' && $box->getMarkVisibility() >= SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
+		elseif($target == 'parent' && $this->parentCanView($box)) {
 			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
 
 			$params = array(
@@ -186,7 +194,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 * @param array|null $diff
 	 * @return Messenger
 	 */
-	public function notifyParentMarked($returnedWork, $user, $diff = null) {
+	public function notifyParentReturned($returnedWork, $user, $diff = null) {
 		return $this->generateMessage('parent', $returnedWork, $user, $diff);
 	}
 
