@@ -63,7 +63,7 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery = substr($classQuery, 0, -3) . ')';
 
         $query = "
-		SELECT          StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
+		SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel, StudentClasses.StudentHouseDescription as house,
                         vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag,
                         StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
