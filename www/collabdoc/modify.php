@@ -25,10 +25,6 @@ if ($authenticator->canCreate($etherpad->getHomepageId())) {
 	$this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
 
 	$this->setVar(array(
-		'etherpad_delete_block' => '',
-	));
-
-	$this->setVar(array(
 		'HOMEPAGE_ID' => $etherpad->getHomepageId(),
 		'ETHERPAD_PAD_ID' => $etherpad->getId(),
 		'ETHERPAD_PAD_NAME' => $etherpad->getName()
