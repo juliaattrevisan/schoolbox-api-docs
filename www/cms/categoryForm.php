@@ -111,10 +111,10 @@ if ($_POST['name']) {
 		if ($groupHandler->allowOwner($_SESSION['id']) ) {
 
             /* Setup group and forward to group management page */
-            $groupHandler->createGroup($category['id']);
-            $groupHandler->addUser($category['id'], $_SESSION['id'], 3);
+            $groupHandler->createGroup($model->getId());
+            $groupHandler->addUser($model->getId(), $_SESSION['id'], 3);
 
-            SitePage::localRedir('/group/modify/'.$category['id']);
+            SitePage::localRedir('/group/modify/'.$model->getId());
 		}
 
         error(20);
