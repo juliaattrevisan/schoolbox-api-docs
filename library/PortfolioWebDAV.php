@@ -399,12 +399,12 @@ class PortfolioWebDAV
             if ($groupHandler->isStaff()) {
                 $paths = array(
                     $settings['baseUri'].'/webdav/staff/' . $_SESSION['username'] . '/',
-                    $settings['baseUri'].'/webdavshared/'
+                    //$settings['baseUri'].'/webdavshared/'
                 );
             } else if ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].'/webdav/student/' . $_SESSION['username'] . '/',
-                    $settings['baseUri'].'/webdavshared/'
+                    //$settings['baseUri'].'/webdavshared/'
                 );
             } else {
                 return false;
