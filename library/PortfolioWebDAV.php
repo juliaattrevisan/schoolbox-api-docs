@@ -398,13 +398,13 @@ class PortfolioWebDAV
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    '/webdav/staff/' . $_SESSION['username'] . '/',
-                    '/webdavshared/'
+                    $settings['baseUri'].'/webdav/staff/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'/webdavshared/'
                 );
             } else if ($groupHandler->isStudent()) {
                 $paths = array(
-                    '/webdav/student/' . $_SESSION['username'] . '/',
-                    '/webdavshared/'
+                    $settings['baseUri'].'/webdav/student/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'/webdavshared/'
                 );
             } else {
                 return false;
