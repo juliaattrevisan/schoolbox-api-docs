@@ -170,10 +170,15 @@ class PostNotifier extends AbstractModuleNotifier {
 
 		$parentAuthorId = $parent->getOwnerId();
 
+		// compensate for inconsistent return types -_-
+		if($parentAuthorId instanceof User) {
+			$parentAuthorId = $parentAuthorId->getId();
+		}
+
 		/** @var Collection|SocialStream_Post_Abstract[] $siblings */
 		$siblings = $this->mapper->findChildren($post);
 
-		$siblingAuthorIds = $siblings->getColumnValues('ownerId') ?: array();
+		$siblingAuthorsOrIds = $siblings->getColumnValues('ownerId') ?: array();
 
 		$href = '/homepage/'.$cat->getId();
 		$icon = $this->getPostIcon($post, $author);
@@ -187,7 +192,8 @@ class PostNotifier extends AbstractModuleNotifier {
 			'stub'   => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 48)
 		));
 
-		foreach($siblingAuthorIds as $siblingId) {
+		foreach($siblingAuthorsOrIds as $siblingOrId) {
+			$siblingId = $siblingOrId instanceof User ? $siblingOrId->getId() : $siblingOrId;
 			$msgr->targetToUser($siblingId, $siblingMsg, "sstream.{$post->getPostId()}.replied", Logger::NOTICE, array(
 				'author' => array($author->formatName(), '/search/user/'.$author->getId()),
 				'cat'    => array($cat->getName(), $href),
