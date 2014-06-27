@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Course\TaskMapper;
 
 // #: get base items
 $categoryMapper = CategoryMapper::getInstance();
@@ -22,16 +23,20 @@ else {
     // Children of root node
     $list = $categoryMapper->findByParent($parentId);
     foreach ($list as $category) {
-        // Does this item have categories?
-        $type = 'folder';
-        if ($category->hasHomepage()) {
-            $type = 'homepage';
+
+        // Type: homepage or folder
+        // Could be a course as well, if any child has tasks.
+        $type     = $category->hasHomepage() ? 'homepage' : 'folder';
+        $children = $categoryMapper->findByParent($category->getId());
+        $childIds = $children->getColumnValues('id');
+        if (TaskMapper::getInstance()->countByColumn('category_id', $childIds)) {
+            $type = 'course';
         }
         $output[] = array(
             'id'       => $category->getId(),
             'parent'   => $category->getParent()->getId() ?: '0',
             'text'     => $category->getName(),
-            'children' => count($categoryMapper->findByParent($category->getId())) > 0,
+            'children' => count($children) > 0,
             'type'     => $type,
         );
     }
