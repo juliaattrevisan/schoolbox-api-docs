@@ -15,6 +15,7 @@ if ($parentId === '#') {
         'id'       => '0',
         'text'     => 'Resources',
         'children' => count($categoryMapper->findByParent(0)) > 0,
+        'type'     => 'root',
     );
 }
 else {
@@ -22,12 +23,16 @@ else {
     $list = $categoryMapper->findByParent($parentId);
     foreach ($list as $category) {
         // Does this item have categories?
+        $type = 'folder';
+        if ($category->hasHomepage()) {
+            $type = 'homepage';
+        }
         $output[] = array(
-            'id'     => $category->getId(),
-            'parent' => $category->getParent()->getId() ?: '0',
-            'text'   => $category->getName(),
-            // I just need to know if there are children for this node.
+            'id'       => $category->getId(),
+            'parent'   => $category->getParent()->getId() ?: '0',
+            'text'     => $category->getName(),
             'children' => count($categoryMapper->findByParent($category->getId())) > 0,
+            'type'     => $type,
         );
     }
 }
