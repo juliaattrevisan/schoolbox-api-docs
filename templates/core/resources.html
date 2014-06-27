@@ -87,6 +87,27 @@ $j(function() {
                 }, 'json');
             }
         })
+        .on('move_node.jstree', function(e, data) {
+            // Move node event
+            var failMessage = function(error) {
+                var message = 'An error occurred during processing. Please reload your browser and try again.';
+                if (error) {
+                    message += '\nError: ' + message;
+                }
+                alert(message);
+            }
+            $.ajax({
+                type: 'post',
+                url:  '/cms/categoryForm.php',
+                data: { move: data.node.id, categoryID: data.parent},
+                dataType: 'json'
+            })
+            .done(function(data) {
+                if (data && data.error) {
+                    failMessage(data.error)
+                }
+            })
+        })
         .jstree({
             animation: 50,
             core: {
@@ -104,7 +125,7 @@ $j(function() {
                     icons: true
                 }
             },
-            plugins : ["dnd", 'state'],
+            plugins : ['dnd', 'sort', 'state', 'wholerow'],
             dnd: {
                 copy: false
             }
