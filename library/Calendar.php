@@ -673,7 +673,7 @@ class Calendar extends DeprecatedModel {
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = ".self::ACCESS_GROUP." AND sid IN (" . implode(',', $groupList) . "))";
+                $groupQuery = "OR (access = ".self::ACCESS_GROUP." AND event_sid.sid IN (" . implode(',', $groupList) . "))";
             }
         }
 
@@ -702,7 +702,7 @@ class Calendar extends DeprecatedModel {
 		}
 		if ($filter['group']) {
 			$filter_query[] = 'access = '.self::ACCESS_GROUP;
-			$filter_query[] = 'event.sid = '.intval($filter['group']);
+			$filter_query[] = 'event_sid.sid = '.intval($filter['group']);
 		}
 		if ($filter['personal']) {
 			$filter_query[] = 'access = '.self::ACCESS_PERSONAL;
@@ -719,12 +719,13 @@ class Calendar extends DeprecatedModel {
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
 				startDate, startTime, endDate, endTime, allday,
 				SUBSTR(event.startDate, 1, 4) AS year,
-				type, note, access, sid, location, detail, attendance,
+				type, note, access, location, detail, attendance,
 				user.id as uid, title, firstname, lastname,
 				eventType, eventColour,
 				event.publish_date,
 				category.id AS categoryId, category.name AS categoryName,
-				event.completed, author_id
+				event.completed, author_id,
+				event_sid.sid
 			FROM event
 			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
@@ -732,6 +733,7 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
+			LEFT JOIN event_sid ON event.id = event_sid.event_id
 			WHERE
 				resource_booking.id IS NULL
 				AND (
