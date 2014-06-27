@@ -125,9 +125,26 @@ $j(function() {
                     icons: true
                 }
             },
-            plugins : ['dnd', 'sort', 'state', 'wholerow'],
+            plugins : ['dnd', 'sort', 'state', 'types', 'wholerow'],
             dnd: {
                 copy: false
+            },
+            types: {
+                root: {
+                    icon: '/images/tree/server.gif'
+                },
+                'default': {
+                    icon: '/images/icons/22x22/folder.png'
+                },
+                folder: {
+                    icon: '/images/icons/22x22/folder.png'
+                },
+                homepage: {
+                    icon: '/images/icons/22x22/home.png'
+                },
+                course: {
+                    icon: '/images/tree/server.gif'
+                }
             }
         });
 
