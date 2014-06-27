@@ -9,6 +9,7 @@ $page->setFile(TEMPLATE_content, 'calendar/modify.html');
 $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+$page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 
 /* Modify existing event
  */
@@ -26,7 +27,6 @@ if (is_numeric($_GET['eventID'])) {
 	/* Default values
 	 */
 	$defaultTypeId = $event->getType()->getId();
-	$defaultSid = $event->getServiceId();
 	$defaultAccessLevel = $event->getAccess();
 
 	/* Only provide publish date if one was provided and if it
@@ -89,8 +89,6 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_reminder_block', 'recurring_reminder');
 		$page->setVar('recurring_dates_block', '');
 	}
-
-	$page->parse('delete_button_block', 'delete_button');
 }
 /* Create new event
  */
@@ -163,6 +161,20 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 $groupHandler = new \Group();
 $groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
 
+/* Group checkbox array when using Group Event Level
+ */
+foreach($groupList as $currentUserGroup) {
+	$page->setVar(array(
+		'EVENT_GROUP_ID' => $currentUserGroup['id'],
+		'EVENT_GROUP_NAME' => $currentUserGroup['name'],
+		'EVENT_GROUP_ID_SELECTED' => $event->getServiceId()->getBy('sid', $currentUserGroup['id']) ? 'checked="checked"' : '',
+	));
+
+	$page->parse('event_group_drop_block', 'event_group_drop', true);
+}
+
+$page->parse('delete_button_block', 'delete_button');
+
 /* Only provide Campus options if campuses have been defined
  */
 $campusMapper = new \Schoolbox\CampusMapper();
@@ -177,14 +189,6 @@ $campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
 $page->dropDown('event_level_drop', new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
 	'id' => 'EVENT_EVENTLEVEL_ID',
 	'name' => 'EVENT_EVENTLEVEL_NAME',
-));
-
-/* Group dropdown when using Group Event Level
- */
-
-$page->dropDown('event_group_drop', $groupList, $defaultSid, TEMPLATE_content, array(
-	'id' => 'EVENT_GROUP_ID',
-	'name' => 'EVENT_GROUP_NAME'
 ));
 
 /* Campus Checkbox Array when using Campus Event Level
