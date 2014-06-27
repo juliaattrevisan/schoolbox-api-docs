@@ -127,35 +127,42 @@ if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
     foreach ($subList as $sub) {
+
+        // TODO fully rewrite this awful copypasted loop
         if ($prevCat['category'] != $sub['category'] && $prevCat['category'] != '') {
-            $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
-            /* @param  \Schoolbox\Resource\Category $curCategory
+            try {
+                $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+                /* @param  \Schoolbox\Resource\Category $curCategory */
 
-            /* Get full student list of class to show those who have not submitted
-                */
-            if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
-                /* If synergy code, get synergy students
+                /* Get full student list of class to show those who have not submitted
+                 */
+                if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
+                    /* If synergy code, get synergy students
                      */
-                $studentList = $synHandler->getStudents($curCategory->getCodeString());
-            } else {
-                /* Retrieve student list from group membership
+                    $studentList = $synHandler->getStudents($curCategory->getCodeString());
+                } else {
+                    /* Retrieve student list from group membership
                      */
-                $studentList = $groupHandler->getMemberList($curCategory->getId());
+                    $studentList = $groupHandler->getMemberList($curCategory->getId());
+                }
+
+                $this->setVar('STUDENTS', count($studentList));
+
+                if (count($curCategory->getCodes()) > 0) {
+                    $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
+                } else {
+                    $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
+                }
+
+                $this->setVar('CATEGORY_ID', $curCategory->getId());
+                $this->parse('category_block', 'category_listing', true);
+                $this->setVar('submission_block', '');
+
+                $i = 0;
             }
-
-            $this->setVar('STUDENTS', count($studentList));
-
-            if (count($curCategory->getCodes()) > 0) {
-                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
-            } else {
-                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
+            catch (Exception $e) {
+                // Couldn't find category, probably as it wasn't set.
             }
-
-            $this->setVar('CATEGORY_ID', $curCategory->getId());
-            $this->parse('category_block', 'category_listing', true);
-            $this->setVar('submission_block', '');
-
-            $i = 0;
         }
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
