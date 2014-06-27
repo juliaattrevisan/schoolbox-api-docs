@@ -293,6 +293,19 @@
 				}
 			}
 
+			/* Check if a Group is selected when using the Group
+			 * level option in the dropdown
+			 */
+			var validateGroupSelected = function() {
+				var level = parseInt($('select[name=level]').val());
+
+				if (level == 2) {
+					return true;
+				}
+
+				return false;
+			}
+
 			/* For EOTC
 			 * Disabled need for files to be uploaded, regardless of the setting
 			 */
@@ -341,6 +354,11 @@
 						},
 						minlength: {
 							param: 1
+						}
+					},
+					'group[]': {
+						required: {
+							depends: validateGroupSelected
 						}
 					}
 				},
