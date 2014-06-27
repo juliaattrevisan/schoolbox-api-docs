@@ -85,6 +85,14 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
+		/* Ensure at least one group is selected
+		 */
+		if ($_POST['level'] == 2) {
+			if (!(is_array($_POST['group']) && count($_POST['group']))) {
+				error(2);
+			}
+		}
+
 		/* NO RETREAT
 		 * NO SURRENDER
 		 */
