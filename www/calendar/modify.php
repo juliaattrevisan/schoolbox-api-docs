@@ -87,7 +87,6 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     $groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-    array_unshift($groupList, array('id' => $event['sid'], 'name' => '-- unchanged --'));
 
 	/* Render a list of User Groups
 	 */
