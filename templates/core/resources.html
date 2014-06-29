@@ -34,6 +34,7 @@ $j(function() {
             if (files.length > 0) {
                 /* files exist, show them */
                 files.show();
+                initialiseFiles(relationID);
 
                 /* re-apply on off */
                 $j('#file-list tbody tr').removeClass('dark');
