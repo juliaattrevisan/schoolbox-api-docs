@@ -796,8 +796,10 @@ class Calendar extends DeprecatedModel {
                 }
 
                 if ($currentEvent['access'] == self::ACCESS_GROUP) {
-                    $event->setCategoryId($currentEvent['categoryId']);
-                    $event->setCategoryname($currentEvent['categoryName']);
+					$mapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
+					$allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
+
+					$event->setCategoryCollection($allRelations);
                 }
 	            else if($currentEvent['access'] == self::ACCESS_CAMPUS) {
 		            $event->setCampusList($currentEvent['campusList']);
