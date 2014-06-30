@@ -1,0 +1,19 @@
+<dl>
+    <dt>Start Time</dt>
+    <dd>
+        {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
+        {% include 'sub/datetimeInput.twig' with {
+            value: item.event.startDateTime,
+            name:  'start_datetime',
+            id:    'start_datetime'
+        } %}
+    </dd>
+    <dt>End Time</dt>
+    <dd>
+        {% include 'sub/datetimeInput.twig' with {
+            value: item.event.endDateTime,
+            name:  'end_datetime',
+            id:    'end_datetime'
+        } %}
+    </dd>
+</dl>

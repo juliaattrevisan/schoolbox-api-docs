@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.timetableDaySelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -51,6 +52,19 @@ $(document).ready(function() {
         endDate: $('input[name="end_datetime[date]"]')
     })
 
+    // Set up tabz for the projector.
+    // Always default to setting a date and time directly, though.
+    var tabSelector = $('[data-interaction="tabs"]')
+            .tabs({
+                heightStyle: 'auto',
+                active: 0
+            })
+            .on('tabsbeforeactivate', function(event, ui) {
+                // Ensure that all inputs in inactive tabs are disabled
+                ui.oldPanel.find(':input').prop('disabled', true)
+                ui.newPanel.find(':input').prop('disabled', false)
+            })
+
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
     $('[data-interaction="timetableSelector"]')
@@ -69,26 +83,27 @@ $(document).ready(function() {
                 }
             }
         })
-        .on('useDate.timetableDaySelector', function(event, date, startTime, endTime) {
+        .on('selectDate.timetableDaySelector', function(event, date, startTime, endTime) {
+            var timetableTab = $('#timetableSelector')
             date = moment(date)
             if (date.isValid()) {
                 var dateOutput = date.format('DD/MM/YYYY')
-                $('input[name="start_datetime[date]"]').val(dateOutput)
-                $('input[name="end_datetime[date]"]').val(dateOutput)
+                timetableTab.find('input[name="start_datetime[date]"]').val(dateOutput)
+                timetableTab.find('input[name="end_datetime[date]"]').val(dateOutput)
             }
 
             startTime = moment(startTime, 'HH:mm')
             if (startTime.isValid()) {
-                $('input[name="start_datetime[hour]"]').val(startTime.format('h'))
-                $('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
-                $('select[name="start_datetime[meridien]"]').val(startTime.format('a'))
+                timetableTab.find('input[name="start_datetime[hour]"]').val(startTime.format('h'))
+                timetableTab.find('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
+                timetableTab.find('input[name="start_datetime[meridien]"]').val(startTime.format('a'))
             }
 
             endTime = moment(endTime, 'HH:mm')
             if (endTime.isValid()) {
-                $('input[name="end_datetime[hour]"]').val(endTime.format('h'))
-                $('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
-                $('select[name="end_datetime[meridien]"]').val(endTime.format('a'))
+                timetableTab.find('input[name="end_datetime[hour]"]').val(endTime.format('h'))
+                timetableTab.find('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
+                timetableTab.find('input[name="end_datetime[meridien]"]').val(endTime.format('a'))
             }
         })
 
@@ -222,6 +237,7 @@ $(document).ready(function() {
 
     // Submit resource booking form via AJAX
     form.validate({
+        ignore: ':disabled',
         rules: {
             'start_datetime[date]': {
                 required: true,
@@ -262,11 +278,11 @@ $(document).ready(function() {
             },
             'start_datetime[meridien]': {
                 required: true,
-                selected: true
+                pattern:  /^(?:am|pm)$/i
             },
             'end_datetime[meridien]': {
                 required: true,
-                selected: true
+                pattern:  /^(?:am|pm)$/i
             }
         },
         errorPlacement: function(label, element) {
@@ -275,11 +291,11 @@ $(document).ready(function() {
                 case 'start_datetime[date]':
                 case 'start_datetime[hour]':
                 case 'start_datetime[minute]':
-                case 'start_datetime[meriden]':
+                case 'start_datetime[meridien]':
                 case 'end_datetime[date]':
                 case 'end_datetime[hour]':
                 case 'end_datetime[minute]':
-                case 'end_datetime[meriden]':
+                case 'end_datetime[meridien]':
                     element.closest('td').append(label)
                     break
                 default:
@@ -358,6 +374,7 @@ $(document).ready(function() {
             }
         })
         .change()
+
 })
 </script>
 <!-- END custom_header -->
@@ -393,72 +410,27 @@ $(document).ready(function() {
         </tr>
         <tr>
             <td class="formLabelWidth">
-                <h4>Timetable</h4>
-                <em>You may select a timetable day and period to book this item for here.</em>
-                <em>If you want this booking to recur for a timetable period, then
-                    make sure you select the "Timetable Based" option in "Repeat".</em>
+                <h4>Booking Time</h4>
             </td>
             <td>
-                {# Select campus, day, period #}
-                {# on change campus: deselect day and period#}
-                <dl class="timetableSelector" data-interaction="timetableSelector">
-                    <dt>Campus</dt>
-                    <dd>
-                        <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
-                            <option disabled>-- select campus --</option>
-                            {% for campus in campusList %}
-                                <option value="{{ campus.id }}"
-                                        label="{{ campus.name }}"
-                                        >{{ campus.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </dd>
-                    <dt>Day</dt>
-                    <dd>
-                        <select id="timetableDay" name="timetable[day]" disabled data-role="daySelector">
-                            <option disabled>-- select day --</option>
-                        </select>
-                    </dd>
-                    <dt>Period</dt>
-                    <dd>
-                        <select id="timetablePeriod" name="timetable[period]" disabled data-role="periodSelector">
-                            <option disabled>-- select period --</option>
-                        </select>
-                    </dd>
-                    <dt>Date</dt>
-                    <dd>
-                        <time data-role="selectedDate"></time>
-                        <time data-role="selectedTimeStart"></time>
-                        <time data-role="selectedTimeEnd"></time>
-                    </dd>
-                    <dt>&nbsp;</dt>
-                    <dd>
-                        <a data-interaction="previousDate" class="btn go-back no-text float-left" title="Previous" href="#"><span></span></a>
-                        <a data-interaction="nextDate" class="btn go-to no-text float-left" title="Next" href="#"><span></span></a>
-                        <a data-interaction="useDate" class="btn tick no-text float-left" title="Use this date" href="#"><span></span></a>
-                    </dd>
-                </dl>
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth"><h4>Begin</h4></td>
-            <td>
-                {#{% include 'sub/errors.twig' with {errors: errors.start_datetime} %}#}
-                {% include 'sub/datetimeInput.twig' with {
-                    value: item.event.startDateTime,
-                    name:  'start_datetime',
-                    id:    'start_datetime'
-                } %}
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth"><h4>End</h4></td>
-            <td>
-                {% include 'sub/datetimeInput.twig' with {
-                    value: item.event.endDateTime,
-                    name:  'end_datetime',
-                    id:    'end_datetime'
-                } %}
+                {# Existing items - only show the date and time (for now) #}
+                {# New items - allow choice of timetable or date/time #}
+                {% if item.id %}
+                    {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                {% else %}
+                    <div data-interaction="tabs">
+                        <ul>
+                            <li><a href="#dateSelector">Choose a Time</a></li>
+                            <li><a href="#timetableSelector">Choose from Timetable</a></li>
+                        </ul>
+                        <div class="clearfix" id="timetableSelector">
+                            {% include '@resourceBooking/sub/timetableSelector.twig' with {campusList: campusList} %}
+                        </div>
+                        <div class="clearfix" id="dateSelector">
+                            {% include '@resourceBooking/sub/datetimeSelector.twig' with {item: item} %}
+                        </div>
+                    </div>
+                {% endif %}
             </td>
         </tr>
         {% if item.event.id is empty %}

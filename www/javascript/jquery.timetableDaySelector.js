@@ -149,6 +149,7 @@
                 self.startTimeDisplay
                     .attr('datetime', startTime.format('HH:mm'))
                     .text(startTime.format('h:mm A'))
+                self.triggerSelectDateEvent()
             }
             else {
                 self.startTimeDisplay
@@ -159,6 +160,7 @@
                 self.endTimeDisplay
                     .attr('datetime', endTime.format('HH:mm'))
                     .text(endTime.format('h:mm A'))
+                self.triggerSelectDateEvent()
             }
             else {
                 self.endTimeDisplay
@@ -240,16 +242,30 @@
             self.dateDisplay
                 .attr('datetime', date.format('YYYY-MM-DD'))
                 .text(date.format('DD/MM/YYYY'))
-            self.buttons.prop('disabled', false).removeClass('disabled').show('fast')
+            self.buttons.prop('disabled', false).removeClass('disabled').show()
+            self.triggerSelectDateEvent()
         })
         .fail(function() {
             self.dateDisplay
                 .text('error')
                 .addClass('error')
-            self.buttons.hide('fast')
+            self.buttons.hide()
         })
     }
 
+    /**
+     * Triggers a select date event on the element.
+     */
+    TimetableDaySelector.prototype.triggerSelectDateEvent = function() {
+        this.element.trigger(
+            'selectDate.timetableDaySelector',
+            [
+                this.dateDisplay.attr('datetime'),
+                this.startTimeDisplay.attr('datetime'),
+                this.endTimeDisplay.attr('datetime'),
+            ]
+        )
+    }
 
     /**
      * Sets up the timetable day selector.
