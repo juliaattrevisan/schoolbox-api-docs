@@ -109,9 +109,14 @@ $j(function() {
                 }
             })
         })
-//        .on('load_node.jstree', function() {
-//            console.log(arguments)
-//        })
+        .on('after_open.jstree', function(event, tree) {
+            // Set up folders as drop targets for files
+            $.each(tree.node.children, function(i,v) {
+                tree.instance.get_node(v, true).droppable({
+                    scope: 'resourceFile'
+                })
+            });
+        })
         .jstree({
             animation: 50,
             core: {
@@ -161,7 +166,11 @@ $j(function() {
                     icon: '/images/famicons/chart_curve.png'
                 }
             }
-        });
+        })
+        .on('drop', 'li[role="treeitem"]', function(event, ui) {
+            // Drop event for files
+            console.log(event, ui)
+        })
 
   var relationID = '{OPEN}';
 
@@ -243,6 +252,7 @@ $j(function() {
 		if (permission === 'full' || categoryNode === 'write') {
 
 			newChildren.find('span.file').draggable({
+				scope: 'resourceFile',
 				cursor: 'move',
 				cursorAt: {top: 5, left: 5},
 				helper: function (event) {
