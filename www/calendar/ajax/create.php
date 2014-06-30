@@ -44,25 +44,31 @@ else {
 $event = new Event();
 
 $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
-	  ->setAuthor($user)
-	  ->setAccess(Event::ACCESS_PERSONAL)
-	  ->setCampusCollection(new Collection())
-	  ->setRoleCollection(new Collection())
-	  ->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
-	  ->setNote($_POST['note'])
-	  ->setStartDateTime($dateObj)
-	  ->setEndDateTime($dateObj)
-	  ->setAllDay(true)
-	  ->setLocation($_POST['location'])
-	  ->setAttendance($_POST['attendance'])
-	  ->setDetail($_POST['detail'])
-	  ->setPublishDateTime(null)
-	  ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
+	->setAuthor($user)
+	->setAccess(Event::ACCESS_PERSONAL)
+	->setCampusCollection(new Collection())
+	->setRoleCollection(new Collection())
+	->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
+	->setNote($_POST['note'])
+	->setStartDateTime($dateObj)
+	->setEndDateTime($dateObj)
+	->setAllDay(true)
+	->setLocation($_POST['location'])
+	->setAttendance($_POST['attendance'])
+	->setDetail($_POST['detail'])
+	->setPublishDateTime(null)
+	->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 
 $affectedIds = EventMapper::getInstance()->save($event);
 
-/* TODO: Save a Personal Relation
+/* Save a Personal Relation
  */
+$personalRelation = new \Schoolbox\Calendar\Relation\Personal();
+$personalRelation->setEventId($event->getId());
+$personalRelation->setUserId($ownerId);
+
+$personalRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
+$personalRelationMapper->save($personalRelation);
 
 if (count($affectedIds) == 1) {
 	$json = array(
