@@ -162,7 +162,33 @@ $j(function() {
         })
         .on('drop', 'li[role="treeitem"]', function(event, ui) {
             // Drop event for files
-            console.log(event, ui)
+            // This drop event bubbles up the list of droppables, so trigger it
+            // only if this.id and event.target.id match.
+            var newCategoryId = this.id;
+            if (newCategoryId == event.target.id) {
+                var fileElement   = ui.draggable.closest('tr');
+                var fileId        = fileElement.attr('id').replace(/\D/g, '');
+                var oldCategoryId = 0;
+                fileElement.attr('class').split(/\s+/).forEach(function(className) {
+                    var matches = className.match(/^category-(\d+)$/);
+                    if (matches) {
+                        oldCategoryId = matches[1];
+                    }
+                })
+                // Make sure every single file gets moved
+                $.post(
+                    '/cms/fileForm.php',
+                    { move: fileId, categoryID: newCategoryId },
+                    function(data) {
+                        // move the file out of old category and into new one
+                        // May as well clear all in old and new category, as
+                        // they've both changed.
+                        $('tr#file-' + fileId).remove();
+                        $('tr.category-' + newCategoryId).remove();
+                    },
+                    'json'
+                );
+            }
         })
 
   var relationID = '{OPEN}';
