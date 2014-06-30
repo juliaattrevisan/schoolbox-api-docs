@@ -419,14 +419,11 @@ $j(function () {
                 <em>Select the group which will be able to view this event</em>
 			</td>
             <td>
-				<select name="group">
-					<!-- BEGIN group_drop -->
-					<option value="{UGROUP_ID}"
-					{UGROUP_ID_SELECTED} />
-					{UGROUP_NAME}
-					</option>
-					<!-- END group_drop -->
-				</select>
+				<!-- BEGIN usergroup -->
+				<label>
+					<input type="checkbox" name="group[]" value="{USERGROUP_ID}" {USERGROUP_SELECTED} />{USERGROUP_NAME}
+				</label>
+				<!-- END usergroup -->
 			</td>
         </tr>
         <tr id="groupList" style="display:none;">

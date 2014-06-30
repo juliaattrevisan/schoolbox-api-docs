@@ -87,11 +87,20 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     $groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-    array_unshift($groupList, array('id' => $event['sid'], 'name' => '-- unchanged --'));
 
-    $page->dropDown(
-        'group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
-    );
+	/* Render a list of User Groups
+	 */
+	$page->setBlock(TEMPLATE_content, 'usergroup', 'usergroup_block');
+
+	foreach($groupList as $currentUserGroup) {
+		$page->setVar(array(
+			'USERGROUP_ID' => $currentUserGroup['id'],
+			'USERGROUP_NAME' => $currentUserGroup['name'],
+			'USERGROUP_SELECTED' => in_array($currentUserGroup['id'], array($event['sid'])) ? 'checked="checked"' : '',
+		));
+
+		$page->parse('usergroup_block', 'usergroup', true);
+	}
 
     $page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
@@ -155,6 +164,7 @@ else {
     $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
     $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
     $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+	$page->setBlock(TEMPLATE_content, 'usergroup', 'usergroup_block');
     $page->setTitle('Add Calendar Event');
 
     $date = $_GET['date'];
@@ -242,14 +252,30 @@ else {
             }
             catch (Schoolbox\Mapper\Exception $e) {}
         }
-        $page->dropDown(
-            'group_drop', $groupList, $_GET['sid'], TEMPLATE_content,
-            array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
-        );
+
+		/* Render a list of User Groups
+		 */
+		foreach($groupList as $currentUserGroup) {
+			$page->setVar(array(
+				'USERGROUP_ID' => $currentUserGroup['id'],
+				'USERGROUP_NAME' => $currentUserGroup['name'],
+				'USERGROUP_SELECTED' => in_array($_GET['sid'], array($event['sid'])) ? 'checked="checked"' : '',
+			));
+
+			$page->parse('usergroup_block', 'usergroup', true);
+		}
     } else {
-        $page->dropDown(
-            'group_drop', $groupList, '', TEMPLATE_content, array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
-        );
+		/* Render a list of User Groups
+		 */
+		foreach($groupList as $currentUserGroup) {
+			$page->setVar(array(
+				'USERGROUP_ID' => $currentUserGroup['id'],
+				'USERGROUP_NAME' => $currentUserGroup['name'],
+				'USERGROUP_SELECTED' => '',
+			));
+
+			$page->parse('usergroup_block', 'usergroup', true);
+		}
     }
 
     $levelList[] = array('LEVEL_ID' => 1, 'LEVEL_NAME' => 'Personal');
