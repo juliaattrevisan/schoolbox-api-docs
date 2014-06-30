@@ -10,18 +10,35 @@ use Schoolbox\Assessment\Course\TaskMapper;
 $DEPRECATEDHANDLER = new Group();
 $categoryMapper = CategoryMapper::getInstance();
 
+$getPermissionString = function($code) {
+    switch ($code) {
+        case FULL_ACCESS:
+            return 'full';
+            break;
+        case WRITE_ACCESS:
+            return 'write';
+            break;
+        case READ_ACCESS:
+            return 'read';
+            break;
+        default:
+            break;
+    }
+    return '';
+};
+
 $output = array();
 $parentId = $_GET['parent'];
 if ($parentId === '#') {
     // Root node
-    // Can this user read or write to the root node?
+    // Can this user read or write to the root node? Honestly I don't know
     $output[] = array(
         'id'       => '0',
         'text'     => 'Resources',
         'children' => count($categoryMapper->findByParent(0)) > 0,
         'type'     => 'root',
         'li_attr'  => array(
-            'data-permission' => 'read',
+            'data-permission' => $getPermissionString($DEPRECATEDHANDLER->getPermission(0)),
         ),
     );
 }
@@ -31,22 +48,8 @@ else {
     foreach ($list as $category) {
 
         // Get the permission this user has on this folder.
-        $permission = '';
-        switch ($DEPRECATEDHANDLER->getPermission($category->getId())) {
-            case FULL_ACCESS:
-                $permission = 'full';
-                break;
-            case WRITE_ACCESS:
-                $permission = 'write';
-                break;
-            case READ_ACCESS:
-                $permission = 'read';
-                break;
-            default:
-                break;
-        }
-
         // No permission: don't show it at all!
+        $permission = $getPermissionString($DEPRECATEDHANDLER->getPermission($category->getId()));
         if (empty($permission)) {
             continue;
         }
