@@ -398,7 +398,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	private function getUserCampusName() {
-		return $this->user->getDefaultCampus()->getName();
+		$defaultCampus = $this->user->getDefaultCampus();
+		if ($defaultCampus instanceof \Schoolbox\Campus) {
+			return $defaultCampus->getName();
+		}
+		// What if there is no default? Return the first campus I guess.
+		return $this->user->getCampusCollection()->first()->getName();
 	}
 
 	/**
