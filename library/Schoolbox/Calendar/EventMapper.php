@@ -150,6 +150,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'event_id',
 		));
+		$this->hasJoin('category', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
@@ -166,6 +171,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$personalMapper = $this->getJoinMapper('personal');
+		$categoryMapper = $this->getJoinMapper('category');
 
 		$query = "
 			SELECT
@@ -173,12 +179,14 @@ class EventMapper extends Schoolbox\External\Mapper {
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
-				{$personalMapper->getColumnString('p')}
+				{$personalMapper->getColumnString('p')},
+				{$categoryMapper->getColumnString('c')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
+			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
 			WHERE e.id = :eventId
 		";
 
@@ -189,6 +197,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		/* Hydrate or die
 		 */
 		$personalCollection = new Collection();
+		$categoryCollection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
@@ -211,12 +220,17 @@ class EventMapper extends Schoolbox\External\Mapper {
 			/* Personal
 			 */
 			$personalCollection->add($personalMapper->hydrate($row, 'p'));
+
+			/* Category
+			 */
+			$categoryCollection->add($categoryMapper->hydrate($row, 'c'));
 		}
 
 		/* If an event was found matching this id
 		 */
 		if ($eventItem) {
-			$eventItem->personal = $personalCollection;
+			$eventItem->setUserCollection($personalCollection);
+			$eventItem->setCategoryCollection($categoryCollection);
 
 			return $eventItem;
 		}

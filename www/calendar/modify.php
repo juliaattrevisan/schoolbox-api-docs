@@ -163,6 +163,7 @@ $groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), t
 
 /* Group checkbox array when using Group Event Level
  */
+
 foreach($groupList as $currentUserGroup) {
 	$page->setVar(array(
 		'EVENT_GROUP_ID' => $currentUserGroup['id'],
