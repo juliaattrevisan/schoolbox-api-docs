@@ -330,17 +330,9 @@ $j(function() {
 	/* auto scroll to open branch */
 //	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
 
-  // retrieve meta for open branch
-  threePanel.getMeta({OPEN});
-
-	var date2 = new Date;
-
-	if (window.location.href.indexOf('debug') != -1)
-		alert((date2.getTime() - date1.getTime()) / 1000);
-
-  // set up resizing
-  threePanel.resizePanels()
-	$j(window).resize(threePanel.resizePanels());
+    // set up resizing
+    threePanel.resizePanels()
+    $j(window).resize(threePanel.resizePanels);
 
   var actions = {
     cms : {
