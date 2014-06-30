@@ -411,6 +411,29 @@ class PortfolioWebDAV
             }
 
         }
+        else if ($site_location=='fintona') {
+            $settings = array(
+                'baseUri' => 'https://files.fintona.vic.edu.au/',
+                'userName' => "fintona/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'staff/',
+                    $settings['baseUri'].'student/',
+                    $settings['baseUri'].'public/',
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].'student/',
+                    $settings['baseUri'].'public/',
+                );
+            } else {
+                return false;
+            }
+
+        }
         else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
