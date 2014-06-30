@@ -11,7 +11,7 @@
 $j(function() {
 
     // Select a node: update the second and third panels.
-    var tree = $j('#test-tree');
+    var tree = $j('#tree');
     tree.on('select_node.jstree', function(event, jstree) {
             var relationID = jstree.node.id;
 
@@ -296,7 +296,7 @@ $j(function() {
 	};
 
 	/* triggered after a new branch is loaded */
-	$j('#tree').bind('loaded', function () {
+	tree.bind('loaded', function () {
 		var table = $j(this), scroller = $j('#category-window div.scroller');
 
 		/* fix left panel width */
@@ -322,11 +322,11 @@ $j(function() {
 		}
 	});
 
-	$j('#tree').triggerHandler('loaded');
+	tree.triggerHandler('loaded');
 
 	/* resize left column on window resize */
 	$j(window).resize(function () {
-		$j('#tree').triggerHandler('loaded');
+		tree.triggerHandler('loaded');
 	});
 
 	$j("div.loading").hide();
@@ -492,7 +492,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
         </thead>
       </table>
       <div class="scroller">
-          <div id="test-tree"></div>
+          <div id="tree"></div>
           <!-- BEGIN category_list -->
           <!-- END category_list -->
       </div>
