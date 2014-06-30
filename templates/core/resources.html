@@ -8,17 +8,17 @@
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
     // Select a node: update the second and third panels.
-    var tree = $j('#tree');
+    var tree = $('#tree');
     tree.on('select_node.jstree', function(event, jstree) {
             var relationID = jstree.node.id;
 
             /* hide and deselect all files */
-            $j('#file-list tbody tr').removeClass('selected').hide();
+            $('#file-list tbody tr').removeClass('selected').hide();
 
-            var files = $j('tr.category-' + relationID);
+            var files = $('tr.category-' + relationID);
 
             threePanel.getMeta(relationID);
 
@@ -28,25 +28,25 @@ $j(function() {
                 initialiseFiles(relationID);
 
                 /* re-apply on off */
-                $j('#file-list tbody tr').removeClass('dark');
-                $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+                $('#file-list tbody tr').removeClass('dark');
+                $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
                 /* remember tree branch */
-                $j.post('/ajax/tree.php', {resourcesID : relationID});
+                $.post('/ajax/tree.php', {resourcesID : relationID});
 
             } else {
 
                 /* ajax load files */
-                $j.post('/ajax/file.php', {categoryID : relationID}, function (data) {
+                $.post('/ajax/file.php', {categoryID : relationID}, function (data) {
 
                     if (data.error) {
                         alert(data.error);
                     } else if (data.length == 0) {
                         /* display empty message */
-                        $j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                        $('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
 
                     } else {
-                        var template = $j('#file-template');
+                        var template = $('#file-template');
                         for (i in data) {
                             var row = data[i];
 
@@ -65,13 +65,13 @@ $j(function() {
                             if (row.hidden == 1)
                                 clone.addClass('hidden');
 
-                            clone.appendTo($j('#file-list')).show();
+                            clone.appendTo($('#file-list')).show();
                         }
                     }
 
                     /* re-apply on off */
-                    $j('#file-list tbody tr').removeClass('dark');
-                    $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+                    $('#file-list tbody tr').removeClass('dark');
+                    $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
 
                     initialiseFiles(relationID);
@@ -109,7 +109,7 @@ $j(function() {
             });
         })
         .on('loaded.jstree', function() {
-            var table = $j(this), scroller = $j('#category-window div.scroller');
+            var table = $(this), scroller = $('#category-window div.scroller');
 
             /* fix left panel width */
             var scrollerWidth = parseInt(scroller.width()) - 1;
@@ -122,8 +122,8 @@ $j(function() {
                 var maxWidth = 0, width;
                 table.find('tr').each(function () {
                     width = 0;
-                    $j(this).find('span').each(function () {
-                        width += $j(this).width();
+                    $(this).find('span').each(function () {
+                        width += $(this).width();
                     });
                     width += 39 ; // cell padding, highlight border
                     if (width > maxWidth)
@@ -251,15 +251,15 @@ $j(function() {
 
 	var initialiseFiles = function(relationID) {
 
-		var newChildren  = $j('tr.category-' + relationID + ':not(.empty)'),
-			categoryNode = $j('#' + String(relationID));
+		var newChildren  = $('tr.category-' + relationID + ':not(.empty)'),
+			categoryNode = $('#' + String(relationID));
 
 		/* double click files, default action */
 		newChildren.dblclick(function () {
-			if ($j(this).hasClass("link"))
-				window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank");
+			if ($(this).hasClass("link"))
+				window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank");
 			else
-				window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank");
+				window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank");
 		});
 
 		/* select files */
@@ -267,29 +267,29 @@ $j(function() {
 
 			/* allow multiple select */
 			if (!event.ctrlKey && !event.shiftKey)
-				$j('#file-list tr.selected').removeClass('selected');
+				$('#file-list tr.selected').removeClass('selected');
 
 			if (event.ctrlKey)
-				$j(this).toggleClass('selected');
+				$(this).toggleClass('selected');
 			else
-				$j(this).addClass('selected');
+				$(this).addClass('selected');
 
 			/* select range */
 			if (event.shiftKey) {
 
-				var node1 = $j('#file-list tr').index($j('#file-list tr.current'));
-				var node2 = $j('#file-list tr').index(this);
+				var node1 = $('#file-list tr').index($('#file-list tr.current'));
+				var node2 = $('#file-list tr').index(this);
 
 				if (node1 > node2)
-					$j('#file-list tr').slice(node2, node1).addClass('selected');
+					$('#file-list tr').slice(node2, node1).addClass('selected');
 				else
-					$j('#file-list tr').slice(node1, node2).addClass('selected');
+					$('#file-list tr').slice(node1, node2).addClass('selected');
 			}
 
-			$j('#file-list tr.current').removeClass('current');
-			$j(this).addClass('current');
+			$('#file-list tr.current').removeClass('current');
+			$(this).addClass('current');
 
-      threePanel.getMeta(relationID, $j('#file-list tr.selected'))
+      threePanel.getMeta(relationID, $('#file-list tr.selected'))
 
 		});
 
@@ -304,8 +304,8 @@ $j(function() {
 				helper: function (event) {
 					// How many items are selected?
 					// More than one - show the number of files, not the name.
-					var length = $j('#file-list tr.selected').length;
-					var node   = $j(event.currentTarget).clone().addClass('accept').css('z-index', 100);
+					var length = $('#file-list tr.selected').length;
+					var node   = $(event.currentTarget).clone().addClass('accept').css('z-index', 100);
 					if (length > 1) {
 						node.text('('+String(length)+' files)');
 					}
@@ -321,18 +321,18 @@ $j(function() {
 	};
 
 	/* resize left column on window resize */
-	$j(window).resize(function () {
+	$(window).resize(function () {
 		tree.triggerHandler('loaded.jstree');
 	});
 
-	$j("div.loading").hide();
+	$("div.loading").hide();
 
 	/* auto scroll to open branch */
 //	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
 
     // set up resizing
     threePanel.resizePanels()
-    $j(window).resize(threePanel.resizePanels);
+    $(window).resize(threePanel.resizePanels);
 
   var actions = {
     cms : {
@@ -363,9 +363,9 @@ $j(function() {
       },
       f_properties : function(kind, id) {
         var path = '/cms/properties.php?' + kind + 'ID=' + id
-        $j.get(path, function(data) {
+        $.get(path, function(data) {
 
-          $j('<div />').append(data).dialog({
+          $('<div />').append(data).dialog({
               modal:  true,
               title:  'Properties',
               width:  'auto',
@@ -383,14 +383,14 @@ $j(function() {
         return true
       },
       f_delete : function(id) {
-        var name = $j('#folder-detail h3.name').html()
+        var name = $('#folder-detail h3.name').html()
         if(confirm("Are you sure you want to delete " + name + "?")) {
           window.open("/cms/categoryForm.php?delete=" + id, "_self")
         }
         return true
       },
       f_delete_all : function(id) {
-        var name = $j('#folder-detail h3.name').html()
+        var name = $('#folder-detail h3.name').html()
         if(confirm("Are you sure you want to delete " + name + "? This will also delete all subfolders and their contents.")) {
           var path = '/cms/categoryForm.php?deleteAll=' + id
           window.open(path, "_self")
@@ -418,7 +418,7 @@ $j(function() {
       f_join : function(id) {
         var target = threePanel.folderDetail.find('a.join-btn')
         // do this one via ajax
-        $j.get('/group/joinForm.php', {join : id, ajax : 1})
+        $.get('/group/joinForm.php', {join : id, ajax : 1})
             .done(function(data) {
               if(typeof(data.status) !== 'undefined') {
                 target.hide()
@@ -434,13 +434,13 @@ $j(function() {
     },
     multi : {
       f_delete : function() {
-        var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
+        var selected = $('#file-list tr.selected'), fileList = '', linkList = '', id
 
         if(selected.length > 1) {
           selected.each(function() {
-            id = $j(this).attr("id").substring(5) + ','
+            id = $(this).attr("id").substring(5) + ','
 
-            if ($j(this).hasClass('link'))
+            if ($(this).hasClass('link'))
               linkList += id
             else
               fileList += id
@@ -455,7 +455,7 @@ $j(function() {
   }
 
   // bind actions to buttons
-  $j(document).ready(function() {
+  $(document).ready(function() {
     threePanel.actionBind(actions)
   })
 });
