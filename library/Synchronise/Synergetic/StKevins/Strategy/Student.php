@@ -90,8 +90,26 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 	public function getGroupIDFromUser($currentUser) {
 		$year  = $this->getYearFromUser($currentUser);
 		$group = 0;
-		if (in_array($year, array(3, 4, 5, 6,))) {
-			$group = 7;
+		if ($year == 0) {
+			$group = 12;
+		}
+		elseif ($year == 1) {
+				$group = 13;
+		}
+		elseif ($year == 2) {
+			$group = 14;
+		}
+		elseif ($year == 3) {
+			$group = 15;
+		}
+		elseif ($year == 4) {
+			$group = 16;
+		}
+		elseif ($year == 5) {
+			$group = 17;
+		}
+		elseif ($year == 6) {
+			$group = 18;
 		}
 		elseif ($year == 7) {
 			$group = 8;
