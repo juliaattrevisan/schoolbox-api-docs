@@ -152,7 +152,21 @@ class Event {
 	protected $roleCollection = null;
 
 	/**
-	 * Any associated campuses
+	 * Any associated users (Type 1)
+	 *
+	 * @var null
+	 */
+	protected $userCollection = null;
+
+	/**
+	 * Any associated categories (Type 2)
+	 *
+	 * @var null
+	 */
+	protected $categoryCollection = null;
+
+	/**
+	 * Any associated campuses (Type 3)
 	 *
 	 * @var Collection|Campus[]
 	 */
@@ -804,5 +818,41 @@ class Event {
 	 */
 	public function getAttendanceDirty() {
 		return $this->attendanceDirty;
+	}
+
+	/**
+	 * Set category collection
+	 *
+	 * @param null $categoryCollection
+	 */
+	public function setCategoryCollection($categoryCollection) {
+		$this->categoryCollection = $categoryCollection;
+	}
+
+	/**
+	 * Get category collection
+	 *
+	 * @return null
+	 */
+	public function getCategoryCollection() {
+		return $this->categoryCollection;
+	}
+
+	/**
+	 * Set user collection
+	 *
+	 * @param null $userCollection
+	 */
+	public function setUserCollection($userCollection) {
+		$this->userCollection = $userCollection;
+	}
+
+	/**
+	 * Get user collection
+	 *
+	 * @return null
+	 */
+	public function getUserCollection() {
+		return $this->userCollection;
 	}
 }
