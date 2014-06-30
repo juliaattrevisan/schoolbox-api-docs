@@ -108,6 +108,31 @@ $j(function() {
                 })
             });
         })
+        .on('loaded.jstree', function() {
+            var table = $j(this), scroller = $j('#category-window div.scroller');
+
+            /* fix left panel width */
+            var scrollerWidth = parseInt(scroller.width()) - 1;
+            if (table.height() > scroller.height())
+                scrollerWidth -= 16; // scroller width
+
+            if (table.width() < scrollerWidth)
+                table.width(scrollerWidth);
+            else {
+                var maxWidth = 0, width;
+                table.find('tr').each(function () {
+                    width = 0;
+                    $j(this).find('span').each(function () {
+                        width += $j(this).width();
+                    });
+                    width += 39 ; // cell padding, highlight border
+                    if (width > maxWidth)
+                        maxWidth = width;
+                });
+                if (maxWidth > scrollerWidth)
+                    table.width(maxWidth);
+            }
+        })
         .jstree({
             animation: 50,
             core: {
@@ -295,38 +320,9 @@ $j(function() {
 		}
 	};
 
-	/* triggered after a new branch is loaded */
-	tree.bind('loaded', function () {
-		var table = $j(this), scroller = $j('#category-window div.scroller');
-
-		/* fix left panel width */
-		var scrollerWidth = parseInt(scroller.width()) - 1;
-		if (table.height() > scroller.height())
-			scrollerWidth -= 16; // scroller width
-
-		if (table.width() < scrollerWidth)
-			table.width(scrollerWidth);
-		else {
-			var maxWidth = 0, width;
-			table.find('tr').each(function () {
-				width = 0;
-				$j(this).find('span').each(function () {
-					width += $j(this).width();
-				});
-				width += 39 ; // cell padding, highlight border
-				if (width > maxWidth)
-					maxWidth = width;
-			});
-			if (maxWidth > scrollerWidth)
-				table.width(maxWidth);
-		}
-	});
-
-	tree.triggerHandler('loaded');
-
 	/* resize left column on window resize */
 	$j(window).resize(function () {
-		tree.triggerHandler('loaded');
+		tree.triggerHandler('loaded.jstree');
 	});
 
 	$j("div.loading").hide();
