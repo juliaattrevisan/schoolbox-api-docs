@@ -15,10 +15,9 @@ $url = 'https://msa.tps.vic.edu.au';
 
 /* Compute redirect destination
  */
-$userId = $_SESSION['user']->getExternalId();
-$hash = "{$salt}{$userId}";
+$hash = "{$salt}{$_SESSION['user']->getUsername()}";
 $key = md5($hash);
+$username = urlencode($_SESSION['user']->getUsername());
 
-$destination = "{$url}/?id={$userId}&key={$key}";
-
+$destination = "{$url}/?id={$username}&key={$key}";
 header('Location:'.$destination, false, 301);
