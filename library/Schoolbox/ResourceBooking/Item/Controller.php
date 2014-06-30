@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\StorageMapper;
 
 class Controller extends Base {
@@ -27,6 +28,11 @@ class Controller extends Base {
      * @var UserMapper
      */
     protected $userMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
 
     /**
      * @var IUrlPaginator
@@ -129,6 +135,7 @@ class Controller extends Base {
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => array(),
                     'relatedItemList' => array(),
+                    'roleList'        => $this->roleMapper->findAll(),
                 ),
             )
         );
@@ -185,6 +192,7 @@ class Controller extends Base {
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
+                    'roleList'        => $this->roleMapper->findAll(),
                 ),
             )
         );
@@ -280,12 +288,29 @@ class Controller extends Base {
                 $model->addModerator($user);
             }
         }
+
+        // Do likewise with the related resource list
         $model->setRelatedResourceList(new Collection());
         if (is_array($post['related_resource_id'])) {
             foreach ($post['related_resource_id'] as $related_resource_id) {
                 $resource = new Model();
                 $resource->setId($related_resource_id);
                 $model->addRelatedResource($resource);
+            }
+        }
+
+        // Do likewise with the role list
+        $model->setRoleList(new Collection());
+        if (is_array($post['role'])) {
+            foreach ($post['role'] as $roleId => $allowed) {
+                $resourceRole = new RolePermission\Model();
+                $role         = new \Schoolbox\Role();
+                $role->setId($roleId);
+                $resourceRole
+                    ->setResource($model)
+                    ->setRole($role)
+                    ->setAllowed($allowed);
+                $model->addRole($resourceRole);
             }
         }
 
@@ -335,6 +360,22 @@ class Controller extends Base {
      */
     public function getUserMapper() {
         return $this->userMapper;
+    }
+
+    /**
+     * @param  RoleMapper $roleMapper
+     * @return $this
+     */
+    public function setRoleMapper($roleMapper) {
+        $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
     }
 
     /**

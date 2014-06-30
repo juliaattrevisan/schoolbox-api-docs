@@ -97,8 +97,17 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $relatedResourceList;
 
+    /**
+     * @var Collection|RolePermission\Model[]
+     */
+    protected $roleList;
+
     public function __construct() {
-        $this->setModeratorList(new Collection());
+        $this
+            ->setModeratorList(new Collection())
+            ->setRelatedResourceList(new Collection())
+            ->setRoleList(new Collection())
+        ;
     }
 
     /**
@@ -357,6 +366,32 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function addRelatedResource($resource) {
         $this->getRelatedResourceList()->add($resource);
+        return $this;
+    }
+
+    /**
+     * @param  Collection|RolePermission\Model[] $roleList
+     *
+*@return $this
+     */
+    public function setRoleList($roleList) {
+        $this->roleList = $roleList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|RolePermission\Model[]
+     */
+    public function getRoleList() {
+        return $this->roleList;
+    }
+
+    /**
+     * @param  RolePermission\Model $role
+     * @return $this
+     */
+    public function addRole($role) {
+        $this->getRoleList()->add($role);
         return $this;
     }
 

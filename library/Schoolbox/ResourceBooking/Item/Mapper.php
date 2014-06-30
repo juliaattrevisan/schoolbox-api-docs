@@ -158,6 +158,15 @@ class Mapper extends BaseMapper {
                 'multiple'  => true,
             )
         );
+        $this->hasJoin(
+            'role',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RolePermission\\Mapper',
+                'this_key'  => 'id',
+                'other_key' => 'resource_id',
+                'multiple'  => true,
+            )
+        );
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
@@ -201,6 +210,14 @@ class Mapper extends BaseMapper {
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
         $mapper->delete($oldList->diff($newList, $diffMethod));
+
+        // Add save of roles too
+        // If saving a new set of roles, this item's ID has to be attached
+        $roleList = $object->getRoleList();
+        foreach ($roleList as $role) {
+            $role->setResource($object);
+        }
+        $this->getJoinMapper('role')->save($roleList);
     }
 
     /**
@@ -305,6 +322,12 @@ class Mapper extends BaseMapper {
                             return $model;
                         }
                     )
+                );
+
+                // populate role permissions
+                $roleMapper = $mapper->getJoinMapper('role');
+                $model->setRoleList(
+                    $roleMapper->findByColumn('resource_id', $model->getId())
                 );
 
                 return $model;
