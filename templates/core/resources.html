@@ -17,13 +17,6 @@ $j(function() {
     tree.on('select_node.jstree', function(event, jstree) {
             var relationID = jstree.node.id;
 
-            // Special case for root node
-            if (relationID == 0) {
-                threePanel.getMeta(0);
-                $j('#file-list tbody tr').hide();
-                return;
-            }
-
             /* hide and deselect all files */
             $j('#file-list tbody tr').removeClass('selected').hide();
 
