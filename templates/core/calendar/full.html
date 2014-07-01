@@ -185,13 +185,20 @@
 
                     var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
 
+					/* yyyy-mm-dd format only, not timestampede
+					 */
+					var elems = [
+						('0' + date.getDate()).toString().slice(-2),
+						('0' + (date.getMonth()+1)).toString().slice(-2),
+						date.getFullYear()
+					].join('-');
+
                     var eventData = {
-                        date: date.valueOf(),
+                        date: elems,
                         displayDate: displayDate
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
-
                 },
 
                 /**
