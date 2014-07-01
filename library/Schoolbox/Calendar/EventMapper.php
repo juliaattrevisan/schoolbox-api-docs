@@ -150,9 +150,13 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
+		$this->hasJoin('sid', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\SidMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
-
 	}
 
 	/**
@@ -166,17 +170,20 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$ownerMapper = $this->getJoinMapper('owner');
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
+		$sidMapper = $this->getJoinMapper('sid');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
-				{$eventTypeMapper->getColumnString('t')}
+				{$eventTypeMapper->getColumnString('t')},
+				{$sidMapper->getColumnString('s')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			LEFT JOIN {$this->getJoinSql('sid', 'e', 's')}
 			WHERE e.id = :eventId
 		";
 
@@ -184,11 +191,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement->bindParam(":eventId", $identifier);
 		$statement->execute();
 
-		$row = $statement->fetch();
-
 		/* Hydrate or die
 		 */
-		if ($row != false) {
+		$sidCollection = new Collection();
+
+		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
 
 			/* Owner
@@ -205,6 +212,16 @@ class EventMapper extends Schoolbox\External\Mapper {
 			 */
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setType($eventTypeItem);
+
+			/* Sid
+			 */
+			$sidCollection->add($sidMapper->hydrate($row, 's'));
+		}
+
+		/* If an event was found matching this id
+		 */
+		if ($eventItem) {
+			$eventItem->setServiceId($sidCollection);
 
 			return $eventItem;
 		}
