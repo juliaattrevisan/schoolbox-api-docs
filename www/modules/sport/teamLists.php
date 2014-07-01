@@ -126,7 +126,7 @@ class initTeamLists
 			if ($values){
 				//trim off trailing comma
 		 		$values = substr($values, 0, strlen($values) - 1);
-				$query = "SELECT * FROM intranet.user
+				$query = "SELECT * FROM user
 					  WHERE synergy_id IN (".$values.")
 					  ORDER BY lastname, firstname, year
 				";
@@ -260,7 +260,7 @@ class initTeamLists
 		}
 		//search already done, list students matching search name
 		else {
-			$query = "SELECT * FROM intranet.user WHERE group_id IN ('3','4','5') AND (";
+			$query = "SELECT * FROM user WHERE group_id IN ('3','4','5') AND (";
 			$input =  explode(' ', $other);
 			foreach($input as $token)
 			{
@@ -320,7 +320,7 @@ class initTeamLists
                         if ($syns){
        	                	//trim off trailing comma
                         	$syns = substr($syns, 0, strlen($syns) - 1);
-                        	$query = "SELECT id FROM intranet.user WHERE synergy_id in ($syns)";
+				$query = "SELECT id FROM user WHERE synergy_id in ($syns)";
 				$this->db->dbDoQuery($query);
 				if ($this->db->dbCountRows() > 0){
 					while ($stud = $this->db->dbGetNextArray()){
