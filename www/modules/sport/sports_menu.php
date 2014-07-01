@@ -49,7 +49,7 @@ class sports_menu
 				 date_format(news.datetime_posted,'%b %D') as postdate,
 				 user.firstname,
 				 user.lastname
-			  FROM intranet.category as cat, intranet.subject_news as news, intranet.user as user
+			  FROM category as cat, subject_news as news, user as user
 			  WHERE news.code = cat.id
 			  AND user.id = news.owner
 			  AND cat.name = 'Fixture Comments (".$this->camp.")'
