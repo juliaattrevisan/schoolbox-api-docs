@@ -36,4 +36,19 @@ class SidMapper extends Schoolbox\External\Mapper {
 			'type' => self::TYPE_INTEGER,
 		));
 	}
+
+	/**
+	 * Purge existing sid assignations
+	 *
+	 * @param Event $event
+	 */
+	public function cleanse(Event $event) {
+		$statement = $this->database->prepare("
+			DELETE FROM `{$this->table}`
+			WHERE `event_id` = :identifierValue
+		");
+
+		$statement->bindValue(':identifierValue', $event->getId());
+		$statement->execute();
+	}
 }

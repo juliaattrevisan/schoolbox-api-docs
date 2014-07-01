@@ -89,7 +89,7 @@ switch($_POST['action']) {
 		 * NO SURRENDER
 		 */
 		try {
-			$author = $userMapper->findById($_POST['author_id']);
+			$author = $userMapper->findById($_POST['authorId']);
 		}
 		catch(\Schoolbox\Mapper\Exception $e) {
 			error(19);
@@ -101,7 +101,6 @@ switch($_POST['action']) {
 		$event->setOwner($owner);
 		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
-		$event->setServiceId($_POST['group']);
 		$event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
 		$event->setNote($_POST['note']);
 		$event->setStartDateTime($startDate);
@@ -135,6 +134,18 @@ switch($_POST['action']) {
 		 */
 		$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
 		$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+
+		/* Purge existing sids, insert new ones
+		 */
+		$sidMapper = new \Schoolbox\Calendar\SidMapper();
+		$sidMapper->cleanse($event);
+
+		foreach($_POST['group'] as $currentGroup) {
+			$sid = new \Schoolbox\Calendar\Sid();
+			$sid->setEventId($event->getId());
+			$sid->setSid($currentGroup);
+			$sidMapper->save($sid);
+		}
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
