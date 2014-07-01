@@ -550,7 +550,7 @@ class Calendar extends DeprecatedModel {
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = '2' AND sid IN (" . implode(',', $groupList) . "))";
+                $groupQuery = "OR (access = '2' AND event_category.category_id IN (" . implode(',', $groupList) . "))";
             }
         }
 
@@ -572,7 +572,7 @@ class Calendar extends DeprecatedModel {
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
                             startDate, endDate,
-                            type, note, access, sid, location, detail,
+                            type, note, access, location, detail,
                             user.id as uid, title, firstname, lastname,
                             eventType, eventColour,
                             MATCH (`note`, `detail`, `location`) AGAINST ('$keyword') AS `score`
@@ -581,6 +581,7 @@ class Calendar extends DeprecatedModel {
                         LEFT JOIN luEventType ON type = eventTypeID
                         LEFT JOIN event_campus ON event.id = event_campus.event_id
                         LEFT JOIN event_group ON event.id = event_group.event_id
+                        LEFT JOIN event_category ON event.id = event_category.event_id
                         WHERE (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
@@ -597,6 +598,7 @@ class Calendar extends DeprecatedModel {
 						LEFT JOIN luEventType ON type = eventTypeID
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN event_group ON event.id = event_group.event_id
+						LEFT JOIN event_category ON event.id = event_category.event_id
 						WHERE (
 							(access = '1' AND owner = '" . $_SESSION['id'] . "')
 							$groupQuery
