@@ -167,7 +167,7 @@ foreach($groupList as $currentUserGroup) {
 	$page->setVar(array(
 		'EVENT_GROUP_ID' => $currentUserGroup['id'],
 		'EVENT_GROUP_NAME' => $currentUserGroup['name'],
-		'EVENT_GROUP_ID_SELECTED' => $event->getServiceId()->getBy('sid', $currentUserGroup['id']) ? 'checked="checked"' : '',
+		'EVENT_GROUP_ID_SELECTED' => $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']) ? 'checked="checked"' : '',
 	));
 
 	$page->parse('event_group_drop_block', 'event_group_drop', true);

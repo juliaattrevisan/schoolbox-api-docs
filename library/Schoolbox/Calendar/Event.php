@@ -198,6 +198,9 @@ class Event {
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->setUserCollection(new Collection());
+		$this->setCategoryCollection(new Collection());
+
 		$this->setup();
 	}
 
