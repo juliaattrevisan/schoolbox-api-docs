@@ -145,15 +145,47 @@ switch($_POST['action']) {
 
 		/* Purge existing sids, insert new ones
 		 */
-		$sidMapper = new \Schoolbox\Calendar\SidMapper();
-		$sidMapper->cleanse($event);
+		$userRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
+		$userRelationMapper->cleanse($event);
 
-		foreach($_POST['group'] as $currentGroup) {
-			$sid = new \Schoolbox\Calendar\Sid();
-			$sid->setEventId($event->getId());
-			$sid->setSid($currentGroup);
-			$sidMapper->save($sid);
+		$categoryRelationMapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
+		$categoryRelationMapper->cleanse($event);
+
+		/* Save new relations based on its access level
+		 */
+		switch($_POST['level']) {
+
+			/* Access Type 1 (Personal)
+			 */
+			case 1:
+				$userRelation = new \Schoolbox\Calendar\Relation\Personal();
+				$userRelation->setEventId($event->getId());
+				$userRelation->setUserId($owner->getId());
+				$userRelationMapper->save($userRelation);
+
+				break;
+
+			/* Access Type 2 (Category)
+			 */
+			case 2:
+				foreach($_POST['group'] as $currentGroup) {
+					$categoryRelation = new \Schoolbox\Calendar\Relation\Category();
+					$categoryRelation->setEventId($event->getId());
+					$categoryRelation->setCategoryId($currentGroup);
+					$categoryRelationMapper->save($categoryRelation);
+				}
+
+				break;
+
+			/* Access Type 3 (Campus)
+			 */
+			case 3:
+				break;
+
+			default:
+				break;
 		}
+
 
 		/* If you were editing an event on someone else's calendar, don't
 		 * get stuffed around by time travel's one-index-offset rip in
