@@ -231,7 +231,7 @@ foreach($roleList as $current) {
 	);
 }
 
-$page->checkList('event_role_list', $allRoles, $defaultSid, TEMPLATE_content, array(
+$page->checkList('event_role_list', $allRoles, null, TEMPLATE_content, array(
 	'id' => 'EVENT_ROLE_ID',
 	'name' => 'EVENT_ROLE_NAME'
 ));
