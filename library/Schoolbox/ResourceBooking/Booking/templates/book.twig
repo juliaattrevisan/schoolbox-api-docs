@@ -55,15 +55,20 @@ $(document).ready(function() {
     // Set up tabz for the projector.
     // Always default to setting a date and time directly, though.
     var tabSelector = $('[data-interaction="tabs"]')
-            .tabs({
-                heightStyle: 'auto',
-                active: 0
-            })
-            .on('tabsbeforeactivate', function(event, ui) {
-                // Ensure that all inputs in inactive tabs are disabled
-                ui.oldPanel.find(':input').prop('disabled', true)
-                ui.newPanel.find(':input').prop('disabled', false)
-            })
+        .on('tabscreate', function(event, ui) {
+            // Ensure that all inputs in inactive tabs are disabled
+            $(this).find(':input').prop('disabled', true)
+            ui.panel.find(':input').prop('disabled', false)
+        })
+        .on('tabsbeforeactivate', function(event, ui) {
+            // Ensure that all inputs in inactive tabs are disabled
+            ui.oldPanel.find(':input').prop('disabled', true)
+            ui.newPanel.find(':input').prop('disabled', false)
+        })
+        .tabs({
+            heightStyle: 'auto',
+            active: 0
+        })
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
