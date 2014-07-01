@@ -696,18 +696,24 @@ class Calendar extends DeprecatedModel {
 		// Filters - some of these are covered by main query anyway, so no need
 		// for extra filters.
 		$filter_query = array();
+
 		if ($filter['campus']) {
 			$filter_query[] = 'access = '.self::ACCESS_CAMPUS;
 			$filter_query[] = 'eventCampus.campusID = '.intval($filter['campus']);
 		}
+
 		if ($filter['group']) {
 			$filter_query[] = 'access = '.self::ACCESS_GROUP;
-			$filter_query[] = 'event_sid.sid = '.intval($filter['group']);
+			$filter_query[] = 'event_category.category_id = '.intval($filter['group']);
 		}
+
 		if ($filter['personal']) {
 			$filter_query[] = 'access = '.self::ACCESS_PERSONAL;
+			$filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
 		}
+
 		$filter_query = implode(' AND ', $filter_query);
+
 		if (strlen($filter_query) > 0) {
 			$filter_query = " AND ($filter_query)";
 		}
@@ -780,7 +786,6 @@ class Calendar extends DeprecatedModel {
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
-                $event->setSid($currentEvent['sid']);
                 $event->setAllDay(!empty($currentEvent['allday']));
 
 				/* If you have write access to the event
