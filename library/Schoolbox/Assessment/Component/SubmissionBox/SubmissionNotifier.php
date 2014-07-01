@@ -102,13 +102,12 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 				}
 
 				// is this the first? or a resubmit?
-//				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
-				// TODO 'resubmitted' is not a known source, so this does nothing
+				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
 				// because '1' would be the first submission
-//				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
-//					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
-//					break;
-//				}
+				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
+					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
+					break;
+				}
 				$bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
 				break;
 
