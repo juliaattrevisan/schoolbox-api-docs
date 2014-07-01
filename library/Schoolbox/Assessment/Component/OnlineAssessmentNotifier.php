@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -49,6 +50,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/** @var AttemptMapper */
 	protected $attemptMapper;
 
+	/** @var WorkTypeMapper */
+	protected $workTypeMapper;
+
 	/**
 	 * @return string
 	 */
@@ -66,6 +70,27 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function loadDependencies($dependencies = null) {
 		$this->catMapper = CategoryMapper::getInstance();
 		$this->attemptMapper = AttemptMapper::getInstance();
+		$this->workTypeMapper = WorkTypeMapper::getInstance();
+	}
+
+	/**
+	 * Fully hydrates the quiz object, in this case with the work type and
+	 * category.
+	 *
+	 * @todo Remove this when mapper findBy methods can specify joins to hydrate
+	 *
+	 * @param  OnlineAssessment $quiz
+	 * @return OnlineAssessment
+	 */
+	protected function fullyHydrateQuiz(OnlineAssessment $quiz) {
+		// @mattday I've got a surprise for you - it's poop!
+		/** @var OnlineAssessment $quiz */
+		$quiz = $this->mapper->findById($quiz->getId());
+		$quiz
+			->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()))
+			->setCategory($this->catMapper->findById($quiz->getCategory()->getId()))
+		;
+		return $quiz;
 	}
 
 
@@ -235,7 +260,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStudentOpen($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizType = $quiz->getWorkType()->getName();
 		$quizName = $quiz->getTitle();
 
@@ -278,7 +305,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStudentOverdue($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -312,7 +341,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyParentOverdue($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -352,7 +383,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStudentUpcoming($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -387,7 +420,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyParentUpcoming($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -432,6 +467,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStudentUpdated($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		// discard all update notifications if the submissionbox isn't open
 		$openStamp = $quiz->getStart()->getUnixTimestamp();
 		$closeStamp = $quiz->getFinish()->getUnixTimestamp();
@@ -446,7 +484,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $msgr;
 		}
 
-		$quizId   = $quiz->getId();
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
@@ -543,7 +580,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			return $msgr;
 		}
 
-		$quizId   = $quiz->getId();
+		$quizId = $quiz->getId();
+		$quiz   = $this->fullyHydrateQuiz($quiz);
+
 		$quizName = $quiz->getTitle();
 
 		$cat     = $quiz->getCategory();
