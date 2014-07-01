@@ -1,286 +1,48 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
-tinyMCE.init({
-    mode : "textareas",
-    theme : "advanced",
-    skin : "cirkuit",
-    plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
-    browser_spellcheck : true,
-    content_css : "/css/core/tiny.css",
-    theme_advanced_toolbar_location : "top",
-    theme_advanced_toolbar_align : "left",
-    theme_advanced_statusbar_location : "bottom",
-    theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-    theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
-    theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-    theme_advanced_buttons4 : "tablecontrols",
-    accessibility_warnings : false,
-    pdw_toggle_on : 1,
-    pdw_toggle_toolbars : '2, 3, 4',
-    extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-    theme_advanced_blockformats : "h3,h4,p,address,pre",
-    file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-    file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
-    file_browser_category_id : 0,
-    tabfocus_elements : ":prev,:next",
-    convert_urls : false
-});
-
-function confirmDelete(eventID) {
-    /*
-     if (confirm('Delete this event?')) {
-     window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
-     }
-     */
-}
-
-$j(function () {
-    $j('#level').change(function () {
-        $j('#groupDrop, #campusList, #groupList, #attendance').hide();
-
-        if ($j('#level').val() == '1') {
-            var attendance_input = $j('#attendance input');
-
-			attendance_input.prop('checked', false);
-
-            if (attendance_input.parent().hasClass('active-checkbox')) {
-                attendance_input.parent().removeClass('active-checkbox')
-            }
-			else {
-                attendance_input.parent().addClass('active-checkbox');
-            }
-        }
-        else if ($j('#level').val() == "2") {
-            $j('#groupDrop, #attendance').show()
-        }
-        else if ($j('#level').val() == "3") {
-            $j('#campusList, #groupList, #attendance').show()
-        }
-    });
-
-    if ($j('#level').val() == '1') {
-        $j('#attendance input').prop('checked', false);
-    }
-    else if ($j('#level').val() == "2") {
-        $j('#groupDrop, #attendance').show()
-    }
-    else if ($j('#level').val() == "3") {
-        $j('#campusList, #groupList, #attendance').show()
-    }
-
-    /* Datepickers for event date, repeat until and publish date
-     */
-    $j('#startDate, #endDate, #repeat_until, #publishDate').datepicker({
-        dateFormat:'dd/mm/yy',
-        showOn:'both',
-        buttonImage:'/images/core/calendar/calendar-click.png',
-        buttonImageOnly:true,
-        constrainInput:false,
-        onClose:function (string) {
-            var input = $j(this);
-
-            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                input.val(data.time);
-            })
-        }
-    });
-
-//    // Update the start date to be not less than the end date
-//    $j('input#startDate').syncDates({endDate: $j('input#endDate')})
-
-    //greenerising the checkboxes if they're ticked.
-    $j(':checkbox').each(function () {
-        if ($j(this).is(':checked')) {
-            $j(this).parent().addClass('active-checkbox');
-        }
-    });
-
-    $j(':checkbox').click(function () {
-        if ($j(this).parent().hasClass('active-checkbox')) {
-            $j(this).parent().removeClass('active-checkbox')
-			if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
-				$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-			}
-        }
-		else {
-            $j(this).parent().addClass('active-checkbox');
-        }
-    });
-
-	$j('.select_all').change(function(){
-		if($j(this).is(':checked')){
-			$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-		} else {
-			$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-		}
+	tinyMCE.init({
+		mode : "textareas",
+		theme : "advanced",
+		skin : "cirkuit",
+		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+		browser_spellcheck : true,
+		content_css : "/css/core/tiny.css",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+		theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+		theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+		theme_advanced_buttons4 : "tablecontrols",
+		accessibility_warnings : false,
+		pdw_toggle_on : 1,
+		pdw_toggle_toolbars : '2, 3, 4',
+		extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+		theme_advanced_blockformats : "p,address,h4,h5",
+		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+		file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
+		file_browser_category_id : 0,
+		tabfocus_elements : ":prev,:next",
+		convert_urls : false
 	});
-
-    $j('#repeatUntilSelect').change(function () {
-        if ($j(this).val() !== '') {
-            $j('#repeatUntil').show();
-            $j("#repeat_until").rules("add", "required");
-        }
-		else {
-            $j('#repeatUntil').hide();
-            $j("#repeat_until").rules("remove", "required");
-        }
-    });
-
-    // Campus selection validation - only required if eventType === Campus
-    var validateCampusSelected = function() {
-        return $j('select#level').val() == 3;
-    }
-    $j('#eventForm').validate({
-        rules: {
-            'campus[]': {
-                required: {
-                    depends: validateCampusSelected
-                },
-                minlength: {
-                    param: 1,
-                    depends: validateCampusSelected
-                }
-            }
-        },
-		submitHandler:function (form) {
-
-            // the desired action, and if this is a series event or not
-            var act = $j('#action').val();
-            var multi = $j('#repeat-reminder').length != 0;
-
-            // series
-            if (multi) {
-                if (act == 'Update') {
-                    $j('.bulk-update').css('display', 'inline');
-                    $j('.bulk-delete').css('display', 'none');
-                    $j("#dialog-bulk").dialog({
-                        resizable:false,
-                        height:180,
-                        width:400,
-                        modal:true,
-                        draggable:false,
-                        buttons:{
-                            "Only this event":function () {
-                                $j('#efficacy').val('self');
-                                form.submit();
-                            },
-                            "All events in the series":function () {
-                                $j('#efficacy').val('series');
-                                form.submit();
-                            }
-                        },
-                        close:function () {
-                            return false;
-                        }
-                    });
-                }
-                else if (act == 'Delete') {
-                    $j('.bulk-update').css('display', 'none');
-                    $j('.bulk-delete').css('display', 'inline');
-                    $j("#dialog-bulk").dialog({
-                        resizable:false,
-                        height:140,
-                        width:400,
-                        modal:true,
-                        draggable:false,
-                        buttons:{
-                            "Only this event":function () {
-                                $j('#efficacy').val('self');
-                                form.submit();
-                            },
-                            "All events in the series":function () {
-                                $j('#efficacy').val('series');
-                                form.submit();
-                            }
-                        },
-                        close:function () {
-                            return false;
-                        }
-                    });
-                }
-            }
-            // single event
-            else {
-                if (act == 'Update') {
-                    form.submit();
-                }
-                else if (act == 'Delete') {
-                    $j("#dialog-delete").dialog({
-                        resizable:false,
-                        width:400,
-                        height:140,
-                        modal:true,
-                        draggable:false,
-                        buttons:{
-                            "Yes":function () {
-                                form.submit();
-                            },
-                            "No":function () {
-                                $j(this).dialog('close');
-                                return false;
-                            }
-                        },
-                        close:function () {
-                            return false;
-                        }
-                    });
-                }
-                else {
-                    // add
-                    form.submit();
-                }
-            }
-        }
-    });
-        $j('#b{FUNCTION}').click(function () {
-        $j('#action').val('{FUNCTION}');
-    });
-
-    $j('#bDelete').click(function () {
-        $j('#action').val('Delete');
-    });
-
-    $j('.customise').click(function (event) {
-        event.preventDefault();
-        $j(this).children('span').toggle();
-        $j('.adv_hide').toggle();
-
-        if ($j('.adv_hide').is(':visible')) {
-            $j('.adv_hide').children('td').delay(1000).animate({opacity:'1'});
-        }
-		else {
-            $j('.adv_hide').queue('fx', []);
-        }
-    });
-
-    $j('#allday').click(function()  {
-        if($j(this).is(':checked')) {
-            $j('.timeInputs').each(function () {
-                $j(this).hide();
-            });
-
-        }
-        else{
-
-            $j('.timeInputs').each(function () {
-                $j(this).show();
-            });
-        }
-    });
-});
 </script>
-<!-- END custom_head -->
-
+<script type="text/javascript" src="/modules/eotc/js/jquery.eventModify.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#eventForm').eventModify({
+			functionLabel: "{FUNCTION}"
+		});
+	});
+</script>
 <h1>
 	<span>{FUNCTION} Event</span>
 	<a class="customise" href="#">
-		<span {ADV_OFF}>Show Advanced Options</span>
-		<span {ADV_ON}>Close Advanced Options</span>
+		<span {ADVANCED_SHOW}>Show Advanced Options</span>
+		<span {ADVANCED_CLOSE}>Close Advanced Options</span>
 	</a>
 </h1>
 
+<<<<<<< HEAD
 <form method="post" action="/calendar/modifyForm.php" id="eventForm">
     <table class="standardForm table">
         <tr>
@@ -458,55 +220,241 @@ $j(function () {
 					<label class="float-left clear">
 						<input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
 						{CAMPUS_NAME}
+=======
+<form id="eventForm" method="post" action="/modules/eotc/modifyForm.php">
+	<input name="id" type="hidden" value="{EVENT_ID}" />
+	<input name="userId" type="hidden" value="{EVENT_USER_ID}" />
+	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
+	<input name="allday" type="hidden" value="0" />
+	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
+	<input id="efficacy" name="efficacy" type="hidden" value="self" />
+	<input id="action" name="action" type="hidden" value="" />
+
+	<table class="standardForm">
+		<tbody>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Title</h4>
+				</td>
+				<td>
+					<label>
+						<input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_NOTE}" />
+>>>>>>> 00f8530... Migrate replacement modify.php using mappers [SB-5109]
 					</label>
-					<!-- END campus_list -->
-                    <label class="float-left clear">
-                        <input type="checkbox" value="{GROUP_ID}" name="" class="select_all" /> Select all
-                    </label>
-				</div>
-			</td>
-        </tr>
-        <tr id="attendance" style="display:none;">
-            <td>
-				<h4>Attendance</h4>
-			</td>
-            <td>
-				<input name="attendance" type="checkbox" value="1" {ATTENDANCE}>
-			</td>
-        </tr>
-        <tr>
-            <td>
-				<h4>Details</h4>
-			</td>
-            <td>
-				<textarea name="detail" style="width:100%;height:350px">{DETAIL}</textarea>
-			</td>
-        </tr>
-    </table>
+				</td>
+			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>When</h4>
+					<em>Uncheck all day to enter times as well.</em>
+				</td>
+				<td>
+					<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+					<span class="timeInputs {EVENT_TIMEINPUTS}">
+						<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
+						<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+						<select name="startPeriod">
+							<option value="am" {EVENT_START_AM}>AM</option>
+							<option value="pm" {EVENT_START_PM}>PM</option>
+						</select>
+					</span>
 
-    <input type="hidden" name="id" value="{EVENT_ID}"/>
-    <input type="hidden" name="userId" value="{EVENT_USER_ID}"/>
-	<input type="hidden" name="author_id" value="{EVENT_AUTHOR_ID}">
-    <input type="hidden" name="return" value="{RETURN_TO}"/>
-    <input type="hidden" id="efficacy" name="efficacy" value="self"/>
-    <input type="hidden" id="action" name="action" value=""/>
-    <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" class="submit-btn-plain"/>
+					to
 
-    <!-- BEGIN delete_button -->
-    <input id="bDelete" type="submit" name="Delete" value="Delete Event" class="submit-btn-plain cancel"/>
-    <!-- END delete_button -->
+					<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+					<span class="timeInputs {EVENT_TIMEINPUTS}">
+						<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
+						<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
 
-    <div id="dialog-bulk" title="This event is part of a series">
-        <p>
+						<select name="endPeriod">
+							<option value="am" {EVENT_END_AM}>AM</option>
+							<option value="pm" {EVENT_END_PM}>PM</option>
+						</select>
+					</span>
+
+					<br />
+
+					<label for="allday">
+						<input id="allday" name="allday" class="allday" type="checkbox" value="1" {EVENT_ALLDAY_CHECKED} />All Day
+					</label>
+				</td>
+			</tr>
+			<tr class="advanced {SHOW_ADVANCED}">
+				<td class="formLabelWidth">
+					<h4>Publish Date</h4>
+					<em>
+						This event will only be visible to the public after this date. Leave blank to publish
+						immediately.
+					</em>
+				</td>
+				<td>
+					<input id="publishDate" name="publishDate" data-datepicker="true" type="text" size="15" maxlength="30" value="{EVENT_PUBLISH_DATE}"/>
+				</td>
+			</tr>
+			<!-- BEGIN recurring_dates -->
+			<tr class="advanced {SHOW_ADVANCED}">
+				<td class="formLabelWidth">
+					<h4>Repeat</h4>
+					<em>The frequency with which this event recurs, if at all.</em>
+				</td>
+				<td>
+					<select name="repeat">
+						<option value="">Single Event</option>
+						<option value="daily">Daily</option>
+						<option value="weekly">Weekly</option>
+						<option value="fortnightly">Fortnightly</option>
+						<option value="monthly">Monthly</option>
+					</select>
+				</td>
+			</tr>
+			<tr id="repeatUntil" class="advanced hidden">
+				<td class="formLabelWidth">
+					<h4>Repeat Until</h4>
+					<em>The date at which recurrence should cease.</em>
+				</td>
+				<td>
+					<input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+				</td>
+			</tr>
+			<!-- END recurring_dates -->
+			<!-- BEGIN recurring_reminder -->
+			<tr id="repeat-reminder" class="advanced">
+				<td class="formLabelWidth">
+					<h4>Repeat</h4>
+					<em>This event is part of a recurring series.</em>
+				</td>
+				<td>
+					{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+				</td>
+			</tr>
+			<!-- END recurring_reminder -->
+			<tr>
+				<td>
+					<h4>Location</h4>
+				</td>
+				<td>
+					<input name="location" type="text" size="50" value="{EVENT_LOCATION}"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Type</h4>
+					<em>Select the type of event. This will be represented via different colours</em>
+				</td>
+				<td>
+					<select name="type">
+						<!-- BEGIN type_drop -->
+						<option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+						<!-- END type_drop -->
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Level</h4>
+					<em>Select who you would like to be able to see this event</em>
+				</td>
+				<td>
+					<select name="level" id="level">
+						<!-- BEGIN event_level_drop -->
+						<option value="{EVENT_EVENTLEVEL_ID}" {EVENT_EVENTLEVEL_ID_SELECTED}>{EVENT_EVENTLEVEL_NAME}</option>
+						<!-- END event_level_drop -->
+					</select>
+				</td>
+			</tr>
+			<tr id="groupDrop" class="hide">
+				<td>
+					<h4>Group</h4>
+					<em>Select the group which will be able to view this event</em>
+				</td>
+				<td>
+					<!-- BEGIN event_group_drop -->
+					<label>
+						<input type="checkbox" name="group[]" value="{EVENT_GROUP_ID}" {EVENT_GROUP_ID_SELECTED} />{EVENT_GROUP_NAME}
+					</label>
+					<!-- END event_group_drop -->
+				</td>
+			</tr>
+			<tr id="roleList" class="hide">
+				<td>
+					<h4>Roles</h4>
+					<em>Select the roles which will be able to view this event</em>
+				</td>
+				<td>
+					<div class="clearfix checkboxes">
+
+						<!-- BEGIN event_role_list -->
+						<label class="float-left clear">
+							<input type="checkbox" name="roles[]" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
+							{EVENT_ROLE_NAME}
+						</label>
+						<!-- END event_role_list -->
+
+						<label class="float-left clear">
+							<input type="checkbox" data-selectall="true" /> Select all
+						</label>
+					</div>
+				</td>
+			</tr>
+			<tr id="campusList" class="hide">
+				<td>
+					<h4>Campus</h4>
+					<em>Select the campus' which will be able to view this event</em>
+				</td>
+				<td>
+					<div class="clearfix checkboxes">
+
+						<!-- BEGIN event_campus_list -->
+						<label class="float-left clear">
+							<input type="checkbox" class="campusCheck" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} /> {EVENT_CAMPUS_NAME}
+						</label>
+						<!-- END event_campus_list -->
+						<label class="float-left clear">
+							<input type="checkbox" data-selectall='true' /> Select all
+						</label>
+					</div>
+				</td>
+			</tr>
+			<tr id="attendance">
+				<td>
+					<h4>Attendance</h4>
+				</td>
+				<td>
+					<input name="attendance" type="checkbox" value="1" {ATTENDANCE} />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Details</h4>
+				</td>
+				<td>
+					<textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" class="submit-btn-plain"/>
+
+	<!-- BEGIN delete_button -->
+	<input id="bDelete" type="submit" name="Delete" value="Delete Event" class="submit-btn-plain cancel"/>
+	<!-- END delete_button -->
+
+	<div id="dialog-bulk" title="This event is part of a series">
+		<p>
 			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-            <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-            <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
-        </p>
-    </div>
-    <div id="dialog-delete" title="Delete Event">
-        <p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-				Are you sure you want to delete this event?
+			<span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
+			<span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
 		</p>
-    </div>
+	</div>
+	<div id="dialog-delete" title="Delete Event">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+			Are you sure you want to delete this event?
+		</p>
+	</div>
 </form>
+
+
+
+
