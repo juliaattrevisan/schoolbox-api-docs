@@ -80,10 +80,10 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 		FROM event
 		    LEFT JOIN user ON owner = user.id
 		    LEFT JOIN luEventType ON type = eventTypeID
-			JOIN eventCampus ON event.id = eventCampus.eventID
+			JOIN event_campus ON event.id = event_campus.event_id
 			JOIN eventGroup ON event.id = eventGroup.eventID
 		WHERE access = 3
-			AND eventCampus.campusID IN(" . implode(",", $_SESSION['campus']) . ")
+			AND event_campus.campus_id IN(" . implode(",", $_SESSION['campus']) . ")
 			AND eventGroup.groupID = {$_SESSION['gid']}
 			AND ( startDate >= CURRENT_DATE() $where)
 		ORDER BY startDate, startTime";

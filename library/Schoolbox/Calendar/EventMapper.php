@@ -316,8 +316,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement->execute();
 
 		$query = "
-			DELETE FROM eventCampus
-			WHERE eventID = :eventId
+			DELETE FROM event_campus
+			WHERE event_id = :eventId
 		";
 
 		$statement = $this->database->prepare($query);
@@ -365,9 +365,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			}
 
 			$query = "
-				INSERT INTO eventCampus (eventID, campusID)
+				INSERT INTO event_campus (event_id, campus_id)
 				VALUES (:eventId, :campusId)
-				ON DUPLICATE KEY UPDATE eventID = :eventId, campusID = :campusId
+				ON DUPLICATE KEY UPDATE event_id = :eventId, campus_id = :campusId
 			";
 
 			$statement = $this->database->prepare($query);

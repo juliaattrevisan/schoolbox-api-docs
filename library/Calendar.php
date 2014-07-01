@@ -527,7 +527,7 @@ class Calendar extends DeprecatedModel {
         if (is_array($_SESSION['campus'])) {
             $campusList = $_SESSION['campus'];
 
-            $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+            $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
             $campusList = array(1);
 
@@ -566,7 +566,7 @@ class Calendar extends DeprecatedModel {
         }
 
         $event_query = "SELECT DISTINCT event.id, owner,
-                            GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
+                            GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
                             TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
                             TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
@@ -579,7 +579,7 @@ class Calendar extends DeprecatedModel {
                         FROM event
                         LEFT JOIN user ON owner = user.id
                         LEFT JOIN luEventType ON type = eventTypeID
-                        LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+                        LEFT JOIN event_campus ON event.id = event_campus.event_id
                         LEFT JOIN eventGroup ON event.id = eventGroup.eventID
                         WHERE (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
@@ -595,7 +595,7 @@ class Calendar extends DeprecatedModel {
 						FROM event
 						LEFT JOIN user ON owner = user.id
 						LEFT JOIN luEventType ON type = eventTypeID
-						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE (
 							(access = '1' AND owner = '" . $_SESSION['id'] . "')
@@ -642,7 +642,7 @@ class Calendar extends DeprecatedModel {
 				$campusList[] = $currentCampus->getId();
 			}
 
-            $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+            $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         }
 		else {
             $campusQuery = '1 = 1';
@@ -699,7 +699,7 @@ class Calendar extends DeprecatedModel {
 
 		if ($filter['campus']) {
 			$filter_query[] = 'access = '.self::ACCESS_CAMPUS;
-			$filter_query[] = 'eventCampus.campusID = '.intval($filter['campus']);
+			$filter_query[] = 'event_campus.campus_id = '.intval($filter['campus']);
 		}
 
 		if ($filter['group']) {
@@ -722,7 +722,7 @@ class Calendar extends DeprecatedModel {
         // Don't get events for resources, get them separately.
         $query = "
 			SELECT DISTINCT event.id, owner,
-				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
+				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
 				startDate, startTime, endDate, endTime, allday,
 				SUBSTR(event.startDate, 1, 4) AS year,
 				type, note, access, location, detail, attendance,
@@ -734,7 +734,7 @@ class Calendar extends DeprecatedModel {
 			FROM event
 			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
-			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+			LEFT JOIN event_campus ON event.id = event_campus.event_id
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
 			LEFT JOIN event_user ON event.id = event_user.event_id
@@ -820,13 +820,13 @@ class Calendar extends DeprecatedModel {
         $query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
 							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
-							type, note, location, detail, access, eventCampus.campusID as sid
+							type, note, location, detail, access, event_campus.campus_id as sid
 						FROM event
-						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
 							AND (
-								  (access = '3' AND eventCampus.campusID IN(" . implode(
+								  (access = '3' AND event_campus.campus_id IN(" . implode(
             ',', $campusList
         ) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
 								)
@@ -895,10 +895,10 @@ class Calendar extends DeprecatedModel {
 
     function getEventCampus($eventID) {
         $output = array();
-        $query = "SELECT campusID FROM eventCampus WHERE eventID = $eventID";
+        $query = "SELECT campus_id FROM event_campus WHERE event_id = $eventID";
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
-            $output[] = $event['campusID'];
+            $output[] = $event['campus_id'];
         }
         return $output;
     }
@@ -936,10 +936,10 @@ class Calendar extends DeprecatedModel {
         if (is_array($campusList)) {
             foreach ($campusList as $campusID) {
                 $eventCampus = array(
-                    'eventID' => $eventID,
-                    'campusID' => $campusID,
+                    'event_id' => $eventID,
+                    'campus_id' => $campusID,
                 );
-                $this->db->insert('eventCampus', $eventCampus);
+                $this->db->insert('event_campus', $eventCampus);
             }
         }
     }
@@ -947,7 +947,7 @@ class Calendar extends DeprecatedModel {
     function delPerms($eventID) {
 
         $this->db->delete('eventGroup', 'eventID', $eventID);
-        $this->db->delete('eventCampus', 'eventID', $eventID);
+        $this->db->delete('event_campus', 'event_id', $eventID);
     }
 
     function updateFilters($filters, $view) {
