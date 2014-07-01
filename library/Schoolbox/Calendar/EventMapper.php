@@ -307,8 +307,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 */
 	private function deletePermissions($event) {
 		$query = "
-			DELETE FROM eventGroup
-			WHERE eventID = :eventId
+			DELETE FROM event_group
+			WHERE event_id = :eventId
 		";
 
 		$statement = $this->database->prepare($query);
@@ -339,9 +339,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			}
 
 			$query = "
-				INSERT INTO eventGroup (eventID, groupID)
+				INSERT INTO event_group (event_id, group_id)
 				VALUES (:eventId, :groupId)
-				ON DUPLICATE KEY UPDATE eventID = :eventId, groupID = :groupId
+				ON DUPLICATE KEY UPDATE event_id = :eventId, group_id = :groupId
 			";
 
 			$statement = $this->database->prepare($query);

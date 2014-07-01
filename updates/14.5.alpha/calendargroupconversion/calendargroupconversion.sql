@@ -14,3 +14,6 @@ INSERT INTO `event_category` (event_id, category_id) SELECT id, sid FROM `event`
  */
 RENAME TABLE `eventCampus` TO `event_campus`;
 ALTER TABLE `event_campus` CHANGE `eventID` `event_id` INT(11) NOT NULL AUTO_INCREMENT, CHANGE `campusID` `campus_id` INT(11) DEFAULT 0 NOT NULL;
+
+RENAME TABLE `eventGroup` TO `event_group`;
+ALTER TABLE `event_group` CHANGE `eventID` `event_id` INT(11) NOT NULL AUTO_INCREMENT, CHANGE `groupID` `group_id` INT(11) DEFAULT 0 NOT NULL;
