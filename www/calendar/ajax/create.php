@@ -22,7 +22,7 @@ $page = new SitePage();
  * When creating via the js calendar ui, assume single-day events so
  * startDate and endDate are the same.
  */
-$dateObj      = new Alaress_Date_Format($_POST['date']/1000, 'U');
+$dateObj = new Alaress_Date_Format($_POST['date'], 'd-m-y');
 
 $groupHandler = new Group();
 
