@@ -21,12 +21,20 @@ use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
 class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_REVISED = 'revised';
+
+	/** @var WikiMapper */
+	protected $wikiMapper;
+
+	/** @var CategoryMapper */
+	protected $catMapper;
 
 	/**
 	 * Instantiate all your dependencies within yourself.
@@ -35,7 +43,8 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		// noop
+		$this->wikiMapper = WikiMapper::getInstance();
+		$this->catMapper = CategoryMapper::getInstance();
 	}
 
 	/**
@@ -110,16 +119,25 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	public function notifyRevised($roleType, $revision, $author) {
 		$msgr = new Messenger();
 
+		// Hydrate revision because it might not have been when passed -_-
+		$revision     = $this->mapper->findById($revision->getId());
 		$revisionId   = $revision->getId();
 		$revisionName = $revision->getHeading();
-		$revisionSlug = $revision->getWiki()->getSlug();
+
+		/** @var Wiki $wiki */
+		$wiki = $this->wikiMapper->findById($revision->getWiki()->getId());
+
+		/** @var Category $cat */
+		$cat = $this->catMapper->findById($wiki->getCategory()->getId());
+
+		$revisionSlug = $wiki->getSlug();
 
 		$authorId     = $author->getId();
 		$authorName   = $author->formatName();
 		$authorExtId  = $author->getExternalId();
 
-		$categoryId   = $revision->getWiki()->getCategory()->getId();
-		$categoryName = $revision->getWiki()->getCategory()->getName();
+		$categoryId   = $cat->getId();
+		$categoryName = $cat->getName();
 
 		$msg = new Message(
 			':author revised the wiki :title in :catname',
