@@ -119,6 +119,8 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	public function notifyRevised($roleType, $revision, $author) {
 		$msgr = new Messenger();
 
+		// Hydrate revision because it might not have been when passed -_-
+		$revision     = $this->mapper->findById($revision->getId());
 		$revisionId   = $revision->getId();
 		$revisionName = $revision->getHeading();
 
