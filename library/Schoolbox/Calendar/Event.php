@@ -73,13 +73,6 @@ class Event {
 	protected $access = 0;
 
 	/**
-	 * sid ><
-	 *
-	 * @var int
-	 */
-	protected $serviceId = 0;
-
-	/**
 	 * A hex string representing the colour of this event
 	 *
 	 * @var string
@@ -579,26 +572,6 @@ class Event {
 	 */
 	public function getSeriesId() {
 		return $this->seriesId;
-	}
-
-	/**
-	 * Set sid
-	 *
-	 * @param int $sid
-	 * @return self
-	 */
-	public function setServiceId($sid) {
-		$this->serviceId = $sid;
-	 	return $this;
-	}
-
-	/**
-	 * Get sid
-	 *
-	 * @return int
-	 */
-	public function getServiceId() {
-		return $this->serviceId;
 	}
 
 	/**

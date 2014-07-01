@@ -46,7 +46,6 @@ $event = new Event();
 $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	  ->setAuthor($user)
 	  ->setAccess(Event::ACCESS_PERSONAL)
-	  ->setServiceId($ownerId)
 	  ->setCampusCollection(new Collection())
 	  ->setRoleCollection(new Collection())
 	  ->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
@@ -61,6 +60,9 @@ $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	  ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 
 $affectedIds = EventMapper::getInstance()->save($event);
+
+/* TODO: Save a Personal Relation
+ */
 
 if (count($affectedIds) == 1) {
 	$json = array(

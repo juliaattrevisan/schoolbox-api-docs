@@ -46,11 +46,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'type' => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
-			'column' => 'sid',
-			'property' => 'serviceId',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
 			'column' => 'attendance',
 			'property' => 'attendance',
 			'type' => self::TYPE_INTEGER,
@@ -150,8 +145,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
-		$this->hasJoin('sid', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\SidMapper',
+		$this->hasJoin('personal', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
 			'this_key'  => 'id',
 			'other_key' => 'event_id',
 		));
@@ -170,7 +165,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$ownerMapper = $this->getJoinMapper('owner');
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
-		$sidMapper = $this->getJoinMapper('sid');
+		$personalMapper = $this->getJoinMapper('personal');
 
 		$query = "
 			SELECT
@@ -178,12 +173,12 @@ class EventMapper extends Schoolbox\External\Mapper {
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
-				{$sidMapper->getColumnString('s')}
+				{$personalMapper->getColumnString('p')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN {$this->getJoinSql('sid', 'e', 's')}
+			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
 			WHERE e.id = :eventId
 		";
 
@@ -193,7 +188,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		/* Hydrate or die
 		 */
-		$sidCollection = new Collection();
+		$personalCollection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
@@ -213,15 +208,15 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setType($eventTypeItem);
 
-			/* Sid
+			/* Personal
 			 */
-			$sidCollection->add($sidMapper->hydrate($row, 's'));
+			$personalCollection->add($personalMapper->hydrate($row, 'p'));
 		}
 
 		/* If an event was found matching this id
 		 */
 		if ($eventItem) {
-			$eventItem->setServiceId($sidCollection);
+			$eventItem->personal = $personalCollection;
 
 			return $eventItem;
 		}
