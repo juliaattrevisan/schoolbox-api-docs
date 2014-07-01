@@ -120,12 +120,12 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$templateHandle = "component_{$component->getInstance()->getId()}";
 			$templateHandle = TEMPLATE_content;
 
-			/* -_-
-			 */
-			$userHandler = new User();
-			$user = $userHandler->getById($eportfolioHandler->getSettingsPageOwner());
 
-			$component->setup($user, $component->getInstance()->getConfigArray() );
+            //Setup permissions for component
+            $context['uid'] = $eportfolioHandler->getSettingsPageOwner();
+            $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+
+			$component->setup($context, $component->getInstance()->getConfigArray() );
 
 			if ($component->execute() !== false) {
 
