@@ -123,7 +123,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             //Setup permissions for component
             $context['uid'] = $eportfolioHandler->getSettingsPageOwner();
-            $context['permission'] = 2;
+            $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
 
 			$component->setup($context, $component->getInstance()->getConfigArray() );
 
