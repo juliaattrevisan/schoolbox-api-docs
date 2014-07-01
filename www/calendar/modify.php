@@ -100,7 +100,6 @@ else {
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
-	$defaultSid = '';
 	$defaultAccessLevel = '';
 
 	/* Miscellaneous setvarring
