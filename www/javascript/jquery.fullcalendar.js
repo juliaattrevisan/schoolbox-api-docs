@@ -618,7 +618,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 	}
 
     // Hide reviewed by as well
-    if (eventData.reviewerId == -1) {
+    if (!('reviewerId' in eventData) || eventData.reviewerId == -1) {
         $j('dd.reviewed-by').hide();
     }
     else {
