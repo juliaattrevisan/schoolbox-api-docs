@@ -673,7 +673,7 @@ class Calendar extends DeprecatedModel {
             /* If there are no groups prevent sql error
              */
             if (count($groupList)) {
-                $groupQuery = "OR (access = ".self::ACCESS_GROUP." AND event_sid.sid IN (" . implode(',', $groupList) . "))";
+                $groupQuery = "OR (access = ".self::ACCESS_GROUP." AND event_category.category_id IN (" . implode(',', $groupList) . "))";
             }
         }
 
@@ -730,16 +730,16 @@ class Calendar extends DeprecatedModel {
 				eventType, eventColour,
 				event.publish_date,
 				category.id AS categoryId, category.name AS categoryName,
-				event.completed, author_id,
-				event_sid.sid
+				event.completed, author_id
 			FROM event
 			LEFT JOIN user ON event.author_id = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
 			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
-			LEFT JOIN event_sid ON event.id = event_sid.event_id
+			LEFT JOIN event_user ON event.id = event_user.event_id
+			LEFT JOIN event_category ON event.id = event_category.event_id
+			LEFT JOIN category ON event_category.category_id = category.id AND event_category.category_id IS NOT NULL
 			WHERE
 				resource_booking.id IS NULL
 				AND (
@@ -748,10 +748,8 @@ class Calendar extends DeprecatedModel {
 					OR (access = ".self::ACCESS_CAMPUS." AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
 				)
 				AND (
-					-- Get any events which overlap timespan.
-					-- NOT (event.end BEFORE startTimestamp OR event.start AFTER endTimestamp)
 					NOT (
-						DATE(endDate)   <  DATE(FROM_UNIXTIME('{$startTimestamp}'))
+						DATE(endDate) < DATE(FROM_UNIXTIME('{$startTimestamp}'))
 						OR
 						DATE(startDate) >= DATE(FROM_UNIXTIME('{$endTimestamp}'))
 					)
