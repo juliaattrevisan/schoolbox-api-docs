@@ -11,6 +11,19 @@ $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 
+if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
+	try {
+		$userMapper = new \Schoolbox\UserMapper();
+		$selectedUser = $userMapper->findById($_GET['userId']);
+	}
+	catch (\Exception $e) {
+		error(31);
+	}
+}
+else {
+	$selectedUser = $_SESSION['user'];
+}
+
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
@@ -60,7 +73,7 @@ if (is_numeric($_GET['eventID'])) {
 
 	$page->setVar(array(
 		'EVENT_ID' => $event->getId(),
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
+		'EVENT_USER_ID' => $selectedUser->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => $event->getNote(),
 		'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
@@ -127,7 +140,7 @@ else {
 
 	$page->setVar(array(
 		'EVENT_ID' => '',
-		'EVENT_USER_ID' => $_SESSION['user']->getId(),
+		'EVENT_USER_ID' => $selectedUser->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
 		'EVENT_NOTE' => '',
 		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
@@ -171,7 +184,7 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 /* Only provide Group option if groups have been defined
  */
 $groupHandler = new \Group();
-$groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), true, WRITE_ACCESS);
+$groupList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
 
 /* Group checkbox array when using Group Event Level
  */
@@ -206,7 +219,7 @@ $page->parse('delete_button_block', 'delete_button');
 /* Only provide Campus options if campuses have been defined
  */
 $campusMapper = new \Schoolbox\CampusMapper();
-$campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
+$campusList = $campusMapper->getAvailableCampusesForUser($selectedUser);
 
 /* Event Access Levels
  * Requires both $groupList and $campusList for optional values
