@@ -23,7 +23,7 @@ if (is_numeric($_GET['eventID'])) {
 		error(160);
 		exit;
 	}
-
+new \Alaress_Probe($event);
 	/* Default values
 	 */
 	$defaultTypeId = $event->getType()->getId();

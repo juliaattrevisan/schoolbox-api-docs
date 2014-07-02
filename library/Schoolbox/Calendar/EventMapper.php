@@ -160,6 +160,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'event_id',
 		));
+		$this->hasJoin('role', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
@@ -178,6 +183,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$personalMapper = $this->getJoinMapper('personal');
 		$categoryMapper = $this->getJoinMapper('category');
 		$campusMapper = $this->getJoinMapper('campus');
+		$roleMapper = $this->getJoinMapper('role');
 
 		$query = "
 			SELECT
@@ -187,7 +193,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 				{$eventTypeMapper->getColumnString('t')},
 				{$personalMapper->getColumnString('p')},
 				{$categoryMapper->getColumnString('c')},
-				{$campusMapper->getColumnString('ca')}
+				{$campusMapper->getColumnString('ca')},
+				{$roleMapper->getColumnString('r')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
@@ -195,6 +202,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
 			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('campus', 'e', 'ca')}
+			LEFT JOIN {$this->getJoinSql('role', 'e', 'r')}
 			WHERE e.id = :eventId
 		";
 
@@ -207,6 +215,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$personalCollection = new Collection();
 		$categoryCollection = new Collection();
 		$campusCollection = new Collection();
+		$roleCollection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
@@ -226,25 +235,41 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setType($eventTypeItem);
 
-			/* Personal
+			/* Personal de-dupe
 			 */
-			$personalCollection->add($personalMapper->hydrate($row, 'p'));
+			$personal = $personalMapper->hydrate($row, 'p');
+			$personalCollection->setOffset($personal->getUserId(), $personal);
 
-			/* Category
+			/* Category de-dupe
 			 */
-			$categoryCollection->add($categoryMapper->hydrate($row, 'c'));
+			$category = $categoryMapper->hydrate($row, 'c');
+			$categoryCollection->setOffset($category->getCategoryId(), $category);
 
-			/* Campus
+			/* Campus de-dupe
  			 */
-			$campusCollection->add($campusMapper->hydrate($row, 'ca'));
+			$campus = $campusMapper->hydrate($row, 'ca');
+			$campusCollection->setOffset($campus->getCampusId(), $campus);
+
+			/* Role de-dupe
+ 			 */
+			$role = $roleMapper->hydrate($row, 'r');
+			$roleCollection->setOffset($role->getRoleId(), $role);
 		}
 
 		/* If an event was found matching this id
 		 */
 		if ($eventItem) {
+			$personalCollection->reindex();
 			$eventItem->setUserCollection($personalCollection);
+
+			$categoryCollection->reindex();
 			$eventItem->setCategoryCollection($categoryCollection);
+
+			$campusCollection->reindex();
 			$eventItem->setCampusCollection($campusCollection);
+
+			$roleCollection->reindex();
+			$eventItem->setRoleCollection($roleCollection);
 
 			return $eventItem;
 		}
