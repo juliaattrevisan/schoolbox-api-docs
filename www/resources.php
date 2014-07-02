@@ -82,7 +82,7 @@ while ($parentID > 0) {
 }
 
 // Build a tree up to the last resource we looked at
-$treeBuilder = new Schoolbox\Resource\CategoryTree(
+$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 	CategoryMapper::getInstance(),
 	TaskMapper::getInstance(),
 	$groupHandler

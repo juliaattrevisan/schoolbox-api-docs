@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 
-$treeBuilder = new Schoolbox\Resource\CategoryTree(
+$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
     CategoryMapper::getInstance(),
     TaskMapper::getInstance(),
     new Group()

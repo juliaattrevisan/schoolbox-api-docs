@@ -12,7 +12,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Group as CategoryHandler;
 
-class CategoryTree {
+class CategoryTreeBuilder {
 
     /**
      * @var CategoryMapper
