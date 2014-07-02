@@ -3,7 +3,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $this->setFile(TEMPLATE_content, 'resources.html');
-$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
@@ -122,85 +121,7 @@ $output = array(
 );
 $this->setVar($output);
 
-// output folders, column 1
-$categoryList = $categoryHandler->getCategoryNode($openCategory);
-if (is_array($categoryList)) {
-
-	foreach ($categoryList as $category) {
-		// get permissions
-		if (!isset($permission[$category['id']])) {
-			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
-		}
-
-		// limit permission by parent
-		//if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
-		//	$permission[$category['id']] = $permission[$category['parent']];
-
-		// check permission
-		if ($permission[$category['id']] >= READ_ACCESS) {
-
-			$class = array();
-
-			// set parent category
-			$class[] = "child-of-node-{$category['parent']}";
-
-			/* add plus sign to parent nodes */
-			if ($category['isParent'] == '1') {
-				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
-			}
-
-			/* select default dir */
-			if ($category['id'] == $openCategory) {
-				$class[] = 'selected';
-			}
-
-			/* mark homepages */
-			if ($category['template'] > 0) {
-				$class[] = "homepage";
-			}
-
-			// mark courses
-			if ($category['taskCount'] > 0) {
-				$class[] = "course";
-			}
-
-			/* mark write access */
-			if ($permission[$category['id']] == WRITE_ACCESS) {
-				$class[] = "write";
-			}
-
-			/* mark full access*/
-			if ($permission[$category['id']] == FULL_ACCESS) {
-				$class[] = "full";
-			}
-
-			/* append code to name */
-			$name = $category['name'];
-			if ($category['code'] != '' && $category['code'] != $category['name']) {
-				$name .= ' (' . $category['code'] . ')';
-			}
-			// This is duplicated in ajax/tree.php - wouldn't it be nice to have
-			// it not be duplicated?
-			$name = Scrub::text(TextFormatter::cutString($name, 32));
-
-			$output = array(
-				'CATEGORY_ID' => $category['id'],
-				'CATEGORY_NAME' => $name,
-				'CLASS' => implode(" ", $class),
-			);
-			$this->setVar($output);
-			$this->parse('category_list_block', 'category_list', true);
-		}
-	}
-
-	/* If no permission to folders handle blank block */
-	if (!$output['CATEGORY_ID']) {
-		$this->setVar('category_list_block', '');
-	}
-}
-else {
-	$this->setVar('category_list_block', '');
-}
+// output folders, column 1 - now done via jsTree and TREEDATA
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
