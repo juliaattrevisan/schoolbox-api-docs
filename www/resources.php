@@ -97,7 +97,8 @@ foreach ($parentList as $parentCategoryId) {
 }
 // Which tree nodes are opened?
 foreach ($partialTree as &$leaf) {
-	$leaf['state']['opened'] = in_array($leaf['id'], $parentList);
+	$leaf['state']['opened']   = in_array($leaf['id'], $parentList);
+	$leaf['state']['selected'] = ($leaf['id'] == $openCategory);
 }
 unset($leaf);
 
