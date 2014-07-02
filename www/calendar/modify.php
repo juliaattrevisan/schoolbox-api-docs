@@ -29,6 +29,15 @@ if (is_numeric($_GET['eventID'])) {
 	$defaultTypeId = $event->getType()->getId();
 	$defaultAccessLevel = $event->getAccess();
 
+	/* Only provide Campus options if campuses have been defined
+	 */
+	$selectedCampus = array();
+	$allCampuses = $event->getCampusCollection();
+
+	foreach($allCampuses as $currentCampus) {
+		$selectedCampuses[] = $currentCampus->getCampusId();
+	}
+
 	/* Only provide publish date if one was provided and if it
 	 * wasn't useless somehow
 	 */
@@ -101,6 +110,10 @@ else {
 
 	$defaultTypeId = '';
 	$defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
+
+	/* Preselected campus
+	 */
+	$selectedCampuses = array($_SESSION['campus'][0]);
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -187,13 +200,13 @@ foreach($groupList as $currentUserGroup) {
 
 $page->parse('delete_button_block', 'delete_button');
 
+/* Render all the dropdowns
+ */
+
 /* Only provide Campus options if campuses have been defined
  */
 $campusMapper = new \Schoolbox\CampusMapper();
 $campusList = $campusMapper->getAvailableCampusesForUser($_SESSION['user']);
-
-/* Render all the dropdowns
- */
 
 /* Event Access Levels
  * Requires both $groupList and $campusList for optional values
@@ -215,7 +228,7 @@ if ($campusList->count()) {
 		);
 	}
 
-	$page->checkList('event_campus_list', $allCampuses, array($_SESSION['campus'][0]), TEMPLATE_content, array(
+	$page->checkList('event_campus_list', $allCampuses, $selectedCampuses, TEMPLATE_content, array(
 		'id' => 'EVENT_CAMPUS_ID',
 		'name' => 'EVENT_CAMPUS_NAME',
 	));
