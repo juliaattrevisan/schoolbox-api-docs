@@ -87,23 +87,9 @@ $treeBuilder = new Schoolbox\Resource\CategoryTree(
 	TaskMapper::getInstance(),
 	$groupHandler
 );
-// Root node + all the parents we looked at
-$partialTree = $treeBuilder->createTree('#');
-foreach ($parentList as $parentCategoryId) {
-	$partialTree = array_merge(
-		$partialTree,
-		$treeBuilder->createTree($parentCategoryId)
-	);
-}
-// Which tree nodes are opened?
-foreach ($partialTree as &$leaf) {
-	$leaf['state']['opened']   = in_array($leaf['id'], $parentList);
-	$leaf['state']['selected'] = ($leaf['id'] == $openCategory);
-}
-unset($leaf);
 
 // output folders, column 1 - now done via jsTree and TREEDATA
-$this->setVar('TREEDATA', json_encode($partialTree));
+$this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));

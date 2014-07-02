@@ -1,6 +1,6 @@
 <?php
 /**
- * Builder for a category tree.
+ * Builder for a node list to be output by jsTree.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -41,12 +41,12 @@ class CategoryTree {
     }
 
     /**
-     * Builds a node out of this category?
+     * Builds a list of child nodes for $categoryId
      *
      * @param  mixed $categoryId
      * @return array
      */
-    public function createTree($categoryId) {
+    public function buildChildNodes($categoryId) {
 
         $output = array();
 
@@ -105,7 +105,55 @@ class CategoryTree {
     }
 
     /**
-     * gets a permission string out of something
+     * Builds a partial tree.
+     *
+     * This method loads $categoryId's children, then its parent's direct
+     * children, and repeats all the way up to the parent node.
+     *
+     * @param  mixed $categoryId
+     * @return array
+     */
+    public function buildPartialTree($categoryId) {
+
+        // build a list of parentage
+        $parentList[] = $parentId = $categoryId;
+        $i = 0;
+        while ($parentId > 0) {
+            if ($i++ > 100) {
+                break;
+            }
+            try {
+                $parentList[] = $parentId = $this->mapper->findById($parentId)->getParent()->getId();
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                break;
+            }
+        }
+
+        // Build the root node
+        $partialTree = $this->buildChildNodes('#');
+
+        // Build the parent nodes
+        foreach ($parentList as $parentCategoryId) {
+            $partialTree = array_merge(
+                $partialTree,
+                $this->buildChildNodes($parentCategoryId)
+            );
+        }
+
+        // Open $categoryId's node and its parents
+        foreach ($partialTree as &$leaf) {
+            $leaf['state']['opened']   = in_array($leaf['id'], $parentList);
+            $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
+        }
+        unset($leaf);
+
+        return $partialTree;
+    }
+
+    /**
+     * Gets a permission string out of a permission code returned from
+     * $this->handler->getPermission().
      *
      * @param  $code
      * @return string

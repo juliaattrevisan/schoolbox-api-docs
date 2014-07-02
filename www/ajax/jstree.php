@@ -13,4 +13,4 @@ $treeBuilder = new Schoolbox\Resource\CategoryTree(
 );
 
 header('Content-Type: application/json');
-echo json_encode($treeBuilder->createTree($_GET['parent']));
+echo json_encode($treeBuilder->buildChildNodes($_GET['parent']));
