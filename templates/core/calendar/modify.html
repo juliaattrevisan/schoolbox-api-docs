@@ -70,27 +70,27 @@
 				</td>
 				<td>
 					<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
-					<span class="timeInputs {EVENT_TIMEINPUTS}">
-						<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
-						<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-						<select name="startPeriod">
-							<option value="am" {EVENT_START_AM}>AM</option>
-							<option value="pm" {EVENT_START_PM}>PM</option>
-						</select>
-					</span>
+								<span class="timeInputs {EVENT_TIMEINPUTS}">
+									<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
+									<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+									<select name="startPeriod">
+										<option value="am" {EVENT_START_AM}>AM</option>
+										<option value="pm" {EVENT_START_PM}>PM</option>
+									</select>
+								</span>
 
 					to
 
 					<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
-					<span class="timeInputs {EVENT_TIMEINPUTS}">
-						<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
-						<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+								<span class="timeInputs {EVENT_TIMEINPUTS}">
+									<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
+									<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
 
-						<select name="endPeriod">
-							<option value="am" {EVENT_END_AM}>AM</option>
-							<option value="pm" {EVENT_END_PM}>PM</option>
-						</select>
-					</span>
+									<select name="endPeriod">
+										<option value="am" {EVENT_END_AM}>AM</option>
+										<option value="pm" {EVENT_END_PM}>PM</option>
+									</select>
+								</span>
 
 					<br />
 
@@ -253,28 +253,31 @@
 			</tr>
 		</tbody>
 	</table>
+	<div class="clearfix checkboxes">
+		<input type="hidden" name="id" value="{EVENT_ID}"/>
+		<input type="hidden" name="userId" value="{EVENT_USER_ID}"/>
+		<input type="hidden" name="author_id" value="{EVENT_AUTHOR_ID}">
+		<input type="hidden" name="return" value="{EVENT_REDIRECT}"/>
+		<input type="hidden" id="efficacy" name="efficacy" value="self"/>
+		<input type="hidden" id="action" name="action" value="{FUNCTION}"/>
+		<input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" class="submit-btn-plain"/>
 
-	<input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{FUNCTION} Event" class="submit-btn-plain"/>
+		<!-- BEGIN delete_button -->
+		<input id="bDelete" type="submit" name="Delete" value="Delete Event" class="submit-btn-plain cancel"/>
+		<!-- END delete_button -->
 
-	<!-- BEGIN delete_button -->
-	<input id="bDelete" type="submit" name="Delete" value="Delete Event" class="submit-btn-plain cancel"/>
-	<!-- END delete_button -->
-
-	<div id="dialog-bulk" title="This event is part of a series">
-		<p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-			<span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-			<span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
-		</p>
-	</div>
-	<div id="dialog-delete" title="Delete Event">
-		<p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-			Are you sure you want to delete this event?
-		</p>
+		<div id="dialog-bulk" title="This event is part of a series">
+			<p>
+				<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+				<span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
+				<span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
+			</p>
+		</div>
+		<div id="dialog-delete" title="Delete Event">
+			<p>
+				<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+				Are you sure you want to delete this event?
+			</p>
+		</div>
 	</div>
 </form>
-
-
-
-

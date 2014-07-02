@@ -73,13 +73,6 @@ class Event {
 	protected $access = 0;
 
 	/**
-	 * sid ><
-	 *
-	 * @var int
-	 */
-	protected $serviceId = 0;
-
-	/**
 	 * A hex string representing the colour of this event
 	 *
 	 * @var string
@@ -159,7 +152,21 @@ class Event {
 	protected $roleCollection = null;
 
 	/**
-	 * Any associated campuses
+	 * Any associated users (Type 1)
+	 *
+	 * @var null
+	 */
+	protected $userCollection = null;
+
+	/**
+	 * Any associated categories (Type 2)
+	 *
+	 * @var null
+	 */
+	protected $categoryCollection = null;
+
+	/**
+	 * Any associated campuses (Type 3)
 	 *
 	 * @var Collection|Campus[]
 	 */
@@ -191,6 +198,9 @@ class Event {
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->setUserCollection(new Collection());
+		$this->setCategoryCollection(new Collection());
+
 		$this->setup();
 	}
 
@@ -582,26 +592,6 @@ class Event {
 	}
 
 	/**
-	 * Set sid
-	 *
-	 * @param int $sid
-	 * @return self
-	 */
-	public function setServiceId($sid) {
-		$this->serviceId = $sid;
-	 	return $this;
-	}
-
-	/**
-	 * Get sid
-	 *
-	 * @return int
-	 */
-	public function getServiceId() {
-		return $this->serviceId;
-	}
-
-	/**
 	 * Set start datetime
 	 *
 	 * @param Alaress_Date_Format $startDateTime
@@ -831,5 +821,41 @@ class Event {
 	 */
 	public function getAttendanceDirty() {
 		return $this->attendanceDirty;
+	}
+
+	/**
+	 * Set category collection
+	 *
+	 * @param null $categoryCollection
+	 */
+	public function setCategoryCollection($categoryCollection) {
+		$this->categoryCollection = $categoryCollection;
+	}
+
+	/**
+	 * Get category collection
+	 *
+	 * @return null
+	 */
+	public function getCategoryCollection() {
+		return $this->categoryCollection;
+	}
+
+	/**
+	 * Set user collection
+	 *
+	 * @param null $userCollection
+	 */
+	public function setUserCollection($userCollection) {
+		$this->userCollection = $userCollection;
+	}
+
+	/**
+	 * Get user collection
+	 *
+	 * @return null
+	 */
+	public function getUserCollection() {
+		return $this->userCollection;
 	}
 }

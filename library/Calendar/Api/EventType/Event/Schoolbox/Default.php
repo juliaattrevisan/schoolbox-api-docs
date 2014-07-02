@@ -93,7 +93,6 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setDetail($currentEvent['detail']);
 			$event->setLocation($currentEvent['location']);
 			$event->setPublishDate($currentEvent['publish_date']);
-			$event->setSid($currentEvent['sid']);
 			$event->setAllday($currentEvent['allday']);
 
 			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
@@ -104,8 +103,10 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			}
 
 			if ($currentEvent['access'] == 2) {
-				$event->setCategoryId($currentEvent['categoryId']);
-				$event->setCategoryname($currentEvent['categoryName']);
+				$mapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
+				$allRelations = $mapper->findByColumn('event_id', $eventId);
+
+				$event->setCategoryCollection($allRelations);
 			}
 
 			$event->setAttendance($currentEvent['attendance']);

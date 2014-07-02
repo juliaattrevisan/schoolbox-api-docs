@@ -46,11 +46,6 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'type' => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
-			'column' => 'sid',
-			'property' => 'serviceId',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
 			'column' => 'attendance',
 			'property' => 'attendance',
 			'type' => self::TYPE_INTEGER,
@@ -150,8 +145,13 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'type',
 			'other_key' => 'eventTypeID',
 		));
-		$this->hasJoin('sid', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\SidMapper',
+		$this->hasJoin('personal', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
+		$this->hasJoin('category', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
 			'this_key'  => 'id',
 			'other_key' => 'event_id',
 		));
@@ -170,7 +170,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$ownerMapper = $this->getJoinMapper('owner');
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
-		$sidMapper = $this->getJoinMapper('sid');
+		$personalMapper = $this->getJoinMapper('personal');
+		$categoryMapper = $this->getJoinMapper('category');
 
 		$query = "
 			SELECT
@@ -178,12 +179,14 @@ class EventMapper extends Schoolbox\External\Mapper {
 				{$ownerMapper->getColumnString('o')},
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
-				{$sidMapper->getColumnString('s')}
+				{$personalMapper->getColumnString('p')},
+				{$categoryMapper->getColumnString('c')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN {$this->getJoinSql('sid', 'e', 's')}
+			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
+			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
 			WHERE e.id = :eventId
 		";
 
@@ -193,7 +196,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		/* Hydrate or die
 		 */
-		$sidCollection = new Collection();
+		$personalCollection = new Collection();
+		$categoryCollection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
@@ -213,15 +217,20 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
 			$eventItem->setType($eventTypeItem);
 
-			/* Sid
+			/* Personal
 			 */
-			$sidCollection->add($sidMapper->hydrate($row, 's'));
+			$personalCollection->add($personalMapper->hydrate($row, 'p'));
+
+			/* Category
+			 */
+			$categoryCollection->add($categoryMapper->hydrate($row, 'c'));
 		}
 
 		/* If an event was found matching this id
 		 */
 		if ($eventItem) {
-			$eventItem->setServiceId($sidCollection);
+			$eventItem->setUserCollection($personalCollection);
+			$eventItem->setCategoryCollection($categoryCollection);
 
 			return $eventItem;
 		}
@@ -298,8 +307,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 */
 	private function deletePermissions($event) {
 		$query = "
-			DELETE FROM eventGroup
-			WHERE eventID = :eventId
+			DELETE FROM event_group
+			WHERE event_id = :eventId
 		";
 
 		$statement = $this->database->prepare($query);
@@ -307,8 +316,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement->execute();
 
 		$query = "
-			DELETE FROM eventCampus
-			WHERE eventID = :eventId
+			DELETE FROM event_campus
+			WHERE event_id = :eventId
 		";
 
 		$statement = $this->database->prepare($query);
@@ -330,9 +339,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			}
 
 			$query = "
-				INSERT INTO eventGroup (eventID, groupID)
+				INSERT INTO event_group (event_id, group_id)
 				VALUES (:eventId, :groupId)
-				ON DUPLICATE KEY UPDATE eventID = :eventId, groupID = :groupId
+				ON DUPLICATE KEY UPDATE event_id = :eventId, group_id = :groupId
 			";
 
 			$statement = $this->database->prepare($query);
@@ -356,9 +365,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			}
 
 			$query = "
-				INSERT INTO eventCampus (eventID, campusID)
+				INSERT INTO event_campus (event_id, campus_id)
 				VALUES (:eventId, :campusId)
-				ON DUPLICATE KEY UPDATE eventID = :eventId, campusID = :campusId
+				ON DUPLICATE KEY UPDATE event_id = :eventId, campus_id = :campusId
 			";
 
 			$statement = $this->database->prepare($query);

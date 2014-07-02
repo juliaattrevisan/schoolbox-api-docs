@@ -101,7 +101,7 @@ function Calendar(id, bubbleId, opts) {
                         url = calEvent.data.custom.modifyLink;
                     }
                     else {
-                        url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=week';
+                        url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
                     }
 
                     data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';

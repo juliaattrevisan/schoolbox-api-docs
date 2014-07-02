@@ -225,7 +225,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				$event->setEventType($this->getTypeNameByID($eventTypeID));
 				$event->setColour($this->getCalendarHandler()->displayColour($eventTypeID));
 				$event->setPublishDate((string)$attribs->ows_Created);
-				$event->setSid($this->getSidFromName((string)$attribs->ows_School));
 				$event->setCategoryId('');
 				$event->setCategoryName('');
 				$event->setAttendance('');
@@ -495,22 +494,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
     }
 
     /**
-     * Get content to use in the query for sid
-     *
-     * @param $name
-     * @return mixed
-     */
-    private function getSidFromName($name) {
-        if ($name == 'ALL') {
-            $allCampuses = $this->getCampusList();
-
-            return $allCampuses[0] . implode(' OR sid = ', $allCampuses);
-        }
-
-        return $this->campusList[$name];
-    }
-
-    /**
      * Used to map event types from STK to Schoolbox
      *
      * @param $name
@@ -521,7 +504,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
     }
 
     /* Getters/Setters
-      */
+     */
 
     /**
      * Set soap

@@ -59,9 +59,12 @@ abstract class Calendar_Event_Type_Abstract {
      */
     protected $campusList = '';
 
-    /* sid ><
-     */
-    protected $sid = -1;
+	/**
+	 * Associated Groups (Type 2)
+	 *
+	 * @var null
+	 */
+	protected $categoryCollection = null;
 
     /* The class used to render this event object. This should be
      * just the class' name, not an actual instance of it
@@ -457,24 +460,6 @@ abstract class Calendar_Event_Type_Abstract {
     }
 
     /**
-     * Set sid
-     *
-     * @param $sid
-     */
-    public function setSid($sid) {
-        $this->sid = $sid;
-    }
-
-    /**
-     * Get sid
-     *
-     * @return int
-     */
-    public function getSid() {
-        return $this->sid;
-    }
-
-    /**
      * Set category id
      *
      * @param $categoryId
@@ -639,5 +624,23 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	public function getCustom() {
 		return $this->custom;
+	}
+
+	/**
+	 * Set category collection
+	 *
+	 * @param null $categoryCollection
+	 */
+	public function setCategoryCollection($categoryCollection) {
+		$this->categoryCollection = $categoryCollection;
+	}
+
+	/**
+	 * Get category collection
+	 *
+	 * @return null
+	 */
+	public function getCategoryCollection() {
+		return $this->categoryCollection;
 	}
 }

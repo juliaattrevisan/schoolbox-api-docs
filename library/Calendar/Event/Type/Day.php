@@ -63,7 +63,13 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
             }
         } else {
             if ($this->isGroupAccess()) {
-                $eventLevel = 'group' . $this->getSid();
+				$allLevels = array();
+
+				foreach ($this->getCategoryCollection() as $currentCategory) {
+					$allLevels[] = 'group' . $currentCategory->getCategoryId();
+				}
+
+                $eventLevel = implode(' ', $allLevels);
             } else {
                 $eventLevel = 'personal';
             }
