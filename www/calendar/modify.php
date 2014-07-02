@@ -100,7 +100,7 @@ else {
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
-	$defaultAccessLevel = '';
+	$defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
