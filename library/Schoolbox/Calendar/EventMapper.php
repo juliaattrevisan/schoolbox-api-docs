@@ -155,6 +155,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'event_id',
 		));
+		$this->hasJoin('campus', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
@@ -172,6 +177,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$personalMapper = $this->getJoinMapper('personal');
 		$categoryMapper = $this->getJoinMapper('category');
+		$campusMapper = $this->getJoinMapper('campus');
 
 		$query = "
 			SELECT
@@ -180,13 +186,15 @@ class EventMapper extends Schoolbox\External\Mapper {
 				{$authorMapper->getColumnString('a')},
 				{$eventTypeMapper->getColumnString('t')},
 				{$personalMapper->getColumnString('p')},
-				{$categoryMapper->getColumnString('c')}
+				{$categoryMapper->getColumnString('c')},
+				{$campusMapper->getColumnString('ca')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('owner', 'e', 'o')}
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', 'e', 'p')}
 			LEFT JOIN {$this->getJoinSql('category', 'e', 'c')}
+			LEFT JOIN {$this->getJoinSql('campus', 'e', 'ca')}
 			WHERE e.id = :eventId
 		";
 
@@ -198,6 +206,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		 */
 		$personalCollection = new Collection();
 		$categoryCollection = new Collection();
+		$campusCollection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$eventItem = $this->hydrate($row, 'e');
@@ -224,6 +233,10 @@ class EventMapper extends Schoolbox\External\Mapper {
 			/* Category
 			 */
 			$categoryCollection->add($categoryMapper->hydrate($row, 'c'));
+
+			/* Campus
+ 			 */
+			$campusCollection->add($campusMapper->hydrate($row, 'ca'));
 		}
 
 		/* If an event was found matching this id
@@ -231,6 +244,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		if ($eventItem) {
 			$eventItem->setUserCollection($personalCollection);
 			$eventItem->setCategoryCollection($categoryCollection);
+			$eventItem->setCampusCollection($campusCollection);
 
 			return $eventItem;
 		}
