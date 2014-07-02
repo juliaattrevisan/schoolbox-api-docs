@@ -148,6 +148,9 @@ switch($_POST['action']) {
 		$userRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
 		$userRelationMapper->cleanse($event);
 
+		$roleRelationMapper = new \Schoolbox\Calendar\Relation\RoleMapper();
+		$roleRelationMapper->cleanse($event);
+
 		$categoryRelationMapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
 		$categoryRelationMapper->cleanse($event);
 
@@ -180,6 +183,13 @@ switch($_POST['action']) {
 			/* Access Type 3 (Campus)
 			 */
 			case 3:
+				foreach($_POST['roles'] as $currentRole) {
+					$roleRelation = new \Schoolbox\Calendar\Relation\Role();
+					$roleRelation->setEventId($event->getId());
+					$roleRelation->setRoleId($currentRole);
+					$roleRelationMapper->save($roleRelation);
+				}
+
 				break;
 
 			default:
