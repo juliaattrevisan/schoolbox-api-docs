@@ -6,79 +6,11 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 
-// #: get base items
-$DEPRECATEDHANDLER = new Group();
-$categoryMapper = CategoryMapper::getInstance();
-
-$getPermissionString = function($code) {
-    switch ($code) {
-        case FULL_ACCESS:
-            return 'full';
-            break;
-        case WRITE_ACCESS:
-            return 'write';
-            break;
-        case READ_ACCESS:
-            return 'read';
-            break;
-        default:
-            break;
-    }
-    return '';
-};
-
-$output = array();
-$parentId = $_GET['parent'];
-if ($parentId === '#') {
-    // Root node
-    // Can this user read or write to the root node? Honestly I don't know
-    $output[] = array(
-        'id'       => '0',
-        'text'     => 'Resources',
-        'children' => count($categoryMapper->findByParent(0)) > 0,
-        'type'     => 'root',
-        'li_attr'  => array(
-            'data-permission' => $getPermissionString($DEPRECATEDHANDLER->getPermission(0)),
-        ),
-    );
-}
-else {
-    // Children of root node
-    $list = $categoryMapper->findByParent($parentId);
-    foreach ($list as $category) {
-
-        // Get the permission this user has on this folder.
-        // No permission: don't show it at all!
-        $permission = $getPermissionString($DEPRECATEDHANDLER->getPermission($category->getId()));
-        if (empty($permission)) {
-            continue;
-        }
-
-        // Type: homepage or folder
-        // Could be a course as well, if any child has tasks.
-        $type     = $category->hasHomepage() ? 'homepage' : 'folder';
-        $children = $categoryMapper->findByParent($category->getId());
-        $childIds = $children->getColumnValues('id');
-        if (TaskMapper::getInstance()->countByColumn('category_id', $childIds)) {
-            $type = 'course';
-        }
-
-        // Output something.
-        $output[] = array(
-            'id'       => $category->getId(),
-            'parent'   => $category->getParent()->getId() ?: '0',
-            'text'     => $category->getName(),
-            'children' => count($children) > 0,
-            'type'     => $type,
-            'a_attr'   => array(
-                'href' => '/homepage/'.$category->getId(),
-            ),
-            'li_attr'  => array(
-                'data-permission' => $permission,
-            ),
-        );
-    }
-}
+$treeBuilder = new Schoolbox\Resource\CategoryTree(
+    CategoryMapper::getInstance(),
+    TaskMapper::getInstance(),
+    new Group()
+);
 
 header('Content-Type: application/json');
-echo json_encode($output);
+echo json_encode($treeBuilder->createTree($_GET['parent']));
