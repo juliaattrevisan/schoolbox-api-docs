@@ -504,7 +504,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
     }
 
     /* Getters/Setters
-      */
+     */
 
     /**
      * Set soap
