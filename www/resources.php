@@ -79,11 +79,46 @@ while ($parentID > 0) {
 	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
 }
 
+// Build a partial tree
+$partialTree = array(
+    array(
+        'id'     => 0,
+        'parent' => '#',
+        'text'   => 'Resources',
+        'state'  => array(
+            'opened' => true,
+        ),
+        'li_attr'  => array(
+            'data-permission' => 'full',
+        ),
+        'children' => true,
+    )
+);
+$mapper = \Schoolbox\Resource\CategoryMapper::getInstance();
+foreach ($parentList as $parentCategoryId) {
+    foreach ($mapper->findByParent($parentCategoryId) as $categoryModel) {
+        $childCategoryId = $categoryModel->getId();
+        $partialTree[] = array(
+            'id'     => $childCategoryId,
+            'parent' => $parentCategoryId,
+            'text'   => $categoryModel->getName(),
+            'state'  => array(
+                'opened' => (in_array($childCategoryId, $parentList)),
+            ),
+            'li_attr'  => array(
+                'data-permission' => 'full',
+            ),
+            'children' => ($mapper->countByColumn('parent', $childCategoryId) > 0),
+        );
+    }
+}
+
 $output = array(
 	'WRITE' => $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
 	'FULL' => $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
 	'OPEN' => $openCategory,
 	'HTTP_HOST' => $_SERVER['HTTP_HOST'],
+	'TREEDATA' => json_encode($partialTree),
 );
 $this->setVar($output);
 

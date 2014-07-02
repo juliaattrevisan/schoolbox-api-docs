@@ -7,6 +7,8 @@
 <script type="text/javascript">
 $(function() {
 
+    var treeData = {TREEDATA};
+
     // Select a node: update the second and third panels.
     var tree = $('#tree');
     tree.on('select_node.jstree', function(event, jstree) {
@@ -129,15 +131,33 @@ $(function() {
                 if (maxWidth > scrollerWidth)
                     table.width(maxWidth);
             }
+
+            // Select whatever node I was on last
         })
         .jstree({
             animation: 50,
             core: {
-                data: {
-                    url: '/ajax/jstree.php',
-                    type: 'GET',
-                    data: function(node) {
-                        return { parent: node.id }
+                data: function(node, callback) {
+                    // Search the tree for the children of this node.
+                    var children = treeData.filter(function(child) {
+                        return child.parent == node.id;
+                    })
+                    if (children.length) {
+                        callback(children);
+                    }
+                    else {
+                        $.ajax({
+                            url:      '/ajax/jstree.php',
+                            type:     'GET',
+                            data:     { parent: node.id },
+                            dataType: 'json'
+                        })
+                        .done(function(data) {
+                            callback(data);
+                        })
+                        .fail(function() {
+                            callback();
+                        })
                     }
                 },
                 multiple: false,
@@ -147,7 +167,7 @@ $(function() {
                     icons: true
                 }
             },
-            plugins : ['dnd', 'sort', 'state', 'types', 'wholerow'],
+            plugins : ['dnd', 'sort', 'types', 'wholerow'],
             dnd: {
                 copy: false,
                 is_draggable: function(nodes) {
