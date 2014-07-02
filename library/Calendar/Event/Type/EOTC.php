@@ -57,12 +57,11 @@ class Calendar_Event_Type_EOTC extends Calendar_Event_Type_Abstract {
             } else {
                 $eventLevel .= ' campus' . $this->getCampusList();
             }
-        } else {
-            if ($this->isGroupAccess()) {
-                $eventLevel = 'group' . $this->getSid();
-            } else {
-                $eventLevel = 'personal';
-            }
+        }
+		/* EOTC events are always campus, and aren't assigned to groups
+		 */
+		else {
+			$eventLevel = 'personal';
         }
 
         return $eventLevel;
