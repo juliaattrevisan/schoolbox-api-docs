@@ -100,7 +100,7 @@ else {
 	$event->setupDates($_GET['date']);
 
 	$defaultTypeId = '';
-	$defaultAccessLevel = '';
+	$defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -162,12 +162,24 @@ $groupList = $groupHandler->involvedInCategoryList($_SESSION['user']->getId(), t
 
 /* Group checkbox array when using Group Event Level
  */
-
 foreach($groupList as $currentUserGroup) {
+	$alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']);
+	$fromHomepage = (($_GET['level'] == 2) && ($_GET['sid'] == $currentUserGroup['id']));
+
+	/* If you have already chosen these categories, or if it's specified
+	 * from a homepage via Group Calendar > Add Event
+	 */
+	if ($alreadyInCategory || $fromHomepage) {
+		$selected = 'checked="checked"';
+	}
+	else {
+		$selected = '';
+	}
+
 	$page->setVar(array(
 		'EVENT_GROUP_ID' => $currentUserGroup['id'],
 		'EVENT_GROUP_NAME' => $currentUserGroup['name'],
-		'EVENT_GROUP_ID_SELECTED' => $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']) ? 'checked="checked"' : '',
+		'EVENT_GROUP_ID_SELECTED' => $selected
 	));
 
 	$page->parse('event_group_drop_block', 'event_group_drop', true);
