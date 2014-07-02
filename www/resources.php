@@ -102,16 +102,8 @@ foreach ($partialTree as &$leaf) {
 }
 unset($leaf);
 
-$output = array(
-	'WRITE' => $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
-	'FULL' => $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
-	'OPEN' => $openCategory,
-	'HTTP_HOST' => $_SERVER['HTTP_HOST'],
-	'TREEDATA' => json_encode($partialTree),
-);
-$this->setVar($output);
-
 // output folders, column 1 - now done via jsTree and TREEDATA
+$this->setVar('TREEDATA', json_encode($partialTree));
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
