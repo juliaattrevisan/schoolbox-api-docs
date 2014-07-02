@@ -2,6 +2,9 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Course\TaskMapper;
+
 $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
@@ -78,39 +81,25 @@ while ($parentID > 0) {
 	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
 }
 
-// Build a partial tree
-$partialTree = array(
-    array(
-        'id'     => 0,
-        'parent' => '#',
-        'text'   => 'Resources',
-        'state'  => array(
-            'opened' => true,
-        ),
-        'li_attr'  => array(
-            'data-permission' => 'full',
-        ),
-        'children' => true,
-    )
+// Build a tree up to the last resource we looked at
+$treeBuilder = new Schoolbox\Resource\CategoryTree(
+	CategoryMapper::getInstance(),
+	TaskMapper::getInstance(),
+	$groupHandler
 );
-$mapper = \Schoolbox\Resource\CategoryMapper::getInstance();
+// Root node + all the parents we looked at
+$partialTree = $treeBuilder->createTree('#');
 foreach ($parentList as $parentCategoryId) {
-    foreach ($mapper->findByParent($parentCategoryId) as $categoryModel) {
-        $childCategoryId = $categoryModel->getId();
-        $partialTree[] = array(
-            'id'     => $childCategoryId,
-            'parent' => $parentCategoryId,
-            'text'   => $categoryModel->getName(),
-            'state'  => array(
-                'opened' => (in_array($childCategoryId, $parentList)),
-            ),
-            'li_attr'  => array(
-                'data-permission' => 'full',
-            ),
-            'children' => ($mapper->countByColumn('parent', $childCategoryId) > 0),
-        );
-    }
+	$partialTree = array_merge(
+		$partialTree,
+		$treeBuilder->createTree($parentCategoryId)
+	);
 }
+// Which tree nodes are opened?
+foreach ($partialTree as &$leaf) {
+	$leaf['state']['opened'] = in_array($leaf['id'], $parentList);
+}
+unset($leaf);
 
 $output = array(
 	'WRITE' => $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
