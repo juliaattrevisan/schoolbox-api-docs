@@ -145,14 +145,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 	 *
 	 * @return bool
 	 */
-	private function isVisible($currentEvent) {
-//		$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-//		$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
-//
-//		if ($isFutureEvent && !($isVisibleToUser)) {
-//			return false;
-//		}
-//
+	protected function isVisible($currentEvent) {
 		return true;
 	}
 
