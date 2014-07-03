@@ -2,7 +2,7 @@ INSERT INTO `component_definition`
   (`name`, `class`, `description`, `module`, `component_category`, `visible`, `multiple`)
 VALUES
   ('Image Slider', 'Component_Dashboard_ImageSliderController',
-   'Display an animated image carousel, fading between all the images', 'dashboard', NULL, true, true);
+   'An interactive slider for displaying ads that can be clicked', 'dashboard', NULL, true, true);
 
 INSERT INTO `component_config_definition`
   (`component_definition_id`, `key`, `default_value`, `label`)
