@@ -76,12 +76,14 @@ class FileListMapper extends Schoolbox\Mapper {
 	 */
 	public function findAllImagesByPage($pageId) {
 		$query = "
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
-            WHERE myFile.mime_type LIKE '%image/%'
-            AND myFile.deleted IS FALSE
-            AND {$this->table}.page_id = :pageId
+			SELECT
+				{$this->getColumnString('fl')},
+				{$this->getJoinColumnString('files', 'f')}
+			FROM `{$this->table}` fl
+			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
+			WHERE f.mime_type LIKE '%image/%'
+			AND f.deleted IS FALSE
+			AND fl.page_id = :pageId
 		";
 
 		$statement = $this->database->prepare($query);
@@ -90,9 +92,10 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
+			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
+			return $model;
+		});
 	}
 
 	/**
@@ -104,15 +107,17 @@ class FileListMapper extends Schoolbox\Mapper {
 	 */
 	public function findRecent($uid, $limit) {
 		$query = "
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
-            WHERE myFile.mime_type LIKE '%image/%'
-            AND myFile.owner = :uid
-            AND myFile.deleted IS FALSE
-            GROUP BY {$this->table}.file_id
-            ORDER BY created_at DESC
-            LIMIT :limit
+			SELECT
+				{$this->getColumnString('fl')},
+				{$this->getJoinColumnString('files', 'f')}
+			FROM `{$this->table}` fl
+			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
+			WHERE f.mime_type LIKE '%image/%'
+			AND f.owner = :uid
+			AND f.deleted IS FALSE
+			GROUP BY fl.file_id
+			ORDER BY fl.created_at DESC
+			LIMIT :limit
 		";
 
 		$statement = $this->database->prepare($query);
@@ -122,9 +127,10 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
+			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
+			return $model;
+		});
 	}
 
 	/**
