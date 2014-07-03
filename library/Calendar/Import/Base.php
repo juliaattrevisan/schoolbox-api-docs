@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Calendar;
+namespace Calendar\Import;
 
 
 abstract class Base {

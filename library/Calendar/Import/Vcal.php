@@ -8,8 +8,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Calendar;
+namespace Calendar\Import;
 
+use Sabre\VObject;
 
 class Vcal extends Base {
 
@@ -17,13 +18,16 @@ class Vcal extends Base {
 	 * Load one event into schoolbox, generateo outcome array
 	 */
 	public function load() {
+		if (is_file($this->getFile())) {
+			$allEvents = VObject\Reader::read(file_get_contents($this->getFile()));
+
+			foreach ($allEvents as $currentEvent) {
+				new \Alaress_Probe($currentEvent);
+			}
+         }
+	}
+
 //{
-
-
-
-
-
-
 //		if ($this->getCalendarHandler()->create($event)) {
 //			$output[] = array(
 //				'name' => $summary,
@@ -39,5 +43,4 @@ class Vcal extends Base {
 //			);
 //		}
 //	}
-	}
 }
