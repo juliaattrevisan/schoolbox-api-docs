@@ -255,7 +255,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		if ($allImages->count()) {
 			foreach ($allImages as $currentImage) {
 				$this->getPage()->setVar(array(
-					'RECENT_PHOTO_FILE_ID' => $currentImage->getFileId(),
+					'RECENT_PHOTO_FILE_ID'   => $currentImage->getFile()->getId(),
+					'RECENT_PHOTO_FILE_DESC' => Scrub::html($currentImage->getFile()->getDescription()),
 				));
 
 				$this->getPage()->parse('recent_photo_block', 'recent_photo', true);
