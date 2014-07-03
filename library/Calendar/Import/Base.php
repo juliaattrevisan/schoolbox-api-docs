@@ -10,6 +10,7 @@
 
 namespace Calendar\Import;
 
+use \Schoolbox\Calendar\EventTypeMapper;
 
 abstract class Base {
 
@@ -18,14 +19,14 @@ abstract class Base {
 	 *
 	 * @var int
 	 */
-	protected $userId = -1;
+	protected $user = null;
 
 	/**
 	 * The person who spawned the event
 	 *
 	 * @var int
 	 */
-	protected $authorId = null;
+	protected $author = null;
 
 	/**
 	 * A list of selected event_group relations
@@ -57,20 +58,32 @@ abstract class Base {
 	protected $output = array();
 
 	/**
+	 * All event types, from the lookup
+	 *
+	 * @var null
+	 */
+	protected $allEventTypes = null;
+
+	/**
 	 * Constructor
 	 *
-	 * @param $userId
-	 * @param $authorId
+	 * @param $user
+	 * @param $author
 	 * @param $groupList
 	 * @param $campusList
 	 * @param $file
 	 */
-	public function __construct($userId, $authorId, $groupList, $campusList, $file) {
-		$this->setUserId($userId);
-		$this->setAuthorId($authorId);
+	public function __construct($user, $author, $groupList, $campusList, $file) {
+		$this->setUser($user);
+		$this->setAuthor($author);
 		$this->setGroupList($groupList);
 		$this->setCampusList($campusList);
 		$this->setFile($file);
+
+		/* All the available event types
+		 */
+		$eventTypeMapper = new EventTypeMapper();
+		$this->setAllEventTypes($eventTypeMapper->findAll());
 	}
 
 	/**
@@ -84,10 +97,10 @@ abstract class Base {
 	/**
 	 * Set author id
 	 *
-	 * @param null $authorId
+	 * @param null $author
 	 */
-	protected function setAuthorId($authorId) {
-		$this->authorId = $authorId;
+	protected function setAuthor($author) {
+		$this->author = $author;
 	}
 
 	/**
@@ -95,8 +108,8 @@ abstract class Base {
 	 *
 	 * @return null
 	 */
-	protected function getAuthorId() {
-		return $this->authorId;
+	protected function getAuthor() {
+		return $this->author;
 	}
 
 	/**
@@ -154,21 +167,21 @@ abstract class Base {
 	}
 
 	/**
-	 * Set user id
+	 * Set user
 	 *
-	 * @param null $userId
+	 * @param null $user
 	 */
-	protected function setUserId($userId) {
-		$this->userId = $userId;
+	protected function setUser($user) {
+		$this->user = $user;
 	}
 
 	/**
-	 * Get user id
+	 * Get user
 	 *
 	 * @return null
 	 */
-	protected function getUserId() {
-		return $this->userId;
+	protected function getUser() {
+		return $this->user;
 	}
 
 	/**
@@ -187,5 +200,23 @@ abstract class Base {
 	 */
 	public function getOutput() {
 		return $this->output;
+	}
+
+	/**
+	 * Set all event types
+	 *
+	 * @param null $allEventTypes
+	 */
+	public function setAllEventTypes($allEventTypes) {
+		$this->allEventTypes = $allEventTypes;
+	}
+
+	/**
+	 * Get all event types
+	 *
+	 * @return null
+	 */
+	public function getAllEventTypes() {
+		return $this->allEventTypes;
 	}
 }
