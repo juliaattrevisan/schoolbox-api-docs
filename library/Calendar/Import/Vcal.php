@@ -50,7 +50,7 @@ class Vcal extends Base {
 	}
 
 	/**
-	 * Load one event into schoolbox, generateo outcome array
+	 * Load all events into schoolbox, generate outcome array
 	 */
 	public function load() {
 		$output = array();
