@@ -15,22 +15,6 @@ class Bulk_Calendar extends Bulk_Abstract {
 	 * @return array
 	 */
 	public function addCalendar() {
-		if (stristr(file_get_contents($this->getFile(), null, null, 0, 20), 'BEGIN:VCALENDAR')) {
-			return $this->addVCalCalendar($this->getFile());
-		}
-		else {
-			return $this->addCSVCalendar($this->getFile());
-		}
-	}
-
-	/**
-	 * Imports events from csv
-	 *
-	 * @param <type> $file
-	 *
-	 * @return array
-	 */
-	private function addCSVCalendar() {
 		if (is_file($this->getFile())) {
 
 			/* Set defaults for id and campus if they are not submitted
@@ -56,49 +40,13 @@ class Bulk_Calendar extends Bulk_Abstract {
 				$campusList = $_POST['campusList'];
 			}
 
-			$importer = new \Calendar\Import\Csv($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
-			$importer->load();
-
-			return $importer->getOutput();
-		}
-
-		return array();
-	}
-
-	/**
-	 * Imports from a vcal file, exported from outlook
-	 *
-	 * @return array
-	 */
-	private function addVCalCalendar() {
-		if (is_file($this->getFile())) {
-			if ($_POST['userid'] == '') {
-				$uid = $_SESSION['id'];
-			}
-			else {
-				$uid = $_POST['userid'];
-			}
-
-			/* Set up specified campus list
-			 * Set up specified group list
+			/* Use factory to spawn a builder
 			 */
-			$groupList = array();
-			$campusList = array();
+			$factory = new \Calendar\Import\Factory($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
+			$strategy = $factory->build();
+			$strategy->load();
 
-			if (is_array($_POST['userGroup'])) {
-				$groupList = $_POST['userGroup'];
-			}
-
-			if (is_array($_POST['campusList'])) {
-				$campusList = $_POST['campusList'];
-			}
-
-			/* Process vcal events
-			 */
-			$v = new \Calendar\Import\Vcal($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
-			$v->load();
-
-			return $v->getOutput();
+			return $strategy->getOutput();
 		}
 
 		return array();
