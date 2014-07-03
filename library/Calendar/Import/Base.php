@@ -1,6 +1,6 @@
 <?php
 /**
- * Import
+ * Base
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,42 +11,42 @@
 namespace Calendar;
 
 
-class Import implements ImportInterface {
+abstract class Base {
 
 	/**
 	 * The person to whom these imported events are relevant
 	 *
 	 * @var int
 	 */
-	private $userId = -1;
+	protected $userId = -1;
 
 	/**
 	 * The person who spawned the event
 	 *
 	 * @var int
 	 */
-	private $authorId = null;
+	protected $authorId = null;
 
 	/**
 	 * A list of selected event_group relations
 	 *
 	 * @var array
 	 */
-	private $groupList = array();
+	protected $groupList = array();
 
 	/**
 	 * A list of selected event_campus relations
 	 *
 	 * @var array
 	 */
-	private $campusList = array();
+	protected $campusList = array();
 
 	/**
 	 * The source file from which to import
 	 *
 	 * @var null
 	 */
-	private $file = null;
+	protected $file = null;
 
 	/**
 	 * The outcome of each event's processing
@@ -54,7 +54,7 @@ class Import implements ImportInterface {
 	 *
 	 * @var null
 	 */
-	private $output = array();
+	protected $output = array();
 
 	/**
 	 * Constructor
@@ -76,22 +76,7 @@ class Import implements ImportInterface {
 	/**
 	 * Load events from file into schoolbox
 	 */
-	public function load() {
-//		if ($this->getCalendarHandler()->create($event)) {
-//			$output[] = array(
-//				'name' => $summary,
-//				'status' => 'Added',
-//				'error' => 'OK',
-//			);
-//		}
-//		else {
-//			$output[] = array(
-//				'name' => $summary,
-//				'status' => 'Not Added',
-//				'error' => 'Could not create event',
-//			);
-//		}
-	}
+	abstract public function load();
 
 	/* Getters/Setters
 	 */
@@ -101,7 +86,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param null $authorId
 	 */
-	private function setAuthorId($authorId) {
+	protected function setAuthorId($authorId) {
 		$this->authorId = $authorId;
 	}
 
@@ -110,7 +95,7 @@ class Import implements ImportInterface {
 	 *
 	 * @return null
 	 */
-	private function getAuthorId() {
+	protected function getAuthorId() {
 		return $this->authorId;
 	}
 
@@ -119,7 +104,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param array $campusList
 	 */
-	private function setCampusList($campusList) {
+	protected function setCampusList($campusList) {
 		$this->campusList = $campusList;
 	}
 
@@ -128,7 +113,7 @@ class Import implements ImportInterface {
 	 *
 	 * @return array
 	 */
-	private function getCampusList() {
+	protected function getCampusList() {
 		return $this->campusList;
 	}
 
@@ -137,7 +122,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param null $file
 	 */
-	private function setFile($file) {
+	protected function setFile($file) {
 		$this->file = $file;
 	}
 
@@ -146,7 +131,7 @@ class Import implements ImportInterface {
 	 *
 	 * @return null
 	 */
-	private function getFile() {
+	protected function getFile() {
 		return $this->file;
 	}
 
@@ -155,7 +140,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param array $groupList
 	 */
-	private function setGroupList($groupList) {
+	protected function setGroupList($groupList) {
 		$this->groupList = $groupList;
 	}
 
@@ -164,7 +149,7 @@ class Import implements ImportInterface {
 	 *
 	 * @return array
 	 */
-	private function getGroupList() {
+	protected function getGroupList() {
 		return $this->groupList;
 	}
 
@@ -173,7 +158,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param null $userId
 	 */
-	private function setUserId($userId) {
+	protected function setUserId($userId) {
 		$this->userId = $userId;
 	}
 
@@ -182,7 +167,7 @@ class Import implements ImportInterface {
 	 *
 	 * @return null
 	 */
-	private function getUserId() {
+	protected function getUserId() {
 		return $this->userId;
 	}
 
@@ -191,7 +176,7 @@ class Import implements ImportInterface {
 	 *
 	 * @param null $output
 	 */
-	private function setOutput($output) {
+	protected function setOutput($output) {
 		$this->output = $output;
 	}
 
