@@ -212,7 +212,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 			/* Process vcal events
 			 */
-			$v = new ICal_Creator($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
+			$v = new \Calendar\Import($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
 			$v->load();
 
 			return $v->getOutput();
