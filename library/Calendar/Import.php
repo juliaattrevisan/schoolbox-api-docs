@@ -49,6 +49,14 @@ class Import implements ImportInterface {
 	private $file = null;
 
 	/**
+	 * The outcome of each event's processing
+	 * This is an array of name, status, and error message values
+	 *
+	 * @var null
+	 */
+	private $output = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param $userId
@@ -69,6 +77,20 @@ class Import implements ImportInterface {
 	 * Load events from file into schoolbox
 	 */
 	public function load() {
+//		if ($this->getCalendarHandler()->create($event)) {
+//			$output[] = array(
+//				'name' => $summary,
+//				'status' => 'Added',
+//				'error' => 'OK',
+//			);
+//		}
+//		else {
+//			$output[] = array(
+//				'name' => $summary,
+//				'status' => 'Not Added',
+//				'error' => 'Could not create event',
+//			);
+//		}
 	}
 
 	/* Getters/Setters
@@ -163,5 +185,22 @@ class Import implements ImportInterface {
 	private function getUserId() {
 		return $this->userId;
 	}
-//$uid, $_SESSION['id'], $groupList, $campusList, $this->getFile()
-} 
+
+	/**
+	 * Set output
+	 *
+	 * @param null $output
+	 */
+	private function setOutput($output) {
+		$this->output = $output;
+	}
+
+	/**
+	 * Get output
+	 *
+	 * @return null
+	 */
+	public function getOutput() {
+		return $this->output;
+	}
+}

@@ -13,4 +13,5 @@ namespace Calendar;
 
 interface ImportInterface {
 	public function load();
+	public function getOutput();
 }
