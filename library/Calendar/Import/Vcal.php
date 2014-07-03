@@ -14,7 +14,9 @@ use \Sabre\VObject;
 use \Sabre\VObject\Component\VEvent;
 use \Schoolbox\Calendar\Event;
 use \Schoolbox\Calendar\EventMapper;
-use \Schoolbox\Calendar\EventTypeMapper;
+use \Schoolbox\Calendar\Relation\Role;
+use \Schoolbox\Calendar\Relation\RoleMapper;
+use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
 
 class Vcal extends Base {
@@ -54,11 +56,12 @@ class Vcal extends Base {
 		$output = array();
 
 		if (is_file($this->getFile())) {
+			$campusMapper = new CampusMapper();
 			$eventMapper = new EventMapper();
+			$roleRelationMapper = new RoleMapper();
 
 			/* All the campuses selected in the ui
 			 */
-			$campusMapper = new \Schoolbox\CampusMapper();
 			$allCampuses = $campusMapper->findByColumn('id', $this->getCampusList());
 
 			/* All the events from the file
@@ -110,6 +113,15 @@ class Vcal extends Base {
 					$result = $eventMapper->save($event);
 
 					/* Assign Role relations
+					 */
+					foreach($this->getGroupList() as $currentRole) {
+						$role = new Role();
+						$role->setEventId($event->getId());
+						$role->setRoleId($currentRole);
+						$roleRelationMapper->save($role);
+					}
+
+					/* Output messages
 					 */
 					if (is_array($result) && count($result)) {
 						$output[] = array(
