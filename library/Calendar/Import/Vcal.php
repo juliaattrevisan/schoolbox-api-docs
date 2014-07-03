@@ -51,6 +51,8 @@ class Vcal extends Base {
 	 * Load one event into schoolbox, generateo outcome array
 	 */
 	public function load() {
+		$output = array();
+
 		if (is_file($this->getFile())) {
 			$eventMapper = new EventMapper();
 
@@ -91,8 +93,8 @@ class Vcal extends Base {
 					$event = new Event();
 					$event->setOwner($this->getUser());
 					$event->setAuthor($this->getAuthor());
-					$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-					$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+					$event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+					$event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 					$event->setNote((string)$currentEvent->SUMMARY);
 					$event->setAccess(Event::ACCESS_CAMPUS);
 					$event->setType($this->findEventTypeFromArray($categoryList));
@@ -105,29 +107,28 @@ class Vcal extends Base {
 
 					/* Save it
 					 */
-					$eventMapper->save($event);
-new \Alaress_Probe($event);
+					$result = $eventMapper->save($event);
+
 					/* Assign Role relations
 					 */
+					if (is_array($result) && count($result)) {
+						$output[] = array(
+							'name' => $event->getNote(),
+							'status' => 'Added',
+							'error' => 'OK',
+						);
+					}
+					else {
+						$output[] = array(
+							'name' => $event->getNote(),
+							'status' => 'Not Added',
+							'error' => 'Could not create event',
+						);
+					}
 				}
 			}
-         }
-	}
+        }
 
-//{
-//		if ($this->getCalendarHandler()->create($event)) {
-//			$output[] = array(
-//				'name' => $summary,
-//				'status' => 'Added',
-//				'error' => 'OK',
-//			);
-//		}
-//		else {
-//			$output[] = array(
-//				'name' => $summary,
-//				'status' => 'Not Added',
-//				'error' => 'Could not create event',
-//			);
-//		}
-//	}
+		$this->setOutput($output);
+	}
 }
