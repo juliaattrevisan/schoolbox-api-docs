@@ -698,6 +698,9 @@ class User extends DeprecatedModel {
 			}
 		}
 
+		// Filthily notify the binder that user was updated
+		$this->notifyUpdated($user['id']);
+
 		return true;
 	}
 
@@ -756,10 +759,58 @@ class User extends DeprecatedModel {
 				$this->db->insert('superusers', array('id' => $id));
 			}
 
+			// Filthily notify the binder that there's a new user
+			$this->notifyCreated($id);
 			return $id;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Filthy method for telling the notifications binder that user was created.
+	 *
+	 * @param  int  $userId
+	 * @return bool
+	 */
+	public function notifyCreated($userId) {
+		return $this->notifyChanged($userId, true);
+	}
+
+	/**
+	 * Filthy method for telling the notifications binder that user was updated.
+	 *
+	 * @param  int  $userId
+	 * @return bool
+	 */
+	public function notifyUpdated($userId) {
+		return $this->notifyChanged($userId, false);
+	}
+
+	/**
+	 * Filthy method for telling the notifications binder that user has changed.
+	 *
+	 * @param  int  $userId
+	 * @param  bool $new
+	 * @return bool
+	 */
+	protected function notifyChanged($userId, $new) {
+		try {
+			$user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+		}
+		catch (\Schoolbox\Mapper\Exception $e) {
+			return false;
+		}
+
+		$notifier = new \Schoolbox\UserNotifier(new \Schoolbox\Config\Loader());
+		if ($new) {
+			$notifier->notifyCreated($user, $_SESSION['user']);
+		}
+		else {
+			$notifier->notifyUpdated($user, $_SESSION['user']);
+		}
+
+		return true;
 	}
 
 
