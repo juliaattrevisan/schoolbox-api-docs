@@ -200,6 +200,7 @@ class Event {
 	public function __construct() {
 		$this->setUserCollection(new Collection());
 		$this->setCategoryCollection(new Collection());
+		$this->setRoleCollection(new Collection());
 
 		$this->setup();
 	}

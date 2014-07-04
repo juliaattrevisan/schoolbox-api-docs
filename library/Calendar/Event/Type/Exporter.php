@@ -98,24 +98,4 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 			return $e;
 		}
 	}
-
-	/**
-	 * If the Publish Date hasn't been reached yet, only show the events to Superusers
-	 * in a different way so they can still edit/click them. Otherwise, they don't appear
-	 * at all for everyone else
-	 *
-	 * @param $currentEvent
-	 *
-	 * @return bool
-	 */
-	private function isVisible($currentEvent) {
-		$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-		$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
-
-		if ($isFutureEvent && !($isVisibleToUser)) {
-			return false;
-		}
-
-		return true;
-	}
 }

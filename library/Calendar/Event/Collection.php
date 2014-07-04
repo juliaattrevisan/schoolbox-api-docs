@@ -18,7 +18,10 @@
  */
 class Calendar_Event_Collection implements Iterator, Countable {
 
-	/* A bunch of Calendar_Event_Type_Abstract subclasses
+	/**
+	 * A bunch of Calendar_Event_Type_Abstract subclasses
+	 *
+	 * @var Calendar_Event_Type_Abstract[]
 	 */
 	private $stack = array();
 	private $position = 0;
@@ -107,7 +110,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Add an Calendar_Event_Abstract-typed element to the stack
 	 *
-	 * @param $element
+	 * @param Calendar_Event_Type_Abstract $element
 	 */
 	public function add(Calendar_Event_Type_Abstract $element) {
 		$this->stack[] = $element;
@@ -252,7 +255,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Get stack
 	 *
-	 * @return array
+	 * @return array|Calendar_Event_Type_Abstract[]
 	 */
 	public function getStack() {
 		return $this->stack;
@@ -268,7 +271,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Current
 	 *
-	 * @return mixed
+	 * @return Calendar_Event_Type_Abstract
 	 */
 	public function current() {
 		return $this->stack[$this->position];
