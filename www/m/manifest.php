@@ -1,6 +1,13 @@
 <?php
 // Bootstrap is needed so I can get site_location
 require_once __DIR__ . '/../../include/Bootstrap.php';
+
+// Is caching switched off? 404 (thus ignoring application cache)
+if (!Config::get('mobile_application_cache_enabled')) {
+    header(':', null, 404);
+    exit;
+}
+
 $location = Config::get('site_location');
 
 header('Content-Type: text/cache-manifest');
