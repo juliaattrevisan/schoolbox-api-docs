@@ -76,6 +76,25 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	}
 
 	/**
+	 * Find the next status for an event
+	 *
+	 * @param $event
+	 * @return int
+	 */
+	public function findNextStatus($event) {
+		$nextStatusId = -1;
+
+		try {
+			$chain = new \EOTC\ListGroup\Chain($event);
+			$nextStatusId = $chain->getResult()->getNextStatus();
+		}
+		catch (\Exception $e) {
+		}
+
+		return $nextStatusId;
+	}
+
+	/**
 	 * Find the available statuses for a given event and its
 	 * configuration - there should on be the current status,
 	 * the next status, and Rejected
@@ -84,6 +103,8 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findAvailableStatuses($event) {
+		$nextStatusId = -1;
+
 		try {
 			$chain = new \EOTC\ListGroup\Chain($event);
 			$nextStatusId = $chain->getResult()->getNextStatus();

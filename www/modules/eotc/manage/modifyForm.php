@@ -191,6 +191,16 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 			}
 
+			/* If promoting an event, set to the next status
+			 * This is a special case for event authors and In Principle status
+			 */
+			if (isset($_POST['promoteInPrinciple']) && $_POST['promoteInPrinciple'] == 1) {
+				$eventStatusMapper = new \EOTC\EventStatusMapper();
+				$nextStatusId = $eventStatusMapper->findNextStatus($event);
+
+				$event->getMetadata()->setStatus($nextStatusId);
+			}
+
 			/* Save this event and any recurring incidents too
 			 */
 			$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
