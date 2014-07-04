@@ -236,7 +236,14 @@ if (is_numeric($_GET['eventID'])) {
 
 		/* Cannot self-promote until a status is In Principle
 		 */
-		$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
+		if ($authenticator->canPromote($_SESSION['user'], $event)) {
+			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
+		}
+		else {
+			$page->setVar(array(
+				'can_promote_in_principle_block' => ''
+			));
+		}
 	}
 	else {
 		error(19);
