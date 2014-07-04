@@ -63,8 +63,7 @@ class Authenticator {
 			return true;
 		}
 
-		$eventPermissionMapper = new \EOTC\EventPermissionMapper();
-		$allPermissions = $eventPermissionMapper->findByUser($user);
+		$allPermissions = $this->getPermissionMapper()->findByUser($user);
 
 		if ($allPermissions->count()) {
 			return true;
@@ -96,6 +95,15 @@ class Authenticator {
 		 */
 		if ($event->getMetadata()->getStatus()->isRejected()) {
 			return true;
+		}
+
+		/* Allow event authors to modify status of events from In Principle
+		 * to the next status
+		 */
+		if ($event->getMetadata()->getStatus()->isInPrinciple()) {
+			if ($event->getAuthor()->getId() == $user->getId()) {
+				return true;
+			}
 		}
 
 		$allPermissions = $this->getPermissionMapper()->findByUser($user);
