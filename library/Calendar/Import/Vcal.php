@@ -66,7 +66,11 @@ class Vcal extends Base {
 
 			/* All the events from the file
 			 */
+			$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+			$later = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
+
 			$allEvents = VObject\Reader::read(file_get_contents($this->getFile()));
+			$allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
 
 			foreach ($allEvents->children as $currentEvent) {
 				if ($currentEvent instanceof VEvent) {
