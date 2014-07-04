@@ -122,7 +122,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                     ),
                     'CAL_DATE' => $calendarDate->getDateOnly(),
                     'CAL_ID' => $event['id'],
-                    'CAL_NOTE' => Scrub::text($event['note']),
+                    'CAL_TITLE' => Scrub::text($event['title']),
                     'CAL_LOCATION' => Scrub::text($event['location']),
                     'CAL_DETAIL' => Scrub::html($event['detail']),
                     'CAL_COLOUR' => $event['colour'],

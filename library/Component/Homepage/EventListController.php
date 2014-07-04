@@ -77,7 +77,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 $output = array(
                     'CAL_DATE' => $eventObject->getEventSpan(),
                     'CAL_ID' => $eventId,
-                    'CAL_NOTE' => Scrub::text($eventObject->getTitle()),
+                    'CAL_TITLE' => Scrub::text($eventObject->getTitle()),
                     'CAL_LOCATION' => Scrub::text($eventObject->getLocation()),
                     'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
                     'CAL_COLOUR' => $eventObject->getColour(),
