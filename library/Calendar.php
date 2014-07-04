@@ -575,7 +575,7 @@ class Calendar extends DeprecatedModel {
                             type, event.title, access, location, detail,
                             user.id as uid, user.title AS userTitle, firstname, lastname,
                             eventType, eventColour,
-                            MATCH (`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+                            MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
                         FROM event
                         LEFT JOIN user ON owner = user.id
                         LEFT JOIN luEventType ON type = eventTypeID
@@ -586,7 +586,7 @@ class Calendar extends DeprecatedModel {
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
-                            AND MATCH (`title`, `detail`, `location`) AGAINST ('$keyword')
+                            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -604,7 +604,7 @@ class Calendar extends DeprecatedModel {
 							$groupQuery
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
-						AND MATCH (`title`, `detail`, `location`) AGAINST ('$keyword')
+						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
 						";
 
         $events = $this->db->getAll($event_query);
