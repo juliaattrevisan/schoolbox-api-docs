@@ -60,7 +60,7 @@ class Event_Attendance_Controller extends Controller
 				else {
 					$this->getPage()->setVar(array(
 						'EVENT_ID' => $currentEvent['id'],
-						'EVENT_NOTE' => $currentEvent['note'],
+						'EVENT_TITLE' => $currentEvent['title'],
 						'EVENT_DATE' => $eventDate->getShort(),
 						'EVENT_LOCATION' => $currentEvent['location'],
 						'EVENT_USER_FIRSTNAME' => $currentEvent['firstname'],
