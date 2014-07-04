@@ -72,7 +72,7 @@ $personalRelationMapper->save($personalRelation);
 
 if (count($affectedIds) == 1) {
 	$json = array(
-		'title' => $event->getNote(),
+		'title' => $event->getTitle(),
 		'start' => $event->getStartDateTime()->getUnixTimestamp(),
 
 		/* Whether you can edit this event or not
