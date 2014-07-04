@@ -64,7 +64,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 		// no return for this user, show a blank comment
 		$comment = '';
 	}
-	$this->setVar('COMMENT', $comment);
+	$this->setVar('COMMENT', Scrub::text($comment));
 
 	/* Parse out everything
 	 */
