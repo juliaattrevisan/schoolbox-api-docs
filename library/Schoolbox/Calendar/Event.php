@@ -533,23 +533,24 @@ class Event {
 	}
 
 	/**
-	 * Set note
+	 * Set title
 	 *
-	 * @param string $note
+	 * @param string $title
 	 * @return self
 	 */
-	public function setNote($note) {
-		$this->note = $note;
+	public function setTitle($title) {
+		$this->title = $title;
+
 	 	return $this;
 	}
 
 	/**
-	 * Get note
+	 * Get title
 	 *
 	 * @return string
 	 */
-	public function getNote() {
-		return $this->note;
+	public function getTitle() {
+		return $this->title;
 	}
 
 	/**

@@ -32,7 +32,7 @@ $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
-	'EVENT_NAME' => $event->getNote(),
+	'EVENT_NAME' => $event->getTitle(),
 ));
 
 if ($event->getMetadata()->getStudentAttendees()->count()) {

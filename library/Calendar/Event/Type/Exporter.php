@@ -90,7 +90,7 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 				);
 			}
 
-			$e->setProperty('summary', $currentEvent->getNote());
+			$e->setProperty('summary', $currentEvent->getTitle());
 
 			/* Return the event object so you can agglutinate it elsewhere
 			 * A slight deviation from classical Visitor, but is ok

@@ -96,8 +96,8 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'join' => 'eventType'
 		));
 		$this->hasMap(array(
-			'column' => 'note',
-			'property' => 'note',
+			'column' => 'title',
+			'property' => 'title',
 			'type' => self::TYPE_STRING,
 		));
 		$this->hasMap(array(

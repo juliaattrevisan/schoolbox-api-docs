@@ -136,7 +136,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		$bob->setTitle(":applicant submitted new EOTC, :event")
 			->setParams(array(
 				'applicant' => new UserParam($applicant, ParameterInterface::STACKING_REPLACE),
-				'event'     => new Param($relEvent->getNote())
+				'event'     => new Param($relEvent->getTitle())
 			))
 			->setIcon("/portrait.php?size=square32&userId=".$applicant->getExternalId())
 			->setHref("/modules/eotc/status/modify/".$relEvent->getId())
@@ -179,7 +179,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		/** @var Event $relEvent */
 		$relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 		$relEventId = $relEvent->getId();
-		$relEventNote = $relEvent->getNote();
+		$relEventNote = $relEvent->getTitle();
 
 		// pray that these are actually User objects
 		$teacherInCharge = $relEvent->getTeacherInCharge();
@@ -263,7 +263,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		/** @var Event $relEvent */
 		$relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 		$relEventId = $relEvent->getId();
-		$relEventNote = $relEvent->getNote();
+		$relEventNote = $relEvent->getTitle();
 
 		// pray that these are actually User objects
 		$teacherInCharge = $relEvent->getTeacherInCharge();

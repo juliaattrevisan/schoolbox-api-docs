@@ -48,7 +48,7 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 				$this->setVar(array(
 					'EVENT_ID' => $currentEvent->getId(),
 					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
-					'EVENT_NOTE' => $currentEvent->getNote(),
+					'EVENT_NOTE' => $currentEvent->getTitle(),
 					'EVENT_START_DATETIME' => $currentEvent->getStartDatetime()->getShort(),
 					'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
 					'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),

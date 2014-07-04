@@ -33,7 +33,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Default extends Calendar_Even
                 'EVENT_ID' => '',
                 'TIME' => '',
                 'FULL_TIME' => '',
-                'NOTE' => $currentEvent->getNote(),
+                'NOTE' => $currentEvent->getTitle(),
                 'COLOUR' => $currentEvent->getColour(),
                 'LOCATION' => '',
                 'DETAIL' => '',

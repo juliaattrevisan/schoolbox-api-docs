@@ -61,7 +61,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
 			$event = array(
-				'title' => $currentEvent->getNote(),
+				'title' => $currentEvent->getTitle(),
 				'start' => "$start",
 				'end' => "$end",
 

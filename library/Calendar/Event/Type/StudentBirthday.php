@@ -13,11 +13,17 @@
  */
 class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
 
-	/* Renderer
+	/**
+	 * Renderer
+	 *
+	 * @var string
 	 */
 	protected $rendererClass = 'Calendar_Event_Type_StudentBirthday_Renderer_Javascript';
 
-	/* Contextual: The actual birthdate
+	/**
+	 * Actual birthdate
+	 *
+	 * @var string
 	 */
 	protected $date = '';
 
@@ -25,9 +31,18 @@ class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
 	 */
 	protected $eventType = 'Birthday';
 
-	/* The Birthday person's name and age
+	/**
+	 * The Birthday Person's name
+	 *
+	 * @var string
 	 */
 	private $name = '';
+
+	/**
+	 * The Birthday Person's age
+	 *
+	 * @var int
+	 */
 	private $age = -1;
 
 	/* Form? What is this
@@ -49,7 +64,7 @@ class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
 	 * Sets the event note in a standardised way
 	 */
 	public function setBirthdayNote() {
-		$this->setNote('Student Birthday - ' . $this->getName() . ' in ' . $this->getForm() . ' turns ' . $this->getAge());
+		$this->setTitle('Student Birthday - ' . $this->getName() . ' in ' . $this->getForm() . ' turns ' . $this->getAge());
 	}
 
 	/* Getters/Setters

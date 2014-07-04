@@ -141,12 +141,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
 				$eventOutput['EVENT_ID']   = '';
 				$eventOutput['EVENT_TYPE'] = 'submission';
-				$eventOutput['NOTE']       = $currentEvent->getNote();
+				$eventOutput['NOTE']       = $currentEvent->getTitle();
 			}
 			else {
 				$eventOutput['EVENT_ID']   = $currentEvent->getEventId();
 				$eventOutput['EVENT_TYPE'] = 'type' . $currentEvent->getType();
-				$eventOutput['NOTE']       = Scrub::text($currentEvent->getNote());
+				$eventOutput['NOTE']       = Scrub::text($currentEvent->getTitle());
 			}
 			$this->setVar($eventOutput);
 

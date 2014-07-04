@@ -110,7 +110,7 @@ class Csv extends Base {
 				$event->setAccess(Event::ACCESS_CAMPUS);
 				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'y-m-d h:i:s'));
 				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'y-m-d h:i:s'));
-				$event->setNote($name);
+				$event->setTitle($name);
 				$event->setDetail(nl2br(\Scrub::text($detail)));
 				$event->setLocation($location);
 				$event->setAllDay($all_day);
@@ -140,14 +140,14 @@ class Csv extends Base {
 
 				if (is_array($result) && count($result)) {
 					$output[] = array(
-						'name' => \Scrub::text($event->getNote()),
+						'name' => \Scrub::text($event->getTitle()),
 						'status' => 'Added',
 						'error' => 'OK',
 					);
 				}
 				else {
 					$output[] = array(
-						'name' => \Scrub::text($event->getNote()),
+						'name' => \Scrub::text($event->getTitle()),
 						'status' => 'Not Added',
 						'error' => 'Could not create event',
 					);

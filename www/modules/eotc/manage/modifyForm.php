@@ -148,7 +148,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$event->setAuthor($author);
 			$event->setTeacherInCharge($teacherInCharge);
 			$event->setType($eventType);
-			$event->setNote($_POST['note']);
+			$event->setTitle($_POST['note']);
 			$event->setStartDateTime($startDate);
 			$event->setEndDateTime($endDate);
 			$event->setLocation($_POST['location']);

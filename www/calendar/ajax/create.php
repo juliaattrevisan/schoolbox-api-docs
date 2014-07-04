@@ -49,7 +49,7 @@ $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	->setCampusCollection(new Collection())
 	->setRoleCollection(new Collection())
 	->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
-	->setNote($_POST['note'])
+	->setTitle($_POST['note'])
 	->setStartDateTime($dateObj)
 	->setEndDateTime($dateObj)
 	->setAllDay(true)
@@ -72,7 +72,7 @@ $personalRelationMapper->save($personalRelation);
 
 if (count($affectedIds) == 1) {
 	$json = array(
-		'title' => $event->getNote(),
+		'title' => $event->getTitle(),
 		'start' => $event->getStartDateTime()->getUnixTimestamp(),
 
 		/* Whether you can edit this event or not

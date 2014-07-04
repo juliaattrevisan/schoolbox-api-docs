@@ -114,7 +114,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			'EVENT_RAMS_UPLOADED' => $event->getMetadata()->getRamsFiles()->count() ? 1 : 0,
 			'EVENT_ID' => $event->getId(),
 			'EVENT_AUTHOR_ID' => $event->getAuthor()->getId(),
-			'EVENT_NOTE' => $event->getNote(),
+			'EVENT_NOTE' => $event->getTitle(),
 			'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
 			'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
 			'EVENT_START_HOUR' => $event->getStartDateTime()->getUsingFormat('g'),

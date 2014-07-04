@@ -61,7 +61,7 @@ if (is_numeric($_GET['eventID'])) {
 		'EVENT_ID' => $event->getId(),
 		'EVENT_USER_ID' => $_SESSION['user']->getId(),
 		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
-		'EVENT_NOTE' => $event->getNote(),
+		'EVENT_NOTE' => $event->getTitle(),
 		'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
 		'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
 		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),

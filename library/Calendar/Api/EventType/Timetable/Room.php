@@ -101,7 +101,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setEndTime(new Alaress_Date_Format($classEnd, 'U'));
                 // Currently event needs a publish date.
                 $event->setPublishDate($event->getStartTime());
-                $event->setNote($room['Description']);
+                $event->setTitle($room['Description']);
                 $event->setCampusList($campusId);
 
                 // Load room and category if they aren't already there.

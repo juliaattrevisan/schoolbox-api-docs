@@ -120,7 +120,7 @@ class EventNotifier extends AbstractModuleNotifier {
 		$envelope = new Envelope();
 		$bob = $this->newBuilder('upcoming', $roleType, $event)
 					->setTitle(':name is about to start')
-					->setParam('name', new Param($event->getNote()));
+					->setParam('name', new Param($event->getTitle()));
 
 		$instance = $bob->build();
 
@@ -161,7 +161,7 @@ class EventNotifier extends AbstractModuleNotifier {
 				->setParams(array(
 					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
 					'old'  => new Param($diff['note'][1]),
-					'new'  => new Param($event->getNote())
+					'new'  => new Param($event->getTitle())
 				));
 			$instances[] = $bob->build();
 			unset($diff['note']);
@@ -171,7 +171,7 @@ class EventNotifier extends AbstractModuleNotifier {
 		if(isset($diff['location'])) {
 			$bob->setTitle(':event has moved from :old to :new')
 			    ->setParams(array(
-				    'user' => new Param($event->getNote()),
+				    'user' => new Param($event->getTitle()),
 				    'old'  => new Param($diff['location'][1]),
 				    'new'  => new Param($event->getLocation())
 			    ));
@@ -184,7 +184,7 @@ class EventNotifier extends AbstractModuleNotifier {
 			$bob->setTitle(':user changed the start time of :name to :time')
 				->setParams(array(
 					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-					'name' => new Param($event->getNote()),
+					'name' => new Param($event->getTitle()),
 					'time' => new Param($event->getStartDateTime()->getShort())
 				));
 
@@ -198,7 +198,7 @@ class EventNotifier extends AbstractModuleNotifier {
 			$bob->setTitle(':user updated the event :name')
 				->setParams(array(
 					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-					'name' => new Param($event->getNote())
+					'name' => new Param($event->getTitle())
 				));
 
 			$instances[] = $bob->build();

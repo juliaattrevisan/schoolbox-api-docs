@@ -472,7 +472,7 @@ class API extends Generic\API {
 					'access' => $event->getAccess(),
 					'sid' => $event->getSid(),
 					'type' => $event->getType(),
-					'note' => $event->getNote(),
+					'note' => $event->getTitle(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'location' => $event->getLocation(),
 					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',

@@ -73,7 +73,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 			}
 
 			$event = array(
-				'title' => Scrub::text($currentEvent->getNote()),
+				'title' => Scrub::text($currentEvent->getTitle()),
 				'start' => "$start",
 				'end' => "$end",
 

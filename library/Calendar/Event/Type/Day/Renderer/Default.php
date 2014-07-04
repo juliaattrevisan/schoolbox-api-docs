@@ -42,7 +42,7 @@ class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Rende
 				'EVENT_ID' => $currentEvent->getEventId(),
 				'FULL_TIME' => $currentEvent->getFullDate(),
 				'TIME' => $currentEvent->getTime(),
-				'NOTE' => Scrub::text($currentEvent->getNote()),
+				'NOTE' => Scrub::text($currentEvent->getTitle()),
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => Scrub::text($currentEvent->getLocation()),
 				'DETAIL' => Scrub::html($currentEvent->getDetail()),
