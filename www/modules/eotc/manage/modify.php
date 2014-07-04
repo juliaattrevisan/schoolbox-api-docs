@@ -235,8 +235,9 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('can_add_resources_block', 'can_add_resources');
 
 		/* Cannot self-promote until a status is In Principle
+		 * Only offer self-promotion to non-eotc-administrators
 		 */
-		if ($authenticator->canPromote($_SESSION['user'], $event)) {
+		if (!$authenticator->isEOTCAdministrator($_SESSION['user']) && $authenticator->canPromote($_SESSION['user'], $event)) {
 			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
 		}
 		else {
