@@ -28,7 +28,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
-		'EVENT_NAME' => $event->getNote(),
+		'EVENT_NAME' => $event->getTitle(),
 		'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
 	));
 

@@ -30,7 +30,7 @@ catch (\Exception $e) {
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
-	'EVENT_NAME' => $event->getNote(),
+	'EVENT_NAME' => $event->getTitle(),
 ));
 
 /* If there are attendees, pop it out
@@ -63,7 +63,7 @@ if ($event->getMetadata()->getStudentAttendees()->count()) {
 
 /* Thump out a csv
  */
-$slug = new \Url("{$event->getId()}-{$event->getNote()}-attendees");
+$slug = new \Url("{$event->getId()}-{$event->getTitle()}-attendees");
 $filename = $slug->getSlug();
 
 header('Content-type: text/ascii');

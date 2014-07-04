@@ -39,7 +39,7 @@ $this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebookin
 
 $this->setVar(array(
 	'EVENT_ID' => $event->getId(),
-	'EVENT_NOTE' => $event->getNote(),
+	'EVENT_NOTE' => $event->getTitle(),
 	'EVENT_LOCATION' => $event->getLocation(),
 	'EVENT_DETAIL' => $event->getDetail(),
 	'EVENT_CREATED_AT' => $event->getMetadata()->getCreatedAt()->getShort(),
