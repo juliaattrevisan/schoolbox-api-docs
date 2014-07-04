@@ -55,7 +55,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $e['DTEND']   = array('DATE' => $end_time->format('Ymd'));
             }
 
-            $e['SUMMARY'] = $currentEvent->getNote();
+            $e['SUMMARY'] = $currentEvent->getTitle();
             return $this->getVCalendar()->add('VEVENT', $e);
         }
     }

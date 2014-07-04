@@ -54,7 +54,7 @@ class Calendar_Event_Type_Submission_Renderer_Default extends Calendar_Event_Typ
                 'EVENT_ID' => '',
                 'TIME' => $currentEvent->getTime(),
                 'FULL_TIME' => $currentEvent->getFullDate(),
-                'NOTE' => $currentEvent->getNote(),
+                'NOTE' => $currentEvent->getTitle(),
                 'COLOUR' => $currentEvent->getColour(),
                 'LOCATION' => '',
                 'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),

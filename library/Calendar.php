@@ -38,7 +38,7 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT
 				event.id,
-				event.note,
+				event.title,
 				event.startDate,
 				event.startTime,
 				event.endDate,
@@ -326,7 +326,7 @@ class Calendar extends DeprecatedModel {
     public function getByID($eventID) {
         $query = "
 			SELECT
-				e.id, e.series_id, e.owner, e.author_id, e.access, e.type, e.note, e.startDate, e.endDate,
+				e.id, e.series_id, e.owner, e.author_id, e.access, e.type, e.title, e.startDate, e.endDate,
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
@@ -352,7 +352,7 @@ class Calendar extends DeprecatedModel {
 						startDate, endDate,
 						DATE_FORMAT(startDate, '%Y') as year, DATE_FORMAT(startDate, '%c') as month, DATE_FORMAT(startDate, '%e') as day,
 						startTime, endTime,
-						type, note, location, detail,
+						type, title, location, detail,
 						user.id as uid, title, firstname, lastname,
 						eventType, eventColour,
 						attendance, allday
@@ -572,10 +572,10 @@ class Calendar extends DeprecatedModel {
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
                             startDate, endDate,
-                            type, note, access, location, detail,
-                            user.id as uid, title, firstname, lastname,
+                            type, event.title, access, location, detail,
+                            user.id as uid, user.title AS userTitle, firstname, lastname,
                             eventType, eventColour,
-                            MATCH (`note`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+                            MATCH (`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
                         FROM event
                         LEFT JOIN user ON owner = user.id
                         LEFT JOIN luEventType ON type = eventTypeID
@@ -586,7 +586,7 @@ class Calendar extends DeprecatedModel {
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
-                            AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')
+                            AND MATCH (`title`, `detail`, `location`) AGAINST ('$keyword')
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -604,7 +604,7 @@ class Calendar extends DeprecatedModel {
 							$groupQuery
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
-						AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')
+						AND MATCH (`title`, `detail`, `location`) AGAINST ('$keyword')
 						";
 
         $events = $this->db->getAll($event_query);
@@ -727,8 +727,8 @@ class Calendar extends DeprecatedModel {
 				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
 				startDate, startTime, endDate, endTime, allday,
 				SUBSTR(event.startDate, 1, 4) AS year,
-				type, note, access, location, detail, attendance,
-				user.id as uid, title, firstname, lastname,
+				type, event.title, access, location, detail, attendance,
+				user.id as uid, user.title as userTitle, firstname, lastname,
 				eventType, eventColour,
 				event.publish_date,
 				category.id AS categoryId, category.name AS categoryName,
@@ -779,7 +779,7 @@ class Calendar extends DeprecatedModel {
                 $event->setStartTime(new Alaress_Date_Format($currentEvent['startDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
                 $event->setEndTime(new Alaress_Date_Format($currentEvent['endDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s'));
                 $event->setType($currentEvent['type']);
-                $event->setNote($currentEvent['note']);
+                $event->setTitle($currentEvent['title']);
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
                 $event->setColour($currentEvent['eventColour']);
@@ -822,7 +822,7 @@ class Calendar extends DeprecatedModel {
         $query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
 							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
-							type, note, location, detail, access, event_campus.campus_id as sid
+							type, title, location, detail, access, event_campus.campus_id as sid
 						FROM event
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN event_group ON event.id = event_group.event_id

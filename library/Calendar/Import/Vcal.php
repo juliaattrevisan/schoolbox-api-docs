@@ -102,7 +102,7 @@ class Vcal extends Base {
 					$event->setAuthor($this->getAuthor());
 					$event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 					$event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
-					$event->setNote((string)$currentEvent->SUMMARY);
+					$event->setTitle((string)$currentEvent->SUMMARY);
 					$event->setAccess(Event::ACCESS_CAMPUS);
 					$event->setType($this->findEventTypeFromArray($categoryList));
 					$event->setCampusCollection($allCampuses);
@@ -129,14 +129,14 @@ class Vcal extends Base {
 					 */
 					if (is_array($result) && count($result)) {
 						$output[] = array(
-							'name' => $event->getNote(),
+							'name' => $event->getTitle(),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => $event->getNote(),
+							'name' => $event->getTitle(),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);

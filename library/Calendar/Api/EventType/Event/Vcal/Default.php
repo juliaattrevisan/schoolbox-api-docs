@@ -284,7 +284,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 		$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 		$event->setType($metaDetails['eventTypeID']);
-		$event->setNote("{$currentEvent->SUMMARY}");
+		$event->setTitle("{$currentEvent->SUMMARY}");
 		$event->setAccess('');
 		$event->setEventType($metaDetails['eventType']);
 		$event->setColour($metaDetails['eventColour']);

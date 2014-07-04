@@ -66,11 +66,10 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 	 *
 	 * @return string
 	 */
-    public function getNote() {
+    public function getTitle() {
 
         /* Optional categoryCodes suffix
          */
-
         if (count($this->getCategoryCodes())) {
             $extended = ' (' . implode(', ', $this->getCategoryCodes()) . ')';
         } else {

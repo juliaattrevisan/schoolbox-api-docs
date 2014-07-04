@@ -85,7 +85,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'])));
 			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'])));
 			$event->setType($currentEvent['type']);
-			$event->setNote($currentEvent['note']);
+			$event->setTitle($currentEvent['note']);
 			$event->setAccess($currentEvent['access']);
 			$event->setEventType($currentEvent['eventType']);
 			$event->setColour($currentEvent['eventColour']);

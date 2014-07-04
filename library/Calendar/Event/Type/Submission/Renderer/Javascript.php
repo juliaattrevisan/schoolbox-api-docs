@@ -64,7 +64,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 			}
 
 			$event = array(
-				'title' => $currentEvent->getNote(),
+				'title' => $currentEvent->getTitle(),
 				'start' => "$start",
 				'end' => "",
 

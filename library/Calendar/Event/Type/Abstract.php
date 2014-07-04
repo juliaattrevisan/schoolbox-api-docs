@@ -27,37 +27,69 @@ abstract class Calendar_Event_Type_Abstract {
      */
     protected $eventType = '';
 
-    /* Location, short description and long description of the event
-     */
-    protected $location = '';
-    protected $note = '';
-    protected $detail = '';
+	/**
+	 * Event location
+	 *
+	 * @var string
+	 */
+	protected $location = '';
+
+	/**
+	 * Event title
+	 *
+	 * @var string
+	 */
+	protected $title = '';
+
+	/**
+	 * Event description, typically
+	 *
+	 * @var string
+	 */
+	protected $detail = '';
 
     /* An int from the event table corresponding to $eventType
      */
     protected $type = -1;
 
-    /* Event author's name and id
-     */
-    protected $authorName = '';
-    protected $authorId = -1;
+	/**
+	 * Author's name
+	 *
+	 * @var string
+	 */
+	protected $authorName = '';
+
+	/**
+	 * Author's id
+	 *
+	 * @var int
+	 */
+	protected $authorId = -1;
 
     /* A hex string representing the colour of this event
+     * This should be deprecated
      */
     protected $colour = '';
 
-    /* Access level
-     */
-    protected $access = -1;
+	/**
+	 * Access level
+	 *
+	 * @var int
+	 */
+	protected $access = -1;
 
     /* Category id and name
+     * This should be deprecated
      */
     protected $categoryId = -1;
     protected $categoryName = '';
 
-    /* CSV separated list of campus ids relevant to this event.
-     */
-    protected $campusList = '';
+	/**
+	 * CSV separated list of campus ids relevant to this event.
+	 *
+	 * @var string
+	 */
+	protected $campusList = '';
 
 	/**
 	 * Associated Groups (Type 2)
@@ -66,17 +98,26 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	protected $categoryCollection = null;
 
-    /* The class used to render this event object. This should be
-     * just the class' name, not an actual instance of it
-     */
-    protected $rendererClass = '';
+	/**
+	 * The class used to render this event object. This should be
+	 * just the class' name, not an actual instance of it
+	 *
+	 * @var string
+	 */
+	protected $rendererClass = '';
 
-    /* Whether or not to display the modify link
-     */
-    protected $isEditable = true;
+	/**
+	 * Whether or not to display the modify link
+	 *
+	 * @var bool
+	 */
+	protected $isEditable = true;
 
-	/* The date when the event was published (made visible to users)
+	/**
+	 * The date when the event was published (made visible to users)
 	 * Stored always as an Alaress_Date_Format() instance
+	 *
+	 * @var null
 	 */
 	protected $publishDate = null;
 
@@ -334,21 +375,21 @@ abstract class Calendar_Event_Type_Abstract {
     }
 
     /**
-     * Set note
+     * Set title
      *
-     * @param $note
+     * @param $title
      */
-    public function setNote($note) {
-        $this->note = $note;
+    public function setTitle($title) {
+        $this->title = $title;
     }
 
     /**
-     * Get note
+     * Get title
      *
      * @return null
      */
-    public function getNote() {
-        return $this->note;
+    public function getTitle() {
+        return $this->title;
     }
 
     /**

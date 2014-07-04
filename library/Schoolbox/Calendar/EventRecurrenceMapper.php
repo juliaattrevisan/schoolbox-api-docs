@@ -195,10 +195,11 @@ class EventRecurrenceMapper {
 	 * @param Event $coreEvent
 	 */
 	protected function setSeriesEventData($seriesEvent, $coreEvent) {
+
 		/* Copy date from $event to each thingy in the series
 		 * to preserve other series -related data
 		 */
-		$seriesEvent->setNote($coreEvent->getNote());
+		$seriesEvent->setTitle($coreEvent->getTitle());
 		$seriesEvent->setDetail($coreEvent->getDetail());
 		$seriesEvent->setLocation($coreEvent->getLocation());
 		$seriesEvent->setAllDay($coreEvent->getAllDay());

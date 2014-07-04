@@ -83,7 +83,7 @@ class EventConnector extends EventMapper {
 			 * in calendar filters
 			 */
 			$event->setType($eventItem->getType()->getId());
-			$event->setNote($eventItem->getNote());
+			$event->setTitle($eventItem->getTitle());
 			$event->setAccess($eventItem->getAccess());
 			$event->setEventType($eventItem->getType()->getType());
 			$event->setColour($eventItem->getType()->getColor());
@@ -300,7 +300,7 @@ class EventConnector extends EventMapper {
 				 * in calendar filters
 				 */
 				$event->setType($eventItem->getType()->getId());
-				$event->setNote($eventItem->getNote());
+				$event->setTitle($eventItem->getTitle());
 				$event->setAccess($eventItem->getAccess());
 				$event->setEventType($eventItem->getType()->getType());
 				$event->setColour($eventItem->getType()->getColor());

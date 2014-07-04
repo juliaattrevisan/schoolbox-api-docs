@@ -180,7 +180,7 @@ class Controller extends Base {
             $event = $this->getBaseEvent();
             $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
             $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
-            $event->setNote("Booking: ".$item->getName());
+            $event->setTitle("Booking: ".$item->getName());
             $event->setDetail($this->getRequest()->post['notes']);
 
             // Build the booking

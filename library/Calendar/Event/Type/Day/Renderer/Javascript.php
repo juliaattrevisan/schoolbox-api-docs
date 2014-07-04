@@ -150,7 +150,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			}
 
 			$event = array(
-				'title' => Scrub::text($currentEvent->getNote()),
+				'title' => Scrub::text($currentEvent->getTitle()),
 				'start' => "$start",
 				'end' => "$end",
 

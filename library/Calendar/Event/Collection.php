@@ -200,7 +200,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 		else if ($a_timestamp > $b_timestamp) {
 			return 1;
 		}
-		return strcmp($a->getNote(), $b->getNote());
+		return strcmp($a->getTitle(), $b->getTitle());
 	}
 
 	/**

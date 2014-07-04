@@ -218,7 +218,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				$event->setAuthorId('');
 				$event->setEventId((int)$attribs->ows_ID);
 				$event->setType($eventTypeID);
-				$event->setNote((string)$attribs->ows_Title);
+				$event->setTitle((string)$attribs->ows_Title);
 				$event->setLocation((string)$attribs->ows_School);
 				$event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
 				$event->setCampusList($eventCampusID);
