@@ -202,6 +202,15 @@ class Controller extends Base {
                 // Just save the event by itself.
                 foreach ($bookingList as $booking) {
                     $this->eventMapper->save($booking->getEvent());
+                    // Save personal event relations
+                    /** @var Calendar\Relation\PersonalMapper $relationMapper */
+                    /** @var Calendar\Relation\Personal       $relation */
+                    $relationMapper = $this->eventMapper->getJoinMapper('personal');
+                    $relation       = $relationMapper->createModel();
+                    $relation->setEventId($event->getId());
+                    $relation->setUserId($event->getOwner()->getId());
+                    $relationMapper->save($relation);
+
                 }
             }
 
@@ -695,7 +704,7 @@ class Controller extends Base {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
-        $event = $this->getEventMapper()->createModel();
+        $event = $this->eventMapper->createModel();
         // Whatever the booking type is.
         // Could probably be left unset so events show on a different event
         // source.
@@ -707,7 +716,6 @@ class Controller extends Base {
         // bookings for other people.
         $event->setOwner($this->getUser());
         $event->setAuthor($this->getUser());
-        $event->setServiceId($this->getUser()->getId());
         $event->setAccess(Calendar\EventMapper::ACCESS_PERSONAL);
         // Currently role and campus must be set to empty collections.
         $event->setRoleCollection(new Collection());
