@@ -1,20 +1,29 @@
 /**
- * Bridging plugin between threePanel and resourceTree, it abstracts away all
- * the nasty 3panel related events.
- *
- * Ties resourceTree events to talk to threePanel.
+ * Bridging plugin between threePanel and resourceTree, it abstracts away 3panel
+ * related events.
  */
 (function($) {
-
+    /**
+     * @param element  the jQuery object to bind the threePanel to.
+     * @param options
+     *   threePanel:   the ThreePanel object to bind to
+     *   selectedNode: the initially selected node. This will be the ID of a
+     *                 node in the JsTree tree.
+     * @constructor
+     */
     var ResourceTreeThreePanelBridge = function(element, options) {
         var self     = this;
-        var defaults = {}
+        var defaults = {
+            threePanel: null,
+            selected:   null
+        }
 
         self.element = element;
         self.options = $.extend(true, {}, defaults, options);
         self.threePanel = self.options.threePanel;
 
-        // Ensure callbacks are bound to this, instead of to the DOM node.
+        // Ensure callbacks are bound to this object, instead of to the DOM node
+        // they were triggered on.
         element
             .on('select_node.jstree', self.onSelectNode.bind(self))
             .on('move_node.jstree',   self.onMoveNode.bind(self))
@@ -24,6 +33,8 @@
 
     /**
      * Select node event for the JsTree plugin.
+     *
+     * Fired on the trigger of a select node event.
      *
      * @param event  The event object
      * @param jstree The JsTree object
@@ -45,7 +56,7 @@
             // threePanel.showFiles(relationId);
             /* files exist, show them */
             files.show();
-            self.initialiseFiles(relationID);
+            self.initializeFiles(relationID);
 
             /* re-apply on off */
             // TODO use CSS :even selector instead
@@ -98,8 +109,8 @@
                 $('#file-list tbody tr').removeClass('dark');
                 $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
-//                threePanel.initialiseFiles();
-                self.initialiseFiles(relationID);
+//                threePanel.initializeFiles();
+                self.initializeFiles(relationID);
 
             }, 'json');
         }
@@ -132,6 +143,12 @@
         })
     };
 
+    /**
+     * After open node event for the JsTree plugin.
+     *
+     * @param event
+     * @param tree  The JsTree object
+     */
     ResourceTreeThreePanelBridge.prototype.onAfterOpen = function(event, tree) {
         // Set up folders as drop targets for files
         $.each(tree.node.children, function(i,v) {
@@ -141,6 +158,12 @@
         });
     };
 
+    /**
+     * Drop event for leaves within the JsTree plugin.
+     *
+     * @param event
+     * @param ui    The jQuery UI object
+     */
     ResourceTreeThreePanelBridge.prototype.onDropOntoTreeNode = function(event, ui) {
         // Drop event for files
         // This drop event bubbles up the list of droppables, so trigger it
@@ -176,11 +199,10 @@
         }
     };
 
-
-    ResourceTreeThreePanelBridge.prototype.initialiseFiles = function(relationID) {
-
+    ResourceTreeThreePanelBridge.prototype.initializeFiles = function(relationID) {
         var newChildren  = $('tr.category-' + relationID + ':not(.empty)'),
-            categoryNode = $('#' + String(relationID));
+            categoryNode = $('#' + String(relationID)),
+            self         = this;
 
         /* double click files, default action */
         newChildren.dblclick(function() {
@@ -248,6 +270,15 @@
         }
     };
 
+    /**
+     * Plugin for the bridge between threePanel and the resource tree.
+     *
+     * @param options
+     *   threePanel:   the ThreePanel object to bind to
+     *   selectedNode: the initially selected node. This will be the ID of a
+     *                 node in the JsTree tree.
+     * @returns this
+     */
     $.fn.resourceTreeThreePanelBridge = function(options) {
         if (options.threePanel) {
             this.each(function() {
