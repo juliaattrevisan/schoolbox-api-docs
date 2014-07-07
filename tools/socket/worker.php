@@ -19,7 +19,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Worker', array(
 ));
 
 $kernel->run(function($di, $loop, $debug, $options) {
-	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(STDERR, array('time','mem')));
+	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(STDOUT, array('time','mem')));
 });
 
 // yup. that's all you need to do.
