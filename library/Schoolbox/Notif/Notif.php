@@ -231,6 +231,9 @@ class Notif implements LoggerInterface {
 				$syslog = new StreamHandler($lp, Logger::INFO, false);
 				array_push($stack, $syslog);
 			}
+			else {
+				trigger_error(sprintf('Cannot open syslog "%s"', $logfile), E_USER_WARNING);
+			}
 		}
 		else {
 			try {
