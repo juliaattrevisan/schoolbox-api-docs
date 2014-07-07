@@ -339,7 +339,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.updated", Logger::INFO, array(
 				'user' => array($effectorName, "/search/user/$effectorId"),
-				'name' => array($categoryName, "/homepage/$categoryId")
+				'name' => $resourceName
 			), array(
 				'roletype' => $roleType
 			));
