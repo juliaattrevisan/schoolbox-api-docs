@@ -184,22 +184,22 @@ $j(function() {
 			<h3>Mass Cleanup</h3>
 			<p>Display a list of events between two dates.</p>
 
-			<!-- BEGIN cleanup_has_dates -->
 			<form action="/adminv2/calendar/Cleanup" method="get">
-				<label>
+				<label class="float-left">
 					From
 					<input type="text" id='start_date' name="cleanupFrom" style="width:100px" value="{CLEANUP_HAS_DATES_FROM}" />
 				</label>
-
-				<label>
-					Until
+				<label class="float-left">
+					until
 					<input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" style="width:100px" value="{CLEANUP_HAS_DATES_TO}" />
 				</label>
 
-				<input type="submit" value="Submit" />
+				<input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
 			</form>
-			<!-- END cleanup_has_dates -->
 
+			<div class="clearfix"></div>
+
+			<!-- BEGIN cleanup_has_events -->
 			<h3>Events</h3>
 			<form action="/adminv2/calendar/modifyForm" method="post">
 				<table class="table ruler">
@@ -223,8 +223,9 @@ $j(function() {
 					</tbody>
 				</table>
 
-				<input type="submit" value="Submit" />
+				<input type="submit" class='submit-btn-plain' value="Remove Selected Events" />
 			</form>
+			<!-- END cleanup_has_events -->
 		</div>
 	</div>
 	<!-- END cleanup -->
