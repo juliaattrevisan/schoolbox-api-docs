@@ -27,4 +27,13 @@ interface DispatcherInterface {
 	 * @return array
 	 */
 	public function getPoolStatus();
+
+
+	/**
+	 * Signals that all workers should be terminated
+	 *
+	 * @return void
+	 */
+	public function releaseWorkerPool();
+
 } 

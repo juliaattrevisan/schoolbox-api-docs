@@ -278,7 +278,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return WorkerBundleInterface
 	 */
 	public function newWorkerBundle() {
-		return new WorkerArray();
+		return new WorkerArray($this->protocol);
 	}
 
 

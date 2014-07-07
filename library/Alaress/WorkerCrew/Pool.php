@@ -138,11 +138,14 @@ class Pool extends EventEmitter {
 		}
 
 		$status = proc_get_status($pp);
-		$pid = $status['pid'];
 
 		if(!$status['running']) {
 			throw new RuntimeException("Worker process terminated unexpectedly");
 		}
+
+		// proc_open creates a shell in which the PHP worker is executed: we need the actual worker PID from within it
+		$shell = $status['pid'];
+		$pid = (int)trim(`ps h --ppid $shell -o pid`);
 
 		$this->workers->attach($pid, new Worker($status['command'], $pp, $pipes, $this->poolingStrat));
 
@@ -465,6 +468,14 @@ class Pool extends EventEmitter {
 	 */
 	public function getWorkerIdleTimeout() {
 		return $this->poolingStrat->getWorkerIdleTimeout();
+	}
+
+
+	/**
+	 * Terminate all workers
+	 */
+	public function releaseWorkers() {
+		$this->workers->terminateAll();
 	}
 
 }

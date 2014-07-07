@@ -208,4 +208,14 @@ class Dispatcher implements DispatcherInterface {
 		return $this->pool->getStatus();
 	}
 
+
+	/**
+	 * Signals that all workers should be terminated
+	 *
+	 * @return void
+	 */
+	public function releaseWorkerPool() {
+		$this->pool->releaseWorkers();
+	}
+
 }

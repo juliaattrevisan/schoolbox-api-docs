@@ -100,4 +100,12 @@ interface WorkerBundleInterface {
 	 */
 	public function getStatus();
 
+
+	/**
+	 * Terminate all workers
+	 *
+	 * @return void
+	 */
+	public function terminateAll();
+
 } 
