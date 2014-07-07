@@ -290,6 +290,106 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @return Messenger
      */
+    public function notifyStudentCreated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'created');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentUpdated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'updated');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentApproved(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'approved');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentPending(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'pending');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentRejected(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentCreated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'created');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentUpdated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'updated');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentApproved(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'approved');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentPending(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'pending');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentRejected(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
     public function notifyStaffCancelled(Model $object, User $user/*, $diff*/) {
         return $this->buildMessenger($object, $user, 'cancelled');
     }
