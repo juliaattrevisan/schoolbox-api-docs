@@ -128,7 +128,7 @@ class Pool extends EventEmitter {
 			self::DEBUG_ERR => array("pipe", "w")  // stderr    is a pipe that the child will write to
 		);
 
-		if(!($pp = proc_open($cmd, $descriptorSpec, $pipes))) {
+		if(!($pp = proc_open("exec $cmd", $descriptorSpec, $pipes))) {
 			throw new RuntimeException("Cannot launch worker process");
 		}
 
@@ -143,9 +143,7 @@ class Pool extends EventEmitter {
 			throw new RuntimeException("Worker process terminated unexpectedly");
 		}
 
-		// proc_open creates a shell in which the PHP worker is executed: we need the actual worker PID from within it
-		$shell = $status['pid'];
-		$pid = (int)trim(`ps h --ppid $shell -o pid`);
+		$pid = $status['pid'];
 
 		$this->workers->attach($pid, new Worker($status['command'], $pp, $pipes, $this->poolingStrat));
 
