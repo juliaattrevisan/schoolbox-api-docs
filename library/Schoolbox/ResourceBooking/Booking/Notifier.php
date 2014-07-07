@@ -148,39 +148,24 @@ class Notifier extends AbstractModuleNotifier {
                 '/search/user/'.$owner->getId(),
             )
         );
-//        if (!$isOwnerCreator) {
-//            $messageParams['owner'] = array($owner->formatName(), '/search/user/'.$owner->getId(),);
-//        }
         switch ($event) {
             case 'created':
-                $messageText = $isOwnerCreator ?
-                    ':user booked :resource for :date':
-                    ':user booked :resource for :owner for :date';
+                $messageText = ':user booked :resource for :owner for :date';
                 break;
             case 'approved':
-                $messageText = $isOwnerCreator ?
-                    ':user approved booking of :resource for :date':
-                    ':user approved booking of :resource for :owner for :date';
+                $messageText = ':user approved booking of :resource for :owner for :date';
                 break;
             case 'rejected':
-                $messageText = $isOwnerCreator ?
-                    ':user rejected booking of :resource for :date':
-                    ':user rejected booking of :resource for :owner for :date';
+                $messageText = ':user rejected booking of :resource for :owner for :date';
                 break;
             case 'pending':
-                $messageText = $isOwnerCreator ?
-                    ':user put on hold booking of :resource for :date':
-                    ':user put on hold booking of :resource for :owner for :date';
+                $messageText = ':user put on hold booking of :resource for :owner for :date';
                 break;
             case 'cancelled':
-                $messageText = $isOwnerCreator ?
-                    ':user cancelled booking of :resource for :date':
-                    ':user cancelled booking of :resource for :owner for :date';
+                $messageText = ':user cancelled booking of :resource for :owner for :date';
                 break;
             case 'updated':
-                $messageText = $isOwnerCreator ?
-                    ':user changed booking of :resource for :date':
-                    ':user changed booking of :resource for :owner for :date';
+                $messageText = ':user changed booking of :resource for :owner for :date';
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -188,32 +173,41 @@ class Notifier extends AbstractModuleNotifier {
                 );
         }
 
-        // the message to be sent
-        $message = new Message(
+        // the message to be sent to owners - point this to the resource view
+        // TODO add calendar date selection
+        $ownerMessage = new Message(
+            $messageText,
+            '/portrait.php?userId='.$user->getExternalId().'&size=square32',
+            '/resource-booking/item/'.$object->getResource()->getId()
+//            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
+        );
+
+        // Notify the owner of the booking (usually the person who the booking is for)
+        $ownerMessageParams = $messageParams;
+        if ($isOwnerCreator) {
+            $ownerMessageParams['owner'][0] = 'you';
+        }
+        $messenger->targetToUser(
+            $owner->getId(),
+            $ownerMessage,
+            $key,
+            $level,
+            $ownerMessageParams
+        );
+
+        // Moderator message - point this to the actual booking
+        $moderatorMessage = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
             '/resource-booking/booking/'.$object->getId().'/edit'
 //            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
         );
 
-        // Notify the owner of the booking that someone booked for them
-        // Don't show the owner in the name of this message, show "you" instead
-        // (because this message is targeted at the event owner)
-        if (!$isOwnerCreator) {
-            $messenger->targetToUser(
-                $owner->getId(),
-                $message,
-                $key,
-                $level,
-                (array('owner' => 'you') + $messageParams)
-            );
-        }
-
         // Send a message to all the moderators of the object
         foreach ($object->getResource()->getModeratorList() as $moderator) {
             $messenger->targetToUser(
                 $moderator->getId(),
-                $message,
+                $moderatorMessage,
                 $key,
                 $level,
                 $messageParams
@@ -225,7 +219,7 @@ class Notifier extends AbstractModuleNotifier {
             UserAccess::SERVICE_RESOURCE_BOOKING,
             0,
             UserAccess::ACCESS_FULL,
-            $message,
+            $moderatorMessage,
             $key,
             $level,
             $messageParams
