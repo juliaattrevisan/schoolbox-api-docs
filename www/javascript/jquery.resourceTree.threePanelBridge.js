@@ -25,11 +25,26 @@
         // Ensure callbacks are bound to this object, instead of to the DOM node
         // they were triggered on.
         element
+            .on('redraw.jstree',      self.onRedraw.bind(self))
             .on('select_node.jstree', self.onSelectNode.bind(self))
             .on('move_node.jstree',   self.onMoveNode.bind(self))
             .on('after_open.jstree',  self.onAfterOpen.bind(self))
             .on('drop', 'li[role="treeitem"]', self.onDropOntoTreeNode.bind(self))
     };
+
+    /**
+     * Redraw node event for the JsTree plugin - ensures that files are
+     * initialized for all open nodes.
+     *
+     * @param event  The event object
+     * @param jstree The JsTree object
+     */
+    ResourceTreeThreePanelBridge.prototype.onRedraw = function(event, jstree) {
+        var self = this;
+        jstree.nodes.forEach(function(node) {
+            self.initializeFiles(node);
+        })
+    }
 
     /**
      * Select node event for the JsTree plugin.
