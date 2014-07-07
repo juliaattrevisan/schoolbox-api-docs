@@ -17,6 +17,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Monolog\Logger;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -122,7 +123,12 @@ class Notifier extends AbstractModuleNotifier {
      */
     protected function buildMessenger(Model $object, User $user, $event) {
         $messenger      = new Messenger();
-        $owner          = $object->getEvent()->getOwner();
+
+        // Hydrate event owner
+        /** @var Event $calendarEvent */
+        $eventMapper    = $this->mapper->getJoinMapper('event');
+        $calendarEvent  = $eventMapper->findById($object->getEvent()->getId());
+        $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
         $key            = $this->slug.'.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $user->getId();
