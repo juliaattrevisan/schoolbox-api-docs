@@ -27,6 +27,9 @@ abstract class Kernel {
 	/** @var Di\Container */
 	protected $di;
 
+	/** @var callable */
+	protected $shutdown;
+
 	/**
 	 * Load the boot loader, returning success or failure
 	 *
@@ -88,5 +91,15 @@ abstract class Kernel {
 	 * @return void
 	 */
 	public abstract function run();
+
+
+	/**
+	 * @param callable $callable
+	 */
+	public function registerCustomShutdown($callable) {
+		if(is_callable($callable)) {
+			$this->shutdown = $callable;
+		}
+	}
 
 }
