@@ -9,6 +9,7 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use DateTime;
 use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
@@ -147,15 +148,20 @@ class Controller extends Base {
      * @param Model $item
      */
     public function read(Model $item) {
+        // Show a given view and date
+        $calendarDate = DateTime::createFromFormat('Y-m-d', $this->request->query['date']);
+        if (!($calendarDate instanceof DateTime)) {
+            $calendarDate = new DateTime('now');
+        }
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/read.twig',
                 'data'     => array(
-                    'item'                 => $item,
-//                    'defaultModeratorList' => $this->getUserMapper()->findByAccess(
-//                        UserAccess::SERVICE_RESOURCE_BOOKING,
-//                        UserAccess::ACCESS_FULL
-//                    ),
+                    'item'     => $item,
+                    'calendar' => array(
+                        'date' => $calendarDate->format('Y-m-d'),
+                        'view' => $this->request->query['view'] ?: 'month',
+                    )
                 ),
             )
         );
