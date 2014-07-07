@@ -89,7 +89,12 @@ $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 );
 
 // output folders, column 1 - now done via jsTree and TREEDATA
-$this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));
+$this->setVar(
+    array(
+        'TREEDATA'      => json_encode($treeBuilder->buildPartialTree($openCategory)),
+        'OPEN_CATEGORY' => intval($openCategory),
+    )
+);
 
 // output files, column 2
 $fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
