@@ -126,34 +126,59 @@ $j(function() {
     <!-- BEGIN subscribe -->
     <div class="settings heading">
         <form method='post' action='/adminv2/calendar/modifyForm'>
-        <!-- BEGIN eventType -->
-        <div class='eventList'>
-            <h3>{EVENTTYPE_LABEL}</h3>
-                <div class="level clearfix">
-            <!-- BEGIN connector -->
-            <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
-                <label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
-                    <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-                {CONNECTOR_NAME}</label>
+			<!-- BEGIN eventType -->
+			<div class='eventList'>
+				<h3>{EVENTTYPE_LABEL}</h3>
+				<div class="level clearfix">
+					<!-- BEGIN connector -->
+					<div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
+						<label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
+							<input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+							{CONNECTOR_NAME}
+						</label>
 
-                <div class="clearfix"></div>
+						<div class="clearfix"></div>
 
-                <!-- BEGIN connectorConfig -->
-                <!-- END connectorConfig -->
-
-            </div>
-            <!-- BEGIN has_multiple_options -->
-            <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
-            <!-- END has_multiple_options -->
-            <!-- END connector -->
-        </div>
-        <!-- END eventType -->
+						<!-- BEGIN connectorConfig -->
+						<!-- END connectorConfig -->
+					</div>
+					<!-- BEGIN has_multiple_options -->
+					<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
+					<!-- END has_multiple_options -->
+					<!-- END connector -->
+				</div>
+			</div>
+			<!-- END eventType -->
 
             <input type="submit" class="submit-btn-plain" value='Update' />
-            </form>
-        </div>
-    </div>
+		</form>
+	</div>
     <!-- END subscribe -->
+
+	<!-- BEGIN cleanup -->
+	<div class="settings heading">
+		<div class="level clearfix">
+			<h3>Mass Cleanup</h3>
+			<!-- BEGIN cleanup_has_dates -->
+			<form action="/adminv2/calendar/modifyForm" method="post">
+				<label>Start:
+					<input type="text" name="cleanupFrom" value="" />
+				</label>
+				<label>Until:
+					<input type="text" name="cleanupTo" value="" />
+				</label>
+
+				<input type="submit" value="Submit" />
+			</form>
+			<!-- END cleanup_has_dates -->
+			<ul>
+				<!-- BEGIN cleanup_event -->
+				<li>test</li>
+				<!-- END cleanup_event -->
+			</ul>
+		</div>
+	</div>
+	<!-- END cleanup -->
 </div>
 
 <!-- BEGIN custom_javascript -->

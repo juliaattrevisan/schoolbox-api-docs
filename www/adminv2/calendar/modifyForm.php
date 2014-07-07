@@ -47,6 +47,8 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 		Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
 	}
 }
+else if (isset($_POST['cleanupFrom']) && isset($_POST['cleanupTo'])) {
+}
 
 /* Update the status of each connector by deactivating everything,
  * then selectively reactivating

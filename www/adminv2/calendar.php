@@ -21,17 +21,24 @@ $this->checkList('user_group_check_list', $userHandler->getGroupList(), '', TEMP
 /* Stolen from Settings
  */
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
+
 $this->setBlock(TEMPLATE_content, 'import', 'import_block');
+
 $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
 $this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
 $this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
+$this->setBlock(TEMPLATE_content, 'cleanup', 'cleanup_block');
+$this->setBlock('cleanup', 'cleanup_event', 'cleanup_event_block');
+
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
 $this->setVar('eventType_block', '');
 $this->setVar('connector_block', '');
+$this->setVar('cleanup_block', '');
+$this->setVar('cleanup_event_block', '');
 
 if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
@@ -46,6 +53,9 @@ $typeList = array(
 	),
 	array(
 		'type' => 'Subscribe'
+	),
+	array(
+		'type' => 'Cleanup'
 	),
 );
 
@@ -163,6 +173,14 @@ if (is_array($typeList)) {
 			}
 
 			$this->parse('subscribe_block', 'subscribe');
+		}
+		/* Cleanup page
+		 */
+		else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+//			$eventMapper = new \Schoolbox\Calendar\EventMapper();
+//			$allEvents = $eventMapper->findAll();
+
+			$this->parse('cleanup_block', 'cleanup');
 		}
 	}
 }
