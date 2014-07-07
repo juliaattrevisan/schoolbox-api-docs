@@ -143,10 +143,14 @@ class Notifier extends AbstractModuleNotifier {
 	            $startDate->getLocal(),
                 '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
             ),
+            'owner'    => array(
+                $owner->formatName(),
+                '/search/user/'.$owner->getId(),
+            )
         );
-        if (!$isOwnerCreator) {
-            $messageParams['owner'] = array($owner->formatName(), '/search/user/'.$owner->getId(),);
-        }
+//        if (!$isOwnerCreator) {
+//            $messageParams['owner'] = array($owner->formatName(), '/search/user/'.$owner->getId(),);
+//        }
         switch ($event) {
             case 'created':
                 $messageText = $isOwnerCreator ?
