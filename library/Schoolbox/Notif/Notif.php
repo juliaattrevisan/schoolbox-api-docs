@@ -227,9 +227,13 @@ class Notif implements LoggerInterface {
 
 			// [3c] syslog (neither does this one)
 			$logfile = sprintf("%s/%s.log", $this->conf->get('logs_dir'), $this->topic);
-			$syslog = new StreamHandler(fopen($logfile, 'a'), Logger::INFO, false);
-
-			array_push($stack, $syslog);
+			if (is_resource($lp = fopen($logfile, 'a'))) {
+				$syslog = new StreamHandler($lp, Logger::INFO, false);
+				array_push($stack, $syslog);
+			}
+			else {
+				trigger_error(sprintf('Cannot open syslog "%s"', $logfile), E_USER_WARNING);
+			}
 		}
 		else {
 			try {
