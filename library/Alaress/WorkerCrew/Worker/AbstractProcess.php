@@ -60,6 +60,17 @@ abstract class AbstractProcess extends PipeWriter {
 
 		$this->stream->on('data', array($this, 'onData'));
 		$this->stream->on('close', array($this, 'onClose'));
+		$this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
+
+		pcntl_signal(SIGTERM, array($this, 'onTerminate'));
+	}
+
+
+	/**
+	 * Check if a signal has been raised
+	 */
+	public function signalDispatch() {
+		pcntl_signal_dispatch();
 	}
 
 
@@ -72,6 +83,15 @@ abstract class AbstractProcess extends PipeWriter {
 
 
 	/**
+	 * When a terminate signal is raised
+	 */
+	public function onTerminate() {
+		$this->debug->v("GOT SIGTERM", '>');
+		$this->loop->stop();
+		exit;
+	}
+
+	/**
 	 * @param string $data
 	 * @param Stream $stream
 	 * @return mixed
@@ -80,7 +100,7 @@ abstract class AbstractProcess extends PipeWriter {
 		try {
 			// cease and desist received
 			if($this->strat->getProtocol()->isCancelled($data)) {
-				$this->loop->stop();
+				$this->onTerminate();
 				return;
 			}
 
