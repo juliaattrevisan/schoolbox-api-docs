@@ -31,6 +31,7 @@ $this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
 $this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
 $this->setBlock(TEMPLATE_content, 'cleanup', 'cleanup_block');
+$this->setBlock('cleanup', 'cleanup_has_no_events', 'cleanup_has_no_events_block');
 $this->setBlock('cleanup', 'cleanup_has_events', 'cleanup_has_events_block');
 $this->setBlock('cleanup_has_events', 'cleanup_event', 'cleanup_event_block');
 
@@ -40,6 +41,7 @@ $this->setVar('eventType_block', '');
 $this->setVar('connector_block', '');
 $this->setVar('cleanup_block', '');
 $this->setVar('cleanup_has_events_block', '');
+$this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
 if ($this->arg[0]) {
@@ -207,11 +209,17 @@ if (is_array($typeList)) {
 
 				if ($allEvents->count()) {
 					$this->parse('cleanup_has_events_block', 'cleanup_has_events');
+
+					$this->setVar(array(
+						'cleanup_has_no_events_block' => ''
+					));
 				}
 				else {
 					$this->setVar(array(
 						'cleanup_has_events_block' => ''
 					));
+
+					$this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
 				}
 			}
 			else {
