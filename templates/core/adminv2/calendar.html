@@ -4,9 +4,14 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
-
 $j(function() {
+	$('.table').selectAll({
+		key: 'selectall',
+		checkboxName: 'cleanupEventId[]'
+	});
+
     $j('#name')
         .selectizeSelector({
             ajax: {
@@ -195,16 +200,27 @@ $j(function() {
 			</form>
 			<!-- END cleanup_has_dates -->
 
+			<h3>Events</h3>
 			<form action="/adminv2/calendar/modifyForm" method="post">
-				<table>
-					<!-- BEGIN cleanup_event -->
-					<tr>
-						<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
-						<td>{CLEANUP_EVENT_TITLE}</td>
-						<td>{CLEANUP_EVENT_START}</td>
-						<td>{CLEANUP_EVENT_END}</td>
-					</tr>
-					<!-- END cleanup_event -->
+				<table class="table ruler">
+					<thead>
+						<tr>
+							<th><input type="checkbox" data-selectall="true" value="" /></th>
+							<th>Title</th>
+							<th>Start</th>
+							<th>End</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN cleanup_event -->
+						<tr>
+							<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
+							<td>{CLEANUP_EVENT_TITLE}</td>
+							<td>{CLEANUP_EVENT_START}</td>
+							<td>{CLEANUP_EVENT_END}</td>
+						</tr>
+						<!-- END cleanup_event -->
+					</tbody>
 				</table>
 
 				<input type="submit" value="Submit" />
