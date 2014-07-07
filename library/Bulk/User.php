@@ -28,6 +28,7 @@ class Bulk_User extends Bulk_Abstract {
 		12. mail handler
 		13 alt. email
         14 webmail tab
+        15 eportfolio
 	 *
 	 * @return array
 	 */
@@ -110,7 +111,8 @@ class Bulk_User extends Bulk_Abstract {
 						'local_email' => $user[11],
 						'mail_handler' => $user[12],
 						'alt_email' => $user[13],
-                        'webmail' => $user[14],
+						'webmail' => $user[14],
+						'eportfolio_enabled' => $user[15],
 					);
 
 					if (empty($userCampus)) {
