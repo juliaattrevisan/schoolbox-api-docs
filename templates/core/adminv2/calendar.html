@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript">
 
 $j(function() {
@@ -35,6 +36,23 @@ $j(function() {
             }
         });
     });
+
+	/* date picker */
+	$j('#start_date, #finish_date').datepicker({
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+		}
+	});
+
+	$j('#start_date').syncDates({endDate: $j('#finish_date')});
 });
 </script>
 <!-- END custom_head-->
@@ -159,23 +177,38 @@ $j(function() {
 	<div class="settings heading">
 		<div class="level clearfix">
 			<h3>Mass Cleanup</h3>
+			<p>Display a list of events between two dates.</p>
+
 			<!-- BEGIN cleanup_has_dates -->
-			<form action="/adminv2/calendar/modifyForm" method="post">
-				<label>Start:
-					<input type="text" name="cleanupFrom" value="" />
+			<form action="/adminv2/calendar/Cleanup" method="get">
+				<label>
+					From
+					<input type="text" id='start_date' name="cleanupFrom" style="width:100px" value="{CLEANUP_HAS_DATES_FROM}" />
 				</label>
-				<label>Until:
-					<input type="text" name="cleanupTo" value="" />
+
+				<label>
+					Until
+					<input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" style="width:100px" value="{CLEANUP_HAS_DATES_TO}" />
 				</label>
 
 				<input type="submit" value="Submit" />
 			</form>
 			<!-- END cleanup_has_dates -->
-			<ul>
-				<!-- BEGIN cleanup_event -->
-				<li>test</li>
-				<!-- END cleanup_event -->
-			</ul>
+
+			<form action="/adminv2/calendar/modifyForm" method="post">
+				<table>
+					<!-- BEGIN cleanup_event -->
+					<tr>
+						<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
+						<td>{CLEANUP_EVENT_TITLE}</td>
+						<td>{CLEANUP_EVENT_START}</td>
+						<td>{CLEANUP_EVENT_END}</td>
+					</tr>
+					<!-- END cleanup_event -->
+				</table>
+
+				<input type="submit" value="Submit" />
+			</form>
 		</div>
 	</div>
 	<!-- END cleanup -->

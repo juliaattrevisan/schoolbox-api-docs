@@ -177,8 +177,38 @@ if (is_array($typeList)) {
 		/* Cleanup page
 		 */
 		else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
-//			$eventMapper = new \Schoolbox\Calendar\EventMapper();
-//			$allEvents = $eventMapper->findAll();
+
+			/* If both dates specified, find events between those two dates inclusive
+			 */
+			if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
+				$from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
+				$to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+
+				$this->setVar(array(
+					'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
+					'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
+				));
+
+				$eventMapper = new \Schoolbox\Calendar\EventMapper();
+				$allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+
+				foreach($allEvents as $currentEvent) {
+					$this->setVar(array(
+						'CLEANUP_EVENT_ID' => $currentEvent->getId(),
+						'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
+						'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
+						'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
+					));
+
+					$this->parse('cleanup_event_block', 'cleanup_event', true);
+				}
+			}
+			else {
+				$this->setVar(array(
+					'CLEANUP_HAS_DATES_FROM' => '',
+					'CLEANUP_HAS_DATES_TO' => ''
+				));
+			}
 
 			$this->parse('cleanup_block', 'cleanup');
 		}

@@ -474,4 +474,36 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		return $row['series_id'];
 	}
+
+	/**
+	 * Find all the events between two dates, inclusive
+	 *
+	 * @param $startDate
+	 * @param $endDate
+	 * @return Collection
+	 */
+	public function findEventsBetween($startDate, $endDate) {
+		$query = "
+			SELECT {$this->getColumnString('e')}
+			FROM `{$this->getTable()}` e
+			WHERE startDate >= :startDate
+			AND endDate <= :endDate
+			ORDER BY startDate
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":startDate", $startDate);
+		$statement->bindParam(":endDate", $endDate);
+		$statement->execute();
+
+		$allEvents = new \Schoolbox\Collection();
+
+		while ($row = $statement->fetch()) {
+			$event = $this->hydrate($row, 'e');
+
+			$allEvents->add($event);
+		}
+
+		return $allEvents;
+	}
 }
