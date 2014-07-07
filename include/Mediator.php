@@ -38,7 +38,7 @@ class Mediator {
 
     public function __construct($url = '') {
         // general config
-        set_error_handler(array($this, 'errorHandler'));
+//        set_error_handler(array($this, 'errorHandler'));
         session_set_cookie_params(MOBILE_SESSION_TIMEOUT);
         session_start();
 
