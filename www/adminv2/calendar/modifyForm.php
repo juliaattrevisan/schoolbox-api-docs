@@ -102,5 +102,37 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
 		}
 	}
 }
+else if (is_array($_POST['cleanupEventId']) && count($_POST['cleanupEventId'])) {
+	ini_set('max_execution_time', 300);
+
+	/* Remove all the events
+	 */
+	$eventMapper = new \Schoolbox\Calendar\EventMapper();
+	$userRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
+	$categoryRelationMapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
+	$roleRelationMapper = new \Schoolbox\Calendar\Relation\RoleMapper();
+	$campusRelationMapper = new \Schoolbox\Calendar\Relation\CampusMapper();
+
+	/* Purge all the relations as well
+	 */
+	foreach($_POST['cleanupEventId'] as $currentEventId) {
+		try {
+			$event = $eventMapper->findById($currentEventId);
+
+			/* Purge existing sids
+			 */
+			$userRelationMapper->cleanse($event);
+			$categoryRelationMapper->cleanse($event);
+			$roleRelationMapper->cleanse($event);
+			$campusRelationMapper->cleanse($event);
+
+			/* Purge event
+			 */
+			$eventMapper->delete($event);
+		}
+		catch (\Exception $e) {
+		}
+	}
+}
 
 $this->backToTheFuture(1);

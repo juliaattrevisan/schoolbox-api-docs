@@ -205,7 +205,14 @@ if (is_array($typeList)) {
 					$this->parse('cleanup_event_block', 'cleanup_event', true);
 				}
 
-				$this->parse('cleanup_has_events_block', 'cleanup_has_events');
+				if ($allEvents->count()) {
+					$this->parse('cleanup_has_events_block', 'cleanup_has_events');
+				}
+				else {
+					$this->setVar(array(
+						'cleanup_has_events_block' => ''
+					));
+				}
 			}
 			else {
 				$this->setVar(array(
