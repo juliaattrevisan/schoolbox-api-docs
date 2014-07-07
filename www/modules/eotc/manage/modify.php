@@ -11,34 +11,41 @@
 /* Direct access to modify.php -_-
  */
 require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
+
 $page = new SitePage();
+$page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
+$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
+$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
+$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
+$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
+$page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
+$page->setBlock('can_add_resources', 'resource', 'resource_block');
 
 $authenticator = new \EOTC\Authenticator();
 
-if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
-	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
-	$page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
-	$page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
-	$page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
-	$page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
-	$page->setBlock('can_add_resources', 'resource', 'resource_block');
+/* Modify existing event
+ */
+if (is_numeric($_GET['eventID'])) {
+	$mapper = new \EOTC\EventMapper();
 
-	/* Modify existing event
+	try {
+		/** @var EOTC\Event $event */
+		$event = $mapper->findById($_GET['eventID']);
+	}
+	catch (\Exception $e) {
+		error(160);
+	}
+
+	/* Edit rules
 	 */
-	if (is_numeric($_GET['eventID'])) {
-		$mapper = new \EOTC\EventMapper();
+	$canAdminister = $authenticator->isEOTCAdministrator($_SESSION['user']);
+	$isAuthor = (($event->getAuthor()->getId() == $_SESSION['user']->getId()) && $authenticator->isEOTCCreator($_SESSION['user']));
 
-		try {
-			/** @var EOTC\Event $event */
-			$event = $mapper->findById($_GET['eventID']);
-		}
-		catch (\Exception $e) {
-			error(160);
-		}
-
+	/* EOTC Administrators and event authors can edit this event
+	 */
+	if ($canAdminister || $isAuthor) {
 		/* Do a check for missing metadata
 		 */
 		if (!$event->getMetadata()) {
@@ -226,150 +233,155 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		 */
 		$page->parse('can_add_resources_block', 'can_add_resources');
 	}
-	/* Create new event
-	 */
 	else {
-
-		/* Set up default dates
-		 */
-		$event = new \EOTC\Event();
-		$event->setupDates($_GET['date']);
-
-		$metadata = new \EOTC\EventMetadata();
-		$event->setMetadata($metadata);
-
-		$defaultTypeId = '';
-
-		/* This is used in the checkbox preselect outside this if/else
-		 * so we set it to null, to prevent any campuses from being
-		 * preselected
-		 */
-		$defaultCampusId = null;
-
-		/* Miscellaneous setvarring
-		 * Hide advanced options by default
-		 */
-		$page->setVar(array(
-			'FUNCTION' => 'Add',
-			'EOTC_FUNCTION' => 'Submit for Initial Approval',
-			'SHOW_ADVANCED' => '',
-			'ADVANCED_SHOW' => '',
-			'ADVANCED_CLOSE' => 'hidden',
-		));
-
-		$statusMapper = new \EOTC\EventStatusMapper();
-		$status = $statusMapper->findDefaultStatus();
-
-		/* You are the default teacher in charge
-		 * Even if you're not a teacher
-		 */
-		$teacherInCharge = array(
-			'id' => $_SESSION['user']->getId(),
-			'name' => $_SESSION['user']->getFullname(),
-		);
-
-		/* -_-
-		 */
-		$groupHandler = new Group();
-
-		$page->setVar(array(
-			'EVENT_RAMS_FILE' => '',
-			'EVENT_CURRENT_STUDENTS' => 0,
-			'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
-			'EVENT_STAFF' => json_encode(array()),
-			'EVENT_STATUS' => $status->getName(),
-			'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
-			'EVENT_RAMS_UPLOADED' => 0,
-			'EVENT_ID' => '',
-			'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
-			'EVENT_TITLE' => '',
-			'EVENT_TIMEINPUTS' => 'hide',
-			'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
-			'EVENT_START_HOUR' => '',
-			'EVENT_START_MIN' => '',
-			'EVENT_START_AM' => '',
-			'EVENT_START_PM' => '',
-			'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
-			'EVENT_END_HOUR' => '',
-			'EVENT_END_MIN' => '',
-			'EVENT_END_AM' => '',
-			'EVENT_END_PM' => '',
-			'EVENT_LOCATION' => '',
-			'EVENT_DETAIL' => '',
-			'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
-			'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
-			'EVENT_STATUS_CLASS' => $status->getStyle(),
-			'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
-			'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
-		));
-
-		/* Recurrence
-		 */
-		$page->setVar(array(
-			'recurring_reminder_block' => '',
-			'delete_button_block' => ''
-		));
-
-		$page->parse('recurring_dates_block', 'recurring_dates');
-
-		/* Activity Logs
-		 */
-		$page->setVar(array(
-			'has_activity_log_block' => '',
-			'activity_log_block' => ''
-		));
-
-		/* Cannot add students until an event is created
-		 */
-		$page->setVar(array(
-			'can_add_students_block' => ''
-		));
-
-		/* Cannot add resources until an event is created
- 		 */
-		$page->setVar(array(
-			'can_add_resources_block' => ''
-		));
-
+		error(19);
 	}
+}
+/* Create new event
+ */
+else if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
-	/* Event Types
+	/* Set up default dates
 	 */
-	$calendarEventTypeMapper = new \EOTC\EventTypeMapper();
-	$allEventTypes = $calendarEventTypeMapper->findAll();
+	$event = new \EOTC\Event();
+	$event->setupDates($_GET['date']);
 
-	$page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
-		'id' => 'EVENT_EVENTTYPE_ID',
-		'type' => 'EVENT_EVENTTYPE_NAME'
+	$metadata = new \EOTC\EventMetadata();
+	$event->setMetadata($metadata);
+
+	$defaultTypeId = '';
+
+	/* This is used in the checkbox preselect outside this if/else
+	 * so we set it to null, to prevent any campuses from being
+	 * preselected
+	 */
+	$defaultCampusId = null;
+
+	/* Miscellaneous setvarring
+	 * Hide advanced options by default
+	 */
+	$page->setVar(array(
+		'FUNCTION' => 'Add',
+		'EOTC_FUNCTION' => 'Submit for Initial Approval',
+		'SHOW_ADVANCED' => '',
+		'ADVANCED_SHOW' => '',
+		'ADVANCED_CLOSE' => 'hidden',
 	));
 
-	/* Campus Checkbox Array when using Campus Event Level
+	$statusMapper = new \EOTC\EventStatusMapper();
+	$status = $statusMapper->findDefaultStatus();
+
+	/* You are the default teacher in charge
+	 * Even if you're not a teacher
 	 */
-	$campusMapper = new \Schoolbox\CampusMapper();
-	$campusList = $campusMapper->findAll();
+	$teacherInCharge = array(
+		'id' => $_SESSION['user']->getId(),
+		'name' => $_SESSION['user']->getFullname(),
+	);
 
-	if ($campusList->count()) {
-		$allCampuses = array();
+	/* -_-
+	 */
+	$groupHandler = new Group();
 
-		foreach($campusList as $current) {
-			$allCampuses[] = array(
-				'id' => $current->getId(),
-				'name' => $current->getName()
-			);
-		}
+	$page->setVar(array(
+		'EVENT_RAMS_FILE' => '',
+		'EVENT_CURRENT_STUDENTS' => 0,
+		'EVENT_TEACHER_IN_CHARGE' => json_encode($teacherInCharge),
+		'EVENT_STAFF' => json_encode(array()),
+		'EVENT_STATUS' => $status->getName(),
+		'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
+		'EVENT_RAMS_UPLOADED' => 0,
+		'EVENT_ID' => '',
+		'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
+		'EVENT_TITLE' => '',
+		'EVENT_TIMEINPUTS' => 'hide',
+		'EVENT_START_DATE' => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+		'EVENT_START_HOUR' => '',
+		'EVENT_START_MIN' => '',
+		'EVENT_START_AM' => '',
+		'EVENT_START_PM' => '',
+		'EVENT_END_DATE' => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+		'EVENT_END_HOUR' => '',
+		'EVENT_END_MIN' => '',
+		'EVENT_END_AM' => '',
+		'EVENT_END_PM' => '',
+		'EVENT_LOCATION' => '',
+		'EVENT_DETAIL' => '',
+		'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+		'EVENT_ALLDAY_CHECKED' => 'checked="checked"',
+		'EVENT_STATUS_CLASS' => $status->getStyle(),
+		'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
+		'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
+	));
 
-		$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
-			'id' => 'EVENT_CAMPUS_ID',
-			'name' => 'EVENT_CAMPUS_NAME',
-		));
-	}
-	else {
-		$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
-		$page->setVar('event_campus_list_block', '');
-	}
+	/* Recurrence
+	 */
+	$page->setVar(array(
+		'recurring_reminder_block' => '',
+		'delete_button_block' => ''
+	));
 
-	$page->outputPage();
+	$page->parse('recurring_dates_block', 'recurring_dates');
+
+	/* Activity Logs
+	 */
+	$page->setVar(array(
+		'has_activity_log_block' => '',
+		'activity_log_block' => ''
+	));
+
+	/* Cannot add students until an event is created
+	 */
+	$page->setVar(array(
+		'can_add_students_block' => ''
+	));
+
+	/* Cannot add resources until an event is created
+	 */
+	$page->setVar(array(
+		'can_add_resources_block' => ''
+	));
+
 }
+/* Nobody else should be here
+ */
 else {
 	error(19);
 }
+
+/* Event Types
+ */
+$calendarEventTypeMapper = new \EOTC\EventTypeMapper();
+$allEventTypes = $calendarEventTypeMapper->findAll();
+
+$page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
+	'id' => 'EVENT_EVENTTYPE_ID',
+	'type' => 'EVENT_EVENTTYPE_NAME'
+));
+
+/* Campus Checkbox Array when using Campus Event Level
+ */
+$campusMapper = new \Schoolbox\CampusMapper();
+$campusList = $campusMapper->findAll();
+
+if ($campusList->count()) {
+	$allCampuses = array();
+
+	foreach($campusList as $current) {
+		$allCampuses[] = array(
+			'id' => $current->getId(),
+			'name' => $current->getName()
+		);
+	}
+
+	$page->checkList('event_campus_list', $allCampuses, $defaultCampusId, TEMPLATE_content, array(
+		'id' => 'EVENT_CAMPUS_ID',
+		'name' => 'EVENT_CAMPUS_NAME',
+	));
+}
+else {
+	$page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
+	$page->setVar('event_campus_list_block', '');
+}
+
+$page->outputPage();
