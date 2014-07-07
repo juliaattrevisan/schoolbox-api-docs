@@ -6,16 +6,30 @@
     /**
      * @param element  the jQuery object to bind the threePanel to.
      * @param options
-     *   threePanel:   the ThreePanel object to bind to
-     *   selectedNode: the initially selected node. This will be the ID of a
-     *                 node in the JsTree tree.
+     *   threePanel: the ThreePanel object to bind to
+     *   moveNode:
+     *     ajaxParams: params for AJAX call for moving a node
+     *     ajaxData:   callback for determining data params for AJAX call
      * @constructor
      */
     var ResourceTreeThreePanelBridge = function(element, options) {
         var self     = this;
         var defaults = {
             threePanel: null,
-            selected:   null
+            moveNode: {
+                ajaxParams: {
+                    type: 'post',
+                    url:  '/cms/categoryForm.php',
+                    data: {},
+                    dataType: 'json'
+                },
+                ajaxData: function(data) {
+                    return {
+                        move:       data.node.id,
+                        categoryID: data.parent
+                    }
+                }
+            }
         }
 
         self.element = element;
@@ -59,7 +73,7 @@
         var relationID = jstree.node.id;
 
         /* hide and deselect all files */
-        // threePanel.unselectFiles();
+        // threePanel.clearSelection();
         $('#file-list tbody tr').removeClass('selected').hide();
 
         // threePanel.getFiles(relationId);
@@ -137,7 +151,8 @@
      * @param event
      * @param data
      */
-    ResourceTreeThreePanelBridge.prototype.onMoveNode = function(event, data) {
+    ResourceTreeThreePanelBridge.prototype.onMoveNode = function(event, jstree) {
+        var self = this;
         var failMessage = function(error) {
             var message = 'An error occurred during processing. Please reload your browser and try again.';
             if (error) {
@@ -145,17 +160,15 @@
             }
             alert(message);
         }
-        $.ajax({
-            type: 'post',
-            url:  '/cms/categoryForm.php',
-            data: { move: data.node.id, categoryID: data.parent},
-            dataType: 'json'
-        })
-        .done(function(data) {
-            if (data && data.error) {
-                failMessage(data.error)
-            }
-        })
+
+        var ajaxParams  = self.options.moveNode.ajaxParams;
+        ajaxParams.data = $.extend(true, ajaxParams.data, self.options.moveNode.ajaxData(jstree))
+        $.ajax(ajaxParams)
+            .done(function(data) {
+                if (data && data.error) {
+                    failMessage(data.error)
+                }
+            })
     };
 
     /**
