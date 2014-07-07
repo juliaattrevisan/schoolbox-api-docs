@@ -131,7 +131,7 @@ class Notifier extends AbstractModuleNotifier {
         $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
         $key            = $this->slug.'.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
-        $isOwnerCreator = $owner->getId() == $user->getId();
+        $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
         $startDate      = new \Alaress_Date_Format(
             $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
         );
