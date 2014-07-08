@@ -41,7 +41,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 			 */
 			if ($currentEvent->getCategoryId() > 0) {
 				$categoryId = $currentEvent->getCategoryId();
-				$categoryName = Scrub::text($currentEvent->getCategoryName());
+				$categoryName = $currentEvent->getCategoryName();
 			}
 			else {
 				$categoryId = '';
@@ -87,7 +87,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 						'location' => $currentEvent->getLocation(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),
-						'author' => Scrub::text($currentEvent->getAuthorName()),
+						'author' => $currentEvent->getAuthorName(),
 						'authorId' => $currentEvent->getAuthorId(),
 						'level' => $currentEvent->getDerivedEventLevel(),
 						'completed' => $currentEvent->getCompleted(),
