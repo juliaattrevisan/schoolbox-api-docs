@@ -76,9 +76,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
             $extended = '';
         }
 
-        return Scrub::text($this->getCategoryName() . $extended) . '<br />' . Scrub::text(
-            $this->getSubmissionBoxName()
-        );
+        return $this->getCategoryName() . $extended . '<br />' . $this->getSubmissionBoxName();
     }
 
 	/**
