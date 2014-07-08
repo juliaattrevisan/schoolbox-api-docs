@@ -228,12 +228,16 @@ EOL;
 			E_COMPILE_ERROR => 'Compilation'
 		);
 
+		if(is_callable($this->shutdown)) {
+			call_user_func($this->shutdown);
+		}
+
 		// don't report anything
 		if(!isset($cases[$error['type']])) {
 			if($this->debug instanceof Debug) {
 				$this->debug->v('Exiting normally');
 			}
-			return;
+			exit(0);
 		}
 
 		// report if possible
@@ -241,6 +245,8 @@ EOL;
 			$message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
 			$this->debug->v($message, '!');
 		}
+
+		exit(1);
 	}
 
 }

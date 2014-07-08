@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
+use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use OutOfBoundsException;
 use RuntimeException;
 
@@ -18,6 +19,15 @@ class WorkerArray implements WorkerBundleInterface {
 	/** @var Worker[] */
 	protected $workers = array();
 
+	/** @var AlaressIPCProtocol */
+	protected $protocol;
+
+	/**
+	 * @param AlaressIPCProtocol $protocol
+	 */
+	public function __construct($protocol) {
+		$this->protocol = $protocol;
+	}
 
 	/**
 	 * Will workers gracefully
@@ -182,6 +192,18 @@ class WorkerArray implements WorkerBundleInterface {
 		}
 
 		return $status;
+	}
+
+
+	/**
+	 * Unceremoniously terminate all workers
+	 *
+	 * @return void
+	 */
+	public function terminateAll() {
+		foreach($this->workers as $pid => $w) {
+			posix_kill((int)$pid, SIGKILL);
+		}
 	}
 
 }

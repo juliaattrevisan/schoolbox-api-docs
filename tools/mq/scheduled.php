@@ -29,10 +29,18 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
 	'errors'  => E_ALL
 ));
 
+$sched = null;
 
+$kernel->registerCustomShutdown(function() use (&$sched) {
+	if(!$sched instanceof Scheduler) {
+		return;
+	}
+
+	$sched->getDispatcher()->releaseWorkerPool();
+});
 
 // CREATE SCHEDULER APP
-$kernel->run(function($di, $loop, $debug, $opts) {
+$kernel->run(function($di, $loop, $debug, $opts) use (&$sched) {
 	/**
 	 * @var Di\Container $di
 	 * @var LoopInterface $loop
