@@ -489,7 +489,7 @@ class Controller extends Base {
                             $event,
                             'series',
                             $recurrenceRule,
-                            new Alaress_Date_Format($repeatUntil),
+                            new Alaress_Date_Format($repeatUntil->modify('+1 day 00:00:00')),
                             $event->getStartDateTime(),
                             $event->getEndDateTime()
                         );
