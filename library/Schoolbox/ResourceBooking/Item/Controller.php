@@ -44,7 +44,7 @@ class Controller extends Base {
      */
     public function browse() {
 
-        // Get the list of categories.
+        // Get the list of items
         $query  = array();
         $catId  = $this->getRequest()->query['category'];
         $search = trim($this->getRequest()->query['search']);
@@ -76,6 +76,7 @@ class Controller extends Base {
                 $list = $this->mapper->findByColumnList(
                     $query,
                     array(
+                        'order'  => array('modified_at' => 'desc'),
                         'limit'  => $this->paginator->getPageSize(),
                         'offset' => $this->paginator->getOffset($page),
                     )

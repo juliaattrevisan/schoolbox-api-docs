@@ -350,6 +350,7 @@ class Mapper extends BaseMapper {
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
               AND {$this->getSoftDeleteFilterSql('re')}
+            ORDER BY `re`.`modified_at` DESC
             LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
