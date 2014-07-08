@@ -135,6 +135,18 @@ class Notifier extends AbstractModuleNotifier {
         $startDate      = new \Alaress_Date_Format(
             $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
         );
+
+        $resourceUrl = sprintf(
+            '/resource-booking/item/%d?%s',
+            $object->getResource()->getId(),
+            http_build_query(
+                array(
+                    'date' => $object->getEvent()->getStartDate(),
+                    'view' => 'day',
+                )
+            )
+        );
+        $bookingUrl = '/resource-booking/booking/'.$object->getId().'/edit';
         $messageParams  = array(
             'user'     => array(
                 $user->formatName(),
@@ -142,11 +154,10 @@ class Notifier extends AbstractModuleNotifier {
             ),
             'resource' => array(
                 $object->getResource()->getName(),
-                '/resource-booking/item/'.$object->getResource()->getId()
-//                $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
+                $resourceUrl
             ),
             'date'     => array(
-	            $startDate->getLocal(),
+                $startDate->getLocal(),
                 '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
             ),
             'owner'    => array(
@@ -180,12 +191,10 @@ class Notifier extends AbstractModuleNotifier {
         }
 
         // the message to be sent to owners - point this to the resource view
-        // TODO add calendar date selection
         $ownerMessage = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/item/'.$object->getResource()->getId()
-//            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
+            $resourceUrl
         );
 
         // Notify the owner of the booking (usually the person who the booking is for)
@@ -205,8 +214,7 @@ class Notifier extends AbstractModuleNotifier {
         $moderatorMessage = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/booking/'.$object->getId().'/edit'
-//            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
+            $bookingUrl
         );
 
         // Send a message to all the moderators of the object
