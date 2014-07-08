@@ -477,7 +477,6 @@ class Controller extends Base {
     ) {
         $newList = new Collection();
         foreach ($bookingList as $booking) {
-            $newList->add($booking);
             $event = $booking->getEvent();
             $eventList = new Collection();
             switch ($recurrenceRule) {
