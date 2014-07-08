@@ -158,7 +158,7 @@ class Notifier extends AbstractModuleNotifier {
             ),
             'date'     => array(
                 $startDate->getLocal(),
-                '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
+                '/calendar/full/'.$startDate->getUsingFormat('d-m-Y').'/'.$owner->getId(),
             ),
             'owner'    => array(
                 $owner->formatName(),
