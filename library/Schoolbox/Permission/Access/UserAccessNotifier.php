@@ -263,18 +263,63 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 		return $this->notifyApproved($userAccess, $user, $diff);
 	}
 
+	/**
+	 * Tells the scheduler commander that the user in $userAccess needs to be
+	 * rebound.
+	 *
+	 * @param UserAccess $userAccess
+	 */
+	protected function adviseSchedulerCommander($userAccess) {
+		$cmdr = new SchedulerCommander();
+		$cmdr->adviseBindUser($userAccess->getUser()->getId());
+	}
 
 	/**
-	 * Intentionally does not return a Messenger
+	 * System notifiers intentionally don't return a Messenger - instead, they
+	 * tell the scheduler commander to rebind the user whose access was changed.
+	 *
+	 * @param UserAccess $userAccess
+	 * @param User $user
+	 * @param array $diff
+	 */
+	public function notifySystemJoined($userAccess, $user, $diff = null) {
+		$this->adviseSchedulerCommander($userAccess);
+	}
+
+	/**
+	 * System notifiers intentionally don't return a Messenger - instead, they
+	 * tell the scheduler commander to rebind the user whose access was changed.
+	 *
+	 * @param UserAccess $userAccess
+	 * @param User $user
+	 * @param array $diff
+	 */
+	public function notifySystemLeft($userAccess, $user, $diff = null) {
+		$this->adviseSchedulerCommander($userAccess);
+	}
+
+	/**
+	 * System notifiers intentionally don't return a Messenger - instead, they
+	 * tell the scheduler commander to rebind the user whose access was changed.
 	 *
 	 * @param UserAccess $userAccess
 	 * @param User $user
 	 * @param array $diff
 	 */
 	public function notifySystemApproved($userAccess, $user, $diff = null) {
-		// user access has changed: advise Scheduler to rebind for this user
-		$cmdr = new SchedulerCommander();
-		$cmdr->adviseBindUser($userAccess->getUser()->getId());
+		$this->adviseSchedulerCommander($userAccess);
+	}
+
+	/**
+	 * System notifiers intentionally don't return a Messenger - instead, they
+	 * tell the scheduler commander to rebind the user whose access was changed.
+	 *
+	 * @param UserAccess $userAccess
+	 * @param User $user
+	 * @param array $diff
+	 */
+	public function notifySystemRejected($userAccess, $user, $diff = null) {
+		$this->adviseSchedulerCommander($userAccess);
 	}
 
 }
