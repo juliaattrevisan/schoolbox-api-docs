@@ -513,13 +513,17 @@ class Controller extends Base {
                     break;
             }
 
-            // Add a booking for each recurring event that was created.
             if (count($eventList)) {
+                // Add a booking for each recurring event that was created.
                 foreach ($eventList as $event) {
                     $newBooking = clone $booking;
                     $newBooking->setEvent($event);
                     $newList->add($newBooking);
                 }
+            }
+            else {
+                // Just add the existing booking back to the collection.
+                $newList->add($booking);
             }
         }
         return $newList;
