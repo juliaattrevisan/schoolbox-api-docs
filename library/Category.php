@@ -232,7 +232,7 @@ class Category extends DeprecatedModel {
     }
 
     function getImages($categoryID, $limit = 0, $excludeWork = false) {
-        $query = "SELECT id, file.description
+        $query = "SELECT id, file.description, file.comment
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
 				  WHERE category = '$categoryID'

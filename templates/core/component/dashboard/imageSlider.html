@@ -1,0 +1,21 @@
+<script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+<script type="text/javascript">
+    $j(function(){
+        $j("#imageSlider").AnySlider();
+    });
+</script>
+
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <!-- BEGIN has_header -->
+    <h2>{COMPONENT_NAME}</h2>
+    <!-- END has_header -->
+    <div id="imageSlider" class="box clearfix">
+        <!-- BEGIN image_scroller -->
+        <div>
+            <a href="{IMAGE_URL}">
+                <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+            </a>
+        </div>
+        <!-- END image_scroller -->
+    </div>
+</div>
