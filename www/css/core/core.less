@@ -2117,6 +2117,65 @@ li:hover > .actions .btn
     }
 }
 
+// Resource booking tabs for choosing booking time directly or timetable.
+// Could be extended to all tab widgets.
+#resource-booking-form .ui-tabs {
+    background: transparent;
+    border: none;
+
+    .ui-widget-header {
+        background: transparent;
+    }
+
+    .ui-tabs-panel {
+        border: 1px solid @border-color;
+        background: transparent;
+    }
+
+    // Adaptations from default widget styles
+    .ui-state-default,
+    .ui-widget-content .ui-state-default,
+    .ui-widget-header .ui-state-default {
+        border-color: @border-color;
+        background: transparent;
+        color: @body-text;
+    }
+    .ui-state-default a,
+    .ui-state-default a:link,
+    .ui-state-default a:visited {
+        color: @body-text;
+    }
+    .ui-state-hover,
+    .ui-widget-content .ui-state-hover,
+    .ui-widget-header .ui-state-hover,
+    .ui-state-focus,
+    .ui-widget-content .ui-state-focus,
+    .ui-widget-header .ui-state-focus {
+        border-color: @border-color;
+        background: @navigation-hover-background;
+        color: @navigation-hover-color;
+    }
+    .ui-state-hover a,
+    .ui-state-hover a:hover,
+    .ui-state-hover a:link,
+    .ui-state-hover a:visited {
+      background: @navigation-hover-background;
+      color: @navigation-hover-color;
+    }
+    .ui-state-active,
+    .ui-widget-content .ui-state-active,
+    .ui-widget-header .ui-state-active {
+        border-color: @border-color;
+        background: @navigation-hover-background;
+
+    }
+    .ui-state-active a,
+    .ui-state-active a:link,
+    .ui-state-active a:visited {
+        color: @navigation-hover-color;
+    }
+}
+
 #calendar{
     .fc-event{
         border: none;
