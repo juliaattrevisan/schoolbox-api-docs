@@ -141,7 +141,7 @@ class Notifier extends AbstractModuleNotifier {
             $object->getResource()->getId(),
             http_build_query(
                 array(
-                    'date' => $object->getEvent()->getStartDate(),
+                    'date' => $object->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y'),
                     'view' => 'day',
                 )
             )

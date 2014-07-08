@@ -149,7 +149,7 @@ class Controller extends Base {
      */
     public function read(Model $item) {
         // Show a given view and date
-        $calendarDate = DateTime::createFromFormat('Y-m-d', $this->request->query['date']);
+        $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query['date']);
         if (!($calendarDate instanceof DateTime)) {
             $calendarDate = new DateTime('now');
         }
