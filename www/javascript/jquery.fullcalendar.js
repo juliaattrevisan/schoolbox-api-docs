@@ -90,7 +90,7 @@ function Calendar(id, bubbleId, opts) {
                 }
                 data.date = $.fullCalendar.formatDate(calEvent.start, format)
                 if (calEvent.end != null) {
-                    data.date += " &ndash; "
+                    data.date += " – "
                     data.date += $.fullCalendar.formatDate(calEvent.end, format)
                 }
 
