@@ -207,6 +207,8 @@ $(document).ready(function() {
 
     // Callback for form validation and save in one step
     var callback = function() {
+        // Update the textarea behind the TinyMCE box -_-
+        tinyMCE.triggerSave();
         var ajaxParams = {
             url:      form.attr('action'),
             type:     form.attr('method'),
