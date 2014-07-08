@@ -2,10 +2,18 @@
 
 class User extends DeprecatedModel {
 
+	/**
+	 * A copy of the user notifier - it is called when a user changes.
+	 *
+	 * @var Schoolbox\UserNotifier
+	 */
+	protected $userNotifier;
+
 	function User() {
 
 		$this->_table = "user";
 		$this->_index = "id";
+		$this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
 
 		parent::DeprecatedModel();
 	}
@@ -699,7 +707,7 @@ class User extends DeprecatedModel {
 		}
 
 		// Filthily notify the binder that user was updated
-		$this->notifyUpdated($user['id']);
+		$this->userNotifier->manualNotifyUpdated($user['id'], $_SESSION['user']);
 
 		return true;
 	}
@@ -760,57 +768,11 @@ class User extends DeprecatedModel {
 			}
 
 			// Filthily notify the binder that there's a new user
-			$this->notifyCreated($id);
+			$this->userNotifier->manualNotifyCreated($id, $_SESSION['user']);
 			return $id;
 		}
 
 		return false;
-	}
-
-	/**
-	 * Filthy method for telling the notifications binder that user was created.
-	 *
-	 * @param  int  $userId
-	 * @return bool
-	 */
-	public function notifyCreated($userId) {
-		return $this->notifyChanged($userId, true);
-	}
-
-	/**
-	 * Filthy method for telling the notifications binder that user was updated.
-	 *
-	 * @param  int  $userId
-	 * @return bool
-	 */
-	public function notifyUpdated($userId) {
-		return $this->notifyChanged($userId, false);
-	}
-
-	/**
-	 * Filthy method for telling the notifications binder that user has changed.
-	 *
-	 * @param  int  $userId
-	 * @param  bool $new
-	 * @return bool
-	 */
-	protected function notifyChanged($userId, $new) {
-		try {
-			$user = \Schoolbox\UserMapper::getInstance()->findById($userId);
-		}
-		catch (\Schoolbox\Mapper\Exception $e) {
-			return false;
-		}
-
-		$notifier = new \Schoolbox\UserNotifier(new \Schoolbox\Config\Loader());
-		if ($new) {
-			$notifier->notifyCreated($user, $_SESSION['user']);
-		}
-		else {
-			$notifier->notifyUpdated($user, $_SESSION['user']);
-		}
-
-		return true;
 	}
 
 
