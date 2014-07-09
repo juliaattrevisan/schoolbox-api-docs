@@ -196,19 +196,13 @@ if (is_array($typeList)) {
 				$allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
 				foreach($allEvents as $currentEvent) {
-					$campus = array();
-
-//					foreach($currentEvent->getCampusCollection() as $currentCampus) {
-//						$campus[] = $currentCampus->getName();
-//					}
-
 					$this->setVar(array(
-						'CLEANUP_EVENT_ID' => $currentEvent->getId(),
-						'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
-						'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
-						'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
-						'CLEANUP_EVENT_AUTHOR' => $currentEvent->getAuthor()->getFullName(),
-						'CLEANUP_EVENT_CAMPUSES' => implode(', ', $campus),
+						'CLEANUP_EVENT_ID' => $currentEvent['event']->getId(),
+						'CLEANUP_EVENT_TITLE' => $currentEvent['event']->getTitle(),
+						'CLEANUP_EVENT_START' => $currentEvent['event']->getStartDateTime()->getShort(),
+						'CLEANUP_EVENT_END' => $currentEvent['event']->getEndDateTime()->getShort(),
+						'CLEANUP_EVENT_AUTHOR' => $currentEvent['event']->getAuthor()->getFullName(),
+						'CLEANUP_EVENT_CAMPUSES' => $currentEvent['auxiliary']['campuses'],
 					));
 
 					$this->parse('cleanup_event_block', 'cleanup_event', true);
