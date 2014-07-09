@@ -86,35 +86,40 @@
 
 #infoPanel {
 	margin: 10px 0;
+	li {
+		background: none;
+	}
 	.bell {
-		background-image: url('/images/joeys/bell.png');
 		margin: 0;
-		border-radius: 3px;
-		-moz-border-radius: 3px;
-		-webkit-border-radius: 3px;
+		background-image: url('/images/joeys/bell.png');
 		background-position: 0 -36px;
 		&[data-unread="0"] {
 			background-position: 0 -4px;
 		}
+	}
+	.more {
+		width: 18px;
+		padding: 0;
+		li {
+			padding: 0;
+			margin: 0;
+		}
+	}
+	.bell, .more {
+		border-radius: 3px;
+		-moz-border-radius: 3px;
+		-webkit-border-radius: 3px;
 		&.open {
 			background-position: 0 -68px;
 			&:after {
-				background: transparent;
-				width: 0;
-				height: 0;
-				bottom: -11px;
-				right: 30%;
-				position: absolute;
-				border-left: 6px solid transparent;
-				border-right: 6px solid transparent;
-				border-bottom: 6px solid @flyout-background;
-				z-index: 60;
+				content: '';
+				display: none;
 			}
 		}
 
 	}
 }
-#message-list {
+#message-list, #account-menu {
 	border: solid 1px #333;
 	border-radius: 3px;
 	-moz-border-radius: 3px;
