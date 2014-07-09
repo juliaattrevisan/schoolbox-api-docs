@@ -179,6 +179,8 @@ class Notifier extends AbstractModuleNotifier {
                 $messageText = ':user put on hold booking of :resource for :owner for :date';
                 break;
             case 'cancelled':
+                // For Cancelled bookings, the booking URL is no longer relevant
+                $bookingUrl  = $resourceUrl;
                 $messageText = ':user cancelled booking of :resource for :owner for :date';
                 break;
             case 'updated':
