@@ -426,7 +426,17 @@ class Session
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
-                        $result = $catHandler->getByCode($subject['code']);
+                        $result = false;
+                        if($subject['campusCode']) {
+                            //Check for subject with campus code
+                            $result = $catHandler->getByCode($subject['campusCode'].'/'.$subject['code']);
+                        }
+
+                        if(!is_array($result)) {
+                            //Try to fetch witout campus code
+                            $result = $catHandler->getByCode($subject['code']);
+                        }
+
                         if (is_array($result) && is_numeric($result['id'])) {
                             if (!in_array($result['id'], $catList)) {
                                 $subject['id'] = $result['id'];
