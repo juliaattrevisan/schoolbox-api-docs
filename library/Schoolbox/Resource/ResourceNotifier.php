@@ -10,15 +10,20 @@
 namespace Schoolbox\Resource;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -30,6 +35,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	const TRIGGER_CREATED = 'created';
 	const TRIGGER_UPDATED = 'updated';
 	const TRIGGER_DELETED = 'deleted';
+
+
+	/** @var CategoryMapper */
+	protected $categoryMapper;
 
 
 	/**
@@ -47,7 +56,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		// noop
+		$this->categoryMapper = CategoryMapper::getInstance();
 	}
 
 
@@ -109,34 +118,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @return bool
 	 */
 	protected function notifySystem($action, $resource, $effector) {
-		if($resource instanceof Category) {
-			$id = $resource->getId();
-			$type = 'folder';
-		}
-		elseif($resource instanceof File) {
-			$id = $resource->getId();
-			$type = 'file';
-		}
-		elseif($resource instanceof Link) {
-			$id = $resource->getId();
-			$type = 'link';
-		}
-		elseif($resource instanceof Textbox) {
-			$id = $resource->getId();
-			$type = 'content';
-		}
-		else {
-			throw new ScheduleException("Invalid resource type given");
-		}
-
 		$notif = new Notif(Notif::TOPIC_CMS);
+
 		return $notif->notice("CRUD", array(
-			'object'   => $type,
-			'objectId' => $id,
+			'object'   => $this->getResourceKind(),
+			'objectId' => $id = $resource->getId(),
 			'action'   => $action,
 			'user'     => $effector->getId()
 		));
-
 	}
 
 
@@ -189,36 +178,35 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param string $kind
 	 * @param int $id
 	 * @param string $action
-	 * @param array|string $param
+	 * @param ParameterInterface $param
 	 * @param User $effector
 	 * @param Category $category
 	 * @param string $roletype
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function notify($kind, $id, $action, $param, $effector, $category, $roletype) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
 		$categoryId    = $category->getId();
-		$categoryName  = $category->getName();
-
-		$effectorId    = $effector->getId();
 		$effectorExtId = $effector->getExternalId();
-		$effectorName  = $effector->formatName();
 
-		$icon = "/portrait.php?userId=$effectorExtId&size=square32";
-		$href = "/homepage/$categoryId";
+		$bob = new Builder();
+		$bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
+			->setHref("/homepage/$categoryId")
+			->setTitle(":effector $action the $kind :resource in :category")
+			->setParams(array(
+				'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+				'resource' => $param,
+				'category' => new CategoryParam($category)
+			))
+			->setNamespace($this->getSlug())
+			->setSeverity(Logger::INFO)
+			->addTopic("cms.$kind.$id.$action")
+			->addFilter('roletype', $roletype);
 
-		$message = new Message(":effector $action the $kind :resource in :category", $icon, $href);
+		$envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
 
-		$msgr->broadcastToCategory($categoryId, $message, "cms.$kind.$id.$action", Logger::INFO, array(
-			'effector' => array($effectorName, "/search/user/$effectorId"),
-			'resource' => $param,
-			'category' => array($categoryName, "/homepage/$categoryId")
-		), array(
-			'roletype' => $roletype
-		));
-
-		return $msgr;
+		return $envelope;
 	}
 
 
@@ -258,102 +246,122 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyUpdated($roleType, $resource, $effector, $diff = null) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
-		// setup data so as to abstract the different resource types
-
-		$effectorId    = $effector->getId();
 		$effectorExtId = $effector->getExternalId();
-		$effectorName  = $effector->formatName();
-
 		$resourceId    = $resource->getId();
 
-		if($resource instanceof Category) {
-			$resourceName  = $resource->getName();
-			$category      = $resource->getParent();
-			$resourceKind  = LogMapper::KIND_FOLDER;
-			$nameField     = 'name';
-			$categoryField = 'parent';
-		}
-		else {
-			$resourceName  = $resource->getDescription();
-			$category      = CategoryMapper::getInstance()->findById($resource->getFolder());
-			$nameField     = 'description';
-			$categoryField = 'category';
+		// setup data from the different resource types
+		$resourceName  = $this->getResourceName($resource);
+		$category      = $this->getResourceCategory($resource);
+		$resourceKind  = $this->getResourceKind();
+		$nameField     = $this->getResourceNameProperty();
+		$categoryField = $this->getResourceCategoryProperty();
 
-			if($resource instanceof File) {
-				$resourceKind = LogMapper::KIND_FILE;
-			}
-			elseif($resource instanceof Link) {
-				$resourceKind = LogMapper::KIND_LINK;
-			}
-			else {
-				return $msgr;
-			}
-		}
+		// remove unnecessary diff fields
+		unset($diff['hidden']);
+		unset($diff['modified']);
 
-		$categoryId    = $category->getId();
-		$categoryName  = $category->getName();
+		$categoryId = $category->getId();
 
-		$icon = "/portrait.php?userId=$effectorExtId&size=square32";
-		$href = "/homepage/$categoryId";
+		$bob = new Builder();
+
+		$bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
+			->setHref("/homepage/$categoryId")
+			->setNamespace($this->getSlug())
+			->setSeverity(Logger::INFO)
+			->addFilter('roletype', $roleType)
+			->setTopics(array("cms.$resourceKind.$resourceId.updated"));
+
+		$userParam = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+		$catParam  = new CategoryParam($category);
 
 		// if renamed...
 		if(isset($diff[$nameField])) {
-			$message = new Message(":user renamed the $resourceKind :oldname to :newname", $icon, $href);
+			$bob->setTitle(":user renamed the $resourceKind :oldname to :newname in :category")
+				->setParams(array(
+					'user'     => $userParam,
+					'oldname'  => new Param($diff[$nameField][1]),
+					'newname'  => new Param($resourceName),
+					'category' => $catParam
+				));
 
-			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.renamed", Logger::INFO, array(
-				'user'    => array($effectorName, "/search/user/$effectorId"),
-				'oldname' => $diff[$nameField][1],
-				'newname' => array($categoryName, "/homepage/$categoryId")
-			), array(
-				'roletype' => $roleType
-			));
-			unset($diff['name']);
+			$envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+
+			unset($diff[$nameField]);
 		}
 
 		// if moved elsewhere...
 		if(isset($diff[$categoryField])) {
-			$message = new Message(":user moved the $resourceKind :name into :category", $icon, $href);
+			$bob->setTitle(":user moved the $resourceKind :name into :category")
+				->setParams(array(
+					'user'     => $userParam,
+					'name'     => new Param($resourceName),
+					'category' => $catParam
+				));
 
-			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.moved", Logger::INFO, array(
-				'user'     => array($effectorName, "/search/user/$effectorId"),
-				'name'     => $resourceName,
-				'category' => array($categoryName, "/homepage/$categoryId")
-			), array(
-				'roletype' => $roleType
-			));
+			$envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+
 			unset($diff[$categoryField]);
 		}
 
 		// if changed in some other way...
 		if(count($diff)) {
-			$message = new Message(
-				":user updated the $resourceKind :name",
-				"/portrait.php?userId=$effectorExtId&size=square32",
-				"/homepage/$categoryId"
-			);
+			$instances = $this->notify(
+				$resourceKind, $resourceId, self::TRIGGER_UPDATED,
+				new Param($resourceName), $effector, $category, $roleType
+			)->getAll();
 
-			$msgr->broadcastToCategory($categoryId, $message, "cms.$resourceKind.$resourceId.updated", Logger::INFO, array(
-				'user' => array($effectorName, "/search/user/$effectorId"),
-				'name' => $resourceName
-			), array(
-				'roletype' => $roleType
-			));
+			foreach($instances as $inst) {
+				$envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $inst);
+			}
 		}
 
-		return $msgr;
+		return $envelope;
 	}
+
+
+	/**
+	 * @param Category|File|Link|Textbox $resource
+	 * @return string
+	 */
+	protected abstract function getResourceName($resource);
+
+
+	/**
+	 * @param Category|File|Link|Textbox $resource
+	 * @return Category
+	 */
+	protected abstract function getResourceCategory($resource);
+
+
+	/**
+	 * @return string
+	 */
+	protected abstract function getResourceKind();
+
+
+	/**
+	 * @return string
+	 */
+	protected abstract function getResourceNameProperty();
+
+
+	/**
+	 * @return string
+	 */
+	protected abstract function getResourceCategoryProperty();
+
 
 	/**
 	 * @param string $roletype
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public abstract function notifyCreated($roletype, $resource, $author, $diff = null);
 
@@ -362,7 +370,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public abstract function notifyDeleted($roletype, $resource, $author, $diff = null);
 
@@ -372,7 +380,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentCreated($resource, $effector) {
 		return $this->notifyCreated(Role::STUDENT, $resource, $effector);
@@ -382,7 +390,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentUpdated($resource, $effector, $diff = null) {
 		return $this->notifyUpdated(Role::STUDENT, $resource, $effector, $diff);

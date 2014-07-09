@@ -11,20 +11,18 @@ namespace Schoolbox\Resource;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
 
 class CategoryNotifier extends ResourceNotifier {
 
-	const TRIGGER_UPDATED = 'updated';
 	const TRIGGER_RENAMED = 'renamed';
 	const TRIGGER_MOVED   = 'moved';
-	const TRIGGER_CREATED = 'created';
-	const TRIGGER_DELETED = 'deleted';
 
 
 	/**
@@ -96,12 +94,12 @@ class CategoryNotifier extends ResourceNotifier {
 	 * @param Category $category
 	 * @param User $creator
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyCreated($roleType, $category, $creator, $diff = null) {
 		return $this->notify(
 			LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_CREATED,
-			array($category->getName(), "/homepage/".$category->getId()),
+			new Param($category->getName(), "/homepage/".$category->getId()),
 			$creator, $category->getParent(), $roleType
 		);
 	}
@@ -113,14 +111,56 @@ class CategoryNotifier extends ResourceNotifier {
 	 * @param Category $category
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyDeleted($roleType, $category, $effector, $diff = null) {
 		return $this->notify(
 			LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
-			$category->getName(), $effector, $category->getParent(), $roleType
+			new Param($category->getName()),
+			$effector, $category->getParent(), $roleType
 		);
 	}
 
 
-} 
+	/**
+	 * @param Category $resource
+	 * @return string
+	 */
+	protected function getResourceName($resource) {
+		return $resource->getName();
+	}
+
+
+	/**
+	 * @param Category $resource
+	 * @return Category
+	 */
+	protected function getResourceCategory($resource) {
+		return $resource->getParent();
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceKind() {
+		return LogMapper::KIND_FOLDER;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceNameProperty() {
+		return 'name';
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceCategoryProperty() {
+		return 'parent';
+	}
+
+}

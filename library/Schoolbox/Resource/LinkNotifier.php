@@ -11,8 +11,9 @@ namespace Schoolbox\Resource;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Collection;
-use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\User;
 
 class LinkNotifier extends ResourceNotifier {
@@ -37,14 +38,14 @@ class LinkNotifier extends ResourceNotifier {
 	 * @param Link $link
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyCreated($roletype, $link, $effector, $diff = null) {
 		$category = CategoryMapper::getInstance()->findById($link->getFolder());
 
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
-			array($link->getDescription(), $link->getUrl()),                // the :resource param
+			new Param($link->getDescription(), $link->getUrl()),            // the :resource param
 			$effector, $category, $roletype
 		);
 	}
@@ -54,16 +55,58 @@ class LinkNotifier extends ResourceNotifier {
 	 * @param Link $link
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyDeleted($roletype, $link, $effector, $diff = null) {
 		$category = CategoryMapper::getInstance()->findById($link->getFolder());
 		// abstract this so far it doesn't even make sense any more
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
-			array($link->getDescription(), $link->getUrl()),                // the :resource param
+			new Param($link->getDescription()),                             // the :resource param
 			$effector, $category, $roletype
 		);
 	}
 
-} 
+
+	/**
+	 * @param Link $resource
+	 * @return string
+	 */
+	protected function getResourceName($resource) {
+		return $resource->getDescription();
+	}
+
+
+	/**
+	 * @param Link $resource
+	 * @return Category
+	 */
+	protected function getResourceCategory($resource) {
+		return $this->categoryMapper->findById($resource->getFolder());
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceKind() {
+		return LogMapper::KIND_LINK;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceNameProperty() {
+		return 'description';
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getResourceCategoryProperty() {
+		return 'folder';
+	}
+
+}
