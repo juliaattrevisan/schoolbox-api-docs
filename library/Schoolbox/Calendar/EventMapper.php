@@ -509,6 +509,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 			LEFT JOIN luCampus ON event_campus.campus_id = luCampus.id
 			WHERE startDate >= :startDate
 			AND endDate <= :endDate
+			GROUP BY e.id
 		";
 
 		$statement = $this->database->prepare($query);
