@@ -90,7 +90,7 @@ function Calendar(id, bubbleId, opts) {
                 }
                 data.date = $.fullCalendar.formatDate(calEvent.start, format)
                 if (calEvent.end != null) {
-                    data.date += " &ndash; "
+                    data.date += " – "
                     data.date += $.fullCalendar.formatDate(calEvent.end, format)
                 }
 
@@ -701,6 +701,30 @@ Bubble.prototype.fillForm = function(formId, vars) {
     // retrieve form from cache
     var form = this.forms[formId]
 
+    /**
+     * Fill element helper: if the element that is getting filled has a
+     * 'is-html' data element, then it gets filled with HTML - otherwise with
+     * text.
+     *
+     * @param element
+     * @param value
+     */
+    var fillElement = function(element, value) {
+        if (element) {
+            if (element.length && value && value.length) {
+                if (element.data('is-html')) {
+                    element.html(value)
+                }
+                else {
+                    element.text(value)
+                }
+            }
+            else {
+                element.text('')
+            }
+        }
+    }
+
     // iterate across the variables supplied, and insert them into the appropriate form elements
     $j.each(vars, function(k, v) {
         // first test if it's an input with the name we're after
@@ -709,12 +733,12 @@ Bubble.prototype.fillForm = function(formId, vars) {
             var type = element.attr('type')
             // textboxes and textareas get filled with text...
             if(type == 'text' || element.is('textarea')) {
-                element.attr('value', v)
+                element.val(v)
             }
             // ...and if hidden, also populate its associated span...
             else if(type == 'hidden') {
                 element.attr('value', v)
-                form.find('.'+k).html(v)
+                fillElement(form.find('.'+k), v)
             }
             // ...and checkboxes get checked or unchecked
             else if(type == 'checkbox') {
@@ -723,10 +747,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
         }
         // if no form input element found, try for an element with the right class
         else {
-            element = form.find('.'+k)
-            if(element.length) {
-                element.html(v)
-            }
+            fillElement(form.find('.'+k), v)
         }
     })
 }

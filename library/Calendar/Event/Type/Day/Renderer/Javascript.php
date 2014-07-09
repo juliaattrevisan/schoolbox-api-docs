@@ -73,7 +73,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			 */
 			if ($currentEvent->getCategoryId() > 0) {
 				$categoryId = $currentEvent->getCategoryId();
-				$categoryName = Scrub::text($currentEvent->getCategoryName());
+				$categoryName = $currentEvent->getCategoryName();
 			}
 			else {
 				$categoryId = '';
@@ -150,7 +150,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			}
 
 			$event = array(
-				'title' => Scrub::text($currentEvent->getTitle()),
+				'title' => $currentEvent->getTitle(),
 				'start' => "$start",
 				'end' => "$end",
 
@@ -178,11 +178,11 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
 						'detail' => Scrub::html($currentEvent->getDetail()),
-						'location' => Scrub::text($currentEvent->getLocation()),
+						'location' => $currentEvent->getLocation(),
 						'eventTypeId' => $currentEvent->getType(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),
-						'author' => Scrub::text($currentEvent->getAuthorName()),
+						'author' => $currentEvent->getAuthorName(),
 						'authorId' => $currentEvent->getAuthorId(),
 						'level' => $currentEvent->getDerivedEventLevel(),
 						'completed' => $currentEvent->getCompleted(),

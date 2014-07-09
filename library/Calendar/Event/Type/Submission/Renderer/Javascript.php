@@ -41,7 +41,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 			 */
 			if ($currentEvent->getCategoryId() > 0) {
 				$categoryId = $currentEvent->getCategoryId();
-				$categoryName = Scrub::text($currentEvent->getCategoryName());
+				$categoryName = $currentEvent->getCategoryName();
 			}
 			else {
 				$categoryId = '';
@@ -93,10 +93,10 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
 						'detail' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
-						'location' => Scrub::text($currentEvent->getLocation()),
+						'location' => $currentEvent->getLocation(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),
-						'author' => Scrub::text($currentEvent->getAuthorName()),
+						'author' => $currentEvent->getAuthorName(),
 						'authorId' => $currentEvent->getAuthorId(),
 						'level' => $currentEvent->getDerivedEventLevel(),
 						'completed' => $currentEvent->getCompleted(),

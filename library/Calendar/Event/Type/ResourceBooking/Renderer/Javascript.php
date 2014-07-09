@@ -147,12 +147,12 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         else {
             $detail = sprintf(
                 "(Booking for: %s)<br />%s",
-                Scrub::text($currentEvent->getBooking()->getResource()->getName()),
+                $currentEvent->getBooking()->getResource()->getName(),
                 $detail
             );
         }
         $event = array(
-            'title' => Scrub::text($title),
+            'title' => $title,
             'start' => "$start",
             'end' => "$end",
 
@@ -180,11 +180,11 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                     'eventId' => $currentEvent->getEventId(),
                     'time' => $currentEvent->getTime(),
                     'detail' => Scrub::html($detail),
-                    'location' => Scrub::text($currentEvent->getLocation()),
+                    'location' => $currentEvent->getLocation(),
                     'eventTypeId' => $currentEvent->getType(),
                     'eventType' => 'type' . $currentEvent->getType(),
                     'type' => $currentEvent->getEventType(),
-                    'author' => Scrub::text($currentEvent->getAuthorName()),
+                    'author' => $currentEvent->getAuthorName(),
                     'authorId' => $currentEvent->getAuthorId(),
                     'level' => $currentEvent->getDerivedEventLevel(),
                     'completed' => $currentEvent->getCompleted(),
@@ -209,7 +209,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                     'buttons' => $bookingButtons,
                     'reviewer' => array(
                         'id'   => $currentEvent->getBooking()->getReviewer()->getId() ?: -1,
-                        'name' => Scrub::text($currentEvent->getBooking()->getReviewer()->formatName()),
+                        'name' => $currentEvent->getBooking()->getReviewer()->formatName(),
                     ),
                 ),
             )
