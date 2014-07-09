@@ -22,6 +22,7 @@ $page->setBlock('has_activity_log', 'activity_log', 'activity_log_block');
 $page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 $page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
 $page->setBlock('can_add_resources', 'resource', 'resource_block');
+$page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
 
 $authenticator = new \EOTC\Authenticator();
 
@@ -232,6 +233,18 @@ if (is_numeric($_GET['eventID'])) {
 		/* Cannot add resources until an event is created
 		 */
 		$page->parse('can_add_resources_block', 'can_add_resources');
+
+		/* Cannot self-promote until a status is In Principle
+		 * Only offer self-promotion to non-eotc-administrators
+		 */
+		if (!$authenticator->isEOTCAdministrator($_SESSION['user']) && $authenticator->canPromote($_SESSION['user'], $event)) {
+			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
+		}
+		else {
+			$page->setVar(array(
+				'can_promote_in_principle_block' => ''
+			));
+		}
 	}
 	else {
 		error(19);
@@ -342,6 +355,11 @@ else if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		'can_add_resources_block' => ''
 	));
 
+	/* Cannot self-promote until a status is In Principle
+ 	 */
+	$page->setVar(array(
+		'can_promote_in_principle_block' => ''
+	));
 }
 /* Nobody else should be here
  */

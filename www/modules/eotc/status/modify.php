@@ -12,10 +12,6 @@
  */
 $authenticator = new \EOTC\Authenticator();
 
-if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
-	error(19);
-}
-
 $mapper = new \EOTC\EventMapper();
 
 try {
@@ -23,6 +19,10 @@ try {
 }
 catch (\Exception $e) {
 	error(160);
+}
+
+if (!$authenticator->isEOTCAdministrator($_SESSION['user']) && !$authenticator->canPromote($_SESSION['user'], $event)) {
+	error(19);
 }
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');

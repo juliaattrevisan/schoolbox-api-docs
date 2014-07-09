@@ -12,14 +12,6 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-/* Only EOTC Administrators can view this page
- */
-$authenticator = new \EOTC\Authenticator();
-
-if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
-	error(19);
-}
-
 $eventMapper = new \EOTC\EventMapper();
 
 /* Spawn an existing event if id provided
@@ -32,7 +24,15 @@ catch (\Exception $e) {
 	error(160);
 }
 
-if ($authenticator->canPromote($_SESSION['user'], $event)) {
+/* Only EOTC Administrators can view this page
+ * and a special case for events currently in status In Principle; creators
+ * can self-promote this status into the next.
+ */
+$authenticator = new \EOTC\Authenticator();
+
+$canPromote = $authenticator->canPromote($_SESSION['user'], $event);
+
+if ($authenticator->isEOTCAdministrator($_SESSION['user']) || $canPromote) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
@@ -71,9 +71,16 @@ if ($authenticator->canPromote($_SESSION['user'], $event)) {
 	 */
 	$registry->notify();
 
-	/* Redirect back to status screen
+	/* Promoter redirect back to modify screen
 	 */
-	$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
+	if ($canPromote) {
+		$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
+	}
+	/* Admin redirect back to status screen
+	 */
+	else {
+		$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
+	}
 }
 else {
 	error(19);
