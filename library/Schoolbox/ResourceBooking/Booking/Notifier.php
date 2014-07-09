@@ -17,6 +17,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Monolog\Logger;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -122,13 +123,30 @@ class Notifier extends AbstractModuleNotifier {
      */
     protected function buildMessenger(Model $object, User $user, $event) {
         $messenger      = new Messenger();
-        $owner          = $object->getEvent()->getOwner();
+
+        // Hydrate event owner
+        /** @var Event $calendarEvent */
+        $eventMapper    = $this->mapper->getJoinMapper('event');
+        $calendarEvent  = $eventMapper->findById($object->getEvent()->getId());
+        $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
         $key            = $this->slug.'.'.$object->getId().'.'.$event;
         $level          = Logger::NOTICE;
-        $isOwnerCreator = $owner->getId() == $user->getId();
+        $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
         $startDate      = new \Alaress_Date_Format(
             $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
         );
+
+        $resourceUrl = sprintf(
+            '/resource-booking/item/%d?%s',
+            $object->getResource()->getId(),
+            http_build_query(
+                array(
+                    'date' => $object->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y'),
+                    'view' => 'day',
+                )
+            )
+        );
+        $bookingUrl = '/resource-booking/booking/'.$object->getId().'/edit';
         $messageParams  = array(
             'user'     => array(
                 $user->formatName(),
@@ -136,47 +154,35 @@ class Notifier extends AbstractModuleNotifier {
             ),
             'resource' => array(
                 $object->getResource()->getName(),
-                '/resource-booking/item/'.$object->getResource()->getId()
-//                $this->router->generate('resourceItem.read', array('id' => $object->getResource()->getId()))
+                $resourceUrl
             ),
             'date'     => array(
-	            $startDate->getLocal(),
-                '/calendar/full/'.$owner->getId().'/'.$startDate->getUsingFormat('d-m-Y'),
+                $startDate->getLocal(),
+                '/calendar/full/'.$startDate->getUsingFormat('d-m-Y').'/'.$owner->getId(),
             ),
+            'owner'    => array(
+                $owner->formatName(),
+                '/search/user/'.$owner->getId(),
+            )
         );
-        if (!$isOwnerCreator) {
-            $messageParams['owner'] = array($owner->formatName(), '/search/user/'.$owner->getId(),);
-        }
         switch ($event) {
             case 'created':
-                $messageText = $isOwnerCreator ?
-                    ':user booked :resource for :date':
-                    ':user booked :resource for :owner for :date';
+                $messageText = ':user booked :resource for :owner for :date';
                 break;
             case 'approved':
-                $messageText = $isOwnerCreator ?
-                    ':user approved booking of :resource for :date':
-                    ':user approved booking of :resource for :owner for :date';
+                $messageText = ':user approved booking of :resource for :owner for :date';
                 break;
             case 'rejected':
-                $messageText = $isOwnerCreator ?
-                    ':user rejected booking of :resource for :date':
-                    ':user rejected booking of :resource for :owner for :date';
+                $messageText = ':user rejected booking of :resource for :owner for :date';
                 break;
             case 'pending':
-                $messageText = $isOwnerCreator ?
-                    ':user put on hold booking of :resource for :date':
-                    ':user put on hold booking of :resource for :owner for :date';
+                $messageText = ':user put on hold booking of :resource for :owner for :date';
                 break;
             case 'cancelled':
-                $messageText = $isOwnerCreator ?
-                    ':user cancelled booking of :resource for :date':
-                    ':user cancelled booking of :resource for :owner for :date';
+                $messageText = ':user cancelled booking of :resource for :owner for :date';
                 break;
             case 'updated':
-                $messageText = $isOwnerCreator ?
-                    ':user changed booking of :resource for :date':
-                    ':user changed booking of :resource for :owner for :date';
+                $messageText = ':user changed booking of :resource for :owner for :date';
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -184,32 +190,38 @@ class Notifier extends AbstractModuleNotifier {
                 );
         }
 
-        // the message to be sent
-        $message = new Message(
+        // the message to be sent to owners - point this to the resource view
+        $ownerMessage = new Message(
             $messageText,
             '/portrait.php?userId='.$user->getExternalId().'&size=square32',
-            '/resource-booking/booking/'.$object->getId().'/edit'
-//            $this->router->generate('resourceBooking.edit', array('id' => $object->getId()))
+            $resourceUrl
         );
 
-        // Notify the owner of the booking that someone booked for them
-        // Don't show the owner in the name of this message, show "you" instead
-        // (because this message is targeted at the event owner)
-        if (!$isOwnerCreator) {
-            $messenger->targetToUser(
-                $owner->getId(),
-                $message,
-                $key,
-                $level,
-                (array('owner' => 'you') + $messageParams)
-            );
+        // Notify the owner of the booking (usually the person who the booking is for)
+        $ownerMessageParams = $messageParams;
+        if ($isOwnerCreator) {
+            $ownerMessageParams['owner'][0] = 'you';
         }
+        $messenger->targetToUser(
+            $owner->getId(),
+            $ownerMessage,
+            $key,
+            $level,
+            $ownerMessageParams
+        );
+
+        // Moderator message - point this to the actual booking
+        $moderatorMessage = new Message(
+            $messageText,
+            '/portrait.php?userId='.$user->getExternalId().'&size=square32',
+            $bookingUrl
+        );
 
         // Send a message to all the moderators of the object
         foreach ($object->getResource()->getModeratorList() as $moderator) {
             $messenger->targetToUser(
                 $moderator->getId(),
-                $message,
+                $moderatorMessage,
                 $key,
                 $level,
                 $messageParams
@@ -221,7 +233,7 @@ class Notifier extends AbstractModuleNotifier {
             UserAccess::SERVICE_RESOURCE_BOOKING,
             0,
             UserAccess::ACCESS_FULL,
-            $message,
+            $moderatorMessage,
             $key,
             $level,
             $messageParams
@@ -277,6 +289,106 @@ class Notifier extends AbstractModuleNotifier {
      * @return Messenger
      */
     public function notifyStaffRejected(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentCreated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'created');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentUpdated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'updated');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentApproved(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'approved');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentPending(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'pending');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentRejected(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentCreated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'created');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentUpdated(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'updated');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentApproved(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'approved');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentPending(Model $object, User $user/*, $diff*/) {
+        return $this->buildMessenger($object, $user, 'pending');
+    }
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentRejected(Model $object, User $user/*, $diff*/) {
         return $this->buildMessenger($object, $user, 'rejected');
     }
 

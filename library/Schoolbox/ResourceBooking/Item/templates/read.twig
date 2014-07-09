@@ -10,6 +10,27 @@
 // once the DOM has loaded, punch a fancy calendar into it
 $(document).ready(function() {
 
+    // Calendar setup
+    var calendarDate = moment({{ calendar.date|json_encode|raw }});
+    if (calendarDate.isValid()) {
+        calendarDate = calendarDate.toDate();
+    }
+    else {
+        calendarDate = new Date();
+    }
+    var calendarView = {{ calendar.view|json_encode|raw }};
+    switch (calendarView) {
+        case 'week':
+            calendarView = 'agendaWeek';
+            break;
+        case 'day':
+            calendarView = 'agendaDay';
+            break;
+        default:
+            calendarView = 'month';
+            break;
+    }
+
     // Dialog for use when clicking an item that is in a series
     var updateSeriesDialog = $('#dialog-bulk-update')
     updateSeriesDialog.dialog({
@@ -24,8 +45,7 @@ $(document).ready(function() {
         }
     })
 
-    var now = new Date();
-    var c   = new Calendar('calendar', 'calendar-bubble', {
+    var c = new Calendar('calendar', 'calendar-bubble', {
         filter: {
             enabled: true,
             ajax: false,
@@ -38,11 +58,11 @@ $(document).ready(function() {
         fullCalendar: {
             firstHour: 9,
             allDaySlot: false,
-            date:  now.getDate(),
-            month: now.getMonth(),
-            year:  now.getFullYear(),
+            date:  calendarDate.getDate(),
+            month: calendarDate.getMonth(),
+            year:  calendarDate.getFullYear(),
             columnFormat: 'ddd d/M',
-            defaultView: 'month',
+            defaultView: calendarView,
             timeFormat: { month: 'h(:mm)tt' },
             events: function(start, end, callback) {
                 var data = [
