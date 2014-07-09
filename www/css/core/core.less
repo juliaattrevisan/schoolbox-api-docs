@@ -683,6 +683,7 @@ Notifications
 	}
 	// styles specific to the account menu dropdown
 	.user {
+		transition: background-color 0.1s;
 		&.open:after {
 			width: 32px;
 		}
@@ -696,6 +697,47 @@ Notifications
 				border-bottom: solid 1px @border-color;
 				color: @flyout-color;
 				text-decoration: none;
+				&:hover {
+					text-decoration: underline;
+					background: @flyout-hover-background;
+					color: @flyout-hover-color;
+				}
+			}
+		}
+	}
+	> li.more {
+		min-width: 18px;
+	}
+	.more {
+		transition: background-color 0.1s;
+		width: 18px;
+		margin-left: -3px;
+		margin-right: 8px;
+		&.open {
+			background-color: @flyout-background;
+			&:after {
+				width: 18px;
+			}
+			> a {
+				color: @notify-open-text-color;
+			}
+		}
+		> a {
+			text-align: center;
+			text-decoration: none;
+			display: block;
+		}
+		li {
+			&:last-child a {
+				border-bottom: none;
+			}
+			a {
+				padding: 5px 30px 5px 10px;
+				display: block;
+				border-bottom: solid 1px @border-color;
+				color: @flyout-color;
+				text-decoration: none;
+				text-align: center;
 				&:hover {
 					text-decoration: underline;
 					background: @flyout-hover-background;
