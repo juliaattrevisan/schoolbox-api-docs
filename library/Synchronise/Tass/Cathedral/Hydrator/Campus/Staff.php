@@ -1,6 +1,6 @@
 <?php
 /**
- * Hydrator for campus for Cathedral users.
+ * Hydrator for campus for Cathedral staff.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -8,40 +8,52 @@
  */
 class Synchronise_Tass_Cathedral_Hydrator_Campus_Staff implements Synchronise_Base_IHydrator {
 
+    const CAMPUS_SENIOR = 1;
+    const CAMPUS_MIDDLE = 2;
+    const CAMPUS_ELC    = 3;
+    const CAMPUS_JUNIOR = 5;
+    const CAMPUS_ADMIN  = 8;
+
     /**
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $campus = $this->getDefaultCampusFromUser($externalUser);
-        if ($campus) {
-            $newUser['campus']        = array($campus);
-            $newUser['defaultCampus'] = $campus;
+        $campusList = array();
+        switch (strtoupper($externalUser['paypoint_text'])) {
+            case 'ADMIN':
+            case 'MAINT':
+            case 'RETAI':
+            case 'TSHOP':
+            case 'VEH':
+                $campusList[] = self::CAMPUS_ADMIN;
+                break;
+            case 'BOARD':
+                $campusList[] = self::CAMPUS_SENIOR;
+                $campusList[] = self::CAMPUS_JUNIOR;
+                break;
+            case 'ELC':
+            case 'OSHC':
+                $campusList[] = self::CAMPUS_ELC;
+                break;
+            case 'SNR':
+            case 'ROW':
+                $campusList[] = self::CAMPUS_SENIOR;
+                break;
+            case 'JNR':
+                $campusList[] = self::CAMPUS_JUNIOR;
+                break;
+            case 'HIRE':
+            case 'OUT':
+            case '':
+            default:
+                break;
         }
-        return $newUser;
-    }
 
-    /**
-     * Gets campus according to the following map:
-     *
-     * * Year 0-6   => 5 (Junior Campus)
-     * * Year 7-9   => 2 (Middle Campus)
-     * * Year 10-12 => 1 (Senior Campus)
-     *
-     * @param  array $externalUser
-     * @return int
-     * @throws RangeException if student's year isn't in the list above
-     */
-    public function getDefaultCampusFromUser($externalUser) {
-        $year = $externalUser['StudentYearLevel'];
-        if (in_array($year, array(0,1,2,3,4,5,6))) {
-            return 5;
+        if (empty($campusList)) {
+            throw new RangeException('Staff member has no campus');
         }
-        if (in_array($year, array(7,8,9))) {
-            return 2;
-        }
-        if (in_array($year, array(10,11,12))) {
-            return 1;
-        }
-        throw new RangeException('Student\'s year is not in range 0-12');
+        $newUser['campus']        = $campusList;
+        $newUser['defaultCampus'] = $campusList[0];
+        return $newUser;
     }
 }
