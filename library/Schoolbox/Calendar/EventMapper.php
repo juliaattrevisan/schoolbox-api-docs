@@ -156,20 +156,22 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'this_key' => 'id',
 			'other_key' => 'id'
 		));
-//		$this->hasJoin('category', array(
-//			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
-//			'this_key'  => 'id',
-//			'other_key' => 'event_id',
-//		));
-//		$this->hasJoin('campus', array(
-//			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
-//			'this_key'  => 'id',
-//			'other_key' => 'event_id',
-//		));
-//
-//		$this->hasJoin('roles', array(
-//
-//		));
+		$this->hasJoin('category', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
+		$this->hasJoin('campus', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
+
+		$this->hasJoin('roles', array(
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\RoleMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
+		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
