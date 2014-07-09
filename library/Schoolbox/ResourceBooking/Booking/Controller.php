@@ -478,7 +478,6 @@ class Controller extends Base {
     ) {
         $newList = new Collection();
         foreach ($bookingList as $booking) {
-            $newList->add($booking);
             $event = $booking->getEvent();
             $eventList = new Collection();
             switch ($recurrenceRule) {
@@ -491,7 +490,7 @@ class Controller extends Base {
                             $event,
                             'series',
                             $recurrenceRule,
-                            new Alaress_Date_Format($repeatUntil),
+                            new Alaress_Date_Format($repeatUntil->modify('23:59:59')),
                             $event->getStartDateTime(),
                             $event->getEndDateTime()
                         );
@@ -515,13 +514,17 @@ class Controller extends Base {
                     break;
             }
 
-            // Add a booking for each recurring event that was created.
             if (count($eventList)) {
+                // Add a booking for each recurring event that was created.
                 foreach ($eventList as $event) {
                     $newBooking = clone $booking;
                     $newBooking->setEvent($event);
                     $newList->add($newBooking);
                 }
+            }
+            else {
+                // Just add the existing booking back to the collection.
+                $newList->add($booking);
             }
         }
         return $newList;
