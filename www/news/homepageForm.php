@@ -27,8 +27,11 @@ else {
 	$news->setPostDate(new Alaress_Date_Format(time(), 'U'));
 }
 
-// check user is owner
-if ($permission == WRITE_ACCESS && $news->getOwner()->getId() != $_SESSION['id']) {
+// check user is owner, or other users can edit other's news
+if ($permission == WRITE_ACCESS
+	&& $news->getOwner()->getId() != $_SESSION['id']
+	&& !Cfg::get('news_edit_other')
+) {
 	error(23);
 }
 

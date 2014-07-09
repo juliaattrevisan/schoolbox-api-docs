@@ -145,7 +145,7 @@ class Blog extends DeprecatedModel {
 		$blog = $this->getByID($id);
 		if(is_array($blog)) {
 			$permission = $this->group->getPermission($blog['cid']);
-			if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
+			if($blog['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
 				return true;
 			else
 				return false;

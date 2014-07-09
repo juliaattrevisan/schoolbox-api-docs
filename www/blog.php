@@ -15,7 +15,7 @@ if (is_numeric($this->arg[0])) {
         error(29);
     }
 
-    if ($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other) {
+    if ($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
         $this->setVar(
             'MODIFY_BLOG', "<a class=\"btn modify\" href=\"/blog/modify/{$blog['id']}\"><span></span>Modify</a>"
         );
@@ -64,7 +64,7 @@ if (is_numeric($this->arg[0])) {
                 )
             );
 
-            if ($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other) {
+            if ($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS) {
                 $this->setVar(
                     'DELETE_COMMENT',
                     "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>"

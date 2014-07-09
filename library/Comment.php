@@ -57,7 +57,7 @@ class Comment extends DeprecatedModel {
 
 	function permission($id) {
 		$comment = $this->getByID($id);
-		return $comment['owner'] == $_SESSION['id'] || $this->group->getPermission($comment['cid']) >= WRITE_ACCESS || NEWS_teacher_edit_other;
+		return $comment['owner'] == $_SESSION['id'] || $this->group->getPermission($comment['cid']) >= WRITE_ACCESS;
 	}
 
 	function config($config = null) {

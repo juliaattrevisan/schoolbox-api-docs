@@ -120,7 +120,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             $j = 0;
             foreach ($newsList as $news) {
-                if ($news['owner'] == $_SESSION['id'] || $this->permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $this->permission >= WRITE_ACCESS)) {
+                // news_edit_other allows users with write access to edit other's news
+                if ($news['owner'] == $_SESSION['id']
+                    || $this->permission >= FULL_ACCESS
+                    || ($this->permission >= WRITE_ACCESS && Config::get('news_edit_other'))
+                ) {
                     $this->setVar(
                         'MOD_NEWS',
                         '<a class="btn no-text modify" href="/news/homepage/' . $news['id'] . '" title="Modify News"><span></span></a>'
