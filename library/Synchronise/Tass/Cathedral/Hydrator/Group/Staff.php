@@ -1,56 +1,43 @@
 <?php
 /**
- * Hydrator for group for Cathedral students.
+ * Hydrator for group for Cathedral staff.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 class Synchronise_Tass_Cathedral_Hydrator_Group_Staff implements Synchronise_Base_IHydrator {
+
+    const GROUP_ADMIN   = 1;
+    const GROUP_TEACHER = 2;
+    const GROUP_ELC     = 16;
+
     /**
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['group_id'] = $this->getGroupIDFromUser($externalUser);
-        return $newUser;
-    }
+        $groupId = null;
+        switch ($externalUser['awd_code']) {
+            case "TE":
+            case "TECAS":
+            case "EX":
+                $groupId = self::GROUP_TEACHER;
+                break;
 
-    /**
-     * Groups for Cathedral students are based on the value of StaffDepartment.
-     *
-     * Could be:
-     * 1:  Administration
-     * 2:  Teachers
-     * 16: ELC Staff
-     *
-     * @param  array $externalUser
-     * @return int
-     */
-    public function getGroupIDFromUser($externalUser) {
-        switch ($externalUser['StaffDepartment']) {
-            case "MAT": // ?
-            case "SOC": // ?
-            case "ART": // Art
-            case "PRE": // Pre-school
-            case "":    // ?
-            case "LAN": // Language?
-            case "SCI": // Science
-            case "ENG": // English
-            case "PE":  // Phys-Ed
-            case "MUS": // Music
-            case "OTH": // Other
-            case "TUT": // Tutors
-            case "MID": // Middle school?
-            case "HUM": // Humanities
-            case "HPE": // ?
-            case "TEC": // Technology
-            case "PRI": // Primary?
-            case "LOT": // ?
-            case "NON": // ?
-            case "BBR": // ?
-            case "NO":  // ?
-            case "GBR": // ?
             default:
+                // check paypoint_text
+                switch ($externalUser['paypoint_text']) {
+                    case 'ELC':
+                    case 'OSHC':
+                        $groupId = self::GROUP_ELC;
+                        break;
+                    default:
+                        $groupId = self::GROUP_TEACHER;
+                        break;
+                }
+                break;
         }
+        $newUser['group_id'] = $groupId;
+        return $newUser;
     }
 }
