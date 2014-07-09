@@ -20,5 +20,23 @@ $factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList,
 $strategy = $factory->build();
 $strategy->load();
 
-new \Alaress_Probe($_POST);
-die();
+$allEvents = $strategy->getOutput();
+
+$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
+$this->setBlock(TEMPLATE_content, 'event', 'event_block');
+
+if ($allEvents && count($allEvents)) {
+	foreach ($allEvents as $currentEvent) {
+		$this->setVar(array(
+			'EVENT_NAME' => $currentEvent['name'],
+			'EVENT_STATUS' => $currentEvent['status'],
+			'EVENT_ERROR' => $currentEvent['error'],
+		));
+
+		$this->parse('event_block', 'event', true);
+	}
+}
+else {
+	$this->setVar('event_block', '');
+}
+
