@@ -98,32 +98,51 @@
 	.bell {
 		background-image: url('/images/mggs/bell.png');
 		background-position: 4px -24px;
-		height: 24px;
-		-moz-border-radius: 4px;
-		-webkit-border-radius: 4px;
-		border-radius: 4px;
 		&[data-unread="0"] {
 			background-position: 4px 0;
 		}
 		&.open {
 			background-position: 4px -48px;
+		}
+	}
+	li.more {
+		&.open {
 			&:after {
-				width: 0;
-				height: 0;
-				bottom: -10px;
-				right: 30%;
-				position: absolute;
-				border-left: 6px solid transparent;
-				border-right: 6px solid transparent;
-				border-bottom: 6px solid #e5edf5;
+				right: 10%;
 			}
+			> a {
+				color: @banner-color;
+			}
+		}
+		> a {
+			color: @module-background;
+		}
+	}
+	.bell, .more {
+		height: 24px;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		&.open:after {
+			width: 0;
+			height: 0;
+			bottom: -10px;
+			right: 30%;
+			position: absolute;
+			border-left: 6px solid transparent;
+			border-right: 6px solid transparent;
+			border-bottom: 6px solid #e5edf5;
 		}
 		> a {
 			line-height: 24px;
 		}
 	}
 }
-#message-list {
+#message-list, #account-menu {
 	border: solid 3px #e5edf5;
 	top: 34px;
+	> li {
+		padding: 0;
+		margin: 0;
+	}
 }

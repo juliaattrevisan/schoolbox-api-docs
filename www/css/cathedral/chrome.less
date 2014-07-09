@@ -104,8 +104,29 @@
 			}
 		}
 	}
+	.more {
+		border-radius: 4px;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		&.open {
+			&:after {
+				background: transparent;
+				width: 0;
+				height: 0;
+				bottom: -10px;
+				right: 25%;
+				position: absolute;
+				border-left: 6px solid transparent;
+				border-right: 6px solid transparent;
+				border-bottom: 6px solid @flyout-border;
+			}
+			> a {
+				color: @footer-color;
+			}
+		}
+	}
 }
-#message-list {
+#message-list, #account-menu {
 	top: 41px;
 	border: solid 1px @flyout-border;
 	border-radius: 3px;
