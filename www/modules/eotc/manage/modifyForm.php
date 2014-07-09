@@ -197,8 +197,37 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			if (isset($_POST['promoteInPrinciple']) && $_POST['promoteInPrinciple'] == 1) {
 				$eventStatusMapper = new \EOTC\EventStatusMapper();
 				$nextStatusId = $eventStatusMapper->findNextStatus($event);
+				$eventStatus = $eventStatusMapper->findById($nextStatusId);
 
-				$event->getMetadata()->setStatus($nextStatusId);
+				/* Remember original states so we know which obs to spawn
+				 */
+				$originalStatus = $event->getMetadata()->getStatus()->getId();
+				$originalComment = $event->getMetadata()->getComment();
+
+				/* Set status id
+				 */
+				$event->getMetadata()->setStatus($eventStatus);
+
+				/* Activity Log
+				 */
+				$registry = new \EOTC\ActivityLog\Registry();
+				$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+
+				/* If a status changed, log it
+				 */
+				if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+					$registry->add($factory->produce('StatusChange'));
+				}
+
+				/* If a comment changed, log it
+				 */
+				if ($originalComment != $event->getMetadata()->getComment()) {
+					$registry->add($factory->produce('CommentChange'));
+				}
+
+				/* Notify everyone
+				 */
+				$registry->notify();
 			}
 
 			/* Save this event and any recurring incidents too
