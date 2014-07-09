@@ -9,5 +9,8 @@
  */
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$groupHandler = new Group();
 $this->setFile(TEMPLATE_content, 'calendar/import.html');
+
+$this->setVar(array(
+	'HOMEPAGE_ID' => $this->arg[0]
+));
