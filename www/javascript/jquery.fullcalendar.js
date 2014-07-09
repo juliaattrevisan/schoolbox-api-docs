@@ -710,12 +710,17 @@ Bubble.prototype.fillForm = function(formId, vars) {
      * @param value
      */
     var fillElement = function(element, value) {
-        if (element.length && value.length) {
-            if (element.data('is-html')) {
-                element.html(value)
+        if (element) {
+            if (element.length && value && value.length) {
+                if (element.data('is-html')) {
+                    element.html(value)
+                }
+                else {
+                    element.text(value)
+                }
             }
             else {
-                element.text(value)
+                element.text('')
             }
         }
     }
