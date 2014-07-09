@@ -42,13 +42,22 @@ if (is_numeric($_GET['eventID'])) {
 	$defaultTypeId = $event->getType()->getId();
 	$defaultAccessLevel = $event->getAccess();
 
-	/* Only provide Campus options if campuses have been defined
+	/* Preselected campuses
 	 */
-	$selectedCampus = array();
+	$selectedCampuses = array();
 	$allCampuses = $event->getCampusCollection();
 
 	foreach($allCampuses as $currentCampus) {
 		$selectedCampuses[] = $currentCampus->getCampusId();
+	}
+
+	/* Preselected roles
+	 */
+	$selectedRoles = array();
+	$allRoles = $event->getRoleCollection();
+
+	foreach($allRoles as $currentRole) {
+		$selectedRoles[] = $currentRole->getRoleId();
 	}
 
 	/* Only provide publish date if one was provided and if it
@@ -127,6 +136,10 @@ else {
 	/* Preselected campus
 	 */
 	$selectedCampuses = array($_SESSION['campus'][0]);
+
+	/* Preselected roles
+	 */
+	$selectedRoles = array();
 
 	/* Miscellaneous setvarring
 	 * Hide advanced options by default
@@ -269,7 +282,7 @@ foreach($roleList as $current) {
 	);
 }
 
-$page->checkList('event_role_list', $allRoles, null, TEMPLATE_content, array(
+$page->checkList('event_role_list', $allRoles, $selectedRoles, TEMPLATE_content, array(
 	'id' => 'EVENT_ROLE_ID',
 	'name' => 'EVENT_ROLE_NAME'
 ));
