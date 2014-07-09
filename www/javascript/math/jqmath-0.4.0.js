@@ -1240,7 +1240,7 @@ var jqMath = function() {
 	M.inline$$Q = false;	/* whether $$ $$ or \[ \] in a <p> or <span> should be wrapped in an
 		inline-block */
 	M.parseMath = function(nod) {
-		if (nod.nodeType == 1 /* Element */ && nod.tagName != 'SCRIPT') {
+		if (nod.nodeType == 1 /* Element */ && nod.tagName != 'SCRIPT' && nod.tagName != 'TEXTAREA') {
 			if (nod.tagName.toUpperCase() == 'MATH') {
 				var newE = M.eToMathE(nod);
 				if (newE != nod)	nod.parentNode.replaceChild(newE, nod);
