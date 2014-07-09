@@ -58,6 +58,7 @@
 @navigation-hover-background: 	@admin-nav;
 @navigation-hover-color:  		#FFFFFF;
 @navigation-sub-background:  	@link;
+@submit-btn:                    @admin-nav;
 
 // Main "Tab" Navigation
 @tab-background:				#922142;
@@ -105,9 +106,10 @@ body{
             }
         }
     #wrap{
-        background: url("/images/spags/body-bg.png") no-repeat 0% 50%;
+        background: url("/images/spags/body-bg.png") no-repeat 0% 520px;
     }
-    #tabs li a:hover{ background-color: @tab-background !important; }  // seriously?
+    .core #tabs li a:hover{ background-color: @tab-background; }
+	.core #tabs .navthis a:hover{ background-color: @white; }
 }
 
 body.login{
