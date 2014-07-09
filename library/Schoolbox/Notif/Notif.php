@@ -39,6 +39,9 @@ use Swift_Message;
  */
 class Notif implements LoggerInterface {
 
+	/** Note - If you create any extra topics, ensure they are added to the following for auto create:
+	 * tools/create-data-dirs.sh
+	 */
 	const TOPIC_SYSTEM       = 'sys';     // notifications about top-level events
 	const TOPIC_NOTIFICATION = 'notif';   //     "           "   the notification system
 	const TOPIC_DATABASE     = 'db';      //     "           "   internal database events
