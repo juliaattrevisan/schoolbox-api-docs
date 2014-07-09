@@ -113,6 +113,10 @@ class External_Tass_User implements External_UserInterface
     function getStaff($tassID)
     {
 
+        $query = "
+            SELECT *
+            FROM tel_vw_telemf
+        ";
     }
 
     function getStudentContactList($tassID)
@@ -300,17 +304,21 @@ class External_Tass_User implements External_UserInterface
 
     public function getStaffUserAccountInfo()
     {
-        // Include Synergetic fields, and attempt to perform data normalisation
-        // using extra fields.
+
+        // Based on Cathedral sync (SB-4132)
+        // Main Differences with Meriden sync: ActiveFlag
         $query = "
             SELECT
-                t.tch_code AS StaffID,
+                t.emp_code AS StaffID,
                 '' AS NetworkLogin,
-                t.curr_flg AS ActiveFlag,
-                '' AS StaffTitle,
-                '' AS StaffPreferredName,
-                t.surname AS StaffSurname,
-                t.tch_name AS StaffFullName,
+                CASE
+                    WHEN (t.term_date) IS NULL THEN 0
+                    ELSE 1
+                END AS ActiveFlag,
+                t.salutation_flag AS StaffTitle,
+                t.prefer_name_text AS StaffPreferredName,
+                t.surname_text AS StaffSurname,
+                '' AS StaffFullName,
                 '' AS DefaultEmailCode,
                 '' AS OccupEmail,
                 t.e_mail AS Email,
@@ -319,10 +327,31 @@ class External_Tass_User implements External_UserInterface
                 '' AS StaffCategory,
                 td.tch_dept AS StaffDepartment,
                 *
-            FROM teacher AS t
-            JOIN tchdept AS td ON t.tch_code = td.tch_code
-            WHERE t.curr_flg = 'Y'
+            FROM tel_vw_telemf AS t
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
         ";
+//        $query = "
+//            SELECT
+//                t.tch_code AS StaffID,
+//                '' AS NetworkLogin,
+//                t.curr_flg AS ActiveFlag,
+//                '' AS StaffTitle,
+//                '' AS StaffPreferredName,
+//                t.surname AS StaffSurname,
+//                t.tch_name AS StaffFullName,
+//                '' AS DefaultEmailCode,
+//                '' AS OccupEmail,
+//                t.e_mail AS Email,
+//                '' AS StaffCampus,
+//                '' AS StaffCategoryType,
+//                '' AS StaffCategory,
+//                td.tch_dept AS StaffDepartment,
+//                *
+//            FROM teacher AS t
+//            JOIN tchdept AS td ON t.tch_code = td.tch_code
+//            WHERE t.curr_flg = 'Y'
+//        ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
     }
