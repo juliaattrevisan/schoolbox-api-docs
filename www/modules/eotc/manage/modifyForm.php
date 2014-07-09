@@ -207,7 +207,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				/* Set status id
 				 */
 				$event->getMetadata()->setStatus($eventStatus);
-
+				$event->getMetadata()->setComment($_POST['comment']);
+				
 				/* Activity Log
 				 */
 				$registry = new \EOTC\ActivityLog\Registry();
