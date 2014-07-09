@@ -10,33 +10,39 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$user = $_SESSION['user'];
-$author = $_SESSION['user'];
-$groupList = array($_POST['homepageId']);
-$campusList = array();
-$file = $_FILES['file']['tmp_name'];
+$groupHandler = new Group();
 
-$factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList, $file);
-$strategy = $factory->build();
-$strategy->load();
-
-$allEvents = $strategy->getOutput();
-
-$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
-$this->setBlock(TEMPLATE_content, 'event', 'event_block');
-
-if ($allEvents && count($allEvents)) {
-	foreach ($allEvents as $currentEvent) {
-		$this->setVar(array(
-			'EVENT_NAME' => $currentEvent['name'],
-			'EVENT_STATUS' => $currentEvent['status'],
-			'EVENT_ERROR' => $currentEvent['error'],
-		));
-
-		$this->parse('event_block', 'event', true);
-	}
+if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
+	error(19);
 }
 else {
-	$this->setVar('event_block', '');
-}
+	$user = $_SESSION['user'];
+	$author = $_SESSION['user'];
+	$groupList = array($_POST['homepageId']);
+	$campusList = array();
+	$file = $_FILES['file']['tmp_name'];
 
+	$factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList, $file);
+	$strategy = $factory->build();
+	$strategy->load();
+
+	$allEvents = $strategy->getOutput();
+
+	$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
+	$this->setBlock(TEMPLATE_content, 'event', 'event_block');
+
+	if ($allEvents && count($allEvents)) {
+		foreach ($allEvents as $currentEvent) {
+			$this->setVar(array(
+				'EVENT_NAME' => $currentEvent['name'],
+				'EVENT_STATUS' => $currentEvent['status'],
+				'EVENT_ERROR' => $currentEvent['error'],
+			));
+
+			$this->parse('event_block', 'event', true);
+		}
+	}
+	else {
+		$this->setVar('event_block', '');
+	}
+}

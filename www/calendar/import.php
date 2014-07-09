@@ -9,8 +9,15 @@
  */
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$this->setFile(TEMPLATE_content, 'calendar/import.html');
+$groupHandler = new Group();
 
-$this->setVar(array(
-	'HOMEPAGE_ID' => $this->arg[0]
-));
+if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+	error(19);
+}
+else {
+	$this->setFile(TEMPLATE_content, 'calendar/import.html');
+
+	$this->setVar(array(
+		'HOMEPAGE_ID' => $this->arg[0]
+	));
+}
