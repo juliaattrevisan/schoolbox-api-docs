@@ -174,7 +174,7 @@ class Node {
 			$record = array(
 				'type' => 'file',
 				'fileId' => $currentFile->getId(),
-				'name' => $currentFile->getFilename(),
+				'name' => $currentFile->getDescription(),
 				'icon' => $mimetype->getIconFile(),
 			);
 

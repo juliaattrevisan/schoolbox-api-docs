@@ -139,6 +139,7 @@ class NodeRenderer {
 	 * Render a category record
 	 *
 	 * @param $currentRecord
+	 * @param $i
 	 */
 	private function renderCategory($currentRecord, $i) {
 		$this->getPage()->setVar(array(
@@ -154,6 +155,7 @@ class NodeRenderer {
 	 * Render a file record
 	 *
 	 * @param $currentRecord
+	 * @param $i
 	 */
 	private function renderFile($currentRecord, $i) {
 		$this->getPage()->setVar(array(
