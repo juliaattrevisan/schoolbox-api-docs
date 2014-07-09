@@ -1,8 +1,18 @@
 <!-- BEGIN banner_logged_in -->
 <ul id="infoPanel">
     <li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a></li>
+    <li class="more">
+      <a href="#" data-menu="account-menu">&#9660;</a>
+      <ul id="account-menu" class="flyout-menu">
+        <li>
+          <a href="/settings/messages">Settings</a>
+        </li>
+        <li>
+          <a href="/logout.php">Logout</a>
+        </li>
+      </ul>
+    </li>
     {INSTANTMESSAGE_BLOCK}
-    <li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
 </ul>
 <form id="search" action="/search.php" method="get">
     <fieldset>
