@@ -379,6 +379,7 @@ class Controller extends Base {
 
                 $bookingList->add($booking);
             }
+            $this->bookingMapper->save($bookingList);
         }
         else {
             $code = 400;
