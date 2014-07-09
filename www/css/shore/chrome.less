@@ -114,8 +114,11 @@
 			}
 		}
 	}
+	li.more.open > a {
+		color: @link;
+	}
 }
-#message-list {
+#message-list, #account-menu {
 	// no box shadowing
 	.box-shadow(0,0,0,transparent);
 	border: solid 1px @flyout-border;
@@ -123,5 +126,8 @@
 	top: 25px;
 	h4 {
 		color: @body-text;
+	}
+	li {
+		padding: 0;
 	}
 }
