@@ -11,34 +11,19 @@
  */
 class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
 
-//    public function generateList() {
-//        parent::generateList();
-//
-//        var_dump(
-//            array_count_values(
-//                array_map(function($b) {
-//                    return $b['StaffDepartment'];
-//                }, $this->list)));
-//
-////        // Dump unique campuses
-////        $campuses = array();
-////        foreach ($this->list as $item) {
-////            $campuses[$item['StudentCampus']][$item['StudentYearLevel']]++;
-////        }
-////        var_dump($campuses);
-//    }
-
     /**
      * Setup verbose output
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
+        $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', 'group_id'));
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromId())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Staff())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Group_Staff())
+            ->addHydrator($unsetOnUpdate)
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
