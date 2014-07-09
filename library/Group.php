@@ -12,11 +12,19 @@ class Group extends DeprecatedModel
 	const STUDENT_GROUP_TYPE = 'student';
 	const GUEST_GROUP_TYPE = 'guest';
 
+	/**
+	 * A copy of the user notifier - it is called when a user changes.
+	 *
+	 * @var Schoolbox\UserNotifier
+	 */
+	protected $userNotifier;
+
 	function Group($service = HOMEPAGE_SERVICE)
 	{
 		$this->_table = 'userGroups';
 		$this->_index = 'cid';
 		$this->_service = $service;
+		$this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
 
 		parent::DeprecatedModel();
 	}
@@ -220,7 +228,9 @@ class Group extends DeprecatedModel
 	function setUserGroupType($sid, $uid, $type)
 	{
 		$query = "UPDATE userAccess SET type = '$type' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$sid'";
-		$this->db->query($query);
+		if ($this->db->query($query)) {
+			$this->userNotifier->manualNotifyUpdated($uid, $_SESSION['user']);
+		}
 	}
 
 	/**
@@ -233,7 +243,9 @@ class Group extends DeprecatedModel
 	function setSID($previousSid, $sid, $uid)
 	{
 		$query = "UPDATE userAccess SET sid = '$sid' WHERE uid = '$uid' AND service = '" . $this->_service . "' AND sid = '$previousSid'";
-		$this->db->query($query);
+		if ($this->db->query($query)) {
+			$this->userNotifier->manualNotifyUpdated($uid, $_SESSION['user']);
+		}
 	}
 
 	function getOwner($relationID)
@@ -305,9 +317,12 @@ class Group extends DeprecatedModel
 				'service' => $this->_service,
 				'type' => $type,
 			);
-			return $this->db->insert('userAccess', $data);
-		} else
-			return false;
+			if ($result = $this->db->insert('userAccess', $data)) {
+				$this->userNotifier->manualNotifyUpdated($userID, $_SESSION['user']);
+			}
+			return $result;
+		}
+		return false;
 	}
 
 	/**
@@ -325,7 +340,10 @@ class Group extends DeprecatedModel
 			AND uid = '{$this->db->quote($userID)}'
 		";
 
-		return $this->db->query($query);
+		if ($result = $this->db->query($query)) {
+			$this->userNotifier->manualNotifyUpdated($userID, $_SESSION['user']);
+		}
+		return $result;
 	}
 
 	/**

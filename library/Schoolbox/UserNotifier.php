@@ -20,6 +20,11 @@ class UserNotifier extends AbstractModuleNotifier {
 	const TRIGGER_UPDATED = 'updated';
 
 	/**
+	 * @var UserMapper
+	 */
+	protected $userMapper;
+
+	/**
 	 * @return string
 	 */
 	protected function getSlug() {
@@ -34,7 +39,7 @@ class UserNotifier extends AbstractModuleNotifier {
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		// noop
+		$this->userMapper = UserMapper::getInstance();
 	}
 
 
@@ -67,6 +72,52 @@ class UserNotifier extends AbstractModuleNotifier {
 		return array(
 			array($this, 'notify'.ucfirst($label))
 		);
+	}
+
+
+	/**
+	 * Manual trigger for when a user is created.
+	 *
+	 * This and manualTriggerUpdated() are intended for use by handlers, so that
+	 * code that currently uses handlers doesn't have to be rewritten right away
+	 * to use mappers.
+	 *
+	 * @param int  $userId      The ID of the user who was created
+	 * @param User $currentUser The user who did the creating. Usually comes
+	 *                          from $_SESSION[user]
+	 *
+	 * @return bool
+	 */
+	public function manualNotifyCreated($userId, $currentUser) {
+		try {
+			$user = $this->userMapper->findById($userId);
+		}
+		catch (\Exception $e) {
+			return false;
+		}
+		$this->notifyCreated($user, $currentUser);
+		return true;
+	}
+
+
+	/**
+	 * Manual trigger for when a user is updated.
+	 *
+	 * @param int  $userId      The ID of the user who was updated
+	 * @param User $currentUser The user who did the updating. Usually comes
+	 *                          from $_SESSION[user]
+	 *
+	 * @return bool
+	 */
+	public function manualNotifyUpdated($userId, $currentUser) {
+		try {
+			$user = $this->userMapper->findById($userId);
+		}
+		catch (\Exception $e) {
+			return false;
+		}
+		$this->notifyUpdated($user, $currentUser);
+		return true;
 	}
 
 

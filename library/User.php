@@ -2,10 +2,18 @@
 
 class User extends DeprecatedModel {
 
+	/**
+	 * A copy of the user notifier - it is called when a user changes.
+	 *
+	 * @var Schoolbox\UserNotifier
+	 */
+	protected $userNotifier;
+
 	function User() {
 
 		$this->_table = "user";
 		$this->_index = "id";
+		$this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
 
 		parent::DeprecatedModel();
 	}
@@ -698,6 +706,9 @@ class User extends DeprecatedModel {
 			}
 		}
 
+		// Filthily notify the binder that user was updated
+		$this->userNotifier->manualNotifyUpdated($user['id'], $_SESSION['user']);
+
 		return true;
 	}
 
@@ -756,6 +767,8 @@ class User extends DeprecatedModel {
 				$this->db->insert('superusers', array('id' => $id));
 			}
 
+			// Filthily notify the binder that there's a new user
+			$this->userNotifier->manualNotifyCreated($id, $_SESSION['user']);
 			return $id;
 		}
 
