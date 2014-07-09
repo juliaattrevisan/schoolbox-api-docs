@@ -22,27 +22,32 @@ else {
 	$campusList = array();
 	$file = $_FILES['file']['tmp_name'];
 
-	$factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList, $file);
-	$strategy = $factory->build();
-	$strategy->load();
+	if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
+		$factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList, $file);
+		$strategy = $factory->build();
+		$strategy->load();
 
-	$allEvents = $strategy->getOutput();
+		$allEvents = $strategy->getOutput();
 
-	$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
-	$this->setBlock(TEMPLATE_content, 'event', 'event_block');
+		$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
+		$this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
-	if ($allEvents && count($allEvents)) {
-		foreach ($allEvents as $currentEvent) {
-			$this->setVar(array(
-				'EVENT_NAME' => $currentEvent['name'],
-				'EVENT_STATUS' => $currentEvent['status'],
-				'EVENT_ERROR' => $currentEvent['error'],
-			));
+		if ($allEvents && count($allEvents)) {
+			foreach ($allEvents as $currentEvent) {
+				$this->setVar(array(
+					'EVENT_NAME' => $currentEvent['name'],
+					'EVENT_STATUS' => $currentEvent['status'],
+					'EVENT_ERROR' => $currentEvent['error'],
+				));
 
-			$this->parse('event_block', 'event', true);
+				$this->parse('event_block', 'event', true);
+			}
+		}
+		else {
+			$this->setVar('event_block', '');
 		}
 	}
 	else {
-		$this->setVar('event_block', '');
+		error(2);
 	}
 }
