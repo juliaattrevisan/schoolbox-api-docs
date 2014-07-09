@@ -50,18 +50,21 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 	/* Return
 	 */
 	$returnedWorkMapper = new ReturnedWorkMapper();
-	$return = $returnedWorkMapper->findByColumnList(array(
-		'box_id' => $submissionBox->getId(),
-		'owner' => $user->getId()
-	), array(
-		'order' => array(
-			'returned' => 'desc'
-		)
-	))->first();
-
-	$this->setVar(array(
-		'COMMENT' => $return->getComment()
-	));
+	try {
+		$return = $returnedWorkMapper->findOneByColumnList(
+			array(
+				'box_id' => $submissionBox->getId(),
+				'owner' => $user->getId()
+			),
+			array('returned' => 'desc')
+		);
+		$comment = $return->getComment();
+	}
+	catch (\Schoolbox\Mapper\Exception $e) {
+		// no return for this user, show a blank comment
+		$comment = '';
+	}
+	$this->setVar('COMMENT', Scrub::text($comment));
 
 	/* Parse out everything
 	 */
