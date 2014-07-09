@@ -147,14 +147,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'other_key' => 'eventTypeID',
 		));
 		$this->hasJoin('personal', array(
-			'multi' => array(
-				'via_table' => 'event_user',
-				'this_key' => 'event_id',
-				'other_key' => 'user_id'
-			),
-			'mapper' => '\\Schoolbox\\UserMapper',
-			'this_key' => 'id',
-			'other_key' => 'id'
+			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
+			'this_key'  => 'id',
+			'other_key' => 'event_id',
 		));
 		$this->hasJoin('category', array(
 			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
