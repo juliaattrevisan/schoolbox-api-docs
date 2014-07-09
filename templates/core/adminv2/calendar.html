@@ -207,6 +207,7 @@ $j(function() {
 						<tr>
 							<th><input type="checkbox" data-selectall="true" value="" /></th>
 							<th>Title</th>
+							<th>Type</th>
 							<th>Author</th>
 							<th>Start</th>
 							<th>End</th>
@@ -218,7 +219,8 @@ $j(function() {
 						<tr>
 							<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
 							<td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
-							<td>{CLEANUP_EVENT_AUTHOR}</td>
+							<td>{CLEANUP_EVENT_EVENTTYPE}</td>
+							<td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
 							<td>{CLEANUP_EVENT_START}</td>
 							<td>{CLEANUP_EVENT_END}</td>
 							<td>{CLEANUP_EVENT_CAMPUSES}</td>
