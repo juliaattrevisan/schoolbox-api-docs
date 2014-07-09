@@ -270,7 +270,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 		$bob = new Builder();
 
 		$bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
-			->setHref("/resources/$categoryId")
+			->setHref("/homepage/$categoryId")
 			->setNamespace($this->getSlug())
 			->setSeverity(Logger::INFO)
 			->addFilter('roletype', $roleType)
