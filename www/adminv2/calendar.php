@@ -144,7 +144,6 @@ if (is_array($typeList)) {
 
 						/* Whether this connector displays at Ticked or not
 						 */
-
 						$connectorActive = 'connector-active';
 						$connectorChecked = 'checked="checked"';
 					}
@@ -197,11 +196,19 @@ if (is_array($typeList)) {
 				$allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
 				foreach($allEvents as $currentEvent) {
+					$campus = array();
+
+//					foreach($currentEvent->getCampusCollection() as $currentCampus) {
+//						$campus[] = $currentCampus->getName();
+//					}
+
 					$this->setVar(array(
 						'CLEANUP_EVENT_ID' => $currentEvent->getId(),
 						'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
 						'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
 						'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
+						'CLEANUP_EVENT_AUTHOR' => $currentEvent->getAuthor()->getFullName(),
+						'CLEANUP_EVENT_CAMPUSES' => implode(', ', $campus),
 					));
 
 					$this->parse('cleanup_event_block', 'cleanup_event', true);

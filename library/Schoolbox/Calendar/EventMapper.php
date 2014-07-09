@@ -11,6 +11,7 @@
 namespace Schoolbox\Calendar;
 use Schoolbox;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
@@ -146,20 +147,29 @@ class EventMapper extends Schoolbox\External\Mapper {
 			'other_key' => 'eventTypeID',
 		));
 		$this->hasJoin('personal', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
-			'this_key'  => 'id',
-			'other_key' => 'event_id',
+			'multi' => array(
+				'via_table' => 'event_user',
+				'this_key' => 'event_id',
+				'other_key' => 'user_id'
+			),
+			'mapper' => '\\Schoolbox\\UserMapper',
+			'this_key' => 'id',
+			'other_key' => 'id'
 		));
-		$this->hasJoin('category', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
-			'this_key'  => 'id',
-			'other_key' => 'event_id',
-		));
-		$this->hasJoin('campus', array(
-			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
-			'this_key'  => 'id',
-			'other_key' => 'event_id',
-		));
+//		$this->hasJoin('category', array(
+//			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CategoryMapper',
+//			'this_key'  => 'id',
+//			'other_key' => 'event_id',
+//		));
+//		$this->hasJoin('campus', array(
+//			'mapper'    => '\\Schoolbox\\Calendar\\Relation\\CampusMapper',
+//			'this_key'  => 'id',
+//			'other_key' => 'event_id',
+//		));
+//
+//		$this->hasJoin('roles', array(
+//
+//		));
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
@@ -483,12 +493,22 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @return Collection
 	 */
 	public function findEventsBetween($startDate, $endDate) {
+		$authorMapper = $this->getJoinMapper('author');
+		$eventTypeMapper = $this->getJoinMapper('eventType');
+
 		$query = "
-			SELECT {$this->getColumnString('e')}
-			FROM `{$this->getTable()}` e
+			SELECT
+				{$this->getColumnString('e')},
+				{$authorMapper->getColumnString('a')},
+				{$eventTypeMapper->getColumnString('t')},
+				GROUP_CONCAT(DISTINCT luCampus.name ORDER BY luCampus.name ASC SEPARATOR ', ') AS aux_event_campuses
+			FROM `{$this->table}` e
+			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+			LEFT JOIN event_campus ON e.id = event_campus.event_id
+			LEFT JOIN luCampus ON event_campus.campus_id = luCampus.id
 			WHERE startDate >= :startDate
 			AND endDate <= :endDate
-			ORDER BY startDate
 		";
 
 		$statement = $this->database->prepare($query);
@@ -496,12 +516,26 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$statement->bindParam(":endDate", $endDate);
 		$statement->execute();
 
-		$allEvents = new \Schoolbox\Collection();
+		/* Hydrate or die
+		 */
+		$allEvents = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$event = $this->hydrate($row, 'e');
+			$author = $authorMapper->hydrate($row, 'a');
+			$eventType = $eventTypeMapper->hydrate($row, 't');
 
-			$allEvents->add($event);
+			$event->setAuthor($author);
+			$event->setType($eventType);
+
+			$augmented = array(
+				'event' => $event,
+				'auxiliary' => array(
+					'campuses' => $row['aux_event_campuses'],
+				)
+			);
+
+			$allEvents->add($augmented);
 		}
 
 		return $allEvents;
