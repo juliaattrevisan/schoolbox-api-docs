@@ -93,8 +93,22 @@
 			border-bottom-right-radius: 0;
 		}
 	}
+	.more {
+		margin: 0 0 0 4px;
+		border-radius: 3px;
+		&.open {
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+			> a {
+				color: @link;
+			}
+		}
+		> a {
+			color: @banner-color;
+		}
+	}
 }
-#message-list {
+#message-list, #account-menu {
 	border-radius: 3px;
 	border-top-right-radius: 0;
 }
