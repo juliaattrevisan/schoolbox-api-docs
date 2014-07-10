@@ -27,6 +27,7 @@ use Schoolbox\User;
 class AttemptNotifier extends AbstractModuleNotifier {
 
 	const TRIGGER_ATTEMPTED = 'attempted';
+	const TRIGGER_MARKED    = 'marked';
 
 	/** @var OnlineAssessmentMapper */
 	protected $assessMapper;
@@ -66,6 +67,9 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
 			$bundle->attach(self::TRIGGER_ATTEMPTED, self::IMMEDIATELY);
 		}
+		if($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+			$bundle->attach(self::TRIGGER_MARKED, self::IMMEDIATELY);
+		}
 	}
 
 
@@ -99,6 +103,83 @@ class AttemptNotifier extends AbstractModuleNotifier {
 			->addTopic("assess.$assessId.attempted");
 
 		$envelope->targetToUser($assess->getUser(), $bob->build());
+
+		return $envelope;
+	}
+
+
+	/**
+	 * @param Attempt $attempt
+	 * @param User    $teacher
+	 * @param array   $diff
+	 * @return Envelope
+	 */
+	public function notifyStudentMarked($attempt, $teacher, $diff = null) {
+		$envelope = new Envelope();
+		$bob = new Builder();
+
+		$assessId = $attempt->getAssessment()->getId();
+		/** @var OnlineAssessment $assess */
+		$assess = $this->assessMapper->findById($assessId);
+
+		$studentId = $assess->getUser()->getId();
+
+		$href = "/assess/attempts/$assessId/$studentId";
+
+		$bob->setSeverity(Logger::NOTICE)
+			->setNamespace($this->getSlug())
+			->setHref($href)
+			->setIcon("/portrait?size=square32&userId=".$teacher->getExternalId())
+			->setTitle(":staff has marked your attempt of :quiz in :cat")
+			->setParams(array(
+				'staff' => new UserParam($teacher),
+				'quiz'  => new Param($assess->getTitle(), $href),
+				'cat'   => new CategoryParam($assess->getCategory())
+			))
+			->addTopic("assess.$assessId.marked");
+
+		$envelope->targetToUser($attempt->getUser(), $bob->build());
+
+		return $envelope;
+	}
+
+
+	/**
+	 * @param Attempt $attempt
+	 * @param User    $teacher
+	 * @param array   $diff
+	 * @return Envelope
+	 */
+	public function notifyParentMarked($attempt, $teacher, $diff = null) {
+		$envelope = new Envelope();
+
+		if($this->conf->get('restrict_parent_duework_access')) {
+			return $envelope;
+		}
+
+		$assessId = $attempt->getAssessment()->getId();
+		/** @var OnlineAssessment $assess */
+		$assess = $this->assessMapper->findById($assessId);
+
+		$studentId = $assess->getUser()->getId();
+
+		$href = "/assess/attempts/$assessId/$studentId";
+
+		$bob = new Builder();
+		$bob->setSeverity(Logger::NOTICE)
+		    ->setNamespace($this->getSlug())
+		    ->setHref($href)
+		    ->setIcon("/portrait?size=square32&userId=".$teacher->getExternalId())
+		    ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
+		    ->setParams(array(
+			    'staff' => new UserParam($teacher),
+			    'child' => new UserParam($attempt->getUser(), Param::STACKING_REPLACE, '{firstname}'),
+			    'quiz'  => new Param($assess->getTitle(), $href),
+			    'cat'   => new CategoryParam($assess->getCategory())
+		    ))
+		    ->addTopic("assess.$assessId.marked");
+
+		$envelope->targetToParent($attempt->getUser(), $bob->build());
 
 		return $envelope;
 	}

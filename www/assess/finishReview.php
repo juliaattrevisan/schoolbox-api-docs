@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+
 /**
  * Review completion. Marks when an assessment review is finished.
  *
@@ -8,8 +11,8 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
+$assessHandler = false;
+$attemptHandler = false;
 $groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
@@ -20,26 +23,33 @@ if (!is_numeric($this->arg[1])) {
     error(118);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
-$attempt = $attemptHandler->getByID($this->arg[1]);
+$assessMapper = OnlineAssessmentMapper::getInstance();
+$attemptMapper = AttemptMapper::getInstance();
 
-if (!$assess) {
-    error(112);
+try {
+	/** @var Schoolbox\Assessment\Component\OnlineAssessment $assess */
+	$assess = $assessMapper->findById($this->arg[0]);
 }
-
-if ($assessHandler->isDeleted($this->arg[0])) {
+catch(\Schoolbox\Mapper\Exception $e) {
 	error(112);
+	exit;
 }
 
-if (!$attempt) {
-    error(118);
+try {
+	/** @var \Schoolbox\Assessment\Component\OnlineAssessment\Attempt $attempt */
+	$attempt = $attemptMapper->findById($this->arg[1]);
+}
+catch(\Schoolbox\Mapper\Exception $e) {
+	error(118);
+	exit;
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-    error(127);
+if($assess->getUser()->getId() != $_SESSION['user']->getId() || $groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS) {
+	error(127);
 }
 
-$attemptHandler->reviewed($this->arg[1]);
+$attempt->setReviewed(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+$attemptMapper->save($attempt);
 
 SitePage::localRedir('/assess/results/' . $this->arg[0]);
 

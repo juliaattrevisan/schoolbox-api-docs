@@ -31,9 +31,6 @@ use Schoolbox\User;
 
 class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceInterface {
 
-	// TODO these two go elsewhere
-	const TRIGGER_MARKED    = 'marked';
-
 	const TRIGGER_CLOSED    = 'closed';
 	const TRIGGER_OPEN      = 'open';
 	const TRIGGER_OVERDUE   = 'overdue';
