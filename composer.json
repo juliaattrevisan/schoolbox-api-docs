@@ -74,7 +74,7 @@
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.0.*",
+        "phpunit/phpunit": "4.1.*",
         "behat/behat": "2.5.*",
         "behat/mink": "1.5.*",
         "behat/mink-extension": "1.2.*",
