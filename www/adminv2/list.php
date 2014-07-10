@@ -180,7 +180,7 @@ if (isset($selectedTable['fields'])) {
 if ($table) {
     foreach ($table as $row) {
         foreach ($row as $keys => $data) {
-            $this->setVar('TABLE_DATA', $data);
+            $this->setVar('TABLE_DATA',   Scrub::text($data));
             $this->setVar('TABLE_COLUMN', $keys);
 
             $currentColumn = $selectedTable['fields'][$keys];
