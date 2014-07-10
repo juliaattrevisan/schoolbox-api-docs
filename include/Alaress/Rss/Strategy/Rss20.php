@@ -38,12 +38,23 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface {
 				$content = $currentRss->children('http://purl.org/rss/1.0/modules/content/');
 				$dc = $currentRss->children('http://purl.org/dc/elements/1.1/');
 
+				// Standardize pubDate into DateTime objects
+				try {
+					$pubDate = DateTime::createFromFormat(DateTime::RSS, $currentRss->pubDate);
+					if (!($pubDate instanceof DateTime)) {
+						$pubDate = new DateTime($currentRss->pubDate);
+					}
+				}
+				catch (Exception $e) {
+					$pubDate = null;
+				}
+
 				$article = array(
 					'title' => (string)$currentRss->title,
 					'link' => (string)$currentRss->link,
 					'description' => (string)$currentRss->description,
 					'content'       => (string)$content->encoded,
-					'pubDate' => (string)$currentRss->pubDate,
+					'pubDate' => $pubDate,
 					'creator'   => (string)$dc->creator,
 				);
 

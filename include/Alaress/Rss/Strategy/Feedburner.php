@@ -56,11 +56,22 @@ class Alaress_Rss_Strategy_Feedburner implements Alaress_Rss_Strategy_Interface 
 			else {
 				$currentRss = $allRss[$i];
 
+				// Standardize pubDate into DateTime objects
+				try {
+					$pubDate = DateTime::createFromFormat(DateTime::RSS, $currentRss['pubDate']);
+					if (!($pubDate instanceof DateTime)) {
+						$pubDate = new DateTime($currentRss['pubDate']);
+					}
+				}
+				catch (Exception $e) {
+					$pubDate = null;
+				}
+
 				$data[] = array(
 					'title' => $currentRss['title'],
 					'link' => $currentRss['link'],
 					'description' => (string)$currentRss['description'],
-					'pubDate' => (string)$currentRss['pubDate'],
+					'pubDate' => $pubDate,
 				);
 			}
 		}
