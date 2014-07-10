@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "02e188c291aca1146aef948b74ded301",
+    "hash": "6f43b6ced426e1c38cfcb4aa5514129f",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -366,15 +366,15 @@
         },
         {
             "name": "devristo/phpws",
-            "version": "dev-master",
+            "version": "dev-master-php53compat",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Devristo/phpws.git",
+                "url": "https://github.com/armatronic/phpws.git",
                 "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Devristo/phpws/zipball/911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30",
+                "url": "https://api.github.com/repos/armatronic/phpws/zipball/911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30",
                 "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30",
                 "shasum": ""
             },
@@ -390,7 +390,6 @@
                     "Devristo\\Phpws\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Devristo",
@@ -398,6 +397,9 @@
                 }
             ],
             "description": "WebSocket Server and Client library for PHP",
+            "support": {
+                "source": "https://github.com/armatronic/phpws/tree/master-php53compat"
+            },
             "time": "2014-05-08 16:27:18"
         },
         {
