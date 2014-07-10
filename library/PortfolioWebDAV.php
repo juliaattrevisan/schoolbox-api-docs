@@ -737,7 +737,7 @@ class PortfolioWebDAV
         }
 
         if (isset($data['description'])) {
-            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . rawurlencode($data['description']);
+            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . '/' . rawurlencode($data['description']);
             $this->client->move($_SESSION['portfolioIdPathMap'][$data['id']], $destination);
 
             $_SESSION['portfolioIdPathMap'][$data['id']] = $destination;
