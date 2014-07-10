@@ -344,6 +344,10 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyParentOverdue($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
+		if($this->conf->get('restrict_parent_duework_access')) {
+			return $msgr;
+		}
+
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
@@ -423,6 +427,10 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyParentUpcoming($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
+		if($this->conf->get('restrict_parent_duework_access')) {
+			return $msgr;
+		}
+
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
@@ -452,7 +460,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 			$msgr->targetToParent($childId, $msg, "assess.$quizId.upcoming", Logger::WARNING, array(
 				'child'     => array($childName, "/search/user/$childId"),
-				'boxname'   => $quizdata,
+				'quizname'  => $quizdata,
 				'catname'   => array($catName, "/homepage/$catId")
 			));
 		}
