@@ -40,6 +40,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         // Filter to a given number of days.
         $eventLimit = intval($this->getConfig('size'));
         $dayLimit   = intval($this->getConfig('days'));
+
         if ($dayLimit <= 0) {
             $dayLimit = 365;
         }

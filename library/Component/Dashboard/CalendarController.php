@@ -48,9 +48,13 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$this->start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
 		$this->end   = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
 		$days  = $this->getConfig('days');
+
+		/* Get 30 days of events by default
+		 */
 		if ($days <= 1) {
-			$days = 1;
+			$days = 30;
 		}
+
 		$this->end->addDays($days);
 
 		/* A list of submissions
