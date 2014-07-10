@@ -45,7 +45,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	const UPCOMING_WINDOW     = 2;
 
 	/** @var CategoryMapper */
-	protected $catMapper;
+	protected $categoryMapper;
 
 	/** @var AttemptMapper */
 	protected $attemptMapper;
@@ -68,10 +68,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->catMapper = CategoryMapper::getInstance();
+		$this->categoryMapper = CategoryMapper::getInstance();
 		$this->attemptMapper = AttemptMapper::getInstance();
 		$this->workTypeMapper = WorkTypeMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
+
 
 	/**
 	 * Fully hydrates the quiz object, in this case with the work type and
@@ -88,7 +90,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$quiz = $this->mapper->findById($quiz->getId());
 		$quiz
 			->setWorkType($this->workTypeMapper->findById($quiz->getWorkType()->getId()))
-			->setCategory($this->catMapper->findById($quiz->getCategory()->getId()))
+			->setCategory($this->categoryMapper->findById($quiz->getCategory()->getId()))
 		;
 		return $quiz;
 	}

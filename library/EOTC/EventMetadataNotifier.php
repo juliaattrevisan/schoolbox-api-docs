@@ -47,16 +47,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 	}
 
 	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		// subconstructor: load any mapper dependencies etc. here
-	}
-
-	/**
 	 * Bundle triggers
 	 *
 	 * @param TriggerBundle $bundle

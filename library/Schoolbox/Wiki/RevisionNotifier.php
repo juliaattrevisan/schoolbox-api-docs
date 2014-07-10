@@ -45,6 +45,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	public function loadDependencies($dependencies = null) {
 		$this->wikiMapper = WikiMapper::getInstance();
 		$this->catMapper = CategoryMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 	/**

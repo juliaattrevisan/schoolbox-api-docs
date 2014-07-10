@@ -34,15 +34,6 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_POSTED = 'posted';
 
-	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		// noop
-	}
 
 	/**
 	 * @return string

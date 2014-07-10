@@ -38,16 +38,6 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		// noop
-	}
-
-	/**
 	 * @param TriggerBundle $bundle
 	 * @return void
 	 */

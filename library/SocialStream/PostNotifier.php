@@ -60,6 +60,7 @@ class PostNotifier extends AbstractModuleNotifier {
 		$this->catMapper = CategoryMapper::getInstance();
 		$this->userAccessMapper = UserAccessMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 

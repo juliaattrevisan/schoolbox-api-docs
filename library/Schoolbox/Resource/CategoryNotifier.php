@@ -40,16 +40,6 @@ class CategoryNotifier extends ResourceNotifier {
 
 
 	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-
-	}
-
-	/**
 	 * @return string
 	 */
 	protected function getSlug() {

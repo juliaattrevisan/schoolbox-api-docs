@@ -54,6 +54,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	public function loadDependencies($dependencies = null) {
 		$this->blogMapper = BlogMapper::getInstance();
 		$this->catMapper = CategoryMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 	/**

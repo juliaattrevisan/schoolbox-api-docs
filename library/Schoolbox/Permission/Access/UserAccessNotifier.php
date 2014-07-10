@@ -41,17 +41,6 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 
 
 	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		$this->namespace = NSMapper::getInstance()->findOneBySlug(NSMapper::NS_GROUP);
-	}
-
-
-	/**
 	 * @param TriggerBundle $bundle
 	 * @return void
 	 */

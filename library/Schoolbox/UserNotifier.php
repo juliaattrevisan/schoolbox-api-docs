@@ -20,26 +20,10 @@ class UserNotifier extends AbstractModuleNotifier {
 	const TRIGGER_UPDATED = 'updated';
 
 	/**
-	 * @var UserMapper
-	 */
-	protected $userMapper;
-
-	/**
 	 * @return string
 	 */
 	protected function getSlug() {
 		return 'user';
-	}
-
-
-	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		$this->userMapper = UserMapper::getInstance();
 	}
 
 
@@ -90,7 +74,7 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function manualNotifyCreated($userId, $currentUser) {
 		try {
-			$user = $this->userMapper->findById($userId);
+			$user = $this->mapper->findById($userId);
 		}
 		catch (\Exception $e) {
 			return false;
@@ -111,7 +95,7 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function manualNotifyUpdated($userId, $currentUser) {
 		try {
-			$user = $this->userMapper->findById($userId);
+			$user = $this->mapper->findById($userId);
 		}
 		catch (\Exception $e) {
 			return false;
