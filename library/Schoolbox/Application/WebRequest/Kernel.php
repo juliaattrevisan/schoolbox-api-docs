@@ -66,12 +66,13 @@ class Kernel extends \Alaress\Application\Kernel {
 		$path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$route = $this->di->get('router')->match($path, $_SERVER);
 		if ($route instanceof Route) {
-			// do something with the route.
-			// For now, I just assume the DI container knows how to get a controller
-			// named 'controller:$route->params[controller]', and this controller has a
-			// public method named $route->params[action].
+			// The route name's format:
+			// "[controllerName].[action](:[label])"
+			// The : and label are optional.
+			preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
+			$controllerName = $parsedName['controller'];
+			$action         = $parsedName['action'];
 			/** @var \Alaress\Web\Controller\Base $controller */
-			list($controllerName, $action) = explode('.', $route->name);
 			$controller = $this->di->get('controller:'.$controllerName);
 			/** @var \Alaress\Session\Session $session */
 			$session = $this->di->get('session');
