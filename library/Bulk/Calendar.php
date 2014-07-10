@@ -28,9 +28,11 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 			/* Set up specified campus list
 			 * Set up specified group list
+			 * Set up specified category list
 			 */
 			$groupList = array();
 			$campusList = array();
+			$categoryList = array();
 
 			if (is_array($_POST['userGroup'])) {
 				$groupList = $_POST['userGroup'];
@@ -40,9 +42,13 @@ class Bulk_Calendar extends Bulk_Abstract {
 				$campusList = $_POST['campusList'];
 			}
 
+			if (is_array($_POST['categoryList'])) {
+				$categoryList = $_POST['categoryList'];
+			}
+
 			/* Use factory to spawn a builder
 			 */
-			$factory = new \Calendar\Import\Factory($uid, $_SESSION['id'], $groupList, $campusList, $this->getFile());
+			$factory = new \Calendar\Import\Factory($uid, $_SESSION['id'], $categoryList, $groupList, $campusList, $this->getFile());
 			$strategy = $factory->build();
 			$strategy->load();
 
