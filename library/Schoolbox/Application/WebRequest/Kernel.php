@@ -71,7 +71,8 @@ class Kernel extends \Alaress\Application\Kernel {
 			// named 'controller:$route->params[controller]', and this controller has a
 			// public method named $route->params[action].
 			/** @var \Alaress\Web\Controller\Base $controller */
-			$controller = $this->di->get('controller:'.$route->params['controller']);
+			list($controllerName, $action) = explode('.', $route->name);
+			$controller = $this->di->get('controller:'.$controllerName);
 			/** @var \Alaress\Session\Session $session */
 			$session = $this->di->get('session');
 
@@ -79,6 +80,7 @@ class Kernel extends \Alaress\Application\Kernel {
 			$response = null;
 			// Has session expired? Assume no user here then, but that should probably
 			// be handled in authenticator.
+			$params = array();
 			try {
 				// Do authorization here
 				// TODO Inject user getter into authorizer, and use it to determine:
@@ -102,7 +104,7 @@ class Kernel extends \Alaress\Application\Kernel {
 
 				// Call the controller method.
 				// Ensure that the parameters match up with the names used.
-				$method = new ReflectionMethod($controller, $params['action']);
+				$method = new ReflectionMethod($controller, $action);
 				$args   = array();
 				foreach ($method->getParameters() as $parameter) {
 					$name   = $parameter->getName();
