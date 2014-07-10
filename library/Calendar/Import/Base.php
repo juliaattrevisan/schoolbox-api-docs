@@ -29,6 +29,13 @@ abstract class Base {
 	protected $author = null;
 
 	/**
+	 * A list of selected event_category relations
+	 *
+	 * @var array
+	 */
+	protected $categoryList = array();
+
+	/**
 	 * A list of selected event_group relations
 	 *
 	 * @var array
@@ -69,13 +76,15 @@ abstract class Base {
 	 *
 	 * @param $user
 	 * @param $author
+	 * @param $categoryList
 	 * @param $groupList
 	 * @param $campusList
 	 * @param $file
 	 */
-	public function __construct($user, $author, $groupList, $campusList, $file) {
+	public function __construct($user, $author, $categoryList, $groupList, $campusList, $file) {
 		$this->setUser($user);
 		$this->setAuthor($author);
+		$this->setCategoryList($categoryList);
 		$this->setGroupList($groupList);
 		$this->setCampusList($campusList);
 		$this->setFile($file);
@@ -218,5 +227,23 @@ abstract class Base {
 	 */
 	public function getAllEventTypes() {
 		return $this->allEventTypes;
+	}
+
+	/**
+	 * Set category list
+	 *
+	 * @param array $categoryList
+	 */
+	protected function setCategoryList($categoryList) {
+		$this->categoryList = $categoryList;
+	}
+
+	/**
+	 * Get category list
+	 *
+	 * @return array
+	 */
+	protected function getCategoryList() {
+		return $this->categoryList;
 	}
 }

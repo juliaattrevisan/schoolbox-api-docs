@@ -18,12 +18,13 @@ if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
 else {
 	$user = $_SESSION['user'];
 	$author = $_SESSION['user'];
-	$groupList = array($_POST['homepageId']);
+	$categoryList = array($_POST['homepageId']);
+	$groupList = array();
 	$campusList = array();
 	$file = $_FILES['file']['tmp_name'];
 
 	if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
-		$factory = new \Calendar\Import\Factory($user, $author, $groupList, $campusList, $file);
+		$factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, $file);
 		$strategy = $factory->build();
 		$strategy->load();
 
