@@ -45,6 +45,11 @@ class Module {
     /**
      * Initializes any routes for this module, with a given base path.
      *
+     * The base path for each route needs to match up to the name of the
+     * controller in $this->initControllers(), so if its base path is
+     * "user", there must be a controller in the DI container called
+     * "controller:user"
+     *
      * @param Router $router
      * @param string $basePath The base route for this module
      */
