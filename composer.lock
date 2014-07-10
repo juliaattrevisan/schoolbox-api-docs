@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ddc4aac96e5659e99d0c1713acb1086d",
+    "hash": "02e188c291aca1146aef948b74ded301",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -54,12 +54,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Di.git",
-                "reference": "b1f1e51d301bdbf8a15fd5e4208966998d2cacc8"
+                "reference": "5246645db7b369861e952fb9c3b7701d36c646f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/b1f1e51d301bdbf8a15fd5e4208966998d2cacc8",
-                "reference": "b1f1e51d301bdbf8a15fd5e4208966998d2cacc8",
+                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/5246645db7b369861e952fb9c3b7701d36c646f3",
+                "reference": "5246645db7b369861e952fb9c3b7701d36c646f3",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 "di",
                 "di container"
             ],
-            "time": "2014-04-21 20:32:44"
+            "time": "2014-05-30 17:00:18"
         },
         {
             "name": "aura/router",
@@ -106,12 +106,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Router.git",
-                "reference": "7a623e4f59982449243a997725fe009778742849"
+                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/7a623e4f59982449243a997725fe009778742849",
-                "reference": "7a623e4f59982449243a997725fe009778742849",
+                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
+                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
                 "shasum": ""
             },
             "require": {
@@ -152,28 +152,24 @@
                 "router",
                 "routing"
             ],
-            "time": "2014-04-22 02:26:42"
+            "time": "2014-05-30 17:12:38"
         },
         {
             "name": "aura/session",
-            "version": "dev-develop-2-PHP5.3-session-status",
+            "version": "dev-develop-2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/armatronic/Aura.Session.git",
-                "reference": "63f709a99665ea635f6bd9f8e929d72ecf1ac103"
+                "url": "https://github.com/auraphp/Aura.Session.git",
+                "reference": "dbcba7d866ba81b23128a2a56784a1d2a615891e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/armatronic/Aura.Session/zipball/63f709a99665ea635f6bd9f8e929d72ecf1ac103",
-                "reference": "63f709a99665ea635f6bd9f8e929d72ecf1ac103",
+                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/dbcba7d866ba81b23128a2a56784a1d2a615891e",
+                "reference": "dbcba7d866ba81b23128a2a56784a1d2a615891e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.0.*",
-                "squizlabs/php_codesniffer": "1.5.*"
             },
             "suggest": {
                 "ext-mcrypt": "Mcrypt generates the next best secure CSRF tokens.",
@@ -193,6 +189,7 @@
                     "Aura\\Session\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -211,10 +208,7 @@
                 "session",
                 "sessions"
             ],
-            "support": {
-                "source": "https://github.com/armatronic/Aura.Session/tree/develop-2-PHP5.3-session-status"
-            },
-            "time": "2014-04-04 04:49:45"
+            "time": "2014-07-08 23:22:31"
         },
         {
             "name": "aura/web",
@@ -222,12 +216,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Web.git",
-                "reference": "45d3121f4d881e267557a3ab669a565c0849f952"
+                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/45d3121f4d881e267557a3ab669a565c0849f952",
-                "reference": "45d3121f4d881e267557a3ab669a565c0849f952",
+                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/b4b8a94b824488187100967d7d73d312e56b9afd",
+                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd",
                 "shasum": ""
             },
             "require": {
@@ -267,7 +261,7 @@
                 "request",
                 "response"
             ],
-            "time": "2014-04-18 21:02:40"
+            "time": "2014-05-30 17:18:31"
         },
         {
             "name": "browscap/browscap-php",
@@ -275,12 +269,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/browscap/browscap-php.git",
-                "reference": "a7140f1b125b1b52300f4b8ba2c41a0ad40cf458"
+                "reference": "1d64d648e034495abb63a0d79e5b4ca57c0bb999"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/browscap/browscap-php/zipball/a7140f1b125b1b52300f4b8ba2c41a0ad40cf458",
-                "reference": "a7140f1b125b1b52300f4b8ba2c41a0ad40cf458",
+                "url": "https://api.github.com/repos/browscap/browscap-php/zipball/1d64d648e034495abb63a0d79e5b4ca57c0bb999",
+                "reference": "1d64d648e034495abb63a0d79e5b4ca57c0bb999",
                 "shasum": ""
             },
             "require": {
@@ -319,7 +313,7 @@
                 "get_browser",
                 "user agent"
             ],
-            "time": "2014-05-09 06:55:43"
+            "time": "2014-05-17 05:42:09"
         },
         {
             "name": "cboden/ratchet",
@@ -975,12 +969,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/event-loop.git",
-                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d"
+                "reference": "c75b334ef4a345d6c89954af71a4ef17fce4d04d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/49208fa3a15c9eae4adf8351ee9caa4064fe550d",
-                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/c75b334ef4a345d6c89954af71a4ef17fce4d04d",
+                "reference": "c75b334ef4a345d6c89954af71a4ef17fce4d04d",
                 "shasum": ""
             },
             "require": {
@@ -1061,12 +1055,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "9cc32838d25a934ce950d2662cce2ff1b9e9f8aa"
+                "reference": "e08ffb983a512b6f4812943656c10b12224ae641"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/9cc32838d25a934ce950d2662cce2ff1b9e9f8aa",
-                "reference": "9cc32838d25a934ce950d2662cce2ff1b9e9f8aa",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/e08ffb983a512b6f4812943656c10b12224ae641",
+                "reference": "e08ffb983a512b6f4812943656c10b12224ae641",
                 "shasum": ""
             },
             "require": {
@@ -1187,12 +1181,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream.git",
-                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da"
+                "reference": "c212d551d021bcc3a172688b7a08219a262e5dfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/stream/zipball/b72900ab00513b591fb101faecad38f9c8eab8da",
-                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/c212d551d021bcc3a172688b7a08219a262e5dfb",
+                "reference": "c212d551d021bcc3a172688b7a08219a262e5dfb",
                 "shasum": ""
             },
             "require": {
@@ -1285,7 +1279,7 @@
             "authors": [
                 {
                     "name": "Evert Pot",
-                    "email": "evert@rooftopsolutions.nl",
+                    "email": "me@evertpot.com",
                     "homepage": "http://evertpot.com/",
                     "role": "Developer"
                 }
@@ -3494,12 +3488,6 @@
             "alias_normalized": "2.1.0.0",
             "version": "3.1.3.0",
             "package": "sabre/vobject"
-        },
-        {
-            "alias": "2.0.x-dev",
-            "alias_normalized": "2.0.9999999.9999999-dev",
-            "version": "dev-develop-2-PHP5.3-session-status",
-            "package": "aura/session"
         },
         {
             "alias": "dev-master",
