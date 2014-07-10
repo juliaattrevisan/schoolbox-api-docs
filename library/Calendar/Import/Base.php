@@ -50,6 +50,13 @@ abstract class Base {
 	protected $campusList = array();
 
 	/**
+	 * Access level for each event imported
+	 *
+	 * @var int
+	 */
+	protected $access = 0;
+
+	/**
 	 * The source file from which to import
 	 *
 	 * @var null
@@ -79,14 +86,16 @@ abstract class Base {
 	 * @param $categoryList
 	 * @param $groupList
 	 * @param $campusList
+	 * @param $access
 	 * @param $file
 	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $file) {
+	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
 		$this->setGroupList($groupList);
 		$this->setCampusList($campusList);
+		$this->setAccess($access);
 		$this->setFile($file);
 
 		/* All the available event types
@@ -245,5 +254,23 @@ abstract class Base {
 	 */
 	protected function getCategoryList() {
 		return $this->categoryList;
+	}
+
+	/**
+	 * Set access
+	 *
+	 * @param int $access
+	 */
+	protected function setAccess($access) {
+		$this->access = $access;
+	}
+
+	/**
+	 * Get access
+	 *
+	 * @return int
+	 */
+	protected function getAccess() {
+		return $this->access;
 	}
 }

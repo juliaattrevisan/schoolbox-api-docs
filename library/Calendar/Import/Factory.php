@@ -49,6 +49,13 @@ class Factory {
 	protected $campusList = array();
 
 	/**
+	 * Access level for each event imported
+	 *
+	 * @var int
+	 */
+	protected $access = 0;
+
+	/**
 	 * The source file from which to import
 	 *
 	 * @var null
@@ -63,14 +70,16 @@ class Factory {
 	 * @param $categoryList
 	 * @param $groupList
 	 * @param $campusList
+	 * @param $access
 	 * @param $file
 	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $file) {
+	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
 		$this->setGroupList($groupList);
 		$this->setCampusList($campusList);
+		$this->setAccess($access);
 		$this->setFile($file);
 	}
 
@@ -87,7 +96,7 @@ class Factory {
 			$classname = '\Calendar\Import\Csv';
 		}
 
-		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getFile());
+		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile());
 	}
 
 	/* Getters/Setters
@@ -199,5 +208,23 @@ class Factory {
 	 */
 	protected function getCategoryList() {
 		return $this->categoryList;
+	}
+
+	/**
+	 * Set access
+	 *
+	 * @param int $access
+	 */
+	protected function setAccess($access) {
+		$this->access = $access;
+	}
+
+	/**
+	 * Get access
+	 *
+	 * @return int
+	 */
+	protected function getAccess() {
+		return $this->access;
 	}
 }

@@ -106,7 +106,7 @@ class Vcal extends Base {
 					$event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 					$event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 					$event->setTitle((string)$currentEvent->SUMMARY);
-					$event->setAccess(Event::ACCESS_CAMPUS);
+					$event->setAccess($this->getAccess());
 					$event->setType($this->findEventTypeFromArray($categoryList));
 					$event->setCampusCollection($allCampuses);
 					$event->setDetail(nl2br((string)$currentEvent->DESCRIPTION));

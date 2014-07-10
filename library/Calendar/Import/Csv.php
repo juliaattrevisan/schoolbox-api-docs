@@ -110,7 +110,7 @@ class Csv extends Base {
 				$event = new Event();
 				$event->setOwner($this->getUser());
 				$event->setAuthor($this->getAuthor());
-				$event->setAccess(Event::ACCESS_CAMPUS);
+				$event->setAccess($this->getAccess());
 				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'y-m-d h:i:s'));
 				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'y-m-d h:i:s'));
 				$event->setTitle($name);

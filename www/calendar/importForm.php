@@ -24,7 +24,7 @@ else {
 	$file = $_FILES['file']['tmp_name'];
 
 	if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
-		$factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, $file);
+		$factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
 		$strategy = $factory->build();
 		$strategy->load();
 
