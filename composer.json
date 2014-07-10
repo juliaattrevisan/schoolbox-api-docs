@@ -38,6 +38,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/armatronic/phpws"
         }
     ],
     "require": {
@@ -57,7 +61,7 @@
         "monolog/monolog": "1.7.0",
         "videlalvaro/php-amqplib": "2.2.5",
         "cboden/ratchet": "0.3.0",
-        "devristo/phpws": "dev-master",
+        "devristo/phpws": "dev-master-php53compat",
         "react/stomp": "0.2.*@dev",
         "mtdowling/cron-expression": "1.0.*",
         "djfm/cssin": "0.1.0",
