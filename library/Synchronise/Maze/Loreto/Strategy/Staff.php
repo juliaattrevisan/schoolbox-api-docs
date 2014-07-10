@@ -18,7 +18,8 @@ class Synchronise_Maze_Loreto_Strategy_Staff extends Synchronise_Base_Strategy_S
 			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
 			->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
-            ->addHydrator(new Synchronise_Maze_Loreto_Hydrator_StaffCampus())
+			->addHydrator(new Synchronise_Maze_Loreto_Hydrator_Group_Staff())
+			->addHydrator(new Synchronise_Maze_Loreto_Hydrator_StaffCampus())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
