@@ -1,4 +1,7 @@
 {
+    "name": "alaress/schoolbox",
+    "description": "Schoolbox LMS",
+    "license": "proprietary",
     "repositories": [
         {
             "type": "package",
