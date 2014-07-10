@@ -47,6 +47,10 @@ else {
 		else {
 			$this->setVar('event_block', '');
 		}
+
+		$this->setVar(array(
+			'HOMEPAGE_ID' => $_POST['homepageId']
+		));
 	}
 	else {
 		error(2);
