@@ -207,7 +207,7 @@ class Builder {
 	 * @param ParameterInterface $param
 	 * @return self
 	 */
-	public function setParam($token, $param) {
+	public function setParam($token, ParameterInterface $param) {
 		$this->params[$token] = $param;
 		return $this;
 	}
@@ -217,7 +217,10 @@ class Builder {
 	 * @return self
 	 */
 	public function setParams($params) {
-		$this->params = $params;
+		$this->params = array();
+		foreach($params as $t => $p) {
+			$this->setParam($t, $p);
+		}
 		return $this;
 	}
 
