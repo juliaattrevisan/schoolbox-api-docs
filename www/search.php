@@ -510,7 +510,9 @@ if (!empty($result['sitenews'])) {
     foreach ($result['sitenews'] as $news) {
         $tName = strtolower($news['topicName']);
         $archived = (new DateTime() > new DateTime($news['item_datetime_expires']));
-        $news['breadcrumb'] = ($archived ? ' Archived' : 'Posted') . " in <a href=\"/news/" . ($archived ? 'archive/' : '') . "$tName\">{$news['topicName']}</a>";
+        $news['breadcrumb'] = ($archived ? ' Archived' : 'Posted') . " in <a href=\"/news/" .
+            ($archived ? 'archive/' : '') .
+            "$tName\">".Scrub::text($news['topicName'])."</a>";
 
         $news['link'] = "/news/item/{$news['item_id']}";
 

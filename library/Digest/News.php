@@ -247,7 +247,7 @@ class Digest_News {
                     'id'        => $article['item_id'],
                     'title'     => $article['item_heading'],
                     'abstract'  => $this->scrub($article['item_body']),
-                    'topic'     => $article['topicName'],
+                    'topic'     => Scrub::text($article['topicName']),
                     'topic_url' => 'news/'.strtolower(urlencode($article['topicName'])),
                     'date'      => strtotime($article['item_datetime_posted']),
                     'poster'    => $this->getPosterFromArticle($article),

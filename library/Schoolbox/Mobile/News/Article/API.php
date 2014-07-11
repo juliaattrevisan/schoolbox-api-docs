@@ -10,6 +10,7 @@ namespace Schoolbox\Mobile\News\Article;
 
 use News;
 use Response_HTTP;
+use Scrub;
 use CategoryNews;
 
 class API {
@@ -37,7 +38,7 @@ class API {
 	            )
 	        );
 
-	        $response->setPage('title', 'School News &rsaquo; ' . $topic['name']);
+	        $response->setPage('title', 'School News &rsaquo; ' . Scrub::text($topic['name']));
 	        $response->setResponse('articles',array($article));
 		    return $response;
 	    }

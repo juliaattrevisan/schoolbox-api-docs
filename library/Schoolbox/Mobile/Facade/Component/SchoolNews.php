@@ -52,12 +52,18 @@ class SchoolNews extends Generic {
             }
         }
 
+        // Why do I have to do this?
+        $escapedNewsList = array();
+        foreach ($newsList as $topic => $articles) {
+            $escapedNewsList[Scrub::text($topic)] = $articles;
+        }
+
         return array(
             'title'   => 'School News',
             'aside'   => '',
             'class'   => 'dashboard-news',
             'icon'    => 'news',
-            'content' => $newsList,
+            'content' => $escapedNewsList,
         );
     }
 }

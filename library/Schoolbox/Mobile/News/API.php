@@ -36,7 +36,7 @@ class API extends Generic\API {
                 if(!isset($articles[$headline['newsTopicID']])) {
                     // create an article for this topic
                     $articles[$headline['newsTopicID']] = array(
-                        'title'   => $headline['topicName'],
+                        'title'   => Scrub::text($headline['topicName']),
                         'aside'   => '',
                         'class'   => 'news',
                         'icon'    => '',
