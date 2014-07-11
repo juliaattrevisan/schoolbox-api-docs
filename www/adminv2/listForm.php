@@ -27,7 +27,7 @@ if ($groupHandler->isSuperuser()) {
 		/* Accumulate a set of data from the relevant data columns
 		 */
 		foreach ($allColumns as $currentColumn) {
-			$data[$currentColumn] = Scrub::text($_POST[$currentColumn][$i]);
+			$data[$currentColumn] = $_POST[$currentColumn][$i];
 		}
 
 		/* Determine whether this is a new record, or whether to update existing
