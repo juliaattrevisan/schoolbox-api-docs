@@ -7,5 +7,4 @@
  * @link      http://www.alaress.com.au/
  */
 class Synchronise_Synergetic_Oakburn_Hydrator_Parent_Campus extends Synchronise_Synergetic_Oakburn_Hydrator_Student_Campus {
-
 }
