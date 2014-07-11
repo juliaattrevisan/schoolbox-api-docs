@@ -15,7 +15,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Campus implements Synchronise_Base
 		switch($externalUser['StudentCampus']) {
 			case 'S': $campus = 1; break;
 			case 'J': $campus = 2; break;
-			default: break;
+			default: $campus = 3; break;
 		}
 
         $newUser['campus'] = array($campus);
