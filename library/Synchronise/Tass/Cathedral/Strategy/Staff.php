@@ -17,7 +17,7 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
         $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
-        $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', /*'group_id'*/));
+        $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', 'group_id'));
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromId())
@@ -30,8 +30,15 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
         ;
     }
 
-//    protected function executeCreateUpdate($newUser) {
-//        var_dump($newUser);;
-//        parent::executeCreateUpdate($newUser);
-//    }
+    /**
+     * Retrieves the user that exists in Schoolbox for this user account, or
+     * an empty value if they don't.
+     *
+     * @param  array $user
+     *
+     * @return array
+     */
+    protected function userExists($user) {
+        return $this->user_handler->getByUsername($user['username']);
+    }
 }
