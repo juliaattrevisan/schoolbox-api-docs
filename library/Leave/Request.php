@@ -34,6 +34,11 @@ class Leave_Request {
     protected $hostType;
     protected $hostName;
     protected $hostPhone;
+	protected $hostMobile;
+	protected $hostAddress;
+	protected $collectorName;
+	protected $returnerName;
+	protected $reason;
     protected $userPhone;
     protected $description;
     protected $created;
@@ -553,5 +558,95 @@ class Leave_Request {
 	 */
 	public function getAllHostTypes() {
 		return $this->allHostTypes;
+	}
+
+	/**
+	 * Set collector name
+	 *
+	 * @param mixed $collectorName
+	 */
+	public function setCollectorName($collectorName) {
+		$this->collectorName = $collectorName;
+	}
+
+	/**
+	 * Get collector name
+	 *
+	 * @return mixed
+	 */
+	public function getCollectorName() {
+		return $this->collectorName;
+	}
+
+	/**
+	 * Set host address
+	 *
+	 * @param mixed $hostAddress
+	 */
+	public function setHostAddress($hostAddress) {
+		$this->hostAddress = $hostAddress;
+	}
+
+	/**
+	 * Get host address
+	 *
+	 * @return mixed
+	 */
+	public function getHostAddress() {
+		return $this->hostAddress;
+	}
+
+	/**
+	 * Set host mobile
+	 *
+	 * @param mixed $hostMobile
+	 */
+	public function setHostMobile($hostMobile) {
+		$this->hostMobile = $hostMobile;
+	}
+
+	/**
+	 * Get host mobile
+	 *
+	 * @return mixed
+	 */
+	public function getHostMobile() {
+		return $this->hostMobile;
+	}
+
+	/**
+	 * Set reason
+	 *
+	 * @param mixed $reason
+	 */
+	public function setReason($reason) {
+		$this->reason = $reason;
+	}
+
+	/**
+	 * Get reason
+	 *
+	 * @return mixed
+	 */
+	public function getReason() {
+		return $this->reason;
+	}
+
+	/**
+	 * Set returner name
+	 *
+	 * @param mixed $returnerName
+	 */
+	public function setReturnerName($returnerName) {
+		$this->returnerName = $returnerName;
+	}
+
+	/**
+	 * Get returner name
+	 *
+	 * @return mixed
+	 */
+	public function getReturnerName() {
+		return $this->returnerName;
 	}
 }
