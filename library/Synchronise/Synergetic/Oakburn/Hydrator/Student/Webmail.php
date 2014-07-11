@@ -24,7 +24,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Student_Webmail implements Synchro
 				$newUser['webmail'] = 1;
 				break;
 		}
-		new \Alaress_Probe($newUser);
+		
         return $newUser;
     }
 }
