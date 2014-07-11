@@ -566,7 +566,7 @@ $this->dropDown('subject', $summary, '', TEMPLATE_content, array('cid' => 'SUBJE
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 $colourIndex = 0;
 foreach($summary as $category) {
-    $this->setVar('CATEGORY_COLOUR', $colourList->offsetGet($colourIndex % count($colourList))->getHexColour());
+    $this->setVar('CATEGORY_COLOUR', Scrub::text($colourList->offsetGet($colourIndex % count($colourList))->getHexColour()));
     $this->setVar('CATEGORY_ID', $category['cid']);
     $this->parse('subject_colour_block', 'subject_colour',true);
     $colourIndex++;

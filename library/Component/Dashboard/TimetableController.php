@@ -185,7 +185,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 ++$colourIndex;
                             }
 
-                            $this->setVar('PERIOD_COLOUR', '#' . $subjectColourMap[$period['code']]);
+                            $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$period['code']]));
 
                             $cat = $this->category->getByCode($period['code']);
                             if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
