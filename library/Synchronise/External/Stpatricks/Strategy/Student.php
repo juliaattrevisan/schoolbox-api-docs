@@ -30,7 +30,7 @@ class Synchronise_External_Stpatricks_Strategy_Student extends Synchronise_Exter
      */
     protected function insertHouses($newHouses) {
         $stmt = Database::getInstance()->prepare("
-            INSERT INTO `house` VALUES (:id, :name)
+            INSERT IGNORE INTO `house` VALUES (:id, :name)
         ");
 
         foreach($newHouses as $name => $id) {
