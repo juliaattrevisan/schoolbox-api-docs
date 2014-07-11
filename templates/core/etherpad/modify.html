@@ -7,6 +7,7 @@ $(function() {
 
 <form id='collabdoc-form' action="/collabdoc/modifyForm" method="post">
     <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
+	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
 
 	<table class="standardForm table">
 		<tr>
@@ -22,5 +23,13 @@ $(function() {
 		</tr>
 	</table>
 
-    <input type="submit" value="Update Collab Doc" class="submit-btn-plain no-marg" />
+    <input type="submit" name='submit' value="Update Collab Doc" class="submit-btn-plain no-marg" />
+
+	<!-- BEGIN etherpad_delete -->
+	<input type="submit" name='delete' value="Delete Collab Doc" class="submit-btn-plain no-marg" />
+	<!-- END etherpad_delete -->
 </form>
+
+
+
+

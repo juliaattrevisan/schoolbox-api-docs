@@ -22,11 +22,15 @@ catch (\Exception $e) {
 
 if ($authenticator->canCreate($etherpad->getHomepageId())) {
 	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
+	$this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
 
 	$this->setVar(array(
+		'HOMEPAGE_ID' => $etherpad->getHomepageId(),
 		'ETHERPAD_PAD_ID' => $etherpad->getId(),
 		'ETHERPAD_PAD_NAME' => $etherpad->getName()
 	));
+
+	$this->parse('etherpad_delete_block', 'etherpad_delete');
 }
 else {
 	error(19);
