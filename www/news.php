@@ -58,7 +58,7 @@ $topicSlugMap = array();
 foreach ($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
     $output = array(
-        'LIST_TOPIC_NAME' => $sidebarTopic['name'],
+        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $url->getSlug(),
         'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'current' : '',
     );

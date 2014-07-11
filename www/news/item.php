@@ -97,7 +97,7 @@ array_unshift($topicList, array('name' => 'All'));
 foreach ($topicList as $sidebarTopic) {
     $topicUrl = new Url($sidebarTopic['name'], false);
     $output = array(
-        'LIST_TOPIC_NAME' => $sidebarTopic['name'],
+        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $topicUrl->getSlug(),
         'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'current' : '',
     );
