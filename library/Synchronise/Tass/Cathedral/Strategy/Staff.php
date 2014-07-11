@@ -21,6 +21,7 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromId())
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('Email', 'alt_email'))
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Group_Staff())
 //            ->addHydrator($unsetOnUpdate)
@@ -28,4 +29,9 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
+
+//    protected function executeCreateUpdate($newUser) {
+//        var_dump($newUser);;
+//        parent::executeCreateUpdate($newUser);
+//    }
 }
