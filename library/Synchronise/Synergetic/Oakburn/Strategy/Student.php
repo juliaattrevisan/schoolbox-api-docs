@@ -17,6 +17,7 @@ class Synchronise_Synergetic_Oakburn_Strategy_Student extends Synchronise_Base_S
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
 			->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_House())
 			->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Campus())
+			->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Group_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
