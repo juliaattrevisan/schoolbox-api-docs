@@ -12,6 +12,7 @@
 
 namespace Alaress\Session;
 use Aura\Session as SessionLibrary;
+use Aura\Session\Phpfunc;
 
 class Factory {
 
@@ -37,6 +38,12 @@ class Factory {
     public function build() {
         $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(new SessionLibrary\Randval(new SessionLibrary\Phpfunc()));
-        return new Session($segmentFactory, $csrfTokenFactory, $this->cookies);
+        $func             = new Phpfunc();
+        return new Session(
+            $segmentFactory,
+            $csrfTokenFactory,
+            $func,
+            $this->cookies
+        );
     }
 }

@@ -66,12 +66,14 @@ class Kernel extends \Alaress\Application\Kernel {
 		$path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$route = $this->di->get('router')->match($path, $_SERVER);
 		if ($route instanceof Route) {
-			// do something with the route.
-			// For now, I just assume the DI container knows how to get a controller
-			// named 'controller:$route->params[controller]', and this controller has a
-			// public method named $route->params[action].
+			// The route name's format:
+			// "[controllerName].[action](:[label])"
+			// The : and label are optional.
+			preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
+			$controllerName = $parsedName['controller'];
+			$action         = $parsedName['action'];
 			/** @var \Alaress\Web\Controller\Base $controller */
-			$controller = $this->di->get('controller:'.$route->params['controller']);
+			$controller = $this->di->get('controller:'.$controllerName);
 			/** @var \Alaress\Session\Session $session */
 			$session = $this->di->get('session');
 
@@ -79,6 +81,7 @@ class Kernel extends \Alaress\Application\Kernel {
 			$response = null;
 			// Has session expired? Assume no user here then, but that should probably
 			// be handled in authenticator.
+			$params = array();
 			try {
 				// Do authorization here
 				// TODO Inject user getter into authorizer, and use it to determine:
@@ -102,7 +105,7 @@ class Kernel extends \Alaress\Application\Kernel {
 
 				// Call the controller method.
 				// Ensure that the parameters match up with the names used.
-				$method = new ReflectionMethod($controller, $params['action']);
+				$method = new ReflectionMethod($controller, $action);
 				$args   = array();
 				foreach ($method->getParameters() as $parameter) {
 					$name   = $parameter->getName();
