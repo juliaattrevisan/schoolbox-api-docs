@@ -16,15 +16,15 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
-//        $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
-//        $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', 'group_id'));
+        $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', /*'group_id'*/));
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromId())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('Email', 'alt_email'))
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Group_Staff())
-//            ->addHydrator($unsetOnUpdate)
+            ->addHydrator($unsetOnUpdate)
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
