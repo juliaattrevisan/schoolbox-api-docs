@@ -76,10 +76,12 @@
                         jsEvent.replaceWith('').hide();
                     }
 
-                    //
+                    var inner = jsEvent.find('.fc-event-inner')
+                    var title = jsEvent.find('.fc-event-title')
+
                     // newer fullCalendar implementations escape event title -
                     // we've already done this, so reset the title.
-                    jsEvent.find('.fc-event-title').html(calEvent.title);
+                    title.html(calEvent.title);
 
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
@@ -89,16 +91,19 @@
                             content.append(span)
                         }
                         else {
-                            jsEvent.find('.fc-event-inner').append(span)
+                            inner.append(span)
                         }
                     }
 
                     // If this event is a task, alter the state of the checkbox accordingly
                     if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
-                        $j(jsEvent).find('.fc-event-inner').prepend('<input id="t'
-                            + calEvent.data.meta.eventId + '" type="checkbox" name="completed" />')
+                        inner.prepend(
+                            $('<input type="checkbox" name="completed" />')
+                                .attr('id', 't'+ calEvent.data.meta.eventId)
+                        )
                         if (calEvent.data.meta.completed == '1') {
-                            $j(jsEvent).find('.fc-event-inner input').prop('checked', true)
+                            title.addClass('strike')
+                            inner.find(':checkbox').prop('checked', true)
                         }
                     }
 
