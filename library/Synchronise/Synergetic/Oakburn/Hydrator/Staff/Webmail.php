@@ -14,18 +14,13 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Webmail implements Synchroni
 	 * SOC have a special conditional webmail
      */
     public function hydrate($externalUser, $newUser) {
-		new \Alaress_Probe($externalUser);
-//		switch ($externalUser['StudentYearLevel']) {
-//			case '30':
-//			case '40':
-//				$newUser['webmail'] = 0;
-//				break;
-//
-//			default:
-//				$newUser['webmail'] = 1;
-//				break;
-//		}
-//
+
+		/* This is supposed to be a conditional, but assume that everyone
+		 * has webmail for the time being - nobody provided any useful details
+		 * on the role mappings for this to take effect
+		 */
+		$newUser['webmail'] = 1;
+
         return $newUser;
     }
 }
