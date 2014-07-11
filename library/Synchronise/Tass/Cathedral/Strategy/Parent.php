@@ -20,9 +20,9 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Parent())
-//            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Parent())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             // TASS has no separate spouse entries, so just add a clear one.
