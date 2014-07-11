@@ -14,7 +14,6 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group implements Synchronise
     public function hydrate($externalUser, $newUser) {
 		switch ($externalUser['StaffCategory']) {
 			case 'T': $group = 3; break;
-			case 'CSS': break;
 			case 'RT': $group = 3; break;
 			case 'A': $group = 2; break;
 			case 'M': $group = 2; break;
@@ -22,7 +21,6 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group implements Synchronise
 			case 'BH': $group = 2; break;
 			case 'MU': $group = 2; break;
 			case 'D': $group = 2; break;
-			case 'RTA': break;
 			case 'L': $group = 2; break;
 			case 'Chap': $group = 3; break;
 
@@ -38,7 +36,9 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group implements Synchronise
 
 				break;
 
-			default: break;
+			case 'RTA':
+			case 'CSS':
+			default: $group = 0; break;
 		}
 
 		$newUser['group_id'] = $group;
