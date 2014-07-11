@@ -415,9 +415,14 @@ class Leave_Controller extends Controller {
 			$request->setFinish($finish->getDatabase());
 			$request->setHostType($data['request']['hostType']);
 			$request->setHostName($data['request']['hostName']);
+			$request->setHostAddress($data['request']['hostAddress']);
 			$request->setHostPhone($data['request']['hostPhone']);
+			$request->setHostMobile($data['request']['hostMobile']);
 			$request->setUserPhone($data['request']['userPhone']);
+			$request->setReason($data['request']['reason']);
 			$request->setDescription($data['request']['description']);
+			$request->setCollectorName($data['request']['collectorName']);
+			$request->setReturnerName($data['request']['returnerName']);
 			$request->setStatus(Leave_Request::STATUS_PENDING);
 			$request->setCreated($created->getDatabase());
 
@@ -570,8 +575,8 @@ class Leave_Controller extends Controller {
      */
     public function renderViewRequest($data) {
 
-        /*Allow the user and staff to view requests
-             */
+        /* Allow the user and staff to view requests
+         */
 
         /** @var Leave_Request $request */
         $request = $data['request'];
