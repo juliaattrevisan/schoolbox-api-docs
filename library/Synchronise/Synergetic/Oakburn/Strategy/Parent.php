@@ -16,9 +16,11 @@ class Synchronise_Synergetic_Oakburn_Strategy_Parent extends Synchronise_Base_St
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
+			->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Parent_Campus())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
+			->addSpouseHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Parent_Campus())
         ;
     }
 }
