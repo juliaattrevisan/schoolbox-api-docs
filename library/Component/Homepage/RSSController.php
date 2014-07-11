@@ -64,8 +64,8 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                     $this->parse('rss_brief_output_block', 'rss_brief_output');
                 }
                 // If the item has a pubDate
-                if (strlen($currentRss['pubDate'])) {
-                    $postedDate = new Alaress_Date_Relative(strtotime($currentRss['pubDate']), 'U');
+                if ($currentRss['pubDate'] instanceof DateTime) {
+                    $postedDate = new Alaress_Date_Relative($currentRss['pubDate']);
 
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');

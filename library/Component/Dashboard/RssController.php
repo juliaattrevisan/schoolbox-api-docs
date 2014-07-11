@@ -63,8 +63,8 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                 if (!$compactMode) {
                     $this->parse('rss_brief_output_block', 'rss_brief_output');
                 }
-                if (strlen($item['pubDate'])) {
-                    $postedDate = new Alaress_Date_Relative(new DateTime($item['pubDate']), 'U');
+                if ($item['pubDate'] instanceof DateTime) {
+                    $postedDate = new Alaress_Date_Relative($item['pubDate']);
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');
                 }

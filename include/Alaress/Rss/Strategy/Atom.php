@@ -36,11 +36,22 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface {
 			else {
 				$currentRss = $allRss[$i];
 
+				// Standardize pubDate into DateTime objects (or null)
+				try {
+					$pubDate = DateTime::createFromFormat(DateTime::RSS, $currentRss->published);
+					if (!($pubDate instanceof DateTime)) {
+						$pubDate = new DateTime($currentRss->published);
+					}
+				}
+				catch (Exception $e) {
+					$pubDate = null;
+				}
+
 				$data[] = array(
 					'title' => (string)$currentRss->title,
 					'link' => (string)$currentRss->link[0]->attributes()->href,
 					'description' => (string)$currentRss->summary,
-					'pubDate' => (string)$currentRss->published,
+					'pubDate' => $pubDate,
 				);
 			}
 		}
