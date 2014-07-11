@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Synergetic_Oakburn_Hydrator_Group_Student implements Synchronise_Base_IHydrator {
+class Synchronise_Synergetic_Oakburn_Hydrator_Student_Group implements Synchronise_Base_IHydrator {
     /**
      * {@inheritdoc}
      */
@@ -24,6 +24,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Group_Student implements Synchroni
      */
     public function getGroupIDFromUser($externalUser) {
 		switch ($externalUser['StudentYearLevel']) {
+			case 0: return 8; break;
 			case 1: return 9; break;
 			case 2: return 10; break;
 			case 3: return 11; break;
