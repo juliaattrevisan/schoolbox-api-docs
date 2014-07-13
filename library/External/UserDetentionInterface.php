@@ -1,6 +1,10 @@
 <?php
 /**
  * Interface for how school management systems should determine user's detention.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 interface External_UserDetentionInterface {
