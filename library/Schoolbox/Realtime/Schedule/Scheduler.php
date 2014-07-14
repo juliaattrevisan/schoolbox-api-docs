@@ -29,6 +29,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
@@ -171,6 +172,10 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 			// notice that we don't ACK the resolver here before returning
 			return;
+		}
+		catch(MapperException $e) {
+			// TODO Mappers shouldn't even be being used from within this block @see SB-5250
+			$this->debug->v("Mapper exception: ".$e->getMessage(), '!');
 		}
 	    catch(RuntimeException $e) {
 		    $truncated = substr($frame->body, 0, 64);
