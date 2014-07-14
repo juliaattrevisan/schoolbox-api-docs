@@ -12,14 +12,13 @@ interface External_UserDetentionInterface {
     /**
      * Retrieves a user's awards.
      *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
+     * @param mixed $externalId The student's external ID.
+     * @param int   $year
+     * @param int   $semester
+     *
      * @return array
      */
-    public function getAwards($externalId, DateTime $fromDate = null, DateTime $toDate = null);
+    public function getAwards($externalId, $year, $semester);
 
     /**
      * Retrieves a user's detentions.

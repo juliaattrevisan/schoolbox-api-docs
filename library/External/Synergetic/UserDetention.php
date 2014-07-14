@@ -70,20 +70,18 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     /**
      * Retrieves a user's awards.
      *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
+     * @param mixed $externalId The student's external ID.
+     * @param int   $year
+     * @param int   $semester
      *
      * @return array
      */
     public function getAwards(
         $externalId,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
+        $year,
+        $semester
     ) {
-        // Awards: based on year and semester, not a date span?
+        // Awards: fetch based on year and semester, not a date span?
         $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvSchoLAward";
         return $this->database->getAll($query);
     }
