@@ -59,7 +59,39 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvSchoolDetention";
+        $query = "
+            SELECT
+                ID,
+                CONVERT(VARCHAR(12), DetentionDate, 105) AS DetentionDate,
+                DetentionDescription,
+                Comments
+            FROM SynergyOne.dbo.uvSchoLDetention
+            %s
+            ORDER BY DetentionDate DESC
+        ";
+        $whereParts = array(
+            'ID = :externalId'
+        );
+        $params = array(
+            ':externalId' => "'".$this->database->quote($externalId)."'",
+        );
+
+        // Apply date checks
+        if ($fromDate) {
+            $whereParts[]        = 'DetentionDate >= :fromDate';
+            $params[':fromDate'] = "'".$this->database->quote($fromDate->format('Y-m-d'))."'";
+        }
+        if ($toDate) {
+            $whereParts[]      = 'DetentionDate <= :toDate';
+            $params[':toDate'] = "'".$this->database->quote($toDate->format('Y-m-d'))."'";
+        }
+
+        // Slam the where part in
+        $wherePart = '';
+        if (!empty($whereParts)) {
+            $wherePart = 'WHERE '.implode(' AND ', $whereParts);
+        }
+        $query = strtr(sprintf($query, $wherePart), $params);
         return $this->database->getAll($query);
     }
 
