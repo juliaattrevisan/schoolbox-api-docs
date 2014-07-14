@@ -89,7 +89,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 FileSemester,
                 AwardCode,
                 AwardDescription,
-                AwardDate,
+                CONVERT(VARCHAR(12), AwardDate, 105) AS AwardDate,
                 AwardAchievement,
                 AwardComment
             FROM SynergyOne.dbo.uvSchoLAward
@@ -130,7 +130,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 ID,
                 CONVERT(VARCHAR(12), DetentionDate, 105) AS DetentionDate,
                 DetentionDescription,
-                Comments
+                Comments AS DetentionComment
             FROM SynergyOne.dbo.uvSchoLDetention
             %s
             ORDER BY DetentionDate DESC
@@ -162,7 +162,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         $query = "
             SELECT
                 ID,
-                EventDateTime,
+                CONVERT(VARCHAR(19), EventDateTime, 120) AS EventDateTime,
                 AbsenceTypeCode,
                 AbsenceDescription,
                 ClassCode,
@@ -171,9 +171,10 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 AttendanceDayNumber,
                 AttendancePeriod,
                 LateArrivalFlag,
-                LatearrivalTime
+                CONVERT(VARCHAR(19), LatearrivalTime, 120) AS LateArrivalTime
             FROM SynergyOne.dbo.uvSchoLAbsence
             %s
+            AND AbsenceTypeCode != ''
             ORDER BY EventDateTime DESC
         ";
         list($wherePart, $params) = $this->buildWherePart(
