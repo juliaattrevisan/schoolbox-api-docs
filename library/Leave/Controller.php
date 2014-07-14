@@ -119,9 +119,17 @@ class Leave_Controller extends Controller {
         $emptyTravelType = new Leave_Request_TravelType();
         $emptyTravelType->setName('Not specified');
         $travelMethods = array(0 => $emptyTravelType);
-        foreach (Leave_Request_TravelTypeMapper::getInstance()->findAll() as $method) {
+
+		$allTravelTypes = Leave_Request_TravelTypeMapper::getInstance()->findAll(array(
+			'order' => array(
+				'sequence' => 'asc'
+			)
+		));
+
+        foreach ($allTravelTypes as $method) {
             $travelMethods[$method->getId()] = $method;
         }
+
         $this->setTravelTypes($travelMethods);
     }
 

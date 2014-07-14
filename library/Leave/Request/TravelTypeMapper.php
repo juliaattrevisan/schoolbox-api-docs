@@ -28,5 +28,11 @@ class Leave_Request_TravelTypeMapper extends Schoolbox\Mapper {
                 'type'     => self::TYPE_STRING,
             )
         );
+
+		$this->hasMap(array(
+			'column' => 'sequence',
+			'property' => 'sequence',
+			'type' => self::TYPE_INTEGER,
+		));
     }
 }
