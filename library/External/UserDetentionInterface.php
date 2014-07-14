@@ -35,7 +35,7 @@ interface External_UserDetentionInterface {
     public function getDetentions($externalId, DateTime $fromDate = null, DateTime $toDate = null);
 
     /**
-     * Retrieves a user's non-attendances that do not have an absence code.
+     * Retrieves a user's absences that do not have an absence code.
      *
      * @param mixed    $externalId The student's external ID.
      * @param DateTime $fromDate   The date to fetch from, or null to get all
@@ -45,6 +45,6 @@ interface External_UserDetentionInterface {
      *
      * @return array
      */
-    public function getNonAttendances($externalId, DateTime $fromDate = null, DateTime $toDate = null);
+    public function getAbsences($externalId, DateTime $fromDate = null, DateTime $toDate = null);
 
 }

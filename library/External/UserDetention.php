@@ -64,7 +64,7 @@ class External_UserDetention implements External_UserDetentionInterface {
     }
 
     /**
-     * Retrieves a user's non-attendances that do not have an absence code.
+     * Retrieves a user's absences that do not have an absence code.
      *
      * @param mixed    $externalId The student's external ID.
      * @param DateTime $fromDate   The date to fetch from, or null to get all
@@ -74,12 +74,12 @@ class External_UserDetention implements External_UserDetentionInterface {
      *
      * @return array
      */
-    public function getNonAttendances(
+    public function getAbsences(
         $externalId,
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        return $this->database->getNonAttendances($externalId, $fromDate, $toDate);
+        return $this->database->getAbsences($externalId, $fromDate, $toDate);
     }
 
 }
