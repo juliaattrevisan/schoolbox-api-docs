@@ -70,6 +70,14 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         if (!parent::loadTemplate($templateHandle, 'stMichaelsAwards')) {
             return false;
         }
+
+        if (empty($this->detentionList)
+            || empty($this->awardList)
+            || empty($this->absenceList)
+        ) {
+            return false;
+        }
+
         $this->parseConfig();
 
         // <!-- BEGIN blockages -->
