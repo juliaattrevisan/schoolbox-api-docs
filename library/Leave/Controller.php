@@ -657,6 +657,7 @@ class Leave_Controller extends Controller {
 		$request->setConfirmedBy($data['request']['confirmedBy']);
 		$request->setReturnerName($data['request']['returnerName']);
 		$request->setCollectorName($data['request']['collectorName']);
+		$request->setReason($data['request']['reason']);
 
 		$travelType  = $data['request']['travelType'];
 		$travelTypes = $this->getTravelTypes();
