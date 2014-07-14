@@ -39,7 +39,8 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvSchoolAward";
+        // Awards: based on year and semester, not a date span?
+        $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvSchoLAward";
         return $this->database->getAll($query);
     }
 
@@ -111,7 +112,23 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvScholAbsences";
+        $query = "
+            SELECT
+                ID,
+                EventDateTime,
+                AbsenceTypeCode,
+                AbsenceDescription,
+                ClassCode,
+                ClassCampus,
+                ClassDescription,
+                AttendanceDayNumber,
+                AttendancePeriod,
+                LateArrivalFlag,
+                LatearrivalTime
+            FROM SynergyOne.dbo.uvSchoLAbsence
+            %s
+            ORDER BY DetentionDate DESC
+        ";
         return $this->database->getAll($query);
     }
 
