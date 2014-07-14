@@ -13,7 +13,6 @@ namespace Schoolbox\Realtime\Schedule\Module;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\TopicFactory;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
