@@ -192,6 +192,7 @@ function interrogate($event, $d) {
 		}
 	}, $d);
 
+	$exit = 0;
 
 	// test trigger bundling
 	try {
@@ -200,7 +201,8 @@ function interrogate($event, $d) {
 		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle($event, \Schoolbox\Mapper::METHOD_DELETE));
 	}
 	catch(Exception $e) {
-		$d->v(sprintf("Caught exception - %s: %s", get_class($e), $e->getMessage()), '!');
+		$d->v(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()), '!');
+		$exit = 1;
 	}
 
 
@@ -219,9 +221,10 @@ function interrogate($event, $d) {
 			$m->invoke($instance, $event->getObject(), $event->getEffector(), $event->getDiff());
 		}
 		catch(Exception $e) {
-			$d->v(sprintf("Caught exception - %s: %s", get_class($e), $e->getMessage()), '!');
+			$d->v(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()), '!');
+			$exit = 1;
 		}
 	}
 
-	exit(0);
+	exit($exit);
 }
