@@ -200,8 +200,8 @@ class EventRecurrenceMapper {
 	 * Another totally custom recurrence save method - this one uses an iterable
 	 * date source to create dates.
 	 *
-	 * @param Event       $event
-	 * @param DateTime[] $dateSource
+	 * @param Event                   $event
+	 * @param DateTime[]|\Traversable $dateSource
 	 */
 	public function createSequenceFromIterator(Event $event, $dateSource = null) {
 		if (!isset($dateSource)) {
