@@ -82,7 +82,30 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         $semester
     ) {
         // Awards: fetch based on year and semester, not a date span?
-        $query = "SELECT TOP 10 * FROM SynergyOne.dbo.uvSchoLAward";
+        $query = "
+            SELECT
+                ID,
+                FileYear,
+                FileSemester,
+                AwardCode,
+                AwardDescription,
+                AwardDate,
+                AwardAchievement,
+                AwardComment
+            FROM SynergyOne.dbo.uvSchoLAward
+            WHERE ID           = :externalId
+            AND   FileYear     = :year
+            AND   FileSemester = :semester
+        ";
+        $query = strtr(
+            $query,
+            array(
+                ':externalId' => "'".$this->database->quote($externalId)."'",
+                ':year'       => "'".$this->database->quote($year)."'",
+                ':semester'   => "'".$this->database->quote($semester)."'",
+            )
+        );
+//        new Alaress_Probe($query);
         return $this->database->getAll($query);
     }
 
