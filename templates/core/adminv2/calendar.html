@@ -3,9 +3,15 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
-
 $j(function() {
+	$('.table').selectAll({
+		key: 'selectall',
+		checkboxName: 'cleanupEventId[]'
+	});
+
     $j('#name')
         .selectizeSelector({
             ajax: {
@@ -35,6 +41,23 @@ $j(function() {
             }
         });
     });
+
+	/* date picker */
+	$j('#start_date, #finish_date').datepicker({
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+		}
+	});
+
+	$j('#start_date').syncDates({endDate: $j('#finish_date')});
 });
 </script>
 <!-- END custom_head-->
@@ -126,34 +149,96 @@ $j(function() {
     <!-- BEGIN subscribe -->
     <div class="settings heading">
         <form method='post' action='/adminv2/calendar/modifyForm'>
-        <!-- BEGIN eventType -->
-        <div class='eventList'>
-            <h3>{EVENTTYPE_LABEL}</h3>
-                <div class="level clearfix">
-            <!-- BEGIN connector -->
-            <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
-                <label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
-                    <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-                {CONNECTOR_NAME}</label>
+			<!-- BEGIN eventType -->
+			<div class='eventList'>
+				<h3>{EVENTTYPE_LABEL}</h3>
+				<div class="level clearfix">
+					<!-- BEGIN connector -->
+					<div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
+						<label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
+							<input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+							{CONNECTOR_NAME}
+						</label>
 
-                <div class="clearfix"></div>
+						<div class="clearfix"></div>
 
-                <!-- BEGIN connectorConfig -->
-                <!-- END connectorConfig -->
-
-            </div>
-            <!-- BEGIN has_multiple_options -->
-            <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
-            <!-- END has_multiple_options -->
-            <!-- END connector -->
-        </div>
-        <!-- END eventType -->
+						<!-- BEGIN connectorConfig -->
+						<!-- END connectorConfig -->
+					</div>
+					<!-- BEGIN has_multiple_options -->
+					<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
+					<!-- END has_multiple_options -->
+					<!-- END connector -->
+				</div>
+			</div>
+			<!-- END eventType -->
 
             <input type="submit" class="submit-btn-plain" value='Update' />
-            </form>
-        </div>
-    </div>
+		</form>
+	</div>
     <!-- END subscribe -->
+
+	<!-- BEGIN cleanup -->
+	<div class="settings heading">
+		<div class="level clearfix">
+			<h3>Mass Cleanup</h3>
+			<p>Display a list of events between two dates.</p>
+
+			<form action="/adminv2/calendar/Cleanup" method="get">
+				<label class="float-left">
+					From
+					<input type="text" id='start_date' name="cleanupFrom" style="width:100px" value="{CLEANUP_HAS_DATES_FROM}" />
+				</label>
+				<label class="float-left">
+					until
+					<input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" style="width:100px" value="{CLEANUP_HAS_DATES_TO}" />
+				</label>
+
+				<input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
+			</form>
+
+			<div class="clearfix"></div>
+
+			<!-- BEGIN cleanup_has_events -->
+			<h3>Events</h3>
+			<form action="/adminv2/calendar/modifyForm" method="post">
+				<table class="table ruler">
+					<thead>
+						<tr>
+							<th><input type="checkbox" data-selectall="true" value="" /></th>
+							<th>Title</th>
+							<th>Type</th>
+							<th>Author</th>
+							<th>Start</th>
+							<th>End</th>
+							<th>Campus</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN cleanup_event -->
+						<tr>
+							<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
+							<td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
+							<td>{CLEANUP_EVENT_EVENTTYPE}</td>
+							<td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+							<td>{CLEANUP_EVENT_START}</td>
+							<td>{CLEANUP_EVENT_END}</td>
+							<td>{CLEANUP_EVENT_CAMPUSES}</td>
+						</tr>
+						<!-- END cleanup_event -->
+					</tbody>
+				</table>
+
+				<input type="submit" class='submit-btn-plain' value="Remove Selected Events" />
+			</form>
+			<!-- END cleanup_has_events -->
+
+			<!-- BEGIN cleanup_has_no_events -->
+			<p>No events found within the selected date range.</p>
+			<!-- END cleanup_has_no_events -->
+		</div>
+	</div>
+	<!-- END cleanup -->
 </div>
 
 <!-- BEGIN custom_javascript -->

@@ -21,17 +21,28 @@ $this->checkList('user_group_check_list', $userHandler->getGroupList(), '', TEMP
 /* Stolen from Settings
  */
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
+
 $this->setBlock(TEMPLATE_content, 'import', 'import_block');
+
 $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
 $this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
 $this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
+$this->setBlock(TEMPLATE_content, 'cleanup', 'cleanup_block');
+$this->setBlock('cleanup', 'cleanup_has_no_events', 'cleanup_has_no_events_block');
+$this->setBlock('cleanup', 'cleanup_has_events', 'cleanup_has_events_block');
+$this->setBlock('cleanup_has_events', 'cleanup_event', 'cleanup_event_block');
+
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
 $this->setVar('eventType_block', '');
 $this->setVar('connector_block', '');
+$this->setVar('cleanup_block', '');
+$this->setVar('cleanup_has_events_block', '');
+$this->setVar('cleanup_has_no_events_block', '');
+$this->setVar('cleanup_event_block', '');
 
 if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
@@ -46,6 +57,9 @@ $typeList = array(
 	),
 	array(
 		'type' => 'Subscribe'
+	),
+	array(
+		'type' => 'Cleanup'
 	),
 );
 
@@ -130,7 +144,6 @@ if (is_array($typeList)) {
 
 						/* Whether this connector displays at Ticked or not
 						 */
-
 						$connectorActive = 'connector-active';
 						$connectorChecked = 'checked="checked"';
 					}
@@ -163,6 +176,63 @@ if (is_array($typeList)) {
 			}
 
 			$this->parse('subscribe_block', 'subscribe');
+		}
+		/* Cleanup page
+		 */
+		else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+
+			/* If both dates specified, find events between those two dates inclusive
+			 */
+			if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
+				$from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
+				$to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+
+				$this->setVar(array(
+					'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
+					'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
+				));
+
+				$eventMapper = new \Schoolbox\Calendar\EventMapper();
+				$allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+
+				foreach($allEvents as $currentEvent) {
+					$this->setVar(array(
+						'CLEANUP_EVENT_ID' => $currentEvent['event']->getId(),
+						'CLEANUP_EVENT_TITLE' => $currentEvent['event']->getTitle(),
+						'CLEANUP_EVENT_START' => $currentEvent['event']->getStartDateTime()->getShort(),
+						'CLEANUP_EVENT_END' => $currentEvent['event']->getEndDateTime()->getShort(),
+						'CLEANUP_EVENT_AUTHOR' => $currentEvent['event']->getAuthor()->getFullName(),
+						'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent['event']->getAuthor()->getId(),
+						'CLEANUP_EVENT_EVENTTYPE' => $currentEvent['event']->getType()->getType(),
+						'CLEANUP_EVENT_CAMPUSES' => $currentEvent['auxiliary']['campuses'],
+					));
+
+					$this->parse('cleanup_event_block', 'cleanup_event', true);
+				}
+
+				if ($allEvents->count()) {
+					$this->parse('cleanup_has_events_block', 'cleanup_has_events');
+
+					$this->setVar(array(
+						'cleanup_has_no_events_block' => ''
+					));
+				}
+				else {
+					$this->setVar(array(
+						'cleanup_has_events_block' => ''
+					));
+
+					$this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
+				}
+			}
+			else {
+				$this->setVar(array(
+					'CLEANUP_HAS_DATES_FROM' => '',
+					'CLEANUP_HAS_DATES_TO' => ''
+				));
+			}
+
+			$this->parse('cleanup_block', 'cleanup');
 		}
 	}
 }
