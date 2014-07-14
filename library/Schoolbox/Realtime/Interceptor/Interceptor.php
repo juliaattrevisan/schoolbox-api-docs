@@ -18,7 +18,6 @@ use Alaress\WorkerCrew\Transaction\Transaction;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
-use PhpAmqpLib\Message\AMQPMessage;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
@@ -28,22 +27,14 @@ use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Interceptor implements TaskResponseHandlerInterface {
 
 	const TRANSACTION_CACHE_TIMEOUT = 0.5;
 	const TRANSACTION_COUNT_LIMIT   = 80;
-
-	/** @var UserMapper */
-	protected $userMapper;
-
-	/** @var RerouteMapper */
-	protected $rerouteMapper;
 
 	/** @var RoutePermissionMapper */
 	protected $permissionMapper;
@@ -75,9 +66,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 		$this->conn  = new Connector();
 		$this->uqf   = new UserQueueFactory($this->conn);
 
-		$this->rerouteMapper    = RerouteMapper::getInstance();
 		$this->permissionMapper = RoutePermissionMapper::getInstance();
-		$this->userMapper       = UserMapper::getInstance();
 
 		// optional construction in case null was passed for $loop
 		if($loop instanceof LoopInterface) {
