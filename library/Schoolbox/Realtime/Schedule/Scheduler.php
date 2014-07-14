@@ -22,6 +22,7 @@ use Exception;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
+use React\Stomp\Exception\ProcessingException;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
@@ -279,7 +280,12 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		/** @var User[]|Collection $users */
 		$users = UserMapper::getInstance()->findAll();
 		foreach($users as $user) {
-			$this->subscribeUser($user->getId());
+			try {
+				$this->subscribeUser($user->getId());
+			}
+			catch(ProcessingException $e) {
+				$this->debug->v("Could not subscribe user {$user->getId()}", '*');
+			}
 		}
 		$this->debug->v("Subscribed to {$users->count()} user queues");
 	}
