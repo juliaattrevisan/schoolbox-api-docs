@@ -622,8 +622,13 @@ class Leave_Controller extends Controller {
                     'REQUEST_FINISH_TIME' => $request->getFinish()->getTimeOnly(),
                     'REQUEST_HOST_NAME' => $request->getHostName(),
                     'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+					'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+					'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
+					'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+					'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+					'REQUEST_REASON' => $request->getReason(),
                     'REQUEST_NOTES' => $request->getNotes(),
                     'REQUEST_TRAVEL_TYPE' => $travelType->getName(),
                 )
