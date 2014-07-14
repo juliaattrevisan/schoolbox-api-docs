@@ -49,6 +49,11 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
                 'LEAVE_HOST_NAME' => $this->getRequest()->getHostName(),
                 'LEAVE_HOST_PHONE' => $this->getRequest()->getHostPhone(),
                 'LEAVE_STUDENT_PHONE' => $this->getRequest()->getUserPhone(),
+				'LEAVE_HOST_MOBILE' => $this->getRequest()->getHostMobile(),
+				'LEAVE_HOST_ADDRESS' => $this->getRequest()->getHostAddress(),
+				'LEAVE_COLLECTOR_NAME' => $this->getRequest()->getCollectorName(),
+				'LEAVE_RETURNER_NAME' => $this->getRequest()->getReturnerName(),
+				'LEAVE_REASON' => $this->getRequest()->getReason(),
                 'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
             )
         );
