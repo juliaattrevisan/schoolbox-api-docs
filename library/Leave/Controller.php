@@ -508,38 +508,39 @@ class Leave_Controller extends Controller {
             $this->renderHostTypeDropdown($request);
             $this->renderConfirmedByCheckboxes($request);
 
-            $this->getPage()->setVar(
-                array(
-                    'REQUEST_ID' => $request->getId(),
-                    'REQUEST_STATUS' => $request->getStatus(true),
-					'AUTHOR_NAME' => $request->getAuthor()->formatName(),
-					'USER_NAME' => $user->formatName(),
-                    'USER_EXTERNAL_ID' => $user->getExternalId(),
-                    'USER_YEAR' => $user->getYear(),
-                    'USER_HOUSE' => $house->getHouse(),
-                    'USER_HOUSE_ID' => $house->getId(),
-                    'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
-                    'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
-                    'REQUEST_HOST_NAME' => $request->getHostName(),
-                    'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-                    'REQUEST_USER_PHONE' => $request->getUserPhone(),
-                    'REQUEST_DESCRIPTION' => $request->getDescription(),
-                    'REQUEST_NOTES' => $request->getNotes(),
-                )
-            );
+            $this->getPage()->setVar(array(
+				'REQUEST_ID' => $request->getId(),
+				'REQUEST_STATUS' => $request->getStatus(true),
+				'AUTHOR_NAME' => $request->getAuthor()->formatName(),
+				'USER_NAME' => $user->formatName(),
+				'USER_EXTERNAL_ID' => $user->getExternalId(),
+				'USER_YEAR' => $user->getYear(),
+				'USER_HOUSE' => $house->getHouse(),
+				'USER_HOUSE_ID' => $house->getId(),
+				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
+				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
+				'REQUEST_HOST_NAME' => $request->getHostName(),
+				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+				'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+				'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
+				'REQUEST_USER_PHONE' => $request->getUserPhone(),
+				'REQUEST_DESCRIPTION' => $request->getDescription(),
+				'REQUEST_NOTES' => $request->getNotes(),
+				'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+				'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+				'REQUEST_REASON' => $request->getReason(),
+			));
 
             /* What is the next/previous pending request?
-                */
+             */
             $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
                 $request->getId(), $user->getResidentialHouse()
             );
 
             if ($nextRequest) {
-                $this->getPage()->setVar(
-                    array(
-                        'NEXT_PENDING_ID' => $nextRequest->getId()
-                    )
-                );
+                $this->getPage()->setVar(array(
+					'NEXT_PENDING_ID' => $nextRequest->getId()
+				));
 
                 $this->getPage()->parse('next_pending_block', 'next_pending');
             } else {
@@ -648,10 +649,14 @@ class Leave_Controller extends Controller {
 		$request->setHostType($data['request']['hostType']);
 		$request->setHostName($data['request']['hostName']);
 		$request->setHostPhone($data['request']['hostPhone']);
+		$request->setHostMobile($data['request']['hostMobile']);
+		$request->setHostAddress($data['request']['hostAddress']);
 		$request->setUserPhone($data['request']['userPhone']);
 		$request->setDescription($data['request']['description']);
 		$request->setNotes($data['request']['notes']);
 		$request->setConfirmedBy($data['request']['confirmedBy']);
+		$request->setReturnerName($data['request']['returnerName']);
+		$request->setCollectorName($data['request']['collectorName']);
 
 		$travelType  = $data['request']['travelType'];
 		$travelTypes = $this->getTravelTypes();

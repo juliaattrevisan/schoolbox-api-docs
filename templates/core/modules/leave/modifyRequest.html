@@ -133,14 +133,44 @@
             <td>
                 <input type="text" name="request[hostName]" size="24" class="required" value="{REQUEST_HOST_NAME}"/>
             </td>
-            <td class="formLabelWidth">
-                <h4>Host Phone</h4>
-                <em></em>
-            </td>
-            <td>
-                <input type="text" name="request[hostPhone]" size="16" class="required" value="{REQUEST_HOST_PHONE}"/>
-            </td>
+			<td class="formLabelWidth">
+				<h4>Host Address</h4>
+				<em>The host's address during the leave period</em>
+			</td>
+			<td>
+				<textarea name="request[hostAddress]">{REQUEST_HOST_ADDRESS}</textarea>
+			</td>
         </tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Host Phone</h4>
+			</td>
+			<td>
+				<input type="text" name="request[hostPhone]" size="16" class="required" value="{REQUEST_HOST_PHONE}" />
+			</td>
+
+			<td class="formLabelWidth">
+				<h4>Host Mobile</h4>
+			</td>
+			<td>
+				<input type="text" name="request[hostMobile]" size="16" class="required" value="{REQUEST_HOST_MOBILE}" />
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Collector's Name</h4>
+			</td>
+			<td>
+				<input type="text" name="request[collectorName]" size="16" class="required" value="{REQUEST_COLLECTOR_NAME}" />
+			</td>
+
+			<td class="formLabelWidth">
+				<h4>Returner's Name</h4>
+			</td>
+			<td>
+				<input type="text" name="request[returnerName]" size="16" class="required" value="{REQUEST_RETURNER_NAME}" />
+			</td>
+		</tr>
         <tr>
             <td class="formLabelWidth">
                 <h4>Travel Method</h4>
@@ -148,7 +178,7 @@
             <td colspan="3">
                 <select name="request[travelType]">
                     <!-- BEGIN travel_drop -->
-                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}" {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
                     <!-- END travel_drop -->
                 </select>
             </td>
@@ -161,6 +191,14 @@
             <td>
                 <textarea rows="4" cols="40" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
             </td>
+			<td class="formLabelWidth">
+				<h4>Reason For Leave</h4>
+			</td>
+			<td>
+				<textarea rows="4" cols="60" name="request[reason]">{REQUEST_REASON}</textarea>
+			</td>
+		</tr>
+		<tr colspan="4">
             <td class="formLabelWidth">
                 <h4>Notes</h4>
                 <em></em>
