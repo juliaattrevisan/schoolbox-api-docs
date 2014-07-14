@@ -2,22 +2,30 @@
     <!-- BEGIN awardList -->
     <div class="awardList">
         <h2>My Awards</h2>
-        <ul>
+        <dl>
             <!-- BEGIN award -->
-            <li></li>
+            <dt title="{AWARD_DESCRIPTION}">
+                <span class="description">{AWARD_ACHIEVEMENT}</span>
+                earned <time datetime="{AWARD_DATE}">{AWARD_DATE_LABEL}</time>
+            </dt>
+            <dd>{AWARD_COMMENT}</dd>
             <!-- END award -->
-        </ul>
+        </dl>
     </div>
     <!-- END awardList -->
 
     <!-- BEGIN detentionList -->
     <div class="detentionList">
         <h2>My Detentions</h2>
-        <ul>
+        <dl>
             <!-- BEGIN detention -->
-            <li></li>
+            <dt>
+                <span class="description">{DETENTION_DESCRIPTION}</span>
+                on <time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time>
+            </dt>
+            <dd>{DETENTION_COMMENT}</dd>
             <!-- END detention -->
-        </ul>
+        </dl>
     </div>
     <!-- END detentionList -->
 
@@ -26,7 +34,11 @@
         <h2>My Absences</h2>
         <ul>
             <!-- BEGIN absence -->
-            <li></li>
+            <li>
+                <span class="description">{ABSENCE_DESCRIPTION}</span>
+                for <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
+                on <time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time>
+            </li>
             <!-- END absence -->
         </ul>
     </div>

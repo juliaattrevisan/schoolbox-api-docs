@@ -95,11 +95,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $this->parse('awardList_block', 'awardList');
             $this->setVar('award_block', '');
             foreach ($this->awardList as $award) {
+                $date = new Alaress_Date_Format(new DateTime($award['AwardDate']));
                 $this->setVar(
                     array(
                         'AWARD_CODE'        => $award['AwardCode'],
                         'AWARD_DESCRIPTION' => $award['AwardDescription'],
                         'AWARD_DATE'        => $award['AwardDate'],
+                        'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                         'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
                         'AWARD_COMMENT'     => $award['AwardComment'],
                     )
@@ -113,11 +115,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $this->parse('detentionList_block', 'detentionList');
             $this->setVar('detention_block', '');
             foreach ($this->detentionList as $detention) {
+                $date = new Alaress_Date_Format(new DateTime($detention['DetentionDate']));
                 $this->setVar(
                     array(
                         'DETENTION_CODE'        => $detention['DetentionCode'],
                         'DETENTION_DESCRIPTION' => $detention['DetentionDescription'],
                         'DETENTION_DATE'        => $detention['DetentionDate'],
+                        'DETENTION_DATE_LABEL'  => $date->getLongDateOnly(),
                         'DETENTION_COMMENT'     => $detention['DetentionComment'],
                     )
                 );
@@ -130,17 +134,22 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $this->parse('absenceList_block', 'absenceList');
             $this->setVar('absence_block', '');
             foreach ($this->absenceList as $absence) {
+                $eventDate = new Alaress_Date_Format(new DateTime($absence['EventDateTime']));
+                $lateTime  = new Alaress_Date_Format(new DateTime($absence['LateArrivalTime']));
                 $this->setVar(
                     array(
-                        'ABSENCE_TYPE_CODE'     => $absence['AbsenceTypeCode'],
-                        'ABSENCE_DESCRIPTION'   => $absence['AbsenceDescription'],
-                        'CLASS_CODE'            => $absence['ClassCode'],
-                        'CLASS_CAMPUS'          => $absence['ClassCampus'],
-                        'CLASS_DESCRIPTION'     => $absence['ClassDescription'],
-                        'ATTENDANCE_DAY_NUMBER' => $absence['AttendanceDayNumber'],
-                        'ATTENDANCE_PERIOD'     => $absence['AttendancePeriod'],
-                        'LATE_ARRIVAL_FLAG'     => $absence['LateArrivalFlag'],
-                        'LATE_ARRIVAL_TIME'     => $absence['LateArrivalTime'],
+                        'EVENT_DATETIME'          => $absence['EventDateTime'],
+                        'EVENT_DATETIME_LABEL'    => $eventDate->getLong(),
+                        'ABSENCE_TYPE_CODE'       => $absence['AbsenceTypeCode'],
+                        'ABSENCE_DESCRIPTION'     => $absence['AbsenceDescription'],
+                        'CLASS_CODE'              => $absence['ClassCode'],
+                        'CLASS_CAMPUS'            => $absence['ClassCampus'],
+                        'CLASS_DESCRIPTION'       => $absence['ClassDescription'],
+                        'ATTENDANCE_DAY_NUMBER'   => $absence['AttendanceDayNumber'],
+                        'ATTENDANCE_PERIOD'       => $absence['AttendancePeriod'],
+                        'LATE_ARRIVAL_FLAG'       => $absence['LateArrivalFlag'],
+                        'LATE_ARRIVAL_TIME'       => $absence['LateArrivalTime'],
+                        'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
                     )
                 );
                 $this->parse('absence_block', 'absence', true);
