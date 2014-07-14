@@ -24,6 +24,50 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     }
 
     /**
+     * Dead simple query builder
+     *
+     * @param  mixed    $externalId
+     * @param  string   $dateField
+     * @param  DateTime $fromDate
+     * @param  DateTime $toDate
+     * @return array    0: the where part, 1: the params to use in the quer
+     *
+     */
+    protected function buildWherePart(
+        $externalId,
+        $dateField,
+        DateTime $fromDate = null,
+        DateTime $toDate = null
+    ) {
+        $whereParts = array(
+            'ID = :externalId'
+        );
+        $params = array(
+            ':externalId' => "'".$this->database->quote($externalId)."'",
+        );
+
+        // Apply date checks
+        if ($dateField) {
+            if ($fromDate) {
+                $whereParts[]        = $dateField.' >= :fromDate';
+                $params[':fromDate'] = "'".$this->database->quote($fromDate->format('Y-m-d'))."'";
+            }
+            if ($toDate) {
+                $whereParts[]      = $dateField.' <= :toDate';
+                $params[':toDate'] = "'".$this->database->quote($toDate->format('Y-m-d'))."'";
+            }
+        }
+
+        // Slam the where part in
+        $wherePart = '';
+        if (!empty($whereParts)) {
+            $wherePart = 'WHERE '.implode(' AND ', $whereParts);
+        }
+
+        return array($wherePart, $params,);
+    }
+
+    /**
      * Retrieves a user's awards.
      *
      * @param mixed    $externalId The student's external ID.
@@ -70,29 +114,11 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             %s
             ORDER BY DetentionDate DESC
         ";
-        $whereParts = array(
-            'ID = :externalId'
+        list($wherePart, $params) = $this->buildWherePart(
+            $externalId, 'DetentionDate', $fromDate, $toDate
         );
-        $params = array(
-            ':externalId' => "'".$this->database->quote($externalId)."'",
-        );
-
-        // Apply date checks
-        if ($fromDate) {
-            $whereParts[]        = 'DetentionDate >= :fromDate';
-            $params[':fromDate'] = "'".$this->database->quote($fromDate->format('Y-m-d'))."'";
-        }
-        if ($toDate) {
-            $whereParts[]      = 'DetentionDate <= :toDate';
-            $params[':toDate'] = "'".$this->database->quote($toDate->format('Y-m-d'))."'";
-        }
-
-        // Slam the where part in
-        $wherePart = '';
-        if (!empty($whereParts)) {
-            $wherePart = 'WHERE '.implode(' AND ', $whereParts);
-        }
         $query = strtr(sprintf($query, $wherePart), $params);
+//        new Alaress_Probe($query);
         return $this->database->getAll($query);
     }
 
@@ -127,8 +153,13 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 LatearrivalTime
             FROM SynergyOne.dbo.uvSchoLAbsence
             %s
-            ORDER BY DetentionDate DESC
+            ORDER BY EventDateTime DESC
         ";
+        list($wherePart, $params) = $this->buildWherePart(
+            $externalId, 'EventDateTime', $fromDate, $toDate
+        );
+        $query = strtr(sprintf($query, $wherePart), $params);
+//        new Alaress_Probe($query);
         return $this->database->getAll($query);
     }
 
