@@ -12,7 +12,7 @@
  */
 $authenticator = new \Etherpad\Authenticator();
 
-if (isset($_POST['submit'])) {
+if ($_POST['type'] == 'update') {
 	try {
 		$etherpadMapper = new \Etherpad\PadMapper();
 		$etherpad = $etherpadMapper->findById($_POST['padId']);
@@ -31,7 +31,7 @@ if (isset($_POST['submit'])) {
 		error(19);
 	}
 }
-else if (isset($_POST['delete'])) {
+else if ($_POST['type'] == 'delete') {
 
 	/* Load the pad from our db to get its groupId
 	 * Error out if you can't find it
