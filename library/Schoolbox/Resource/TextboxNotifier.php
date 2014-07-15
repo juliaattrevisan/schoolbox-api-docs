@@ -49,6 +49,7 @@ class TextboxNotifier extends ResourceNotifier {
 		    ))
 		    ->setIcon("/portrait.php?size=square32&userId=".$effector->getExternalId())
 		    ->setHref("/homepage/".$category->getId())
+			->setNamespace($this->getSlug())
 		    ->setSeverity(Logger::INFO)
 		    ->addTopic("cms.textbox.$resourceId.$action")
 		    ->addFilter('roletype', $roletype);
