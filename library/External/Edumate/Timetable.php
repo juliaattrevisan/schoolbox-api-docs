@@ -193,8 +193,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
             $timetable[$i] = array(
                 'periodName'     => $definition['desc'][$i],
-                'periodStart'    => $definition['start'][$i]->format('h:ia'),
-                'periodEnd'      => $definition['end'][$i]->format('h:ia'),
+                'periodStart'    => $definition['start'][$i],
+                'periodEnd'      => $definition['end'][$i],
                 'periodNumber'   => $definition['number'][$i],
                 'periodSequence' => $definition['sequence'][$i]
             );
@@ -270,8 +270,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
             $timetable[$i] = array(
                 'periodName'     => $definition['desc'][$i],
-                'periodStart'    => $definition['start'][$i]->format('h:ia'),
-                'periodEnd'      => $definition['end'][$i]->format('h:ia'),
+                'periodStart'    => $definition['start'][$i],
+                'periodEnd'      => $definition['end'][$i],
                 'periodNumber'   => $definition['number'][$i],
                 'periodSequence' => $definition['sequence'][$i]
             );
