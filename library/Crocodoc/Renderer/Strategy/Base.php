@@ -10,6 +10,8 @@
 
 namespace Crocodoc\Renderer\Strategy;
 
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 abstract class Base {
 
@@ -26,6 +28,13 @@ abstract class Base {
 	 * @var null
 	 */
 	protected $submission = null;
+
+	/**
+	 * Returned work
+	 *
+	 * @var null
+	 */
+	protected $returnedWork = null;
 
 	/**
 	 * An array of previous, current and next students
@@ -59,12 +68,14 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param Submission $submission
+	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null, $navigationElements) {
+	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
+		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
 	}
 
@@ -202,5 +213,23 @@ abstract class Base {
 	 */
 	protected function getUploadFile() {
 		return $this->uploadFile;
+	}
+
+	/**
+	 * Set returned work
+	 *
+	 * @param null $returnedWork
+	 */
+	protected function setReturnedWork($returnedWork) {
+		$this->returnedWork = $returnedWork;
+	}
+
+	/**
+	 * Get returned work
+	 *
+	 * @return null
+	 */
+	protected function getReturnedWork() {
+		return $this->returnedWork;
 	}
 }

@@ -10,6 +10,8 @@
 
 namespace Crocodoc\Renderer;
 
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 class Factory {
 
@@ -19,6 +21,13 @@ class Factory {
 	 * @var null
 	 */
 	private $submission = null;
+
+	/**
+	 * An instance of ReturnedWork
+	 *
+	 * @var null
+	 */
+	private $returnedWork = null;
 
 	/**
 	 * Supported mime types
@@ -55,12 +64,14 @@ class Factory {
 	 * (some submissions don't use crocodoc)
 	 *
 	 * @param $page
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param Submission $submission
+	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null, $navigationElements) {
+	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
+		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
 	}
 
@@ -73,32 +84,32 @@ class Factory {
 		/* No submission
 		 */
 		if ($this->getSubmission() === null) {
-			return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 		/* Crocodoc-friendly file types (only if Crocodoc is active with an api token)
 		 */
 		else if (strlen(\Cfg::get('crocodoc_api_token')) && in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 		/* Other special presentation methods for inline viewing of media
 		 * such as images and videos
 		 */
 		else if (preg_match('#^image/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Image($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Image($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 		else if (preg_match('#^text/html#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Html($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Html($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 		/* Otherwise just download the file
 		 */
 		else {
-			return new Strategy\Download($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+			return new Strategy\Download($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 		}
 
-		return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getNavigationElements());
+		return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
 	}
 
 	/* Getters/Setters
@@ -174,5 +185,23 @@ class Factory {
 	 */
 	private function getNavigationElements() {
 		return $this->navigationElements;
+	}
+
+	/**
+	 * Set returned work
+	 *
+	 * @param null $returnedWork
+	 */
+	private function setReturnedWork($returnedWork) {
+		$this->returnedWork = $returnedWork;
+	}
+
+	/**
+	 * Get returned work
+	 *
+	 * @return null
+	 */
+	private function getReturnedWork() {
+		return $this->returnedWork;
 	}
 }

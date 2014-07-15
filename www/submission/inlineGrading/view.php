@@ -111,6 +111,19 @@ for ($i=0; $i < count($stack); $i++) {
 $userMapper = new \Schoolbox\UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
+/* Find the latest returned work
+ */
+$latestReturnedWork = null;
+
+$returnWorkMapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+$latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId())->first();
+
+if ($latestReturnedActivity instanceof \Schoolbox\Assessment\Activity) {
+	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
+}
+
+/* Augment array with data
+ */
 if ($currentAugmented['submission'] != null) {
 	$submissionId = $currentAugmented['submission']->getId();
 }
@@ -132,7 +145,7 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 /* Render injectable views
  */
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], $navigationElements);
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], $latestReturnedWork, $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
