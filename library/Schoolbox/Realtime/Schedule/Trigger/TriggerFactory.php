@@ -33,7 +33,7 @@ class TriggerFactory {
 	 */
 	public function __construct($instance, $event) {
 		$this->notifier = $instance;
-        $this->event = $event;
+		$this->event = $event;
 		$this->bundles = array();
 	}
 

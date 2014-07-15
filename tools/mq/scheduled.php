@@ -36,7 +36,9 @@ $kernel->registerCustomShutdown(function() use (&$sched) {
 		return;
 	}
 
-	$sched->getDispatcher()->releaseWorkerPool();
+	if($d = $sched->getDispatcher()) {
+		$d->releaseWorkerPool();
+	}
 });
 
 // CREATE SCHEDULER APP

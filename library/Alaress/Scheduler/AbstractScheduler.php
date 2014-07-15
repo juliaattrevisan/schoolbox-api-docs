@@ -130,7 +130,10 @@ abstract class AbstractScheduler extends EventEmitter implements SchedulerInterf
      * @return DispatcherInterface
      */
     public function getDispatcher() {
-        return $this->dispatcher;
+        if(isset($this->dispatcher)) {
+            return $this->dispatcher;
+        }
+        return null;
     }
 
 
