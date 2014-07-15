@@ -207,8 +207,7 @@ class Cloner {
      * @return Alaress_Date_Format
      */
     protected function getAssessmentCloseTimeFromTask() {
-        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 00:00:00'));
-        $close_date->modify('+1 day');
+        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
         return new \Alaress_Date_Format($close_date);
     }
 }
