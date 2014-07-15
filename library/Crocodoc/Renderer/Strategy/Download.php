@@ -68,6 +68,14 @@ class Download extends Base {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 
+		$this->getPage()->setVar(array(
+			'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
+			'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
+			'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
+			'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
+			'MOST_RECENT_RETURN_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+		));
+
 		/* Control how Return Work is done
 		 */
 		$this->getPage()->setVar(array(
