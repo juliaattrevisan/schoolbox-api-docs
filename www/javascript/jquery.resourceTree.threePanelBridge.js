@@ -180,9 +180,59 @@
     ResourceTreeThreePanelBridge.prototype.onAfterOpen = function(event, tree) {
         // Set up folders as drop targets for files
         $.each(tree.node.children, function(i,v) {
-            tree.instance.get_node(v, true).droppable({
-                scope: 'resourceFile'
-            })
+            tree.instance.get_node(v, true)
+                .droppable({
+                    scope: 'resourceFile',
+                    hoverClass: "accept",
+                    greedy: true,
+                    tolerance: 'pointer',
+                })
+                .on('drop', function(event, ui) {
+
+                    var node          = $(ui.draggable).closest("tr"),
+                        destinationId = this.id;
+
+                    // Move all files, not just the one directly selected
+                    var nodeList = node.add(node.parent().find('tr.selected'));
+                    nodeList.each(function() {
+
+                        var node     = $(this),
+                            isLink   = node.hasClass('link'),
+                            id       = node.attr('id').substring(5),
+                            oldClass = this.className.match(/category-[\d]+/).toString(),
+                            newClass = 'category-'+String(destinationId);
+
+                        node.hide();
+
+                        var ajaxParams = {
+                            type: 'post',
+                            url:  '/cms/fileForm.php',
+                            data: {
+                                move:       id,
+                                categoryID: destinationId
+                            },
+                            dataType: 'json'
+                        }
+                        if (isLink) {
+                            ajaxParams.url = '/cms/linkForm.php';
+                        }
+                        $.ajax(ajaxParams)
+                            .done(function(data) {
+                                if (data && data.result != 'success') {
+                                    alert(data.result);
+                                    node.show();
+                                }
+                                else {
+                                    // Put this in a new class
+                                    node.remove();
+//                                    node.removeClass(oldClass).addClass(newClass);
+                                }
+                            })
+                            .fail(function(data) {
+                                node.show();
+                            })
+                    });
+                })
         });
     };
 
