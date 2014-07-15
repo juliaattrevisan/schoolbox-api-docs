@@ -83,7 +83,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     protected function parseTime($time) {
-        return new DateTime($time, new DateTimeZone('UTC'));
+        $timeObject = new DateTime($time, new DateTimeZone('UTC'));
+        return $timeObject->format('g:ia');
     }
 
     /**
@@ -120,8 +121,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $defn = $this->getTimetableDefinition($campusId);
         $sequence = 0;
 
-        for($i = 0; $i < count($defn['sequence']); ++$i) {
-            if($now < $defn['end'][$i]) {
+        for ($i = 0; $i < count($defn['sequence']); ++$i) {
+            // Time definitions are now in format "g:ia"
+            $defTime = new DateTime($defn['end'][$i], new DateTimeZone('UTC'));
+            if ($now < $defTime->format('Hi')) {
                 $sequence = $defn['sequence'][$i];
                 break;
             }
