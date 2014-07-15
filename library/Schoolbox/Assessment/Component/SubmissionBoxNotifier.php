@@ -14,12 +14,14 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Alaress_Date_Format;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -115,6 +117,24 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 		/** @var SubmissionBox $box */
 		$box = $bundle->getEvent()->getObject();
 
+		// check for detachment
+		if($bundle->getMethod() == Mapper::METHOD_DELETE) {
+			$bundle->detachEach(array(
+				self::TRIGGER_OPEN,
+				self::TRIGGER_OVERDUE,
+				self::TRIGGER_UPCOMING,
+				self::TRIGGER_CLOSED
+			));
+			return;
+		}
+
+		// can't work with nonexistent dates
+		if(!($box->getOpenDate() && $box->getDueDate() && $box->getLateDate())) {
+			return;
+		}
+
+		// ok, we're clear to attach some triggers now
+
 		$open = $box->getOpenDate()->getUnixTimestamp();
 		$closed = $box->getDueDate()->getUnixTimestamp();
 		$upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
@@ -144,21 +164,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 					self::TRIGGER_CLOSED   => $late
 				));
 				break;
-
-			case Mapper::METHOD_READ:
-				break;
-
-			case Mapper::METHOD_DELETE:
-				$bundle->detachEach(array(
-					self::TRIGGER_OPEN,
-					self::TRIGGER_OVERDUE,
-					self::TRIGGER_UPCOMING,
-					self::TRIGGER_CLOSED
-				));
-				break;
-
-			default:
-				throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
 		}
 
 	}
