@@ -68,7 +68,7 @@ class Factory {
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork, $navigationElements) {
+	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
