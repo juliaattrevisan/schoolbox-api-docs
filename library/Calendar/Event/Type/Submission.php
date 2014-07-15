@@ -76,7 +76,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
             $extended = '';
         }
 
-        return $this->getCategoryName() . $extended . '<br />' . $this->getSubmissionBoxName();
+        return $this->getCategoryName() . $extended . "\n" . $this->getSubmissionBoxName();
     }
 
 	/**
