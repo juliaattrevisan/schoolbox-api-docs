@@ -62,8 +62,7 @@ foreach($msgsByDay as $day => $timestamps) {
 		$fday = $custom[$day];
 	}
 	else {
-		// TODO format this header date to be prettier
-		$fday = $day;
+		$fday = date('D M jS Y', strtotime($day));
 	}
 
 	$this->setVar('DAY', ucfirst($fday));
