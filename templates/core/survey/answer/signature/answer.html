@@ -3,12 +3,31 @@
 		$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
 			id: {QUESTION_ID}
 		});
+
+		$('.sigPad').signaturePad({
+			drawOnly: true
+		});
 	});
 </script>
+
+<!--[if lt IE 9]><script src="/javascript/signature/assets/flashcanvas.js"></script><![endif]-->
+<script src="/javascript/signature/jquery.signaturepad.min.js"></script>
+<script src="/javascript/signature/assets/json2.min.js"></script>
+<link rel="stylesheet" href="/javascript/signature/signaturepad.css">
+
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-<label>
+<label class="sigPad">
+
     <!-- BEGIN answerOption -->
-	{CONFIGURATION_MANDATORY}
+	<div class="sigPadWrapper">
+		<div class="typed"></div>
+		<canvas class="pad" width="500" height="100"></canvas>
+		<input type="hidden" name="output" class="output">
+	</div>
+
+	<p class="clearButton">
+		<a href="#clear">Clear</a>
+	</p>
 
     {ANSWER}
     <!-- END answerOption -->
