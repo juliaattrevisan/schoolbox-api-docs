@@ -1,0 +1,1 @@
+INSERT INTO `assess_luQuestionType` (`classname`, `filename`, `description`, `moodle`, `automated_marking`, `availability`, `has_legend`, `has_config`) VALUES ('Signature', 'signature', 'Signature', 'signature', 'false', 'survey', 'false', 'true');
