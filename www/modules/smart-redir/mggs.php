@@ -85,8 +85,8 @@ switch($to)
         $form="form";
         $action="http://www.activehistory.co.uk/amember/plugins/protect/new_rewrite/login.php?v=-1,2,6,7,8,9,10,11,12,13,14&url=/main_area/index.php";
         $method="POST";
-	    $formArray['amember_login'] = 'haase';
-        $formArray['amember_pass'] = 'mggs';
+	    $formArray['amember_login'] = 'melbgirls';
+        $formArray['amember_pass'] = 'mggs1893';
         //$formArray['login_attempt_id'] = '1312519491';
     break;
 
