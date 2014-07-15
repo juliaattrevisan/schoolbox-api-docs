@@ -17,7 +17,12 @@ $component = array(
     'description'        => 'Shows awards, detentions and absences for your students',
     'multiple'           => 'false',
     'visible'            => 'true',
-    'config'             => array(),
+    'config'             => array(
+        'componentname'  => array(
+            'default_value' => 'Awards',
+            'label'         => 'Heading'
+        ),
+    )
 );
 
 Component_DefinitionMapper::getInstance()->create($component);
