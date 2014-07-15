@@ -3,6 +3,9 @@
 	/**
 	 * Constructor
 	 *
+	 * This is slightly different as it saves immediately upon instantiation
+	 * This is used in a callback to SignaturePad
+	 *
 	 * @param options
 	 */
 	$.fn.evaluationSignature = function(options) {
@@ -32,9 +35,7 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
-//			config.questionForm.find('textarea').change(function() {
-//				$.fn.evaluationShort.saveOne(config.questionForm);
-//			});
+			$.fn.evaluationShort.saveOne(config.questionForm);
 		}
 	}
 
@@ -44,26 +45,26 @@
 	 * @param element
 	 */
 	$.fn.evaluationSignature.saveOne = function(element) {
-//		$.ajax({
-//			type: 'post',
-//			url: $(element).attr('action'),
-//			data: $(element).serialize(),
-//
-//			/* Ensure all forms submit before redirecting
-//			 * Do not upgrade jquery to 1.9 or you'll lose this
-//			 */
-//			async: false,
-//
-//			/* Callback on success
-//			 */
-//			success: function(responseText) {
-//				var result = new Function('return ' + responseText);
-//
-//				$.fn.evaluationPercentageComplete({
-//					result: result()
-//				});
-//			}
-//		});
+		$.ajax({
+			type: 'post',
+			url: $(element).attr('action'),
+			data: $(element).serialize(),
+
+			/* Ensure all forms submit before redirecting
+			 * Do not upgrade jquery to 1.9 or you'll lose this
+			 */
+			async: false,
+
+			/* Callback on success
+			 */
+			success: function(responseText) {
+				var result = new Function('return ' + responseText);
+
+				$.fn.evaluationPercentageComplete({
+					result: result()
+				});
+			}
+		});
 	}
 
 	/**

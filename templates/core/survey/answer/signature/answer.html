@@ -1,11 +1,12 @@
 <script type='text/javascript'>
 	$j(function() {
-		$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-			id: {QUESTION_ID}
-		});
-
 		$('.sigPad').signaturePad({
-			drawOnly: true
+			drawOnly: true,
+			onDrawEnd: function() {
+				$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+					id: {QUESTION_ID}
+				});
+			}
 		});
 	});
 </script>
