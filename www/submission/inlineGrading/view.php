@@ -8,6 +8,18 @@
  * @version     SVN: $Id$
  */
 
+
+use \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use \Schoolbox\Assessment\Activity;
+use \Schoolbox\File\MimetypeMapper;
+use \Schoolbox\Resource\CategoryCodeMapper;
+use \Schoolbox\UserMapper;
+use \Schoolbox\Collection;
+use \Crocodoc\Renderer\Factory;
+use \Rubric\Renderer\Vertical;
+
 /* /submission/inline/view/<box_id>/<user_id>
  */
 $submissionBoxId = $this->arg[0];
@@ -17,12 +29,12 @@ $currentUid = $this->arg[1];
  */
 $submissionId = $this->arg[2];
 
-$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+$submissionBoxMapper = new SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
 /* Add category codes
  */
-$categoryCodeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
+$categoryCodeMapper = new CategoryCodeMapper();
 $categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
 $submissionBox->getCategory()->setCodes($categoryCode);
 
@@ -58,7 +70,7 @@ foreach ($studentList as $currentStudent) {
 
 /* Trim out only this student
  */
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submissionMapper = new SubmissionMapper();
 
 for ($i=0; $i < count($stack); $i++) {
 	$currentAugmented = $stack[$i];
@@ -74,7 +86,7 @@ for ($i=0; $i < count($stack); $i++) {
 
 				/* Apply mime type
 				 */
-				$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+				$mimetypeMapper = new MimetypeMapper();
 				$mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
 				$submission->setMimetype($mime);
 
@@ -108,18 +120,24 @@ for ($i=0; $i < count($stack); $i++) {
 
 /* Rendering things out
  */
-$userMapper = new \Schoolbox\UserMapper();
+$userMapper = new UserMapper();
 $user = $userMapper->findById($this->arg[1]);
 
 /* Find the latest returned work
  */
 $latestReturnedWork = null;
 
-$returnWorkMapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+$returnWorkMapper = new ReturnedWorkMapper();
 $latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId())->first();
 
-if ($latestReturnedActivity instanceof \Schoolbox\Assessment\Activity) {
+if ($latestReturnedActivity instanceof Activity) {
 	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
+
+	/* Find the Mime again
+	 */
+	$mimetypeMapper = new MimetypeMapper();
+	$mime = $mimetypeMapper->findOneByColumn('mime', $latestReturnedWork->getMimeType()->getMime());
+	$latestReturnedWork->setMimetype($mime);
 }
 
 /* Augment array with data
@@ -145,13 +163,13 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 /* Render injectable views
  */
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], $latestReturnedWork, $navigationElements);
+$templateFactory = new Factory($this, $currentAugmented['submission'], $latestReturnedWork, $navigationElements);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
 /* Assign marks
  */
-$oneStudent = new \Schoolbox\Collection();
+$oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxId);
@@ -160,7 +178,7 @@ $dueWorkDetail->renderDetails($this);
 
 /* Rubric's Cube
  */
-$rubricsRenderer = new \Rubric\Renderer\Vertical($this, $submissionBox, $user);
+$rubricsRenderer = new Vertical($this, $submissionBox, $user);
 $rubricsRenderer->render()->parseBlock();
 
 /* Determine redirect based on whether you're at the end of the list or not
