@@ -43,10 +43,11 @@ if (is_numeric($_GET['eventID'])) {
 	 */
 	$canAdminister = $authenticator->isEOTCAdministrator($_SESSION['user']);
 	$isAuthor = (($event->getAuthor()->getId() == $_SESSION['user']->getId()) && $authenticator->isEOTCCreator($_SESSION['user']));
+	$isTeacherInCharge = ($event->getTeacherInCharge() instanceof \Schoolbox\User) && ($event->getTeacherInCharge()->getId() == $_SESSION['user']->getId());
 
 	/* EOTC Administrators and event authors can edit this event
 	 */
-	if ($canAdminister || $isAuthor) {
+	if ($canAdminister || $isAuthor || $isTeacherInCharge) {
 
 		/* Do a check for missing metadata
 		 */
@@ -238,7 +239,10 @@ if (is_numeric($_GET['eventID'])) {
 		/* Cannot self-promote until a status is In Principle
 		 * Only an author can do it to his own event
 		 */
-		if ($isAuthor && $authenticator->canSelfPromote($_SESSION['user'], $event)) {
+		$authorSelfPromote = $isAuthor && $authenticator->canSelfPromote($_SESSION['user'], $event);
+		$teacherInChargeSelfPromote = $isTeacherInCharge && $authenticator->canSelfPromote($event->getTeacherInCharge(), $event);
+
+		if ($authorSelfPromote || $teacherInChargeSelfPromote) {
 			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
 		}
 		else {
