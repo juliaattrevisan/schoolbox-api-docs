@@ -48,7 +48,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             return false;
         }
 
-        $userId = $this->user->getId();
+        $userId = $this->user->getExternalId();
 
         // Here's some test data, because this only works on St Michaels servers
         $this->detentionList = array(
