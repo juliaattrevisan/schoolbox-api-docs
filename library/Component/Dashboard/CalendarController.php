@@ -51,7 +51,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		/* Get 30 days of events by default
 		 */
-		if ($days <= 1) {
+		if ($days <= 0) {
 			$days = 30;
 		}
 
