@@ -404,7 +404,7 @@ class External_Tass_User implements External_UserInterface
                 '' AS StudentContactTitle,
                 p.f_name AS StudentContactPreferred,
                 p.surname AS StudentContactSurname,
-                '' AS StudentContactDefaultEmail,
+                pa.e_mail AS StudentContactDefaultEmail,
 
                 '' AS StudentContactSpouseID,
                 '' AS StudentContactSpouseTitle,
@@ -416,8 +416,11 @@ class External_Tass_User implements External_UserInterface
                 s.campus_code AS StudentCampus,
                 s.sex AS StudentGender,
 
-                p.*
+                p.*,
+                pa.*
             FROM parent AS p
+            INNER JOIN paraddress as pa
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
             -- INNER JOIN pia_sfaccess AS sf
             --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
             INNER JOIN student as s
