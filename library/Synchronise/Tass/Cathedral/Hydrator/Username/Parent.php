@@ -13,7 +13,7 @@ class Synchronise_Tass_Cathedral_Hydrator_Username_Parent implements Synchronise
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['synergy_id'] = $newUser['username'] = 'P'.$externalUser['StudentContactID'];
+        $newUser['synergy_id'] = 'P'.$externalUser['StudentContactID'];
         return $newUser;
     }
 }
