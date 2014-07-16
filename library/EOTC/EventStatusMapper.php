@@ -20,7 +20,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 
 	const STATUS_DRAFT = 1;
 	const STATUS_INPRINCIPLE = 2;
-	const STATUS_RAMSAPPROVED = 3;
+	const STATUS_DETAILSCOMPLETED = 3;
 	const STATUS_RAMSCONFIRMED = 4;
 	const STATUS_AWAITINGFINALAPPROVAL = 4;
 	const STATUS_APPROVED = 5;

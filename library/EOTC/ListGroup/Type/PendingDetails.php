@@ -20,7 +20,7 @@ class PendingDetails extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = EventStatusMapper::STATUS_RAMSAPPROVED;
+	protected $nextStatusId = EventStatusMapper::STATUS_DETAILSCOMPLETED;
 
 	/**
 	 * Determine where to go next

@@ -79,7 +79,7 @@ class EventStatus {
 	 * @return bool
 	 */
 	public function isRamsApproved() {
-		if ($this->getId() == EventStatusMapper::STATUS_RAMSAPPROVED) {
+		if ($this->getId() == EventStatusMapper::STATUS_DETAILSCOMPLETED) {
 			return true;
 		}
 
