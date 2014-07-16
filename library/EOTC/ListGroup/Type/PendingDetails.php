@@ -33,7 +33,7 @@ class PendingDetails extends Base {
 		 * with the RAMS Required configuration
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
-			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingRamsReviewIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
