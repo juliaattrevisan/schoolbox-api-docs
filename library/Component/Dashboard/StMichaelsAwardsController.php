@@ -48,14 +48,18 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             return false;
         }
 
+        $userId = $this->user->getId();
+
         // Here's some test data, because this only works on St Michaels servers
         $this->detentionList = array(
             array(
+                'ID'                   => $userId,
                 'DetentionDate'        => date('Y-m-d'),
                 'DetentionDescription' => 'Noobed out',
                 'DetentionComment'     => 'You are a noob',
             ),
             array(
+                'ID'                   => $userId,
                 'DetentionDate'        => date('Y-m-d'),
                 'DetentionDescription' => 'Fell asleep at desk',
                 'DetentionComment'     => "* Fell asleep at desk\nAgain",
@@ -63,6 +67,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         );
         $this->absenceList = array(
             array(
+                'ID'                  => $userId,
                 'EventDateTime'       => date('Y-m-d H:i:s'),
                 'AbsenceTypeCode'     => 'LT',
                 'AbsenceDescription'  => 'Late',
@@ -75,6 +80,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                 'LateArrivalTime'     => date('H:i:s'),
             ),
             array(
+                'ID'                  => $userId,
                 'EventDateTime'       => date('Y-m-d H:i:s'),
                 'AbsenceTypeCode'     => 'ABS',
                 'AbsenceDescription'  => 'Absent',
@@ -89,6 +95,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         );
         $this->awardList = array(
             array(
+                'ID'               => $userId,
                 'FileYear'         => $_SESSION['FileYear'],
                 'FileSemester'     => $_SESSION['FileSemester'],
                 'AwardCode'        => 'EIA',
@@ -98,6 +105,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                 'AwardComment'     => 'You are awesome',
             ),
             array(
+                'ID'               => $userId,
                 'FileYear'         => $_SESSION['FileYear'],
                 'FileSemester'     => $_SESSION['FileSemester'],
                 'AwardCode'        => 'PRO',
@@ -109,7 +117,6 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         );
 
         // Live data
-//        $userId              = $this->user->getId();
 //        $this->externalDb    = new External_UserDetention();
 //        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
 //        $this->absenceList   = $this->externalDb->getAbsences($userId);
