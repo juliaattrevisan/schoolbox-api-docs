@@ -21,7 +21,12 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Parent())
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping(
+                'StudentContactID', 'username'
+            ))
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping(
+                'StudentContactID', 'synergy_id', 'P%s'
+            ))
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
