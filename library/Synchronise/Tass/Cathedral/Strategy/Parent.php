@@ -30,7 +30,6 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
             // Use the student campus hydrator, as the student and parent have
             // campus in the same field.
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Student())
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             // TASS has no separate spouse entries, so just add a clear one.
