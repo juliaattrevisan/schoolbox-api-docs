@@ -15,9 +15,41 @@ class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Bas
      */
     public function hydrate($externalUser, $newUser) {
         // Example Name: "Cpt A Cripps & Mrs P Cripps"
-        // Tass ain't giving me titles
+        // Tass ain't giving me titles, but it does give me
+        // "StudentContactPreferred" and "StudentContactSpousePreferred"
+        // I'll just jam names together (probably not updating existing names)
         $newUser['firstname'] = '';
-        $newUser['lastname']  = $externalUser['StudentContactSurname'];
+
+        if (!$externalUser['StudentContactSpousePreferred']) {
+            // Single parent in main contact record
+            $newUser['lastname'] = $externalUser['StudentContactPreferred'];
+        }
+        elseif (!$externalUser['StudentContactPreferred']) {
+            // Single parent in spouse contact record
+            $newUser['lastname'] = $externalUser['StudentContactSpousePreferred'];
+        }
+        else {
+            // Two parents which may or may not have the same surname. Find out.
+            list($contactFirstName, $contactSurname)
+                = preg_split("/\\s+/", $externalUser['StudentContactPreferred'], 2);
+            list($spouseFirstName, $spouseSurname)
+                = preg_split("/\\s+/", $externalUser['StudentContactSpousePreferred'], 2);
+            if ($contactSurname == $spouseSurname) {
+                $newUser['lastname'] = sprintf(
+                    '%s & %s %s',
+                    $contactFirstName,
+                    $spouseFirstName,
+                    $contactSurname
+                );
+            }
+            else {
+                $newUser['lastname'] = sprintf(
+                    '%s & %s',
+                    $externalUser['StudentContactPreferred'],
+                    $externalUser['StudentContactSpousePreferred']
+                );
+            }
+        }
         return $newUser;
     }
 }
