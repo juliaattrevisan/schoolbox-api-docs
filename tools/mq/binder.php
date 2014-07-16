@@ -58,7 +58,7 @@ foreach($userCollection as $user) {
 		);
 	}
 
-	$deleted = $qFactory->destoryUserBindings($user->getId(), $dryRun);
+	$deleted = $qFactory->destroyUserBindings($user->getId(), $dryRun);
 
 	if($deleted < 0) {
 		if($verbose) {

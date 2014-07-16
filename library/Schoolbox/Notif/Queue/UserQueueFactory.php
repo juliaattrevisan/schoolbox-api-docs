@@ -351,7 +351,7 @@ class UserQueueFactory {
 	 * @param bool $simulate
 	 * @return int
 	 */
-	public function destoryUserBindings($userId, $simulate = false) {
+	public function destroyUserBindings($userId, $simulate = false) {
 
 		if(!$this->existingBindings) {
 			$this->cacheExistingBindings();
