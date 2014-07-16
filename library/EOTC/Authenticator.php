@@ -85,6 +85,12 @@ class Authenticator {
 			if ($event->getAuthor()->getId() == $user->getId()) {
 				return true;
 			}
+
+			/* Teacher in Charge can self promote, too
+			 */
+			if ($event->getTeacherInCharge()->getId() == $user->getId()) {
+				return true;
+			}
 		}
 
 		return false;
