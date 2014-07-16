@@ -11,14 +11,14 @@ namespace Schoolbox\Notif\Queue;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
-use Exception;
 use External_User;
-use Group;
 use InvalidArgumentException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
@@ -47,8 +47,8 @@ class UserQueueFactory {
 	/** @var RoleMapper */
 	protected $roleMapper;
 
-	/** @var Group */
-	protected $_DEPRECATED_GROUP;
+	/** @var UserAccessMapper */
+	protected $userAccessMapper;
 
 	/** @var External_User */
 	protected $_DEPRECATED_EXT_USER;
@@ -102,13 +102,33 @@ class UserQueueFactory {
 
 
 	/**
-	 * @return Group
+	 * @param External_User $externalUserHandler
+	 * @return self
 	 */
-	public function GET_DEPRECATED_GROUP() {
-		if(!$this->_DEPRECATED_GROUP) {
-			$this->_DEPRECATED_GROUP = new Group();
+	public function SET_DEPRECATED_EXT_USER($externalUserHandler) {
+		$this->_DEPRECATED_EXT_USER = $externalUserHandler;
+		return $this;
+	}
+
+
+	/**
+	 * @param UserAccessMapper $userAccessMapper
+	 * @return self
+	 */
+	public function setUserAccessMapper($userAccessMapper) {
+		$this->userAccessMapper = $userAccessMapper;
+		return $this;
+	}
+
+
+	/**
+	 * @return UserAccessMapper
+	 */
+	public function getUserAccessMapper() {
+		if(!$this->userAccessMapper) {
+			$this->userAccessMapper = UserAccessMapper::getInstance();
 		}
-		return $this->_DEPRECATED_GROUP;
+		return $this->userAccessMapper;
 	}
 
 
@@ -120,6 +140,16 @@ class UserQueueFactory {
 			$this->roleMapper = RoleMapper::getInstance();
 		}
 		return $this->roleMapper;
+	}
+
+
+	/**
+	 * @param \Schoolbox\RoleMapper $roleMapper
+	 * @return self
+	 */
+	public function setRoleMapper($roleMapper) {
+		$this->roleMapper = $roleMapper;
+		return $this;
 	}
 
 
@@ -254,6 +284,25 @@ class UserQueueFactory {
 		// *.notify.service.{service}.{itemId}.{level}.#
 		// Higher access levels get lower level bindings as well.
 		$bindings['service'] = array();
+
+		try {
+			// retrieve all homepages the user has access to; pull homepage service access from synergy as well
+			$catIds = $this->getCategoryMapper()->findForUser($user)->getColumnValues('id');
+
+			/** @var UserAccess $access */
+			$accessList = $this->getUserAccessMapper()->findByColumnList(array(
+				'uid'     => $user->getId(),
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'sid'     => $catIds
+			));
+		}
+		catch(MapperException $e) {
+			$accessList = new Collection();
+		}
+
+		// combine with all other services user has access to
+		$accessList->mergeUnique($user->getAccessList());
+
 		foreach ($user->getAccessList() as $access) {
 			$baseBinding = $access->getService().'.'.$access->getServiceIdentifier();
 			$accessLevel = $access->getAccessLevel();
@@ -267,23 +316,6 @@ class UserQueueFactory {
 				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
 			}
 		}
-
-		// Additional service bindings: pull homepage service access from synergy as well
-
-		/** @var Collection|Category[] $cats */
-		$cats = $this->getCategoryMapper()->findForUser($user);
-
-		foreach($cats as $cat) {
-			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
-
-			// it doesn't matter if any of these duplicate any created above
-			$baseBinding = UserAccess::SERVICE_HOMEPAGE.'.'.$cat->getId();
-			if($catOwner['uid'] == $user->getId()) {
-				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_FULL.'.#';
-			}
-			$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
-		}
-
 
 		return $bindings;
 	}
