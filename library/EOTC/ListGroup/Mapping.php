@@ -27,7 +27,7 @@ class Mapping {
 		'Awaiting Final Approval',
 		'Confirm RAMs',
 		'Pending Initial Application Review',
-		'Pending RAMS Review',
+		'Pending Details',
 		'Approved',
 		'Rejected',
 	);
@@ -85,11 +85,11 @@ class Mapping {
 	}
 
 	/**
-	 * Index of Pending Rams Review events
+	 * Index of Pending Details events
 	 *
 	 * @return int
 	 */
-	public function getPendingRamsReviewIndex() {
+	public function getPendingDetailsIndex() {
 		return 4;
 	}
 

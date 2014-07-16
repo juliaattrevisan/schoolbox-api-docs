@@ -33,7 +33,7 @@ class Chain {
 		 * Pending Final Approval
 		 * Confirm RAMs,
 		 * Pending In Principle,
-		 * Pending RAMS,
+		 * Pending Details,
 		 * Approved,
 		 * Rejected,
 		 * None (throws whacky exception)
@@ -41,7 +41,7 @@ class Chain {
 		$pendingFinalApproval = new Type\PendingFinalApproval($event);
 		$pendingConfirmRAMs = new Type\PendingConfirmRAMs($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
-		$pendingRamsReview = new Type\PendingRamsReview($event);
+		$pendingDetails = new Type\PendingDetails($event);
 		$approved = new Type\Approved($event);
 		$rejected = new Type\Rejected($event);
 		$none = new Type\None($event);
@@ -50,8 +50,8 @@ class Chain {
 		 */
 		$rejected->setNext($none);
 		$approved->setNext($rejected);
-		$pendingRamsReview->setNext($approved);
-		$pendingInPrincipleReview->setNext($pendingRamsReview);
+		$pendingDetails->setNext($approved);
+		$pendingInPrincipleReview->setNext($pendingDetails);
 		$pendingConfirmRAMs->setNext($pendingInPrincipleReview);
 		$pendingFinalApproval->setNext($pendingConfirmRAMs);
 

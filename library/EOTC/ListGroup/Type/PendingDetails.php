@@ -1,6 +1,6 @@
 <?php
 /**
- * PendingRamsReview
+ * PendingDetails
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,15 +10,17 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Response;
 
-class PendingRamsReview extends Base {
+class PendingDetails extends Base {
 
 	/**
 	 * Next status id
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_RAMSAPPROVED;
+	protected $nextStatusId = EventStatusMapper::STATUS_DETAILSCOMPLETED;
 
 	/**
 	 * Determine where to go next
@@ -31,7 +33,7 @@ class PendingRamsReview extends Base {
 		 * with the RAMS Required configuration
 		 */
 		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingRamsReviewIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

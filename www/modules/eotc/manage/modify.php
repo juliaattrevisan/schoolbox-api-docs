@@ -47,6 +47,7 @@ if (is_numeric($_GET['eventID'])) {
 	/* EOTC Administrators and event authors can edit this event
 	 */
 	if ($canAdminister || $isAuthor) {
+
 		/* Do a check for missing metadata
 		 */
 		if (!$event->getMetadata()) {
@@ -235,9 +236,9 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('can_add_resources_block', 'can_add_resources');
 
 		/* Cannot self-promote until a status is In Principle
-		 * Only offer self-promotion to non-eotc-administrators
+		 * Only an author can do it to his own event
 		 */
-		if (!$authenticator->isEOTCAdministrator($_SESSION['user']) && $authenticator->canPromote($_SESSION['user'], $event)) {
+		if ($isAuthor && $authenticator->canSelfPromote($_SESSION['user'], $event)) {
 			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
 		}
 		else {

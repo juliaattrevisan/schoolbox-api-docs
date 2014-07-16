@@ -308,12 +308,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				}
 				break;
 
-			case EventStatusMapper::STATUS_RAMSAPPROVED:
+			case EventStatusMapper::STATUS_DETAILSCOMPLETED:
 				$bob->setTitle(":moderator has approved RAMs for :event")
 					->setHref($hrefMod);
 				break;
 
-			case EventStatusMapper::STATUS_RAMSCONFIRMED:
+			case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
 				$bob->setTitle(":moderator has confirmed RAMs for :event")
 				    ->setHref($hrefMod);
 				break;
@@ -358,7 +358,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					if($eventMetadata->getRamsRequired()) {
 						$bob->setHref($hrefMod);
 
-						$ramsModIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_RAMSAPPROVED);
+						$ramsModIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
 
 						foreach($ramsModIds as $userId) {
 							$envelope->targetToUser($userId, $bob->build());

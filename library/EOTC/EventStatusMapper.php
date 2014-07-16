@@ -10,6 +10,7 @@
 
 namespace EOTC;
 
+use \Schoolbox\Collection;
 
 class EventStatusMapper extends \Schoolbox\Mapper {
 
@@ -20,8 +21,8 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 
 	const STATUS_DRAFT = 1;
 	const STATUS_INPRINCIPLE = 2;
-	const STATUS_RAMSAPPROVED = 3;
-	const STATUS_RAMSCONFIRMED = 4;
+	const STATUS_DETAILSCOMPLETED = 3;
+	const STATUS_READYFORFINALAPPROVAL = 4;
 	const STATUS_AWAITINGFINALAPPROVAL = 4;
 	const STATUS_APPROVED = 5;
 	const STATUS_REJECTED = 6;
@@ -64,7 +65,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 		 */
 		$exclusions = array(self::STATUS_APPROVED, self::STATUS_REJECTED);
 
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		foreach($allStatuses as $currentStatus) {
 			if (!in_array($currentStatus->getId(), $exclusions)) {
@@ -85,7 +86,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 		$nextStatusId = -1;
 
 		try {
-			$chain = new \EOTC\ListGroup\Chain($event);
+			$chain = new ListGroup\Chain($event);
 			$nextStatusId = $chain->getResult()->getNextStatus();
 		}
 		catch (\Exception $e) {
@@ -106,7 +107,7 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 		$nextStatusId = -1;
 
 		try {
-			$chain = new \EOTC\ListGroup\Chain($event);
+			$chain = new ListGroup\Chain($event);
 			$nextStatusId = $chain->getResult()->getNextStatus();
 		}
 		catch (\Exception $e) {
