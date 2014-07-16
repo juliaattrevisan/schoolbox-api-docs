@@ -2,6 +2,8 @@
 
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
+$this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
+$this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
 
@@ -25,10 +27,15 @@ if (is_numeric($this->arg[0])) {
 	if($groupHandler->getPermission($this->arg[0]) < FULL_ACCESS)
 		error(19);
 
+	$this->setVar(
+		array(
+			'groupOwner_block'     => '',
+			'groupUnmanaged_block' => '',
+		)
+	);
+
 	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
-					'GROUP_OWNER'		=> $category['owner']?$userHandler->formatName($category):'Unmanaged',
-					'OWNER_ID'			=> $category['owner'],
 					'GROUP_TYPE_1'		=> '',
 					'GROUP_TYPE_2'		=> '',
 					'GROUP_TYPE_3'		=> '',
@@ -36,6 +43,18 @@ if (is_numeric($this->arg[0])) {
 					);
 
 	$this->setVar($output);
+	if ($category['owner']) {
+		$this->setVar(
+			array(
+				'GROUP_OWNER' => $userHandler->formatName($category),
+				'OWNER_ID'    => $category['owner'],
+			)
+		);
+		$this->parse('groupOwner_block', 'groupOwner');
+	}
+	else {
+		$this->parse('groupUnmanaged_block', 'groupUnmanaged');
+	}
 
 	$memberList   = $groupHandler->getMemberList($category['id']);
 	//
