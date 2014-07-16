@@ -194,7 +194,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* If promoting an event, set to the next status
 			 * This is a special case for event authors and In Principle status
 			 */
-			if (isset($_POST['promoteInPrinciple']) && $_POST['promoteInPrinciple'] == 1) {
+			$canSelfPromote = $authenticator->canSelfPromote($_SESSION['user'], $event);
+
+			if (isset($_POST['promoteInPrinciple']) && ($_POST['promoteInPrinciple'] == 1) && $canSelfPromote) {
 				$eventStatusMapper = new \EOTC\EventStatusMapper();
 				$nextStatusId = $eventStatusMapper->findNextStatus($event);
 				$eventStatus = $eventStatusMapper->findById($nextStatusId);

@@ -238,7 +238,7 @@ if (is_numeric($_GET['eventID'])) {
 		/* Cannot self-promote until a status is In Principle
 		 * Only an author can do it to his own event
 		 */
-		if ($isAuthor) {
+		if ($isAuthor && $authenticator->canSelfPromote($_SESSION['user'], $event)) {
 			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
 		}
 		else {

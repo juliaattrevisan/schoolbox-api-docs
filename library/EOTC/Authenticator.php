@@ -73,6 +73,24 @@ class Authenticator {
 	}
 
 	/**
+	 * Allow event authors to modify status of events from In Principle
+	 * to the next status
+	 *
+	 * @param \Schoolbox\User $user
+	 * @param Event $event
+	 * @return bool
+	 */
+	public function canSelfPromote(\Schoolbox\User $user, Event $event) {
+		if ($event->getMetadata()->getStatus()->isInPrinciple()) {
+			if ($event->getAuthor()->getId() == $user->getId()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether the current user's permissions allow them
 	 * to change the status of $event
 	 *
@@ -95,15 +113,6 @@ class Authenticator {
 		 */
 		if ($event->getMetadata()->getStatus()->isRejected()) {
 			return true;
-		}
-
-		/* Allow event authors to modify status of events from In Principle
-		 * to the next status
-		 */
-		if ($event->getMetadata()->getStatus()->isInPrinciple()) {
-			if ($event->getAuthor()->getId() == $user->getId()) {
-				return true;
-			}
 		}
 
 		$allPermissions = $this->getPermissionMapper()->findByUser($user);
