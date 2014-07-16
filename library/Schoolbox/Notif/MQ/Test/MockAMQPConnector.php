@@ -213,7 +213,7 @@ class MockAMQPConnector implements AMQPInterface {
 	 * @return AMQPExchange
 	 */
 	public function getSecondaryExchange($name) {
-		return new AMQPExchange('mock','mock');
+		return new AMQPExchange("mock.$name",'mock');
 	}
 
 
