@@ -313,7 +313,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					->setHref($hrefMod);
 				break;
 
-			case EventStatusMapper::STATUS_RAMSCONFIRMED:
+			case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
 				$bob->setTitle(":moderator has confirmed RAMs for :event")
 				    ->setHref($hrefMod);
 				break;
