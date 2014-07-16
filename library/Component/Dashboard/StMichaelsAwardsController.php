@@ -53,7 +53,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             array(
                 'DetentionDate'        => date('Y-m-d'),
                 'DetentionDescription' => 'Noobed out',
-                'DetentionComment'     => 'stfu noob',
+                'DetentionComment'     => 'You are a noob',
             ),
             array(
                 'DetentionDate'        => date('Y-m-d'),
@@ -108,6 +108,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             ),
         );
 
+        // Live data
 //        $userId              = $this->user->getId();
 //        $this->externalDb    = new External_UserDetention();
 //        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
