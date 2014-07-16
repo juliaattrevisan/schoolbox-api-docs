@@ -1,0 +1,41 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript">
+	$j(function() {
+		$j('thead td').each(function() {
+			var activeContent = $j(this).find('em').html();
+			$j(this).qtip({
+				content: activeContent,
+				style: {
+					classes: 'qtip-green qtip-shadow',
+					tip: { corner: false }
+				},
+				position: {
+					my: 'bottom left',
+					at: 'top left'
+				}
+			});
+		});
+	});
+</script>
+<!-- END custom_head -->
+<table class="bulk-users table">
+	<thead>
+		<tr>
+			<td><h3>Event Detail<em>The name of the category, indicated from reading the rows in the CSV file.</em><span class="question">?</span></h3></td>
+			<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span class="question">?</span></h3></td>
+			<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span class="question">?</span></h3></td>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN event -->
+		<tr>
+			<td>{EVENT_NAME}</td>
+			<td>{EVENT_STATUS}</td>
+			<td>{EVENT_ERROR}</td>
+		</tr>
+		<!-- END event -->
+	</tbody>
+</table>
+
+<a href="/homepage/{HOMEPAGE_ID}" class="btn go-back"><span></span>Return to homepage</a>

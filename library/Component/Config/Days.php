@@ -10,6 +10,5 @@
 class Component_Config_Days extends Component_Config_Size {
 
     protected $max           = 30;
-    protected $showAllOption = false;
-
+    protected $showAllOption = true;
 }

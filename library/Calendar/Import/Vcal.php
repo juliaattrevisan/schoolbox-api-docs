@@ -14,6 +14,8 @@ use \Sabre\VObject;
 use \Sabre\VObject\Component\VEvent;
 use \Schoolbox\Calendar\Event;
 use \Schoolbox\Calendar\EventMapper;
+use \Schoolbox\Calendar\Relation\Category;
+use \Schoolbox\Calendar\Relation\CategoryMapper;
 use \Schoolbox\Calendar\Relation\Role;
 use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
@@ -58,6 +60,7 @@ class Vcal extends Base {
 		if (is_file($this->getFile())) {
 			$campusMapper = new CampusMapper();
 			$eventMapper = new EventMapper();
+			$categoryRelationMapper = new CategoryMapper();
 			$roleRelationMapper = new RoleMapper();
 
 			/* All the campuses selected in the ui
@@ -103,7 +106,7 @@ class Vcal extends Base {
 					$event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 					$event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 					$event->setTitle((string)$currentEvent->SUMMARY);
-					$event->setAccess(Event::ACCESS_CAMPUS);
+					$event->setAccess($this->getAccess());
 					$event->setType($this->findEventTypeFromArray($categoryList));
 					$event->setCampusCollection($allCampuses);
 					$event->setDetail(nl2br((string)$currentEvent->DESCRIPTION));
@@ -115,6 +118,15 @@ class Vcal extends Base {
 					/* Save it
 					 */
 					$result = $eventMapper->save($event);
+
+					/* Assign Category relations
+					 */
+					foreach($this->getCategoryList() as $currentCategory) {
+						$category = new Category();
+						$category->setEventId($event->getId());
+						$category->setCategoryId($currentCategory);
+						$categoryRelationMapper->save($category);
+					}
 
 					/* Assign Role relations
 					 */

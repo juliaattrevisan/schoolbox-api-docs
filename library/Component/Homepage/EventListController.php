@@ -30,6 +30,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         //event output
         $this->setBlock($templateHandle, "group_events", "group_events_block");
+		$this->setBlock($templateHandle, "import_events", "import_events_block");
 
         // From updated calendar
         $groupHandler = new Group();
@@ -39,6 +40,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         // Filter to a given number of days.
         $eventLimit = intval($this->getConfig('size'));
         $dayLimit   = intval($this->getConfig('days'));
+
         if ($dayLimit <= 0) {
             $dayLimit = 365;
         }
@@ -157,13 +159,16 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
         if ($this->permission < WRITE_ACCESS) {
-            $this->setVar("submit_event_block", "");
-        } else {
-            $this->parse("submit_event_block", "submit_event");
+			$this->setVar(array(
+				'submit_event_block' => '',
+				'import_events_block' => ''
+			));
         }
-
+		else {
+            $this->parse("submit_event_block", "submit_event");
+			$this->parse('import_events_block', 'import_events');
+        }
 
         return true;
     }
-
 }

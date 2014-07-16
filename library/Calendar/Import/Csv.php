@@ -12,6 +12,8 @@ namespace Calendar\Import;
 
 use \Schoolbox\Calendar\Event;
 use \Schoolbox\Calendar\EventMapper;
+use \Schoolbox\Calendar\Relation\Category;
+use \Schoolbox\Calendar\Relation\CategoryMapper;
 use \Schoolbox\Calendar\Relation\Role;
 use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
@@ -27,6 +29,7 @@ class Csv extends Base {
 
 		$campusMapper = new CampusMapper();
 		$eventMapper = new EventMapper();
+		$categoryRelationMapper = new CategoryMapper();
 		$roleRelationMapper = new RoleMapper();
 
 		/* All the campuses selected in the ui
@@ -107,7 +110,7 @@ class Csv extends Base {
 				$event = new Event();
 				$event->setOwner($this->getUser());
 				$event->setAuthor($this->getAuthor());
-				$event->setAccess(Event::ACCESS_CAMPUS);
+				$event->setAccess($this->getAccess());
 				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'y-m-d h:i:s'));
 				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'y-m-d h:i:s'));
 				$event->setTitle($name);
@@ -128,6 +131,15 @@ class Csv extends Base {
 				/* Save it
 				 */
 				$result = $eventMapper->save($event);
+
+				/* Assign Category relations
+				 */
+				foreach($this->getCategoryList() as $currentCategory) {
+					$category = new Category();
+					$category->setEventId($event->getId());
+					$category->setCategoryId($currentCategory);
+					$categoryRelationMapper->save($category);
+				}
 
 				/* Assign Role relations
 				 */
