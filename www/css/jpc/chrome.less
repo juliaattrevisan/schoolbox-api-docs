@@ -198,23 +198,36 @@ body.login{
 #nav h4 { padding: 0 0 0 14px; color: #222478 }
 
 /* ---- Mobile (landscape fix for login) ---- */
-@media screen
-and (max-device-width: 1024px)
-and (orientation : landscape) {
-    body.login{
-        #container #content{
-            top: 20px;
-            .error, .forgotten{
-                margin: 10px 0;
-            }
-            #login-logo img{
-                width: 169px;
-                height: 161px;
-            }
-        }
-        #footer{
-            left: auto;
-            right: 0;
-        }
-    }
-}
+ @media screen
+ and (max-device-width: 1024px) {
+     body.login{
+         #container #content{
+             top: 20px;
+             .error, .forgotten{
+                 margin: 10px 0;
+             }
+             #login-logo img{
+                 width: 100%;
+                 height: auto;
+             }
+         }
+         #footer{
+             left: auto;
+             right: 0;
+         }
+     }
+ }
+
+  @media screen
+  and (max-device-width: 600px) {
+      body.login{
+          #container #content{
+              .error, .forgotten{
+                  display: none;
+              }
+          }
+          #footer{
+              display: none;
+          }
+      }
+  }
