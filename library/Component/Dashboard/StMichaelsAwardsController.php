@@ -48,15 +48,75 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             return false;
         }
 
-        $userId = $this->user->getId();
-        $this->externalDb    = new External_UserDetention();
-        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
-        $this->absenceList   = $this->externalDb->getAbsences($userId);
-        $this->awardList     = $this->externalDb->getAwards(
-            $userId,
-            $_SESSION['FileYear'],
-            $_SESSION['FileSemester']
+        // Here's some test data, because this only works on St Michaels servers
+        $this->detentionList = array(
+            array(
+                'DetentionDate'        => date('Y-m-d'),
+                'DetentionDescription' => 'Noobed out',
+                'DetentionComment'     => 'stfu noob',
+            ),
+            array(
+                'DetentionDate'        => date('Y-m-d'),
+                'DetentionDescription' => 'Fell asleep at desk',
+                'DetentionComment'     => "* Fell asleep at desk\nAgain",
+            ),
         );
+        $this->absenceList = array(
+            array(
+                'EventDateTime'       => date('Y-m-d H:i:s'),
+                'AbsenceTypeCode'     => 'LT',
+                'AbsenceDescription'  => 'Late',
+                'ClassCode'           => 'ENC17',
+                'ClassCampus'         => 'SEN',
+                'ClassDescription'    => 'English Unit 1',
+                'AttendanceDayNumber' => '1',
+                'AttendancePeriod'    => '1',
+                'LateArrivalFlag'     => true,
+                'LateArrivalTime'     => date('H:i:s'),
+            ),
+            array(
+                'EventDateTime'       => date('Y-m-d H:i:s'),
+                'AbsenceTypeCode'     => 'ABS',
+                'AbsenceDescription'  => 'Absent',
+                'ClassCode'           => 'ENC17',
+                'ClassCampus'         => 'SEN',
+                'ClassDescription'    => 'English Unit 1',
+                'AttendanceDayNumber' => '1',
+                'AttendancePeriod'    => '1',
+                'LateArrivalFlag'     => false,
+                'LateArrivalTime'     => '',
+            ),
+        );
+        $this->awardList = array(
+            array(
+                'FileYear'         => $_SESSION['FileYear'],
+                'FileSemester'     => $_SESSION['FileSemester'],
+                'AwardCode'        => 'EIA',
+                'AwardDescription' => 'Everything is awesome',
+                'AwardDate'        => date('Y-m-d'),
+                'AwardAchievement' => 'was awesome',
+                'AwardComment'     => 'You are awesome',
+            ),
+            array(
+                'FileYear'         => $_SESSION['FileYear'],
+                'FileSemester'     => $_SESSION['FileSemester'],
+                'AwardCode'        => 'PRO',
+                'AwardDescription' => 'You are a pro',
+                'AwardDate'        => date('Y-m-d'),
+                'AwardAchievement' => 'graduated from noob to pro',
+                'AwardComment'     => 'Stopped sucking and started being awesome',
+            ),
+        );
+
+//        $userId              = $this->user->getId();
+//        $this->externalDb    = new External_UserDetention();
+//        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
+//        $this->absenceList   = $this->externalDb->getAbsences($userId);
+//        $this->awardList     = $this->externalDb->getAwards(
+//            $userId,
+//            $_SESSION['FileYear'],
+//            $_SESSION['FileSemester']
+//        );
         return true;
     }
 
