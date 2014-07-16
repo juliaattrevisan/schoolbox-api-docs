@@ -1,13 +1,35 @@
 <script type='text/javascript'>
+
+	/* Timeout closure
+	 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+	 */
+	var createDelayManager = function() {
+		var timer = 0;
+		return function(callback, ms) {
+			clearTimeout(timer);
+			timer = setTimeout(callback, ms);
+		};
+	}
+
+	var dm1 = createDelayManager();
+
 	$j(function() {
 		$('.sigPad').signaturePad({
 			drawOnly: true,
 			onDrawEnd: function() {
-				$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
-					id: {QUESTION_ID}
-				});
+
+				/* Apply delay to auto-save, so the signature
+				 * process remains fluid
+				 *
+				 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+				 */
+				dm1(function() {
+					$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+						id: {QUESTION_ID}
+					});
+				}, 1500);
 			}
-		});
+		}).regenerate({ANSWER});
 	});
 </script>
 
@@ -27,9 +49,7 @@
 	</div>
 
 	<p class="clearButton">
-		<a href="#clear">Clear</a>
+		<a href="#clear">Clear Signature</a>
 	</p>
-
-    {ANSWER}
     <!-- END answerOption -->
 </label>

@@ -41,6 +41,49 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         $page->parse('graph_block', $componentHandle);
     }
 
+	/**
+	 * Resets answer tokens so a user can fill them in while actually taking
+	 * the test.
+	 *
+	 * Don't scrub this, because it breaks the json object
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function prepareResponse($page, $question_id) {
+
+		/* Optional configuration hook
+		 */
+		$this->configureResponse($page, $question_id);
+
+		$existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+		$currentAnswer = $this->getByQuestionID($question_id);
+
+		if ($existing['response']) {
+			$page->setVar(
+				array(
+					'QUESTION_ID' => $question_id,
+					'QUESTION_PLUGIN' => $this->plugin,
+					'ANSWER_ID' => $currentAnswer['answer_id'],
+					'ANSWER' => $existing['response'],
+				)
+			);
+		} else {
+			$page->setVar(
+				array(
+					'QUESTION_ID' => $question_id,
+					'QUESTION_PLUGIN' => $this->plugin,
+					'ANSWER_ID' => $currentAnswer['answer_id'],
+					'ANSWER' => '',
+				)
+			);
+		}
+
+		$page->parse('answerOption_block', 'answerOption', true);
+	}
+
     /**
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
