@@ -2,6 +2,7 @@
 <script type="text/javascript">
 	tinyMCE.init({
 		mode : "textareas",
+		editor_deselector: "selfPromotionalComment",
 		theme : "advanced",
 		skin : "cirkuit",
 		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
@@ -351,7 +352,7 @@
 					<em>Add a comment</em>
 				</td>
 				<td>
-					<textarea name="comment" style="width:100%;height:80px;"></textarea>
+					<textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
 				</td>
 			</tr>
 		</tbody>
