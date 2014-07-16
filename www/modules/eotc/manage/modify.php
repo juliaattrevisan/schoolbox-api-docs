@@ -236,6 +236,7 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('can_add_resources_block', 'can_add_resources');
 
 		/* Cannot self-promote until a status is In Principle
+		 * Only an author can do it to his own event
 		 */
 		if ($isAuthor) {
 			$page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
