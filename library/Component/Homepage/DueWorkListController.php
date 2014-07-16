@@ -31,7 +31,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
     public function execute() {
         $this->groupHandler = new Group();
         $options = array(
-            'order' => array('date' => 'asc'),
+            'order' => array('date' => 'desc'),
         );
         $size = $this->getConfig('size');
         if ($size > 0) {
@@ -42,6 +42,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->getContext('id'),
             $options
         );
+
+        // Order the sub list by earliest due date first.
+        $this->submissionList->sortBy('dueDate', 'asc');
     }
 
     /**
