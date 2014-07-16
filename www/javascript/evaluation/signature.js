@@ -80,7 +80,14 @@
 			element: 'input[name=answer]',
 			rules: {
 				required: true,
-				minlength: 1
+				minlength: 3,
+
+				/* Custom error messages can be programatically entered this way
+				 */
+				messages: {
+					required: 'Please sign',
+					minlength: 'Please sign'
+				}
 			},
 			errorContainer: '[data-evaluationerrors="1"]'
 		}
