@@ -37,7 +37,7 @@ class External_Maze_Helper {
 		 *
 		 * CURRENT_SEMESTER is empty in the Maze db
 		 */
-		$currentSemester = 1;
+		$currentSemester = 2;
 
 		/* Only get subjects that are relevant now
 		 */
