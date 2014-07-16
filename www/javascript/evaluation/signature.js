@@ -77,7 +77,7 @@
 	 */
 	$.fn.evaluationSignature.getValidationRules = function() {
 		return {
-			element: 'textarea',
+			element: 'input[name=answer]',
 			rules: {
 				required: true,
 				minlength: 1
