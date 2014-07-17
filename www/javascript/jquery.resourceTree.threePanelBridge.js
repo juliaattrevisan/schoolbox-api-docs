@@ -181,24 +181,14 @@
     };
 
     /**
-     * After open node event for the JsTree plugin.
+     * After open node event for the JsTree plugin - initializes files for this
+     * event.
      *
      * @param event
      * @param tree  The JsTree object
      */
     ResourceTreeThreePanelBridge.prototype.onAfterOpen = function(event, tree) {
-        // Set up folders as drop targets for files
-        var leaves = $();
-        $.each(tree.node.children, function(i,v) {
-            leaves = leaves.add(tree.instance.get_node(v, true));
-        });
-        leaves
-            .droppable({
-                scope: 'resourceFile',
-                hoverClass: "accept",
-                greedy: true,
-                tolerance: 'pointer',
-            })
+        this.initializeFiles(tree.node.id);
     };
 
     /**
