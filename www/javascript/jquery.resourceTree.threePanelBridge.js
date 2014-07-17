@@ -35,15 +35,24 @@
         self.element = element;
         self.options = $.extend(true, {}, defaults, options);
         self.threePanel = self.options.threePanel;
+        self.hoveredId  = null;
 
         // Ensure callbacks are bound to this object, instead of to the DOM node
         // they were triggered on.
         element
-            .on('redraw.jstree',      self.onRedraw.bind(self))
-            .on('select_node.jstree', self.onSelectNode.bind(self))
-            .on('move_node.jstree',   self.onMoveNode.bind(self))
-            .on('after_open.jstree',  self.onAfterOpen.bind(self))
-            .on('drop', 'li[role="treeitem"]', self.onDropOntoTreeNode.bind(self))
+            .on('redraw.jstree',       self.onRedraw.bind(self))
+            .on('select_node.jstree',  self.onSelectNode.bind(self))
+            .on('move_node.jstree',    self.onMoveNode.bind(self))
+            .on('after_open.jstree',   self.onAfterOpen.bind(self))
+            .on('hover_node.jstree',   self.onHoverNode.bind(self))
+            .on('dehover_node.jstree', self.onDehoverNode.bind(self))
+            .droppable({
+                scope: 'resourceFile',
+                hoverClass: "accept",
+                greedy: true,
+                tolerance: 'pointer',
+            })
+            .on('drop',                self.onDropOntoTreeNode.bind(self))
     };
 
     /**
@@ -183,7 +192,6 @@
         $.each(tree.node.children, function(i,v) {
             leaves = leaves.add(tree.instance.get_node(v, true));
         });
-//        console.log(leaves)
         leaves
             .droppable({
                 scope: 'resourceFile',
@@ -191,52 +199,27 @@
                 greedy: true,
                 tolerance: 'pointer',
             })
-            .on('drop', function(event, ui) {
+    };
 
-                var node          = $(ui.draggable).closest("tr"),
-                    destinationId = this.id;
+    /**
+     * Hover event for leaves within the JsTree plugin - sets hoveredId so that
+     * drop event has access to it.
+     *
+     * @param event
+     * @param tree  The JsTree object
+     */
+    ResourceTreeThreePanelBridge.prototype.onHoverNode = function(event, tree) {
+        this.hoveredId = tree.node.id;
+    };
 
-                // Move all files, not just the one directly selected
-                var nodeList = node.add(node.parent().find('tr.selected'));
-                nodeList.each(function() {
-
-                    var node     = $(this),
-                        isLink   = node.hasClass('link'),
-                        id       = node.attr('id').substring(5),
-                        oldClass = this.className.match(/category-[\d]+/).toString(),
-                        newClass = 'category-'+String(destinationId);
-
-                    node.hide();
-
-                    var ajaxParams = {
-                        type: 'post',
-                        url:  '/cms/fileForm.php',
-                        data: {
-                            move:       id,
-                            categoryID: destinationId
-                        },
-                        dataType: 'json'
-                    }
-                    if (isLink) {
-                        ajaxParams.url = '/cms/linkForm.php';
-                    }
-                    $.ajax(ajaxParams)
-                        .done(function(data) {
-                            if (data && data.result != 'success') {
-                                alert(data.result);
-                                node.show();
-                            }
-                            else {
-                                // Put this in a new class
-                                node.remove();
-//                                node.removeClass(oldClass).addClass(newClass);
-                            }
-                        })
-                        .fail(function(data) {
-                            node.show();
-                        })
-                });
-            })
+    /**
+     * Dehover event for leaves within the JsTree plugin - clears hoveredId.
+     *
+     * @param event
+     * @param tree  The JsTree object
+     */
+    ResourceTreeThreePanelBridge.prototype.onDehoverNode = function(event, tree) {
+        this.hoveredId = null;
     };
 
     /**
@@ -246,38 +229,60 @@
      * @param ui    The jQuery UI object
      */
     ResourceTreeThreePanelBridge.prototype.onDropOntoTreeNode = function(event, ui) {
-        // Drop event for files
-        // This drop event bubbles up the list of droppables, so trigger it
-        // only if this.id and event.target.id match.
-        var newCategoryId = this.id;
-        if (newCategoryId == event.target.id) {
-            ui.draggable
-                .closest('tr')
-                .add('tr.selected', ui.draggable.closest('table'))
-                .each(function() {
-                    var fileElement   = $(this);
-                    var fileId        = fileElement.attr('id').replace(/\D/g, '');
-                    var oldCategoryId = 0;
-                    fileElement.attr('class').split(/\s+/).forEach(function(className) {
-                        var matches = className.match(/^category-(\d+)$/);
-                        if (matches) {
-                            oldCategoryId = matches[1];
-                        }
-                    })
-                    // Make sure every single file gets moved
-                    $.post(
-                        '/cms/fileForm.php',
-                        { move: fileId, categoryID: newCategoryId },
-                        function(data) {
-                            // move the file from old category into new
-                            // Clear all in new category, as it's changed
-                            $('tr#file-' + fileId).remove();
-                            $('tr.category-' + newCategoryId).remove();
-                        },
-                        'json'
-                    );
-                });
+
+        // For some unknown reason setting each leaf droppable doesn't
+        // work - I can't drop onto a node with children.
+        // Why not just set the whole tree as droppable and figure out
+        // which node is selected?
+        var scope         = $(event.currentTarget).droppable('option', 'scope'),
+            node          = $(ui.draggable).closest("tr"),
+            destinationId = this.hoveredId;
+        if (scope != 'resourceFile') {
+            return;
         }
+        if (!destinationId) {
+            return;
+        }
+
+        // Move all files, not just the one directly selected
+        var nodeList = node.add(node.parent().find('tr.selected'));
+        nodeList.each(function() {
+            var node     = $(this),
+                isLink   = node.hasClass('link'),
+                id       = node.attr('id').substring(5),
+                oldClass = this.className.match(/category-[\d]+/).toString(),
+                newClass = 'category-'+String(destinationId);
+
+            node.hide();
+
+            var ajaxParams = {
+                type: 'post',
+                url:  '/cms/fileForm.php',
+                data: {
+                    move:       id,
+                    categoryID: destinationId
+                },
+                dataType: 'json'
+            }
+            if (isLink) {
+                ajaxParams.url = '/cms/linkForm.php';
+            }
+            $.ajax(ajaxParams)
+                .done(function(data) {
+                    if (data && data.result != 'success') {
+                        alert(data.result);
+                        node.show();
+                    }
+                    else {
+                        // Put this in a new class
+                        node.remove();
+//                        node.removeClass(oldClass).addClass(newClass);
+                    }
+                })
+                .fail(function(data) {
+                    node.show();
+                })
+        });
     };
 
     ResourceTreeThreePanelBridge.prototype.initializeFiles = function(relationID) {
