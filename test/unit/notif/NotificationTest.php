@@ -75,14 +75,16 @@ class NotificationTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetTimestamp() {
-		$this->markTestSkipped();
-//      TODO currently not passing
-//		$n = new \Alaress\Async\Notification\Notification(array(
-//			$this->newInstance('foobar', array(), 'mock', '#', '#', 0, array(), 9001),
-//			$this->newInstance('foobar', array(), 'mock', '#', '#', 0, array(), 90001)
-//		));
-//
-//		$this->assertEquals(90001, $n->getTimestamp());
+		// the params must differ for the second to survive deduping
+		$pBar = new \Alaress\Async\Notification\Parameter\Param('bar');
+		$pBaz = new \Alaress\Async\Notification\Parameter\Param('baz');
+
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance(':foo', array('foo' => $pBar), 'mock', '#', '#', 0, array(), 9001),
+			$this->newInstance(':foo', array('foo' => $pBaz), 'mock', '#', '#', 0, array(), 90001)
+		));
+
+		$this->assertEquals(90001, $n->getTimestamp());
 	}
 
 	public function testGetNamespace() {
