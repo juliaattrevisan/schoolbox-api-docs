@@ -1403,7 +1403,7 @@ class Submission extends DeprecatedModel {
 					$user = $userMapper->findById($currentStudent['uid']);
 				}
 				else {
-					$user = $userMapper->findByColumn('synergy_id', $currentStudent['synergy_id'])->first();
+					$user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
 				}
 
 				$allStudents->add($user);
