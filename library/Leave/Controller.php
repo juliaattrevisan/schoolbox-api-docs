@@ -433,6 +433,7 @@ class Leave_Controller extends Controller {
 
 			$this->sendUserNotice($request);
 			$this->sendParentNotice($request);
+			$this->sendAdminNotice($request);
 
 			SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
 		}
@@ -681,6 +682,7 @@ class Leave_Controller extends Controller {
 		if (isset($data['approve']) || isset($data['reject'])) {
 			$this->sendUserNotice($request);
 			$this->sendParentNotice($request);
+			$this->sendAdminNotice($request);
 		}
 
 		$this->getPage()->backToTheFuture(2);
@@ -1092,6 +1094,7 @@ class Leave_Controller extends Controller {
 
                         $this->sendUserNotice($request);
                         $this->sendParentNotice($request);
+                        $this->sendAdminNotice($request);
                     }
                 }
             }
@@ -1314,6 +1317,19 @@ class Leave_Controller extends Controller {
             $leaveFactory = new Leave_Notice_Factory($request);
             $leaveFactory->produceParentFactory()->produce()->send();
         }
+    }
+
+    /**
+     * Send a notice to a parent when someone creates a leave request
+     *
+     * At Kings Live, parent_notification started saving as integer 1/0, instead
+     * of the usual true/false string?
+     *
+     * @param $request
+     */
+    public function sendAdminNotice($request) {
+        $leaveFactory = new Leave_Notice_Factory($request);
+        $leaveFactory->produceAdminFactory()->produce()->send();
     }
 
     /* Getters/Setters
