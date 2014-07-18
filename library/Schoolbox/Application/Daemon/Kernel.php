@@ -131,12 +131,11 @@ EOL;
 			return true;
 		}
 
-		if($this->debug instanceof Debug) {
-			$this->debug->v("$errStr - $errFile::$errLine", 'e');
-		}
-
 		switch($errNum) {
 			case E_RECOVERABLE_ERROR:
+				if($this->debug instanceof Debug) {
+					$this->debug->v("$errStr - $errFile::$errLine", 'e');
+				}
 				// for any of these errors, we want an exception we can catch
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
