@@ -8,4 +8,14 @@
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
 class Leave_Mggs_Notice_Admin_Submitted extends Leave_Mggs_Notice_Admin_Abstract {
+
+    /**
+     * Send it to someone@mggs.vic.edu.au
+     */
+    public function send() {
+        $mail = $this->getEmail();
+        $mail->setTo('Boarders.Leave@mggs.vic.edu.au');
+        $mail->send();
+    }
+
 }
