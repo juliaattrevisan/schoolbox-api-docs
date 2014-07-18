@@ -33,6 +33,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	const TASK_PUBLISH   = 'publish';
 	const TASK_INTERCEPT = 'intercept';
 	const TASK_DIGEST    = 'digest';
+	const TASK_REROUTE   = 'intercept';
 
 	protected $flywheelSpins;
 
