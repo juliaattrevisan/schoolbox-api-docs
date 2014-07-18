@@ -12,6 +12,7 @@ namespace Schoolbox\Notif\MQ;
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
+use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
 use PhpAmqpLib\Connection\AMQPConnection;
@@ -20,6 +21,20 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 
 class Connector extends AMQPConnector {
+
+	/** @var AMQPInterface */
+	protected static $instance;
+
+	/**
+	 * @return Connector
+	 */
+	public static function getInstance() {
+		if(!self::$instance instanceof self) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
 
 	const PRIMARY_EXCHANGE = 'sb.%s.tx';
 	const PRIMARY_TYPE     = 'topic';
