@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/hhvm
 <?php
 
 use Alaress\Async\Stomp\Subscriber;
@@ -55,12 +55,14 @@ $kernel->run(function($di, $loop, $debug, $opts) use (&$rrtr) {
 
 		$stompFactory = new \React\Stomp\Factory($loop);
 
+		$conf = new \Schoolbox\Config\Loader();
+
 		$client = $stompFactory->createClient(array(
-			'host'      => Cfg::get('amqp_host'),
-			'port'      => Cfg::get('amqp_stomp_port'),
+			'host'      => $conf->get('amqp_host'),
+			'port'      => $conf->get('amqp_stomp_port'),
 			'vhost'     => '/',
-			'login'     => Cfg::get('amqp_user'),
-			'passcode'  => Cfg::get('amqp_pass'),
+			'login'     => $conf->get('amqp_user'),
+			'passcode'  => $conf->get('amqp_pass'),
 		));
 
 		$rrtr = new Rerouter($loop, new RerouterDispatchStrategy(), $debug, new Subscriber($client, new UserSubscriptionList()));
