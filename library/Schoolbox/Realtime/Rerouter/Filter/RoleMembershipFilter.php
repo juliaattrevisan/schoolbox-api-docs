@@ -26,8 +26,8 @@ class RoleMembershipFilter extends ContextFilter {
 	 */
 	public function validate($message, $formatted, $user) {
 		// if roletype set, must be of role specified
-		if(isset($formatted['context']['roletype'])) {
-			if(!$this->testContextValue($formatted['context']['roletype'], $user->getRole()->getType())) {
+		if(isset($formatted['context']['role'])) {
+			if(!$this->testContextValue($formatted['context']['role'], $user->getRole()->getId())) {
 				throw new FilterException("User not a member of any given role");
 			}
 		}
