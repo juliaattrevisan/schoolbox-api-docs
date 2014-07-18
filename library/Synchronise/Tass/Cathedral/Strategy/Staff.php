@@ -19,6 +19,7 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
         $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
         $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', 'group_id'));
         $this
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeCompanyCodes())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff_UsernameFromId())
             ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('Email', 'alt_email'))

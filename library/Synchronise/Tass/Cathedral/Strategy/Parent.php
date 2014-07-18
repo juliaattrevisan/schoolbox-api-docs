@@ -18,6 +18,7 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
         $this
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeCompanyCodes())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
