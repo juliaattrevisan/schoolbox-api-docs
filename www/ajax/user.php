@@ -9,9 +9,10 @@ $emailObj = new Email();
 
 $result = $suggestions = $data = $return = array();
 
-$keyword    = $_GET['query'];
-$groupID    = $_GET['groupID'];
-$roleTypeID = $_GET['roleTypeID'];
+$keyword      = $_GET['query'];
+$groupID      = $_GET['groupID'];
+$roleTypeID   = $_GET['roleTypeID'];
+$boardersOnly = !empty($_GET['boardersOnly']);
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     && (strlen($groupID) || strlen($roleTypeID))
@@ -56,7 +57,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
         $groupID = 0;
     }
 
-    $userList = $userHandler->ajaxSearch($keyword, $groupID, 30);
+    $userList = $userHandler->ajaxSearch($keyword, $groupID, $boardersOnly, 30);
 
     if (is_array($userList)) {
         foreach ($userList as $user) {

@@ -222,12 +222,25 @@ class User extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
-	function ajaxSearch($keyword, $group = 0, $limit = false) {
+	function ajaxSearch($keyword, $group = 0, $boardersOnly = false, $limit = false) {
 		//search for a user based on at least one of the above fields
 		//assumes at least one contains something
 
-		$query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, year, local_email, alt_email
-					FROM user LEFT JOIN groups ON user.group_id = groups.id WHERE ";
+		$query = "
+            SELECT
+                user.id as uid,
+                title,
+                firstname,
+                lastname,
+                username,
+                groups.name AS gname,
+                year,
+                local_email,
+                alt_email
+            FROM user
+            LEFT JOIN groups ON user.group_id = groups.id
+            WHERE
+        ";
 
 		if ($keyword != "") {
 			if (is_numeric($keyword)) {
@@ -259,6 +272,11 @@ class User extends DeprecatedModel {
 			} else {
 				error(2);
 			}
+		}
+
+		// Only students in boarding house are fetched
+		if ($boardersOnly) {
+			$query .= "AND IFNULL(residential_house_id, 0) > 0 ";
 		}
 
 		$query .= "ORDER BY group_id, year, lastname, firstname";
