@@ -31,9 +31,8 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	const TASK_FETCH     = 'fetch';
 	const TASK_PUBLISH   = 'publish';
-	const TASK_INTERCEPT = 'intercept';
 	const TASK_DIGEST    = 'digest';
-	const TASK_REROUTE   = 'intercept';
+	const TASK_REROUTE   = 'reroute';
 
 	protected $flywheelSpins;
 
@@ -132,7 +131,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 * @return array
 	 */
 	public function getSupportedActions() {
-		return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_INTERCEPT, self::TASK_DIGEST);
+		return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST);
 	}
 
 
