@@ -22,11 +22,9 @@ use Exception;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
-use React\Stomp\Exception\ProcessingException;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -35,12 +33,8 @@ use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * This class is meant to hold a list of notifications that are pending for broadcast, and at the appropriate time,
@@ -81,9 +75,6 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     /** @var ResolutionManager */
     protected $resolvers;
 
-	/** @var Interceptor */
-	protected $interceptor;
-
 
     /**
      * @param LoopInterface $loop
@@ -99,7 +90,6 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	    // run construction
         parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
 	    $this->resolvers = new ResolutionManager();
-	    $this->interceptor = new Interceptor($this->debug, $this->loop);
 
 	    self::bindQueues();
 
@@ -122,18 +112,6 @@ class Scheduler extends StompScheduler implements CommandableInterface {
             'login'     => $this->conf->get('amqp_user'),
             'passcode'  => $this->conf->get('amqp_pass'),
         ));
-    }
-
-
-    /**
-     * Callback executed when the STOMP client connects
-     */
-    public function onConnect() {
-	    // perform the subscription
-        parent::onConnect();
-
-	    // technically in this context it's only "load", but the outcome is the same
-		$this->reload();
     }
 
 
@@ -215,8 +193,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * Callback executed when SIGHUP is received by the process
 	 */
 	public function onHangup() {
-		$this->debug->v("HUP received: reloading user queue subscriptions", ">");
-		$this->reload();
+		$this->debug->v("HUP received: would reload config if I had one", ">");
 	}
 
 
@@ -238,62 +215,6 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		// die safely
 		unset($this->dispatcher);
 		exit;
-	}
-
-
-	/**
-	 * @param int $userId
-	 * @return bool
-	 */
-	public function subscribeUser($userId) {
-		/** @var User $user - unfortunately necessary self hydration */
-		$user = UserMapper::getInstance()->findById($userId);
-		$queue = UserQueue::getUserToSortQueueName($userId);
-		$debug = $this->debug;
-		$int = $this->interceptor;
-		return $this->subscribe("/amq/queue/$queue", function($frame) use ($int, $user, $debug) {
-			// this closure is executed every time a message is sent to the client based on the given subscription
-			$int->process($user, $frame);
-		});
-	}
-
-
-	/**
-	 * @param int $userId
-	 * @return bool
-	 */
-	public function unsubscribeUser($userId) {
-		$queue = UserQueue::getUserToSortQueueName($userId);
-		return $this->unsubscribe($queue);
-	}
-
-
-	/**
-	 * Drops all user subscriptions currently held, and then reloads all from DB
-	 */
-	public function reload() {
-		// detach user subscriptions
-		foreach(array_keys($this->subscriptions) as $queue) {
-			// don't unsubscribe from the master queues
-			if($queue == $this->scheduleQueue || $queue == $this->commandQueue) {
-				continue;
-			}
-			$this->unsubscribe($queue);
-		}
-
-		// reattach user subscriptions
-		// subscribe to every (every!) user's 'to sort' queue, and run those messages through the Interceptor
-		/** @var User[]|Collection $users */
-		$users = UserMapper::getInstance()->findAll();
-		foreach($users as $user) {
-			try {
-				$this->subscribeUser($user->getId());
-			}
-			catch(ProcessingException $e) {
-				$this->debug->v("Could not subscribe user {$user->getId()}", '*');
-			}
-		}
-		$this->debug->v("Subscribed to {$users->count()} user queues");
 	}
 
 
