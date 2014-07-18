@@ -63,7 +63,7 @@ class Interceptor implements TaskResponseHandlerInterface {
 		$this->loop  = $loop;
 		$this->v     = $debug;
 		$this->notif = new Notif();
-		$this->conn  = new Connector();
+		$this->conn  = Connector::getInstance();
 		$this->uqf   = new UserQueueFactory($this->conn);
 
 		$this->permissionMapper = RoutePermissionMapper::getInstance();

@@ -61,7 +61,7 @@ class MailNotifier implements Serializable {
 	public function processDigest($role) {
 
 		// setup
-		$conn = new Connector();
+		$conn = Connector::getInstance();
 
 		// get a list of users
         /** @var Collection|User[] $users */

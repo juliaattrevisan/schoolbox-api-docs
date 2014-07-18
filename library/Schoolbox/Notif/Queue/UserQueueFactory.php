@@ -64,7 +64,7 @@ class UserQueueFactory {
 	 * @param AMQPInterface $mqConnector
 	 */
 	public function __construct($mqConnector = null) {
-		$this->setMessageQueueConnector($mqConnector ?: new MQConnector());
+		$this->setMessageQueueConnector($mqConnector ?: MQConnector::getInstance());
 	}
 
 
