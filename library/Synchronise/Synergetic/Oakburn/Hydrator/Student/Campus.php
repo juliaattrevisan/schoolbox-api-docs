@@ -14,8 +14,8 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Student_Campus implements Synchron
     public function hydrate($externalUser, $newUser) {
 		switch($externalUser['StudentCampus']) {
 			case 'S': $campus = 1; break;
-			case 'J': $campus = 2; break;
-			default: $campus = 3; break;
+			case 'J': $campus = 3; break;
+			default: $campus = 4; break;
 		}
 
         $newUser['campus'] = array($campus);
