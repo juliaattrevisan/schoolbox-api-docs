@@ -20,7 +20,7 @@ abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_No
         $email = new Mailer(
             Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
             $subject,
-            $this->getRequest()->getUser()->getAltEmail()
+            $this->getRequest()->getUser()->getEmail()
         );
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');

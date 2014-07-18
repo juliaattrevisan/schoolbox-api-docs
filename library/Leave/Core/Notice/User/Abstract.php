@@ -22,7 +22,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
 		$email = new Mailer(
 			Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
 			$subject,
-			$this->getRequest()->getUser()->getAltEmail()
+			$this->getRequest()->getUser()->getEmail()
 		);
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
@@ -49,7 +49,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
 	 * Send it
 	 */
 	public function send() {
-		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
+		$email = new \Email($this->getRequest()->getUser()->getEmail());
 
 		if ($email->isValid()) {
 			$this->getEmail()->send();
