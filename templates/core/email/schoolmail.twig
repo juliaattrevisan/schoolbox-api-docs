@@ -1,11 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-{% macro spacer(height, width, colspan) %}
+{% macro spacer(fqdn, height, width, colspan) %}
 <td colspan="{{ colspan|default('1') }}"
     valign="top"
     height="{{ height|default('1') }}"
     width="{{ width|default('1') }}"
     style="line-height:{{ height|default('1') }}px;">
-    <img src="http://{{ _context.config.site_domain }}/images/emails/spacer.gif"
+    <img src="http://{{ fqdn }}/images/emails/spacer.gif"
          height="{{ height|default('1') }}"
          width="0"
          border="0" />
@@ -37,17 +37,17 @@
         <tr{# content #}>
             <td class="content">
                 <table align="center" width="640">
-                    {#<tr>{{ fn.spacer(16, 0, 3) }}</tr>#}
+                    {#<tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>#}
                     <tr>
-                        {{ fn.spacer(0, 8) }}
+                        {{ fn.spacer(config.fqdn, 0, 8) }}
                         <td>
                         {% block content %}
                             <!-- NO CONTENT -->
                         {% endblock %}
                         </td>
-                        {{ fn.spacer(0, 8) }}
+                        {{ fn.spacer(config.fqdn, 0, 8) }}
                     </tr>
-                    <tr class="content">{{ fn.spacer(8, 0, 3) }}</tr>
+                    <tr class="content">{{ fn.spacer(config.fqdn, 8, 0, 3) }}</tr>
                 </table>
             </td>
         </tr>

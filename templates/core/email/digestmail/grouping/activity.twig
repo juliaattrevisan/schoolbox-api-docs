@@ -1,9 +1,9 @@
-<tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(8, 0, 4) }}</tr>
+<tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 8, 0, 4) }}</tr>
 <tr class="{{ loop.index is even ? 'dark' : '' }}">
     <td width="64" height="32" valign="top">
         <table>
             <tr>
-                {{ fn.spacer(0, 32) }}
+                {{ fn.spacer(config.fqdn, 0, 32) }}
                 <td>
                     {% set msg = row.messages | first %}
                     <img src="{{ msg.icon }}" width="32" height="32" />
@@ -11,7 +11,7 @@
             </tr>
         </table>
     </td>
-    {{ fn.spacer(0, 8) }}
+    {{ fn.spacer(config.fqdn, 0, 8) }}
     <td valign="middle">
         <table width="100%">
             <tr>
@@ -22,6 +22,6 @@
             </tr>
         </table>
     </td>
-    {{ fn.spacer(0, 8) }}
+    {{ fn.spacer(config.fqdn, 0, 8) }}
 </tr>
-<tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(8, 0, 4) }}</tr>
+<tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 8, 0, 4) }}</tr>

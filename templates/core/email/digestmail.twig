@@ -3,9 +3,9 @@
 {% block content %}
     <table>
     {% for ns, group in groups %}
-        <tr>{{ fn.spacer(16, 0, 3) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
         <tr class="heading">
-            {{ fn.spacer(0, 8) }}
+            {{ fn.spacer(config.fqdn, 0, 8) }}
             <td class="heading" valign="middle" height="32">{{ group.heading }}</td>
         </tr>
         <tr>
@@ -20,12 +20,12 @@
                             </table>
                         </td>
                     </tr>
-                    <tr>{{ fn.spacer(4, 0) }}</tr>
+                    <tr>{{ fn.spacer(config.fqdn, 4, 0) }}</tr>
                 </table>
             </td>
         </tr>
     {% endfor %}
-        <tr>{{ fn.spacer(8, 0, 2) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn, 8, 0, 2) }}</tr>
     </table>
 {% endblock %}
 
