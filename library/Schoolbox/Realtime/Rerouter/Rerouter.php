@@ -28,7 +28,6 @@ use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\User;
@@ -92,9 +91,6 @@ class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
 
 		$this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
 
-		$this->permissionMapper = RoutePermissionMapper::getInstance();
-		$this->userMapper       = UserMapper::getInstance();
-
 		// register signal listeners
 		$this->on(SIGTSTP, array($this, 'onPause'));
 		$this->on(SIGCONT, array($this, 'onResume'));
@@ -103,17 +99,17 @@ class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
 		$this->on(SIGINT,  array($this, 'onInterrupt'));
 		$this->on(SIGTERM, array($this, 'onTerminate'));
 
-		// TODO transpose these NEWs into a factory
-		$this->dispatcher = new Dispatcher($loop, $this, $debug, $dispatchStrategy);
-
-		$d = $this->dispatcher;
+		// TODO transpose these NEWs and getInstances into a factory
+		$this->permissionMapper = RoutePermissionMapper::getInstance();
+		$this->userMapper       = UserMapper::getInstance();
+		$this->dispatcher =  $d = new Dispatcher($loop, $this, $debug, $dispatchStrategy);
 
 		$this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
 
 		$this->transaction = new Transaction($loop, function($timer) use ($d) {
 			/** @var $timer TimerInterface */
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
-		}, self::TRANSACTION_CACHE_TIMEOUT);
+		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 	}
 
 
