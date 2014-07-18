@@ -174,7 +174,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 CONVERT(VARCHAR(19), LatearrivalTime, 120) AS LateArrivalTime
             FROM SynergyOne.dbo.uvSchoLAbsence
             %s
-            AND AbsenceTypeCode != ''
+            -- AND AbsenceTypeCode != ''
             ORDER BY EventDateTime DESC
         ";
         list($wherePart, $params) = $this->buildWherePart(
