@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Rerouter;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\LoggerInterface;
+use Alaress\Async\SignalEmitter;
 use Alaress\Async\Stomp\Subscriber;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Dispatcher;
@@ -19,7 +20,6 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
-use Evenement\EventEmitter;
 use Exception;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -33,7 +33,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
+class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 	const TRANSACTION_CACHE_TIMEOUT = 0.5;
 	const TRANSACTION_COUNT_LIMIT   = 80;
@@ -79,6 +79,8 @@ class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
 	 * @param UserQueueFactory          $uqFactory
 	 */
 	public function __construct($loop, $dispatchStrategy, $debug, $subscriber, $notif = null, $conn = null, $uqFactory = null) {
+		parent::__construct($loop);
+
 		$this->loop       = $loop;
 		$this->running    = false;
 		$this->subscriber = $subscriber;
@@ -88,8 +90,6 @@ class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
 		$this->notif      = $notif ?: new Notif();
 		$this->conn       = $conn ?: new Connector();
 		$this->uqf        = $uqFactory ?: new UserQueueFactory($this->conn);
-
-		$this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
 
 		// register signal listeners
 		$this->on(SIGTSTP, array($this, 'onPause'));
@@ -118,26 +118,6 @@ class Rerouter extends EventEmitter implements TaskResponseHandlerInterface {
 	 */
 	public function getDispatcher() {
 		return $this->dispatcher;
-	}
-
-
-	/**
-	 * Receive signals
-	 *
-	 * @param int $event
-	 * @param callable $listener
-	 */
-	public function on($event, $listener) {
-		pcntl_signal($event, array($this, 'emit'));
-		parent::on($event, $listener);
-	}
-
-
-	/**
-	 * Check if a signal has been raised
-	 */
-	public function signalDispatch() {
-		pcntl_signal_dispatch();
 	}
 
 
