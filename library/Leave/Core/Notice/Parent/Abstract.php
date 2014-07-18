@@ -11,7 +11,7 @@
  */
 abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice {
     protected $email = null;
-    protected $emailTemplateFile = '../../core/modules/leave/parentNoticeEmail.html';
+    protected $emailTemplateFile = 'modules/leave/parentNoticeEmail.html';
 
     private $externalUser = null;
 
@@ -28,7 +28,10 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
 
         /* Set destination email address in loop in send()
          */
-        $email = new Mailer($this->getEmailTemplateFile(), $subject, '');
+        $email = new Mailer(
+            Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
+            $subject, ''
+        );
         $email->setFromAsCurrentUser();
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');

@@ -11,7 +11,7 @@
  */
 abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;
-	protected $emailTemplateFile = '../../core/modules/leave/userNoticeEmail.html';
+	protected $emailTemplateFile = 'modules/leave/userNoticeEmail.html';
 
 	/**
 	 * Setup
@@ -19,7 +19,11 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
 	public function setup() {
 		$subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getAltEmail());
+		$email = new Mailer(
+			Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
+			$subject,
+			$this->getRequest()->getUser()->getAltEmail()
+		);
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');

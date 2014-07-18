@@ -9,7 +9,7 @@
  */
 abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_Notice {
     protected $email = null;
-    protected $emailTemplateFile = '../../core/modules/leave/adminNoticeEmail.html';
+    protected $emailTemplateFile = 'modules/leave/adminNoticeEmail.html';
 
     /**
      * Setup
@@ -17,7 +17,11 @@ abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_No
     public function setup() {
         $subject = '(Admin) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getAltEmail());
+        $email = new Mailer(
+            Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
+            $subject,
+            $this->getRequest()->getUser()->getAltEmail()
+        );
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
         $email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
