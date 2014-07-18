@@ -58,6 +58,21 @@ class Leave_Notice_Factory {
         return new $fullClassname($this->getRequestData());
 	}
 
+    /**
+     * Produce an Admin factory
+     *
+     * @return mixed
+     */
+    public function produceAdminFactory() {
+        $fullClassname = "Leave_{$this->getClassname()}_Notice_Admin_Factory";
+
+        if(!class_exists($fullClassname)) { //Default to core
+            $fullClassname = "Leave_Core_Notice_Admin_Factory";
+        }
+
+        return new $fullClassname($this->getRequestData());
+    }
+
 	/* Getters/Setters
 	 */
 
