@@ -79,4 +79,29 @@ class Mailer extends \Alaress\Mail\AbstractMailer {
         print $this->composeHTML();
     }
 
+    /**
+     * Converts a template path in PHPLib format to one that works as the
+     * template path for this class.
+     *
+     * Gets around the issue with mail templates always being expected to be in
+     * "templates/{$site_location,core}/email".
+     *
+     * I don't want it to be static either, but it has to be as I need to call
+     * this method before the mailer object gets created.
+     *
+     * @param  string $template A path to a PHPLib template
+     *                          Example: "modules/leave/someEmail.tpl" will
+     *                          check "templates/$site_location/" for this
+     *                          template first, then "templates/core"
+     * @return string
+     */
+    public static function translateTemplatePathToMailPath($template) {
+        $schoolTemplate  = strtolower(Cfg::get('site_location')).'/'.$template;
+        $genericTemplate = 'core/'.$template;
+        if (file_exists(Cfg::get('template_dir').'/'.$schoolTemplate)) {
+            return '../../'.$schoolTemplate;
+        }
+        return '../../'.$genericTemplate;
+    }
+
 }
