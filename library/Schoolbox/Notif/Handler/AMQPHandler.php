@@ -10,41 +10,35 @@
 namespace Schoolbox\Notif\Handler;
 
 
+use Alaress\Async\AMQP\AMQPInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use PhpAmqpLib\Channel\AMQPChannel;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Notif\NotifException;
 
 class AMQPHandler extends AbstractProcessingHandler {
 
-	/** @var MQConnector */
+	/** @var AMQPInterface */
 	protected $connection;
 
 	/**
-	 * @param MQConnector $connection
+	 * @param AMQPInterface $connection
 	 * @param bool|int $level
 	 * @param bool $bubble
-	 * @throws \Schoolbox\Notif\NotifException
+	 * @throws NotifException
 	 */
 	public function __construct($connection, $level = Logger::DEBUG, $bubble = true) {
 		parent::__construct($level, $bubble);
 
-		if($connection instanceof MQConnector) {
-			$this->connection = $connection;
-		}
-		else {
-			throw new NotifException("connection not instance of Schoolbox\\Notif\\MQ\\Connector");
-		}
-
 		// by default, this uses a JSON formatter
 		$this->setFormatter(new JsonFormatter());
+		$this->connection = $connection;
 	}
 
 
 	/**
-	 * @return MQConnector
+	 * @return AMQPInterface
 	 */
 	public function getMQConnector() {
 		return $this->connection;
@@ -52,20 +46,16 @@ class AMQPHandler extends AbstractProcessingHandler {
 
 
 	/**
-	 * @return AMQPChannel
-	 */
-	public function getChannel() {
-		return $this->connection->getChannel();
-	}
-
-	/**
 	 * Writes the record down to the log of the implementing handler
 	 *
 	 * @param  array $record
+	 * @throws AMQPRuntimeException
 	 * @return void
 	 */
 	protected function write(array $record) {
-
+		if(!$this->getMQConnector() instanceof AMQPInterface) {
+			throw new AMQPRuntimeException("Not connected to AMQP, cannot write");
+		}
 		// key in the form of [severity].[namespace](.[namespace])*
 		$routingKey = sprintf(
 			'%s.%s',
