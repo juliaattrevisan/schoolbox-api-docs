@@ -47,7 +47,7 @@ $stomp = $stompFactory->createClient(array(
 
 $seen = new stdClass();
 
-$amqpConn = new \Schoolbox\Notif\MQ\Connector();
+$amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
 $amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();

@@ -43,7 +43,7 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	 */
 	public static function bindQueues() {
 		// make sure our endpoints exist
-		$mqc = new Connector();
+		$mqc = Connector::getInstance();
 		$queues = array(
 			INSTANCE_ID . self::QUEUE_COMMAND       => '*.' . Notif::TOPIC_CMD_DIGEST
 		);

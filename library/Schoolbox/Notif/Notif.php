@@ -97,7 +97,7 @@ class Notif implements LoggerInterface {
 
 		try {
 			// if the rabbit cannot be contacted, this will throw an exception
-			$this->mqc = new MQConnector();
+			$this->mqc = MQConnector::getInstance();
 		}
 		catch(AMQPRuntimeException $e) {
 			$this->mqc = false;
