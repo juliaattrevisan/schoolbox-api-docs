@@ -7,7 +7,7 @@
      * @param element  the jQuery object to bind the threePanel to.
      * @param options
      *   threePanel: the ThreePanel object to bind to
-     *   moveNode:
+     *   moveFolder:
      *     ajaxParams: params for AJAX call for moving a node
      *     ajaxData:   callback for determining data params for AJAX call
      * @constructor
@@ -16,7 +16,7 @@
         var self     = this;
         var defaults = {
             threePanel: null,
-            moveNode: {
+            moveFolder: {
                 ajaxParams: {
                     type: 'post',
                     url:  '/cms/categoryForm.php',
@@ -42,7 +42,7 @@
         element
             .on('redraw.jstree',       self.onRedraw.bind(self))
             .on('select_node.jstree',  self.onSelectNode.bind(self))
-            .on('move_node.jstree',    self.onMoveNode.bind(self))
+            .on('move_node.jstree',    self.onmoveFolder.bind(self))
             .on('after_open.jstree',   self.onAfterOpen.bind(self))
             .on('hover_node.jstree',   self.onHoverNode.bind(self))
             .on('dehover_node.jstree', self.onDehoverNode.bind(self))
@@ -160,7 +160,7 @@
      * @param event
      * @param data
      */
-    ResourceTreeThreePanelBridge.prototype.onMoveNode = function(event, jstree) {
+    ResourceTreeThreePanelBridge.prototype.onmoveFolder = function(event, jstree) {
         var self = this;
         var failMessage = function(error) {
             var message = 'An error occurred during processing. Please reload your browser and try again.';
@@ -170,8 +170,8 @@
             alert(message);
         }
 
-        var ajaxParams  = self.options.moveNode.ajaxParams;
-        ajaxParams.data = $.extend(true, ajaxParams.data, self.options.moveNode.ajaxData(jstree))
+        var ajaxParams  = self.options.moveFolder.ajaxParams;
+        ajaxParams.data = $.extend(true, ajaxParams.data, self.options.moveFolder.ajaxData(jstree))
         $.ajax(ajaxParams)
             .done(function(data) {
                 if (data && data.error) {
