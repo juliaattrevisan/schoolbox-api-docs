@@ -50,6 +50,14 @@
                     },
                     dataType: 'json'
                 }
+            },
+            loadFolderFiles: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/ajax/file.php',
+                    data: {categoryID : folderId},
+                    dataType: 'json'
+                }
             }
         }
 
@@ -131,47 +139,48 @@
 
             /* ajax load files */
             // threePanel.loadFiles(relationId)
-            $.post('/ajax/file.php', {categoryID : relationID}, function (data) {
-                if (data.error) {
-                    alert(data.error);
-                }
-                else if (data.length == 0) {
-                    /* display empty message */
-                    $('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
-
-                }
-                else {
-                    var template = $('#file-template');
-                    for (i in data) {
-                        var row = data[i];
-
-                        /* build new file (row) */
-                        var clone = template.clone();
-                        clone.attr('id', 'file-' + row.id);
-                        clone.find('span.file').text(row.description);
-                        clone.find('td:eq(1)').text(row.user);
-                        clone.find('td:eq(2)').text(row.relative);
-                        clone.addClass('category-' + relationID);
-                        clone.addClass(row.mimeClass);
-
-                        if (row.url)
-                            clone.addClass('link');
-
-                        if (row.hidden == 1)
-                            clone.addClass('hidden');
-
-                        clone.appendTo($('#file-list')).show();
+            var ajaxParams = self.options.loadFolderFiles(self, relationID);
+            $.ajax(ajaxParams)
+                .done(function(data) {
+                    if (data.error) {
+                        alert(data.error);
                     }
-                }
+                    else if (data.length == 0) {
+                        /* display empty message */
+                        $('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
 
-                /* re-apply on off */
-//                $('#file-list tbody tr').removeClass('dark');
-//                $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+                    }
+                    else {
+                        var template = $('#file-template');
+                        for (i in data) {
+                            var row = data[i];
 
-//                threePanel.initializeFiles();
-                self.initializeFiles(relationID);
+                            /* build new file (row) */
+                            var clone = template.clone();
+                            clone.attr('id', 'file-' + row.id);
+                            clone.find('span.file').text(row.description);
+                            clone.find('td:eq(1)').text(row.user);
+                            clone.find('td:eq(2)').text(row.relative);
+                            clone.addClass('category-' + relationID);
+                            clone.addClass(row.mimeClass);
 
-            }, 'json');
+                            if (row.url)
+                                clone.addClass('link');
+
+                            if (row.hidden == 1)
+                                clone.addClass('hidden');
+
+                            clone.appendTo($('#file-list')).show();
+                        }
+                    }
+
+                    /* re-apply on off */
+//                    $('#file-list tbody tr').removeClass('dark');
+//                    $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+//
+//                    threePanel.initializeFiles();
+                    self.initializeFiles(relationID);
+                })
         }
     };
 
