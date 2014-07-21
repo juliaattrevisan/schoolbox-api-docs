@@ -4,7 +4,16 @@
  * Can tie into three panel.
  */
 (function($) {
-
+    /**
+     * @param element The jQuery element to tie this resource tree to.
+     * @param options
+     *   data:
+     *     cache:         A set of preloaded nodes (see jstree.data)
+     *     ajaxParams:    Parameters passed to jQuery.ajax to load child nodes
+     *     ajaxDataParam: the parameter to put the node ID to load into
+     *   jstree: Any and all jstree parameters
+     * @constructor
+     */
     var ResourceTree = function(element, options) {
         var self     = this;
         var defaults = {
