@@ -106,7 +106,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
          */
         $page->setVar(array(
             'ANSWER_ID' => $currentAnswer['answer_id'],
-            'ANSWER' => Scrub::text($existing['response']),
+            'ANSWER' => $existing['response'],
             'RESPONSE_ID' => $existing['response_id'],
         ));
     }
