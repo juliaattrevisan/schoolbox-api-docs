@@ -2,7 +2,8 @@
 /**
  * Hydrator for username for Cathedral parents.
  *
- * This is exactly the same as the Meriden parent username sync.
+ * This is exactly the same as the Meriden parent username sync, but with
+ * usernames for single parents (add_num=4) suffixed with "-4".
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -13,7 +14,11 @@ class Synchronise_Tass_Cathedral_Hydrator_Username_Parent implements Synchronise
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['synergy_id'] = 'P'.$externalUser['StudentContactID'];
+        $externalId = 'P'.$externalUser['StudentContactID'];
+        if ($externalUser['add_num'] == 4) {
+            $externalId .= '-4';
+        }
+        $newUser['username'] = $externalId;
         return $newUser;
     }
 }
