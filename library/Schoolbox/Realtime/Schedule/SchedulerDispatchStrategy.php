@@ -12,6 +12,8 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use RuntimeException;
+use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use SplQueue;
@@ -27,10 +29,18 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
 	/** @var QueueItemMapper */
 	protected $mapper;
 
+	/** @var Notif */
+	protected $notifier;
 
-	public function __construct() {
+
+	/**
+	 * @param Notif $notif
+	 * @param Mapper $mapper
+	 */
+	public function __construct($notif, $mapper) {
 		parent::__construct();
-		$this->mapper = QueueItemMapper::getInstance();
+		$this->mapper = $mapper;
+		$this->notifier = $notif;
 	}
 
 
