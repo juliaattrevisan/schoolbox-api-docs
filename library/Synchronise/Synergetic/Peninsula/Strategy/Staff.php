@@ -128,6 +128,6 @@ class Synchronise_Synergetic_Peninsula_Strategy_Staff extends Synchronise_Base_S
     * @return int|void
     */
     public function getExternalMailFromUser($currentUser) {
-            return 0;
+            return 1;
     }
 }
