@@ -53,4 +53,33 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
 		return 'Schedule';
 	}
 
+
+	/**
+	 * Constructs the queue, but also checks for any SQL-rescued events from AMQP being offline
+	 *
+	 * @return SplQueue
+	 */
+	public function buildQueue() {
+		try {
+			/** @var QueueItem[] $qiColl */
+			$qiColl = $this->mapper->findAll();
+
+			foreach($qiColl as $qi) {
+				$event = $qi->getIdentifier();
+				$command = $qi->getCommand();
+
+				if($event instanceof Event) {
+					if($this->notifier->setTopic($command)->notice(serialize($event))) {
+						$this->mapper->delete($qi);
+					}
+				}
+			}
+		}
+		catch(RuntimeException $e) {
+			// couldn't unserialize or rabbit offline, just leave it for now
+		}
+
+		return parent::buildQueue();
+	}
+
 }

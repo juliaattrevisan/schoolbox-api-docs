@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif;
 
 
+use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\LoggerInterface;
 use ConfigFallback;
 use Mailer;
@@ -25,9 +26,10 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\InstamailHandler;
-use Schoolbox\Notif\Handler\MessageHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
+use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Swift_Mailer;
 use Swift_Message;
 
@@ -60,7 +62,7 @@ class Notif implements LoggerInterface {
 	/** @var string */
 	protected $topic;
 
-	/** @var MQConnector */
+	/** @var AMQPInterface */
 	protected $mqc = null;
 
 	/** @var HandlerInterface[] */
@@ -211,16 +213,10 @@ class Notif implements LoggerInterface {
 
 			// [3a] internal application message
 			if(in_array($this->topic, array(self::TOPIC_APPLICATION, self::TOPIC_CMD_SCHED, self::TOPIC_CMD_DIGEST))) {
-				try {
-					if(!isset($this->handlers['amqp'])) {
-						$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
-					}
-					array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
+				if(!isset($this->handlers['amqp'])) {
+					$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
 				}
-				catch(NotifException $e) {
-					// no connection to rabbit available. We should be able to safely ignore this
-				}
-
+				array_push($stack, $this->handlers['amqp']->setFormatter(new CompressedFormatter()));
 			}
 
 			// [3b] sqllog (this one doesn't get stored globally)
@@ -239,16 +235,11 @@ class Notif implements LoggerInterface {
 			}
 		}
 		else {
-			try {
-				// [3d] instant user message (notice)
-				if(!isset($this->handlers['instant'])) {
-					$this->handlers['instant'] = new MessageHandler($this->mqc, Logger::INFO, true);
-				}
-				array_push($stack, $this->handlers['instant']);
+			// [3d] instant user message (notice)
+			if(!isset($this->handlers['instant'])) {
+				$this->handlers['instant'] = new AMQPHandler($this->mqc, Logger::INFO, true);
 			}
-			catch(NotifException $e) {
-				// no connection to rabbit available. We should be able to safely ignore this
-			}
+			array_push($stack, $this->handlers['instant']);
 
 			// [3e] instant user email (warning)
 			if(!isset($this->handlers['plusmail'])) {
@@ -363,12 +354,24 @@ class Notif implements LoggerInterface {
 	 * @return bool
 	 */
 	public function log($level, $message, array $context = array()) {
-		$log = new Logger($this->topic, $this->getHandlers());
 		try {
+			$log = new Logger($this->topic, $this->getHandlers());
 			return $log->addRecord($level, $message, $context);
 		}
 		catch(\Swift_TransportException $e) {
 			// rabbit failed... email failed... at least it's logged to file
+			return false;
+		}
+		catch(AMQPRuntimeException $e) {
+			// a rabbit push was attempted, but connection refused, so cache it in SQL instead
+			$event = unserialize($message);
+
+			$qi = new QueueItem();
+			$qi->setIdentifier($event);
+			$qi->setCommand($this->topic);
+			$qi->setData(null);
+			QueueItemMapper::getInstance()->save($qi);
+
 			return false;
 		}
 	}
