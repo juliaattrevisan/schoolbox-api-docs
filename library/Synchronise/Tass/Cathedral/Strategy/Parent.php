@@ -24,9 +24,7 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Email_Parent())
-            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping(
-                'StudentContactID', 'username'
-            ))
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Parent())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExternalId_Parent())
             // Use the student campus hydrator, as the student and parent have
             // campus in the same field.
