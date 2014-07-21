@@ -509,12 +509,6 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			$i++;
 		}
 
-		/* TODO: Some serious assumption about final period 0
-		 * Truncate the final Period 0, last in the $finalTimetable.
-		 * It follows Period 7 right out of the stored proc
-		 */
-		array_pop($finalTimetable);
-
 		return $finalTimetable;
 	}
 
