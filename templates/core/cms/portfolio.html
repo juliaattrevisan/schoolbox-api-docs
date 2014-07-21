@@ -7,9 +7,7 @@
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-
-  var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php', 'eportfolio')
-
+    var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php', 'eportfolio')
     var tree = $('#tree');
     tree
         .resourceTree({
@@ -21,7 +19,49 @@ $j(document).ready(function() {
             }
         })
         .resourceTreeThreePanelBridge({
-            threePanel: threePanel
+            threePanel: threePanel,
+//            moveFolder: function(self, folderNode, destinationNode) {
+//                return {
+//                    type: 'post',
+//                    url:  '/cms/myFolderForm.php',
+//                    data: {
+//                        move:       folderNode.attr('id'),
+//                        categoryID: destinationNode.attr('id')
+//                    },
+//                    dataType: 'json'
+//                }
+//            },
+//            moveFile: function(self, fileNode, destinationNode) {
+//                var url = '/cms/fileForm.php';
+//                if (fileNode.hasClass('link')) {
+//                    url = '/cms/linkForm.php';
+//                }
+//                return {
+//                    type: 'post',
+//                    url:  url,
+//                    data: {
+//                        move:       fileNode.attr('id').substring(5),
+//                        categoryID: destinationNode.attr('id')
+//                    },
+//                    dataType: 'json'
+//                }
+//            },
+            loadFolderFiles: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/ajax/portfolioForm.php',
+                    data: {categoryID : folderId},
+                    dataType: 'json'
+                }
+            },
+            savePosition: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/cms/myFolderForm.php',
+                    data: {portfolioID : folderId},
+                    dataType: 'json'
+                }
+            }
         })
 
 //	/* left tree navigation */
