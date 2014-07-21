@@ -20,8 +20,8 @@ class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Bas
         // I'll just jam names together (probably not updating existing names)
         $newUser['firstname'] = '';
 
-        if (isset($externalUser['salutation'])) {
-            $newUser['lastname'] = $externalUser['salutation'];
+        if (isset($externalUser['par_name'])) {
+            $newUser['lastname'] = $externalUser['par_name'];
         }
         elseif (!$externalUser['StudentContactSpousePreferred']) {
             // Single parent in main contact record
