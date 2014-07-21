@@ -226,7 +226,8 @@
         // which node is selected?
         var scope         = $(event.currentTarget).droppable('option', 'scope'),
             node          = $(ui.draggable).closest("tr"),
-            destinationId = this.hoveredId;
+            destinationId = this.hoveredId,
+            fileContainer = node.parent()
         if (scope != 'resourceFile') {
             return;
         }
@@ -235,7 +236,7 @@
         }
 
         // Move all files, not just the one directly selected
-        var nodeList = node.add(node.parent().find('tr.selected'));
+        var nodeList = node.add(fileContainer.find('tr.selected'));
         nodeList.each(function() {
             var node     = $(this),
                 isLink   = node.hasClass('link'),
@@ -264,9 +265,11 @@
                         node.show();
                     }
                     else {
-                        // Put this in a new class
+                        // Put this in a new class?
                         node.remove();
-//                        node.removeClass(oldClass).addClass(newClass);
+                        // Remove all files from the class I moved to. This
+                        // triggers reload next time I view this folder's files.
+                        fileContainer.find('.'+newClass).remove();
                     }
                 })
                 .fail(function(data) {
@@ -275,6 +278,11 @@
         });
     };
 
+    /**
+     * Initializes click events for files for the given relation ID.
+     *
+     * @param relationID
+     */
     ResourceTreeThreePanelBridge.prototype.initializeFiles = function(relationID) {
         var newChildren  = $('tr.category-' + relationID + ':not(.empty)'),
             categoryNode = $('#' + String(relationID)),
