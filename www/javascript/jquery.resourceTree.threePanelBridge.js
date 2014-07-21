@@ -58,6 +58,14 @@
                     data: {categoryID : folderId},
                     dataType: 'json'
                 }
+            },
+            savePosition: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/ajax/tree.php',
+                    data: {resourcesID : folderId},
+                    dataType: 'json'
+                }
             }
         }
 
@@ -132,8 +140,10 @@
 
             /* remember tree branch */
             // threePanel.on('selectBranch');
-            $.post('/ajax/tree.php', {resourcesID : relationID});
-
+            var ajaxParams = self.options.savePosition(self, relationID);
+            if (ajaxParams) {
+                $.ajax(ajaxParams)
+            }
         }
         else {
 
