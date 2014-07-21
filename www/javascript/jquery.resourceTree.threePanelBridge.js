@@ -8,26 +8,47 @@
      * @param options
      *   threePanel: the ThreePanel object to bind to
      *   moveFolder:
-     *     ajaxParams: params for AJAX call for moving a node
-     *     ajaxData:   callback for determining data params for AJAX call
+     *     a callback that accept the following params:
+     *       self:            This object
+     *       folderNode:      The folder to move
+     *       destinationNode: The folder to move it to
+     *     and returns an object to use as the parameter to jQuery.ajax
+     *   moveFile:
+     *     a callback that accept the following params:
+     *       self:            This object
+     *       fileNode:        The file to move
+     *       destinationNode: The folder to move it to
+     *     and returns an object to use as the parameter to jQuery.ajax
      * @constructor
      */
     var ResourceTreeThreePanelBridge = function(element, options) {
         var self     = this;
         var defaults = {
             threePanel: null,
-            moveFolder: {
-                ajaxParams: {
+            moveFolder: function(self, folderNode, destinationNode) {
+                return {
                     type: 'post',
                     url:  '/cms/categoryForm.php',
-                    data: {},
+                    data: {
+                        move:       folderNode.attr('id'),
+                        categoryID: destinationNode.attr('id')
+                    },
                     dataType: 'json'
-                },
-                ajaxData: function(data) {
-                    return {
-                        move:       data.node.id,
-                        categoryID: data.parent
-                    }
+                }
+            },
+            moveFile: function(self, fileNode, destinationNode) {
+                var url = '/cms/fileForm.php';
+                if (fileNode.hasClass('link')) {
+                    url = '/cms/linkForm.php';
+                }
+                return {
+                    type: 'post',
+                    url:  url,
+                    data: {
+                        move:       fileNode.attr('id').substring(5),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
                 }
             }
         }
@@ -42,7 +63,7 @@
         element
             .on('redraw.jstree',       self.onRedraw.bind(self))
             .on('select_node.jstree',  self.onSelectNode.bind(self))
-            .on('move_node.jstree',    self.onmoveFolder.bind(self))
+            .on('move_node.jstree',    self.onMoveNode.bind(self))
             .on('after_open.jstree',   self.onAfterOpen.bind(self))
             .on('hover_node.jstree',   self.onHoverNode.bind(self))
             .on('dehover_node.jstree', self.onDehoverNode.bind(self))
@@ -160,7 +181,20 @@
      * @param event
      * @param data
      */
-    ResourceTreeThreePanelBridge.prototype.onmoveFolder = function(event, jstree) {
+    ResourceTreeThreePanelBridge.prototype.onMoveNode = function(event, jstree) {
+
+        var folderNode      = jstree.instance.get_node(jstree.node.id, true);
+        var destinationNode = jstree.instance.get_node(jstree.parent,  true);
+
+        // DOM node might not exist yet, if I dragged into a folder I just expanded.
+        // Output a virtual node instead with that ID if so, so the interface is at least consistent
+        if (folderNode.length === 0) {
+            folderNode      = $('<div />').attr('id', jstree.node.id);
+        }
+        if (destinationNode.length === 0) {
+            destinationNode = $('<div />').attr('id', jstree.parent);
+        }
+
         var self = this;
         var failMessage = function(error) {
             var message = 'An error occurred during processing. Please reload your browser and try again.';
@@ -170,8 +204,8 @@
             alert(message);
         }
 
-        var ajaxParams  = self.options.moveFolder.ajaxParams;
-        ajaxParams.data = $.extend(true, ajaxParams.data, self.options.moveFolder.ajaxData(jstree))
+        // Fill out ajax params with callback
+        var ajaxParams = self.options.moveFolder(this, folderNode, destinationNode);
         $.ajax(ajaxParams)
             .done(function(data) {
                 if (data && data.error) {
@@ -224,7 +258,8 @@
         // work - I can't drop onto a node with children.
         // Why not just set the whole tree as droppable and figure out
         // which node is selected?
-        var scope         = $(event.currentTarget).droppable('option', 'scope'),
+        var self          = this,
+            scope         = $(event.currentTarget).droppable('option', 'scope'),
             node          = $(ui.draggable).closest("tr"),
             destinationId = this.hoveredId,
             fileContainer = node.parent()
@@ -234,6 +269,8 @@
         if (!destinationId) {
             return;
         }
+
+        var destinationNode = $(event.currentTarget).find('#'+destinationId);
 
         // Move all files, not just the one directly selected
         var nodeList = node.add(fileContainer.find('tr.selected'));
@@ -246,18 +283,8 @@
 
             node.hide();
 
-            var ajaxParams = {
-                type: 'post',
-                url:  '/cms/fileForm.php',
-                data: {
-                    move:       id,
-                    categoryID: destinationId
-                },
-                dataType: 'json'
-            }
-            if (isLink) {
-                ajaxParams.url = '/cms/linkForm.php';
-            }
+            // Fill out AJAX params
+            var ajaxParams = self.options.moveFile(self, node, destinationNode);
             $.ajax(ajaxParams)
                 .done(function(data) {
                     if (data && data.result != 'success') {
