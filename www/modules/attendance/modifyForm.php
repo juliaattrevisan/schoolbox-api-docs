@@ -45,7 +45,7 @@ if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
  */
 $groupHandler = new Group();
 
-if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
+if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($_POST['classCode'])) && !$groupHandler->isSuperuser()) {
 	error(19);
 }
 
@@ -55,10 +55,6 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode
 /* Attendance Period
  */
 $attendancePeriod = $_POST['attendancePeriod'];
-
-/* Return url once non-ajax updates are done
- */
-$redirect = '/modules/attendance/modify/' . $class['ClassCode'] . '/' . $attendanceDate->getDatabaseDate() . '/' . $attendancePeriod;
 
 /* Deal with it all
  */
@@ -93,7 +89,6 @@ if (is_array($_POST['studentID'])) {
             'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
             'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
             'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
-
             'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
         );
 

@@ -27,11 +27,26 @@ class External_Synergetic_Class implements External_ClassInterface
         }
     }
 
-	public function getClass($classCode) {
+    /**
+     * Returns the details of a class based on its code
+     * This function is Synergetic only, not included in the interface and used for attendances
+     * @param $classCode
+     * @return mixed
+     */
+    public function getClass($classCode) {
+
+        if(strpos($classCode, '/') !== FALSE ) {
+            $codeArray = explode('/',$classCode);
+            $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) ";
+        }
+        else {
+            $classQuery .= "ClassCode = '$classCode'";
+        }
+
 		$query = "
 			SELECT *
 			FROM SynergyOne.dbo.SubjectClasses
-			WHERE ClassCode = '$classCode'
+			WHERE $classQuery
 			AND FileYear='" . $_SESSION['FileYear'] . "'
 			AND FileSemester='" . $_SESSION['FileSemester'] . "'
 		";
