@@ -29,7 +29,7 @@ class Mapping {
 		'Pending Initial Application Review',
 		'Pending Details',
 		'Approved',
-		'Rejected',
+		'Cancelled',
 	);
 
 	/**
