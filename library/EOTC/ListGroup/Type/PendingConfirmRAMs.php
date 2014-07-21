@@ -10,6 +10,7 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\ListGroup\Response;
 
 class PendingConfirmRAMs extends Base {
 
@@ -29,14 +30,10 @@ class PendingConfirmRAMs extends Base {
 
 		/* This comprises events which came from:
 		 *
-		 * In Principle (RAMS Not Required) and
 		 * RAMS Approved (RAMS Required)
 		 */
-		if (!$this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
-		}
-		else if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
+		if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
+			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
