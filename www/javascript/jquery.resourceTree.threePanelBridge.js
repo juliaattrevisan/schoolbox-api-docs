@@ -98,8 +98,8 @@
 
             /* re-apply on off */
             // TODO use CSS :even selector instead
-            $('#file-list tbody tr').removeClass('dark');
-            $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+//            $('#file-list tbody tr').removeClass('dark');
+//            $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
             /* remember tree branch */
             // threePanel.on('selectBranch');
@@ -144,8 +144,8 @@
                 }
 
                 /* re-apply on off */
-                $('#file-list tbody tr').removeClass('dark');
-                $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+//                $('#file-list tbody tr').removeClass('dark');
+//                $('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
 //                threePanel.initializeFiles();
                 self.initializeFiles(relationID);
