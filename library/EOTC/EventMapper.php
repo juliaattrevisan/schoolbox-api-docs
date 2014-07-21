@@ -265,6 +265,7 @@ class EventMapper extends Calendar\EventMapper {
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			WHERE e.author_id = :userId
+			OR e.teacher_in_charge_id = :userId
 			ORDER BY e.startDate, e.startTime
 		";
 
