@@ -74,7 +74,7 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-//    SitePage::localRedir('/survey/question/create/' . $_POST['section_id']);
+    SitePage::localRedir('/survey/question/create/' . $_POST['section_id']);
 } else {
     if (!is_numeric($this->arg[0])) {
         error(51);
