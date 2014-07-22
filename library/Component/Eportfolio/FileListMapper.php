@@ -65,7 +65,12 @@ class FileListMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		parent::mapping();
+		$this->hasJoin('pages', array(
+			'multiple'  => true,
+			'mapper'    => '\\Eportfolio\\PageMapper',
+			'this_key'  => 'page_id',
+			'other_key' => 'page_id',
+		));
 	}
 
 	/**
@@ -90,6 +95,36 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement->bindParam(':pageId', $pageId, \PDO::PARAM_INT);
 
+		$statement->execute();
+
+		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
+			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
+			return $model;
+		});
+	}
+
+	/**
+	 * Find all published image files on any page owned by a particular user
+	 *
+	 * @param $userId
+	 * @return Collection
+	 */
+	public function findAllImagesByUser($userId) {
+		$query = "
+			SELECT
+				{$this->getColumnString('fl')},
+				{$this->getJoinColumnString('files', 'f')},
+				{$this->getJoinColumnString('pages', 'p')}
+			FROM `{$this->table}` fl
+			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
+			LEFT JOIN {$this->getJoinSql('pages', 'fl', 'p')}
+			WHERE f.mime_type LIKE '%image/%'
+			AND f.deleted IS FALSE
+			AND p.uid = :userId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(':userId', $userId, \PDO::PARAM_INT);
 		$statement->execute();
 
 		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {

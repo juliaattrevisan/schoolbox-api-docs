@@ -17,16 +17,16 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
         $page->setVar('config_images_block', '');
 
 		$imageMapper = new \Component\Eportfolio\FileListMapper();
-		$imageList = $imageMapper->findByColumn('user_id', $this->cat['uid']);
+		$allImages = $imageMapper->findAllImagesByUser($this->cat['uid']);
 
-        if ($imageList->count()) {
-            foreach ($imageList as $image) {
-				new \Alaress_Probe($image);
-//                $page->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-//                $page->setVar(
-//                    'COMPONENT_CONFIG_IMAGE_SELECTED',
-//                    $image['description'] == $configValue ? ' selected="selected"' : ''
-//                );
+        if ($allImages->count()) {
+            foreach ($allImages as $currentImage) {
+                $page->setVar('COMPONENT_CONFIG_IMAGE', $currentImage->getFile()->getDescription());
+                $page->setVar(
+                    'COMPONENT_CONFIG_IMAGE_SELECTED',
+					$currentImage->getFile()->getDescription() == $configValue ? ' selected="selected"' : ''
+                );
+
                 $page->parse('config_images_block', 'config_images', true);
             }
         }
