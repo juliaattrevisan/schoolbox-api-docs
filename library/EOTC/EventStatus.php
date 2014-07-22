@@ -74,11 +74,11 @@ class EventStatus {
 	}
 
 	/**
-	 * Determine whether this event is RAMS Approved
+	 * Determine whether this event is Details Completed
 	 *
 	 * @return bool
 	 */
-	public function isRamsApproved() {
+	public function isDetailsCompleted() {
 		if ($this->getId() == EventStatusMapper::STATUS_DETAILSCOMPLETED) {
 			return true;
 		}

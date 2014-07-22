@@ -32,7 +32,7 @@ class PendingConfirmRAMs extends Base {
 		 *
 		 * RAMS Approved (RAMS Required)
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && $this->getEvent()->getMetadata()->getStatus()->isRamsApproved()) {
+		if ($this->getEvent()->getMetadata()->getStatus()->isDetailsCompleted()) {
 			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
 		}
 
