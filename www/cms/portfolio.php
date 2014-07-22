@@ -38,7 +38,7 @@ if ($_SESSION['user'] instanceof Schoolbox\User) {
 $this->setVar(
     array(
         'TREEDATA'      => json_encode($partialTree),
-        'OPEN_CATEGORY' => intval($openCategory),
+        'OPEN_CATEGORY' => intval($openFolder),
     )
 );
 
