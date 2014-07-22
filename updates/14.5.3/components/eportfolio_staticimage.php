@@ -29,10 +29,6 @@ $definition = array(
 			'default_value' => '200',
 			'label' => 'Max width/height',
 		),
-		'url' => array(
-			'default_value' => '#',
-			'label' => 'Url',
-		),
 	),
 );
 
