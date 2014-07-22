@@ -31,21 +31,17 @@ $j(document).ready(function() {
                     dataType: 'json'
                 }
             },
-//            moveFile: function(self, fileNode, destinationNode) {
-//                var url = '/cms/fileForm.php';
-//                if (fileNode.hasClass('link')) {
-//                    url = '/cms/linkForm.php';
-//                }
-//                return {
-//                    type: 'post',
-//                    url:  url,
-//                    data: {
-//                        move:       fileNode.attr('id').substring(5),
-//                        categoryID: destinationNode.attr('id')
-//                    },
-//                    dataType: 'json'
-//                }
-//            },
+            moveFile: function(self, fileNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/myFileForm.php',
+                    data: {
+                        move:       fileNode.attr('id').substring(5),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
             loadFolderFiles: function(self, folderId) {
                 return {
                     type: 'post',
