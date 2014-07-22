@@ -1,69 +1,22 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css"/>
-<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <script type="text/javascript">
     $j(function () {
         /* left tree navigation */
-        $j('#tree').tree({
-            type:'table',
-            node:'tr',
-            onOff:'dark',
-            sequencing:false,
-            dragDrop:false
-        });
-
-        /* Folder click event */
-        $j(document).on('click', '#tree tr:not(.server)', function () {
-
-            /* select folder */
-            $j('#tree .selected').removeClass('selected');
-            $j(this).addClass('selected');
-
-            var relationID = $j(this).attr('id').substring(5);
-
-            $j('#sourceCategoryId').val(relationID);
-        });
-
-        /* triggered after a new branch is loaded */
-        $j('#tree').bind('loaded', function () {
-            var table = $j(this), scroller = $j('#category-window div.scroller');
-
-            /* fix left panel width */
-            var scrollerWidth = parseInt(scroller.width()) - 1;
-            if (table.height() > scroller.height())
-                scrollerWidth -= 16; // scroller width
-
-            if (table.width() < scrollerWidth)
-                table.width(scrollerWidth);
-            else {
-                var maxWidth = 0, width;
-                table.find('tr').each(function () {
-                    width = 0;
-                    $j(this).find('span').each(function () {
-                        width += $j(this).width();
-                    });
-                    width += 39; // cell padding, highlight border
-                    if (width > maxWidth)
-                        maxWidth = width;
-                });
-                if (maxWidth > scrollerWidth)
-                    table.width(maxWidth);
-            }
-        });
-
-        $j('#tree').triggerHandler('loaded');
-
-        /* resize left column on window resize */
-        $j(window).resize(function () {
-            $j('#tree').triggerHandler('loaded');
-        });
+        $j('#tree')
+            .resourceTree({
+                data: {
+                    cache: {TREEDATA}
+                }
+            })
+            .on('select_node.jstree', function(event, jstree) {
+                $j('#sourceCategoryId').val(jstree.node.id);
+            })
 
         $j("div.loading").hide();
-
-        /* auto scroll to open branch */
-        $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
-
 
 		/*
 		* Adjust the height of the source browser depending on the height of the screen.
@@ -99,29 +52,8 @@
                         </thead>
                     </table>
                     <div class="scroller">
-                        <table id="tree" class="table">
-                            <tbody>
-                            <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
-                                <td><span class="server label">Resources</span></td>
-                            </tr>
-                            <!-- BEGIN category_list -->
-                            <tr id="node-{CATEGORY_ID}" class="{CLASS}">
-                                <td>
-                                    <span class="elbow"></span>
-                                    <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
-                                </td>
-                            </tr>
-                            <!-- END category_list -->
-                            </tbody>
-                            <tfoot>
-                            <tr id="node-template">
-                                <td>
-                                    <span class="elbow"></span>
-                                    <a href="#"><span class="label"></span></a>
-                                </td>
-                            </tr>
-                            </tfoot>
-                        </table>
+                        <div id="tree" class="table">
+                        </div>
                     </div>
                 </div>
 

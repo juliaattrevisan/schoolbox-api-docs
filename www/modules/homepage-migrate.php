@@ -43,7 +43,6 @@ if ( !empty($_POST) ) {
 else {
     $this->setFile(TEMPLATE_content, 'modules/homepage-migrate/index.html');
 
-    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
     $this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
     $this->setBlock(TEMPLATE_content, 'homepage_migrate', 'homepage_migrate_block');
 
@@ -66,95 +65,12 @@ else {
     	$categoryHandler->logPageView($openCategory);
     }
 
-    // get parentIDs from openCategory to 0
-    $parentList[] = $parentID = $openCategory;
-    $i = 0;
-    while ($parentID > 0) {
-    	if ($i++ > 100) {
-    		break;
-    	}
-    	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
-    }
-
-    $output = array(
-    	'WRITE' => $groupHandler->getPermission(0) >= WRITE_ACCESS ? 'write' : '',
-    	'FULL' => $groupHandler->getPermission(0) >= FULL_ACCESS ? 'full' : '',
-    	'OPEN' => $openCategory,
-    	'HTTP_HOST' => $_SERVER['HTTP_HOST'],
+    $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
+        Schoolbox\Resource\CategoryMapper::getInstance(),
+        Schoolbox\Assessment\Course\TaskMapper::getInstance(),
+        $groupHandler
     );
-    $this->setVar($output);
-
-    $sourceCategoryList = $categoryHandler->getCategoryNode($openCategory);
-
-    if (is_array($sourceCategoryList)) {
-
-    	foreach ($sourceCategoryList as $category) {
-    		// get permissions
-    		if (!isset($permission[$category['id']])) {
-    			$permission[$category['id']] = $groupHandler->getPermission($category['id']);
-    		}
-
-    		// limit permission by parent
-    		//if (isset($permission[$category['parent']]) && $permission[$category['id']] > $permission[$category['parent']])
-    		//	$permission[$category['id']] = $permission[$category['parent']];
-
-    		// check permission
-    		if ($permission[$category['id']] >= READ_ACCESS) {
-
-    			$class = array();
-
-    			// set parent category
-    			$class[] = "child-of-node-{$category['parent']}";
-
-    			/* add plus sign to parent nodes */
-    			if ($category['isParent'] == '1') {
-    				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
-    			}
-
-    			/* select default dir */
-    			if ($category['id'] == $openCategory) {
-    				$class[] = 'selected';
-    			}
-
-    			/* mark homepages */
-    			if ($category['template'] > 0) {
-    				$class[] = "homepage";
-    			}
-
-    			/* mark write access */
-    			if ($permission[$category['id']] == WRITE_ACCESS) {
-    				$class[] = "write";
-    			}
-
-    			/* mark full access*/
-    			if ($permission[$category['id']] == FULL_ACCESS) {
-    				$class[] = "full";
-    			}
-
-    			/* append code to name */
-    			$name = Scrub::text($category['name']);
-    			if ($category['code'] != '' && $category['code'] != $category['name']) {
-    				$name .= ' (' . Scrub::text($category['code']) . ')';
-    			}
-
-    			$output = array(
-    				'CATEGORY_ID' => $category['id'],
-    				'CATEGORY_NAME' => $name,
-    				'CLASS' => implode(" ", $class),
-    			);
-    			$this->setVar($output);
-    			$this->parse('category_list_block', 'category_list', true);
-    		}
-    	}
-
-    	/* If no permission to folders handle blank block */
-    	if (!$output['CATEGORY_ID']) {
-    		$this->setVar('category_list_block', '');
-    	}
-    }
-    else {
-    	$this->setVar('category_list_block', '');
-    }
+    $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));
 
     if ( $involvedCategoryList = $groupHandler->involvedInCategoryList($userId, true, WRITE_ACCESS) ) {
         $this->setVar('no_categories_block', '');
