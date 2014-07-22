@@ -71,16 +71,6 @@ if ($openCategory > 0) {
 	$categoryHandler->logPageView($openCategory);
 }
 
-// get parentIDs from openCategory to 0
-$parentList[] = $parentID = $openCategory;
-$i = 0;
-while ($parentID > 0) {
-	if ($i++ > 100) {
-		break;
-	}
-	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
-}
-
 // Build a tree up to the last resource we looked at
 $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 	CategoryMapper::getInstance(),
