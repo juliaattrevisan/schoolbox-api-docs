@@ -270,13 +270,13 @@ class Factory {
 	 */
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
-
+        $errors = $this->getErrors();
 
 		/* A string mark was submitted (Absent, Not Submitted, etc)
 		 */
 		if (isset($errors[$this->getMark()])) {
 			$returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
-			$returnedWork->setNormalisedMark($errors[$this->getMark()]->getNormaliseAs());
+			$returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
 		}
 		/* If it's a rubric, it normalises in a special way
 		 */
@@ -297,8 +297,7 @@ class Factory {
 		 */
 		else {
 			$normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
-
-			$returnedWork->setMark($this->getMark());
+			$returnedWork->setMark($normalisedMarkArray['mark']);
 			$returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
 		}
 
