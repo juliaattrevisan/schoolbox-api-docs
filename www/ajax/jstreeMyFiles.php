@@ -4,41 +4,14 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 // Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
 session_start();
 
-$folderHandler = new MyFolder();
-
-// Root node
-$folderId = $_GET['relationID'];
+use Schoolbox\User;
+use Schoolbox\MyFolderMapper;
+use Schoolbox\MyFolderTreeBuilder;
 
 $output = array();
-if ($folderId === '#') {
-    $output[] = array(
-        'id'       => '0',
-        'parent'   => '#',
-        'text'     => 'Resources',
-        'children' => (bool)$folderHandler->hasChildren(0),
-        'type'     => 'root',
-        'li_attr'  => array(
-            'data-permission' => 'full',
-        ),
-    );
+if ($_SESSION['user'] instanceof User) {
+    $treeBuilder = new MyFolderTreeBuilder(MyFolderMapper::getInstance(), $_SESSION['user']);
+    $output      = $treeBuilder->buildChildNodes($_GET['relationID']);
 }
-else {
-    $folderList = $folderHandler->getFolderList($folderId);
-    if (is_array($folderList)) {
-        foreach ($folderList as $folder) {
-            $output[] = array(
-                'id'       => $folder['id'],
-                'parent'   => $folder['parent'],
-                'text'     => $folder['name'],
-                'children' => (bool)$folderHandler->hasChildren($folder['id']),
-                'type'     => 'folder',
-                'li_attr'  => array(
-                    'data-permission' => 'full',
-                ),
-            );
-        }
-    }
-}
-
-header("Content-type: application/json");
-print json_encode($output);
+header('Content-Type: application/json');
+echo json_encode($output);
