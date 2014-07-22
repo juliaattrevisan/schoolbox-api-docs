@@ -7,10 +7,8 @@
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
 $j(function() {
-
     var threePanel = new ThreePanelView('/ajax/resource/networkMeta.php', 'network')
-
-    var tree = $('#tree');
+    var tree       = $('#tree');
     tree
         .resourceTree({
             data: {
@@ -23,28 +21,28 @@ $j(function() {
         })
         .resourceTreeThreePanelBridge({
             threePanel: threePanel,
-//            moveFolder: function(self, folderNode, destinationNode) {
-//                return {
-//                    type: 'post',
-//                    url:  '/cms/myFolderForm.php',
-//                    data: {
-//                        move:       folderNode.attr('id'),
-//                        categoryID: destinationNode.attr('id')
-//                    },
-//                    dataType: 'json'
-//                }
-//            },
-//            moveFile: function(self, fileNode, destinationNode) {
-//                return {
-//                    type: 'post',
-//                    url:  '/cms/myFileForm.php',
-//                    data: {
-//                        move:       fileNode.attr('id').substring(5),
-//                        categoryID: destinationNode.attr('id')
-//                    },
-//                    dataType: 'json'
-//                }
-//            },
+            moveFolder: function(self, folderNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFolderForm.php',
+                    data: {
+                        move:       folderNode.attr('id'),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
+            moveFile: function(self, fileNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFileForm.php',
+                    data: {
+                        move:       fileNode.attr('id').substring(5),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
             loadFolderFiles: function(self, folderId) {
                 return {
                     type: 'post',
