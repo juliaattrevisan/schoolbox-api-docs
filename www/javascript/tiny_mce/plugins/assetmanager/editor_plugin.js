@@ -71,31 +71,6 @@
 			});
 		},
 
-        /**
-         * open a new browser window
-         */
-        eportfolioFileBrowser : function (field_name, url, type, win) {
-            var ed = tinyMCE.activeEditor, file;
-
-            if (type.toLowerCase() == 'image')
-                file = '/eportfolio_file_browser.php?filter=image';
-            else if (type.toLowerCase() == 'media')
-                  file = '/eportfolio_file_browser.php?filter=video';
-            else
-                file = '/eportfolio_file_browser.php?filter=none';
-
-            ed.windowManager.open({
-                url : this.url + file + '&userID=' + ed.settings['file_browser_user_id'],
-                width: 640 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
-                height : 511 + parseInt(ed.getLang('amadeo_draft.delta_height', 0)),
-                movable : true,
-                inline : true
-            }, {
-                window	: win,
-                input : field_name
-            });
-        },
-
         fileUploader : function(field_name, url, type, win) {
             var ed = tinyMCE.activeEditor;
 
