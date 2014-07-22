@@ -1302,8 +1302,8 @@ class Mapper implements Serializable {
 
 		$this->database->beginTransaction();
 		foreach ($collection as $i => $model) {
-			$this->bindParamsForSave($model, $statement);
-			if ($statement->execute()) {
+//			$this->bindParamsForSave($model, $statement);
+			if ($statement->execute($this->dehydrate($model))) {
 				// take note of whether this was an insert or update
 				$m = $statement->rowCount();
 				switch($m) {
@@ -1924,15 +1924,15 @@ class Mapper implements Serializable {
 	}
 
 	/**
-	 * Binds values from the model into the statement.
+	 * Inverse of hydrate(). Converts a model to an array with indices matching the db fields.
 	 *
 	 * @param object        $model     The model to get values from
-	 * @param \PDOStatement $statement The statement for inserting/updating model
-	 *
 	 * @throws Mapper\Exception if the map is not valid
-	 * @return void
+	 * @return array
 	 */
-	protected function bindParamsForSave($model, \PDOStatement $statement) {
+	public function dehydrate($model) {
+		$result = array();
+
 		foreach ($this->map as $map) {
 
 			if(empty($map['column'])) {
@@ -1950,9 +1950,11 @@ class Mapper implements Serializable {
 			//
 			// Timestamp fields will never be bound.
 			if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
-				$statement->bindValue(":$columnName", $this->getModelProperty($model, $propertyName));
+				$result[$columnName] = $this->getModelProperty($model, $propertyName);
 			}
 		}
+
+		return $result;
 	}
 
 	/**
