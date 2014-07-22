@@ -1,6 +1,10 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{IMAGE_TITLE}</h2>
     {CONFIGURATION}
-    <div class="text" style="text-align:{IMAGE_ALIGN};"> {CONTENT_URL_START}<img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />{CONTENT_URL_END} </div>
+
+    <div class="text" style="text-align:{IMAGE_ALIGN};">
+		<img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
+	</div>
+
     <p class="interact"><a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post Image</a></p>
 </div>

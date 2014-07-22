@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class Component_Eportfolio_ImageController extends Component_Homepage_ControllerAbstract {
+class Component_Eportfolio_ImageController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
 	 * Prepares data for the render function. Business logic.
@@ -28,7 +28,7 @@ class Component_Eportfolio_ImageController extends Component_Homepage_Controller
 	 * @return bool
 	 */
 	public function renderTemplate($templateHandle) {
-		if (!parent::loadTemplate($templateHandle, 'image')) {
+		if (!parent::loadTemplate($templateHandle, 'Image')) {
 			return false;
 		}
 
