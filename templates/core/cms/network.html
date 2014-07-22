@@ -21,8 +21,8 @@ $j(function() {
                 ajaxDataParam: 'relationID'
             }
         })
-//        .resourceTreeThreePanelBridge({
-//            threePanel: threePanel,
+        .resourceTreeThreePanelBridge({
+            threePanel: threePanel,
 //            moveFolder: function(self, folderNode, destinationNode) {
 //                return {
 //                    type: 'post',
@@ -45,62 +45,61 @@ $j(function() {
 //                    dataType: 'json'
 //                }
 //            },
-//            loadFolderFiles: function(self, folderId) {
-//                return {
-//                    type: 'post',
-//                    url:  '/cms/portfolioForm.php',
-//                    data: {categoryID : folderId},
-//                    dataType: 'json'
-//                }
-//            },
-//            savePosition: function(self, folderId) {
-//                return {
-//                    type: 'post',
-//                    url:  '/cms/myFolderForm.php',
-//                    data: {portfolioID : folderId},
-//                    dataType: 'json'
-//                }
-//            },
-//            drawFiles: function(self, categoryId, data) {
-//                if (data.error) {
-//                    alert(data.error);
-//                }
-//                else if (data.length == 0) {
-//                    /* display empty message */
-//                    var empty = $j('#file-list tr.category-'+categoryId+'.empty');
-//                    if (empty.length) {
-//                        empty.show();
-//                    }
-//                    else {
-//                        $j('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
-//                    }
-//                }
-//                else {
-//                    var template = $j('#file-template');
-//
-//                    for (i in data) {
-//                        var row = data[i];
-//
-//                        /* build new file (row) */
-//                        var clone = template.clone();
-//                        clone.attr('id', 'file-' + row.id);
-//                        clone.find('span.file').text(row.name).addClass(row.icon);
-//                        clone.find('td:eq(1)').text(row.modified);
-//                        clone.addClass('category-' + categoryId);
-//
-//                        if (row.url) {
-//                            clone.addClass('link');
-//                        }
-//
-//                        if (row.hidden == 1) {
-//                            clone.addClass('hidden');
-//                        }
-//
-//                        clone.appendTo($j('#file-list')).show();
-//                    }
-//                }
-//            }
-//        })
+            loadFolderFiles: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkForm.php',
+                    data: {categoryID : folderId},
+                    dataType: 'json'
+                }
+            },
+            savePosition: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFolderForm.php',
+                    data: {portfolioID : folderId},
+                    dataType: 'json'
+                }
+            },
+            drawFiles: function(self, categoryId, data) {
+                if (data.error) {
+                    alert(data.error);
+                }
+                else if (data.length == 0) {
+                    /* display empty message */
+                    var empty = $j('#file-list tr.category-' + categoryId + '.empty');
+                    if (empty.length) {
+                        empty.show();
+                    } else {
+                        $j('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                    }
+                }
+                else {
+                    var template = $j('#file-template');
+
+                    for (i in data) {
+                        var row = data[i];
+
+                        /* build new file (row) */
+                        var clone = template.clone();
+                        clone.attr('id', 'file-' + row.id);
+                        clone.find('span.file').text(row.name).addClass(row.icon);
+                        clone.find('td:eq(1)').text(row.modified);
+                        clone.addClass('category-' + categoryId);
+
+                        if (row.url) {
+                            clone.addClass('link');
+                        }
+
+                        if (row.hidden == 1) {
+                            clone.addClass('hidden');
+                        }
+
+                        clone.appendTo($j('#file-list')).show();
+                    }
+                }
+            }
+        })
 
 //    /* left tree navigation */
 //    $j('#tree').tree({
