@@ -33,7 +33,7 @@ class WebdavTreeBuilder {
         // Did I ask for the root node? get it
         if ($folderId === '#') {
             $output[] = array(
-                'id'       => '0',
+                'id'       => 0,
                 'parent'   => '#',
                 'text'     => 'Top',
                 'children' => $this->connection->hasChildren(0),
@@ -46,9 +46,9 @@ class WebdavTreeBuilder {
         else {
             foreach ($this->connection->getFolderList($folderId) as $folder) {
                 $output[] = array(
-                    'id'       => $folder['id'],
+                    'id'       => intval($folder['id']),
                     'text'     => $folder['description'],
-                    'parent'   => $folder['parent'],
+                    'parent'   => intval($folder['parent']),
                     'children' => $this->connection->hasChildren($folder['id']),
                     'type'     => 'folder',
                     'li_attr'  => array(
