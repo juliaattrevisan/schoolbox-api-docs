@@ -12,6 +12,7 @@ $j(document).ready(function() {
     tree
         .resourceTree({
             data: {
+                cache: {TREEDATA},
                 ajaxParams: {
                     url: '/ajax/jstreeMyFiles.php',
                 },
@@ -442,31 +443,7 @@ $j(document).ready(function() {
       </table>
 
       <div class="scroller">
-      <table id="tree" class="table">
-        <tbody>
-          <tr id="node-0" class="server expanded loaded full write">
-							<td>
-								<span class="server label no-drop">Top</span>
-							</td>
-          </tr>
-          <!-- BEGIN category_list -->
-          <tr id="node-{CATEGORY_ID}" class="{CLASS} full write">
-							<td>
-								<span class="elbow"></span>
-								<a href="#"><span class="label">{CATEGORY_NAME}</span></a>
-							</td>
-          </tr>
-          <!-- END category_list -->
-        </tbody>
-        <tfoot>
-          <tr id="node-template" class=" full write">
-							<td>
-								<span class="elbow"></span>
-								<a href="#"><span class="label"></span></a>
-							</td>
-          </tr>
-        </tfoot>
-      </table>
+        <div id="tree"></div>
       </div>
     </div>
   </div>
