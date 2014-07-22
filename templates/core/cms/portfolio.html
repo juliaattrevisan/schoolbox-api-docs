@@ -49,7 +49,7 @@ $j(document).ready(function() {
             loadFolderFiles: function(self, folderId) {
                 return {
                     type: 'post',
-                    url:  '/ajax/portfolioForm.php',
+                    url:  '/cms/portfolioForm.php',
                     data: {categoryID : folderId},
                     dataType: 'json'
                 }
