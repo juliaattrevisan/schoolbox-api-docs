@@ -1,10 +1,10 @@
-<tr>{{ fn.spacer(16, 4, 3) }}</tr>
+<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
 <tr>
-  {{ fn.spacer(64, 4) }}
+  {{ fn.spacer(config.fqdn, 64, 4) }}
   <td colspan="2" valign="middle">
     <img src="http://{{ config.fqdn }}/images/{{ config.site_location }}/{{ config.logo }}.png"
          alt="{{ config.title }}" border="0" height="64"
     />
   </td>
 </tr>
-<tr>{{ fn.spacer(16, 4, 3) }}</tr>
+<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
