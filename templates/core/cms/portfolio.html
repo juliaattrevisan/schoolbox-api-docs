@@ -20,6 +20,7 @@ $j(document).ready(function() {
             }
         })
         .resourceTreeThreePanelBridge({
+            selected: {OPEN_CATEGORY},
             threePanel: threePanel,
             moveFolder: function(self, folderNode, destinationNode) {
                 return {
@@ -99,6 +100,7 @@ $j(document).ready(function() {
                 }
             }
         })
+    threePanel.getMeta({OPEN_CATEGORY});
 
     // set up resizing
     threePanel.resizePanels()
