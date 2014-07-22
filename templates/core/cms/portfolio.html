@@ -20,17 +20,17 @@ $j(document).ready(function() {
         })
         .resourceTreeThreePanelBridge({
             threePanel: threePanel,
-//            moveFolder: function(self, folderNode, destinationNode) {
-//                return {
-//                    type: 'post',
-//                    url:  '/cms/myFolderForm.php',
-//                    data: {
-//                        move:       folderNode.attr('id'),
-//                        categoryID: destinationNode.attr('id')
-//                    },
-//                    dataType: 'json'
-//                }
-//            },
+            moveFolder: function(self, folderNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/myFolderForm.php',
+                    data: {
+                        move:       folderNode.attr('id'),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
 //            moveFile: function(self, fileNode, destinationNode) {
 //                var url = '/cms/fileForm.php';
 //                if (fileNode.hasClass('link')) {
