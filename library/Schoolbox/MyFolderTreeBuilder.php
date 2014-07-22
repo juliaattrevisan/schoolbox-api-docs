@@ -51,7 +51,7 @@ class MyFolderTreeBuilder {
             $output[] = array(
                 'id'       => '0',
                 'parent'   => '#',
-                'text'     => 'Resources',
+                'text'     => 'Top',
                 'children' => $this->mapper->countByColumnList($childSearch) > 0,
                 'type'     => 'root',
                 'li_attr'  => array(
