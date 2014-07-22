@@ -23,9 +23,12 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
-                $page->setVar('COMPONENT_CONFIG_IMAGE', $currentImage->getFile()->getDescription());
+                $page->setVar(array(
+					'COMPONENT_CONFIG_FILE_ID' => $currentImage->getFile()->getId(),
+					'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getFile()->getDescription()
+				));
 
-				if ($currentImage->getFile()->getDescription() == $configValue) {
+				if ($currentImage->getFile()->getId() == $configValue) {
 					$page->setVar(array(
 						'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
 						'IMAGE_TITLE' => $currentImage->getFile()->getDescription()
@@ -39,7 +42,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
             }
         }
 		else {
-            $page->setVar('COMPONENT_CONFIG_IMAGE', '(none)');
+            $page->setVar('COMPONENT_CONFIG_FILE_DESCRIPTION', '(none)');
             $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
             $page->parse('config_images_block', 'config_images', false);
         }

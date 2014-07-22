@@ -33,5 +33,20 @@ class Component_Eportfolio_ImageController extends Component_Homepage_Controller
 		}
 
 		$this->parseConfig();
+
+		if ($this->getConfig('pixel') > 600) {
+			$pixel = 600;
+		}
+		else if($this->getConfig('pixel') < 20) {
+			$pixel = 20;
+		}
+		else {
+			$pixel = $this->getConfig('pixel');
+		}
+
+		$this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
+		$this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel");
+		$this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
+
 	}
 }
