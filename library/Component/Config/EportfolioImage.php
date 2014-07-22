@@ -16,7 +16,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-		$imageMapper = new \Component\Eportfolio\ImageMapper();
+		$imageMapper = new \Component\Eportfolio\FileListMapper();
 		$imageList = $imageMapper->findByColumn('user_id', $this->cat['uid']);
 
         if ($imageList->count()) {
