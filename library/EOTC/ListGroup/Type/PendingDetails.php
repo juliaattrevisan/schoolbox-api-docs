@@ -29,10 +29,9 @@ class PendingDetails extends Base {
 	 */
 	public function determine() {
 
-		/* This comprises events which came from In Principle
-		 * with the RAMS Required configuration
+		/* All events which are In Principle
 		 */
-		if ($this->getEvent()->getMetadata()->getRamsRequired() && ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple())) {
+		if ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
 			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
 		}
 
