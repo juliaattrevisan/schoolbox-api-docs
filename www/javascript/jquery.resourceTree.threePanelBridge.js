@@ -66,6 +66,40 @@
                     data: {resourcesID : folderId},
                     dataType: 'json'
                 }
+            },
+            drawFiles: function(self, categoryId, data) {
+                if (data.error) {
+                    alert(data.error);
+                }
+                else if (data.length == 0) {
+                    /* display empty message */
+                    $('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
+                }
+                else {
+                    var template = $('#file-template');
+                    for (i in data) {
+                        var row = data[i];
+
+                        /* build new file (row) */
+                        var clone = template.clone();
+                        clone.attr('id', 'file-' + row.id);
+                        clone.find('span.file').text(row.description);
+                        clone.find('td:eq(1)').text(row.user);
+                        clone.find('td:eq(2)').text(row.relative);
+                        clone.addClass('category-' + categoryId);
+                        clone.addClass(row.mimeClass);
+
+                        if (row.url) {
+                            clone.addClass('link');
+                        }
+
+                        if (row.hidden == 1) {
+                            clone.addClass('hidden');
+                        }
+
+                        clone.appendTo($('#file-list')).show();
+                    }
+                }
             }
         }
 
@@ -152,37 +186,8 @@
             var ajaxParams = self.options.loadFolderFiles(self, relationID);
             $.ajax(ajaxParams)
                 .done(function(data) {
-                    if (data.error) {
-                        alert(data.error);
-                    }
-                    else if (data.length == 0) {
-                        /* display empty message */
-                        $('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
-
-                    }
-                    else {
-                        var template = $('#file-template');
-                        for (i in data) {
-                            var row = data[i];
-
-                            /* build new file (row) */
-                            var clone = template.clone();
-                            clone.attr('id', 'file-' + row.id);
-                            clone.find('span.file').text(row.description);
-                            clone.find('td:eq(1)').text(row.user);
-                            clone.find('td:eq(2)').text(row.relative);
-                            clone.addClass('category-' + relationID);
-                            clone.addClass(row.mimeClass);
-
-                            if (row.url)
-                                clone.addClass('link');
-
-                            if (row.hidden == 1)
-                                clone.addClass('hidden');
-
-                            clone.appendTo($('#file-list')).show();
-                        }
-                    }
+                    // draw callback
+                    self.options.drawFiles(self, relationID, data);
 
                     /* re-apply on off */
 //                    $('#file-list tbody tr').removeClass('dark');
