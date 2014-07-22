@@ -12,7 +12,7 @@ $j(function() {
     tree
         .resourceTree({
             data: {
-                cache: [],
+                cache: {TREEDATA},
                 ajaxParams: {
                     url: '/ajax/jstreeWebdav.php',
                 },
@@ -20,6 +20,7 @@ $j(function() {
             }
         })
         .resourceTreeThreePanelBridge({
+            selected:   {OPEN},
             threePanel: threePanel,
             moveFolder: function(self, folderNode, destinationNode) {
                 return {
