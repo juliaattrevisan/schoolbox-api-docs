@@ -15,7 +15,7 @@ if ($folderId === '#') {
         'children' => $folderHandler->hasChildren($folder['id']),
         'type'     => 'root',
         'li_attr'  => array(
-            'data-permission' => 'full',
+            'data-permission' => 'write',
         ),
     );
 }
@@ -29,7 +29,7 @@ else {
             'children' => $folderHandler->hasChildren($folder['id']),
             'type'     => 'folder',
             'li_attr'  => array(
-                'data-permission' => 'full',
+                'data-permission' => 'write',
             ),
         );
     }
