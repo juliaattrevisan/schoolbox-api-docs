@@ -56,7 +56,8 @@
                     check_callback: true,
                     themes: {
                         dots: true,
-                        icons: true
+                        icons: true,
+                        responsive: false
                     }
                 },
                 plugins : ['dnd', 'sort', 'types', 'wholerow'],
