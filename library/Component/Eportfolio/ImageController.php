@@ -34,6 +34,7 @@ class Component_Eportfolio_ImageController extends Component_Homepage_Controller
 
 		$this->parseConfig();
 
+
 		
 	}
 }

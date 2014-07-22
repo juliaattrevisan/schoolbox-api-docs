@@ -1,0 +1,1 @@
+CREATE TABLE `eportfolio_component_image`( `id` INT(11) NOT NULL AUTO_INCREMENT, `user_id` INT(11), `file_id` INT(11), PRIMARY KEY (`id`) );
