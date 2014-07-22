@@ -19,13 +19,21 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
 		$imageMapper = new \Component\Eportfolio\FileListMapper();
 		$allImages = $imageMapper->findAllImagesByUser($this->cat['uid']);
 
+		$page->setVar('IMAGE_TITLE', 'Image');
+
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
                 $page->setVar('COMPONENT_CONFIG_IMAGE', $currentImage->getFile()->getDescription());
-                $page->setVar(
-                    'COMPONENT_CONFIG_IMAGE_SELECTED',
-					$currentImage->getFile()->getDescription() == $configValue ? ' selected="selected"' : ''
-                );
+
+				if ($currentImage->getFile()->getDescription() == $configValue) {
+					$page->setVar(array(
+						'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
+						'IMAGE_TITLE' => $currentImage->getFile()->getDescription()
+					));
+				}
+				else {
+					$page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
+				}
 
                 $page->parse('config_images_block', 'config_images', true);
             }
