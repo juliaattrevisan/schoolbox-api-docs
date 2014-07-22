@@ -12,7 +12,6 @@ $this->setTab('myfiles');
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
-unset($_SESSION['portfolioID']);
 if (isset($this->arg[0])) {
     $_SESSION['portfolioID'] = $this->arg[0];
     SitePage::localRedir('/cms/portfolio/');
