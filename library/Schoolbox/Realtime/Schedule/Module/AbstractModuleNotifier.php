@@ -103,12 +103,14 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		if(!class_exists($mapperClass)) {
 			throw new ScheduleException("Could not find class '$mapperClass'");
 		}
-		$m = new $mapperClass();
-		if(!$m instanceof Mapper) {
+		if(method_exists($mapperClass, 'getInstance')) {
+			$mapper = $mapperClass::getInstance();
+		}
+		if(!$mapper instanceof Mapper) {
 			throw new ScheduleException("Class '$mapperClass' must be an instance of Mapper");
 		}
 
-		$this->mapper = $m;
+		$this->mapper = $mapper;
 	}
 
 
@@ -168,7 +170,10 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 * @return string the string representation of the object or null
 	 */
 	public function serialize() {
-		return get_class($this->conf);
+		return serialize(array(
+			get_class($this->conf),
+			$this->namespace
+		));
 	}
 
 
@@ -178,8 +183,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 * @return void
 	 */
 	public function unserialize($serialized) {
+		$data = unserialize($serialized);
+		$conf = $data[0];
+		$this->namespace = $data[1];
 		// the only thing we serialize is the name of the config class
-		$this->__construct(new $serialized());
+		$this->__construct(method_exists($conf, 'getInstance') ? $conf::getInstance() : new $conf());
 	}
 
 	/**
