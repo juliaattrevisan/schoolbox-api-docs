@@ -17,7 +17,7 @@ $definition = array(
 	'description'        => 'Completely configurable image display, select the image, control the size and link to another location',
 	'multiple'           => 'true',
 	'config'             => array(
-		'image' => array(
+		'eportfolioImage' => array(
 			'default_value' => 'Preview Image',
 			'label' => 'Image',
 		),
