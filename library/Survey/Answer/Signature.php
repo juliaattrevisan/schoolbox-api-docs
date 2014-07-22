@@ -42,6 +42,38 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     }
 
 	/**
+	 * Get the response for a particular question
+	 *
+	 * @param  $attempt_id
+	 * @param  $question_id
+	 *
+	 * @return array
+	 */
+	public function exportResponseToCSV($attempt_id, $question_id) {
+		$response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		/* In case someone saves with empty signature, which is
+		 * represented by an empty array []
+		 */
+		if (strlen($response['response']) > 2) {
+			$data['response'] = 'Signed';
+		}
+		else {
+			$data['response'] = 'Unsigned';
+		}
+
+		/* Append commentary
+		 */
+		$data['comment'] = $response['comment'];
+
+		/* Append awarded mark
+		 */
+		$data['mark'] = $response['mark'];
+
+		return $data;
+	}
+
+	/**
 	 * Resets answer tokens so a user can fill them in while actually taking
 	 * the test.
 	 *
