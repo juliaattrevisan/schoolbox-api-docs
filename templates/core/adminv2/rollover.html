@@ -21,86 +21,78 @@
     text-align: center;
   }
 </style>
-<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <script type="text/javascript">
 
-  $j(function() {
-    /* left tree navigation */
-    $j('#tree').tree({
-      type: 'table',
-      node: 'tr',
-      onOff: 'dark',
-      sequencing: false
-    });
+    $(function() {
+        var traversalWindow    = $('#traversal-window');
+        var confirmationWindow = $('#confirmation-window');
 
-    var traversalWindow = $j('#traversal-window');
-    var confirmationWindow = $j('#confirmation-window');
+        /* left tree navigation */
+        $('#tree')
+            .resourceTree({
+                data: {
+                    cache: {TREEDATA}
+                }
+            })
+            .on('select_node.jstree', function(event, jstree) {
+                traversalWindow.addClass('loading').html('Searching...');
+                confirmationWindow.html('');
 
-    $j('#tree').on('click', 'tr:not(.server)', function () {
-      /* select folder */
-      $j('#tree .selected').removeClass('selected');
-      $j(this).addClass('selected');
+                var content = $('<div/>');
+                var parent  = jstree.node.id;
 
-      traversalWindow.addClass('loading').html('Searching...');
-      confirmationWindow.html('');
+                $.post(
+                    '/adminv2/rolloverForm.php',
+                    { traverse: parent },
+                    null,
+                    'json'
+                )
+                    .always(function() {
+                        traversalWindow.removeClass('loading');
+                    })
+                    .done(function(data) {
+                        var len = Object.keys(data).length;
+                        if (len) {
+                            var list = $('<ul/>');
+                            $.each(data, function(k, v) {
+                                list.append(
+                                    $('<li/>').html(v.name + ' (' + v.code + ')')
+                                );
+                            });
+                            content
+                                .append($('<h3/>').html(len + ' classes found.'))
+                                .append(list);
 
-      var content = $j('<div/>');
+                            var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
+                            confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
+                            confirmation.append($('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
+                            confirmation.append(
+                                $('<input type="submit" value="Rollover" class="submit-btn-plain" />')
+                            );
+                            confirmationWindow.html(confirmation);
+                        }
+                        else {
+                            content.html('No classes found.');
+                        }
+                        traversalWindow.removeClass('error').html(content);
+                    })
+                    .fail(function(e) {
+                        var errString = '';
+                        try {
+                            errString = JSON.parse(e.responseText)
+                        }
+                        catch(e) {
+                            errString = 'Failed to retrieve class listing.';
+                        }
 
-      var parent = this.id.split('-')[1];
-
-      $j.post('/adminv2/rolloverForm.php', { traverse: parent }, null, 'json')
-          .always(function() {
-            traversalWindow
-                .removeClass('loading');
-          })
-          .done(function(data) {
-
-            var len = Object.keys(data).length;
-
-            if(len) {
-              var list = $j('<ul/>');
-              $j.each(data, function(k, v) {
-                list.append(
-                    $j('<li/>').html(v.name + ' (' + v.code + ')')
-                );
-              });
-              content
-                  .append($j('<h3/>').html(len + ' classes found.'))
-                  .append(list);
-
-              var confirmation = $j('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
-              confirmation.append($j('<input type="hidden" />').attr('name', 'rollover').val(parent));
-              confirmation.append($j('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
-              confirmation.append(
-                  $j('<input type="submit" value="Rollover" class="submit-btn-plain" />')
-              );
-
-              confirmationWindow.html(confirmation);
-
-            }
-            else {
-              content.html('No classes found.');
-            }
-
-            traversalWindow.removeClass('error').html(content);
-          })
-          .fail(function(e) {
-            var errString = '';
-            try {
-              errString = JSON.parse(e.responseText)
-            }
-            catch(e) {
-              errString = 'Failed to retrieve class listing.';
-            }
-
-            traversalWindow
-                .addClass('error')
-                .html(errString);
-
-          });
-    });
-
+                        traversalWindow
+                            .addClass('error')
+                            .html(errString);
+                    });
+            })
   });
 </script>
 <!-- END custom_head -->
