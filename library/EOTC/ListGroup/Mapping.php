@@ -89,7 +89,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingDetailsIndex() {
+	public function getPendingDetailsReviewIndex() {
 		return 4;
 	}
 

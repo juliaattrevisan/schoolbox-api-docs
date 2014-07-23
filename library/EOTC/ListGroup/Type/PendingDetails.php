@@ -41,10 +41,10 @@ class PendingDetails extends Base {
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
 			if ($this->getEvent()->getMetadata()->getRamsRequired()) {
-				return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
+				return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsReviewIndex());
 			}
 			else {
-				return new Response($this->getAlternateNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
+				return new Response($this->getAlternateNextStatusId(), $this->getMapping()->getPendingDetailsReviewIndex());
 			}
 		}
 
