@@ -2,30 +2,38 @@
     <!-- BEGIN awardList -->
     <div class="awardList clearfix">
         <h2>My Awards</h2>
-        <dl>
+        <ul>
             <!-- BEGIN award -->
-            <dt title="{AWARD_DESCRIPTION}">
+            <li title="{AWARD_DESCRIPTION}">
+                <h3>
                 <span class="description">{AWARD_ACHIEVEMENT}</span>
                 earned <time datetime="{AWARD_DATE}">{AWARD_DATE_LABEL}</time>
-            </dt>
-            <dd>{AWARD_COMMENT}</dd>
+                </h3>
+                <ul><li>{AWARD_COMMENT}</li></ul>
+            </li>
             <!-- END award -->
-        </dl>
+        </ul>
     </div>
     <!-- END awardList -->
 
     <!-- BEGIN detentionList -->
     <div class="detentionList clearfix">
         <h2>My Detentions</h2>
-        <dl>
+        <ul>
             <!-- BEGIN detention -->
-            <dt>
+            <li>
+                <h3>
                 <span class="description">{DETENTION_DESCRIPTION}</span>
                 on <time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time>
-            </dt>
-            <dd>{DETENTION_COMMENT}</dd>
+                </h3>
+                <ul>
+                    <!-- BEGIN detentionLine -->
+                    <li>{DETENTION_COMMENT_LINE}</li>
+                    <!-- END detentionLine -->
+                </ul>
+            </li>
             <!-- END detention -->
-        </dl>
+        </ul>
     </div>
     <!-- END detentionList -->
 
@@ -35,9 +43,16 @@
         <ul>
             <!-- BEGIN absence -->
             <li>
+                <h3>
                 <span class="description">{ABSENCE_DESCRIPTION}</span>
                 for <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
                 on <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                </h3>
+                <ul>
+                    <!-- BEGIN absenceLateArrival -->
+                    <li>(arrived <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>)</li>
+                    <!-- END absenceLateArrival -->
+                </ul>
             </li>
             <!-- END absence -->
         </ul>

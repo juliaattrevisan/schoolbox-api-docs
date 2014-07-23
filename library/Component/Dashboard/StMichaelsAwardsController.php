@@ -153,8 +153,10 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->setBlock('awardList',     'award',         'award_block');
         $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
         $this->setBlock('detentionList', 'detention',     'detention_block');
+        $this->setBlock('detention',     'detentionLine', 'detentionLine_block');
         $this->setBlock($templateHandle, 'absenceList',   'absenceList_block');
         $this->setBlock('absenceList',   'absence',       'absence_block');
+        $this->setBlock('absence',       'absenceLateArrival', 'absenceLateArrival_block');
         // <!-- END blockages -->
 
         // {VARIABLES}
@@ -200,11 +202,16 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'DETENTION_DATE'        => $detention['DetentionDate'],
                     'DETENTION_DATE_LABEL'  => $date->getLongDateOnly(),
                     'DETENTION_COMMENT'     => $detention['DetentionComment'],
+                    'detentionLine_block'   => '',
                 );
-                // Scrub. Assume comments may have line breaks
+                // Scrub.
+                // Assume comments may have line breaks, put each one in a UL
                 $params = array_map(array('Scrub', 'text'), $params);
-                $params['DETENTION_COMMENT'] = nl2br($params['DETENTION_COMMENT']);
                 $this->setVar($params);
+                foreach (preg_split('/[\\n\\r]+/', $params['DETENTION_COMMENT']) as $line) {
+                    $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
+                    $this->parse('detentionLine_block', 'detentionLine', true);
+                }
                 $this->parse('detention_block', 'detention', true);
             }
         }
@@ -229,9 +236,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'LATE_ARRIVAL_FLAG'       => $absence['LateArrivalFlag'],
                     'LATE_ARRIVAL_TIME'       => $absence['LateArrivalTime'],
                     'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
+                    'absenceLateArrival_block' => '',
                 );
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
+                if ($absence['LateArrivalFlag']) {
+                    $this->parse('absenceLateArrival_block', 'absenceLateArrival');
+                }
                 $this->parse('absence_block', 'absence', true);
             }
         }
