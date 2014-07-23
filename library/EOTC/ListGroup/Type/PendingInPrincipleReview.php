@@ -10,6 +10,8 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Response;
 
 class PendingInPrincipleReview extends Base {
 
@@ -18,7 +20,7 @@ class PendingInPrincipleReview extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_INPRINCIPLE;
+	protected $nextStatusId = EventStatusMapper::STATUS_INPRINCIPLE;
 
 	/**
 	 * Determine where to go next
@@ -30,7 +32,7 @@ class PendingInPrincipleReview extends Base {
 		/* All Draft (Initial Application) events get promoted to this
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isDraft()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingInPrincipleReviewIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingInPrincipleReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

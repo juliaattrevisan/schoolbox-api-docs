@@ -10,6 +10,9 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\Event;
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Mapping;
 
 abstract class Base {
 
@@ -34,14 +37,14 @@ abstract class Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_INPRINCIPLE;
+	protected $nextStatusId = EventStatusMapper::STATUS_INPRINCIPLE;
 
 	/**
 	 * @param \EOTC\Event $event
 	 */
-	public function __construct(\EOTC\Event $event) {
+	public function __construct(Event $event) {
 		$this->setEvent($event);
-		$this->setMapping(new \EOTC\ListGroup\Mapping());
+		$this->setMapping(new Mapping());
 
 		$this->setup();
 	}

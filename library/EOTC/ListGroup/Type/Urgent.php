@@ -10,6 +10,9 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\ListGroup\Chain;
+use \EOTC\ListGroup\Response;
+use \EOTC\ConfigMapper;
 
 class Urgent extends Base {
 
@@ -23,7 +26,7 @@ class Urgent extends Base {
 
 		/* Find out what the event's next status should be
 		 */
-		$chain = new \EOTC\ListGroup\Chain($this->getEvent());
+		$chain = new Chain($this->getEvent());
 		$location = $chain->getResult();
 
 		/* 3 days before start of event: throw it into the Urgent category
@@ -34,7 +37,7 @@ class Urgent extends Base {
 		$isRejected = $this->getEvent()->getMetadata()->getStatus()->isRejected();
 
 		if ($this->isWithinThreshold($difference) && !$isApproved && !$isRejected) {
-			return new \EOTC\ListGroup\Response($location->getNextStatus(), $this->getMapping()->getUrgentIndex());
+			return new Response($location->getNextStatus(), $this->getMapping()->getUrgentIndex());
 		}
 
 		/* Not urgent; proceed as normal
@@ -50,7 +53,7 @@ class Urgent extends Base {
 	 * @return bool
 	 */
 	private function isWithinThreshold($timeDifference) {
-		$configMapper = new \EOTC\ConfigMapper();
+		$configMapper = new ConfigMapper();
 		$config = $configMapper->findUrgentThreshold();
 
 		/* N days before the event starts causes an event to be

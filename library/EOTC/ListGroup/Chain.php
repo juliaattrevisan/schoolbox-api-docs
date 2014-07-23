@@ -16,6 +16,7 @@
 
 namespace EOTC\ListGroup;
 
+use \EOTC\Event;
 
 class Chain {
 
@@ -24,7 +25,7 @@ class Chain {
 	 *
 	 * @param \EOTC\Event $event
 	 */
-	public function __construct(\EOTC\Event $event) {
+	public function __construct(Event $event) {
 
 		/* Set up chain of responsibility
 		 * Checks occur in this order:

@@ -10,6 +10,7 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
 use \EOTC\ListGroup\Response;
 
 class ConfirmRAMs extends Base {
@@ -19,7 +20,7 @@ class ConfirmRAMs extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
+	protected $nextStatusId = EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
 
 	/**
 	 * Determine where to go next
