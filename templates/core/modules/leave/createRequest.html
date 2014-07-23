@@ -40,7 +40,7 @@ $j(function() {
 			ajax: {
 				url:      '/ajax/user.php',
 				type:     'GET',
-				data:     {groupID: "{STUDENT_GROUP_IDS}"},
+				data:     {groupID: "{STUDENT_GROUP_IDS}", boardersOnly: true},
 				dataType: 'json'
 			}
 		})
