@@ -26,17 +26,17 @@ if (count($this->arg) < 3) {
  * but only if this class exists
  */
 $externalClass = new External_Synergetic_Class();
-$class = $externalClass->getClass($this->arg[0]);
+$class = $externalClass->getClass($this->arg[0].'/'.$this->arg[1]);
 
 if (!$class) {
 	error(148);
 }
 
-if (!strlen($this->arg[1])) {
+if (!strlen($this->arg[2])) {
 	error(149);
 }
 
-if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[2]))) {
+if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3]))) {
 	error(150);
 }
 
@@ -44,7 +44,7 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[2]))) {
  * Check that you are allowed to edit something in a particular date range
  * (You cannot edit anything older than the previous week)
  */
-$attendanceDate = new Alaress_Date_Format($this->arg[1], 'y-m-d');
+$attendanceDate = new Alaress_Date_Format($this->arg[2], 'y-m-d');
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
@@ -65,7 +65,7 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode
 
 /* Attendance Period
  */
-$attendancePeriod = $this->arg[2];
+$attendancePeriod = $this->arg[3];
 
 /* Get Period Definition */
 $externalTimetable = new External_Synergetic_Timetable();
@@ -74,7 +74,7 @@ $definition = $externalTimetable->getTimetableDefinition($_SESSION['campus'], $e
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];
-
+$periodName = $definition['desc'][$periods[0]];
 /* Let's do it
  */
 if ($class) {
@@ -83,12 +83,13 @@ if ($class) {
     /* Cosmetic makeup for the masses
     */
     $this->setVar(array(
-            'CLASS_CODE' => $class['ClassCode'],
+            'CLASS_CODE' => $class['ClassCampus'].'/'.$class['ClassCode'],
             'ATTENDANCE_START' => $startTime,
             'ATTENDANCE_END' => $endTime,
             'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
-            'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
+            'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
             'ATTENDANCE_PERIOD' => $attendancePeriod,
+            'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
         ));
 
     /* Get the attendance record for this class

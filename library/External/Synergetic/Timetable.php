@@ -334,7 +334,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if($this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT 
-				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode, StaffID
+				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
 				FROM 
 				SynergyOne.dbo.StudentClasses StudentClasses,
 				SynergyOne.dbo.SubjectClasses SubjectClasses, 
@@ -362,7 +362,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		else
 		{
 			$query = "SELECT Timetable.Room, SubjectClasses.Description,
-				Timetable.PeriodNumber, Timetable.ClassCode
+				Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode
 				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
 				SynergyOne.dbo.Timetable Timetable
 				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
@@ -399,7 +399,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			{
 				$timetable[$x]['description'] = $desc['Description'];
 				$timetable[$x]['code'] = $desc['ClassCode'];
-				$timetable[$x]['room'] = $desc['Room'];
+                $timetable[$x]['campus'] = $desc['ClassCampus'];
+                $timetable[$x]['room'] = $desc['Room'];
                 $timetable[$x]['staffID'] = $desc['StaffID'];
 				$desc = $this->getDatabase()->getNextArray();
 				
@@ -453,7 +454,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		{
 			$query ="SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
-						Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
+						Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
 						vStaff.StaffSurname
 					FROM
 						SynergyOne.dbo.StudentClasses StudentClasses,
@@ -490,7 +491,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 			$query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
-						Timetable.ClassCode
+						Timetable.ClassCampus, Timetable.ClassCode
 					FROM
 						SynergyOne.dbo.SubjectClasses SubjectClasses,
 						SynergyOne.dbo.Timetable Timetable
@@ -537,6 +538,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['periodOn'] = 1;
 					$timetable[$x]['day'][$y]['description'] = $desc['Description'];
 					$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
+                    $timetable[$x]['day'][$y]['campus'] = $desc['ClassCampus'];
 					$timetable[$x]['day'][$y]['room'] = $desc['Room'];
                     $timetable[$x]['day'][$y]['staffID'] = $desc['StaffID'];
                     $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredName'];
