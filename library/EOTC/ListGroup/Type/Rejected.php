@@ -10,6 +10,8 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Response;
 
 class Rejected extends Base {
 
@@ -18,7 +20,7 @@ class Rejected extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_REJECTED;
+	protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
 
 	/**
 	 * Determine where to go next
@@ -30,7 +32,7 @@ class Rejected extends Base {
 		/* All Rejected events end up in their own feedback cycle
 		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->isRejected())) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getRejectedIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getRejectedIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

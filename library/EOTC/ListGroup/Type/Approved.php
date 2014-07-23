@@ -10,6 +10,8 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Response;
 
 class Approved extends Base {
 
@@ -18,7 +20,7 @@ class Approved extends Base {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
+	protected $nextStatusId = EventStatusMapper::STATUS_APPROVED;
 
 	/**
 	 * Determine where to go next
@@ -30,7 +32,7 @@ class Approved extends Base {
 		/* All Approved events end up in their own feedback cycle
 		 */
 		if (($this->getEvent()->getMetadata()->getStatus()->isApproved())) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getApprovedIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getApprovedIndex());
 		}
 
 		/* Otherwise get the next class to deal with it

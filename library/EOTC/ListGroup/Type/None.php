@@ -20,6 +20,7 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
 
 class None {
 
@@ -28,7 +29,7 @@ class None {
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_REJECTED;
+	protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
 
 	/**
 	 * Determine where to go next

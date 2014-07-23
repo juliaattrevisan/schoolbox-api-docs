@@ -62,7 +62,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingFinalApprovalReviewIndex() {
+	public function getAwaitingFinalApprovalReviewIndex() {
 		return 1;
 	}
 
@@ -71,7 +71,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingConfirmRAMsReviewIndex() {
+	public function getConfirmRAMsReviewIndex() {
 		return 2;
 	}
 
@@ -89,7 +89,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingDetailsIndex() {
+	public function getPendingDetailsReviewIndex() {
 		return 4;
 	}
 

@@ -16,11 +16,18 @@ use \EOTC\ListGroup\Response;
 class PendingDetails extends Base {
 
 	/**
-	 * Next status id
+	 * Next status id, based on RAMS requirement
 	 *
 	 * @var int
 	 */
 	protected $nextStatusId = EventStatusMapper::STATUS_DETAILSCOMPLETED;
+
+	/**
+	 * Alternate next status id, based on RAMS requirement
+	 *
+	 * @var int
+	 */
+	private $alternateNextStatusId = EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
 
 	/**
 	 * Determine where to go next
@@ -29,10 +36,16 @@ class PendingDetails extends Base {
 	 */
 	public function determine() {
 
-		/* All events which are In Principle
+		/* All events which are Approved In Principle go into
+		 * the Pending Details list group
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
-			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
+			if ($this->getEvent()->getMetadata()->getRamsRequired()) {
+				return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsReviewIndex());
+			}
+			else {
+				return new Response($this->getAlternateNextStatusId(), $this->getMapping()->getPendingDetailsReviewIndex());
+			}
 		}
 
 		/* Otherwise get the next class to deal with it
@@ -40,5 +53,23 @@ class PendingDetails extends Base {
 		if ($this->getNext()) {
 			return $this->getNext()->determine();
 		}
+	}
+
+	/**
+	 * Set alternate next status id
+	 *
+	 * @param int $alternateNextStatusId
+	 */
+	private function setAlternateNextStatusId($alternateNextStatusId) {
+		$this->alternateNextStatusId = $alternateNextStatusId;
+	}
+
+	/**
+	 * Get alternate next status id
+	 *
+	 * @return int
+	 */
+	private function getAlternateNextStatusId() {
+		return $this->alternateNextStatusId;
 	}
 }

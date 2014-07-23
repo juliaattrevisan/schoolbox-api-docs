@@ -16,6 +16,7 @@
 
 namespace EOTC\ListGroup;
 
+use \EOTC\Event;
 
 class Chain {
 
@@ -24,13 +25,13 @@ class Chain {
 	 *
 	 * @param \EOTC\Event $event
 	 */
-	public function __construct(\EOTC\Event $event) {
+	public function __construct(Event $event) {
 
 		/* Set up chain of responsibility
 		 * Checks occur in this order:
 		 *
 		 * Urgent,
-		 * Pending Final Approval
+		 * Awaiting Final Approval
 		 * Confirm RAMs,
 		 * Pending In Principle,
 		 * Pending Details,
@@ -38,8 +39,8 @@ class Chain {
 		 * Rejected,
 		 * None (throws whacky exception)
  		 */
-		$pendingFinalApproval = new Type\PendingFinalApproval($event);
-		$pendingConfirmRAMs = new Type\PendingConfirmRAMs($event);
+		$pendingFinalApproval = new Type\AwaitingFinalApproval($event);
+		$pendingConfirmRAMs = new Type\ConfirmRAMs($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingDetails = new Type\PendingDetails($event);
 		$approved = new Type\Approved($event);

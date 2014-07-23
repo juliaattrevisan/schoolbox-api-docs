@@ -1,6 +1,6 @@
 <?php
 /**
- * PendingFinalApproval
+ * AwaitingFinalApproval
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,15 +10,17 @@
 
 namespace EOTC\ListGroup\Type;
 
+use \EOTC\EventStatusMapper;
+use \EOTC\ListGroup\Response;
 
-class PendingFinalApproval extends Base {
+class ConfirmRAMs extends Base {
 
 	/**
 	 * Next status id
 	 *
 	 * @var int
 	 */
-	protected $nextStatusId = \EOTC\EventStatusMapper::STATUS_APPROVED;
+	protected $nextStatusId = EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL;
 
 	/**
 	 * Determine where to go next
@@ -27,10 +29,12 @@ class PendingFinalApproval extends Base {
 	 */
 	public function determine() {
 
-		/* If it's Awaiting Final Approval, next status is Approved
+		/* This comprises events which came from:
+		 *
+		 * RAMS Approved (RAMS Required)
 		 */
-		if ($this->getEvent()->getMetadata()->getStatus()->isAwaitingFinalApproval()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalApprovalReviewIndex());
+		if ($this->getEvent()->getMetadata()->getStatus()->isDetailsCompleted()) {
+			return new Response($this->getNextStatusId(), $this->getMapping()->getConfirmRAMsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
