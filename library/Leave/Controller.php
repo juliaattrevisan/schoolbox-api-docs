@@ -414,8 +414,8 @@ class Leave_Controller extends Controller {
 			$request = new Leave_Request();
 
 			/* Use the userId field when submitting on someone else's behalf,
-			   * otherwise just your own id
-			   */
+			 * otherwise just your own id
+			 */
 			$userId = $data['userId'];
 			$request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
 			$request->setAuthor($_SESSION['user']);
@@ -436,6 +436,7 @@ class Leave_Controller extends Controller {
 
 			$travelType  = $data['request']['travelType'];
 			$travelTypes = $this->getTravelTypes();
+
 			if ($travelType && array_key_exists($travelType, $travelTypes)) {
 				$request->setTravelType($travelTypes[$travelType]);
 			}
