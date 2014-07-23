@@ -44,6 +44,10 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 			$pixel = $this->getConfig('pixel');
 		}
 
+		/* Set up blocks and stuff
+		 */
+		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
+
 		/* Load a file, if one exists - otherwise clear phplibs
 		 */
 		try {
@@ -67,5 +71,14 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		$this->setVar(array(
 			'IMAGE_ALIGN' => $this->getConfig('align'),
 		));
+
+		/* Show edit buttons
+		 */
+		if ($this->permission >= WRITE_ACCESS) {
+			$this->parse('modify_button_block','modify_button');
+		}
+		else {
+			$this->setVar('modify_button_block','');
+		}
 	}
 }
