@@ -16,22 +16,22 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract {
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-		$imageMapper = new \Component\Eportfolio\FileListMapper();
-		$allImages = $imageMapper->findAllImagesByUser($this->cat['uid']);
+		$fileMapper = new \Schoolbox\MyFileMapper();
+		$allImages = $fileMapper->findAllImagesByUser($this->cat['uid']);
 
 		$page->setVar('IMAGE_TITLE', 'Image');
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
                 $page->setVar(array(
-					'COMPONENT_CONFIG_FILE_ID' => $currentImage->getFile()->getId(),
-					'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getFile()->getDescription()
+					'COMPONENT_CONFIG_FILE_ID' => $currentImage->getId(),
+					'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getDescription()
 				));
 
-				if ($currentImage->getFile()->getId() == $configValue) {
+				if ($currentImage->getId() == $configValue) {
 					$page->setVar(array(
 						'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
-						'IMAGE_TITLE' => $currentImage->getFile()->getDescription()
+						'IMAGE_TITLE' => $currentImage->getDescription()
 					));
 				}
 				else {

@@ -104,36 +104,6 @@ class FileListMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Find all published image files on any page owned by a particular user
-	 *
-	 * @param $userId
-	 * @return Collection
-	 */
-	public function findAllImagesByUser($userId) {
-		$query = "
-			SELECT
-				{$this->getColumnString('fl')},
-				{$this->getJoinColumnString('files', 'f')},
-				{$this->getJoinColumnString('pages', 'p')}
-			FROM `{$this->table}` fl
-			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
-			LEFT JOIN {$this->getJoinSql('pages', 'fl', 'p')}
-			WHERE f.mime_type LIKE '%image/%'
-			AND f.deleted IS FALSE
-			AND p.uid = :userId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(':userId', $userId, \PDO::PARAM_INT);
-		$statement->execute();
-
-		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
-			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
-			return $model;
-		});
-	}
-
-	/**
 	 * Retrieves a list of recently-published images
 	 *
 	 * @param $uid

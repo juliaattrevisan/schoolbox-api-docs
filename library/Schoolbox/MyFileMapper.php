@@ -77,4 +77,33 @@ class MyFileMapper extends Mapper {
 			'other_key' => 'mime',
 		));
 	}
+
+	/**
+	 * Find all image files owned by a particular user
+	 *
+	 * @param $userId
+	 * @return Collection
+	 */
+	public function findAllImagesByUser($userId) {
+		$query = "
+			SELECT
+				{$this->getColumnString('mf')}
+			FROM `{$this->table}` mf
+			WHERE mf.mime_type LIKE '%image/%'
+			AND mf.deleted IS FALSE
+			AND mf.owner = :userId
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(':userId', $userId, \PDO::PARAM_INT);
+		$statement->execute();
+
+		$collection = new \Schoolbox\Collection();
+
+		while ($row = $statement->fetch()) {
+			$collection->add($this->hydrate($row, 'mf'));
+		}
+
+		return $collection;
+	}
 }
