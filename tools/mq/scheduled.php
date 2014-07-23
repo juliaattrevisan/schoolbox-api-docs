@@ -6,6 +6,7 @@ use Aura\Di;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
 
@@ -51,7 +52,8 @@ $kernel->run(function($di, $loop, $debug, $opts) use (&$sched) {
 	 */
 
 	try {
-		$sched = new Scheduler($loop, new SchedulerDispatchStrategy(), $debug);
+		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper());
+		$sched = new Scheduler($loop, $strat, $debug);
 
 		// read STDIN in the stream loop so we can communicate with it in dev mode
 		$stdin = new \React\Stream\Stream(STDIN, $loop);

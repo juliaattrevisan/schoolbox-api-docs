@@ -13,6 +13,8 @@ namespace Schoolbox\Realtime\Schedule\Persistence;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Event;
 
 class QueueItemMapper extends Mapper {
 
@@ -76,6 +78,19 @@ class QueueItemMapper extends Mapper {
 			'property'   => 'data',
 			'type'       => self::TYPE_SERIALIZED,
 		));
+	}
+
+
+	/**
+	 * This mapper does not raise notifications.
+	 *
+	 * @param object $object
+	 * @param string $verb
+	 * @param null   $previous
+	 * @return bool
+	 */
+	protected function raiseNotification($object, $verb, $previous = null) {
+		return false;
 	}
 
 }
