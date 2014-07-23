@@ -29,8 +29,9 @@
 
 
 /var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log {
-	weekly
+	daily
+	copytruncate
 	missingok
-	rotate 4
+	rotate 14
 	compress
 }
