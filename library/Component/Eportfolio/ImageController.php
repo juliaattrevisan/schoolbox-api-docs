@@ -34,9 +34,6 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 
 		$this->parseConfig();
 
-		$fileMapper = new \Schoolbox\MyFileMapper();
-		$file = $fileMapper->findById($this->getConfig('eportfolioImage'));
-
 		if ($this->getConfig('pixel') > 600) {
 			$pixel = 600;
 		}
@@ -47,8 +44,28 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 			$pixel = $this->getConfig('pixel');
 		}
 
-		$this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
-		$this->setVar("PREVIEW_IMAGE_URL", "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel");
-		$this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($file->getDescription()));
+		/* Load a file, if one exists - otherwise clear phplibs
+		 */
+		try {
+			$fileMapper = new \Schoolbox\MyFileMapper();
+			$file = $fileMapper->findById($this->getConfig('eportfolioImage'));
+
+			$this->setVar(array(
+				'PREVIEW_IMAGE_URL' => "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel",
+				'PREVIEW_IMAGE_DESC' => Scrub::text($file->getDescription())
+			));
+		}
+		catch (\Exception $e) {
+			$this->setVar(array(
+				'PREVIEW_IMAGE_URL' => '',
+				'PREVIEW_IMAGE_DESC' => ''
+			));
+		}
+
+		/* Alignment
+		 */
+		$this->setVar(array(
+			'IMAGE_ALIGN' => $this->getConfig('align'),
+		));
 	}
 }
