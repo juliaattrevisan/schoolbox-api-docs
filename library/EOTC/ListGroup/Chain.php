@@ -30,7 +30,7 @@ class Chain {
 		 * Checks occur in this order:
 		 *
 		 * Urgent,
-		 * Pending Final Approval
+		 * Awaiting Final Approval
 		 * Confirm RAMs,
 		 * Pending In Principle,
 		 * Pending Details,
@@ -38,7 +38,7 @@ class Chain {
 		 * Rejected,
 		 * None (throws whacky exception)
  		 */
-		$pendingFinalApproval = new Type\PendingFinalApproval($event);
+		$pendingFinalApproval = new Type\AwaitingFinalApproval($event);
 		$pendingConfirmRAMs = new Type\PendingConfirmRAMs($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingDetails = new Type\PendingDetails($event);

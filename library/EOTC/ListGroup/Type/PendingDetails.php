@@ -36,14 +36,15 @@ class PendingDetails extends Base {
 	 */
 	public function determine() {
 
-		/* All events which are In Principle
+		/* All events which are Approved In Principle go into
+		 * the Pending Details list group
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isInPrinciple()) {
 			if ($this->getEvent()->getMetadata()->getRamsRequired()) {
 				return new Response($this->getNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
 			}
 			else {
-				return new Response($this->getAlternateNextStatusId(), $this->getMapping()->getPendingFinalApprovalReviewIndex());
+				return new Response($this->getAlternateNextStatusId(), $this->getMapping()->getPendingDetailsIndex());
 			}
 		}
 

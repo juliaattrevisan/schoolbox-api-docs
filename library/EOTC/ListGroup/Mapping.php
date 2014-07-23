@@ -62,7 +62,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingFinalApprovalReviewIndex() {
+	public function getAwaitingFinalApprovalReviewIndex() {
 		return 1;
 	}
 

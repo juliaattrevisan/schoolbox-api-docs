@@ -11,7 +11,7 @@
 namespace EOTC\ListGroup\Type;
 
 
-class PendingFinalApproval extends Base {
+class AwaitingFinalApproval extends Base {
 
 	/**
 	 * Next status id
@@ -30,7 +30,7 @@ class PendingFinalApproval extends Base {
 		/* If it's Awaiting Final Approval, next status is Approved
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isAwaitingFinalApproval()) {
-			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getPendingFinalApprovalReviewIndex());
+			return new \EOTC\ListGroup\Response($this->getNextStatusId(), $this->getMapping()->getAwaitingFinalApprovalReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
