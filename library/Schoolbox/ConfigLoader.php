@@ -71,4 +71,14 @@ class ConfigLoader implements IConfigLoader, ArrayAccess {
     public function offsetUnset($offset) {
         throw new OutOfRangeException('ConfigLoader object is read-only');
     }
+
+	/**
+	 * Drop any cached config
+	 *
+	 * @return void
+	 */
+	public function dropCache() {
+		// noop
+	}
+
 }

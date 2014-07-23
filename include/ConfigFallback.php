@@ -25,4 +25,14 @@ class ConfigFallback implements \Schoolbox\IConfigLoader {
 		return '';
 	}
 
+
+	/**
+	 * Drop any cached config
+	 *
+	 * @return void
+	 */
+	public function dropCache() {
+		// noop
+	}
+
 } 
