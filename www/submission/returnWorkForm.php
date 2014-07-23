@@ -74,4 +74,9 @@ if (isset($_POST['crocodoc'])) {
 
 /* Go to St. Albans when finished
  */
-$page->localRedir($redirect);
+if($redirect) {
+    $page->localRedir($redirect);
+}
+else {
+    echo "data stored";
+}

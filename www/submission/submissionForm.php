@@ -139,7 +139,7 @@ if (!$is_task) {
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
 
 // if Total Mark selected, mark value must be specified
-if ($markTypeID == SubmissionBox\MarkType::TYPE_RAW && empty($_POST['markvalue'])) {
+if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
     error(2);
 }
 // if Rubric selected, generate the objects needed
