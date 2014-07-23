@@ -71,7 +71,7 @@ class Mapping {
 	 *
 	 * @return int
 	 */
-	public function getPendingConfirmRAMsReviewIndex() {
+	public function getConfirmRAMsReviewIndex() {
 		return 2;
 	}
 

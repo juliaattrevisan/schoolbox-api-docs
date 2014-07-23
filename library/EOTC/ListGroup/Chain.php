@@ -39,7 +39,7 @@ class Chain {
 		 * None (throws whacky exception)
  		 */
 		$pendingFinalApproval = new Type\AwaitingFinalApproval($event);
-		$pendingConfirmRAMs = new Type\PendingConfirmRAMs($event);
+		$pendingConfirmRAMs = new Type\ConfirmRAMs($event);
 		$pendingInPrincipleReview = new Type\PendingInPrincipleReview($event);
 		$pendingDetails = new Type\PendingDetails($event);
 		$approved = new Type\Approved($event);

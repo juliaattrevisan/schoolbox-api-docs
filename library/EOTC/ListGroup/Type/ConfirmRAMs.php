@@ -12,7 +12,7 @@ namespace EOTC\ListGroup\Type;
 
 use \EOTC\ListGroup\Response;
 
-class PendingConfirmRAMs extends Base {
+class ConfirmRAMs extends Base {
 
 	/**
 	 * Next status id
@@ -33,7 +33,7 @@ class PendingConfirmRAMs extends Base {
 		 * RAMS Approved (RAMS Required)
 		 */
 		if ($this->getEvent()->getMetadata()->getStatus()->isDetailsCompleted()) {
-			return new Response($this->getNextStatusId(), $this->getMapping()->getPendingConfirmRAMsReviewIndex());
+			return new Response($this->getNextStatusId(), $this->getMapping()->getConfirmRAMsReviewIndex());
 		}
 
 		/* Otherwise get the next class to deal with it
