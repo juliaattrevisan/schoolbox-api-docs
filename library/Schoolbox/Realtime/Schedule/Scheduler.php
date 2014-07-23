@@ -144,8 +144,9 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @return void
      */
     public function onException($e) {
-	    $this->debug->v($e->getMessage(), "!");
-        $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
+	    $this->debug->v(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), "!");
+		// TODO improve the email handling of these messages to be less spammy
+		// $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
     }
 
 
