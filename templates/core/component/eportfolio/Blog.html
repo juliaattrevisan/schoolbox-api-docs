@@ -20,7 +20,9 @@
 			/* For viewing comment thread
 			 */
 			component.find('.viewCommentThread').hide();
-			component.find('.viewComments').unbind('click').click(function() {
+			component.find('.viewComments').unbind('click').click(function(event) {
+				event.preventDefault();
+
 				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/)
 				if (matches) {
 					var postId = matches[1]
