@@ -19,7 +19,7 @@ abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_No
 	public function setup() {
 		$subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getAltEmail());
+        $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getEmail());
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
@@ -45,7 +45,7 @@ abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_No
 	 * Send it
 	 */
 	public function send() {
-		$email = new \Email($this->getRequest()->getUser()->getAltEmail());
+		$email = new \Email($this->getRequest()->getUser()->getEmail());
 
 		if ($email->isValid()) {
 			$this->getEmail()->send();

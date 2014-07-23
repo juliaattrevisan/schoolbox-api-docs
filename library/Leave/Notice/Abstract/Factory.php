@@ -30,15 +30,15 @@ abstract class Leave_Notice_Abstract_Factory {
 	 */
 
 	/**
-	 * @param $request
+	 * @param Leave_Request $request
 	 */
 	protected function setRequest($request) {
 		$this->request = $request;
 	}
 
 	/**
-	 * @return null
-	 */
+	 * @return Leave_Request
+     */
 	protected function getRequest() {
 		return $this->request;
 	}
