@@ -87,6 +87,7 @@ class UserProfile extends SubjectListAbstract {
                     $category = $categoryHandler->getByCode($currentSubject['subject']['code']);
                     if(is_array($category)) {
                         $currentSubject['category']['id'] = $category['id'];
+                        $currentSubject['category']['code'] = array_shift(explode(',',$category['code']));
                         $finalSubjectList[] = $currentSubject;
                     }
                     else if(\Config::get('show_all_subjects') == 1) {
@@ -106,16 +107,9 @@ class UserProfile extends SubjectListAbstract {
                             'subject_teacher_block' => ''
                         ));
 
-                        if ($currentSubject['subject']['campusCode']) {
-                            $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
-                        }
-                        else {
-                            $code = $currentSubject['subject']['code'];
-                        }
-
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$code}": '#',
+                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']}": '#',
                         ));
 
                         /* Fetch teacher names */
