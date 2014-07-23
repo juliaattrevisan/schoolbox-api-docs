@@ -205,12 +205,17 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'detentionLine_block'   => '',
                 );
                 // Scrub.
-                // Assume comments may have line breaks, put each one in a UL
+                // Assume comments may have line breaks, put each one in a UL.
+                // They also seem to add * characters in front of each line to
+                // denote lists, remove that.
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
                 foreach (preg_split('/[\\n\\r]+/', $params['DETENTION_COMMENT']) as $line) {
-                    $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
-                    $this->parse('detentionLine_block', 'detentionLine', true);
+                    $line = trim(preg_replace('/^\\W+/', '', $line));
+                    if (strlen($line) > 0) {
+                        $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
+                        $this->parse('detentionLine_block', 'detentionLine', true);
+                    }
                 }
                 $this->parse('detention_block', 'detention', true);
             }
