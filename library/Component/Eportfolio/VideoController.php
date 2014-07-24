@@ -110,7 +110,6 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 			$j = 0;
 
 		    foreach($this->outputList as $video) {
-				new \Alaress_Probe($video);
 			    $this->setVar(array(
 					'VIDEO_LIST_ID' => $video->getFile()->getId(),
 					'VIDEO_LIST_TITLE' => Scrub::text($video->getFile()->getDescription()),
