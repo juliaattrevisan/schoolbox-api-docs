@@ -113,7 +113,7 @@ class UserProfile extends SubjectListAbstract {
                         ));
 
                         /* Fetch teacher names */
-                        $teacherList = $this->getExternalClassHandler()->getTeacherName($code);
+                        $teacherList = $this->getExternalClassHandler()->getTeacherName($currentSubject['category']['code']);
 
                         if (is_array($teacherList) && count($teacherList)) {
                             foreach ($teacherList as $teacherSynID) {
