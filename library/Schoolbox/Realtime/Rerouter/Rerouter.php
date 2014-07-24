@@ -238,6 +238,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	protected function rebind() {
+		$this->debug->v("Releasing workers");
+		$this->getDispatcher()->releaseWorkerPool(false);
 		$this->debug->v("Performing rebind");
 	}
 

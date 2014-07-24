@@ -197,6 +197,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	public function onHangup() {
 		$this->debug->v("HUP received: reloading config", ">");
 		$this->conf->dropCache();
+		$this->getDispatcher()->releaseWorkerPool(false);
 	}
 
 
