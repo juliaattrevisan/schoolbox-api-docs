@@ -233,6 +233,43 @@ class ResourceVideoMapper extends Mapper {
 
 	}
 
+	/**
+	 * Find a video in the MyFile table
+	 *
+	 * @param $id
+	 * @return null|object
+	 * @throws \Schoolbox\Mapper\Exception
+	 */
+	public function findByMyFileId($id) {
+		$fileMapper = new \Schoolbox\Resource\FileMapper;
+
+		$statement = $this->database->prepare("
+            SELECT
+            	{$fileMapper->getColumnString('mf')},
+            	{$this->getColumnString('vq')}
+			FROM `{$this->getTable()}` vq
+			JOIN {$this->getJoinSQL('file','vq','mf')}
+			WHERE mf.id = ?
+			AND vq.status = 'completed'
+			AND vq.type='myfile'
+		");
+
+		$statement->execute(array($id));
+
+		$video = null;
+
+		foreach($statement as $row) {
+			$video = $this->hydrate($row, 'vq');
+			$video->setFile($fileMapper->hydrate($row,'mf'));
+		}
+
+		if (!($video instanceof ResourceVideo)) {
+			throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+		}
+
+		return $video;
+	}
+
     public function findByStorageId($id) {
         $storageMapper = new \Schoolbox\StorageMapper;
 

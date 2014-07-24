@@ -36,7 +36,7 @@ if (isset($type) && isset($id) ) {
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
     }
 
-    if($size == 'poster') {
+    if ($size == 'poster') {
    		$filename = $video->getPosterLocation();
            $pixels = 400;
    	}

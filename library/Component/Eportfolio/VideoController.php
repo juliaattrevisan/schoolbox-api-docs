@@ -61,9 +61,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 		);
 
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
-//
-//        $this->source_category_id = $source;
-//
+
         if ($this->getConfig('size') > 1) {
             $this->outputList = $videoResourceMapper->findByMyFilesUser($source, $sortConfig, $this->getConfig('size')-1);
         }
@@ -73,18 +71,20 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         else {
             $this->outputList = new \Schoolbox\Collection();
         }
-//
-//        if ($this->getConfig('video')) {
-//            try {
-//                $this->defaultVideo = $videoResourceMapper->findByFileId($this->getConfig('video'));
-//            }
-//            catch (\Schoolbox\Mapper\Exception $e) {
-//                $this->defaultVideo = $this->outputList->first();
-//            }
-//        }
-//        else {
-//            $this->defaultVideo = $this->outputList->first();
-//        }
+
+        if ($this->getConfig('eportfolioVideo')) {
+            try {
+//                $this->defaultVideo = $videoResourceMapper->findByMyFileId($this->getConfig('eportfolioVideo'));
+				$this->defaultVideo = $videoResourceMapper->findByMyFileId(18);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                $this->defaultVideo = $this->outputList->first();
+            }
+
+        }
+        else {
+            $this->defaultVideo = $this->outputList->first();
+        }
 //
 //        $group_handler = new Group();
 //        if ($group_handler->getPermission($this->source_category_id) < READ_ACCESS) {
