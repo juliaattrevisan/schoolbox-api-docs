@@ -20,7 +20,9 @@
 			/* For viewing comment thread
 			 */
 			component.find('.viewCommentThread').hide();
-			component.find('.viewComments').unbind('click').click(function() {
+			component.find('.viewComments').unbind('click').click(function(event) {
+				event.preventDefault();
+
 				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/)
 				if (matches) {
 					var postId = matches[1]
@@ -123,7 +125,7 @@
 				</form>
 
 				<p class='interact'>
-					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show Comments</a>
+					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show Comments  ({COMMENT_TOTAL})</a>
 					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
 				</p>
 
@@ -146,7 +148,6 @@
 			</li>
 			<!-- END list_item -->
 		</ul>
-
 
 	<!-- BEGIN create_text -->
 	<p class="interact"><a href="/eportfolio/{ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Post Entry</a></p>

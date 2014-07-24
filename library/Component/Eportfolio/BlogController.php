@@ -112,7 +112,6 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				/* Add commentary
 				 */
 				if ($currentItem->getComments()->count()) {
-
 					foreach($currentItem->getComments() as $currentComment) {
 						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
 
@@ -137,12 +136,21 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 						$this->parse('comment_block', 'comment', true);
 					}
 
+					$this->setVar(array(
+						'COMMENT_TOTAL' => $currentItem->getComments()->count()
+					));
+
 					$this->parse('has_comments_block', 'has_comments');
 
 					/* Clear children after parsing out the parent
 					 */
 					$this->setVar('comment_block', '');
 					$this->setVar('has_delete_comment_form_block', '');
+				}
+				else {
+					$this->setVar(array(
+						'COMMENT_TOTAL' => $currentItem->getComments()->count()
+					));
 				}
 
 				/* If modifying this textbox
