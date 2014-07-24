@@ -22,6 +22,6 @@ class RouterFactory {
      * @return Router
      */
     public function newInstance() {
-        return new Router(new RouteCollection(new RouteFactory()), new \Aura\Router\Generator());
+        return new Router(new RouteCollection(new RouteFactory()));
     }
 }
