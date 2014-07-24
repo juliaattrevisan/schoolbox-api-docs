@@ -76,6 +76,12 @@ class MyFileMapper extends Mapper {
 			'this_key'  => 'mime_type',
 			'other_key' => 'mime',
 		));
+
+		$this->hasJoin('owner', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'owner',
+			'other_key' => 'id',
+		));
 	}
 
 	/**
