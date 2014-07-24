@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f87d9c8c7512807bd5aa2ae998424d00",
+    "hash": "b1a7fe80ba9e13a7b0c306898f85aea8",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -106,12 +106,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Router.git",
-                "reference": "6ca7112ece71ad81731bb3209c91dbd0324c4812"
+                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/6ca7112ece71ad81731bb3209c91dbd0324c4812",
-                "reference": "6ca7112ece71ad81731bb3209c91dbd0324c4812",
+                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
+                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
                 "shasum": ""
             },
             "require": {
@@ -152,7 +152,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2014-07-09 17:15:00"
+            "time": "2014-05-30 17:12:38"
         },
         {
             "name": "aura/session",
@@ -211,17 +211,84 @@
             "time": "2014-07-10 02:01:43"
         },
         {
+            "name": "aura/sqlquery",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/auraphp/Aura.SqlQuery.git",
+                "reference": "f5edf56d233ed8721a48970df880a79e5853d59e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/auraphp/Aura.SqlQuery/zipball/f5edf56d233ed8721a48970df880a79e5853d59e",
+                "reference": "f5edf56d233ed8721a48970df880a79e5853d59e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "aura/sql": "Provides an extension to the native PDO along with a profiler and connection locator. Use version 2.*."
+            },
+            "type": "library",
+            "extra": {
+                "aura": {
+                    "type": "library"
+                },
+                "branch-alias": {
+                    "dev-develop-2": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aura\\SqlQuery\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Aura.SqlQuery Contributors",
+                    "homepage": "https://github.com/auraphp/Aura.SqlQuery/contributors"
+                }
+            ],
+            "description": "Object-oriented query builders for MySQL, Postgres, SQLite, and SQLServer; can be used with any database connection library.",
+            "homepage": "https://github.com/auraphp/Aura.SqlQuery",
+            "keywords": [
+                "database",
+                "db",
+                "delete",
+                "dml",
+                "insert",
+                "mysql",
+                "pdo",
+                "pgsql",
+                "postgres",
+                "postgresql",
+                "query",
+                "select",
+                "sql",
+                "sql server",
+                "sqlite",
+                "sqlserver",
+                "update"
+            ],
+            "time": "2014-06-09 16:06:27"
+        },
+        {
             "name": "aura/web",
             "version": "dev-develop-2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Web.git",
-                "reference": "6347ac036423a1cdbc4980c615d6e47f002e391a"
+                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/6347ac036423a1cdbc4980c615d6e47f002e391a",
-                "reference": "6347ac036423a1cdbc4980c615d6e47f002e391a",
+                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/b4b8a94b824488187100967d7d73d312e56b9afd",
+                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd",
                 "shasum": ""
             },
             "require": {
@@ -261,7 +328,7 @@
                 "request",
                 "response"
             ],
-            "time": "2014-06-26 16:09:10"
+            "time": "2014-05-30 17:18:31"
         },
         {
             "name": "browscap/browscap-php",
