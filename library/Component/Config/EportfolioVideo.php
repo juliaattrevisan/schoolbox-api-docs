@@ -17,7 +17,7 @@ class Component_Config_EportfolioVideo extends Component_Config_Abstract {
 		);
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-		$allVideos = $videoMapper->findByMyFilesUser($allConfigs['src']['value'], $sortConfig);
+		$allVideos = $videoMapper->findByMyFilesUser($this->cat['uid'], $sortConfig);
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');
