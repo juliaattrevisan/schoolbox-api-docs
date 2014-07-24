@@ -39,12 +39,32 @@ class Video extends Base {
 		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_player', 'injectable_video_player_block');
 		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_status', 'injectable_video_status_block');
 
+        /* Upload file
+        */
+        $this->getPage()->setFile('injectableUpload', $this->getUploadFile());
+        $this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+
+        /* Control how Return Work is done
+         */
+        $this->getPage()->setVar(array(
+            'INJECTED_INTERFACE_CONTROL' => ''
+        ));
+
 		try {
 			$videoMapper = new \Schoolbox\Video\Factory\Video('submission', $this->getSubmission()->getId());
 			$video = $videoMapper->produce();
 		}
 		catch (\Exception $e) {
-		}
+            $this->getPage()->setVar(array(
+                'INJECTABLE_VIDEO_STATUS_SRC' => '/images/core/corrupt-image.png',
+                'INJECTABLE_VIDEO_STATUS_MSG' => 'Sorry we are unable to process this video, please download the video to watch.',
+                'injectable_video_player_block' => ''
+            ));
+
+            $this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
+
+            return;
+        }
 
 		/* If video is finished processing, show it in a player
 		 * Otherwise, if no video, then render a thumbnail instead
@@ -59,21 +79,13 @@ class Video extends Base {
 		else {
 			$this->getPage()->setVar(array(
 				'INJECTABLE_VIDEO_STATUS_SRC' => $video->getStatusImage(),
+                'INJECTABLE_VIDEO_STATUS_MSG' => 'We are currently processing this video, if you return later it will be ready to play.',
 				'injectable_video_player_block' => ''
 			));
 
 			$this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
 		}
 
-		/* Upload file
-		 */
-		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
-		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 
-		/* Control how Return Work is done
-		 */
-		$this->getPage()->setVar(array(
-			'INJECTED_INTERFACE_CONTROL' => ''
-		));
 	}
 }

@@ -22,13 +22,14 @@ $mapper = new QueueMapper();
 
 $database = Database::getInstance();
 
+/* Scans for videos in the SBFS */
 $stmt= $database->prepare("SELECT file.id FROM file
-					LEFT JOIN video_queue ON file.id = video_queue.file_id
+					LEFT JOIN video_queue ON file.id = video_queue.file_id AND video_queue.type = :type
 					WHERE ( file.mime_type LIKE 'video/%')
 					AND video_queue.video_queue_id IS NULL"
 );
 
-$stmt->execute();
+$stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_SBFS));
 
 while($pendingFile = $stmt->fetch() ){
 
@@ -43,3 +44,24 @@ while($pendingFile = $stmt->fetch() ){
 	unset($videoQ);
 }
 
+/* Scans for videos in student submissions */
+$stmt= $database->prepare("SELECT student_submission.id FROM student_submission
+					LEFT JOIN video_queue ON student_submission.id = video_queue.file_id AND video_queue.type = :type
+					WHERE ( student_submission.mime_type LIKE 'video/%')
+					AND video_queue.video_queue_id IS NULL"
+);
+
+$stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_SUBMISSION));
+
+while($pendingFile = $stmt->fetch() ){
+
+    $videoQ = new Queue();
+
+    $videoQ->setFileID($pendingFile['id']);
+    $videoQ->setStatus( QueueMapper::STATUS_PENDING );
+    $videoQ->setType( QueueMapper::FILE_TYPE_SUBMISSION);
+
+    $mapper->save($videoQ);
+
+    unset($videoQ);
+}
