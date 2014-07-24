@@ -558,17 +558,20 @@ class Mapper implements Serializable {
 		if (!isset($this->soft_delete_column)) {
 			return false;
 		}
+		$collection = $this->getModelAsCollection($object);
 		$success = $this->updateAll(
-			$object,
+			$collection,
 			$this->soft_delete_column,
 			$this->soft_delete_deleted_value,
 			'preSoftDelete',
 			'postSoftDelete'
 		);
 
-		if($success) {
+		if ($success) {
 			// raise delete notification
-			$this->raiseNotification($object, self::METHOD_DELETE);
+			foreach ($collection as $model) {
+				$this->raiseNotification($model, self::METHOD_DELETE);
+			}
 		}
 
 		return $success;
@@ -615,7 +618,9 @@ class Mapper implements Serializable {
 		}
 
 		// raise delete notification
-		$this->raiseNotification($object, self::METHOD_DELETE);
+		foreach ($collection as $model) {
+			$this->raiseNotification($model, self::METHOD_DELETE);
+		}
 
 		return true;
 	}
