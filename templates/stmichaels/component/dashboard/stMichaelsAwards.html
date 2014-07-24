@@ -1,15 +1,30 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box clearfix awardsComponent" id="component{COMPONENT_INSTANCE_ID}">
+    <style type="text/css">
+        .awardsComponent .comment {
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+        .awardsComponent .detentionList .comment {
+            list-style: disc inside;
+        }
+        .awardsComponent .awardList .award,
+        .awardsComponent .detentionList .detention,
+        .awardsComponent .absenceList .absence, {
+            padding-top: 0px;
+            padding-bottom: 14px;
+        }
+    </style>
     <!-- BEGIN awardList -->
     <div class="awardList clearfix">
         <h2>My Awards</h2>
         <ul>
             <!-- BEGIN award -->
-            <li title="{AWARD_DESCRIPTION}">
+            <li class="award" title="{AWARD_DESCRIPTION}">
                 <h3>
                 <span class="description">{AWARD_ACHIEVEMENT}</span>
                 earned <time datetime="{AWARD_DATE}">{AWARD_DATE_LABEL}</time>
                 </h3>
-                <ul><li>{AWARD_COMMENT}</li></ul>
+                <ul><li class="comment">{AWARD_COMMENT}</li></ul>
             </li>
             <!-- END award -->
         </ul>
@@ -21,14 +36,14 @@
         <h2>My Detentions</h2>
         <ul>
             <!-- BEGIN detention -->
-            <li>
+            <li class="detention">
                 <h3>
                 <span class="description">{DETENTION_DESCRIPTION}</span>
                 on <time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time>
                 </h3>
                 <ul>
                     <!-- BEGIN detentionLine -->
-                    <li>{DETENTION_COMMENT_LINE}</li>
+                    <li class="comment">{DETENTION_COMMENT_LINE}</li>
                     <!-- END detentionLine -->
                 </ul>
             </li>
@@ -42,7 +57,7 @@
         <h2>My Absences</h2>
         <ul>
             <!-- BEGIN absence -->
-            <li>
+            <li class="absence">
                 <h3>
                 <span class="description">{ABSENCE_DESCRIPTION}</span>
                 for <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
@@ -50,7 +65,7 @@
                 </h3>
                 <ul>
                     <!-- BEGIN absenceLateArrival -->
-                    <li>(arrived <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>)</li>
+                    <li class="comment">(arrived <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>)</li>
                     <!-- END absenceLateArrival -->
                 </ul>
             </li>
