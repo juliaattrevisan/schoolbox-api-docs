@@ -20,8 +20,11 @@ class External_DatabaseFactory {
      * @param string $databaseName The database type to use. Defaults to
      *                             whatever the configured external DB is, or
      *                             "offline" if it isn't enabled.
-     * @return External_ClassInterface|External_AttendanceInterface|External_PingInterface|External_TimetableInterface|External_UserInterface
-     *         Depends on value of $databaseType
+     *
+     * @return External_ClassInterface|External_AttendanceInterface|
+     *         External_PingInterface|External_TimetableInterface|
+     *         External_UserInterface|External_UserDetentionInterface
+     *         (depends on value of $databaseType)
      * @throws LogicException if even the offline class could be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
@@ -102,5 +105,14 @@ class External_DatabaseFactory {
         return $this->buildConnector('User', $databaseName);
     }
 
+    /**
+     * Builds a user detention connector.
+     *
+     * @param  string $databaseName
+     * @return External_UserDetentionInterface
+     */
+    public function buildUserDetentionConnector($databaseName = '') {
+        return $this->buildConnector('UserDetention', $databaseName);
+    }
 
 }

@@ -1,0 +1,76 @@
+<div class="box clearfix awardsComponent" id="component{COMPONENT_INSTANCE_ID}">
+    <style type="text/css">
+        .awardsComponent .comment {
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+        .awardsComponent .detentionList .comment {
+            list-style: disc inside;
+        }
+        .awardsComponent .awardList .award,
+        .awardsComponent .detentionList .detention,
+        .awardsComponent .absenceList .absence, {
+            padding-top: 0px;
+            padding-bottom: 14px;
+        }
+    </style>
+    <!-- BEGIN awardList -->
+    <div class="awardList clearfix">
+        <h2>My Awards</h2>
+        <ul>
+            <!-- BEGIN award -->
+            <li class="award" title="{AWARD_DESCRIPTION}">
+                <h3>
+                <span class="description">{AWARD_ACHIEVEMENT}</span>
+                earned <time datetime="{AWARD_DATE}">{AWARD_DATE_LABEL}</time>
+                </h3>
+                <ul><li class="comment">{AWARD_COMMENT}</li></ul>
+            </li>
+            <!-- END award -->
+        </ul>
+    </div>
+    <!-- END awardList -->
+
+    <!-- BEGIN detentionList -->
+    <div class="detentionList clearfix">
+        <h2>My Detentions</h2>
+        <ul>
+            <!-- BEGIN detention -->
+            <li class="detention">
+                <h3>
+                <span class="description">{DETENTION_DESCRIPTION}</span>
+                on <time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time>
+                </h3>
+                <ul>
+                    <!-- BEGIN detentionLine -->
+                    <li class="comment">{DETENTION_COMMENT_LINE}</li>
+                    <!-- END detentionLine -->
+                </ul>
+            </li>
+            <!-- END detention -->
+        </ul>
+    </div>
+    <!-- END detentionList -->
+
+    <!-- BEGIN absenceList -->
+    <div class="absenceList clearfix">
+        <h2>My Absences</h2>
+        <ul>
+            <!-- BEGIN absence -->
+            <li class="absence">
+                <h3>
+                <span class="description">{ABSENCE_DESCRIPTION}</span>
+                for <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
+                on <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                </h3>
+                <ul>
+                    <!-- BEGIN absenceLateArrival -->
+                    <li class="comment">(arrived <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>)</li>
+                    <!-- END absenceLateArrival -->
+                </ul>
+            </li>
+            <!-- END absence -->
+        </ul>
+    </div>
+    <!-- END absenceList -->
+</div>
