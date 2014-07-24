@@ -181,6 +181,10 @@ EOL;
 			// this is fine to be let through
 			return;
 		}
+		if(strpos($errStr, 'fread') === 0) {
+			// this is fine to be let through
+			return;
+		}
 		if(strpos($errStr, 'Undefined index') === 0) {
 			if($this->debug instanceof Debug) {
 				$this->debug->v("$errStr in $errFile:$errLine", '*');
