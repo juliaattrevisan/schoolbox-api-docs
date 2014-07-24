@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b1a7fe80ba9e13a7b0c306898f85aea8",
+    "hash": "493bced7715b6239af9b90eb5c3f12f8",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -50,16 +50,16 @@
         },
         {
             "name": "aura/di",
-            "version": "dev-develop-2",
+            "version": "2.0.0-beta1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Di.git",
-                "reference": "5246645db7b369861e952fb9c3b7701d36c646f3"
+                "reference": "8c7536d352dfbef11c5ed1308a4afdf194a595cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/5246645db7b369861e952fb9c3b7701d36c646f3",
-                "reference": "5246645db7b369861e952fb9c3b7701d36c646f3",
+                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/8c7536d352dfbef11c5ed1308a4afdf194a595cc",
+                "reference": "8c7536d352dfbef11c5ed1308a4afdf194a595cc",
                 "shasum": ""
             },
             "require": {
@@ -98,20 +98,20 @@
                 "di",
                 "di container"
             ],
-            "time": "2014-05-30 17:00:18"
+            "time": "2014-04-10 17:19:42"
         },
         {
             "name": "aura/router",
-            "version": "dev-develop-2",
+            "version": "2.0.0-beta1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Router.git",
-                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5"
+                "reference": "c20cb8579f0d06ee02b79350b43f76e36e5d7e1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
-                "reference": "7edb4f7edd0f9b3a66bba7753d0aec6e4a95b0b5",
+                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/c20cb8579f0d06ee02b79350b43f76e36e5d7e1a",
+                "reference": "c20cb8579f0d06ee02b79350b43f76e36e5d7e1a",
                 "shasum": ""
             },
             "require": {
@@ -120,20 +120,16 @@
             "type": "library",
             "extra": {
                 "aura": {
-                    "type": "library",
-                    "config": {
-                        "common": "Aura\\Router\\_Config\\Common"
-                    }
+                    "type": "library"
                 },
                 "branch-alias": {
                     "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Aura\\Router\\": "src/",
-                    "Aura\\Router\\_Config\\": "config/"
-                }
+                "files": [
+                    "autoload.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -152,7 +148,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2014-05-30 17:12:38"
+            "time": "2014-01-08 16:29:06"
         },
         {
             "name": "aura/session",
@@ -160,12 +156,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Session.git",
-                "reference": "51d935968f3be2953ff42138200a609d0e7e2f76"
+                "reference": "eabfa445582ff398b025eee2cb57c294d98c5375"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/51d935968f3be2953ff42138200a609d0e7e2f76",
-                "reference": "51d935968f3be2953ff42138200a609d0e7e2f76",
+                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/eabfa445582ff398b025eee2cb57c294d98c5375",
+                "reference": "eabfa445582ff398b025eee2cb57c294d98c5375",
                 "shasum": ""
             },
             "require": {
@@ -178,7 +174,10 @@
             "type": "library",
             "extra": {
                 "aura": {
-                    "type": "library"
+                    "type": "library",
+                    "config": {
+                        "common": "Aura\\Session\\_Config\\Common"
+                    }
                 },
                 "branch-alias": {
                     "dev-develop-2": "2.0.x-dev"
@@ -186,7 +185,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Aura\\Session\\": "src/"
+                    "Aura\\Session\\": "src/",
+                    "Aura\\Session\\_Config\\": "config/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -199,7 +199,7 @@
                     "homepage": "https://github.com/auraphp/Aura.Session/contributors"
                 }
             ],
-            "description": "Provides session management functionality, including session segments, read-once (flash) values, CSRF tools, and lazy session starting.",
+            "description": "Provides session management functionality, including lazy session starting, session segments, next-request-only (\"flash\") values, and CSRF tools.",
             "homepage": "http://auraphp.github.com/Aura.Session",
             "keywords": [
                 "csrf",
@@ -208,7 +208,7 @@
                 "session",
                 "sessions"
             ],
-            "time": "2014-07-10 02:01:43"
+            "time": "2014-07-22 22:28:12"
         },
         {
             "name": "aura/sqlquery",
@@ -279,16 +279,16 @@
         },
         {
             "name": "aura/web",
-            "version": "dev-develop-2",
+            "version": "2.0.0-beta1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Web.git",
-                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd"
+                "reference": "9682a9fad71d86447c71cce4dca9f1924fb92d2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/b4b8a94b824488187100967d7d73d312e56b9afd",
-                "reference": "b4b8a94b824488187100967d7d73d312e56b9afd",
+                "url": "https://api.github.com/repos/auraphp/Aura.Web/zipball/9682a9fad71d86447c71cce4dca9f1924fb92d2d",
+                "reference": "9682a9fad71d86447c71cce4dca9f1924fb92d2d",
                 "shasum": ""
             },
             "require": {
@@ -297,20 +297,16 @@
             "type": "library",
             "extra": {
                 "aura": {
-                    "type": "library",
-                    "config": {
-                        "common": "Aura\\Web\\_Config\\Common"
-                    }
+                    "type": "library"
                 },
                 "branch-alias": {
                     "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Aura\\Web\\": "src/",
-                    "Aura\\Web\\_Config\\": "config/"
-                }
+                "files": [
+                    "autoload.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -328,7 +324,7 @@
                 "request",
                 "response"
             ],
-            "time": "2014-05-30 17:18:31"
+            "time": "2014-01-09 08:11:40"
         },
         {
             "name": "browscap/browscap-php",
@@ -3641,9 +3637,9 @@
         "shareworks/xml-security": 20,
         "devristo/phpws": 20,
         "react/stomp": 20,
-        "aura/di": 20,
-        "aura/router": 20,
-        "aura/web": 20,
+        "aura/di": 10,
+        "aura/router": 10,
+        "aura/web": 10,
         "aura/session": 20,
         "0x46616c6b/etherpad-lite-client": 20
     },
