@@ -86,6 +86,46 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(
 			array(
+				'column' => 'host_mobile',
+				'property' => 'hostMobile',
+				'type' => self::TYPE_STRING
+			)
+		);
+
+		$this->hasMap(
+			array(
+				'column' => 'host_address',
+				'property' => 'hostAddress',
+				'type' => self::TYPE_STRING
+			)
+		);
+
+		$this->hasMap(
+			array(
+				'column' => 'collector_name',
+				'property' => 'collectorName',
+				'type' => self::TYPE_STRING
+			)
+		);
+
+		$this->hasMap(
+			array(
+				'column' => 'returner_name',
+				'property' => 'returnerName',
+				'type' => self::TYPE_STRING
+			)
+		);
+
+		$this->hasMap(
+			array(
+				'column' => 'reason',
+				'property' => 'reason',
+				'type' => self::TYPE_STRING
+			)
+		);
+
+		$this->hasMap(
+			array(
 				'column' => 'user_phone',
 				'property' => 'userPhone',
 				'type' => self::TYPE_STRING,

@@ -119,9 +119,17 @@ class Leave_Controller extends Controller {
         $emptyTravelType = new Leave_Request_TravelType();
         $emptyTravelType->setName('Not specified');
         $travelMethods = array(0 => $emptyTravelType);
-        foreach (Leave_Request_TravelTypeMapper::getInstance()->findAll() as $method) {
+
+		$allTravelTypes = Leave_Request_TravelTypeMapper::getInstance()->findAll(array(
+			'order' => array(
+				'sequence' => 'asc'
+			)
+		));
+
+        foreach ($allTravelTypes as $method) {
             $travelMethods[$method->getId()] = $method;
         }
+
         $this->setTravelTypes($travelMethods);
     }
 
@@ -406,8 +414,8 @@ class Leave_Controller extends Controller {
 			$request = new Leave_Request();
 
 			/* Use the userId field when submitting on someone else's behalf,
-			   * otherwise just your own id
-			   */
+			 * otherwise just your own id
+			 */
 			$userId = $data['userId'];
 			$request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
 			$request->setAuthor($_SESSION['user']);
@@ -415,14 +423,20 @@ class Leave_Controller extends Controller {
 			$request->setFinish($finish->getDatabase());
 			$request->setHostType($data['request']['hostType']);
 			$request->setHostName($data['request']['hostName']);
+			$request->setHostAddress($data['request']['hostAddress']);
 			$request->setHostPhone($data['request']['hostPhone']);
+			$request->setHostMobile($data['request']['hostMobile']);
 			$request->setUserPhone($data['request']['userPhone']);
+			$request->setReason($data['request']['reason']);
 			$request->setDescription($data['request']['description']);
+			$request->setCollectorName($data['request']['collectorName']);
+			$request->setReturnerName($data['request']['returnerName']);
 			$request->setStatus(Leave_Request::STATUS_PENDING);
 			$request->setCreated($created->getDatabase());
 
 			$travelType  = $data['request']['travelType'];
 			$travelTypes = $this->getTravelTypes();
+
 			if ($travelType && array_key_exists($travelType, $travelTypes)) {
 				$request->setTravelType($travelTypes[$travelType]);
 			}
@@ -503,38 +517,39 @@ class Leave_Controller extends Controller {
             $this->renderHostTypeDropdown($request);
             $this->renderConfirmedByCheckboxes($request);
 
-            $this->getPage()->setVar(
-                array(
-                    'REQUEST_ID' => $request->getId(),
-                    'REQUEST_STATUS' => $request->getStatus(true),
-					'AUTHOR_NAME' => $request->getAuthor()->formatName(),
-					'USER_NAME' => $user->formatName(),
-                    'USER_EXTERNAL_ID' => $user->getExternalId(),
-                    'USER_YEAR' => $user->getYear(),
-                    'USER_HOUSE' => $house->getHouse(),
-                    'USER_HOUSE_ID' => $house->getId(),
-                    'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
-                    'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
-                    'REQUEST_HOST_NAME' => $request->getHostName(),
-                    'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-                    'REQUEST_USER_PHONE' => $request->getUserPhone(),
-                    'REQUEST_DESCRIPTION' => $request->getDescription(),
-                    'REQUEST_NOTES' => $request->getNotes(),
-                )
-            );
+            $this->getPage()->setVar(array(
+				'REQUEST_ID' => $request->getId(),
+				'REQUEST_STATUS' => $request->getStatus(true),
+				'AUTHOR_NAME' => $request->getAuthor()->formatName(),
+				'USER_NAME' => $user->formatName(),
+				'USER_EXTERNAL_ID' => $user->getExternalId(),
+				'USER_YEAR' => $user->getYear(),
+				'USER_HOUSE' => $house->getHouse(),
+				'USER_HOUSE_ID' => $house->getId(),
+				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
+				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
+				'REQUEST_HOST_NAME' => $request->getHostName(),
+				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+				'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+				'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
+				'REQUEST_USER_PHONE' => $request->getUserPhone(),
+				'REQUEST_DESCRIPTION' => $request->getDescription(),
+				'REQUEST_NOTES' => $request->getNotes(),
+				'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+				'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+				'REQUEST_REASON' => $request->getReason(),
+			));
 
             /* What is the next/previous pending request?
-                */
+             */
             $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
                 $request->getId(), $user->getResidentialHouse()
             );
 
             if ($nextRequest) {
-                $this->getPage()->setVar(
-                    array(
-                        'NEXT_PENDING_ID' => $nextRequest->getId()
-                    )
-                );
+                $this->getPage()->setVar(array(
+					'NEXT_PENDING_ID' => $nextRequest->getId()
+				));
 
                 $this->getPage()->parse('next_pending_block', 'next_pending');
             } else {
@@ -570,8 +585,8 @@ class Leave_Controller extends Controller {
      */
     public function renderViewRequest($data) {
 
-        /*Allow the user and staff to view requests
-             */
+        /* Allow the user and staff to view requests
+         */
 
         /** @var Leave_Request $request */
         $request = $data['request'];
@@ -608,8 +623,13 @@ class Leave_Controller extends Controller {
                     'REQUEST_FINISH_TIME' => $request->getFinish()->getTimeOnly(),
                     'REQUEST_HOST_NAME' => $request->getHostName(),
                     'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+					'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+					'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
+					'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+					'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+					'REQUEST_REASON' => $request->getReason(),
                     'REQUEST_NOTES' => $request->getNotes(),
                     'REQUEST_TRAVEL_TYPE' => $travelType->getName(),
                 )
@@ -643,10 +663,15 @@ class Leave_Controller extends Controller {
 		$request->setHostType($data['request']['hostType']);
 		$request->setHostName($data['request']['hostName']);
 		$request->setHostPhone($data['request']['hostPhone']);
+		$request->setHostMobile($data['request']['hostMobile']);
+		$request->setHostAddress($data['request']['hostAddress']);
 		$request->setUserPhone($data['request']['userPhone']);
 		$request->setDescription($data['request']['description']);
 		$request->setNotes($data['request']['notes']);
 		$request->setConfirmedBy($data['request']['confirmedBy']);
+		$request->setReturnerName($data['request']['returnerName']);
+		$request->setCollectorName($data['request']['collectorName']);
+		$request->setReason($data['request']['reason']);
 
 		$travelType  = $data['request']['travelType'];
 		$travelTypes = $this->getTravelTypes();

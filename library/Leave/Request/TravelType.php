@@ -27,6 +27,13 @@ class Leave_Request_TravelType {
      */
     protected $name;
 
+	/**
+	 * For ordering the dropdown
+	 *
+	 * @var int
+	 */
+	protected $sequence = 0;
+
     /**
      * @param  int   $id
      * @return $this
@@ -58,4 +65,22 @@ class Leave_Request_TravelType {
     public function getName() {
         return $this->name;
     }
+
+	/**
+	 * Set sequence
+	 *
+	 * @param int $sequence
+	 */
+	public function setSequence($sequence) {
+		$this->sequence = $sequence;
+	}
+
+	/**
+	 * Get sequence
+	 *
+	 * @return int
+	 */
+	public function getSequence() {
+		return $this->sequence;
+	}
 }
