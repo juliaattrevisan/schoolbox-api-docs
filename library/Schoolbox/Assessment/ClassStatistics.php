@@ -116,11 +116,27 @@ class ClassStatistics {
 			'mark_visibility' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
-			$this->addWork($assess);
+            /* @var Assess $assess */
+            $due = $assess->getFinish();
+            $dueYear = $due->getUsingFormat('Y');
+            $dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
+            // if year (and possibly also semester) are given, filter dates
+            if($year) {
+                if($dueYear == $year) {
+                    if($semester) {
+                        if($dueSemester == $semester) {
+                            $this->addWork($assess);
+                        }
+                    }
+                    else {
+                        $this->addWork($assess);
+                    }
+                }
+            }
+            else {
+                $this->addWork($assess);
+            }
 		}
-
-//		print_r($this->workMap);
-
 	}
 
 	/**

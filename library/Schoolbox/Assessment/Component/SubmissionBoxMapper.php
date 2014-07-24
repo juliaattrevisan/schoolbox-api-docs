@@ -457,23 +457,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
 				AND sb.deleted IS FALSE
 				AND sb.task_id IS NULL
-				AND (
-					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
-					OR
-					(YEAR(sr.returned)  = :year AND MONTH(sr.returned)  BETWEEN :month_start AND :month_end)
-				)
+				AND (YEAR(sb.`date`) = :year AND MONTH(sb.`date`) BETWEEN :month_start AND :month_end)
 			)
 			GROUP BY category.id
 			ORDER BY category.name";
 
 		$months    = $this->getSemesterMonths($semester);
 		$statement = $this->database->prepare($query);
+
 		$statement->execute(array(
-			'user_id'     => $user_id,
-			'year'        => $year,
-			'month_start' => $months['start'],
-			'month_end'   => $months['end'],
-		));
+            'user_id'     => $user_id,
+            'year'        => $year,
+            'month_start' => $months['start'],
+            'month_end'   => $months['end'],
+        ));
 		return $statement->fetchAll();
 	}
 
@@ -529,6 +526,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
+
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
 		return $statement->fetchAll();
