@@ -270,6 +270,7 @@ class Pool extends EventEmitter {
 
 		$this->debug->v("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
+		$this->cleanup();
 	}
 
 
@@ -472,8 +473,8 @@ class Pool extends EventEmitter {
 	/**
 	 * Terminate all workers
 	 */
-	public function releaseWorkers() {
-		$this->workers->terminateAll();
+	public function releaseWorkers($hard = true) {
+		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
 	}
 
 }
