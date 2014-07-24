@@ -17,7 +17,7 @@ $definition = array(
 	'description'        => 'Upload and play videos directly in your ePortfolio',
 	'multiple'           => 'true',
 	'config'             => array(
-		'componentName' => array(
+		'componentname' => array(
 			'default_value' => 'Video',
 			'label' => 'Heading',
 		),
@@ -25,7 +25,7 @@ $definition = array(
 			'default_value' => '10',
 			'label' => 'Limit',
 		),
-		'video' => array(
+		'eportfolioVideo' => array(
 			'default_value' => '',
 			'label' => 'Video',
 		),
@@ -33,7 +33,7 @@ $definition = array(
 			'default_value' => 'date',
 			'label' => 'Sort By',
 		),
-		'sortDir' => array(
+		'sortdir' => array(
 			'default_value' => 'desc',
 			'label' => 'Direction',
 		),
