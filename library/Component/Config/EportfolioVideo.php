@@ -17,10 +17,7 @@ class Component_Config_EportfolioVideo extends Component_Config_Abstract {
 		);
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-
-		/* TODO: Remove hardcoding for testing
-		 */
-		$allVideos = $videoMapper->findByEportfolioPage(8, $sortConfig);
+		$allVideos = $videoMapper->findByEportfolioPage($page->arg[1], $sortConfig);
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');
