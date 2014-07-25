@@ -158,6 +158,10 @@ class Queue extends ResourceVideo {
 			$sourceStore = $this->config->get('submission_dir');
 			return $sourceStore . '/' . $this->fileID . '.dat';
 		}
+		else if($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
+			$sourceStore = $this->config->get('myfile_dir');
+			return $sourceStore . '/' . $this->fileID . '.dat';
+		}
         else {
             throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
         }

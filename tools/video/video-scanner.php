@@ -17,28 +17,24 @@ use \Schoolbox\Video\Queue;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-
 $mapper = new QueueMapper();
-
 $database = Database::getInstance();
 
 /* Scans for videos in the SBFS */
-$stmt= $database->prepare("SELECT file.id FROM file
-					LEFT JOIN video_queue ON file.id = video_queue.file_id AND video_queue.type = :type
-					WHERE ( file.mime_type LIKE 'video/%')
-					AND video_queue.video_queue_id IS NULL"
-);
+$stmt= $database->prepare("
+	SELECT file.id FROM file
+	LEFT JOIN video_queue ON file.id = video_queue.file_id AND video_queue.type = :type
+	WHERE (file.mime_type LIKE 'video/%')
+	AND video_queue.video_queue_id IS NULL
+");
 
 $stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_SBFS));
 
-while($pendingFile = $stmt->fetch() ){
-
+while ($pendingFile = $stmt->fetch()) {
 	$videoQ = new Queue();
-
 	$videoQ->setFileID($pendingFile['id']);
-	$videoQ->setStatus( QueueMapper::STATUS_PENDING );
-	$videoQ->setType( QueueMapper::FILE_TYPE_SBFS);
-
+	$videoQ->setStatus(QueueMapper::STATUS_PENDING);
+	$videoQ->setType(QueueMapper::FILE_TYPE_SBFS);
 	$mapper->save($videoQ);
 
 	unset($videoQ);
@@ -54,14 +50,33 @@ $stmt= $database->prepare("SELECT student_submission.id FROM student_submission
 $stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_SUBMISSION));
 
 while($pendingFile = $stmt->fetch() ){
+	$videoQ = new Queue();
+	$videoQ->setFileID($pendingFile['id']);
+	$videoQ->setStatus( QueueMapper::STATUS_PENDING );
+	$videoQ->setType( QueueMapper::FILE_TYPE_SUBMISSION);
+	$mapper->save($videoQ);
 
-    $videoQ = new Queue();
-
-    $videoQ->setFileID($pendingFile['id']);
-    $videoQ->setStatus( QueueMapper::STATUS_PENDING );
-    $videoQ->setType( QueueMapper::FILE_TYPE_SUBMISSION);
-
-    $mapper->save($videoQ);
-
-    unset($videoQ);
+	unset($videoQ);
 }
+
+/* Videos uploaded into MyFiles
+ */
+$stmt= $database->prepare("
+	SELECT myFile.id FROM myFile
+	LEFT JOIN video_queue ON myFile.id = video_queue.file_id AND video_queue.type = :type
+	WHERE (myFile.mime_type LIKE 'video/%')
+	AND video_queue.video_queue_id IS NULL
+");
+
+$stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_MYFILE));
+
+while ($pendingFile = $stmt->fetch()) {
+	$videoQ = new Queue();
+	$videoQ->setFileID($pendingFile['id']);
+	$videoQ->setStatus(QueueMapper::STATUS_PENDING);
+	$videoQ->setType(QueueMapper::FILE_TYPE_MYFILE);
+	$mapper->save($videoQ);
+
+	unset($videoQ);
+}
+
