@@ -122,15 +122,15 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$icon = sprintf("/portrait.php?userId=%s&size=square32", $user->getExternalId());
 
-		$text = ":user posted the news :title in :catname";
-		$href = '/homepage/' . $news->getId();
-
 		$articleId = $news->getId();
 		$heading = $news->getHeading();
 
 		$cat = $this->categoryMapper->findById($news->getCategory()->getId());
 		$catId = $cat->getId();
 		$catName = $cat->getName();
+
+		$text = ":user posted the news :title in :catname";
+		$href = "/homepage/$catId";
 
 		$authorName = $user->formatName();
 		$authorId = $user->getId();
