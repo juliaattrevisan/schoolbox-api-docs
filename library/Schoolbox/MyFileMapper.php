@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox;
+use Schoolbox;
 use Schoolbox\Mapper;
 
 class MyFileMapper extends Mapper {
@@ -62,7 +63,8 @@ class MyFileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'mime_type',
 			'property'   => 'mime',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'allowedFileType',
 		));
 
 		$this->hasMap(array(
@@ -82,6 +84,8 @@ class MyFileMapper extends Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+
+		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
@@ -111,5 +115,46 @@ class MyFileMapper extends Mapper {
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Save the file to the correct location
+	 * Setup video processing
+	 *
+	 * @param \Schoolbox\MyFile $file
+	 * @param object $previous
+	 * @throws File\Exception
+	 */
+	protected function postSave(Schoolbox\MyFile $file, $previous = null) {
+
+		// copy file into location
+		if( is_readable($file->getTempFileLocation())) {
+			$filename = $this->getSaveLocation() . $file->getId() . '.dat';
+			@unlink($filename);
+
+			if (!copy($file->getTempFileLocation(), $filename)) {
+				throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
+			}
+			// If video add to video processing queue */
+			if ($file->getMime()->isVideo()) {
+				$mapper = new Schoolbox\Video\QueueMapper();
+				$videoQ = new Schoolbox\Video\Queue();
+				$videoQ->setFileID($file->getId());
+				$videoQ->setStatus(Schoolbox\Video\QueueMapper::STATUS_PENDING);
+				$videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS);
+
+				$mapper->save($videoQ);
+			}
+		}
+
+		// TODO: log action MD?
+	}
+
+	/**
+	 * Returns the location where files should be saved
+	 * @return string
+	 */
+	private function getSaveLocation() {
+		return \Config::get('myfile_dir') . '/';
 	}
 }

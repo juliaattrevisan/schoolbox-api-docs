@@ -1,6 +1,9 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use \Schoolbox\MyFileMapper;
+use \Schoolbox\MyFile;
+
 $page = new SitePage();
 
 $userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
@@ -11,7 +14,7 @@ if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
 	error(47);
 }
 
-$fileHandler = new MyFile($userId);
+//$fileHandler = new MyFile($userId);
 
 // Upload a new file
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
@@ -23,20 +26,36 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
     if (is_numeric($_POST['fileID'])) {
         // check user owns file
-        $current = $fileHandler->getByID($_POST['fileID']);
+		$currentFile = MyFileMapper::getInstance()->findById($_POST['fileID']);
 
-        if ($current['owner'] != $userId) {
+        if ($currentFile->getOwner() != $userId) {
             $page->error(47);
         }
 
-        $fileID = $file['id'] = $_POST['fileID'];
-        $fileHandler->update($file);
+		$currentFile->setParent($_POST['parent']);
+		$currentFile->setOwner($_SESSION['user']->getId());
+		$currentFile->setDescription($_POST['description']);
+
+		MyFileMapper::getInstance()->save($currentFile);
     }
     else {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
-        $fileID = $fileHandler->create($file, $_FILES['file']);
+		$mimetype = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
+
+		$currentFile = new MyFile();
+		$currentFile->setParent($_POST['parent']);
+		$currentFile->setOwner($_SESSION['user']->getId());
+		$currentFile->setDescription($_POST['description']);
+		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
+		$currentFile->setFilename($_FILES['file']['name']);
+		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
+		$currentFile->setMime($mimetype);
+		$currentFile->setCreatedAt(new Datetime('now'));
+		$currentFile->setdeletedAt(0);
+
+		MyFileMapper::getInstance()->save($currentFile);
     }
 
 	/* If any checkboxes were selected, publish to eportfolio My Files components on various pages
