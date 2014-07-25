@@ -62,10 +62,10 @@ class ResourceVideoMapper extends Mapper {
 			'this_key'  => 'file_id',
 			'other_key' => 'id',
 		));
-		$this->hasJoin('myfile', array(
-			'mapper'    => '\\Schoolbox\\MyFileMapper',
+		$this->hasJoin('eportfolio_filelist', array(
+			'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
 			'this_key'  => 'file_id',
-			'other_key' => 'id',
+			'other_key' => 'file_id',
 		));
 	}
 
@@ -139,24 +139,26 @@ class ResourceVideoMapper extends Mapper {
 	/**
 	 * Find videos for a particular MyFiles user
 	 *
-	 * @param $userId
+	 * @param $pageId
 	 * @param $options
 	 * @param bool $limit
 	 * @return Collection
 	 */
-	public function findByMyFilesUser($userId, $options, $limit = false) {
+	public function findByEportfolioPage($pageId, $options, $limit = false) {
 		$videoList = new Collection(array());
 		$myFileMapper = new \Schoolbox\MyFileMapper;
+		$fileListMapper = new \Component\Eportfolio\FileListMapper();
 
 		$query = "
             SELECT
-            	{$this->getJoinMapper('myfile')->getColumnString('mf')},
             	{$this->getColumnString('vq')},
+            	{$fileListMapper->getJoinMapper('myfile')->getColumnString('mf')},
             	{$myFileMapper->getJoinMapper('owner')->getColumnString('o')}
 			FROM `{$this->getTable()}` vq
-			LEFT JOIN {$this->getJoinSQL('myfile', 'vq', 'mf')}
+			LEFT JOIN {$this->getJoinSQL('eportfolio_filelist', 'vq', 'fl')}
+			LEFT JOIN {$fileListMapper->getJoinSQL('myfile', 'vq', 'mf')}
 			LEFT JOIN {$myFileMapper->getJoinSQL('owner', 'mf', 'o')}
-			WHERE owner = :userId
+			WHERE fl.page_id = :pageId
 			AND vq.status != 'failed'
 			AND mf.deleted = 0
 		";
@@ -184,7 +186,7 @@ class ResourceVideoMapper extends Mapper {
 		}
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(':userId', $userId);
+		$statement->bindParam(':pageId', $pageId);
 
 		if ($limit != false) {
 			$statement->bindParam(':lim', $limit, \PDO::PARAM_INT);

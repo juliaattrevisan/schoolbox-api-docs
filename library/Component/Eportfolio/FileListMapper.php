@@ -71,6 +71,12 @@ class FileListMapper extends Schoolbox\Mapper {
 			'this_key'  => 'page_id',
 			'other_key' => 'page_id',
 		));
+
+		$this->hasJoin('myfile', array(
+			'mapper'    => '\\Schoolbox\\MyFileMapper',
+			'this_key'  => 'file_id',
+			'other_key' => 'id',
+		));
 	}
 
 	/**

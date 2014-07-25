@@ -49,9 +49,11 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $this->parseConfig();
         $source = $this->getConfig('src');
 
-        if (empty($source)) {
-            $source = $this->getContext('uid');
-        }
+//        if (empty($source)) {
+//            $source = $this->getContext('uid');
+//        }
+
+		$source=5;
 
 		/* Sort order
 		 */
@@ -63,10 +65,10 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
         if ($this->getConfig('size') > 1) {
-            $this->outputList = $videoResourceMapper->findByMyFilesUser($source, $sortConfig, $this->getConfig('size')-1);
+            $this->outputList = $videoResourceMapper->findByEportfolioPage($source, $sortConfig, $this->getConfig('size')-1);
         }
         else if ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByMyFilesUser($source, $sortConfig);
+            $this->outputList = $videoResourceMapper->findByEportfolioPage($source, $sortConfig);
         }
         else {
             $this->outputList = new \Schoolbox\Collection();
