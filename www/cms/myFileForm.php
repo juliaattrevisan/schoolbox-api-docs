@@ -42,6 +42,8 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
+		/* TODO: this should be made consistent with File -_-
+		 */
 		$mimetype = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
 
 		$currentFile = new MyFile();
@@ -51,7 +53,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
 		$currentFile->setFilename($_FILES['file']['name']);
 		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-		$currentFile->setMime($mimetype);
+		$currentFile->setMime($mimetype->getMime());
 		$currentFile->setCreatedAt(new Datetime('now'));
 		$currentFile->setdeletedAt(0);
 

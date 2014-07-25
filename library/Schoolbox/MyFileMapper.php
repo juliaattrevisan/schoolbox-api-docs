@@ -63,8 +63,7 @@ class MyFileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'mime_type',
 			'property'   => 'mime',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'allowedFileType',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
@@ -132,16 +131,18 @@ class MyFileMapper extends Mapper {
 			$filename = $this->getSaveLocation() . $file->getId() . '.dat';
 			@unlink($filename);
 
+			$mimetype = Schoolbox\File\MimetypeMapper::getInstance()->findOneByColumn('mime', $file->getMime());
+
 			if (!copy($file->getTempFileLocation(), $filename)) {
 				throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
 			}
 			// If video add to video processing queue */
-			if ($file->getMime()->isVideo()) {
+			if ($mimetype->isVideo()) {
 				$mapper = new Schoolbox\Video\QueueMapper();
 				$videoQ = new Schoolbox\Video\Queue();
 				$videoQ->setFileID($file->getId());
 				$videoQ->setStatus(Schoolbox\Video\QueueMapper::STATUS_PENDING);
-				$videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS);
+				$videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_MYFILE);
 
 				$mapper->save($videoQ);
 			}
