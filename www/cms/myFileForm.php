@@ -72,7 +72,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 					if ($authenticator->canModify()) {
 						$publishedFile = new \Component\Eportfolio\FileList();
 						$publishedFile->setPageId($currentPageId);
-						$publishedFile->setFileId($fileID);
+						$publishedFile->setFileId($currentFile->getId());
 						$publishedFile->setCreatedAt($now);
 						$publishedFile->setUpdatedAt($now);
 
