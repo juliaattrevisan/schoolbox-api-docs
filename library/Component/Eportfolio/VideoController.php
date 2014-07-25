@@ -47,13 +47,8 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         }
 
         $this->parseConfig();
-        $source = $this->getConfig('src');
 
-//        if (empty($source)) {
-//            $source = $this->getContext('uid');
-//        }
-
-		$source=5;
+		$pageId = $this->getInstance()->getIdentifier();
 
 		/* Sort order
 		 */
@@ -65,10 +60,10 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
         if ($this->getConfig('size') > 1) {
-            $this->outputList = $videoResourceMapper->findByEportfolioPage($source, $sortConfig, $this->getConfig('size')-1);
+            $this->outputList = $videoResourceMapper->findByEportfolioPage($pageId, $sortConfig, $this->getConfig('size')-1);
         }
         else if ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByEportfolioPage($source, $sortConfig);
+            $this->outputList = $videoResourceMapper->findByEportfolioPage($pageId, $sortConfig);
         }
         else {
             $this->outputList = new \Schoolbox\Collection();
@@ -76,27 +71,19 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
         if ($this->getConfig('eportfolioVideo')) {
             try {
-//                $this->defaultVideo = $videoResourceMapper->findByMyFileId($this->getConfig('eportfolioVideo'));
-				$this->defaultVideo = $videoResourceMapper->findByMyFileId(18);
+                $this->defaultVideo = $videoResourceMapper->findByMyFileId($this->getConfig('eportfolioVideo'));
             }
             catch (\Schoolbox\Mapper\Exception $e) {
                 $this->defaultVideo = $this->outputList->first();
             }
-
         }
         else {
             $this->defaultVideo = $this->outputList->first();
         }
-//
-//        $group_handler = new Group();
-//        if ($group_handler->getPermission($this->source_category_id) < READ_ACCESS) {
-//            return false;
-//        }
-//
-//        // Set up component name
+
+        // Set up component name
         $this->setVar(array(
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Video',
-//	        'FILE_CAT_ID'   => $this->source_category_id,
         ));
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
