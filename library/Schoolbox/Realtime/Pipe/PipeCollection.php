@@ -50,9 +50,12 @@ class PipeCollection {
 		$socketKey = $pipe->getSocketKey();
 		$sessionId = $pipe->getSession();
 
-		$this->pipesBySocketKey[$socketKey] = $pipe;
+		try {
+			if(!$sessionId) {
+				throw new SessionException("No session, no user.");
+			}
 
-		if($sessionId) {
+			$this->pipesBySocketKey[$socketKey] = $pipe;
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
 			$this->v->v("LINK       '$socketKey' -> SESSION '$sessionId'");
 
@@ -62,8 +65,9 @@ class PipeCollection {
 				$this->v->v("LINK       '$socketKey' -> USER    '$userId'");
 			}
 		}
-		else {
-			throw new SessionException("No session, no user.");
+		catch(SessionException $e) {
+			$this->unregisterPipe($socketKey);
+			throw $e;
 		}
 	}
 
