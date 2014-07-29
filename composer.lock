@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "493bced7715b6239af9b90eb5c3f12f8",
+    "hash": "1e940e5915eb73f5157b64298283fc3e",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -384,22 +384,22 @@
         },
         {
             "name": "cboden/ratchet",
-            "version": "v0.3.0",
+            "version": "v0.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/cboden/Ratchet.git",
-                "reference": "d756e0b507a5f3cdbf8c59dbb7baf68574dc7d58"
+                "url": "https://github.com/ratchetphp/Ratchet.git",
+                "reference": "d36a8699df04354147a4f47845035b1ea8239189"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cboden/Ratchet/zipball/d756e0b507a5f3cdbf8c59dbb7baf68574dc7d58",
-                "reference": "d756e0b507a5f3cdbf8c59dbb7baf68574dc7d58",
+                "url": "https://api.github.com/repos/ratchetphp/Ratchet/zipball/d36a8699df04354147a4f47845035b1ea8239189",
+                "reference": "d36a8699df04354147a4f47845035b1ea8239189",
                 "shasum": ""
             },
             "require": {
-                "guzzle/http": ">=3.6.0,<3.8.0-dev",
+                "guzzle/http": "~3.6",
                 "php": ">=5.3.9",
-                "react/socket": "0.3.*",
+                "react/socket": "0.3.*|0.4.*",
                 "symfony/http-foundation": "~2.2",
                 "symfony/routing": "~2.2"
             },
@@ -429,45 +429,22 @@
                 "server",
                 "sockets"
             ],
-            "time": "2013-10-14 14:38:12"
+            "time": "2014-06-08 15:19:45"
         },
         {
             "name": "devristo/phpws",
-            "version": "dev-master-php53compat",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/armatronic/phpws.git",
+                "url": "https://github.com/Devristo/phpws",
                 "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/armatronic/phpws/zipball/911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30",
-                "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30",
-                "shasum": ""
-            },
-            "require": {
-                "react/socket": "0.3.*",
-                "react/socket-client": "0.3.*",
-                "zendframework/zend-http": "2.*",
-                "zendframework/zend-log": "2.*"
             },
             "type": "library",
             "autoload": {
                 "psr-0": {
                     "Devristo\\Phpws\\": "src/"
                 }
-            },
-            "authors": [
-                {
-                    "name": "Devristo",
-                    "email": "chris@devristo.com"
-                }
-            ],
-            "description": "WebSocket Server and Client library for PHP",
-            "support": {
-                "source": "https://github.com/armatronic/phpws/tree/master-php53compat"
-            },
-            "time": "2014-05-08 16:27:18"
+            }
         },
         {
             "name": "djfm/cssin",
@@ -949,89 +926,6 @@
             "time": "2012-12-21 11:40:51"
         },
         {
-            "name": "react/cache",
-            "version": "v0.3.2",
-            "target-dir": "React/Cache",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/cache.git",
-                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/cache/zipball/a821f4318e38fc7efd02d81698fcee9d3d34dafe",
-                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "react/promise": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\Cache": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async caching.",
-            "keywords": [
-                "cache"
-            ],
-            "time": "2013-04-24 08:33:43"
-        },
-        {
-            "name": "react/dns",
-            "version": "v0.3.2",
-            "target-dir": "React/Dns",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/dns.git",
-                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
-                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "react/cache": "0.3.*",
-                "react/promise": "~1.0",
-                "react/socket": "0.3.*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\Dns": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async DNS resolver.",
-            "keywords": [
-                "dns",
-                "dns-resolver"
-            ],
-            "time": "2013-04-27 08:57:30"
-        },
-        {
             "name": "react/event-loop",
             "version": "v0.3.4",
             "target-dir": "React/EventLoop",
@@ -1158,48 +1052,6 @@
                 "Socket"
             ],
             "time": "2014-02-17 22:32:00"
-        },
-        {
-            "name": "react/socket-client",
-            "version": "v0.3.2",
-            "target-dir": "React/SocketClient",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/socket-client.git",
-                "reference": "0696ede9876749dc49670f282aab9f6c8549275b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/0696ede9876749dc49670f282aab9f6c8549275b",
-                "reference": "0696ede9876749dc49670f282aab9f6c8549275b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "react/dns": "0.3.*",
-                "react/event-loop": "0.3.*",
-                "react/promise": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\SocketClient": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async connector to open TCP/IP and SSL/TLS based connections.",
-            "keywords": [
-                "Socket"
-            ],
-            "time": "2013-04-20 14:55:59"
         },
         {
             "name": "react/stomp",
@@ -2928,6 +2780,131 @@
             "time": "2014-06-12 07:22:15"
         },
         {
+            "name": "react/cache",
+            "version": "v0.3.2",
+            "target-dir": "React/Cache",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/cache.git",
+                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/reactphp/cache/zipball/a821f4318e38fc7efd02d81698fcee9d3d34dafe",
+                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "react/promise": "~1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "React\\Cache": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Async caching.",
+            "keywords": [
+                "cache"
+            ],
+            "time": "2013-04-24 08:33:43"
+        },
+        {
+            "name": "react/dns",
+            "version": "v0.3.2",
+            "target-dir": "React/Dns",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/dns.git",
+                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/reactphp/dns/zipball/c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
+                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "react/cache": "0.3.*",
+                "react/promise": "~1.0",
+                "react/socket": "0.3.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "React\\Dns": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Async DNS resolver.",
+            "keywords": [
+                "dns",
+                "dns-resolver"
+            ],
+            "time": "2013-04-27 08:57:30"
+        },
+        {
+            "name": "react/socket-client",
+            "version": "v0.3.2",
+            "target-dir": "React/SocketClient",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/socket-client.git",
+                "reference": "0696ede9876749dc49670f282aab9f6c8549275b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/0696ede9876749dc49670f282aab9f6c8549275b",
+                "reference": "0696ede9876749dc49670f282aab9f6c8549275b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "react/dns": "0.3.*",
+                "react/event-loop": "0.3.*",
+                "react/promise": "~1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "React\\SocketClient": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Async connector to open TCP/IP and SSL/TLS based connections.",
+            "keywords": [
+                "Socket"
+            ],
+            "time": "2013-04-20 14:55:59"
+        },
+        {
             "name": "sebastian/comparator",
             "version": "1.0.0",
             "source": {
@@ -3193,6 +3170,121 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2014-03-07 15:35:33"
+        },
+        {
+            "name": "sensiolabs/behat-page-object-extension",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sensiolabs/BehatPageObjectExtension.git",
+                "reference": "97701070863bb99709239a6432d921dd1275b0f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sensiolabs/BehatPageObjectExtension/zipball/97701070863bb99709239a6432d921dd1275b0f6",
+                "reference": "97701070863bb99709239a6432d921dd1275b0f6",
+                "shasum": ""
+            },
+            "require": {
+                "behat/behat": "~2.4",
+                "behat/mink-extension": "~1.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "behat/mink-goutte-driver": "~1.0",
+                "bossa/phpspec2-expect": "~1.0",
+                "phpspec/phpspec": "~2.0",
+                "symfony/filesystem": "~2.3",
+                "symfony/process": "~2.3"
+            },
+            "suggest": {
+                "bossa/phpspec2-expect": "Allows to use PHPSpec2 matchers in Behat context files"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "SensioLabs\\Behat\\PageObjectExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcello Duarte",
+                    "email": "mduarte@inviqa.com"
+                },
+                {
+                    "name": "Jakub Zalas",
+                    "email": "jzalas@sensiolabs.co.uk"
+                }
+            ],
+            "description": "Page object extension for Behat",
+            "homepage": "https://github.com/sensiolabs/BehatPageObjectExtension",
+            "keywords": [
+                "BDD",
+                "Behat",
+                "page"
+            ],
+            "time": "2014-05-21 21:42:07"
+        },
+        {
+            "name": "symfony/class-loader",
+            "version": "v2.5.2",
+            "target-dir": "Symfony/Component/ClassLoader",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ClassLoader.git",
+                "reference": "25b74b67d455268415d7d34b41f8b7df4cb33ba4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ClassLoader/zipball/25b74b67d455268415d7d34b41f8b7df4cb33ba4",
+                "reference": "25b74b67d455268415d7d34b41f8b7df4cb33ba4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/finder": "~2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\ClassLoader\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony ClassLoader Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-07-09 09:05:48"
         },
         {
             "name": "symfony/config",
@@ -3635,7 +3727,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "shareworks/xml-security": 20,
-        "devristo/phpws": 20,
         "react/stomp": 20,
         "aura/di": 10,
         "aura/router": 10,

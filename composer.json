@@ -36,12 +36,25 @@
             }
         },
         {
-            "type": "vcs",
-            "url":  "https://github.com/alaress/etherpad-lite-client"
+            "type": "package",
+            "package": {
+                "name": "devristo/phpws",
+                "version": "0.1.0",
+                "source": {
+                    "url": "https://github.com/Devristo/phpws",
+                    "type": "git",
+                    "reference": "911de5a6b54c5ee9c40fc9231e7301fdfdfa5b30"
+                },
+                "autoload": {
+                    "psr-0": {
+                        "Devristo\\Phpws\\": "src/"
+                    }
+                }
+            }
         },
         {
             "type": "vcs",
-            "url":  "https://github.com/armatronic/phpws"
+            "url":  "https://github.com/alaress/etherpad-lite-client"
         }
     ],
     "require": {
@@ -60,8 +73,8 @@
         "predis/predis": "0.8.*",
         "monolog/monolog": "1.7.0",
         "videlalvaro/php-amqplib": "2.2.5",
-        "cboden/ratchet": "0.3.0",
-        "devristo/phpws": "dev-master-php53compat",
+        "cboden/ratchet": "0.3.2",
+        "devristo/phpws": "0.1.0",
         "react/stomp": "0.2.*@dev",
         "mtdowling/cron-expression": "1.0.*",
         "djfm/cssin": "0.1.0",
