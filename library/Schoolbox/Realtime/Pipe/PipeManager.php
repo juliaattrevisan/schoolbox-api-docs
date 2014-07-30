@@ -62,6 +62,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var Transaction[] */
 	protected $pushTransactions;
 
+    /** @var array */
+    protected $activeCommands;
+
 	/**
 	 * @param LoopInterface $reactLoop
 	 * @param PredisClientInterface $predisClient
@@ -187,6 +190,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$command = $request['key'];
 		$arguments = array($userId, $request['value']);
 
+        if(isset($this->activeCommands[$socketKey])) {
+            // pipe has a command active: don't permit another until this one is finished
+            $this->sendToPipe($pipe, json_encode(array(
+                $command => 'wait'
+            )));
+            return;
+        }
+
+        // set the pipe to "busy"
+        $this->activeCommands[$socketKey] = $command;
+
 		// don't flatly spawn a new worker: add the request to a queue
 		$this->taskDispatcher->enqueue($pipe, $command, $arguments);
 
@@ -274,6 +288,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		$this->v("Handling a worker response: $command");
 
+        $release = true;
+
 		switch(strtolower($command)) {
 			// deal with this yourself
 			case 'subscribe':
@@ -296,6 +312,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 			case 'push':
 				$this->sendToUser($userId, array($command => $data));
+                $release = false;
 				break;
 
 			// deal with this yourself
@@ -307,6 +324,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 		}
 
+        // release the socket if permissible
+        if($release) {
+            unset($this->activeCommands[$pipe->getSocketKey()]);
+        }
 	}
 
 
