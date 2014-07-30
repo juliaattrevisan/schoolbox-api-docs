@@ -39,7 +39,7 @@ class Session extends BaseSession {
     public function getAuthUser() {
         $user = null;
         if ($this->isAuthSessionAlive()) {
-            $user = $this->newSegment(null)->user;
+            $user = $this->getSegment(null)->get('user');
         }
         return ($user instanceof User) ? $user : new User();
     }
@@ -49,8 +49,8 @@ class Session extends BaseSession {
      * request's time is.
      */
     public function updateLastTime() {
-        $authSession           = $this->newSegment(null);
-        $authSession->lasttime = $this->getRequestTime();
+        $authSession = $this->getSegment(null);
+        $authSession->set('lasttime', $this->getRequestTime());
     }
 
     /**
@@ -60,8 +60,8 @@ class Session extends BaseSession {
      * @return bool
      */
     public function isAuthSessionAlive() {
-        $authSession   = $this->newSegment(null);
-        $lastTime      = $authSession->lasttime;
+        $authSession   = $this->getSegment(null);
+        $lastTime      = $authSession->get('lasttime');
         $sessionLength = $this->getConfig()->get('session_length');
 
         // Session timed out: don't get the user.
@@ -76,8 +76,8 @@ class Session extends BaseSession {
      * @param string $value The URL to store in history.
      */
     public function pushHistory($value) {
-        $session = $this->newSegment(null);
-        $history = $session->history;
+        $session = $this->getSegment(null);
+        $history = $session->get('history');
         if (empty($history)) {
             $history = array();
         }
@@ -91,7 +91,7 @@ class Session extends BaseSession {
             // 3 most recent only
             $history = array_slice($history, 0, 3);
         }
-        $session->history = $history;
+        $session->set('history', $history);
     }
 
     /**
@@ -104,8 +104,8 @@ class Session extends BaseSession {
      * @return string
      */
     public function getHistory($level = 1, $default = '/') {
-        $session = $this->newSegment(null);
-        $history = $session->history;
+        $session = $this->getSegment(null);
+        $history = $session->get('history');
         if (empty($history)) {
             return $default;
         }

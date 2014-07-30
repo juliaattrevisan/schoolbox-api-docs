@@ -67,10 +67,11 @@
         "djfm/cssin": "0.1.0",
         "html2text/html2text": "1.0.*",
         "browscap/browscap-php": "~2.0.2",
-        "aura/di": "2.*@dev",
-        "aura/router": "2.0.*@dev",
-        "aura/web": "2.*@dev",
+        "aura/di": "~2.0.0@beta",
+        "aura/router": "~2.0.0@beta",
+        "aura/web": "~2.0.0@beta",
         "aura/session": "2.0.x-dev",
+        "aura/sqlquery": "~2.0.0",
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master"
     },
     "require-dev": {
