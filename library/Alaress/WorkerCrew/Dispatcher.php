@@ -80,8 +80,15 @@ class Dispatcher implements DispatcherInterface {
 	 * @param object $identifier
 	 * @param string $command
 	 * @param string $data
+	 * @throws QueueingException
 	 */
 	public function enqueue($identifier, $command, $data) {
+        $qLength = $this->q->count();
+        $mLength = $this->strat->getMaxQueueLength();
+
+        if($qLength >= $mLength) {
+            throw new QueueingException("Cannot enqueue, max queue length of $mLength reached");
+        }
 
 		// call for persistence
 		$this->strat->penqueue($identifier, $command, $data);
@@ -89,6 +96,10 @@ class Dispatcher implements DispatcherInterface {
 		// store the element locally
 		$this->q->enqueue(array($identifier, $command, $data));
 		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
+
+        if($qLength >= $this->strat->getWarningQueueLength()) {
+            $this->v->v("Queue is getting large", '?');
+        }
 
 		$this->attach($this->strat->getQueueDelay());
 	}

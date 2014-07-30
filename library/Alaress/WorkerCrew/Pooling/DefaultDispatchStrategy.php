@@ -26,7 +26,11 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	const MIN_WORKERS  = 1;
 	const MAX_WORKERS  = 6;
 	const MAX_FLYWHEEL = 0;
+
 	const QUEUE_DELAY  = 1;
+    const QUEUE_SIZE_WARN = PHP_INT_MAX;
+    const QUEUE_SIZE_MAX  = PHP_INT_MAX;
+
 	const IDLE_TIMEOUT = 2000;
 
 	const TASK_FETCH     = 'fetch';
@@ -227,7 +231,29 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	}
 
 
-	/**
+    /**
+     * Returns the size of a queue that should be considered abnormal
+     *
+     * @return int
+     */
+    public function getWarningQueueLength()
+    {
+        return self::QUEUE_SIZE_WARN;
+    }
+
+
+    /**
+     * Returns the size of a queue that should not be exceeded
+     *
+     * @return int
+     */
+    public function getMaxQueueLength()
+    {
+        return self::QUEUE_SIZE_MAX;
+    }
+
+
+    /**
 	 * Returns whether the Dispatcher should keep spinning, or spin down.
 	 * If false is returned, this method should reset any internal counter.
 	 *
