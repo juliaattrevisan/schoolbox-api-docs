@@ -139,6 +139,20 @@ interface DispatchStrategyInterface {
 	 */
 	public function getQueueDelay();
 
+    /**
+     * Returns the size of a queue that should be considered abnormal
+     *
+     * @return int
+     */
+    public function getWarningQueueLength();
+
+    /**
+     * Returns the size of a queue that should not be exceeded
+     *
+     * @return int
+     */
+    public function getMaxQueueLength();
+
 	/**
 	 * Returns whether the Dispatcher should keep spinning, or spin down.
 	 * If false is returned, this method should reset any internal counter.

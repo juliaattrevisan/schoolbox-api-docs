@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\ClientInterface as PredisClientInterface;
@@ -61,6 +62,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 	/** @var Transaction[] */
 	protected $pushTransactions;
+
+    /** @var array */
+    protected $activeCommands;
 
 	/**
 	 * @param LoopInterface $reactLoop
@@ -187,8 +191,35 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$command = $request['key'];
 		$arguments = array($userId, $request['value']);
 
+        if(isset($this->activeCommands[$socketKey])) {
+            // pipe has a command active: don't permit another until this one is finished
+            $this->sendToPipe($pipe, json_encode(array(
+                $command => 'wait'
+            )));
+            return;
+        }
+
+        // set the pipe to "busy"
+        $this->activeCommands[$socketKey] = $command;
+
 		// don't flatly spawn a new worker: add the request to a queue
-		$this->taskDispatcher->enqueue($pipe, $command, $arguments);
+        try {
+            $this->taskDispatcher->enqueue($pipe, $command, $arguments);
+        }
+        catch(QueueingException $e) {
+            $this->v("Failed to enqueue, task '$command' lost: ".$e->getMessage(), '!');
+            // since a full queue constitutes service unavailable, probably best to kick this pipe
+            $this->sendToPipe($pipe, json_encode(array(
+                'error' => 'Service Unavailable',
+                'code'  => 503,
+                'retry' => true
+            )));
+
+            // cleanup
+            unset($this->activeCommands[$socketKey]);
+            $this->pipes->unregisterPipe($socketKey);
+            $pipe->close();
+        }
 
 	}
 
@@ -221,7 +252,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 					$decorator = new Decorator();
 					$decorator->appendInstances($timer->getData());
 					// enqueue to be dispatched
-					$self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+                    try {
+                        $self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+                    }
+                    catch(QueueingException $e) {
+                        $self->v('Failed to enqueue, task lost: '.$e->getMessage(), '!');
+                    }
 				}
 			);
 		}
@@ -274,6 +310,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		$this->v("Handling a worker response: $command");
 
+        $release = true;
+
 		switch(strtolower($command)) {
 			// deal with this yourself
 			case 'subscribe':
@@ -296,6 +334,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 			case 'push':
 				$this->sendToUser($userId, array($command => $data));
+                $release = false;
 				break;
 
 			// deal with this yourself
@@ -307,6 +346,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 		}
 
+        // release the socket if permissible
+        if($release) {
+            unset($this->activeCommands[$pipe->getSocketKey()]);
+        }
 	}
 
 

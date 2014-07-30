@@ -25,13 +25,17 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
 	protected $queueDelay;
 	protected $maxFlywheel;
 	protected $idleTimeout;
+    protected $queueWarnSize;
+    protected $queueMaxSize;
 
 
-	public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $idleTimeout) {
+	public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout) {
 		$this->flywheelSpins = $maxFlywheel;
 		$this->minWorkers = $minWorkers;
 		$this->maxWorkers = $maxWorkers;
 		$this->queueDelay = $queueDelay;
+        $this->queueWarnSize = $queueWarnSize;
+        $this->queueMaxSize = $queueMaxSize;
 		$this->maxFlywheel = $maxFlywheel;
 		$this->idleTimeout = $idleTimeout;
 		$this->protocol = new AlaressIPCProtocol();
@@ -114,5 +118,23 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
 	public function getWorkerIdleTimeout() {
 		return $this->idleTimeout;
 	}
+
+
+    /**
+     * @return int
+     */
+    public function getWarningQueueLength()
+    {
+        return $this->queueWarnSize;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMaxQueueLength()
+    {
+        return $this->queueMaxSize;
+    }
 
 }
