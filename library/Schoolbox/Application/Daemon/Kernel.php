@@ -131,12 +131,11 @@ EOL;
 			return true;
 		}
 
-		if($this->debug instanceof Debug) {
-			$this->debug->v("$errStr - $errFile::$errLine", 'e');
-		}
-
 		switch($errNum) {
 			case E_RECOVERABLE_ERROR:
+				if($this->debug instanceof Debug) {
+					$this->debug->v("$errStr - $errFile::$errLine", 'e');
+				}
 				// for any of these errors, we want an exception we can catch
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
@@ -175,6 +174,10 @@ EOL;
 			return;
 		}
 		if(strpos($errStr, 'unable to recvfrom') === 0) {
+			// this is fine to be let through
+			return;
+		}
+		if(strpos($errStr, 'unable to select') === 0) {
 			// this is fine to be let through
 			return;
 		}

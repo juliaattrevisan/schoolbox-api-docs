@@ -30,9 +30,6 @@ class WorkerProcess extends AbstractProcess {
 	/** @var UserQueueFactory  */
 	protected $mqf;
 
-	/** @var Interceptor */
-	protected $interceptor;
-
 
 	/**
 	 * @param LoopInterface $loop
@@ -42,7 +39,6 @@ class WorkerProcess extends AbstractProcess {
 	public function __construct($loop, $strat = null, $debug = null) {
 		parent::__construct($loop, $strat, $debug);
 		$this->mqf = new UserQueueFactory();
-		$this->interceptor = new Interceptor($debug);
 	}
 
 
@@ -79,10 +75,6 @@ class WorkerProcess extends AbstractProcess {
 					throw new RuntimeException("Data should be array(2+); is ".gettype($data)."(".count($data).")");
 				}
 				return $this->digest($data[0], $data[1]);
-
-			// process interceptions
-			case DefaultDispatchStrategy::TASK_INTERCEPT:
-				return $this->reroute($args);
 		}
 
 		throw new InvalidArgumentException("Can't process '$command'.");
@@ -193,23 +185,6 @@ class WorkerProcess extends AbstractProcess {
 		);
 	}
 
-
-	/**
-	 * Process reroute/intercept/whatever you want to call it
-	 *
-	 * @param array $args
-	 * @return int
-	 */
-	protected function reroute($args) {
-		$count = 0;
-		$this->debug->v("Iterating frames provided");
-		foreach($args as $v) {
-			list($user, $frame) = $v;
-			$count += $this->interceptor->reroute($user, $frame) ? 1 : 0;
-		}
-		$this->debug->v("Rerouted $count message".($count == 1 ? '' : 's'));
-		return $count;
-	}
 
 	/**
 	 * @param callable $callable

@@ -7,12 +7,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Interceptor;
+namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 
-class InterceptorDispatchStrategy extends DefaultDispatchStrategy {
+class RerouterDispatchStrategy extends DefaultDispatchStrategy {
 
 	/**
 	 * Get the name of the strategy currently being used
@@ -20,7 +20,23 @@ class InterceptorDispatchStrategy extends DefaultDispatchStrategy {
 	 * @return string
 	 */
 	public function getName() {
-		return 'Intercept';
+		return 'Reroute';
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getCommand() {
+		return SITE_root . "/tools/notif/reroute/worker.php";
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getSupportedActions() {
+		return array(self::TASK_REROUTE);
 	}
 
 }
