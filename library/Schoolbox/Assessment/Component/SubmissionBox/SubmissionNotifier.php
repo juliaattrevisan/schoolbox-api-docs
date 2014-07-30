@@ -69,6 +69,7 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 		$this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 	/**

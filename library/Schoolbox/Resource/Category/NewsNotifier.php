@@ -47,6 +47,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	public function loadDependencies($dependencies = null) {
 		$this->userMapper = UserMapper::getInstance();
 		$this->categoryMapper = CategoryMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 	/**

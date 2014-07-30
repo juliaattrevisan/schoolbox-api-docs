@@ -33,24 +33,71 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	/** @var NS */
 	protected $namespace;
 
+	/** @var Mapper */
+	protected $nsMapper;
+
+	/** @var Mapper */
+	protected $srcMapper;
+
 
 	/**
 	 * @param IConfigLoader $configLoader
+	 * @param Mapper[]      $dependencies
 	 * @throws ScheduleException
 	 */
-	public function __construct($configLoader) {
+	public function __construct($configLoader, $dependencies = array()) {
 		$this->conf = $configLoader;
-		$this->instantiateMapper();
-		$this->loadDependencies();
+		$this->loadDependencies($dependencies);
+		if($this->nsMapper instanceof NSMapper) {
+			$this->namespace = $this->nsMapper->findOneBySlug($this->getSlug());
+		}
+	}
+
+
+	/**
+	 * @param Mapper[] $dependencies
+	 */
+	public function loadDependencies($dependencies = null) {
+		if(!is_array($dependencies)) {
+			$dependencies = array();
+		}
+
+		if(empty($dependencies['mapper'])) {
+			$dependencies['mapper'] = null;
+		}
+
+		if(empty($dependencies['nsMapper'])) {
+			$dependencies['nsMapper'] = NSMapper::getInstance();
+		}
+
+		if(empty($dependencies['srcMapper'])) {
+			$dependencies['srcMapper'] = SourceMapper::getInstance();
+		}
+
+		// rudimentary dependency injection to allow DI of mappers for testability
+		foreach($dependencies as $prop => $dep) {
+			$method = 'set'.ucfirst($prop);
+
+			if(method_exists($this, $method)) {
+				call_user_func(array($this, $method), $dep);
+			}
+		}
 	}
 
 
 	/**
 	 * Helper method to figure out which Mapper we apply to, and instantiate it
 	 *
+	 * @param Mapper $mapper
 	 * @throws ScheduleException
 	 */
-	protected function instantiateMapper() {
+	protected function setMapper($mapper = null) {
+		if($mapper instanceof Mapper) {
+			$this->mapper = $mapper;
+			return;
+		}
+
+		// do some black magic to find out what the mapper class should be
 		$mapperClass = str_replace('Notifier', 'Mapper', get_called_class());
 
 		if(!class_exists($mapperClass)) {
@@ -62,8 +109,22 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 		}
 
 		$this->mapper = $m;
+	}
 
-		$this->namespace = NSMapper::getInstance()->findOneBySlug($this->getSlug());
+
+	/**
+	 * @param NSMapper $nsMapper
+	 */
+	protected function setNsMapper($nsMapper) {
+		$this->nsMapper = $nsMapper;
+	}
+
+
+	/**
+	 * @param SourceMapper $srcMapper
+	 */
+	protected function setSrcMapper($srcMapper) {
+		$this->srcMapper = $srcMapper;
 	}
 
 
@@ -76,15 +137,12 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 	 * @return array
 	 */
 	public function retrieveCallbacks($label) {
-		/** @var SourceMapper $m */
-		$m = SourceMapper::getInstance();
-
 		if(!$this->namespace instanceof NS) {
 			throw new ScheduleException("Malformed namespace in ".get_called_class());
 		}
 
 		/** @var Collection|Source[] $sourceCollection */
-		$sourceCollection = $m->findByColumnList(array(
+		$sourceCollection = $this->srcMapper->findByColumnList(array(
 			'namespace' => $this->namespace->getId(),
 			'key'       => $label
 		));

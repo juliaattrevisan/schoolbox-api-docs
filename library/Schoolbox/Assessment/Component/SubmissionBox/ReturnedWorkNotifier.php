@@ -57,6 +57,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		$this->userMapper = UserMapper::getInstance();
 		$this->catMapper = CategoryMapper::getInstance();
 		$this->boxMapper = SubmissionBoxMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 	/**

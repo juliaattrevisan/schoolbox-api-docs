@@ -59,15 +59,6 @@ class Notifier extends AbstractModuleNotifier {
         return $this->slug;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadDependencies($dependencies = null) {
-//        /** @var ContainerInterface $di */
-//        global $di;
-        $this->namespace = NSMapper::getInstance()->findOneBySlug($this->slug);
-//        $this->router    = $di->get('router');
-    }
 
     /**
      * @param TriggerBundle $bundle

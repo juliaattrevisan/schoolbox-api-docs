@@ -15,6 +15,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Html2Text\Html2Text;
 use Monolog\Logger;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -35,7 +36,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 * @return string
 	 */
 	protected function getSlug() {
-		return 'news';
+		return NSMapper::NS_NEWS;
 	}
 
 	/**
@@ -46,6 +47,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->roleMapper = RoleMapper::getInstance();
+		parent::loadDependencies($dependencies);
 	}
 
 
