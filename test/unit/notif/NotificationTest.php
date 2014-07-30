@@ -1,0 +1,148 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+class NotificationTest extends PHPUnit_Framework_TestCase {
+
+	/**
+	 * @param string $title
+	 * @param array  $params
+	 * @param string $ns
+	 * @param string $href
+	 * @param string $icon
+	 * @param int    $level
+	 * @param array  $topics
+	 * @param int    $time
+	 * @param array  $meta
+	 * @param array  $context
+	 * @return \Alaress\Async\Notification\Instance\Instance
+	 */
+	protected function newInstance($title, $params = array(), $ns = 'mock', $href = '#', $icon = '#', $level = 0, $topics = array(), $time = 0, $meta = array(), $context = array()) {
+		return new \Alaress\Async\Notification\Instance\Instance($title, $ns, $icon, $href, $params, $level, $topics, $time, $meta, $context);
+	}
+
+	public function testConstructSingleInstance() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar')
+		));
+
+		$this->assertInstanceOf('Alaress\Async\Notification\Notification', $n);
+	}
+
+	public function testConstructMultipleInstances() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar'),
+			$this->newInstance('foobar'),
+		));
+
+		$this->assertInstanceOf('Alaress\Async\Notification\Notification', $n);
+	}
+
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testAppendInvalidInstance() {
+		new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar'),
+			$this->newInstance('globber'),
+		));
+	}
+
+	public function testAppendInstanceWithReplaceParam() {
+		$this->markTestIncomplete();
+	}
+
+	public function testAppendInstanceWithAppendParam() {
+		$this->markTestIncomplete();
+	}
+
+	public function testAppendInstanceWithIgnoreParam() {
+		$this->markTestIncomplete();
+	}
+
+	public function testGetTitle() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar')
+		));
+
+		$this->assertEquals('foobar', $n->getTitle());
+	}
+
+	public function testGetTimestamp() {
+		// the params must differ for the second to survive deduping
+		$pBar = new \Alaress\Async\Notification\Parameter\Param('bar');
+		$pBaz = new \Alaress\Async\Notification\Parameter\Param('baz');
+
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance(':foo', array('foo' => $pBar), 'mock', '#', '#', 0, array(), 9001),
+			$this->newInstance(':foo', array('foo' => $pBaz), 'mock', '#', '#', 0, array(), 90001)
+		));
+
+		$this->assertEquals(90001, $n->getTimestamp());
+	}
+
+	public function testGetNamespace() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar', array(), 'bazbin')
+		));
+
+		$this->assertEquals('bazbin', $n->getNamespace());
+	}
+
+	public function testGetIcon() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar', array(), 'mock', '#', '/super-awesome/icon.jpg')
+		));
+
+		$this->assertEquals('/super-awesome/icon.jpg', $n->getIcon());
+	}
+
+	public function testGetHref() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar', array(), 'mock', '/mega-awesome/link')
+		));
+
+		$this->assertEquals('/mega-awesome/link', $n->getHref());
+	}
+
+	public function testGetMeta() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance('foobar', array(), 'mock', '#', '#', 0, array(), 0, array(
+				'body'   => 'contentment',
+				'byline' => 'authorman',
+				'foo'    => 'bar',
+			))
+		));
+
+		$this->assertCount(3, $n->getMeta());
+		$this->assertEquals('bar', $n->getMeta('foo'));
+		$this->assertEquals('', $n->getMeta('empty'));
+		$this->assertEquals('contentment', $n->getBody());
+		$this->assertEquals('authorman', $n->getByline());
+	}
+
+	public function testGetParameters() {
+		$n = new \Alaress\Async\Notification\Notification(array(
+			$this->newInstance(':foobar', array(
+				'foobar' => new \Alaress\Async\Notification\Parameter\Param('bazbin', '#',
+					\Alaress\Async\Notification\Parameter\ParameterInterface::STACKING_REPLACE
+				)
+			))
+		));
+
+		$p = $n->getParameters();
+
+		$this->assertArrayHasKey('foobar', $p);
+
+		$v = array_values($p['foobar']);
+
+		$this->assertEquals('bazbin', $v[0]->getText());
+	}
+}
+ 

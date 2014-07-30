@@ -10,15 +10,19 @@
 namespace Schoolbox\Notif\Queue;
 
 use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\AMQP\Bunny\BunnyControl;
+use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Notification\Instance\Instance;
-use Exception;
 use External_User;
-use Group;
+use External_UserInterface;
 use InvalidArgumentException;
+use RuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
@@ -38,6 +42,9 @@ class UserQueueFactory {
 	/** @var AMQPInterface */
 	protected $mqConnector;
 
+	/** @var ControlInterface */
+	protected $bunnyController;
+
 	/** @var UserMapper */
 	protected $userMapper;
 
@@ -47,8 +54,8 @@ class UserQueueFactory {
 	/** @var RoleMapper */
 	protected $roleMapper;
 
-	/** @var Group */
-	protected $_DEPRECATED_GROUP;
+	/** @var UserAccessMapper */
+	protected $userAccessMapper;
 
 	/** @var External_User */
 	protected $_DEPRECATED_EXT_USER;
@@ -79,6 +86,35 @@ class UserQueueFactory {
 
 
 	/**
+	 * @return AMQPInterface
+	 */
+	public function getMessageQueueConnector() {
+		return $this->mqConnector;
+	}
+
+
+	/**
+	 * @param ControlInterface $controller
+	 * @return self
+	 */
+	public function setRabbitController($controller) {
+		$this->bunnyController = $controller;
+		return $this;
+	}
+
+
+	/**
+	 * @return ControlInterface
+	 */
+	public function getRabbitController() {
+		if(!$this->bunnyController) {
+			$this->setRabbitController(new BunnyControl());
+		}
+		return $this->bunnyController;
+	}
+
+
+	/**
 	 * @param UserMapper $userMapper
 	 * @return self
 	 */
@@ -89,11 +125,11 @@ class UserQueueFactory {
 
 
 	/**
-	 * @return External_User
+	 * @return External_UserInterface
 	 */
 	public function GET_DEPRECATED_EXT_USER() {
 		if(!$this->_DEPRECATED_EXT_USER) {
-			$this->_DEPRECATED_EXT_USER = new External_User();
+			$this->SET_DEPRECATED_EXT_USER(new External_User());
 			$this->_DEPRECATED_EXT_USER->getCurrentSemester();
 		}
 
@@ -102,13 +138,33 @@ class UserQueueFactory {
 
 
 	/**
-	 * @return Group
+	 * @param External_UserInterface $externalUserHandler
+	 * @return self
 	 */
-	public function GET_DEPRECATED_GROUP() {
-		if(!$this->_DEPRECATED_GROUP) {
-			$this->_DEPRECATED_GROUP = new Group();
+	public function SET_DEPRECATED_EXT_USER($externalUserHandler) {
+		$this->_DEPRECATED_EXT_USER = $externalUserHandler;
+		return $this;
+	}
+
+
+	/**
+	 * @param UserAccessMapper $userAccessMapper
+	 * @return self
+	 */
+	public function setUserAccessMapper($userAccessMapper) {
+		$this->userAccessMapper = $userAccessMapper;
+		return $this;
+	}
+
+
+	/**
+	 * @return UserAccessMapper
+	 */
+	public function getUserAccessMapper() {
+		if(!$this->userAccessMapper) {
+			$this->setUserAccessMapper(UserAccessMapper::getInstance());
 		}
-		return $this->_DEPRECATED_GROUP;
+		return $this->userAccessMapper;
 	}
 
 
@@ -117,9 +173,19 @@ class UserQueueFactory {
 	 */
 	public function getRoleMapper() {
 		if(!$this->roleMapper) {
-			$this->roleMapper = RoleMapper::getInstance();
+			$this->setRoleMapper(RoleMapper::getInstance());
 		}
 		return $this->roleMapper;
+	}
+
+
+	/**
+	 * @param \Schoolbox\RoleMapper $roleMapper
+	 * @return self
+	 */
+	public function setRoleMapper($roleMapper) {
+		$this->roleMapper = $roleMapper;
+		return $this;
 	}
 
 
@@ -128,7 +194,7 @@ class UserQueueFactory {
 	 */
 	public function getUserMapper() {
 		if(!$this->userMapper) {
-			$this->userMapper = UserMapper::getInstance();
+			$this->setUserMapper(UserMapper::getInstance());
 		}
 		return $this->userMapper;
 	}
@@ -149,7 +215,7 @@ class UserQueueFactory {
 	 */
 	public function getCategoryMapper() {
 		if(!$this->categoryMapper) {
-			$this->categoryMapper = CategoryMapper::getInstance();
+			$this->setCategoryMapper(CategoryMapper::getInstance());
 		}
 		return $this->categoryMapper;
 	}
@@ -225,9 +291,9 @@ class UserQueueFactory {
 				if(empty($this->roleCache)) {
 					// cache roles
 					$this->roleCache = $this->getRoleMapper()->findAll()->groupBy('type')->getAll();
-					foreach($this->roleCache as $roleType => $roleCollection) {
+					foreach($this->roleCache as $rType => $roleCollection) {
 						/** @var $roleCollection Collection|Role[] */
-						$this->roleCache[$roleType] = $roleCollection->getColumnValues('id');
+						$this->roleCache[$rType] = $roleCollection->getColumnValues('id');
 					}
 				}
 				if(array_key_exists(Role::STUDENT, $this->roleCache)) {
@@ -254,6 +320,25 @@ class UserQueueFactory {
 		// *.notify.service.{service}.{itemId}.{level}.#
 		// Higher access levels get lower level bindings as well.
 		$bindings['service'] = array();
+
+		try {
+			// retrieve all homepages the user has access to; pull homepage service access from synergy as well
+			$catIds = $this->getCategoryMapper()->findForUser($user)->getColumnValues('id');
+
+			/** @var UserAccess $access */
+			$accessList = $this->getUserAccessMapper()->findByColumnList(array(
+				'uid'     => $user->getId(),
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'sid'     => $catIds
+			));
+		}
+		catch(MapperException $e) {
+			$accessList = new Collection();
+		}
+
+		// combine with all other services user has access to
+		$accessList->mergeUnique($user->getAccessList());
+
 		foreach ($user->getAccessList() as $access) {
 			$baseBinding = $access->getService().'.'.$access->getServiceIdentifier();
 			$accessLevel = $access->getAccessLevel();
@@ -267,23 +352,6 @@ class UserQueueFactory {
 				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
 			}
 		}
-
-		// Additional service bindings: pull homepage service access from synergy as well
-
-		/** @var Collection|Category[] $cats */
-		$cats = $this->getCategoryMapper()->findForUser($user);
-
-		foreach($cats as $cat) {
-			$catOwner = $this->GET_DEPRECATED_GROUP()->getOwner($cat->getId());
-
-			// it doesn't matter if any of these duplicate any created above
-			$baseBinding = UserAccess::SERVICE_HOMEPAGE.'.'.$cat->getId();
-			if($catOwner['uid'] == $user->getId()) {
-				$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_FULL.'.#';
-			}
-			$bindings['service'][] = $baseBinding.'.'.UserAccess::ACCESS_READ.'.#';
-		}
-
 
 		return $bindings;
 	}
@@ -319,7 +387,7 @@ class UserQueueFactory {
 	 * @param bool $simulate
 	 * @return int
 	 */
-	public function destoryUserBindings($userId, $simulate = false) {
+	public function destroyUserBindings($userId, $simulate = false) {
 
 		if(!$this->existingBindings) {
 			$this->cacheExistingBindings();
@@ -352,46 +420,29 @@ class UserQueueFactory {
 	protected function cacheExistingBindings() {
 		$this->existingBindings = array();
 
-		// there's a bit of black magic in here
-		if(posix_getuid() !== 0) {
-			// this method can only succeed if the user is root - don't even try otherwise
+		try {
+			$bindings = $this->getRabbitController()->listBindings(array('destination_name', 'routing_key'));
+		}
+		catch(RuntimeException $e) {
 			return -1;
 		}
-
-		$allBindings = `/usr/sbin/rabbitmqctl list_bindings destination_name routing_key`;
-
-		if(!$allBindings) {
-			return 0;
-		}
-
-		$bindings = explode("\n", $allBindings);
 
 		if(!count($bindings)) {
 			return 0;
 		}
 
 		$count = 0;
+		$prefix = $this->mqConnector->getSecondaryExchange('')->getName();
 
 		foreach($bindings as $binding) {
-
-			$xpl = preg_split('/\s+/', $binding);
-
-			if(count($xpl) != 2) {
-				continue;
-			}
-
-			list($exchange, $routingKey) = $xpl;
-
-			$prefix = $this->mqConnector->getSecondaryExchange('')->getName();
-
 			// only parse line if this is a user exchange
-			if(substr($exchange, 0, strlen($prefix)) != $prefix) {
+			if(substr($binding['destination_name'], 0, strlen($prefix)) != $prefix) {
 				continue;
 			}
 
-			$username = substr($exchange, strlen($prefix));
+			$username = substr($binding['destination_name'], strlen($prefix));
 
-			$this->existingBindings[$username][] = $routingKey;
+			$this->existingBindings[$username][] = $binding['routing_key'];
 
 			++$count;
 		}

@@ -167,7 +167,7 @@ class SchedulerCommander extends AbstractCommander {
 		$scheduler->debug->v("Resetting bindings for user $id");
 		try {
 			$uqf = new UserQueueFactory();
-			$uqf->destoryUserBindings($id);
+			$uqf->destroyUserBindings($id);
 			$uqf->bindUserQueue($id);
 			return true;
 		}

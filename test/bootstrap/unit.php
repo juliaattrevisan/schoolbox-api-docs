@@ -7,6 +7,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-// Load the Autoloader, that's all that needs to happen
+require_once __DIR__ . '/../../www/conf/conf.php';
 require_once dirname(__FILE__) . '/../../include/Autoloader.php';
 Autoloader::initialise();
