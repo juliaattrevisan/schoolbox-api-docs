@@ -56,56 +56,34 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return array
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
-		$vars = array(
-			'klp_GetTimetableStructure',
-			array(
-				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
+		$query = "
+			SELECT TOP 10 TH.*
+			FROM TH
+			WHERE THKEY = '2014S2'
+		";
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		$result = $this->getDb()->getAll($query);
 
 		$timetableDef = array();
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		/* Distill data
-			 [138] => Array
-                (
-                    [PeriodNo] => 139
-                    [DayName] => Day 5
-                    [PerNoDesc] => Period 7
-                    [DayIndex] => 12
-                    [DayNo] => 5
-                    [CalDate] => Mar 28 2014 12:00:00:000AM
-                    [CalRow] => 13
-                    [qrow] => 13
-                )
+		if (count($result) && is_array($result)) {
+			$key = 'TH_RLABEL';
 
-            [139] => Array
-                (
-                    [PeriodNo] => 140
-                    [DayName] => Day 5
-                    [PerNoDesc] => Period 0
-                    [DayIndex] => 12
-                    [DayNo] => 5
-                    [CalDate] => Mar 28 2014 12:00:00:000AM
-                    [CalRow] => 14
-				)
-		*/
-		if (is_array($result['result']) && count($result['result'])) {
-			foreach ($result['result'] as $currentPeriod) {
-				$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
+			$definition = $result[0];
 
-				if ($periodDate->getDatabaseDate() == $now->getDatabaseDate()) {
-					if (!$day || $day == $currentPeriod['DayNo']) {
-						$timetableDef['desc'][] = $currentPeriod['PerNoDesc'];
-						$timetableDef['start'][] = '';
-						$timetableDef['end'][] = '';
-						$timetableDef['number'][] = $currentPeriod['PeriodNo'];
-						$timetableDef['sequence'][] = $currentPeriod['PeriodNo'];
-					}
-				}
+			for ($i = 1; $i <= $definition['THROWS']; $i++) {
+
+				/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+				 */
+				$tempKey = $key . ($i < 10 ? 0 . $i : $i);
+
+				/* Ram it in
+				 */
+				$timetableDef['desc'][] = $definition[$tempKey];
+				$timetableDef['start'][] = '';
+				$timetableDef['end'][] = '';
+				$timetableDef['number'][] = $i;
+				$timetableDef['sequence'][] = $i;
 			}
 		}
 
