@@ -14,8 +14,10 @@ namespace Schoolbox\Realtime\Schedule;
 use Alaress\Scheduler\Event\EventInterface;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Serializable;
 
-class Event implements EventInterface {
+class Event implements EventInterface, Serializable {
 
     /** @var User */
     protected $effector;
@@ -98,4 +100,37 @@ class Event implements EventInterface {
     }
 
 
-} 
+	/**
+	 * String representation of object
+	 *
+	 * @return string the string representation of the object or null
+	 */
+	public function serialize() {
+		return serialize(array(
+			'u' => UserMapper::getInstance()->dehydrate($this->effector),
+			'a' => $this->getAction(),
+			'o' => array(
+				'c' => get_class($this->getMapper()),
+				'i' => $this->getMapper()->dehydrate($this->getObject())
+			),
+			'd' => $this->getDiff(),
+		));
+	}
+
+
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized The string representation of the object.
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		$array = unserialize($serialized);
+
+		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
+		$this->action   = $array['a'];
+		$this->mapper   = $array['o']['c']::getInstance();
+		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
+		$this->diff     = $array['d'];
+	}
+}

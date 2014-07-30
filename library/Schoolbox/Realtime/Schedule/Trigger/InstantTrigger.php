@@ -15,7 +15,7 @@ use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\OnetimeTrigger;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
-class InstantTrigger extends OnetimeTrigger {
+class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface {
 
 	/** @var ModuleNotifierInterface */
     protected $notifier;

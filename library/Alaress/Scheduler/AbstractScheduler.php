@@ -243,7 +243,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     public function hashObject($object) {
         // use json rather than serialize to avoid any side-effects
-        return sha1(json_encode($object));
+        return spl_object_hash($object);
     }
 
 } 

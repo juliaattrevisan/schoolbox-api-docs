@@ -49,6 +49,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	const QUEUE_SCHEDULE = '.sb.sched';
 	const QUEUE_COMMAND  = '.sb.cmd.sched';
 
+	const COMPRESSION_LEVEL = 9;
 
 	/**
 	 * Binds the queues that the Scheduler requires
@@ -85,10 +86,10 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     public function __construct($loop, $dispatchStrategy, $debug, $conf = null) {
 	    // cast optional param
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
-	    $this->notif = new Notif();
 
 	    // run construction
         parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
+        $this->notif = new Notif();
 	    $this->resolvers = new ResolutionManager();
 
 	    self::bindQueues();
@@ -122,9 +123,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @return void
      */
     public function onException($e) {
-	    $this->debug->v(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), "!");
-		// TODO improve the email handling of these messages to be less spammy
-		// $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
+	    $this->debug->v($e->getMessage(), "!");
+        $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
     }
 
 
@@ -144,11 +144,13 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
 			$this->debug->v("Building trigger factory for ".get_class($event->getObject()));
-			$triggerFactory = new TriggerFactory($this->getModule($event), $event);
+			$triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
 
 			// retrieve, populate, and schedule this bundle of triggers
 			$this->debug->v("Retrieving triggers");
-			$this->scheduleNotifications($triggerFactory->buildTriggers($event->getAction())->getTriggers(), $resolver);
+			$triggers = $triggerFactory->buildTriggers($event->getAction())->getTriggers();
+			$this->scheduleNotifications($triggers, $resolver);
+			$triggerFactory->cleanup($triggers);
 
 			// notice that we don't ACK the resolver here before returning
 			return;
@@ -240,9 +242,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @param AckResolver $resolver
      */
     public function scheduleNotification($trigger, $resolver = null) {
-        parent::scheduleNotification($trigger);
+	    parent::scheduleNotification($trigger);
         if($resolver instanceof AckResolver) {
-	        $this->debug->v("Attaching resolver");
             $this->attachResolverTrigger($resolver, $trigger);
         }
 	    else {
@@ -353,8 +354,8 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      */
     protected function attachResolverTrigger($ackResolver, $trigger) {
 	    $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
-	    $relTime = $trigger->getTimestamp() - time();
-	    $this->debug->v("Attached trigger [{$trigger->getLabel()}, {$trigger->getEvent()->getAction()} : T-$relTime], resolver contains ".$this->resolvers->getTriggerCount($ackResolver)." triggers", '+');
+//	    $relTime = $trigger->getTimestamp() - time();
+//	    $this->debug->v("Attached trigger [{$trigger->getLabel()}, {$trigger->getEvent()->getAction()} : T-$relTime], resolver contains ".$this->resolvers->getTriggerCount($ackResolver)." triggers", '+');
     }
 
 
@@ -391,4 +392,4 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
 	}
 
-} 
+}
