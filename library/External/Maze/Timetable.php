@@ -71,7 +71,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
 		$query = "
-			SELECT TOP 10 TH.*
+			SELECT TOP 2 TH.*
 			FROM TH
 			WHERE THKEY = '2014S2'
 		";
