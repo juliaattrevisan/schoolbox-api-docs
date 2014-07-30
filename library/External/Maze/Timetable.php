@@ -48,6 +48,20 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	}
 
 	/**
+	 * Array key
+	 *
+	 * @var string
+	 */
+	private $timetablePeriodLabel = 'TH_RLABEL';
+
+	/**
+	 * Array key
+	 *
+	 * @var string
+	 */
+	private $timetableDayLabel = 'TH_CLABEL';
+
+	/**
 	 * The headings of the timetable, going horizontally
 	 * from left to right containing all the times and day numbers
 	 *
@@ -67,27 +81,72 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		$timetableDef = array();
 
 		if (count($result) && is_array($result)) {
-			$key = 'TH_RLABEL';
-
 			$definition = $result[0];
 
 			for ($i = 1; $i <= $definition['THROWS']; $i++) {
+				$dayTempKey = $this->getTimetableDayLabel($i);
 
-				/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+				/* Day-specific e.g. for Dashboard
 				 */
-				$tempKey = $key . ($i < 10 ? 0 . $i : $i);
+				if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
 
-				/* Ram it in
-				 */
-				$timetableDef['desc'][] = $definition[$tempKey];
-				$timetableDef['start'][] = '';
-				$timetableDef['end'][] = '';
-				$timetableDef['number'][] = $i;
-				$timetableDef['sequence'][] = $i;
+					/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+					 */
+					$periodTempKey = $this->getTimetablePeriodLabel($i);
+
+					/* Ram it in
+					 */
+					$timetableDef['desc'][] = $definition[$periodTempKey];
+					$timetableDef['start'][] = '';
+					$timetableDef['end'][] = '';
+					$timetableDef['number'][] = $i;
+					$timetableDef['sequence'][] = $i;
+				}
 			}
 		}
 
 		return $timetableDef;
+	}
+
+	/**
+	 * Get timetable period label
+	 *
+	 * @param $i
+	 * @return string
+	 */
+	private function getTimetablePeriodLabel($i) {
+		return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
+	}
+
+	/**
+	 * Get timetable day label
+	 *
+	 * @param $i
+	 * @return string
+	 */
+	private function getTimetableDayLabel($i) {
+		return $this->timetableDayLabel . ($i < 10 ? 0 . $i : $i);
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set timetable period label
+	 *
+	 * @param string $timetablePeriodLabel
+	 */
+	private function setTimetablePeriodLabel($timetablePeriodLabel) {
+		$this->timetablePeriodLabel = $timetablePeriodLabel;
+	}
+
+	/**
+	 * Set timetable day label
+	 *
+	 * @param string $timetableDayLabel
+	 */
+	private function setTimetableDayLabel($timetableDayLabel) {
+		$this->timetableDayLabel = $timetableDayLabel;
 	}
 
 	/**
