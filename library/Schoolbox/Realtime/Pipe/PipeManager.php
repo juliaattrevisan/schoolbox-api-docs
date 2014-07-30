@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\ClientInterface as PredisClientInterface;
@@ -202,7 +203,23 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         $this->activeCommands[$socketKey] = $command;
 
 		// don't flatly spawn a new worker: add the request to a queue
-		$this->taskDispatcher->enqueue($pipe, $command, $arguments);
+        try {
+            $this->taskDispatcher->enqueue($pipe, $command, $arguments);
+        }
+        catch(QueueingException $e) {
+            $this->v("Failed to enqueue, task '$command' lost: ".$e->getMessage(), '!');
+            // since a full queue constitutes service unavailable, probably best to kick this pipe
+            $this->sendToPipe($pipe, json_encode(array(
+                'error' => 'Service Unavailable',
+                'code'  => 503,
+                'retry' => true
+            )));
+
+            // cleanup
+            unset($this->activeCommands[$socketKey]);
+            $this->pipes->unregisterPipe($socketKey);
+            $pipe->close();
+        }
 
 	}
 
@@ -235,7 +252,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 					$decorator = new Decorator();
 					$decorator->appendInstances($timer->getData());
 					// enqueue to be dispatched
-					$self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+                    try {
+                        $self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+                    }
+                    catch(QueueingException $e) {
+                        $self->v('Failed to enqueue, task lost: '.$e->getMessage(), '!');
+                    }
 				}
 			);
 		}
