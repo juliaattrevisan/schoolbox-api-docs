@@ -201,8 +201,26 @@ class WorkerArray implements WorkerBundleInterface {
 	 * @return void
 	 */
 	public function terminateAll() {
+		$this->signalAll(SIGKILL);
+	}
+
+
+	/**
+	 * Allow all workers to finish what they're doing, then die
+	 */
+	public function releaseAll() {
+		$this->signalAll(SIGTERM);
+	}
+
+
+	/**
+	 * Send the given signal to all workers
+	 *
+	 * @param int $signal
+	 */
+	public function signalAll($signal) {
 		foreach($this->workers as $pid => $w) {
-			posix_kill((int)$pid, SIGKILL);
+			posix_kill((int)$pid, $signal);
 		}
 	}
 

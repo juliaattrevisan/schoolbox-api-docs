@@ -88,7 +88,6 @@ abstract class AbstractProcess extends PipeWriter {
 	public function onTerminate() {
 		$this->debug->v("GOT SIGTERM", '>');
 		$this->loop->stop();
-		exit;
 	}
 
 	/**

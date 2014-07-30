@@ -195,7 +195,9 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * Callback executed when SIGHUP is received by the process
 	 */
 	public function onHangup() {
-		$this->debug->v("HUP received: would reload config if I had one", ">");
+		$this->debug->v("HUP received: reloading config", ">");
+		$this->conf->dropCache();
+		$this->getDispatcher()->releaseWorkerPool(false);
 	}
 
 

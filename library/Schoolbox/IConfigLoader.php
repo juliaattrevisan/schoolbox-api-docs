@@ -8,6 +8,22 @@
  */
 
 namespace Schoolbox;
+
 interface IConfigLoader {
+
+	/**
+	 * Return the value of the given config var
+	 *
+	 * @param string $var
+	 * @return mixed
+	 */
 	public function get($var);
+
+
+	/**
+	 * Drop any cached config
+	 *
+	 * @return void
+	 */
+	public function dropCache();
 }

@@ -223,10 +223,11 @@ class Dispatcher implements DispatcherInterface {
 	/**
 	 * Signals that all workers should be terminated
 	 *
+	 * @param bool $hard
 	 * @return void
 	 */
-	public function releaseWorkerPool() {
-		$this->pool->releaseWorkers();
+	public function releaseWorkerPool($hard = true) {
+		$this->pool->releaseWorkers($hard);
 	}
 
 }

@@ -32,8 +32,9 @@ interface DispatcherInterface {
 	/**
 	 * Signals that all workers should be terminated
 	 *
+	 * @param bool $hard
 	 * @return void
 	 */
-	public function releaseWorkerPool();
+	public function releaseWorkerPool($hard = true);
 
 } 

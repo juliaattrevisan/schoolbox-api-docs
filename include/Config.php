@@ -2,6 +2,9 @@
 
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
+/**
+ * @deprecated use \Schoolbox\Config\Loader
+ */
 class Config extends DeprecatedModel {
 
     const FIELD_INPUT     = 1;
@@ -34,6 +37,9 @@ class Config extends DeprecatedModel {
         static private $data = false;
         static private $consts;
 
+        /**
+         * @deprecated use \Schoolbox\Config\Loader
+         */
         public function __construct () {
 
                 $this->_table = 'config';

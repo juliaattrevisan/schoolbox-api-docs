@@ -117,4 +117,13 @@ class Loader implements IConfigLoader, ArrayAccess {
         throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
     }
 
+    /**
+     * Drop any cached config
+     *
+     * @return void
+     */
+    public function dropCache() {
+        $this->cache = array();
+    }
+
 }

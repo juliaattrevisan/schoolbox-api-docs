@@ -100,4 +100,13 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 	}
 
 
+	/**
+	 * Drop any cached config
+	 *
+	 * @return void
+	 */
+	public function dropCache() {
+		$this->cache = array();
+	}
+
 }

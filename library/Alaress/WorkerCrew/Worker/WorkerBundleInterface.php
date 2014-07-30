@@ -102,10 +102,11 @@ interface WorkerBundleInterface {
 
 
 	/**
-	 * Terminate all workers
+	 * Signal all workers
 	 *
+	 * @param int $signal
 	 * @return void
 	 */
-	public function terminateAll();
+	public function signalAll($signal);
 
 } 

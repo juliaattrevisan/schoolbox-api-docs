@@ -203,6 +203,15 @@ class Pool extends EventEmitter {
 
 		$worker = $this->workers->get($pid);
 
+		// evaluate stream metadata
+		$meta = stream_get_meta_data($stream->stream);
+
+		// this stream is closed
+		if($meta['eof']) {
+			// do nothing
+			return;
+		}
+
 		// interpret the first character sent and determine the worker's state based on it
 		switch($this->poolingStrat->checkState($data)) {
 			case Worker::READY: // ready for another task
@@ -268,8 +277,10 @@ class Pool extends EventEmitter {
 			return;
 		}
 
+		$this->datastreams->offsetUnset($stream);
 		$this->debug->v("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
+		$this->cleanup();
 	}
 
 
@@ -472,8 +483,8 @@ class Pool extends EventEmitter {
 	/**
 	 * Terminate all workers
 	 */
-	public function releaseWorkers() {
-		$this->workers->terminateAll();
+	public function releaseWorkers($hard = true) {
+		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
 	}
 
 }

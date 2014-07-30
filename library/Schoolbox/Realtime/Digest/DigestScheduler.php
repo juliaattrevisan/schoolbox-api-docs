@@ -81,7 +81,18 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 		    $client->subscribe(INSTANCE_ID.DigestScheduler::QUEUE_COMMAND, array($self, 'onCommand'));
 	    });
 
-	    // instantiate schedule
+		$this->on(SIGHUP, array($this, 'onReload'));
+
+		// instantiate schedule
+		$this->reload();
+	}
+
+
+	/**
+	 * Callback executed when SIGHUP received by process
+	 */
+	public function onReload() {
+		$this->conf->dropCache();
 		$this->reload();
 	}
 
