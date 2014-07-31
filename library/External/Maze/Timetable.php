@@ -448,6 +448,9 @@ class External_Maze_Timetable implements External_TimetableInterface {
 				'code' => '',
 				'room' => '',
 				'staffID' => '',
+				'staffTitle' => '',
+				'staffFirstname' => '',
+				'staffSurname' => '',
 			);
 		}
 
@@ -470,7 +473,36 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		foreach ($allResults as $currentRow) {
 			$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
 			$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
-			$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($currentRow['T1TEACH'] . ' ' . $currentRow['T1TEACH']);
+
+			/* Find the teacher
+			 */
+			$query = "
+				SELECT *
+				FROM TCTQ
+				WHERE TCTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+				AND SUBJ = '{$currentRow['SUBJ']}'
+				AND CLASS = '{$currentRow['CLASS']}'
+				AND TCTQ.TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			";
+
+			$teacher = $this->getDb()->getRow($query);
+
+			if (strlen(trim($teacher['T1TEACH']))) {
+				try {
+					$userMapper = new \Schoolbox\UserMapper();
+					$user = $userMapper->findOneByColumn('synergy_id', $teacher['T1TEACH']);
+
+					/* Paste teacher in
+					 */
+					$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($teacher['T1TEACH']);
+					$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
+					$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
+					$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+
+				}
+				catch (Exception $e) {
+				}
+			}
 
 			/* Samuel, Samuel, Samuel...
 			 */
@@ -557,13 +589,12 @@ class External_Maze_Timetable implements External_TimetableInterface {
 					'description' => $allDayTimetables[$day][$period]['description'],
 					'code' => $allDayTimetables[$day][$period]['code'],
 					'room' => $allDayTimetables[$day][$period]['room'],
-					'staffID' => '',
-					'staffFirstname' => '',
-					'staffSurname' => '',
-					'staffTitle' => '',
+					'staffID' => $allDayTimetables[$day][$period]['staffID'],
+					'staffFirstname' => $allDayTimetables[$day][$period]['staffFirstname'],
+					'staffSurname' => $allDayTimetables[$day][$period]['staffSurname'],
+					'staffTitle' => $allDayTimetables[$day][$period]['staffTitle'],
 				);
 			}
-
 		}
 
 		return $timetable;
