@@ -107,6 +107,7 @@ override_dh_install:
 	rm -fR tools/vagrant*
 	rm -fR tools/pkg-*
 	rm -fR tools/composer*
+	rm -fR tools/git*
 	rm -fR www/test
 	rm -fR Vagrantfile
 	rm -fR www/javascript/components/*/node_modules
