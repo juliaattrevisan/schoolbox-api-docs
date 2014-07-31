@@ -53,11 +53,21 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     /* Select this poll in the component
      */
-    $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
-    $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-                                   array(    'module'                =>'homepage',
-                                             'identifier'            => $_POST['categoryID'],
-                                             'component_definition_id'=> $cdm->getDefinitionId()));
+    try {
+        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
+        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+            array(
+                'id'                      => $_POST['homepageComponentID'],
+                'module'                  => 'homepage',
+                'identifier'              => $_POST['categoryID'],
+                'component_definition_id' => $cdm->getDefinitionId(),
+            )
+        );
+    }
+    catch (Schoolbox\Mapper\Exception $e) {
+        error(19);
+        exit;
+    }
 
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
@@ -85,12 +95,22 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
     $current = $pollHandler->getCurrentPoll($poll['categoryID']);
 
     if ($current['pollID']) {
-        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
+        try {
+            $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
+            $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+                array(
+                    'id'                      => $_POST['homepageComponentID'],
+                    'module'                  => 'homepage',
+                    'identifier'              => $_POST['categoryID'],
+                    'component_definition_id' => $cdm->getDefinitionId(),
+                )
+            );
+        }
+        catch (Schoolbox\Mapper\Exception $e) {
+            error(19);
+            exit;
+        }
 
-        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-                                                      array(    'module'                =>'homepage',
-                                                                'identifier'            => $poll['categoryID'],
-                                                                'component_definition_id'=> $cdm->getDefinitionId()));
         $confI = new Component_Config();
         $confI->setConfigDefinitionId($cdm->getId());
         $confI->setInstanceId($cim->getId());
