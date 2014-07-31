@@ -47,7 +47,7 @@ elseif($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
 
 	$permission = $groupHandle->getPermission($comment->getBlog()->getCategory()->getId());
 
-	if($comment->getOwner()->getId() == $_SESSION['id'] || $permission == FULL_ACCESS) {
+	if($comment->getOwner()->getId() == $_SESSION['id'] || $permission >= WRITE_ACCESS) {
 		\Schoolbox\Blog\CommentMapper::getInstance()->delete($comment);
 		$this->backToTheFuture(1);
 	}
