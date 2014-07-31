@@ -43,9 +43,11 @@ class API extends Generic\API {
         $response = new Response_HTTP();
         $selected = $this->parseDate($date);
 
+        // Get events with a 1 day buffer at end of month, to ensure that last
+        // day's events get gotten.
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
-        $month['end']   = strtotime("+1 month -1 second", $month['start']);
+        $month['end']   = strtotime("+1 month +1 day", $month['start']);
 
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
@@ -347,7 +349,7 @@ class API extends Generic\API {
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
-        $month['end']   = strtotime("+1 month -1 second", $month['start']);
+        $month['end']   = strtotime("+1 month +1 day", $month['start']);
 
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
