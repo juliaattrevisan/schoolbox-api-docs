@@ -11,8 +11,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $pageNum;
-    private $perPage;
     private $filter;
 
     // visible field mapping: index => humanreadable
@@ -114,9 +112,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         if($orderDir == '') {
             $orderDir = 'DESC';
         }
-
-        $this->pageNum = ($offset / $limit) + 1;
-        $this->perPage = $limit;
 
         // need fields from which to retrieve data
         if(empty($this->fields))
