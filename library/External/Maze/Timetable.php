@@ -68,7 +68,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return string
 	 */
 	public function mazeTime($date) {
-		return strtolower(substr($date, 12, 5) . substr($date, -2));
+		return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
 	}
 
 	/**
@@ -228,9 +228,9 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			foreach($allTimes as $currentTime) {
 				if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
 					if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
-
 						return array(
-							'PeriodNumber' => $i
+							'PeriodNumber' => $i,
+							'PeriodNumberSeq' => 1,
 						);
 					}
 				}
@@ -240,7 +240,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		}
 
 		return array(
-			'PeriodNumber' => 0
+			'PeriodNumber' => 0,
+			'PeriodNumberSeq' => 0,
 		);
 	}
 
@@ -443,7 +444,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 				'periodStart' => $definition['start'][$index-1],
 				'periodEnd' => $definition['end'][$index-1],
 				'periodNumber' => $index,
-				'periodSequence' => $index,
+				'periodSequence' => 1,
 				'description' => '',
 				'code' => '',
 				'room' => '',
@@ -580,6 +581,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
 			$timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
 			$timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
+			$timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
+			$timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
 
 			/* Put in Day classes
 			 */
