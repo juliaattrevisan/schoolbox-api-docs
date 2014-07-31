@@ -85,8 +85,13 @@ else {
 /* Don't worry about bounds checking here - the implementation takes care of it */
 
 // setup pagination vars from args
-$limit = Cfg::get('search_type_limit') * 2;
-$offset = ($page - 1) * $limit;
+if (!$exportToCSV) {
+    $limit = Cfg::get('search_type_limit') * 2;
+    $offset = ($page - 1) * $limit;
+}
+else {
+    $limit = $offset = 0;
+}
 
 $report = Report_Factory::build($reportType, $this);
 
