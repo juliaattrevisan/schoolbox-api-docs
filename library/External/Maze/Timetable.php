@@ -62,6 +62,16 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	private $timetableDayLabel = 'TH_CLABEL';
 
 	/**
+	 * Take a Maze datetime and returns the time portion of it
+	 *
+	 * @param $date
+	 * @return string
+	 */
+	public function mazeTime($date) {
+		return strtolower(substr($date, 12, 5) . substr($date, -2));
+	}
+
+	/**
 	 * The headings of the timetable, going horizontally
 	 * from left to right containing all the times and day numbers
 	 *
@@ -71,8 +81,9 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 */
 	public function getTimetableDefinition($campusId, $day=0) {
 		$query = "
-			SELECT TOP 2 TH.*
+			SELECT TOP 50 *
 			FROM TH
+			INNER JOIN TCTD ON TH.THKEY = TCTD.QKEY
 			WHERE THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 		";
 
@@ -97,8 +108,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 					/* Ram it in
 					 */
 					$timetableDef['desc'][] = $definition[$periodTempKey];
-					$timetableDef['start'][] = '';
-					$timetableDef['end'][] = '';
+					$timetableDef['start'][] = $this->mazeTime($result[$i-1]['TIME_START']);
+					$timetableDef['end'][] = $this->mazeTime($result[$i-1]['TIME_END']);
 					$timetableDef['number'][] = $i;
 					$timetableDef['sequence'][] = $i;
 				}
@@ -157,13 +168,11 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return bool
 	 */
 	public function getDayNumber($campusId, $date = 0) {
-		$currentDateString = date('M d Y');
-
 		$query = "
 			SELECT TOP 1 QCOL
 			FROM TCTQ
 			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY
-			WHERE TCTQKEY LIKE '{$currentDateString}%'
+			WHERE TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
 		";
 
 		$result = $this->getDb()->getRow($query);
@@ -173,20 +182,31 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
 	public function getTest() {
 		$query = "
-			SELECT
-			 	THKEY,
-			 	CALENDAR_START01,
-			 	CALENDAR_START02,
-			 	CALENDAR_START03,
-			 	CALENDAR_START04,
-			 	CALENDAR_END01,
-			 	CALENDAR_END02,
-			 	CALENDAR_END03,
-			 	CALENDAR_END04
+			SELECT *
 			FROM TH
-			WHERE THKEY LIKE '2014%'
-			ORDER BY THKEY DESC
+			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND THTQ.QCOL = '{$this->getDayNumber(1)}'
+			AND STMA.SKEY = 'ABBOMEG'
 		";
+
+		$result1 = $this->getDb()->getAll($query);
+
+//		$query = "
+//			SELECT TOP 100 *
+//			FROM TCTD
+//			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+//			ORDER BY TIME_INDEX
+//		";
+//
+//		$result2 = $this->getDb()->getAll($query);
+
+		new \Alaress_ThreeProbe(null, $result1, null);
 	}
 
 	/**
@@ -411,6 +431,52 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return mixed
 	 */
 	public function getStudentTimetable($externalUserId, $dayNumber) {
+		$query = "
+			SELECT *
+			FROM TH
+			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND THTQ.QCOL = '{$this->getDayNumber($dayNumber)}'
+			AND STMA.SKEY = '{$externalUserId}'
+		";
+
+		$allResults = $this->getDb()->getAll($query);
+
+		$definition = $this->getTimetableDefinition(1);
+
+		foreach($definition['number'] as $index) {
+			$finalTimetable0[$index-1] = array(
+				'periodName' => $definition['desc'][$index-1],
+				'periodStart' => $definition['start'][$index-1],
+				'periodEnd' => $definition['end'][$index-1],
+				'periodNumber' => $index,
+				'periodSequence' => $index,
+				'description' => '',
+				'code' => '',
+				'room' => '',
+				'staffID' => '',
+			);
+		}
+
+		foreach ($allResults as $currentRow) {
+			$finalTimetable0[$currentRow['QROW']-1]['description'] = '';
+			$finalTimetable0[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+			$finalTimetable0[$currentRow['QROW']-1]['staffID'] = trim($currentRow['T1TEACH'] . ' ' . $currentRow['T1TEACH']);
+
+			/* Samuel, Samuel, Samuel...
+			 */
+			$finalTimetable0[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
+		}
+
+
+
+
+
+
 
 		/* Get all the subjects for the current ttperiod
 		 */
@@ -547,7 +613,9 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			$i++;
 		}
 
-		return $finalTimetable;
+//		new \Alaress_ThreeProbe($finalTimetable0, $finalTimetable, null);
+//		die();
+		return $finalTimetable0;
 	}
 
 	/**

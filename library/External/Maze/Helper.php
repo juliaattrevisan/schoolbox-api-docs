@@ -44,6 +44,23 @@ class External_Maze_Helper {
 	}
 
 	/**
+	 * As designed by Samuel himself
+	 *
+	 * @return bool|string
+	 */
+	public function currentDate() {
+
+		/* Samuel wanted it like this.
+		 * My life, where did it go?
+		 */
+		if (date('d') < 10) {
+			return date('M  d Y');
+		}
+
+	 	return date('M d Y');
+	}
+
+	/**
 	 * Get the current semester
 	 *
 	 * This should take the form below:
