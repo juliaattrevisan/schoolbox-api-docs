@@ -11,8 +11,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $pageNum;
-    private $perPage;
     private $filter;
 
     // visible field mapping: index => humanreadable
@@ -102,9 +100,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
             $orderDir = 'DESC';
         }
 
-        $this->pageNum = ($offset / $limit) + 1;
-        $this->perPage = $limit;
-
         // need fields from which to retrieve data
         if(empty($this->fields))
             return false;
@@ -167,6 +162,26 @@ OR ml.name        LIKE :keyword
             sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
             '';
 
+        $joins = "
+            LEFT JOIN `user` u    ON u.id = cl.user
+            LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
+            LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
+            LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
+            LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
+            LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
+        ";
+
+        // Get count separately from data
+        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM cmsLog cl $joins $sqlFilterString");
+        foreach ($params as $name => $value) {
+            $countStatement->bindValue($name, $value);
+        }
+        $countStatement->execute();
+        $this->dataCount = $countStatement->fetchColumn();
+        if (!$this->dataCount) {
+            return 0;
+        }
+
         $dataQuery = "SELECT
             cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
             u.username, u.title, u.firstname, u.lastname,
@@ -176,12 +191,7 @@ OR ml.name        LIKE :keyword
             mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
             ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name
             FROM cmsLog cl
-            LEFT JOIN `user` u    ON u.id = cl.user
-            LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
-            LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
-            LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
-            LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
-            LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
+            $joins
             $sqlFilterString
             ORDER BY $orderBy $orderDir";
         if ($limit > 0) {
@@ -201,11 +211,6 @@ OR ml.name        LIKE :keyword
             $statement->bindValue('offset', $offset, PDO::PARAM_INT);
         }
         $statement->execute();
-
-        $this->dataCount = $statement->rowCount();
-        if(!$this->dataCount) {
-            return 0;
-        }
 
         // get limited records from the resource, rather than in bulk
         $this->dataSet = $statement;
