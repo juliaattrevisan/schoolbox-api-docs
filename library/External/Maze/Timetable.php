@@ -271,155 +271,74 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return array
 	 */
 	public function getStaffTimetable($externalUserId, $dayNumber) {
+		$userMapper = new \Schoolbox\UserMapper();
+		$user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+		$user = $userMapper->findById($user->getId());
 
-		/* Get staff member's KLPID
-		 */
-		$query = "
-			SELECT KLPID
-			FROM SF
-			WHERE SFKEY = '{$externalUserId}'
-		";
+		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
-		$result1 = $this->getDb()->getRow($query);
-
-		$klpId = $result1['KLPID'];
-
-		/* Get all the periods (I think this sql stored proc is somehow not working)
- 		 */
-		$vars = array(
-			'klp_GetTimetable',
-			array(
-				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		/* A list of all the class values, which are stma.idents
-		 */
-		$allSubjects = array();
-		$allObjects = array();
-
-		if (is_array($result2['result']) && count($result2['result'])) {
-			foreach($result2['result'] as $currentPeriod) {
-				if ($currentPeriod['staffid'] == $klpId) {
-					$allObjects[] = $currentPeriod;
-
-					$allSubjects[] = $currentPeriod['class'];
-				}
-			}
-		}
-
-		$allSubjects = '(\'' . implode('\',\'', $allSubjects) . '\')';
-
-		/* Find all the STMAs that are in $allSubjects and rearrange
-		 */
-		$query = "
-			SELECT *
-			FROM STMA
-			WHERE STMA.IDENT IN {$allSubjects}
-		";
-
-		$allStma = $this->getDb()->getAll($query);
-
-		$processedStma = array();
-
-		if (is_array($allStma) && count($allStma)) {
-			foreach($allStma as $currentStma) {
-				$processedStma[$currentStma['IDENT']] = $currentStma;
-			}
-		}
-
-		/* Get the timetable definition
-		 */
-		$vars = array(
-			'klp_GetTimetableStructure',
-			array(
-				array('@Today', null, SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		/* Invert everything in the timetable definition
-		 */
-		$allStructures = array();
-
-		foreach($result3['result'] as $currentTimetableStructure) {
-
-			/* Restrict to a specified Day
-			 * Otherwise skip it
-			 */
-			if ($currentTimetableStructure['DayNo'] == $dayNumber) {
-
-				/* Clone that guy out
-				 */
-				$structure = $currentTimetableStructure;
-				$structure['class']['subject'] = array();
-
-				/* Find the subjects which have this period number
-				 * This class occurs in $currentTimetableStructure
-				 */
-				if (is_array($allObjects) && count($allObjects)) {
-					foreach($allObjects as $currentObject) {
-						if ($currentTimetableStructure['PeriodNo'] == $currentObject['periodno']) {
-
-							/* Separate subject identifier
-							 */
-							$subjectData = $processedStma[$currentObject['class']];
-
-							/* Assemble
-							 */
-							$class = $currentObject;
-
-							$class['subject']['code'] = $this->getHelper()->generateClassCode($subjectData['MKEY'], $subjectData['CLASS']);
-							$class['subject']['name'] = $this->getSubjectName($subjectData['MKEY']);
-
-							/* Stack up
-							 */
-							$structure['class'] = $class;
-						}
-					}
-				}
-
-				/* Stack up
-				 */
-				$allStructures[] = $structure;
-			}
-		}
-
-		/* Postprocess for Dashboard compatibility
-		 */
-		$finalTimetable = array();
-		$times = $this->getPeriodTimes();
-		$i = 0;
-
-		foreach($allStructures as $currentStructure) {
-
-			/* For the dashboard which alternates between heading and data
-			 */
-			$finalTimetable[] = array(
-				'periodName' => $currentStructure['PerNoDesc'],
-				'periodStart' => $times[$i]['startTime']->getTimeOnly(),
-				'periodEnd' => $times[$i]['endTime']->getTimeOnly(),
-				'periodNumber' => $currentStructure['CalRow'],
+		foreach($definition['number'] as $index) {
+			$finalTimetable[$index-1] = array(
+				'periodName' => $definition['desc'][$index-1],
+				'periodStart' => $definition['start'][$index-1],
+				'periodEnd' => $definition['end'][$index-1],
+				'periodNumber' => $index,
 				'periodSequence' => 1,
-				'description' => $currentStructure['class']['subject']['name'],
-				'code' => $currentStructure['class']['subject']['code'],
-				'room' => $currentStructure['class']['room'],
+				'description' => '',
+				'code' => '',
+				'room' => '',
 				'staffID' => '',
+				'staffTitle' => '',
+				'staffFirstname' => '',
+				'staffSurname' => '',
 			);
-
-			$i++;
 		}
 
-		/* TODO: Some serious assumption about final period 0
-		 * Truncate the final Period 0, last in the $finalTimetable.
-		 * It follows Period 7 right out of the stored proc
-		 */
-		array_pop($finalTimetable);
+		$query = "
+			SELECT TOP 100 *
+			FROM TH
+			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND THTQ.QCOL = '{$dayNumber}'
+			AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
+			ORDER BY QCOL, QROW
+		";
+
+		$allRows = $this->getDb()->getAll($query);
+
+		foreach ($allRows as $currentRow) {
+			$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
+			$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+
+			/* Find the teacher if one is assigned
+			 */
+			if (strlen($currentRow['T1TEACH']) || strlen($currentRow['T2TEACH'])) {
+				if ($currentRow['T1TEACH'] == $externalUserId) {
+					$key = 'T1TEACH';
+				}
+				else if ($currentRow['T2TEACH'] == $externalUserId) {
+					$key = 'T2TEACH';
+				}
+
+				try {
+					$userMapper = new \Schoolbox\UserMapper();
+					$user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
+
+					/* Paste teacher in
+					 */
+					$finalTimetable[$currentRow['QROW']-1]['staffID'] = $externalUserId;
+					$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
+					$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
+					$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+				}
+				catch (Exception $e) {
+				}
+			}
+		}
 
 		return $finalTimetable;
 	}
