@@ -90,18 +90,17 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     $pollHandler->delete($_GET['delete']);
 
-    /* select next textBox
+    /* select next poll
      */
     $current = $pollHandler->getCurrentPoll($poll['categoryID']);
-
     if ($current['pollID']) {
         try {
             $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
             $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
                 array(
-                    'id'                      => $_POST['homepageComponentID'],
+                    'id'                      => $_GET['homepageComponentID'],
                     'module'                  => 'homepage',
-                    'identifier'              => $_POST['categoryID'],
+                    'identifier'              => $poll['categoryID'],
                     'component_definition_id' => $cdm->getDefinitionId(),
                 )
             );
