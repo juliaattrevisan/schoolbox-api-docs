@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7517a0248243700b69b3d7dbbe0a6ff2",
+    "hash": "a1addf502270a4e0d4c7f4bdb8e15965",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2343,6 +2343,54 @@
             "time": "2013-06-02 19:09:45"
         },
         {
+            "name": "fabpot/php-cs-fixer",
+            "version": "v0.5.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fabpot/PHP-CS-Fixer.git",
+                "reference": "85d8f69bee216a30397c84b9f42c7328d1276d42"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fabpot/PHP-CS-Fixer/zipball/85d8f69bee216a30397c84b9f42c7328d1276d42",
+                "reference": "85d8f69bee216a30397c84b9f42c7328d1276d42",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.6",
+                "sebastian/diff": "1.1.*",
+                "symfony/console": "~2.1",
+                "symfony/filesystem": "~2.1",
+                "symfony/finder": "~2.1"
+            },
+            "bin": [
+                "php-cs-fixer"
+            ],
+            "type": "application",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\CS": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "A script to automatically fix Symfony Coding Standard",
+            "time": "2014-07-29 18:07:04"
+        },
+        {
             "name": "instaclick/php-webdriver",
             "version": "1.0.17",
             "source": {
@@ -3343,69 +3391,6 @@
             "time": "2014-03-07 15:35:33"
         },
         {
-            "name": "sensiolabs/behat-page-object-extension",
-            "version": "v1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sensiolabs/BehatPageObjectExtension.git",
-                "reference": "97701070863bb99709239a6432d921dd1275b0f6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/BehatPageObjectExtension/zipball/97701070863bb99709239a6432d921dd1275b0f6",
-                "reference": "97701070863bb99709239a6432d921dd1275b0f6",
-                "shasum": ""
-            },
-            "require": {
-                "behat/behat": "~2.4",
-                "behat/mink-extension": "~1.0",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "behat/mink-goutte-driver": "~1.0",
-                "bossa/phpspec2-expect": "~1.0",
-                "phpspec/phpspec": "~2.0",
-                "symfony/filesystem": "~2.3",
-                "symfony/process": "~2.3"
-            },
-            "suggest": {
-                "bossa/phpspec2-expect": "Allows to use PHPSpec2 matchers in Behat context files"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "SensioLabs\\Behat\\PageObjectExtension\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marcello Duarte",
-                    "email": "mduarte@inviqa.com"
-                },
-                {
-                    "name": "Jakub Zalas",
-                    "email": "jzalas@sensiolabs.co.uk"
-                }
-            ],
-            "description": "Page object extension for Behat",
-            "homepage": "https://github.com/sensiolabs/BehatPageObjectExtension",
-            "keywords": [
-                "BDD",
-                "Behat",
-                "page"
-            ],
-            "time": "2014-05-21 21:42:07"
-        },
-        {
             "name": "squizlabs/php_codesniffer",
             "version": "dev-phpcs-fixer",
             "source": {
@@ -3477,58 +3462,6 @@
                 "standards"
             ],
             "time": "2014-07-29 23:17:03"
-        },
-        {
-            "name": "symfony/class-loader",
-            "version": "v2.5.2",
-            "target-dir": "Symfony/Component/ClassLoader",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/ClassLoader.git",
-                "reference": "25b74b67d455268415d7d34b41f8b7df4cb33ba4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ClassLoader/zipball/25b74b67d455268415d7d34b41f8b7df4cb33ba4",
-                "reference": "25b74b67d455268415d7d34b41f8b7df4cb33ba4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "symfony/finder": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\ClassLoader\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony ClassLoader Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-07-09 09:05:48"
         },
         {
             "name": "symfony/config",
@@ -4017,7 +3950,8 @@
         "aura/web": 10,
         "aura/session": 20,
         "0x46616c6b/etherpad-lite-client": 20,
-        "squizlabs/php_codesniffer": 20
+        "squizlabs/php_codesniffer": 20,
+        "fabpot/php-cs-fixer": 0
     },
     "prefer-stable": false,
     "platform": [
