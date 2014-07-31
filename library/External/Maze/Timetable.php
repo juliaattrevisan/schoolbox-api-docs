@@ -431,25 +431,14 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return mixed
 	 */
 	public function getStudentTimetable($externalUserId, $dayNumber) {
-		$query = "
-			SELECT *
-			FROM TH
-			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
-			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
-			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-			AND THTQ.QCOL = '{$this->getDayNumber($dayNumber)}'
-			AND STMA.SKEY = '{$externalUserId}'
-		";
+		$userMapper = new \Schoolbox\UserMapper();
+		$user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+		$user = $userMapper->findById($user->getId());
 
-		$allResults = $this->getDb()->getAll($query);
-
-		$definition = $this->getTimetableDefinition(1);
+		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
 		foreach($definition['number'] as $index) {
-			$finalTimetable0[$index-1] = array(
+			$finalTimetable[$index-1] = array(
 				'periodName' => $definition['desc'][$index-1],
 				'periodStart' => $definition['start'][$index-1],
 				'periodEnd' => $definition['end'][$index-1],
@@ -462,160 +451,33 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			);
 		}
 
+		$query = "
+			SELECT *
+			FROM TH
+			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND THTQ.QCOL = '{$dayNumber}'
+			AND STMA.SKEY = '{$externalUserId}'
+		";
+
+		$allResults = $this->getDb()->getAll($query);
+
 		foreach ($allResults as $currentRow) {
-			$finalTimetable0[$currentRow['QROW']-1]['description'] = '';
-			$finalTimetable0[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
-			$finalTimetable0[$currentRow['QROW']-1]['staffID'] = trim($currentRow['T1TEACH'] . ' ' . $currentRow['T1TEACH']);
+			$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
+			$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+			$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($currentRow['T1TEACH'] . ' ' . $currentRow['T1TEACH']);
 
 			/* Samuel, Samuel, Samuel...
 			 */
-			$finalTimetable0[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
+			$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
 		}
 
-
-
-
-
-
-
-		/* Get all the subjects for the current ttperiod
-		 */
-		$query = "
-			SELECT *
-			FROM STMA
-			WHERE SKEY = '{$externalUserId}'
-			AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
-		";
-
-		$result1 = $this->getDb()->getAll($query);
-
-		/* Get all the periods (I think this sql stored proc is somehow not working)
-		 */
-		$vars = array(
-			'klp_GetTimetable',
-			array(
-				array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result2 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		/* Get the timetable definition
-		 */
-		$vars = array(
-			'klp_GetTimetableStructure',
-			array(
-				array('@Today', null, SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
-
-		$result3 = $this->getDb()->executeProcedure($vars[0], $vars[1]);
-
-		/* Manual join
-		 * For every STMA record, find the STMA.IDENT
-		 * Find all the GetTimetable.class records that match
-		 * Find all the PeriodNo's that GetTimetable.class belongs in
-		 */
-		$allObjects = array();
-
-		/* Reduce data sets. This generates a list of subjects and the periods
-		 * in which they appear stored as an array
-		 */
-		if (is_array($result1) && count($result1)) {
-			foreach($result1 as $currentStma) {
-				$object = array();
-				$object['stma'] = $currentStma;
-				$object['period'] = array();
-
-				/* This tends to be a big data set
-				 */
-				foreach($result2['result'] as $currentPeriod) {
-					if ($currentStma['IDENT'] == $currentPeriod['class']) {
-						$object['period'][$currentPeriod['periodno']] = $currentPeriod;
-					}
-				}
-
-				$allObjects[] = $object;
-			}
-		}
-
-		/* Invert everything in the timetable definition
-		 */
-		$allStructures = array();
-
-		foreach($result3['result'] as $currentTimetableStructure) {
-
-			/* Restrict to a specified Day
-			 * Otherwise skip it
-			 */
-			if ($currentTimetableStructure['DayNo'] == $dayNumber) {
-
-				/* Clone that guy out
-				 */
-				$structure = $currentTimetableStructure;
-				$structure['class']['subject'] = array();
-				$structure['class']['periods'] = array();
-
-				/* Find the subjects which have this period number
-				 * This class occurs in $currentTimetableStructure
-				 */
-				if (is_array($allObjects) && count($allObjects)) {
-					foreach($allObjects as $currentObject) {
-						if (in_array($currentTimetableStructure['PeriodNo'], array_keys($currentObject['period']))) {
-
-							/* Assemble
-							 */
-							$class = $currentObject['period'][$currentTimetableStructure['PeriodNo']];
-
-							/* Separate subject identifier
-							 */
-							$class['subject']['code'] = $this->getHelper()->generateClassCode($currentObject['stma']['MKEY'], $currentObject['stma']['CLASS']);
-							$class['subject']['name'] = $this->getSubjectName($currentObject['stma']['MKEY']);
-
-							/* Stack up
-							 */
-							$structure['stmaIdent'] = $currentObject['stma']['IDENT'];
-							$structure['class'] = $class;
-						}
-					}
-				}
-
-				/* Stack up
-				 */
-				$allStructures[] = $structure;
-			}
-		}
-
-		/* Postprocess for Dashboard compatibility
- 		 */
-		$times = $this->getPeriodTimes();
-		$finalTimetable = array();
-		$i = 0;
-
-		foreach($allStructures as $currentStructure) {
-
-			/* For the dashboard which alternates between heading and data
-			 */
-			$finalTimetable[] = array(
-				'periodName' => $currentStructure['PerNoDesc'],
-				'periodStart' => $times[$i]['startTime']->getTimeOnly(),
-				'periodEnd' => $times[$i]['endTime']->getTimeOnly(),
-				'periodNumber' => $currentStructure['CalRow'],
-				'periodSequence' => 1,
-				'description' => $currentStructure['class']['subject']['name'],
-				'code' => $currentStructure['class']['subject']['code'],
-				'room' => $currentStructure['class']['room'],
-				'staffID' => '',
-			);
-
-			$i++;
-		}
-
-//		new \Alaress_ThreeProbe($finalTimetable0, $finalTimetable, null);
-//		die();
-		return $finalTimetable0;
+		return $finalTimetable;
 	}
 
 	/**
