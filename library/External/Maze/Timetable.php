@@ -73,7 +73,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		$query = "
 			SELECT TOP 2 TH.*
 			FROM TH
-			WHERE THKEY = '2014S2'
+			WHERE THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 		";
 
 		$result = $this->getDb()->getAll($query);
@@ -157,35 +157,36 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @return bool
 	 */
 	public function getDayNumber($campusId, $date = 0) {
-		$vars = array(
-			'klp_GetTimetableStructure',
-			array(
-				array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
-				array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-			)
-		);
+		$currentDateString = date('M d Y');
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		$query = "
+			SELECT TOP 1 QCOL
+			FROM TCTQ
+			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY
+			WHERE TCTQKEY LIKE '{$currentDateString}%'
+		";
 
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$result = $this->getDb()->getRow($query);
 
-		if (is_array($result['result']) && count($result['result'])) {
-			if ($date) {
-				$periodDate = new \Alaress_Date_Format(strtotime($date), 'U');
-			}
+		return $result['QCOL'];
+	}
 
-			foreach ($result['result'] as $currentPeriod) {
-				if (!$date) {
-					$periodDate = new \Alaress_Date_Format(strtotime($currentPeriod['CalDate']), 'U');
-				}
-
-				if ($periodDate->getDatabaseDate() == $now->getDatabaseDate()) {
-					return $currentPeriod['DayNo'];
-				}
-			}
-		}
-
-		return false;
+	public function getTest() {
+		$query = "
+			SELECT
+			 	THKEY,
+			 	CALENDAR_START01,
+			 	CALENDAR_START02,
+			 	CALENDAR_START03,
+			 	CALENDAR_START04,
+			 	CALENDAR_END01,
+			 	CALENDAR_END02,
+			 	CALENDAR_END03,
+			 	CALENDAR_END04
+			FROM TH
+			WHERE THKEY LIKE '2014%'
+			ORDER BY THKEY DESC
+		";
 	}
 
 	/**
