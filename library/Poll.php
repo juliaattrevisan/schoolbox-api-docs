@@ -14,11 +14,6 @@ class Poll extends DeprecatedModel {
 		$query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table. " WHERE " . $this->_index . " = '$pollID'";
 		return $this->db->getRow($query);
 	}
-	
-	function getCurrentPoll ($categoryID) {
-		$pollList = $this->getAllByCategory($categoryID);
-		return $pollList[0];
-	}
 
 	function getAllByCategory ($categoryID) {
 		$query = "SELECT * FROM poll WHERE categoryID = $categoryID ORDER BY created DESC";
