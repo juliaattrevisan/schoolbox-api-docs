@@ -161,27 +161,6 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		return $this->timetableDayLabel . ($i < 10 ? 0 . $i : $i);
 	}
 
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set timetable period label
-	 *
-	 * @param string $timetablePeriodLabel
-	 */
-	private function setTimetablePeriodLabel($timetablePeriodLabel) {
-		$this->timetablePeriodLabel = $timetablePeriodLabel;
-	}
-
-	/**
-	 * Set timetable day label
-	 *
-	 * @param string $timetableDayLabel
-	 */
-	private function setTimetableDayLabel($timetableDayLabel) {
-		$this->timetableDayLabel = $timetableDayLabel;
-	}
-
 	/**
 	 * Get the current day number
 	 *
@@ -653,5 +632,23 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 */
 	private function getGroupHandler() {
 		return $this->groupHandler;
+	}
+
+	/**
+	 * Set timetable period label
+	 *
+	 * @param string $timetablePeriodLabel
+	 */
+	private function setTimetablePeriodLabel($timetablePeriodLabel) {
+		$this->timetablePeriodLabel = $timetablePeriodLabel;
+	}
+
+	/**
+	 * Set timetable day label
+	 *
+	 * @param string $timetableDayLabel
+	 */
+	private function setTimetableDayLabel($timetableDayLabel) {
+		$this->timetableDayLabel = $timetableDayLabel;
 	}
 }
