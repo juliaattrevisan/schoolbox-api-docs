@@ -38,16 +38,6 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	private $groupHandler = null;
 
 	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setDb(MSSQL::getInstance());
-		$this->setHelper(new External_Maze_Helper());
-		$this->setCampusMapper(new \Schoolbox\CampusMapper());
-		$this->setGroupHandler(new Group());
-	}
-
-	/**
 	 * Array key
 	 *
 	 * @var string
@@ -60,6 +50,48 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	 * @var string
 	 */
 	private $timetableDayLabel = 'TH_CLABEL';
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setDb(MSSQL::getInstance());
+		$this->setHelper(new External_Maze_Helper());
+		$this->setCampusMapper(new \Schoolbox\CampusMapper());
+		$this->setGroupHandler(new Group());
+	}
+
+	/**
+	 * Test method for experimentation
+	 */
+	public function getTest() {
+//		$query = "
+//			SELECT *
+//			FROM TH
+//			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+//			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+//			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+//			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+//			AND THTQ.QCOL = '{$this->getDayNumber(1)}'
+//			AND STMA.SKEY = 'ABBOMEG'
+//		";
+//
+//		$result1 = $this->getDb()->getAll($query);
+//
+//		$query = "
+//			SELECT TOP 100 *
+//			FROM TCTD
+//			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+//			AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+//			ORDER BY TIME_INDEX
+//		";
+//
+//		$result2 = $this->getDb()->getAll($query);
+//
+//		new \Alaress_ThreeProbe(null, $result1, null);
+	}
 
 	/**
 	 * Take a Maze datetime and returns the time portion of it
@@ -180,35 +212,6 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		return $result['QCOL'];
 	}
 
-	public function getTest() {
-		$query = "
-			SELECT *
-			FROM TH
-			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
-			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
-			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-			AND THTQ.QCOL = '{$this->getDayNumber(1)}'
-			AND STMA.SKEY = 'ABBOMEG'
-		";
-
-		$result1 = $this->getDb()->getAll($query);
-
-//		$query = "
-//			SELECT TOP 100 *
-//			FROM TCTD
-//			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-//			AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-//			ORDER BY TIME_INDEX
-//		";
-//
-//		$result2 = $this->getDb()->getAll($query);
-
-		new \Alaress_ThreeProbe(null, $result1, null);
-	}
-
 	/**
 	 * Calculates the current period based on the current time
 	 *
@@ -295,7 +298,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		}
 
 		$query = "
-			SELECT TOP 100 *
+			SELECT *
 			FROM TH
 			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
 			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
@@ -310,33 +313,39 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
 		$allRows = $this->getDb()->getAll($query);
 
-		foreach ($allRows as $currentRow) {
-			$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-			$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+		if (is_array($allRows) && count($allRows)) {
+			foreach ($allRows as $currentRow) {
+				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
+				$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
 
-			/* Find the teacher if one is assigned
-			 */
-			if (strlen($currentRow['T1TEACH']) || strlen($currentRow['T2TEACH'])) {
-				if ($currentRow['T1TEACH'] == $externalUserId) {
-					$key = 'T1TEACH';
-				}
-				else if ($currentRow['T2TEACH'] == $externalUserId) {
-					$key = 'T2TEACH';
+				/* Find the teacher if one is assigned
+				 */
+				if (strlen($currentRow['T1TEACH']) || strlen($currentRow['T2TEACH'])) {
+					if ($currentRow['T1TEACH'] == $externalUserId) {
+						$key = 'T1TEACH';
+					}
+					else if ($currentRow['T2TEACH'] == $externalUserId) {
+						$key = 'T2TEACH';
+					}
+
+					try {
+						$userMapper = new \Schoolbox\UserMapper();
+						$user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
+
+						/* Paste teacher in
+						 */
+						$finalTimetable[$currentRow['QROW']-1]['staffID'] = $externalUserId;
+						$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
+						$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
+						$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+					}
+					catch (Exception $e) {
+					}
 				}
 
-				try {
-					$userMapper = new \Schoolbox\UserMapper();
-					$user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
-
-					/* Paste teacher in
-					 */
-					$finalTimetable[$currentRow['QROW']-1]['staffID'] = $externalUserId;
-					$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
-					$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
-					$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
-				}
-				catch (Exception $e) {
-				}
+				/* Samuel, Samuel, Samuel...
+				 */
+				$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
 			}
 		}
 
@@ -388,45 +397,46 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			AND STMA.SKEY = '{$externalUserId}'
 		";
 
-		$allResults = $this->getDb()->getAll($query);
+		$allRows = $this->getDb()->getAll($query);
 
-		foreach ($allResults as $currentRow) {
-			$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-			$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+		if (is_array($allRows) && count($allRows)) {
+			foreach ($allRows as $currentRow) {
+				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
+				$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
 
-			/* Find the teacher
-			 */
-			$query = "
-				SELECT *
-				FROM TCTQ
-				WHERE TCTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-				AND SUBJ = '{$currentRow['SUBJ']}'
-				AND CLASS = '{$currentRow['CLASS']}'
-				AND TCTQ.TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-			";
+				/* Find the teacher
+				 */
+				$query = "
+					SELECT *
+					FROM TCTQ
+					WHERE TCTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+					AND SUBJ = '{$currentRow['SUBJ']}'
+					AND CLASS = '{$currentRow['CLASS']}'
+					AND TCTQ.TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+				";
 
-			$teacher = $this->getDb()->getRow($query);
+				$teacher = $this->getDb()->getRow($query);
 
-			if (strlen(trim($teacher['T1TEACH']))) {
-				try {
-					$userMapper = new \Schoolbox\UserMapper();
-					$user = $userMapper->findOneByColumn('synergy_id', $teacher['T1TEACH']);
+				if (strlen(trim($teacher['T1TEACH']))) {
+					try {
+						$userMapper = new \Schoolbox\UserMapper();
+						$user = $userMapper->findOneByColumn('synergy_id', $teacher['T1TEACH']);
 
-					/* Paste teacher in
-					 */
-					$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($teacher['T1TEACH']);
-					$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
-					$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
-					$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
-
+						/* Paste teacher in
+						 */
+						$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($teacher['T1TEACH']);
+						$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
+						$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
+						$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+					}
+					catch (Exception $e) {
+					}
 				}
-				catch (Exception $e) {
-				}
+
+				/* Samuel, Samuel, Samuel...
+				 */
+				$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
 			}
-
-			/* Samuel, Samuel, Samuel...
-			 */
-			$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
 		}
 
 		return $finalTimetable;
