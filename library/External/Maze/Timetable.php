@@ -94,16 +94,6 @@ class External_Maze_Timetable implements External_TimetableInterface {
 	}
 
 	/**
-	 * Take a Maze datetime and returns the time portion of it
-	 *
-	 * @param $date
-	 * @return string
-	 */
-	public function mazeTime($date) {
-		return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
-	}
-
-	/**
 	 * The headings of the timetable, going horizontally
 	 * from left to right containing all the times and day numbers
 	 *
@@ -140,8 +130,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 					/* Ram it in
 					 */
 					$timetableDef['desc'][] = $definition[$periodTempKey];
-					$timetableDef['start'][] = $this->mazeTime($result[$i-1]['TIME_START']);
-					$timetableDef['end'][] = $this->mazeTime($result[$i-1]['TIME_END']);
+					$timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i-1]['TIME_START']);
+					$timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i-1]['TIME_END']);
 					$timetableDef['number'][] = $i;
 					$timetableDef['sequence'][] = $i;
 				}

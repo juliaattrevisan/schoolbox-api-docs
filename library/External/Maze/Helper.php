@@ -61,6 +61,16 @@ class External_Maze_Helper {
 	}
 
 	/**
+	 * Take a Maze datetime and returns the time portion of it
+	 *
+	 * @param $date
+	 * @return string
+	 */
+	public function mazeTime($date) {
+		return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
+	}
+
+	/**
 	 * Get the current semester
 	 *
 	 * This should take the form below:
