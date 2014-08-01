@@ -270,6 +270,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
 		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
+		$finalTimetable = array();
+
 		foreach($definition['number'] as $index) {
 			$finalTimetable[$index-1] = array(
 				'periodName' => $definition['desc'][$index-1],
@@ -306,7 +308,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		if (is_array($allRows) && count($allRows)) {
 			foreach ($allRows as $currentRow) {
 				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-				$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+				$finalTimetable[$currentRow['QROW']-1]['code'] = $this->getHelper()->generateClassCode($currentRow['SUBJ'], $currentRow['CLASS']);
 
 				/* Find the teacher if one is assigned
 				 */
@@ -335,7 +337,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
 				/* Samuel, Samuel, Samuel...
 				 */
-				$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
+				$finalTimetable[$currentRow['QROW']-1]['room'] = trim("{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}");
 			}
 		}
 
@@ -355,6 +357,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		$user = $userMapper->findById($user->getId());
 
 		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+
+		$finalTimetable = array();
 
 		foreach($definition['number'] as $index) {
 			$finalTimetable[$index-1] = array(
@@ -392,7 +396,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		if (is_array($allRows) && count($allRows)) {
 			foreach ($allRows as $currentRow) {
 				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-				$finalTimetable[$currentRow['QROW']-1]['code'] = $currentRow['SUBJ'] . '-' . $currentRow['CLASS'];
+				$finalTimetable[$currentRow['QROW']-1]['code'] = $this->getHelper()->generateClassCode($currentRow['SUBJ'], $currentRow['CLASS']);
 
 				/* Find the teacher
 				 */
@@ -425,7 +429,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
 				/* Samuel, Samuel, Samuel...
 				 */
-				$finalTimetable[$currentRow['QROW']-1]['room'] = trim($currentRow['R1ROOM'] . ' ' . $currentRow['R2ROOM']);
+				$finalTimetable[$currentRow['QROW']-1]['room'] = trim("{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}");
 			}
 		}
 
