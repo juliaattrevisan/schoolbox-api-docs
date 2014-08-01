@@ -88,6 +88,10 @@
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master"
     },
     "require-dev": {
+        "sebastian/phpcpd": "2.*",
+        "phpmd/phpmd" : "2.*",
+        "squizlabs/php_codesniffer": "2.*@dev",
+        "fabpot/php-cs-fixer": "@stable",
         "phpunit/phpunit": "4.1.*",
         "behat/behat": "2.5.*",
         "behat/mink": "1.5.*",
