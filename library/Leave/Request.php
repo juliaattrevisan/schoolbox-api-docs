@@ -2,13 +2,6 @@
 
 class Leave_Request {
 
-	/**
-	 * A collection of host type instances
-	 *
-	 * @var \Schoolbox\Collection
-	 */
-	private $allHostTypes = null;
-
     /* Leave Requests confirmation types and their presentation labels
       */
     private $confirmedByMap = array(
@@ -55,18 +48,6 @@ class Leave_Request {
      * @var Leave_Request_TravelType
      */
     protected $travelType;
-
-//	/**
-//	 * Constructor
-//	 */
-//	public function __construct() {
-//
-//		/* Set up host types again
-//		 * TODO remove this unnecessary and dangerous dependency on the database
-//		 */
-//		$hostTypeMapper = new \Leave\HostTypeMapper();
-//		$this->setAllHostTypes($hostTypeMapper->findAll());
-//	}
 
 	/**
 	 * Get duration
@@ -209,12 +190,6 @@ class Leave_Request {
      */
     public function getHostType() {
         return $this->hostType;
-//        if ($string) {
-////            return $this->getHostTypeMapIndex($this->hostType);
-//            return $this->getHostType()->getName();
-//        } else {
-//            return $this->hostType;
-//        }
     }
 
     /**
@@ -453,16 +428,6 @@ class Leave_Request {
         return $this->notes;
     }
 
-//    /**
-//     * Get host type label for a host type id
-//     *
-//     * @param $index
-//     * @return mixed
-//     */
-//    public function getHostTypeMapIndex($index) {
-//		return $this->getAllHostTypes()->getBy('id', $index);
-//    }
-
     /**
      * Get confirmed by
      *
@@ -533,24 +498,6 @@ class Leave_Request {
 	public function getAuthor() {
 		return $this->author;
 	}
-
-//	/**
-//	 * Set all host types
-//	 *
-//	 * @param \Schoolbox\Collection $allHostTypes
-//	 */
-//	private function setAllHostTypes($allHostTypes) {
-//		$this->allHostTypes = $allHostTypes;
-//	}
-//
-//	/**
-//	 * Set all host types
-//	 *
-//	 * @return \Schoolbox\Collection|\Leave\HostType[]
-//	 */
-//	public function getAllHostTypes() {
-//		return $this->allHostTypes;
-//	}
 
 	/**
 	 * Set collector name
