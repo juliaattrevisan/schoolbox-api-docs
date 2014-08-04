@@ -64,7 +64,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			array(
 				'column' => 'host_type',
 				'property' => 'hostType',
-				'type' => self::TYPE_INTEGER,
+				'type' => self::TYPE_MODEL,
+				'join' => 'host_type',
+				'join_def' => array(
+					'mapper'    => '\\Leave\\HostTypeMapper',
+					'other_key' => 'id',
+				),
 			)
 		);
 
@@ -462,7 +467,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				{$this->getColumnString('lr')},
 				{$this->getUserMapper()->getColumnString('u')},
 				{$this->getUserMapper()->getColumnString('au')},
-				{$this->getJoinColumnString('travelType', 'tt')}
+				{$this->getJoinColumnString('travelType', 'tt')},
+				{$this->getJoinColumnString('host_type', 'ht')}
 			FROM {$this->getTable()} `lr`
 			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
 				AND lr.start < :finish
@@ -470,6 +476,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
 			WHERE u.residential_house_id = :houseId
 			ORDER BY LENGTH(u.year), u.year, u.lastname
 		");
@@ -631,6 +638,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				/* Hydrate travel type */
 				if (!empty($row['tt.id'])) {
 					$request->setTravelType($mapper->getJoinMapper('travelType')->hydrate($row, 'tt'));
+				}
+				/* Hydrate request type */
+				if (!empty($row['ht.id'])) {
+					$request->setHostType($mapper->hydrateJoin($row, 'host_type', 'ht'));
 				}
 				return $request;
 			};

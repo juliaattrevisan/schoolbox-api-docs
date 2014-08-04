@@ -56,17 +56,17 @@ class Leave_Request {
      */
     protected $travelType;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-
-		/* Set up host types again
-		 * TODO remove this unnecessary and dangerous dependency on the database
-		 */
-		$hostTypeMapper = new \Leave\HostTypeMapper();
-		$this->setAllHostTypes($hostTypeMapper->findAll());
-	}
+//	/**
+//	 * Constructor
+//	 */
+//	public function __construct() {
+//
+//		/* Set up host types again
+//		 * TODO remove this unnecessary and dangerous dependency on the database
+//		 */
+//		$hostTypeMapper = new \Leave\HostTypeMapper();
+//		$this->setAllHostTypes($hostTypeMapper->findAll());
+//	}
 
 	/**
 	 * Get duration
@@ -205,16 +205,16 @@ class Leave_Request {
     /**
      * Get host type
      *
-     * @param bool $string
-     *
      * @return string
      */
-    public function getHostType($string = false) {
-        if ($string) {
-            return $this->getHostTypeMapIndex($this->hostType);
-        } else {
-            return $this->hostType;
-        }
+    public function getHostType() {
+        return $this->hostType;
+//        if ($string) {
+////            return $this->getHostTypeMapIndex($this->hostType);
+//            return $this->getHostType()->getName();
+//        } else {
+//            return $this->hostType;
+//        }
     }
 
     /**
@@ -453,24 +453,15 @@ class Leave_Request {
         return $this->notes;
     }
 
-    /**
-     * Get host type map array
-     *
-     * @return array
-     */
-    public function getHostTypeMap() {
-        return $this->hostTypeMap;
-    }
-
-    /**
-     * Get host type label for a host type id
-     *
-     * @param $index
-     * @return mixed
-     */
-    public function getHostTypeMapIndex($index) {
-		return $this->getAllHostTypes()->getBy('id', $index);
-    }
+//    /**
+//     * Get host type label for a host type id
+//     *
+//     * @param $index
+//     * @return mixed
+//     */
+//    public function getHostTypeMapIndex($index) {
+//		return $this->getAllHostTypes()->getBy('id', $index);
+//    }
 
     /**
      * Get confirmed by
@@ -543,23 +534,23 @@ class Leave_Request {
 		return $this->author;
 	}
 
-	/**
-	 * Set all host types
-	 *
-	 * @param \Schoolbox\Collection $allHostTypes
-	 */
-	private function setAllHostTypes($allHostTypes) {
-		$this->allHostTypes = $allHostTypes;
-	}
-
-	/**
-	 * Set all host types
-	 *
-	 * @return \Schoolbox\Collection|\Leave\HostType[]
-	 */
-	public function getAllHostTypes() {
-		return $this->allHostTypes;
-	}
+//	/**
+//	 * Set all host types
+//	 *
+//	 * @param \Schoolbox\Collection $allHostTypes
+//	 */
+//	private function setAllHostTypes($allHostTypes) {
+//		$this->allHostTypes = $allHostTypes;
+//	}
+//
+//	/**
+//	 * Set all host types
+//	 *
+//	 * @return \Schoolbox\Collection|\Leave\HostType[]
+//	 */
+//	public function getAllHostTypes() {
+//		return $this->allHostTypes;
+//	}
 
 	/**
 	 * Set collector name
