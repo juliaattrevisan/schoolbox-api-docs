@@ -308,6 +308,7 @@ class Leave_Request {
             } elseif ($this->isDeleted()) {
                 return 'Deleted';
             }
+            return '';
         } else {
             return $this->status;
         }
