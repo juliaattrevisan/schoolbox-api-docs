@@ -198,9 +198,6 @@
         value: def,
         slide: function(event, ui) {
           hiddens.filter('[data-perm=default]').val(unmap[ui.value]).trigger('change');
-
-
-
         }
       });
 
@@ -251,6 +248,12 @@
     var self = $j(this);
     update(self.closest('li.source'));
     if(self.val() == 0 && self.is(':checked')) {
+      var row = self.closest('tr.role');
+      row.find('div.slide.default').slider('value', 0);
+      row.find('div.slide.range').slider('values', 0, 0);
+      row.find('div.slide.range').slider('values', 1, 0);
+      row.find('input[data-perm]').val(0);
+
       submit(self);
     }
   });
