@@ -353,7 +353,7 @@ class Leave_Core_Report_House_Web
                     $hostTypes = array();
 
                     foreach($currentPerson['request_host_type'] as $currentHostType) {
-                        if ($currentHostType instanceof Leave\HostType) {
+                        if (!empty($currentHostType)) {
                             $hostTypes[] = $currentHostType->getName();
                         }
                     }
