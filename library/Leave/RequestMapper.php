@@ -252,12 +252,14 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				{$this->getJoinColumnString('user', 'u')},
 				{$this->getJoinColumnString('author', 'a')},
 				{$this->getJoinColumnString('authorisationUser', 'au')},
-				{$this->getJoinColumnString('travelType', 'tt')}
+				{$this->getJoinColumnString('travelType', 'tt')},
+				{$this->getJoinColumnString('host_type', 'ht')}
 			FROM `{$this->table}` lr
 			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
 			LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
 		";
 	}
 
