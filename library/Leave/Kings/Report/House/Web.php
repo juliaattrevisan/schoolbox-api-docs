@@ -624,7 +624,7 @@ class Leave_Kings_Report_House_Web
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     protected function getPage()
     {
