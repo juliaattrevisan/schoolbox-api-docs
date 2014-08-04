@@ -58,7 +58,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
+                  WHERE assess_id = {$this->db->smartQuote($assess_id)}
+                  AND deleted_at IS NULL";
 
         if ($groupById) {
             $query .= " GROUP BY user_id";
