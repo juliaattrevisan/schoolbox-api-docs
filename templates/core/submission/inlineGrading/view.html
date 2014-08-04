@@ -13,8 +13,8 @@
 
 		$('.dropdown-navigator').inlineGradingNavigator({
 			currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-			direct: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT}',
-			items: '{INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS}',
+			direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
+			items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
 			disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
 
 			/* Callback methods
@@ -51,8 +51,8 @@
 			$.post(url, data, function(responseText) {
 				$('.dropdown-navigator').inlineGradingNavigator({
 					currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-					direct: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT}',
-					items: '{INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS}',
+					direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
+					items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
 					disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
 					useDisabled: useDisabled,
 
