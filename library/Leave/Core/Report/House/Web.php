@@ -84,7 +84,7 @@ class Leave_Core_Report_House_Web
 
             $combined[$key]['request_id'][$request->getId()] = $request->getId();
             $combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
-            $combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
+            $combined[$key]['request_host_type'][$request->getId()] = $request->getHostType()->getName();
             $combined[$key]['request_description'][$request->getId()] = $request->getDescription();
             $combined[$key]['request_travel_type'][$request->getId()] = $request->getTravelType()->getName();
 
@@ -353,7 +353,7 @@ class Leave_Core_Report_House_Web
                     $hostTypes = array();
 
                     foreach($currentPerson['request_host_type'] as $currentHostType) {
-                        if ($currentHostType !== null) {
+                        if ($currentHostType instanceof Leave\HostType) {
                             $hostTypes[] = $currentHostType->getName();
                         }
                     }
