@@ -536,6 +536,7 @@ class Submission extends DeprecatedModel {
                 assess.mark_visibility
             FROM assess
             WHERE category_id = '$categoryID'
+            AND assess.availability = 'assess'
             AND assess.deleted_at IS NULL
             $ownerCondB
             AND assess.task_id IS NULL
