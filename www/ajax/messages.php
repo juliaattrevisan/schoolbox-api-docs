@@ -21,6 +21,14 @@ header('Content-Type: application/json');
 
 session_start();
 
+// check the session is valid before continuing
+if(empty($_SESSION['user'])) {
+    die(json_encode(array(
+        'error' => 'Unauthorized',
+        'code'  => 401,
+    )));
+}
+
 $protocol = empty($_SERVER['HTTPS']) ? 'ws' : 'wss';
 $path = Cfg::get('websocket_path') ?: '/';
 
