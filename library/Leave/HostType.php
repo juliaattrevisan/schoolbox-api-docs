@@ -11,6 +11,41 @@ namespace Leave;
 
 class HostType {
 
+    /**
+     * Host type: mother
+     *
+     * @var int
+     */
+    const TYPE_MOTHER   = 1;
+
+    /**
+     * Host type: father
+     *
+     * @var int
+     */
+    const TYPE_FATHER   = 2;
+
+    /**
+     * Host type: guardian other than mother or father
+     *
+     * @var int
+     */
+    const TYPE_GUARDIAN = 3;
+
+    /**
+     * Host type: self (no host)
+     *
+     * @var int
+     */
+    const TYPE_SELF     = 4;
+
+    /**
+     * Host type: other (whatever that is)
+     *
+     * @var int
+     */
+    const TYPE_OTHER    = 5;
+
 	/**
 	 * Identifier
 	 *

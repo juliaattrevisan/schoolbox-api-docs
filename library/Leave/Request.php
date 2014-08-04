@@ -62,6 +62,7 @@ class Leave_Request {
 	public function __construct() {
 
 		/* Set up host types again
+		 * TODO remove this unnecessary and dangerous dependency on the database
 		 */
 		$hostTypeMapper = new \Leave\HostTypeMapper();
 		$this->setAllHostTypes($hostTypeMapper->findAll());
@@ -554,7 +555,7 @@ class Leave_Request {
 	/**
 	 * Set all host types
 	 *
-	 * @return \Schoolbox\Collection
+	 * @return \Schoolbox\Collection|\Leave\HostType[]
 	 */
 	public function getAllHostTypes() {
 		return $this->allHostTypes;
