@@ -72,6 +72,30 @@ class Subscription {
 	}
 
 
+    /**
+     * Destroy this subscription
+     */
+    public function __destruct() {
+        $this->unsubscribe();
+    }
+
+    /**
+     * Close this subscription
+     */
+    public function unsubscribe() {
+        if($this->client instanceof Client) {
+            $this->client->unsubscribe($this->id);
+        }
+
+        // unload
+        unset($this->pipeManager);
+        unset($this->id);
+        unset($this->userId);
+        unset($this->client);
+        unset($this->messages);
+        unset($this->destination);
+    }
+
 	/**
 	 * Returns the STOMP ID of this subscription
 	 *

@@ -108,6 +108,46 @@ class SubscriptionManager {
 		$this->subscriptions[$destination] = $subscription;
 	}
 
+
+    /**
+     * Attempts removal of subscriptions of the given userIds.
+     * Returns an array of booleans indexed by userId, each value indicating whether or not the subscription was removed
+     *
+     * @param array $userIds
+     * @return array
+     */
+    public function removeSubscriptions($userIds) {
+        $result = array();
+        foreach($userIds as $id) {
+            $result[$id] = $this->removeSubscription($id);
+        }
+        return $result;
+    }
+
+
+    /**
+     * Attempts removal of a user subscription. Returns boolean of success/failure
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public function removeSubscription($userId) {
+        if(!$this->userHasSubscription($userId)) {
+            return false;
+        }
+
+        $dest = $this->userSubscriptionDestination($userId);
+
+        // call an explicit unsubscription to unhook from STOMP
+        $this->subscriptions[$dest]->unsubscribe();
+
+        // delete the reference, which hopefully calls the destructor
+        unset($this->subscriptions[$dest]);
+
+        return true;
+    }
+
+
 	/**
 	 * @param int $userId
 	 * @param bool $generateIfAbsent
