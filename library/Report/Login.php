@@ -11,8 +11,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $pageNum;
-    private $perPage;
     private $filter;
 
     // visible field mapping: index => humanreadable
@@ -115,9 +113,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             $orderDir = 'DESC';
         }
 
-        $this->pageNum = ($offset / $limit) + 1;
-        $this->perPage = $limit;
-
         // need fields from which to retrieve data
         if(empty($this->fields))
             return false;
@@ -175,6 +170,17 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
             '';
 
+        // Get count separately from data
+        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $sqlFilterString");
+        foreach ($params as $name => $value) {
+            $countStatement->bindValue($name, $value);
+        }
+        $countStatement->execute();
+        $this->dataCount = $countStatement->fetchColumn();
+        if (!$this->dataCount) {
+            return 0;
+        }
+
         $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
                       FROM login_log
                       LEFT JOIN `user` ON `user`.`username` = login_log.username
@@ -198,11 +204,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             $statement->bindValue('offset', $offset, PDO::PARAM_INT);
         }
         $statement->execute();
-
-        $this->dataCount = $statement->rowCount();
-        if(!$this->dataCount) {
-            return 0;
-        }
 
         // get limited records from the resource, rather than in bulk
         $this->dataSet = $statement;
