@@ -652,6 +652,69 @@ class Controller extends Base
                 $errors,
                 $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
             );
+            if (!($existingBooking instanceof Model)) {
+                // Validating a new booking?
+                // Expand this single booking out to a list of related items,
+                // and validate them all.
+                $dateParts = array(
+                    array($resource, $startDate, $endDate),
+                );
+
+                // Check each in series
+                $series = $this->getRecurrencePeriod(
+                    $startDate,
+                    $this->request->post['repeat'],
+                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+                    $this->request->post['timetable']['campus']
+                );
+                $difference = $startDate->diff($endDate);
+                foreach ($series as $occurenceStart) {
+                    $occurenceEnd = clone $occurenceStart;
+                    $occurenceEnd->add($difference);
+
+                    // Check all of $occurenceStart and $occurenceEnd
+                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                }
+
+                $relatedItems = $this->request->post['related_item'] ?: array();
+                foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                    if (in_array($relatedResource->getId(), $relatedItems)) {
+                        $dateParts[] = array($relatedResource, $startDate, $endDate);
+
+                        foreach ($series as $occurenceStart) {
+                            $occurenceEnd = clone $occurenceStart;
+                            $occurenceEnd->add($difference);
+
+                            // Check all of $occurenceStart and $occurenceEnd
+                            $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                        }
+                    }
+                }
+
+                foreach ($dateParts as $check) {
+                    list($resource, $thisStart, $thisEnd) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
+                    );
+                }
+            }
+//            else {
+//                // Validating an existing booking?
+//                // Check each item in the series, adjusting difference.
+//                $dateParts = array(
+//                    array($resource, $startDate, $endDate, $existingBooking),
+//                );
+//
+//                $difference = $startDate->diff($endDate);
+//                foreach ($series as $occurenceStart) {
+//                    $occurenceEnd = clone $occurenceStart;
+//                    $occurenceEnd->add($difference);
+//
+//                    // Check all of $occurenceStart and $occurenceEnd
+//                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+//                }
+//            }
         }
 
         // If updating a booking and its timespan hasn't changed:
@@ -712,17 +775,33 @@ class Controller extends Base
             $endDate->getTimestamp() - 1,
             array(Status\Model::STATUS_APPROVED)
         );
-        // If updating a booking - Remove the item being updated from the
-        // check (because it's being moved)
+
+        // Conflicting bookings could include the existing booking.
+        // Remove it, because a booking can't conflict with itself!
+        // Also remove any items in the same series, because bookings can't
+        // conflict with bookings in the same series (they're all offset at the
+        // same time)
+        // There may be rare occurrences where they can (a booking that is so
+        // long it overlaps the next item in series!), but I'm not going to
+        // worry about those.
         if ($existingBooking instanceof Model) {
-            $existingId          = $existingBooking->getId();
+            $existingId     = $existingBooking->getId();
+            $existingSeries = $existingBooking->getEvent()->getSeriesId();
             $conflictingBookings = $conflictingBookings->filter(
-                function ($item) use ($existingId) {
+                function($item) use($existingId, $existingSeries) {
                     /** @var Model $item */
-                    return $item->getId() != $existingId;
+                    if ($item->getId() == $existingId) {
+                        return false;
+                    }
+                    if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
+                        return false;
+                    }
+                    return true;
                 }
             );
         }
+
+        // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
             $errors['start_datetime'][] = 'conflict';
         } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
