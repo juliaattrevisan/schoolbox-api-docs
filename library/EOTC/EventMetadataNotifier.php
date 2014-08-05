@@ -299,12 +299,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				break;
 
 			case EventStatusMapper::STATUS_DETAILSCOMPLETED:
-				$bob->setTitle(":moderator has approved RAMs for :event")
+				$bob->setTitle(":moderator has completed details for :event")
 					->setHref($hrefMod);
 				break;
 
 			case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
-				$bob->setTitle(":moderator has confirmed RAMs for :event")
+				$bob->setTitle(":moderator has made :event ready for final approval")
 				    ->setHref($hrefMod);
 				break;
 
