@@ -528,10 +528,11 @@
     }
 
     function LongPoll() {
-        this.i = 15000;
-        // perform first check, then every 15 seconds thereafter
+        this.i = 30000;
+        // perform first check, then every 30 seconds thereafter
         this.check.apply(this);
         this.ii = setInterval(this.check.bind(this), this.i);
+        this.count = 0;
     }
 
     LongPoll.prototype = {
@@ -549,6 +550,11 @@
                     self.onmessage({ data : xhr.responseText });
                 }
             });
+            this.count++;
+            // only allow 30 minutes of polling
+            if(this.count > 60) {
+                this.close();
+            }
         },
 
         send      : function(data) {

@@ -21,6 +21,17 @@ header('Content-Type: application/json');
 
 session_start();
 
+$factory = new \Alaress\Session\Factory($_COOKIE);
+$session = $factory->build();
+
+// check the session is valid before continuing
+if($session->isAuthSessionAlive()) {
+    die(json_encode(array(
+        'error' => 'Unauthorized',
+        'code'  => 401,
+    )));
+}
+
 $protocol = empty($_SERVER['HTTPS']) ? 'ws' : 'wss';
 $path = Cfg::get('websocket_path') ?: '/';
 
