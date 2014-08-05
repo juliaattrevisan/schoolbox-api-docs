@@ -99,8 +99,7 @@ class OneLogin_Saml_XmlSec
 
         $validTimestamps = $this->validateTimestamps();
         if (!$validTimestamps) {
-            throw new Exception('Timing issues (please check your clock settings)
-            ');
+            throw new Exception('Timing issues (please check your clock settings). Current server time does not match the time references in the SAML assertion.');
         }
 
         $objKey = $objXMLSecDSig->locateKey();
