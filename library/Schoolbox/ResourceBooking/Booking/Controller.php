@@ -472,7 +472,7 @@ class Controller extends Base
      *
      * @return DateTime[]
      */
-    protected function createPeriodFromRecurrence(
+    protected function getRecurrencePeriod(
         Calendar\Event $event,
         $recurrenceRule,
         DateTime $repeatUntil,
@@ -527,7 +527,7 @@ class Controller extends Base
             $event     = $booking->getEvent();
             $eventList = new Collection();
             if ($repeatUntil instanceof DateTime) {
-                $period = $this->createPeriodFromRecurrence(
+                $period = $this->getRecurrencePeriod(
                     $event,
                     $recurrenceRule,
                     $repeatUntil,
@@ -545,39 +545,6 @@ class Controller extends Base
                     $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
                 }
             }
-//            switch ($recurrenceRule) {
-//                case 'daily':
-//                case 'weekly':
-//                case 'fortnightly':
-//                case 'monthly':
-//                    if ($repeatUntil instanceof DateTime) {
-//                        $this->eventRecurrenceMapper->save(
-//                            $event,
-//                            'series',
-//                            $recurrenceRule,
-//                            new Alaress_Date_Format($repeatUntil->modify('23:59:59')),
-//                            $event->getStartDateTime(),
-//                            $event->getEndDateTime()
-//                        );
-//                        // Create a whole set of bookings based on this event.
-//                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
-//                    }
-//                    break;
-//                case 'timetable':
-//                    if ($repeatUntil instanceof DateTime) {
-//                        $period = new \External_TimetableDatePeriod(
-//                            $event->getStartDateTime()->getDateTimeObject(),
-//                            $repeatUntil->modify('+1 day'),
-//                            $this->getExternalTimetableHandler(),
-//                            $campus
-//                        );
-//                        $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
-//                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
 
             if (count($eventList)) {
                 // Add a booking for each recurring event that was created.
