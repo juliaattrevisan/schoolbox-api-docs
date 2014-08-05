@@ -191,7 +191,7 @@ class Controller extends Base
 
             // Expand into bookings for recurrence
             if (!empty($this->request->post['repeat'])) {
-                $bookingList = $this->expandBookingForRecurrence(
+                $bookingList = $this->saveBookingsForRecurrences(
                     $bookingList,
                     $this->getRequest()->post['repeat'],
                     DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
@@ -215,7 +215,7 @@ class Controller extends Base
 
             // Expand into related items.
             if (!empty($this->request->post['related_item'])) {
-                $bookingList = $this->expandBookingForRelatedItems(
+                $bookingList = $this->saveBookingsForRelatedItems(
                     $bookingList,
                     $this->request->post['related_item'] ? : array()
                 );
@@ -421,10 +421,7 @@ class Controller extends Base
     }
 
     /**
-     * Expands each item in a list of bookings into a set of bookings for
-     * related items.
-     *
-     * The bookings are saved after this step.
+     * Saves each item in a list of bookings into a set of bookings for related items.
      *
      * @todo make this a mapper method
      *
@@ -433,7 +430,7 @@ class Controller extends Base
      *
      * @return Collection
      */
-    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems)
+    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems)
     {
         if (empty($relatedItems)) {
             return $bookingList;
@@ -508,9 +505,7 @@ class Controller extends Base
     }
 
     /**
-     * Expands each item in a list of bookings into a series of bookings.
-     *
-     * The events that are created are saved.
+     * Saves each item in a list of bookings into a series of bookings.
      *
      * @todo make this a mapper method
      *
@@ -521,7 +516,7 @@ class Controller extends Base
      *
      * @return Collection
      */
-    protected function expandBookingForRecurrence(
+    protected function saveBookingsForRecurrences(
         Collection $bookingList,
         $recurrenceRule,
         DateTime $repeatUntil,
