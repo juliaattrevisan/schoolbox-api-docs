@@ -470,20 +470,20 @@ class Controller extends Base
      * Creates a DatePeriod or other traversable list of DateTime objects that
      * corresponds to a list of event recurrences.
      *
-     * @param Calendar\Event $event          The event that is to recur.
-     * @param string         $recurrenceRule The recurrence rule:
-     *                                       "daily", "weekly", "fortnightly",
-     *                                       "monthly" or "timetable".
-     *                                       Anything else is treated as a
-     *                                       single event.
-     * @param DateTime       $repeatUntil    The day to expand this event to.
-     * @param int            $campus         The campus to use when determining
-     *                                       when a timetable day recurs.
+     * @param DateTime $startTime      The event that is to recur.
+     * @param string   $recurrenceRule The recurrence rule:
+     *                                 "daily", "weekly", "fortnightly",
+     *                                 "monthly" or "timetable".
+     *                                 Anything else is treated as a single
+     *                                 event.
+     * @param DateTime $repeatUntil    The day to expand this event to.
+     * @param int      $campus         The campus to use when determining when a
+     *                                 timetable day recurs.
      *
      * @return DateTime[]
      */
     protected function getRecurrencePeriod(
-        Calendar\Event $event,
+        DateTime $startTime,
         $recurrenceRule,
         DateTime $repeatUntil,
         $campus
@@ -494,14 +494,14 @@ class Controller extends Base
             case 'fortnightly':
             case 'monthly':
                 $period = new \DatePeriod(
-                    $event->getStartDateTime()->getDateTimeObject(),
+                    $startTime,
                     \DateInterval::createFromDateString('+1 day'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
             case 'timetable':
                 $period = new \External_TimetableDatePeriod(
-                    $event->getStartDateTime()->getDateTimeObject(),
+                    $startTime,
                     $repeatUntil->modify('+1 day'),
                     $this->getExternalTimetableHandler(),
                     $campus
@@ -538,7 +538,7 @@ class Controller extends Base
             $eventList = new Collection();
             if ($repeatUntil instanceof DateTime) {
                 $period = $this->getRecurrencePeriod(
-                    $event,
+                    $event->getStartDateTime()->getDateTimeObject(),
                     $recurrenceRule,
                     $repeatUntil,
                     $campus
