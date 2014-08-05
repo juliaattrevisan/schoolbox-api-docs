@@ -13,10 +13,22 @@ class User extends DeprecatedModel {
 
 		$this->_table = "user";
 		$this->_index = "id";
-		$this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
 
 		parent::DeprecatedModel();
 	}
+
+
+    /**
+     * @return Schoolbox\UserNotifier
+     */
+    protected function getUserNotifier() {
+        // only load this if you *actually* need it
+        if(empty($this->userNotifier)) {
+            $this->userNotifier = new Schoolbox\UserNotifier(new Schoolbox\Config\Loader());
+        }
+        return $this->userNotifier;
+    }
+
 
 	/**
 	 * Gets the ID associated with a particular campus name. Returns false if
@@ -725,7 +737,7 @@ class User extends DeprecatedModel {
 		}
 
 		// Filthily notify the binder that user was updated
-		$this->userNotifier->manualNotifyUpdated($user['id'], $_SESSION['user']);
+		$this->getUserNotifier()->manualNotifyUpdated($user['id'], $_SESSION['user']);
 
 		return true;
 	}
@@ -786,7 +798,7 @@ class User extends DeprecatedModel {
 			}
 
 			// Filthily notify the binder that there's a new user
-			$this->userNotifier->manualNotifyCreated($id, $_SESSION['user']);
+			$this->getUserNotifier()->manualNotifyCreated($id, $_SESSION['user']);
 			return $id;
 		}
 

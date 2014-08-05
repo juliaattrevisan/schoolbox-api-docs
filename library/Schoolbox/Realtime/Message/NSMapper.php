@@ -54,11 +54,15 @@ class NSMapper extends Mapper {
 
 	/**
 	 * @param string $slug
-	 * @param array $options
-	 * @return \Schoolbox\Collection
+	 * @return NS
 	 */
-	public function findOneBySlug($slug, $options = array()) {
-		return $this->findByColumn('slug', $slug, $options)->first();
+	public function findOneBySlug($slug) {
+        try {
+            return $this->findOneByColumn('slug', $slug);
+        }
+        catch(Mapper\Exception $e) {
+            return null;
+        }
 	}
 
 }
