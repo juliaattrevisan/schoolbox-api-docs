@@ -53,11 +53,21 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     /* Select this poll in the component
      */
-    $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
-    $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-                                   array(    'module'                =>'homepage',
-                                             'identifier'            => $_POST['categoryID'],
-                                             'component_definition_id'=> $cdm->getDefinitionId()));
+    try {
+        $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
+        $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
+            array(
+                'id'                      => $_POST['homepageComponentID'],
+                'module'                  => 'homepage',
+                'identifier'              => $_POST['categoryID'],
+                'component_definition_id' => $cdm->getDefinitionId(),
+            )
+        );
+    }
+    catch (Schoolbox\Mapper\Exception $e) {
+        error(19);
+        exit;
+    }
 
     $confI = new Component_Config();
     $confI->setConfigDefinitionId($cdm->getId());
@@ -80,25 +90,33 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
     $pollHandler->delete($_GET['delete']);
 
-    /* select next textBox
+    /* do not select next poll, that's just dumb
+     * I deleted this poll, then I don't expect to be Hydra'd by another poll
+     * spawning in its place
      */
-    $current = $pollHandler->getCurrentPoll($poll['categoryID']);
-
-    if ($current['pollID']) {
+    try {
         $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
-
         $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-                                                      array(    'module'                =>'homepage',
-                                                                'identifier'            => $poll['categoryID'],
-                                                                'component_definition_id'=> $cdm->getDefinitionId()));
-        $confI = new Component_Config();
-        $confI->setConfigDefinitionId($cdm->getId());
-        $confI->setInstanceId($cim->getId());
-        $confI->setValue($current['pollID']);
-
-        $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
-        $componentConfigInstanceMapper->save($confI);
+            array(
+                'id'                      => $_GET['homepageComponentID'],
+                'module'                  => 'homepage',
+                'identifier'              => $poll['categoryID'],
+                'component_definition_id' => $cdm->getDefinitionId(),
+            )
+        );
     }
+    catch (Schoolbox\Mapper\Exception $e) {
+        error(19);
+        exit;
+    }
+
+    $confI = new Component_Config();
+    $confI->setConfigDefinitionId($cdm->getId());
+    $confI->setInstanceId($cim->getId());
+    $confI->setValue(null);
+
+    $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
+    $componentConfigInstanceMapper->save($confI);
 
     SitePage::localRedir("/homepage/" . $poll['categoryID']);
 }
