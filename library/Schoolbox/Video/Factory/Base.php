@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Video\Factory;
 
+use \Schoolbox\Video\QueueMapper;
+use \Schoolbox\Video\ResourceVideoMapper;
 
 abstract class Base {
 
@@ -55,19 +57,23 @@ abstract class Base {
 	 * @throws \Exception
 	 */
 	public function produce() {
-		$videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
+		$videoMapper = new ResourceVideoMapper();
 
 		switch($this->getType()) {
-			case \Schoolbox\Video\QueueMapper::FILE_TYPE_STORAGE:
+			case QueueMapper::FILE_TYPE_STORAGE:
 				return $videoMapper->findByStorageHash($this->getId());
 
-			case \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS:
+			case QueueMapper::FILE_TYPE_SBFS:
 				$video = $videoMapper->findByFileId($this->getId());
 				$this->permissionCheck($video);
 				return $video;
 
-			case \Schoolbox\Video\QueueMapper::FILE_TYPE_SUBMISSION:
+			case QueueMapper::FILE_TYPE_SUBMISSION:
 				$video = $videoMapper->findBySubmissionId($this->getId());
+				return $video;
+
+			case QueueMapper::FILE_TYPE_MYFILE:
+				$video = $videoMapper->findByMyFileId($this->getId());
 				return $video;
 
 			default: break;

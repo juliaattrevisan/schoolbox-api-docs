@@ -80,6 +80,12 @@ class MyFile {
 	protected $config_loader;
 
 	/**
+	 * Location of file prior to creation
+	 * @var string
+	 */
+	protected $tempFileLocation;
+
+	/**
 	 * Creates object and sets up sub-objects.
 	 */
 	public function __construct() {
@@ -261,5 +267,21 @@ class MyFile {
 	 */
 	public function getDeletedAt() {
 		return $this->deleted_at;
+	}
+
+	/**
+	 * Use this function to set the location of the file when creating a new file record
+	 * @param mixed $tempFileLocation
+	 */
+	public function setTempFileLocation($tempFileLocation) {
+		$this->tempFileLocation = $tempFileLocation;
+	}
+
+	/**
+	 * This function only exists to move the uploaded file into the correct location on save
+	 * @return mixed
+	 */
+	public function getTempFileLocation() {
+		return $this->tempFileLocation;
 	}
 }

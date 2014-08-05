@@ -1,0 +1,46 @@
+<?php
+/**
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+class Component_Config_EportfolioVideo extends Component_Config_Abstract {
+
+    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+
+		/* Sort order
+		 */
+		$sortConfig = array(
+			'sort' => $allConfigs['sort']['value'],
+			'sortdir' => $allConfigs['sortdir']['value']
+		);
+
+        $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
+		$allVideos = $videoMapper->findByEportfolioPage($page->arg[1], $sortConfig);
+
+        $page->setBlock($keyblock, 'video_select', 'video_select_block');
+        $page->setVar('video_select_block', '');
+
+        if ($allVideos->count()) {
+            foreach ($allVideos as $currentVideo) {
+                $page->setVar(array(
+					'COMPONENT_CONFIG_VIDSELECT_NAME' => Scrub::text($currentVideo->getFile()->getDescription()),
+					'COMPONENT_CONFIG_VIDSELECT_VALUE' => $currentVideo->getFile()->getId(),
+					'COMPONENT_CONFIG_VIDSELECT_SELECTED' => $currentVideo->getFile()->getId() == $configValue ? 'selected="selected"' : '',
+                ));
+
+                $page->parse("video_select_block", "video_select", true);
+            }
+        }
+        else {
+            $page->setVar(array(
+				'COMPONENT_CONFIG_VIDSELECT_NAME' => Scrub::text(' (none) '),
+				'COMPONENT_CONFIG_VIDSELECT_VALUE' => '0',
+				'COMPONENT_CONFIG_VIDSELECT_SELECTED' => 'disabled="disabled"',
+            ));
+
+            $page->parse("video_select_block", "video_select", true);
+        }
+    }
+}

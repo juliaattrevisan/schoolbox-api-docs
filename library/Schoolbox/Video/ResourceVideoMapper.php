@@ -27,44 +27,45 @@ class ResourceVideoMapper extends Mapper {
             'type'       => self::TYPE_INTEGER,
             'identifier' => true,
         ));
-
 		$this->hasMap(array(
-			              'column'     => 'type',
-			              'property'   => 'type',
-			              'type'       => self::TYPE_STRING,
-		              ));
+			'column'     => 'type',
+			'property'   => 'type',
+			'type'       => self::TYPE_STRING,
+		));
 		$this->hasMap(array(
-			              'column'     => 'status',
-			              'property'   => 'status',
-			              'type'       => self::TYPE_STRING,
-		              ));
+			'column'     => 'status',
+			'property'   => 'status',
+			'type'       => self::TYPE_STRING,
+		));
 		$this->hasMap(array(
-			              'column'     => 'duration',
-			              'property'   => 'duration',
-			              'type'       => self::TYPE_INTEGER,
-		              ));
+			'column'     => 'duration',
+			'property'   => 'duration',
+			'type'       => self::TYPE_INTEGER,
+		));
 		$this->hasMap(array(
 			'column'     => 'file_id',
 			'property'   => 'fileID',
 			'type'       => self::TYPE_INTEGER,
 		));
-
-
 		$this->hasJoin('file', array(
-                         'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
-                         'this_key'  => 'file_id',
-                         'other_key' => 'id',
-                     ));
-
+			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
+			'this_key'  => 'file_id',
+			'other_key' => 'id',
+		));
         $this->hasJoin('storage', array(
-                'mapper'    => '\\Schoolbox\\StorageMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'storage_id',
+			'mapper'    => '\\Schoolbox\\StorageMapper',
+			'this_key'  => 'file_id',
+			'other_key' => 'storage_id',
         ));
 		$this->hasJoin('student_submission', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
 			'this_key'  => 'file_id',
 			'other_key' => 'id',
+		));
+		$this->hasJoin('eportfolio_filelist', array(
+			'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
+			'this_key'  => 'file_id',
+			'other_key' => 'file_id',
 		));
 	}
 
@@ -135,6 +136,81 @@ class ResourceVideoMapper extends Mapper {
 		return $videoList;
 	}
 
+	/**
+	 * Find videos for a particular MyFiles user
+	 *
+	 * @param $pageId
+	 * @param $options
+	 * @param bool $limit
+	 * @return Collection
+	 */
+	public function findByEportfolioPage($pageId, $options, $limit = false) {
+		$videoList = new Collection(array());
+		$myFileMapper = new \Schoolbox\MyFileMapper;
+		$fileListMapper = new \Component\Eportfolio\FileListMapper();
+
+		$query = "
+            SELECT
+            	{$this->getColumnString('vq')},
+            	{$fileListMapper->getJoinMapper('myfile')->getColumnString('mf')},
+            	{$myFileMapper->getJoinMapper('owner')->getColumnString('o')}
+			FROM `{$this->getTable()}` vq
+			LEFT JOIN {$this->getJoinSQL('eportfolio_filelist', 'vq', 'fl')}
+			LEFT JOIN {$fileListMapper->getJoinSQL('myfile', 'vq', 'mf')}
+			LEFT JOIN {$myFileMapper->getJoinSQL('owner', 'mf', 'o')}
+			WHERE fl.page_id = :pageId
+			AND vq.status != 'failed'
+			AND mf.deleted = 0
+		";
+
+		/* Sort order
+		 */
+		$sortFields = array(
+			'name' => 'mf.description',
+			'date' => 'mf.submitted'
+		);
+
+		/* Really?
+		 * http://stackoverflow.com/questions/2542410/how-do-i-set-order-by-params-using-prepared-pdo-statement
+		 */
+		if (in_array($options['sort'], array_keys($sortFields))) {
+			if (in_array(strtoupper($options['sortdir']), array('DESC', 'ASC'))) {
+				$query .= "
+					ORDER BY {$sortFields[$options['sort']]} {$options['sortdir']}
+				";
+			}
+		}
+
+		if ($limit != false) {
+			$query .= "LIMIT 0,:lim";
+		}
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(':pageId', $pageId);
+
+		if ($limit != false) {
+			$statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
+		}
+
+		$statement->execute();
+
+		foreach($statement as $row) {
+			$video = $this->hydrate($row, 'vq');
+			$video->setFile($myFileMapper->hydrate($row, 'mf'));
+
+			if ($row['o.id']){
+				$video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->hydrate($row, 'o'));
+			}
+			else {
+				$video->getFile()->setOwner($myFileMapper->getJoinMapper('owner')->getUnknownUser());
+			}
+
+			$videoList->add($video);
+		}
+
+		return $videoList;
+	}
+
 	public function findByFileId($id) {
 		$fileMapper = new \Schoolbox\Resource\FileMapper;
 
@@ -157,6 +233,43 @@ class ResourceVideoMapper extends Mapper {
 		}
 		return $video;
 
+	}
+
+	/**
+	 * Find a video in the MyFile table
+	 *
+	 * @param $id
+	 * @return null|object
+	 * @throws \Schoolbox\Mapper\Exception
+	 */
+	public function findByMyFileId($id) {
+		$fileMapper = new \Schoolbox\Resource\FileMapper;
+
+		$statement = $this->database->prepare("
+            SELECT
+            	{$fileMapper->getColumnString('mf')},
+            	{$this->getColumnString('vq')}
+			FROM `{$this->getTable()}` vq
+			JOIN {$this->getJoinSQL('file','vq','mf')}
+			WHERE mf.id = ?
+			AND vq.status = 'completed'
+			AND vq.type='myfile'
+		");
+
+		$statement->execute(array($id));
+
+		$video = null;
+
+		foreach($statement as $row) {
+			$video = $this->hydrate($row, 'vq');
+			$video->setFile($fileMapper->hydrate($row,'mf'));
+		}
+
+		if (!($video instanceof ResourceVideo)) {
+			throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+		}
+
+		return $video;
 	}
 
     public function findByStorageId($id) {
