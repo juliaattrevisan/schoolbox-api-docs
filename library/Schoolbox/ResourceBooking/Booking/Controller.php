@@ -215,14 +215,12 @@ class Controller extends Base
 
             // Expand into related items.
             if (!empty($this->request->post['related_item'])) {
-                $bookingList = $this->saveBookingsForRelatedItems(
+                $bookingList = $this->getBookingsForRelatedItems(
                     $bookingList,
                     $this->request->post['related_item'] ? : array()
                 );
-            } else {
-                // Just save the booking.
-                $this->bookingMapper->save($bookingList);
             }
+            $this->bookingMapper->save($bookingList);
         } else {
             $code = 400;
         }
