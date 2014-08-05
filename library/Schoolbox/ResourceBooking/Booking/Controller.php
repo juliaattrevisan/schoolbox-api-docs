@@ -665,9 +665,9 @@ class Controller extends Base
                     $errors['end_datetime'][] = 'too_long';
                 }
             }
-            // Check conflicts in series and for related items.
-            $relatedItems = $this->request->post['related_item'];
-
+            
+//            // Check conflicts in series and for related items.
+//            $relatedItems = $this->request->post['related_item'];
 
 
             // Check conflicting bookings as well for this item.
@@ -678,7 +678,7 @@ class Controller extends Base
             // (We may need to implement a down time between bookings.)
             $errors = array_merge_recursive(
                 $errors,
-                $this->validateConflicts($resource, $startDate, $endDate, $existingBooking)
+                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
             );
         }
 
@@ -713,21 +713,27 @@ class Controller extends Base
     /**
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
-     *
-     * @param Item\Model $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     * @param Model      $existingBooking
-     *
+     * 
+     * @param  Item\Model $resource
+     * @param  DateTime   $startDate
+     * @param  DateTime   $endDate
+     * @param  Model      $existingBooking
      * @return array
      */
-    protected function validateConflicts(
+    protected function validateForConflicts(
         Item\Model $resource,
-        $startDate,
-        $endDate,
+        DateTime $startDate,
+        DateTime $endDate,
         Model $existingBooking = null
     ) {
         $errors = array();
+
+        // Only check approved bookings. Wow, the calendar population method
+        // can do exactly that!
+        // I do however want to allow a booking to start at the same time
+        // that the previous booking ended.
+        // (We may need to implement a down time between bookings.)
+        /** @var Collection|Model[] $conflictingBookings */
         $conflictingBookings = $this->getBookingMapper()->findForResource(
             $resource->getId(),
             $startDate->getTimestamp() + 1,
@@ -740,6 +746,7 @@ class Controller extends Base
             $existingId          = $existingBooking->getId();
             $conflictingBookings = $conflictingBookings->filter(
                 function ($item) use ($existingId) {
+                    /** @var Model $item */
                     return $item->getId() != $existingId;
                 }
             );
@@ -761,6 +768,7 @@ class Controller extends Base
                 $errors['start_datetime'][] = 'timetabled_class';
             }
         }
+
         return $errors;
     }
 
