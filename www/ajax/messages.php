@@ -21,8 +21,11 @@ header('Content-Type: application/json');
 
 session_start();
 
+$factory = new \Alaress\Session\Factory($_COOKIE);
+$session = $factory->build();
+
 // check the session is valid before continuing
-if(empty($_SESSION['user'])) {
+if($session->isAuthSessionAlive()) {
     die(json_encode(array(
         'error' => 'Unauthorized',
         'code'  => 401,
