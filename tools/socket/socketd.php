@@ -5,9 +5,11 @@ use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
 use Aura\Di;
+use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\Realtime\Pipe\SessionValidator;
 
 /**
  * The Websocket Daemon.
@@ -72,7 +74,9 @@ $kernel->run(function($di, $loop, $debug, $opts) {
 		$debug->v("Using default strat");
 	}
 
-	$pipeManager = new PipeManager($loop, $redis, $debug, $poolStrat);
+    $sessionValidator = new SessionValidator($redis, new PhpHandler(), $di->get('config')->get('session_length'));
+
+    $pipeManager = new PipeManager($loop, $sessionValidator, $debug, $poolStrat);
 
 	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
 	$wss->disableVersion(0);

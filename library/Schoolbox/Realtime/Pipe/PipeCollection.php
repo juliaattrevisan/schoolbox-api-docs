@@ -10,34 +10,34 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-use Predis\Client;
-use Predis\CommunicationException;
+use Alaress\Cli\Debug;
 use Schoolbox\Realtime\SessionException;
-use Schoolbox\Realtime\Verboser;
 
 class PipeCollection {
 
 	/** @var Pipe[] */
 	protected $pipesBySocketKey;
 
-	/** @var Pipe[][] */
+	/** @var array */
 	protected $pipesBySessionId;
 
-	/** @var Pipe[][] */
+	/** @var array */
 	protected $pipesByUserId;
 
-	/** @var Verboser */
-	protected $v;
+	/** @var Debug */
+	protected $debug;
 
-	/** @var Client */
-	protected $redis;
 
-	public function __construct($redis, $v) {
+    /**
+     * @param SessionValidator $validator
+     * @param Debug $debug
+     */
+    public function __construct($validator, $debug) {
 		$this->pipesBySocketKey = array();
 		$this->pipesBySessionId = array();
 		$this->pipesByUserId    = array();
-		$this->redis = $redis;
-		$this->v = $v;
+		$this->validator = $validator;
+		$this->debug = $debug;
 	}
 
 	/**
@@ -46,7 +46,7 @@ class PipeCollection {
 	 * @param Pipe $pipe
 	 * @throws SessionException
 	 */
-	public function registerPipe($pipe) {
+	public function registerPipe(Pipe $pipe) {
 		$socketKey = $pipe->getSocketKey();
 		$sessionId = $pipe->getSession();
 
@@ -57,12 +57,12 @@ class PipeCollection {
 
 			$this->pipesBySocketKey[$socketKey] = $pipe;
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-			$this->v->v("LINK       '$socketKey' -> SESSION '$sessionId'");
+			$this->debug->v("LINK       '$socketKey' -> SESSION '$sessionId'");
 
-			if($userId = $this->findUserBySession($sessionId, $pipe->getRemoteAddress(), 2)) {
+			if($userId = $this->validator->findUserIdBySessionId($sessionId)) {
 				$pipe->setUserId($userId);
 				$this->pipesByUserId[$userId][$socketKey] = $pipe;
-				$this->v->v("LINK       '$socketKey' -> USER    '$userId'");
+				$this->debug->v("LINK       '$socketKey' -> USER    '$userId'");
 			}
 		}
 		catch(SessionException $e) {
@@ -89,60 +89,13 @@ class PipeCollection {
 			unset($this->pipesBySocketKey[$socketKey]);
 		}
 		else {
-			$this->v->v("Ignoring closure of '$socketKey'");
+			$this->debug->v("Ignoring closure of '$socketKey'");
 		}
 
 	}
 
 	/**
-	 * Extracts a user by ID from a Redis session and returns the associated User object, or
-	 * null if the user cannot be located.
-	 *
-	 * @param string $sessionId
-	 * @param string $pipeIp
-	 * @param int $retriesRemaining
-	 * @throws \Schoolbox\Realtime\SessionException
-	 * @throws \Predis\CommunicationException
-	 * @return int
-	 */
-	protected function findUserBySession($sessionId, $pipeIp = null, $retriesRemaining = 0) {
-		if(!$sessionId) {
-			throw new SessionException("No sessionID provided on which to search.");
-		}
-
-		$redisResponse = '';
-
-		try {
-			$redisResponse = $this->redis->executeCommand(
-				$this->redis->createCommand('get', array(PipeManager::REDIS_SESSION_PREFIX.$sessionId))
-			);
-		}
-		catch(CommunicationException $e) {
-			// redis timed out, this attempt should have reawoken it
-
-			if($retriesRemaining <= 0) {
-				// if we've run out of retries, rethrow the exception
-				throw $e;
-			}
-
-			// recurse
-			$this->findUserBySession($sessionId, $pipeIp, $retriesRemaining - 1);
-		}
-
-		if($redisResponse) {
-			if(!preg_match('`id\|s:[0-9]+:"([0-9]+)";`', $redisResponse, $matches)) {
-				throw new SessionException("User not found");
-			}
-
-			if(is_numeric($userId = $matches[1])) {
-				return $userId;
-			}
-		}
-		throw new SessionException("User ID not found in session.");
-	}
-
-	/**
-	 * @param $socketKey
+	 * @param string $socketKey
 	 * @return bool
 	 */
 	public function containsPipe($socketKey) {
@@ -150,7 +103,7 @@ class PipeCollection {
 	}
 
 	/**
-	 * @param $userId
+	 * @param int $userId
 	 * @return int
 	 */
 	public function userPipeCount($userId) {
@@ -158,7 +111,7 @@ class PipeCollection {
 	}
 
 	/**
-	 * @param $sessionId
+	 * @param string $sessionId
 	 * @return int
 	 */
 	public function sessionPipeCount($sessionId) {
