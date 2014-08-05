@@ -97,17 +97,14 @@ switch($_POST['action']) {
 		 * NO SURRENDER
 		 */
 		try {
-			$author = $userMapper->findById($_POST['authorId']);
+			// Author might've been deleted, so don't die if they don't exist
+			$event->setAuthor($userMapper->findById($_POST['author_id']));
 		}
-		catch(\Schoolbox\Mapper\Exception $e) {
-			error(19);
-			exit;
-		}
+		catch(\Schoolbox\Mapper\Exception $e) {}
 
 		/* Spawned further up
 		 */
 		$event->setOwner($owner);
-		$event->setAuthor($author);
 		$event->setAccess($_POST['level']);
 		$event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
 		$event->setTitle($_POST['note']);
