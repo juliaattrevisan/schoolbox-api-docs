@@ -23,24 +23,28 @@ if ($_POST['name']) {
 		'recursive' => $_POST['recursive'] ? '1' : '0',
 	);
 
-	$codeCollection = new \Schoolbox\Collection();
-	foreach(explode(',', $_POST['code']) as $code) {
-		$trimmedCode = trim($code);
-
-		if (strlen($trimmedCode)) {
-			$codeModel = new \Schoolbox\Resource\CategoryCode();
-			$codeModel->setCode($trimmedCode);
-			$codeCollection->add($codeModel);
-		}
-	}
-
 	/** @var \Schoolbox\Resource\Category $model */
 	$model = CategoryMapper::getInstance()->createModel()
 		->setName($_POST['name'])
-		->setParent(CategoryMapper::getInstance()->createModel()
-			->setId($_POST['parent'])
-		)
-		->setCodes($codeCollection);
+		->setParent(
+			CategoryMapper::getInstance()->createModel()
+				->setId($_POST['parent'])
+		);
+
+	// Only superusers get to change class codes
+	$codeCollection = new \Schoolbox\Collection();
+	if ($groupHandler->isSuperuser()) {
+		foreach(explode(',', $_POST['code']) as $code) {
+			$trimmedCode = trim($code);
+
+			if (strlen($trimmedCode)) {
+				$codeModel = new \Schoolbox\Resource\CategoryCode();
+				$codeModel->setCode($trimmedCode);
+				$codeCollection->add($codeModel);
+			}
+		}
+		$model->setCodes($codeCollection);
+	}
 
 	if (is_numeric($_POST['categoryID'])) {
 		if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
@@ -60,7 +64,7 @@ if ($_POST['name']) {
 	// gets saved.
 	// (I'm not confident that deleting cat codes in the postSave method
 	//  regardless of whether there are any won't break somewhere else)
-	if ($model->getId() && count($codeCollection) === 0) {
+	if ($groupHandler->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
 		CategoryCodeMapper::getInstance()->delete(
 			CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
 		);
