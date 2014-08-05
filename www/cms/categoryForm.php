@@ -90,6 +90,7 @@ if ($_POST['name']) {
 	// if homepage is to be removed
 	if($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
 		HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
+		HomepageConfigMapper::getInstance()->delete($homepageConfig);
 	}
 	// if template defined
 	elseif($_POST['template'] > 0) {

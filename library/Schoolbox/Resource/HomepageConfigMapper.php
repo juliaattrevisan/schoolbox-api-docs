@@ -29,6 +29,7 @@ class HomepageConfigMapper extends Mapper {
 			'property'   => 'category',
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'category',
+			'identifier' => true,
 		));
 		$this->hasMap(array(
 			'column'     => 'template',
