@@ -17,6 +17,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -299,12 +300,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 				break;
 
 			case EventStatusMapper::STATUS_DETAILSCOMPLETED:
-				$bob->setTitle(":moderator has approved RAMs for :event")
+				$bob->setTitle(":moderator has completed details for :event")
 					->setHref($hrefMod);
 				break;
 
 			case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
-				$bob->setTitle(":moderator has confirmed RAMs for :event")
+				$bob->setTitle(":moderator has made :event ready for final approval")
 				    ->setHref($hrefMod);
 				break;
 
@@ -366,12 +367,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 		}
 
 		// get list of moderators relevant to the current status
-		$currentStatus = $eventMetadata->getStatus();
-		$moderatordIds = $this->getModerators($relEvent, $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus);
+		$moderatorIds = $this->getModerators($relEvent, $newStatus);
 
 		// inform them
 		$bob->setHref($hrefMod);
-		foreach($moderatordIds as $modId) {
+		foreach($moderatorIds as $modId) {
 			$envelope->targetToUser($modId, $bob->build());
 		}
 
