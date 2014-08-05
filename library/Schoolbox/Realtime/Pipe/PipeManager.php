@@ -21,6 +21,7 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\Wamp\WampServerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
+use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory as StompFactory;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -44,6 +45,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
 	const PHP_SESSION_PREFIX   = 'PHPSESSID';
+    const INACTIVE_TIMEOUT     = 1800; // 30 minutes
 
 	/** @var PipeCollection */
 	protected $pipes;
@@ -65,6 +67,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
     /** @var array */
     protected $activeCommands;
+
+    /** @var TimerInterface[] */
+    protected $userTimeouts = array();
 
 	/**
 	 * @param LoopInterface $reactLoop
@@ -103,21 +108,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			// couldn't talk to redis, send a retry back to the client
 			$this->v("Communication Exception" . $e->getMessage(), '!');
 
-			$this->sendToPipe($pipe, json_encode(array(
-				'error' => 'Service Unavailable',
-				'code'  => 503,
-				'retry' => true
-			)));
+			$this->sendHeader($pipe, 503, true);
 			$pipe->close();
 		}
 		catch(SessionException $e) {
 			// user not found, not logged in: signal authentication required
 			$this->v('Failed to fully register pipe: '.$e->getMessage(), '!');
 
-			$this->sendToPipe($pipe, json_encode(array(
-				'error' => 'Unauthorized',
-				'code'  => 401,
-			)));
+			$this->sendHeader($pipe, 401);
 			$pipe->close();
 		}
 	}
@@ -202,6 +200,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         // set the pipe to "busy"
         $this->activeCommands[$socketKey] = $command;
 
+        // flag the user as active
+        $this->refreshUser($userId);
+
 		// don't flatly spawn a new worker: add the request to a queue
         try {
             $this->taskDispatcher->enqueue($pipe, $command, $arguments);
@@ -209,11 +210,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         catch(QueueingException $e) {
             $this->v("Failed to enqueue, task '$command' lost: ".$e->getMessage(), '!');
             // since a full queue constitutes service unavailable, probably best to kick this pipe
-            $this->sendToPipe($pipe, json_encode(array(
-                'error' => 'Service Unavailable',
-                'code'  => 503,
-                'retry' => true
-            )));
+            $this->sendHeader($pipe, 503, true);
 
             // cleanup
             unset($this->activeCommands[$socketKey]);
@@ -270,6 +267,21 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		return true;
 	}
+
+
+    /**
+     * @param TimerInterface $timer
+     */
+    public function onTimeout($timer) {
+        $userId = $timer->getData();
+        $success = $this->subscriptionManager->removeSubscription($userId);
+        $this->v("User $userId has timed out, " . ($success ? "unsubscribed" : "failed to unsubscribe"));
+
+        foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
+            $this->sendHeader($pipe, 401);
+            $pipe->close();
+        }
+    }
 
 
 	/**
@@ -353,6 +365,35 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	}
 
 
+    /**
+     * @param Pipe $pipe
+     * @param int $code
+     * @param bool $allowRetry
+     * @return bool
+     */
+    public function sendHeader($pipe, $code, $allowRetry = false) {
+        $map = array(
+            401 => 'Unauthorized',
+            503 => 'Service Unavailable'
+        );
+
+        if(isset($map[$code])) {
+            $data = array(
+                'error' => $map[$code],
+                'code'  => $code
+            );
+
+            if($allowRetry) {
+                $data['retry'] = true;
+            }
+
+            $this->sendToPipe($pipe, json_encode($data));
+            return true;
+        }
+        return false;
+    }
+
+
 	/**
 	 * Send data to a specific pipe.
 	 *
@@ -391,6 +432,20 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			$this->sendToPipe($pipe, $data);
 		}
 	}
+
+
+    /**
+     * @param int $userId
+     */
+    public function refreshUser($userId) {
+        if($this->userTimeouts[$userId] instanceof TimerInterface) {
+            $this->reactLoop->cancelTimer($this->userTimeouts[$userId]);
+            unset($this->userTimeouts[$userId]);
+        }
+
+        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(self::INACTIVE_TIMEOUT, array($this, 'onTimeout'));
+        $this->userTimeouts[$userId]->setData($userId);
+    }
 
 
 	// noop
