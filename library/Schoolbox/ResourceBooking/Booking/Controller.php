@@ -271,35 +271,15 @@ class Controller extends Base
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
 
         if (empty($errors)) {
-            // Get the date and time changes.
-            // These will be applied to the whole series.
-            $startDate     = $this->getDateFromForm('start_datetime');
-            $endDate       = $this->getDateFromForm('end_datetime');
-            $startDelta    = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
-                $startDate
+            $isTimeChanged = false;
+            $series = $this->getUpdatedSeries(
+                $item,
+                $this->getDateFromForm('start_datetime'),
+                $this->getDateFromForm('end_datetime'),
+                $this->request->post['related_item'] ?: array(),
+                $this->request->post['efficacy'],
+                $isTimeChanged
             );
-            $endDelta      = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
-                $endDate
-            );
-            $isTimeChanged =
-                $startDelta->getSecondTotal() !== 0
-                || $endDelta->getSecondTotal() !== 0;
-
-            /** @var Collection|Model[] $series */
-            if ($this->request->post['efficacy'] === 'series') {
-                // Load whole series
-                $series = $this->bookingMapper->findSeriesBookings(
-                    $item->getId(),
-                    $item->getEvent()->getSeriesId()
-                );
-            } else {
-                // Divorce booking from its series
-                $series = new Collection();
-                $item->getEvent()->setSeriesId(null);
-            }
-            $series->add($item);
 
             // Save the whole series
             $bookingList = new Collection();
@@ -311,75 +291,81 @@ class Controller extends Base
 
                 // Adjust the current event, if its time changed.
                 // If times changed, the event's status will need to change.
-                if ($isTimeChanged) {
-                    $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
-                        $startDelta->getAsDateInterval()
-                    );
-                    $event->setStartDateTime(new Alaress_Date_Format($newStart));
-                    $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
-                        $endDelta->getAsDateInterval()
-                    );
-                    $event->setEndDateTime(new Alaress_Date_Format($newEnd));
-                }
+//                if ($isTimeChanged) {
+//                    $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
+//                        $startDelta->getAsDateInterval()
+//                    );
+//                    $event->setStartDateTime(new Alaress_Date_Format($newStart));
+//                    $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
+//                        $endDelta->getAsDateInterval()
+//                    );
+//                    $event->setEndDateTime(new Alaress_Date_Format($newEnd));
+//                }
                 $event->setDetail($this->request->post['notes']);
                 $this->eventMapper->save($event);
 
                 // Adjust $booking
                 $booking->setName($this->request->post['name']);
 
-                // Get all the related bookings for this event at this time.
-                $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
-                foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-                    $relatedBooking = null;
-                    foreach ($existingRelatedBookings as $existing) {
-                        if ($existing->getResource()->getId() == $relatedResource->getId()) {
-                            $relatedBooking = $existing;
-                            break;
-                        }
-                    }
-                    $inNew = in_array(
-                        $relatedResource->getId(),
-                        $this->request->post['related_item'] ? : array()
-                    );
+//                // Get all the related bookings for this event at this time.
+//                $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
+//                foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+//
+//                    $relatedBooking = null;
+//                    foreach ($existingRelatedBookings as $existing) {
+//                        if ($existing->getResource()->getId() == $relatedResource->getId()) {
+//                            $relatedBooking = $existing;
+//                            break;
+//                        }
+//                    }
+//                    $inNew = in_array(
+//                        $relatedResource->getId(),
+//                        $this->request->post['related_item'] ?: array()
+//                    );
+//
+//                    if ($inNew) {
+//                        if ($relatedBooking instanceof Model) {
+//                            // update
+//
+//                            // Has the booking time changed?
+//                            // That invalidates existing bookings
+//                            if ($isTimeChanged) {
+//                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+//                            }
+//                        }
+//                        else {
+//                            // create
+//                            $relatedBooking = new Model();
+//                            $relatedBooking
+//                                ->setEvent($event)
+//                                ->setResource($relatedResource)
+//                                ->setStatus(Status\Model::STATUS_PENDING);
+//                        }
+//
+//                        // Open resource: automatically confirm
+//                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+//                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+//                        }
+//
+//                        // Status:
+//                        // pending if new, or time was changed
+//                        $relatedBooking->setName($this->request->post['name']);
+////                            ->addRelatedBooking($booking);
+////                        $booking->addRelatedBooking($relatedBooking);
+////                        $this->bookingMapper->save($relatedBooking);
+//                        $bookingList->add($relatedBooking);
+//                    }
+//                    elseif ($relatedBooking instanceof Model) {
+//                        // delete
+//                        $this->bookingMapper->delete($relatedBooking);
+//                    }
+//                }
 
-                    if ($inNew) {
-                        if ($relatedBooking instanceof Model) {
-                            // update
-
-                            // Has the booking time changed?
-                            // That invalidates existing bookings
-                            if ($isTimeChanged) {
-                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
-                            }
-                        } else {
-                            // create
-                            $relatedBooking = new Model();
-                            $relatedBooking
-                                ->setEvent($event)
-                                ->setResource($relatedResource)
-                                ->setStatus(Status\Model::STATUS_PENDING);
-                        }
-
-                        // Open resource: automatically confirm
-                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
-                        }
-
-                        // Status:
-                        // pending if new, or time was changed
-                        $relatedBooking
-                            ->setName($this->request->post['name'])
-                            ->addRelatedBooking($booking);
-                        $booking->addRelatedBooking($relatedBooking);
-                        $this->bookingMapper->save($relatedBooking);
-                        $bookingList->add($relatedBooking);
-                    } elseif ($relatedBooking instanceof Model) {
-                        // delete
-                        $this->bookingMapper->delete($relatedBooking);
-                    }
+                if ($booking->isDeleted()) {
+                    $this->bookingMapper->delete($booking);
+                } else {
+                    $bookingList->add($booking);
                 }
-
-                $bookingList->add($booking);
             }
             $this->bookingMapper->save($bookingList);
         } else {
@@ -699,13 +685,34 @@ class Controller extends Base
                     );
                 }
             }
-//            else {
-//                // Validating an existing booking?
-//                // Check each item in the series, adjusting difference.
-//                $dateParts = array(
-//                    array($resource, $startDate, $endDate, $existingBooking),
-//                );
-//
+            else {
+                // Validating an existing booking?
+                // Check each item in the series, adjusting its dates
+                $isTimeChanged = false;
+                $series = $this->getUpdatedSeries(
+                    $existingBooking,
+                    $startDate,
+                    $endDate,
+                    $this->request->post['related_item'] ?: array(),
+                    $this->request->post['efficacy'],
+                    $isTimeChanged
+                );
+                $dateParts = array();
+                foreach ($series as $thisBooking) {
+                    $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
+                }
+
+                // Remove non-existent related bookings
+                $newSeries = array();
+
+                // Add the new related bookings
+                $relatedItems = $this->request->post['related_item'] ?: array();
+                foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                    if (in_array($relatedResource->getId(), $relatedItems)) {
+                    }
+                }
+
+
 //                $difference = $startDate->diff($endDate);
 //                foreach ($series as $occurenceStart) {
 //                    $occurenceEnd = clone $occurenceStart;
@@ -714,7 +721,7 @@ class Controller extends Base
 //                    // Check all of $occurenceStart and $occurenceEnd
 //                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
 //                }
-//            }
+            }
         }
 
         // If updating a booking and its timespan hasn't changed:
@@ -1318,5 +1325,119 @@ class Controller extends Base
     public function getExternalTimetableHandler()
     {
         return $this->externalTimetableHandler;
+    }
+
+    /**
+     * Gets a series for update, adjusting their start and end dates.
+     *
+     * @param Model    $item
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param array    $relatedItems
+     * @param string   $efficacy
+     * @param bool&    $isTimeChanged Were any bookings changed?
+     *
+     * @return Collection|Model[]
+     */
+    protected function getUpdatedSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        $efficacy,
+        &$isTimeChanged
+    ) {
+        // Get the date and time changes.
+        $startDelta = Interval::createFromDateTimeDifference(
+            $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+            $startDate
+        );
+        $endDelta = Interval::createFromDateTimeDifference(
+            $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+            $endDate
+        );
+        $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+
+        /** @var Collection|Model[] $series */
+        if ($efficacy === 'series') {
+            // Load whole series
+            $series = $this->bookingMapper->findSeriesBookings(
+                $item->getId(),
+                $item->getEvent()->getSeriesId()
+            );
+        }
+        else {
+            // Divorce booking from its series
+            $series = new Collection();
+            $item->getEvent()->setSeriesId(null);
+        }
+        $series->add($item);
+
+        $bookingList = new Collection();
+
+        // Adjust the datetimes for the events in the series
+        foreach ($series as $booking) {
+            $event = $booking->getEvent();
+            $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
+                $startDelta->getAsDateInterval()
+            );
+            $event->setStartDateTime(new Alaress_Date_Format($newStart));
+            $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
+                $endDelta->getAsDateInterval()
+            );
+            $event->setEndDateTime(new Alaress_Date_Format($newEnd));
+
+            $bookingList->add($booking);
+
+            // Set up bookings for related items
+            $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
+            foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+                $relatedBooking = null;
+                foreach ($existingRelatedBookings as $existing) {
+                    if ($existing->getResource()->getId() == $relatedResource->getId()) {
+                        $relatedBooking = $existing;
+                        break;
+                    }
+                }
+                $inNew = in_array($relatedResource->getId(), $relatedItems);
+
+                if ($inNew) {
+                    if ($relatedBooking instanceof Model) {
+                        // update
+
+                        // Has the booking time changed?
+                        // That invalidates existing bookings
+                        if ($isTimeChanged) {
+                            $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+                        }
+                    }
+                    else {
+                        // create
+                        $relatedBooking = new Model();
+                        $relatedBooking
+                            ->setEvent($event)
+                            ->setResource($relatedResource)
+                            ->setStatus(Status\Model::STATUS_PENDING);
+                    }
+
+                    // Open resource: automatically confirm
+                    if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                        $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+                    }
+
+                    // Status:
+                    // pending if new, or time was changed
+                    $relatedBooking->setName($this->request->post['name']);
+                    $bookingList->add($relatedBooking);
+                }
+                elseif ($relatedBooking instanceof Model) {
+                    // delete or don't add. Maybe mark as deleted?
+//                    $this->bookingMapper->delete($relatedBooking);
+                    $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
+                }
+            }
+        }
+
+        return $bookingList;
     }
 }
