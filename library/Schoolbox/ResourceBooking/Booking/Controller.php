@@ -421,17 +421,14 @@ class Controller extends Base
     }
 
     /**
-     * Saves each item in a list of bookings into a set of bookings for related items.
-     *
-     * @todo make this a mapper method
+     * Expands $bookingList with a booking for each item in $relatedItems.
      *
      * @param Collection|Model[] $bookingList
      * @param array              $relatedItems
      *
      * @return Collection
      */
-    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems)
-    {
+    protected function getBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
         if (empty($relatedItems)) {
             return $bookingList;
         }
@@ -452,6 +449,21 @@ class Controller extends Base
             }
             $newList->add($booking);
         }
+        return $newList;
+    }
+
+    /**
+     * Saves each item in a list of bookings into a set of bookings for related items.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param array              $relatedItems
+     *
+     * @return Collection
+     */
+    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
+        $newList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
         $this->bookingMapper->save($newList);
         return $newList;
     }
