@@ -562,7 +562,7 @@ setupCustomise = {
 	updateColor: function(element, color) {
 		switch (element) {
 			case 'top_bg_primary':
-				return $j('.top .text, .top .listing').css('background-color', color);
+				return $j('.top .text, .top .listing, .top .information-list li').css('background-color', color);
 				break;
 			case 'top_bg_secondary':
 				return $j('.top .dark').css('background-color', color);
@@ -580,7 +580,7 @@ setupCustomise = {
 				return $j('.top a').css('color', color);
 				break;
 			case 'left_bg_primary':
-				return $j('.left .text, .left .listing').css('background-color', color);
+				return $j('.left .text, .left .listing, .left .information-list li').css('background-color', color);
 				break;
 			case 'left_bg_secondary':
 				return $j('.left .dark').css('background-color', color);
@@ -601,7 +601,7 @@ setupCustomise = {
 				return $j('.right a:hover').css('color', color);
 				break;
 			case 'right_bg_primary':
-				return $j('.right .text, .right .listing').css('background-color', color);
+				return $j('.right .text, .right .listing, .right .information-list li').css('background-color', color);
 				break;
 			case 'right_bg_secondary':
 				return $j('.right .dark').css('background-color', color);

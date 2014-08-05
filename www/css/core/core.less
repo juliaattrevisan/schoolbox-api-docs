@@ -1616,10 +1616,6 @@ Notifications
  Information List - Displays summary info with minimal actions
 --------------------------------------------------------------*/
 .information-list {
-    //Hover cover on .dark elements to override inline styles for 'Customise Page' custom colours
-    .ui-sortable{
-        .dark:hover{ background-color: lighten(@highlight-color,@lighten-value); }
-    }
 	// List clear and rule between list items
 	li {
 		border-bottom: 1px solid @border-color;
@@ -11288,7 +11284,6 @@ th.rotate {
 
 .ui-sortable {
 	&> li {
-		background-color: #fff;
 		background-image: url('/images/core/tablesorter/sort.gif');
 		background-repeat: no-repeat;
 		background-position: left center;
