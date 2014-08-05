@@ -800,13 +800,14 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStaffContactListExtended() {
 		$query = "
 			SELECT
-				vStaff.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
-				vStaff.StaffOccupPhone, vStaff.StaffOccupEmail, vStaff.StaffExtension,
-				vStaff.StaffCampusDescription, vStaff.StaffCategoryType,
-				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
+					vStaff.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
+					vStaff.StaffOccupPhone, vStaff.StaffOccupEmail, vStaff.StaffExtension,
+					vStaff.StaffCampusDescription, vStaff.StaffCategoryType,
+					Department.Description AS StaffDepartment, JobPositions.JobPositionDescription, JobPositions.StaffJobPositionStartDate, JobPositions.StaffJobPositionEndDate
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-			WHERE ActiveFlag = 1
+			LEFT JOIN SynergyOne.dbo.luDepartment Department ON vStaff.StaffDepartment = Department.Code
+			WHERE vStaff.ActiveFlag = 1
 			AND StaffCategoryDescription != 'Staff on leave'
 			AND StaffCategory NOT IN ('SC')
 			AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
