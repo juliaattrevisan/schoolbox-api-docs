@@ -1,0 +1,14 @@
+Source: newrelic-plugin-nginx
+Section: non-free/web
+Priority: optional
+Maintainer: Alaress Support <support@schoolbox.com.au>
+Build-Depends: debhelper (>= 8.0.0), ruby, rubygems, ruby-bundler
+Standards-Version: 3.9.3
+Homepage: http://nginx.com/download/newrelic/newrelic_nginx_agent.tar.gz
+
+Package: newrelic-plugin-nginx
+Architecture: all
+Depends: ruby, rubygems, ruby-bundler,
+ ${misc:Depends}
+Description: NewRelic plugin nginx
+ Parses nginx stub data and reports to NewRelic

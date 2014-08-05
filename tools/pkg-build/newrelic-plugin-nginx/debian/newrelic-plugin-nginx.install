@@ -1,0 +1,11 @@
+# Directories.
+.bundle /usr/share/newrelic-plugin-nginx
+config /usr/share/newrelic-plugin-nginx
+Gemfile /usr/share/newrelic-plugin-nginx
+Gemfile.lock /usr/share/newrelic-plugin-nginx
+LICENSE /usr/share/newrelic-plugin-nginx
+newrelic_nginx_agent /usr/share/newrelic-plugin-nginx
+newrelic_nginx_agent.daemon /usr/share/newrelic-plugin-nginx
+README.txt /usr/share/newrelic-plugin-nginx
+ruby /usr/share/newrelic-plugin-nginx
+newrelic-plugin-nginx.conf /etc/init
