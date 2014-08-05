@@ -21,6 +21,7 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
         $this
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeCompanyCodes())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentStaff())
+            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeNonTeachers())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Staff())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExternalId_Staff())
