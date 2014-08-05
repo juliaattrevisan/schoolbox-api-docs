@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use DateTime;
 use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Collection;
 
 class EventRecurrenceMapper {
 
@@ -197,16 +198,18 @@ class EventRecurrenceMapper {
 	}
 
 	/**
-	 * Another totally custom recurrence save method - this one uses an iterable
-	 * date source to create dates.
+	 * Gets an event sequence from a base event and an iterable date source.
 	 *
 	 * @param Event                   $event
 	 * @param DateTime[]|\Traversable $dateSource
+	 *
+	 * @return Collection|Event[]
 	 */
-	public function createSequenceFromIterator(Event $event, $dateSource = null) {
+	public function getSequenceFromIterator(Event $event, $dateSource = null) {
+		$collection = new Collection();
 		if (!isset($dateSource)) {
-			// just save the single event
-			$this->getEventMapper()->save($event);
+			// just get the single event
+			$collection->add($event);
 		}
 		else {
 			// dateSource could be a datePeriod
@@ -217,14 +220,25 @@ class EventRecurrenceMapper {
 			$dayDiff   = $diff->days;
 			$seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
 			foreach ($dateSource as $currentDate) {
-				// Save event in a sequence.
 				$event->setId(null);
 				$event->setSeriesId($seriesId);
 				$event->setStartDate($currentDate->format('Y-m-d'));
 				$event->setEndDate($currentDate->modify("+$dayDiff days")->format('Y-m-d'));
-				$this->getEventMapper()->save($event);
+				$collection->add($event);
 			}
 		}
+		return $collection;
+	}
+
+	/**
+	 * Another totally custom recurrence save method - this one uses an iterable
+	 * date source to create dates.
+	 *
+	 * @param Event                   $event
+	 * @param DateTime[]|\Traversable $dateSource
+	 */
+	public function createSequenceFromIterator(Event $event, $dateSource = null) {
+		$this->getEventMapper()->save($this->getSequenceFromIterator($event, $dateSource));
 	}
 
 
