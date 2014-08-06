@@ -221,6 +221,35 @@ body.login{
   }
 }
 
+// Custom Awards Component
+.awardsComponent{
+    h3 {
+        padding: 8px 16px;
+    }
+    p { margin: 0 0 8px 0; }
+    .award,
+    .detention,
+    .absence {
+        padding: 8px 16px 8px 45px;
+    }
+    .comment {
+        list-style: disc inside;
+        padding: 3px 0px;
+    }
+    .award {
+        background: url(/images/stmichaels/star.png) 18px 8px no-repeat;
+        .award-desc { color: #00cc33; }
+    }
+    .detention {
+        background: url(/images/stmichaels/detention.png) 18px 8px no-repeat;
+        .detention-desc { color: #db0000; }
+    }
+    .absence {
+        background: url(/images/stmichaels/late.png) 18px 8px no-repeat;
+        .absence-desc { color: @module-background; }
+    }
+}
+
 @media screen and (max-width: 1024px){
 
   #loginForm #tandc {
