@@ -17,6 +17,10 @@ $definition = array(
 	'description'        => 'Show a grid of image thumbnails sourced from the files uploaded into My Files.',
 	'multiple'           => 'true',
 	'config'             => array(
+		'componentname' => array(
+			'default_value' => 'Image Gallery',
+			'label' => 'Heading',
+		),
 		'pixel' => array(
 			'default_value' => '200',
 			'label' => 'Max width/height',
