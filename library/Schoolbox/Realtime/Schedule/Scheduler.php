@@ -12,13 +12,13 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
-use Alaress\Cli\Debug;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
@@ -80,15 +80,15 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param Debug $debug
+     * @param LoggerInterface $log
      * @param IConfigLoader $conf
      */
-    public function __construct($loop, $dispatchStrategy, $debug, $conf = null) {
+    public function __construct($loop, $dispatchStrategy, $log, $conf = null) {
 	    // cast optional param
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
 
 	    // run construction
-        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $debug);
+        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $log);
         $this->notif = new Notif();
 	    $this->resolvers = new ResolutionManager();
 
@@ -123,31 +123,32 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * @return void
      */
     public function onException($e) {
-	    $this->debug->v($e->getMessage(), "!");
-        $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
+	    $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()));
+		// TODO improve the email handling of these messages to be less spammy
+		// $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
     }
 
 
     /**
      * Callback executed when a message is received from RabbitMQ on the schedule queue
      *
-     * @param Frame $frame
+     * @param Frame       $frame
      * @param AckResolver $resolver
      * @return void
      */
     public function onMessage($frame, $resolver) {
-		$this->debug->v('Received message from '.INSTANCE_ID.self::QUEUE_SCHEDULE, '>');
+		$this->log->info('Received message from '.INSTANCE_ID.self::QUEUE_SCHEDULE, array('char' => '>'));
 		try {
 			$formatted = CompressedFormatter::uncompress($frame->body);
 			$event = unserialize($formatted['message']);
 
 			// only a few Models actually have schedule strategies, failure is ok
 			// each module strategy knows how to deal with its own events
-			$this->debug->v("Building trigger factory for ".get_class($event->getObject()));
+			$this->log->info("Building trigger factory for ".get_class($event->getObject()));
 			$triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
 
 			// retrieve, populate, and schedule this bundle of triggers
-			$this->debug->v("Retrieving triggers");
+			$this->log->info("Retrieving triggers");
 			$triggers = $triggerFactory->buildTriggers($event->getAction())->getTriggers();
 			$this->scheduleNotifications($triggers, $resolver);
 			$triggerFactory->cleanup($triggers);
@@ -157,20 +158,20 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		}
 		catch(MapperException $e) {
 			// TODO Mappers shouldn't even be being used from within this block @see SB-5250
-			$this->debug->v("Mapper exception: ".$e->getMessage(), '!');
+			$this->log->critical("Mapper exception: ".$e->getMessage());
 		}
 	    catch(RuntimeException $e) {
 		    $truncated = substr($frame->body, 0, 64);
-		    $this->debug->v("Could not decode '$truncated...' to schedule event", '!');
+		    $this->log->critical("Could not decode '$truncated...' to schedule event", array($e));
 		    // this message is can't be parsed, so we ACK it to make it go away
 	    }
 		catch(ScheduleException $e) {
 			// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-			$this->debug->v('Schedule Exception: ' . $e->getMessage(), '*');
+			$this->log->info('Schedule Exception: ' . $e->getMessage(), array('char' => '?'));
 		}
 		catch(CompressionException $e) {
 			// this message is unparseable, so we'll eventually ACK it to make it go away
-			$this->debug->v('Compression Exception: ' . $e->getMessage(), '!');
+			$this->log->critical('Compression Exception: ' . $e->getMessage(), array($e));
 		}
 
 		$resolver->ack();
@@ -183,21 +184,32 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * @param Frame $frame
 	 */
 	public function onCommand($frame) {
-		$this->debug->v('Received command from '.INSTANCE_ID.self::QUEUE_COMMAND, '>');
+		$this->log->info('Received command from '.INSTANCE_ID.self::QUEUE_COMMAND, array('char' => '>'));
 		$cmdr = new SchedulerCommander();
-		$body = CompressedFormatter::uncompress($frame->body);
-		$result = $cmdr->exec($this, $body['message']);
-		$this->debug->v("Command executed ".($result ? 'successfully' : 'unsuccessfully'), $result ? ' ' : '*');
-	}
+        try {
+            $body = CompressedFormatter::uncompress($frame->body);
+            $result = $cmdr->exec($this, $body['message']);
+            if($result) {
+                $this->log->debug("Command executed successfully");
+                return;
+            }
+        }
+        catch(CompressionException $e) {
+            // noop
+        }
+        $this->log->error("Command failed to execute");
+    }
 
 
 	/**
 	 * Callback executed when SIGHUP is received by the process
 	 */
 	public function onHangup() {
-		$this->debug->v("HUP received: reloading config", ">");
+		$this->log->notice("HUP received", array('char' => '>'));
+		$this->log->debug("Invalidating config cache");
 		$this->conf->dropCache();
-		$this->getDispatcher()->releaseWorkerPool(false);
+        $this->log->debug("Releasing workers");
+		$this->dispatcher->releaseWorkerPool(false);
 	}
 
 
@@ -205,7 +217,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * Callback executed when SIGINT is received by the process
 	 */
 	public function onInterrupt() {
-		$this->debug->v("Interrupting starfish!", '>');
+		$this->log->notice("Interrupting starfish!", array('char' => '>'));
 		// for now, just treat as a termination request
 		$this->onTerminate();
 	}
@@ -215,7 +227,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * Callback executed when SIGTERM is received by the process
 	 */
 	public function onTerminate() {
-		$this->debug->v("Cleaning up and terminating", '*');
+		$this->log->error("Cleaning up and terminating");
 		// die safely
 		unset($this->dispatcher);
 		exit;
@@ -229,10 +241,10 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     public function scheduleNotifications($triggers, $resolver = null) {
         $c = count($triggers);
 	    if($c == 0) {
-	        $this->debug->v("No triggers to schedule");
+	        $this->log->info("No triggers to schedule");
 	        return;
         }
-	    $this->debug->v(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
+	    $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
 	    foreach($triggers as $trigger) {
             $this->scheduleNotification($trigger, $resolver);
         }
@@ -249,7 +261,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
             $this->attachResolverTrigger($resolver, $trigger);
         }
 	    else {
-		    $this->debug->v("No resolver supplied for attaching trigger", '*');
+		    $this->log->warning("No resolver supplied for attaching trigger");
 	    }
     }
 
@@ -264,7 +276,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * @return void                       - this method does not return any value
 	 */
 	public function handleResponse($trigger, $command, $data) {
-		$this->debug->v("Received worker response to handle: '$command' -> ".substr(json_encode($data), 0, 64)."...");
+		$this->log->notice("Received worker response to handle: '$command' -> ".substr(json_encode($data), 0, 64)."...");
 
 		// detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
 		$this->detachTrigger($trigger);
@@ -274,7 +286,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 		// method not implemented or nothing to send, this is fine
 		if(is_null($bundle)) {
-			$this->debug->v("No messages to broadcast");
+			$this->log->debug("No messages to broadcast");
 			return;
 		}
 		// check that a bundle was returned
@@ -287,20 +299,20 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 
 		// if there are no messages, just ignore this callback and move on
 		if($bundle->isEmpty()) {
-			$this->debug->v("No messages to broadcast");
+			$this->log->debug("No messages to broadcast");
 			return;
 		}
 
-		$postman = new Postman($this->notif, $this->debug);
+		$postman = new Postman($this->notif, $this->log);
 
 		$count = $postman->deliver($bundle, array('user' => $trigger->getEvent()->getEffector()->getId()));
 
         if(is_null($count)) {
-            $this->debug->d("No messages to broadcast");
+            $this->log->debug("No messages to broadcast");
             return;
         }
 
-		$this->debug->v(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), '<');
+		$this->log->info(sprintf("%s message%s broadcast", $count, $count == 1 ? '' : 's'), array('char' => '<'));
 	}
 
 
@@ -380,7 +392,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 			    break;
 	    }
 
-	    $this->debug->v("Detaching trigger: $msg", '-');
+	    $this->log->debug("Detaching trigger: $msg");
 
 	    return $count;
     }

@@ -15,6 +15,7 @@ use Alaress\Scheduler\CronScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
 use React\Stomp\Factory;
@@ -59,10 +60,10 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param \Alaress\Cli\Debug $cli
+     * @param LoggerInterface $log
      */
-    public function __construct($loop, $dispatchStrategy, $cli) {
-        parent::__construct($loop, $dispatchStrategy, $cli);
+    public function __construct($loop, $dispatchStrategy, $log) {
+        parent::__construct($loop, $dispatchStrategy, $log);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
 	    self::bindQueues();
 
@@ -151,7 +152,7 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	 * @return mixed
 	 */
 	protected function report($data) {
-		$this->debug->v("Emails sent: ".unserialize($data[0]));
+		$this->log->notice("Emails sent: ".unserialize($data[0]));
 	}
 
 
@@ -159,7 +160,7 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	 * @param Frame $frame
 	 */
 	public function onCommand($frame) {
-		$this->debug->v("Received command");
+		$this->log->info("Received command");
 		$commander = new DigestCommander($this);
 		$body = CompressedFormatter::uncompress($frame->body);
 		$commander->exec($this, $body['message']);

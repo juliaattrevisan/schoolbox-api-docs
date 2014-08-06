@@ -10,12 +10,13 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Alaress\Async\AMQP\AMQPResponseHandlerInterface;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\CommunicationException;
+use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\Wamp\WampServerInterface;
@@ -40,7 +41,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * Class PipeManager
  * @package Schoolbox\Realtime
  */
-class PipeManager implements WampServerInterface, MessageComponentInterface, TaskResponseHandlerInterface {
+class PipeManager implements WampServerInterface, MessageComponentInterface, TaskResponseHandlerInterface, AMQPResponseHandlerInterface {
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
 	const PHP_SESSION_PREFIX   = 'PHPSESSID';
@@ -55,8 +56,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var LoopInterface */
 	protected $reactLoop;
 
-	/** @var Debug */
-	protected $verboser;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/** @var Dispatcher */
 	protected $taskDispatcher;
@@ -73,19 +74,18 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/**
 	 * @param LoopInterface $reactLoop
 	 * @param SessionValidator $sessionValidator
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
      * @param Client $stompClient
 	 * @param DispatchStrategyInterface $strat
-     * @param
 	 */
-	public function __construct($reactLoop, $sessionValidator, $stompClient, $debug, $strat = null) {
-		$this->pipes = new PipeCollection($sessionValidator, $debug);
-		$this->subscriptionManager = new SubscriptionManager($stompClient, $this);
+	public function __construct($reactLoop, $sessionValidator, $stompClient, $log, $strat = null) {
+		$this->pipes = new PipeCollection($sessionValidator, $log);
+		$this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log);
 		$this->reactLoop = $reactLoop;
-		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $debug, $strat);
-		$this->verboser = $debug;
+		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
+		$this->log = $log;
 
-		$this->v('Instantiated PipeManager');
+		$this->log->debug('Instantiated PipeManager');
 	}
 
 
@@ -100,21 +100,21 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		// receive new connection, register a pipe based on it
 		$pipe = new Pipe($conn);
 
-		$this->v( sprintf( 'Received socket connection from %s', $pipe->getRemoteAddress()));
+		$this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));
 
 		try {
 			$this->pipes->registerPipe($pipe);
 		}
 		catch(CommunicationException $e) {
 			// couldn't talk to redis, send a retry back to the client
-			$this->v("Communication Exception" . $e->getMessage(), '!');
+			$this->log->error("Communication Exception" . $e->getMessage(), array($e));
 
 			$this->sendHeader($pipe, 503, true);
 			$pipe->close();
 		}
 		catch(SessionException $e) {
 			// user not found, not logged in: signal authentication required
-			$this->v('Failed to fully register pipe: '.$e->getMessage(), '!');
+			$this->log->error('Failed to fully register pipe: '.$e->getMessage(), array($e));
 
 			$this->sendHeader($pipe, 401);
 			$pipe->close();
@@ -145,7 +145,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * @throws \Exception
 	 */
 	public function onError(ConnectionInterface $conn, \Exception $e) {
-		$this->v(sprintf('Exception! %s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), '!');
+		$this->log->critical(sprintf('Exception! %s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()));
 
 		// process exception needs to be rethrown
 		if($e instanceof ProcessException) {
@@ -171,7 +171,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$userId = $pipe->getUserId();
 		$sessionId = $pipe->getSession() ?: 'sessionless';
 
-		$this->v(sprintf('Received message: %s (%s:%s) > %s', $userId ?: 'unknown', $socketKey, $sessionId, $msg), '>');
+		$this->log->info(sprintf('Received message: %s (%s:%s) > %s', $userId ?: 'unknown', $socketKey, $sessionId, $msg), array('char' => '>'));
 
 		// we'll just ignore messages that are of unknown origin
 		if(!($userId && $sessionId)) {
@@ -209,7 +209,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
             $this->taskDispatcher->enqueue($pipe, $command, $arguments);
         }
         catch(QueueingException $e) {
-            $this->v("Failed to enqueue, task '$command' lost: ".$e->getMessage(), '!');
+            $this->log->critical("Failed to enqueue, task '$command' lost: ".$e->getMessage());
             // since a full queue constitutes service unavailable, probably best to kick this pipe
             $this->sendHeader($pipe, 503, true);
 
@@ -239,13 +239,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		// just get *a* pipe for the user, it doesn't matter which
 		$pipe = reset($this->pipes->getPipesByUserId($userId));
 		$self = $this;
+        $log  = $this->log;
 
 		if(empty($this->pushTransactions[$userId])) {
 			$this->pushTransactions[$userId] = new Transaction($this->reactLoop,
-				function($timer) use ($self, $pipe) {
+				function($timer) use ($self, $pipe, $userId, $log) {
 					/** @var Timer $timer */
 					// the timer contains the data to be processed
-					$self->v("Spawning worker to push cache", '>');
+					$log->info("Pushing cached messages to user $userId", array('char' => '>'));
 					// run the instances through a decorator
 					$decorator = new Decorator();
 					$decorator->appendInstances($timer->getData());
@@ -254,7 +255,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
                         $self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
                     }
                     catch(QueueingException $e) {
-                        $self->v('Failed to enqueue, task lost: '.$e->getMessage(), '!');
+                        $log->critical('Failed to enqueue, task lost: '.$e->getMessage());
                     }
 				}
 			);
@@ -321,7 +322,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		$userId = $pipe->getUserId();
 
-		$this->v("Handling a worker response: $command");
+		$this->log->notice("Handling a worker response: $command");
 
         $release = true;
 
@@ -404,7 +405,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	public function sendToPipe($pipe, $data) {
 		$data = is_string($data) ? $data : json_encode($data);
 		$bytes = strlen($data);
-		$this->v("Sending $bytes bytes to {$pipe->getSocketKey()}", '<');
+		$this->log->info("Sending $bytes bytes to {$pipe->getSocketKey()}", array('char' => '<'));
 		$pipe->send($data);
 	}
 
@@ -455,8 +456,4 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	public function onUnSubscribe(ConnectionInterface $conn, $topic) { }
 	public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) { }
 
-
-	public function v($msg, $char = ' ') {
-		$this->verboser->v($msg, $char);
-	}
 }

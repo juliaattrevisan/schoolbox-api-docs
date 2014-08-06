@@ -11,8 +11,9 @@ namespace Schoolbox\Realtime\Digest;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Cli\Debug;
+use Alaress\Lumberjack\Logger;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -31,24 +32,24 @@ class MailNotifier implements Serializable {
     /** @var IConfigLoader */
     protected $conf;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/**
-	 * @param IConfigLoader $configLoader
-	 * @param Debug         $debug
+	 * @param IConfigLoader   $configLoader
+	 * @param LoggerInterface $log
 	 */
-    public function __construct($configLoader = null, $debug = null) {
+    public function __construct($configLoader = null, $log = null) {
         $this->conf = $configLoader ?: ConfigMapper::getInstance();
-	    $this->setDebug($debug ?: new Debug(null));
+	    $this->setLogger($log ?: new Logger(null));
     }
 
 
 	/**
-	 * @param Debug $debug
+	 * @param LoggerInterface $debug
 	 */
-	public function setDebug($debug) {
-		$this->debug = $debug;
+	public function setLogger($debug) {
+		$this->log = $debug;
 	}
 
 
@@ -67,7 +68,7 @@ class MailNotifier implements Serializable {
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
 
-		$this->debug->v("Preparing to digest {$role->getName()}: {$users->count()} users");
+		$this->log->info("Preparing to digest {$role->getName()}: {$users->count()} users");
 
 		$result = 0;
 
@@ -77,7 +78,7 @@ class MailNotifier implements Serializable {
 		// iterate and digest
 		foreach($users as $user) {
 			$email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-			$this->debug->v("Digesting {$user->getUsername()}");
+			$this->log->info("Digesting {$user->getUsername()}");
 			$q = UserQueue::getUserDigestQueueName($user->getId());
 			$acks = array();
 
@@ -98,18 +99,18 @@ class MailNotifier implements Serializable {
 				}
 				catch(InvalidArgumentException $e) {
 					// meh. just ignore this message then
-					$this->debug->v("Unparseable message instance detected", '*');
+					$this->log->error("Unparseable message instance detected");
 				}
 			}
 
 			if(!count($acks)) {
 				// this user has nothing to digest
-				$this->debug->v("{$user->getUsername()} has nothing to digest");
+				$this->log->notice("{$user->getUsername()} has nothing to digest");
 				continue;
 			}
 
 			$context = $decorator->renderAsTwigContext($email->getCoreContext(), $dir);
-			$this->debug->v(sprintf('Collated %s instances into %s notifications to digest', count($acks), count($decorator->getAll())));
+			$this->log->debug(sprintf('Collated %s instances into %s notifications to digest', count($acks), count($decorator->getAll())));
 
 			// explicitly an rfc822 email spec, so it sets, not adds
 			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
@@ -119,18 +120,18 @@ class MailNotifier implements Serializable {
 
             // if email sent successfully, ACK, otherwise NACK
 			if($sent) {
-				$this->debug->v("Mail sent successfully");
+				$this->log->notice("Mail sent successfully");
 				$conn->acceptMessages($acks);
 				++$result;
 			}
 			else {
-				$this->debug->v("Failed to email, rejecting messages", '*');
+				$this->log->warning("Failed to email, rejecting messages");
 				$conn->rejectMessages($acks);
 			}
 		}
 
 		// return the number of emails successfully sent
-		$this->debug->v("Finished digesting {$role->getName()}: $result emails sent");
+		$this->log->info("Finished digesting {$role->getName()}: $result emails sent");
 		return $result;
 	}
 

@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
-use Alaress\Cli\Debug;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\SessionException;
 
 class PipeCollection {
@@ -24,20 +24,20 @@ class PipeCollection {
 	/** @var array */
 	protected $pipesByUserId;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 
     /**
      * @param SessionValidator $validator
-     * @param Debug $debug
+     * @param LoggerInterface $log
      */
-    public function __construct($validator, $debug) {
+    public function __construct($validator, $log) {
 		$this->pipesBySocketKey = array();
 		$this->pipesBySessionId = array();
 		$this->pipesByUserId    = array();
 		$this->validator = $validator;
-		$this->debug = $debug;
+		$this->log = $log;
 	}
 
 	/**
@@ -57,12 +57,12 @@ class PipeCollection {
 
 			$this->pipesBySocketKey[$socketKey] = $pipe;
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-			$this->debug->v("LINK       '$socketKey' -> SESSION '$sessionId'");
+			$this->log->debug("LINK       '$socketKey' -> SESSION '$sessionId'");
 
 			if($userId = $this->validator->findUserIdBySessionId($sessionId)) {
 				$pipe->setUserId($userId);
 				$this->pipesByUserId[$userId][$socketKey] = $pipe;
-				$this->debug->v("LINK       '$socketKey' -> USER    '$userId'");
+				$this->log->debug("LINK       '$socketKey' -> USER    '$userId'");
 			}
 		}
 		catch(SessionException $e) {
@@ -89,7 +89,7 @@ class PipeCollection {
 			unset($this->pipesBySocketKey[$socketKey]);
 		}
 		else {
-			$this->debug->v("Ignoring closure of '$socketKey'");
+			$this->log->debug("Ignoring closure of '$socketKey'");
 		}
 
 	}
@@ -111,7 +111,7 @@ class PipeCollection {
 	}
 
 	/**
-	 * @param string $sessionId
+	 * @param $sessionId
 	 * @return int
 	 */
 	public function sessionPipeCount($sessionId) {
