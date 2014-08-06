@@ -22,13 +22,14 @@ class Bulk_User extends Bulk_Abstract {
 		6. campus
 		7. campus 2
 		8. campus 3
-		9. year
-		10. password
-	    11. local email
-		12. mail handler
-		13 alt. email
-        14 webmail tab
-        15 eportfolio
+	    9. campus 4
+		10. year
+		11. password
+	    12. local email
+		13. mail handler
+		14. alt. email
+        15. webmail tab
+	    16. eportfolio enabled
 	 *
 	 * @return array
 	 */
@@ -71,29 +72,16 @@ class Bulk_User extends Bulk_Abstract {
 					 */
 					$userCampus = array();
 
-					if ($user[6]) {
-						$campus = $userHandler->getCampusID($user[6]);
+					for ($i = 6; $i < 10; $i++) {
+						if ($user[$i]) {
+							$campus = $userHandler->getCampusID($user[$i]);
 
-						if (is_numeric($campus)) {
-							$userCampus[] = $campus;
+							if (is_numeric($campus)) {
+								$userCampus[] = $campus;
+							}
 						}
 					}
 
-					if ($user[7]) {
-						$campus = $userHandler->getCampusID($user[7]);
-
-						if (is_numeric($campus)) {
-							$userCampus[] = $campus;
-						}
-					}
-
-					if ($user[8]) {
-						$campus = $userHandler->getCampusID($user[8]);
-
-						if (is_numeric($campus)) {
-							$userCampus[] = $campus;
-						}
-					}
 					$userCampus = array_unique(array_filter($userCampus));
 
 					/* New User object
@@ -106,13 +94,13 @@ class Bulk_User extends Bulk_Abstract {
 						'synergy_id' => $user[4],
 						'group_id' => $user[5],
 						'campus' => $userCampus,
-						'year' => $user[9],
-						'password' => $user[10],
-						'local_email' => $user[11],
-						'mail_handler' => $user[12],
-						'alt_email' => $user[13],
-						'webmail' => $user[14],
-						'eportfolio_enabled' => $user[15],
+						'year' => $user[10],
+						'password' => $user[11],
+						'local_email' => $user[12],
+						'mail_handler' => $user[13],
+						'alt_email' => $user[14],
+                        'webmail' => $user[15],
+						'eportfolio_enabled' => $user[16],
 					);
 
 					if (empty($userCampus)) {
