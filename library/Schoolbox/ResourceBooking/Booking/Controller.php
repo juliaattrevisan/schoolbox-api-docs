@@ -637,30 +637,21 @@ class Controller extends Base
                     $this->request->post['efficacy'],
                     $isTimeChanged
                 );
+
                 $dateParts = array();
                 foreach ($series as $thisBooking) {
-                    $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
-                }
-
-                // Remove non-existent related bookings
-                $newSeries = array();
-
-                // Add the new related bookings
-                $relatedItems = $this->request->post['related_item'] ?: array();
-                foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                    if (in_array($relatedResource->getId(), $relatedItems)) {
+                    if (!($thisBooking->isDeleted())) {
+                        $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
                     }
                 }
 
-
-//                $difference = $startDate->diff($endDate);
-//                foreach ($series as $occurenceStart) {
-//                    $occurenceEnd = clone $occurenceStart;
-//                    $occurenceEnd->add($difference);
-//
-//                    // Check all of $occurenceStart and $occurenceEnd
-//                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
-//                }
+                foreach ($dateParts as $check) {
+                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                    );
+                }
             }
         }
 
@@ -732,20 +723,22 @@ class Controller extends Base
         // long it overlaps the next item in series!), but I'm not going to
         // worry about those.
         if ($existingBooking instanceof Model) {
-            $existingId     = $existingBooking->getId();
-            $existingSeries = $existingBooking->getEvent()->getSeriesId();
-            $conflictingBookings = $conflictingBookings->filter(
-                function($item) use($existingId, $existingSeries) {
-                    /** @var Model $item */
-                    if ($item->getId() == $existingId) {
-                        return false;
+            $existingId = $existingBooking->getId();
+            if ($existingId) {
+                $existingSeries = $existingBooking->getEvent()->getSeriesId();
+                $conflictingBookings = $conflictingBookings->filter(
+                    function($item) use($existingId, $existingSeries) {
+                        /** @var Model $item */
+                        if ($item->getId() == $existingId) {
+                            return false;
+                        }
+                        if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
+                            return false;
+                        }
+                        return true;
                     }
-                    if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
-                        return false;
-                    }
-                    return true;
-                }
-            );
+                );
+            }
         }
 
         // Anything still in list of conflicts? We have a conflict
