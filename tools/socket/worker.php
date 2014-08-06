@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
+use Alaress\Lumberjack\Logger;
 
-use Alaress\Cli\Debug;
 
 /**
  * 
@@ -19,7 +19,11 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Worker', array(
 ));
 
 $kernel->run(function($di, $loop, $debug, $options) {
-	new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, null, new Debug(STDOUT, array('time','mem')));
+
+        $level  = isset($_ENV['level'])  ? $_ENV['level']  : 200;
+        $fields = isset($_ENV['fields']) ? $_ENV['fields'] : array('mem');
+
+        new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, new Logger(STDOUT, STDERR, $level, $fields), null);
 });
 
 // yup. that's all you need to do.

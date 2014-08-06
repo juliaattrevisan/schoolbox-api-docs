@@ -15,7 +15,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 
 require_once(__DIR__ . '/../../include/Bootstrap.php');
 
-$d = new \Alaress\Cli\Debug(STDOUT, array());
+$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100);
 
 $stmt = Database::getInstance()->prepare("
 	SELECT *
@@ -33,25 +33,25 @@ while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$encodedIdentifier = $r['identifier'];
 		$encodedData = $r['data'];
 
-		$d->v("[$hash] Command is '$command'");
+		$d->info("[$hash] Command is '$command'");
 
 		$identifier = unserialize($encodedIdentifier);
 		$data = unserialize(unserialize($encodedData));
 
 		if($identifier === false) {
-			$d->v("[$hash] Failed to unserialize identifier");
+			$d->info("[$hash] Failed to unserialize identifier");
 			throw new Exception();
 		}
 		else {
 			switch(gettype($identifier)) {
 				case 'object':
-					$d->v("[$hash] Identifier is instance of ".get_class($identifier), $identifier instanceof TriggerInterface ? '+' : '*');
+					$d->info("[$hash] Identifier is instance of ".get_class($identifier), $identifier instanceof TriggerInterface ? '+' : '*');
 					break;
 				case 'resource':
-					$d->v("[$hash] Identifier is resource", '*');
+					$d->error("[$hash] Identifier is resource");
 					throw new Exception();
 				default:
-					$d->v("[$hash] Identifier is ".gettype($identifier).": '$identifier'", '*');
+					$d->info("[$hash] Identifier is ".gettype($identifier).": '$identifier'", '*');
 					$err = true;
 			}
 		}
@@ -60,61 +60,65 @@ while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 
 		if($data === false) {
-			$d->v("[$hash] Failed to unserialize data");
+			$d->info("[$hash] Failed to unserialize data");
 			throw new Exception();
 		}
 
 		if($identifier instanceof TriggerInterface) {
 			// data should be an array
-			$correctType = gettype($data) == 'array';
-			$d->v("[$hash] Data is ".gettype($data), $correctType ? '+' : '*');
+            $dataType = gettype($data);
 
-			if(!$correctType) {
-				throw new Exception();
-			}
+            $msg = "[$hash] Data is $dataType";
+
+            if($dataType != 'array') {
+                $d->error($msg);
+                throw new Exception();
+            }
+
+            $d->info($msg);
 
 			if(in_array($command, array(DefaultDispatchStrategy::TASK_PUBLISH, DefaultDispatchStrategy::TASK_DIGEST))) {
 				if(count($data) != 4) {
-					$d->v("[$hash] Datacount for publication must be 4, got ".count($data), '*');
+					$d->info("[$hash] Datacount for publication must be 4, got ".count($data), '*');
 					throw new Exception();
 				}
 
 				if(is_callable($data[0])) {
-					$d->v("[$hash] First argument is callable", '+');
+					$d->info("[$hash] First argument is callable", array('char' => '+'));
 				}
 				else {
-					$d->v("[$hash] First argument is NOT callable", '*');
+					$d->error("[$hash] First argument is NOT callable");
 				}
 
 				if(is_object($data[1])) {
-					$d->v("[$hash] Second argument is object, instance of ".get_class($data[1]), '+');
+					$d->info("[$hash] Second argument is object, instance of ".get_class($data[1]), '+');
 				}
 				else {
-					$d->v("[$hash] First argument is NOT object", '*');
+					$d->error("[$hash] First argument is NOT object");
 				}
 
 				if($data[2] instanceof \Schoolbox\User) {
-					$d->v("[$hash] Third argument is instance of Schoolbox\\User", '+');
+					$d->info("[$hash] Third argument is instance of Schoolbox\\User", array('char' => '+'));
 				}
 				else {
-					$d->v("[$hash] Third argument is NOT instance of Schoolbox\\User", '*');
+					$d->error("[$hash] Third argument is NOT instance of Schoolbox\\User");
 				}
 
 				if(is_null($data[3]) || is_array($data[3])) {
-					$d->v("[$hash] Fourth argument is an acceptable diff", '+');
+					$d->info("[$hash] Fourth argument is an acceptable diff", array('char' => '+'));
 				}
 				else {
-					$d->v("[$hash] Fourth argument is NOT an acceptable diff", '*');
+					$d->error("[$hash] Fourth argument is NOT an acceptable diff");
 				}
 
 			}
 		}
 
-		$d->v("[$hash] Probably can process");
+		$d->info("[$hash] Probably can process");
 
 	}
 	catch(Exception $e) {
-		$d->v("[$hash] Probably cannot process, should delete", '!');
+		$d->critical("[$hash] Probably cannot process, should delete");
 	}
 
 }

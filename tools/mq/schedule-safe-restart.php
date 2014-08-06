@@ -18,19 +18,34 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$opts = getopt('',array('perform'));
+$opts = getopt('v',array('perform'));
 $perform = isset($opts['perform']);
 
-$d = new \Alaress\Cli\Debug(STDOUT);
+$threshold = 0;
+if(isset($opts['v'])) {
+    $threshold = 1;
+    if(is_array($opts['v'])) {
+        $threshold = min(3, count($opts['v']));
+    }
+}
 
-$d->v("Starting schedule diagnostics...");
+$limits = array(
+    0 => 500, // nil verbosity: exceptional behaviour only
+    1 => 250, // min verbosity: significant events
+    2 => 200, // mod verbosity: most things
+    3 => 100  // max verbosity: EV-ER-Y-THING...
+);
+
+$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$threshold], array('truemem'));
+
+$d->info("Starting schedule diagnostics...");
 
 if($perform) {
-	$d->v("Running with the safety off, you have 3 seconds to change your mind", '!');
+	$d->warning("Running with the safety off, you have 3 seconds to change your mind");
 	sleep(3);
 }
 else {
-	$d->v("Doing diagnostic only, no data will be harmed (despite what messages say)");
+	$d->notice("Doing diagnostic only, no data will be harmed (despite what messages say)");
 }
 
 $loop = \React\EventLoop\Factory::create();
@@ -71,7 +86,7 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 			$date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
 			// do this for every message that comes in
-			$d->v("Processing message (arrived at $date)", '>');
+			$d->info("Processing message (arrived at $date)", array('char' => '>'));
 
 			Database::reinitialise();
 			DeprecatedDatabase::reinitialise();
@@ -82,7 +97,7 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 
 				// if the interrogation says to dismiss the message, we do
 				if(interrogate($event, $d)) {
-					$d->v("Message broken", '*');
+					$d->error("Message broken");
 
 					if($perform) {
 						// split this message off onto a special queue
@@ -94,7 +109,7 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 					}
 				}
 				else {
-					$d->v("Message retained", '+');
+					$d->notice("Message retained", array('char' => '+'));
 				}
 
 				// hold onto our NACK's
@@ -102,18 +117,18 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
 			}
 			catch(RuntimeException $e) {
 				// this message is can't be parsed, so we ACK it to make it go away
-				$d->v("RuntimeException: ".$e->getMessage(), '!');
-				$d->v("Message unparseable", '-');
+				$d->error("RuntimeException: ".$e->getMessage());
+				$d->notice("Message unparseable", array('char' => '-'));
 			}
 			catch(\Schoolbox\Realtime\Schedule\ScheduleException $e) {
 				// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-				$d->v('Schedule Exception: ' . $e->getMessage(), '*');
-				$d->v("Message ignorable", '-');
+				$d->warning('Schedule Exception: ' . $e->getMessage());
+				$d->notice("Message ignorable", array('char' => '-'));
 			}
 			catch(\Schoolbox\Notif\Formatter\CompressionException $e) {
 				// this message is unparseable, so we'll eventually ACK it to make it go away
-				$d->v('Compression Exception: ' . $e->getMessage(), '!');
-				$d->v("Message unparseable", '-');
+				$d->error('Compression Exception: ' . $e->getMessage());
+				$d->notice("Message unparseable", array('char' => '-'));
 			}
 
 			if($perform) {
@@ -129,11 +144,11 @@ $loop->run();
 
 /**
  * @param \Schoolbox\Realtime\Schedule\Event $event
- * @param \Alaress\Cli\Debug $d
+ * @param \Psr\Log\LoggerInterface $log
  * @throws \Schoolbox\Realtime\Schedule\ScheduleException
  * @return bool whether or not to acknowledge the message
  */
-function interrogate($event, $d) {
+function interrogate($event, $log) {
 	// setup for ifs
 	$modelClass = get_class($event->getObject());
 	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
@@ -159,7 +174,7 @@ function interrogate($event, $d) {
 		throw new \Schoolbox\Realtime\Schedule\ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
 	}
 
-	$d->v(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
+	$log->debug(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
 
 	// BEWARE! CUTLERY!
 	$pid = pcntl_fork();
@@ -174,7 +189,7 @@ function interrogate($event, $d) {
 			$exitCode = pcntl_wexitstatus($status);
 			// if zero exit code, we want to retain this message
 			if($exitCode === 0) {
-				$d->v("All clear!");
+				$log->notice("All clear!");
 				return false;
 			}
 
@@ -184,13 +199,14 @@ function interrogate($event, $d) {
 
 	// YOU ARE IN CHILD CONTEXT HERE. DO NOT ATTEMPT TO RETURN. YOU MUST EXIT INSTEAD.
 	register_shutdown_function(function($d) {
+        /** @var \Psr\Log\LoggerInterface $d */
 		$last = error_get_last();
 
 		if(in_array($last['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR))) {
-			$d->v(sprintf("%s in %s:%s", $last['message'], $last['file'], $last['line']), '!');
+			$d->error(sprintf("%s in %s:%s", $last['message'], $last['file'], $last['line']));
 			exit(1);
 		}
-	}, $d);
+	}, $log);
 
 	$exit = 0;
 
@@ -201,7 +217,7 @@ function interrogate($event, $d) {
 		$instance->bundleTriggers(new \Schoolbox\Realtime\Schedule\Trigger\Test\StubTriggerBundle($event, \Schoolbox\Mapper::METHOD_DELETE));
 	}
 	catch(Exception $e) {
-		$d->v(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()), '!');
+		$log->error(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()));
 		$exit = 1;
 	}
 
@@ -214,14 +230,14 @@ function interrogate($event, $d) {
 			continue;
 		}
 
-		$d->v(sprintf("Testing event against %s::%s", get_class($instance), $m->getName()));
+		$log->info(sprintf("Testing event against %s::%s", get_class($instance), $m->getName()));
 
 		// attempt to invoke with the current arguments. if it dies, the message will be dismissed
 		try {
 			$m->invoke($instance, $event->getObject(), $event->getEffector(), $event->getDiff());
 		}
 		catch(Exception $e) {
-			$d->v(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()), '!');
+			$log->error(sprintf("Encountered exception - %s: %s", get_class($e), $e->getMessage()));
 			$exit = 1;
 		}
 	}
