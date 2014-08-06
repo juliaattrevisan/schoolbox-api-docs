@@ -163,12 +163,11 @@ class DueWork_Detail {
             $closeString = $closeADF->getUsingFormat($formatDateTime);
         }
 
-
         $page->setVar(
             array(
                 'DUEWORK_DESCRIPTION'   => Scrub::text($this->dueWork['name']),
                 'DUEWORK_YEAR'          => date('Y', strtotime($this->dueWork['date'])),
-                'DUEWORK_SEMESTER'      => DueWork_All::getSemester($this->dueWork['date']),
+                'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($this->dueWork['date'])),
                 'CATEGORY_NAME'         => Scrub::text($this->dueWork['categoryName']),
                 'DUEWORK_TYPE'          => $this->dueWork['typeName'],
                 'DUEWORK_DUEDATE'       => $closeString,
