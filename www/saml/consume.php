@@ -31,7 +31,7 @@ try {
         }
     }
     else {
-        echo 'Invalid SAML response.';
+        echo 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
     }
 }
 catch (Exception $e) {
