@@ -10,11 +10,11 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 
 interface DispatchStrategyInterface {
@@ -193,10 +193,10 @@ interface DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 * @return void
 	 */
-	public function handleException($exception, $debug);
+	public function handleException($exception, $log);
 
 
 	/**

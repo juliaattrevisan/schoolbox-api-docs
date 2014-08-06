@@ -10,7 +10,6 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
@@ -19,6 +18,7 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 
 class DefaultDispatchStrategy implements DispatchStrategyInterface {
@@ -321,11 +321,11 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 * @return void
 	 */
-	public function handleException($exception, $debug) {
-		$debug->v(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), '!');
+	public function handleException($exception, $log) {
+		$log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), array($exception));
 	}
 
 

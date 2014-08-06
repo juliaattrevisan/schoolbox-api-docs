@@ -10,8 +10,8 @@
 namespace Alaress\Scheduler\Interactive;
 
 
-use Alaress\Cli\Debug;
 use Alaress\Scheduler\StompScheduler;
+use Psr\Log\LoggerInterface;
 
 /**
  * Designed to accept data that ultiamtely came from STDIN, to output various data of the state of the scheduler
@@ -27,15 +27,15 @@ class Interactor {
 	/** @var StompScheduler */
 	protected $scheduler;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/**
 	 * @param StompScheduler $scheduler
 	 */
 	public function __construct($scheduler) {
 		$this->scheduler = $scheduler;
-		$this->debug = $scheduler->debug;
+		$this->log = $scheduler->log;
 	}
 
 	/**
@@ -50,17 +50,17 @@ class Interactor {
 
 		switch($cmd) {
 			case self::CMD_STATUS:
-				$this->debug->v(print_r($this->scheduler->getStatus($fields), true));
+				$this->log->notice(print_r($this->scheduler->getStatus($fields), true));
 				break;
 			case self::CMD_HELP:
-				$this->debug->v(<<<EOL
+				$this->log->notice(<<<EOL
 HELP
     status => valid options: stomp
 EOL
 );
 				break;
 			default:
-				$this->debug->v("Unrecognised command: '$cmd'", '*');
+				$this->log->error("Unrecognised command: '$cmd'");
 		}
 
 	}

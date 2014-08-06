@@ -10,12 +10,13 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Alaress\Cli\Debug;
+use Alaress\Lumberjack\Logger;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
@@ -41,15 +42,15 @@ abstract class AbstractProcess extends PipeWriter {
 	/**
 	 * @param LoopInterface $loop
 	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 */
-	public function __construct($loop, $strat = null, $debug = null) {
+	public function __construct($loop, $strat = null, $log = null) {
 		// cast optional args
 		$strat = $strat ?: new DefaultDispatchStrategy();
-		$debug = $debug ?: new Debug(null);
+		$log   = $log   ?: new Logger(null);
 
 		// we open stream(3) as our data output stream
-		parent::__construct($strat, $debug, fopen("php://fd/3", 'w'));
+		parent::__construct($strat, $log, fopen("php://fd/3", 'w'));
 		$this->strat = $strat;
 
 		$this->loop = $loop;
@@ -86,7 +87,7 @@ abstract class AbstractProcess extends PipeWriter {
 	 * When a terminate signal is raised
 	 */
 	public function onTerminate() {
-		$this->debug->v("GOT SIGTERM", '>');
+		$this->log->info("GOT SIGTERM", array('char' => '>'));
 		$this->loop->stop();
 	}
 
@@ -117,21 +118,21 @@ abstract class AbstractProcess extends PipeWriter {
 				try {
 					$this->buffering = false;
 					$this->write($this->parseBuffer());
-					$this->debug->v("Task Complete");
+					$this->log->debug("Task Complete");
 				}
 				catch(ErrorException $e) {
 					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
-					$this->debug->v($msg);
+					$this->log->warning($msg);
 					$this->write($msg, true);
 				}
 				catch(Exception $e) {
 					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
-					$this->debug->v($msg);
+					$this->log->error($msg);
 					$this->write($msg, true);
 				}
 
 				if($buffer = ob_get_contents()) {
-					$this->debug->v("Captured output: $buffer", 'd');
+					$this->log->debug("Captured output: $buffer");
 				}
 				ob_end_clean();
 
@@ -142,7 +143,7 @@ abstract class AbstractProcess extends PipeWriter {
 		catch(Exception $e) {
 			// all exceptions must be caught, otherwise the react loop explodes and this worker dies
 			$msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
-			$this->debug->v($msg);
+			$this->log->critical($msg, array($e));
 			$this->write($msg, true);
 		}
 	}
@@ -172,15 +173,15 @@ abstract class AbstractProcess extends PipeWriter {
 			}
 		}
 		catch(InvalidArgumentException $e) {
-			$this->debug->v("Rejecting data '$this->buffer'", '*');
+			$this->log->error("Rejecting data '$this->buffer'", array($e));
 			throw $e;
 		}
 
 		$response = $this->process($cmd, $args);
-		$this->debug->v("Processing successful");
+		$this->log->info("Processing successful");
 		$flat = $this->strat->getProtocol()->flatten($response);
 		$size = strlen($flat);
-		$this->debug->v("Flattened response is $size bytes", 'd');
+		$this->log->debug("Flattened response is $size bytes");
 
 		return $flat;
 	}

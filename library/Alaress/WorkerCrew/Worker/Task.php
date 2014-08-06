@@ -10,7 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Schoolbox\Realtime\Verboser;
+use Psr\Log\LoggerInterface;
 
 class Task {
 
@@ -95,20 +95,18 @@ class Task {
 	}
 
 	/**
-	 * Debug yourself into the given Verboser
+	 * Debug yourself into the given LoggerInterface
 	 *
-	 * @param Verboser $v
+	 * @param LoggerInterface $log
 	 */
-	public function debug($v) {
-		if(!$v instanceof Verboser) {
+	public function debug($log) {
+		if(!$log instanceof LoggerInterface) {
 			return;
 		}
-		// clear the majority of fields, we don't need them
-		$v->setVisibleFields(array('time'));
 
 		$duration = ($this->finish - $this->start) * 1000;
 
-		$v->v(sprintf("cmd=%s|args=%s|time=%10.04f|data=%s",
+		$log->debug(sprintf("cmd=%s|args=%s|time=%10.04f|data=%s",
 			$this->command, json_encode($this->args), $duration, $this->data
 		));
 

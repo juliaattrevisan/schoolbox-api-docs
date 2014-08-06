@@ -10,12 +10,12 @@
 namespace Alaress\WorkerCrew;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Evenement\EventEmitter;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
@@ -53,17 +53,17 @@ class Pool extends EventEmitter {
 	/** @var SplObjectStorage */
 	protected $errstreams;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
 	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 */
-	public function __construct($loop, $msgHandler, $strat, $debug) {
+	public function __construct($loop, $msgHandler, $strat, $log) {
 		$this->loop = $loop;
 		$this->poolingStrat = $strat;
 		$this->workers = $this->poolingStrat->newWorkerBundle();
@@ -71,7 +71,7 @@ class Pool extends EventEmitter {
 		$this->logstreams = new SplObjectStorage();
 		$this->errstreams = new SplObjectStorage();
 		$this->msgHandler = $msgHandler;
-		$this->debug = $debug;
+		$this->log = $log;
 	}
 
 
@@ -118,7 +118,7 @@ class Pool extends EventEmitter {
 	 * @throws RuntimeException
 	 */
 	protected function attachWorker() {
-		$this->debug->v("Attaching worker to {$this->poolingStrat->getName()} pool", '+');
+		$this->log->notice("Attaching worker to {$this->poolingStrat->getName()} pool", array('char' => '+'));
 		$cmd = $this->poolingStrat->getCommand();
 
 		$descriptorSpec = array(
@@ -147,7 +147,7 @@ class Pool extends EventEmitter {
 
 		$this->workers->attach($pid, new Worker($status['command'], $pp, $pipes, $this->poolingStrat));
 
-		$this->workers->get($pid)->attachDebug($this->debug);
+		$this->workers->get($pid)->attachLogger($this->log);
 
 		// listen to worker's output stream for data
 		$datastream = new Stream($pipes[self::DATA_OUT], $this->loop);
@@ -197,7 +197,7 @@ class Pool extends EventEmitter {
 			$pid = $this->datastreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
-			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
+			$this->log->critical("Unexpected stream supplied, cannot locate PID");
 			return;
 		}
 
@@ -215,22 +215,22 @@ class Pool extends EventEmitter {
 		// interpret the first character sent and determine the worker's state based on it
 		switch($this->poolingStrat->checkState($data)) {
 			case Worker::READY: // ready for another task
-				$this->debug->v("Worker $pid ready for new task");
+				$this->log->info("Worker $pid ready for new task");
 				$worker->setStatus(Worker::READY);
 				break;
 
 			case Worker::BUSY:  // data sent, but not finished yet
-				$this->debug->v("Worker $pid still working");
+				$this->log->debug("Worker $pid still working");
 				$worker->appendData($data);
 				break;
 
 			case Worker::ERROR: // still alive, but cannot accept more tasks
-				$this->debug->v("Worker $pid in error");
+				$this->log->notice("Worker $pid in error");
 				$worker->setStatus(Worker::BUSY);
 				break;
 
 			case Worker::DONE:  // job done, ready for another task
-				$this->debug->v("Worker $pid complete, ready for new task");
+				$this->log->info("Worker $pid complete, ready for new task");
 				$worker
 					->appendData($data)
 					->markTaskComplete();
@@ -246,7 +246,7 @@ class Pool extends EventEmitter {
 				}
 				catch(Exception $e) {
 					// your reactor will explode if you don't catch exceptions coming from your response handler
-					$this->poolingStrat->handleException($e, $this->debug);
+					$this->poolingStrat->handleException($e, $this->log);
 				}
 
 				// regardless of whether or not the handling of the response succeeded, we need to ditch this message
@@ -254,7 +254,7 @@ class Pool extends EventEmitter {
 				break;
 
 			case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
-				$this->debug->v("Worker $pid killed");
+				$this->log->info("Worker $pid killed");
 				$worker->setStatus(Worker::ENDED);
 				break;
 		}
@@ -278,7 +278,7 @@ class Pool extends EventEmitter {
 		}
 
 		$this->datastreams->offsetUnset($stream);
-		$this->debug->v("Worker $pid killed");
+        $this->log->notice("Worker $pid killed");
 		$this->workers->get($pid)->setStatus(Worker::ENDED);
 		$this->cleanup();
 	}
@@ -295,10 +295,10 @@ class Pool extends EventEmitter {
 			$pid = $this->datastreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
-			$this->debug->v("$data",'w');
+			$this->log->notice("$data", array('char' => 'w'));
 			return;
 		}
-		$this->debug->v("{{$pid}}$data",'w');
+		$this->log->notice("{{$pid}}$data", array('char' => 'w'));
 	}
 
 
@@ -312,10 +312,10 @@ class Pool extends EventEmitter {
 			$pid = $this->errstreams->offsetGet($stream);
 		}
 		catch(UnexpectedValueException $e) {
-			$this->debug->v("$data", '!');
+			$this->log->critical("$data");
 			return;
 		}
-		$this->debug->v("{{$pid}}$data", '!');
+		$this->log->critical("{{$pid}}$data");
 	}
 
 
@@ -483,8 +483,8 @@ class Pool extends EventEmitter {
 	/**
 	 * Terminate all workers
 	 */
-	public function releaseWorkers($hard = true) {
-		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
+	public function releaseWorkers() {
+		$this->workers->terminateAll();
 	}
 
 }

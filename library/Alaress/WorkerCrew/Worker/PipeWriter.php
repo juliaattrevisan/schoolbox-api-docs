@@ -10,29 +10,29 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Psr\Log\LoggerInterface;
 
 abstract class PipeWriter {
 
 	/** @var ProtocolInterface */
 	protected $proto;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/** @var resource */
 	protected $downpipe;
 
 	/**
 	 * @param DispatchStrategyInterface $strat
-	 * @param \Alaress\Cli\Debug $debug
+	 * @param LoggerInterface $log
 	 * @param resource $downpipe
 	 */
-	public function __construct($strat, $debug, $downpipe) {
+	public function __construct($strat, $log, $downpipe) {
 		$this->proto = $strat->getProtocol();
-		$this->debug = $debug;
+		$this->log = $log;
 		$this->downpipe = $downpipe;
 	}
 
@@ -53,20 +53,20 @@ abstract class PipeWriter {
 			$shard = str_pad(substr($string, $written, $chunk), $chunk, $end);
 			$fwrite = fwrite($this->downpipe, $shard);
 			if ($fwrite === false) {
-				$this->debug->v("Broken pipe, could not write to target", '!');
+				$this->log->critical("Broken pipe, could not write to target");
 				break;
 			}
 		}
 		fflush($this->downpipe);
 
 		if($overhang = $written % $chunk) {
-			$this->debug->v("$overhang bytes unflushed", '*');
+			$this->log->error("$overhang bytes unflushed");
 		}
 
-		$this->debug->v(sprintf("Sent %d bytes to target (%d x %d-byte chunks)", $written, $written / $chunk, $chunk));
+		$this->log->info(sprintf("Sent %d bytes to target (%d x %d-byte chunks)", $written, $written / $chunk, $chunk));
 
 		if($written < $strlen) {
-			$this->debug->v("Pipe communication terminated prematurely after $written bytes, ", $strlen - $written, " unsent", '!');
+			$this->log->critical("Pipe communication terminated prematurely after $written bytes, ", $strlen - $written, " unsent");
 		}
 
 		return $this;

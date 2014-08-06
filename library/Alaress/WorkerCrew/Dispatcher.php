@@ -10,10 +10,10 @@
 namespace Alaress\WorkerCrew;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use SplQueue;
@@ -39,15 +39,15 @@ class Dispatcher implements DispatcherInterface {
 	/**
 	 * @param LoopInterface $loop
 	 * @param TaskResponseHandlerInterface $msgHandler
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 * @param DispatchStrategyInterface $strat
 	 */
-	public function __construct($loop, $msgHandler, $debug, $strat = null) {
+	public function __construct($loop, $msgHandler, $log, $strat = null) {
 
 		$this->strat = $strat ?: new DefaultDispatchStrategy();
 
 		// pool of workers
-		$this->pool = new Pool($loop, $msgHandler, $this->strat, $debug);
+		$this->pool = new Pool($loop, $msgHandler, $this->strat, $log);
 
 		// dispatcher depends on a react loop
 		$this->loop = $loop;
@@ -56,13 +56,13 @@ class Dispatcher implements DispatcherInterface {
 		$this->msgHandler = $msgHandler;
 
 		// for debugging output
-		$this->v = $debug;
+		$this->log = $log;
 
 		// build the queue, retrieving from storage if that's part of the strat, and execute if it contains stuff
 		$this->q = $this->strat->buildQueue();
 
 		if($this->q->count()) {
-			$this->v->v("Queue is preloaded, draining: queue length is ".$this->q->count());
+			$this->log->notice("Queue is preloaded, draining: queue length is ".$this->q->count());
 			$this->attach($this->strat->getQueueDelay());
 		}
 	}
@@ -95,10 +95,10 @@ class Dispatcher implements DispatcherInterface {
 
 		// store the element locally
 		$this->q->enqueue(array($identifier, $command, $data));
-		$this->v->v("Enqueued '$command': queue length is ".$this->q->count());
+		$this->log->info("Enqueued '$command': queue length is ".$this->q->count());
 
         if($qLength >= $this->strat->getWarningQueueLength()) {
-            $this->v->v("Queue is getting large", '?');
+            $this->log->warning("Queue is getting large");
         }
 
 		$this->attach($this->strat->getQueueDelay());
@@ -121,7 +121,7 @@ class Dispatcher implements DispatcherInterface {
 
 		// if there's a timer, use it, otherwise create it
 		if(!($this->timer instanceof TimerInterface)) {
-			$this->v->v("Creating timer to fire at {$rate}ms intervals", '+');
+			$this->log->debug("Creating timer to fire at {$rate}ms intervals");
 			$this->timer = $this->loop->addPeriodicTimer($rate / 1000, array($this, 'dispatch'));
 		}
 	}
@@ -133,7 +133,7 @@ class Dispatcher implements DispatcherInterface {
 	protected function detach() {
 		// don't try to remove a timer that isn't there
 		if($this->timer instanceof TimerInterface) {
-			$this->v->v("Detaching dispatcher (queue length is {$this->q->count()})",'-');
+			$this->log->debug("Detaching dispatcher (queue length is {$this->q->count()})");
 			$this->pool->dispatcherIdle();
 			$this->loop->cancelTimer($this->timer);
 			$this->timer = null;
@@ -151,14 +151,14 @@ class Dispatcher implements DispatcherInterface {
 		// there's nothing in the queue
 		if(!$this->q->count()) {
 			if($this->pool->canDispatcherFlywheel()) {
-				$this->v->v("Queue is empty: flywheel spinning");
+				$this->log->debug("Queue is empty: flywheel spinning");
 				return;
 			}
 
 			$this->loop->cancelTimer($timer);
 			$this->timer = null;
 
-			$this->v->v("Queue is empty: detaching timer", '-');
+			$this->log->debug("Queue is empty: detaching timer");
 
 			$this->pool->dispatcherIdle();
 			return;
@@ -176,12 +176,12 @@ class Dispatcher implements DispatcherInterface {
 			try {
 				// we obtained the data from q::bottom() so just drop the reference
 				$this->q->dequeue();
-				$this->v->v("Internally handling '$cmd'");
+				$this->log->info("Internally handling '$cmd'");
 				$this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
 			}
 			catch(Exception $e) {
 				// we need to catch any and all exception here, lest we explode our reactor
-				$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
+				$this->log->warning("Exception suppressed: ".get_class($e) . " ".$e->getMessage(), array($e));
 			}
 			// regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
 			$this->strat->pdequeue($identifier);
@@ -202,11 +202,11 @@ class Dispatcher implements DispatcherInterface {
 			// we obtained the data from q::bottom() so just drop the reference
 			$this->q->dequeue();
 			$pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
-			$this->v->v("Command '$cmd' pushed to worker {{$pid}}", '>');
+			$this->log->info("Command '$cmd' pushed to worker {{$pid}}", array('char' => '>'));
 		}
 		catch(Exception $e) {
 			// we need to catch any and all exception here, lest we explode our reactor
-			$this->v->v("Exception suppressed: ".get_class($e) . " ".$e->getMessage(),'*');
+			$this->log->warning("Exception suppressed: ".get_class($e) . " ".$e->getMessage(), array($e));
 		}
 
 	}
