@@ -372,6 +372,29 @@ class PortfolioWebDAV
                       $settings['baseUri'].'elphinstaff/' . $_SESSION['username'] . '/Documents/',
                   );
                 }
+
+                $fileShares = array(
+                    'Academic',
+                    'BIT',
+                    'DramaAndDance',
+                    'EdOutdoors',
+                    'English',
+                    'HPE',
+                    'Humanities',
+                    'LOTE',
+                    'Maths',
+                    'Music',
+                    'Science',
+                    'Technology',
+                    'VisualArts',
+                    'RoundSquare',
+                    'AdminDocs'
+                );
+
+                foreach($fileShares as $share) {
+                    $paths[] = $settings['baseUri'].'/'.$share.'/';
+                }
+
             } else if ($groupHandler->isStudent()) {
                 if($_SESSION['year']>='6') {
                   $paths = array(
