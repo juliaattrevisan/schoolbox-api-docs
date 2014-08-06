@@ -361,6 +361,8 @@ class Controller extends Base
 //                    }
 //                }
 
+                // getUpdatedSeries() sets deleted field if the item isn't in
+                // the sequence.
                 if ($booking->isDeleted()) {
                     $this->bookingMapper->delete($booking);
                 } else {
@@ -646,13 +648,17 @@ class Controller extends Base
                     array($resource, $startDate, $endDate),
                 );
 
-                // Check each in series
-                $series = $this->getRecurrencePeriod(
-                    $startDate,
-                    $this->request->post['repeat'],
-                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
-                    $this->request->post['timetable']['campus']
-                );
+                // Check each in series (if there is one)
+                $repeatUntil = DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']);
+                $series      = array();
+                if ($repeatUntil instanceof DateTime) {
+                    $series = $this->getRecurrencePeriod(
+                        $startDate,
+                        $this->request->post['repeat'],
+                        $repeatUntil,
+                        $this->request->post['timetable']['campus']
+                    );
+                }
                 $difference = $startDate->diff($endDate);
                 foreach ($series as $occurenceStart) {
                     $occurenceEnd = clone $occurenceStart;
