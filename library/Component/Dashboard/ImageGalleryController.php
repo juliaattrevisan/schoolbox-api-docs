@@ -87,9 +87,21 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 		/* Template rendering
 		 */
 		$this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
+		$this->setBlock($templateHandle, "submit_image", "submit_image_block");
 
         // Set up component name
-        $this->setVar('COMPONENT_NAME', strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery');
+        $this->setVar(array(
+			'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery',
+			'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
+		));
+
+		// Controls such as Post News
+		if ($this->permission < WRITE_ACCESS) {
+			$this->setVar("submit_image_block", "");
+		}
+		else {
+			$this->parse("submit_image_block", "submit_image");
+		}
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
         * and initialise empty gallery by default
@@ -104,8 +116,8 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 			$this->setVar(array(
 				'THUMBNAIL_ID' => $currentImage->getId(),
 				'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
-				'THUMBNAIL_SIZE' =>	$this->getConfig('pixel'),
-				'IMAGE_HEIGHT' => $this->getConfig('pixel'),
+				'THUMBNAIL_SIZE' =>	$this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
+				'IMAGE_HEIGHT' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Cfg::get('thumbnail_size'),
 			));
 
 			$this->parse('image_gallery_block', 'image_gallery', true);

@@ -14,16 +14,12 @@ $definition = array(
 	'module'             => 'dashboard',
 	'component_category' => null,
 	'class'              => 'Component_Dashboard_ImageGalleryController',
-	'description'        => 'Show a grid of image thumbnails sourced from the files uploaded into My Files.',
+	'description'        => 'Show a grid of image thumbnails sourced from the files uploaded into the Resource Browser.',
 	'multiple'           => 'true',
 	'config'             => array(
 		'componentname' => array(
 			'default_value' => 'Image Gallery',
 			'label' => 'Heading',
-		),
-		'pixel' => array(
-			'default_value' => '200',
-			'label' => 'Max width/height',
 		),
 		'size' => array(
 			'default_value' => '10',
