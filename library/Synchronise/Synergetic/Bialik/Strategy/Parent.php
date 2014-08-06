@@ -70,6 +70,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$newUser['firstname'] = $currentUser['StudentContactPreferred'];
 		$newUser['lastname'] = $currentUser['StudentContactSurname'];
 		$newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
+        $newUser['mail_handler'] = 1;
 
 		/* Campus config: needs to map to a campus id
 		 */
