@@ -1420,7 +1420,6 @@ class Controller extends Base
                         // create
                         $relatedBooking = new Model();
                         $relatedBooking
-                            ->setEvent($event)
                             ->setResource($relatedResource)
                             ->setStatus(Status\Model::STATUS_PENDING);
                     }
@@ -1429,17 +1428,13 @@ class Controller extends Base
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
                         $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
                     }
-
-                    // Status:
-                    // pending if new, or time was changed
-                    $relatedBooking->setName($this->request->post['name']);
-                    $bookingList->add($relatedBooking);
                 }
                 elseif ($relatedBooking instanceof Model) {
                     // delete or don't add. Maybe mark as deleted?
-//                    $this->bookingMapper->delete($relatedBooking);
                     $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
                 }
+                $relatedBooking->setEvent($event);
+                $bookingList->add($relatedBooking);
             }
         }
 
