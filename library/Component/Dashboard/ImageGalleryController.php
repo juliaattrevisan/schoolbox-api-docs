@@ -97,8 +97,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         $this->setVar('image_gallery_block', '');
 
 		// Load images for the current homepage
-		$limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * $this->getImagesPerRow() : 0;
-		$allImages = $this->getCategoryMapper()->findImages($this->getSource()->getId(), $limit, true);
+		$allImages = $this->getCategoryMapper()->findImages($this->getSource()->getId(), $this->getConfig('size'), true);
 
         // Iterate
 		foreach($allImages as $currentImage) {
