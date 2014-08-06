@@ -536,11 +536,7 @@ class SitePage extends Page {
             switch ($this->site) {
                 case 'shore':
                     if ($this->groupHandler->isStaff()) {
-                        if (strpos(Session::getIP(), '192.168.') === false) {
-                            $location = 'https://mail.shore.nsw.edu.au/exchange/';
-                        } else {
-                            $location = 'http://shorexch01.shore.nsw.edu.au/exchange/';
-                        }
+                        $location = 'https://mail.shore.nsw.edu.au/exchange/';
                     } else if ($this->groupHandler->isStudent()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
