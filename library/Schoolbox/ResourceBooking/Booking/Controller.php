@@ -288,78 +288,11 @@ class Controller extends Base
                 // Role and campus currently need to be set to something.
                 $event->setRoleCollection(new Collection());
                 $event->setCampusCollection(new Collection());
-
-                // Adjust the current event, if its time changed.
-                // If times changed, the event's status will need to change.
-//                if ($isTimeChanged) {
-//                    $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
-//                        $startDelta->getAsDateInterval()
-//                    );
-//                    $event->setStartDateTime(new Alaress_Date_Format($newStart));
-//                    $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
-//                        $endDelta->getAsDateInterval()
-//                    );
-//                    $event->setEndDateTime(new Alaress_Date_Format($newEnd));
-//                }
                 $event->setDetail($this->request->post['notes']);
                 $this->eventMapper->save($event);
 
                 // Adjust $booking
                 $booking->setName($this->request->post['name']);
-
-//                // Get all the related bookings for this event at this time.
-//                $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
-//                foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-//
-//                    $relatedBooking = null;
-//                    foreach ($existingRelatedBookings as $existing) {
-//                        if ($existing->getResource()->getId() == $relatedResource->getId()) {
-//                            $relatedBooking = $existing;
-//                            break;
-//                        }
-//                    }
-//                    $inNew = in_array(
-//                        $relatedResource->getId(),
-//                        $this->request->post['related_item'] ?: array()
-//                    );
-//
-//                    if ($inNew) {
-//                        if ($relatedBooking instanceof Model) {
-//                            // update
-//
-//                            // Has the booking time changed?
-//                            // That invalidates existing bookings
-//                            if ($isTimeChanged) {
-//                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
-//                            }
-//                        }
-//                        else {
-//                            // create
-//                            $relatedBooking = new Model();
-//                            $relatedBooking
-//                                ->setEvent($event)
-//                                ->setResource($relatedResource)
-//                                ->setStatus(Status\Model::STATUS_PENDING);
-//                        }
-//
-//                        // Open resource: automatically confirm
-//                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-//                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
-//                        }
-//
-//                        // Status:
-//                        // pending if new, or time was changed
-//                        $relatedBooking->setName($this->request->post['name']);
-////                            ->addRelatedBooking($booking);
-////                        $booking->addRelatedBooking($relatedBooking);
-////                        $this->bookingMapper->save($relatedBooking);
-//                        $bookingList->add($relatedBooking);
-//                    }
-//                    elseif ($relatedBooking instanceof Model) {
-//                        // delete
-//                        $this->bookingMapper->delete($relatedBooking);
-//                    }
-//                }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
                 // the sequence.
