@@ -137,24 +137,33 @@ class SubmissionReturn extends DeprecatedModel {
     }
 
     function getLetterGradeByUser($user_id, $box_id = 0) {
+        // First: join on submission_errors
         $query = "
-            SELECT g.*, r.mark, r.comment FROM submission_return r, submission_grade g
+            SELECT e.*, r.mark, r.comment
+            FROM submission_return r
+            INNER JOIN submission_errors e ON r.mark = e.display_as
             WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
-            AND g.lower_bound <= r.norm_mark
-            ORDER BY returned DESC, lower_bound DESC
+            ORDER BY returned DESC
             LIMIT 1
         ";
-
         $result = $this->db->getRow($query);
 
-        // confirm this isn't an error, and if it is, overwrite the values
-        $dem = DueWork_ErrorMapper::getInstance();
-        $errs = $dem->listDisplayValues();
-
-        if(in_array($result['mark'], $errs)) {
-            $result['grade_id'] = $result['mark'];
-            $result['caption'] = $result['mark'];
+        if (empty($result)) {
+            // Did that not return anything?
+            // Try searching the grades table as before.
+            $query = "
+                SELECT g.*, r.mark, r.comment FROM submission_return r, submission_grade g
+                WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+                AND r.box_id = " . $this->db->smartQuote($box_id) . "
+                AND g.lower_bound <= r.norm_mark
+                ORDER BY returned DESC, lower_bound DESC
+                LIMIT 1
+            ";
+            $result = $this->db->getRow($query);
+        }
+        else {
+            $result['grade_id'] = $result['caption'] = $result['mark'];
         }
         unset($result['mark']);
 
