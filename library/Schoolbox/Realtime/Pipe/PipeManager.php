@@ -11,10 +11,10 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use PhpAmqpLib\Message\AMQPMessage;
-use Predis\ClientInterface as PredisClientInterface;
 use Predis\CommunicationException;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -32,7 +32,6 @@ use Schoolbox\Realtime\Stomp\SubscriptionManager;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use Schoolbox\Realtime\Verboser;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -56,7 +55,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var LoopInterface */
 	protected $reactLoop;
 
-	/** @var Verboser */
+	/** @var Debug */
 	protected $verboser;
 
 	/** @var Dispatcher */
@@ -73,16 +72,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 	/**
 	 * @param LoopInterface $reactLoop
-	 * @param PredisClientInterface $predisClient
-	 * @param Verboser $verboser
+	 * @param SessionValidator $sessionValidator
+	 * @param Debug $debug
 	 * @param DispatchStrategyInterface $strat
+     * @param
 	 */
-	public function __construct($reactLoop, $predisClient, $verboser, $strat = null) {
-		$this->pipes = new PipeCollection($predisClient, $verboser);
+	public function __construct($reactLoop, $sessionValidator, $debug, $strat = null) {
+		$this->pipes = new PipeCollection($sessionValidator, $debug);
 		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
 		$this->reactLoop = $reactLoop;
-		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $verboser, $strat);
-		$this->verboser = $verboser;
+		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $debug, $strat);
+		$this->verboser = $debug;
 
 		$this->v('Instantiated PipeManager');
 	}
