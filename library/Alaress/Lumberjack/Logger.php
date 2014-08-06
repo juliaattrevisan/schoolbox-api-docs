@@ -20,10 +20,24 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface {
 
-    const FIELD_MEM      = 'mem';
-    const FIELD_TRUE_MEM = 'truemem';
-    const FIELD_PID      = 'pid';
-    const FIELD_LEVEL    = 'level';
+    const FIELD_MEM       = 'mem';
+    const FIELD_TRUE_MEM  = 'truemem';
+    const FIELD_PID       = 'pid';
+    const FIELD_LEVEL     = 'level';
+    const FIELD_PORCELAIN = 'porcelain';
+
+    /**
+     * @return array
+     */
+    public static function getAvailableFields() {
+        return array(
+            self::FIELD_LEVEL,
+            self::FIELD_PID,
+            self::FIELD_MEM,
+            self::FIELD_TRUE_MEM,
+        );
+    }
+
 
     /** @var resource */
     protected $out;
