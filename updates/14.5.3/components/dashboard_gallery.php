@@ -25,6 +25,10 @@ $definition = array(
 			'default_value' => '10',
 			'label' => 'Limit',
 		),
+		'src' => array(
+			'default_value' => '200',
+			'label' => 'Source',
+		),
 	),
 );
 
