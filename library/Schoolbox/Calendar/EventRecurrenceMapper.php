@@ -219,12 +219,13 @@ class EventRecurrenceMapper {
 			$diff      = $startDate->diff($endDate);
 			$dayDiff   = $diff->days;
 			$seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
+			$event->setSeriesId($seriesId);
 			foreach ($dateSource as $currentDate) {
-				$event->setId(null);
-				$event->setSeriesId($seriesId);
-				$event->setStartDate($currentDate->format('Y-m-d'));
-				$event->setEndDate($currentDate->modify("+$dayDiff days")->format('Y-m-d'));
-				$collection->add($event);
+				$newEvent = clone $event;
+				$newEvent->setId(null);
+				$newEvent->setStartDate($currentDate->format('Y-m-d'));
+				$newEvent->setEndDate($currentDate->modify("+$dayDiff days")->format('Y-m-d'));
+				$collection->add($newEvent);
 			}
 		}
 		return $collection;
