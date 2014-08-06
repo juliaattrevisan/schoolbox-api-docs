@@ -138,6 +138,9 @@ abstract class Synchronise_Base_Strategy {
 		$this->verbose_filter->intro();
 		foreach($this->list as $user) {
 			$new_user = $this->setupUserDetails($user);
+			if (empty($new_user)) {
+				continue;
+			}
 			$user_id  = $this->executeCreateUpdate($new_user);
 			if ($user_id > 0) {
 				$new_user['id'] = $user_id;
@@ -493,12 +496,16 @@ abstract class Synchronise_Base_Strategy {
 
 		if ($this->hasHydrator()) {
 			foreach ($this->getHydratorList() as $hydrator) {
-                try {
-				    $newUser = $hydrator->hydrate($external_user, $newUser);
-                }catch (Exception $e) {
-                    // Skip user as something is not good
-                    return false;
-                }
+				try {
+					$newUser = $hydrator->hydrate($external_user, $newUser);
+				}
+				catch (Exception $e) {
+					// Skip user as something is not good.
+					// Raise a skip message, though.
+					$this->verbose_filter->outputSkipMessage('user because: ' .$e->getMessage() ?: 'exception thrown');
+					$this->verbose_filter->incrementSkipped();
+					return false;
+				}
 			}
 
 			return $newUser;
