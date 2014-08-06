@@ -692,10 +692,12 @@ class Controller extends Base
             }
             else {
                 // Validating an existing booking?
-                // Check each item in the series, adjusting its dates
+                // Check each item in the series, adjusting its dates.
+                // Work with a fresh copy of the booking, because it can get
+                // messed with.
                 $isTimeChanged = false;
                 $series = $this->getUpdatedSeries(
-                    $existingBooking,
+                    $this->bookingMapper->findById($existingBooking->getId()),
                     $startDate,
                     $endDate,
                     $this->request->post['related_item'] ?: array(),
