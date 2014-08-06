@@ -539,8 +539,7 @@ class Controller extends Base
                     break;
                 }
                 if ($recurs) {
-                    $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
-                    $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
+                    $eventList = $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
                 }
             }
 

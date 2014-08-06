@@ -219,9 +219,9 @@ class EventRecurrenceMapper {
 			$diff      = $startDate->diff($endDate);
 			$dayDiff   = $diff->days;
 			$seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
-			$event->setSeriesId($seriesId);
 			foreach ($dateSource as $currentDate) {
 				$newEvent = clone $event;
+				$newEvent->setSeriesId($seriesId);
 				$newEvent->setId(null);
 				$newEvent->setStartDate($currentDate->format('Y-m-d'));
 				$newEvent->setEndDate($currentDate->modify("+$dayDiff days")->format('Y-m-d'));
@@ -237,11 +237,14 @@ class EventRecurrenceMapper {
 	 *
 	 * @param Event                   $event
 	 * @param DateTime[]|\Traversable $dateSource
+	 *
+	 * @return Collection|Event[]
 	 */
 	public function createSequenceFromIterator(Event $event, $dateSource = null) {
-		$this->getEventMapper()->save($this->getSequenceFromIterator($event, $dateSource));
+		$sequence = $this->getSequenceFromIterator($event, $dateSource);
+		$this->getEventMapper()->save($sequence);
+		return $sequence;
 	}
-
 
 	/**
 	 * @param Event $seriesEvent
