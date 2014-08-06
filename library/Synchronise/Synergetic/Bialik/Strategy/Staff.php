@@ -47,6 +47,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 		$newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email'] = '';
 		$newUser['local_email'] = 1;
+        $newUser['mail_handler'] = 1;
 		$newUser['webmail'] = 0;
 
 		/* Retrieve campuses from timetable definition (dirty hack)
