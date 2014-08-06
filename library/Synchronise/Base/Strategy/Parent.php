@@ -67,7 +67,16 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 		$newUser = array();
 		if ($this->hasSpouseHydrator()) {
 			foreach ($this->getSpouseHydratorList() as $hydrator) {
-				$newUser = $hydrator->hydrate($external_user, $newUser);
+				try {
+					$newUser = $hydrator->hydrate($external_user, $newUser);
+				}
+				catch (Exception $e) {
+					// Skip user as something is not good.
+					// Raise a skip message, though.
+					$this->verbose_filter->outputSkipMessage('spouse because: ' .$e->getMessage() ?: 'exception thrown');
+					$this->verbose_filter->incrementSkipped();
+					return false;
+				}
 			}
 			return $newUser;
 		}
@@ -131,7 +140,9 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy {
 		//
 		// Pass 2: insert/update into list of users
 		foreach ($parents as $parent) {
-			$this->executeCreateUpdate($parent);
+			if (!empty($parent)) {
+				$this->executeCreateUpdate($parent);
+			}
 		}
 
 		$this->verbose_filter->summary();
