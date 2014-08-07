@@ -29,6 +29,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'tweet', 'tweet_block');
+		$this->setBlock('tweet', 'tweet_media', 'tweet_media_block');
 
         $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
         $allTweets->setMaxTweets($this->getConfig('size'))->load();
@@ -40,6 +41,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
         if (count($allResults)) {
             $i = 0;
+
             foreach($allResults as $currentTweet) {
                 $color = ++$i % 2 ? '' : 'dark';
                 $date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
@@ -52,7 +54,29 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                     'TWEET_AVATAR' => Scrub::text($currentTweet['avatar']),
                     'ON_OFF' => $color,
                 ));
+
+				if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
+					foreach ($currentTweet['media'] as $currentMedia) {
+						$this->setVar(array(
+							'TWEET_MEDIA_URL' => $currentMedia->media_url_https,
+						));
+
+						$this->parse('tweet_media_block', 'tweet_media', true);
+					}
+				}
+				else {
+					$this->setVar(array(
+						'tweet_media_block' => ''
+					));
+				}
+
                 $this->parse('tweet_block', 'tweet', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar(array(
+					'tweet_media_block' => ''
+				));
             }
         }
 
