@@ -142,19 +142,23 @@ class DueWork_Rubric_Handler {
 				sb.id AS box_id,
 				rm.criterion_id,
 				rm.mark,
-				rd.value AS dmax_mark,
-				rr.value AS rmax_mark,
+				(
+					SELECT MAX(rd.value)
+					FROM rubric_descriptor rd
+					WHERE rm.criterion_id = rd.criterion_id
+					AND sb.rubric_result_set = 0
+				) AS dmax_mark,
+				(
+					SELECT MAX(rr.value)
+					FROM rubric_result rr
+					WHERE sb.rubric_result_set = rr.resultset_id
+					AND sb.rubric_result_set > 0
+				) AS rmax_mark,
 				rm.tstamp
 			FROM rubric_mark rm
 			LEFT JOIN
 				submission_box sb
 				ON rm.submission_box_id = sb.id
-			LEFT JOIN rubric_result rr
-				ON sb.rubric_result_set = rr.resultset_id
-				AND sb.rubric_result_set > 0
-			LEFT JOIN rubric_descriptor rd
-				ON rm.criterion_id = rd.criterion_id
-				AND sb.rubric_result_set = 0
 			WHERE rm.valid = 1
 				AND sb.mark_type = :mark_type
 				AND rm.student_id = :student_id
