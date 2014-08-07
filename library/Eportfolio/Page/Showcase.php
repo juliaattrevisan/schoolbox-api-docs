@@ -79,22 +79,28 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 			$allSubjects = array();
 
 			foreach ($allShowcasedItems as $currentShowcasedItem) {
-				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+				try {
+					$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+					$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
+					$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
 
-				/* Set up subject info
-				 */
-				$allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
+					/* Set up subject info
+					 */
+					$allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
 
-				/* Push individual items into the subject
-				 */
-				$allSubjects[$currentBox->getCategory()->getId()]['items'][] = array(
-					'currentBox' => $currentBox,
-					'currentShowcasedItem' => $currentShowcasedItem,
-					'latestSubmission' => $latestSubmission,
-					'latestReturn' => $latestReturn,
-				);
+					/* Push individual items into the subject
+					 */
+					$allSubjects[$currentBox->getCategory()->getId()]['items'][] = array(
+						'currentBox' => $currentBox,
+						'currentShowcasedItem' => $currentShowcasedItem,
+						'latestSubmission' => $latestSubmission,
+						'latestReturn' => $latestReturn,
+					);
+				}
+				catch (\Exception $e) {
+					/* Skip showcased work that has been linked to nonexistent submission box
+					 */
+				}
 			}
 		}
 
