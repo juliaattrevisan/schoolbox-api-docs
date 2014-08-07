@@ -1,0 +1,17 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    <div class="clearfix">
+        <!-- BEGIN image_gallery -->
+        <div class="float-left image-thumbnail">
+            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
+            </a>
+        </div>
+        <!-- END image_gallery -->
+    </div>
+
+	<!-- BEGIN submit_image -->
+	<a href="/cms/file/multi/{IMAGEGALLERY_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a>
+	<!-- END submit_image -->
+	<p class="interact"><a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}" class="btn"><span></span>View Full Gallery</a>
+</div>

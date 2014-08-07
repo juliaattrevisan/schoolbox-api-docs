@@ -14,6 +14,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use \External_UserInterface;
+use Schoolbox\Resource\Category;
 
 
 class CategoryMapper extends Mapper {
@@ -87,7 +88,48 @@ class CategoryMapper extends Mapper {
 
 		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
 		$this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+	}
 
+	/**
+	 * Find all images for a category
+	 *
+	 * @param $categoryId
+	 * @param int $limit
+	 * @param bool $excludeWork
+	 * @return mixed
+	 */
+	public function findImages($categoryId, $limit = 0, $excludeWork = false) {
+		$fileMapper = $this->getJoinMapper('files');
+
+		$limit = (int)$limit;
+
+		$query = "SELECT
+					{$fileMapper->getColumnString('f')}
+				  FROM file f
+				  WHERE category = :categoryId
+				  AND INSTR(mime_type, 'image/')
+				  AND deleted = '0'
+				  AND hidden = '0'
+				  ORDER BY submitted";
+
+		if ($limit > 0) {
+			$query .= " LIMIT 0, {$limit}";
+		}
+
+		$params = array(
+			'categoryId' => $categoryId,
+		);
+
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+
+		$collection = new \Schoolbox\Collection();
+
+		foreach ($statement as $row) {
+			$collection->add($fileMapper->hydrate($row, 'f'));
+		}
+
+		return $collection;
 	}
 
 	/**
