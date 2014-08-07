@@ -1,0 +1,61 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <link href="/javascript/components/video.js/build/files/video-js.min.css" rel="stylesheet">
+    <link href="/css/core/video-js/video-js.overrides.css" rel="stylesheet">
+    <script src="/javascript/components/video.js/build/files/minified.video.js"></script>
+
+	<h2>{COMPONENT_NAME}</h2>
+
+	<!-- BEGIN default_video -->
+	<div class="videoWrapper">
+		<video id="schoolbox_video{COMPONENT_INSTANCE_ID}" class="video-js vjs-default-skin" controls preload="none"
+			   poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster">
+		  <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+		</video>
+		<script> var video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}", {width: '100%', height: '400px'}); </script>
+	</div>
+	<!-- END default_video -->
+
+	<ul class="information-list">
+		<!-- BEGIN video_list -->
+		<li class="{ON_OFF}">
+			<a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
+				<img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
+				<h4>{VIDEO_LIST_TITLE}</h4>
+			</a>
+			<p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+			<p>{VIDEO_LIST_COMMENT}</p>
+		</li>
+		<!-- END video_list -->
+		<!-- BEGIN video_pending_list -->
+		<li class="{ON_OFF}">
+			<img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
+			<h4>{VIDEO_LIST_TITLE}</h4>
+			<p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+			<p>{VIDEO_LIST_COMMENT}</p>
+		</li>
+		<!-- END video_pending_list -->
+	</ul>
+
+	<script type="text/javascript">
+		$j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function() {
+			var $target = "/cms/sendVideo.php?type=sbfs&id="+$j(this).attr("rel");
+			var $poster = "/cms/videoThumb.php?type=sbfs&id="+$j(this).attr("rel")+"&size=poster";
+			var $video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}", {width: '100%', height: '400px'});
+
+			$video.ready(function(){
+				this.pause();
+				$j("#schoolbox_video{COMPONENT_INSTANCE_ID}_html5_api").attr('poster', $poster);
+				$j("#component{COMPONENT_INSTANCE_ID} .vjs-poster").css( { "background-image": "url("+$poster+")"});
+				this.src({ type: "video/mp4", src: $target});
+			});
+
+			return false;
+		});
+	</script>
+
+	<!-- BEGIN submit_video -->
+	<p class="interact">
+		<a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Video</a>
+	</p>
+	<!-- END submit_video -->
+</div>
