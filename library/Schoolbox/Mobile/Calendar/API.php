@@ -77,6 +77,13 @@ class API extends Generic\API {
             $currentDay = strtotime("+1 day", $currentDay);
             $eventGroup = date('Ymd', $currentDay);
 
+            // Filter by current month/year
+            if (date('m', $currentDay) != $selected['month']
+                || date('Y', $currentDay) != $selected['year']
+            ) {
+                continue;
+            }
+
             $day = array(
 				'dayOfMonth' => date('j', $currentDay),
 				'niceDay' => date('jS', $currentDay),
