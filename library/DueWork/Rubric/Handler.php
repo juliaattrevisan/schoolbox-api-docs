@@ -133,19 +133,37 @@ class DueWork_Rubric_Handler {
 	 * @return array
 	 */
 	public function getStudentMarksByCriteriaInCategory($studentID, $categoryID) {
+		// Ordering:
+		// box and criterion
+		// most recent submissions first
+		// highest marks first
 		$stmt = Database::getInstance()->prepare("
-			SELECT rm.criterion_id, rm.mark, MAX(rd.value) AS dmax_mark, MAX(rr.value) AS rmax_mark
+			SELECT
+				sb.id AS box_id,
+				rm.criterion_id,
+				rm.mark,
+				rd.value AS dmax_mark,
+				rr.value AS rmax_mark,
+				rm.tstamp
 			FROM rubric_mark rm
-			LEFT JOIN submission_box sb ON rm.submission_box_id = sb.id
-			LEFT JOIN rubric_result rr ON sb.rubric_result_set = rr.resultset_id AND sb.rubric_result_set > 0
-			LEFT JOIN rubric_descriptor rd ON rm.criterion_id = rd.criterion_id AND sb.rubric_result_set = 0
+			LEFT JOIN
+				submission_box sb
+				ON rm.submission_box_id = sb.id
+			LEFT JOIN rubric_result rr
+				ON sb.rubric_result_set = rr.resultset_id
+				AND sb.rubric_result_set > 0
+			LEFT JOIN rubric_descriptor rd
+				ON rm.criterion_id = rd.criterion_id
+				AND sb.rubric_result_set = 0
 			WHERE rm.valid = 1
-			AND sb.mark_type = :mark_type
-
-			AND rm.student_id = :student_id
-			AND sb.category = :category_id
-
-			GROUP BY rm.criterion_id, sb.id;
+				AND sb.mark_type = :mark_type
+				AND rm.student_id = :student_id
+				AND sb.category = :category_id
+			ORDER BY
+				sb.id ASC,
+				rm.criterion_id ASC,
+				rm.tstamp DESC,
+				rm.mark DESC
 		");
 
 		$stmt->execute(array(
@@ -157,6 +175,10 @@ class DueWork_Rubric_Handler {
 		// create a normalised value for each criterion
 		$crits = array();
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			// only use the most recent mark for each submission/criterion
+			if (isset($crits[$row['criterion_id']][$row['box_id']])) {
+				continue;
+			}
 			if($row['dmax_mark']) {
 				$localAvg = $row['mark'] / $row['dmax_mark'];
 			}
@@ -166,7 +188,7 @@ class DueWork_Rubric_Handler {
 			else {
 				continue;
 			}
-			$crits[$row['criterion_id']][] = $localAvg;
+			$crits[$row['criterion_id']][$row['box_id']] = $localAvg;
 		}
 		$return = array();
 		foreach($crits as $critID => $marks) {
