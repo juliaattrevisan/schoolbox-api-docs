@@ -79,6 +79,11 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 				));
             }
         }
+		else {
+			$this->setVar(array(
+				'tweet_media_block' => ''
+			));
+		}
 
 		// Build Twitter Search URL
 		$q = 'https://twitter.com/search?q=';
