@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use Exception;
 use InvalidArgumentException;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
@@ -123,12 +124,13 @@ abstract class AbstractProcess extends PipeWriter {
 				catch(ErrorException $e) {
 					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
 					$this->log->warning($msg);
-					$this->write($msg, true);
 				}
+                catch(PDOException $e) {
+                    throw $e;
+                }
 				catch(Exception $e) {
 					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
 					$this->log->error($msg);
-					$this->write($msg, true);
 				}
 
 				if($buffer = ob_get_contents()) {
@@ -140,11 +142,14 @@ abstract class AbstractProcess extends PipeWriter {
 			}
 
 		}
+        catch(PDOException $e) {
+            $this->log->emergency("PDOException: ".$e->getMessage(), array($e));
+            $this->loop->stop();
+        }
 		catch(Exception $e) {
 			// all exceptions must be caught, otherwise the react loop explodes and this worker dies
 			$msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
 			$this->log->critical($msg, array($e));
-			$this->write($msg, true);
 		}
 	}
 
