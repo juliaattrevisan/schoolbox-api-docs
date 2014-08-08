@@ -180,8 +180,18 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		 * Otherwise return an empty collection
 		 */
 		if (!$this->hasError()) {
-			$response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
-
+			$soap = $this->getSoap();
+			$response = unserialize(
+				Alaress\Redis::getInstance()->cacheFunctionCall(
+					'sharepoint.stk',
+					function($params) use($soap) {
+						list($payload) = $params;
+						$b = $soap->GetListItems(new SoapVar($payload, XSD_ANYXML));
+						return serialize($b);
+					},
+					array($xmlPayload->getPayload())
+				)
+			);
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
 
 			//
