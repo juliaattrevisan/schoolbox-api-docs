@@ -30,21 +30,28 @@ class External_DatabaseFactory {
      *                         for $databaseType.)
      */
     protected function buildConnector($databaseType, $databaseName = '') {
-        $offlineClass = "External_Offline_$databaseType";
+        $offlineClass    = "External_Offline_$databaseType";
+        $databaseClasses = array();
         if (!Config::get('external_enable')) {
-            $databaseClass = $offlineClass;
+            $databaseClasses[] = $offlineClass;
         }
         else {
             if (empty($databaseName)) {
                 $databaseName = Config::get('external_type');
             }
-            $databaseClass = "External_".ucfirst($databaseName)."_".$databaseType;
+            // Enable school-specific connection classes
+            $databaseClasses[] = "External_".ucfirst($databaseName)."_".ucfirst(Config::get('site_location'))."_".$databaseType;
+            $databaseClasses[] = "External_".ucfirst($databaseName)."_".$databaseType;
         }
-        if (class_exists($databaseClass, true)) {
-            try {
-                return new $databaseClass();
+
+        // Try each database class in order of definition
+        foreach ($databaseClasses as $databaseClass) {
+            if (class_exists($databaseClass, true)) {
+                try {
+                    return new $databaseClass();
+                }
+                catch (\Schoolbox\External\Exception $e) {}
             }
-            catch (\Schoolbox\External\Exception $e) {}
         }
 
         // At this point: return an offline class.
