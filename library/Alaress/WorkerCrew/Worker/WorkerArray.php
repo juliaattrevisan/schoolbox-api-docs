@@ -19,6 +19,9 @@ class WorkerArray implements WorkerBundleInterface {
 	/** @var Worker[] */
 	protected $workers = array();
 
+    /** @var array */
+    protected $pipes = array();
+
 	/** @var AlaressIPCProtocol */
 	protected $protocol;
 
@@ -50,15 +53,25 @@ class WorkerArray implements WorkerBundleInterface {
 			throw new RuntimeException("Cannot redeclare PID $pid");
 		}
 		$this->workers[$pid] = $worker;
+        foreach($worker->getPipes() as $pipe) {
+            $this->pipes[(int)$pipe] = $pid;
+        }
 	}
 
-	/**
-	 * @param int $pid
-	 */
-	public function detach($pid) {
-//		echo "MORTON REPORTS DETACHMENT OF $pid\n";
-		unset($this->workers[$pid]);
-	}
+
+    /**
+     * @param int $pid
+     */
+    public function detach($pid)
+    {
+        unset($this->workers[$pid]);
+        $this->pipes = array_filter(
+            $this->pipes,
+            function ($v) use ($pid) {
+                return $v != $pid;
+            }
+        );
+    }
 
 	/**
 	 * @param int $status
@@ -82,13 +95,36 @@ class WorkerArray implements WorkerBundleInterface {
 
 	/**
 	 * @param int $pid
+     * @throws OutOfBoundsException
 	 * @return Worker
 	 */
-	public function get($pid) {
-		return $this->workers[$pid];
+	public function getByProcessId($pid) {
+        if($this->contains($pid)) {
+            return $this->workers[$pid];
+        }
+        throw new OutOfBoundsException("No worker matched given process ID");
 	}
 
-	/**
+
+    /**
+     * Returns the PID of the worker attached to the given stream (each Worker will have 4)
+     * Throws OutOfBounds exception if it does not exist
+     *
+     * @param resource $resource
+     * @throws OutOfBoundsException
+     * @return int
+     */
+    public function getProcessIdByResource($resource)
+    {
+        $resourceId = (int)$resource;
+        if(array_key_exists($resourceId, $this->pipes)) {
+            return $this->pipes[$resourceId];
+        }
+        throw new OutOfBoundsException("No worker matched given resource");
+    }
+
+
+    /**
 	 * Returns a (single) Worker that matches the given status bitwise grouping
 	 * Throws OutOfBounds exception if no matching workers are found
 	 *

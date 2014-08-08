@@ -52,7 +52,17 @@ interface WorkerBundleInterface {
 	 * @throws OutOfBoundsException
 	 * @return Worker
 	 */
-	public function get($pid);
+	public function getByProcessId($pid);
+
+    /**
+     * Returns the PID of the worker attached to the given stream (each Worker will have 4)
+     * Throws OutOfBounds exception if it does not exist
+     *
+     * @param resource $resource
+     * @throws OutOfBoundsException
+     * @return int
+     */
+    public function getProcessIdByResource($resource);
 
 	/**
 	 * Returns a (single) Worker that matches the given status bitwise grouping
