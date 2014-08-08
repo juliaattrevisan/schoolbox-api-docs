@@ -357,12 +357,16 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		}
 
 		$query = "
-			SELECT *
+			SELECT
+				THTQ.QROW, THTQ.QCOL, THTQ.SUBJ, THTQ.CLASS, THTQ.R1ROOM, THTQ.R2ROOM,
+				SU.FULLNAME,
+				TTTG.T1TEACH, TTTG.T2TEACH
 			FROM TH
 			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
 			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
 			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
 			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+			INNER JOIN TTTG ON THTQ.IDENT = TTTG.IDENT
 			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
@@ -377,27 +381,25 @@ class External_Maze_Timetable implements External_TimetableInterface {
 				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
 				$finalTimetable[$currentRow['QROW']-1]['code'] = $this->getHelper()->generateClassCode($currentRow['SUBJ'], $currentRow['CLASS']);
 
-				/* Find the teacher
+				/* Find the teacher - just choose the first one with content
 				 */
-				$query = "
-					SELECT *
-					FROM TCTQ
-					WHERE TCTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-					AND SUBJ = '{$currentRow['SUBJ']}'
-					AND CLASS = '{$currentRow['CLASS']}'
-					AND TCTQ.TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-				";
+				$teacherKey = '';
 
-				$teacher = $this->getDb()->getRow($query);
+				if (strlen($currentRow['T1TEACH'])) {
+					$teacherKey = $currentRow['T1TEACH'];
+				}
+				else if (strlen($currentRow['T2TEACH'])) {
+					$teacherKey = $currentRow['T2TEACH'];
+				}
 
-				if (strlen(trim($teacher['T1TEACH']))) {
+				if (strlen($teacherKey)) {
 					try {
 						$userMapper = new \Schoolbox\UserMapper();
-						$user = $userMapper->findOneByColumn('synergy_id', $teacher['T1TEACH']);
+						$user = $userMapper->findOneByColumn('synergy_id', $teacherKey);
 
 						/* Paste teacher in
 						 */
-						$finalTimetable[$currentRow['QROW']-1]['staffID'] = trim($teacher['T1TEACH']);
+						$finalTimetable[$currentRow['QROW']-1]['staffID'] = $teacherKey;
 						$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
 						$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
 						$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
