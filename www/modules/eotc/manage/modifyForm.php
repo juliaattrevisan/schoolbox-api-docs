@@ -137,11 +137,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* All the resources that were selected
 			 */
-			$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
 			$resourceBookingCollection = new \Schoolbox\Collection();
 
-			if (is_array($_POST['resourcebooking']) && count($_POST['resourcebooking'])) {
-				$resourceBookingCollection = $resourceBookingMapper->findByColumn('id', $_POST['resourcebooking']);
+			if (is_numeric($event->getId())) {
+				$resourceBookingCollection = $metadataMapper->findResourceBookings($metadata->getId());
 			}
 
 			$metadata->setResourceBookings($resourceBookingCollection);
