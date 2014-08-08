@@ -397,12 +397,15 @@ class External_Maze_Timetable implements External_TimetableInterface {
 						$userMapper = new \Schoolbox\UserMapper();
 						$user = $userMapper->findOneByColumn('synergy_id', $teacherKey);
 
-						/* Paste teacher in
+						/* Paste teacher in. There are dupe records for teachers at this point,
+						 * so accept the first in the list
 						 */
-						$finalTimetable[$currentRow['QROW']-1]['staffID'] = $teacherKey;
-						$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
-						$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
-						$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+						if (!strlen($finalTimetable[$currentRow['QROW']-1]['staffID'])) {
+							$finalTimetable[$currentRow['QROW']-1]['staffID'] = $teacherKey;
+							$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
+							$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
+							$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
+						}
 					}
 					catch (Exception $e) {
 					}
