@@ -14,7 +14,9 @@ class External_Tass_Cathedral_User extends External_Tass_User {
 
     /**
      * Retrieves staff user account info for sync script.
-     * Main difference from Meriden sync: ActiveFlag
+     *
+     * Main difference from standard TASS sync: ActiveFlag uses term_date
+     * instead of curr_flg.
      *
      * @return array
      */
@@ -46,28 +48,6 @@ class External_Tass_Cathedral_User extends External_Tass_User {
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
         ";
-
-//        $query = "
-//            SELECT
-//                t.tch_code AS StaffID,
-//                '' AS NetworkLogin,
-//                t.curr_flg AS ActiveFlag,
-//                '' AS StaffTitle,
-//                '' AS StaffPreferredName,
-//                t.surname AS StaffSurname,
-//                t.tch_name AS StaffFullName,
-//                '' AS DefaultEmailCode,
-//                '' AS OccupEmail,
-//                t.e_mail AS Email,
-//                '' AS StaffCampus,
-//                '' AS StaffCategoryType,
-//                '' AS StaffCategory,
-//                td.tch_dept AS StaffDepartment,
-//                *
-//            FROM teacher AS t
-//            JOIN tchdept AS td ON t.tch_code = td.tch_code
-//            WHERE t.curr_flg = 'Y'
-//        ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
     }
@@ -75,15 +55,17 @@ class External_Tass_Cathedral_User extends External_Tass_User {
     /**
      * Retrieves parent user account info for sync script.
      *
+     * Main difference from standard TASS sync: students are fetched from and
+     * associated with students based on Split Family Access table.
+     *
      * @return array
      */
     public function getParentUserAccountInfo() {
-        // status of TASS support for single, gay, transgendered or polygamous
-        // parents - unknown
-        // par_code: most likely login
-        // According to getEnrolledStudents(): parent codes are prefixed with 'P'
-        // There seems to be no separate accounts for separate parents, maybe
-        // I'll have to create one.
+        // pia_sfaccess:
+        // * both add_nums and stud_codes are comma-separated lists, unfortunately
+        // joining students to parents:
+        // * if pia_sfaccess: join if student.stud_code is in pia_sfaccess.stud_codes
+        // * otherwise: always join
         $query = "
             SELECT
                 p.par_code AS StudentContactID,
@@ -107,10 +89,17 @@ class External_Tass_Cathedral_User extends External_Tass_User {
             FROM parent AS p
             INNER JOIN paraddress as pa
                 ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
-            -- INNER JOIN pia_sfaccess AS sf
-            --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
+            LEFT JOIN pia_sfaccess AS sf
+                ON p.par_code = sf.par_code
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                AND p.cmpy_code = sf.cmpy_code
             INNER JOIN student as s
-                ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
+                ON p.par_code = s.par_code
+                AND p.cmpy_code = s.cmpy_code
+                AND (
+                    sf.stud_codes IS NULL
+                    OR (CHARINDEX(','+RTRIM(s.stud_code)+',', ','+RTRIM(sf.stud_codes)+',') > 0)
+                )
             ORDER BY p.par_code ASC
         ";
         $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
