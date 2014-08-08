@@ -302,20 +302,17 @@ class External_Tass_User implements External_UserInterface
     public function getStaffUserAccountInfo()
     {
 
-        // Based on Cathedral sync (SB-4132)
-        // Main Differences with Meriden sync: ActiveFlag
+        // Include Synergetic fields, and attempt to perform data normalisation
+        // using extra fields.
         $query = "
             SELECT
-                t.emp_code AS StaffID,
+                t.tch_code AS StaffID,
                 '' AS NetworkLogin,
-                CASE
-                    WHEN (t.term_date) IS NULL THEN 0
-                    ELSE 1
-                END AS ActiveFlag,
-                t.salutation_flag AS StaffTitle,
-                t.prefer_name_text AS StaffPreferredName,
-                t.surname_text AS StaffSurname,
-                '' AS StaffFullName,
+                t.curr_flg AS ActiveFlag,
+                '' AS StaffTitle,
+                '' AS StaffPreferredName,
+                t.surname AS StaffSurname,
+                t.tch_name AS StaffFullName,
                 '' AS DefaultEmailCode,
                 '' AS OccupEmail,
                 t.e_mail AS Email,
@@ -324,32 +321,11 @@ class External_Tass_User implements External_UserInterface
                 '' AS StaffCategory,
                 td.tch_dept AS StaffDepartment,
                 *
-            FROM tel_vw_telemf AS t
-            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
-            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
+            FROM teacher AS t
+            JOIN tchdept AS td ON t.tch_code = td.tch_code
+            WHERE t.curr_flg = 'Y'
         ";
 
-//        $query = "
-//            SELECT
-//                t.tch_code AS StaffID,
-//                '' AS NetworkLogin,
-//                t.curr_flg AS ActiveFlag,
-//                '' AS StaffTitle,
-//                '' AS StaffPreferredName,
-//                t.surname AS StaffSurname,
-//                t.tch_name AS StaffFullName,
-//                '' AS DefaultEmailCode,
-//                '' AS OccupEmail,
-//                t.e_mail AS Email,
-//                '' AS StaffCampus,
-//                '' AS StaffCategoryType,
-//                '' AS StaffCategory,
-//                td.tch_dept AS StaffDepartment,
-//                *
-//            FROM teacher AS t
-//            JOIN tchdept AS td ON t.tch_code = td.tch_code
-//            WHERE t.curr_flg = 'Y'
-//        ";
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
     }
@@ -402,7 +378,7 @@ class External_Tass_User implements External_UserInterface
                 '' AS StudentContactTitle,
                 p.f_name AS StudentContactPreferred,
                 p.surname AS StudentContactSurname,
-                pa.e_mail AS StudentContactDefaultEmail,
+                '' AS StudentContactDefaultEmail,
 
                 '' AS StudentContactSpouseID,
                 '' AS StudentContactSpouseTitle,
@@ -414,11 +390,8 @@ class External_Tass_User implements External_UserInterface
                 s.campus_code AS StudentCampus,
                 s.sex AS StudentGender,
 
-                p.*,
-                pa.*
+                p.*
             FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
             -- INNER JOIN pia_sfaccess AS sf
             --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
             INNER JOIN student as s
