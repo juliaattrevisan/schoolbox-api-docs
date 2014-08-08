@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
+use Alaress\WorkerCrew\Worker\PipeWriter;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -31,13 +32,14 @@ class WorkerProcess extends AbstractProcess {
 	protected $mqf;
 
 
-	/**
-	 * @param LoopInterface $loop
+    /**
+     * @param LoopInterface $loop
      * @param LoggerInterface $log
-	 * @param DispatchStrategyInterface $strat
-	 */
-	public function __construct($loop, $log, $strat = null) {
-		parent::__construct($loop, $strat, $log);
+     * @param PipeWriter $writer
+     * @param DispatchStrategyInterface $strat
+     */
+    public function __construct($loop, $log, $writer, $strat) {
+		parent::__construct($loop, $log, $writer, $strat);
 		$this->mqf = new UserQueueFactory();
 	}
 
