@@ -66,6 +66,10 @@ class External_Tass_Cathedral_User extends External_Tass_User {
         // joining students to parents:
         // * if pia_sfaccess: join if student.stud_code is in pia_sfaccess.stud_codes
         // * otherwise: always join
+
+        // pia_sfaccess: only join the relevant paraddress
+        // no pia_sfaccess: get all paraddress
+
         $query = "
             SELECT
                 p.par_code AS StudentContactID,
@@ -83,6 +87,8 @@ class External_Tass_Cathedral_User extends External_Tass_User {
                 s.year_grp AS StudentYearLevel,
                 s.campus_code AS StudentCampus,
                 s.sex AS StudentGender,
+
+                sf.sfa_num,
 
                 p.*,
                 pa.*
