@@ -18,13 +18,13 @@ use Schoolbox\Realtime\Digest\DigestScheduler;
  * @version     SVN: $Id$
  */
 
+$fields = array('porcelain', 'mem', 'truemem', 'pid');
 
-$opts = getopt('v', \Alaress\Lumberjack\Logger::getAvailableFields());
+$opts = getopt('v', $fields);
 
-$fields = array();
-foreach(\Alaress\Lumberjack\Logger::getAvailableFields() as $name) {
-    if(isset($opts[$name])) {
-        $fields[] = $name;
+foreach($fields as $k => $name) {
+    if(!isset($opts[$name])) {
+        unset($fields[$k]);
     }
 }
 
