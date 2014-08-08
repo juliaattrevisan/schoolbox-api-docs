@@ -14,7 +14,7 @@ use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Psr\Log\LoggerInterface;
 
-abstract class PipeWriter {
+class PipeWriter {
 
 	/** @var ProtocolInterface */
 	protected $proto;

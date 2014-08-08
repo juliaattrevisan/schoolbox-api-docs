@@ -1,0 +1,145 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\WorkerCrew\Worker\IO\Listener;
+
+
+use Alaress\Async\Listener\Stream\StreamEvent;
+use Alaress\WorkerCrew\IPC\ProtocolInterface;
+use Alaress\WorkerCrew\Worker\PipeWriter;
+use Alaress\WorkerCrew\Worker\WorkerInterface;
+use ErrorException;
+use Exception;
+use PDOException;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+
+class InputStreamListener extends AbstractIOStreamListener {
+
+    /** @var LoopInterface */
+    protected $loop;
+
+    /** @var ProtocolInterface */
+    protected $proto;
+
+    /** @var PipeWriter */
+    protected $writer;
+
+    /** @var WorkerInterface */
+    protected $worker;
+
+    /** @var bool */
+    protected $buffering = false;
+
+    /** @var string */
+    protected $buffer = '';
+
+
+    /**
+     * @param LoggerInterface   $log
+     * @param LoopInterface     $loop
+     * @param ProtocolInterface $protocol
+     * @param PipeWriter        $writer
+     * @param WorkerInterface   $worker
+     */
+    public function __construct(
+        LoggerInterface $log,
+        LoopInterface $loop,
+        ProtocolInterface $protocol,
+        PipeWriter $writer,
+        WorkerInterface $worker
+    ) {
+        parent::__construct($log);
+        $this->loop   = $loop;
+        $this->proto  = $protocol;
+        $this->writer = $writer;
+        $this->worker = $worker;
+    }
+
+
+    /**
+     * Sent when the stream has been closed for any reason
+     *
+     * @param StreamEvent $e
+     * @return void
+     */
+    public function streamClosed(StreamEvent $e)
+    {
+        // input stream closed, no more data can come in, let's just bug out
+        $this->loop->stop();
+    }
+
+
+    /**
+     * Sent when data is received through the stream
+     *
+     * @param StreamEvent $e
+     * @return void
+     */
+    public function dataReceived(StreamEvent $e)
+    {
+        $data = $e->getData();
+
+        try {
+            // cease and desist received
+            if($this->proto->isCancelled($data)) {
+                $this->streamClosed($e);
+                return;
+            }
+
+            if(!$this->buffering) {
+                $this->buffering = true;
+                $this->buffer = '';
+            }
+
+            $this->buffer .= $data;
+
+            // if EOT received
+            if($this->proto->isEnded($data)) {
+                ob_start();
+
+                try {
+                    $this->buffering = false;
+                    $this->writer->write($this->worker->parse($this->buffer));
+                    $this->log->debug("Task Complete");
+                }
+                catch(ErrorException $e) {
+                    $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
+                    $this->log->warning($msg);
+                }
+                catch(PDOException $e) {
+                    throw $e;
+                }
+                catch(Exception $e) {
+                    $msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
+                    $this->log->error($msg);
+                }
+
+                if($buffer = ob_get_contents()) {
+                    $this->log->debug("Captured output: $buffer");
+                }
+                ob_end_clean();
+
+                $this->buffering = false;
+            }
+
+        }
+        catch(PDOException $e) {
+            $this->log->emergency("PDOException: ".$e->getMessage(), array($e));
+            $this->loop->stop();
+        }
+        catch(Exception $e) {
+            // all exceptions must be caught, otherwise the react loop explodes and this worker dies
+            $msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
+            $this->log->alert($msg, array($e));
+            $this->loop->stop();
+        }
+    }
+
+}
