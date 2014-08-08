@@ -18,6 +18,7 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
@@ -26,6 +27,7 @@ use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -120,12 +122,16 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      * Callback executed when an exception bubbles to the top of the loop
      *
      * @param Exception $e
+     * @throws PDOException
+     * @throws External\Exception
      * @return void
      */
     public function onException($e) {
 	    $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()));
-		// TODO improve the email handling of these messages to be less spammy
-		// $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
+        // we need the daemon to crash if there's a database issue
+        if($e instanceof PDOException || $e instanceof External\Exception) {
+            throw $e;
+        }
     }
 
 
@@ -134,6 +140,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
      *
      * @param Frame       $frame
      * @param AckResolver $resolver
+     * @throws PDOException
      * @return void
      */
     public function onMessage($frame, $resolver) {
@@ -160,6 +167,10 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 			// TODO Mappers shouldn't even be being used from within this block @see SB-5250
 			$this->log->critical("Mapper exception: ".$e->getMessage());
 		}
+        catch(PDOException $e) {
+            // this must be thrown out!
+            throw $e;
+        }
 	    catch(RuntimeException $e) {
 		    $truncated = substr($frame->body, 0, 64);
 		    $this->log->critical("Could not decode '$truncated...' to schedule event", array($e));

@@ -112,6 +112,12 @@ EOL;
 			$this->getLoop()->run();
 			$this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
 		}
+        catch(PDOException $e) {
+            $this->logger()->emergency($e->getMessage(), array($e));
+        }
+        catch(\Schoolbox\External\Exception $e) {
+            $this->logger()->emergency($e->getMessage(), array($e));
+        }
 		catch(Exception $e) {
 			$this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e), $e->getMessage()), array($e));
 		}
@@ -132,11 +138,11 @@ EOL;
 			return true;
 		}
 
-        $this->logger()->info("$errStr - $errFile::$errLine", array('char' => 'e'));
 
 		switch($errNum) {
 			case E_RECOVERABLE_ERROR:
 				// for any of these errors, we want an exception we can catch
+                $this->logger()->info("$errStr - $errFile::$errLine", array('char' => 'e'));
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
 			case E_NOTICE:
@@ -195,6 +201,9 @@ EOL;
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
 		}
+        if(strpos($errStr, 'mysqli_') === 0) {
+            throw new PDOException($errStr, $errNum);
+        }
 		if(strpos($errStr, 'fclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
@@ -270,7 +279,8 @@ EOL;
                 3 => 100  // max verbosity: EV-ER-Y-THING...
             );
 
-            $this->log = new Logger(STDOUT, STDERR, $limits[$threshold], $this->getOpt('fields'));
+            $opts = $this->getOpt('fields') ?: array();
+            $this->log = new Logger(STDOUT, STDERR, $limits[$threshold], $opts, in_array('porcelain', $opts));
         }
         return $this->log;
     }

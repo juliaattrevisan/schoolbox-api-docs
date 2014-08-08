@@ -105,7 +105,7 @@ class Database implements Serializable {
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
-	        if($options['throw']) {
+            if(isset($options['throw']) && $options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
 	        }
             $this->error($exception);

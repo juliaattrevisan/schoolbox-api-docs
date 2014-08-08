@@ -18,6 +18,7 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use SplQueue;
 
@@ -322,10 +323,16 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	/**
 	 * @param Exception $exception
 	 * @param LoggerInterface $log
+     * @throws PDOException
 	 * @return void
 	 */
 	public function handleException($exception, $log) {
 		$log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), array($exception));
+
+        // allow PDO exceptions to get out
+        if($exception instanceof PDOException) {
+            throw $exception;
+        }
 	}
 
 
