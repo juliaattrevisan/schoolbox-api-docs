@@ -128,6 +128,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
                 $callback, $event->getObject(), $event->getEffector(), $event->getDiff()
             )));
         }
+        if(count($trigger->getCallbacks()) == 0) {
+            $this->log->notice(sprintf("Trigger for '%s' has no callbacks", get_class($event->getObject())));
+        }
     }
 
 
