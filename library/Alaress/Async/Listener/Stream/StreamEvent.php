@@ -10,9 +10,7 @@
 namespace Alaress\Async\Listener\Stream;
 
 
-use Alaress\Async\Listener\Listenable;
-
-class StreamEvent implements Listenable
+class StreamEvent
 {
 
     /** @var resource */

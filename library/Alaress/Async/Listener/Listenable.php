@@ -13,4 +13,17 @@ namespace Alaress\Async\Listener;
 interface Listenable
 {
 
+    /**
+     * @param EventListener $listener
+     * @return void
+     */
+    public function attachListener(EventListener $listener);
+
+
+    /**
+     * @param EventListener $listener
+     * @return void
+     */
+    public function detachListener(EventListener $listener);
+
 } 
