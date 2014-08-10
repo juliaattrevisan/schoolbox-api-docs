@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
+use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Psr\Log\LoggerInterface;
@@ -42,6 +43,7 @@ class PipeWriter {
 	 *
 	 * @param string $string
 	 * @param bool $err
+     * @throws IOException
 	 * @return self
 	 */
 	public function write($string, $err = false) {
@@ -52,10 +54,15 @@ class PipeWriter {
 		for ($written = 0; $written < $strlen; $written += $fwrite) {
 			$shard = str_pad(substr($string, $written, $chunk), $chunk, $end);
 			$fwrite = fwrite($this->downpipe, $shard);
-			if ($fwrite === false) {
-				$this->log->critical("Broken pipe, could not write to target");
-				break;
-			}
+
+            /*
+             * The size of $shard will never be zero, so if fwrite() returns 0, this means the pipe has been broken.
+             * In socket programming, fwrite() does not return false when it fails to write (go figure)
+             * @see http://php.net/manual/en/function.fwrite.php#96951
+             */
+            if ($fwrite === false || $fwrite === 0) {
+                throw new IOException("Broken pipe, could not write to target");
+            }
 		}
 		fflush($this->downpipe);
 
@@ -66,7 +73,7 @@ class PipeWriter {
 		$this->log->info(sprintf("Sent %d bytes to target (%d x %d-byte chunks)", $written, $written / $chunk, $chunk));
 
 		if($written < $strlen) {
-			$this->log->critical("Pipe communication terminated prematurely after $written bytes, ", $strlen - $written, " unsent");
+			throw new IOException("Pipe communication terminated prematurely after $written bytes, " . ($strlen - $written) . " unsent");
 		}
 
 		return $this;
