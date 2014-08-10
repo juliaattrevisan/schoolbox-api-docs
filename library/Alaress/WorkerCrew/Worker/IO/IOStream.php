@@ -42,15 +42,19 @@ class IOStream extends Stream implements Listenable
             $this->attachListener($listener);
         }
 
-        $self = $this;
         $listenerStore = $this->getListeners();
 
         $this->on(
              'data',
-                 function ($data, $reactStream) use ($listenerStore, $self) {
+                 function ($data, $reactStream) use ($listenerStore) {
+                     /**
+                      * @var string $data
+                      * @var self $reactStream
+                      */
+
                      // confirm valid resource
                      if (!is_resource($reactStream->stream)) {
-                         $self->close();
+                         $reactStream->close();
                          return;
                      }
 
@@ -61,7 +65,7 @@ class IOStream extends Stream implements Listenable
 
                      // don't send null data down the pipe
                      if ($e->isStreamEnded() || strlen($data) === 0) {
-                         $self->close();
+                         $reactStream->close();
                          return;
                      }
 
