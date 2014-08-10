@@ -92,16 +92,14 @@ if (is_numeric($this->arg[1])
     $userID = $currentUserId;
 }
 
-/* Check if system config restrict_student_submissions is on
- */
-if ($groupHandler->isParentOfChild($this->arg[1])) {
-    if (Cfg::get('restrict_student_submissions')) {
-        error(19);
-    }
-}
-
 // setup boolean for whether the current user is a parent and ONLY a parent (and therefore can't see download links)
-$parentOnly = ($groupHandler->isParent() && !$groupHandler->isStaff() && !$groupHandler->isSuperuser());
+// error out if parent and student submissions restricted
+$parentOnly = $groupHandler->isParent()
+    && !$groupHandler->isStaff()
+    && !$groupHandler->isSuperuser();
+if ($parentOnly && Config::get('restrict_student_submissions')) {
+    error(19);
+}
 
 $user = $userHandler->getByID($userID);
 
