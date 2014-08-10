@@ -10,6 +10,7 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
+use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
@@ -140,6 +141,7 @@ class Worker extends PipeWriter {
 	 * @param object $identifier
 	 * @param string $cmd
 	 * @param string $args
+     * @throws IOException
 	 * @return self
 	 */
 	public function setTask($identifier, $cmd, $args) {

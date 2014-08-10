@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew;
 
 
 use Alaress\Async\Listener\Stream\StreamListener;
+use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Worker\IO\IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\ErrorIOListener;
@@ -50,6 +51,9 @@ class Pool extends EventEmitter {
 
     /** @var StreamListener[] */
     protected $ioListeners;
+
+    /** @var array (IOStream[][]) */
+    protected $streams;
 
 
     /**
@@ -104,14 +108,34 @@ class Pool extends EventEmitter {
 				throw new RuntimeException("No process is available to handle this request, did you check first?");
 			case 0:  // no current processes available, but you can create one
 				$pid = $this->attachWorker();
+                $new = true;
+                $this->log->debug("Created new worker with PID $pid");
 				break;
 			default: // any positive integer is the PID of the process we will be sending this to
+                $new = false;
 				break;
 		}
 
-		$this->assignTask($pid, $cmd, $args, $identifier);
-		return $pid;
-	}
+        try {
+            // attempt to assign the given task to the worker found
+            $this->log->debug("Tasking $pid with $cmd");
+            $this->assignTask($pid, $cmd, $args, $identifier);
+        }
+        catch(IOException $e) {
+            // communication problem with the given worker
+            $this->detachWorker($pid);
+
+            // if we're not able to communicate with the process we only just created, that's special...
+            if($new) {
+                throw new RuntimeException("Could not communicate with freshly created process", 0, $e);
+            }
+
+            // ...otherwise just rethrow the IO exception
+            throw $e;
+        }
+
+        return $pid;
+    }
 
 
 	/**
@@ -131,7 +155,9 @@ class Pool extends EventEmitter {
 			self::DEBUG_ERR => array("pipe", "w")  // stderr    is a pipe that the child will write to
 		);
 
-		if(!($pp = proc_open("exec $cmd", $descriptorSpec, $pipes))) {
+        $process = "exec $cmd ".$this->strat->getFlags();
+
+		if(!($pp = proc_open($process, $descriptorSpec, $pipes))) {
 			throw new RuntimeException("Cannot launch worker process");
 		}
 
@@ -153,14 +179,29 @@ class Pool extends EventEmitter {
 
         $this->workers->attach($pid, $worker);
 
-        // create listenable stream objects (we don't need to hold onto references, they're held in the loop)
+        // create listenable stream objects
         foreach($this->ioListeners as $k => $listener) {
             // @developers: look at the stream listeners for callback functionality
-            new IOStream($pipes[$k], $this->loop, $this->ioListeners[$k]);
+            $this->streams[$pid][$k] = new IOStream($pipes[$k], $this->loop, $this->ioListeners[$k]);
         }
 
 		return $pid;
 	}
+
+
+    /**
+     * @param int $pid
+     */
+    protected function detachWorker($pid) {
+        foreach($this->streams[$pid] as $fd => $stream) {
+            /** @var IOStream $stream */
+            $stream->detachListener($this->ioListeners[$fd]);
+            $stream->close();
+        }
+        unset($this->streams[$pid]);
+        $this->workers->detach($pid);
+        $this->log->debug("Detached $pid");
+    }
 
 
 	/**
@@ -333,8 +374,8 @@ class Pool extends EventEmitter {
 	/**
 	 * Terminate all workers
 	 */
-	public function releaseWorkers() {
-		$this->workers->signalAll(SIGTERM);
+	public function releaseWorkers($hard = true) {
+		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
 	}
 
 }

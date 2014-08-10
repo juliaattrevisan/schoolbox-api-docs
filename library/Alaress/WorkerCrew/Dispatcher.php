@@ -10,12 +10,14 @@
 namespace Alaress\WorkerCrew;
 
 
+use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
+use RuntimeException;
 use SplQueue;
 
 class Dispatcher implements DispatcherInterface {
@@ -200,10 +202,16 @@ class Dispatcher implements DispatcherInterface {
 		// pop the task from the queue and run the next task
 		try {
 			// we obtained the data from q::bottom() so just drop the reference
-			$this->q->dequeue();
+            $this->q->dequeue();
 			$pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
 			$this->log->info("Command '$cmd' pushed to worker {{$pid}}", array('char' => '>'));
 		}
+        catch(IOException $e) {
+            $this->log->warning("Could not communicate with worker: ".$e->getMessage());
+        }
+        catch(RuntimeException $e) {
+            $this->log->critical("Failed to spawn worker: ".$e->getMessage());
+        }
 		catch(Exception $e) {
 			// we need to catch any and all exception here, lest we explode our reactor
 			$this->log->warning("Exception suppressed: ".get_class($e) . " ".$e->getMessage(), array($e));
