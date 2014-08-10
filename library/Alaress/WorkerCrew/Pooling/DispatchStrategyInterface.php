@@ -139,6 +139,14 @@ interface DispatchStrategyInterface {
 	 */
 	public function getQueueDelay();
 
+
+    /**
+     * Returns the flags that should be used for workers
+     *
+     * @return string
+     */
+    public function getFlags();
+
     /**
      * Returns the size of a queue that should be considered abnormal
      *

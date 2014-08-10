@@ -42,9 +42,17 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	protected $flywheelSpins;
 
 
-	public function __construct() {
+    /** @var string */
+    protected $flags;
+
+
+    /**
+     * @param string $flags
+     */
+    public function __construct($flags = '') {
 		$this->flywheelSpins = self::MAX_FLYWHEEL;
 		$this->protocol = new AlaressIPCProtocol();
+        $this->flags = $flags;
 	}
 
 
@@ -140,7 +148,18 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	}
 
 
-	/**
+    /**
+     * Returns the flags that should be used for workers
+     *
+     * @return string
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+
+    /**
 	 * Evaluate the segment of data given and return a Worker STATE based on it
 	 *
 	 * @param string $data

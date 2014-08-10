@@ -29,7 +29,18 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
     protected $queueMaxSize;
 
 
-	public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout) {
+    /**
+     * @param int    $minWorkers
+     * @param int    $maxWorkers
+     * @param int    $maxFlywheel
+     * @param int    $queueDelay
+     * @param int    $queueWarnSize
+     * @param int    $queueMaxSize
+     * @param int    $idleTimeout
+     * @param string $flags
+     */
+    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $flags = '') {
+        parent::__construct($flags);
 		$this->flywheelSpins = $maxFlywheel;
 		$this->minWorkers = $minWorkers;
 		$this->maxWorkers = $maxWorkers;
