@@ -53,7 +53,11 @@ class PipeWriter {
 
 		for ($written = 0; $written < $strlen; $written += $fwrite) {
 			$shard = str_pad(substr($string, $written, $chunk), $chunk, $end);
-			$fwrite = fwrite($this->downpipe, $shard);
+
+            // so...guarantee that fread() will actually PUT all the data in the pipe... but only for exactly as long as needed
+            stream_set_blocking($this->downpipe, 1);
+            $fwrite = fwrite($this->downpipe, $shard);
+            stream_set_blocking($this->downpipe, 0);
 
             /*
              * The size of $shard will never be zero, so if fwrite() returns 0, this means the pipe has been broken.
