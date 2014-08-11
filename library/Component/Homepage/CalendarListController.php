@@ -125,11 +125,11 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                     'CAL_TITLE' => Scrub::text($event['title']),
                     'CAL_LOCATION' => Scrub::text($event['location']),
                     'CAL_DETAIL' => Scrub::html($event['detail']),
-                    'CAL_COLOUR' => $event['colour'],
+                    'CAL_COLOUR' => Scrub::text($event['colour']),
                     'CAL_MODIFY' => $this->calendarHandler->getPerm(
                         $event['id']
                     ) > 1 ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=homepage&sid=".$this->getContext('id')."\" title=\"Modify\"><span></span>Modify</a>" : '',
-                    'CAL_TYPE' => $event['eventType'],
+                    'CAL_TYPE' => Scrub::text($event['eventType']),
                     'CAL_AUTHOR' => $userHandler->formatName($event),
                     'CAL_AUTHOR_ID' => $event['owner'],
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',

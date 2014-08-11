@@ -74,7 +74,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
 				$page->setVar(array(
 					'LUEVENTTYPE_VALUE' => $currentLookupEventType['eventTypeID'],
-					'LUEVENTTYPE_NAME' => $currentLookupEventType['eventType'],
+					'LUEVENTTYPE_NAME' => Scrub::text($currentLookupEventType['eventType']),
 					'LUEVENTTYPE_SELECTED' => $selected,
 				));
 

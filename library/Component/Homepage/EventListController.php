@@ -82,11 +82,11 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     'CAL_TITLE' => Scrub::text($eventObject->getTitle()),
                     'CAL_LOCATION' => Scrub::text($eventObject->getLocation()),
                     'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
-                    'CAL_COLOUR' => $eventObject->getColour(),
+                    'CAL_COLOUR' => Scrub::text($eventObject->getColour()),
                     'CAL_MODIFY' => $calendarHandler->getPerm($eventId) > READ_ACCESS
                             ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID=" . $eventId . "&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
                             : '',
-                    'CAL_TYPE' => $eventObject->getEventType(),
+                    'CAL_TYPE' => Scrub::text($eventObject->getEventType()),
                     'CAL_AUTHOR' => $eventObject->getAuthorName(),
                     'CAL_AUTHOR_ID' => $eventObject->getAuthorId(),
                     'ON_OFF' => $j % 2 ? '' : 'dark',
