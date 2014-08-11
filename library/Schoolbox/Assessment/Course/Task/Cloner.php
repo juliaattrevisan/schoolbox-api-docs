@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
@@ -150,28 +151,39 @@ class Cloner {
     /**
      * Updates linked items (submission box or online assessment) hat is
      * attached to this object's task instance.
+     *
+     * @return void
      */
-    public function updateLinkedItems() {
-        $assess_id = $this->task_instance->getAssessment()->getId();
-        if ($assess_id) {
-            /** @var OnlineAssessment $assess_object */
-            $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
-            $assess_object
-                ->setStart($this->getOpenTimeFromTask())
-                ->setFinish($this->getAssessmentCloseTimeFromTask())
-            ;
-            OnlineAssessmentMapper::getInstance()->save($assess_object);
+    public function updateLinkedItems()
+    {
+        try {
+            $assess_id = $this->task_instance->getAssessment()->getId();
+            if ($assess_id) {
+                /** @var OnlineAssessment $assess_object */
+                $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                $assess_object
+                    ->setStart($this->getOpenTimeFromTask())
+                    ->setFinish($this->getAssessmentCloseTimeFromTask())
+                ;
+                OnlineAssessmentMapper::getInstance()->save($assess_object);
+            }
+        } catch (Exception $e) {
+            // quiz may have been deleted. Nothing to see here, move along
         }
-        $box_id = $this->task_instance->getSubmissionBox()->getId();
-        if ($box_id) {
-            /** @var SubmissionBox $box */
-            $box = SubmissionBoxMapper::getInstance()->findById($box_id);
-            $box
-                ->setOpenDate($this->getOpenTimeFromTask())
-                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
-                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
-            ;
-            SubmissionBoxMapper::getInstance()->save($box);
+        try {
+            $box_id = $this->task_instance->getSubmissionBox()->getId();
+            if ($box_id) {
+                /** @var SubmissionBox $box */
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+                $box
+                    ->setOpenDate($this->getOpenTimeFromTask())
+                    ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                    ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
+                ;
+                SubmissionBoxMapper::getInstance()->save($box);
+            }
+        } catch (Exception $e) {
+            // box may have been deleted. Nothing to see here, move along
         }
     }
 
