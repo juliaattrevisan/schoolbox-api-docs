@@ -321,20 +321,3 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         return $this->upcomingWork;
     }
 }
-
-/**
- * Order by date descending.
- *
- * @param <type> $a
- * @param <type> $b
- * @return int
- */
-function cmp($a, $b)
-{
-    if ($a['relevant_date'] == $b['relevant_date']) {
-        return 0;
-    } elseif ($a['relevant_date'] > $b['relevant_date']) {
-        return 1;
-    }
-    return -1;
-}
