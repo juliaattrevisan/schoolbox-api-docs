@@ -21,6 +21,13 @@ class Assess_Question_Bank extends Evaluation_Question_Bank {
 	private $questionHandler = null;
 
 	/**
+	 * Handler
+	 *
+	 * @var null
+	 */
+	private $answerHandler = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -34,6 +41,7 @@ class Assess_Question_Bank extends Evaluation_Question_Bank {
 	 */
 	private function setup() {
 		$this->setQuestionHandler(new Assess_Question());
+		$this->setAnswerHandler(new Assess_Answer());
 		$this->setContext();
 	}
 
@@ -72,5 +80,23 @@ class Assess_Question_Bank extends Evaluation_Question_Bank {
 	 */
 	public function getQuestionHandler() {
 		return $this->questionHandler;
+	}
+
+	/**
+	 * Set answer handler
+	 *
+	 * @param null $answerHandler
+	 */
+	private function setAnswerHandler($answerHandler) {
+		$this->answerHandler = $answerHandler;
+	}
+
+	/**
+	 * Get answer handler
+	 *
+	 * @return null
+	 */
+	public function getAnswerHandler() {
+		return $this->answerHandler;
 	}
 }

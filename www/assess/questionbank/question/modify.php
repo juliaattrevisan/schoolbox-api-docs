@@ -104,7 +104,7 @@ else {
     $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/modify.html');
     $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
-    $answerHandler->modify($this, $question['question_id']);
+    $answerHandler->modifyInQuestionBank($this, $question['answer']);
 
     $this->parse('answerInputs_block', 'answerFormFragment', true);
 

@@ -17,11 +17,10 @@ abstract class Evaluation_Question extends DeprecatedModel
 
 	/**
 	 * Allowed fields to go into the db
-	 * "answer" is included here, for editing questions in the QuestionBank
 	 *
 	 * @var array
 	 */
-	protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'answer', 'deleted_at');
+	protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
 
     /**
      * Constructor
