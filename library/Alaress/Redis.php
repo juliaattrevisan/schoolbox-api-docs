@@ -84,7 +84,7 @@ class Redis {
      *                           if there is no value already in the cache.
      * @param mixed    $params   A parameter to pass to $callback. This is also
      *                           used to generate the cache key.
-     * @param int      $timeout  Cache timeout (null for none)
+     * @param int      $timeout  Cache timeout in seconds (null for none)
      *
      * @return mixed
      */
