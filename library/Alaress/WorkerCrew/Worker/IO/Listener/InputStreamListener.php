@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew\Worker\IO\Listener;
 
 
 use Alaress\Async\Listener\Stream\StreamEvent;
+use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\PipeWriter;
 use Alaress\WorkerCrew\Worker\WorkerInterface;
@@ -100,35 +101,30 @@ class InputStreamListener extends AbstractIOStreamListener {
 
             $this->buffer .= $data;
 
-            // if EOT received
-            if($this->proto->isEnded($data)) {
-                ob_start();
-
-                try {
-                    $this->buffering = false;
-                    $this->writer->write($this->worker->parse($this->buffer));
-                    $this->log->debug("Task Complete");
-                }
-                catch(ErrorException $e) {
-                    $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
-                    $this->log->warning($msg);
-                }
-                catch(PDOException $e) {
-                    throw $e;
-                }
-                catch(Exception $e) {
-                    $msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
-                    $this->log->error($msg);
-                }
-
-                if($buffer = ob_get_contents()) {
-                    $this->log->debug("Captured output: $buffer");
-                }
-                ob_end_clean();
-
-                $this->buffering = false;
+            // if EOT not yet received
+            if(!$this->proto->isEnded($data)) {
+                return;
             }
 
+            ob_start();
+
+            $this->buffering = false;
+            $this->writer->write($this->worker->parse($this->buffer));
+            $this->log->debug("Task Complete");
+
+            if($buffer = ob_get_contents()) {
+                $this->log->debug("Captured output: $buffer");
+            }
+
+            ob_end_clean();
+        }
+        catch(IOException $e) {
+            // this means the pipe has been broken; no point logging, no point carrying on. everything is meaningless.
+            $this->loop->stop();
+        }
+        catch(ErrorException $e) {
+            $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
+            $this->log->warning($msg);
         }
         catch(PDOException $e) {
             $this->log->emergency("PDOException: ".$e->getMessage(), array($e));
@@ -137,8 +133,7 @@ class InputStreamListener extends AbstractIOStreamListener {
         catch(Exception $e) {
             // all exceptions must be caught, otherwise the react loop explodes and this worker dies
             $msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
-            $this->log->alert($msg, array($e));
-            $this->loop->stop();
+            $this->log->critical($msg, array($e));
         }
     }
 
