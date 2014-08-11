@@ -43,6 +43,7 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      * Adds a question to the question bank, by copying its question text and
      * answer.
      *
+	 * @param  $questionHandler
      * @param  $questionCategoryID
      * @param  $typeID
      * @param  $questionID
@@ -50,9 +51,11 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      * @param  $marks
      * @return void
      */
-    public function addQuestion($questionCategoryID, $typeID, $questionID, $answerID, $marks)
-    {
-        $question = $this->getQuestionHandler()->getByID($questionID);
+    public function addQuestion($questionHandler, $questionCategoryID, $typeID, $questionID, $answerID, $marks) {
+
+		/* Raw questionHandler context, to get the question info
+		 */
+        $question = $questionHandler->getByID($questionID);
         $answer = $this->getAnswerHandler()->getByID($answerID);
 
         $this->create(array(
