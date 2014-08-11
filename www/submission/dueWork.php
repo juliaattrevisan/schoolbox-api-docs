@@ -455,13 +455,15 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                 $activity->getName()
             );
         }
-    } else {
+    } elseif (!$restrictSubmissions) {
         $boxUrl = sprintf(
             '<a href="/submission/submissionHistory/%d/%d">%s</a>',
             $activity->getId(),
             $userID,
             $activity->getName()
         );
+    } else {
+        $boxUrl = $activity->getName();
     }
 
     switch ($activity->getEvent()) {
