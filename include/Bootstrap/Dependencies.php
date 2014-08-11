@@ -26,12 +26,8 @@ $di->set(
     'session',
     $di->lazy(
         function() use($di) {
-            $factory = new Alaress\Session\Factory($_COOKIE);
+            $factory = new Alaress\Session\Factory($_COOKIE,$di->get('config'));
             $session = $factory->build();
-            $session
-                ->setConfig($di->get('config'))
-                ->setRequestTime($_SERVER['REQUEST_TIME'])
-            ;
             return $session;
         }
     )

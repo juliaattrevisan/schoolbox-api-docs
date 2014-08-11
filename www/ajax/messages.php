@@ -20,12 +20,12 @@ if(isset($this)) {
 header('Content-Type: application/json');
 
 session_start();
-
-$factory = new \Alaress\Session\Factory($_COOKIE);
+$config = new \Schoolbox\ConfigLoader();
+$factory = new \Alaress\Session\Factory($_COOKIE, $config);
 $session = $factory->build();
 
 // check the session is valid before continuing
-if($session->isAuthSessionAlive()) {
+if(!$session->isAuthSessionAlive()) {
     die(json_encode(array(
         'error' => 'Unauthorized',
         'code'  => 401,

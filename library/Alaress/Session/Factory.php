@@ -25,9 +25,12 @@ class Factory {
      * Creates factory.
      *
      * @param array $cookies Cookies, often from $_COOKIE but not always.
+     * @param \Schoolbox\IConfigLoader $config
+     * @param \
      */
-    public function __construct($cookies) {
+    public function __construct($cookies, \Schoolbox\IConfigLoader $config) {
         $this->cookies = $cookies;
+        $this->config = $config;
     }
 
     /**
@@ -43,7 +46,9 @@ class Factory {
             $segmentFactory,
             $csrfTokenFactory,
             $func,
-            $this->cookies
+            $this->cookies,
+            $this->config,
+            $_SERVER['REQUEST_TIME']
         );
     }
 }
