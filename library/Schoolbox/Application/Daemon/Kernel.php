@@ -42,8 +42,7 @@ class Kernel extends \Alaress\Application\Kernel {
 	 * @param array $opts
 	 */
 	public function __construct($name, $opts = array()) {
-        $this->opts = $opts;
-
+        $this->setOpts($opts);
 		$this->boot = new Bootstrap($this);
 		$this->boot();
 
@@ -62,6 +61,14 @@ class Kernel extends \Alaress\Application\Kernel {
 		return $this->loop;
 	}
 
+
+    /**
+     * @param array $opts
+     */
+    protected function setOpts($opts) {
+        $this->opts = $opts;
+        $this->opts['level'] = $this->getLoggingLevel();
+    }
 
 	/**
 	 * @param string $name
@@ -257,30 +264,40 @@ EOL;
 
 
     /**
+     * @return int
+     */
+    public function getLoggingLevel() {
+        $v = $this->getOpt('verbose');
+
+        $threshold = 0;
+        if(isset($v)) {
+            $threshold = 1;
+            if(is_array($v)) {
+                $threshold = min(3, count($v));
+            }
+        }
+
+        $limits = array(
+            0 => 500, // nil verbosity: exceptional behaviour only
+            1 => 250, // min verbosity: significant events
+            2 => 200, // mod verbosity: most things
+            3 => 100  // max verbosity: EV-ER-Y-THING...
+        );
+
+        return $limits[$threshold];
+    }
+
+
+    /**
      * @return LoggerInterface
      */
     protected function logger() {
         if(!$this->log instanceof LoggerInterface) {
             // if verbose output is on
-            $v = $this->getOpt('verbose');
-
-            $threshold = 0;
-            if(isset($v)) {
-                $threshold = 1;
-                if(is_array($v)) {
-                    $threshold = min(3, count($v));
-                }
-            }
-
-            $limits = array(
-                0 => 500, // nil verbosity: exceptional behaviour only
-                1 => 250, // min verbosity: significant events
-                2 => 200, // mod verbosity: most things
-                3 => 100  // max verbosity: EV-ER-Y-THING...
-            );
-
-            $opts = $this->getOpt('fields') ?: array();
-            $this->log = new Logger(STDOUT, STDERR, $limits[$threshold], $opts, in_array('porcelain', $opts));
+            $level     = $this->getOpt('level');
+            $fields    = $this->getOpt('fields') ?: array();
+            $porcelain = in_array('porcelain', $fields);
+            $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
         }
         return $this->log;
     }

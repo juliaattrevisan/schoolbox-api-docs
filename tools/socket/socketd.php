@@ -30,6 +30,8 @@ foreach($fields as $k => $name) {
     }
 }
 
+$flags = implode(' ', array_slice($argv, 1));
+
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -38,7 +40,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Socket', array(
 	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'port'    => empty($opts['p']) ? 9081 : $opts['p'],
 	'conf'    => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
-    'fields'  => $fields
+    'fields'  => array_values($fields),
+    'flags'   => $flags
 ));
 
 // CREATE WEBSOCKET APP
@@ -69,7 +72,8 @@ $kernel->run(function($di, $loop, $log, $opts) {
 			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
 			isset($queueWarnSize) ? (int)$queueWarnSize : DefaultDispatchStrategy::QUEUE_SIZE_WARN,
 			isset($queueMaxSize)  ? (int)$queueMaxSize  : DefaultDispatchStrategy::QUEUE_SIZE_MAX,
-			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT
+			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT,
+            $opts['flags']
 		);
 
 		$log->info(sprintf("Current strat: workers [%d - %d], queueing (%dms <= %d)",
@@ -80,7 +84,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
 		));
 	}
 	else {
-		$poolStrat = new DefaultDispatchStrategy();
+		$poolStrat = new DefaultDispatchStrategy($opts['flags']);
 		$log->warning("Couldn't read config: using default strat");
 	}
 

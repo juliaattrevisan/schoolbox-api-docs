@@ -30,13 +30,16 @@ foreach($fields as $k => $name) {
     }
 }
 
+$flags = implode(' ', array_slice($argv, 1));
+
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
 	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'errors'  => E_ALL,
-    'fields'  => $fields
+    'fields'  => array_values($fields),
+    'flags'   => $flags
 ));
 
 $sched = null;
@@ -61,7 +64,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	 */
 
 	try {
-		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper());
+		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper(), $opts['flags']);
 		$sched = new Scheduler($loop, $strat, $log);
 
 		// read STDIN in the stream loop so we can communicate with it in dev mode
