@@ -39,6 +39,21 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
     private $actionable;
 
     /**
+     * Are links to quizzes shown? Currently always equal to $this->actionable
+     *
+     * @var bool
+     */
+    private $showQuizLink;
+
+    /**
+     * Are links to assessments shown? Currently equal to $actionable, unless
+     * user is a parent and restrict_student_submissions is off - then it's true
+     *
+     * @var bool
+     */
+    private $showAssessLink;
+
+    /**
      * Business logic to collate data ready for output
      * @return bool
      */
@@ -82,10 +97,16 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             return false;
         }
 
+        // Show assess or quiz links? Depends on $actionable
+        $this->showAssessLink = $this->actionable;
+        $this->showQuizLink   = $this->actionable;
+
         // if this is a parent viewing their child's work
         if($groupHandler->isParentOfChild($this->userID)) {
             // Check if system config restrict_student_submissions is on.
-            $this->restrictedMode = Cfg::get('restrict_parent_grades');
+            // Parents can view assess links if it's off.
+            $this->restrictedMode = Config::get('restrict_parent_grades');
+            $this->showAssessLink = !Config::get('restrict_student_submissions');
         }
 
         foreach($upcoming as $item) {
@@ -180,8 +201,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             if($item['kind'] == 0) {
                 // duework
                 $output['UPCOMING_HREF'] = '/submission/submissionHistory/' . $item['id'] . '/' . $this->userID;
-
-				$output['upcoming_work_actionable_block'] = '';
+                $output['upcoming_work_actionable_block'] = '';
+                $output['showLink'] = $this->showAssessLink;
             }
             else {
                 // assess
@@ -226,6 +247,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 					$output['UPCOMING_HREF'] = '/assess/intro/' . $item['id'];
 					$output['upcoming_work_actionable_block'] = '';
 				}
+                $output['showLink'] = $this->showQuizLink;
             }
 
             // if the actionable flag is false, don't display the buttons
