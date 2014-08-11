@@ -43,6 +43,14 @@ class Assess_Question_Bank extends Evaluation_Question_Bank {
 	private function setContext() {
 		$this->getQuestionHandler()->_table = 'assess_question_bank';
 		$this->getQuestionHandler()->_index = 'question_bank_id';
+
+		/* Use context-specific fields
+		 */
+		$this->getQuestionHandler()->setAllowedFields(array(
+			'question_bank_id', 'question_category_id', 'type_id',
+			'question', 'answer', 'marks',
+			'config', 'deleted_at'
+		));
 	}
 
 	/* Getters/Setters

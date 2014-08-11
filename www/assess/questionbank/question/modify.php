@@ -23,10 +23,7 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
 
-	$questionBank = new Assess_Question_Bank();
-
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
-    $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
 	/* If configuration was provided
 	 */
@@ -49,10 +46,10 @@ if (!empty($_POST)) {
 	$data = $_POST;
 	$data['config'] = json_encode($config);
 
-	new \Alaress_Probe($data);
-	die();
-    $questionHandler->update($data);
-    $answerHandler->update($_POST);
+	/* Context-specific questionHandler
+	 */
+	$questionBank = new Assess_Question_Bank();
+    $questionBank->getQuestionHandler()->update($data);
 
     /* Find the assess summary page
      */
