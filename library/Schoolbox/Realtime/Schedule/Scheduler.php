@@ -219,7 +219,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 		$this->log->notice("HUP received", array('char' => '>'));
 		$this->log->debug("Invalidating config cache");
 		$this->conf->dropCache();
-        $this->log->debug("Releasing workers");
+		$this->log->debug("Releasing workers");
 		$this->dispatcher->releaseWorkerPool(false);
 	}
 
