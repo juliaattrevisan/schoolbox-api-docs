@@ -20,9 +20,9 @@ if (!empty($_POST)) {
         error(116);
     }
 
-    $section = $sectionHandler->getByID($_POST['section_id']);
-    $assess = $assessHandler->getByID($section['assess_id']);
-
+//    $section = $sectionHandler->getByID($_POST['section_id']);
+//    $assess = $assessHandler->getByID($section['assess_id']);
+//
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
 
 	/* If configuration was provided

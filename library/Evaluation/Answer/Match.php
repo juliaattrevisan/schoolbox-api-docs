@@ -102,6 +102,31 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Render answers in the QuestionBank
+	 *
+	 * @param  $page
+	 * @param string $answerGroup
+	 * @return void
+	 */
+	public function modifyInQuestionBank($page, $answerGroup) {
+		if (strlen($answerGroup)) {
+			$allAnswers = unserialize($answerGroup);
+
+			foreach ($allAnswers as $currentAnswer) {
+				$page->setVar(array(
+					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+					'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
+				));
+
+				$page->parse('answerOption_block', 'answerOption', true);
+			}
+		}
+		else {
+			$page->setVar('answerOption_block', '');
+		}
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
