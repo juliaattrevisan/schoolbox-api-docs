@@ -240,8 +240,9 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	public function onTerminate() {
 		$this->log->error("Cleaning up and terminating");
 		// die safely
-		unset($this->dispatcher);
-		exit;
+        $this->dispatcher->releaseWorkerPool(false);
+//		unset($this->dispatcher);
+		$this->loop->stop();
 	}
 
 
