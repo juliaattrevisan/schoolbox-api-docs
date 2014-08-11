@@ -658,10 +658,20 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		foreach ($this->database->getAll($query) as $row) {
 			$timetableCode = $row['TimetableGroup'];
 			if (!array_key_exists($timetableCode, $campusTimetableList)) {
-				$campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableCode);
-				$campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
+				try {
+					$campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableCode);
+					$campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
+				}
+				catch (\Schoolbox\Mapper\Exception $e) {
+					// No campus found: error out
+					// TODO: make getTimetableDefinition() accept campus code instead of SB ID
+					$campusTimetableList[$timetableCode] = null;
+				}
 			}
 			$campusTimetable = $campusTimetableList[$timetableCode];
+			if (!isset($campusTimetable)) {
+				continue;
+			}
 
 			// Match day and period against a start and end.
 			for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
