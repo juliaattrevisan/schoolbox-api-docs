@@ -279,6 +279,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         $this->setBlock($templateHandle, 'upcoming_work', 'upcoming_work_block');
         $this->setBlock($templateHandle, 'view_all_due_work', 'view_all_due_work_block');
         $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
+        $this->setBlock('upcoming_work', 'upcoming_work_link', 'upcoming_work_link_block');
+        $this->setBlock('upcoming_work', 'upcoming_work_nolink', 'upcoming_work_nolink_block');
 
         // To display the "view all" button, we must be not restricted
         if($this->restrictedMode) {
@@ -293,6 +295,16 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 $this->setVar($output);
                 if(!isset($output['upcoming_work_actionable_block'])) {
                     $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
+                }
+
+                // show link or no link depending on whether it's readonly
+                $this->setVar('upcoming_work_link_block', '');
+                $this->setVar('upcoming_work_nolink_block', '');
+                if ($output['showLink']) {
+                    $this->parse('upcoming_work_link_block', 'upcoming_work_link');
+                }
+                else {
+                    $this->parse('upcoming_work_nolink_block', 'upcoming_work_nolink');
                 }
                 $this->parse('upcoming_work_block','upcoming_work', true);
             }
