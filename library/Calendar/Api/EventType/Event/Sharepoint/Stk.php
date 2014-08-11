@@ -189,7 +189,9 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 						$b = $soap->GetListItems(new SoapVar($payload, XSD_ANYXML));
 						return serialize($b);
 					},
-					array($xmlPayload->getPayload())
+					array($xmlPayload->getPayload()),
+                    // May as well hardcode this, the whole thing is hardcoded
+                    300
 				)
 			);
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
