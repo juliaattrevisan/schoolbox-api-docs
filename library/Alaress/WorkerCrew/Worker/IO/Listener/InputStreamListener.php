@@ -120,7 +120,8 @@ class InputStreamListener extends AbstractIOStreamListener {
             ob_end_clean();
         }
         catch(IOException $e) {
-            // this means the pipe has been broken; no point logging, no point carrying on. everything is meaningless.
+            // this means the pipe or connection to an external service has been broken
+            // no point logging, no point carrying on. everything is meaningless.
             $this->loop->stop();
         }
         catch(ErrorException $e) {

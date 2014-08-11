@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\Daemon;
 
+use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Aura\Di;
 use ErrorException;
@@ -200,6 +201,9 @@ EOL;
             $this->logger()->error("$errStr in $errFile:$errLine");
 			return;
 		}
+        if(strpos($errStr, 'fwrite') === 0) {
+            throw new IOException($errStr, $errNum);
+        }
 		if(strpos($errStr, 'unserialize') === 0) {
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
@@ -217,7 +221,7 @@ EOL;
 		if(strpos($errStr, 'pclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
-        $this->logger()->info("$errStr in $errFile:$errLine [$errNum]");
+        $this->logger()->info("$errStr in $errFile:$errLine [$errNum]", array('char' => 'e'));
 
 		throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 	}
