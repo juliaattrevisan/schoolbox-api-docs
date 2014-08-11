@@ -10,7 +10,6 @@
 namespace Alaress\Mail;
 
 
-use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -20,6 +19,7 @@ use Swift_Mailer;
 use Swift_MailTransport;
 use Swift_Message;
 use Swift_SmtpTransport;
+use Swift_SwiftException;
 use Swift_Transport;
 
 abstract class AbstractMailer implements IMailer {
@@ -193,7 +193,7 @@ abstract class AbstractMailer implements IMailer {
 			$this->configureSwiftMailer($mailer);
 			$mailer->send($this->email);
 		}
-		catch (Exception $ex) {
+		catch (Swift_SwiftException $ex) {
 			return false;
 		}
 		return true;
