@@ -1,11 +1,11 @@
 <?php
-/************************************************************
- *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides access to synergetic timetable info    *
- *                                                           *
- ************************************************************/
+/**
+ * Synergetic implementation of External_TimetableInterface
+ *
+ * @author    Alaress Pty Ltd
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
 use Alaress\DebugBar\Instance as DebugBar;
 
