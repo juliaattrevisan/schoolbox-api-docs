@@ -52,7 +52,7 @@ abstract class AbstractProcess implements WorkerInterface {
 
         // listen to STDIN for commands
         $listener = new InputStreamListener($log, $loop, $strat->getProtocol(), $writer, $this);
-        $stream   = new IOStream(STDIN, $loop, $listener);
+        $stream   = new IOStream(fopen('php://stdin', 'r'), $loop, $listener);
         $stream->bufferSize = $this->strat->getProtocol()->chunkLength();
 
 		$this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));

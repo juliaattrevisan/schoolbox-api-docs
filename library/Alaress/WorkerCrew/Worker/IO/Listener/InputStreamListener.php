@@ -109,6 +109,7 @@ class InputStreamListener extends AbstractIOStreamListener {
             ob_start();
 
             $this->buffering = false;
+            $this->log->debug('Data transfer complete (got '.strlen($this->buffer).' bytes), starting work');
             $this->writer->write($this->worker->parse($this->buffer));
             $this->log->debug("Task Complete");
 
