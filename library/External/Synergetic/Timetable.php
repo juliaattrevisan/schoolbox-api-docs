@@ -60,12 +60,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
 
             $timetableDef['desc'][]     = $period['Description'];
-            $timetableDef['start'][]    = (int) $TimeFromMatches[1] . ':' . $TimeFromMatches[2] . strtolower(
-                    $TimeFromMatches[3]
-                );
-            $timetableDef['end'][]      = (int) $TimeToMatches[1] . ':' . $TimeToMatches[2] . strtolower(
-                    $TimeToMatches[3]
-                );
+            $timetableDef['start'][]    =
+                (int)$TimeFromMatches[1]
+                . ':' . $TimeFromMatches[2]
+                . strtolower($TimeFromMatches[3]);
+            $timetableDef['end'][]      =
+                (int)$TimeToMatches[1]
+                . ':' . $TimeToMatches[2]
+                . strtolower($TimeToMatches[3]);
             $timetableDef['number'][]   = $period['PeriodNumber'];
             $timetableDef['sequence'][] = $period['PeriodNumberSeq'];
             $periodCount++;
@@ -111,8 +113,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return false;
         }
 
-        // if operating on a 5-day timetable
         if ($days == 5) {
+            // if operating on a 5-day timetable
             $day = date("w", $date);
             if ($day < 1 || $day > 5) {
                 $day = 1;
@@ -141,9 +143,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 return $day;
             }
 
-        } // if operating on a 7-day timetable
-        else if ($days == 7) {
-
+        } elseif ($days == 7) {
+            // if operating on a 7-day timetable
             $startDate = $this->getLastSynergeticDay($date, $campus);
 
             //find number of days between both dates
@@ -159,9 +160,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $currentDay = $currentDay % 7 + 1;
             }
             return $currentDay;
-        } // if operating on a 10-day timetable
-        else if ($days == 10) {
-
+        } elseif ($days == 10) {
+            // if operating on a 10-day timetable
             $startDate = $this->getLastSynergeticDay($date, $campus);
 
             if ($this->synergeticDay[$startDate] > 5) {
@@ -170,7 +170,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             $startDate = $startDate - ($this->synergeticDay[$startDate] * 86400);
 
-            if (!$startDate) { //Just assume the start of the year if we cannot find anything
+            if (!$startDate) {
+                // Just assume the start of the year if we cannot find anything
                 $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
             }
 
@@ -181,18 +182,21 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             if (($weeks % 2) == 0) {
                 $day = date('w', $date);
-                if ($day < 1) { //on sundays move it forward
+                if ($day < 1) {
+                    // on sundays move it forward
                     $day = 1;
                 }
             } else {
                 $day = date('w', $date) + 5;
-                if ($day < 6) { //on sundays move it forward
+                if ($day < 6) {
+                    // on sundays move it forward
                     $day = 6;
                 }
 
             }
             return $day;
-        } else { //unknown day number
+        } else {
+            // unknown day number
             return 0;
         }
     }
@@ -233,10 +237,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $result = $this->getDatabase()->query($query);
         //Cache all date and days into variable
         while ($day = $this->getDatabase()->getNextArray($result)) {
-
             //cut out d from CalenderType string
             preg_match('/d([0-9]+)/i', $day['type'], $match);
-
             if ($match[1] > 0 and $match[1] <= $days) {
                 $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
             }
@@ -248,9 +250,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 return $date;
             }
         } else {
-
             /*  Else get calendar dates from the general pool   */
-
             $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) AS startDate, CalendarEvents.CalendarType AS type
                 FROM SynergyOne.dbo.CalendarEvents CalendarEvents
                 WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
@@ -481,7 +481,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND PeriodNumber <= " . $timetabledef['periodCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         } else {
-
             // if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query
             if ($timetabledef['dayCount'] == null) {
                 $timetabledef['dayCount'] = 0;
