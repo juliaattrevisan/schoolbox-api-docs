@@ -15,48 +15,39 @@ $database = Database::getInstance();
 // Torn directly from adminv2/list
 $tableList = array(
     array(
-        'name' => 'groups',
-        'title' => 'Roles',
+        'name'  => 'groups',
         'index' => 'id',
     ),
     array(
-        'name' => 'house',
-        'title' => 'Houses',
-        'index' => 'id'
-    ),
-    array(
-        'name' => 'luResidentialHouse',
-        'title' => 'Residential Houses',
-        'index' => 'id'
-    ),
-    array(
-        'name' => 'luCampus',
-        'title' => 'Campus',
+        'name'  => 'house',
         'index' => 'id',
     ),
     array(
-        'name' => 'luEventType',
-        'title' => 'Event Types',
-        'index' => 'eventTypeID'
+        'name'  => 'luResidentialHouse',
+        'index' => 'id',
     ),
     array(
-        'name' => 'newsTopic',
-        'title' => 'News Topics',
-        'index' => 'newsTopicID'
+        'name'  => 'luCampus',
+        'index' => 'id',
     ),
     array(
-        'name' => 'submission_grade',
-        'title' => 'Submission Grades',
-        'index' => 'grade_id'
+        'name'  => 'luEventType',
+        'index' => 'eventTypeID',
     ),
     array(
-        'name' => 'component_definition',
-        'title' => 'Components',
+        'name'  => 'newsTopic',
+        'index' => 'newsTopicID',
+    ),
+    array(
+        'name'  => 'submission_grade',
+        'index' => 'grade_id',
+    ),
+    array(
+        'name'  => 'component_definition',
         'index' => 'id',
     ),
     array(
         'name' => 'lu_timetable_colour',
-        'title' => 'Timetable Colours',
         'index' => 'timetable_colour_id'
     ),
 );
