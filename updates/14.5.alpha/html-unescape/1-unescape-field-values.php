@@ -50,6 +50,10 @@ $tableList = array(
         'name' => 'lu_timetable_colour',
         'index' => 'timetable_colour_id'
     ),
+    array(
+        'name'  => 'submission_mark_type',
+        'index' => 'mark_type_id',
+    ),
 );
 
 foreach ($tableList as $table) {
