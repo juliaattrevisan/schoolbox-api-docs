@@ -536,7 +536,7 @@ class Leave_Core_Report_House_Web {
 			foreach ($this->getHouseList() as $house) {
 				$this->getPage()->setVar(array(
                     'HOUSE_ID' => $house->getId(),
-                    'HOUSE_NAME' => $house->getHouse()
+                    'HOUSE_NAME' => Scrub::text($house->getHouse())
                 ) );
 
 				if ($house->getId() == $this->getCurrentHouse()->getId()) {
@@ -558,7 +558,7 @@ class Leave_Core_Report_House_Web {
 		$currentTime = new Alaress_Date_Format(time(), 'U');
 
 		$this->getPage()->setVar(array(
-			'HOUSE_NAME' => $this->getCurrentHouse()->getHouse(),
+			'HOUSE_NAME' => Scrub::text($this->getCurrentHouse()->getHouse()),
 			'HOUSE_ID' => $this->getCurrentHouse()->getId(),
 			'GENERATED_AT' => $currentTime->getShort(),
 			'REPORT_DATE' => $this->getReportDate(),

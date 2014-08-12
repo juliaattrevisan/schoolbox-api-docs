@@ -85,7 +85,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract {
 				 */
 				$this->getPage()->setVar(array(
 					'HOUSE_ID' => $data['houseList'][0][$i]['houseId'],
-					'HOUSE_NAME' => $data['houseList'][0][$i]['name'],
+					'HOUSE_NAME' => Scrub::text($data['houseList'][0][$i]['name']),
 					'CLASS' => $i % 2 ? 'dark' : '',
 				));
 

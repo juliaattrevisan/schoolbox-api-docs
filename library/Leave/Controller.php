@@ -524,7 +524,7 @@ class Leave_Controller extends Controller {
 				'USER_NAME' => $user->formatName(),
 				'USER_EXTERNAL_ID' => $user->getExternalId(),
 				'USER_YEAR' => $user->getYear(),
-				'USER_HOUSE' => $house->getHouse(),
+				'USER_HOUSE' => Scrub::text($house->getHouse()),
 				'USER_HOUSE_ID' => $house->getId(),
 				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
 				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
@@ -614,7 +614,7 @@ class Leave_Controller extends Controller {
                     'USER_NAME' => $request->getAuthor()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
-                    'USER_HOUSE' => $house->getHouse(),
+                    'USER_HOUSE' => Scrub::text($house->getHouse()),
                     'USER_HOUSE_ID' => $house->getId(),
                     'HOST_TYPE' => $request->getHostType(),
                     'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
@@ -822,7 +822,7 @@ class Leave_Controller extends Controller {
         $this->getPage()->setVar(
             array(
                 'HOUSE_ID' => $house->getId(),
-                'HOUSE_NAME' => $house->getHouse()
+                'HOUSE_NAME' => Scrub::text($house->getHouse())
             )
         );
 
@@ -1003,7 +1003,7 @@ class Leave_Controller extends Controller {
                 array(
                     'USER_ID' => $user->getId(),
                     'USER_NAME' => $user->formatName(),
-                    'HOUSE_NAME' => $house->getHouse(),
+                    'HOUSE_NAME' => Scrub::text($house->getHouse()),
                     'HOUSE_ID' => $house->getId(),
                     'ALLOWED_ACTION' => $this->hasApprovePermission() ? 'modify' : 'view',
                 )

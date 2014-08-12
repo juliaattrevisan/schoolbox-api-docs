@@ -548,7 +548,7 @@ class Leave_Kings_Report_House_Web {
                 $this->getPage()->setVar(
                     array(
                         'HOUSE_ID' => $house->getId(),
-                        'HOUSE_NAME' => $house->getHouse()
+                        'HOUSE_NAME' => Scrub::text($house->getHouse())
                     )
                 );
 
@@ -571,7 +571,7 @@ class Leave_Kings_Report_House_Web {
 
         $this->getPage()->setVar(
             array(
-                'HOUSE_NAME' => $this->getCurrentHouse()->getHouse(),
+                'HOUSE_NAME' => Scrub::text($this->getCurrentHouse()->getHouse()),
                 'HOUSE_ID' => $this->getCurrentHouse()->getId(),
                 'GENERATED_AT' => $currentTime->getShort(),
                 'REPORT_DATE' => $this->getReportDate(),
