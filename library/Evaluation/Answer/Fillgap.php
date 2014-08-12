@@ -102,6 +102,16 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		));
 	}
 
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return $data;
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
