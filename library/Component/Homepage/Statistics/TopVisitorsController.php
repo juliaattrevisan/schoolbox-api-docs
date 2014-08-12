@@ -6,11 +6,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_Statistics_TopVisitorsController extends Component_Homepage_Statistics_ControllerAbstract {
-
+class Component_Homepage_Statistics_TopVisitorsController extends Component_Homepage_Statistics_ControllerAbstract
+{
     private $visitors;
 
-    public function execute() {
+    public function execute()
+    {
         $visitors = array();
 
         $dateFilter = '';
@@ -53,7 +54,8 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
     }
 
 
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'topVisitors')) {
             return false;
         }

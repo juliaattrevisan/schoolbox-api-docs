@@ -204,9 +204,7 @@ class SitePage extends Page
         $this->ajax = $state;
     }
 
-
-    function setLite($state)
-    {
+    function setLite($state) {
         $this->lite = $state;
     }
 
@@ -234,8 +232,7 @@ class SitePage extends Page
      *                              Exits after output if false.
      * @param int   $responseCode   If set, output this response code.
      */
-    public function outputJson($output, $keepProcessing = false, $responseCode = null)
-    {
+    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
             header(':', true, $responseCode);
@@ -320,7 +317,7 @@ class SitePage extends Page
         $this->setFile('bannerTpl', 'include/banner.html');
         $this->setFile('navTpl', 'include/nav.html');
         $this->setFile('tabTpl', 'include/tab.html');
-        $this->setFile('instantTpl', 'include/instant.html');
+	    $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
         $this->renderSideNav();
@@ -414,8 +411,7 @@ class SitePage extends Page
         $_SESSION['lasttime'] = mktime();
     }
 
-
-    function saveHistory($override = '')
+    function saveHistory($override = '') 
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
@@ -1181,7 +1177,7 @@ class SitePage extends Page
 
             if ($url->isLocalUrl()) {
                 $linkUrl = $url->getRelativeURL();
-            } else if ($url->isFTPURL()) {
+            } elseif ($url->isFTPURL()) {
                 $linkUrl = $url->getUrl();
             } else {
                 $linkUrl = $url->getBase64EncodedRedirect();

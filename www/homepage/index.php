@@ -20,31 +20,31 @@ $prefix = 'code';
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     $category = $catHandler->getByID($this->arg[0]);
 
-	/* If the category wasn't found, try searching for a category code with this
+    /* If the category wasn't found, try searching for a category code with this
 	 * numerical value i.e. treat the int as if it were a category code string
 	 */
-	if (!$category) {
-		$category = $catHandler->getByCode($this->arg[0]);
-	}
+    if (!$category) {
+        $category = $catHandler->getByCode($this->arg[0]);
+    }
 }
 /* If a prefixed argument is given, load category code directly
  * e.g. /homepage/$prefix/EN344
  */
 else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
-	$items = $this->arg;
-	array_shift($items);
+    $items = $this->arg;
+    array_shift($items);
 
-	$code = implode('/', $items);
-	$category = $catHandler->getByCode(urldecode(urldecode($code)));
+    $code = implode('/', $items);
+    $category = $catHandler->getByCode(urldecode(urldecode($code)));
 }
 /* When just an alphabetical category code provided
  * e.g. /homepage/EN344
  */
 else if (!is_numeric($this->arg[0])) {
-	$items = $this->arg;
-	$code = implode('/', $items);
+    $items = $this->arg;
+    $code = implode('/', $items);
 
-	$this->localRedir("/homepage/{$prefix}/$code");
+    $this->localRedir("/homepage/{$prefix}/$code");
 }
 
 // if we still have no category, advise that these are not the droids you're looking for
@@ -99,8 +99,7 @@ if ($permission >= WRITE_ACCESS) {
     if (Cfg::get('homepage_enable_colour')) {
         $this->parse('homepage_color_link_block',     'homepage_color_link');
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
-    }
-    else {
+    } else {
         $this->setVar('homepage_color_link_block', '');
         $this->setVar('homepage_color_selector_block', '');
     }
@@ -173,8 +172,7 @@ if ($permission >= WRITE_ACCESS) {
             $tabList[$component->getComponentCategory()]['count']++;
 
         }
-    }
-    else {
+    } else {
         $this->setVar(array(
             'homepage_component_block' => '',
             'homepage_component_page_block' => 'No components are available for you to add.',
@@ -253,8 +251,7 @@ $codeArray = explode(',', $code);
 
 if(count($codeArray) > 4) {
     $codeString = Scrub::text(implode(',',array_slice($codeArray, 0, 4)).'....');
-}
-else {
+} else {
     $codeString = Scrub::text($code);
 }
 

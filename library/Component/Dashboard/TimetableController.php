@@ -9,8 +9,8 @@
  *
  */
 
-class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract {
-
+class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
+{
     private $externalTimetable;
 
     private $dayNumber = array();
@@ -24,7 +24,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private $colourList;
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable)
+    {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
@@ -32,8 +33,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->category = $category;
     }
 
-    public function execute() {
-
+    public function execute()
+    {
         if (!($_SESSION['timetable'] && Cfg::get('external_enable'))) {
             return false;
         }
@@ -70,7 +71,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     }
 
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!$this->loadTemplate($templateHandle, 'timetable')) {
             return false;
         }
@@ -105,25 +107,24 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $attendance_date = $now->getDatabaseDate();
 
         foreach ($this->timetable as $campus_id => $timetable) {
-			$classCount = 0;
+            $classCount = 0;
 
-			/* Find out if the current campus timetable has any classes associated
+            /* Find out if the current campus timetable has any classes associated
 			 * with the timetable definition. If not, skip its rendering altogether
 			 */
-			if (is_array($timetable) && count($timetable)) {
-				foreach($timetable as $currentPeriod) {
-					if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
-						$classCount++;
-					}
-				}
-			}
+            if (is_array($timetable) && count($timetable)) {
+                foreach($timetable as $currentPeriod) {
+                    if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
+                        $classCount++;
+                    }
+                }
+            }
 
             if (is_array($timetable) && !empty($timetable) && $classCount) {
                 if ($timetable_count > 1) {
                     $this->setVar("CAMPUS_NAME", $campus_list[$campus_id]->getName());
                     $this->parse('timetable_campus_name_block', 'timetable_campus_name');
-                }
-                else {
+                } else {
                     $this->setVar('timetable_campus_name_block', '');
                 }
                 $this->setVar("DAYNUMBER", $this->dayNumber[$campus_id]);
@@ -176,6 +177,23 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             $this->setVar('PERIOD_ROOM', $period['room']);
                             $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
 
+                            if ($current_period['PeriodNumber'] == $period['periodNumber']) {
+                                $this->setVar(
+                                    array(
+                                        'PERIOD_CLASS' => 'current',
+                                        'PERIOD_TH_CLASS' => 'dayCurrent'
+                                    )
+                                );
+                            }
+                            else {
+                                $this->setVar(
+                                    array(
+                                        'PERIOD_CLASS' => 'normal',
+                                        'PERIOD_TH_CLASS' => 'normal'
+                                    )
+                                );
+                            }
+
                             /* Handle colour array */
                             if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
                                 if (!($this->colourList->offsetExists($colourIndex))) {
@@ -190,8 +208,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             $cat = $this->category->getByCode($period['code']);
                             if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
                                 $this->parse('period_class_link_block', 'period_class_link');
-                            }
-                            else {
+                            } else {
                                 $this->parse('period_class_block', 'period_class');
                             }
 
@@ -211,8 +228,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->parse('has_attendances_block', 'has_attendances');
                             }
-                        }
-                        else {
+                        } else {
                             $this->setVar(
                                 array(
                                     'PERIOD_COLOUR' => '',

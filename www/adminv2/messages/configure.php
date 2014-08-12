@@ -3,7 +3,7 @@ use Monolog\Logger;
 use Schoolbox\Role;
 
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,38 +11,38 @@ use Schoolbox\Role;
  */
 
 if(!isset($this)) {
-	require_once '../../../include/Bootstrap.php';
-	if(!isset($_POST)) {
-		SitePage::localRedir('/adminv2/messages/configure');
-	}
+    require_once '../../../include/Bootstrap.php';
+    if(!isset($_POST)) {
+        SitePage::localRedir('/adminv2/messages/configure');
+    }
 
-	// you gotst permishunz?
-	session_start();
-	$groupHandler = new Group();
-	if(!$groupHandler->isSuperuser()) {
-		error(19);
-	}
+    // you gotst permishunz?
+    session_start();
+    $groupHandler = new Group();
+    if(!$groupHandler->isSuperuser()) {
+        error(19);
+    }
 
 
-	header('Content-Type: application/json');
-	// do ajax
+    header('Content-Type: application/json');
+    // do ajax
 
-	$data = array($_POST);
+    $data = array($_POST);
 
-	try {
+    try {
 
-		foreach($_POST['data'] as $namespace => $keys) {
-			foreach($keys as $key => $roleIds) {
-				foreach($roleIds as $roleId => $state) {
+        foreach($_POST['data'] as $namespace => $keys) {
+            foreach($keys as $key => $roleIds) {
+                foreach($roleIds as $roleId => $state) {
 
-					$enabled = !!$state['enabled'];
-					$levels  = isset($state['level']) ? $state['level'] : array();
+                    $enabled = !!$state['enabled'];
+                    $levels  = isset($state['level']) ? $state['level'] : array();
 
-					$data[] = array($namespace, $key, $roleId, $enabled, $levels);
+                    $data[] = array($namespace, $key, $roleId, $enabled, $levels);
 
-					if($enabled) {
+                    if($enabled) {
 
-						$query = "
+                        $query = "
 							INSERT INTO msg_route_perm (
 							    msg_source_id, role_id, min_level, max_level, default_level
 							) VALUES (
@@ -64,21 +64,20 @@ if(!isset($this)) {
 						";
 
 
-						// insert / update so it will show up for users of that group
-						$stmt = Database::getInstance()->prepare($query);
-						$stmt->execute(array(
-							'min'     => $levels['min'],
-							'max'     => $levels['max'],
-							'default' => $levels['default'],
-							'role_id' => $roleId,
-							'key'     => $key,
-							'slug'    => $namespace
-						));
+                        // insert / update so it will show up for users of that group
+                        $stmt = Database::getInstance()->prepare($query);
+                        $stmt->execute(array(
+                            'min'     => $levels['min'],
+                            'max'     => $levels['max'],
+                            'default' => $levels['default'],
+                            'role_id' => $roleId,
+                            'key'     => $key,
+                            'slug'    => $namespace
+                        ));
 
-					}
-					else {
-						// delete
-						$query = "
+                    } else {
+                        // delete
+                        $query = "
 							DELETE FROM msg_route_perm
 							WHERE msg_source_id = (
 								SELECT src.id
@@ -92,32 +91,31 @@ if(!isset($this)) {
 							AND role_id = :role_id
 						";
 
-						$stmt = Database::getInstance()->prepare($query);
-						$stmt->execute(array(
-							'role_id' => $roleId,
-							'key'     => $key,
-							'slug'    => $namespace
-						));
-					}
-				}
-			}
-		}
+                        $stmt = Database::getInstance()->prepare($query);
+                        $stmt->execute(array(
+                            'role_id' => $roleId,
+                            'key'     => $key,
+                            'slug'    => $namespace
+                        ));
+                    }
+                }
+            }
+        }
 
-	}
-	catch(Exception $e) {
-		header(':', true, 500);
-		$data[] = $e->getTrace();
-	}
+    } catch(Exception $e) {
+        header(':', true, 500);
+        $data[] = $e->getTrace();
+    }
 
-	echo json_encode($data);
+    echo json_encode($data);
 
-	exit;
+    exit;
 }
 
 
 $groupHandler = new Group();
 if(!$groupHandler->isSuperuser()) {
-	error(19);
+    error(19);
 }
 
 /** @var SitePage $this */
@@ -134,7 +132,7 @@ $roletypes = array('parent','student','staff');
 $filter = isset($this->arg[0]) && in_array($this->arg[0], $roletypes) ? $this->arg[0] : null;
 
 if($filter) {
-	$stmt = $db->prepare("
+    $stmt = $db->prepare("
 		SELECT *
 		FROM msg_namespace ns
 		LEFT JOIN msg_source src ON ns.id = src.namespace
@@ -143,10 +141,9 @@ if($filter) {
 		WHERE g.group_type = ?
 		ORDER BY slug, src.key, g.id
 	");
-	$stmt->execute(array($filter));
-}
-else {
-	$stmt = $db->prepare("
+    $stmt->execute(array($filter));
+} else {
+    $stmt = $db->prepare("
 		SELECT *
 		FROM msg_namespace ns
 		LEFT JOIN msg_source src ON ns.id = src.namespace
@@ -154,71 +151,71 @@ else {
 		LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.id = perm.role_id
 		ORDER BY slug, src.key, g.id
 	");
-	$stmt->execute();
+    $stmt->execute();
 
-	// override blank to the string 'all' for display
-	$filter = 'all';
+    // override blank to the string 'all' for display
+    $filter = 'all';
 }
 
 $data = array();
 
 // build yo data structure
 while($r = $stmt->fetch(PDO::FETCH_NUM)) {
-	$r = slice($r);
+    $r = slice($r);
 
-	// identifiers
-	$slug = $r['ns']['slug'];
-	$source = $r['source']['key'] . sha1($r['source']['description']);
-	$role = $r['role']['id'];
+    // identifiers
+    $slug = $r['ns']['slug'];
+    $source = $r['source']['key'] . sha1($r['source']['description']);
+    $role = $r['role']['id'];
 
 
-	//// NAMESPACE ////
+    //// NAMESPACE ////
 
 //	if(is_null($slug)) {
 //		continue;
 //	}
-	if(!isset($data['namespace'][$slug])) {
-		$data['namespace'][$slug] = $r['ns'];
-		$data['namespace'][$slug]['source'] = array();
-	}
-	$dns = &$data['namespace'][$slug];
+    if(!isset($data['namespace'][$slug])) {
+        $data['namespace'][$slug] = $r['ns'];
+        $data['namespace'][$slug]['source'] = array();
+    }
+    $dns = &$data['namespace'][$slug];
 
 
-	//// SOURCE ////
+    //// SOURCE ////
 
 //	if(is_null($source)) {
 //		continue;
 //	}
-	if(!isset($dns['source'][$source])) {
-		$dns['source'][$source] = $r['source'];
-		$dns['source'][$source]['roles'] = array();
-	}
-	$dsource = &$dns['source'][$source];
+    if(!isset($dns['source'][$source])) {
+        $dns['source'][$source] = $r['source'];
+        $dns['source'][$source]['roles'] = array();
+    }
+    $dsource = &$dns['source'][$source];
 
 
-	//// ROLE ////
+    //// ROLE ////
 
-	if(!isset($dsource['roles'][$role])) {
-		$dsource['roles'][$role] = $r['role'];
-		$dsource['roles'][$role]['perms'] = array();
-	}
-	$drole = &$dsource['roles'][$role];
+    if(!isset($dsource['roles'][$role])) {
+        $dsource['roles'][$role] = $r['role'];
+        $dsource['roles'][$role]['perms'] = array();
+    }
+    $drole = &$dsource['roles'][$role];
 
 
-	//// PERM ////
+    //// PERM ////
 
 //	if(is_null($r['perm']['min_level'])) {
 //		continue;
 //	}
-	$drole['perms'][] = $r['perm'];
+    $drole['perms'][] = $r['perm'];
 
 }
 
 $methods = array(
-	0               => 'Off',
-	Logger::INFO    => 'Digest',
-	Logger::NOTICE  => 'Instant',
-	Logger::WARNING => '+ Email',
+    0               => 'Off',
+    Logger::INFO    => 'Digest',
+    Logger::NOTICE  => 'Instant',
+    Logger::WARNING => '+ Email',
 );
 
 
@@ -235,130 +232,127 @@ $this->setBlock('role', 'perm_option', 'perm_option_block');
 
 
 foreach(array_merge(array('all'), $roletypes) as $type) {
-	$output = array(
-		'FILTER_NAME' => ucfirst($type),
-		'FILTER_SLUG' => $type == 'all' ? '' : $type,
-	);
+    $output = array(
+        'FILTER_NAME' => ucfirst($type),
+        'FILTER_SLUG' => $type == 'all' ? '' : $type,
+    );
 
-	// if this is the currently selected filter
-	if($filter == $type) {
-		$output['FILTER_CLASS'] = 'current';
-	}
-	else {
-		$output['FILTER_CLASS'] = '';
-	}
+    // if this is the currently selected filter
+    if($filter == $type) {
+        $output['FILTER_CLASS'] = 'current';
+    } else {
+        $output['FILTER_CLASS'] = '';
+    }
 
-	$this->setVar($output);
-	$this->parse('filter_block', 'filter', true);
+    $this->setVar($output);
+    $this->parse('filter_block', 'filter', true);
 }
 
 foreach($data['namespace'] as $namespace) {
-	$this->setVar(array(
-		'NAMESPACE_ID'    => $namespace['id'],
-		'NAMESPACE_SLUG'  => $namespace['slug'],
-		'NAMESPACE_LABEL' => $namespace['label'],
+    $this->setVar(array(
+        'NAMESPACE_ID'    => $namespace['id'],
+        'NAMESPACE_SLUG'  => $namespace['slug'],
+        'NAMESPACE_LABEL' => $namespace['label'],
 
-		'source_block'    => ''
-	));
+        'source_block'    => ''
+    ));
 
-	foreach($namespace['source'] as $source) {
-		$this->setVar(array(
-			'SOURCE_KEY' => $source['key'],
-			'SOURCE_DESCRIPTION' => $source['description'],
-			'SOURCE_ROUTING_KEY' => $source['routing_key'],
+    foreach($namespace['source'] as $source) {
+        $this->setVar(array(
+            'SOURCE_KEY' => $source['key'],
+            'SOURCE_DESCRIPTION' => $source['description'],
+            'SOURCE_ROUTING_KEY' => $source['routing_key'],
 
-			'role_block' => ''
-		));
+            'role_block' => ''
+        ));
 
-		if($source['key']) {
-			foreach($source['roles'] as $role) {
-				$this->setVar(array(
-					'ROLE_ID'   => $role['id'],
-					'ROLE_NAME' => Scrub::text($role['name']),
+        if($source['key']) {
+            foreach($source['roles'] as $role) {
+                $this->setVar(array(
+                    'ROLE_ID'   => $role['id'],
+                    'ROLE_NAME' => Scrub::text($role['name']),
 
-					'perm_block' => '',
-					'perm_option_block' => '',
-					'perm_enabled_block' => ''
-				));
+                    'perm_block' => '',
+                    'perm_option_block' => '',
+                    'perm_enabled_block' => ''
+                ));
 
-				foreach($role['perms'] as $perm) {
+                foreach($role['perms'] as $perm) {
 
-					foreach(array('Off', 'On') as $value => $label) {
-						$this->setVar(array(
-							'PERM_TOGGLE_VALUE' => $value,
-							'PERM_TOGGLE_LABEL' => $label,
-							'PERM_TOGGLE_SELECTED' => is_null($perm['default']) != $value ? 'checked="checked"' : ''
-						));
-						$this->parse('perm_enabled_block', 'perm_enabled', true);
-					}
+                    foreach(array('Off', 'On') as $value => $label) {
+                        $this->setVar(array(
+                            'PERM_TOGGLE_VALUE' => $value,
+                            'PERM_TOGGLE_LABEL' => $label,
+                            'PERM_TOGGLE_SELECTED' => is_null($perm['default']) != $value ? 'checked="checked"' : ''
+                        ));
+                        $this->parse('perm_enabled_block', 'perm_enabled', true);
+                    }
 
-					foreach($methods as $level => $label) {
+                    foreach($methods as $level => $label) {
 //						$disabled = ($level == Logger::INFO) && ($role['digest_schedule'] == Role::DIGEST_NEVER) && false;
 
-						$this->setVar(array(
-							'PERM_OPTION_LABEL'    => $label,
+                        $this->setVar(array(
+                            'PERM_OPTION_LABEL'    => $label,
 //							'PERM_OPTION_SELECTED' => $level == $levelValue ? 'checked="checked"' : '',
 //							'PERM_OPTION_DISABLED' => $disabled ? 'disabled="disabled"' : '',
-						));
-						$this->parse('perm_option_block', 'perm_option', true);
-					}
+                        ));
+                        $this->parse('perm_option_block', 'perm_option', true);
+                    }
 
-					foreach($perm as $levelLabel => $levelValue) {
-						$this->setVar(array(
-							'PERM_LABEL'        => $levelLabel,
-							'PERM_OPTION_VALUE' => $levelValue,
-						));
-						$this->parse('perm_block', 'perm', true);
-					}
+                    foreach($perm as $levelLabel => $levelValue) {
+                        $this->setVar(array(
+                            'PERM_LABEL'        => $levelLabel,
+                            'PERM_OPTION_VALUE' => $levelValue,
+                        ));
+                        $this->parse('perm_block', 'perm', true);
+                    }
 
 
-				}
-				$this->parse('role_block', 'role',  true);
-			}
-			$this->parse('existing_source_block', 'existing_source');
-		}
-		else {
-			$this->setVar('existing_source_block','');
-		}
-		$this->parse('source_readonly_block','source_readonly');
-		$this->setVar('source_editable_block');
-		if($source['key']) {
-			$this->parse('source_block', 'source', true);
-		}
-		else {
-			$this->setVar('source_block', '<p>No events.</p>');
-		}
-	}
-	$this->parse('namespace_block', 'namespace', true);
+                }
+                $this->parse('role_block', 'role',  true);
+            }
+            $this->parse('existing_source_block', 'existing_source');
+        } else {
+            $this->setVar('existing_source_block','');
+        }
+        $this->parse('source_readonly_block','source_readonly');
+        $this->setVar('source_editable_block');
+        if($source['key']) {
+            $this->parse('source_block', 'source', true);
+        } else {
+            $this->setVar('source_block', '<p>No events.</p>');
+        }
+    }
+    $this->parse('namespace_block', 'namespace', true);
 }
 
 
 
 
-function slice($flat) {
-	$map = array(
-		'ns'      => array('id','slug','label'),
-		'source'  => array('id','','key','role_type','description'),
-		'role'    => array('id','name','','','digest_schedule'),
-		'perm'    => array('','','min_level','max_level','default_level')
-	);
+function slice($flat)
+{
+    $map = array(
+        'ns'      => array('id','slug','label'),
+        'source'  => array('id','','key','role_type','description'),
+        'role'    => array('id','name','','','digest_schedule'),
+        'perm'    => array('','','min_level','max_level','default_level')
+    );
 
-	$offset = 0;
+    $offset = 0;
 
-	$sliced = array();
+    $sliced = array();
 
-	foreach($map as $label => $fields) {
-		$sliced[$label] = array_combine($fields, array_slice($flat, $offset, count($fields)));
-		$offset += count($fields);
-		unset($sliced[$label]['']);
-	}
+    foreach($map as $label => $fields) {
+        $sliced[$label] = array_combine($fields, array_slice($flat, $offset, count($fields)));
+        $offset += count($fields);
+        unset($sliced[$label]['']);
+    }
 
-	$sliced['perm'] = array(
-		'max'     => $sliced['perm']['max_level'],
-		'default' => $sliced['perm']['default_level'],
-		'min'     => $sliced['perm']['min_level']
-	);
+    $sliced['perm'] = array(
+        'max'     => $sliced['perm']['max_level'],
+        'default' => $sliced['perm']['default_level'],
+        'min'     => $sliced['perm']['min_level']
+    );
 
-	return $sliced;
+    return $sliced;
 }
-

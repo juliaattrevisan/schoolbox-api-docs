@@ -6,11 +6,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_Statistics_UnvisitedController extends Component_Homepage_Statistics_ControllerAbstract {
-
+class Component_Homepage_Statistics_UnvisitedController extends Component_Homepage_Statistics_ControllerAbstract
+{
     private $unvisitors;
 
-    public function execute() {
+    public function execute()
+    {
         $this->unvisitors = array();
 
         $dateFilter = '';
@@ -106,33 +107,34 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
 
     }
 
-	/**
+    /**
 	 * Render template
 	 *
 	 * @param String $templateHandle
 	 * @return bool
 	 */
-	public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'unvisited')) {
             return false;
         }
 
-		/* Don't want to convert all this stuff to mappers right now.
+        /* Don't want to convert all this stuff to mappers right now.
 		 */
-		$userHandler = new User();
+        $userHandler = new User();
 
         $this->setBlock($templateHandle, 'unvisitor', 'unvisitor_block');
 
         if (count($this->unvisitors)) {
             for ($i = 0; $i < 8 && $i < count($this->unvisitors); ++$i) {
                 $this->setVar(array(
-					'VISITOR_ID' => $this->unvisitors[$i]['id'],
-					'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
-					'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i]),
-					'VISITOR_GROUP' => Scrub::text($this->unvisitors[$i]['gname']),
-					'VISITOR_TOOLTIP' => $userHandler->formatName($this->unvisitors[$i])
-				));
-				
+                    'VISITOR_ID' => $this->unvisitors[$i]['id'],
+                    'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
+                    'VISITOR_NAME' => $userHandler->formatName($this->unvisitors[$i]),
+                    'VISITOR_GROUP' => Scrub::text($this->unvisitors[$i]['gname']),
+                    'VISITOR_TOOLTIP' => $userHandler->formatName($this->unvisitors[$i])
+                ));
+
                 $this->parse('unvisitor_block', 'unvisitor', true);
             }
         } else {

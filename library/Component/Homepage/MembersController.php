@@ -6,15 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract {
-
+class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
+{
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
-
+    public function execute()
+    {
     }
 
     /**
@@ -22,7 +22,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if(!parent::loadTemplate($templateHandle, 'members')) {
             return false;
         }
@@ -31,11 +32,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         //output users of group
         $this->setBlock($templateHandle, "member_email", "member_email_block");
         $this->setBlock($templateHandle, "person", "person_block");
-		$this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-		$this->setBlock('person', 'has_icon', 'has_icon_block');
+        $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
+        $this->setBlock('person', 'has_icon', 'has_icon_block');
 
-		$this->setVar('has_thumbnail_block', '');
-		$this->setVar('has_icon_block', '');
+        $this->setVar('has_thumbnail_block', '');
+        $this->setVar('has_icon_block', '');
         $this->setVar('person_block', '');
 
         /* Display options
@@ -53,10 +54,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             ),
         );
 
-		$display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-		$this->setVar(array(
-			'LIST_STYLE' => $displayOptions[$display]['css'],
-		));
+        $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+        $this->setVar(array(
+            'LIST_STYLE' => $displayOptions[$display]['css'],
+        ));
 
         $userHandler = new User;
         $userList = $userHandler->getAllInCategory($this->getContext('id'));
@@ -79,7 +80,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 }
 
                 $this->setVar(array(
-					'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
                     'PERSON_UID' => $user['uid'],
                     'PERSON_NAME' => $name,
                     'PERSON_EXTERNAL_ID' => $user['synergy_id'],
@@ -87,38 +88,36 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     'LIST_STYLE' => $displayOptions[$display]['css'],
                 ));
 
-				/* Don't display images in list view
+                /* Don't display images in list view
 			   */
-				if ($this->getConfig('displayPortraits') == 'grid') {
-					$this->parse('has_thumbnail_block', 'has_thumbnail');
-					$this->setVar('has_icon_block', '');
-				} else {
-					$this->setVar('has_thumbnail_block', '');
-					$this->parse('has_icon_block', 'has_icon');
-				}
+                if ($this->getConfig('displayPortraits') == 'grid') {
+                    $this->parse('has_thumbnail_block', 'has_thumbnail');
+                    $this->setVar('has_icon_block', '');
+                } else {
+                    $this->setVar('has_thumbnail_block', '');
+                    $this->parse('has_icon_block', 'has_icon');
+                }
 
-				$this->parse('person_block', 'person', true);
+                $this->parse('person_block', 'person', true);
 
-				/* Clear children after parsing out the parent
+                /* Clear children after parsing out the parent
 			   */
-				$this->setVar('has_thumbnail_block', '');
-				$this->setVar('has_icon_block', '');
+                $this->setVar('has_thumbnail_block', '');
+                $this->setVar('has_icon_block', '');
 
-			}
+            }
 
             $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
             $this->setVar("EMAILALL", implode(',', $emailall));
 
-			if (\Cfg::get('mail_enable')) {
-            	$this->parse("member_email_block", "member_email");
-			}
-			else {
-				$this->setVar(array(
-					'member_email_block' => ''
-				));
-			}
-        }
-        else {
+            if (\Cfg::get('mail_enable')) {
+                $this->parse("member_email_block", "member_email");
+            } else {
+                $this->setVar(array(
+                    'member_email_block' => ''
+                ));
+            }
+        } else {
             $this->setVar('member_email_block','');
         }
 

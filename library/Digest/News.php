@@ -17,8 +17,8 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
-class Digest_News {
-
+class Digest_News
+{
     protected $host;
 
     protected $catHandler;
@@ -52,8 +52,8 @@ class Digest_News {
      */
     protected $homepage_activity_component;
 
-    public function __construct($windowStart, $windowEnd, $debug = false) {
-
+    public function __construct($windowStart, $windowEnd, $debug = false)
+    {
         $this->debug = $debug;
 
         $this->host = Cfg::get('site_domain');
@@ -106,7 +106,8 @@ class Digest_News {
         );
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         unset($this->userList);
         unset($this->catHandler);
         unset($this->newsHandler);
@@ -114,7 +115,8 @@ class Digest_News {
         unset($this->textFormatter);
     }
 
-    public function compileUserList(Role $role = null) {
+    public function compileUserList(Role $role = null)
+    {
         $params = array();
         $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.group_id gid, u.local_email, u.alt_email, uc.campus
                 FROM `user` u
@@ -164,7 +166,8 @@ class Digest_News {
      * * missing:  number of users with missing emails
      * * failures: number of failures
      */
-    public function send() {
+    public function send()
+    {
         $keys = array_keys($this->userList);
 
         $this->cli(sprintf("Memory limit: %s", ini_get('memory_limit')));
@@ -182,8 +185,7 @@ class Digest_News {
             if ($result['sendable']) {
                 $this->cli(sprintf("Sending digest to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
                 $summary['total']++;
-            }
-            else {
+            } else {
                 $this->cli(sprintf("No digest to send to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
             }
             if ($result['missing']) {
@@ -206,7 +208,8 @@ class Digest_News {
      *
      * @return string
      */
-    protected function getPosterFromArticle($article) {
+    protected function getPosterFromArticle($article)
+    {
         $poster = sprintf('%s %s', $article['firstname'],  $article['lastname']);
         if ($article['title']) {
             $poster = $article['title'].' '.$poster;
@@ -223,7 +226,8 @@ class Digest_News {
      *
      * @return string
      */
-    protected function getPosterFromUser($user) {
+    protected function getPosterFromUser($user)
+    {
         $poster = $user->getFirstName().' '.$user->getLastName();
         if ($title = $user->getTitle()) {
             $poster = $title.' '.$poster;
@@ -237,7 +241,8 @@ class Digest_News {
      * @param $u
      * @return array
      */
-    protected function compileNews($u) {
+    protected function compileNews($u)
+    {
         $newsList = $this->newsHandler->getFilteredNews($u['id'], $u['campus'], $u['gid']);
 
         $u['articles'] = array('c' => array(), 'h' => array());
@@ -287,7 +292,7 @@ class Digest_News {
         //
         // Sort each type of news - most recent first, then by name.
         foreach ($u['articles'] as &$articles) {
-            usort($articles, function($a, $b) {
+            usort($articles, function ($a, $b) {
                 if ($a['date'] != $b['date']) {
                     return $a['date'] < $b['date'] ? 1 : -1;
                 }
@@ -310,7 +315,8 @@ class Digest_News {
      * * missing:  if email address is missing
      * * error:    if there was an error or not (and what it was if so)
      */
-    protected function sendEmail($u) {
+    protected function sendEmail($u)
+    {
         // do nothing if there's no email address
         if(!trim($u['email'])) {
             return array(
@@ -323,8 +329,7 @@ class Digest_News {
 
         try {
             $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return array(
                 'sendable' => true,
                 'sent'     => false,
@@ -389,8 +394,7 @@ class Digest_News {
                         ));
                         if ($article['image']) {
                             $mailer->parse('image_block', 'image');
-                        }
-                        else {
+                        } else {
                             $mailer->setVar('image_block', '');
                         }
 
@@ -474,15 +478,13 @@ class Digest_News {
                 $mailer->setVar('activity_nolink_block', '');
                 if ($activity['link']) {
                     $mailer->parse('activity_link_block', 'activity_link');
-                }
-                else {
+                } else {
                     $mailer->parse('activity_nolink_block', 'activity_nolink');
                 }
                 $mailer->parse('activity_block', 'activity', true);
             }
             $mailer->parse('activitylist_block', 'activitylist');
-        }
-        else {
+        } else {
             $mailer->setVar('activitylist_block', '');
         }
 
@@ -547,8 +549,7 @@ class Digest_News {
                 $mailer->parse('upcoming_block', 'upcoming', true);
             }
             $mailer->parse('upcominglist_block', 'upcominglist');
-        }
-        else {
+        } else {
             $mailer->setVar('upcominglist_block', '');
         }
 
@@ -568,15 +569,18 @@ class Digest_News {
         return $result;
     }
 
-    protected function debugging() {
+    protected function debugging()
+    {
         return $this->debug;
     }
 
-    protected function withinWindow($stamp) {
+    protected function withinWindow($stamp)
+    {
         return (($stamp > $this->digestStart) && ($stamp < $this->digestEnd));
     }
 
-    protected function cli($output, $err = false) {
+    protected function cli($output, $err = false)
+    {
         if($this->debugging() || $err) {
             printf("[%s] %s\n", $err ? '!' : ' ', $output);
         }
@@ -588,12 +592,14 @@ class Digest_News {
      * @param $size
      * @return string
      */
-    protected function convert($size) {
+    protected function convert($size)
+    {
         $unit=array('','K','M','G','T','P');
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $unit[(int)$i];
     }
 
-    protected function scrub($html) {
+    protected function scrub($html)
+    {
         return $this->textFormatter->cutSentence(Scrub::html2text($html), 300);
     }
 

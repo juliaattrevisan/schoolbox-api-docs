@@ -9,173 +9,165 @@
 $groupHandler = new Group;
 
 if ($groupHandler->isStaff()) {
-	$userHandler = new User;
-	$categoryHandler = new Category;
-	$synergeticClass = new External_Class;
+    $userHandler = new User;
+    $categoryHandler = new Category;
+    $synergeticClass = new External_Class;
 
-	$this->setFile(TEMPLATE_content, 'class/classList.htm');
-	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
-	$this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
-	$this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
-	$this->setBlock('student_list', 'select_student', 'select_student_block');
-	$this->setBlock('student_list', 'select_student_below', 'select_student_below_block');
-	$this->setBlock('student_list', 'medical', 'medical_block');
-	$this->setBlock('student_list', 'special', 'special_block');
-	$this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
+    $this->setFile(TEMPLATE_content, 'class/classList.htm');
+    $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
+    $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
+    $this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
+    $this->setBlock('student_list', 'select_student', 'select_student_block');
+    $this->setBlock('student_list', 'select_student_below', 'select_student_below_block');
+    $this->setBlock('student_list', 'medical', 'medical_block');
+    $this->setBlock('student_list', 'special', 'special_block');
+    $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
 
-	$this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
-	$this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
-	$this->setBlock('student_list', 'actions', 'actions_block');
+    $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
+    $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
+    $this->setBlock('student_list', 'actions', 'actions_block');
 
-	$this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
-	$this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
+    $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
+    $this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
 
-	$this->setTitle('Class List');
+    $this->setTitle('Class List');
 
-	$code = urldecode(implode('/', $this->arg));
+    $code = urldecode(implode('/', $this->arg));
 
-	if (stristr($code, ',')) {
-		$codeArray = explode(',', $code);
-		$category = $categoryHandler->getByCode($codeArray[0]);
-	}
-	else {
-		$category = $categoryHandler->getByCode($code);
-	}
+    if (stristr($code, ',')) {
+        $codeArray = explode(',', $code);
+        $category = $categoryHandler->getByCode($codeArray[0]);
+    } else {
+        $category = $categoryHandler->getByCode($code);
+    }
 
-	if (is_array($category)) {
+    if (is_array($category)) {
 
-		$canEmail = false;
-		$email    = '';
-		if (Cfg::get('mail_enable')) {
-			$emailObj = new Email();
-			$email = $emailObj->formatEmailFromArray($_SESSION);
-			if ($email) {
-				$canEmail = true;
-			}
-		}
+        $canEmail = false;
+        $email    = '';
+        if (Cfg::get('mail_enable')) {
+            $emailObj = new Email();
+            $email = $emailObj->formatEmailFromArray($_SESSION);
+            if ($email) {
+                $canEmail = true;
+            }
+        }
 
-		$this->setVar(array(
-			'SUBJECTNAME' => $category['name'] . " ($code)",
-			'CLASS_CODE' => $code,
-			'select_all_block' => '',
-		));
-		if ($canEmail) {
-			$this->parse('select_all_block', 'select_all');
-		}
+        $this->setVar(array(
+            'SUBJECTNAME' => $category['name'] . " ($code)",
+            'CLASS_CODE' => $code,
+            'select_all_block' => '',
+        ));
+        if ($canEmail) {
+            $this->parse('select_all_block', 'select_all');
+        }
 
-		$classList = $synergeticClass->getStudents($code);
+        $classList = $synergeticClass->getStudents($code);
 
-		$synergyIds = array();
+        $synergyIds = array();
 
-		if (is_array($classList) && !empty($classList)) {
-			foreach ($classList as $student) {
-				$emailaddr = '';
+        if (is_array($classList) && !empty($classList)) {
+            foreach ($classList as $student) {
+                $emailaddr = '';
 
-				$user = $userHandler->getBySynergy($student['synergy_id']);
+                $user = $userHandler->getBySynergy($student['synergy_id']);
 
-				if (is_array($user)) {
-					$emailObj = new Email();
-					$emailaddr = $emailObj->formatEmailFromArray($user);
+                if (is_array($user)) {
+                    $emailObj = new Email();
+                    $emailaddr = $emailObj->formatEmailFromArray($user);
 
-					if ($emailaddr) {
-						$emaillink = "<a href=\"" . $_SESSION['mailhandle'] . $emailaddr . "\">Email</a>";
-					}
-				}
+                    if ($emailaddr) {
+                        $emaillink = "<a href=\"" . $_SESSION['mailhandle'] . $emailaddr . "\">Email</a>";
+                    }
+                }
 
-				$lastVisit = $categoryHandler->lastVisit($category['id'], $user['uid']);
+                $lastVisit = $categoryHandler->lastVisit($category['id'], $user['uid']);
 
-				$studentOutput = array(
-					'SURNAME' => $student['lastname'],
-					'FIRSTNAME' => $student['firstname'],
-					'YEARLEVEL' => $student['yearlevel'],
-					'HOUSE' => Scrub::text($student['house']),
-					'LASTVISIT' => $lastVisit ? $lastVisit : 'Never',
-					'ID' => $user['uid'],
-					'SYNERGYID' => $student['synergy_id'],
-					'EMAIL' => $emailaddr ? $emaillink : '',
-					'EMAIL_ADDRESS' => $emailaddr,
-					'EMAIL_BTN' => $emailaddr ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>',$_SESSION['mailhandle'], $emailaddr) : '',
-					'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
-					'ON_OFF' => ++$j % 2 ? '' : 'dark',
-					'SELECT' => $emailaddr ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
-				);
+                $studentOutput = array(
+                    'SURNAME' => $student['lastname'],
+                    'FIRSTNAME' => $student['firstname'],
+                    'YEARLEVEL' => $student['yearlevel'],
+                    'HOUSE' => Scrub::text($student['house']),
+                    'LASTVISIT' => $lastVisit ? $lastVisit : 'Never',
+                    'ID' => $user['uid'],
+                    'SYNERGYID' => $student['synergy_id'],
+                    'EMAIL' => $emailaddr ? $emaillink : '',
+                    'EMAIL_ADDRESS' => $emailaddr,
+                    'EMAIL_BTN' => $emailaddr ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>',$_SESSION['mailhandle'], $emailaddr) : '',
+                    'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
+                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                    'SELECT' => $emailaddr ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
+                );
 
-				$this->setVar($studentOutput);
+                $this->setVar($studentOutput);
 
-				$this->setVar('select_student_block', '');
-				$this->setVar('select_student_below_block', '');
-				if ($canEmail) {
-					$this->parse('select_student_block', 'select_student');
-					$this->parse('select_student_below_block', 'select_student_below');
-				}
+                $this->setVar('select_student_block', '');
+                $this->setVar('select_student_below_block', '');
+                if ($canEmail) {
+                    $this->parse('select_student_block', 'select_student');
+                    $this->parse('select_student_below_block', 'select_student_below');
+                }
 
-				$student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
-				$student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
+                $student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
+                $student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
 
-				if (!empty($student['StudentMedicalAlert']) && Cfg::get('protect_medicalspecial') == 0) {
-					$this->parse('medical_block', 'medical');
-				}
-				else {
-					$this->setVar('medical_block', '');
-				}
+                if (!empty($student['StudentMedicalAlert']) && Cfg::get('protect_medicalspecial') == 0) {
+                    $this->parse('medical_block', 'medical');
+                } else {
+                    $this->setVar('medical_block', '');
+                }
 
-				if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
-					$this->parse('special_block', 'special');
-				}
-				else {
-					$this->setVar('special_block', '');
-				}
+                if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
+                    $this->parse('special_block', 'special');
+                } else {
+                    $this->setVar('special_block', '');
+                }
 
-				/* If the user has an enabled eportfolio, enable link
+                /* If the user has an enabled eportfolio, enable link
 				 */
-				if ($user['eportfolio_enabled']) {
-					$this->parse('eportfolio_block', 'eportfolio');
-				}
-				else {
-					$this->setVar('eportfolio_block', '');
-				}
+                if ($user['eportfolio_enabled']) {
+                    $this->parse('eportfolio_block', 'eportfolio');
+                } else {
+                    $this->setVar('eportfolio_block', '');
+                }
 
-				/* Parse out the name blocks: if they were found in Schoolbox,
+                /* Parse out the name blocks: if they were found in Schoolbox,
 				 * give the names links - otherwise leave them unlinked
 				 */
-				if (is_array($user)) {
-					$this->parse('name_with_link_block', 'name_with_link');
-					$this->setVar('name_without_link_block', '');
-					$this->parse('actions_block', 'actions');
-				}
-				else {
-					$this->parse('name_without_link_block', 'name_without_link');
-					$this->setVar('name_with_link_block', '');
-					$this->setVar('actions_block', '');
-				}
+                if (is_array($user)) {
+                    $this->parse('name_with_link_block', 'name_with_link');
+                    $this->setVar('name_without_link_block', '');
+                    $this->parse('actions_block', 'actions');
+                } else {
+                    $this->parse('name_without_link_block', 'name_without_link');
+                    $this->setVar('name_with_link_block', '');
+                    $this->setVar('actions_block', '');
+                }
 
-				$this->parse("student_list_block", "student_list", true);
-			}
+                $this->parse("student_list_block", "student_list", true);
+            }
 
-			// Show the email view/select forms
-			$this->setVar('email_class_block', '');
-			$this->setVar('parent_email_block', '');
-			if ($canEmail && $email) {
-				$this->setVar('REPLYTO', $email);
-				$this->parse('email_class_block', 'email_class');
+            // Show the email view/select forms
+            $this->setVar('email_class_block', '');
+            $this->setVar('parent_email_block', '');
+            if ($canEmail && $email) {
+                $this->setVar('REPLYTO', $email);
+                $this->parse('email_class_block', 'email_class');
 
-				/* Emailing parents is a configuration
+                /* Emailing parents is a configuration
 				 */
-				if ((Cfg::get('email_all_parents') == 1)) {
-					$this->parse('parent_email_block', 'parent_email');
-				}
-			}
-		}
-		else {
-			$this->setVar('student_list_block', '');
-			$this->setVar('parent_email_block', '');
-			$this->setVar('email_class_block', '');
-		}
-	}
-	else {
-		$this->error(18);
-	}
-}
-else {
-	error(19);
+                if ((Cfg::get('email_all_parents') == 1)) {
+                    $this->parse('parent_email_block', 'parent_email');
+                }
+            }
+        } else {
+            $this->setVar('student_list_block', '');
+            $this->setVar('parent_email_block', '');
+            $this->setVar('email_class_block', '');
+        }
+    } else {
+        $this->error(18);
+    }
+} else {
+    error(19);
 }

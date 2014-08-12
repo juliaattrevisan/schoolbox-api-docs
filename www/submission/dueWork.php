@@ -35,14 +35,13 @@ $submissionHandler = new Submission();
 // If student: allow student
 // If staff or superuser: allow private
 $visibilities = array(
-	\Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+    \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
 );
 if ($groupHandler->isStudent()) {
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-}
-elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+} elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 }
 
 /* Instantiate for current date time
@@ -167,8 +166,8 @@ $output = array(
     'WORK_USER_ID' => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
     'USER_TOKEN' => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
-	'WORK_SEMESTER' => DueWork_All::getSemester(),
-	'WORK_YEAR' => date('Y')
+    'WORK_SEMESTER' => DueWork_All::getSemester(),
+    'WORK_YEAR' => date('Y')
 );
 
 $this->setVar($output);
@@ -341,10 +340,9 @@ foreach ($categoryList as $category) {
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
             $assess_mapper->getStudentMarks($category['id'], $userID)
         );
-        usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
-        $studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
-    }
-    else {
+        usort($studentGrades, function ($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
+        $studentGrades = array_map(function ($row) { return $row['mark']; }, $studentGrades);
+    } else {
         $studentGrades = array();
     }
 
@@ -367,8 +365,7 @@ foreach ($categoryList as $category) {
             $trendAmt = $grade['trend'];
             if ($trendAmt > 0) {
                 $trendDir = '&#x25B2;';
-            }
-            elseif ($trendAmt < 0) {
+            } elseif ($trendAmt < 0) {
                 $trendDir = '&#x25BC;';
             }
             if ($trendAmt != 0) {
@@ -380,7 +377,7 @@ foreach ($categoryList as $category) {
     // calculate grade averages and trending
     $this->setFile('subjectTpl', 'activity/subjectlist.html');
     $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
-	$this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+    $this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
     $output = array(
@@ -398,13 +395,13 @@ foreach ($categoryList as $category) {
     $this->setVar($output);
 
     if ($gradeAvg == -1) {
-	    $this->setVar('subject_grade_block', '');
+        $this->setVar('subject_grade_block', '');
     } else {
-	    $this->setVar(array(
+        $this->setVar(array(
             'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
             'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
-	    ));
-	    $this->parse('subject_grade_block', 'subject_grade');
+        ));
+        $this->parse('subject_grade_block', 'subject_grade');
     }
 
 
@@ -414,7 +411,7 @@ foreach ($categoryList as $category) {
         if (isset($teacherOutput) && count($teacherOutput)) {
             foreach ($teacherOutput as $teacher) {
                 $tOutput = array(
-	                'SUBJ_TEACHER_ID' => $teacher['id'],
+                    'SUBJ_TEACHER_ID' => $teacher['id'],
                     'SUBJ_TEACHER_NAME' => $teacher['name'],
                     'SUBJ_TEACHER_URL' => $teacher['email'],
                     'SUBJ_TEACHER_ROLE' => 'Teacher',
@@ -448,16 +445,14 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     if ($activity->getType() == \Schoolbox\Assessment\Component\SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT) {
         if ($activity->getEvent() == 'closed') {
             $boxUrl = $activity->getName();
-        }
-        else {
+        } else {
             $boxUrl = sprintf(
                 '<a href="/assess/intro/%d">%s</a>',
                 $activity->getId(),
                 $activity->getName()
             );
         }
-    }
-    else {
+    } else {
         $boxUrl = sprintf(
             '<a href="/submission/submissionHistory/%d/%d">%s</a>',
             $activity->getId(),
@@ -501,8 +496,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                     // legacy support
                     if ($rtn['slug'] == 'free') {
                         $numericMark = $rtn['mark'];
-                    }
-                    else {
+                    } else {
                         $numericMark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
                     }
 
@@ -511,14 +505,12 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                     );
 
                     $beginning = $user['person_label'] . ' received ' . $mark;
-                }
-                else {
+                } else {
                     $file_id   = $activity->getReturnedFileId();
                     $file_name = $activity->getReturnedWork()->getFilename();
                     if ($file_id && $file_name) {
                         $beginning = '<a href="/submission/send.php?id=' . $file_id . '&return=1">Work returned</a>';
-                    }
-                    else {
+                    } else {
                         $beginning = 'Work returned';
                     }
                 }
@@ -550,13 +542,12 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
 
 $activityList = new Activity_ListArray($feedItems);
 if (empty($feedItems)) {
-	$this->setVar('ACTIVITY_LIST', '<li>You have no recent activity.</li>');
-}
-else {
-	$activityList->setTarget($this, 'ACTIVITY_LIST');
-	foreach ($activityList as $a) {
-		// iterates across and pumps out the list
-	}
+    $this->setVar('ACTIVITY_LIST', '<li>You have no recent activity.</li>');
+} else {
+    $activityList->setTarget($this, 'ACTIVITY_LIST');
+    foreach ($activityList as $a) {
+        // iterates across and pumps out the list
+    }
 }
 
 // subject drop down
@@ -583,26 +574,27 @@ foreach($summary as $category) {
  *
  * @return \Schoolbox\Assessment\ActivityCollection
  */
-function getActivities($user, $limit, $categories, $visibilities, $is_restricted) {
-	$box_mapper    = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-	$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
-	$submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-	$return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
-	$params        = array(
-		'categories'   => $categories,
-		'visibilities' => $visibilities,
-	);
-	$activities    = $box_mapper
-		->getActivities($user, $limit, $categories)
-		->merge($assess_mapper->getActivities($user, $limit, $categories))
-		->merge($submit_mapper->getActivities($user, $limit, $categories))
-	;
-	if (!$is_restricted) {
-		$activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
-	}
-	$activities
-		->sortBy('date', 'desc')
-		->limit(0, 15)
-	;
-	return $activities;
+function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
+{
+    $box_mapper    = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+    $submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+    $return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+    $params        = array(
+        'categories'   => $categories,
+        'visibilities' => $visibilities,
+    );
+    $activities    = $box_mapper
+        ->getActivities($user, $limit, $categories)
+        ->merge($assess_mapper->getActivities($user, $limit, $categories))
+        ->merge($submit_mapper->getActivities($user, $limit, $categories))
+    ;
+    if (!$is_restricted) {
+        $activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
+    }
+    $activities
+        ->sortBy('date', 'desc')
+        ->limit(0, 15)
+    ;
+    return $activities;
 }

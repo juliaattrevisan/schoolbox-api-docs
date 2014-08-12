@@ -6,43 +6,40 @@ $groupHandler = new Group();
 
 if ($groupHandler->isSuperuser()) {
 
-	/* Set up generic table handler thing. Exclude certain columns from being
+    /* Set up generic table handler thing. Exclude certain columns from being
 	 * interpreted as data columns.
 	 */
-	$exclusion = array('tableName', 'tableIndex');
+    $exclusion = array('tableName', 'tableIndex');
 
-	$tableIndex = Scrub::text($_POST['tableIndex']);
-	$tableName = Scrub::text($_POST['tableName']);
+    $tableIndex = Scrub::text($_POST['tableIndex']);
+    $tableName = Scrub::text($_POST['tableName']);
 
-	$genericHandler = new GenericTable($tableName, $tableIndex);
-	$table = $genericHandler->getAll();
+    $genericHandler = new GenericTable($tableName, $tableIndex);
+    $table = $genericHandler->getAll();
 
-	$allColumns = array_diff(array_keys($_POST), $exclusion);
+    $allColumns = array_diff(array_keys($_POST), $exclusion);
 
-	/* Update each row
+    /* Update each row
 	 */
-	for ($i=0; $i<count($_POST[$tableIndex]); $i++) {
-		$data = array();
+    for ($i=0; $i<count($_POST[$tableIndex]); $i++) {
+        $data = array();
 
-		/* Accumulate a set of data from the relevant data columns
+        /* Accumulate a set of data from the relevant data columns
 		 */
-		foreach ($allColumns as $currentColumn) {
-			$data[$currentColumn] = $_POST[$currentColumn][$i];
-		}
+        foreach ($allColumns as $currentColumn) {
+            $data[$currentColumn] = $_POST[$currentColumn][$i];
+        }
 
-		/* Determine whether this is a new record, or whether to update existing
+        /* Determine whether this is a new record, or whether to update existing
 		 */
-		if (is_numeric($data[$tableIndex])) {
-			$genericHandler->update($data);
-		}
-		else {
-			$genericHandler->create($data);
-		}
-	}
+        if (is_numeric($data[$tableIndex])) {
+            $genericHandler->update($data);
+        } else {
+            $genericHandler->create($data);
+        }
+    }
 
-	$page->backToTheFuture(1);
+    $page->backToTheFuture(1);
+} else {
+    error(19);
 }
-else {
-	error(19);
-}
-?>

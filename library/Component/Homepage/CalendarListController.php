@@ -9,8 +9,8 @@
  * This component is deprecated, it was previously used to display a school's campus calendar on a homepage
  *
  */
-class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract {
-
+class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract
+{
     /**
      * @var DeprecatedDatabase
      */
@@ -26,8 +26,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      *
      * @return void
      */
-    public function execute() {
-
+    public function execute()
+    {
         $this->db = DeprecatedDatabase::getInstance();
         $this->calendarHandler = new Calendar();
 
@@ -38,7 +38,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'calendarList')) {
             return false;
         }
@@ -65,8 +66,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         //event limit changed from posts to days
         if ($this->getConfig('size') != 0 && $this->getConfig('size') != '')
             $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$this->getConfig('size')} DAY) ";
-        else
-                {
+        else {
                     $where = "";
                 }
 
@@ -167,9 +167,9 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                             */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');
-                            } else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                            } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Approved');
-                            } else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                            } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Rejected');
                             }
 
@@ -181,7 +181,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                         }
 
                         $this->parse('attendance_request_button_block', 'attendance_request_button');
-                    } else if ($groupHandler->isStaff($_SESSION['id'])) {
+                    } elseif ($groupHandler->isStaff($_SESSION['id'])) {
                         $this->parse('attendance_list_button_block', 'attendance_list_button');
                     }
                 }

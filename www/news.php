@@ -140,7 +140,7 @@ if (is_array($items)) {
             $url = new Url($previous['topicName']);
 
             $formatter = new TextFormatter();
-            
+
             $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
             $output = array(
@@ -168,4 +168,3 @@ if (is_array($items)) {
 } else {
     $this->setVar('news_block', 'No current news in this topic.');
 }
-

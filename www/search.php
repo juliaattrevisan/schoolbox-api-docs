@@ -94,7 +94,7 @@ if (empty($type) || $type == 'all') {
     $page->setBlock(TEMPLATE_content, 'type', 'type_block');
     $page->setBlock(TEMPLATE_content, 'result', 'result_block');
     $page->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
-	$page->setBlock(TEMPLATE_content, 'see_more', 'see_more_block');
+    $page->setBlock(TEMPLATE_content, 'see_more', 'see_more_block');
     // escape any quotes in the keyword string, or the javascript will explode.
 
     // setup default values
@@ -182,7 +182,7 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
     $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
-	$page->setBlock('user', 'user_calendar', 'user_calendar_block');
+    $page->setBlock('user', 'user_calendar', 'user_calendar_block');
 
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
@@ -212,12 +212,12 @@ if (!empty($result['user'])) {
         if ($groupHandler->isParent()) {
             unset($email);
         }
-        
+
         /* If restrict_parent_emails and not a staff member, remove the email address */
         if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent($user['id']) && !$groupHandler->isStaff()) {
             unset($email);
         }
-        
+
         $page->setVar(array(
             'USER_SEARCH_ID' => $user['id'],
             'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
@@ -235,25 +235,21 @@ if (!empty($result['user'])) {
         $page->setVar('eportfolio_block');
         $page->setVar('boarder_leave_block');
 
-		/* Hide Due Work link from parents, if Due Work access is restricted
+        /* Hide Due Work link from parents, if Due Work access is restricted
 		 */
-		if ($group->isParent() && Config::get('restrict_parent_duework_access')) {
-			$page->setVar('due_work_block', '');
-		}
-        else if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
+        if ($group->isParent() && Config::get('restrict_parent_duework_access')) {
+            $page->setVar('due_work_block', '');
+        } elseif (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
             $page->setVar('due_work_block');
-		}
-        else {
+        } else {
             $page->parse('due_work_block', 'due_work');
-		}
+        }
 
         if($groupHandler->isParent() && Config::get('restrict_parent_grades') ) {
             $page->setVar('grades_button_block', '');
-        }
-        else if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
+        } elseif (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id']))) {
             $page->setVar('grades_button_block', '');
-        }
-        else {
+        } else {
             $page->parse('grades_button_block', 'grades_button');
         }
 
@@ -273,7 +269,7 @@ if (!empty($result['user'])) {
 
             }
             if (Cfg::get('boarder_leave_enabled') == '1') {
-                if ($group->isStaff() AND $user['residential_house_id']) {
+                if ($group->isStaff() and $user['residential_house_id']) {
                     $page->parse('boarder_leave_block', 'boarder_leave');
                 }
             }
@@ -288,39 +284,38 @@ if (!empty($result['user'])) {
         else
             $page->parse('modify_block', 'modify');
 
-		/* ePortfolio link
+        /* ePortfolio link
 		 */
-		$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['id'], 'profile');
+        $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['id'], 'profile');
 
-		if ($authenticator->canView()) {
-			$page->parse('eportfolio_block', 'eportfolio');
-		}
+        if ($authenticator->canView()) {
+            $page->parse('eportfolio_block', 'eportfolio');
+        }
 
-		/* Calendar link
+        /* Calendar link
 		 * Calendar only exist for students' parents, staff, supers, and themselves
 		 */
-		$isParentOfChild = $groupHandler->isParentOfChild($user['id']);
-		$isSuperuser = $_SESSION['user']->getSuperuser();
-		$isStaff = $groupHandler->isStaff();
-		$isSelf = ($user['id'] == $_SESSION['user']->getId());
+        $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
+        $isSuperuser = $_SESSION['user']->getSuperuser();
+        $isStaff = $groupHandler->isStaff();
+        $isSelf = ($user['id'] == $_SESSION['user']->getId());
 
-		if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
-			$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+        if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {
+            $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-			$page->setVar(array(
-				'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
-			));
+            $page->setVar(array(
+                'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
+            ));
 
-			$page->parse('user_calendar_block', 'user_calendar');
-		}
-		else {
-			$page->setVar('user_calendar_block', '');
-		}
+            $page->parse('user_calendar_block', 'user_calendar');
+        } else {
+            $page->setVar('user_calendar_block', '');
+        }
 
-		$page->parse('user_block', 'user', true);
+        $page->parse('user_block', 'user', true);
     }
 
-	outputSeeMore($page, $type, $count, 'user');
+    outputSeeMore($page, $type, $count, 'user');
 
     $page->parse('RESULT', 'user_t', true);
 }
@@ -365,7 +360,7 @@ if (!empty($result['file'])) {
         $page->parse('file_block', 'file', true);
     }
 
-	outputSeeMore($page, $type, $count, 'file');
+    outputSeeMore($page, $type, $count, 'file');
 
     $page->parse('RESULT', 'file_t', true);
 }
@@ -401,7 +396,7 @@ if (!empty($result['category'])) {
         $page->parse('category_block', 'category', true);
     }
 
-	outputSeeMore($page, $type, $count, 'category');
+    outputSeeMore($page, $type, $count, 'category');
 
     $page->parse('RESULT', 'category_t', true);
 }
@@ -450,7 +445,7 @@ if (!empty($result['link'])) {
         $page->parse('link_block', 'link', true);
     }
 
-	outputSeeMore($page, $type, $count, 'link');
+    outputSeeMore($page, $type, $count, 'link');
 
     $page->parse('RESULT', 'link_t', true);
 }
@@ -537,7 +532,7 @@ if (!empty($result['sitenews'])) {
         $page->parse('sitenews_block', 'sitenews', true);
     }
 
-	outputSeeMore($page, $type, $count, 'sitenews');
+    outputSeeMore($page, $type, $count, 'sitenews');
 
     $page->parse('RESULT', 'sitenews_t', true);
 }
@@ -575,7 +570,7 @@ if (!empty($result['blog'])) {
         $page->parse('blog_block', 'blog', true);
     }
 
-	outputSeeMore($page, $type, $count, 'blog');
+    outputSeeMore($page, $type, $count, 'blog');
 
     $page->parse('RESULT', 'blog_t', true);
 }
@@ -614,7 +609,7 @@ if (!empty($result['wiki'])) {
         $page->parse('wiki_block', 'wiki', true);
     }
 
-	outputSeeMore($page, $type, $count, 'wiki');
+    outputSeeMore($page, $type, $count, 'wiki');
 
     $page->parse('RESULT', 'wiki_t', true);
 }
@@ -651,7 +646,7 @@ if (!empty($result['forum'])) {
         $page->parse('forum_block', 'forum', true);
     }
 
-	outputSeeMore($page, $type, $count, 'forum');
+    outputSeeMore($page, $type, $count, 'forum');
 
     $page->parse('RESULT', 'forum_t', true);
 }
@@ -691,7 +686,7 @@ if (!empty($result['event'])) {
         $page->parse('event_block', 'event', true);
     }
 
-	outputSeeMore($page, $type, $count, 'event');
+    outputSeeMore($page, $type, $count, 'event');
 
     $page->parse('RESULT', 'event_t', true);
 }
@@ -791,15 +786,14 @@ else if ($result[$type] || $type == 'all') {
  *
  * @return void
  */
-function outputSeeMore($page, $type, $count, $handle) {
-
-	$page->setBlock($handle . '_t', 'see_more', 'see_more_block');
+function outputSeeMore($page, $type, $count, $handle)
+{
+    $page->setBlock($handle . '_t', 'see_more', 'see_more_block');
 
     if($type == 'all' && $count[$handle] > Cfg::get('search_all_limit')) {
-	    $page->setVar('MORE_COUNT', $count[$handle]);
-	    $page->parse('see_more_block', 'see_more');
+        $page->setVar('MORE_COUNT', $count[$handle]);
+        $page->parse('see_more_block', 'see_more');
+    } else {
+        $page->setVar('see_more_block', '');
     }
-	else {
-		$page->setVar('see_more_block', '');
-	}
 }

@@ -14,10 +14,10 @@ use Scrub;
 use TextFormatter;
 use Schoolbox\User;
 
-class SchoolNews extends Generic {
-
-    public function render(User $user) {
-
+class SchoolNews extends Generic
+{
+    public function render(User $user)
+    {
         $limit = 3;
 
         $newsHandler = new \News();

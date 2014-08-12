@@ -13,35 +13,38 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract {
-
-	/**
+class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
+{
+    /**
 	 * Choose template file
 	 */
-	protected function setupTemplateFile() {
-		$this->setTemplateFile('calendar/full.html');
+    protected function setupTemplateFile()
+    {
+        $this->setTemplateFile('calendar/full.html');
         $this->getPage()->setTab('calendar');
-	}
+    }
 
-	/**
+    /**
 	 * Set up blocks and stuff
 	 */
-	protected function setupBlocks() {
-		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
-		$this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+    protected function setupBlocks()
+    {
+        $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+        $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
 
-		$this->getPage()->setVar(array(
-			'USER_CALENDAR_ID' => $this->getUser()->getId(),
-			'USER_FULLNAME' => $this->getUser()->getFullname(),
-		));
+        $this->getPage()->setVar(array(
+            'USER_CALENDAR_ID' => $this->getUser()->getId(),
+            'USER_FULLNAME' => $this->getUser()->getFullname(),
+        ));
 
         $this->setupSelectedDayMonthYear();
-	}
+    }
 
-	/**
+    /**
 	 * Set up selected day/month/year
 	 */
-	protected function setupSelectedDayMonthYear() {
+    protected function setupSelectedDayMonthYear()
+    {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
 
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
@@ -63,45 +66,44 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract {
                 'SELECTED_YEAR' => $selectedYear,
             )
         );
-	}
+    }
 
-	/**
+    /**
 	 * Render calendar
 	 */
-	public function render() {
-
+    public function render()
+    {
         $this->setupMovementButtons();
 
         $this->getPage()->setVar(array(
-			'CALENDAR_USER_ID' => $this->getUser()->getId(),
+            'CALENDAR_USER_ID' => $this->getUser()->getId(),
             'CALENDAR_VIEW' => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
             'USER_TOKEN'    => $this->getUser()->getKey(),
         ));
 
-		/* Render event types to chooze from
+        /* Render event types to chooze from
 		 */
-		$allTypes = $this->getCalendarHandler()->getTypeList();
+        $allTypes = $this->getCalendarHandler()->getTypeList();
 
-		if (is_array($allTypes) && count($allTypes)) {
-			foreach($allTypes as $currentType) {
-				$this->getPage()->setVar(array(
-					'EVENT_TYPE_ID' => $currentType['eventTypeID'],
-					'EVENT_TYPE_NAME' => Scrub::text($currentType['eventType']),
-				));
+        if (is_array($allTypes) && count($allTypes)) {
+            foreach($allTypes as $currentType) {
+                $this->getPage()->setVar(array(
+                    'EVENT_TYPE_ID' => $currentType['eventTypeID'],
+                    'EVENT_TYPE_NAME' => Scrub::text($currentType['eventType']),
+                ));
 
-				$this->getPage()->parse('event_type_block', 'event_type', true);
+                $this->getPage()->parse('event_type_block', 'event_type', true);
 
-				/* Event Task id
+                /* Event Task id
 				 */
-				if ($currentType['eventType'] == 'Task') {
-					$this->getPage()->setVar(array(
-						'TASK_TYPE_ID' => $currentType['eventTypeID'],
-					));
-				}
-			}
-		}
-		else {
-			$this->getPage()->setVar('event_type_block', '');
-		}
-	}
+                if ($currentType['eventType'] == 'Task') {
+                    $this->getPage()->setVar(array(
+                        'TASK_TYPE_ID' => $currentType['eventTypeID'],
+                    ));
+                }
+            }
+        } else {
+            $this->getPage()->setVar('event_type_block', '');
+        }
+    }
 }

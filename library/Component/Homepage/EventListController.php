@@ -6,15 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract {
-
+class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
+{
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
-
+    public function execute()
+    {
     }
 
     /**
@@ -22,7 +22,8 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'eventList')) {
             return false;
         }
@@ -30,7 +31,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         //event output
         $this->setBlock($templateHandle, "group_events", "group_events_block");
-		$this->setBlock($templateHandle, "import_events", "import_events_block");
+        $this->setBlock($templateHandle, "import_events", "import_events_block");
 
         // From updated calendar
         $groupHandler = new Group();
@@ -159,14 +160,13 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
         if ($this->permission < WRITE_ACCESS) {
-			$this->setVar(array(
-				'submit_event_block' => '',
-				'import_events_block' => ''
-			));
-        }
-		else {
+            $this->setVar(array(
+                'submit_event_block' => '',
+                'import_events_block' => ''
+            ));
+        } else {
             $this->parse("submit_event_block", "submit_event");
-			$this->parse('import_events_block', 'import_events');
+            $this->parse('import_events_block', 'import_events');
         }
 
         return true;

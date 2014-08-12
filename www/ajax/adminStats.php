@@ -39,12 +39,11 @@ if(isset($_POST['module'])) {
 
         case 'service_www':
             $context = \Proxy\Server::getInstance()->getContext();
-		    if(@file_get_contents('http://deb.alaress.com.au/testfile.txt', null, $context)) {
+            if(@file_get_contents('http://deb.alaress.com.au/testfile.txt', null, $context)) {
                 $output[] = array('WWW_LIGHT'  => 'on',
                                   'WWW_STATUS' => 'Available'
                 );
-            }
-            else {
+            } else {
                 $output[] = array('WWW_LIGHT'  => '',
                                   'WWW_STATUS' => 'Inaccessible');
             }
@@ -72,5 +71,3 @@ if(isset($_POST['module'])) {
 
 header("Content-type: application/json");
 print json_encode($output);
-
-?>

@@ -6,8 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Report_Group extends Report_Abstract implements Report_IReport {
-
+class Report_Group extends Report_Abstract implements Report_IReport
+{
     private $groupID = null;
     private $dataSet;
     private $dataCount;
@@ -31,7 +31,8 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     private $sortable = array('firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email');
     private $defaultOrderBy = 'lastname';
 
-    public function __construct($page) {
+    public function __construct($page)
+    {
         $this->setGroupHandler(new Group());
 
         if (!$this->checkPermissions()) {
@@ -44,7 +45,8 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         }
     }
 
-    protected function setup() {
+    protected function setup()
+    {
         // set blocks
         $this->getPage()->setFile('user_t', 'adminv2/report/group.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'group', 'group_block');
@@ -56,41 +58,49 @@ class Report_Group extends Report_Abstract implements Report_IReport {
 
     }
 
-    public function setIndexID($groupID) {
+    public function setIndexID($groupID)
+    {
         $this->groupID = $groupID;
     }
 
-    public function getIndexID() {
+    public function getIndexID()
+    {
         return $this->groupID;
     }
 
-    public function getReportTitle() {
+    public function getReportTitle()
+    {
         $rtn = $this->getGroupHandler()->getGroupName($this->getIndexID());
         return $rtn ? $rtn : 'Group';
     }
 
-    public function setFields($fields) {
+    public function setFields($fields)
+    {
         $this->fields = $fields;
     }
 
-    public function getSortableFields() {
+    public function getSortableFields()
+    {
         return $this->sortable;
     }
 
-    public function addFields($fields) {
+    public function addFields($fields)
+    {
         array_merge($this->fields, $fields);
     }
 
-    public function getFields() {
+    public function getFields()
+    {
         return $this->fields;
     }
 
-    public function getDefaultOrderBy() {
+    public function getDefaultOrderBy()
+    {
         return $this->defaultOrderBy;
     }
 
-    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '') {
-
+    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '')
+    {
         if($orderDir == '') {
             $orderDir = 'ASC';
         }
@@ -136,7 +146,8 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         return $this->dataCount;
     }
 
-    public function render() {
+    public function render()
+    {
         // the group and the dataset must both not be null
         if($this->getIndexID() == null || empty($this->dataSet))
             error(19);
@@ -199,14 +210,16 @@ class Report_Group extends Report_Abstract implements Report_IReport {
 
     }
 
-    public function export() {
+    public function export()
+    {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
         $exporter->setData($this->dataResource);
         $exporter->export('CSV');
     }
 
-    public function displayFilterBlock() {
+    public function displayFilterBlock()
+    {
         // this report does not utilise filtering
         return;
     }
