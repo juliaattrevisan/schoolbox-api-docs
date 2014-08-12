@@ -86,6 +86,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
 	 * Make the assess_question_bank table behave like assess_question
 	 */
 	protected function setContext() {
+		$this->getQuestionHandler()->_table = 'assess_question_bank';
+		$this->getQuestionHandler()->_index = 'question_bank_id';
 
 		/* Use context-specific fields
 		 */

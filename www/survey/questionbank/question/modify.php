@@ -67,6 +67,8 @@ if (!empty($_POST)) {
 	 */
 	$questionBank = new Survey_Question_Bank();
 	$questionBank->getQuestionHandler()->update($data);
+new \Alaress_Probe($data);
+die();
 
     /* Find the Survey summary page
      */
@@ -131,7 +133,6 @@ else {
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
 		'QUESTION' => Scrub::text($question['question']),
-		'MARKS' => $question['marks'],
 		'QUESTION_BANK_REDIRECT_URL' => '/survey/questionbank/contents'
     ));
 }
