@@ -187,7 +187,7 @@ if ($permission >= WRITE_ACCESS) {
 
             $output = array(
                 'COMPONENT_CATEGORY_ID' => $id,
-                'COMPONENT_CATEGORY_NAME' => $tab['name'],
+                'COMPONENT_CATEGORY_NAME' => Scrub::text($tab['name']),
                 'COMPONENT_CATEGORY_COUNT' => $tab['count']
             );
 

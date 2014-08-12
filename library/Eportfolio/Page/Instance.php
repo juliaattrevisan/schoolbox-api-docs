@@ -250,7 +250,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 				/* >:/
 				 */
-				$this->tabList[$this_category]['name'] = $component->getDefinition()->getComponentCategoryName();
+				$this->tabList[$this_category]['name'] = Scrub::text($component->getDefinition()->getComponentCategoryName());
 				$this->tabList[$this_category]['count']++;
 			}
 		}
