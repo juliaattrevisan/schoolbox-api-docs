@@ -204,7 +204,7 @@ if (is_array($typeList)) {
 						'CLEANUP_EVENT_AUTHOR' => $currentEvent['event']->getAuthor()->getFullName(),
 						'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent['event']->getAuthor()->getId(),
 						'CLEANUP_EVENT_EVENTTYPE' => $currentEvent['event']->getType()->getType(),
-						'CLEANUP_EVENT_CAMPUSES' => $currentEvent['auxiliary']['campuses'],
+						'CLEANUP_EVENT_CAMPUSES' => Scrub::text($currentEvent['auxiliary']['campuses']),
 					));
 
 					$this->parse('cleanup_event_block', 'cleanup_event', true);

@@ -99,7 +99,7 @@ if(is_numeric($this->arg[0])) {
 		foreach($userHandler->getCampusList() as $campus) {
 			$outcampus = array(
 				'CAMPUS_ID'         => $campus['id'],
-				'CAMPUS_NAME'           => $campus['name'],
+				'CAMPUS_NAME'           => Scrub::text($campus['name']),
 				'CAMPUS_ID_CHECKED'     => '',
 				'CAMPUS_DEFAULT_CHECKED'    => '',
 			);
@@ -286,7 +286,7 @@ else {
      foreach($campusList as $campus ) {
 
          $outcampus = array('CAMPUS_ID'         => $campus['id'],
-                        'CAMPUS_NAME'           => $campus['name'],
+                        'CAMPUS_NAME'           => Scrub::text($campus['name']),
                         'CAMPUS_ID_CHECKED'     => '',
                         'CAMPUS_DEFAULT_CHECKED'    => '',);
 
@@ -294,4 +294,3 @@ else {
          $this->parse('campus_block','campus',true);
      }
 }
-?>

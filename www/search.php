@@ -225,7 +225,9 @@ if (!empty($result['user'])) {
             'USER_SEARCH_EMAIL' => $email,
             'USER_SEARCH_COUNT' => $count['user'],
             'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
-            'USER_SEARCH_CAMPUS' => stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name'],
+            'USER_SEARCH_CAMPUS' => Scrub::text(
+                stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
+            ),
             'USER_SEARCH_GROUP' => $user['group_name'],
         ));
 

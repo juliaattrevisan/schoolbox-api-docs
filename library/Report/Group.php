@@ -171,7 +171,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
                     'USER_SYNERGY_ID' => $user['synergy_id'],
                     'USER_EMAIL'      => $email,
                     'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
-                    'USER_CAMPUS'     => $user['campus'],
+                    'USER_CAMPUS'     => Scrub::text($user['campus']),
                 ));
 
                 if(!$_SESSION['su'])
