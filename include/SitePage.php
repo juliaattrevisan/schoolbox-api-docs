@@ -1074,7 +1074,7 @@ class SitePage extends Page
             foreach ($data as $row) {
                 foreach ($row as $key => $value) {
                     $mapping[$key] ? $key = $mapping[$key] : '';
-                    $this->setVar($key, $value);
+                    $this->setVar($key, Scrub::text($value));
                     if (in_array($value, $selected)) {
                         $this->setVar($key . '_SELECTED', 'checked="checked"');
                     } else {
