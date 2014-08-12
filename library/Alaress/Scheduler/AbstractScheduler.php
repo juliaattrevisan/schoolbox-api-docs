@@ -30,8 +30,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /** @var LoopInterface */
     protected $loop;
 
-    /** @var Debug */
-    public $debug;
+    /** @var LoggerInterface */
+    public $log;
 
     /** @var array */
     protected $timers;

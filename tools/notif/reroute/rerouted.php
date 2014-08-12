@@ -2,8 +2,8 @@
 <?php
 
 use Alaress\Async\Stomp\Subscriber;
-use Alaress\Cli\Debug;
 use Aura\Di;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Notif\Notif;
@@ -21,14 +21,26 @@ use Schoolbox\Realtime\Rerouter\UserSubscriptionList;
  */
 
 
-$opts = getopt('v');
+$fields = array('porcelain', 'mem', 'truemem', 'pid');
+
+$opts = getopt('v', $fields);
+
+foreach($fields as $k => $name) {
+    if(!isset($opts[$name])) {
+        unset($fields[$k]);
+    }
+}
+
+$flags = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Reroute', array(
 	'verbose' => isset($opts['v']),
-	'errors'  => E_ALL
+	'errors'  => E_ALL,
+    'fields'  => array_values($fields),
+    'flags'   => $flags
 ));
 
 $rrtr = null;
@@ -44,11 +56,11 @@ $kernel->registerCustomShutdown(function() use (&$rrtr) {
 });
 
 // CREATE SCHEDULER APP
-$kernel->run(function($di, $loop, $debug, $opts) use (&$rrtr) {
+$kernel->run(function($di, $loop, $log, $opts) use (&$rrtr) {
 	/**
 	 * @var Di\Container $di
 	 * @var LoopInterface $loop
-	 * @var Debug $debug
+	 * @var LoggerInterface $log
 	 * @var array $opts
 	 */
 	try {
@@ -65,10 +77,10 @@ $kernel->run(function($di, $loop, $debug, $opts) use (&$rrtr) {
 			'passcode'  => $conf->get('amqp_pass'),
 		));
 
-		$rrtr = new Rerouter($loop, new RerouterDispatchStrategy(), $debug, new Subscriber($client, new UserSubscriptionList()));
+		$rrtr = new Rerouter($loop, new RerouterDispatchStrategy($opts['flags']), $log, new Subscriber($client, new UserSubscriptionList()));
 	}
 	catch(AMQPRuntimeException $e) {
-		$debug->v("Unable to connect to RabbitMQ: server is offline.",'!');
+		$log->alert("Unable to connect to RabbitMQ: server is offline.", array($e));
 		$n = new Notif(Notif::TOPIC_NOTIFICATION);
 		$n->alert('RabbitMQ is offline');
 		throw $e;

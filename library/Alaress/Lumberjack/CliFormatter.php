@@ -11,7 +11,6 @@ namespace Alaress\Lumberjack;
 
 
 
-use Exception;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog;
 

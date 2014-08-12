@@ -20,7 +20,6 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Role;

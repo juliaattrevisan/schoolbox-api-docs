@@ -13,7 +13,9 @@ namespace Schoolbox\Realtime\Worker;
 use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
+use Alaress\WorkerCrew\Worker\PipeWriter;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
@@ -24,11 +26,12 @@ class RerouteWorker extends AbstractProcess {
 	/**
 	 * @param QueueSorter $queueSorter
 	 * @param LoopInterface $loop
+     * @param LoggerInterface $log
+     * @param PipeWriter $writer
 	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
 	 */
-	public function __construct($queueSorter, $loop, $strat = null, $debug = null) {
-		parent::__construct($loop, $strat, $debug);
+	public function __construct($queueSorter, $loop, $log, $writer, $strat) {
+		parent::__construct($loop, $log, $writer, $strat);
 		$this->sorter = $queueSorter;
 	}
 
@@ -45,12 +48,12 @@ class RerouteWorker extends AbstractProcess {
 			throw new InvalidArgumentException("Worker can only reroute");
 		}
 		$count = 0;
-		$this->debug->v("Iterating frames provided");
+		$this->log->debug("Iterating frames provided");
 		foreach($args as $v) {
 			list($user, $frame) = $v;
 			$count += $this->sorter->process($user, $frame) ? 1 : 0;
 		}
-		$this->debug->v("Rerouted $count message".($count == 1 ? '' : 's'));
+		$this->log->info("Rerouted $count message".($count == 1 ? '' : 's'));
 		return $count;
 
 	}
