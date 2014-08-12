@@ -112,11 +112,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 continue;
             }
 
-			/* If something was submitted to this box, hide it from the component
-			 */
-			if ($submission_counts[$submission->getId()]) {
-				continue;
-			}
+            /* If student can no longer submit to this box,
+             * hide it from the component
+             */
+            if ($submission_counts[$submission->getId()]
+                && !$submission->getAcceptMultiple()
+            ) {
+                continue;
+            }
 
             $box_id = $submission->getId();
 
