@@ -44,9 +44,24 @@ if (!empty($_POST)) {
 	$data['config'] = json_encode($config);
 
 	/* Because questions and answers aren't stored in separate tables
-	 * in the QuestionBank context
+	 * in the QuestionBank context, so this had to get decomposed a bit
+	 * which is severely unfortunate
+	 *
+	 * Non-json stringified answers use 'answer' key
+	 * Json-stringified answers use 'allAnswers' key
+	 *
+	 * Sigh
+	 *
+	 * TODO: Sigh.
 	 */
-	$data['answer'] = $answerHandler->encodeForQuestionBank($data['allAnswers']);
+	if (isset($data['allAnswers'])) {
+		$encoded = $answerHandler->encodeForQuestionBank($data['allAnswers']);
+	}
+	else if (isset($data['answer'])) {
+		$encoded = $answerHandler->encodeForQuestionBank($data['answer']);
+	}
+
+	$data['answer'] = $encoded;
 
 	/* Context-specific questionHandler, for the QuestionBank
 	 */
