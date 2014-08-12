@@ -149,6 +149,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         return unserialize($answerGroup['answer']);
     }
 
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return serialize(json_decode($data));
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.

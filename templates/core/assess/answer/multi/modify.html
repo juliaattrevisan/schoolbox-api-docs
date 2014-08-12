@@ -29,20 +29,39 @@
                             }
                         });
 
-                        var data = {
-                            section_id:theForm.find('input[name=section_id]').val(),
-                            question_id:theForm.find('input[name=question_id]').val(),
-                            sequence:theForm.find('input[name=sequence]').val(),
-                            type_id:theForm.find('input[name=type_id]').val(),
-                            question:tinyMCE.get('question').getContent(),
-                            marks:theForm.find('input[name=marks]').val(),
-                            allAnswers:JSON.stringify(answerCollection),
-							configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
-                        };
+						if (questionBank == undefined) {
+							var data = {
+								section_id:theForm.find('input[name=section_id]').val(),
+								question_id:theForm.find('input[name=question_id]').val(),
+								sequence:theForm.find('input[name=sequence]').val(),
+								type_id:theForm.find('input[name=type_id]').val(),
+								question:tinyMCE.get('question').getContent(),
+								marks:theForm.find('input[name=marks]').val(),
+								allAnswers:JSON.stringify(answerCollection),
+								configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+							};
 
-                        $j.post(theForm.attr('action'), data, function (responseText) {
-                            window.location = '/assess/question/modify/' + data.question_id;
-                        });
+							$j.post(theForm.attr('action'), data, function (responseText) {
+								window.location = '/assess/question/modify/' + data.question_id;
+							});
+						}
+						/* Editing from QuestionBank context
+						 */
+						else {
+							var data = {
+								question_bank_id:theForm.find('input[name=question_bank_id]').val(),
+								sequence:theForm.find('input[name=sequence]').val(),
+								type_id:theForm.find('input[name=type_id]').val(),
+								question:tinyMCE.get('question').getContent(),
+								marks:theForm.find('input[name=marks]').val(),
+								allAnswers:JSON.stringify(answerCollection),
+								configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+							};
+
+							$j.post(theForm.attr('action'), data, function (responseText) {
+								window.location = questionBank.url;
+							});
+						}
 
                         return false;
                     },
