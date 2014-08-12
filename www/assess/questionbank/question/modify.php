@@ -10,7 +10,6 @@
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
-$sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 
 /* If a question was submitted
@@ -20,10 +19,8 @@ if (!empty($_POST)) {
         error(116);
     }
 
-//    $section = $sectionHandler->getByID($_POST['section_id']);
-//    $assess = $assessHandler->getByID($section['assess_id']);
-//
-    $questionHandler = $factory->createQuestionModel($_POST['type_id']);
+	$questionHandler = $factory->createQuestionModel($_POST['type_id']);
+	$answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
 	/* If configuration was provided
 	 */
@@ -46,10 +43,15 @@ if (!empty($_POST)) {
 	$data = $_POST;
 	$data['config'] = json_encode($config);
 
-	/* Context-specific questionHandler
+	/* Because questions and answers aren't stored in separate tables
+	 * in the QuestionBank context
+	 */
+	$data['answer'] = $answerHandler->encodeForQuestionBank($data['allAnswers']);
+
+	/* Context-specific questionHandler, for the QuestionBank
 	 */
 	$questionBank = new Assess_Question_Bank();
-    $questionBank->getQuestionHandler()->update($data);
+	$questionBank->getQuestionHandler()->update($data);
 
     /* Find the assess summary page
      */
@@ -109,12 +111,13 @@ else {
     $this->parse('answerInputs_block', 'answerFormFragment', true);
 
     $this->setVar(array(
+		'QUESTION_BANK_ID' => $question['question_bank_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
-		'QUESTION_BANK_ID' => $question['question_bank_id'],
 		'QUESTION' => Scrub::text($question['question']),
 		'MARKS' => $question['marks'],
+		'QUESTION_BANK_REDIRECT_URL' => '/assess/questionbank/contents'
     ));
 }
 

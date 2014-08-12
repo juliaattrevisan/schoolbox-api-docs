@@ -41,7 +41,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
                 $answer['sequence']++;
             }
 
-            $answer['answer'] = serialize($answer['answer']);
+            $answer['answer'] = $this->encode($answer['answer']);
 
             // only important on an update but we want to make sure we dont delete anything if there is no answers
             $this->db->delete($this->_table, 'question_id', $question_id);
@@ -125,6 +125,16 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 		else {
 			$page->setVar('answerOption_block', '');
 		}
+	}
+
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return serialize(json_decode($data));
 	}
 
     /**
