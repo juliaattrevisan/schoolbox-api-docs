@@ -86,7 +86,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract {
 			foreach($allTypes as $currentType) {
 				$this->getPage()->setVar(array(
 					'EVENT_TYPE_ID' => $currentType['eventTypeID'],
-					'EVENT_TYPE_NAME' => $currentType['eventType'],
+					'EVENT_TYPE_NAME' => Scrub::text($currentType['eventType']),
 				));
 
 				$this->getPage()->parse('event_type_block', 'event_type', true);

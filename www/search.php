@@ -679,7 +679,7 @@ if (!empty($result['event'])) {
 
         $page->setVar(array(
             'EVENT_TITLE' => Scrub::html2text($event['note']),
-            'EVENT_TYPE' => $event['eventType'],
+            'EVENT_TYPE' => Scrub::text($event['eventType']),
             'EVENT_DETAIL' => Scrub::html2text($event['detail']),
             'EVENT_DATE' => implode('-', array_reverse(explode('-', $event['startDate']))), // yep... -_-
             'EVENT_LOCATION' => $event['location'],

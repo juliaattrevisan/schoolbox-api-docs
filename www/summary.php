@@ -73,7 +73,7 @@ else
 		else
 				$page->setVar("TIME", $event['startTime']." - ".$event['endTime']);
 
-		$page->setVar("NOTE_COLOUR", $cal->displayColour($event['priority']));
+		$page->setVar("NOTE_COLOUR", Scrub::text($cal->displayColour($event['priority'])));
 		$page->setVar("NOTE_DESCRIPTION", $event['note']);
 		$page->parse("note_listing","note_block", true);
 
