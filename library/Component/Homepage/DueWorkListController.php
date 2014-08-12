@@ -90,13 +90,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
-        $return_counts     = array();
         $submission_counts = array();
         if ($this->groupHandler->isStudent()) {
             $box_id_list = $this->submissionList->getColumnValues('id');
-            $return_counts = SubmissionBox\ReturnedWorkMapper::getInstance()->findCountsForSubmissionBoxes(
-                $box_id_list, $_SESSION['id']
-            );
             $submission_counts = SubmissionBox\SubmissionMapper::getInstance()->findCountsForSubmissionBoxes(
                 $box_id_list, $_SESSION['id']
             );
@@ -152,9 +148,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 if (!$isTask) {
                     $displayActions = false;
                     $actionURL = '/submission/submissionHistory/' . $box_id .'/'. $_SESSION['id'];
-
-					/* Button Gravestone
-					 */
                 }
             }
 
