@@ -146,7 +146,7 @@ class AjaxFlot {
 				'USER_USER_ID' => $currentData['userId'],
 				'USER_FIRSTNAME' => $currentData['firstname'],
 				'USER_LASTNAME' => $currentData['lastname'],
-				'USER_GROUP' => $currentData['name'],
+				'USER_GROUP' => \Scrub::text($currentData['name']),
 				'USER_BYTES' => $bytes->bytesToString($currentData['bytes']),
 			));
 

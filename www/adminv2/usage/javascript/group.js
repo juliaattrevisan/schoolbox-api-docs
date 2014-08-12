@@ -87,6 +87,7 @@
 
 			/* Make every bar relative to max
 			 */
+			var html = $('<h3></h3>').text(config.title);
 			for (var i = 0; i < datasets.length; i++) {
 				var used = parseInt(datasets[i].data);
 
@@ -97,24 +98,13 @@
 					var percentage = 0;
 				}
 
-				var html = '\
-					<div>\
-						<h4>\
-							{NAME}\
-						</h4>\
-						{BAR}\
-					</div>\
-				';
-
-				var html = html.replace('{NAME}', datasets[i].label);
-				var html = html.replace('{BAR}', $.fn.bargraphPlainAmount(used, percentage));
-
-				output += html;
+				var line = $('<div><h4></h4></div>');
+				line.find('h4')
+					.text(datasets[i].label)
+					.after($.fn.bargraphPlainAmount(used, percentage));
+				html.append(line);
 			}
-
-			var output = output.replace('{TITLE}', config.title);
-
-			config.element.html(output);
+			config.element.html(html);
 		}
 
 		/**
