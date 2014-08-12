@@ -16,6 +16,20 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
     public $_table = 'assess_question_bank';
     public $_index = 'question_bank_id';
 
+	/**
+	 * Handler
+	 *
+	 * @var Assess_Question
+	 */
+	protected $questionHandler = null;
+
+	/**
+	 * Handler
+	 *
+	 * @var null
+	 */
+	protected $answerHandler = null;
+
     /**
      * Get a list of all the questions in the question bank, and show what types
      * they are.
@@ -67,4 +81,57 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
 			'config' => $question['config'],
         ));
     }
+
+	/**
+	 * Make the assess_question_bank table behave like assess_question
+	 */
+	protected function setContext() {
+
+		/* Use context-specific fields
+		 */
+		$this->getQuestionHandler()->setAllowedFields(array(
+			'question_bank_id', 'question_category_id', 'type_id',
+			'question', 'answer', 'marks',
+			'config', 'deleted_at'
+		));
+	}
+
+	/* Getters/Setters
+ 	 */
+
+	/**
+	 * Set question handler
+	 *
+	 * @param \Evaluation_Question|null $questionHandler
+	 */
+	protected function setQuestionHandler($questionHandler) {
+		$this->questionHandler = $questionHandler;
+	}
+
+	/**
+	 * Get question handler
+	 *
+	 * @return \Evaluation_Question|null
+	 */
+	public function getQuestionHandler() {
+		return $this->questionHandler;
+	}
+
+	/**
+	 * Set answer handler
+	 *
+	 * @param null $answerHandler
+	 */
+	protected function setAnswerHandler($answerHandler) {
+		$this->answerHandler = $answerHandler;
+	}
+
+	/**
+	 * Get answer handler
+	 *
+	 * @return null
+	 */
+	public function getAnswerHandler() {
+		return $this->answerHandler;
+	}
 }
