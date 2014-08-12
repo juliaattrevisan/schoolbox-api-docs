@@ -228,7 +228,7 @@ if (!empty($result['user'])) {
             'USER_SEARCH_CAMPUS' => Scrub::text(
                 stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
             ),
-            'USER_SEARCH_GROUP' => $user['group_name'],
+            'USER_SEARCH_GROUP' => Scrub::text($user['group_name']),
         ));
 
         $page->setVar('timetable_block');

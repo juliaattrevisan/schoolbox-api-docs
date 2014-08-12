@@ -61,7 +61,7 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
                     'VISITOR_ID' => $this->visitors[$i]['id'],
                     'VISITOR_THUMB' => sprintf('/portrait.php?userId=%s&size=square64', $this->visitors[$i]['synid']),
                     'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
-                    'VISITOR_GROUP' => $this->visitors[$i]['gname'],
+                    'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['gname']),
                     'VISITOR_TOOLTIP' => sprintf(
                         "%s (last visited %s)", $uHandler->formatName($this->visitors[$i]),
                         lcfirst($dtime->getRelativeTime())

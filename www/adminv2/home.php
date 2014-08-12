@@ -177,7 +177,7 @@ if(in_array('nojscript', $this->arg)) {
 
     foreach($summary as $group) {
         $groupOut = array('GROUP_ID'        => $group['id'],
-                          'GROUP_NAME'      => $group['name'],
+                          'GROUP_NAME'      => Scrub::text($group['name']),
                           'GROUP_USER'      => $group['total'],
                           'GROUP_LOGGED_IN' => $group['logged_in']);
         $totalUser += $group['total'];

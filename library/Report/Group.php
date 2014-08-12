@@ -151,7 +151,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
 
             $page->setVar(array(
                 'COUNTABLE_COUNT' => $this->dataCount,
-                'REPORT_TITLE'    => $groupName,
+                'REPORT_TITLE'    => Scrub::text($groupName),
                 'SORT_BASE'       => "group/{$this->getIndexID()}",
                 'COUNTABLE'       => 'members',
             ));

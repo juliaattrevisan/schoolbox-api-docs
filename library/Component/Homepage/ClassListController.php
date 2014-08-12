@@ -106,7 +106,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             'PERSON_UID' => $user['uid'],
                             'PERSON_EXTERNAL_ID' => $user['synergy_id'],
                             'PERSON_NAME' => $name,
-                            'PERSON_GROUP' => $user['gname'],
+                            'PERSON_GROUP' => Scrub::text($user['gname']),
                         )
                     );
 

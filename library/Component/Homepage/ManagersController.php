@@ -89,7 +89,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     'PERSON_UID' => $manager['uid'],
                     'PERSON_NAME' => $name,
                     'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
-                    'PERSON_GROUP' => $meta['gname'],
+                    'PERSON_GROUP' => Scrub::text($meta['gname']),
                 ));
 
 				/* Don't display images in list view

@@ -68,7 +68,7 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
                     'VISITOR_ID' => $this->visitors[$i]['id'],
                     'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
                     'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
-                    'VISITOR_GROUP' => $this->visitors[$i]['group_name'],
+                    'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['group_name']),
                     'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100)
                 )
             );

@@ -274,7 +274,7 @@ foreach($data['namespace'] as $namespace) {
 			foreach($source['roles'] as $role) {
 				$this->setVar(array(
 					'ROLE_ID'   => $role['id'],
-					'ROLE_NAME' => $role['name'],
+					'ROLE_NAME' => Scrub::text($role['name']),
 
 					'perm_block' => '',
 					'perm_option_block' => '',

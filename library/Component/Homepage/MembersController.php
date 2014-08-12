@@ -83,7 +83,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     'PERSON_UID' => $user['uid'],
                     'PERSON_NAME' => $name,
                     'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                    'PERSON_GROUP' => $meta['gname'],
+                    'PERSON_GROUP' => Scrub::text($meta['gname']),
                     'LIST_STYLE' => $displayOptions[$display]['css'],
                 ));
 

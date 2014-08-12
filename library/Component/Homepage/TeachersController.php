@@ -75,7 +75,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             'PERSON_UID' => $teacher['uid'],
                             'PERSON_NAME' => $teacher['firstname'] . ' ' . $teacher['lastname'],
                             'PERSON_EXTERNAL_ID' => $synid,
-                            'PERSON_GROUP' => $meta['gname'],
+                            'PERSON_GROUP' => Scrub::text($meta['gname']),
                         ));
 
                         /* Don't display images in list view

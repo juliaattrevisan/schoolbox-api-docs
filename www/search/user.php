@@ -151,7 +151,7 @@ if (is_numeric($this->arg[0])) {
         'CAMPUS_ID' => $user['campus'],
         'EMAIL_ADDRESS' => $emailAddress,
         'EMAIL' => $email,
-        'POSITION' => $user['gname'],
+        'POSITION' => Scrub::text($user['gname']),
         'HOMEPAGE' => '',
         'SYNERGY_ID' => $user['synergy_id'],
     );

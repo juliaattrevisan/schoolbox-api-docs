@@ -70,7 +70,7 @@ if($enabled) {
 		/** @var \Schoolbox\Role $role */
 
 		$this->setVar(array(
-			'ROLE_NAME' => $role->getName(),
+			'ROLE_NAME' => Scrub::text($role->getName()),
 			'ROLE_ID'   => $role->getId()
 		));
 

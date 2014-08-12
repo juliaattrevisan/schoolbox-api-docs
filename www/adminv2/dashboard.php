@@ -33,7 +33,7 @@ if ( is_array($groupList) ) {
     foreach ( $groupList as $group ) {
         $this->setVar(array(
             'group.id'   => $group['id'],
-            'group.name' => $group['name']
+            'group.name' => Scrub::text($group['name'])
         ));
 
         $this->parse('group_block', 'group', true);
