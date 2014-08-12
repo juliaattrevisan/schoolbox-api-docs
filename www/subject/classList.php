@@ -88,7 +88,7 @@ if ($groupHandler->isStaff()) {
 					'SURNAME' => $student['lastname'],
 					'FIRSTNAME' => $student['firstname'],
 					'YEARLEVEL' => $student['yearlevel'],
-					'HOUSE' => $student['house'],
+					'HOUSE' => Scrub::text($student['house']),
 					'LASTVISIT' => $lastVisit ? $lastVisit : 'Never',
 					'ID' => $user['uid'],
 					'SYNERGYID' => $student['synergy_id'],
