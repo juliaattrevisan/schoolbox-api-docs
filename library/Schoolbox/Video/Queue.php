@@ -64,11 +64,16 @@ class Queue extends ResourceVideo {
 			}
 		}
 
-		//
-		// Get a scale factor for this video (rounding down to nearest even #)
-		if ($width && $height) {
+		// Get a scale factor for this video
+        if($height > 720) {
+            // some idevices cannot play back 1080p so we are limiting to 720p as a max
+            $scale = '-vf scale=-1:720';
+        }
+        else if (($width && $height)) {
+            //avconv does not like uneven heights and widths so this makes them all even
 			$scale = sprintf('-vf scale=%d:%d', intval($width/2)*2, intval($height/2)*2);
 		}
+
 
         // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
         $rotation = 0;
