@@ -148,9 +148,10 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 	public function encodeForQuestionBank($data) {
 		return serialize(json_decode($data));
 	}
-	
+
 	/**
 	 * Assign a letter to the Other portion of possible answers
+	 *
 	 * @param $allAnswers
 	 * @return string
 	 */
