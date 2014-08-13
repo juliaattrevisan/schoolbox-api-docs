@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
 
 $j(function() {
@@ -168,9 +169,21 @@ $j(function() {
 			},
 			alt_email: {
 				email:true	
+			},
+			firstname: {
+				require_from_group: [1, '.name-required']
+			},
+			lastname: {
+				require_from_group: [1, '.name-required']
 			}
 		},
 		messages: {
+			firstname: {
+				require_from_group: "Please enter either a first name or surname"
+			},
+			lastname: {
+				require_from_group: "Please enter either a first name or surname"
+			},
 			defaultCampus: "Please select a default campus",
 			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
 		},
@@ -291,10 +304,10 @@ $j(function() {
 					</select>
 				</label>
 				<label for="firstname" class="width2 first">First Name
-					<input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" class="required" />
+					<input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" class="name-required" />
 				</label>
 				<label for="lastname">Surname
-					<input id="lastname" type="text" name="lastname" value="{LASTNAME}" class="required"/>
+					<input id="lastname" type="text" name="lastname" value="{LASTNAME}" class="name-required"/>
 				</label>
 				<label for="database" class="">{DATABASE_TYPE} ID
 					<input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
