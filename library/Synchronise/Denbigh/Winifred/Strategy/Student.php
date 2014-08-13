@@ -51,6 +51,7 @@ class Synchronise_Denbigh_Winifred_Strategy_Student extends Synchronise_Denbigh_
         $newUser['house']                = $this->getHouse($currentUser['house']);
         $newUser['residential_house_id'] = $this->getResidentialHouse($currentUser['cateringHouse']);
         $newUser['alt_email']            = $currentUser['username'] . ($newUser['campus'][0] == self::GIBGATE_CAMPUS_ID ? '@gibgate.nsw.edu.au':'@frensham.nsw.edu.au');
+        $newUser['webmail']              = $newUser['campus'][0] == self::GIBGATE_CAMPUS_ID ? '0':'1';
         $newUser['local_email']          = 0;
         $newUser['defaultCampus']        = $newUser['campus'][0];
         $newUser['eportfolio_enabled']   = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
