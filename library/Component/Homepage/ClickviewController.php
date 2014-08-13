@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
     }
 
@@ -22,7 +24,8 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'clickview')) {
             return false;
         }
@@ -40,7 +43,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
          * So just hide all this instead
          */
         if (strlen(trim($this->getConfig('url')))) {
-
             /* Pattern match the necessary code out of a url given to us
              * by the Clickview web interface
              *
@@ -58,7 +60,11 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             /* Latest version now provides iframe embedding but uses a masking URL, so annoying
             * http://clickv.ie/w/-eFa
              * Also can be embed code with the following URL
-             * <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="http://online.clickview.com.au/Share/PlayEmbed?shareCode=b207b279&a=false"></iframe>
+             * <iframe frameborder="0"
+             *  allowfullscreen webkitallowfullscreen mozallowfullscreen
+             *  width="640" height="360"
+             *  src="http://online.clickview.com.au/Share/PlayEmbed?shareCode=b207b279&a=false"
+             * ></iframe>
              */
 
             $patternRedir = '/clickv\.ie\/w\/([a-zA-Z0-9\-]+)/';
@@ -68,31 +74,30 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $matches = array();
 
             if (preg_match($pattern, $this->getConfig('url'), $matches)) {
-                $this->setVar('VIDEO_ID',$matches[2]);
+                $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('has_clickview_block', 'has_clickview');
-            }
-            else if (preg_match($patternOnline, $this->getConfig('url'), $matches)) {
+            } elseif (preg_match($patternOnline, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('online_clickview_block', 'online_clickview');
-            }
-            else if (preg_match($patternIframe, $this->getConfig('url'), $matches)) {
+            } elseif (preg_match($patternIframe, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
-            }
-            else if (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
-
+            } elseif (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
                 //Fetch redirect headers from shorten URL for video ID
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $this->getConfig('url'));
                 curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
                 curl_exec($ch);
                 $curlinfo = curl_getinfo($ch);
 
-                if(preg_match('/shareCode=([a-zA-Z0-9\-]+)/', $curlinfo['redirect_url'], $matches)) {
-                    $this->setVar('VIDEO_ID', $matches[1]);
+                parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
+                $parts = array_change_key_case($parts, CASE_LOWER);
+                if (isset($parts['sharecode'])) {
+                    // TODO: store the video ID once it is known
+                    $this->setVar('VIDEO_ID', $parts['sharecode']);
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
             }
@@ -100,5 +105,4 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
         return true; // everything went according to plan
     }
-
 }
