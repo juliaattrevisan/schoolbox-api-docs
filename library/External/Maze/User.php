@@ -686,6 +686,19 @@ class External_Maze_User implements External_UserInterface {
 				AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
 			";
 
+			$query = "
+				SELECT
+					THTQ.SUBJ AS ClassCode,
+					THTQ.CLASS AS ClassNumber,
+					SU.FULLNAME AS name,
+					'' AS classType,
+					'' AS ClassCampus
+				FROM THTQ
+				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
+				AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
+			";
+
 			$part2 = $this->getDb()->getAll($query);
 
 			if (!$part2) {
@@ -702,11 +715,17 @@ class External_Maze_User implements External_UserInterface {
 		$processedIds = array();
 
 		/* Format it in a schoolbox-friendly way
-		 * Also uniqueify this list
+		 * Also uniqueify this list using classCode/classNumber combination
 		 */
 		if (is_array($allSubjects) && count($allSubjects)) {
 			foreach($allSubjects as $currentSubject) {
-				if (!in_array($currentSubject['ClassCode'], $processedIds)) {
+
+				/* Don't display these timetable items as part of Subject List
+				 * (Not Available, Faculty Meetings, Gate Duty, etc)
+				 */
+				$match = preg_match('#^NOT|^FACUL|^MEET|^TSHOP|^FRONT|^STAFF|\d?A/F|^QUAD#', $currentSubject['ClassCode']);
+
+				if (!$match) {
 					if (strlen($currentSubject['ClassNumber'])) {
 						$classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
 					}
@@ -714,14 +733,16 @@ class External_Maze_User implements External_UserInterface {
 						$classCode = $currentSubject['ClassCode'];
 					}
 
-					$subjectList[] = array(
-						'code' => $classCode,
-						'name' => $currentSubject['name'],
-						'classType' => $currentSubject['classType'],
-						'campusCode' => $currentSubject['ClassCampus']
-					);
+					if (!in_array($classCode, $processedIds)) {
+						$subjectList[] = array(
+							'code' => $classCode,
+							'name' => $currentSubject['name'],
+							'classType' => $currentSubject['classType'],
+							'campusCode' => $currentSubject['ClassCampus']
+						);
 
-					$processedIds[] = $currentSubject['ClassCode'];
+						$processedIds[] = $classCode;
+					}
 				}
 			}
 		}

@@ -146,30 +146,35 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->setVar("PERIOD_END", $period['periodEnd']);
                         $periodCount++;
 
-                        if ($period['description']) {
+						/* Always highlight the current cell, regardless of
+						 * whether it has something on or not
+						 */
+						if ($current_period['PeriodNumber'] == $period['periodNumber']) {
+							$this->setVar(
+								array(
+									'PERIOD_CLASS' => 'current',
+									'PERIOD_TH_CLASS' => 'dayCurrent'
+								)
+							);
+						}
+						else {
+							$this->setVar(
+								array(
+									'PERIOD_CLASS' => 'normal',
+									'PERIOD_TH_CLASS' => 'normal'
+								)
+							);
+						}
 
+						/* Display info only if it exists
+						 * Otherwise empty cell
+						 */
+                        if ($period['description']) {
                             $this->setVar('PERIOD_DESC', $period['description']);
                             $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
                             $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
                             $this->setVar('PERIOD_ROOM', $period['room']);
                             $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
-
-                            if ($current_period['PeriodNumber'] == $period['periodNumber']) {
-                                $this->setVar(
-                                    array(
-                                        'PERIOD_CLASS' => 'current',
-                                        'PERIOD_TH_CLASS' => 'dayCurrent'
-                                    )
-                                );
-                            }
-                            else {
-                                $this->setVar(
-                                    array(
-                                        'PERIOD_CLASS' => 'normal',
-                                        'PERIOD_TH_CLASS' => 'normal'
-                                    )
-                                );
-                            }
 
                             /* Handle colour array */
                             if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
@@ -217,10 +222,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     'PERIOD_ABSENTEES' => '',
                                     'PERIOD_URL' => '#',
                                     'has_attendances_block' => '',
-                                    'PERIOD_CLASS' => 'normal',
-                                    'PERIOD_TH_CLASS' => 'normal',
                                 )
                             );
+
                             $this->parse('period_class_block', 'period_class');
                         }
 

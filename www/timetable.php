@@ -223,6 +223,14 @@ if (is_array($outputList)) {
                                         )
                                     );
                                     break;
+								case 'maze':
+									$period_staff = $userHandler->formatName(
+										array(
+											'title' => $period['staffTitle'],
+											'lastname' => $period['staffSurname']
+										)
+									);
+									break;
                                 case 'tass':
                                 case 'schoolbox':
                                     $period_staff = $period['staffCode'];

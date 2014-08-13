@@ -17,11 +17,14 @@ class External_Maze_Helper {
 	 */
 	private $db = null;
 
+	private $currentSemester = '';
+
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->setDb(MSSQL::getInstance());
+		$this->setCurrentSemester($this->determineCurrentSemester());
 	}
 
 	/**
@@ -33,17 +36,38 @@ class External_Maze_Helper {
 		$currentYear = $now->getUsingFormat('Y');
 		$currentSemester = $this->getCurrentSemester();
 
-		/* TODO: Hard code this for now
-		 *
-		 * CURRENT_SEMESTER is empty in the Maze db
-		 */
-		$currentSemester = 2;
-
 		/* Only get subjects that are relevant now
 		 */
 		$ttPeriod = "{$currentYear}S{$currentSemester}";
 
 		return $ttPeriod;
+	}
+
+	/**
+	 * As designed by Samuel himself
+	 *
+	 * @return bool|string
+	 */
+	public function currentDate() {
+
+		/* Samuel wanted it like this.
+		 * My life, where did it go?
+		 */
+		if (date('d') < 10) {
+			return date('M  d Y');
+		}
+
+	 	return date('M d Y');
+	}
+
+	/**
+	 * Take a Maze datetime and returns the time portion of it
+	 *
+	 * @param $date
+	 * @return string
+	 */
+	public function mazeTime($date) {
+		return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
 	}
 
 	/**
@@ -55,17 +79,82 @@ class External_Maze_Helper {
 	 * @param null $externalUserId
 	 * @return mixed
 	 */
-	public function getCurrentSemester($externalUserId = null) {
+	public function determineCurrentSemester($externalUserId = null) {
+		$currentYear = date('Y');
+
 		$query = "
-			SELECT CURRENT_SEMESTER
-			FROM SI
+			SELECT
+			 	THKEY,
+			 	CALENDAR_START01,
+			 	CALENDAR_START02,
+			 	CALENDAR_START03,
+			 	CALENDAR_START04,
+			 	CALENDAR_END01,
+			 	CALENDAR_END02,
+			 	CALENDAR_END03,
+			 	CALENDAR_END04
+			FROM TH
+			WHERE THKEY LIKE '{$currentYear}%'
+			ORDER BY THKEY DESC
 		";
 
-		$row = $this->getDb()->getRow($query);
+		$allRows = $this->getDb()->getAll($query);
 
-		preg_match('/\d+S(\d+)/', $row['CURRENT_SEMESTER'], $matches);
+		/* For every semester in the current year, find one which fits
+		 * the current datetime
+		 */
+		foreach ($allRows as $currentRow) {
 
-		return $matches[1];
+			/* Find the earliest start
+			 */
+			$afterSemesterStart = false;
+
+			for ($i = 1; $i < 5; $i++) {
+				$key = "CALENDAR_START0{$i}";
+
+				$currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
+				$currentTime = $currentDate->getUnixTimestamp();
+
+				if ($currentRow[$key] != '') {
+					if ($currentTime < $_SERVER['REQUEST_TIME']) {
+						$afterSemesterStart = true;
+						break;
+					}
+				}
+			}
+
+			/* Find the latest end
+			 */
+			$beforeSemesterEnd = false;
+
+			for ($i = 1; $i < 5; $i++) {
+				$key = "CALENDAR_END0{$i}";
+
+				$currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
+				$currentTime = $currentDate->getUnixTimestamp();
+
+				if ($currentRow[$key] != '') {
+					if ($currentTime >= $_SERVER['REQUEST_TIME']) {
+						$beforeSemesterEnd = true;
+						break;
+					}
+				}
+			}
+
+			/* You are currently in the most recently added semester definition
+			 */
+			if ($afterSemesterStart && $beforeSemesterEnd) {
+				return str_replace("{$currentYear}S", '', $currentRow['THKEY']);
+			}
+
+			/* Not in this semester yet? Maybe try an older one from the same year
+			 * Continue with loop
+			 */
+		}
+
+		/* In between semesters
+		 */
+		return '';
 	}
 
 	/**
@@ -114,5 +203,23 @@ class External_Maze_Helper {
 	 */
 	private function getDb() {
 		return $this->db;
+	}
+
+	/**
+	 * Set current semester
+	 *
+	 * @param string $currentSemester
+	 */
+	private function setCurrentSemester($currentSemester) {
+		$this->currentSemester = $currentSemester;
+	}
+
+	/**
+	 * Get current semester
+	 *
+	 * @return string
+	 */
+	public function getCurrentSemester() {
+		return $this->currentSemester;
 	}
 }
