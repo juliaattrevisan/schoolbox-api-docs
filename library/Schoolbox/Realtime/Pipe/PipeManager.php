@@ -23,7 +23,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
-use React\Stomp\Factory as StompFactory;
+use React\Stomp\Client;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
@@ -74,12 +74,13 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * @param LoopInterface $reactLoop
 	 * @param SessionValidator $sessionValidator
 	 * @param Debug $debug
+     * @param Client $stompClient
 	 * @param DispatchStrategyInterface $strat
      * @param
 	 */
-	public function __construct($reactLoop, $sessionValidator, $debug, $strat = null) {
+	public function __construct($reactLoop, $sessionValidator, $stompClient, $debug, $strat = null) {
 		$this->pipes = new PipeCollection($sessionValidator, $debug);
-		$this->subscriptionManager = new SubscriptionManager(new StompFactory($reactLoop), $this);
+		$this->subscriptionManager = new SubscriptionManager($stompClient, $this);
 		$this->reactLoop = $reactLoop;
 		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $debug, $strat);
 		$this->verboser = $debug;

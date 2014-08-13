@@ -12,7 +12,6 @@ namespace Schoolbox\Realtime\Stomp;
 
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
-use React\Stomp\Factory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
@@ -25,8 +24,8 @@ class SubscriptionManager {
 	/** @var PipeManager */
 	protected $pipeManager;
 
-	/** @var Factory */
-	protected $stompFactory;
+	/** @var Client */
+	protected $stompClient;
 
 	/** @var Subscription[] */
 	protected $subscriptions;
@@ -35,13 +34,13 @@ class SubscriptionManager {
 	protected $conf;
 
 	/**
-	 * @param Factory $stompFactory
+	 * @param Client $stompClient
 	 * @param PipeManager $pipeManager
 	 */
-	public function __construct($stompFactory, $pipeManager) {
+	public function __construct($stompClient, $pipeManager) {
 		// this factory requires its own loop to work
 		$this->subscriptions = array();
-		$this->stompFactory = $stompFactory;
+		$this->stompClient = $stompClient;
 		$this->pipeManager = $pipeManager;
 		$this->conf = ConfigMapper::getInstance();
 	}
@@ -68,25 +67,12 @@ class SubscriptionManager {
 		$this->pipeManager->v('SUBSCRIBE', '+');
 
 		try {
-			$client = $this->stompFactory->createClient(array(
-				'host'      => $this->conf->get('amqp_host'),
-				'port'      => $this->conf->get('amqp_stomp_port'),
-				'vhost'     => '/',
-				'login'     => $this->conf->get('amqp_user'),
-				'passcode'  => $this->conf->get('amqp_pass'),
-			));
-
-			$self = $this;
-
-			$client->connect()->then(function($client) use ($self, $userId, $responder) {
-				/** @var Client $client */
-				// this closure is executed when a stomp client connection is established
-				$self->putSubscription(new Subscription($client, $userId, $self->getPipeManager()));
-				// if a responder is provided, use it as a callback for success
-				if($responder instanceof SelfResponder) {
-					$responder->notifyPipe(json_encode(array('subscribe' => true)));
-				}
-			});
+            // this closure is executed when a stomp client connection is established
+            $this->putSubscription(new Subscription($this->stompClient, $userId, $this->getPipeManager()));
+            // if a responder is provided, use it as a callback for success
+            if($responder instanceof SelfResponder) {
+                $responder->notifyPipe(json_encode(array('subscribe' => true)));
+            }
 
 			return true;
 		}

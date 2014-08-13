@@ -8,6 +8,7 @@ use Aura\Di;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
+use React\Stomp\Factory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\SessionValidator;
 
@@ -74,9 +75,23 @@ $kernel->run(function($di, $loop, $debug, $opts) {
 		$debug->v("Using default strat");
 	}
 
-    $sessionValidator = new SessionValidator($redis, new PhpHandler(), $di->get('config')->get('session_length'));
+    $conf = $di->get('config');
+    $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'));
 
-    $pipeManager = new PipeManager($loop, $sessionValidator, $debug, $poolStrat);
+    $stompFactory = new Factory($loop);
+
+    // we have but one STOMP client (ie. socket connection) to rabbit for all our subscriptions
+    $client = $stompFactory->createClient(array(
+        'host'      => $conf->get('amqp_host'),
+        'port'      => $conf->get('amqp_stomp_port'),
+        'vhost'     => '/',
+        'login'     => $conf->get('amqp_user'),
+        'passcode'  => $conf->get('amqp_pass'),
+    ));
+
+    $client->connect(2)->then(function ($client) use ($loop, $sessionValidator, $debug, $poolStrat, $opts) {
+
+    $pipeManager = new PipeManager($loop, $sessionValidator, $client, $debug, $poolStrat);
 
 	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
 	$wss->disableVersion(0);
@@ -96,6 +111,7 @@ $kernel->run(function($di, $loop, $debug, $opts) {
 		throw $e;
 	}
 
+    });
 });
 
 
