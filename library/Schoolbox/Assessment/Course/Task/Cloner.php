@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
@@ -29,8 +30,8 @@ use Assess_Section;
 use Assess_Export_Xml;
 use Assess_Import_Xml;
 
-class Cloner {
-
+class Cloner
+{
     /**
      * @var Instance
      */
@@ -52,7 +53,8 @@ class Cloner {
      *
      * @param Instance $object
      */
-    public function __construct(Instance $object) {
+    public function __construct(Instance $object)
+    {
         $this->task_instance = $object;
         $this->unit          = UnitInstanceMapper::getInstance()->findById(
             $object->getUnitInstance()->getId()
@@ -70,7 +72,8 @@ class Cloner {
      * @return OnlineAssessment The assessment that was created.
      * @throws ClonerException  if the assessment was not able to be created
      */
-    public function cloneAssessment() {
+    public function cloneAssessment()
+    {
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
             $handler  = new Assess_Main();
@@ -110,6 +113,7 @@ class Cloner {
                 ->setFinish($this->getAssessmentCloseTimeFromTask())
             ;
             OnlineAssessmentMapper::getInstance()->save($assess_object);
+
             return $assess_object;
         }
         throw new ClonerException('No assessment is attached to this task');
@@ -122,7 +126,8 @@ class Cloner {
      * @return SubmissionBox   The cloned submission box
      * @throws ClonerException if the box was not able to be created
      */
-    public function cloneSubmissionBox() {
+    public function cloneSubmissionBox()
+    {
         $box_id = $this->task_instance->getTask()->getSubmissionBox()->getId();
         if ($box_id) {
             $box = SubmissionBoxMapper::getInstance()->findById($box_id);
@@ -142,6 +147,7 @@ class Cloner {
                 ->copyFromCopiedSubmissionBox($box_id, $box->getId());
             SubmissionBox\Rubric\DescriptorMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($box_id, $box->getId());
+
             return $box;
         }
         throw new ClonerException('No submission box is attached to this task');
@@ -150,28 +156,39 @@ class Cloner {
     /**
      * Updates linked items (submission box or online assessment) hat is
      * attached to this object's task instance.
+     *
+     * @return void
      */
-    public function updateLinkedItems() {
-        $assess_id = $this->task_instance->getAssessment()->getId();
-        if ($assess_id) {
-            /** @var OnlineAssessment $assess_object */
-            $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
-            $assess_object
-                ->setStart($this->getOpenTimeFromTask())
-                ->setFinish($this->getAssessmentCloseTimeFromTask())
-            ;
-            OnlineAssessmentMapper::getInstance()->save($assess_object);
+    public function updateLinkedItems()
+    {
+        try {
+            $assess_id = $this->task_instance->getAssessment()->getId();
+            if ($assess_id) {
+                /** @var OnlineAssessment $assess_object */
+                $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                $assess_object
+                    ->setStart($this->getOpenTimeFromTask())
+                    ->setFinish($this->getAssessmentCloseTimeFromTask())
+                ;
+                OnlineAssessmentMapper::getInstance()->save($assess_object);
+            }
+        } catch (Exception $e) {
+            // quiz may have been deleted. Nothing to see here, move along
         }
-        $box_id = $this->task_instance->getSubmissionBox()->getId();
-        if ($box_id) {
-            /** @var SubmissionBox $box */
-            $box = SubmissionBoxMapper::getInstance()->findById($box_id);
-            $box
-                ->setOpenDate($this->getOpenTimeFromTask())
-                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
-                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
-            ;
-            SubmissionBoxMapper::getInstance()->save($box);
+        try {
+            $box_id = $this->task_instance->getSubmissionBox()->getId();
+            if ($box_id) {
+                /** @var SubmissionBox $box */
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+                $box
+                    ->setOpenDate($this->getOpenTimeFromTask())
+                    ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                    ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
+                ;
+                SubmissionBoxMapper::getInstance()->save($box);
+            }
+        } catch (Exception $e) {
+            // box may have been deleted. Nothing to see here, move along
         }
     }
 
@@ -181,7 +198,8 @@ class Cloner {
      *
      * @return \Alaress_Date_Format
      */
-    protected function getOpenTimeFromTask() {
+    protected function getOpenTimeFromTask()
+    {
         return new \Alaress_Date_Format(
             new \DateTime($this->unit->getOpenDate()->getUsingFormat('Y-m-d 00:00:00'))
         );
@@ -194,8 +212,10 @@ class Cloner {
      *
      * @return Alaress_Date_Format
      */
-    protected function getSubmissionBoxCloseTimeFromTask() {
+    protected function getSubmissionBoxCloseTimeFromTask()
+    {
         $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
+
         return new \Alaress_Date_Format($close_date);
     }
 
@@ -206,8 +226,10 @@ class Cloner {
      *
      * @return Alaress_Date_Format
      */
-    protected function getAssessmentCloseTimeFromTask() {
+    protected function getAssessmentCloseTimeFromTask()
+    {
         $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
+
         return new \Alaress_Date_Format($close_date);
     }
 }
