@@ -169,6 +169,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         // <!-- BEGIN blockages -->
         $this->setBlock($templateHandle,   'awardList',       'awardList_block');
         $this->setBlock('awardList',       'award',           'award_block');
+        $this->setBlock('award',           'awardLine',       'awardLine_block');
         $this->setBlock($templateHandle,   'detentionList',   'detentionList_block');
         $this->setBlock('detentionList',   'detention',       'detention_block');
         $this->setBlock('detention',       'detentionLine',   'detentionLine_block');
@@ -200,11 +201,14 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'AWARD_DATE'        => $award['AwardDate'],
                     'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                     'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
-                    'AWARD_COMMENT'     => $award['AwardComment'],
+                    'awardLine_block'   => '',
                 );
                 // Scrub. Assume comments may have line breaks
                 $params = array_map(array('Scrub', 'text'), $params);
-                $params['AWARD_COMMENT'] = nl2br($params['AWARD_COMMENT']);
+                foreach ($this->splitComment($params['AWARD_COMMENT']) as $line) {
+                    $this->setVar('AWARD_COMMENT_LINE', Scrub::text($line));
+                    $this->parse('awardLine_block', 'awardLine', true);
+                }
                 $this->setVar($params);
                 $this->parse('award_block', 'award', true);
             }
@@ -224,18 +228,11 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'DETENTION_COMMENT'     => $detention['DetentionComment'],
                     'detentionLine_block'   => '',
                 );
-                // Scrub.
-                // Assume comments may have line breaks, put each one in a UL.
-                // They also seem to add * characters in front of each line to
-                // denote lists, remove that.
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
-                foreach (preg_split('/[\\n\\r]+/', $params['DETENTION_COMMENT']) as $line) {
-                    $line = trim(preg_replace('/^\\W+/', '', $line));
-                    if (strlen($line) > 0) {
-                        $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
-                        $this->parse('detentionLine_block', 'detentionLine', true);
-                    }
+                foreach ($this->splitComment($params['DETENTION_COMMENT']) as $line) {
+                    $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
+                    $this->parse('detentionLine_block', 'detentionLine', true);
                 }
                 $this->parse('detention_block', 'detention', true);
             }
@@ -306,5 +303,30 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         }
 
         return true;
+    }
+
+    /**
+     * Splits comment lines on characters that may be a line break, and then
+     * trims all non-word characters from each line.
+     *
+     * This is implemented because detention lines are similar to:
+     * <pre>
+     * * Didn't turn up to class this day
+     * * Detention set for tomorrow instead
+     * </pre>
+     * or something like that.
+     *
+     * @param  string $commentLine
+     * @return array
+     */
+    protected function splitComment($commentLine) {
+        $lines = array();
+        foreach (preg_split('/[\\n\\r]+/', $commentLine) as $line) {
+            $line = trim(preg_replace('/^\\W+/', '', $line));
+            if (strlen($line) > 0) {
+                $lines[] = $line;
+            }
+        }
+        return $lines;
     }
 }
