@@ -19,6 +19,7 @@ class ResourceVideo {
 	protected $duration;
 	protected $file;
 	protected $fileID;
+    protected $config;
 
 	/**
 	 * Creates object and sets up sub-objects.
