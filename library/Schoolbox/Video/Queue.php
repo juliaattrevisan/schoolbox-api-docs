@@ -9,86 +9,89 @@
 
 namespace Schoolbox\Video;
 
-class Queue extends ResourceVideo {
+class Queue extends ResourceVideo
+{
 
-	protected $id;
-	protected $fileID;
-	protected $type;
-	protected $status;
-	protected $message;
-	protected $duration;
-	protected $created;
-	protected $modified;
+    protected $id;
+    protected $fileID;
+    protected $type;
+    protected $status;
+    protected $message;
+    protected $duration;
+    protected $created;
+    protected $modified;
 
 
-	/**
-	 * Takes existing file and transcodes into web format and creates thumbnail
-	 *
-	 * @returns boolean
-	 * @throws Exception_Schoolbox
-	 */
+    /**
+     * Takes existing file and transcodes into web format and creates thumbnail
+     *
+     * @returns boolean
+     * @throws Exception_Schoolbox
+     */
 
-	public function processVideo() {
+    public function processVideo()
+    {
         $sourceFile = $this->getSourceFile();
 
-		//
-		// Choose whether to use AVconv or FFMpeg, depending on whether AVconv
-		// exists or not.
-		// FFMpeg needs strict flag, as MP4 is technically experimental
-		$executable = 'avconv';
-		$info_exec  = 'avprobe';
-		$strict     = false;
-		exec('which avconv', $unused, $errorcode);
-		if ($errorcode) {
-			$executable = 'ffmpeg';
-			$info_exec  = 'ffprobe';
-			$strict     = true;
-		}
+        //
+        // Choose whether to use AVconv or FFMpeg, depending on whether AVconv
+        // exists or not.
+        // FFMpeg needs strict flag, as MP4 is technically experimental
+        $executable = 'avconv';
+        $info_exec = 'avprobe';
+        $strict = false;
+        exec('which avconv', $unused, $errorcode);
+        if ($errorcode) {
+            $executable = 'ffmpeg';
+            $info_exec = 'ffprobe';
+            $strict = true;
+        }
 
-		//
-		// Get information about width and height of video file
-		exec("$info_exec -show_streams ".escapeshellarg($sourceFile).' 2>&1', $info_message, $info_return);
-		$info_message = implode("\n", $info_message);
-		if (!($info_return == 0)) {
-			return false;
-		}
-		$width  = 0;
-		$height = 0;
-		$scale  = '';
-		if ($info_return == 0) {
-			if (preg_match('/width=(\\d+)/', $info_message, $matches)) {
-				list(, $width) = $matches;
-			}
-			if (preg_match('/height=(\\d+)/', $info_message, $matches)) {
-				list(, $height) = $matches;
-			}
-		}
+        //
+        // Get information about width and height of video file
+        exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
+        $info_message = implode("\n", $info_message);
+        if (!($info_return == 0)) {
+            return false;
+        }
+        $width = 0;
+        $height = 0;
+        $scale = '';
+        if ($info_return == 0) {
+            if (preg_match('/width=(\\d+)/', $info_message, $matches)) {
+                list(, $width) = $matches;
+            }
+            if (preg_match('/height=(\\d+)/', $info_message, $matches)) {
+                list(, $height) = $matches;
+            }
+        }
 
-		// Get a scale factor for this video
-        if($height > 720) {
+        // Get a scale factor for this video
+        if ($height > 720) {
             // some idevices cannot play back 1080p so we are limiting to 720p as a max
             $scale = '-vf scale=-1:720';
+        } else {
+            if (($width && $height)) {
+                //avconv does not like uneven heights and widths so this makes them all even
+                $scale = sprintf('-vf scale=%d:%d', intval($width / 2) * 2, intval($height / 2) * 2);
+            }
         }
-        else if (($width && $height)) {
-            //avconv does not like uneven heights and widths so this makes them all even
-			$scale = sprintf('-vf scale=%d:%d', intval($width/2)*2, intval($height/2)*2);
-		}
 
 
         // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
         $rotation = 0;
         $rotate = '';
         exec('which exiftool', $unused, $errorcode);
-        if(!$errorcode) {
-            $rotationCmd = 'exiftool -Rotation '.escapeshellarg($sourceFile) ."|sed 's/^[^:]*: //'";
+        if (!$errorcode) {
+            $rotationCmd = 'exiftool -Rotation ' . escapeshellarg($sourceFile) . "|sed 's/^[^:]*: //'";
             exec($rotationCmd, $rotationOut, $return);
-            if(!$return && isset($rotationOut[0])) {
+            if (!$return && isset($rotationOut[0])) {
                 $rotation = $rotationOut[0];
             }
 
-            if($rotation) {
+            if ($rotation) {
 
-                switch($rotation) {
+                switch ($rotation) {
                     case 90:
                         $rotate = 'transpose=1';
                         break;
@@ -102,8 +105,8 @@ class Queue extends ResourceVideo {
                         $rotate = '';
                 }
 
-                if($scale && $rotate) {
-                    $scale .= ','.$rotate;
+                if ($scale && $rotate) {
+                    $scale .= ',' . $rotate;
                 } else {
                     $scale = $rotate;
                 }
@@ -112,87 +115,91 @@ class Queue extends ResourceVideo {
         }
 
 
-		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
-		$processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
-			" -c:v libx264 $scale -preset slow -b 512k -r 24".
-			" -timelimit " .escapeshellarg($this->config->get('video_processing_timeout')) .' '.
-			($strict ? '-strict -2 ' : '').
-			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
+        /* Process video to 512kb in libx264 format for mobile and html5 streaming */
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
+            " -c:v libx264 $scale -preset slow -b 512k -r 24" .
+            " -timelimit " . escapeshellarg($this->config->get('video_processing_timeout')) . ' ' .
+            ($strict ? '-strict -2 ' : '') .
+            '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
-		exec($processString, $message, $return);
-		$this->setMessage(implode( "\n", $message));
+        exec($processString, $message, $return);
+        $this->setMessage(implode("\n", $message));
 
-		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
+        preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
 
-		if(isset($match[1])) {
-			$hours = $minutes = $seconds = 0;
-			sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
-			$duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
-			$this->setDuration($duration);
-		}
+        if (isset($match[1])) {
+            $hours = $minutes = $seconds = 0;
+            sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
+            $duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
+            $this->setDuration($duration);
+        }
 
-		/* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
-		$thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
-		$thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64'.(($rotate)?','.$rotate:'').' -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
-		$posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 '.(($rotate)?'-vf '.$rotate:'').' ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
+        /* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
+        $thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
+        $thumbnailString = "nice $executable -y -i " . escapeshellarg(
+                $sourceFile
+            ) . ' -f image2 -ss ' . $thumbnailSeconds . ' -vf scale=-1:64,crop=64:64' . (($rotate) ? ',' . $rotate : '') . ' -frames:v 1 ' . escapeshellarg(
+                $this->getThumbnailLocation()
+            ) . ' 2>&1';
+        $posterString = "nice $executable -y -i " . escapeshellarg(
+                $sourceFile
+            ) . ' -f image2 -ss ' . $thumbnailSeconds . ' -frames:v 1 ' . (($rotate) ? '-vf ' . $rotate : '') . ' ' . escapeshellarg(
+                $this->getPosterLocation()
+            ) . ' 2>&1';
 
-		if($return == 0){
-			exec($thumbnailString, $output, $return);
-			exec($posterString, $output, $return);
+        if ($return == 0) {
+            exec($thumbnailString, $output, $return);
+            exec($posterString, $output, $return);
 
-			if($return == 0)
-				return true;
-			else
-				return false;
-		}
-		return false;
+            if ($return == 0)
+                return true;
+            else
+                return false;
+        }
+        return false;
 
 
+    }
 
-	}
-
-    private function getSourceFile() {
+    private function getSourceFile()
+    {
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
             $sourceStore = $this->config->get('file_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
-        }
-        else if($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
+        } else if ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
             $sourceStore = $this->config->get('storage_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
-        }
-		else if($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
-			$sourceStore = $this->config->get('submission_dir');
-			return $sourceStore . '/' . $this->fileID . '.dat';
-		}
-		else if($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
-			$sourceStore = $this->config->get('myfile_dir');
-			return $sourceStore . '/' . $this->fileID . '.dat';
-		}
-        else {
+        } else if ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
+            $sourceStore = $this->config->get('submission_dir');
+            return $sourceStore . '/' . $this->fileID . '.dat';
+        } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
+            $sourceStore = $this->config->get('myfile_dir');
+            return $sourceStore . '/' . $this->fileID . '.dat';
+        } else {
             throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
         }
     }
 
 
-	public function setCreated($created) {
-		$this->created = $created;
-	}
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
 
-	public function getCreated() {
-		return $this->created;
-	}
+    public function getCreated()
+    {
+        return $this->created;
+    }
 
-	public function setModified($modified) {
-		$this->modified = $modified;
-	}
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
+    }
 
-	public function getModified() {
-		return $this->modified;
-	}
-
-
-
-
+    public function getModified()
+    {
+        return $this->modified;
+    }
 
 
 }
