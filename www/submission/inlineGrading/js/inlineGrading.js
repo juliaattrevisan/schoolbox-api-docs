@@ -138,9 +138,6 @@
 			}
 
 			var merged = $j.extend(defaults, derived, options);
-			merged.items = jQuery.parseJSON(merged.items);
-			merged.disabled = merged.disabled;
-			merged.direct = merged.direct;
 			merged.currentId = parseInt(merged.currentId);
 
 			/* Do some preprocessing first by indicating which people
