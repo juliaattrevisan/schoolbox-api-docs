@@ -30,6 +30,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     protected $absenceList;
 
     /**
+     * Late arrivals for the current user.
+     *
+     * @var array
+     */
+    protected $lateArrivalList;
+
+    /**
      * Awards for the current user.
      *
      * @var array
@@ -125,6 +132,17 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $_SESSION['FileYear'],
             $_SESSION['FileSemester']
         );
+
+        // Filter award list into absences and lateness
+        $absenceList = $this->absenceList;
+        $lateFilter = function($absence) {
+            return ($absence['LateArrivalFlag']);
+        };
+        $absenceFilter = function($absence) {
+            return !($absence['LateArrivalFlag']);
+        };
+        $this->lateArrivalList = array_filter($absenceList, $lateFilter);
+        $this->absenceList     = array_filter($absenceList, $absenceFilter);
         return true;
     }
 
