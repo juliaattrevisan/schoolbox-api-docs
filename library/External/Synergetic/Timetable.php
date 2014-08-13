@@ -1,48 +1,48 @@
 <?php
-/************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd				*
-*                                                           *
-*	This file provides access to synergetic timetable info	*	    
-*                                                           *
-************************************************************/
+/**
+ * Synergetic implementation of External_TimetableInterface
+ *
+ * @author    Alaress Pty Ltd
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 
 use Alaress\DebugBar\Instance as DebugBar;
 
-class External_Synergetic_Timetable implements External_TimetableInterface {
+class External_Synergetic_Timetable implements External_TimetableInterface
+{
 
-	/**
-	 * @var MSSQL $database
-	 */
-	private $database;
+    /**
+     * @var MSSQL $database
+     */
+    private $database;
 
-	protected $synergeticDay = array();
+    protected $synergeticDay = array();
 
-	function __construct () {
-		$this->setDatabase(MSSQL::getInstance());
-		if (DebugBar::isEnabled()) {
-			$this->getDatabase()->installCollector();
-			/** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-			$collector = $this->getDatabase()->getCollector();
-			if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-				DebugBar::getInstance()->addCollector($collector);
-			}
-		}
-		$this->groupHandler = new Group;
+    public function __construct()
+    {
+        $this->setDatabase(MSSQL::getInstance());
+        if (DebugBar::isEnabled()) {
+            $this->getDatabase()->installCollector();
+            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
+            $collector = $this->getDatabase()->getCollector();
+            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+                DebugBar::getInstance()->addCollector($collector);
+            }
+        }
+        $this->groupHandler = new Group();
+        $this->campusMapper = new \Schoolbox\CampusMapper();
+    }
 
-		$this->campusMapper = new \Schoolbox\CampusMapper();
+    public function getTimetableDefinition($campus, $day = 0)
+    {
 
+        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
+        if (!($campusModel instanceof \Schoolbox\Campus)) {
+            return array();
+        }
 
-	}
-
-	function getTimetableDefinition($campus, $day = 0) {
-
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
-		if (!($campusModel instanceof \Schoolbox\Campus)) {
-			return array();
-		}
-
-		$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
+        $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
 					FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
 					WHERE TimetableDefinition.FileYear='{$_SESSION['FileYear']}' AND
@@ -51,250 +51,254 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						(TimetableDefinition.DayNumber = '$day' )
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
-		$this->getDatabase()->query($query);
+        $this->getDatabase()->query($query);
 
-		$periodCount = 0;
+        $periodCount = 0;
 
-		while($period = $this->getDatabase()->getNextArray() ) {
-			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
-			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
+        while ($period = $this->getDatabase()->getNextArray()) {
+            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
+            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
 
-			$timetableDef['desc'][] = $period['Description'];
-			$timetableDef['start'][] = (int)$TimeFromMatches[1].':'.$TimeFromMatches[2].strtolower($TimeFromMatches[3]);
-			$timetableDef['end'][] = (int)$TimeToMatches[1].':'.$TimeToMatches[2].strtolower($TimeToMatches[3]);
-			$timetableDef['number'][] = $period['PeriodNumber'];
-			$timetableDef['sequence'][] = $period['PeriodNumberSeq'];
-			$periodCount++;
-		}
-        
+            $timetableDef['desc'][]     = $period['Description'];
+            $timetableDef['start'][]    =
+                (int)$TimeFromMatches[1]
+                . ':' . $TimeFromMatches[2]
+                . strtolower($TimeFromMatches[3]);
+            $timetableDef['end'][]      =
+                (int)$TimeToMatches[1]
+                . ':' . $TimeToMatches[2]
+                . strtolower($TimeToMatches[3]);
+            $timetableDef['number'][]   = $period['PeriodNumber'];
+            $timetableDef['sequence'][] = $period['PeriodNumberSeq'];
+            $periodCount++;
+        }
+
         //Fall back to day 0 if nothing found
-        if($periodCount == 0 && $day != 0) {
+        if ($periodCount == 0 && $day != 0) {
             return $this->getTimetableDefinition(($campus));
         }
 
-		$timetableDef['periodCount'] = $periodCount;
-		$timetableDef['dayCount'] = $campusModel->getTimetableDay();
-		return $timetableDef;
+        $timetableDef['periodCount'] = $periodCount;
+        $timetableDef['dayCount']    = $campusModel->getTimetableDay();
+        return $timetableDef;
+    }
 
-	}
+    //gets current day number
+    public function getDayNumber($campus, $date = 0)
+    {
 
-	//gets current day number
-	function getDayNumber($campus, $date = 0) {
+        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
+        if (!($campusModel instanceof \Schoolbox\Campus)) {
+            return false;
+        }
+        $days = $campusModel->getTimetableDay();
 
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
-		if (!($campusModel instanceof \Schoolbox\Campus)) {
-			return false;
-		}
-		$days = $campusModel->getTimetableDay();
+        if (!$date) {
+            $date = mktime();
+        }
 
-		if(!$date) {
-			$date = mktime();
-		}
+        $result = $this->getDatabase()->executeProcedure(
+            'spgTimetableDay',
+            array(
+                array('@TimeTableGroup', $campusModel->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
+                array('@Date', date('Y-m-d', $date), SQLVARCHAR, false, false, -1),
+                array('@CurrentDay', 'day', SQLINT4, true, false, -1),
+            )
+        );
+        if ($result['success'] && isset($result['output']['@CurrentDay'])) {
+            return $result['output']['@CurrentDay'];
+        }
 
-		$result = $this->getDatabase()->executeProcedure(
-			'spgTimetableDay',
-			array(
-				array('@TimeTableGroup', $campusModel->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
-				array('@Date',           date('Y-m-d', $date),                SQLVARCHAR, false, false, -1),
-				array('@CurrentDay',     'day',                               SQLINT4,    true,  false, -1),
-			)
-		);
-		if ($result['success'] && isset($result['output']['@CurrentDay'])) {
-			return $result['output']['@CurrentDay'];
-		}
+        if (date('w', $date) == 0 || date('w', $date) == 6) {
+            return false;
+        }
 
-		if(date('w', $date) == 0 || date('w', $date) == 6)
-			return false;
-
-
-
-		// if operating on a 5-day timetable
-		if($days == 5) {
-			$day = date("w", $date);
-            if($day < 1 || $day > 5)
+        if ($days == 5) {
+            // if operating on a 5-day timetable
+            $day = date("w", $date);
+            if ($day < 1 || $day > 5) {
                 $day = 1;
+            }
 
             // calc offset
             $startDate = $this->getLastSynergeticDay($date, $campus);
-            if($startDate) {
-                $offset = ($this->synergeticDay[$startDate]-1) + (date('N', $startDate) + 4);
+            if ($startDate) {
+                $offset = ($this->synergeticDay[$startDate] - 1) + (date('N', $startDate) + 4);
 
                 // timetable does not start on a Monday: calculate the offset for display
-                $today = ($day+$days) - $offset;
-
+                $today = ($day + $days) - $offset;
 
                 // if offset pushes "today" back further than the diaplayed week, wraparound
-                while($today <= 0) {
+                while ($today <= 0) {
                     $today += $days;
                 }
 
                 // if offset is negative, mod to bring back into this week
-                if($today > $days)
+                if ($today > $days) {
                     $today %= $days;
+                }
 
                 return $today;
-            }
-            else {
+            } else {
                 return $day;
             }
 
-        }
-        // if operating on a 7-day timetable
-		else if($days == 7) {
-
-			$startDate = $this->getLastSynergeticDay($date, $campus);
-		
-			//find number of days between both dates
-			$difference = intval(($date - $startDate) / 86400);
-
-			//find number of weekends between 2 dates
-			$weekends = intval(($difference+date("w", $startDate)) / 7);
-
-			$currentDay = ($this->synergeticDay[$startDate] + $difference - 2 * $weekends - 1) % 7 + 1;
-
-			//make correction for sunday (otherwise we travel back in time)
-			if(date("w", $date) == 0)
-				$currentDay = $currentDay % 7 + 1;
-
-			return $currentDay;
-		}
-        // if operating on a 10-day timetable
-		else if($days == 10) {
-
+        } elseif ($days == 7) {
+            // if operating on a 7-day timetable
             $startDate = $this->getLastSynergeticDay($date, $campus);
 
-            if($this->synergeticDay[$startDate] > 5)
-                $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;  //extra days for weekend
+            //find number of days between both dates
+            $difference = intval(($date - $startDate) / 86400);
 
-            $startDate = $startDate - ($this->synergeticDay[$startDate]*86400);
+            //find number of weekends between 2 dates
+            $weekends = intval(($difference + date("w", $startDate)) / 7);
 
-            if(!$startDate) //Just assume the start of the year if we cannot find anything
-                $startDate = mktime(0,0,0,1,1,date('Y'));
+            $currentDay = ($this->synergeticDay[$startDate] + $difference - 2 * $weekends - 1) % 7 + 1;
+
+            //make correction for sunday (otherwise we travel back in time)
+            if (date("w", $date) == 0) {
+                $currentDay = $currentDay % 7 + 1;
+            }
+            return $currentDay;
+        } elseif ($days == 10) {
+            // if operating on a 10-day timetable
+            $startDate = $this->getLastSynergeticDay($date, $campus);
+
+            if ($this->synergeticDay[$startDate] > 5) {
+                $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;
+            } //extra days for weekend
+
+            $startDate = $startDate - ($this->synergeticDay[$startDate] * 86400);
+
+            if (!$startDate) {
+                // Just assume the start of the year if we cannot find anything
+                $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
+            }
 
             //find number of days between both dates
             $difference = floor(($date - $startDate) / 86400);
             //find number of weeks between 2 dates
             $weeks = intval(($difference) / 7);
 
-            if(($weeks % 2) == 0) {
-                    $day =  date('w',$date);
-                    if($day < 1) //on sundays move it forward
-                        $day = 1;
-            }
-            else {
-                    $day =  date('w',$date) + 5;
-                    if($day < 6) //on sundays move it forward
-                        $day = 6;
+            if (($weeks % 2) == 0) {
+                $day = date('w', $date);
+                if ($day < 1) {
+                    // on sundays move it forward
+                    $day = 1;
+                }
+            } else {
+                $day = date('w', $date) + 5;
+                if ($day < 6) {
+                    // on sundays move it forward
+                    $day = 6;
+                }
 
             }
             return $day;
-		}
-		else	//unknown day number 
-			return 0;
-	}
+        } else {
+            // unknown day number
+            return 0;
+        }
+    }
 
+    public function getLastSynergeticDay($date, $campus)
+    {
+        //This function gets all start of term days entered into synergetic from the date provided backwards.
+        //It caches this info so you can get it later again.
+        //Be careful if you call this function with a date in the past then in the future it may cause an error
+        //TODO:  Make function cache entire year then have better smarts at working out which day to use.
 
-	function getLastSynergeticDay($date, $campus){
-			//This function gets all start of term days entered into synergetic from the date provided backwards.
-			//It caches this info so you can get it later again.
-			//Be careful if you call this function with a date in the past then in the future it may cause an error
-			//TODO:  Make function cache entire year then have better smarts at working out which day to use.
+        //date format yyyy-dd-mm 00:00:00
 
-			//date format yyyy-dd-mm 00:00:00
+        //Access cache first
+        if (!empty($this->synergeticDay)) {
+            foreach ($this->synergeticDay as $tdate => $tday) {
+                if ($date > $tdate) {
+                    return $tdate;
+                }
+            }
+        }
 
-			//Access cache first
-			if(!empty($this->synergeticDay)) {
-				foreach($this->synergeticDay as $tdate => $tday) {
-					if($date > $tdate) {
-						return $tdate;
-					}
-				}
-			}
+        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
+        if (!($campusModel instanceof \Schoolbox\Campus)) {
+            return false;
+        }
+        $days = $campusModel->getTimetableDay();
 
-			$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
-			if (!($campusModel instanceof \Schoolbox\Campus)) {
-				return false;
-			}
-			$days = $campusModel->getTimetableDay();
+        $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
 
-			$nowmssqldate = date('Y-m-d',$date).' 00:00:00';
+        /* First attempt to get calendar dates based on campus */
 
-            /* First attempt to get calendar dates based on campus */
-
-			$query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
+        $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
 			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-			WHERE (CalendarEvents.CalendarType LIKE '".$campusModel->getExtTimetableCode()."_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+			WHERE (CalendarEvents.CalendarType LIKE '" . $campusModel->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
-			$result = $this->getDatabase()->query($query);
-			//Cache all date and days into variable
-			while($day = $this->getDatabase()->getNextArray($result)) {
+        $result = $this->getDatabase()->query($query);
+        //Cache all date and days into variable
+        while ($day = $this->getDatabase()->getNextArray($result)) {
+            //cut out d from CalenderType string
+            preg_match('/d([0-9]+)/i', $day['type'], $match);
+            if ($match[1] > 0 and $match[1] <= $days) {
+                $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
+            }
+        }
 
-				//cut out d from CalenderType string
-				preg_match('/d([0-9]+)/i', $day['type'], $match);
-
-                if($match[1] > 0 AND $match[1] <= $days ) {
-                    $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
-                }
-			}
-
-			//yes this is meant to get the first element and return it
-			if(!empty($this->synergeticDay)) {
-                foreach($this->synergeticDay as $date => $day){
-					return $date;
-				}
-			} else {
-
-                /*  Else get calendar dates from the general pool   */
-
-                $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
+        //yes this is meant to get the first element and return it
+        if (!empty($this->synergeticDay)) {
+            foreach ($this->synergeticDay as $date => $day) {
+                return $date;
+            }
+        } else {
+            /*  Else get calendar dates from the general pool   */
+            $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) AS startDate, CalendarEvents.CalendarType AS type
                 FROM SynergyOne.dbo.CalendarEvents CalendarEvents
                 WHERE (CalendarEvents.CalendarType LIKE 'D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
                 ORDER BY CalendarEvents.CalendarDate DESC";
 
-                $result = $this->getDatabase()->query($query);
-                //Cache all date and days into variable
-                while($day = $this->getDatabase()->getNextArray($result)) {
-                    //cut out d from CalenderType string
-				    preg_match('/d([0-9]+)/i', $day['type'], $match);
-                    if($match[1] > 0 AND $match[1] <= $days ) {
-                        $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
-                    }
-                }
-
-               if(!empty($this->synergeticDay)) {
-				foreach($this->synergeticDay as $date => $day){
-					return $date;
-				}
+            $result = $this->getDatabase()->query($query);
+            //Cache all date and days into variable
+            while ($day = $this->getDatabase()->getNextArray($result)) {
+                //cut out d from CalenderType string
+                preg_match('/d([0-9]+)/i', $day['type'], $match);
+                if ($match[1] > 0 and $match[1] <= $days) {
+                    $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
                 }
             }
 
-	}
+            if (!empty($this->synergeticDay)) {
+                foreach ($this->synergeticDay as $date => $day) {
+                    return $date;
+                }
+            }
+        }
+    }
 
-	/**
-	 * Returns the period number for the current time.
-	 *
-	 * @todo campus object should be passed instead of campus ID
-	 *       Either that, or a timetable group code, as all other external DB
-	 *       calls use the key in the external DB, instead of the Schoolbox key.
-	 *
-	 * @param  int   $campus A campus ID (internal, not Synergetic)
-	 * @return array
-	 */
-	function getPeriodNumber($campus)
-	{
-		$campusModel = $this->campusMapper->findById($campus);
-		if (!($campusModel instanceof \Schoolbox\Campus)) {
-			return false;
-		}
-		$campusString = $campusModel->getExtTimetableCode();
+    /**
+     * Returns the period number for the current time.
+     *
+     * @todo campus object should be passed instead of campus ID
+     *       Either that, or a timetable group code, as all other external DB
+     *       calls use the key in the external DB, instead of the Schoolbox key.
+     *
+     * @param int $campus A campus ID (internal, not Synergetic)
+     *
+     * @return array
+     */
+    public function getPeriodNumber($campus)
+    {
+        $campusModel = $this->campusMapper->findById($campus);
+        if (!($campusModel instanceof \Schoolbox\Campus)) {
+            return false;
+        }
+        $campusString = $campusModel->getExtTimetableCode();
 
-		# Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
-		# and sets all dates to be the same, then compares.
-		# First it gets the hours and minutes with datepart, casts them to varchar so that they can be concatenated to 
-		# look like '10:34', then casts this to datetime, which can be compared. Kludgy.
-	
-		$query = "
+        # Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
+        # and sets all dates to be the same, then compares.
+        # First it gets the hours and minutes with datepart, casts them to varchar so that they can be concatenated to
+        # look like '10:34', then casts this to datetime, which can be compared. Kludgy.
+
+        $query = "
 			SELECT	t.TimeFrom,
 				t.TimeTo,
 				t.PeriodNumber,
@@ -308,151 +312,147 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				<=
 				cast( cast( datepart( hh, t.TimeTo) as varchar) + ':' + cast( datepart( mi, t.TimeTo) as varchar) as datetime))
 				and
-				t.FileSemester = '".$_SESSION['FileSemester']."'
+				t.FileSemester = '" . $_SESSION['FileSemester'] . "'
 				and
-				t.FileYear = '".$_SESSION['FileYear']."'
+				t.FileYear = '" . $_SESSION['FileYear'] . "'
 				and
 				TimetableGroup = '" . $campusString . "'";
-		
-		return $this->getDatabase()->getRow($query);
-	}
 
-	function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
-	{
-		$timetabledef = $this->getTimetableDefinition($campus,$daynumber);
+        return $this->getDatabase()->getRow($query);
+    }
 
-        if(!is_array($timetabledef)) {
-           return false;
+    public function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
+    {
+        $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
+
+        if (!is_array($timetabledef)) {
+            return false;
         }
 
-		$campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
-		if (!($campusModel instanceof \Schoolbox\Campus)) {
-			return false;
-		}
-		$campusString = $campusModel->getExtTimetableCode();
+        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
+        if (!($campusModel instanceof \Schoolbox\Campus)) {
+            return false;
+        }
+        $campusString = $campusModel->getExtTimetableCode();
 
-		if($this->groupHandler->isStudent($userID))
-		{
-			$query ="SELECT 
+        if ($this->groupHandler->isStudent($userID)) {
+            $query = "SELECT
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
-				FROM 
+				FROM
 				SynergyOne.dbo.StudentClasses StudentClasses,
-				SynergyOne.dbo.SubjectClasses SubjectClasses, 
+				SynergyOne.dbo.SubjectClasses SubjectClasses,
 				SynergyOne.dbo.Timetable Timetable
-				WHERE 
+				WHERE
 				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND 
-				Timetable.FileSemester = SubjectClasses.FileSemester AND 
-				Timetable.FileType = SubjectClasses.FileType AND 
+				Timetable.ClassCode = SubjectClasses.ClassCode AND
+				Timetable.FileSemester = SubjectClasses.FileSemester AND
+				Timetable.FileType = SubjectClasses.FileType AND
 				Timetable.FileYear = SubjectClasses.FileYear AND
 				StudentClasses.FileSemester = SubjectClasses.FileSemester AND
 				StudentClasses.FileType = SubjectClasses.FileType AND
-				StudentClasses.FileYear = SubjectClasses.FileYear AND 
+				StudentClasses.FileYear = SubjectClasses.FileYear AND
 				StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-				Timetable.FileSemester='".$_SESSION['FileSemester']."' AND 
-				Timetable.FileYear='".$_SESSION['FileYear']."' AND
+				Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND
+				Timetable.FileYear='" . $_SESSION['FileYear'] . "' AND
 				(StudentClasses.ID='$synergy_id' AND
 				Timetable.DayNumber = '$daynumber' AND
 				Timetable.TimetableGroup = '$campusString' AND
 				StudentClasses.StartDate <= getdate() AND
 				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
 				ORDER BY Timetable.PeriodNumber";
-		}
-		else
-		{
-			$query = "SELECT Timetable.Room, SubjectClasses.Description,
+        } else {
+            $query = "SELECT Timetable.Room, SubjectClasses.Description,
 				Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses, 
+				FROM SynergyOne.dbo.SubjectClasses SubjectClasses,
 				SynergyOne.dbo.Timetable Timetable
 				WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND 
-				Timetable.FileSemester = SubjectClasses.FileSemester AND 
-				Timetable.FileType = SubjectClasses.FileType AND 
+				Timetable.ClassCode = SubjectClasses.ClassCode AND
+				Timetable.FileSemester = SubjectClasses.FileSemester AND
+				Timetable.FileType = SubjectClasses.FileType AND
 				Timetable.FileYear = SubjectClasses.FileYear AND
-				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
-				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+				SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] . "' AND
+				SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "' AND
 				Timetable.TimetableGroup = '$campusString' AND
-				Timetable.StaffID='$synergy_id' AND 
+				Timetable.StaffID='$synergy_id' AND
 				Timetable.DayNumber = '$daynumber'
 				ORDER BY Timetable.PeriodNumber";
-		}
-		
-		$result = $this->getDatabase()->query($query);
-		//get first period
-		if ($result !== FALSE && $result !== TRUE)
-			$desc = $this->getDatabase()->getNextArray($result);
-		 else
-			$desc = "";
-
-		//for each period
-		$timetable = array();
-		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
-		{
-			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-			$timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-			$timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-			$timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
-			$timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-	
-			if($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'])
-			{
-				$timetable[$x]['description'] = $desc['Description'];
-				$timetable[$x]['code'] = $desc['ClassCode'];
-                $timetable[$x]['campus'] = $desc['ClassCampus'];
-                $timetable[$x]['room'] = $desc['Room'];
-                $timetable[$x]['staffID'] = $desc['StaffID'];
-				$desc = $this->getDatabase()->getNextArray();
-				
-				//bad data in synergetic.. why..?? 
-				while($desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc != 0) 
-						$desc = $this->getDatabase()->getNextArray();
-			}
-		}
-
-        if(is_array($timetable)) {
-		    usort($timetable, array($this, 'sortTimetable'));
         }
 
-		return $timetable;
-	
-	}
+        $result = $this->getDatabase()->query($query);
+        //get first period
+        if ($result !== false && $result !== true) {
+            $desc = $this->getDatabase()->getNextArray($result);
+        } else {
+            $desc = "";
+        }
 
-	function getFullTimetable($synergy_id, $userID, $campus)
-	{
+        //for each period
+        $timetable = array();
+        for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+
+            if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
+                $timetable[$x]['description'] = $desc['Description'];
+                $timetable[$x]['code']        = $desc['ClassCode'];
+                $timetable[$x]['campus']      = $desc['ClassCampus'];
+                $timetable[$x]['room']        = $desc['Room'];
+                $timetable[$x]['staffID']     = $desc['StaffID'];
+                $desc                         = $this->getDatabase()->getNextArray();
+
+                //bad data in synergetic.. why..??
+                while ($desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc != 0) {
+                    $desc = $this->getDatabase()->getNextArray();
+                }
+            }
+        }
+
+        if (is_array($timetable)) {
+            usort($timetable, array($this, 'sortTimetable'));
+        }
+
+        return $timetable;
+
+    }
+
+    public function getFullTimetable($synergy_id, $userID, $campus)
+    {
         /* Temporarily switch the filesemester to the requested user */
         $originalFileSemester = $_SESSION['FileSemester'];
-        $originalFileYear = $_SESSION['FileYear'];
-        if($synergy_id != $_SESSION['sid']) {
+        $originalFileYear     = $_SESSION['FileYear'];
+        if ($synergy_id != $_SESSION['sid']) {
             $externalUser = new External_Synergetic_User();
             $externalUser->getCurrentSemester($synergy_id);
         }
 
-		$timetabledef = $this->getTimetableDefinition($campus, 1);
+        $timetabledef = $this->getTimetableDefinition($campus, 1);
 
-        if(!is_array($timetabledef['desc'])) {
+        if (!is_array($timetabledef['desc'])) {
             //try getting from full definition
             $timetabledef = $this->getTimetableDefinition($campus, 5);
 
-            if(!is_array($timetabledef['desc'])){
+            if (!is_array($timetabledef['desc'])) {
                 $_SESSION['FileSemester'] = $originalFileSemester;
-                $_SESSION['FileYear'] = $originalFileYear;
+                $_SESSION['FileYear']     = $originalFileYear;
                 return false;
             }
         }
 
-        try{
-		    $campusModel = $this->campusMapper->findById($campus);  //TODO campus object should be passed
+        try {
+            $campusModel  = $this->campusMapper->findById($campus); //TODO campus object should be passed
             $campusString = $campusModel->getExtTimetableCode();
-        } catch (Exception $e ) {
+        } catch (Exception $e) {
             $_SESSION['FileSemester'] = $originalFileSemester;
-            $_SESSION['FileYear'] = $originalFileYear;
+            $_SESSION['FileYear']     = $originalFileYear;
             return false;
         }
 
-		if( $this->groupHandler->isStudent($userID))
-		{
-			$query ="SELECT
+        if ($this->groupHandler->isStudent($userID)) {
+            $query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
 						Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
 						vStaff.StaffSurname
@@ -473,23 +473,20 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						StudentClasses.FileYear = SubjectClasses.FileYear AND
 						StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 						StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND
-						(Timetable.FileYear=".$_SESSION['FileYear'].") AND
+						((Timetable.FileSemester=" . $_SESSION['FileSemester'] . ") AND
+						(Timetable.FileYear=" . $_SESSION['FileYear'] . ") AND
 						Timetable.TimetableGroup = '$campusString' AND
 						(StudentClasses.ID='$synergy_id'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-						AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']."
+						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND PeriodNumber <= " . $timetabledef['periodCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
-		}
-		else
-		{
-
+        } else {
             // if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query
-            if($timetabledef['dayCount'] == NULL) {
+            if ($timetabledef['dayCount'] == null) {
                 $timetabledef['dayCount'] = 0;
             }
 
-			$query = "SELECT
+            $query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
 						Timetable.ClassCampus, Timetable.ClassCode
 					FROM
@@ -501,122 +498,125 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						Timetable.FileSemester = SubjectClasses.FileSemester AND
 						Timetable.FileType = SubjectClasses.FileType AND
 						Timetable.FileYear = SubjectClasses.FileYear AND
-						SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND
-						SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+						SubjectClasses.FileSemester='" . $_SESSION['FileSemester'] . "' AND
+						SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "' AND
 						Timetable.TimetableGroup = '$campusString' AND
 						Timetable.StaffID='$synergy_id' AND
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND
-						PeriodNumber <= ".$timetabledef['periodCount']."
+						PeriodNumber <= " . $timetabledef['periodCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
-		}
+        }
 
-		$dayCount = $timetabledef['dayCount'];
+        $dayCount = $timetabledef['dayCount'];
 
-		$result = $this->getDatabase()->query($query);
+        $result = $this->getDatabase()->query($query);
 
-		//get first period
-		if ($result != 1)
-			$desc = $this->getDatabase()->getNextArray();
-		 else
-			$desc = "";
+        //get first period
+        if ($result != 1) {
+            $desc = $this->getDatabase()->getNextArray();
+        } else {
+            $desc = "";
+        }
 
-		//for each period
-		$timetable = array();
-		for ($x = 0; isset($timetabledef['desc'][$x]); $x++) 
-		{
-			$timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-			$timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-			$timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-			$timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
-			$timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+        //for each period
+        $timetable = array();
+        for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
 
-			//for each day
-			for ($y = 1; $y <= $dayCount; $y++)
-			{	 
-				if($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y)
-				{
-					$timetable[$x]['day'][$y]['periodOn'] = 1;
-					$timetable[$x]['day'][$y]['description'] = $desc['Description'];
-					$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
-                    $timetable[$x]['day'][$y]['campus'] = $desc['ClassCampus'];
-					$timetable[$x]['day'][$y]['room'] = $desc['Room'];
-                    $timetable[$x]['day'][$y]['staffID'] = $desc['StaffID'];
+            //for each day
+            for ($y = 1; $y <= $dayCount; $y++) {
+                if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y) {
+                    $timetable[$x]['day'][$y]['periodOn']       = 1;
+                    $timetable[$x]['day'][$y]['description']    = $desc['Description'];
+                    $timetable[$x]['day'][$y]['code']           = $desc['ClassCode'];
+                    $timetable[$x]['day'][$y]['campus']         = $desc['ClassCampus'];
+                    $timetable[$x]['day'][$y]['room']           = $desc['Room'];
+                    $timetable[$x]['day'][$y]['staffID']        = $desc['StaffID'];
                     $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredName'];
-                    $timetable[$x]['day'][$y]['staffSurname'] = $desc['StaffSurname'];
-                    $timetable[$x]['day'][$y]['staffTitle'] = $desc['StaffTitle'];
-                    $desc = $this->getDatabase()->getNextArray();
+                    $timetable[$x]['day'][$y]['staffSurname']   = $desc['StaffSurname'];
+                    $timetable[$x]['day'][$y]['staffTitle']     = $desc['StaffTitle'];
+                    $desc                                       = $this->getDatabase()->getNextArray();
 
-					//bad data in synergetic.. why..?? 
-					while($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
-						$desc = $this->getDatabase()->getNextArray();
-					}
-				
-				}
-				else
-				{	
-					$timetable[$x]['day'][$y]['periodOn'] = 0;
-				}
-				
-			}
-		}
+                    //bad data in synergetic.. why..??
+                    while ($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
+                        $desc = $this->getDatabase()->getNextArray();
+                    }
+
+                } else {
+                    $timetable[$x]['day'][$y]['periodOn'] = 0;
+                }
+
+            }
+        }
 
         /* Return filesemester to original state */
         $_SESSION['FileSemester'] = $originalFileSemester;
-        $_SESSION['FileYear'] = $originalFileYear;
+        $_SESSION['FileYear']     = $originalFileYear;
 
-        if(is_array($timetable)) {
-		    usort($timetable, array($this, 'sortTimetable'));
+        if (is_array($timetable)) {
+            usort($timetable, array($this, 'sortTimetable'));
         }
-        
-		return $timetable;
 
-	}
+        return $timetable;
 
-	function sortTimetable($a, $b) {
-		$aTime = strtotime($a['periodStart']);
-		$bTime = strtotime($b['periodStart']);
-		if($aTime == $bTime)
-			return 0;
-		return ($aTime > $bTime) ? +1: -1;
-	}
-	
-	function getDaySubjects($synergy_id, $daynum) {
-		$query = "SELECT Timetable.Room, SubjectClasses.Description,
+    }
+
+    public function sortTimetable($a, $b)
+    {
+        $aTime = strtotime($a['periodStart']);
+        $bTime = strtotime($b['periodStart']);
+        if ($aTime == $bTime) {
+            return 0;
+        }
+
+        return ($aTime > $bTime) ? +1 : -1;
+    }
+
+    public function getDaySubjects($synergy_id, $daynum)
+    {
+        $query = "SELECT Timetable.Room, SubjectClasses.Description,
                        	 Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
                          FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
                          WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
                          Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
                          SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
                          AND Timetable.FileYear = SubjectClasses.FileYear AND
-                         ((SubjectClasses.FileSemester=".$_SESSION['FileSemester'].") AND (SubjectClasses.FileYear='".$_SESSION['FileYear']."')
+                         ((SubjectClasses.FileSemester=" . $_SESSION['FileSemester'] . ") AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
                          AND (Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynum'
 			  	ORDER BY Timetable.PeriodNumber";
-		
-		return $this->getDatabase()->getAll($query);
-	
-	} 
-	
-	function getSubjectPeriod($code, $day) {	
-		//give a subject code and day this function returns the period that it occurs in
 
-		$query = "SELECT Timetable.PeriodNumber
+        return $this->getDatabase()->getAll($query);
+
+    }
+
+    public function getSubjectPeriod($code, $day)
+    {
+        //give a subject code and day this function returns the period that it occurs in
+
+        $query = "SELECT Timetable.PeriodNumber
 			FROM SynergyOne.dbo.Timetable Timetable
-			WHERE Timetable.FileSemester='".$_SESSION['FileSemester']."' AND Timetable.FileYear='".$_SESSION['FileYear']."' 
+			WHERE Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND Timetable.FileYear='" . $_SESSION['FileYear'] . "'
 			AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
 		";
 
-		return $this->getDatabase()->getOne($query);
+        return $this->getDatabase()->getOne($query);
 
-	}
+    }
 
-	/**
-	 * Gets the timetable for the given room.
-	 *
-	 * @param  string $roomCode
-	 * @return array
-	 */
-	public function getRoomTimetable($roomCode) {
-		$query = "
+    /**
+     * Gets the timetable for the given room.
+     *
+     * @param string $roomCode
+     *
+     * @return array
+     */
+    public function getRoomTimetable($roomCode)
+    {
+        $query = "
 			SELECT
 				SubjectClasses.Description,
 				Timetable.DayNumber,
@@ -643,63 +643,77 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				Timetable.DayNumber ASC,
 				Timetable.PeriodNumber ASC
 		";
-		$query = strtr(
-			$query,
-			array(
-				':semester' => "'".$this->database->quote($_SESSION['FileSemester'])."'",
-				':year'     => "'".$this->database->quote($_SESSION['FileYear'])."'",
-				':room'     => "'".$this->database->quote($roomCode)."'",
-			)
-		);
+        $query = strtr(
+            $query,
+            array(
+                ':semester' => "'" . $this->database->quote($_SESSION['FileSemester']) . "'",
+                ':year'     => "'" . $this->database->quote($_SESSION['FileYear']) . "'",
+                ':room'     => "'" . $this->database->quote($roomCode) . "'",
+            )
+        );
 
-		// Jam the timetable definition in.
-		$campusTimetableList = array();
-		$result              = array();
-		foreach ($this->database->getAll($query) as $row) {
-			$timetableCode = $row['TimetableGroup'];
-			if (!array_key_exists($timetableCode, $campusTimetableList)) {
-				$campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $timetableCode);
-				$campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
-			}
-			$campusTimetable = $campusTimetableList[$timetableCode];
+        // Jam the timetable definition in.
+        $campusTimetableList = array();
+        $result              = array();
+        foreach ($this->database->getAll($query) as $row) {
+            $timetableCode = $row['TimetableGroup'];
+            if (!array_key_exists($timetableCode, $campusTimetableList)) {
+                try {
+                    $campus                              = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
+                        'ext_timetable_code',
+                        $timetableCode
+                    );
+                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // No campus found: error out
+                    // TODO: make getTimetableDefinition() accept campus code instead of SB ID
+                    $campusTimetableList[$timetableCode] = null;
+                }
+            }
+            $campusTimetable = $campusTimetableList[$timetableCode];
+            if (!isset($campusTimetable)) {
+                continue;
+            }
 
-			// Match day and period against a start and end.
-			for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
-				$periodNumber   = $campusTimetable['number'][$i];
-				$periodSequence = $campusTimetable['sequence'][$i];
+            // Match day and period against a start and end.
+            for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
+                $periodNumber   = $campusTimetable['number'][$i];
+                $periodSequence = $campusTimetable['sequence'][$i];
 
-				// (Ignore period sequence 2, everyone else does)
-				if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
-					$row['PeriodStart'] = $campusTimetable['start'][$i];
-					$row['PeriodEnd']   = $campusTimetable['end'][$i];
-					$row['PeriodName']  = $campusTimetable['desc'][$i];
-					$result[] = $row;
-					break;
-				}
-			}
-		}
-		return $result;
-	}
+                // (Ignore period sequence 2, everyone else does)
+                if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
+                    $row['PeriodStart'] = $campusTimetable['start'][$i];
+                    $row['PeriodEnd']   = $campusTimetable['end'][$i];
+                    $row['PeriodName']  = $campusTimetable['desc'][$i];
+                    $result[]           = $row;
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
 
-	function getSubjectName($code) {
-	
-			$query = "SELECT SubjectClasses.Description 
+    public function getSubjectName($code)
+    {
+        $query = "SELECT SubjectClasses.Description
                        	FROM SynergyOne.dbo.SubjectClasses SubjectClasses
                        	WHERE SubjectClasses.ClassCode = '$code'";
-			return $this->getDatabase()->getOne($query);
-	}
+        return $this->getDatabase()->getOne($query);
+    }
 
-	/**
-	 * @var MSSQL $database
-	 */
-	private function setDatabase ($database) {
-		$this->database = $database;
-	}
+    /**
+     * @var MSSQL $database
+     */
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+    }
 
-	/**
-	 * @return MSSQL
-	 */
-	private function getDatabase () {
-		return $this->database;
-	}
+    /**
+     * @return MSSQL
+     */
+    private function getDatabase()
+    {
+        return $this->database;
+    }
 }
