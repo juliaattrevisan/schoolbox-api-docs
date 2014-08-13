@@ -1,31 +1,14 @@
 <div class="box clearfix awardsComponent" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Notifications</h2>
-    <!-- BEGIN awardList -->
-    <div class="awardList clearfix">
-        <h3 class="dark">My Awards</h3>
-        <ul>
-            <!-- BEGIN award -->
-            <li class="award" title="{AWARD_DESCRIPTION}">
-                <p>
-                    <b class="award-desc"><span class="description">{AWARD_ACHIEVEMENT}</span></b>
-                    earned <b><time datetime="{AWARD_DATE}">{AWARD_DATE_LABEL}</time></b>
-                </p>
-                <ul><li class="comment">{AWARD_COMMENT}</li></ul>
-            </li>
-            <!-- END award -->
-        </ul>
-    </div>
-    <!-- END awardList -->
 
     <!-- BEGIN detentionList -->
     <div class="detentionList clearfix">
-        <h3 class="dark">My Detentions</h3>
         <ul>
             <!-- BEGIN detention -->
             <li class="detention">
                 <p>
                     <b class="detention-desc"><span class="description">{DETENTION_DESCRIPTION}</span></b>
-                    on <b><time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time></b>
+                    - <b><time datetime="{DETENTION_DATE}">{DETENTION_DATE_LABEL}</time></b>
                 </p>
                 <ul>
                     <!-- BEGIN detentionLine -->
@@ -40,23 +23,65 @@
 
     <!-- BEGIN absenceList -->
     <div class="absenceList clearfix">
-        <h3 class="dark">My Absences</h3>
         <ul>
-            <!-- BEGIN absence -->
             <li class="absence">
-                <p>
-                    <b class="absence-desc"><span class="description">{ABSENCE_DESCRIPTION}</span></b>
-                    for <b><span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span></b>
-                    on <b><time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time></b>
-                </p>
+                <p>{ABSENCE_COUNT} {ABSENCE_HEADER}</p>
                 <ul>
-                    <!-- BEGIN absenceLateArrival -->
-                    <li class="comment">(arrived <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>)</li>
-                    <!-- END absenceLateArrival -->
+                    <!-- BEGIN absence -->
+                    <li class="comment">
+                        <p>
+                            <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                            <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
+                        </p>
+                    </li>
+                    <!-- END absence -->
                 </ul>
             </li>
-            <!-- END absence -->
         </ul>
     </div>
     <!-- END absenceList -->
+
+    <!-- BEGIN lateArrivalList -->
+    <div class="lateArrivalList clearfix">
+        <ul>
+            <li class="absence">
+                <p>{LATE_ARRIVAL_COUNT} {LATE_ARRIVAL_HEADER}</p>
+                <ul>
+                    <!-- BEGIN lateArrival -->
+                    <li class="comment">
+                        <p>
+                            <time datetime="{EVENT_DATETIME}">{EVENT_DATETIME_LABEL}</time>
+                            <span class="class" title="{CLASS_DESCRIPTION}">{CLASS_CODE}</span>
+                            <time datetime="{LATE_ARRIVAL_TIME}">{LATE_ARRIVAL_TIME_LABEL}</time>
+                        </p>
+                    </li>
+                    <!-- END lateArrival -->
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <!-- END lateArrivalList -->
+
+    <!-- BEGIN awardList -->
+    <div class="awardList clearfix">
+        <ul>
+            <!-- BEGIN award -->
+            <li class="award">
+                <p>
+                    Congratulations, you have been awarded
+                    <b class="award-desc">{AWARD_DESCRIPTION}</b>
+                    for
+                    <b class="award-desc">{AWARD_ACHIEVEMENT}</b>
+                </p>
+                <ul>
+                    <!-- BEGIN awardLine -->
+                    <li class="comment">{AWARD_COMMENT_LINE}</li>
+                    <!-- END awardLine -->
+                </ul>
+            </li>
+            <!-- END award -->
+        </ul>
+    </div>
+    <!-- END awardList -->
+
 </div>

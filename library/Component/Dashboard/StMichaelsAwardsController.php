@@ -8,8 +8,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard_ControllerAbstract {
-
+class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard_ControllerAbstract
+{
     /**
      * @var External_UserDetentionInterface
      */
@@ -30,6 +30,13 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     protected $absenceList;
 
     /**
+     * Late arrivals for the current user.
+     *
+     * @var array
+     */
+    protected $lateArrivalList;
+
+    /**
      * Awards for the current user.
      *
      * @var array
@@ -41,8 +48,8 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
      *
      * @return bool
      */
-    public function execute() {
-
+    public function execute()
+    {
         // Not St Michaels? This isn't for you
         if (!(Config::get('site_location') == 'stmichaels')) {
             return false;
@@ -125,16 +132,29 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $_SESSION['FileYear'],
             $_SESSION['FileSemester']
         );
+
+        // Filter award list into absences and lateness
+        $absenceList = $this->absenceList;
+        $lateFilter = function ($absence) {
+            return $absence['LateArrivalFlag'];
+        };
+        $absenceFilter = function ($absence) {
+            return !($absence['LateArrivalFlag']);
+        };
+        $this->lateArrivalList = array_filter($absenceList, $lateFilter);
+        $this->absenceList     = array_filter($absenceList, $absenceFilter);
         return true;
     }
 
     /**
      * Parse <!-- blockage --> and set {VARIABLES}
      *
-     * @param  String $templateHandle
+     * @param string $templateHandle The handle to jam this component in?
+     *
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'stMichaelsAwards')) {
             return false;
         }
@@ -149,22 +169,25 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->parseConfig();
 
         // <!-- BEGIN blockages -->
-        $this->setBlock($templateHandle, 'awardList',     'awardList_block');
-        $this->setBlock('awardList',     'award',         'award_block');
-        $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
-        $this->setBlock('detentionList', 'detention',     'detention_block');
-        $this->setBlock('detention',     'detentionLine', 'detentionLine_block');
-        $this->setBlock($templateHandle, 'absenceList',   'absenceList_block');
-        $this->setBlock('absenceList',   'absence',       'absence_block');
-        $this->setBlock('absence',       'absenceLateArrival', 'absenceLateArrival_block');
+        $this->setBlock($templateHandle,   'awardList',       'awardList_block');
+        $this->setBlock('awardList',       'award',           'award_block');
+        $this->setBlock('award',           'awardLine',       'awardLine_block');
+        $this->setBlock($templateHandle,   'detentionList',   'detentionList_block');
+        $this->setBlock('detentionList',   'detention',       'detention_block');
+        $this->setBlock('detention',       'detentionLine',   'detentionLine_block');
+        $this->setBlock($templateHandle,   'absenceList',     'absenceList_block');
+        $this->setBlock('absenceList',     'absence',         'absence_block');
+        $this->setBlock($templateHandle,   'lateArrivalList', 'lateArrivalList_block');
+        $this->setBlock('lateArrivalList', 'lateArrival',     'lateArrival_block');
         // <!-- END blockages -->
 
         // {VARIABLES}
         $this->setVar(
             array(
-                'awardList_block'     => '',
-                'detentionList_block' => '',
-                'absenceList_block'   => '',
+                'awardList_block'       => '',
+                'detentionList_block'   => '',
+                'absenceList_block'     => '',
+                'lateArrivalList_block' => '',
             )
         );
 
@@ -180,11 +203,14 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'AWARD_DATE'        => $award['AwardDate'],
                     'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                     'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
-                    'AWARD_COMMENT'     => $award['AwardComment'],
+                    'awardLine_block'   => '',
                 );
                 // Scrub. Assume comments may have line breaks
                 $params = array_map(array('Scrub', 'text'), $params);
-                $params['AWARD_COMMENT'] = nl2br($params['AWARD_COMMENT']);
+                foreach ($this->splitComment($params['AWARD_COMMENT']) as $line) {
+                    $this->setVar('AWARD_COMMENT_LINE', Scrub::text($line));
+                    $this->parse('awardLine_block', 'awardLine', true);
+                }
                 $this->setVar($params);
                 $this->parse('award_block', 'award', true);
             }
@@ -204,18 +230,11 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'DETENTION_COMMENT'     => $detention['DetentionComment'],
                     'detentionLine_block'   => '',
                 );
-                // Scrub.
-                // Assume comments may have line breaks, put each one in a UL.
-                // They also seem to add * characters in front of each line to
-                // denote lists, remove that.
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
-                foreach (preg_split('/[\\n\\r]+/', $params['DETENTION_COMMENT']) as $line) {
-                    $line = trim(preg_replace('/^\\W+/', '', $line));
-                    if (strlen($line) > 0) {
-                        $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
-                        $this->parse('detentionLine_block', 'detentionLine', true);
-                    }
+                foreach ($this->splitComment($params['DETENTION_COMMENT']) as $line) {
+                    $this->setVar('DETENTION_COMMENT_LINE', Scrub::text($line));
+                    $this->parse('detentionLine_block', 'detentionLine', true);
                 }
                 $this->parse('detention_block', 'detention', true);
             }
@@ -223,36 +242,95 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Absences
         if (!empty($this->absenceList)) {
+            $count = count($this->absenceList);
             $this->parse('absenceList_block', 'absenceList');
-            $this->setVar('absence_block', '');
+            $this->setVar(
+                array(
+                    'absence_block'  => '',
+                    'ABSENCE_COUNT'  => $count,
+                    'ABSENCE_HEADER' => ($count > 1 ? 'Unexplained Absences' : 'Unexplained Absence'),
+                )
+            );
             foreach ($this->absenceList as $absence) {
                 $eventDate = new Alaress_Date_Format(new DateTime($absence['EventDateTime']));
-                $lateTime  = new Alaress_Date_Format(new DateTime($absence['LateArrivalTime']));
                 $params    = array(
-                    'EVENT_DATETIME'          => $absence['EventDateTime'],
-                    'EVENT_DATETIME_LABEL'    => $eventDate->getLong(),
-                    'ABSENCE_TYPE_CODE'       => $absence['AbsenceTypeCode'],
-                    'ABSENCE_DESCRIPTION'     => $absence['AbsenceDescription'],
-                    'CLASS_CODE'              => $absence['ClassCode'],
-                    'CLASS_CAMPUS'            => $absence['ClassCampus'],
-                    'CLASS_DESCRIPTION'       => $absence['ClassDescription'],
-                    'ATTENDANCE_DAY_NUMBER'   => $absence['AttendanceDayNumber'],
-                    'ATTENDANCE_PERIOD'       => $absence['AttendancePeriod'],
-                    'LATE_ARRIVAL_FLAG'       => $absence['LateArrivalFlag'],
-                    'LATE_ARRIVAL_TIME'       => $absence['LateArrivalTime'],
-                    'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
-                    'absenceLateArrival_block' => '',
+                    'EVENT_DATETIME'        => $absence['EventDateTime'],
+                    'EVENT_DATETIME_LABEL'  => $eventDate->getLong(),
+                    'ABSENCE_TYPE_CODE'     => $absence['AbsenceTypeCode'],
+                    'ABSENCE_DESCRIPTION'   => $absence['AbsenceDescription'],
+                    'CLASS_CODE'            => $absence['ClassCode'],
+                    'CLASS_CAMPUS'          => $absence['ClassCampus'],
+                    'CLASS_DESCRIPTION'     => $absence['ClassDescription'],
+                    'ATTENDANCE_DAY_NUMBER' => $absence['AttendanceDayNumber'],
+                    'ATTENDANCE_PERIOD'     => $absence['AttendancePeriod'],
                 );
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
-                if ($absence['LateArrivalFlag']) {
-                    $this->parse('absenceLateArrival_block', 'absenceLateArrival');
-                }
                 $this->parse('absence_block', 'absence', true);
+            }
+        }
+
+        // Lateness
+        if (!empty($this->lateArrivalList)) {
+            $count = count($this->lateArrivalList);
+            $this->parse('lateArrivalList_block', 'lateArrivalList');
+            $this->setVar(
+                array(
+                    'lateArrival_block'   => '',
+                    'LATE_ARRIVAL_COUNT'  => $count,
+                    'LATE_ARRIVAL_HEADER' => 'Late to Class',
+                )
+            );
+            foreach ($this->lateArrivalList as $lateArrival) {
+                $eventDate = new Alaress_Date_Format(new DateTime($lateArrival['EventDateTime']));
+                $lateTime  = new Alaress_Date_Format(new DateTime($lateArrival['LateArrivalTime']));
+                $params    = array(
+                    'EVENT_DATETIME'          => $lateArrival['EventDateTime'],
+                    'EVENT_DATETIME_LABEL'    => $eventDate->getLong(),
+                    'ABSENCE_TYPE_CODE'       => $lateArrival['AbsenceTypeCode'],
+                    'ABSENCE_DESCRIPTION'     => $lateArrival['AbsenceDescription'],
+                    'CLASS_CODE'              => $lateArrival['ClassCode'],
+                    'CLASS_CAMPUS'            => $lateArrival['ClassCampus'],
+                    'CLASS_DESCRIPTION'       => $lateArrival['ClassDescription'],
+                    'ATTENDANCE_DAY_NUMBER'   => $lateArrival['AttendanceDayNumber'],
+                    'ATTENDANCE_PERIOD'       => $lateArrival['AttendancePeriod'],
+                    'LATE_ARRIVAL_FLAG'       => $lateArrival['LateArrivalFlag'],
+                    'LATE_ARRIVAL_TIME'       => $lateArrival['LateArrivalTime'],
+                    'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
+                );
+                $params = array_map(array('Scrub', 'text'), $params);
+                $this->setVar($params);
+                $this->parse('lateArrival_block', 'lateArrival', true);
             }
         }
 
         return true;
     }
 
+    /**
+     * Splits comment lines on characters that may be a line break, and then
+     * trims all non-word characters from each line.
+     *
+     * This is implemented because detention lines are similar to:
+     * <pre>
+     * * Didn't turn up to class this day
+     * * Detention set for tomorrow instead
+     * </pre>
+     * or something like that.
+     *
+     * @param string $commentLine The comment to split into separate lines.
+     *
+     * @return array
+     */
+    protected function splitComment($commentLine)
+    {
+        $lines = array();
+        foreach (preg_split('/[\\n\\r]+/', $commentLine) as $line) {
+            $line = trim(preg_replace('/^\\W+/', '', $line));
+            if (strlen($line) > 0) {
+                $lines[] = $line;
+            }
+        }
+        return $lines;
+    }
 }
