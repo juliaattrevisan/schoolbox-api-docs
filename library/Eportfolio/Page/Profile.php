@@ -55,6 +55,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_subjects', 'has_subjects_block');
 		$this->getPage()->setBlock('has_subjects', 'subject', 'subject_block');
+		$this->getPage()->setBlock('subject', 'subject_linked', 'subject_linked_block');
+		$this->getPage()->setBlock('subject', 'subject_unlinked', 'subject_unlinked_block');
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_groups', 'has_groups_block');
 		$this->getPage()->setBlock('has_groups', 'group', 'group_block');
@@ -333,6 +335,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render subjects
 	 */
 	private function renderSubjects() {
+		$groupHandler = new Group();
 		$allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
 
 		if (is_array($allSubjects) && count($allSubjects)) {
@@ -345,7 +348,26 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
 				));
 
+				/* Check permissions on whether you can view this subject's
+				 * homepage - if not, don't link it
+				 */
+				if (($permission = $groupHandler->getPermission($currentSubject['id'])) < READ_ACCESS) {
+					$this->getPage()->parse('subject_unlinked_block', 'subject_unlinked');
+				}
+				else {
+					$this->getPage()->parse('subject_linked_block', 'subject_linked');
+				}
+
+				/* Parse out subject
+				 */
 				$this->getPage()->parse('subject_block', 'subject', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar(array(
+					'subject_linked_block' => '',
+					'subject_unlinked_block' => ''
+				));
 			}
 
 			$this->getPage()->parse('has_subjects_block', 'has_subjects');

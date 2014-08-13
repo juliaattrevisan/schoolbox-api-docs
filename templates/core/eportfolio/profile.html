@@ -147,7 +147,14 @@
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN subject -->
-                <li class="{ON_OFF}"><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
+                <li class="{ON_OFF}">
+					<!-- BEGIN subject_linked -->
+					<a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
+					<!-- END subject_linked -->
+					<!-- BEGIN subject_unlinked -->
+					{SUBJECT_NAME}
+					<!-- END subject_unlinked -->
+				</li>
                 <!-- END subject -->
             </ul>
         </div>
