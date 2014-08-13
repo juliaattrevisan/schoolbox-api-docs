@@ -13,6 +13,7 @@ namespace Alaress\Session;
 use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
+use Aura\Session\Phpfunc;
 
 class Session extends BaseSession {
 
@@ -29,6 +30,33 @@ class Session extends BaseSession {
      * @var int
      */
     protected $requestTime;
+
+    /**
+     * Constructor sets up config dependencies
+     * @param SegmentFactory $segment_factory A session segment factory.
+     *
+     * @param \Aura\Session\CsrfTokenFactory A CSRF token factory.
+     *
+     * @param array $cookies An arry of cookies from the client, typically a
+     * copy of $_COOKIE.
+     *
+     * @param \Schoolbox\IConfigLoader $config
+     *
+     * @param int Request time, to compare the session time against
+     *
+     */
+    public function __construct(
+        SegmentFactory   $segment_factory,
+        \Aura\Session\CsrfTokenFactory $csrf_token_factory,
+        PhpFunc $phpfunc,
+        array $cookies = array(),
+        \Schoolbox\IConfigLoader $config,
+        $requestTime
+    ) {
+        parent::__construct($segment_factory, $csrf_token_factory, $phpfunc, $cookies);
+        $this->setConfig($config);
+        $this->setRequestTime($requestTime);
+    }
 
     /**
      * Returns the currently logged-in user, or an empty user if none is logged
