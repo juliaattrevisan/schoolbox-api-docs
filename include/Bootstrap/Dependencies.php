@@ -26,7 +26,11 @@ $di->set(
     'session',
     $di->lazy(
         function() use($di) {
-            $factory = new Alaress\Session\Factory($_COOKIE,$di->get('config'));
+            $factory = new Alaress\Session\Factory(
+                $_COOKIE,
+                $di->get('config'),
+                $_SERVER['REQUEST_TIME']
+            );
             $session = $factory->build();
             return $session;
         }

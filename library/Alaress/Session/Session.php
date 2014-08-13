@@ -13,6 +13,7 @@ namespace Alaress\Session;
 use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
+use Aura\Session\Phpfunc;
 
 class Session extends BaseSession {
 
@@ -47,11 +48,12 @@ class Session extends BaseSession {
     public function __construct(
         SegmentFactory   $segment_factory,
         \Aura\Session\CsrfTokenFactory $csrf_token_factory,
+        PhpFunc $phpfunc,
         array $cookies = array(),
         \Schoolbox\IConfigLoader $config,
         $requestTime
     ) {
-        parent::__construct($segment_factory, $csrf_token_factory, $cookies);
+        parent::__construct($segment_factory, $csrf_token_factory, $phpfunc, $cookies);
         $this->setConfig($config);
         $this->setRequestTime($requestTime);
     }

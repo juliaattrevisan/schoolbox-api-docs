@@ -187,7 +187,11 @@ class Bootstrap implements BootstrapInterface {
 			'session',
 			$di->lazy(
 				function () use ($di) {
-					$factory = new Factory($_COOKIE, $di->get('config'));
+					$factory = new Factory(
+						$_COOKIE,
+						$di->get('config'),
+						$_SERVER['REQUEST_TIME']
+					);
 					$session = $factory->build();
 					return $session;
 				}

@@ -20,17 +20,27 @@ class Factory {
      * @var array
      */
     protected $cookies;
+    /**
+     * @var \Schoolbox\IConfigLoader
+     */
+    protected $config;
+
+    /**
+     * @var int
+     */
+    protected $requestTime;
 
     /**
      * Creates factory.
      *
      * @param array $cookies Cookies, often from $_COOKIE but not always.
      * @param \Schoolbox\IConfigLoader $config
-     * @param \
+     * @param int $requestTime Unix timestamp, usually from $_SERVER['REQUEST_TIME'].
      */
-    public function __construct($cookies, \Schoolbox\IConfigLoader $config) {
+    public function __construct($cookies, \Schoolbox\IConfigLoader $config, $requestTime) {
         $this->cookies = $cookies;
         $this->config = $config;
+        $this->requestTime = $requestTime;
     }
 
     /**
@@ -39,9 +49,11 @@ class Factory {
      * @return Session
      */
     public function build() {
-        $segmentFactory   = new SegmentFactory();
-        $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(new SessionLibrary\Randval(new SessionLibrary\Phpfunc()));
         $func             = new Phpfunc();
+        $segmentFactory   = new SegmentFactory();
+        $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(
+            new SessionLibrary\Randval($func)
+        );
         return new Session(
             $segmentFactory,
             $csrfTokenFactory,

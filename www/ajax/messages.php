@@ -21,7 +21,7 @@ header('Content-Type: application/json');
 
 session_start();
 $config = new \Schoolbox\ConfigLoader();
-$factory = new \Alaress\Session\Factory($_COOKIE, $config);
+$factory = new \Alaress\Session\Factory($_COOKIE, $config, $_SERVER['REQUEST_TIME']);
 $session = $factory->build();
 
 // check the session is valid before continuing
