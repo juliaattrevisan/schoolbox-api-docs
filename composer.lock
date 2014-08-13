@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0e0541ce88bd093022b39dd18522f3b3",
+    "hash": "d59b70a8b4ebef06e45a8e94e009088b",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -152,24 +152,11 @@
         },
         {
             "name": "aura/session",
-            "version": "dev-develop-2",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/auraphp/Aura.Session.git",
+                "url": "https://github.com/auraphp/Aura.Session",
                 "reference": "eabfa445582ff398b025eee2cb57c294d98c5375"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/eabfa445582ff398b025eee2cb57c294d98c5375",
-                "reference": "eabfa445582ff398b025eee2cb57c294d98c5375",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "suggest": {
-                "ext-mcrypt": "Mcrypt generates the next best secure CSRF tokens.",
-                "ext-openssl": "OpenSSL generates the best secure CSRF tokens."
             },
             "type": "library",
             "extra": {
@@ -178,9 +165,6 @@
                     "config": {
                         "common": "Aura\\Session\\_Config\\Common"
                     }
-                },
-                "branch-alias": {
-                    "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -188,27 +172,7 @@
                     "Aura\\Session\\": "src/",
                     "Aura\\Session\\_Config\\": "config/"
                 }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Aura.Session Contributors",
-                    "homepage": "https://github.com/auraphp/Aura.Session/contributors"
-                }
-            ],
-            "description": "Provides session management functionality, including lazy session starting, session segments, next-request-only (\"flash\") values, and CSRF tools.",
-            "homepage": "http://auraphp.github.com/Aura.Session",
-            "keywords": [
-                "csrf",
-                "flash",
-                "flash message",
-                "session",
-                "sessions"
-            ],
-            "time": "2014-07-22 22:28:12"
+            }
         },
         {
             "name": "aura/sqlquery",
@@ -1198,8 +1162,8 @@
             "authors": [
                 {
                     "name": "Evert Pot",
-                    "email": "me@evertpot.com",
-                    "homepage": "http://evertpot.com/",
+                    "email": "evert@rooftopsolutions.nl",
+                    "homepage": "http://www.rooftopsolutions.nl/",
                     "role": "Developer"
                 }
             ],
@@ -1254,7 +1218,7 @@
                 {
                     "name": "Evert Pot",
                     "email": "evert@rooftopsolutions.nl",
-                    "homepage": "http://evertpot.com/",
+                    "homepage": "http://www.rooftopsolutions.nl/",
                     "role": "Developer"
                 }
             ],
@@ -1649,16 +1613,16 @@
         },
         {
             "name": "videlalvaro/php-amqplib",
-            "version": "v2.2.5",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/videlalvaro/php-amqplib.git",
-                "reference": "6184ddd5497c6eaffa7817555515ff95999eefa1"
+                "reference": "d8294736e47340e8d96f37d788b15f578bfc084f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/videlalvaro/php-amqplib/zipball/6184ddd5497c6eaffa7817555515ff95999eefa1",
-                "reference": "6184ddd5497c6eaffa7817555515ff95999eefa1",
+                "url": "https://api.github.com/repos/videlalvaro/php-amqplib/zipball/d8294736e47340e8d96f37d788b15f578bfc084f",
+                "reference": "d8294736e47340e8d96f37d788b15f578bfc084f",
                 "shasum": ""
             },
             "require": {
@@ -1667,6 +1631,9 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.*"
+            },
+            "suggest": {
+                "ext-sockets": "Use AMQPSocketConnection"
             },
             "type": "library",
             "autoload": {
@@ -1690,7 +1657,7 @@
                 "queue",
                 "rabbitmq"
             ],
-            "time": "2013-12-13 21:42:40"
+            "time": "2014-06-21 09:27:57"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -2437,7 +2404,7 @@
                 {
                     "name": "Anthon Pang",
                     "email": "apang@softwaredevelopment.ca",
-                    "role": "Fork Maintainer"
+                    "role": "developer"
                 }
             ],
             "description": "PHP WebDriver for Selenium 2",
@@ -2911,131 +2878,6 @@
             "time": "2014-06-12 07:22:15"
         },
         {
-            "name": "react/cache",
-            "version": "v0.3.2",
-            "target-dir": "React/Cache",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/cache.git",
-                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/cache/zipball/a821f4318e38fc7efd02d81698fcee9d3d34dafe",
-                "reference": "a821f4318e38fc7efd02d81698fcee9d3d34dafe",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "react/promise": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\Cache": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async caching.",
-            "keywords": [
-                "cache"
-            ],
-            "time": "2013-04-24 08:33:43"
-        },
-        {
-            "name": "react/dns",
-            "version": "v0.3.2",
-            "target-dir": "React/Dns",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/dns.git",
-                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
-                "reference": "c8c9c57750cb24e8f7b87bc62fee10750f1f9fbf",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "react/cache": "0.3.*",
-                "react/promise": "~1.0",
-                "react/socket": "0.3.*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\Dns": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async DNS resolver.",
-            "keywords": [
-                "dns",
-                "dns-resolver"
-            ],
-            "time": "2013-04-27 08:57:30"
-        },
-        {
-            "name": "react/socket-client",
-            "version": "v0.3.2",
-            "target-dir": "React/SocketClient",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/socket-client.git",
-                "reference": "0696ede9876749dc49670f282aab9f6c8549275b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/0696ede9876749dc49670f282aab9f6c8549275b",
-                "reference": "0696ede9876749dc49670f282aab9f6c8549275b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "react/dns": "0.3.*",
-                "react/event-loop": "0.3.*",
-                "react/promise": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "React\\SocketClient": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async connector to open TCP/IP and SSL/TLS based connections.",
-            "keywords": [
-                "Socket"
-            ],
-            "time": "2013-04-20 14:55:59"
-        },
-        {
             "name": "sebastian/comparator",
             "version": "1.0.0",
             "source": {
@@ -3252,7 +3094,8 @@
                 },
                 {
                     "name": "Adam Harvey",
-                    "email": "aharvey@php.net"
+                    "email": "aharvey@php.net",
+                    "role": "Lead"
                 },
                 {
                     "name": "Bernhard Schussek",
@@ -3398,12 +3241,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "8080aeb51a5211ac4a4a9fe16e8a0b18150f1d2c"
+                "reference": "5e18c7d34e2139670d6c9b1c918a10167786bf48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/8080aeb51a5211ac4a4a9fe16e8a0b18150f1d2c",
-                "reference": "8080aeb51a5211ac4a4a9fe16e8a0b18150f1d2c",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5e18c7d34e2139670d6c9b1c918a10167786bf48",
+                "reference": "5e18c7d34e2139670d6c9b1c918a10167786bf48",
                 "shasum": ""
             },
             "require": {
@@ -3463,7 +3306,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2014-07-29 23:17:03"
+            "time": "2014-08-12 05:05:44"
         },
         {
             "name": "symfony/config",
@@ -3950,7 +3793,6 @@
         "aura/di": 10,
         "aura/router": 10,
         "aura/web": 10,
-        "aura/session": 20,
         "0x46616c6b/etherpad-lite-client": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
