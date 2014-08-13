@@ -181,9 +181,10 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         // {VARIABLES}
         $this->setVar(
             array(
-                'awardList_block'     => '',
-                'detentionList_block' => '',
-                'absenceList_block'   => '',
+                'awardList_block'       => '',
+                'detentionList_block'   => '',
+                'absenceList_block'     => '',
+                'lateArrivalList_block' => '',
             )
         );
 
