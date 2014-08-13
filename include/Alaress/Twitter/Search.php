@@ -44,15 +44,21 @@ class Alaress_Twitter_Search {
 	 */
 	protected function generateParameters() {
 		$search = '';
+
 		if (strlen($this->getUser())) {
 			$search .= "from:{$this->getUser()} ";
 		}
 
-		//
-		// No idea how hashtags should work. #tag1 #tag2?
+		/* https://dev.twitter.com/docs/using-search
+		 */
 		if (strlen($this->getKeywords())) {
-			$search .= '#'.implode(' #', preg_split('/\W+/', $this->getKeywords()));
+			$allHashtags = preg_split('/\s+/', $this->getKeywords(), null, PREG_SPLIT_NO_EMPTY);
+
+			/* Prefix everything with hashes and urlencode for twitter api
+			 */
+			$search .= urlencode('#' . implode(' #', $allHashtags));
 		}
+
 		return array('q' => trim($search));
 	}
 
@@ -61,21 +67,19 @@ class Alaress_Twitter_Search {
 	 */
 	public function load() {
 		$processed = array();
-		$resource  = 'https://api.twitter.com/1.1/search/tweets.json';
-		$params    = $this->generateParameters();
+		$resource = 'https://api.twitter.com/1.1/search/tweets.json';
+		$params = $this->generateParameters();
+
 		if (!empty($params)) {
-
 			$cache = new Alaress_Twitter_Cache();
-
 			$cache->init($resource, $params);
 
 			$all_tweets = $cache->load();
 
-			if(is_array($all_tweets)) {
+			if (is_array($all_tweets)) {
 	            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets())) {
 					$all_tweets = array_slice($all_tweets, 0, $this->getMaxTweets());
 				}
-
 
 				foreach ($all_tweets as $result) {
 					$processed[] = array(

@@ -41,9 +41,8 @@ class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface 
 
         /* Search pattern used by #term syntax
          */
-        $pattern[] = '/(^|\s)#(\w+)/';
+        $pattern[] = '/(^|\s)#([a-zA-Z0-9-_\.]+)/s';
         $replace[] = '\1<a href="http://twitter.com/search?q=%23\2&src=hash">#\2</a>';
-
 
         $finalText = preg_replace($pattern, $replace, $text);
 
