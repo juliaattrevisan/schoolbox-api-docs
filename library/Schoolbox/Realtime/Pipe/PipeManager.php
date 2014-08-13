@@ -277,7 +277,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
     public function onTimeout($timer) {
         $userId = $timer->getData();
         $success = $this->subscriptionManager->removeSubscription($userId);
-        $this->v("User $userId has timed out, " . ($success ? "unsubscribed" : "failed to unsubscribe"));
+        $this->log->info("User $userId has timed out, " . ($success ? "unsubscribed" : "failed to unsubscribe"));
 
         foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
             $this->sendHeader($pipe, 401);

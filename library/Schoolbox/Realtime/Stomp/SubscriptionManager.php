@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Stomp;
 
 
+use Alaress\Async\AMQP\AMQPResponseHandlerInterface;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
@@ -23,7 +24,7 @@ use Schoolbox\Realtime\Pipe\SelfResponder;
 class SubscriptionManager {
 
 	/** @var PipeManager */
-	protected $pipeManager;
+	protected $handler;
 
 	/** @var Client */
 	protected $stompClient;
@@ -38,15 +39,15 @@ class SubscriptionManager {
     protected $log;
 
 	/**
-	 * @param Client $stompClient
-	 * @param PipeManager $pipeManager
+     * @param Client $stompClient
+	 * @param AMQPResponseHandlerInterface $handler
      * @param LoggerInterface $log
 	 */
-	public function __construct($stompClient, $pipeManager, $log) {
+	public function __construct(Client $stompClient, AMQPResponseHandlerInterface $handler, LoggerInterface $log) {
 		// this factory requires its own loop to work
 		$this->subscriptions = array();
+		$this->handler = $handler;
 		$this->stompClient = $stompClient;
-		$this->pipeManager = $pipeManager;
 		$this->conf = ConfigMapper::getInstance();
         $this->log = $log;
 	}
@@ -72,7 +73,7 @@ class SubscriptionManager {
 
 		try {
             // this closure is executed when a stomp client connection is established
-            $this->putSubscription(new Subscription($this->stompClient, $userId, $this->pipeManager, $this->log));
+            $this->putSubscription(new Subscription($this->stompClient, $userId, $this->handler, $this->log));
             // if a responder is provided, use it as a callback for success
             if($responder instanceof SelfResponder) {
                 $responder->notifyPipe(json_encode(array('subscribe' => true)));
