@@ -11,7 +11,8 @@ namespace Alaress;
 
 use Predis;
 
-class Redis {
+class Redis
+{
 
     /**
      * @var static
@@ -28,7 +29,8 @@ class Redis {
      *
      * @return static
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!(static::$instance instanceof static)) {
             static::$instance = new static();
         }
@@ -40,7 +42,8 @@ class Redis {
      *
      * @return Predis\ClientInterface
      */
-    public static function getClientInstance() {
+    public static function getClientInstance()
+    {
         return static::getInstance()->getClient();
     }
 
@@ -51,9 +54,11 @@ class Redis {
      *
      * @param  mixed $parameters
      * @param  mixed $options
+     *
      * @return $this
      */
-    public function connect($parameters = null, $options = null) {
+    public function connect($parameters = null, $options = null)
+    {
         $this->setClient(new Predis\Client($parameters, $options));
         return $this;
     }
@@ -61,15 +66,18 @@ class Redis {
     /**
      * @return Predis\ClientInterface
      */
-    public function getClient() {
+    public function getClient()
+    {
         return $this->client;
     }
 
     /**
      * @param  Predis\ClientInterface $client
+     *
      * @return $this
      */
-    protected function setClient($client) {
+    protected function setClient($client)
+    {
         $this->client = $client;
         return $this;
     }
@@ -84,13 +92,14 @@ class Redis {
      *                           if there is no value already in the cache.
      * @param mixed    $params   A parameter to pass to $callback. This is also
      *                           used to generate the cache key.
-     * @param int      $timeout  Cache timeout (null for none)
+     * @param int      $timeout  Cache timeout in seconds (null for none)
      *
      * @return mixed
      */
-    public function cacheFunctionCall($base_key, $callback, $params, $timeout = null) {
+    public function cacheFunctionCall($base_key, $callback, $params, $timeout = null)
+    {
         $redis = $this->getClient();
-        $key   = $base_key.':'.hash('sha256', serialize($params));
+        $key   = $base_key . ':' . hash('sha256', serialize($params));
 
         // Would use Redis hashes, but individual keys don't have expiry.
         $is_result_called = false;
@@ -102,13 +111,11 @@ class Redis {
                 $result           = call_user_func($callback, $params);
                 if ($timeout > 0) {
                     $redis->setex($key, $timeout, $result);
-                }
-                else {
+                } else {
                     $redis->set($key, $result);
                 }
             }
-        }
-        catch (Predis\PredisException $e) {
+        } catch (Predis\PredisException $e) {
             trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
             if (!$is_result_called) {
                 $result = call_user_func($callback, $params);
