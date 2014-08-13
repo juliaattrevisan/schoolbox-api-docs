@@ -87,7 +87,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
                 curl_exec($ch);
                 $curlinfo = curl_getinfo($ch);
 
