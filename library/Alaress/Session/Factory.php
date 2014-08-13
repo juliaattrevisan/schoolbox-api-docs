@@ -60,7 +60,7 @@ class Factory {
             $func,
             $this->cookies,
             $this->config,
-            $_SERVER['REQUEST_TIME']
+            $this->requestTime
         );
     }
 }
