@@ -8,8 +8,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard_ControllerAbstract {
-
+class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard_ControllerAbstract
+{
     /**
      * @var External_UserDetentionInterface
      */
@@ -48,8 +48,8 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
      *
      * @return bool
      */
-    public function execute() {
-
+    public function execute()
+    {
         // Not St Michaels? This isn't for you
         if (!(Config::get('site_location') == 'stmichaels')) {
             return false;
@@ -135,10 +135,10 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Filter award list into absences and lateness
         $absenceList = $this->absenceList;
-        $lateFilter = function($absence) {
-            return ($absence['LateArrivalFlag']);
+        $lateFilter = function ($absence) {
+            return $absence['LateArrivalFlag'];
         };
-        $absenceFilter = function($absence) {
+        $absenceFilter = function ($absence) {
             return !($absence['LateArrivalFlag']);
         };
         $this->lateArrivalList = array_filter($absenceList, $lateFilter);
@@ -149,10 +149,12 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     /**
      * Parse <!-- blockage --> and set {VARIABLES}
      *
-     * @param  String $templateHandle
+     * @param string $templateHandle The handle to jam this component in?
+     *
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'stMichaelsAwards')) {
             return false;
         }
@@ -316,10 +318,12 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
      * </pre>
      * or something like that.
      *
-     * @param  string $commentLine
+     * @param string $commentLine The comment to split into separate lines.
+     *
      * @return array
      */
-    protected function splitComment($commentLine) {
+    protected function splitComment($commentLine)
+    {
         $lines = array();
         foreach (preg_split('/[\\n\\r]+/', $commentLine) as $line) {
             $line = trim(preg_replace('/^\\W+/', '', $line));
