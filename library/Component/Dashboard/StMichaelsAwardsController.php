@@ -242,9 +242,15 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Absences
         if (!empty($this->absenceList)) {
+            $count = count($this->absenceList);
             $this->parse('absenceList_block', 'absenceList');
-            $this->setVar('absence_block', '');
-            $this->setVar('ABSENCE_COUNT', count($this->absenceList));
+            $this->setVar(
+                array(
+                    'absence_block'  => '',
+                    'ABSENCE_COUNT'  => $count,
+                    'ABSENCE_HEADER' => ($count > 1 ? 'Unexplained Absences' : 'Unexplained Absence'),
+                )
+            );
             foreach ($this->absenceList as $absence) {
                 $eventDate = new Alaress_Date_Format(new DateTime($absence['EventDateTime']));
                 $params    = array(
@@ -266,9 +272,15 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Lateness
         if (!empty($this->lateArrivalList)) {
+            $count = count($this->lateArrivalList);
             $this->parse('lateArrivalList_block', 'lateArrivalList');
-            $this->setVar('lateArrival_block', '');
-            $this->setVar('LATE_ARRIVAL_COUNT', count($this->lateArrivalList));
+            $this->setVar(
+                array(
+                    'lateArrival_block'   => '',
+                    'LATE_ARRIVAL_COUNT'  => $count,
+                    'LATE_ARRIVAL_HEADER' => 'Late to Class',
+                )
+            );
             foreach ($this->lateArrivalList as $lateArrival) {
                 $eventDate = new Alaress_Date_Format(new DateTime($lateArrival['EventDateTime']));
                 $lateTime  = new Alaress_Date_Format(new DateTime($lateArrival['LateArrivalTime']));
@@ -294,5 +306,4 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         return true;
     }
-
 }
