@@ -240,28 +240,23 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             }
         }
 
-        // Absences and lateness
+        // Absences
         if (!empty($this->absenceList)) {
             $this->parse('absenceList_block', 'absenceList');
             $this->setVar('absence_block', '');
             $this->setVar('ABSENCE_COUNT', count($this->absenceList));
             foreach ($this->absenceList as $absence) {
                 $eventDate = new Alaress_Date_Format(new DateTime($absence['EventDateTime']));
-                $lateTime  = new Alaress_Date_Format(new DateTime($absence['LateArrivalTime']));
                 $params    = array(
-                    'EVENT_DATETIME'          => $absence['EventDateTime'],
-                    'EVENT_DATETIME_LABEL'    => $eventDate->getLong(),
-                    'ABSENCE_TYPE_CODE'       => $absence['AbsenceTypeCode'],
-                    'ABSENCE_DESCRIPTION'     => $absence['AbsenceDescription'],
-                    'CLASS_CODE'              => $absence['ClassCode'],
-                    'CLASS_CAMPUS'            => $absence['ClassCampus'],
-                    'CLASS_DESCRIPTION'       => $absence['ClassDescription'],
-                    'ATTENDANCE_DAY_NUMBER'   => $absence['AttendanceDayNumber'],
-                    'ATTENDANCE_PERIOD'       => $absence['AttendancePeriod'],
-                    'LATE_ARRIVAL_FLAG'       => $absence['LateArrivalFlag'],
-                    'LATE_ARRIVAL_TIME'       => $absence['LateArrivalTime'],
-                    'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
-                    'absenceLateArrival_block' => '',
+                    'EVENT_DATETIME'        => $absence['EventDateTime'],
+                    'EVENT_DATETIME_LABEL'  => $eventDate->getLong(),
+                    'ABSENCE_TYPE_CODE'     => $absence['AbsenceTypeCode'],
+                    'ABSENCE_DESCRIPTION'   => $absence['AbsenceDescription'],
+                    'CLASS_CODE'            => $absence['ClassCode'],
+                    'CLASS_CAMPUS'          => $absence['ClassCampus'],
+                    'CLASS_DESCRIPTION'     => $absence['ClassDescription'],
+                    'ATTENDANCE_DAY_NUMBER' => $absence['AttendanceDayNumber'],
+                    'ATTENDANCE_PERIOD'     => $absence['AttendancePeriod'],
                 );
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
@@ -269,6 +264,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             }
         }
 
+        // Lateness
         if (!empty($this->lateArrivalList)) {
             $this->parse('lateArrivalList_block', 'lateArrivalList');
             $this->setVar('lateArrival_block', '');
@@ -289,7 +285,6 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'LATE_ARRIVAL_FLAG'       => $lateArrival['LateArrivalFlag'],
                     'LATE_ARRIVAL_TIME'       => $lateArrival['LateArrivalTime'],
                     'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
-                    'lateArrivalLateArrival_block' => '',
                 );
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
