@@ -91,8 +91,11 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 curl_exec($ch);
                 $curlinfo = curl_getinfo($ch);
 
-                if(preg_match('/shareCode=([a-zA-Z0-9\-]+)/', $curlinfo['redirect_url'], $matches)) {
-                    $this->setVar('VIDEO_ID', $matches[1]);
+                parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
+                $parts = array_change_key_case($parts, CASE_LOWER);
+                if (isset($parts['sharecode'])) {
+                    // TODO: store the video ID once it is known
+                    $this->setVar('VIDEO_ID', $parts['sharecode']);
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
             }
