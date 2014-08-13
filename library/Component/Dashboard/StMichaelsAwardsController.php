@@ -167,14 +167,15 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->parseConfig();
 
         // <!-- BEGIN blockages -->
-        $this->setBlock($templateHandle, 'awardList',     'awardList_block');
-        $this->setBlock('awardList',     'award',         'award_block');
-        $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
-        $this->setBlock('detentionList', 'detention',     'detention_block');
-        $this->setBlock('detention',     'detentionLine', 'detentionLine_block');
-        $this->setBlock($templateHandle, 'absenceList',   'absenceList_block');
-        $this->setBlock('absenceList',   'absence',       'absence_block');
-        $this->setBlock('absence',       'absenceLateArrival', 'absenceLateArrival_block');
+        $this->setBlock($templateHandle,   'awardList',       'awardList_block');
+        $this->setBlock('awardList',       'award',           'award_block');
+        $this->setBlock($templateHandle,   'detentionList',   'detentionList_block');
+        $this->setBlock('detentionList',   'detention',       'detention_block');
+        $this->setBlock('detention',       'detentionLine',   'detentionLine_block');
+        $this->setBlock($templateHandle,   'absenceList',     'absenceList_block');
+        $this->setBlock('absenceList',     'absence',         'absence_block');
+        $this->setBlock($templateHandle,   'lateArrivalList', 'lateArrivalList_block');
+        $this->setBlock('lateArrivalList', 'lateArrival',     'lateArrival_block');
         // <!-- END blockages -->
 
         // {VARIABLES}
@@ -239,10 +240,11 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             }
         }
 
-        // Absences
+        // Absences and lateness
         if (!empty($this->absenceList)) {
             $this->parse('absenceList_block', 'absenceList');
             $this->setVar('absence_block', '');
+            $this->setVar('ABSENCE_COUNT', count($this->absenceList));
             foreach ($this->absenceList as $absence) {
                 $eventDate = new Alaress_Date_Format(new DateTime($absence['EventDateTime']));
                 $lateTime  = new Alaress_Date_Format(new DateTime($absence['LateArrivalTime']));
@@ -263,10 +265,35 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                 );
                 $params = array_map(array('Scrub', 'text'), $params);
                 $this->setVar($params);
-                if ($absence['LateArrivalFlag']) {
-                    $this->parse('absenceLateArrival_block', 'absenceLateArrival');
-                }
                 $this->parse('absence_block', 'absence', true);
+            }
+        }
+
+        if (!empty($this->lateArrivalList)) {
+            $this->parse('lateArrivalList_block', 'lateArrivalList');
+            $this->setVar('lateArrival_block', '');
+            $this->setVar('LATE_ARRIVAL_COUNT', count($this->lateArrivalList));
+            foreach ($this->lateArrivalList as $lateArrival) {
+                $eventDate = new Alaress_Date_Format(new DateTime($lateArrival['EventDateTime']));
+                $lateTime  = new Alaress_Date_Format(new DateTime($lateArrival['LateArrivalTime']));
+                $params    = array(
+                    'EVENT_DATETIME'          => $lateArrival['EventDateTime'],
+                    'EVENT_DATETIME_LABEL'    => $eventDate->getLong(),
+                    'ABSENCE_TYPE_CODE'       => $lateArrival['AbsenceTypeCode'],
+                    'ABSENCE_DESCRIPTION'     => $lateArrival['AbsenceDescription'],
+                    'CLASS_CODE'              => $lateArrival['ClassCode'],
+                    'CLASS_CAMPUS'            => $lateArrival['ClassCampus'],
+                    'CLASS_DESCRIPTION'       => $lateArrival['ClassDescription'],
+                    'ATTENDANCE_DAY_NUMBER'   => $lateArrival['AttendanceDayNumber'],
+                    'ATTENDANCE_PERIOD'       => $lateArrival['AttendancePeriod'],
+                    'LATE_ARRIVAL_FLAG'       => $lateArrival['LateArrivalFlag'],
+                    'LATE_ARRIVAL_TIME'       => $lateArrival['LateArrivalTime'],
+                    'LATE_ARRIVAL_TIME_LABEL' => $lateTime->getTimeOnly(),
+                    'lateArrivalLateArrival_block' => '',
+                );
+                $params = array_map(array('Scrub', 'text'), $params);
+                $this->setVar($params);
+                $this->parse('lateArrival_block', 'lateArrival', true);
             }
         }
 
