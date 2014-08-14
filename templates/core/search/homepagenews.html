@@ -1,0 +1,26 @@
+<div class="box">
+	<h2>Homepage News <!-- BEGIN count -->({HOMEPAGE_NEWS_DISP_COUNT} / {HOMEPAGE_NEWS_COUNT})<!-- END count --></h2>
+	<ul class="information-list">
+	<!-- BEGIN homepage_news -->
+		<li>
+			<a href="{HOMEPAGE_NEWS_LINK}">
+				<img class="thumbnail" height="60" width="60" src="images/icons/60x60/news.png" />
+				<h4>{HOMEPAGE_NEWS_HEADING}</h4>
+			</a>
+			<p class="meta">{HOMEPAGE_NEWS_BREADCRUMB}</p>
+			<p class="meta">Written by <a href="/search/user/{HOMEPAGE_NEWS_OWNER}">{HOMEPAGE_NEWS_OWNER_NAME}</a> {HOMEPAGE_NEWS_CREATED}</p>
+			<p>{HOMEPAGE_NEWS_BODY}</p>
+		</li>
+	<!-- END homepage_news -->
+	</ul>
+	<!-- BEGIN see_more -->
+	<p>
+		<a id="homepagenews-more" class="float-left btn more" rel="homepagenews" href="#"><span></span>See all {MORE_COUNT} results for Homepage News</a>
+	</p>
+	<!-- END see_more -->
+	<ul class="admin-nav foot">
+		<!-- BEGIN pagination -->
+		<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
+		<!-- END pagination -->
+	</ul>
+</div>

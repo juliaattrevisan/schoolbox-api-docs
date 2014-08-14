@@ -455,11 +455,11 @@ if (!empty($result['link'])) {
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
-    $page->setFile('news_t', 'search/news.html');
-    $page->setBlock('news_t', 'news', 'news_block');
+    $page->setFile('homepage_news_t', 'search/homepagenews.html');
+    $page->setBlock('homepage_news_t', 'homepage_news', 'homepage_news_block');
     $page->setVar(array(
-        'NEWS_DISP_COUNT' => count($result['news']),
-        'NEWS_COUNT' => $count['news'],
+        'HOMEPAGE_NEWS_DISP_COUNT' => count($result['homepagenews']),
+        'HOMEPAGE_NEWS_COUNT' => $count['news'],
     ));
 
     foreach ($result['homepagenews'] as $news) {
@@ -477,24 +477,24 @@ if (!empty($result['homepagenews'])) {
         $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
         $page->setVar(array(
-            'NEWS_ID' => $news['id'],
-            'NEWS_CODE' => $news['code'],
-            'NEWS_LINK' => $news['link'],
-            'NEWS_HEADING' => Scrub::text($news['heading']),
-            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-            'NEWS_OWNER' => $news['uid'],
-            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'NEWS_CREATED' => $createdTime->getRelativeTime(),
-            'NEWS_BREADCRUMB' => $news['breadcrumb'],
-            'NEWS_COUNT' => $count['news'],
+            'HOMEPAGE_NEWS_ID' => $news['id'],
+            'HOMEPAGE_NEWS_CODE' => $news['code'],
+            'HOMEPAGE_NEWS_LINK' => $news['link'],
+            'HOMEPAGE_NEWS_HEADING' => Scrub::text($news['heading']),
+            'HOMEPAGE_NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
+            'HOMEPAGE_NEWS_OWNER' => $news['uid'],
+            'HOMEPAGE_NEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'HOMEPAGE_NEWS_CREATED' => $createdTime->getRelativeTime(),
+            'HOMEPAGE_NEWS_BREADCRUMB' => $news['breadcrumb'],
+            'HOMEPAGE_NEWS_COUNT' => $count['homepagenews'],
         ));
 
-        $page->parse('news_block', 'news', true);
+        $page->parse('homepage_news_block', 'homepage_news', true);
     }
 
-	outputSeeMore($page, $type, $count, 'news');
+	outputSeeMore($page, $type, $count, 'homepage_news');
 
-    $page->parse('RESULT', 'news_t', true);
+    $page->parse('RESULT', 'homepage_news_t', true);
 }
 
 
@@ -798,6 +798,4 @@ function outputSeeMore($page, $type, $count, $handle) {
 	else {
 		$page->setVar('see_more_block', '');
 	}
-
 }
-?>
