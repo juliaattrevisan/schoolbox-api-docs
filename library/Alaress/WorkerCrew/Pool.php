@@ -10,18 +10,20 @@
 namespace Alaress\WorkerCrew;
 
 
-use Alaress\Cli\Debug;
+use Alaress\Async\Listener\Stream\StreamListener;
+use Alaress\Exception\IO\IOException;
+use Alaress\WorkerCrew\Worker\IO\IOStream;
+use Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener;
+use Alaress\WorkerCrew\Worker\IO\Listener\ErrorIOListener;
+use Alaress\WorkerCrew\Worker\IO\Listener\LogIOListener;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Evenement\EventEmitter;
-use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stream\Stream;
 use RuntimeException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use SplObjectStorage;
-use UnexpectedValueException;
 
 /**
  * Class Pool
@@ -39,48 +41,53 @@ class Pool extends EventEmitter {
 	protected $loop;
 
 	/** @var DispatchStrategyInterface */
-	protected $poolingStrat;
+	protected $strat;
 
 	/** @var WorkerBundleInterface */
 	protected $workers;
 
-	/** @var SplObjectStorage */
-	protected $datastreams;
+	/** @var LoggerInterface */
+	protected $log;
 
-	/** @var SplObjectStorage */
-	protected $logstreams;
+    /** @var StreamListener[] */
+    protected $ioListeners;
 
-	/** @var SplObjectStorage */
-	protected $errstreams;
-
-	/** @var Debug */
-	protected $debug;
+    /** @var array (IOStream[][]) */
+    protected $streams;
 
 
-	/**
-	 * @param LoopInterface $loop
-	 * @param TaskResponseHandlerInterface $msgHandler
-	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
-	 */
-	public function __construct($loop, $msgHandler, $strat, $debug) {
-		$this->loop = $loop;
-		$this->poolingStrat = $strat;
-		$this->workers = $this->poolingStrat->newWorkerBundle();
-		$this->datastreams = new SplObjectStorage();
-		$this->logstreams = new SplObjectStorage();
-		$this->errstreams = new SplObjectStorage();
-		$this->msgHandler = $msgHandler;
-		$this->debug = $debug;
-	}
+    /**
+     * @param LoopInterface                $loop
+     * @param TaskResponseHandlerInterface $msgHandler
+     * @param DispatchStrategyInterface    $strat
+     * @param LoggerInterface              $log
+     */
+    public function __construct($loop, $msgHandler, $strat, $log)
+    {
+        $this->loop        = $loop;
+        $this->strat       = $strat;
+        $this->log         = $log;
+        $this->workers     = $this->strat->newWorkerBundle();
+
+        $this->ioListeners = array(
+            self::DATA_OUT  => new DataIOListener($log, $this->workers, $strat, $msgHandler, $this),
+            self::DEBUG_OUT => new LogIOListener($log),
+            self::DEBUG_ERR => new ErrorIOListener($log),
+        );
+    }
 
 
-	/**
-	 * Kill workers gracefully
-	 */
-	public function __destruct() {
-		unset($this->workers);
-	}
+    /**
+     * Kill workers gracefully
+     */
+    public function __destruct()
+    {
+        $this->releaseWorkers();
+        unset(
+            $this->ioListeners,
+            $this->workers
+        );
+    }
 
 
 	/**
@@ -94,21 +101,41 @@ class Pool extends EventEmitter {
 	 * @return int
 	 */
 	public function accept($identifier, $cmd, $args, $remainingTaskCount) {
-		$pid = $this->poolingStrat->getAvailableWorker($this->workers, $remainingTaskCount);
+		$pid = $this->getAvailableWorker($remainingTaskCount);
 
 		switch($pid) {
 			case -1: // there is nowhere you can put this, you should not have requested
 				throw new RuntimeException("No process is available to handle this request, did you check first?");
 			case 0:  // no current processes available, but you can create one
 				$pid = $this->attachWorker();
+                $new = true;
+                $this->log->debug("Created new worker with PID $pid");
 				break;
 			default: // any positive integer is the PID of the process we will be sending this to
+                $new = false;
 				break;
 		}
 
-		$this->assignTask($pid, $cmd, $args, $identifier);
-		return $pid;
-	}
+        try {
+            // attempt to assign the given task to the worker found
+            $this->log->debug("Tasking $pid with $cmd");
+            $this->assignTask($pid, $cmd, $args, $identifier);
+        }
+        catch(IOException $e) {
+            // communication problem with the given worker
+            $this->detachWorker($pid);
+
+            // if we're not able to communicate with the process we only just created, that's special...
+            if($new) {
+                throw new RuntimeException("Could not communicate with freshly created process", 0, $e);
+            }
+
+            // ...otherwise just rethrow the IO exception
+            throw $e;
+        }
+
+        return $pid;
+    }
 
 
 	/**
@@ -118,8 +145,8 @@ class Pool extends EventEmitter {
 	 * @throws RuntimeException
 	 */
 	protected function attachWorker() {
-		$this->debug->v("Attaching worker to {$this->poolingStrat->getName()} pool", '+');
-		$cmd = $this->poolingStrat->getCommand();
+		$this->log->notice("Attaching worker to {$this->strat->getName()} pool", array('char' => '+'));
+		$cmd = $this->strat->getCommand();
 
 		$descriptorSpec = array(
 			self::DATA_IN   => array("pipe", "r"), // stdin     is a pipe that the child will read from
@@ -128,7 +155,9 @@ class Pool extends EventEmitter {
 			self::DEBUG_ERR => array("pipe", "w")  // stderr    is a pipe that the child will write to
 		);
 
-		if(!($pp = proc_open("exec $cmd", $descriptorSpec, $pipes))) {
+        $process = "exec $cmd ".$this->strat->getFlags();
+
+		if(!($pp = proc_open($process, $descriptorSpec, $pipes))) {
 			throw new RuntimeException("Cannot launch worker process");
 		}
 
@@ -145,32 +174,34 @@ class Pool extends EventEmitter {
 
 		$pid = $status['pid'];
 
-		$this->workers->attach($pid, new Worker($status['command'], $pp, $pipes, $this->poolingStrat));
+        $worker = new Worker($status['command'], $pp, $pipes, $this->strat);
+        $worker->attachLogger($this->log);
 
-		$this->workers->get($pid)->attachDebug($this->debug);
+        $this->workers->attach($pid, $worker);
 
-		// listen to worker's output stream for data
-		$datastream = new Stream($pipes[self::DATA_OUT], $this->loop);
-		$datastream->on('data',  array($this, 'onData'));
-		$datastream->on('close', array($this, 'onClose'));
-
-		$this->datastreams->attach($datastream, $pid);
-
-		// listen to worker's debug output stream for general debugging
-		$logstream = new Stream($pipes[self::DEBUG_OUT], $this->loop);
-		$logstream->on('data', array($this, 'onLog'));
-
-		$this->logstreams->attach($logstream, $pid);
-
-		// listen to worker's debug error stream for critical errors
-		$errstream = new Stream($pipes[self::DEBUG_ERR], $this->loop);
-		$errstream->on('data', array($this, 'onError'));
-
-		$this->errstreams->attach($errstream, $pid);
+        // create listenable stream objects
+        foreach($this->ioListeners as $k => $listener) {
+            // @developers: look at the stream listeners for callback functionality
+            $this->streams[$pid][$k] = new IOStream($pipes[$k], $this->loop, $this->ioListeners[$k]);
+        }
 
 		return $pid;
-
 	}
+
+
+    /**
+     * @param int $pid
+     */
+    protected function detachWorker($pid) {
+        foreach($this->streams[$pid] as $fd => $stream) {
+            /** @var IOStream $stream */
+            $stream->detachListener($this->ioListeners[$fd]);
+            $stream->close();
+        }
+        unset($this->streams[$pid]);
+        $this->workers->detach($pid);
+        $this->log->debug("Detached $pid");
+    }
 
 
 	/**
@@ -184,138 +215,7 @@ class Pool extends EventEmitter {
 		if(!$this->workers->contains($pid)) {
 			throw new RuntimeException("Cannot assign task to nonexistent worker: $pid");
 		}
-		$this->workers->get($pid)->setTask($identifier, $cmd, $args);
-	}
-
-
-	/**
-	 * @param string $data
-	 * @param Stream $stream
-	 */
-	public function onData($data, $stream) {
-		try {
-			$pid = $this->datastreams->offsetGet($stream);
-		}
-		catch(UnexpectedValueException $e) {
-			$this->debug->v("Unexpected stream supplied, cannot locate PID", '!');
-			return;
-		}
-
-		$worker = $this->workers->get($pid);
-
-		// evaluate stream metadata
-		$meta = stream_get_meta_data($stream->stream);
-
-		// this stream is closed
-		if($meta['eof']) {
-			// do nothing
-			return;
-		}
-
-		// interpret the first character sent and determine the worker's state based on it
-		switch($this->poolingStrat->checkState($data)) {
-			case Worker::READY: // ready for another task
-				$this->debug->v("Worker $pid ready for new task");
-				$worker->setStatus(Worker::READY);
-				break;
-
-			case Worker::BUSY:  // data sent, but not finished yet
-				$this->debug->v("Worker $pid still working");
-				$worker->appendData($data);
-				break;
-
-			case Worker::ERROR: // still alive, but cannot accept more tasks
-				$this->debug->v("Worker $pid in error");
-				$worker->setStatus(Worker::BUSY);
-				break;
-
-			case Worker::DONE:  // job done, ready for another task
-				$this->debug->v("Worker $pid complete, ready for new task");
-				$worker
-					->appendData($data)
-					->markTaskComplete();
-
-				// worker reports being finished, so handle the response it came back with
-				try {
-					// pass to the registered response handler
-					$this->msgHandler->handleResponse(
-						$worker->getTask()->getIdentifier(),
-						$worker->getTask()->getCommand(),
-						$this->poolingStrat->decodeRecords($worker->getTask()->getData(false))
-					);
-				}
-				catch(Exception $e) {
-					// your reactor will explode if you don't catch exceptions coming from your response handler
-					$this->poolingStrat->handleException($e, $this->debug);
-				}
-
-				// regardless of whether or not the handling of the response succeeded, we need to ditch this message
-				$this->poolingStrat->pdequeue($worker->getTask()->getIdentifier());
-				break;
-
-			case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
-				$this->debug->v("Worker $pid killed");
-				$worker->setStatus(Worker::ENDED);
-				break;
-		}
-
-		// if we can accept, emit READY (to be caught by dispatcher)
-		if($this->canAccept()) {
-			$this->emit('ready');
-		}
-	}
-
-
-	/**
-	 * @param Stream $stream
-	 */
-	public function onClose($stream) {
-		try {
-			$pid = $this->datastreams->offsetGet($stream);
-		}
-		catch(UnexpectedValueException $e) {
-			return;
-		}
-
-		$this->datastreams->offsetUnset($stream);
-		$this->debug->v("Worker $pid killed");
-		$this->workers->get($pid)->setStatus(Worker::ENDED);
-		$this->cleanup();
-	}
-
-
-	/**
-	 * Push all worker logging to the daemon's log
-	 *
-	 * @param string $data
-	 * @param Stream $stream
-	 */
-	public function onLog($data, $stream) {
-		try {
-			$pid = $this->datastreams->offsetGet($stream);
-		}
-		catch(UnexpectedValueException $e) {
-			$this->debug->v("$data",'w');
-			return;
-		}
-		$this->debug->v("{{$pid}}$data",'w');
-	}
-
-
-	/**
-	 * Push all worker logging to the daemon's error log
-	 * @param $data
-	 * @param $stream
-	 */
-	public function onError($data, $stream) {
-		try {
-			$pid = $this->errstreams->offsetGet($stream);
-		}
-		catch(UnexpectedValueException $e) {
-			$this->debug->v("$data", '!');
-			return;
-		}
-		$this->debug->v("{{$pid}}$data", '!');
+		$this->workers->getByProcessId($pid)->setTask($identifier, $cmd, $args);
 	}
 
 
@@ -332,20 +232,12 @@ class Pool extends EventEmitter {
 
 
 	/**
-	 * Removes internal reference to any workers that are dead and gone.
-	 */
-	protected function cleanup() {
-		$this->poolingStrat->cleanup($this->workers);
-	}
-
-
-	/**
 	 * Returns whether or not a new command can be accepted.
 	 *
 	 * @return bool
 	 */
 	public function canAccept() {
-		return $this->poolingStrat->canAccept($this->workers);
+		return $this->strat->canAccept($this->workers);
 	}
 
 
@@ -355,7 +247,7 @@ class Pool extends EventEmitter {
 	 * @return string
 	 */
 	public function getCommand() {
-		return $this->poolingStrat->getCommand();
+		return $this->strat->getCommand();
 	}
 
 
@@ -365,12 +257,11 @@ class Pool extends EventEmitter {
 	 *   0 if none are available but it is permissible to create one, or
 	 *   -1 if none are available, and no more may be spawned right now.
 	 *
-	 * @param WorkerBundleInterface $workers
 	 * @param int $remainingTaskCount
 	 * @return int
 	 */
-	public function getAvailableWorker($workers, $remainingTaskCount) {
-		return $this->poolingStrat->getAvailableWorker($workers, $remainingTaskCount);
+	public function getAvailableWorker($remainingTaskCount) {
+		return $this->strat->getAvailableWorker($this->workers, $remainingTaskCount);
 	}
 
 
@@ -380,7 +271,7 @@ class Pool extends EventEmitter {
 	 * @return array
 	 */
 	public function getSupportedActions() {
-		return $this->poolingStrat->getSupportedActions();
+		return $this->strat->getSupportedActions();
 	}
 
 
@@ -391,7 +282,7 @@ class Pool extends EventEmitter {
 	 * @return int
 	 */
 	public function checkState($data) {
-		return $this->poolingStrat->checkState($data);
+		return $this->strat->checkState($data);
 	}
 
 
@@ -403,7 +294,7 @@ class Pool extends EventEmitter {
 	 * @return string
 	 */
 	public function composeTaskString($command, $arguments) {
-		return $this->poolingStrat->composeTaskString($command, $arguments);
+		return $this->strat->composeTaskString($command, $arguments);
 	}
 
 
@@ -415,7 +306,7 @@ class Pool extends EventEmitter {
 	 * @return array
 	 */
 	public function decomposeTaskString($taskString) {
-		return $this->poolingStrat->decomposeTaskString($taskString);
+		return $this->strat->decomposeTaskString($taskString);
 	}
 
 
@@ -426,7 +317,7 @@ class Pool extends EventEmitter {
 	 * @return string
 	 */
 	public function encodeRecord($data) {
-		return $this->poolingStrat->encodeRecord($data);
+		return $this->strat->encodeRecord($data);
 	}
 
 
@@ -435,7 +326,7 @@ class Pool extends EventEmitter {
 	 * @return int
 	 */
 	public function getQueueDelay() {
-		return $this->poolingStrat->getQueueDelay();
+		return $this->strat->getQueueDelay();
 	}
 
 
@@ -446,7 +337,7 @@ class Pool extends EventEmitter {
 	 * @return bool
 	 */
 	public function canDispatcherFlywheel() {
-		return $this->poolingStrat->canDispatcherFlywheel();
+		return $this->strat->canDispatcherFlywheel();
 	}
 
 
@@ -456,7 +347,7 @@ class Pool extends EventEmitter {
 	 * @return void
 	 */
 	public function dispatcherIdle() {
-		$this->poolingStrat->dispatcherIdle();
+		$this->strat->dispatcherIdle();
 	}
 
 
@@ -466,7 +357,7 @@ class Pool extends EventEmitter {
 	 * @return void
 	 */
 	public function dispatcherEngage() {
-		$this->poolingStrat->dispatcherEngage();
+		$this->strat->dispatcherEngage();
 	}
 
 
@@ -476,7 +367,7 @@ class Pool extends EventEmitter {
 	 * @return int
 	 */
 	public function getWorkerIdleTimeout() {
-		return $this->poolingStrat->getWorkerIdleTimeout();
+		return $this->strat->getWorkerIdleTimeout();
 	}
 
 

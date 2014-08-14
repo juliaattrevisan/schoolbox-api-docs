@@ -11,15 +11,15 @@ namespace Schoolbox\Realtime\Pipe;
 
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
+use Alaress\WorkerCrew\Worker\PipeWriter;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\Interceptor\Interceptor;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Role;
@@ -31,13 +31,14 @@ class WorkerProcess extends AbstractProcess {
 	protected $mqf;
 
 
-	/**
-	 * @param LoopInterface $loop
-	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
-	 */
-	public function __construct($loop, $strat = null, $debug = null) {
-		parent::__construct($loop, $strat, $debug);
+    /**
+     * @param LoopInterface $loop
+     * @param LoggerInterface $log
+     * @param PipeWriter $writer
+     * @param DispatchStrategyInterface $strat
+     */
+    public function __construct($loop, $log, $writer, $strat) {
+		parent::__construct($loop, $log, $writer, $strat);
 		$this->mqf = new UserQueueFactory();
 	}
 
@@ -50,7 +51,7 @@ class WorkerProcess extends AbstractProcess {
 	 * @return mixed
 	 */
 	protected function process($command, $args) {
-		$this->debug->v("Received $command command");
+		$this->log->debug("Received $command command");
 
 		switch($command) {
 
@@ -89,7 +90,7 @@ class WorkerProcess extends AbstractProcess {
 	 * @return array
 	 */
 	protected function fetch($userId, $count) {
-		$this->debug->v("Fetching $count for user $userId");
+		$this->log->debug("Fetching $count for user $userId");
 		$decorator = new Decorator();
 
 		$queue = $this->mqf->buildUserQueue($userId, $count, false);
@@ -118,19 +119,19 @@ class WorkerProcess extends AbstractProcess {
 			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
 		}
 
-		$this->debug->v("Executing ".$this->callable2string($callback));
+		$this->log->debug("Executing ".$this->callable2string($callback));
 
 		// this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
 		$return = call_user_func($callback, $model, $user, $diff);
-		$this->debug->v("Callback complete");
+		$this->log->debug("Callback complete");
 
 		if(is_null($return)) {
-			$this->debug->v("Response is NULL, casting to empty Envelope");
+			$this->log->debug("Response is NULL, casting to empty Envelope");
 			$return = new Envelope();
 		}
 
 		if($return instanceof InstanceBundle) {
-			$this->debug->v("InstanceBundle ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+			$this->log->debug("InstanceBundle ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
 
 			$serial = serialize($return);
 			if($serial === false) {
@@ -163,18 +164,18 @@ class WorkerProcess extends AbstractProcess {
 		if(is_array($callback) && is_object($callback[0])) {
 			$setDebug = array($callback[0], 'setDebug');
 			if(is_callable($setDebug)) {
-				call_user_func($setDebug, $this->debug);
+				call_user_func($setDebug, $this->log);
 			}
 		}
 
-		$this->debug->v("Executing ".$this->callable2string($callback));
+		$this->log->debug("Executing ".$this->callable2string($callback));
 		// this call MUST return an integer
 		$return = call_user_func($callback, $role);
-		$this->debug->v("Callback complete");
+		$this->log->debug("Callback complete");
 		// handle standard digest case
 
 		if(is_integer($return)) {
-			$this->debug->v("Response is numeric, returning as is");
+			$this->log->debug("Response is numeric, returning as is");
 			$serial = serialize($return);
 			return $serial;
 		}

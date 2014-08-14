@@ -11,10 +11,10 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Cli\Debug;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\Notif;
@@ -29,8 +29,8 @@ class QueueSorter implements FilterInterface {
 	/** @var FilterInterface[] */
 	protected $filters;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/** @var RoutePermissionMapper */
 	protected $permMapper;
@@ -41,12 +41,12 @@ class QueueSorter implements FilterInterface {
 
 	/**
 	 * @param FilterInterface[]      $filters
-	 * @param Debug                  $debug
+	 * @param LoggerInterface        $log
 	 * @param Notif                  $notif
 	 * @param RoutePermissionMapper  $permMapper
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct($filters, $debug, $notif, $permMapper) {
+	public function __construct($filters, $log, $notif, $permMapper) {
 		$this->filters = array();
 
 		foreach($filters as $filter) {
@@ -59,7 +59,7 @@ class QueueSorter implements FilterInterface {
 			throw new InvalidArgumentException("At least one valid filter must be specified");
 		}
 
-		$this->debug      = $debug;
+		$this->log        = $log;
 		$this->permMapper = $permMapper;
 		$this->notif      = $notif;
 	}
@@ -114,17 +114,17 @@ class QueueSorter implements FilterInterface {
 
 			$newTopic = "$method.user.{$user->getId()}";
 
-			$this->debug->v("Rerouting message to '$newTopic' at level $newLevel");
+			$this->log->info("Rerouting message to '$newTopic' at level $newLevel");
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
 
 			return true;
 		}
 		catch(FilterException $e) {
-			$this->debug->v("Message routed to /dev/null: ".$e->getMessage());
+			$this->log->notice("Message dropped: ".$e->getMessage());
 			return true;
 		}
 		catch(Exception $e) {
-			$this->debug->v("Exception occurred during rerouting: $e", '*');
+			$this->log->error(get_class($e) . " occurred during rerouting: " . $e->getMessage(), array($e));
 		}
 
 		return false;
@@ -168,7 +168,7 @@ class QueueSorter implements FilterInterface {
 
 		// if the user in question has no digest schedule and digest level is selected, escalate to instant
 		if((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && $intent == Logger::INFO) {
-			$this->debug->v("User doesn't have digest schedule: upgrading to instant");
+			$this->log->info("User doesn't have digest schedule: upgrading to instant");
 			$intent = Logger::NOTICE;
 		}
 

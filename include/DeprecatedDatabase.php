@@ -36,7 +36,7 @@ class DeprecatedDatabase implements Serializable
      */
     public $result;
 
-
+/** @var self */
 static private $instance = false;
 
 /**
@@ -102,9 +102,8 @@ function connect()
 		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
 		mysqli_set_charset($this->dbf, 'UTF8');
 	}
-	if(!isset($this->dbf)){
-		print "Unable to connect ".$this->user."@".$this->host." using ".$this->db;
-		exit;
+	if(!$this->dbf instanceof mysqli) {
+		die("Unable to connect ".$this->user."@".$this->host." using ".$this->db);
 	}
 	if(!$this->changeDb($this->db))
 		print "Unable to access ".$this->db.", check the permissions";
@@ -145,9 +144,10 @@ function changeDb($db)
  *
  * @deprecated
  * @param $sql_q
+ * @param bool $retry
  * @return bool|mysqli_result|resource
  */
-function query($sql_q)
+function query($sql_q, $retry = true)
 {
 	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
 		$this->result = $this->collector->query($sql_q);
@@ -156,8 +156,13 @@ function query($sql_q)
 		$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
 
 		if (isset($mysqli_eval_error)) {
+            if($retry) {
+                $this->reconnect();
+                return $this->query($sql_q, false);
+            }
+
 			if ($this->debug) {
-				trigger_error(sprintf('Query: "%s" triggered error: "%s"', $sql_q, $mysqli_eval_error), E_USER_WARNING);
+				trigger_error(sprintf('Query: "%s" triggered error: "%s"', preg_replace('`\s+`', ' ', $sql_q), $mysqli_eval_error), E_USER_WARNING);
 			}
 			else {
 				error(21, $mysqli_eval_error);

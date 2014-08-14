@@ -10,7 +10,6 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
@@ -19,6 +18,8 @@ use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use PDOException;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 
 class DefaultDispatchStrategy implements DispatchStrategyInterface {
@@ -41,9 +42,17 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	protected $flywheelSpins;
 
 
-	public function __construct() {
+    /** @var string */
+    protected $flags;
+
+
+    /**
+     * @param string $flags
+     */
+    public function __construct($flags = '') {
 		$this->flywheelSpins = self::MAX_FLYWHEEL;
 		$this->protocol = new AlaressIPCProtocol();
+        $this->flags = $flags;
 	}
 
 
@@ -139,7 +148,18 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	}
 
 
-	/**
+    /**
+     * Returns the flags that should be used for workers
+     *
+     * @return string
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+
+    /**
 	 * Evaluate the segment of data given and return a Worker STATE based on it
 	 *
 	 * @param string $data
@@ -321,11 +341,17 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
+     * @throws PDOException
 	 * @return void
 	 */
-	public function handleException($exception, $debug) {
-		$debug->v(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), '!');
+	public function handleException($exception, $log) {
+		$log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), array($exception));
+
+        // allow PDO exceptions to get out
+        if($exception instanceof PDOException) {
+            throw $exception;
+        }
 	}
 
 

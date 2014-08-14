@@ -9,10 +9,13 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Cli\Debug;
+use Alaress\Exception\IO\IOException;
+use Alaress\Lumberjack\Logger;
 use Aura\Di;
 use ErrorException;
 use Exception;
+use PDOException;
+use Psr\Log\LoggerInterface;
 use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
@@ -30,8 +33,8 @@ class Kernel extends \Alaress\Application\Kernel {
 	/** @var array */
 	protected $opts;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/**
 	 * Initialise
@@ -40,13 +43,13 @@ class Kernel extends \Alaress\Application\Kernel {
 	 * @param array $opts
 	 */
 	public function __construct($name, $opts = array()) {
+        $this->setOpts($opts);
 		$this->boot = new Bootstrap($this);
 		$this->boot();
 
 		pcntl_signal(SIGCHLD, SIG_IGN);
 		error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
 		$this->name = $name;
-		$this->opts = $opts;
 
 		$this->loop = Factory::create();
 	}
@@ -59,6 +62,14 @@ class Kernel extends \Alaress\Application\Kernel {
 		return $this->loop;
 	}
 
+
+    /**
+     * @param array $opts
+     */
+    protected function setOpts($opts) {
+        $this->opts = $opts;
+        $this->opts['level'] = $this->getLoggingLevel();
+    }
 
 	/**
 	 * @param string $name
@@ -76,10 +87,7 @@ class Kernel extends \Alaress\Application\Kernel {
 	 * @return void
 	 */
 	public function run($callable = null) {
-		// if verbose output is on
-		if($this->getOpt('verbose') === true) {
-			$this->debug = new Debug(STDOUT);
-
+        if(!is_null($this->getOpt('verbose'))) {
 			echo <<<EOL
 
  ||
@@ -88,31 +96,38 @@ class Kernel extends \Alaress\Application\Kernel {
 
 
 EOL;
-
-		}
-		else {
-			$this->debug = new Debug(null);
-		}
+        }
 
 		// not much point going on if we've got nothing to do
 		if(!is_callable($callable)) {
-			$this->debug->v("No daemon to launch, aborting", '*');
+			$this->logger()->critical("No daemon to launch, aborting");
 			return;
 		}
 
 		try {
-			call_user_func($callable, $this->di, $this->loop, $this->debug, $this->opts);
+			call_user_func($callable, $this->di, $this->loop, $this->logger(), $this->opts);
 		}
+        catch(\Schoolbox\External\Exception $e) {
+            $this->logger()->emergency($e->getMessage(), array($e));
+            return;
+        }
 		catch(Exception $e) {
-			$this->debug->v("{$this->name} daemon failed to launch: " . $e->getMessage(), '!');
+			$this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), array($e));
+            return;
 		}
 
 		try {
 			$this->getLoop()->run();
-			$this->debug->v($this->name . " daemon terminating.");
+			$this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
 		}
+        catch(PDOException $e) {
+            $this->logger()->emergency($e->getMessage(), array($e));
+        }
+        catch(\Schoolbox\External\Exception $e) {
+            $this->logger()->emergency($e->getMessage(), array($e));
+        }
 		catch(Exception $e) {
-			$this->debug->v("{$this->name} daemon exception: " . $e->getMessage(), '!');
+			$this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e), $e->getMessage()), array($e));
 		}
 	}
 
@@ -131,12 +146,11 @@ EOL;
 			return true;
 		}
 
+
 		switch($errNum) {
 			case E_RECOVERABLE_ERROR:
-				if($this->debug instanceof Debug) {
-					$this->debug->v("$errStr - $errFile::$errLine", 'e');
-				}
 				// for any of these errors, we want an exception we can catch
+                $this->logger()->info("$errStr - $errFile::$errLine", array('char' => 'e'));
 				throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 
 			case E_NOTICE:
@@ -147,9 +161,7 @@ EOL;
 
 			default:
 				// we don't know how to deal with this, so let the stock error handler deal with it
-				if($this->debug instanceof Debug) {
-					$this->debug->v("Don't know how to handle $errStr", '*');
-				}
+                $this->logger()->error("Don't know how to handle $errStr");
 				return false;
 		}
 	}
@@ -186,11 +198,12 @@ EOL;
 			return;
 		}
 		if(strpos($errStr, 'Undefined index') === 0) {
-			if($this->debug instanceof Debug) {
-				$this->debug->v("$errStr in $errFile:$errLine", '*');
-			}
+            $this->logger()->error("$errStr in $errFile:$errLine");
 			return;
 		}
+        if(strpos($errStr, 'fwrite') === 0) {
+            throw new IOException($errStr, $errNum);
+        }
 		if(strpos($errStr, 'unserialize') === 0) {
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
@@ -199,16 +212,16 @@ EOL;
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
 		}
+        if(strpos($errStr, 'mysqli_') === 0) {
+            throw new PDOException($errStr, $errNum);
+        }
 		if(strpos($errStr, 'fclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
 		if(strpos($errStr, 'pclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
-
-		if($this->debug instanceof Debug) {
-			$this->debug->v("$errStr in $errFile:$errLine [$errNum]");
-		}
+        $this->logger()->info("$errStr in $errFile:$errLine [$errNum]", array('char' => 'e'));
 
 		throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 	}
@@ -218,9 +231,7 @@ EOL;
 	 * @param Exception $e
 	 */
 	public function onException($e) {
-		if($this->debug instanceof Debug) {
-			$this->debug->v('FATAL ' . get_class($e) . ': ' . $e->getMessage(), '!');
-		}
+        $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), array($e));
 		exit;
 	}
 
@@ -245,19 +256,54 @@ EOL;
 
 		// don't report anything
 		if(!isset($cases[$error['type']])) {
-			if($this->debug instanceof Debug) {
-				$this->debug->v('Exiting normally');
-			}
 			exit(0);
 		}
 
-		// report if possible
-		if($this->debug instanceof Debug) {
-			$message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
-			$this->debug->v($message, '!');
-		}
+		// report
+        $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
+        $this->logger()->alert($message);
 
 		exit(1);
 	}
+
+
+    /**
+     * @return int
+     */
+    public function getLoggingLevel() {
+        $v = $this->getOpt('verbose');
+
+        $threshold = 0;
+        if(isset($v)) {
+            $threshold = 1;
+            if(is_array($v)) {
+                $threshold = min(3, count($v));
+            }
+        }
+
+        $limits = array(
+            0 => 500, // nil verbosity: exceptional behaviour only
+            1 => 250, // min verbosity: significant events
+            2 => 200, // mod verbosity: most things
+            3 => 100  // max verbosity: EV-ER-Y-THING...
+        );
+
+        return $limits[$threshold];
+    }
+
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function logger() {
+        if(!$this->log instanceof LoggerInterface) {
+            // if verbose output is on
+            $level     = $this->getOpt('level');
+            $fields    = $this->getOpt('fields') ?: array();
+            $porcelain = in_array('porcelain', $fields);
+            $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
+        }
+        return $this->log;
+    }
 
 }

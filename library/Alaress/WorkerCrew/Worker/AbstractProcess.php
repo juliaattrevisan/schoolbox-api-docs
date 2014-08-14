@@ -10,17 +10,16 @@
 namespace Alaress\WorkerCrew\Worker;
 
 
-use Alaress\Cli\Debug;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use ErrorException;
-use Exception;
+use Alaress\WorkerCrew\Worker\IO\IOStream;
+use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stream\Stream;
 use RuntimeException;
 
-abstract class AbstractProcess extends PipeWriter {
+abstract class AbstractProcess implements WorkerInterface {
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -31,35 +30,31 @@ abstract class AbstractProcess extends PipeWriter {
 	/** @var bool */
 	protected $buffering = false;
 
-	/** @var string */
-	protected $buffer = '';
-
 	/** @var DispatchStrategyInterface */
 	protected $strat;
 
 
-	/**
-	 * @param LoopInterface $loop
-	 * @param DispatchStrategyInterface $strat
-	 * @param Debug $debug
-	 */
-	public function __construct($loop, $strat = null, $debug = null) {
-		// cast optional args
-		$strat = $strat ?: new DefaultDispatchStrategy();
-		$debug = $debug ?: new Debug(null);
+    /**
+     * @param LoopInterface             $loop
+     * @param LoggerInterface           $log
+     * @param PipeWriter                $writer
+     * @param DispatchStrategyInterface $strat
+     */
+    public function __construct(
+        LoopInterface $loop,
+        LoggerInterface $log,
+        PipeWriter $writer,
+        DispatchStrategyInterface $strat
+    ) {
+        $this->log   = $log;
+        $this->loop  = $loop;
+        $this->strat = $strat;
 
-		// we open stream(3) as our data output stream
-		parent::__construct($strat, $debug, fopen("php://fd/3", 'w'));
-		$this->strat = $strat;
+        // listen to STDIN for commands
+        $listener = new InputStreamListener($log, $loop, $strat->getProtocol(), $writer, $this);
+        $stream   = new IOStream(fopen('php://stdin', 'r'), $loop, $listener);
+        $stream->bufferSize = $this->strat->getProtocol()->chunkLength();
 
-		$this->loop = $loop;
-
-		// listen to STDIN for commands
-		$this->stream = new Stream(STDIN, $this->loop);
-		$this->stream->bufferSize = $this->strat->getProtocol()->chunkLength();
-
-		$this->stream->on('data', array($this, 'onData'));
-		$this->stream->on('close', array($this, 'onClose'));
 		$this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
 
 		pcntl_signal(SIGTERM, array($this, 'onTerminate'));
@@ -86,112 +81,48 @@ abstract class AbstractProcess extends PipeWriter {
 	 * When a terminate signal is raised
 	 */
 	public function onTerminate() {
-		$this->debug->v("GOT SIGTERM", '>');
+		$this->log->info("GOT SIGTERM", array('char' => '>'));
 		$this->loop->stop();
 	}
 
-	/**
-	 * @param string $data
-	 * @param Stream $stream
-	 * @return mixed
-	 */
-	public function onData($data, $stream) {
-		try {
-			// cease and desist received
-			if($this->strat->getProtocol()->isCancelled($data)) {
-				$this->onTerminate();
-				return;
-			}
-
-			if(!$this->buffering) {
-				$this->buffering = true;
-				$this->buffer = '';
-			}
-
-			$this->buffer .= $data;
-
-			// if EOT received
-			if($this->strat->getProtocol()->isEnded($data)) {
-				ob_start();
-
-				try {
-					$this->buffering = false;
-					$this->write($this->parseBuffer());
-					$this->debug->v("Task Complete");
-				}
-				catch(ErrorException $e) {
-					$msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
-					$this->debug->v($msg);
-					$this->write($msg, true);
-				}
-				catch(Exception $e) {
-					$msg = sprintf("Failed to process: %s - '%s'", get_class($e), $e->getMessage());
-					$this->debug->v($msg);
-					$this->write($msg, true);
-				}
-
-				if($buffer = ob_get_contents()) {
-					$this->debug->v("Captured output: $buffer", 'd');
-				}
-				ob_end_clean();
-
-				$this->buffering = false;
-			}
-
-		}
-		catch(Exception $e) {
-			// all exceptions must be caught, otherwise the react loop explodes and this worker dies
-			$msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
-			$this->debug->v($msg);
-			$this->write($msg, true);
-		}
-	}
-
 
 	/**
-	 * @param Stream $stream
-	 * @return mixed
-	 */
-	public function onClose($stream) {
-		// stream is closing, I can't communicate with the parent, that's it, I'm out!
-		$this->loop->stop();
-	}
-
-	/**
+     * @param string $buffer
 	 * @throws InvalidArgumentException
 	 * @throws RuntimeException
 	 * @return string
 	 */
-	protected function parseBuffer() {
+	public function parse($buffer) {
 		try {
 			// split the datastring supplied
-			list($cmd, $args) = $this->strat->decomposeTaskString($this->buffer);
+			list($cmd, $args) = $this->strat->decomposeTaskString($buffer);
 			// if not a supported command, reject
 			if(!in_array($cmd, $this->strat->getSupportedActions())) {
-				throw new InvalidArgumentException("Rejecting command '$cmd'", '*');
+				throw new InvalidArgumentException("Rejecting command '$cmd'");
 			}
 		}
 		catch(InvalidArgumentException $e) {
-			$this->debug->v("Rejecting data '$this->buffer'", '*');
+			$this->log->error("Rejecting data '$buffer'", array($e));
 			throw $e;
 		}
 
 		$response = $this->process($cmd, $args);
-		$this->debug->v("Processing successful");
+		$this->log->info("Processing successful");
 		$flat = $this->strat->getProtocol()->flatten($response);
 		$size = strlen($flat);
-		$this->debug->v("Flattened response is $size bytes", 'd');
+		$this->log->debug("Flattened response is $size bytes");
 
 		return $flat;
 	}
 
-	/**
-	 * @param string $command
-	 * @param array $args
-	 * @throws RuntimeException
-	 * @throws InvalidArgumentException
-	 * @return mixed
-	 */
-	protected abstract function process($command, $args);
+
+    /**
+     * @param string $command
+     * @param array  $args
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @return mixed
+     */
+    protected abstract function process($command, $args);
 
 } 

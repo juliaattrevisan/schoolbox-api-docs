@@ -1,7 +1,9 @@
 #!/usr/bin/php
 <?php
 
-use Alaress\Cli\Debug;
+use Aura\Di;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
@@ -18,17 +20,33 @@ use \Schoolbox\Realtime\Rerouter\Filter;
  * @version     SVN: $Id$
  */
 
+$fields = array('porcelain', 'mem', 'truemem', 'pid');
+
+$opts = getopt('v', $fields);
+
+foreach($fields as $k => $name) {
+    if(!isset($opts[$name])) {
+        unset($fields[$k]);
+    }
+}
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Reroute Worker', array(
-	'errors' => E_ALL
+	'errors' => E_ALL,
+    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+    'fields'  => array_values($fields),
+
 ));
 
-$kernel->run(function($di, $loop, $debug, $options) {
-
-	// reset debug so it gets sent properly back to the parent process' log
-	$debug = new Debug(STDOUT, array('time','mem'));
+$kernel->run(function($di, $loop, $log, $opts) {
+    /**
+     * @var Di\Container $di
+     * @var LoopInterface $loop
+     * @var LoggerInterface $log
+     * @var array $opts
+     */
 
 	$rerouteFilters = array(
 		new Filter\AlreadyReroutedFilter(),
@@ -39,9 +57,15 @@ $kernel->run(function($di, $loop, $debug, $options) {
 		new Filter\DuplicateFilter(new UserQueueFactory())
 	);
 
-	$sorter = new QueueSorter($rerouteFilters, $debug, new Notif(), RoutePermissionMapper::getInstance());
+    $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), RoutePermissionMapper::getInstance());
 
-	new RerouteWorker($sorter, $loop, new RerouterDispatchStrategy(), $debug);
+    // use the reroute strat
+    $strat = new RerouterDispatchStrategy();
+
+    // we open stream(3) as our data output stream
+    $writer = new \Alaress\WorkerCrew\Worker\PipeWriter($strat, $log, fopen("php://fd/3", 'w'));
+
+    new RerouteWorker($sorter, $loop, $log, $writer, $strat);
 });
 
 // yup. that's all you need to do.

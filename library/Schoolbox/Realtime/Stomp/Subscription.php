@@ -10,20 +10,20 @@
 namespace Schoolbox\Realtime\Stomp;
 
 
+use Alaress\Async\AMQP\AMQPResponseHandlerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
+use Psr\Log\LoggerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Realtime\Pipe\PipeManager;
-use Schoolbox\Realtime\Verboser;
 
 class Subscription {
 
 
-	/** @var Verboser */
-	public $pipeManager;
+	/** @var AMQPResponseHandlerInterface */
+	public $handler;
 
 	/** @var int */
 	protected $id;
@@ -40,30 +40,35 @@ class Subscription {
 	/** @var string */
 	protected $destination;
 
+    /** @var LoggerInterface */
+    protected $log;
+
 	/**
 	 * @param Client $client
 	 * @param int $userId
-	 * @param PipeManager $pipeManager
+	 * @param AMQPResponseHandlerInterface $handler
+     * @param LoggerInterface $log
 	 */
-	public function __construct($client, $userId, $pipeManager) {
+	public function __construct($client, $userId, $handler, $log) {
 
 		$this->messages = array();
 		$this->client = $client;
-		$this->pipeManager = $pipeManager;
+		$this->handler = $handler;
 		$this->userId = $userId;
+        $this->log = $log;
 		$self = $this;
 
 		$this->destination = "/amq/queue/".UserQueue::getUserUnreadQueueName($userId);
 
 		// subscribe to the user's unread queue and push these immediately to the Pipe Manager
 		$this->id = $this->client->subscribeWithAck($this->destination, 'client-individual',
-			function ($frame, $ackResolver) use ($self, $pipeManager, $userId) {
+			function ($frame, $ackResolver) use ($self, $handler, $userId, $log) {
 				// this closure is executed every time a message is sent to the client based on the given subscription
 				/** @var AckResolver $ackResolver */
 
-				$pipeManager->v("Received message to push to user $userId", '+');
+				$log->info("Received message to push to user $userId", array('char' => '+'));
 
-				if($pipeManager->onAMQP($self->frame2amqp($frame), $userId)) {
+				if($handler->onAMQP($self->frame2amqp($frame), $userId)) {
 					$self->addMessage($frame, $ackResolver);
 				}
 			}, array('persistent' => true)
@@ -125,7 +130,7 @@ class Subscription {
 	public function addMessage($frame, $ackResolver) {
 		$amqpMessageId = $frame->getHeader('amqp-message-id');
 		$this->messages[$amqpMessageId] = new Message($frame, $ackResolver);
-		$this->pipeManager->v("Attached resolver for $amqpMessageId");
+		$this->log->debug("Attached resolver for $amqpMessageId");
 	}
 
 
@@ -135,7 +140,7 @@ class Subscription {
 	public function push() {
 		foreach($this->messages as $stompMsg) {
 			// these will be buffered and forwarded to all clients for this user
-			$this->pipeManager->onAMQP($this->frame2amqp($stompMsg->frame), $this->userId);
+			$this->handler->onAMQP($this->frame2amqp($stompMsg->frame), $this->userId);
 		}
 	}
 
@@ -162,7 +167,7 @@ class Subscription {
 		foreach($this->messages as $msgId => $stompMessage) {
 			try {
 				if(in_array($msgId, $amqpMessageIds)) {
-					$this->pipeManager->v("Attempting ACK of $msgId");
+					$this->log->debug("Attempting ACK of $msgId");
 					$stompMessage->ack();
 					$success[$msgId] = true;
 				}
@@ -173,19 +178,19 @@ class Subscription {
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd
-				$this->pipeManager->v("Caught Runtime Exception, message '$msgId' already N/ACK'd", '*');
+				$this->log->error("Caught Runtime Exception, message '$msgId' already N/ACK'd");
 			}
 		}
 
 		if(count($success)) {
 			foreach(array_keys($success) as $amqpMessageId) {
 				unset($this->messages[$amqpMessageId]);
-				$this->pipeManager->v("Accepted $amqpMessageId");
+				$this->log->info("Accepted $amqpMessageId");
 			}
 			return array_keys($success);
 		}
 		else {
-			$this->pipeManager->v("Did not find any matching messages", '!');
+			$this->log->critical("Did not find any matching messages");
 			return array();
 		}
 	}

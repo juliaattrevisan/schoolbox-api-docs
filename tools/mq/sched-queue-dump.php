@@ -18,9 +18,9 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$d = new \Alaress\Cli\Debug(STDOUT);
+$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100);
 
-$d->v("Starting queue dump");
+$d->info("Starting queue dump");
 
 $loop = \React\EventLoop\Factory::create();
 
@@ -54,7 +54,7 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop) {
 			$date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
 			// do this for every message that comes in
-			$d->v("Processing message (arrived at $date)", '>');
+			$d->info("Processing message (arrived at $date)", '>');
 
 			Database::reinitialise();
 			DeprecatedDatabase::reinitialise();
@@ -71,18 +71,18 @@ $stomp->connect()->then(function($stomp) use ($d, $seen, $loop) {
 			}
 			catch(RuntimeException $e) {
 				// this message is can't be parsed, so we ACK it to make it go away
-				$d->v("RuntimeException: ".$e->getMessage(), '!');
-				$d->v("Message unparseable", '-');
+				$d->critical("RuntimeException: ".$e->getMessage(), array($e));
+				$d->notice("Message unparseable", array('char' => '-'));
 			}
 			catch(\Schoolbox\Realtime\Schedule\ScheduleException $e) {
 				// we're happy to ignore this, it just means no scheduling strategy exists for this Model
-				$d->v('Schedule Exception: ' . $e->getMessage(), '*');
-				$d->v("Message ignorable", '-');
+				$d->error('Schedule Exception: ' . $e->getMessage(), array($e));
+				$d->notice("Message ignorable", array('char' => '-'));
 			}
 			catch(\Schoolbox\Notif\Formatter\CompressionException $e) {
 				// this message is unparseable, so we'll eventually ACK it to make it go away
-				$d->v('Compression Exception: ' . $e->getMessage(), '!');
-				$d->v("Message unparseable", '-');
+				$d->critical('Compression Exception: ' . $e->getMessage(), array($e));
+				$d->notice("Message unparseable", array('char' => '-'));
 			}
 
 		});
@@ -95,11 +95,11 @@ $loop->run();
 
 /**
  * @param \Schoolbox\Realtime\Schedule\Event $event
- * @param \Alaress\Cli\Debug $d
+ * @param \Psr\Log\LoggerInterface $log
  * @throws \Schoolbox\Realtime\Schedule\ScheduleException
  * @return bool whether or not to acknowledge the message
  */
-function interrogate($event, $d) {
+function interrogate($event, $log) {
 	// setup for ifs
 	$modelClass = get_class($event->getObject());
 	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
@@ -137,7 +137,7 @@ function interrogate($event, $d) {
 
 	$action = $event->getAction();
 
-	$d->v(json_encode(array(
+	$log->notice(json_encode(array(
 		'mapper' => $mapperClass,
 		'object' => array(
 			'class' => $objectClass,

@@ -11,16 +11,15 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\AMQP\AMQPInterface;
-use Alaress\Async\Notification\LoggerInterface;
 use Alaress\Async\SignalEmitter;
 use Alaress\Async\Stomp\Subscriber;
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use Exception;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
@@ -50,8 +49,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var Notif */
 	protected $notif;
 
-	/** @var Debug */
-	public $debug;
+	/** @var LoggerInterface */
+	public $log;
 
 	/** @var DispatcherInterface */
 	protected $dispatcher;
@@ -72,19 +71,19 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/**
 	 * @param LoopInterface             $loop
 	 * @param DispatchStrategyInterface $dispatchStrategy
-	 * @param Debug                     $debug
+	 * @param LoggerInterface           $log
 	 * @param Subscriber                $subscriber
 	 * @param LoggerInterface           $notif
 	 * @param AMQPInterface             $conn
 	 * @param UserQueueFactory          $uqFactory
 	 */
-	public function __construct($loop, $dispatchStrategy, $debug, $subscriber, $notif = null, $conn = null, $uqFactory = null) {
+	public function __construct($loop, $dispatchStrategy, $log, $subscriber, $notif = null, $conn = null, $uqFactory = null) {
 		parent::__construct($loop);
 
 		$this->loop       = $loop;
 		$this->running    = false;
 		$this->subscriber = $subscriber;
-		$this->debug      = $debug;
+		$this->log        = $log;
 
 		// cast optional params
 		$this->notif      = $notif ?: new Notif();
@@ -102,7 +101,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 		// TODO transpose these NEWs and getInstances into a factory
 		$this->permissionMapper = RoutePermissionMapper::getInstance();
 		$this->userMapper       = UserMapper::getInstance();
-		$this->dispatcher =  $d = new Dispatcher($loop, $this, $debug, $dispatchStrategy);
+		$this->dispatcher =  $d = new Dispatcher($loop, $this, $log, $dispatchStrategy);
 
 		$this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
 
@@ -126,7 +125,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @override this daemon has no "main queue", so don't use parent onConnect()
 	 */
 	public function onConnect() {
-		$this->debug->v("Connected to STOMP", '+');
+		$this->log->info("Connected to STOMP", array('char' => '+'));
 		// pick up user subscriptions
 		$this->resume();
 	}
@@ -137,7 +136,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	public function onException($e) {
-		$this->debug->v(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), "!");
+		$this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), array($e));
 		// TODO improve the email handling of these messages to be less spammy
 		// $this->notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert("Cannot bind to messaging system: ".$e->getMessage());
 	}
@@ -147,7 +146,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * Callback executed when SIGTSTP received by the process
 	 */
 	public function onPause() {
-		$this->debug->v("SIGTSTP", '>');
+		$this->log->info("SIGTSTP", array('char' => '>'));
 		$this->pause();
 	}
 
@@ -156,13 +155,13 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	protected function pause() {
-		$this->debug->v($this->isRunning() ? 'Halting' : 'Cannot halt, already paused');
+		$this->log->notice($this->isRunning() ? 'Halting' : 'Cannot halt, already paused');
 		// if active
 		if($this->isRunning()) {
 			// drop all subscriptions
 			$count = $this->subscriber->unsubscribeAll();
 
-			$this->debug->v("Dropped $count subscriptions", '-');
+			$this->log->notice("Dropped $count subscriptions", array('char' => '-'));
 
 			// set state to pause
 			$this->running = false;
@@ -174,7 +173,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * Callback executed when SIGCONT received by the process
 	 */
 	public function onResume() {
-		$this->debug->v('SIGCONT', ">");
+		$this->log->info('SIGCONT', array('char' => '>'));
 		$this->resume();
 	}
 
@@ -183,7 +182,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	protected function resume() {
-		$this->debug->v($this->isRunning() ? 'Cannot resume, already running' : 'Resuming');
+		$this->log->notice($this->isRunning() ? 'Cannot resume, already running' : 'Resuming');
 		// if paused
 		if(!$this->isRunning()) {
 			// pick up all subscriptions
@@ -201,7 +200,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 				$tx->put(sha1($frame->dump()), array($data, $frame));
 			});
 
-			$this->debug->v("Added $count subscriptions", '+');
+			$this->log->notice("Added $count subscriptions", array('char' => '+'));
 
 			// set state to active
 			$this->running = true;
@@ -213,7 +212,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	public function onPoll() {
-		$this->debug->v("SIGPOLL", '>');
+		$this->log->info("SIGPOLL", array('char' => '>'));
 		$this->poll();
 	}
 
@@ -221,7 +220,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	protected function poll() {
-		$this->debug->d($this->subscriber->getSubscriptionList()->getAllQueueNames());
+		$this->log->notice(print_r($this->subscriber->getSubscriptionList()->getAllQueueNames()));
 	}
 
 
@@ -229,7 +228,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * Callback executed when SIGHUP is received by the process
 	 */
 	public function onHangup() {
-		$this->debug->v("SIGHUP", ">");
+		$this->log->info("SIGHUP", array('char' => '>'));
 		$this->rebind();
 	}
 
@@ -238,9 +237,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @return void
 	 */
 	protected function rebind() {
-		$this->debug->v("Releasing workers");
+		$this->log->notice("Releasing workers");
 		$this->getDispatcher()->releaseWorkerPool(false);
-		$this->debug->v("Performing rebind");
+		$this->log->debug("Rebind should be performed");
 	}
 
 
@@ -248,7 +247,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * Callback executed when SIGINT is received by the process
 	 */
 	public function onInterrupt() {
-		$this->debug->v("SIGINT: Interrupting starfish!", '>');
+		$this->log->info("SIGINT: Interrupting starfish!", array('char' => '>'));
 		// for now, just treat as a termination request
 		$this->stop();
 	}
@@ -258,7 +257,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * Callback executed when SIGTERM is received by the process
 	 */
 	public function onTerminate() {
-		$this->debug->v("SIGTERM", '>');
+		$this->log->info("SIGTERM", array('char' => '>'));
 	}
 
 
@@ -293,7 +292,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 */
 	public function handleResponse($identifier, $command, $data) {
 		// nothing to do, the worker did the work
-		$this->debug->v("Reroute count: $data[0]");
+		$this->log->notice("Reroute count: $data[0]");
 	}
 
 }

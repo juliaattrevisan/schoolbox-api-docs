@@ -11,7 +11,6 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Async\SignalEmitter;
-use Alaress\Cli\Debug;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
@@ -20,6 +19,7 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -30,8 +30,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /** @var LoopInterface */
     protected $loop;
 
-    /** @var Debug */
-    public $debug;
+    /** @var LoggerInterface */
+    public $log;
 
     /** @var array */
     protected $timers;
@@ -50,15 +50,15 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param \Alaress\Cli\Debug $cli
+     * @param LoggerInterface $log
      * @param IConfigLoader $conf
      */
-    public function __construct($loop, $dispatchStrategy, $cli, $conf = null) {
+    public function __construct($loop, $dispatchStrategy, $log, $conf = null) {
         parent::__construct($loop);
 
         $this->loop = $loop;
-        $this->debug = $cli;
-        $this->dispatcher = new Dispatcher($loop, $this, $cli, $dispatchStrategy);
+        $this->log = $log;
+        $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy);
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
     }
 
@@ -83,14 +83,14 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     public function scheduleNotification($trigger) {
         if($trigger instanceof CancelTrigger) {
-	        $this->debug->v("Unscheduling CancelTrigger");
+	        $this->log->info("Unscheduling CancelTrigger");
             $this->unschedule($trigger);
             return;
         }
         $interval = $trigger->getTimestamp() - time();
 
         if($interval <= self::IMMEDIATELY) {
-	        $this->debug->v("Immediately dispatching trigger");
+	        $this->log->info("Immediately dispatching trigger");
             $this->dispatchTrigger($trigger);
             return;
         }
@@ -128,6 +128,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
                 $callback, $event->getObject(), $event->getEffector(), $event->getDiff()
             )));
         }
+        if(count($trigger->getCallbacks()) == 0) {
+            $this->log->notice(sprintf("Trigger for '%s' has no callbacks", get_class($event->getObject())));
+        }
     }
 
 
@@ -156,7 +159,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
-        $this->debug->v("Scheduling trigger '$class::$label'", '+');
+        $this->log->info("Scheduling trigger '$class::$label'", array('char' => '+'));
 
         return true;
     }
@@ -178,7 +181,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
 
         if($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
-            $this->debug->v("Unscheduling trigger '$class::$label'", '-');
+            $this->log->info("Unscheduling trigger '$class::$label'", array('char' => '-'));
             $this->loop->cancelTimer($timer);
             return true;
         }

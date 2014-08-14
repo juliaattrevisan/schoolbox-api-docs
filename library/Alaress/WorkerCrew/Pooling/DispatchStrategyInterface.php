@@ -10,11 +10,11 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 
 interface DispatchStrategyInterface {
@@ -139,6 +139,14 @@ interface DispatchStrategyInterface {
 	 */
 	public function getQueueDelay();
 
+
+    /**
+     * Returns the flags that should be used for workers
+     *
+     * @return string
+     */
+    public function getFlags();
+
     /**
      * Returns the size of a queue that should be considered abnormal
      *
@@ -193,10 +201,10 @@ interface DispatchStrategyInterface {
 
 	/**
 	 * @param Exception $exception
-	 * @param Debug $debug
+	 * @param LoggerInterface $log
 	 * @return void
 	 */
-	public function handleException($exception, $debug);
+	public function handleException($exception, $log);
 
 
 	/**

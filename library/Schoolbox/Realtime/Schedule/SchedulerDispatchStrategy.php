@@ -33,15 +33,17 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
 	protected $notifier;
 
 
-	/**
-	 * @param Notif $notif
-	 * @param Mapper $mapper
-	 */
-	public function __construct($notif, $mapper) {
-		parent::__construct();
-		$this->mapper = $mapper;
-		$this->notifier = $notif;
-	}
+    /**
+     * @param Notif  $notif
+     * @param Mapper $mapper
+     * @param string  $flags
+     */
+    public function __construct($notif, $mapper, $flags = '')
+    {
+        parent::__construct($flags);
+        $this->mapper   = $mapper;
+        $this->notifier = $notif;
+    }
 
 
 	/**

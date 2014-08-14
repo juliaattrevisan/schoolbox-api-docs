@@ -48,10 +48,10 @@ class DigestCommander extends AbstractCommander {
 	 */
 	public function exec($scheduler, $command) {
 		if($command == 'reload') {
-			$scheduler->debug->v("Received signal to reload");
+			$scheduler->log->notice("Received signal to reload");
 			return $this->reload($scheduler);
 		}
-		$scheduler->debug->v("Unrecognised command: $command");
+		$scheduler->log->warning("Unrecognised command: $command");
 		return false;
 	}
 

@@ -10,11 +10,11 @@
 namespace Alaress\Scheduler;
 
 
-use Alaress\Cli\Debug;
 use Alaress\Scheduler\Interactive\Interactor;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
@@ -41,10 +41,10 @@ abstract class StompScheduler extends AbstractScheduler {
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param string $scheduleQueue
      * @param string $commandQueue
-     * @param Debug $debug
+     * @param LoggerInterface $log
      */
-    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $commandQueue, $debug) {
-        parent::__construct($loop, $dispatchStrategy, $debug);
+    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $commandQueue, $log) {
+        parent::__construct($loop, $dispatchStrategy, $log);
         $this->method = DefaultDispatchStrategy::TASK_PUBLISH;
         $this->scheduleQueue = $scheduleQueue;
 		$this->commandQueue = $commandQueue;
@@ -56,7 +56,7 @@ abstract class StompScheduler extends AbstractScheduler {
         }
         catch(ConnectionException $e) {
             // if the connection bugged out...
-            $this->debug->v('Rabbitmq is offline or STOMP misconfigured: '. $e->getMessage(), '!');
+            $this->log->alert('Rabbitmq is offline or STOMP misconfigured: '. $e->getMessage(), array($e));
             $this->onException($e);
         }
     }
@@ -68,7 +68,7 @@ abstract class StompScheduler extends AbstractScheduler {
      * @return void
      */
     public function onConnect() {
-        $this->debug->v("Connected to STOMP", '+');
+        $this->log->info("Connected to STOMP", array('char' => '+'));
 	    $this->subscribeAck($this->scheduleQueue, array($this, 'onMessage'));
 	    $this->subscribe($this->commandQueue, array($this, 'onCommand'));
 	    $this->stomp->on('error', array($this, 'onException'));

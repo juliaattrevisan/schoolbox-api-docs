@@ -1,8 +1,8 @@
 #!/usr/bin/php
 <?php
 
-use Alaress\Cli\Debug;
 use Aura\Di;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Notif\Notif;
@@ -20,14 +20,26 @@ use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
  */
 
 
-$opts = getopt('v');
+$fields = array('porcelain', 'mem', 'truemem', 'pid');
+
+$opts = getopt('v', $fields);
+
+foreach($fields as $k => $name) {
+    if(!isset($opts[$name])) {
+        unset($fields[$k]);
+    }
+}
+
+$flags = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', array(
-	'verbose' => isset($opts['v']),
-	'errors'  => E_ALL
+	'verbose' => isset($opts['v']) ? $opts['v'] : null,
+	'errors'  => E_ALL,
+    'fields'  => array_values($fields),
+    'flags'   => $flags
 ));
 
 $sched = null;
@@ -43,17 +55,17 @@ $kernel->registerCustomShutdown(function() use (&$sched) {
 });
 
 // CREATE SCHEDULER APP
-$kernel->run(function($di, $loop, $debug, $opts) use (&$sched) {
+$kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	/**
 	 * @var Di\Container $di
 	 * @var LoopInterface $loop
-	 * @var Debug $debug
+	 * @var LoggerInterface $log
 	 * @var array $opts
 	 */
 
 	try {
-		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper());
-		$sched = new Scheduler($loop, $strat, $debug);
+		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper(), $opts['flags']);
+		$sched = new Scheduler($loop, $strat, $log);
 
 		// read STDIN in the stream loop so we can communicate with it in dev mode
 		$stdin = new \React\Stream\Stream(STDIN, $loop);
@@ -62,7 +74,7 @@ $kernel->run(function($di, $loop, $debug, $opts) use (&$sched) {
 		});
 	}
 	catch(AMQPRuntimeException $e) {
-		$debug->v("Unable to connect to RabbitMQ: server is offline.",'!');
+		$log->alert("Unable to connect to RabbitMQ: server is offline.");
 		$n = new Notif(Notif::TOPIC_NOTIFICATION);
 		$n->alert('RabbitMQ is offline');
 		throw $e;

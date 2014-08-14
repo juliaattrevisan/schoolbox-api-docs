@@ -12,23 +12,24 @@ namespace Alaress\Async\Notification;
 
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
-use Alaress\Cli\Debug;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Notif\Notif;
 
 class Postman {
 
-	/** @var LoggerInterface */
-	protected $logger;
+	/** @var Notif */
+	protected $notif;
 
-	/** @var Debug */
-	protected $debug;
+	/** @var LoggerInterface */
+	protected $log;
 
 	/**
-	 * @param LoggerInterface $logger
-	 * @param Debug $debug
+	 * @param Notif $notif
+	 * @param LoggerInterface $log
 	 */
-	public function __construct($logger, $debug) {
-		$this->logger = $logger;
-		$this->debug = $debug;
+	public function __construct($notif, $log) {
+		$this->notif = $notif;
+		$this->log = $log;
 	}
 
 
@@ -42,8 +43,8 @@ class Postman {
 	public function deliver($bundle, $appendContext = array()) {
 		$i = 0;
 		foreach($bundle->getAll() as $destination => $instance) {
-			$this->logger->setTopic($destination)->log($instance->getSeverity(), "$instance", $instance->getContext() + $appendContext);
-			$this->debug->v("Broadcast a message to '$destination' at level {$instance->getSeverity()}", '<');
+			$this->notif->setTopic($destination)->log($instance->getSeverity(), "$instance", $instance->getContext() + $appendContext);
+			$this->log->info("Broadcast a message to '$destination' at level {$instance->getSeverity()}", array('char' => '<'));
 			++$i;
 		}
 		return $i;

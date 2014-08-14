@@ -11,7 +11,6 @@ namespace Schoolbox\Notif;
 
 
 use Alaress\Async\AMQP\AMQPInterface;
-use Alaress\Async\Notification\LoggerInterface;
 use ConfigFallback;
 use Mailer;
 use Monolog\Handler\HandlerInterface;
@@ -21,6 +20,7 @@ use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;

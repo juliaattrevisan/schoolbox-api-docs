@@ -112,7 +112,7 @@ class SchedulerCommander extends AbstractCommander {
 				}
 			}
 		}
-		$scheduler->debug->v("Unrecognised command: $command", '!');
+		$scheduler->log->critical("Unrecognised command: $command");
 		return false;
 	}
 
@@ -124,7 +124,7 @@ class SchedulerCommander extends AbstractCommander {
 	 * @return bool
 	 */
 	protected function reload($scheduler) {
-		$scheduler->debug->v("Reloading all subscriptions");
+		$scheduler->log->info("Reloading all subscriptions");
 		$scheduler->reload();
 		return true;
 	}
@@ -138,7 +138,7 @@ class SchedulerCommander extends AbstractCommander {
 	 * @return bool
 	 */
 	protected function subscribeUser($scheduler, $id) {
-		$scheduler->debug->v("Subscribing user $id");
+		$scheduler->log->info("Subscribing user $id");
 		return $scheduler->subscribeUser($id);
 	}
 
@@ -151,7 +151,7 @@ class SchedulerCommander extends AbstractCommander {
 	 * @return bool
 	 */
 	protected function unsubscribeUser($scheduler, $id) {
-		$scheduler->debug->v("Unsubscribing user $id");
+		$scheduler->log->info("Unsubscribing user $id");
 		return $scheduler->unsubscribeUser($id);
 	}
 
@@ -164,7 +164,7 @@ class SchedulerCommander extends AbstractCommander {
 	 * @return bool
 	 */
 	protected function bindUser($scheduler, $id) {
-		$scheduler->debug->v("Resetting bindings for user $id");
+		$scheduler->log->info("Resetting bindings for user $id");
 		try {
 			$uqf = new UserQueueFactory();
 			$uqf->destroyUserBindings($id);
@@ -173,7 +173,7 @@ class SchedulerCommander extends AbstractCommander {
 		}
 		catch(Exception $e) {
 			// catch any and all exceptions
-			$scheduler->debug->v(get_class($e) . ": ".$e->getMessage(), '!');
+			$scheduler->log->critical(get_class($e) . ": ".$e->getMessage());
 			return false;
 		}
 	}
@@ -186,7 +186,7 @@ class SchedulerCommander extends AbstractCommander {
 	 * @return bool
 	 */
 	protected function bindAll($scheduler) {
-		$scheduler->debug->v("Resetting bindings for all users");
+		$scheduler->log->info("Resetting bindings for all users");
 		$result = true;
 		foreach(UserMapper::getInstance()->findAll() as $user) {
 			/** @var User $user */
