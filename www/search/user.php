@@ -161,7 +161,7 @@ if (is_numeric($this->arg[0])) {
 
         $synUserHandler = new External_User();
 
-        if ($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
+        if ($groupHandler->isParent($user['uid']) && $groupHandler->isStaff()) {
             $parent = $synUserHandler->getParent($user['synergy_id']);
 
             if ($parent['DirectoryIncludeFlag']) {
