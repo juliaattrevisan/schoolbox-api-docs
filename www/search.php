@@ -63,8 +63,8 @@ $handle = array(
     'file' => 'file',
     'category' => 'category',
     'link' => 'link',
-    'news' => 'categoryNews',
-    'sitenews' => 'news',
+	'sitenews' => 'news',
+	'homepagenews' => 'categoryNews',
     'blog' => 'blog',
     'wiki' => 'wiki',
     'forum' => 'forum',
@@ -78,7 +78,7 @@ $type_list = array(
     'category' => 'Folders',
     'link' => 'Links',
     'sitenews' => 'School News',
-    'news' => 'Homepage News',
+    'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
     'wiki' => 'Wikis',
     'forum' => 'Forums',
@@ -454,7 +454,7 @@ if (!empty($result['link'])) {
 }
 
 // render homepage news
-if (!empty($result['news'])) {
+if (!empty($result['homepagenews'])) {
     $page->setFile('news_t', 'search/news.html');
     $page->setBlock('news_t', 'news', 'news_block');
     $page->setVar(array(
@@ -462,7 +462,7 @@ if (!empty($result['news'])) {
         'NEWS_COUNT' => $count['news'],
     ));
 
-    foreach ($result['news'] as $news) {
+    foreach ($result['homepagenews'] as $news) {
         foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
             $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
         }
