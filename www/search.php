@@ -455,11 +455,11 @@ if (!empty($result['link'])) {
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
-    $page->setFile('homepage_news_t', 'search/homepagenews.html');
-    $page->setBlock('homepage_news_t', 'homepage_news', 'homepage_news_block');
+    $page->setFile('homepagenews_t', 'search/homepagenews.html');
+    $page->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
     $page->setVar(array(
         'HOMEPAGE_NEWS_DISP_COUNT' => count($result['homepagenews']),
-        'HOMEPAGE_NEWS_COUNT' => $count['news'],
+        'HOMEPAGE_NEWS_COUNT' => $count['homepagenews'],
     ));
 
     foreach ($result['homepagenews'] as $news) {
@@ -477,24 +477,24 @@ if (!empty($result['homepagenews'])) {
         $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
         $page->setVar(array(
-            'HOMEPAGE_NEWS_ID' => $news['id'],
-            'HOMEPAGE_NEWS_CODE' => $news['code'],
-            'HOMEPAGE_NEWS_LINK' => $news['link'],
-            'HOMEPAGE_NEWS_HEADING' => Scrub::text($news['heading']),
-            'HOMEPAGE_NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-            'HOMEPAGE_NEWS_OWNER' => $news['uid'],
-            'HOMEPAGE_NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'HOMEPAGE_NEWS_CREATED' => $createdTime->getRelativeTime(),
-            'HOMEPAGE_NEWS_BREADCRUMB' => $news['breadcrumb'],
-            'HOMEPAGE_NEWS_COUNT' => $count['homepagenews'],
+            'HOMEPAGENEWS_ID' => $news['id'],
+            'HOMEPAGENEWS_CODE' => $news['code'],
+            'HOMEPAGENEWS_LINK' => $news['link'],
+            'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
+            'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
+            'HOMEPAGENEWS_OWNER' => $news['uid'],
+            'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
+            'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
+            'HOMEPAGENEWS_COUNT' => $count['homepagenews'],
         ));
 
-        $page->parse('homepage_news_block', 'homepage_news', true);
+        $page->parse('homepagenews_block', 'homepagenews', true);
     }
 
-	outputSeeMore($page, $type, $count, 'homepage_news');
+	outputSeeMore($page, $type, $count, 'homepagenews');
 
-    $page->parse('RESULT', 'homepage_news_t', true);
+    $page->parse('RESULT', 'homepagenews_t', true);
 }
 
 
