@@ -11,11 +11,12 @@
 @import "base/typography";
 
 // Components
+@import "components/alert-boxes";
 @import "components/buttons";
 @import "components/carousel";
-@import "components/dropdown";
+@import "components/content";
+@import "components/joyride";
 @import "components/navigation";
-@import "components/alert-boxes";
 
 // Layout
 @import "layout/footer";

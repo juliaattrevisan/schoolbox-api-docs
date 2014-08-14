@@ -144,65 +144,6 @@ $shiny-edge-active-color: rgba(#000, .2);
 // Enables media queries for block-grid classes. Set to false if writing semantic HTML.
 // $block-grid-media-queries: true;
 
-// Breadcrumbs
-
-// $include-html-nav-classes: $include-html-classes;
-
-// We use this to set the background color for the breadcrumb container.
-// $crumb-bg: scale-color($secondary-color, $lightness: 55%);
-
-// We use these to set the padding around the breadcrumbs.
-// $crumb-padding: rem-calc(9 14 9);
-// $crumb-side-padding: rem-calc(12);
-
-// We use these to control border styles.
-// $crumb-function-factor: -10%;
-// $crumb-border-size: 1px;
-// $crumb-border-style: solid;
-// $crumb-border-color: scale-color($crumb-bg, $lightness: $crumb-function-factor);
-// $crumb-radius: $global-radius;
-
-// We use these to set various text styles for breadcrumbs.
-// $crumb-font-size: rem-calc(11);
-// $crumb-font-color: $primary-color;
-// $crumb-font-color-current: #333;
-// $crumb-font-color-unavailable: #999;
-// $crumb-font-transform: uppercase;
-// $crumb-link-decor: underline;
-
-// We use these to control the slash between breadcrumbs
-// $crumb-slash-color: #aaa;
-// $crumb-slash: "/";
-
-// Clearing
-
-// $include-html-clearing-classes: $include-html-classes;
-
-// We use these to set the background colors for parts of Clearing.
-// $clearing-bg: #333;
-// $clearing-caption-bg: $clearing-bg;
-// $clearing-carousel-bg: rgba(51,51,51,0.8);
-// $clearing-img-bg: $clearing-bg;
-
-// We use these to style the close button
-// $clearing-close-color: #ccc;
-// $clearing-close-size: 30px;
-
-// We use these to style the arrows
-// $clearing-arrow-size: 12px;
-// $clearing-arrow-color: $clearing-close-color;
-
-// We use these to style captions
-// $clearing-caption-font-color: #ccc;
-// $clearing-caption-font-size: 0.875em;
-// $clearing-caption-padding: 10px 30px 20px;
-
-// We use these to make the image and carousel height and style
-// $clearing-active-img-height: 85%;
-// $clearing-carousel-height: 120px;
-// $clearing-carousel-thumb-width: 120px;
-// $clearing-carousel-thumb-active-border: 1px solid rgb(255,255,255);
-
 // Flex Video
 
 // $include-html-media-classes: $include-html-classes;
@@ -214,61 +155,6 @@ $shiny-edge-active-color: rgba(#000, .2);
 
 // We use this to control widescreen bottom padding
 // $flex-video-widescreen-padding-bottom: 56.34%;
-
-// Inline Lists
-
-// $include-html-inline-list-classes: $include-html-classes;
-
-// We use this to control the margins and padding of the inline list.
-// $inline-list-top-margin: 0;
-// $inline-list-opposite-margin: 0;
-// $inline-list-bottom-margin: rem-calc(17);
-// $inline-list-default-float-margin: rem-calc(-22);
-// $inline-list-default-float-list-margin: rem-calc(22);
-
-// $inline-list-padding: 0;
-
-// We use this to control the overflow of the inline list.
-// $inline-list-overflow: hidden;
-
-// We use this to control the list items
-// $inline-list-display: block;
-
-// We use this to control any elments within list items
-// $inline-list-children-display: block;
-
-// Joyride
-
-// $include-html-joyride-classes: $include-html-classes;
-
-// Controlling default Joyride styles
-// $joyride-tip-bg: #333;
-// $joyride-tip-default-width: 300px;
-// $joyride-tip-padding: rem-calc(18 20 24);
-// $joyride-tip-border: solid 1px #555;
-// $joyride-tip-radius: 4px;
-// $joyride-tip-position-offset: 22px;
-
-// Here, we're setting the tip dont styles
-// $joyride-tip-font-color: #fff;
-// $joyride-tip-font-size: rem-calc(14);
-// $joyride-tip-header-weight: $font-weight-bold;
-
-// This changes the nub size
-// $joyride-tip-nub-size: 10px;
-
-// This adjusts the styles for the timer when its enabled
-// $joyride-tip-timer-width: 50px;
-// $joyride-tip-timer-height: 3px;
-// $joyride-tip-timer-color: #666;
-
-// This changes up the styles for the close button
-// $joyride-tip-close-color: #777;
-// $joyride-tip-close-size: 24px;
-// $joyride-tip-close-weight: $font-weight-normal;
-
-// When Joyride is filling the screen, we use this style for the bg
-// $joyride-screenfill: rgba(0,0,0,0.5);
 
 // Keystrokes
 
@@ -578,43 +464,7 @@ $magellan-padding: 0 !important;
 // $side-nav-divider-style: solid;
 // $side-nav-divider-color: scale-color(#fff, $lightness: 10%);
 
-// Split Buttons
 
-// $include-html-button-classes: $include-html-classes;
-
-// We use these to control different shared styles for Split Buttons
-// $split-button-function-factor: 10%;
-// $split-button-pip-color: #fff;
-// $split-button-pip-color-alt: #333;
-// $split-button-active-bg-tint: rgba(0,0,0,0.1);
-
-// We use these to control tiny split buttons
-// $split-button-padding-tny: $button-pip-tny * 10;
-// $split-button-span-width-tny: $button-pip-tny * 6;
-// $split-button-pip-size-tny: $button-pip-tny;
-// $split-button-pip-top-tny: $button-pip-tny * 2;
-// $split-button-pip-default-float-tny: rem-calc(-6);
-
-// We use these to control small split buttons
-// $split-button-padding-sml: $button-pip-sml * 10;
-// $split-button-span-width-sml: $button-pip-sml * 6;
-// $split-button-pip-size-sml: $button-pip-sml;
-// $split-button-pip-top-sml: $button-pip-sml * 1.5;
-// $split-button-pip-default-float-sml: rem-calc(-6);
-
-// We use these to control medium split buttons
-// $split-button-padding-med: $button-pip-med * 9;
-// $split-button-span-width-med: $button-pip-med * 5.5;
-// $split-button-pip-size-med: $button-pip-med - rem-calc(3);
-// $split-button-pip-top-med: $button-pip-med * 1.5;
-// $split-button-pip-default-float-med: rem-calc(-6);
-
-// We use these to control large split buttons
-// $split-button-padding-lrg: $button-pip-lrg * 8;
-// $split-button-span-width-lrg: $button-pip-lrg * 5;
-// $split-button-pip-size-lrg: $button-pip-lrg - rem-calc(6);
-// $split-button-pip-top-lrg: $button-pip-lrg + rem-calc(5);
-// $split-button-pip-default-float-lrg: rem-calc(-6);
 
 // Sub Nav
 
@@ -645,46 +495,6 @@ $sub-nav-active-cursor: default;
 
 // $sub-nav-item-divider: "";
 // $sub-nav-item-divider-margin: rem-calc(12);
-
-//
-// SWITCH
-//
-
-// $include-html-form-classes: $include-html-classes;
-
-// Controlling border styles and background colors for the switch container
-// $switch-border-color: scale-color(#fff, $lightness: -20%);
-// $switch-border-style: solid;
-// $switch-border-width: 1px;
-// $switch-bg: #fff;
-
-// We use these to control the switch heights for our default classes
-// $switch-height-tny: rem-calc(22);
-// $switch-height-sml: rem-calc(28);
-// $switch-height-med: rem-calc(36);
-// $switch-height-lrg: rem-calc(44);
-// $switch-bottom-margin: rem-calc(20);
-
-// We use these to control default font sizes for our classes.
-// $switch-font-size-tny: 11px;
-// $switch-font-size-sml: 12px;
-// $switch-font-size-med: 14px;
-// $switch-font-size-lrg: 17px;
-// $switch-label-side-padding: 6px;
-
-// We use these to style the switch-paddle
-// $switch-paddle-bg: #fff;
-// $switch-paddle-fade-to-color: scale-color($switch-paddle-bg, $lightness: -10%);
-// $switch-paddle-border-color: scale-color($switch-paddle-bg, $lightness: -35%);
-// $switch-paddle-border-width: 1px;
-// $switch-paddle-border-style: solid;
-// $switch-paddle-transition-speed: .1s;
-// $switch-paddle-transition-ease: ease-out;
-// $switch-positive-color: scale-color($success-color, $lightness: 94%);
-// $switch-negative-color: #f5f5f5;
-
-// Outline Style for tabbing through switches
-// $switch-label-outline: 1px dotted #888;
 
 // Tables
 

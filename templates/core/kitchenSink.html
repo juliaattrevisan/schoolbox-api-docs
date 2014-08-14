@@ -162,7 +162,13 @@
 
             <hr>
             <h4 id="breadcrumbs">Breadcrumbs</h4>
-            <ul class="breadcrumbs">
+            <!--<ul class="breadcrumbs">-->
+                <!--<li><a href="#">Home</a></li>-->
+                <!--<li><a href="#">Features</a></li>-->
+                <!--<li class="unavailable"><a href="#">Gene Splicing</a></li>-->
+                <!--<li class="current"><a href="#">Cloning</a></li>-->
+            <!--</ul>-->
+            <ul class="breadcrumb">
                 <li><a href="#">Home</a></li>
                 <li><a href="#">Features</a></li>
                 <li class="unavailable"><a href="#">Gene Splicing</a></li>
@@ -171,23 +177,68 @@
 
             <hr>
             <h4 id="dropdown-buttons">Dropdown Buttons</h4>
-            <ul id="drop" class="f-dropdown content" data-dropdown-content>
+            <ul id="drop" class="f-dropdown" data-dropdown-content>
                 <li><a href="#">This is a link</a></li>
                 <li><a href="#">This is another</a></li>
                 <li><a href="#">Yet another</a></li>
             </ul>
 
-            <a href="#" data-dropdown="drop" class="tiny button dropdown">Dropdown Button</a><br>
-            <a href="#" data-dropdown="drop" class="small secondary radius button dropdown">Dropdown Button</a><br>
-            <a href="#" data-dropdown="drop" class="button alert round dropdown">Dropdown Button</a><br>
-            <a href="#" data-dropdown="drop" class="large success button dropdown">Dropdown Button</a><br>
-            <a href="#" data-dropdown="drop" class="large button dropdown expand">Dropdown Button</a>
+            <!--<a href="#" data-dropdown="drop" class="tiny button dropdown">Dropdown Button</a><br>-->
+            <!--<a href="#" data-dropdown="drop" class="small secondary radius button dropdown">Dropdown Button</a><br>-->
+            <a href="#" data-dropdown="drop" class="button primary dropdown">Dropdown Button</a>
+            <a href="#" data-dropdown="drop" class="button secondary dropdown">Dropdown Button</a>
+            <!--<a href="#" data-dropdown="drop" class="button success dropdown">Dropdown Button</a>-->
+            <!--<a href="#" data-dropdown="drop" class="button warning dropdown">Dropdown Button</a>-->
+            <!--<a href="#" data-dropdown="drop" class="button alert dropdown">Dropdown Button</a>-->
+            <!--<a href="#" data-dropdown="drop" class="large success button dropdown">Dropdown Button</a><br>-->
+            <!--<a href="#" data-dropdown="drop" class="large button dropdown expand">Dropdown Button</a>-->
             <hr>
             <h4 id="split-buttons">Split Buttons</h4>
-            <p> <a href="#" class="tiny button split">Split Button <span data-dropdown="drop"></span></a><br>
-                <a href="#" class="small secondary radius button split">Split Button <span data-dropdown="drop"></span></a><br>
-                <a href="#" class="button alert round split">Split Button <span data-dropdown="drop"></span></a><br>
-                <a href="#" class="large success button split">Split Button <span data-dropdown="drop"></span></a></p>
+            <!--<p> <a href="#" class="tiny button split">Split Button <span data-dropdown="drop"></span></a><br>-->
+                <!--<a href="#" class="small secondary radius button split">Split Button <span data-dropdown="drop"></span></a><br>-->
+                <a href="#" class="button split">Split Button <span data-dropdown="drop"></span></a>
+                <!--<a href="#" class="large success button split">Split Button <span data-dropdown="drop"></span></a></p>-->
+
+            <h4 id="switches">Switches</h4>
+            <!--<div class="small-2 switch tiny">-->
+                <!--<input id="a" name="switch-a" type="radio" checked>-->
+                <!--<label for="a" onclick="">Off</label>-->
+
+                <!--<input id="a1" name="switch-a" type="radio">-->
+                <!--<label for="a1" onclick="">On</label>-->
+
+                <!--<span></span>-->
+            <!--</div>-->
+
+            <!--<div class="small-3 switch small">-->
+                <!--<input id="b" name="switch-b" type="radio" checked>-->
+                <!--<label for="b" onclick="">Off</label>-->
+
+                <!--<input id="b1" name="switch-b" type="radio">-->
+                <!--<label for="b1" onclick="">On</label>-->
+
+                <!--<span></span>-->
+            <!--</div>-->
+
+            <div class="small-4 switch">
+                <input id="c" name="switch-c" type="radio" checked>
+                <label for="c" onclick="">Off</label>
+
+                <input id="c1" name="switch-c" type="radio">
+                <label for="c1" onclick="">On</label>
+
+                <span></span>
+            </div>
+
+            <div class="small-6 switch round">
+                <input id="d" name="switch-d" type="radio" checked>
+                <label for="d" onclick="">Off</label>
+
+                <input id="d1" name="switch-d" type="radio">
+                <label for="d1" onclick="">On</label>
+
+                <span></span>
+            </div>
             <hr>
             <h4 id="clearing">Clearing</h4>
             <div>
@@ -729,9 +780,6 @@
                 <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
             </p>
 
-            <footer>
-
-            </footer>
         </div>
     </div>
 </div>

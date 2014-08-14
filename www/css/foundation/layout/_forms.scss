@@ -1,31 +1,36 @@
-// Forms
+//
+// FORMS
+//
 
 // $include-html-form-classes: $include-html-classes;
 
 // We use this to set the base for lots of form spacing and positioning styles
-// $form-spacing: rem-calc(16);
+$form-spacing: rem-calc(22);
 
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
 $form-label-font-size: rem-calc(16);
 $form-label-font-weight: $font-weight-bold;
-// $form-label-line-height: 1.5;
-// $form-label-font-color: scale-color(#000, $lightness: 30%);
+$form-label-line-height: 1.5;
+$form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
-// $form-label-bottom-margin: 0;
+$form-label-bottom-margin: 8px;
 // $input-font-family: inherit;
-$input-font-color: rgba(0,0,0,0.50);
+$input-font-color: $body-grey;
 $input-font-size: rem-calc(16);
 $input-bg-color: $white;
-$input-focus-bg-color: scale-color($secondary-color, $lightness: 50%);
-$input-border-color: $secondary-color;
-$input-focus-border-color: $secondary-color;
-// $input-border-style: solid;
+$input-focus-bg-color: $ocean-sunset;
+$input-focus-color: $black;
+$input-border-color: tint($tertiary, 66%);
+$input-focus-border-color: tint($tertiary, 66%);
+$input-hover-bg-color: tint($tertiary, 87%);
+$input-hover-color: $black;
+$input-border-style: solid;
 $input-border-width: 2px;
 // $input-border-radius: $global-radius;
-// $input-disabled-bg: #ddd;
+$input-disabled-bg: rgba($primary-color, 0.04);
 // $input-disabled-cursor: $cursor-default-value;
-// $input-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+$input-box-shadow: none;
 
 // We use these to style the fieldset border and spacing.
 // $fieldset-border-style: solid;
@@ -61,7 +66,7 @@ $input-border-width: 2px;
 // $input-error-message-font-color-alt: #333;
 
 // We use this to style the glowing effect of inputs when focused
-// $input-include-glowing-effect: true;
+$input-include-glowing-effect: false;
 // $glowing-effect-fade-time: 0.45s;
 // $glowing-effect-color: $input-focus-border-color;
 
@@ -69,4 +74,60 @@ $input-border-width: 2px;
 // $select-bg-color: #fafafa;
 // $select-hover-bg-color: scale-color($select-bg-color, $lightness: -3%);
 
+//
+// SWITCH
+//
+
+// $include-html-form-classes: $include-html-classes;
+
+// Controlling background color for the switch container
+$switch-bg: tint($secondary-color, 26%);
+
+// Controlling border styles and background colors for the switch container
+$switch-border-color: transparent;
+// $switch-border-style: solid;
+$switch-border-width: 0px;
+// $switch-bg: #fff;
+
+// We use these to control the switch heights for our default classes
+// $switch-height-tny: rem-calc(22);
+// $switch-height-sml: rem-calc(28);
+$switch-height-med: rem-calc(32);
+// $switch-height-lrg: rem-calc(44);
+// $switch-bottom-margin: rem-calc(20);
+
+// We use these to control default font sizes for our classes.
+// $switch-font-size-tny: 11px;
+// $switch-font-size-sml: 12px;
+$switch-font-size-med: 16px;
+// $switch-font-size-lrg: 17px;
+// $switch-label-side-padding: 6px;
+
+// We use these to style the switch-paddle
+$switch-active-color: $black;
+// $switch-paddle-bg: #fff;
+$switch-paddle-fade-to-color: tint($secondary-color, 74%);
+$switch-paddle-border-color: transparent;
+$switch-paddle-border-width: 0px;
+// $switch-paddle-border-style: solid;
+// $switch-paddle-transition-speed: .1s;
+// $switch-paddle-transition-ease: ease-out;
+$switch-positive-color: tint($success-color, 50%);
+$switch-negative-color: tint($secondary-color, 74%);
+
+// Outline Style for tabbing through switches
+// $switch-label-outline: 1px dotted #888;
+
 @import "../../../javascript/components/foundation/scss/foundation/components/forms";
+@import "../../../javascript/components/foundation/scss/foundation/components/switches";
+
+//
+// Custom overrides
+//
+
+form 							{ @include placeholder-color($body-grey); @include placeholder-hover-color($black);
+	input, textarea				{ @include single-transition(all, 0.15s, linear);
+		&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
+		&:focus 				{ color: $input-focus-color; }
+	}
+}
