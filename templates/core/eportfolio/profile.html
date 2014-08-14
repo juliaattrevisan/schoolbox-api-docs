@@ -167,7 +167,14 @@
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN group -->
-                <li class="{ON_OFF}"><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
+                <li class="{ON_OFF}">
+					<!-- BEGIN group_linked -->
+					<a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
+					<!-- END group_linked -->
+					<!-- BEGIN group_unlinked -->
+					{GROUP_NAME}
+					<!-- END group_unlinked -->
+				</li>
                 <!-- END group -->
             </ul>
         </div>
