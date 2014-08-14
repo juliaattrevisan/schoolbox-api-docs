@@ -1,15 +1,15 @@
 <div class="box">
-	<h2>School News <!-- BEGIN count -->({NEWS_DISP_COUNT} / {NEWS_COUNT})<!-- END count --></h2>
+	<h2>School News <!-- BEGIN count -->({SITENEWS_DISP_COUNT} / {SITENEWS_COUNT})<!-- END count --></h2>
 	<ul class="information-list">
 	<!-- BEGIN sitenews -->
 		<li>
-			<a href="{NEWS_LINK}">
+			<a href="{SITENEWS_LINK}">
 				<img class="thumbnail" height="60" width="60" src="images/icons/60x60/news.png" />
-				<h4>{NEWS_HEADING}</h4>
+				<h4>{SITENEWS_HEADING}</h4>
 			</a>
-			<p class="meta">{NEWS_BREADCRUMB}</p>
-			<p class="meta">Written by <a href="/search/user/{NEWS_OWNER}">{NEWS_OWNER_NAME}</a> {NEWS_CREATED}</p>
-			<p>{NEWS_BODY}</p>
+			<p class="meta">{SITENEWS_BREADCRUMB}</p>
+			<p class="meta">Written by <a href="/search/user/{SITENEWS_OWNER}">{SITENEWS_OWNER_NAME}</a> {SITENEWS_CREATED}</p>
+			<p>{SITENEWS_BODY}</p>
 		</li>
 	<!-- END sitenews -->
 	</ul>

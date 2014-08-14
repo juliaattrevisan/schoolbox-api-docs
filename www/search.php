@@ -503,8 +503,8 @@ if (!empty($result['sitenews'])) {
     $page->setFile('sitenews_t', 'search/sitenews.html');
     $page->setBlock('sitenews_t', 'sitenews', 'sitenews_block');
     $page->setVar(array(
-        'NEWS_DISP_COUNT' => count($result['news']),
-        'NEWS_COUNT' => $count['news'],
+        'SITENEWS_DISP_COUNT' => count($result['news']),
+        'SITENEWS_COUNT' => $count['news'],
     ));
 
     foreach ($result['sitenews'] as $news) {
@@ -518,16 +518,16 @@ if (!empty($result['sitenews'])) {
         $createdTime = new Alaress_Date_Relative($news['item_datetime_posted']);
 
         $page->setVar(array(
-            'NEWS_ID' => $news['item_id'],
-            'NEWS_CODE' => $news['code'],
-            'NEWS_LINK' => $news['link'],
-            'NEWS_HEADING' => Scrub::text($news['item_heading']),
-            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['item_body']), 150),
-            'NEWS_OWNER' => $news['item_owner'],
-            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'NEWS_CREATED' => $createdTime->getRelativeTime(),
-            'NEWS_BREADCRUMB' => $news['breadcrumb'],
-            'NEWS_COUNT' => $count['news'],
+            'SITENEWS_ID' => $news['item_id'],
+            'SITENEWS_CODE' => $news['code'],
+            'SITENEWS_LINK' => $news['link'],
+            'SITENEWS_HEADING' => Scrub::text($news['item_heading']),
+            'SITENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['item_body']), 150),
+            'SITENEWS_OWNER' => $news['item_owner'],
+            'SITENEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'SITENEWS_CREATED' => $createdTime->getRelativeTime(),
+            'SITENEWS_BREADCRUMB' => $news['breadcrumb'],
+            'SITENEWS_COUNT' => $count['news'],
         ));
 
         $page->parse('sitenews_block', 'sitenews', true);
