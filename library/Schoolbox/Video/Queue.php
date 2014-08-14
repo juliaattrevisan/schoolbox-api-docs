@@ -151,10 +151,11 @@ class Queue extends ResourceVideo
             exec($thumbnailString, $output, $return);
             exec($posterString, $output, $return);
 
-            if ($return == 0)
+            if ($return == 0) {
                 return true;
-            else
+            } else {
                 return false;
+            }
         }
         return false;
 
@@ -166,10 +167,10 @@ class Queue extends ResourceVideo
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
             $sourceStore = $this->config->get('file_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
-        } else if ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            $sourceStore = $this->config->get('storage_dir');
-            return $sourceStore . '/' . $this->fileID . '.dat';
-        } else if ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
+        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
+                $sourceStore = $this->config->get('storage_dir');
+                return $sourceStore . '/' . $this->fileID . '.dat';
+        } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             $sourceStore = $this->config->get('submission_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
