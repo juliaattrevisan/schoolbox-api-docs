@@ -46,13 +46,28 @@ class Alaress_Image_Processor_Strategy_Constrain extends Alaress_Image_Processor
 		*/
 		$dimensions = $this->boundingBox($image);
 
+		/* If resultant dimensions are the same, just return
+		 * what you were provided instead of copying out again
+		 */
+		if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
+
+			$log = new \Alaress_Log_File('../../mort.log', 'Image Transform');
+			$log->log('Skipped manipulate in Constrain');
+
+			return $image;
+		}
 		/* Resize the canvas to fit the new resized dimensions, so
 		 * you don't get excess canvas space
 		 */
-		$resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
-        $this->alphaFill($resizedCanvas);
-		imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+		else {
+			$log = new \Alaress_Log_File('../../mort.log', 'Image Transform');
+			$log->log('Executing manipulate in Constrain');
 
-		return $resizedCanvas;
+			$resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
+			$this->alphaFill($resizedCanvas);
+			imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+
+			return $resizedCanvas;
+		}
 	}
 }
