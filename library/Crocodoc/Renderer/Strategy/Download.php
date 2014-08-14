@@ -39,12 +39,26 @@ class Download extends Base {
 		$recentSubmissionDate = new \Alaress_Date_Relative($this->getSubmission()->getSubmitted(), 'U');
 		$this->plag();
 
+		try {
+			$plagMapper = new \Plagscan_DocumentMapper();
+			$plagDocument = $plagMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
+
+			$plagHref = sprintf(
+				"%s%s/submission/plagiarismReport/%s/?zx_h=600px",
+				$this->getPage()->conType(), $_SERVER['HTTP_HOST'], $plagDocument->getPlagscanId()
+			);
+		}
+		catch (\Exception $e) {
+			$plagHref = '';
+		}
+
 		$this->getPage()->setVar(array(
 			'MOST_RECENT_SUBMISSION_FILE_ID' => $this->getSubmission()->getId(),
 			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
 			'MOST_RECENT_SUBMISSION_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getSubmission()->getFilesize()),
 			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
 			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+			'MOST_RECENT_SUBMISSION_FILE_PLAG_HREF' => base64_encode($plagHref)
 		));
 
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
