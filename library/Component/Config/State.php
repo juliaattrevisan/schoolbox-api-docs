@@ -10,6 +10,11 @@ class Component_Config_State extends Component_Config_Abstract {
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
 
+        // Anything other than "active" gets set to "inactive" directly
+        if (!($configValue == 'Active')) {
+            $configValue = 'Inactive';
+        }
+
         // has an internal block for the select element
         $page->setBlock($keyblock, 'chat_state', 'chat_state_block');
         $page->setVar('chat_state_block', '');
