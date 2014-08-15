@@ -36,6 +36,9 @@ class Pool extends EventEmitter {
 	const DEBUG_ERR = 2;
 	const DATA_OUT  = 3;
 
+    const HARD = true;
+    const SOFT = false;
+
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -87,6 +90,46 @@ class Pool extends EventEmitter {
             $this->ioListeners,
             $this->workers
         );
+    }
+
+
+    /**
+     * Test the health of the pool and attempt to resolve any issues it has
+     */
+    public function healthCheck() {
+        $this->log->notice("Checking health of ".$this->strat->getName()." pool", array('char' => '?'));
+
+        foreach(array_keys($this->streams) as $pid) {
+            $worker  = $this->workers->getByProcessId($pid);
+            $status  = $worker->getStatus();
+            $process = $worker->getCommand();
+            $task    = $worker->getTask();
+            $cmd     = $task->getCommand();
+            $args    = $task->getArgs();
+            $finish  = $task->getFinish();
+            $start   = $task->getStart();
+            $elapsed = microtime(true) - $start;
+
+            $this->log->debug(sprintf('Worker {%5d} (%3d) `%s` started %s(%s) %0.2fs ago', $pid, $status, $process, $cmd, json_encode($args), $elapsed));
+
+            // check for an unexpected finish state
+            if($finish && $status != Worker::READY) {
+                $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
+                $worker->markTaskComplete();
+            }
+
+            // if it's over the hard limit, terminate it
+            elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::HARD)) {
+                $this->log->error("Worker {{$pid}} has exceeded hard execution timeout: forcibly terminating");
+                $this->releaseWorker($pid, self::HARD);
+            }
+
+            // if it's over the soft limit, let it down gently
+            elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::SOFT)) {
+                $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout: gently terminating");
+                $this->releaseWorker($pid, self::SOFT);
+            }
+        }
     }
 
 
@@ -373,9 +416,22 @@ class Pool extends EventEmitter {
 
 	/**
 	 * Terminate all workers
+     *
+     * @param bool $hard
 	 */
-	public function releaseWorkers($hard = true) {
+	public function releaseWorkers($hard = self::HARD) {
 		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
 	}
+
+
+    /**
+     * Terminate a worker
+     *
+     * @param int  $pid
+     * @param bool $hard
+     */
+    public function releaseWorker($pid, $hard = self::HARD) {
+        $this->workers->signalProcess($pid, $hard ? SIGKILL : SIGTERM);
+    }
 
 }

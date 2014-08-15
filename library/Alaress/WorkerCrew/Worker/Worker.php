@@ -22,6 +22,7 @@ class Worker extends PipeWriter {
 	const DONE  = 0x4;
 	const ENDED = 0x8;
 	const ERROR = 0x10;
+    const ALL   = 0x1F;
 
 
 	/** @var string  */
