@@ -33,12 +33,15 @@ class External_Maze_Helper {
 	public function getCurrentTTPeriod() {
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$currentYear = $now->getUsingFormat('Y');
-		$currentSemester = $this->getCurrentSemester();
+        /* Ensure a filesemester is set */
+        if(!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
+            $_SESSION['FileYear'] =  $now->getUsingFormat('Y');
+            $_SESSION['FileSemester'] = $this->getCurrentSemester();
+        }
 
 		/* Only get subjects that are relevant now
 		 */
-		$ttPeriod = "{$currentYear}S{$currentSemester}";
+		$ttPeriod = "{$_SESSION['FileYear']}S{$_SESSION['FileSemester']}";
 
 		return $ttPeriod;
 	}
