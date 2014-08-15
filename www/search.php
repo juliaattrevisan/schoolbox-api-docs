@@ -63,8 +63,8 @@ $handle = array(
     'file' => 'file',
     'category' => 'category',
     'link' => 'link',
-    'news' => 'categoryNews',
-    'sitenews' => 'news',
+	'sitenews' => 'news',
+	'homepagenews' => 'categoryNews',
     'blog' => 'blog',
     'wiki' => 'wiki',
     'forum' => 'forum',
@@ -78,7 +78,7 @@ $type_list = array(
     'category' => 'Folders',
     'link' => 'Links',
     'sitenews' => 'School News',
-    'news' => 'Homepage News',
+    'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
     'wiki' => 'Wikis',
     'forum' => 'Forums',
@@ -454,15 +454,15 @@ if (!empty($result['link'])) {
 }
 
 // render homepage news
-if (!empty($result['news'])) {
-    $page->setFile('news_t', 'search/news.html');
-    $page->setBlock('news_t', 'news', 'news_block');
+if (!empty($result['homepagenews'])) {
+    $page->setFile('homepagenews_t', 'search/homepagenews.html');
+    $page->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
     $page->setVar(array(
-        'NEWS_DISP_COUNT' => count($result['news']),
-        'NEWS_COUNT' => $count['news'],
+        'HOMEPAGE_NEWS_DISP_COUNT' => count($result['homepagenews']),
+        'HOMEPAGE_NEWS_COUNT' => $count['homepagenews'],
     ));
 
-    foreach ($result['news'] as $news) {
+    foreach ($result['homepagenews'] as $news) {
         foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
             $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
         }
@@ -477,34 +477,34 @@ if (!empty($result['news'])) {
         $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
         $page->setVar(array(
-            'NEWS_ID' => $news['id'],
-            'NEWS_CODE' => $news['code'],
-            'NEWS_LINK' => $news['link'],
-            'NEWS_HEADING' => Scrub::text($news['heading']),
-            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-            'NEWS_OWNER' => $news['uid'],
-            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'NEWS_CREATED' => $createdTime->getRelativeTime(),
-            'NEWS_BREADCRUMB' => $news['breadcrumb'],
-            'NEWS_COUNT' => $count['news'],
+            'HOMEPAGENEWS_ID' => $news['id'],
+            'HOMEPAGENEWS_CODE' => $news['code'],
+            'HOMEPAGENEWS_LINK' => $news['link'],
+            'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
+            'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
+            'HOMEPAGENEWS_OWNER' => $news['uid'],
+            'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
+            'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
+            'HOMEPAGENEWS_COUNT' => $count['homepagenews'],
         ));
 
-        $page->parse('news_block', 'news', true);
+        $page->parse('homepagenews_block', 'homepagenews', true);
     }
 
-	outputSeeMore($page, $type, $count, 'news');
+	outputSeeMore($page, $type, $count, 'homepagenews');
 
-    $page->parse('RESULT', 'news_t', true);
+    $page->parse('RESULT', 'homepagenews_t', true);
 }
 
 
 // render school news
 if (!empty($result['sitenews'])) {
-    $page->setFile('sitenews_t', 'search/schoolnews.html');
+    $page->setFile('sitenews_t', 'search/sitenews.html');
     $page->setBlock('sitenews_t', 'sitenews', 'sitenews_block');
     $page->setVar(array(
-        'NEWS_DISP_COUNT' => count($result['news']),
-        'NEWS_COUNT' => $count['news'],
+        'SITENEWS_DISP_COUNT' => count($result['news']),
+        'SITENEWS_COUNT' => $count['news'],
     ));
 
     foreach ($result['sitenews'] as $news) {
@@ -518,16 +518,16 @@ if (!empty($result['sitenews'])) {
         $createdTime = new Alaress_Date_Relative($news['item_datetime_posted']);
 
         $page->setVar(array(
-            'NEWS_ID' => $news['item_id'],
-            'NEWS_CODE' => $news['code'],
-            'NEWS_LINK' => $news['link'],
-            'NEWS_HEADING' => Scrub::text($news['item_heading']),
-            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['item_body']), 150),
-            'NEWS_OWNER' => $news['item_owner'],
-            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
-            'NEWS_CREATED' => $createdTime->getRelativeTime(),
-            'NEWS_BREADCRUMB' => $news['breadcrumb'],
-            'NEWS_COUNT' => $count['news'],
+            'SITENEWS_ID' => $news['item_id'],
+            'SITENEWS_CODE' => $news['code'],
+            'SITENEWS_LINK' => $news['link'],
+            'SITENEWS_HEADING' => Scrub::text($news['item_heading']),
+            'SITENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['item_body']), 150),
+            'SITENEWS_OWNER' => $news['item_owner'],
+            'SITENEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'SITENEWS_CREATED' => $createdTime->getRelativeTime(),
+            'SITENEWS_BREADCRUMB' => $news['breadcrumb'],
+            'SITENEWS_COUNT' => $count['news'],
         ));
 
         $page->parse('sitenews_block', 'sitenews', true);
@@ -798,6 +798,4 @@ function outputSeeMore($page, $type, $count, $handle) {
 	else {
 		$page->setVar('see_more_block', '');
 	}
-
 }
-?>
