@@ -1,8 +1,7 @@
 #!/usr/bin/hhvm
 <?php
 
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
-use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Aura\Di;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
@@ -20,9 +19,9 @@ use Schoolbox\Realtime\Pipe\SessionValidator;
  * @version     SVN: $Id$
  */
 
-$opts = getopt('vp::c::', $fields);
-
 $fields = array('porcelain', 'mem', 'truemem', 'pid');
+
+$opts = getopt('vp::c::', $fields);
 
 foreach($fields as $k => $name) {
     if(!isset($opts[$name])) {
@@ -55,38 +54,27 @@ $kernel->run(function($di, $loop, $log, $opts) {
 	$redis = Alaress\Redis::getClientInstance();
 	$redis->connect();
 
+    $stratConfig = array();
 	if(file_exists($opts['conf']) && is_readable($opts['conf'])) {
 		$fp = fopen($opts['conf'], 'r');
 		while($line = fgets($fp)) {
 			$xpl = explode('=',$line);
 			if(count($xpl) == 2) {
-				${$xpl[0]} = $xpl[1];
+				$stratConfig[$xpl[0]] = $xpl[1];
 			}
 		}
 		fclose($fp);
-
-		$poolStrat = new ConfiguredDispatchStrategy(
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-			isset($queueWarnSize) ? (int)$queueWarnSize : DefaultDispatchStrategy::QUEUE_SIZE_WARN,
-			isset($queueMaxSize)  ? (int)$queueMaxSize  : DefaultDispatchStrategy::QUEUE_SIZE_MAX,
-			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT,
-            $opts['flags']
-		);
-
-		$log->info(sprintf("Current strat: workers [%d - %d], queueing (%dms <= %d)",
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-            isset($queueMaxSize)  ? (int)$queueMaxSize  : DefaultDispatchStrategy::QUEUE_SIZE_MAX
-		));
 	}
 	else {
-		$poolStrat = new DefaultDispatchStrategy($opts['flags']);
 		$log->warning("Couldn't read config: using default strat");
 	}
+
+    $stratBuilder = new ConfiguredDispatchStrategyBuilder($stratConfig);
+    $poolStrat = $stratBuilder->build($opts['flags']);
+
+    $delim = in_array('porcelain', $opts['fields']) ? ' ' : "\n    ";
+
+    $log->info(implode($delim, array("Using strategy:") + $stratBuilder->summarise()), array('char' => '+'));
 
     $conf = $di->get('config');
     $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'));
@@ -104,25 +92,25 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
     $client->connect(2)->then(function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts) {
 
-        $pipeManager = new PipeManager($loop, $sessionValidator, $client, $log, $poolStrat);
+    $pipeManager = new PipeManager($loop, $sessionValidator, $client, $log, $poolStrat);
 
-        $wss = new Ratchet\WebSocket\WsServer($pipeManager);
-        $wss->disableVersion(0);
+	$wss = new Ratchet\WebSocket\WsServer($pipeManager);
+	$wss->disableVersion(0);
 
-        $https = new Ratchet\Http\HttpServer($wss);
+	$https = new Ratchet\Http\HttpServer($wss);
 
-        try {
-            $webSock = new React\Socket\Server($loop);
-            $webSock->listen($opts['port'], '0.0.0.0');
+	try {
+		$webSock = new React\Socket\Server($loop);
+		$webSock->listen($opts['port'], '0.0.0.0');
 
-            new Ratchet\Server\IoServer($https, $webSock, $loop);
+		new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-            $log->info("Listening for incoming websockets on port {$opts['port']}...", '+');
-        }
-        catch(ConnectionException $e) {
-            $log->alert("Unable to launch: " . $e->getMessage(), array($e));
-            throw $e;
-        }
+		$log->info("Listening for incoming websockets on port {$opts['port']}...", array('char' => '+'));
+	}
+	catch(ConnectionException $e) {
+		$log->alert("Unable to launch: " . $e->getMessage(), array($e));
+		throw $e;
+	}
 
     });
 });
