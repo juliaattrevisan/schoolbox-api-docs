@@ -110,7 +110,7 @@ class Download extends Base {
 
 					$this->getPage()->setVar(array(
 						'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
-						'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->getScore(),
+						'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => sprintf("%d%%", $plagDoc->getScore()),
 						'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
 					));
 					$this->getPage()->parse('plag_score_block', 'plag_score');
