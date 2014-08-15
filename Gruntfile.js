@@ -9,7 +9,7 @@ module.exports = function(grunt) {
         core: {
             options: {
                 interrupt: true,
-		interval: 5007
+                interval: 5007
             },
             files: ['www/css/core/*.less'],
             tasks: ['build.css.current']
@@ -25,10 +25,14 @@ module.exports = function(grunt) {
             continue;
         }
         var cssDir = matches[1];
+        // Don't clobber core's watcher
+        if (cssDir === 'core') {
+            continue;
+        }
         watchTasks[cssDir] = {
             options: {
                 interrupt: true,
-		interval: 5007
+                interval: 5007
             },
             files: ['www/css/'+cssDir+'/*.less'],
             tasks: ['build.css:'+cssDir]
