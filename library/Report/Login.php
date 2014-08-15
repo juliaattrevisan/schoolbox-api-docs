@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Report_Login extends Report_Abstract implements Report_IReport {
+class Report_Login extends Report_Abstract implements Report_IReport
+{
 
     private $groupID = null;
     private $dataSet;
@@ -50,7 +51,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
      */
     protected $db;
 
-    public function __construct($page) {
+    public function __construct($page)
+    {
         $this->setGroupHandler(new Group());
 
         if (!$this->checkPermissions()) {
@@ -63,7 +65,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         }
     }
 
-    protected function setup() {
+    protected function setup()
+    {
         // set blocks
         $this->db = Database::getInstance();
         $this->getPage()->setFile('activity_t', 'adminv2/report/login.html');
@@ -71,95 +74,107 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         $this->getPage()->setTitle('Login Report');
     }
 
-    public function setIndexID($groupID) {
+    public function setIndexID($groupID)
+    {
         $this->groupID = $groupID;
     }
 
-    public function getIndexID() {
+    public function getIndexID()
+    {
         return $this->groupID;
     }
 
-    public function getReportTitle() {
+    public function getReportTitle()
+    {
         return "Login";
     }
 
-    public function setFields($fields) {
+    public function setFields($fields)
+    {
         $this->fields = $fields;
     }
 
-    public function getSortableFields() {
+    public function getSortableFields()
+    {
         return $this->sortable;
     }
 
-    public function addFields($fields) {
+    public function addFields($fields)
+    {
         array_merge($this->fields, $fields);
     }
 
-    public function getFields() {
+    public function getFields()
+    {
         return $this->fields;
     }
 
-    public function getFilterFields() {
+    public function getFilterFields()
+    {
         return array_keys($this->filterable);
     }
 
-    public function getDefaultOrderBy() {
+    public function getDefaultOrderBy()
+    {
         return $this->defaultOrderBy;
     }
 
-    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '') {
+    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '')
+    {
 
-        if($orderDir == '') {
+        if ($orderDir == '') {
             $orderDir = 'DESC';
         }
 
         // need fields from which to retrieve data
-        if(empty($this->fields))
+        if (empty($this->fields)) {
             return false;
+        }
 
         // fallback to default if unset
-        if($orderBy == '' || !in_array($orderBy, $this->sortable))
+        if ($orderBy == '' || !in_array($orderBy, $this->sortable)) {
             $orderBy = $this->getDefaultOrderBy();
+        }
 
         // filter data passed in by report
         $filterString = $this->getIndexID();
 
         // explode across comma to get keypairs
-        $filterSplit = explode(',',$filterString);
+        $filterSplit = explode(',', $filterString);
         $resultFilter = array();
 
-        foreach($filterSplit as $split) {
+        foreach ($filterSplit as $split) {
             $thisFilter = explode('=', $split);
-            if(count($thisFilter) == 2)
+            if (count($thisFilter) == 2) {
                 $resultFilter[$thisFilter[0]] = urldecode(urldecode($thisFilter[1]));
+            }
         }
 
         $this->filter = $resultFilter;
 
         $sqlFilter = array();
         $params    = array();
-        foreach($resultFilter as $key => $value) {
-            if(in_array($key, $this->getFilterFields())) {
+        foreach ($resultFilter as $key => $value) {
+            if (in_array($key, $this->getFilterFields())) {
                 // custom filter by user
                 if ($key == 'user') {
-                    $sqlFilter[]     = "user.username LIKE :value OR user.firstname LIKE :value OR user.lastname LIKE :value";
+                    $sqlFilter[]     = "user.username LIKE :value
+                                        OR user.firstname LIKE :value
+                                        OR user.lastname LIKE :value";
                     $params['value'] = '%'.$this->db->quoteForLike($value).'%';
-                }
-                elseif ($key == 'after') {
+                } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date            = date('Y-m-d H:i:s', $date);
                         $sqlFilter[]     = "`date` >= :after";
                         $params['after'] = $date;
                     }
-                }
-                elseif ($key == 'before') {
+                } elseif ($key == 'before') {
                     if ($date = strtotime($value)) {
                         $date             = date('Y-m-d H:i:s', $date);
                         $sqlFilter[]      = "`date` >= :before";
                         $params['before'] = $date;
                     }
-                }
-                else {
+                } else {
                     $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
                     $params[$key] = '%'.$this->db->quoteForLike($value).'%';
                 }
@@ -167,7 +182,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         }
 
         $sqlFilterString = count($sqlFilter) ?
-            sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
+            sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
         $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username";
@@ -200,7 +215,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             $statement->bindValue($name, $value);
         }
         if ($limit > 0) {
-            $statement->bindValue('limit',  $limit,  PDO::PARAM_INT);
+            $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
         if ($offset > 0) {
             $statement->bindValue('offset', $offset, PDO::PARAM_INT);
@@ -213,16 +228,17 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         return $this->dataCount;
     }
 
-    public function render() {
+    public function render()
+    {
         // the group and the dataset must both not be null
-        if($this->getIndexID() == null || empty($this->dataSet))
+        if ($this->getIndexID() == null || empty($this->dataSet)) {
             error(19);
+        }
 
         $page = $this->getPage();
 
         // render users
         if (!empty($this->dataSet)) {
-
             $page->setVar(array(
                 'COUNTABLE_COUNT' => $this->dataCount,
                 'REPORT_TITLE'      => "Login",
@@ -233,7 +249,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             $j = 0;
 
             foreach ($this->dataSet as $log) {
-
                 $action = $log['login'] == 0 ? "Failed login" : "Logged in";
 
                 $userHandler = new User();
@@ -263,8 +278,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             // set up filtering
             $this->displayFilterBlock();
 
-        }
-        // else empty data set
+        } // else empty data set
         else {
             $page->setVar(array(
                 'RESULT'                => 'No results.',
@@ -277,18 +291,19 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         }
     }
 
-    public function export() {
+    public function export()
+    {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->csvFields);
         $exporter->setData($this->dataSet);
         $exporter->export('CSV');
     }
 
-    public function displayFilterBlock() {
+    public function displayFilterBlock()
+    {
         $page = $this->getPage();
 
-        foreach($this->filterable as $field => $pholder) {
-
+        foreach ($this->filterable as $field => $pholder) {
             $output = array(
                 'FILTER_ID'          => $field,
                 'FILTER_NAME'        => $field,
