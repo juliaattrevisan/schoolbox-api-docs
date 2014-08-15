@@ -1,27 +1,30 @@
 <?php
+
 /************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd			    	*
-*                                                           *
-*	This file provides access to TASS user info		        *
-*                                                           *
-************************************************************/
+ *                                                           *
+ *        Copyright (c) 2013 Alaress Pty Ltd                    *
+ *                                                           *
+ *    This file provides access to TASS user info                *
+ *                                                           *
+ ************************************************************/
+class External_Tass_User implements External_UserInterface
+{
+    const SPLIT_PARENT_TASSID_LENGTH = 8;
 
-class External_Tass_User implements External_UserInterface {
-	const SPLIT_PARENT_TASSID_LENGTH = 8;
+    /**
+     * @var MSSQL
+     */
+    private $database;
 
-	/**
-	 * @var MSSQL
-	 */
-	private $database;
+    function __construct()
+    {
+        $this->setDatabase(MSSQL::getInstance());
 
-	function __construct () {
-		$this->setDatabase(MSSQL::getInstance());
-
-		$this->groupHandler = new Group;
+        $this->groupHandler = new Group;
     }
 
-    function getParent($synID) {
+    function getParent($synID)
+    {
 
     }
 
@@ -33,9 +36,10 @@ class External_Tass_User implements External_UserInterface {
      *
      * @return array Currently returns empty list, not yet implemented.
      */
-    public function getParentEmails($synergyIds) {
+    public function getParentEmails($synergyIds)
+    {
         $emailList = array();
-        $idList    = implode(',', array_map('intval', $synergyIds));
+        $idList = implode(',', array_map('intval', $synergyIds));
         if (empty($idList)) {
             return array();
         }
@@ -52,9 +56,9 @@ class External_Tass_User implements External_UserInterface {
         return $emailList;
     }
 
-	function getStudent($tassID)
-	{
-		$query = "
+    function getStudent($tassID)
+    {
+        $query = "
 			SELECT
 				s.stud_code AS StudentID,
 				s.preferred_name AS StudentGiven1,
@@ -95,26 +99,26 @@ class External_Tass_User implements External_UserInterface {
 			LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
 			WHERE stud_code = '$tassID'
 		";
-		$student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
+        $student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
 
-		if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
-			$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
-		}
-		else {
-			$student['StudentBirthDate'] = false;
-		}
-		return $student;
+        if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
+            $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+        } else {
+            $student['StudentBirthDate'] = false;
+        }
+        return $student;
 
-	}
+    }
 
-	function getStaff($tassID)
-	{
+    function getStaff($tassID)
+    {
 
-	}
+    }
 
-	function getStudentContactList ($tassID) {
+    function getStudentContactList($tassID)
+    {
 
-		$query = "SELECT  'P' + student.par_code as StudentContactID,
+        $query = "SELECT  'P' + student.par_code as StudentContactID,
                           parent.f_name StudentContactPreferred,
                           addr1 StudentContactAddress1,
                           addr2 StudentContactAddress2,
@@ -133,33 +137,33 @@ class External_Tass_User implements External_UserInterface {
 						WHERE stud_code = '$tassID'
 					";
 
-		$parent = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        $parent = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
-		return $parent;
-	}
+        return $parent;
+    }
 
-	function getCurrentSemester($exteralUserId = null)
-	{
+    function getCurrentSemester($exteralUserId = null)
+    {
         $query = "SELECT curr_year, curr_sem FROM ttparms WHERE cmpy_code = 01";
         $current = $this->getDatabase()->getRow($query);
         $_SESSION['FileSemester'] = $current['curr_sem'];
         $_SESSION['FileYear'] = $current['curr_year'];
-	}
+    }
 
-	function getSubjectList($tassCode, $userID)
-	{
+    function getSubjectList($tassCode, $userID)
+    {
 
         /* Ensure a filesemester is set */
-        if(!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
+        if (!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
             $this->getCurrentSemester($tassCode);
 
         }
 
-		if (empty($tassCode)) {
-			return false;
-		}
-		if ($this->groupHandler->isStudent($userID)) {
-			$sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, year_grp, sub_desc, sub_type
+        if (empty($tassCode)) {
+            return false;
+        }
+        if ($this->groupHandler->isStudent($userID)) {
+            $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, year_grp, sub_desc, sub_type
 					FROM studsub
 					JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
 					JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
@@ -167,46 +171,47 @@ class External_Tass_User implements External_UserInterface {
 					ORDER BY studsub.sub_code ASC, studsub.class ASC
 			";
 
-			}
-		else {
-			$sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, year_grp, sub_desc, sub_type
+        } else {
+            $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, year_grp, sub_desc, sub_type
 					FROM tchsub
 					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
 					WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'
 					ORDER BY tchsub.sub_code ASC, tchsub.class ASC
 			";
-		}
+        }
 
 
-		$this->getDatabase()->query($sql);
-		while($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray()) ) {
-            if(Cfg::get('site_location') == 'meriden') {
-				$subject['year_grp'] = '';
+        $this->getDatabase()->query($sql);
+        while ($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray())) {
+            if (Cfg::get('site_location') == 'meriden') {
+                $subject['year_grp'] = '';
             }
 
-			$subjectList[] = array('code'=>$subject['year_grp'].'-'.$subject['sub_code'].'-'.$subject['class'], 'name'=>trim($subject['sub_desc']));
-		}
+            $subjectList[] = array('code' => $subject['year_grp'] . '-' . $subject['sub_code'] . '-' . $subject['class'], 'name' => trim($subject['sub_desc']));
+        }
 
-		if(is_array($subjectList))
-			return $subjectList;
-		else
-			return false;
-	}
+        if (is_array($subjectList)) {
+            return $subjectList;
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * Get enrolled students
-	 *
-	 * @param $tassID
-	 * @return mixed
-	 */
-	public function getEnrolledStudents($tassID) {
+    /**
+     * Get enrolled students
+     *
+     * @param $tassID
+     * @return mixed
+     */
+    public function getEnrolledStudents($tassID)
+    {
 
-		/* If the TassID is 8 characters long then it is assumed to be
-		 * someone in the split-parent scenario.
-		 */
+        /* If the TassID is 8 characters long then it is assumed to be
+         * someone in the split-parent scenario.
+         */
 
         // id has to have a [P]arent prefix (or [S]pouse)
-        if(!preg_match('#(?:P|S)[0-9]+#s', $tassID)) {
+        if (!preg_match('#(?:P|S)[0-9]+#s', $tassID)) {
             return array();
         }
 
@@ -214,7 +219,7 @@ class External_Tass_User implements External_UserInterface {
         $id = substr($tassID, 1);
         if (strlen($id) == self::SPLIT_PARENT_TASSID_LENGTH) {
             $parentCode = substr($id, 0, 7);
-            $parentNum = $id[self::SPLIT_PARENT_TASSID_LENGTH-1];
+            $parentNum = $id[self::SPLIT_PARENT_TASSID_LENGTH - 1];
 
             $query = "
                 SELECT stud_codes AS RelatedID
@@ -228,17 +233,16 @@ class External_Tass_User implements External_UserInterface {
             $result = $this->getDatabase()->getAll($query);
 
             // parse the array, because this data is stored in a funky way
-            if(count($result)) {
+            if (count($result)) {
                 foreach ($result as $row) {
                     // data is stored in a single field, comma separated
                     $list = explode(',', $row['RelatedID']);
-                    foreach($list as $childID) {
+                    foreach ($list as $childID) {
                         $return[] = array('RelatedID' => $childID);
                     }
                 }
             }
-        }
-        else {
+        } else {
             $query = "
 				SELECT stud_code AS RelatedID
 				FROM student
@@ -252,25 +256,25 @@ class External_Tass_User implements External_UserInterface {
 
     }
 
-	/**
-	 * Determine the boarder type based on a value
-	 * Returns a human-readable string
-	 *
-	 * @param $boarderValue
-	 * @return string
-	 */
-	public function determineBoarderType($boarderValue) {
-		$boarders = array('Y');
+    /**
+     * Determine the boarder type based on a value
+     * Returns a human-readable string
+     *
+     * @param $boarderValue
+     * @return string
+     */
+    public function determineBoarderType($boarderValue)
+    {
+        $boarders = array('Y');
 
-		if (!strlen($boarderValue)) {
-			return '';
-		}
-		else if (in_array($boarderValue, $boarders)) {
-			return 'Boarder';
-		}
+        if (!strlen($boarderValue)) {
+            return '';
+        } else if (in_array($boarderValue, $boarders)) {
+            return 'Boarder';
+        }
 
-		return 'Day';
-	}
+        return 'Day';
+    }
 
     /**
      * Returns a local path to the user's portrait
@@ -278,22 +282,24 @@ class External_Tass_User implements External_UserInterface {
      * @param Integer $externalUserId
      * @return Bool|String
      */
-    public function getPortrait ($externalUserId) {
+    public function getPortrait($externalUserId)
+    {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) .'/'.strtolower($externalUserId).".jpg";
+        $portraitPath = realpath(Config::get('portrait_dir')) . '/' . strtolower($externalUserId) . ".jpg";
 
-        if ( is_readable($portraitPath) ) {
+        if (is_readable($portraitPath)) {
             return $portraitPath;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public function getEmail ($id) {
+    public function getEmail($id)
+    {
     }
 
-    public function getStaffUserAccountInfo () {
+    public function getStaffUserAccountInfo()
+    {
         // Include Synergetic fields, and attempt to perform data normalisation
         // using extra fields.
         $query = "
@@ -321,7 +327,8 @@ class External_Tass_User implements External_UserInterface {
         return $staffList;
     }
 
-    public function getStudentUserAccountInfo () {
+    public function getStudentUserAccountInfo()
+    {
         // Get all students who have a campus, and don't have a leaving date?
         // (Maybe students who do have a leaving date should be deactivated instead)
         $query = "
@@ -346,13 +353,16 @@ class External_Tass_User implements External_UserInterface {
         return $result;
     }
 
-	public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {
-	}
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+    }
 
-	public function getParentSync ($externalUserId) {
-	}
+    public function getParentSync($externalUserId)
+    {
+    }
 
-    public function getParentUserAccountInfo() {
+    public function getParentUserAccountInfo()
+    {
         // status of TASS support for single, gay, transgendered or polygamous
         // parents - unknown
         // par_code: most likely login
@@ -394,20 +404,24 @@ class External_Tass_User implements External_UserInterface {
      *
      * @return array
      */
-    public function getStaffContactListExtended() {
+    public function getStaffContactListExtended()
+    {
         // TODO: Implement getStaffContactListExtended() method.
         return array();
     }
 
-    private function setDatabase ($database) {
-		$this->database = $database;
-	}
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+    }
 
-	private function getDatabase () {
-		return $this->database;
-	}
+    private function getDatabase()
+    {
+        return $this->database;
+    }
 
-    public function getHousemasterByHouseId($houseID) {
+    public function getHousemasterByHouseId($houseID)
+    {
     }
 
 
