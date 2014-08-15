@@ -148,6 +148,13 @@ class External_Tass_User implements External_UserInterface {
 
 	function getSubjectList($tassCode, $userID)
 	{
+
+        /* Ensure a filesemester is set */
+        if(!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
+            $this->getCurrentSemester($tassCode);
+
+        }
+
 		if (empty($tassCode)) {
 			return false;
 		}
