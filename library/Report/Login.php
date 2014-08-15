@@ -170,8 +170,10 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) :
             '';
 
+        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username";
+
         // Get count separately from data
-        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $sqlFilterString");
+        $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
         foreach ($params as $name => $value) {
             $countStatement->bindValue($name, $value);
         }
@@ -183,7 +185,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
         $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
                       FROM login_log
-                      LEFT JOIN `user` ON `user`.`username` = login_log.username
+                      $joins
                       $sqlFilterString
                       ORDER BY $orderBy $orderDir
                       ";
