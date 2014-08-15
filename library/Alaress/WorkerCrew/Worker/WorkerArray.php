@@ -231,6 +231,16 @@ class WorkerArray implements WorkerBundleInterface {
 	}
 
 
+    /**
+     * Unceremoniously terminate a worker
+     *
+     * @param int $pid
+     */
+    public function terminateProcess($pid) {
+        $this->signalProcess($pid, SIGKILL);
+    }
+
+
 	/**
 	 * Unceremoniously terminate all workers
 	 *
@@ -241,6 +251,16 @@ class WorkerArray implements WorkerBundleInterface {
 	}
 
 
+    /**
+     * Allow worker to finish what it's doing, then die
+     *
+     * @param int $pid
+     */
+    public function releaseProcess($pid) {
+        $this->signalProcess($pid, SIGTERM);
+    }
+
+
 	/**
 	 * Allow all workers to finish what they're doing, then die
 	 */
@@ -249,6 +269,16 @@ class WorkerArray implements WorkerBundleInterface {
 	}
 
 
+    /**
+     * Send the given signal to the given worker
+     *
+     * @param int $pid
+     * @param int $signal
+     */
+    public function signalProcess($pid, $signal) {
+        posix_kill((int)$pid, $signal);
+    }
+
 	/**
 	 * Send the given signal to all workers
 	 *
@@ -256,7 +286,7 @@ class WorkerArray implements WorkerBundleInterface {
 	 */
 	public function signalAll($signal) {
 		foreach($this->workers as $pid => $w) {
-			posix_kill((int)$pid, $signal);
+			$this->signalProcess($pid, $signal);
 		}
 	}
 
