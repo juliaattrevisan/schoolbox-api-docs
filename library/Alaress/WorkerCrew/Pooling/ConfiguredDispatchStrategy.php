@@ -27,6 +27,8 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
 	protected $idleTimeout;
     protected $queueWarnSize;
     protected $queueMaxSize;
+    protected $workerTimeoutSoft;
+    protected $workerTimeoutHard;
 
 
     /**
@@ -37,9 +39,11 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
      * @param int    $queueWarnSize
      * @param int    $queueMaxSize
      * @param int    $idleTimeout
+     * @param int    $workerTimeoutSoft
+     * @param int    $workerTimeoutHard
      * @param string $flags
      */
-    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $flags = '') {
+    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $workerTimeoutSoft, $workerTimeoutHard, $flags = '') {
         parent::__construct($flags);
 		$this->flywheelSpins = $maxFlywheel;
 		$this->minWorkers = $minWorkers;
@@ -146,6 +150,12 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy {
     public function getMaxQueueLength()
     {
         return $this->queueMaxSize;
+    }
+
+
+    public function getWorkerExecutionTimeout($hard = true)
+    {
+        return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
     }
 
 }

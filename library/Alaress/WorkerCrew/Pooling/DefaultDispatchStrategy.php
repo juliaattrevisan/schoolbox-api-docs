@@ -32,7 +32,10 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
     const QUEUE_SIZE_WARN = PHP_INT_MAX;
     const QUEUE_SIZE_MAX  = PHP_INT_MAX;
 
-	const IDLE_TIMEOUT = 2000;
+	const IDLE_TIMEOUT = 60000; // 1 minute
+
+    const WORKER_SOFT_TIMEOUT = 90000;  // 1.5 minutes
+    const WORKER_HARD_TIMEOUT = 180000; // 2.5 minutes
 
 	const TASK_FETCH     = 'fetch';
 	const TASK_PUBLISH   = 'publish';
@@ -40,6 +43,10 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	const TASK_REROUTE   = 'reroute';
 
 	protected $flywheelSpins;
+
+
+    /** @var AlaressIPCProtocol */
+    protected $protocol;
 
 
     /** @var string */
@@ -387,5 +394,15 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 		// noop: this strategy does not use persistent queues.
 	}
 
+
+    /**
+     * Returns the hard or soft execution timeout for a worker task (not the life of the worker itself)
+     *
+     * @param bool $hard
+     * @return int
+     */
+    public function getWorkerExecutionTimeout($hard = true) {
+        return $hard ? self::WORKER_HARD_TIMEOUT : self::WORKER_SOFT_TIMEOUT;
+    }
 
 }
