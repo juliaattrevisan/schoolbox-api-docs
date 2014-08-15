@@ -190,6 +190,11 @@ else if (is_numeric($_GET['deleteAll'])) {
 		error(2);
 	}
 
+    // only superusers can do this no matter what
+    if (!$groupHandler->isSuperuser()) {
+        error(12);
+    }
+
 	$categoryHandler->recursiveDelete($_GET['deleteAll']);
 	$_SESSION['resourcesID'] = $category['parent'];
 }
