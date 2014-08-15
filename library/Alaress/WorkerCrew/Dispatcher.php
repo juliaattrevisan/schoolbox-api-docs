@@ -14,6 +14,7 @@ use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -147,6 +148,7 @@ class Dispatcher implements DispatcherInterface {
 	 * This method will be fired every self::LOOP_DELAY millis
 	 *
 	 * @param TimerInterface $timer
+     * @throws PDOException
 	 */
 	public function dispatch($timer) {
 
@@ -181,9 +183,13 @@ class Dispatcher implements DispatcherInterface {
 				$this->log->info("Internally handling '$cmd'");
 				$this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
 			}
+            catch(PDOException $e) {
+                // forcible rethrow PDO exceptions
+                throw $e;
+            }
 			catch(Exception $e) {
-				// we need to catch any and all exception here, lest we explode our reactor
-				$this->log->warning("Exception suppressed: ".get_class($e) . " ".$e->getMessage(), array($e));
+				// we need to catch (almost) any and all exception here, lest we explode our reactor
+				$this->log->warning(get_class($e) . " suppressed: ".$e->getMessage(), array($e));
 			}
 			// regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
 			$this->strat->pdequeue($identifier);
@@ -192,11 +198,14 @@ class Dispatcher implements DispatcherInterface {
 
 		// all workers are tied up and ceiling has been reached - please wait
 		if(!$this->pool->canAccept()) {
+            $timeout = $this->strat->getWorkerIdleTimeout();
+            $this->log->debug("No workers available, setting healthcheck timeout for {$timeout}ms");
 			// detach and wait for pool to notify us of a free worker
 			$this->detach();
 			$this->pool->once('ready', array($this, 'attach'));
-			$this->attach($this->strat->getWorkerIdleTimeout());
-			return;
+            // attach a timer to check the health of the pool every minute until a worker returns and cancels it
+            $this->timer = $this->loop->addPeriodicTimer($timeout / 1000, array($this->pool, 'healthCheck'));
+            return;
 		}
 
 		// pop the task from the queue and run the next task
@@ -214,7 +223,7 @@ class Dispatcher implements DispatcherInterface {
         }
 		catch(Exception $e) {
 			// we need to catch any and all exception here, lest we explode our reactor
-			$this->log->warning("Exception suppressed: ".get_class($e) . " ".$e->getMessage(), array($e));
+			$this->log->warning(get_class($e) . " suppressed: ".$e->getMessage(), array($e));
 		}
 
 	}
