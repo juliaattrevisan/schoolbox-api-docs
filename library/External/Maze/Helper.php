@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper
  *
@@ -7,82 +8,90 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+class External_Maze_Helper
+{
 
-class External_Maze_Helper {
+    /**
+     * An instance of MSSQL
+     *
+     * @var null
+     */
+    private $db = null;
 
-	/**
-	 * An instance of MSSQL
-	 *
-	 * @var null
-	 */
-	private $db = null;
+    private $currentSemester = '';
 
-	private $currentSemester = '';
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setDb(MSSQL::getInstance());
+        $this->setCurrentSemester($this->determineCurrentSemester());
+    }
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setDb(MSSQL::getInstance());
-		$this->setCurrentSemester($this->determineCurrentSemester());
-	}
+    /**
+     * Get the current timetable period eg. 2013S2
+     */
+    public function getCurrentTTPeriod()
+    {
+        $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-	/**
-	 * Get the current timetable period eg. 2013S2
-	 */
-	public function getCurrentTTPeriod() {
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+        /* Ensure a filesemester is set */
+        if (!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
+            $_SESSION['FileYear'] = $now->getUsingFormat('Y');
+            $_SESSION['FileSemester'] = $this->getCurrentSemester();
+        }
 
-		$currentYear = $now->getUsingFormat('Y');
-		$currentSemester = $this->getCurrentSemester();
+        /* Only get subjects that are relevant now
+         */
+        $ttPeriod = "{$_SESSION['FileYear']}S{$_SESSION['FileSemester']}";
 
-		/* Only get subjects that are relevant now
-		 */
-		$ttPeriod = "{$currentYear}S{$currentSemester}";
+        return $ttPeriod;
+    }
 
-		return $ttPeriod;
-	}
+    /**
+     * As designed by Samuel himself
+     *
+     * @return bool|string
+     */
+    public function currentDate()
+    {
 
-	/**
-	 * As designed by Samuel himself
-	 *
-	 * @return bool|string
-	 */
-	public function currentDate() {
+        /* Samuel wanted it like this.
+         * My life, where did it go?
+         */
+        if (date('d') < 10) {
+            return date('M  d Y');
+        }
 
-		/* Samuel wanted it like this.
-		 * My life, where did it go?
-		 */
-		if (date('d') < 10) {
-			return date('M  d Y');
-		}
+        return date('M d Y');
+    }
 
-	 	return date('M d Y');
-	}
+    /**
+     * Take a Maze datetime and returns the time portion of it
+     *
+     * @param $date
+     * @return string
+     */
+    public function mazeTime($date)
+    {
+        return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
+    }
 
-	/**
-	 * Take a Maze datetime and returns the time portion of it
-	 *
-	 * @param $date
-	 * @return string
-	 */
-	public function mazeTime($date) {
-		return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
-	}
+    /**
+     * Get the current semester
+     *
+     * This should take the form below:
+     * $row['CURRENT_SEMESTER'] = '1998S4';
+     *
+     * @param null $externalUserId
+     * @return mixed
+     */
+    public function determineCurrentSemester($externalUserId = null)
+    {
+        $currentYear = date('Y');
 
-	/**
-	 * Get the current semester
-	 *
-	 * This should take the form below:
-	 * $row['CURRENT_SEMESTER'] = '1998S4';
-	 *
-	 * @param null $externalUserId
-	 * @return mixed
-	 */
-	public function determineCurrentSemester($externalUserId = null) {
-		$currentYear = date('Y');
-
-		$query = "
+        $query = "
 			SELECT
 			 	THKEY,
 			 	CALENDAR_START01,
@@ -98,128 +107,134 @@ class External_Maze_Helper {
 			ORDER BY THKEY DESC
 		";
 
-		$allRows = $this->getDb()->getAll($query);
+        $allRows = $this->getDb()->getAll($query);
 
-		/* For every semester in the current year, find one which fits
-		 * the current datetime
-		 */
-		foreach ($allRows as $currentRow) {
+        /* For every semester in the current year, find one which fits
+         * the current datetime
+         */
+        foreach ($allRows as $currentRow) {
 
-			/* Find the earliest start
-			 */
-			$afterSemesterStart = false;
+            /* Find the earliest start
+             */
+            $afterSemesterStart = false;
 
-			for ($i = 1; $i < 5; $i++) {
-				$key = "CALENDAR_START0{$i}";
+            for ($i = 1; $i < 5; $i++) {
+                $key = "CALENDAR_START0{$i}";
 
-				$currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
-				$currentTime = $currentDate->getUnixTimestamp();
+                $currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
+                $currentTime = $currentDate->getUnixTimestamp();
 
-				if ($currentRow[$key] != '') {
-					if ($currentTime < $_SERVER['REQUEST_TIME']) {
-						$afterSemesterStart = true;
-						break;
-					}
-				}
-			}
+                if ($currentRow[$key] != '') {
+                    if ($currentTime < $_SERVER['REQUEST_TIME']) {
+                        $afterSemesterStart = true;
+                        break;
+                    }
+                }
+            }
 
-			/* Find the latest end
-			 */
-			$beforeSemesterEnd = false;
+            /* Find the latest end
+             */
+            $beforeSemesterEnd = false;
 
-			for ($i = 1; $i < 5; $i++) {
-				$key = "CALENDAR_END0{$i}";
+            for ($i = 1; $i < 5; $i++) {
+                $key = "CALENDAR_END0{$i}";
 
-				$currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
-				$currentTime = $currentDate->getUnixTimestamp();
+                $currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
+                $currentTime = $currentDate->getUnixTimestamp();
 
-				if ($currentRow[$key] != '') {
-					if ($currentTime >= $_SERVER['REQUEST_TIME']) {
-						$beforeSemesterEnd = true;
-						break;
-					}
-				}
-			}
+                if ($currentRow[$key] != '') {
+                    if ($currentTime >= $_SERVER['REQUEST_TIME']) {
+                        $beforeSemesterEnd = true;
+                        break;
+                    }
+                }
+            }
 
-			/* You are currently in the most recently added semester definition
-			 */
-			if ($afterSemesterStart && $beforeSemesterEnd) {
-				return str_replace("{$currentYear}S", '', $currentRow['THKEY']);
-			}
+            /* You are currently in the most recently added semester definition
+             */
+            if ($afterSemesterStart && $beforeSemesterEnd) {
+                return str_replace("{$currentYear}S", '', $currentRow['THKEY']);
+            }
 
-			/* Not in this semester yet? Maybe try an older one from the same year
-			 * Continue with loop
-			 */
-		}
+            /* Not in this semester yet? Maybe try an older one from the same year
+             * Continue with loop
+             */
+        }
 
-		/* In between semesters
-		 */
-		return '';
-	}
+        /* In between semesters
+         */
+        return '';
+    }
 
-	/**
-	 * Glue a class code and class number together into a unique
-	 * Schoolbox ClassCode
-	 *
-	 * @param $classCode
-	 * @param $classNumber
-	 * @return string
-	 */
-	public function generateClassCode($classCode, $classNumber) {
-		return $classCode . '-' . $classNumber;
-	}
+    /**
+     * Glue a class code and class number together into a unique
+     * Schoolbox ClassCode
+     *
+     * @param $classCode
+     * @param $classNumber
+     * @return string
+     */
+    public function generateClassCode($classCode, $classNumber)
+    {
+        return $classCode . '-' . $classNumber;
+    }
 
-	/**
-	 * Deglue a unique Schoolbox ClassCode into its original constituents
-	 *
-	 * @param $schoolboxClassCode
-	 * @return array
-	 */
-	public function degenerateClassCode($schoolboxClassCode) {
-		list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
+    /**
+     * Deglue a unique Schoolbox ClassCode into its original constituents
+     *
+     * @param $schoolboxClassCode
+     * @return array
+     */
+    public function degenerateClassCode($schoolboxClassCode)
+    {
+        list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
 
-		return array(
-			'ClassCode' => $classCode,
-			'ClassNumber' => $classNumber,
-		);
-	}
+        return array(
+            'ClassCode'   => $classCode,
+            'ClassNumber' => $classNumber,
+        );
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set db
-	 *
-	 * @param null $db
-	 */
-	private function setDb($db) {
-		$this->db = $db;
-	}
+    /**
+     * Set db
+     *
+     * @param null $db
+     */
+    private function setDb($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Get db
-	 *
-	 * @return null
-	 */
-	private function getDb() {
-		return $this->db;
-	}
+    /**
+     * Get db
+     *
+     * @return null
+     */
+    private function getDb()
+    {
+        return $this->db;
+    }
 
-	/**
-	 * Set current semester
-	 *
-	 * @param string $currentSemester
-	 */
-	private function setCurrentSemester($currentSemester) {
-		$this->currentSemester = $currentSemester;
-	}
+    /**
+     * Set current semester
+     *
+     * @param string $currentSemester
+     */
+    private function setCurrentSemester($currentSemester)
+    {
+        $this->currentSemester = $currentSemester;
+    }
 
-	/**
-	 * Get current semester
-	 *
-	 * @return string
-	 */
-	public function getCurrentSemester() {
-		return $this->currentSemester;
-	}
+    /**
+     * Get current semester
+     *
+     * @return string
+     */
+    public function getCurrentSemester()
+    {
+        return $this->currentSemester;
+    }
 }
