@@ -111,7 +111,46 @@ interface WorkerBundleInterface {
 	public function getStatus();
 
 
-	/**
+    /**
+     * Unceremoniously terminate a worker
+     *
+     * @param int $pid
+     */
+    public function terminateProcess($pid);
+
+
+    /**
+     * Unceremoniously terminate all workers
+     *
+     * @return void
+     */
+    public function terminateAll();
+
+
+    /**
+     * Allow worker to finish what it's doing, then die
+     *
+     * @param int $pid
+     */
+    public function releaseProcess($pid);
+
+
+    /**
+     * Allow all workers to finish what they're doing, then die
+     */
+    public function releaseAll();
+
+
+    /**
+     * Send the given signal to the given worker
+     *
+     * @param int $pid
+     * @param int $signal
+     */
+    public function signalProcess($pid, $signal);
+
+
+    /**
 	 * Signal all workers
 	 *
 	 * @param int $signal
