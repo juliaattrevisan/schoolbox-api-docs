@@ -99,7 +99,9 @@ class Pool extends EventEmitter {
     public function healthCheck() {
         $this->log->notice("Checking health of ".$this->strat->getName()." pool", array('char' => '?'));
 
-        foreach(array_keys($this->streams) as $pid) {
+        $pids = array_keys($this->streams);
+
+        foreach($pids as $pid) {
             $worker  = $this->workers->getByProcessId($pid);
             $status  = $worker->getStatus();
             $process = $worker->getCommand();
@@ -108,9 +110,9 @@ class Pool extends EventEmitter {
             $args    = $task->getArgs();
             $finish  = $task->getFinish();
             $start   = $task->getStart();
-            $elapsed = microtime(true) - $start;
+            $elapsed = (microtime(true) - $start) * 1000;
 
-            $this->log->debug(sprintf('Worker {%5d} (%3d) `%s` started %s(%s) %0.2fs ago', $pid, $status, $process, $cmd, json_encode($args), $elapsed));
+            $this->log->debug(sprintf('Worker {%5d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
 
             // check for an unexpected finish state
             if($finish && $status != Worker::READY) {
@@ -129,7 +131,45 @@ class Pool extends EventEmitter {
                 $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout: gently terminating");
                 $this->releaseWorker($pid, self::SOFT);
             }
+            else {
+                $this->log->debug("Worker {{$pid}} fine");
+            }
         }
+
+        // if there's no workers, detach the healthchecker
+        if(!count($pids)) {
+            $this->emit('ready');
+        }
+    }
+
+
+    /**
+     * @param array $args
+     * @return string
+     */
+    protected function parseArgs($args) {
+        $reset = reset($args);
+
+        $values = array();
+
+        foreach($reset as $v) {
+            if(is_object($v)) {
+                $value = get_class($v);
+                if(method_exists($v, 'getId')) {
+                    $value .= "({$v->getId()})";
+                }
+            }
+            elseif(is_array($v)) {
+                $value = json_encode($v);
+            }
+            else {
+                $value = "$v";
+            }
+
+            $values[] = substr($value, 0, 128);
+        }
+
+        return implode(', ',$values);
     }
 
 
@@ -420,7 +460,9 @@ class Pool extends EventEmitter {
      * @param bool $hard
 	 */
 	public function releaseWorkers($hard = self::HARD) {
-		$this->workers->signalAll($hard ? SIGKILL : SIGTERM);
+        foreach(array_keys($this->streams) as $pid) {
+            $this->releaseWorker($pid, $hard);
+        }
 	}
 
 
@@ -431,7 +473,13 @@ class Pool extends EventEmitter {
      * @param bool $hard
      */
     public function releaseWorker($pid, $hard = self::HARD) {
-        $this->workers->signalProcess($pid, $hard ? SIGKILL : SIGTERM);
+        if($hard) {
+            $this->workers->terminateProcess($pid);
+            $this->detachWorker($pid);
+        }
+        else {
+            $this->workers->releaseProcess($pid);
+        }
     }
 
 }

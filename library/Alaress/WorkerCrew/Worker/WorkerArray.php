@@ -238,6 +238,7 @@ class WorkerArray implements WorkerBundleInterface {
      */
     public function terminateProcess($pid) {
         $this->signalProcess($pid, SIGKILL);
+        $this->detach($pid);
     }
 
 
@@ -248,6 +249,9 @@ class WorkerArray implements WorkerBundleInterface {
 	 */
 	public function terminateAll() {
 		$this->signalAll(SIGKILL);
+        foreach(array_keys($this->workers) as $pid) {
+            $this->detach($pid);
+        }
 	}
 
 

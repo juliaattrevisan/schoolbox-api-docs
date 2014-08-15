@@ -285,6 +285,7 @@ class Scheduler extends StompScheduler implements CommandableInterface {
 	 * @param string $command             - the command that was executed by the Worker
 	 * @param array  $data                - the data with which the Worker responded
 	 * @throws ScheduleException
+     * @throws RuntimeException
 	 * @return void                       - this method does not return any value
 	 */
 	public function handleResponse($trigger, $command, $data) {
