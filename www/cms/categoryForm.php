@@ -11,6 +11,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $categoryHandler = new Category();
+$categoryMapper = CategoryMapper::getInstance();
 $groupHandler = new Group();
 
 if ($_POST['name']) {
@@ -24,10 +25,10 @@ if ($_POST['name']) {
 	);
 
 	/** @var \Schoolbox\Resource\Category $model */
-	$model = CategoryMapper::getInstance()->createModel()
+	$model = $categoryMapper->createModel()
 		->setName($_POST['name'])
 		->setParent(
-			CategoryMapper::getInstance()->createModel()
+			$categoryMapper->createModel()
 				->setId($_POST['parent'])
 		);
 
@@ -69,7 +70,7 @@ if ($_POST['name']) {
 			CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
 		);
 	}
-	$affectedIds = CategoryMapper::getInstance()->save($model);
+	$affectedIds = $categoryMapper->save($model);
 
 	if($affectedIds === false) {
 		// something went wrong
@@ -159,9 +160,9 @@ else if(is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 		exit;
 	}
 
-	CategoryMapper::getInstance()->save(
-		CategoryMapper::getInstance()->findById($_POST['move'])
-			->setParent(CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
+	$categoryMapper->save(
+		$categoryMapper->findById($_POST['move'])
+			->setParent($categoryMapper->createModel()->setId($_POST['categoryID']))
 	);
 }
 else if (is_numeric($_GET['delete'])) {
@@ -173,9 +174,14 @@ else if (is_numeric($_GET['delete'])) {
 		error(8);
 	}
 
-	CategoryMapper::getInstance()->delete(
-		CategoryMapper::getInstance()->findById($_GET['delete'])
-	);
+    // Are there any children of this category?
+    // If so, error out if not a superuser
+    if ($categoryMapper->countByColumn('parent', $_GET['delete'])) {
+        if (!$groupHandler->isSuperuser()) {
+            error(12);
+        }
+    }
+	$categoryMapper->delete($categoryMapper->findById($_GET['delete']));
 
 	$_SESSION['resourcesID'] = $category['parent'];
 }
