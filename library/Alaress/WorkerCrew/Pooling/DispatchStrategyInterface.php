@@ -233,4 +233,14 @@ interface DispatchStrategyInterface {
 	 * @return void
 	 */
 	public function pdequeue($identifier);
+
+
+    /**
+     * Returns the hard or soft execution timeout for a worker task (not the life of the worker itself)
+     *
+     * @param bool $hard
+     * @return int
+     */
+    public function getWorkerExecutionTimeout($hard = true);
+
 }
