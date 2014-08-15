@@ -32,6 +32,20 @@ class Loader {
 	private $uuid = '';
 
 	/**
+	 * A group handler
+	 *
+	 * @var null
+	 */
+	private $groupHandler = null;
+
+	/**
+	 * Curl object
+	 *
+	 * @var null
+	 */
+	private $curl = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $uuid
@@ -41,28 +55,41 @@ class Loader {
 		$this->setAuthenticator(new Authenticator());
 		$this->setUuid($uuid);
 		$this->setUser($user);
+		$this->setGroupHandler(new \Group());
+		$this->setCurl(new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
 	}
 
 	/**
 	 * Spawn an iframe
 	 */
 	public function render() {
-		$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
-		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create');
+		/* Handle postfields different from student viewers and teacher viewers
+		 */
+		if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
+			$postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+		}
+		else if ($this->getGroupHandler()->isStaff($this->getUser()->getId())) {
+			$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
-		$curl->addOptions(array(
-			CURLOPT_POSTFIELDS => "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}",
+			$postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
+		}
+
+		/* Bicep curl
+		 */
+		$this->getCurl()->addOptions(array(
+			CURLOPT_POSTFIELDS => $postFields,
 			CURLOPT_POST => true,
 		));
 
-		$curl->exec();
+		$this->getCurl()->exec();
 
-		$result = json_decode($curl->getResult());
+		$result = json_decode($this->getCurl()->getResult());
 
 		return json_encode(array(
 			'url' => "https://crocodoc.com/view/{$result->session}",
-			'errors' => $curl->getErrors()
+			'errors' => $this->getCurl()->getErrors(),
+			'path' => getcwd()
 		));
 	}
 
@@ -121,5 +148,41 @@ class Loader {
 	 */
 	private function getAuthenticator() {
 		return $this->authenticator;
+	}
+
+	/**
+	 * Set group handler
+	 *
+	 * @param null $groupHandler
+	 */
+	private function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return null
+	 */
+	private function getGroupHandler() {
+		return $this->groupHandler;
+	}
+
+	/**
+	 * Set curl
+	 *
+	 * @param null $curl
+	 */
+	private function setCurl($curl) {
+		$this->curl = $curl;
+	}
+
+	/**
+	 * Get curl
+	 *
+	 * @return null
+	 */
+	private function getCurl() {
+		return $this->curl;
 	}
 }
