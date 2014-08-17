@@ -35,9 +35,9 @@ class User extends DeprecatedModel
      * Gets the ID associated with a particular campus name. Returns false if
      * the campus name was not matched.
      *
-     * @param  <type> $name
+     * @param  string $name
      *
-     * @return <type>
+     * @return int
      */
     public function getCampusID($name)
     {
@@ -187,7 +187,7 @@ class User extends DeprecatedModel
         }
         // retreive results
         /* Allow search on synergy id
-              */
+         */
         $query = "
             SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
             FROM `user`
@@ -371,7 +371,7 @@ class User extends DeprecatedModel
         $esc_password = $this->db->quote($password);
         $query        =
             "SELECT `" . $this->_index . "` FROM `" . $this->_table . '` ' .
-            "WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password')";;
+            "WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password')";
         $this->db->query($query);
         return ($this->db->countRows() > 0);
     }
@@ -538,9 +538,9 @@ class User extends DeprecatedModel
 
     public function getUserLogins($username, $limit = 10)
     {
-        $query = "SELECT date, ip, login FROM login_log WHERE username like " . $this->db->smartQuote(
-                $username
-            ) . " ORDER BY date DESC LIMIT 0,$limit";
+        $query = "SELECT date, ip, login FROM login_log WHERE username like "
+            . $this->db->smartQuote($username)
+            . " ORDER BY date DESC LIMIT 0,$limit";
         return $this->db->getAll($query);
     }
 
@@ -655,7 +655,8 @@ class User extends DeprecatedModel
     /**
      * Update an existing user's details
      *
-     * @param <type> $user
+     * @param array $user
+     * @return bool
      */
     public function update($user)
     {
@@ -718,7 +719,7 @@ class User extends DeprecatedModel
      *
      * @param array $user
      *
-     * @return <type>
+     * @return int|bool ID of new user, or false if failed
      */
     public function create($user)
     {
@@ -776,6 +777,7 @@ class User extends DeprecatedModel
      * @param bool $hasSynergy
      * @param int  $index
      * @param int  $limit
+     * @return array
      */
     public function getSelectionByGroup($groupID, $hasSynergy = false, $index = 0, $limit = 0)
     {
@@ -803,7 +805,9 @@ class User extends DeprecatedModel
     /**
      * Gets all in the system who are in a particular groupID
      *
-     * @param <type> $groupID
+     * @param int $groupID
+     * @param bool $hasSynergy If true (default: false), only returns users with synergy IDs
+     * @return array
      */
     public function getByGroup($groupID, $hasSynergy = false)
     {
