@@ -165,8 +165,6 @@ class User extends DeprecatedModel {
 	 */
 	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
 
-		// TODO: this function doesn't currently protect against all injection (eg. % gets through).
-
 		// test for exact search, and if so return those results instead
 		if (preg_match('#".+"#', $keyword)) {
 			// strip the prepended and appended quote characters
@@ -175,7 +173,16 @@ class User extends DeprecatedModel {
 			return $this->searchExact($keyword, $offset, $limit, $count, $sort_by, $sort_dir);
 		}
 
-		$keyword = $this->db->quote($keyword);
+        // Don't allow LIKE searches on keywords < 3 chars long
+        $wherePart = sprintf("synergy_id = '%s'", $this->db->quote($keyword));
+        if (mb_strlen($keyword, 'UTF-8') >= 3) {
+            $wherePart .= sprintf(
+                " OR CONCAT_WS(' ',title,firstname,lastname) LIKE '%1\$s'
+                OR CONCAT_WS(' ',title,lastname) LIKE '%1\$s'
+                OR username LIKE '%1\$s'",
+                $this->db->quote('%'.$this->db->quoteForLike($keyword).'%')
+            );
+        }
 
 		// retreive results
 
@@ -187,20 +194,14 @@ class User extends DeprecatedModel {
 			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
 			LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
 			LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-			WHERE CONCAT_WS(' ',title,firstname,lastname) LIKE '%$keyword%'
-			OR CONCAT_WS(' ',title,lastname) LIKE '%$keyword%'
-			OR username LIKE '%$keyword%' OR synergy_id = '$keyword'
+			WHERE $wherePart
 		";
 
 		$query .= " ORDER BY `$sort_by` $sort_dir
 						LIMIT $offset, $limit;";
 
 		// retreive count
-		$count_query = "SELECT COUNT(*)
-								FROM `user`
-								WHERE CONCAT_WS(' ',title,firstname,lastname) LIKE '%$keyword%'
-								OR CONCAT_WS(' ',title,lastname) LIKE '%$keyword%'
-								OR username LIKE '%$keyword%' OR synergy_id = '$keyword'";
+		$count_query = "SELECT COUNT(*) FROM `user` WHERE $wherePart";
 
 		$count = $this->db->getOne($count_query);
 
