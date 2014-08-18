@@ -11,181 +11,203 @@ namespace Crocodoc;
 
 use \Schoolbox\User;
 
-class Loader {
+class Loader
+{
 
-	/**
-	 * Contains API keys
-	 *
-	 * @var null
-	 */
-	private $authenticator = null;
+    /**
+     * Contains API keys
+     *
+     * @var null
+     */
+    private $authenticator = null;
 
-	/**
-	 * The user doing the marking
-	 *
-	 * @var null
-	 */
-	private $user = null;
+    /**
+     * The user doing the marking
+     *
+     * @var null
+     */
+    private $user = null;
 
-	/**
-	 * A unique identifier for a resource uploaded to Crocodoc
-     * 
-	 * @var string
-	 */
-	private $uuid = '';
+    /**
+     * A unique identifier for a resource uploaded to Crocodoc
+     *
+     * @var string
+     */
+    private $uuid = '';
 
-	/**
-	 * A group handler
-	 *
-	 * @var null
-	 */
-	private $groupHandler = null;
+    /**
+     * A group handler
+     *
+     * @var null
+     */
+    private $groupHandler = null;
 
-	/**
-	 * Curl object
-	 *
-	 * @var null
-	 */
-	private $curl = null;
+    /**
+     * Curl object
+     *
+     * @var null
+     */
+    private $curl = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $uuid
-	 * @param User $user
-	 */
-	public function __construct($uuid, User $user) {
-		$this->setAuthenticator(new Authenticator());
-		$this->setUuid($uuid);
-		$this->setUser($user);
-		$this->setGroupHandler(new \Group());
-		$this->setCurl(new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
-	}
+    /**
+     * Constructor
+     *
+     * @param $uuid
+     * @param User $user
+     */
+    public function __construct($uuid, User $user)
+    {
+        $this->setAuthenticator(new Authenticator());
+        $this->setUuid($uuid);
+        $this->setUser($user);
+        $this->setGroupHandler(new \Group());
+        $this->setCurl(new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
+    }
 
-	/**
-	 * Spawn an iframe
-	 */
-	public function render() {
+    /**
+     * Spawn an iframe
+     */
+    public function render()
+    {
 
-		/* Handle postfields different from student viewers and teacher/superuser viewers
-		 */
-		if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
-			$postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
-		}
-		else if ($this->getGroupHandler()->isStaff($this->getUser()->getId()) || $this->getGroupHandler()->isSuperuser($this->getUser()->getId())) {
-			$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+        /* Handle postfields different from student viewers and teacher/superuser viewers
+         */
+        if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+        } else {
+            if ($this->getGroupHandler()->isStaff($this->getUser()->getId()) || $this->getGroupHandler()->isSuperuser(
+                        $this->getUser()->getId()
+                    )
+            ) {
+                $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
-			$postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
-		}
+                $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid(
+                )}&editable=true&user={$userTuple}";
+            }
+        }
 
-		/* Bicep curl
-		 */
-		$this->getCurl()->addOptions(array(
-			CURLOPT_POSTFIELDS => $postFields,
-			CURLOPT_POST => true,
-		));
+        /* Bicep curl
+         */
+        $this->getCurl()->addOptions(
+            array(
+                CURLOPT_POSTFIELDS => $postFields,
+                CURLOPT_POST => true,
+            )
+        );
 
-		$this->getCurl()->exec();
+        $this->getCurl()->exec();
 
-		$result = json_decode($this->getCurl()->getResult());
+        $result = json_decode($this->getCurl()->getResult());
 
-		return json_encode(array(
-			'url' => "https://crocodoc.com/view/{$result->session}",
-			'errors' => $this->getCurl()->getErrors(),
-			'path' => getcwd()
-		));
-	}
+        return json_encode(
+            array(
+                'url' => "https://crocodoc.com/view/{$result->session}",
+                'errors' => $this->getCurl()->getErrors(),
+                'path' => getcwd()
+            )
+        );
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set user
-	 *
-	 * @param null $user
-	 */
-	private function setUser($user) {
-		$this->user = $user;
-	}
+    /**
+     * Set user
+     *
+     * @param null $user
+     */
+    private function setUser($user)
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * Get user
-	 *
-	 * @return null
-	 */
-	private function getUser() {
-		return $this->user;
-	}
+    /**
+     * Get user
+     *
+     * @return null
+     */
+    private function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * Set uuid
-	 *
-	 * @param string $uuid
-	 */
-	private function setUuid($uuid) {
-		$this->uuid = $uuid;
-	}
+    /**
+     * Set uuid
+     *
+     * @param string $uuid
+     */
+    private function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+    }
 
-	/**
-	 * Get uuid
-	 *
-	 * @return string
-	 */
-	private function getUuid() {
-		return $this->uuid;
-	}
+    /**
+     * Get uuid
+     *
+     * @return string
+     */
+    private function getUuid()
+    {
+        return $this->uuid;
+    }
 
-	/**
-	 * Set authenticator
-	 *
-	 * @param null $authenticator
-	 */
-	private function setAuthenticator($authenticator) {
-		$this->authenticator = $authenticator;
-	}
+    /**
+     * Set authenticator
+     *
+     * @param null $authenticator
+     */
+    private function setAuthenticator($authenticator)
+    {
+        $this->authenticator = $authenticator;
+    }
 
-	/**
-	 * Get authenticator
-	 *
-	 * @return null
-	 */
-	private function getAuthenticator() {
-		return $this->authenticator;
-	}
+    /**
+     * Get authenticator
+     *
+     * @return null
+     */
+    private function getAuthenticator()
+    {
+        return $this->authenticator;
+    }
 
-	/**
-	 * Set group handler
-	 *
-	 * @param null $groupHandler
-	 */
-	private function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+     * Set group handler
+     *
+     * @param null $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
 
-	/**
-	 * Get group handler
-	 *
-	 * @return null
-	 */
-	private function getGroupHandler() {
-		return $this->groupHandler;
-	}
+    /**
+     * Get group handler
+     *
+     * @return null
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
 
-	/**
-	 * Set curl
-	 *
-	 * @param null $curl
-	 */
-	private function setCurl($curl) {
-		$this->curl = $curl;
-	}
+    /**
+     * Set curl
+     *
+     * @param null $curl
+     */
+    private function setCurl($curl)
+    {
+        $this->curl = $curl;
+    }
 
-	/**
-	 * Get curl
-	 *
-	 * @return null
-	 */
-	private function getCurl() {
-		return $this->curl;
-	}
+    /**
+     * Get curl
+     *
+     * @return null
+     */
+    private function getCurl()
+    {
+        return $this->curl;
+    }
 }
