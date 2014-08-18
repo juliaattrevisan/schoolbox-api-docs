@@ -40,8 +40,16 @@ class Task {
 		$this->start = microtime(true);
 	}
 
-	public function append($data) {
+
+    /**
+     * Append the given data
+     *
+     * @param string $data
+     * @return self
+     */
+    public function append($data) {
 		$this->data .= $data;
+        return $this;
 	}
 
 	/**
