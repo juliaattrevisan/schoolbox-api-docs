@@ -491,91 +491,102 @@ class Group extends DeprecatedModel
 			return DENY_ACCESS;
 	}
 
-	function isStudent($userID = 0)
-	{
-		// checks if user is a student
-		// default to current user
-		if ($userID > 0) {
-			$userHandler = new User;
-			$user = $userHandler->getByID($userID);
-			$groupID = $user['group_id'];
-		} else if (is_numeric($_SESSION['gid'])) {
-			$groupID = $_SESSION['gid'];
-		} else
-			return false;
+    /**
+     * Synonymous for isGuest(), isStudent(), isParent() and isStaff()
+     *
+     * @param $userId
+     * @param $type
+     * @return bool
+     */
+    private function isUserOfType($userId, $type) {
+        // checks if user is of $type
+        // default to current user
+        if ($userId > 0) {
+            $userHandler = new User();
+            $user = $userHandler->getByID($userId);
+            $groupID = $user['group_id'];
+        } else if (is_numeric($_SESSION['gid'])) {
+            $groupID = $_SESSION['gid'];
+        } else {
+            return false;
+        }
 
-		if ($this->getGroupType($groupID) == Group::STUDENT_GROUP_TYPE) {
-			return true;
-		} else {
-			return false;
-		}
+        if ($this->getGroupType($groupID) == $type) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * So there's this Guest account type nobody knew about for a
+     * few thousand years that's been resurrected like The Sun God
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function isGuest($userID = 0)
+    {
+        return $this->isUserOfType($userID, Group::GUEST_GROUP_TYPE);
+    }
+
+    /**
+     * Find out if the userID belongs to a student
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function isStudent($userID = 0)
+    {
+        return $this->isUserOfType($userID, Group::STUDENT_GROUP_TYPE);
+    }
+
+    /**
+     * Find out if the userID belongs to a parent
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function isParent($userID = 0)
+    {
+        return $this->isUserOfType($userID, Group::PARENT_GROUP_TYPE);
+    }
+
+    /**
+     * Find out if the userID belongs to a staff
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function isStaff($userID = 0)
+	{
+        return $this->isUserOfType($userID, Group::STAFF_GROUP_TYPE);
 	}
 
-	/*
-	 * isSuperuser
-	 * Find out if the current id belongs to a superuser.
-	 */
+    /**
+     * Find out if the userID belongs to a superuser.
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function isSuperuser($userID = 0)
+    {
 
-	function isSuperuser($userID = 0)
-	{
+        // default to current user
+        if ($userID > 0) {
+            $userHandler = new User;
+            $user = $userHandler->getByID($userID);
 
-		// default to current user
-		if ($userID > 0) {
-			$userHandler = new User;
-			$user = $userHandler->getByID($userID);
+            if ($user['su']) {
+                return true;
+            } else {
+                return false;
+            }
+        } else
+            return $_SESSION['su'] == 1 ? true : false;
+    }
 
-			if ($user['su']) {
-				return true;
-			} else {
-				return false;
-			}
-		} else
-			return $_SESSION['su'] == 1 ? true : false;
-	}
-
-	function isStaff($userID = 0)
-	{
-		// checks if user is staff
-		// default to current user
-		if ($userID > 0) {
-			$userHandler = new User;
-			$user = $userHandler->getByID($userID);
-			$groupID = $user['group_id'];
-		} elseif (is_numeric($_SESSION['gid'])) {
-			$groupID = $_SESSION['gid'];
-		} else
-			return false;
-
-		if ($this->getGroupType($groupID) == Group::STAFF_GROUP_TYPE) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	function isParent($userID = 0)
-	{
-		// checks if user is a parent
-		// default to current user
-		if ($userID > 0) {
-			$userHandler = new User;
-			$user = $userHandler->getByID($userID);
-			$groupID = $user['group_id'];
-		} elseif (is_numeric($_SESSION['gid'])) {
-			$groupID = $_SESSION['gid'];
-		}
-		else {
-			return false;
-		}
-
-		if ($this->getGroupType($groupID) == Group::PARENT_GROUP_TYPE) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	function isParentOfChild($childID)
+    function isParentOfChild($childID)
 	{
 		if (is_array($_SESSION['children'])) {
 			foreach ($_SESSION['children'] as $child) {
