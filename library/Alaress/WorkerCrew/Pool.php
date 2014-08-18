@@ -16,10 +16,12 @@ use Alaress\WorkerCrew\Worker\IO\IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\ErrorIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\LogIOListener;
+use Alaress\WorkerCrew\Worker\Task;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use Evenement\EventEmitter;
 use InvalidArgumentException;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
@@ -29,16 +31,12 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
  * Class Pool
  * @package AlaressWorkerCrew
  */
-class Pool extends EventEmitter {
+class Pool extends EventEmitter implements PoolInterface {
 
 	const DATA_IN   = 0;
 	const DEBUG_OUT = 1;
 	const DEBUG_ERR = 2;
 	const DATA_OUT  = 3;
-
-    const HARD = true;
-    const SOFT = false;
-
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -53,10 +51,10 @@ class Pool extends EventEmitter {
 	protected $log;
 
     /** @var StreamListener[] */
-    protected $ioListeners;
+    protected $ioListeners = array();
 
     /** @var array (IOStream[][]) */
-    protected $streams;
+    protected $streams = array();
 
 
     /**
@@ -73,9 +71,9 @@ class Pool extends EventEmitter {
         $this->workers     = $this->strat->newWorkerBundle();
 
         $this->ioListeners = array(
-            self::DATA_OUT  => new DataIOListener($log, $this->workers, $strat, $msgHandler, $this),
+            self::DATA_OUT  => new DataIOListener($log, $this, $strat, $msgHandler),
             self::DEBUG_OUT => new LogIOListener($log),
-            self::DEBUG_ERR => new ErrorIOListener($log),
+            self::DEBUG_ERR => new ErrorIOListener($log, $this),
         );
     }
 
@@ -102,37 +100,43 @@ class Pool extends EventEmitter {
         $pids = array_keys($this->streams);
 
         foreach($pids as $pid) {
-            $worker  = $this->workers->getByProcessId($pid);
-            $status  = $worker->getStatus();
-            $process = $worker->getCommand();
-            $task    = $worker->getTask();
-            $cmd     = $task->getCommand();
-            $args    = $task->getArgs();
-            $finish  = $task->getFinish();
-            $start   = $task->getStart();
-            $elapsed = (microtime(true) - $start) * 1000;
+            try {
+                $worker  = $this->workers->getByProcessId($pid);
+                $status  = $worker->getStatus();
+                $process = $worker->getCommand();
+                $task    = $worker->getTask();
+                $cmd     = $task->getCommand();
+                $args    = $task->getArgs();
+                $finish  = $task->getFinish();
+                $start   = $task->getStart();
+                $elapsed = (microtime(true) - $start) * 1000;
 
-            $this->log->debug(sprintf('Worker {%5d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
+                $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
 
-            // check for an unexpected finish state
-            if($finish && $status != Worker::READY) {
-                $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
-                $worker->markTaskComplete();
+                // check for an unexpected finish state
+                if($finish && $status != Worker::READY) {
+                    $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
+                    $worker->markTaskComplete();
+                }
+
+                // if it's over the hard limit, terminate it
+                elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::HARD)) {
+                    $this->log->error("Worker {{$pid}} has exceeded hard execution timeout");
+                    $this->releaseWorker($pid, self::HARD);
+                }
+
+                // if it's over the soft limit, let it down gently
+                elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::SOFT)) {
+                    $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout");
+                    $this->releaseWorker($pid, self::SOFT);
+                }
+                else {
+                    $this->log->debug("Worker {{$pid}} fine");
+                }
             }
-
-            // if it's over the hard limit, terminate it
-            elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::HARD)) {
-                $this->log->error("Worker {{$pid}} has exceeded hard execution timeout: forcibly terminating");
-                $this->releaseWorker($pid, self::HARD);
-            }
-
-            // if it's over the soft limit, let it down gently
-            elseif($elapsed >= $this->strat->getWorkerExecutionTimeout(self::SOFT)) {
-                $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout: gently terminating");
-                $this->releaseWorker($pid, self::SOFT);
-            }
-            else {
-                $this->log->debug("Worker {{$pid}} fine");
+            catch(OutOfBoundsException $e) {
+                $this->log->warning("Worker {{$pid}} has gone away");
+                $this->detachWorker($pid);
             }
         }
 
@@ -148,26 +152,37 @@ class Pool extends EventEmitter {
      * @return string
      */
     protected function parseArgs($args) {
-        $reset = reset($args);
-
         $values = array();
 
-        foreach($reset as $v) {
-            if(is_object($v)) {
-                $value = get_class($v);
-                if(method_exists($v, 'getId')) {
-                    $value .= "({$v->getId()})";
-                }
+        if(is_string($args)) {
+            try {
+                $args = unserialize($args);
             }
-            elseif(is_array($v)) {
-                $value = json_encode($v);
+            catch(RuntimeException $e) {
+                $values[] = substr($args, 0, 128);
             }
-            else {
-                $value = "$v";
-            }
-
-            $values[] = substr($value, 0, 128);
         }
+
+        if(is_array($args)) {
+            foreach($args as $arg) {
+                $values[] = $this->parseArgs($arg);
+            }
+        }
+
+        if(is_object($args)) {
+            $value = get_class($args);
+            if(method_exists($args, 'getId')) {
+                $value .= "({$args->getId()})";
+            }
+        }
+//        elseif(is_array($v)) {
+//            $value = json_encode($v);
+//        }
+        else {
+            $value = "$args";
+        }
+
+        $values[] = substr($value, 0, 128);
 
         return implode(', ',$values);
     }
@@ -283,7 +298,7 @@ class Pool extends EventEmitter {
         }
         unset($this->streams[$pid]);
         $this->workers->detach($pid);
-        $this->log->debug("Detached $pid");
+        $this->log->debug("Detached worker {{$pid}}");
     }
 
 
@@ -459,7 +474,8 @@ class Pool extends EventEmitter {
      *
      * @param bool $hard
 	 */
-	public function releaseWorkers($hard = self::HARD) {
+	public function releaseWorkers($hard = self::RELEASE_HARD) {
+        $this->log->debug(($hard ? 'Terminating' : 'Releasing')." all workers");
         foreach(array_keys($this->streams) as $pid) {
             $this->releaseWorker($pid, $hard);
         }
@@ -472,7 +488,8 @@ class Pool extends EventEmitter {
      * @param int  $pid
      * @param bool $hard
      */
-    public function releaseWorker($pid, $hard = self::HARD) {
+    public function releaseWorker($pid, $hard = self::RELEASE_HARD) {
+        $this->log->info(($hard ? 'Terminating' : 'Releasing')." worker {{$pid}}", array('char' => '-'));
         if($hard) {
             $this->workers->terminateProcess($pid);
             $this->detachWorker($pid);
@@ -480,6 +497,68 @@ class Pool extends EventEmitter {
         else {
             $this->workers->releaseProcess($pid);
         }
+    }
+
+
+    /**
+     * Returns the PID of the process associated with the given stream or socket
+     *
+     * @param resource $resource
+     * @throws OutOfBoundsException
+     * @return int
+     */
+    public function getProcessIdByResource($resource)
+    {
+        return $this->workers->getProcessIdByResource($resource);
+    }
+
+
+    /**
+     * Returns the Task currently assigned to the worker with the given PID.
+     * Will throw OutOfBoundsException if no Worker with the given PID is found.
+     *
+     * @param int $pid
+     * @throws OutOfBoundsException
+     * @return Task
+     */
+    public function getCurrentTaskByProcessId($pid)
+    {
+        return $this->workers->getByProcessId($pid)->getTask();
+    }
+
+
+    /**
+     * Request to set the status of the worker with the given PID.
+     * The implementing class may elect to ignore this.
+     *
+     * @param int $pid
+     * @param int $status
+     * @throws OutOfBoundsException
+     * @return int
+     */
+    public function setWorkerStatus($pid, $status)
+    {
+        // first, set the worker to the given state (throws OOB if necessary)
+        $worker = $this->workers->getByProcessId($pid);
+
+        $this->log->debug("Attempting {{$pid}} transition from {$worker->getStatus()} to $status");
+
+        $worker->setStatus($status);
+
+        // return the result, knowing it may not have changed
+        return $worker->getStatus();
+    }
+
+
+    /**
+     * Calculates the worker state based on the Event supplied.
+     *
+     * @param string $data
+     * @return int
+     */
+    public function calculateState($data)
+    {
+        return $this->strat->checkState($data);
     }
 
 }
