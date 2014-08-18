@@ -10,6 +10,8 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use ReflectionClass;
+use ReflectionMethod;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -149,6 +151,17 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 			'key'       => $label
 		));
 
+        $availableMethods = array();
+
+        // turns out we have to use reflection for this
+        $rthis = new ReflectionClass($this);
+        // get all public, non-static methods
+        foreach($rthis->getMethods(ReflectionMethod::IS_PUBLIC & ~ReflectionMethod::IS_STATIC) as $m) {
+            if(strpos($m->name, 'notify') === 0) {
+                $availableMethods[$m->name] = true;
+            }
+        }
+
 		$callbacks = array();
 
 		foreach($sourceCollection as $source) {
@@ -156,6 +169,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface {
 				ucfirst(strtolower($source->getRoleType())),
 				ucfirst(strtolower($source->getKey()))
 			);
+//            if(isset($availableMethods[$method])) {
 			if(method_exists($this, $method)) {
 				$callbacks[] = array($this, $method);
 			}
