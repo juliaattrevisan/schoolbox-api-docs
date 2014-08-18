@@ -123,13 +123,14 @@ class External_Synergetic_User implements External_UserInterface {
 
 				$photo = $this->getDatabase()->getRow($query);
 
-				/* Purge all previously transformed copies
+				/* Purge all previously transformed copies is now done in
+				 * Alaress_Image_Cache_Portrait->purgeOldTransformations().
 				 */
-				$pattern = Config::get('stream_dir') . "/portrait/" . escapeshellarg($externalUserId) . '-*.dat';
-
-				foreach (glob($pattern) as $oldCacheFile) {
-					unlink($oldCacheFile);
-				}
+//				$pattern = Config::get('stream_dir') . "/portrait/" . escapeshellarg($externalUserId) . '-*.dat';
+//
+//				foreach (glob($pattern) as $oldCacheFile) {
+//					unlink($oldCacheFile);
+//				}
 
 				/* Save the image
 				 */
