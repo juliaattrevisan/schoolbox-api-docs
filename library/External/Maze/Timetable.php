@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Maze_Timetable
  *
@@ -7,64 +8,66 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+class External_Maze_Timetable implements External_TimetableInterface
+{
+    /**
+     * An instance of MSSQL
+     *
+     * @var null
+     */
+    private $db = null;
 
-class External_Maze_Timetable implements External_TimetableInterface {
-	/**
-	 * An instance of MSSQL
-	 *
-	 * @var null
-	 */
-	private $db = null;
+    /**
+     * Helper
+     *
+     * @var null
+     */
+    private $helper = null;
 
-	/**
-	 * Helper
-	 *
-	 * @var null
-	 */
-	private $helper = null;
+    /**
+     * An instance of CampusMapper
+     *
+     * @var null
+     */
+    private $campusMapper = null;
 
-	/**
-	 * An instance of CampusMapper
-	 *
-	 * @var null
-	 */
-	private $campusMapper = null;
+    /**
+     * An instance of Group
+     *
+     * @var Group
+     */
+    private $groupHandler = null;
 
-	/**
-	 * An instance of Group
-	 *
-	 * @var Group
-	 */
-	private $groupHandler = null;
+    /**
+     * Array key
+     *
+     * @var string
+     */
+    private $timetablePeriodLabel = 'TH_RLABEL';
 
-	/**
-	 * Array key
-	 *
-	 * @var string
-	 */
-	private $timetablePeriodLabel = 'TH_RLABEL';
+    /**
+     * Array key
+     *
+     * @var string
+     */
+    private $timetableDayLabel = 'TH_CLABEL';
 
-	/**
-	 * Array key
-	 *
-	 * @var string
-	 */
-	private $timetableDayLabel = 'TH_CLABEL';
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setDb(MSSQL::getInstance());
+        $this->setHelper(new External_Maze_Helper());
+        $this->setCampusMapper(new \Schoolbox\CampusMapper());
+        $this->setGroupHandler(new Group());
+    }
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setDb(MSSQL::getInstance());
-		$this->setHelper(new External_Maze_Helper());
-		$this->setCampusMapper(new \Schoolbox\CampusMapper());
-		$this->setGroupHandler(new Group());
-	}
-
-	/**
-	 * Test method for experimentation
-	 */
-	public function getTest() {
+    /**
+     * Test method for experimentation
+     */
+    public function getTest()
+    {
 //		$query = "
 //			SELECT *
 //			FROM TH
@@ -91,149 +94,156 @@ class External_Maze_Timetable implements External_TimetableInterface {
 //		$result2 = $this->getDb()->getAll($query);
 //
 //		new \Alaress_ThreeProbe(null, $result1, null);
-	}
+    }
 
-	/**
-	 * The headings of the timetable, going horizontally
-	 * from left to right containing all the times and day numbers
-	 *
-	 * @param $campusId
-	 * @param int $day
-	 * @return array
-	 */
-	public function getTimetableDefinition($campusId, $day=0) {
-		$query = "
+    /**
+     * The headings of the timetable, going horizontally
+     * from left to right containing all the times and day numbers
+     *
+     * @param $campusId
+     * @param int $day
+     * @return array
+     */
+    public function getTimetableDefinition($campusId, $day = 0)
+    {
+        $query = "
 			SELECT TOP 50 *
 			FROM TH
 			INNER JOIN TCTD ON TH.THKEY = TCTD.QKEY
 			WHERE THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 		";
 
-		$result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
 
-		$timetableDef = array();
+        $timetableDef = array();
 
-		if (count($result) && is_array($result)) {
-			$definition = $result[0];
+        if (count($result) && is_array($result)) {
+            $definition = $result[0];
 
-			for ($i = 1; $i <= $definition['THROWS']; $i++) {
-				$dayTempKey = $this->getTimetableDayLabel($i);
+            for ($i = 1; $i <= $definition['THROWS']; $i++) {
+                $dayTempKey = $this->getTimetableDayLabel($i);
 
-				/* Day-specific e.g. for Dashboard
-				 */
-				if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
+                /* Day-specific e.g. for Dashboard
+                 */
+                if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
 
-					/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
-					 */
-					$periodTempKey = $this->getTimetablePeriodLabel($i);
+                    /* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+                     */
+                    $periodTempKey = $this->getTimetablePeriodLabel($i);
 
-					/* Ram it in
-					 */
-					$timetableDef['desc'][] = $definition[$periodTempKey];
-					$timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i-1]['TIME_START']);
-					$timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i-1]['TIME_END']);
-					$timetableDef['number'][] = $i;
-					$timetableDef['sequence'][] = $i;
-				}
-			}
-		}
+                    /* Ram it in
+                     */
+                    $timetableDef['desc'][] = $definition[$periodTempKey];
+                    $timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_START']);
+                    $timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_END']);
+                    $timetableDef['number'][] = $i;
+                    $timetableDef['sequence'][] = $i;
+                }
+            }
+        }
 
-		return $timetableDef;
-	}
+        return $timetableDef;
+    }
 
-	/**
-	 * Get timetable period label
-	 *
-	 * @param $i
-	 * @return string
-	 */
-	private function getTimetablePeriodLabel($i) {
-		return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
-	}
+    /**
+     * Get timetable period label
+     *
+     * @param $i
+     * @return string
+     */
+    private function getTimetablePeriodLabel($i)
+    {
+        return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
+    }
 
-	/**
-	 * Get timetable day label
-	 *
-	 * @param $i
-	 * @return string
-	 */
-	private function getTimetableDayLabel($i) {
-		return $this->timetableDayLabel . ($i < 10 ? 0 . $i : $i);
-	}
+    /**
+     * Get timetable day label
+     *
+     * @param $i
+     * @return string
+     */
+    private function getTimetableDayLabel($i)
+    {
+        return $this->timetableDayLabel . ($i < 10 ? 0 . $i : $i);
+    }
 
-	/**
-	 * Get the current day number
-	 *
-	 * @param $campusId
-	 * @param int $date
-	 * @return bool
-	 */
-	public function getDayNumber($campusId, $date = 0) {
-		$query = "
+    /**
+     * Get the current day number
+     *
+     * @param $campusId
+     * @param int $date
+     * @return bool
+     */
+    public function getDayNumber($campusId, $date = 0)
+    {
+        $query = "
 			SELECT TOP 1 QCOL
 			FROM TCTQ
 			INNER JOIN TH ON TCTQ.QKEY = TH.THKEY
 			WHERE TCTQKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
 		";
 
-		$result = $this->getDb()->getRow($query);
+        $result = $this->getDb()->getRow($query);
 
-		return $result['QCOL'];
-	}
+        return $result['QCOL'];
+    }
 
-	/**
-	 * Calculates the current period based on the current time
-	 *
-	 * The returned data structure is required for Dashboard Timetable Controller
-	 *
-	 * @param $campusId
-	 * @return int
-	 */
-	public function getPeriodNumber($campusId) {
-		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+    /**
+     * Calculates the current period based on the current time
+     *
+     * The returned data structure is required for Dashboard Timetable Controller
+     *
+     * @param $campusId
+     * @return int
+     */
+    public function getPeriodNumber($campusId)
+    {
+        $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$allTimes = $this->getPeriodTimes();
+        $allTimes = $this->getPeriodTimes();
 
-		if (is_array($allTimes) && count($allTimes)) {
-			$i = 1;
+        if (is_array($allTimes) && count($allTimes)) {
+            $i = 1;
 
-			foreach($allTimes as $currentTime) {
-				if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
-					if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
-						return array(
-							'PeriodNumber' => $i,
-							'PeriodNumberSeq' => 1,
-						);
-					}
-				}
+            foreach ($allTimes as $currentTime) {
+                if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
+                    if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
+                        return array(
+                            'PeriodNumber' => $i,
+                            'PeriodNumberSeq' => 1,
+                        );
+                    }
+                }
 
-				$i++;
-			}
-		}
+                $i++;
+            }
+        }
 
-		return array(
-			'PeriodNumber' => 0,
-			'PeriodNumberSeq' => 0,
-		);
-	}
+        return array(
+            'PeriodNumber' => 0,
+            'PeriodNumberSeq' => 0,
+        );
+    }
 
-	/**
-	 * Return a user's timetable for a specific day
-	 *
-	 * @param $externalUserId
-	 * @param $userId
-	 * @param $campusId int ignored
-	 * @param $dayNumber
-	 * @return array|bool
-	 */
-	public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber) {
-		if ($this->getGroupHandler()->isStudent($userId)) {
-			return $this->getStudentTimetable($externalUserId, $dayNumber);
-		}
-		else if ($this->getGroupHandler()->isStaff($userId)) {
-			return $this->getStaffTimetable($externalUserId, $dayNumber);
-		}
-	}
+    /**
+     * Return a user's timetable for a specific day
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param $campusId int ignored
+     * @param $dayNumber
+     * @return array|bool
+     */
+    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    {
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            return $this->getStudentTimetable($externalUserId, $dayNumber);
+        } else {
+            if ($this->getGroupHandler()->isStaff($userId)) {
+                return $this->getStaffTimetable($externalUserId, $dayNumber);
+            }
+        }
+    }
 
     /**
      * Determine whether you're in a weekend
@@ -241,7 +251,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
      * @param $date
      * @return bool
      */
-    private function isWeekend($date) {
+    private function isWeekend($date)
+    {
         $object = new \Alaress_Date_Format(strtotime($date), 'U');
 
         if ($object->getUsingFormat('N') > 5) {
@@ -257,7 +268,8 @@ class External_Maze_Timetable implements External_TimetableInterface {
      * @param $date
      * @return Alaress_Date_Format
      */
-    private function nextMonday($date) {
+    private function nextMonday($date)
+    {
         $object = new \Alaress_Date_Format(strtotime($date), 'U');
 
         $dayIndex = $object->getUsingFormat('N');
@@ -273,38 +285,39 @@ class External_Maze_Timetable implements External_TimetableInterface {
         return $object->getUsingFormat('M j Y');
     }
 
-	/**
-	 * Spawn a staff timetable for a particular user and day number
-	 *
-	 * @param $externalUserId
-	 * @param $dayNumber
-	 * @return array
-	 */
-	public function getStaffTimetable($externalUserId, $dayNumber) {
-		$userMapper = new \Schoolbox\UserMapper();
-		$user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-		$user = $userMapper->findById($user->getId());
+    /**
+     * Spawn a staff timetable for a particular user and day number
+     *
+     * @param $externalUserId
+     * @param $dayNumber
+     * @return array
+     */
+    public function getStaffTimetable($externalUserId, $dayNumber)
+    {
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+        $user = $userMapper->findById($user->getId());
 
-		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
-		$finalTimetable = array();
+        $finalTimetable = array();
 
-		foreach($definition['number'] as $index) {
-			$finalTimetable[$index-1] = array(
-				'periodName' => $definition['desc'][$index-1],
-				'periodStart' => $definition['start'][$index-1],
-				'periodEnd' => $definition['end'][$index-1],
-				'periodNumber' => $index,
-				'periodSequence' => 1,
-				'description' => '',
-				'code' => '',
-				'room' => '',
-				'staffID' => '',
-				'staffTitle' => '',
-				'staffFirstname' => '',
-				'staffSurname' => '',
-			);
-		}
+        foreach ($definition['number'] as $index) {
+            $finalTimetable[$index - 1] = array(
+                'periodName' => $definition['desc'][$index - 1],
+                'periodStart' => $definition['start'][$index - 1],
+                'periodEnd' => $definition['end'][$index - 1],
+                'periodNumber' => $index,
+                'periodSequence' => 1,
+                'description' => '',
+                'code' => '',
+                'room' => '',
+                'staffID' => '',
+                'staffTitle' => '',
+                'staffFirstname' => '',
+                'staffSurname' => '',
+            );
+        }
 
         /* Accelerate to the next Monday if we're in a weekend
          */
@@ -330,79 +343,85 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			ORDER BY QCOL, QROW
 		";
 
-		$allRows = $this->getDb()->getAll($query);
+        $allRows = $this->getDb()->getAll($query);
 
-		if (is_array($allRows) && count($allRows)) {
-			foreach ($allRows as $currentRow) {
-				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-				$finalTimetable[$currentRow['QROW']-1]['code'] = $this->getHelper()->generateClassCode($currentRow['SUBJ'], $currentRow['CLASS']);
+        if (is_array($allRows) && count($allRows)) {
+            foreach ($allRows as $currentRow) {
+                $finalTimetable[$currentRow['QROW'] - 1]['description'] = $currentRow['FULLNAME'];
+                $finalTimetable[$currentRow['QROW'] - 1]['code'] = $this->getHelper()->generateClassCode(
+                    $currentRow['SUBJ'],
+                    $currentRow['CLASS']
+                );
 
-				/* Find the teacher if one is assigned
-				 */
-				if (strlen($currentRow['T1TEACH']) || strlen($currentRow['T2TEACH'])) {
-					if ($currentRow['T1TEACH'] == $externalUserId) {
-						$key = 'T1TEACH';
-					}
-					else if ($currentRow['T2TEACH'] == $externalUserId) {
-						$key = 'T2TEACH';
-					}
+                /* Find the teacher if one is assigned
+                 */
+                if (strlen($currentRow['T1TEACH']) || strlen($currentRow['T2TEACH'])) {
+                    if ($currentRow['T1TEACH'] == $externalUserId) {
+                        $key = 'T1TEACH';
+                    } else {
+                        if ($currentRow['T2TEACH'] == $externalUserId) {
+                            $key = 'T2TEACH';
+                        }
+                    }
 
-					try {
-						$userMapper = new \Schoolbox\UserMapper();
-						$user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
+                    try {
+                        $userMapper = new \Schoolbox\UserMapper();
+                        $user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
 
-						/* Paste teacher in
-						 */
-						$finalTimetable[$currentRow['QROW']-1]['staffID'] = $externalUserId;
-						$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
-						$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
-						$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
-					}
-					catch (Exception $e) {
-					}
-				}
+                        /* Paste teacher in
+                         */
+                        $finalTimetable[$currentRow['QROW'] - 1]['staffID'] = $externalUserId;
+                        $finalTimetable[$currentRow['QROW'] - 1]['staffTitle'] = $user->getTitle();
+                        $finalTimetable[$currentRow['QROW'] - 1]['staffFirstname'] = $user->getFirstname();
+                        $finalTimetable[$currentRow['QROW'] - 1]['staffSurname'] = $user->getLastname();
+                    } catch (Exception $e) {
+                    }
+                }
 
-				/* Samuel, Samuel, Samuel...
-				 */
-				$finalTimetable[$currentRow['QROW']-1]['room'] = trim("{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}");
-			}
-		}
+                /* Samuel, Samuel, Samuel...
+                 */
+                $finalTimetable[$currentRow['QROW'] - 1]['room'] = trim(
+                    "{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}"
+                );
+            }
+        }
 
-		return $finalTimetable;
-	}
+        return $finalTimetable;
+    }
 
-	/**
-	 * Return a student's timetable for a specific day
-	 *
-	 * @param $externalUserId
-	 * @param $dayNumber
-	 * @return mixed
-	 */
-	public function getStudentTimetable($externalUserId, $dayNumber) {
-		$userMapper = new \Schoolbox\UserMapper();
-		$user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-		$user = $userMapper->findById($user->getId());
+    /**
+     * Return a student's timetable for a specific day
+     *
+     * @param $externalUserId
+     * @param $dayNumber
+     * @return mixed
+     */
+    public function getStudentTimetable($externalUserId, $dayNumber)
+    {
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+        $user = $userMapper->findById($user->getId());
 
-		$definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
-		$finalTimetable = array();
+        $finalTimetable = array();
 
-		foreach($definition['number'] as $index) {
-			$finalTimetable[$index-1] = array(
-				'periodName' => $definition['desc'][$index-1],
-				'periodStart' => $definition['start'][$index-1],
-				'periodEnd' => $definition['end'][$index-1],
-				'periodNumber' => $index,
-				'periodSequence' => 1,
-				'description' => '',
-				'code' => '',
-				'room' => '',
-				'staffID' => '',
-				'staffTitle' => '',
-				'staffFirstname' => '',
-				'staffSurname' => '',
-			);
-		}
+        foreach ($definition['number'] as $index) {
+            $finalTimetable[$index - 1] = array(
+                'periodName' => $definition['desc'][$index - 1],
+                'periodStart' => $definition['start'][$index - 1],
+                'periodEnd' => $definition['end'][$index - 1],
+                'periodNumber' => $index,
+                'periodSequence' => 1,
+                'description' => '',
+                'code' => '',
+                'room' => '',
+                'staffID' => '',
+                'staffTitle' => '',
+                'staffFirstname' => '',
+                'staffSurname' => '',
+            );
+        }
 
         /* Accelerate to the next Monday if we're in a weekend
          */
@@ -414,7 +433,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 
         /* Proceed "normally"
          */
-		$query = "
+        $query = "
 			SELECT
 				THTQ.QROW, THTQ.QCOL, THTQ.SUBJ, THTQ.CLASS, THTQ.R1ROOM, THTQ.R2ROOM,
 				SU.FULLNAME,
@@ -432,62 +451,68 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			AND STMA.SKEY = '{$externalUserId}'
 		";
 
-		$allRows = $this->getDb()->getAll($query);
+        $allRows = $this->getDb()->getAll($query);
 
-		if (is_array($allRows) && count($allRows)) {
-			foreach ($allRows as $currentRow) {
-				$finalTimetable[$currentRow['QROW']-1]['description'] = $currentRow['FULLNAME'];
-				$finalTimetable[$currentRow['QROW']-1]['code'] = $this->getHelper()->generateClassCode($currentRow['SUBJ'], $currentRow['CLASS']);
+        if (is_array($allRows) && count($allRows)) {
+            foreach ($allRows as $currentRow) {
+                $finalTimetable[$currentRow['QROW'] - 1]['description'] = $currentRow['FULLNAME'];
+                $finalTimetable[$currentRow['QROW'] - 1]['code'] = $this->getHelper()->generateClassCode(
+                    $currentRow['SUBJ'],
+                    $currentRow['CLASS']
+                );
 
-				/* Find the teacher - just choose the first one with content
-				 */
-				$teacherKey = '';
+                /* Find the teacher - just choose the first one with content
+                 */
+                $teacherKey = '';
 
-				if (strlen($currentRow['T1TEACH'])) {
-					$teacherKey = $currentRow['T1TEACH'];
-				}
-				else if (strlen($currentRow['T2TEACH'])) {
-					$teacherKey = $currentRow['T2TEACH'];
-				}
+                if (strlen($currentRow['T1TEACH'])) {
+                    $teacherKey = $currentRow['T1TEACH'];
+                } else {
+                    if (strlen($currentRow['T2TEACH'])) {
+                        $teacherKey = $currentRow['T2TEACH'];
+                    }
+                }
 
-				if (strlen($teacherKey)) {
-					try {
-						$userMapper = new \Schoolbox\UserMapper();
-						$user = $userMapper->findOneByColumn('synergy_id', $teacherKey);
+                if (strlen($teacherKey)) {
+                    try {
+                        $userMapper = new \Schoolbox\UserMapper();
+                        $user = $userMapper->findOneByColumn('synergy_id', $teacherKey);
 
-						/* Paste teacher in. There are dupe records for teachers at this point,
-						 * so accept the first in the list
-						 */
-						if (!strlen($finalTimetable[$currentRow['QROW']-1]['staffID'])) {
-							$finalTimetable[$currentRow['QROW']-1]['staffID'] = $teacherKey;
-							$finalTimetable[$currentRow['QROW']-1]['staffTitle'] = $user->getTitle();
-							$finalTimetable[$currentRow['QROW']-1]['staffFirstname'] = $user->getFirstname();
-							$finalTimetable[$currentRow['QROW']-1]['staffSurname'] = $user->getLastname();
-						}
-					}
-					catch (Exception $e) {
-					}
-				}
+                        /* Paste teacher in. There are dupe records for teachers at this point,
+                         * so accept the first in the list
+                         */
+                        if (!strlen($finalTimetable[$currentRow['QROW'] - 1]['staffID'])) {
+                            $finalTimetable[$currentRow['QROW'] - 1]['staffID'] = $teacherKey;
+                            $finalTimetable[$currentRow['QROW'] - 1]['staffTitle'] = $user->getTitle();
+                            $finalTimetable[$currentRow['QROW'] - 1]['staffFirstname'] = $user->getFirstname();
+                            $finalTimetable[$currentRow['QROW'] - 1]['staffSurname'] = $user->getLastname();
+                        }
+                    } catch (Exception $e) {
+                    }
+                }
 
-				/* Samuel, Samuel, Samuel...
-				 */
-				$finalTimetable[$currentRow['QROW']-1]['room'] = trim("{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}");
-			}
-		}
+                /* Samuel, Samuel, Samuel...
+                 */
+                $finalTimetable[$currentRow['QROW'] - 1]['room'] = trim(
+                    "{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}"
+                );
+            }
+        }
 
-		return $finalTimetable;
-	}
+        return $finalTimetable;
+    }
 
-	/**
-	 * Get times for when periods begin and end
-	 *
-	 * @return array|bool
-	 */
-	private function getPeriodTimes() {
+    /**
+     * Get times for when periods begin and end
+     *
+     * @return array|bool
+     */
+    private function getPeriodTimes()
+    {
 
-		/* TODO: Some serious assumption about 14 here
-		 */
-		$query = "
+        /* TODO: Some serious assumption about 14 here
+         */
+        $query = "
 			SELECT TOP 14
 				CONVERT(VARCHAR, TIME_START, 120) AS startTime,
 				CONVERT(VARCHAR, TIME_END, 120) AS endTime
@@ -495,223 +520,238 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			WHERE QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 		";
 
-		$result = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
 
-		$processed = array();
+        $processed = array();
 
-		if (is_array($result) && count($result)) {
-			foreach($result as $currentResult) {
-				$processed[] = array(
-					'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
-					'endTime' => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
-				);
-			}
-		}
+        if (is_array($result) && count($result)) {
+            foreach ($result as $currentResult) {
+                $processed[] = array(
+                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
+                    'endTime' => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
+                );
+            }
+        }
 
-		return $processed;
-	}
+        return $processed;
+    }
 
-	/**
-	 * Return the ENTIRE timetable for a user
-	 *
-	 * @param $externalUserId
-	 * @param $userId
-	 * @param $campusId
-	 * @return array|bool
-	 */
-	public function getFullTimetable($externalUserId, $userId, $campusId) {
-		$timetable = array();
-		$allDayTimetables = array();
+    /**
+     * Return the ENTIRE timetable for a user
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param $campusId
+     * @return array|bool
+     */
+    public function getFullTimetable($externalUserId, $userId, $campusId)
+    {
+        $timetable = array();
+        $allDayTimetables = array();
 
-		/* This person's campus
-		 */
-		$campus = $this->getCampusMapper()->findById($campusId);
+        /* This person's campus
+         */
+        $campus = $this->getCampusMapper()->findById($campusId);
 
-		/* Get all the days' timetables first
-		 */
-		for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
-			$allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
-		}
+        /* Get all the days' timetables first
+         */
+        for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
+            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
+        }
 
-		/* Assemble into a 2D array
-		 * Each row represents a Period across each Day in the cycle
-		 *
-		 * [Period1 [Day1, Day2, Day3, DayN...]]
-		 * [Period2 [Day1, Day2, Day3, DayN...]]
-		 * [Period3 [Day1, Day2, Day3, DayN...]]
-		 * [PeriodN [Day1, Day2, Day3, DayN...]]
-		 * ...
-		 */
-		for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
-			$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
-			$timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
-			$timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
-			$timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
-			$timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
+        /* Assemble into a 2D array
+         * Each row represents a Period across each Day in the cycle
+         *
+         * [Period1 [Day1, Day2, Day3, DayN...]]
+         * [Period2 [Day1, Day2, Day3, DayN...]]
+         * [Period3 [Day1, Day2, Day3, DayN...]]
+         * [PeriodN [Day1, Day2, Day3, DayN...]]
+         * ...
+         */
+        for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
+            $timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
+            $timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
+            $timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
+            $timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
+            $timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
 
-			/* Put in Day classes
-			 */
-			for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
-				$timetable[$period]['day'][$day] = array(
-					'periodOn' => '',
-					'description' => $allDayTimetables[$day][$period]['description'],
-					'code' => $allDayTimetables[$day][$period]['code'],
-					'room' => $allDayTimetables[$day][$period]['room'],
-					'staffID' => $allDayTimetables[$day][$period]['staffID'],
-					'staffFirstname' => $allDayTimetables[$day][$period]['staffFirstname'],
-					'staffSurname' => $allDayTimetables[$day][$period]['staffSurname'],
-					'staffTitle' => $allDayTimetables[$day][$period]['staffTitle'],
-				);
-			}
-		}
+            /* Put in Day classes
+             */
+            for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
+                $timetable[$period]['day'][$day] = array(
+                    'periodOn' => '',
+                    'description' => $allDayTimetables[$day][$period]['description'],
+                    'code' => $allDayTimetables[$day][$period]['code'],
+                    'room' => $allDayTimetables[$day][$period]['room'],
+                    'staffID' => $allDayTimetables[$day][$period]['staffID'],
+                    'staffFirstname' => $allDayTimetables[$day][$period]['staffFirstname'],
+                    'staffSurname' => $allDayTimetables[$day][$period]['staffSurname'],
+                    'staffTitle' => $allDayTimetables[$day][$period]['staffTitle'],
+                );
+            }
+        }
 
-		return $timetable;
-	}
+        return $timetable;
+    }
 
-	/**
-	 * Retrieve the list of subjects for a user on a particular day
-	 *
-	 * @param $externalUserId
-	 * @param $dayNumber
-	 * @return bool
-	 */
-	public function getDaySubjects($externalUserId, $dayNumber) {
-	}
+    /**
+     * Retrieve the list of subjects for a user on a particular day
+     *
+     * @param $externalUserId
+     * @param $dayNumber
+     * @return bool
+     */
+    public function getDaySubjects($externalUserId, $dayNumber)
+    {
+    }
 
-	/**
-	 * give a subject code and day this function returns the period that it occurs in
-	 * Assumption made that this should be the sequence rather than period name
-	 *
-	 * @param $classCode
-	 * @param $dayNumber
-	 * @return int|bool
-	 */
-	public function getSubjectPeriod($classCode, $dayNumber) {
-	}
+    /**
+     * give a subject code and day this function returns the period that it occurs in
+     * Assumption made that this should be the sequence rather than period name
+     *
+     * @param $classCode
+     * @param $dayNumber
+     * @return int|bool
+     */
+    public function getSubjectPeriod($classCode, $dayNumber)
+    {
+    }
 
-	/**
-	 * Get the subject name given a string
-	 *
-	 * @param $classCode
-	 * @return bool
-	 */
-	public function getSubjectName($classCode) {
-		$query = "
+    /**
+     * Get the subject name given a string
+     *
+     * @param $classCode
+     * @return bool
+     */
+    public function getSubjectName($classCode)
+    {
+        $query = "
 		 	SELECT TOP 1 FULLNAME
 		 	FROM SU
 		 	WHERE SUKEY = '{$classCode}'
 		 ";
 
-		$subject = $this->getDb()->getRow($query);
+        $subject = $this->getDb()->getRow($query);
 
-		if ($subject) {
-			return $subject['FULLNAME'];
-		}
+        if ($subject) {
+            return $subject['FULLNAME'];
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * @todo Implement for MAZE connector
-	 *
-	 * @param  string $roomCode
-	 * @return array
-	 */
-	public function getRoomTimetable($roomCode) {
-		// I'm not even going to try navigating this MAZE
-		return array();
-	}
+    /**
+     * @todo Implement for MAZE connector
+     *
+     * @param  string $roomCode
+     * @return array
+     */
+    public function getRoomTimetable($roomCode)
+    {
+        // I'm not even going to try navigating this MAZE
+        return array();
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set db
-	 *
-	 * @param null $db
-	 */
-	private function setDb($db) {
-		$this->db = $db;
-	}
+    /**
+     * Set db
+     *
+     * @param null $db
+     */
+    private function setDb($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Get db
-	 *
-	 * @return MSSQL
-	 */
-	private function getDb() {
-		return $this->db;
-	}
+    /**
+     * Get db
+     *
+     * @return MSSQL
+     */
+    private function getDb()
+    {
+        return $this->db;
+    }
 
-	/**
-	 * Set helper
-	 *
-	 * @param null $helper
-	 */
-	private function setHelper($helper) {
-		$this->helper = $helper;
-	}
+    /**
+     * Set helper
+     *
+     * @param null $helper
+     */
+    private function setHelper($helper)
+    {
+        $this->helper = $helper;
+    }
 
-	/**
-	 * Get helper
-	 *
-	 * @return External_Maze_Helper
-	 */
-	private function getHelper() {
-		return $this->helper;
-	}
+    /**
+     * Get helper
+     *
+     * @return External_Maze_Helper
+     */
+    private function getHelper()
+    {
+        return $this->helper;
+    }
 
-	/**
-	 * Set campus mapper
-	 *
-	 * @param null $campusMapper
-	 */
-	private function setCampusMapper($campusMapper) {
-		$this->campusMapper = $campusMapper;
-	}
+    /**
+     * Set campus mapper
+     *
+     * @param null $campusMapper
+     */
+    private function setCampusMapper($campusMapper)
+    {
+        $this->campusMapper = $campusMapper;
+    }
 
-	/**
-	 * Get campus mapper
-	 *
-	 * @return \Schoolbox\CampusMapper
-	 */
-	private function getCampusMapper() {
-		return $this->campusMapper;
-	}
+    /**
+     * Get campus mapper
+     *
+     * @return \Schoolbox\CampusMapper
+     */
+    private function getCampusMapper()
+    {
+        return $this->campusMapper;
+    }
 
-	/**
-	 * Set group handler
-	 *
-	 * @param \Group $groupHandler
-	 */
-	private function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+     * Set group handler
+     *
+     * @param \Group $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
 
-	/**
-	 * Get group handler
-	 *
-	 * @return \Group
-	 */
-	private function getGroupHandler() {
-		return $this->groupHandler;
-	}
+    /**
+     * Get group handler
+     *
+     * @return \Group
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
 
-	/**
-	 * Set timetable period label
-	 *
-	 * @param string $timetablePeriodLabel
-	 */
-	private function setTimetablePeriodLabel($timetablePeriodLabel) {
-		$this->timetablePeriodLabel = $timetablePeriodLabel;
-	}
+    /**
+     * Set timetable period label
+     *
+     * @param string $timetablePeriodLabel
+     */
+    private function setTimetablePeriodLabel($timetablePeriodLabel)
+    {
+        $this->timetablePeriodLabel = $timetablePeriodLabel;
+    }
 
-	/**
-	 * Set timetable day label
-	 *
-	 * @param string $timetableDayLabel
-	 */
-	private function setTimetableDayLabel($timetableDayLabel) {
-		$this->timetableDayLabel = $timetableDayLabel;
-	}
+    /**
+     * Set timetable day label
+     *
+     * @param string $timetableDayLabel
+     */
+    private function setTimetableDayLabel($timetableDayLabel)
+    {
+        $this->timetableDayLabel = $timetableDayLabel;
+    }
 }
