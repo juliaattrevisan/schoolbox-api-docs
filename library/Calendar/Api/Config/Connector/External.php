@@ -14,11 +14,18 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      * Render configs into admin screen. Currently, the only setting is the
      * event type.
      *
-     * @param $page
-     * @return mixed|void
+     * @param  SitePage $page
+     * @return void
      */
     public function render($page)
     {
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+            )
+        );
+        $page->setVar('has_multiple_options_block', '');
         $this->renderEventType($page, $this->getLuEventType());
     }
 
