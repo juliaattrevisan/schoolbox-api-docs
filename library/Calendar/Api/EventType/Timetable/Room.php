@@ -108,8 +108,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setLocation($this->roomCode);
                 $event->setStartTime(new Alaress_Date_Format($classStart, 'U'));
                 $event->setEndTime(new Alaress_Date_Format($classEnd, 'U'));
-                // Currently event needs a publish date.
-                $event->setPublishDate($event->getStartTime());
+                // Let's say the event doesn't have a publish date,
+                // this gets around issue SB-5493 (where events that haven't
+                // occured yet only show to superusers)
+                $event->setPublishDate(null);
                 $event->setTitle($room['Description']);
                 $event->setCampusList($campusId);
 
