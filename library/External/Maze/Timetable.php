@@ -235,8 +235,46 @@ class External_Maze_Timetable implements External_TimetableInterface {
 		}
 	}
 
+    /**
+     * Determine whether you're in a weekend
+     *
+     * @param $date
+     * @return bool
+     */
+    private function isWeekend($date) {
+        $object = new \Alaress_Date_Format(strtotime($date), 'U');
+
+        if ($object->getUsingFormat('N') > 5) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Find next Monday
+     *
+     * @param $date
+     * @return Alaress_Date_Format
+     */
+    private function nextMonday($date) {
+        $object = new \Alaress_Date_Format(strtotime($date), 'U');
+
+        $dayIndex = $object->getUsingFormat('N');
+
+        /* Find out how may days to add to find the next Monday
+         * Saturday is 6, Sunday is 7
+         */
+        if ($dayIndex > 5) {
+            $difference = 8 - $dayIndex;
+            $object->addDays($difference);
+        }
+
+        return $object->getUsingFormat('M j Y');
+    }
+
 	/**
-	 * Spawn a staff timetbale for a particular user and day number
+	 * Spawn a staff timetable for a particular user and day number
 	 *
 	 * @param $externalUserId
 	 * @param $dayNumber
@@ -268,7 +306,17 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			);
 		}
 
-		$query = "
+        /* Accelerate to the next Monday if we're in a weekend
+         */
+        $newDate = $this->getHelper()->currentDate();
+
+        if ($this->isWeekend($newDate)) {
+            $newDate = $this->nextMonday($newDate);
+        }
+
+        /* Proceed "normally"
+         */
+        $query = "
 			SELECT *
 			FROM TH
 			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
@@ -276,7 +324,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
 			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
 			AND THTQ.QCOL = '{$dayNumber}'
 			AND (THTQ.T1TEACH = '{$externalUserId}' OR THTQ.T2TEACH = '{$externalUserId}')
 			ORDER BY QCOL, QROW
@@ -356,6 +404,16 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			);
 		}
 
+        /* Accelerate to the next Monday if we're in a weekend
+         */
+        $newDate = $this->getHelper()->currentDate();
+
+        if ($this->isWeekend($newDate)) {
+            $newDate = $this->nextMonday($newDate);
+        }
+
+        /* Proceed "normally"
+         */
 		$query = "
 			SELECT
 				THTQ.QROW, THTQ.QCOL, THTQ.SUBJ, THTQ.CLASS, THTQ.R1ROOM, THTQ.R2ROOM,
@@ -369,7 +427,7 @@ class External_Maze_Timetable implements External_TimetableInterface {
 			INNER JOIN TTTG ON THTQ.IDENT = TTTG.IDENT
 			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
 			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTTPeriod()}'
-			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+			AND TCTD.TCTDKEY = '{$newDate} 12:00:00:000AM'
 			AND THTQ.QCOL = '{$dayNumber}'
 			AND STMA.SKEY = '{$externalUserId}'
 		";
