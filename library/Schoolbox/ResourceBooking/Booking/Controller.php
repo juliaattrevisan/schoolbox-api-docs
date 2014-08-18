@@ -8,17 +8,19 @@
  */
 
 namespace Schoolbox\ResourceBooking\Booking;
+
 use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
-use DateTime;
 use Alaress_Date_Format;
+use DateTime;
+use External_Timetable;
+use Schoolbox\Calendar;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
-use Schoolbox\Calendar;
-use External_Timetable;
 
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
      * @var Mapper
@@ -50,7 +52,8 @@ class Controller extends Base {
      *
      * @param Item\Model $item
      */
-    public function book(Item\Model $item) {
+    public function book(Item\Model $item)
+    {
         /** @var Model $item */
         /** @var Item\Model $resource */
         $resource = $item;
@@ -58,15 +61,14 @@ class Controller extends Base {
         $item
             ->setResource($resource)
             ->setEvent(new Calendar\Event())
-			->setName($this->getRequest()->query['name']);
+            ->setName($this->getRequest()->query['name']);
 
         // Create datetime is unique to this method, so it can be a function.
-        $createDatetime = function($date, $time) {
+        $createDatetime = function ($date, $time) {
             if ($dateObject = DateTime::createFromFormat('Y-m-d', $date)) {
                 if ($time && ($timeObject = DateTime::createFromFormat('H:i', $time))) {
                     $dateObject->setTime($timeObject->format('H'), $timeObject->format('i'));
-                }
-                else {
+                } else {
                     $dateObject->modify('+1 hour');
                     $dateObject->setTime($dateObject->format('H'), 0);
                 }
@@ -80,7 +82,7 @@ class Controller extends Base {
             $this->request->query['startDate'],
             $this->request->query['startTime']
         );
-        $endDate = $createDatetime(
+        $endDate   = $createDatetime(
             $this->request->query['endDate'],
             $this->request->query['endTime']
         );
@@ -103,9 +105,9 @@ class Controller extends Base {
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item'       => $item,
-                    'campusList' => $this->getCampusList(),
-					'callbackUrl' => $this->getRequest()->query['callbackUrl'],
+                    'item'        => $item,
+                    'campusList'  => $this->getCampusList(),
+                    'callbackUrl' => $this->getRequest()->query['callbackUrl'],
                 ),
             )
         );
@@ -123,7 +125,8 @@ class Controller extends Base {
      * * previous: If true, gets previous date - otherwise, gets next date.
      *
      */
-    public function dateForTimetableDay() {
+    public function dateForTimetableDay()
+    {
         $campus    = $this->request->query['campus'];
         $dayNumber = $this->request->query['day'];
         $date      = strtotime($this->request->query['date']);
@@ -135,14 +138,12 @@ class Controller extends Base {
         }
         try {
             $nearestDate = $previous ?
-                $this->externalTimetableHandler->getPreviousDateForDayNumber($campus, $dayNumber, $date):
+                $this->externalTimetableHandler->getPreviousDateForDayNumber($campus, $dayNumber, $date) :
                 $this->externalTimetableHandler->getNextDateForDayNumber($campus, $dayNumber, $date);
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $code  = 400;
             $error = $e->getMessage();
-        }
-        catch (\RangeException $e) {
+        } catch (\RangeException $e) {
             $code  = 400;
             $error = $e->getMessage();
         }
@@ -150,8 +151,7 @@ class Controller extends Base {
         $data = array();
         if ($error) {
             $data['error'] = $error;
-        }
-        elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
+        } elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
             $data['date'] = $nearestDate->format('Y-m-d');
         }
         $this->response->status->setCode($code);
@@ -168,19 +168,19 @@ class Controller extends Base {
      *
      * @param Item\Model $item The resource to create a booking for.
      */
-    public function createBooking(Item\Model $item) {
+    public function createBooking(Item\Model $item)
+    {
         $bookingList = null;
 
         // Validate this item.
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item);
         if (empty($errors)) {
-
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
             $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
             $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
-            $event->setTitle("Booking: ".$item->getName());
+            $event->setTitle("Booking: " . $item->getName());
             $event->setDetail($this->getRequest()->post['notes']);
 
             // Build the booking
@@ -197,14 +197,13 @@ class Controller extends Base {
                     DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
                     $this->getRequest()->post['timetable']['campus']
                 );
-            }
-            else {
+            } else {
                 // Just save the event by itself.
                 foreach ($bookingList as $booking) {
                     $this->eventMapper->save($booking->getEvent());
                     // Save personal event relations
                     /** @var Calendar\Relation\PersonalMapper $relationMapper */
-                    /** @var Calendar\Relation\Personal       $relation */
+                    /** @var Calendar\Relation\Personal $relation */
                     $relationMapper = $this->eventMapper->getJoinMapper('personal');
                     $relation       = $relationMapper->createModel();
                     $relation->setEventId($event->getId());
@@ -218,45 +217,42 @@ class Controller extends Base {
             if (!empty($this->request->post['related_item'])) {
                 $bookingList = $this->expandBookingForRelatedItems(
                     $bookingList,
-                    $this->request->post['related_item'] ?: array()
+                    $this->request->post['related_item'] ? : array()
                 );
-            }
-            else {
+            } else {
                 // Just save the booking.
                 $this->bookingMapper->save($bookingList);
             }
-        }
-        else {
+        } else {
             $code = 400;
         }
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
 
-			/* Append the booking's id to the url, for the calling module to
-			 * process in whatever way it needs. This allows a decoupling between
-			 * Resource Booking any any modules that use it.
-			 *
-			 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
-			 */
-			$callbackUrl = '';
+            /* Append the booking's id to the url, for the calling module to
+             * process in whatever way it needs. This allows a decoupling between
+             * Resource Booking any any modules that use it.
+             *
+             * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+             */
+            $callbackUrl = '';
 
-			if (strlen($this->getRequest()->post['callbackUrl'])) {
-				$callbackUrl = $this->getRequest()->post['callbackUrl'];
-			}
+            if (strlen($this->getRequest()->post['callbackUrl'])) {
+                $callbackUrl = $this->getRequest()->post['callbackUrl'];
+            }
 
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
                     'data'   => array(
-                        'item'   => $bookingList,
-                        'errors' => $errors,
-						'callbackUrl' => $callbackUrl
+                        'item'        => $bookingList,
+                        'errors'      => $errors,
+                        'callbackUrl' => $callbackUrl
                     ),
                 )
             );
-        }
-        else {
+        } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
@@ -268,7 +264,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function update(Model $item) {
+    public function update(Model $item)
+    {
         $bookingList = null;
 
         // Perform validation, but leave this booking out of calculations.
@@ -276,16 +273,17 @@ class Controller extends Base {
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
 
         if (empty($errors)) {
-
             // Get the date and time changes.
             // These will be applied to the whole series.
-            $startDate  = $this->getDateFromForm('start_datetime');
-            $endDate    = $this->getDateFromForm('end_datetime');
-            $startDelta = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime()->getDateTimeObject(), $startDate
+            $startDate     = $this->getDateFromForm('start_datetime');
+            $endDate       = $this->getDateFromForm('end_datetime');
+            $startDelta    = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $startDate
             );
-            $endDelta = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime()->getDateTimeObject(), $endDate
+            $endDelta      = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $endDate
             );
             $isTimeChanged =
                 $startDelta->getSecondTotal() !== 0
@@ -295,10 +293,10 @@ class Controller extends Base {
             if ($this->request->post['efficacy'] === 'series') {
                 // Load whole series
                 $series = $this->bookingMapper->findSeriesBookings(
-                    $item->getId(), $item->getEvent()->getSeriesId()
+                    $item->getId(),
+                    $item->getEvent()->getSeriesId()
                 );
-            }
-            else {
+            } else {
                 // Divorce booking from its series
                 $series = new Collection();
                 $item->getEvent()->setSeriesId(null);
@@ -334,7 +332,6 @@ class Controller extends Base {
                 // Get all the related bookings for this event at this time.
                 $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
                 foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-
                     $relatedBooking = null;
                     foreach ($existingRelatedBookings as $existing) {
                         if ($existing->getResource()->getId() == $relatedResource->getId()) {
@@ -344,7 +341,7 @@ class Controller extends Base {
                     }
                     $inNew = in_array(
                         $relatedResource->getId(),
-                        $this->request->post['related_item'] ?: array()
+                        $this->request->post['related_item'] ? : array()
                     );
 
                     if ($inNew) {
@@ -356,8 +353,7 @@ class Controller extends Base {
                             if ($isTimeChanged) {
                                 $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
                             }
-                        }
-                        else {
+                        } else {
                             // create
                             $relatedBooking = new Model();
                             $relatedBooking
@@ -379,8 +375,7 @@ class Controller extends Base {
                         $booking->addRelatedBooking($relatedBooking);
                         $this->bookingMapper->save($relatedBooking);
                         $bookingList->add($relatedBooking);
-                    }
-                    elseif ($relatedBooking instanceof Model) {
+                    } elseif ($relatedBooking instanceof Model) {
                         // delete
                         $this->bookingMapper->delete($relatedBooking);
                     }
@@ -389,22 +384,21 @@ class Controller extends Base {
                 $bookingList->add($booking);
             }
             $this->bookingMapper->save($bookingList);
-        }
-        else {
+        } else {
             $code = 400;
         }
 
-		/* Append the booking's id to the url, for the calling module to
-		 * process in whatever way it needs. This allows a decoupling between
-		 * Resource Booking any any modules that use it.
-		 *
-		 * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
- 		 */
-		$callbackUrl = '';
+        /* Append the booking's id to the url, for the calling module to
+         * process in whatever way it needs. This allows a decoupling between
+         * Resource Booking any any modules that use it.
+         *
+         * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+         */
+        $callbackUrl = '';
 
-		if (strlen($this->getRequest()->post['callbackUrl'])) {
-			$callbackUrl = $this->getRequest()->post['callbackUrl'];
-		}
+        if (strlen($this->getRequest()->post['callbackUrl'])) {
+            $callbackUrl = $this->getRequest()->post['callbackUrl'];
+        }
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
@@ -412,18 +406,17 @@ class Controller extends Base {
                 array(
                     'format' => 'json',
                     'data'   => array(
-                        'item'   => $item,
-                        'errors' => $errors,
-						'callbackUrl' => $callbackUrl
+                        'item'        => $item,
+                        'errors'      => $errors,
+                        'callbackUrl' => $callbackUrl
                     ),
                 )
             );
-        }
-        else {
+        } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-			$this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
         }
     }
 
@@ -440,7 +433,8 @@ class Controller extends Base {
      *
      * @return Collection
      */
-    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems) {
+    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems)
+    {
         if (empty($relatedItems)) {
             return $bookingList;
         }
@@ -487,7 +481,7 @@ class Controller extends Base {
     ) {
         $newList = new Collection();
         foreach ($bookingList as $booking) {
-            $event = $booking->getEvent();
+            $event     = $booking->getEvent();
             $eventList = new Collection();
             switch ($recurrenceRule) {
                 case 'daily':
@@ -530,8 +524,7 @@ class Controller extends Base {
                     $newBooking->setEvent($event);
                     $newList->add($newBooking);
                 }
-            }
-            else {
+            } else {
                 // Just add the existing booking back to the collection.
                 $newList->add($booking);
             }
@@ -546,9 +539,11 @@ class Controller extends Base {
      * @param  Model      $existingBooking If provided, this is the booking that
      *                                     is being updated.
      *                                     Leave it out of conflict checks.
+     *
      * @return array
      */
-    protected function validateBookingFromPostData(Item\Model $resource, Model $existingBooking = null) {
+    protected function validateBookingFromPostData(Item\Model $resource, Model $existingBooking = null)
+    {
         // Check:
         // Beginning and end of booking are valid datetime
         $errors    = array();
@@ -556,14 +551,12 @@ class Controller extends Base {
         $endDate   = null;
         try {
             $startDate = $this->getDateFromForm('start_datetime');
-        }
-        catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             $errors['start_datetime'][] = 'invalid';
         }
         try {
             $endDate = $this->getDateFromForm('end_datetime');
-        }
-        catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             $errors['end_datetime'][] = 'invalid';
         }
 
@@ -575,8 +568,7 @@ class Controller extends Base {
             $now->setTimestamp($this->request->server['REQUEST_TIME']);
             if ($startDate < $now) {
                 $errors['start_datetime'][] = 'in_past';
-            }
-            else {
+            } else {
                 $earliest = new DateTime();
                 $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
                 if ($startDate < $earliest) {
@@ -621,20 +613,20 @@ class Controller extends Base {
             // If updating a booking - Remove the item being updated from the
             // check (because it's being moved)
             if ($existingBooking instanceof Model) {
-                $existingId = $existingBooking->getId();
+                $existingId          = $existingBooking->getId();
                 $conflictingBookings = $conflictingBookings->filter(
-                    function($item) use($existingId) {
+                    function ($item) use ($existingId) {
                         return $item->getId() != $existingId;
                     }
                 );
             }
             if (count($conflictingBookings)) {
                 $errors['start_datetime'][] = 'conflict';
-            }
-            elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+            } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
                 // Check if there's a timetabled class here, too.
                 $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                    $this->getUser(), array()
+                    $this->getUser(),
+                    array()
                 );
                 $roomSource->setRoomCode($roomCode);
                 $roomEvents = $roomSource->getEvents(
@@ -652,11 +644,11 @@ class Controller extends Base {
         // This allows someone to change its notes.
         if ($existingBooking instanceof Model) {
             $existingStart = new DateTime(
-                $existingBooking->getEvent()->getStartDate().' '.
+                $existingBooking->getEvent()->getStartDate() . ' ' .
                 $existingBooking->getEvent()->getStartTime()
             );
-            $existingEnd = new DateTime(
-                $existingBooking->getEvent()->getEndDate().' '.
+            $existingEnd   = new DateTime(
+                $existingBooking->getEvent()->getEndDate() . ' ' .
                 $existingBooking->getEvent()->getEndTime()
             );
             if ($startDate == $existingStart && $endDate == $existingEnd) {
@@ -679,10 +671,12 @@ class Controller extends Base {
      * Creates a date object out of the datepicker and inputs.
      *
      * @param  string $paramName
+     *
      * @return DateTime
      * @throws \UnexpectedValueException if creating the date doesn't work
      */
-    protected function getDateFromForm($paramName) {
+    protected function getDateFromForm($paramName)
+    {
         $datetime = DateTime::createFromFormat(
             'd/m/Y g:iA',
             sprintf(
@@ -704,7 +698,8 @@ class Controller extends Base {
      *
      * @return Calendar\Event
      */
-    protected function getBaseEvent() {
+    protected function getBaseEvent()
+    {
         // Create the booking, which in turn adds an event to the calendar.
         // This action saves a connected event.
         /** @var Calendar\Event $event */
@@ -734,16 +729,17 @@ class Controller extends Base {
      *
      * @param  Item\Model     $resource
      * @param  Calendar\Event $event
+     *
      * @return Model
      */
-    protected function getBookingFromEvent(Item\Model $resource, Calendar\Event $event) {
+    protected function getBookingFromEvent(Item\Model $resource, Calendar\Event $event)
+    {
         $booking = new Model();
         $booking
             ->setEvent($event)
             ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING)
-			->setName($this->getRequest()->post['name'])
-        ;
+            ->setName($this->getRequest()->post['name']);
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
@@ -757,7 +753,8 @@ class Controller extends Base {
      *
      * @param Item\Model $item
      */
-    public function bookingCalendar(Item\Model $item) {
+    public function bookingCalendar(Item\Model $item)
+    {
         // Output a calendar as JSON
         // For testing, output the calendar for current user first.
         // the find method should receive:
@@ -788,10 +785,11 @@ class Controller extends Base {
         $roomCode = $item->getRoomCode();
         if (strlen($roomCode)) {
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                $this->getUser(), array()
+                $this->getUser(),
+                array()
             );
             $roomSource->setRoomCode($item->getRoomCode());
-            $roomEvents = $roomSource->getEvents(
+            $roomEvents   = $roomSource->getEvents(
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']
             );
@@ -804,7 +802,7 @@ class Controller extends Base {
         }
 
         $output = ob_get_clean();
-        $output = json_decode('['.$output.'{}]');
+        $output = json_decode('[' . $output . '{}]');
 
         $this->getResponse()->content->set(
             array(
@@ -819,7 +817,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function edit(Model $item) {
+    public function edit(Model $item)
+    {
         $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         // Set start and end date
         $event = $item->getEvent();
@@ -834,9 +833,9 @@ class Controller extends Base {
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item'       => $item,
-                    'recurrence' => $recurrence,
-                    'campusList' => $this->getCampusList(),
+                    'item'              => $item,
+                    'recurrence'        => $recurrence,
+                    'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
                 ),
             )
@@ -848,7 +847,8 @@ class Controller extends Base {
      *
      * @return array
      */
-    protected function getCampusList() {
+    protected function getCampusList()
+    {
         $campusList = array();
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             /** @var Campus $campus */
@@ -885,13 +885,13 @@ class Controller extends Base {
      * @param Model $booking
      * @param int   $status
      */
-    protected function changeStatus(Model $booking, $status) {
+    protected function changeStatus(Model $booking, $status)
+    {
         $currentUser = $this->getUser();
-        $update      = function(Model $booking) use($status, $currentUser) {
+        $update      = function (Model $booking) use ($status, $currentUser) {
             $booking
                 ->setStatus($status)
-                ->setReviewer($currentUser)
-            ;
+                ->setReviewer($currentUser);
         };
         $update($booking);
         $this->getBookingMapper()->save($booking);
@@ -910,8 +910,9 @@ class Controller extends Base {
      *
      * @return string
      */
-    protected function getStatusChangeCallbackUrl() {
-        return $this->request->post['callbackUrl'] ?: $this->getSession()->getHistory();
+    protected function getStatusChangeCallbackUrl()
+    {
+        return $this->request->post['callbackUrl'] ? : $this->getSession()->getHistory();
     }
 
     /**
@@ -919,7 +920,8 @@ class Controller extends Base {
      *
      * @param Model $item The booking to approve.
      */
-    public function approve(Model $item) {
+    public function approve(Model $item)
+    {
         $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
@@ -929,7 +931,8 @@ class Controller extends Base {
      *
      * @param Model $item The booking to reject.
      */
-    public function reject(Model $item) {
+    public function reject(Model $item)
+    {
         $this->changeStatus($item, Status\Model::STATUS_REJECTED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
@@ -939,7 +942,8 @@ class Controller extends Base {
      *
      * @param Model $item The booking to set pending.
      */
-    public function setPending(Model $item) {
+    public function setPending(Model $item)
+    {
         $this->changeStatus($item, Status\Model::STATUS_PENDING);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
     }
@@ -956,7 +960,8 @@ class Controller extends Base {
      *
      * @param Model $item The booking to reject.
      */
-    public function cancel(Model $item) {
+    public function cancel(Model $item)
+    {
         $this->getBookingMapper()->delete($item);
         $series = $this->getSeriesBookings($item);
         if (count($series)) {
@@ -967,10 +972,7 @@ class Controller extends Base {
         // The callback URL might point to the edit page for this booking.
         // Until I implement redirects in route preloads, I'll have to check for
         // that case here.
-        if ($callbackUrl === $this->router->generate(
-            'resourceBooking.edit',
-            array('id' => $item->getId())
-        )) {
+        if ($callbackUrl === $this->router->generate('resourceBooking.edit', array('id' => $item->getId()))) {
             $callbackUrl = $this->router->generate(
                 'resourceItem.read',
                 array('id' => $item->getResource()->getId())
@@ -984,9 +986,11 @@ class Controller extends Base {
      * enabled.
      *
      * @param  Model $booking
+     *
      * @return Collection|Model[]
      */
-    protected function getSeriesBookings(Model $booking) {
+    protected function getSeriesBookings(Model $booking)
+    {
         if ($this->getRequest()->query['efficacy'] === 'series'
             || $this->getRequest()->post['efficacy'] === 'series'
         ) {
@@ -1003,32 +1007,34 @@ class Controller extends Base {
      * @param Model  $booking
      * @param string $callbackUrl
      */
-    protected function setUpdateStatusResponse(Model $booking, $callbackUrl) {
+    protected function setUpdateStatusResponse(Model $booking, $callbackUrl)
+    {
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode(200);
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
                     'data'   => array(
-                        'item' => $booking,
+                        'item'        => $booking,
                         'callbackUrl' => $callbackUrl,
                     ),
                 )
             );
-        }
-        else {
+        } else {
             // Is there a previous location to redirect to? if so use that.
             $this->getResponse()->redirect->afterPost(
-                $callbackUrl ?: $this->getSession()->getHistory()
+                $callbackUrl ? : $this->getSession()->getHistory()
             );
         }
     }
 
     /**
      * @param  Mapper $bookingMapper
+     *
      * @return $this
      */
-    public function setBookingMapper($bookingMapper) {
+    public function setBookingMapper($bookingMapper)
+    {
         $this->bookingMapper = $bookingMapper;
         return $this;
     }
@@ -1036,15 +1042,18 @@ class Controller extends Base {
     /**
      * @return Mapper
      */
-    public function getBookingMapper() {
+    public function getBookingMapper()
+    {
         return $this->bookingMapper;
     }
 
     /**
      * @param  Calendar\EventMapper $eventMapper
+     *
      * @return $this
      */
-    public function setEventMapper($eventMapper) {
+    public function setEventMapper($eventMapper)
+    {
         $this->eventMapper = $eventMapper;
         return $this;
     }
@@ -1052,15 +1061,18 @@ class Controller extends Base {
     /**
      * @return Calendar\EventMapper
      */
-    public function getEventMapper() {
+    public function getEventMapper()
+    {
         return $this->eventMapper;
     }
 
     /**
      * @param  Calendar\EventRecurrenceMapper $eventRecurrenceMapper
+     *
      * @return $this
      */
-    public function setEventRecurrenceMapper($eventRecurrenceMapper) {
+    public function setEventRecurrenceMapper($eventRecurrenceMapper)
+    {
         $this->eventRecurrenceMapper = $eventRecurrenceMapper;
         return $this;
     }
@@ -1068,15 +1080,18 @@ class Controller extends Base {
     /**
      * @return Calendar\EventRecurrenceMapper
      */
-    public function getEventRecurrenceMapper() {
+    public function getEventRecurrenceMapper()
+    {
         return $this->eventRecurrenceMapper;
     }
 
     /**
      * @param  Item\Mapper $resourceMapper
+     *
      * @return $this
      */
-    public function setResourceMapper($resourceMapper) {
+    public function setResourceMapper($resourceMapper)
+    {
         $this->resourceMapper = $resourceMapper;
         return $this;
     }
@@ -1084,15 +1099,18 @@ class Controller extends Base {
     /**
      * @return Item\Mapper
      */
-    public function getResourceMapper() {
+    public function getResourceMapper()
+    {
         return $this->resourceMapper;
     }
 
     /**
      * @param  External_Timetable $externalTimetableHandler
+     *
      * @return $this
      */
-    public function setExternalTimetableHandler($externalTimetableHandler) {
+    public function setExternalTimetableHandler($externalTimetableHandler)
+    {
         $this->externalTimetableHandler = $externalTimetableHandler;
         return $this;
     }
@@ -1100,8 +1118,8 @@ class Controller extends Base {
     /**
      * @return External_Timetable
      */
-    public function getExternalTimetableHandler() {
+    public function getExternalTimetableHandler()
+    {
         return $this->externalTimetableHandler;
     }
-
 }
