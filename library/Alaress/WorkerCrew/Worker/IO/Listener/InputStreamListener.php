@@ -87,6 +87,8 @@ class InputStreamListener extends AbstractIOStreamListener {
     {
         $data = $e->getData();
 
+        ob_start();
+
         try {
             // cease and desist received
             if($this->proto->isCancelled($data)) {
@@ -95,8 +97,7 @@ class InputStreamListener extends AbstractIOStreamListener {
             }
 
             if(!$this->buffering) {
-                $this->buffering = true;
-                $this->buffer = '';
+                $this->resetBuffer(true);
             }
 
             $this->buffer .= $data;
@@ -105,8 +106,6 @@ class InputStreamListener extends AbstractIOStreamListener {
             if(!$this->proto->isEnded($data)) {
                 return;
             }
-
-            ob_start();
 
             $this->buffering = false;
             $this->log->debug('Data transfer complete (got '.strlen($this->buffer).' bytes), starting work');
@@ -117,7 +116,6 @@ class InputStreamListener extends AbstractIOStreamListener {
                 $this->log->debug("Captured output: $buffer");
             }
 
-            ob_end_clean();
         }
         catch(IOException $e) {
             // this means the pipe or connection to an external service has been broken
@@ -127,6 +125,7 @@ class InputStreamListener extends AbstractIOStreamListener {
         catch(ErrorException $e) {
             $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
             $this->log->warning($msg);
+            $this->writer->write($this->proto->cancel());
         }
         catch(PDOException $e) {
             $this->log->emergency("PDOException: ".$e->getMessage(), array($e));
@@ -136,7 +135,22 @@ class InputStreamListener extends AbstractIOStreamListener {
             // all exceptions must be caught, otherwise the react loop explodes and this worker dies
             $msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
             $this->log->critical($msg, array($e));
+            $this->writer->write($this->proto->cancel());
         }
+
+        $this->resetBuffer();
+        ob_end_clean();
+
+    }
+
+
+    /**
+     * @param bool $isBuffering
+     * @return void
+     */
+    protected function resetBuffer($isBuffering = false) {
+        $this->buffer = '';
+        $this->buffering = $isBuffering;
     }
 
 }

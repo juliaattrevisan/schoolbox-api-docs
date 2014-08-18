@@ -12,10 +12,9 @@ namespace Alaress\WorkerCrew\Worker\IO\Listener;
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress\WorkerCrew\PoolInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Worker\Worker;
-use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
-use Evenement\EventEmitter;
 use Exception;
 use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
@@ -23,32 +22,32 @@ use UnexpectedValueException;
 class DataIOListener extends AbstractIOStreamListener
 {
 
-    /** @var WorkerBundleInterface */
-    protected $workerBundle;
-
     /** @var TaskResponseHandlerInterface */
-    protected $responseHandler;
+    protected $handler;
 
     /** @var DispatchStrategyInterface */
     protected $strat;
 
-    /** @var EventEmitter */
-    protected $emitter;
+    /** @var PoolInterface */
+    protected $pool;
 
 
-    /** */
+    /**
+     * @param LoggerInterface              $log
+     * @param PoolInterface                $pool
+     * @param DispatchStrategyInterface    $strat
+     * @param TaskResponseHandlerInterface $responseHandler
+     */
     public function __construct(
         LoggerInterface $log,
-        WorkerBundleInterface $workers,
+        PoolInterface $pool,
         DispatchStrategyInterface $strat,
-        TaskResponseHandlerInterface $responseHandler,
-        EventEmitter $emitter
+        TaskResponseHandlerInterface $responseHandler
     ) {
         parent::__construct($log);
-        $this->workerBundle    = $workers;
-        $this->responseHandler = $responseHandler;
-        $this->strat           = $strat;
-        $this->emitter         = $emitter;
+        $this->handler = $responseHandler;
+        $this->strat   = $strat;
+        $this->pool    = $pool;
     }
 
 
@@ -63,15 +62,15 @@ class DataIOListener extends AbstractIOStreamListener
         $this->log->debug(sprintf('dstream [:%d] close', $e->getStream()));
 
         try {
-            $pid = $this->workerBundle->getProcessIdByResource($e->getStream());
-            $this->workerBundle->getByProcessId($pid)
-                               ->setStatus(Worker::ENDED);
+            $pid = $this->pool->getProcessIdByResource($e->getStream());
+
+            $this->pool->setWorkerStatus($pid, Worker::DONE);
+
             $this->log->notice("Worker $pid killed");
         } catch(UnexpectedValueException $e) {
             $this->log->critical("Unexpected stream supplied, cannot locate PID");
         }
 
-        $this->strat->cleanup($this->workerBundle);
     }
 
 
@@ -85,54 +84,58 @@ class DataIOListener extends AbstractIOStreamListener
     {
         $this->log->debug(sprintf('dstream [:%d] data', $e->getStream()));
 
+        $pool = $this->pool;
+
         try {
-            $pid    = $this->workerBundle->getProcessIdByResource($e->getStream());
-            $worker = $this->workerBundle->getByProcessId($pid);
-            $task   = $worker->getTask();
-            $data   = $e->getData();
+            $pid  = $pool->getProcessIdByResource($e->getStream());
+            $task = $pool->getCurrentTaskByProcessId($pid);
+            $data = $e->getData();
+
         } catch(UnexpectedValueException $e) {
             $this->log->critical("Unexpected stream supplied, cannot locate PID");
             return;
         }
 
-        $state = $this->strat->checkState($data);
+        $status = $pool->setWorkerStatus($pid, $pool->calculateState($data));
 
-        switch ($state) {
+        switch ($status) {
             case Worker::READY: // ready for another task
-                $this->log->info("Worker '$pid' ready for new task");
-                $worker->setStatus(Worker::READY);
+                $this->log->info("Worker {{$pid}} READY for new task");
                 break;
 
             case Worker::BUSY: // data sent, but not finished yet
-                $this->log->debug("Worker '$pid' still working");
-                $worker->appendData($data);
+                $this->log->debug("Worker {{$pid}} still BUSY working");
+                $task->append($data);
                 break;
 
             case Worker::ERROR: // still alive, but cannot accept more tasks
-                $this->log->notice("Worker '$pid' in error");
-                $worker->setStatus(Worker::BUSY);
+                $this->log->warning("Worker {{$pid}} in ERROR");
                 break;
 
             case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
-                $this->log->info("Worker '$pid' killed");
-                $worker->setStatus(Worker::ENDED);
+                $this->log->info("Worker {{$pid}} has ENDED");
+                $pool->releaseWorker($pid);
                 break;
 
             case Worker::DONE: // job done, ready for another task
-                $this->log->info("Worker '$pid' complete, ready for new task");
-                $worker->appendData($data)
-                       ->markTaskComplete();
+                $this->log->info("Worker {{$pid}} is DONE, parsing response");
+                // append the final batch of data
+                $task->append($data);
 
                 try {
                     // pass to the registered response handler
-                    $this->responseHandler->handleResponse(
+                    $this->handler->handleResponse(
                         $task->getIdentifier(),
                         $task->getCommand(),
                         $this->strat->decodeRecords($task->getData(false))
                     );
+                    $pool->setWorkerStatus($pid, Worker::READY);
+                    $this->log->info("Worker {{$pid}} READY for new task");
+
                 } catch(Exception $e) {
                     // your reactor will explode if you don't catch exceptions coming from your response handler
                     $this->strat->handleException($e, $this->log);
+                    $this->log->info("Response from worker {{$pid}} failed to parse, still DONE");
                 }
 
                 // regardless of whether or not the handling of the response succeeded, we need to ditch this message
@@ -142,8 +145,8 @@ class DataIOListener extends AbstractIOStreamListener
         }
 
         // if we can accept, emit READY (to be caught by dispatcher)
-        if ($this->strat->canAccept($this->workerBundle)) {
-            $this->emitter->emit('ready');
+        if ($pool->canAccept()) {
+            $pool->emit('ready');
         }
 
     }
