@@ -131,8 +131,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         $event->setEndTime(
                             new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
                         );
-                        // Currently event needs a publish date.
-                        $event->setPublishDate($event->getStartTime());
+                        $event->setPublishDate(null);
                         $event->setNote($period['description']);
                         $event->setCampusList($campusId);
                         if ($period['staff'] instanceof Schoolbox\User) {
