@@ -174,24 +174,24 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface {
 	 */
 	public function checkState($data) {
 
-		// no data: finished
+		// no data: this pipe is closed
 		if(strlen($data) == 0) {
-			return Worker::DONE;
+			return Worker::ENDED;
 		}
 
 		// rejected: ready for more
 		if($this->protocol->isRejected($data)) {
-			return Worker::READY;
+			return Worker::DONE;
 		}
 
-		// cancelled: I am in error now
+		// job cancelled: ready for more
 		if($this->protocol->isCancelled($data)) {
-			return Worker::ERROR;
+			return Worker::DONE;
 		}
 
 		// ended: That's all your data
 		if($this->protocol->isEnded($data)) {
-			return Worker::DONE;
+			return Worker::DONE; // ready to parse
 		}
 
 		// default case: "here's a chunk of data, I'm not finished yet"
