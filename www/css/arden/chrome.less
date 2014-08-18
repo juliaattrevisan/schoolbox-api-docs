@@ -219,15 +219,31 @@ body{
             border: 4px solid @banner-background;
         }
     }
-    #category{
+    #category,
+    .vertical{
         background: transparent;
         padding: 8px 0 0 0;
         li a{ background: @white; color: @banner-background; border-color: @banner-background; }
-        li:nth-child(2) a{ color: #006a56; border-color: #006a56; }
-        li:nth-child(3) a{ color: #00ae66; border-color: #00ae66; }
-        li:nth-child(4) a{ color: #c43c96; border-color: #c43c96; }
-        li:nth-child(5) a{ color: #ef4056; border-color: #ef4056; }
-        li:nth-child(6) a{ color: #fec357; border-color: #fec357; }
+        li:nth-child(2) a{
+            color: #006a56; border-color: #006a56;
+            &:hover, &.current{ background: #006a56; color: @white; border-color: #006a56; }
+        }
+        li:nth-child(3) a{
+            color: #00ae66; border-color: #00ae66;
+            &:hover, &.current{ background: #00ae66; color: @white; border-color: #00ae66; }
+        }
+        li:nth-child(4) a{
+            color: #c43c96; border-color: #c43c96;
+            &:hover, &.current{ background: #c43c96; color: @white; border-color: #c43c96; }
+        }
+        li:nth-child(5) a{
+            color: #ef4056; border-color: #ef4056;
+            &:hover, &.current{ background: #ef4056; color: @white; border-color: #ef4056; }
+        }
+        li:nth-child(6) a{
+            color: #fec357; border-color: #fec357;
+            &:hover, &.current{ background: #fec357; color: @white; border-color: #fec357; }
+        }
         li .current{ background: @banner-background; color: @white; border-color: @banner-background; }
     }
     .information-list .meta,
@@ -272,6 +288,8 @@ body.login{
         p,a { color: #336a7a; }
         .error{
             width: 155px;
+            font-size: 14px;
+            min-height: 105px;
         }
         #loginForm{
             margin: 55px 0 20px 0;
@@ -285,6 +303,10 @@ body.login{
             input.login{
                 background: @banner-background;
                 font-family: 'Oswald', sans-serif;
+                font-size: 18px;
+                text-transform: uppercase;
+                width: 85px;
+                &:hover{ text-decoration: underline; }
             }
         }
     }
