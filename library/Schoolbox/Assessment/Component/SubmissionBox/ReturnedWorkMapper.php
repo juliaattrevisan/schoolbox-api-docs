@@ -77,6 +77,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'property'   => 'returned',
 			'type'       => self::TYPE_DATETIME,
 		));
+		$this->hasMap(array(
+			'column'     => 'uuid',
+			'property'   => 'uuid',
+			'type'       => self::TYPE_STRING,
+		));
 
 		$this->hasSoftDeleteBooleanField('deleted');
 

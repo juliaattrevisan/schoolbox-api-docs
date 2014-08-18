@@ -40,21 +40,30 @@ $comment = $_POST['comment'];
  */
 $file = $_FILES['file'];
 
+/* Crocodoc uuid, to view return independently of submission
+ */
+if (isset($_POST['crocodoc'])) {
+	$crocodoc = $_POST['crocodoc']['uuid'];
+}
+else {
+	$crocodoc = null;
+}
+
 /* A url to visit after submitting
  */
 $redirect = $_POST['redirect'];
 
 /* Process the return's comments, marks, rubrics and uploads
  */
-$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $redirect);
+$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $crocodoc);
 $returnedWork = $returnedWorkFactory->start();
 
 /* An array of crocodoc-specific controls
  array(
 	'submissionId' => ...
  );
-
  */
+
 /* Deal with crocodoc specifically
  */
 if (isset($_POST['crocodoc'])) {
@@ -74,7 +83,7 @@ if (isset($_POST['crocodoc'])) {
 
 /* Go to St. Albans when finished
  */
-if($redirect) {
+if ($redirect) {
     $page->localRedir($redirect);
 }
 else {

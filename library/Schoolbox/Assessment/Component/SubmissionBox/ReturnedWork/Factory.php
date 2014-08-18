@@ -10,8 +10,10 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
-
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 class Factory {
 
@@ -57,7 +59,7 @@ class Factory {
 	private $file = array();
 
 	/**
-	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper
+	 * An instance of ReturnedWorkMapper
 	 *
 	 * @var null
 	 */
@@ -69,6 +71,13 @@ class Factory {
 	 * @var null
 	 */
 	private $marksheet = null;
+
+	/**
+	 * Crocodoc uuid
+	 *
+	 * @var null
+	 */
+	private $uuid = null;
 
 	/**
 	 * The time differential between using an old ReturnedWork record and spawning
@@ -90,24 +99,26 @@ class Factory {
 	 * $user is the person who submitted the item for marking
 	 * and is also synonymous with 'owner' column in the db
 	 *
-	 * @param \Schoolbox\User $user
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
+	 * @param User $user
+	 * @param SubmissionBox $submissionBox
 	 * @param $mark
 	 * @param $comment
 	 * @param $rubric
 	 * @param $file
+	 * @param $uuid
 	 */
-	public function __construct(\Schoolbox\User $user, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $mark, $comment, $rubric, $file) {
+	public function __construct(User $user, SubmissionBox $submissionBox, $mark, $comment, $rubric, $file, $uuid) {
 		$this->setUser($user);
 		$this->setSubmissionBox($submissionBox);
 		$this->setMark($mark);
 		$this->setComment($comment);
 		$this->setRubric($rubric);
 		$this->setFile($file);
+		$this->setUuid($uuid);
 
 		/* Internally used instances
 		 */
-		$this->setReturnedWorkMapper(new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper());
+		$this->setReturnedWorkMapper(new ReturnedWorkMapper());
 		$this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
 
 		/* Sometimes you don't submit numeric values - this mainly consists
@@ -195,7 +206,7 @@ class Factory {
 	 * Get the returned work record to deal with
 	 * This either spawns a new one, or uses an old one from some time ago
 	 *
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 * @return ReturnedWork
 	 */
 	private function retrieveReturnedWorkRecord() {
 		$returnedWork = null;
@@ -252,13 +263,14 @@ class Factory {
 	/**
 	 * Spawn a new returned work record with appropriate ownerships
 	 *
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 * @return ReturnedWork
 	 */
 	private function spawnNewReturnedWork() {
-		$returnedWork = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
+		$returnedWork = new ReturnedWork();
 		$returnedWork->setOwner($this->getUser());
 		$returnedWork->setSubmissionBox($this->getSubmissionBox());
 		$returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+		$returnedWork->setUuid($this->getUuid());
 
 		return $returnedWork;
 	}
@@ -266,7 +278,7 @@ class Factory {
 	/**
 	 * Apply updates to the returned work record
 	 *
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 * @return ReturnedWork
 	 */
 	private function processReturnedWork() {
 		$returnedWork = $this->retrieveReturnedWorkRecord();
@@ -305,6 +317,7 @@ class Factory {
 		 */
 		$returnedWork->setComment($this->getComment());
 		$returnedWork->setMarker($_SESSION['user']->getId());
+		$returnedWork->setUuid($this->getUuid());
 
 		return $returnedWork;
 	}
@@ -517,5 +530,23 @@ class Factory {
 	 */
 	private function getErrors() {
 		return $this->errors;
+	}
+
+	/**
+	 * Set uuid
+	 *
+	 * @param null $uuid
+	 */
+	private function setUuid($uuid) {
+		$this->uuid = $uuid;
+	}
+
+	/**
+	 * Get uuid
+	 *
+	 * @return null
+	 */
+	private function getUuid() {
+		return $this->uuid;
 	}
 }

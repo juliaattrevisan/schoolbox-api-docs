@@ -98,6 +98,13 @@ class ReturnedWork implements ISoftDeletable {
 	protected $config_loader;
 
 	/**
+	 * Optional crocodoc uuid
+	 *
+	 * @var null
+	 */
+	protected $uuid = null;
+
+	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
@@ -457,5 +464,26 @@ class ReturnedWork implements ISoftDeletable {
 		}
 
 		return false;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set uuid
+	 *
+	 * @param null $uuid
+	 */
+	public function setUuid($uuid) {
+		$this->uuid = $uuid;
+	}
+
+	/**
+	 * Get uuid
+	 *
+	 * @return null
+	 */
+	public function getUuid() {
+		return $this->uuid;
 	}
 }
