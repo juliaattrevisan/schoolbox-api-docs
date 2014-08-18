@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_EventType_Abstract
  *
@@ -11,60 +12,65 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface {
+abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface
+{
 
-	/**
-	 * The calendar_connector id from which this event was retrieved.
-	 * This is used to create a functioning event detail screen in Mobile.
-	 *
-	 * @var string
-	 */
-	protected $connectorId = '';
+    /**
+     * The calendar_connector id from which this event was retrieved.
+     * This is used to create a functioning event detail screen in Mobile.
+     *
+     * @var string
+     */
+    protected $connectorId = '';
 
-	/**
-	 * An instance of User
-	 *
-	 * @var int
-	 */
-	protected $user = null;
+    /**
+     * An instance of User
+     *
+     * @var Schoolbox\User
+     */
+    protected $user = null;
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set calendar_connector id
-	 *
-	 * @param string $connectorId
-	 */
-	public function setConnectorId($connectorId) {
-		$this->connectorId = $connectorId;
-	}
+    /**
+     * Set calendar_connector id
+     *
+     * @param string $connectorId
+     */
+    public function setConnectorId($connectorId)
+    {
+        $this->connectorId = $connectorId;
+    }
 
-	/**
-	 * Get calendar_connector id
-	 *
-	 * @return string
-	 */
-	public function getConnectorId() {
-		return $this->connectorId;
-	}
+    /**
+     * Get calendar_connector id
+     *
+     * @return string
+     */
+    public function getConnectorId()
+    {
+        return $this->connectorId;
+    }
 
-	/**
-	 * Set user
-	 *
-	 * @param $user
-	 * @return $this
-	 */
-	public function setUser($user) {
-		$this->user = $user;
+    /**
+     * Set user
+     *
+     * @param  Schoolbox\User $user
+     *
+     * @return $this
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	protected function getUser() {
-		return $this->user;
-	}
+    /**
+     * @return Schoolbox\User
+     */
+    protected function getUser()
+    {
+        return $this->user;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_Abstract
  *
@@ -7,12 +8,14 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Calendar_Event_Type_Abstract {
+abstract class Calendar_Event_Type_Abstract
+{
 
     /* These probably exist elsewhere.
      */
-    const CAMPUS_ACCESS = 3;
-    const GROUP_ACCESS = 2;
+    const CAMPUS_ACCESS   = 3;
+    const GROUP_ACCESS    = 2;
+    const PERSONAL_ACCESS = 1;
 
     /* Inheritable class vars
      */
@@ -27,56 +30,56 @@ abstract class Calendar_Event_Type_Abstract {
      */
     protected $eventType = '';
 
-	/**
-	 * Event location
-	 *
-	 * @var string
-	 */
-	protected $location = '';
+    /**
+     * Event location
+     *
+     * @var string
+     */
+    protected $location = '';
 
-	/**
-	 * Event title
-	 *
-	 * @var string
-	 */
-	protected $title = '';
+    /**
+     * Event title
+     *
+     * @var string
+     */
+    protected $title = '';
 
-	/**
-	 * Event description, typically
-	 *
-	 * @var string
-	 */
-	protected $detail = '';
+    /**
+     * Event description, typically
+     *
+     * @var string
+     */
+    protected $detail = '';
 
     /* An int from the event table corresponding to $eventType
      */
     protected $type = -1;
 
-	/**
-	 * Author's name
-	 *
-	 * @var string
-	 */
-	protected $authorName = '';
+    /**
+     * Author's name
+     *
+     * @var string
+     */
+    protected $authorName = '';
 
-	/**
-	 * Author's id
-	 *
-	 * @var int
-	 */
-	protected $authorId = -1;
+    /**
+     * Author's id
+     *
+     * @var int
+     */
+    protected $authorId = -1;
 
     /* A hex string representing the colour of this event
      * This should be deprecated
      */
     protected $colour = '';
 
-	/**
-	 * Access level
-	 *
-	 * @var int
-	 */
-	protected $access = -1;
+    /**
+     * Access level
+     *
+     * @var int
+     */
+    protected $access = -1;
 
     /* Category id and name
      * This should be deprecated
@@ -84,70 +87,71 @@ abstract class Calendar_Event_Type_Abstract {
     protected $categoryId = -1;
     protected $categoryName = '';
 
-	/**
-	 * CSV separated list of campus ids relevant to this event.
-	 *
-	 * @var string
-	 */
-	protected $campusList = '';
+    /**
+     * CSV separated list of campus ids relevant to this event.
+     *
+     * @var string
+     */
+    protected $campusList = '';
 
-	/**
-	 * Associated Groups (Type 2)
-	 *
-	 * @var null
-	 */
-	protected $categoryCollection = null;
+    /**
+     * Associated Groups (Type 2)
+     *
+     * @var null
+     */
+    protected $categoryCollection = null;
 
-	/**
-	 * The class used to render this event object. This should be
-	 * just the class' name, not an actual instance of it
-	 *
-	 * @var string
-	 */
-	protected $rendererClass = '';
+    /**
+     * The class used to render this event object. This should be
+     * just the class' name, not an actual instance of it
+     *
+     * @var string
+     */
+    protected $rendererClass = '';
 
-	/**
-	 * Whether or not to display the modify link
-	 *
-	 * @var bool
-	 */
-	protected $isEditable = true;
+    /**
+     * Whether or not to display the modify link
+     *
+     * @var bool
+     */
+    protected $isEditable = true;
 
-	/**
-	 * The date when the event was published (made visible to users)
-	 * Stored always as an Alaress_Date_Format() instance
-	 *
-	 * @var null
-	 */
-	protected $publishDate = null;
+    /**
+     * The date when the event was published (made visible to users)
+     * Stored always as an Alaress_Date_Format() instance
+     *
+     * @var null
+     */
+    protected $publishDate = null;
 
-	/**
-	 * A generic variable for custom stuff
-	 *
-	 * @var string
-	 */
-	protected $custom = array();
+    /**
+     * A generic variable for custom stuff
+     *
+     * @var string
+     */
+    protected $custom = array();
 
-	/**
-	 * Is this an all day event?
-	 *
-	 * @var bool
-	 */
-	protected $allday = false;
+    /**
+     * Is this an all day event?
+     *
+     * @var bool
+     */
+    protected $allday = false;
 
-	/**
-	 * Whether or not this Task has been completed
-	 *
-	 * @var int
-	 */
-	protected $completed = 0;
+    /**
+     * Whether or not this Task has been completed
+     *
+     * @var int
+     */
+    protected $completed = 0;
 
     /**
      * Constructor
      *
      * Set up default settings
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
@@ -155,6 +159,7 @@ abstract class Calendar_Event_Type_Abstract {
      * Use Visitor design pattern to render via an external class
      *
      * @abstract
+     *
      * @param $visitor
      */
     abstract public function accept($visitor);
@@ -164,7 +169,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * Empty by default
      */
-    protected function setup() {
+    protected function setup()
+    {
     }
 
     /**
@@ -173,7 +179,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return bool
      */
-    public function isOwner() {
+    public function isOwner()
+    {
         if ($this->getAuthorId() == $_SESSION['id']) {
             return true;
         }
@@ -186,7 +193,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return bool
      */
-    protected function isCampusAccess() {
+    protected function isCampusAccess()
+    {
         if ($this->getAccess() == self::CAMPUS_ACCESS) {
             return true;
         }
@@ -199,7 +207,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return bool
      */
-    protected function isGroupAccess() {
+    protected function isGroupAccess()
+    {
         if ($this->getAccess() == self::GROUP_ACCESS) {
             return true;
         }
@@ -207,57 +216,57 @@ abstract class Calendar_Event_Type_Abstract {
         return false;
     }
 
-	/**
-	 * Get a string representing the full span of time for this event
-	 * This is used in the calendar dashboard
-	 *
-	 * @return string
-	 */
-	public function getEventSpan() {
-		if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
-			if ($this->getAllDay()) {
-				return $this->getStartTime()->getCalendarDate() . ' &ndash; ' . $this->getEndTime()->getCalendarDate();
-			}
+    /**
+     * Get a string representing the full span of time for this event
+     * This is used in the calendar dashboard
+     *
+     * @return string
+     */
+    public function getEventSpan()
+    {
+        if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
+            if ($this->getAllDay()) {
+                return $this->getStartTime()->getCalendarDate() . ' &ndash; ' . $this->getEndTime()->getCalendarDate();
+            }
+            return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime(
+            )->getCalendarDateTime();
+        } else {
+            if ($this->getAllDay()) {
+                return $this->getStartTime()->getCalendarDate();
+            }
+            return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getTimeOnly();
+        }
+    }
 
-			return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getCalendarDateTime();
-		}
-		else {
-			if ($this->getAllDay()) {
-				return $this->getStartTime()->getCalendarDate();
-			}
-			return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getTimeOnly();
-		}
-	}
+    /**
+     * Gets date of event in format like this: Thursday, 19th December, 2:00AM
+     *
+     * @return string
+     */
+    public function getFullDate()
+    {
+        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
+        if (!$this->getAllDay()) {
+            $formattedTime = $startDate . ', ' . $this->getTime();
+        } else {
+            $formattedTime = $startDate;
+        }
+        return $formattedTime;
+    }
 
-	/**
-	 * Gets date of event in format like this: Thursday, 19th December, 2:00AM
-	 *
-	 * @return string
-	 */
-	public function getFullDate() {
-		$startDate = $this->getStartTime()->getUsingFormat('l, jS F');
-		if (!$this->getAllDay()) {
-			$formattedTime = $startDate . ', ' . $this->getTime();
-		}
-		else {
-			$formattedTime = $startDate;
-		}
-		return $formattedTime;
-	}
-
-	/**
-	 * Special time formattng
-	 *
-	 * @return string
-	 */
-	public function getTime() {
-		if ($this->getAllDay()) {
-			return false;
-		}
-		else {
-			return $this->getStartTime()->getUsingFormat('g:iA');
-		}
-	}
+    /**
+     * Special time formattng
+     *
+     * @return string
+     */
+    public function getTime()
+    {
+        if ($this->getAllDay()) {
+            return false;
+        } else {
+            return $this->getStartTime()->getUsingFormat('g:iA');
+        }
+    }
 
     /* Getters/Setters
      */
@@ -267,7 +276,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $authorName
      */
-    public function setAuthorName($authorName) {
+    public function setAuthorName($authorName)
+    {
         $this->authorName = $authorName;
     }
 
@@ -276,7 +286,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getAuthorName() {
+    public function getAuthorName()
+    {
         return $this->authorName;
     }
 
@@ -285,7 +296,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $authorId
      */
-    public function setAuthorId($authorId) {
+    public function setAuthorId($authorId)
+    {
         $this->authorId = $authorId;
     }
 
@@ -294,7 +306,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getAuthorId() {
+    public function getAuthorId()
+    {
         return $this->authorId;
     }
 
@@ -303,7 +316,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $colour
      */
-    public function setColour($colour) {
+    public function setColour($colour)
+    {
         if ($colour[0] != '#') {
             $this->colour = '#' . $colour;
         } else {
@@ -316,7 +330,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getColour() {
+    public function getColour()
+    {
         return $this->colour;
     }
 
@@ -325,7 +340,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $detail
      */
-    public function setDetail($detail) {
+    public function setDetail($detail)
+    {
         $this->detail = $detail;
     }
 
@@ -334,7 +350,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getDetail() {
+    public function getDetail()
+    {
         return $this->detail;
     }
 
@@ -343,7 +360,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $eventType
      */
-    public function setEventType($eventType) {
+    public function setEventType($eventType)
+    {
         $this->eventType = $eventType;
     }
 
@@ -352,7 +370,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getEventType() {
+    public function getEventType()
+    {
         return $this->eventType;
     }
 
@@ -361,7 +380,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $location
      */
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $this->location = $location;
     }
 
@@ -370,7 +390,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->location;
     }
 
@@ -379,7 +400,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $title
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
     }
 
@@ -388,7 +410,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -397,7 +420,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $type
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = $type;
     }
 
@@ -406,7 +430,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
@@ -415,7 +440,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $eventId
      */
-    public function setEventId($eventId) {
+    public function setEventId($eventId)
+    {
         $this->eventId = $eventId;
     }
 
@@ -424,7 +450,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getEventId() {
+    public function getEventId()
+    {
         return $this->eventId;
     }
 
@@ -433,7 +460,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $access
      */
-    public function setAccess($access) {
+    public function setAccess($access)
+    {
         $this->access = $access;
     }
 
@@ -442,7 +470,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return int
      */
-    public function getAccess() {
+    public function getAccess()
+    {
         return $this->access;
     }
 
@@ -451,7 +480,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $campusList
      */
-    public function setCampusList($campusList) {
+    public function setCampusList($campusList)
+    {
         $this->campusList = $campusList;
     }
 
@@ -460,7 +490,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return null
      */
-    public function getCampusList() {
+    public function getCampusList()
+    {
         return $this->campusList;
     }
 
@@ -469,7 +500,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $endTime
      */
-    public function setEndTime($endTime) {
+    public function setEndTime($endTime)
+    {
         $this->endTime = $endTime;
     }
 
@@ -478,7 +510,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return Alaress_Date_Format
      */
-    public function getEndTime() {
+    public function getEndTime()
+    {
         return $this->endTime;
     }
 
@@ -487,7 +520,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $startTime
      */
-    public function setStartTime($startTime) {
+    public function setStartTime($startTime)
+    {
         $this->startTime = $startTime;
     }
 
@@ -496,7 +530,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return Alaress_Date_Format
      */
-    public function getStartTime() {
+    public function getStartTime()
+    {
         return $this->startTime;
     }
 
@@ -505,7 +540,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $categoryId
      */
-    public function setCategoryId($categoryId) {
+    public function setCategoryId($categoryId)
+    {
         $this->categoryId = $categoryId;
     }
 
@@ -514,7 +550,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return int
      */
-    public function getCategoryId() {
+    public function getCategoryId()
+    {
         return $this->categoryId;
     }
 
@@ -523,7 +560,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $categoryName
      */
-    public function setCategoryName($categoryName) {
+    public function setCategoryName($categoryName)
+    {
         $this->categoryName = $categoryName;
     }
 
@@ -532,25 +570,28 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return string
      */
-    public function getCategoryName() {
+    public function getCategoryName()
+    {
         return $this->categoryName;
     }
 
-	/**
-	 * Set renderer class
-	 *
-	 * @param $rendererClass
-	 */
-	public function setRendererClass($rendererClass) {
-		$this->rendererClass = $rendererClass;
-	}
+    /**
+     * Set renderer class
+     *
+     * @param $rendererClass
+     */
+    public function setRendererClass($rendererClass)
+    {
+        $this->rendererClass = $rendererClass;
+    }
 
     /**
      * Get renderer class
      *
      * @return string
      */
-    public function getRendererClass() {
+    public function getRendererClass()
+    {
         return $this->rendererClass;
     }
 
@@ -559,7 +600,8 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @param $isEditable
      */
-    public function setIsEditable($isEditable) {
+    public function setIsEditable($isEditable)
+    {
         $this->isEditable = $isEditable;
     }
 
@@ -568,120 +610,134 @@ abstract class Calendar_Event_Type_Abstract {
      *
      * @return bool
      */
-    public function getIsEditable() {
+    public function getIsEditable()
+    {
         return $this->isEditable;
     }
 
-	/**
-	 * Set completed
-	 *
-	 * @param int $completed
-	 */
-	public function setCompleted($completed) {
-		$this->completed = $completed;
-	}
+    /**
+     * Set completed
+     *
+     * @param int $completed
+     */
+    public function setCompleted($completed)
+    {
+        $this->completed = $completed;
+    }
 
-	/**
-	 * Get completed
-	 *
-	 * @return int
-	 */
-	public function getCompleted() {
-		return $this->completed;
-	}
+    /**
+     * Get completed
+     *
+     * @return int
+     */
+    public function getCompleted()
+    {
+        return $this->completed;
+    }
 
-	/**
-	 * Set connector id
-	 *
-	 * @param string $connectorId
-	 */
-	public function setConnectorId($connectorId) {
-		$this->connectorId = $connectorId;
-	}
+    /**
+     * Set connector id
+     *
+     * @param string $connectorId
+     */
+    public function setConnectorId($connectorId)
+    {
+        $this->connectorId = $connectorId;
+    }
 
-	/**
-	 * Get connector id
-	 *
-	 * @return string
-	 */
-	public function getConnectorId() {
-		return $this->connectorId;
-	}
+    /**
+     * Get connector id
+     *
+     * @return string
+     */
+    public function getConnectorId()
+    {
+        return $this->connectorId;
+    }
 
-	/**
-	 * @param bool $allday
-	 */
-	public function setAllday($allday) {
-		$this->allday = $allday;
-	}
+    /**
+     * @param bool $allday
+     */
+    public function setAllday($allday)
+    {
+        $this->allday = $allday;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function getAllday() {
-		return $this->allday;
-	}
+    /**
+     * @return bool
+     */
+    public function getAllday()
+    {
+        return $this->allday;
+    }
 
-	/**
-	 * Set publish date object
-	 *
-	 * @param $publishDate
-	 */
-	public function setPublishDate($publishDate) {
-		$this->publishDate = new Alaress_Date_Format($publishDate ?: '1970-01-01 00:00:00', 'y-m-d h:i:s');
-	}
+    /**
+     * Set publish date object
+     *
+     * @param $publishDate
+     */
+    public function setPublishDate($publishDate)
+    {
+        $this->publishDate = new Alaress_Date_Format($publishDate ? : '1970-01-01 00:00:00', 'y-m-d h:i:s');
+    }
 
-	/**
-	 * Get publish date
-	 *
-	 * @return null
-	 */
-	public function getPublishDate() {
-		return $this->publishDate;
-	}
+    /**
+     * Get publish date
+     *
+     * @return null
+     */
+    public function getPublishDate()
+    {
+        return $this->publishDate;
+    }
 
-	/**
-	 * Can someone attend this event? Defaults to false, subclasses can override.
-	 *
-	 * @return bool
-	 */
-	public function canAttend() {
-		return false;
-	}
+    /**
+     * Can someone attend this event? Defaults to false, subclasses can override.
+     *
+     * @return bool
+     */
+    public function canAttend()
+    {
+        return false;
+    }
 
-	/**
-	 * Set custom
-	 *
-	 * @param string $custom
-	 */
-	public function setCustom($custom) {
-		$this->custom = $custom;
-	}
+    /**
+     * Set custom
+     *
+     * @param string $custom
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
+    }
 
-	/**
-	 * Get custom
-	 *
-	 * @return string
-	 */
-	public function getCustom() {
-		return $this->custom;
-	}
+    /**
+     * Get custom
+     *
+     * @return string
+     */
+    public function getCustom()
+    {
+        return $this->custom;
+    }
 
-	/**
-	 * Set category collection
-	 *
-	 * @param null $categoryCollection
-	 */
-	public function setCategoryCollection($categoryCollection) {
-		$this->categoryCollection = $categoryCollection;
-	}
+    /**
+     * Set category collection
+     *
+     * @param null $categoryCollection
+     */
+    public function setCategoryCollection($categoryCollection)
+    {
+        $this->categoryCollection = $categoryCollection;
+    }
 
-	/**
-	 * Get category collection
-	 *
-	 * @return null
-	 */
-	public function getCategoryCollection() {
-		return $this->categoryCollection;
-	}
+    /**
+     * Get category collection
+     *
+     * @return null
+     */
+    public function getCategoryCollection()
+    {
+        return $this->categoryCollection;
+    }
 }
