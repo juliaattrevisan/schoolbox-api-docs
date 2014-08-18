@@ -8,7 +8,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstract
+{
 
     /**
      * @var External_Timetable
@@ -28,7 +29,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param \Schoolbox\User $user
      * @param $config
      */
-    public function __construct(\Schoolbox\User $user, $config) {
+    public function __construct(\Schoolbox\User $user, $config)
+    {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
     }
@@ -40,7 +42,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param $endTimestamp
      * @return Calendar_Event_Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
         $stack = new Calendar_Event_Collection();
 
         $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCode);
@@ -54,10 +57,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $currentTimestamp = $startTimestamp;
         $dayNumberList    = array();
         while ($currentTimestamp <= $endTimestamp) {
-
             // Get the definition for this day only.
             foreach ($roomTimetable as $room) {
-
                 // What's the day number for the campus that has booked this room?
                 // If for some reason I can't find it, get timetable for a null campus
                 $timetableCode = $room['TimetableGroup'];
@@ -67,8 +68,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                             'ext_timetable_code',
                             $timetableCode
                         );
-                    }
-                    catch (Schoolbox\Mapper\Exception $e) {
+                    } catch (Schoolbox\Mapper\Exception $e) {
                         $campusList[$timetableCode] = null;
                     }
                 }
@@ -92,7 +92,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
 
                 // Does this event overlap timespan $startTimestamp to $endTimestamp?
                 $classStart = strtotime($room['PeriodStart'], $currentTimestamp);
-                $classEnd   = strtotime($room['PeriodEnd'],   $currentTimestamp);
+                $classEnd   = strtotime($room['PeriodEnd'], $currentTimestamp);
                 if ($classEnd < $startTimestamp) {
                     continue;
                 }
@@ -120,10 +120,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 if (!(array_key_exists($userExternalId, $userList))) {
                     try {
                         $userList[$userExternalId] = Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id', $userExternalId
+                            'synergy_id',
+                            $userExternalId
                         );
-                    }
-                    catch (Schoolbox\Mapper\Exception $e) {
+                    } catch (Schoolbox\Mapper\Exception $e) {
                         $userList[$userExternalId] = null;
                     }
                 }
@@ -138,8 +138,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $categoryList[$categoryCode] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
                             $categoryCode
                         );
-                    }
-                    catch (Schoolbox\Mapper\Exception $e) {
+                    } catch (Schoolbox\Mapper\Exception $e) {
                         $categoryList[$categoryCode] = null;
                     }
                 }
@@ -163,7 +162,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param $eventId
      * @return Calendar_Event_Collection
      */
-    public function getEvent($eventId) {
+    public function getEvent($eventId)
+    {
         // Blah
         $stack = new Calendar_Event_Collection();
         return $stack;
@@ -174,7 +174,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      *
      * @return $this
      */
-    public function setExternalTimetable($externalTimetable) {
+    public function setExternalTimetable($externalTimetable)
+    {
         $this->externalTimetable = $externalTimetable;
         return $this;
     }
@@ -182,7 +183,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * @return \External_Timetable
      */
-    public function getExternalTimetable() {
+    public function getExternalTimetable()
+    {
         return $this->externalTimetable;
     }
 
@@ -190,7 +192,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param  string $roomCode
      * @return $this
      */
-    public function setRoomCode($roomCode) {
+    public function setRoomCode($roomCode)
+    {
         $this->roomCode = $roomCode;
         return $this;
     }
@@ -198,8 +201,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     /**
      * @return string
      */
-    public function getRoomCode() {
+    public function getRoomCode()
+    {
         return $this->roomCode;
     }
-
 }
