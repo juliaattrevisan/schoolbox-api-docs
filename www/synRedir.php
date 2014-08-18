@@ -12,7 +12,12 @@ $form="Form1";
 $action=Cfg::get('external_portal').'login.aspx';
 $method="POST";
 
-$login = file_get_contents($action);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "$action");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$login = curl_exec($ch);
+curl_close($ch);
+unset($ch);
 
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
 preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
