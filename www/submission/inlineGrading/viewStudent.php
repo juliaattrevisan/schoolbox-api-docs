@@ -70,7 +70,7 @@ if (is_numeric($this->arg[2])) {
 
 /* Rendering things out
  */
-$user = $userMapper->findById($this->arg[1]);
+$user = $userMapper->findById($submission->getOwner()->getId());
 
 if ($currentAugmented['submission'] != null) {
 	$submissionId = $currentAugmented['submission']->getId();
