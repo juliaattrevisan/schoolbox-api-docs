@@ -37,11 +37,6 @@ class Worker extends PipeWriter {
 	protected $start;
 	/** @var Task */
 	protected $task;
-	/** @var Task[] */
-	protected $previousTasks = array();
-
-	/** @var int */
-	protected $taskRetainCount = 0;
 
 	/**
 	 * @param string $cmd
@@ -80,18 +75,13 @@ class Worker extends PipeWriter {
 		}
 	}
 
-	/**
-	 * @param int $count
-	 */
-	public function setTaskRetention($count) {
-		$this->taskRetainCount = $count;
-	}
 
 	/**
 	 * @param LoggerInterface $log
 	 */
 	public function attachLogger($log) {
 		$this->log = $log;
+        $this->status = self::READY;
 	}
 
 	/**
@@ -126,9 +116,59 @@ class Worker extends PipeWriter {
 	 * @param int $status
 	 * @return self
 	 */
-	public function setStatus($status) {
-		$this->status = $status;
-		return $this;
+	public function setStatus($status)
+    {
+        // the Map of Transition Validity
+        $map = array(
+            self::BUSY  => array(
+                self::DONE  => function ($worker) {
+                        /** @var Worker $worker */
+                        $worker->markTaskComplete();
+                        return true;
+                    },
+                self::ERROR => function ($worker) {
+                        /** @var Worker $worker */
+                        return true;
+                    },
+            ),
+            self::DONE  => array(
+                self::READY => function ($worker) {
+                        /** @var Worker $worker */
+                        $worker->clearTask();
+                        return true;
+                    },
+            ),
+            self::ERROR => array(
+                self::ENDED => function ($worker) {
+                        /** @var Worker $worker */
+                        $worker->clearTask();
+                        return true;
+                    },
+            ),
+            self::READY => array(
+                self::BUSY  => function ($worker) {
+                        /** @var Worker $worker */
+                        // task must already be set (ie. use self::setTask())
+                        return $worker->getTask() instanceof Task;
+                    },
+                self::ENDED => function ($worker) {
+                        /** @var Worker $worker */
+                        $worker->clearTask();
+                        return true;
+                    },
+                self::ERROR => function ($worker) {
+                        /** @var Worker $worker */
+                        return true;
+                    },
+            ),
+        );
+
+        // if this is a valid transition, and the transition passes validation, update
+        if(isset($map[$this->status][$status]) && $map[$this->status][$status]($this)) {
+            $this->status = $status;
+        }
+
+		return $this->status;
 	}
 
 	/**
@@ -138,24 +178,22 @@ class Worker extends PipeWriter {
 		return $this->status;
 	}
 
-	/**
-	 * @param object $identifier
-	 * @param string $cmd
-	 * @param string $args
-     * @throws IOException
-	 * @return self
-	 */
-	public function setTask($identifier, $cmd, $args) {
-		if($this->task) {
-			array_unshift($this->previousTasks, $this->previousTasks);
-			while(count($this->previousTasks) > $this->taskRetainCount) {
-				array_pop($this->previousTasks);
-			}
-		}
 
+    /**
+     * @param object $identifier
+     * @param string $cmd
+     * @param string $args
+     * @throws RangeException
+     * @return self
+     */
+	public function setTask($identifier, $cmd, $args) {
+        if($this->getStatus() != self::READY) {
+            // go find someone else to do your dirty work
+            throw new RangeException("Already tasked, cannot accept another");
+        }
 		$this->write($this->strat->composeTaskString($cmd, $args));
+        $this->task = new Task($identifier, $cmd, $args);
 		$this->setStatus(self::BUSY);
-		$this->task = new Task($identifier, $cmd, $args);
 		return $this;
 	}
 
@@ -173,7 +211,6 @@ class Worker extends PipeWriter {
 	 */
 	public function markTaskComplete() {
 		$this->task->setFinish(microtime(true));
-		$this->setStatus(self::READY);
 		return $this;
 	}
 
@@ -185,5 +222,12 @@ class Worker extends PipeWriter {
 	}
 
 
+    /**
+     * @return self
+     */
+    public function clearTask() {
+        $this->task = null;
+        return $this;
+    }
 
 } 
