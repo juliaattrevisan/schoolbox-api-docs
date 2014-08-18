@@ -863,13 +863,14 @@ class Controller extends Base {
             $timetable = $this->externalTimetableHandler->getTimetableDefinition($campusId);
             // Somehow parse $timetable into a list of names, start and end, and
             // the next day they occur.
+            // times always 12-hour, so convert to 24-hour time for consistency
             $campusArray['days'] = $timetable['dayCount'];
             foreach ($timetable['desc'] as $i => $name) {
                 $campusArray['periodList'][] = array(
                     'index' => $i,
                     'desc'  => $name,
-                    'start' => $timetable['start'][$i],
-                    'end'   => $timetable['end'][$i],
+                    'start' => date('H:i', strtotime($timetable['start'][$i])),
+                    'end'   => date('H:i', strtotime($timetable['end'][$i])),
                 );
             }
             $campusList[$campusId] = $campusArray;
