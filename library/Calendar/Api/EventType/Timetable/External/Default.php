@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event type that represents events from the external timetable handler.
  *
@@ -6,7 +7,8 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_EventType_Abstract
+{
 
     /**
      * @var External_Timetable
@@ -17,9 +19,10 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      * Constructor
      *
      * @param \Schoolbox\User $user
-     * @param $config
+     * @param                 $config
      */
-    public function __construct(\Schoolbox\User $user, $config) {
+    public function __construct(\Schoolbox\User $user, $config)
+    {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
     }
@@ -29,11 +32,13 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      *
      * @param $startTimestamp
      * @param $endTimestamp
+     *
      * @return Calendar_Event_Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
-        $stack = new Calendar_Event_Collection();
-        $dayTimetable = array();
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
+        $stack            = new Calendar_Event_Collection();
+        $dayTimetable     = array();
         $currentTimestamp = $startTimestamp;
 
         // Colors come from the timetable color mapper.
@@ -53,19 +58,23 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             foreach ($timetable as $periodDetail) {
                 foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
                     // Build the day timetable detail.
-                    $period = $periodDetail + $dayDetail;
+                    $period             = $periodDetail + $dayDetail;
                     $period['staff']    = null;
                     $period['category'] = null;
                     try {
                         $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id', $period['staffID']
+                            'synergy_id',
+                            $period['staffID']
                         );
+                    } catch (Exception $e) {
                     }
-                    catch (Exception $e) {}
                     try {
-                        $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode($period['code']);
+                        $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                            $period['code']
+                        );
+                    } catch (Exception $e) {
+                        // noop
                     }
-                    catch (Exception $e) {}
 
                     // And set the color map as well.
                     if ($dayDetail['periodOn']) {
@@ -88,7 +97,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         // Figure out event type
         try {
             /** @var Calendar_Api_Config_Record $config */
-            $config = Calendar_Api_Config_Mapper::getInstance()->findOneByColumnList(
+            $config        = Calendar_Api_Config_Mapper::getInstance()->findOneByColumnList(
                 array(
                     'event_type'      => 'Timetable',
                     'connector_class' => 'External',
@@ -96,9 +105,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 )
             );
             $decodedConfig = $config->decodeConfig();
-            $eventType = $decodedConfig->getLuEventType();
-        }
-        catch (\Schoolbox\Mapper\Exception $e) {
+            $eventType     = $decodedConfig->getLuEventType();
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
 
@@ -117,8 +125,12 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         $event = new Calendar_Event_Type_Day();
                         $event->setAllday(false);
                         $event->setLocation($period['room']);
-                        $event->setStartTime(new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U'));
-                        $event->setEndTime(new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U'));
+                        $event->setStartTime(
+                            new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U')
+                        );
+                        $event->setEndTime(
+                            new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
+                        );
                         // Currently event needs a publish date.
                         $event->setPublishDate($event->getStartTime());
                         $event->setNote($period['description']);
@@ -132,8 +144,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setCategoryId($period['category']->getId());
                             $event->setCategoryName($period['category']->getName());
                             $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
-                        }
-                        else {
+                        } else {
                             // Make this up as a campus event if it has no category
                             $event->setSid($campusId);
                             $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
@@ -153,9 +164,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      * Find a particular event from this source
      *
      * @param $eventId
+     *
      * @return Calendar_Event_Collection
      */
-    public function getEvent($eventId) {
+    public function getEvent($eventId)
+    {
         // Blah
         $stack = new Calendar_Event_Collection();
         return $stack;
@@ -166,7 +179,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      *
      * @return $this
      */
-    public function setExternalTimetable($externalTimetable) {
+    public function setExternalTimetable($externalTimetable)
+    {
         $this->externalTimetable = $externalTimetable;
         return $this;
     }
@@ -174,7 +188,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     /**
      * @return \External_Timetable
      */
-    public function getExternalTimetable() {
+    public function getExternalTimetable()
+    {
         return $this->externalTimetable;
     }
 }
