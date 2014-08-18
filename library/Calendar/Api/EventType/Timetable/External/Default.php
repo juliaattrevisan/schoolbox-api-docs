@@ -85,6 +85,23 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             }
         }
 
+        // Figure out event type
+        try {
+            /** @var Calendar_Api_Config_Record $config */
+            $config = Calendar_Api_Config_Mapper::getInstance()->findOneByColumnList(
+                array(
+                    'event_type'      => 'Timetable',
+                    'connector_class' => 'External',
+                    'status'          => 1,
+                )
+            );
+            $decodedConfig = $config->decodeConfig();
+            $eventType = $decodedConfig->getLuEventType();
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            $eventType = 1;
+        }
+
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp <= $endTimestamp) {
@@ -121,10 +138,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setSid($campusId);
                             $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                         }
-                        // Type: I don't even know, does it matter?
-                        // What I do know is it won't show on the calendar
-                        // without a valid one (use whatever's in config)
-                        $event->setType(1);
+                        $event->setType($eventType);
                         $event->setColour($period['color']);
                         $stack->add($event);
                     }
