@@ -95,7 +95,7 @@ class Calendar_Api_Config_Record {
 	/**
 	 * Decode config object when retrieving from db
 	 *
-	 * @return mixed
+	 * @return Calendar_Api_Config_Connector_Abstract
 	 */
 	public function decodeConfig() {
 		return unserialize(base64_decode($this->getConfig()));
