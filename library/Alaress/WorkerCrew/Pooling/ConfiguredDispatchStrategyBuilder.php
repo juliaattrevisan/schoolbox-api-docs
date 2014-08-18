@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,7 +10,8 @@
 namespace Alaress\WorkerCrew\Pooling;
 
 
-class ConfiguredDispatchStrategyBuilder {
+class ConfiguredDispatchStrategyBuilder
+{
 
     /** @var int */
     protected $minWorkers = DefaultDispatchStrategy::MIN_WORKERS;
@@ -43,19 +44,22 @@ class ConfiguredDispatchStrategyBuilder {
     /**
      * @param array $conf
      */
-    public function __construct(array $conf = array()) {
-        foreach($conf as $k => $v) {
-            if(property_exists($this, $k)) {
+    public function __construct(array $conf = array())
+    {
+        foreach ($conf as $k => $v) {
+            if (property_exists($this, $k)) {
                 $this->$k = $v;
             }
         }
     }
 
+
     /**
      * @param string $flags
      * @return ConfiguredDispatchStrategy
      */
-    public function build($flags = '') {
+    public function build($flags = '')
+    {
         return new ConfiguredDispatchStrategy(
             $this->minWorkers,
             $this->maxWorkers,
@@ -83,12 +87,13 @@ class ConfiguredDispatchStrategyBuilder {
             'task'   => sprintf("T : t < %dms <= %dms", $this->workerTimeoutSoft, $this->workerTimeoutHard),
         );
 
-        if(isset($summary[$element])) {
+        if (isset($summary[$element])) {
             return $summary[$element];
         }
 
         return $summary;
     }
+
 
     /**
      * @param int $idleTimeout
@@ -268,6 +273,5 @@ class ConfiguredDispatchStrategyBuilder {
     {
         return $this->workerTimeoutSoft;
     }
-
 
 }

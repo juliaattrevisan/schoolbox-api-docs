@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -14,10 +14,12 @@ use Alaress\WorkerCrew\Worker\Task;
 use Evenement\EventEmitterInterface;
 use OutOfBoundsException;
 
-interface PoolInterface extends EventEmitterInterface {
+interface PoolInterface extends EventEmitterInterface
+{
 
     const RELEASE_HARD = true;
     const RELEASE_SOFT = false;
+
 
     /**
      * Returns the PID of the process associated with the given stream or socket

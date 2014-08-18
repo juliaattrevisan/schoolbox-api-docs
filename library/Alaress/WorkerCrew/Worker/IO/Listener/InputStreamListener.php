@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -21,7 +21,8 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
-class InputStreamListener extends AbstractIOStreamListener {
+class InputStreamListener extends AbstractIOStreamListener
+{
 
     /** @var LoopInterface */
     protected $loop;
@@ -91,49 +92,45 @@ class InputStreamListener extends AbstractIOStreamListener {
 
         try {
             // cease and desist received
-            if($this->proto->isCancelled($data)) {
+            if ($this->proto->isCancelled($data)) {
                 $this->streamClosed($e);
                 ob_end_clean();
                 return;
             }
 
-            if(!$this->buffering) {
+            if (!$this->buffering) {
                 $this->resetBuffer(true);
             }
 
             $this->buffer .= $data;
 
             // if EOT not yet received
-            if(!$this->proto->isEnded($data)) {
+            if (!$this->proto->isEnded($data)) {
                 ob_end_clean();
                 return;
             }
 
             $this->buffering = false;
-            $this->log->debug('Data transfer complete (got '.strlen($this->buffer).' bytes), starting work');
+            $this->log->debug('Data transfer complete (got ' . strlen($this->buffer) . ' bytes), starting work');
             $this->writer->write($this->worker->parse($this->buffer));
             $this->log->debug("Task Complete");
 
-            if($buffer = ob_get_contents()) {
+            if ($buffer = ob_get_contents()) {
                 $this->log->debug("Captured output: $buffer");
             }
 
-        }
-        catch(IOException $e) {
+        } catch(IOException $e) {
             // this means the pipe or connection to an external service has been broken
             // no point logging, no point carrying on. everything is meaningless.
             $this->loop->stop();
-        }
-        catch(ErrorException $e) {
+        } catch(ErrorException $e) {
             $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
             $this->log->warning($msg);
             $this->writer->write($this->proto->cancel());
-        }
-        catch(PDOException $e) {
-            $this->log->emergency("PDOException: ".$e->getMessage(), array($e));
+        } catch(PDOException $e) {
+            $this->log->emergency("PDOException: " . $e->getMessage(), array($e));
             $this->loop->stop();
-        }
-        catch(Exception $e) {
+        } catch(Exception $e) {
             // all exceptions must be caught, otherwise the react loop explodes and this worker dies
             $msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
             $this->log->critical($msg, array($e));
@@ -150,9 +147,10 @@ class InputStreamListener extends AbstractIOStreamListener {
      * @param bool $isBuffering
      * @return void
      */
-    protected function resetBuffer($isBuffering = false) {
+    protected function resetBuffer($isBuffering = false)
+    {
         unset($this->buffer);
-        $this->buffer = '';
+        $this->buffer    = '';
         $this->buffering = $isBuffering;
     }
 
