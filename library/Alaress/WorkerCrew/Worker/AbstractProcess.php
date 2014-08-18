@@ -108,6 +108,7 @@ abstract class AbstractProcess implements WorkerInterface {
 
 		$response = $this->process($cmd, $args);
 		$this->log->info("Processing successful");
+        gc_collect_cycles();
 		$flat = $this->strat->getProtocol()->flatten($response);
 		$size = strlen($flat);
 		$this->log->debug("Flattened response is $size bytes");

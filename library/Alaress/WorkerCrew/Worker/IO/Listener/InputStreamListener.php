@@ -93,6 +93,7 @@ class InputStreamListener extends AbstractIOStreamListener {
             // cease and desist received
             if($this->proto->isCancelled($data)) {
                 $this->streamClosed($e);
+                ob_end_clean();
                 return;
             }
 
@@ -104,6 +105,7 @@ class InputStreamListener extends AbstractIOStreamListener {
 
             // if EOT not yet received
             if(!$this->proto->isEnded($data)) {
+                ob_end_clean();
                 return;
             }
 
@@ -149,6 +151,7 @@ class InputStreamListener extends AbstractIOStreamListener {
      * @return void
      */
     protected function resetBuffer($isBuffering = false) {
+        unset($this->buffer);
         $this->buffer = '';
         $this->buffering = $isBuffering;
     }

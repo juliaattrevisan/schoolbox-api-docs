@@ -66,12 +66,15 @@ class IOStream extends Stream implements Listenable
                      // don't send null data down the pipe
                      if ($e->isStreamEnded() || strlen($data) === 0) {
                          $reactStream->close();
+                         unset($e);
                          return;
                      }
 
                      foreach($listenerStore as $listener) {
                          $listener->dataReceived($e);
                      }
+
+                     unset($e);
                  }
         );
 
@@ -81,6 +84,7 @@ class IOStream extends Stream implements Listenable
                      foreach($listenerStore as $listener) {
                          $listener->streamClosed(new StreamEvent($reactStream->stream));
                      }
+                     unset($e);
                  }
         );
 
@@ -90,6 +94,7 @@ class IOStream extends Stream implements Listenable
                      foreach($listenerStore as $listener) {
                          $listener->errorOccurred(new StreamEvent($reactStream->stream, $error));
                      }
+                     unset($e);
                  }
         );
 
@@ -99,6 +104,7 @@ class IOStream extends Stream implements Listenable
                      foreach($listenerStore as $listener) {
                          $listener->streamDrained(new StreamEvent(null));
                      }
+                     unset($e);
                  }
         );
 
