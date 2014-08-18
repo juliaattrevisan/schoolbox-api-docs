@@ -9,6 +9,8 @@
  */
 namespace Crocodoc;
 
+use \Schoolbox\User;
+
 class Loader {
 
 	/**
@@ -27,6 +29,7 @@ class Loader {
 
 	/**
 	 * A unique identifier for a resource uploaded to Crocodoc
+     * 
 	 * @var string
 	 */
 	private $uuid = '';
@@ -49,9 +52,9 @@ class Loader {
 	 * Constructor
 	 *
 	 * @param $uuid
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 */
-	public function __construct($uuid, \Schoolbox\User $user) {
+	public function __construct($uuid, User $user) {
 		$this->setAuthenticator(new Authenticator());
 		$this->setUuid($uuid);
 		$this->setUser($user);
