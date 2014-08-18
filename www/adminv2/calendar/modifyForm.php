@@ -5,6 +5,7 @@
  */
 if (is_array($_POST['record']) && count($_POST['record'])) {
 	foreach($_POST['record'] as $id => $attribs) {
+        /** @var Calendar_Api_Config_Record $configRecord */
 		$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
 
 		$config = $configRecord->decodeConfig();
