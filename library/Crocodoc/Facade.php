@@ -61,15 +61,25 @@ class Facade {
 			/* Crocodoc-related errors, when a file dies in crocodoc
 			 */
 			if (isset($response['result']->error)) {
-				echo json_encode(array(
-					'errors' => $response['result']->error
-				));
+
+				/* To prevent vertical display of error message
+				 */
+				if (is_array($response['result']->error)) {
+					echo json_encode(array(
+						'errors' => $response['result']->error,
+					));
+				}
+				else {
+					echo json_encode(array(
+						'errors' => array($response['result']->error),
+					));
+				}
 			}
 			/* If crocodoc is unreachable, or curl/network-related errors
 			 */
 			else if (count($response['errors'])) {
 				echo json_encode(array(
-					'errors' => $response['errors']
+					'errors' => $response['errors'],
 				));
 			}
 			/* Otherwise everything went okay, thump out the url to the crocodoc
