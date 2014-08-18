@@ -143,8 +143,8 @@
          */
         self.periodSelector.on('change', function() {
             var selected  = $(this).find(':selected')
-            var startTime = moment(selected.data('start'), 'ha')
-            var endTime   = moment(selected.data('end'),   'ha')
+            var startTime = moment(selected.data('start'), 'H:mm')
+            var endTime   = moment(selected.data('end'),   'H:mm')
             if (startTime.isValid()) {
                 self.startTimeDisplay
                     .attr('datetime', startTime.format('HH:mm'))
