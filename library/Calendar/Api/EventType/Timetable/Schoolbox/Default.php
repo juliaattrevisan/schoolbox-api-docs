@@ -98,9 +98,6 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                 foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
                     if (isset($period['description'])) {
                         $event = new Calendar_Event_Type_Day();
-                        // Make this up as type: campus for now
-                        // It also has a category.
-                        $event->setType(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                         $event->setAllday(false);
                         $event->setLocation($period['room']);
                         $event->setStartTime(new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U'));
@@ -114,9 +111,20 @@ class Calendar_Api_EventType_Timetable_Schoolbox_Default extends Calendar_Api_Ev
                             $event->setAuthorName($period['staff']->formatName());
                         }
                         if ($period['category'] instanceof Schoolbox\Resource\Category) {
+                            $event->setSid($period['category']->getId());
                             $event->setCategoryId($period['category']->getId());
                             $event->setCategoryName($period['category']->getName());
+                            $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
                         }
+                        else {
+                            // Make this up as a campus event if it has no category
+                            $event->setSid($campusId);
+                            $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                        }
+                        // Type: I don't even know, does it matter?
+                        // What I do know is it won't show on the calendar
+                        // without a valid one (use whatever's in config)
+                        $event->setType(1);
                         $event->setColour($period['color']);
                         $stack->add($event);
                     }
