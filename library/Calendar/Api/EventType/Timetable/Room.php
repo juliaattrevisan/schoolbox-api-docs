@@ -52,6 +52,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $userList         = array();
         $categoryList     = array();
         $currentTimestamp = $startTimestamp;
+        $dayNumberList    = array();
         while ($currentTimestamp <= $endTimestamp) {
 
             // Get the definition for this day only.
@@ -75,7 +76,15 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 if ($campusList[$timetableCode] instanceof Schoolbox\Campus) {
                     $campusId = $campusList[$timetableCode]->getId();
                 }
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campusId, $currentTimestamp);
+
+                // Cache lookups for external timetable
+                if (!isset($dayNumberList[$currentTimestamp][$campusId])) {
+                    $dayNumberList[$currentTimestamp][$campusId] = $this->getExternalTimetable()->getDayNumber(
+                        $campusId,
+                        $currentTimestamp
+                    );
+                }
+                $dayNumber = $dayNumberList[$currentTimestamp][$campusId];
 
                 if ($room['DayNumber'] != $dayNumber) {
                     continue;
