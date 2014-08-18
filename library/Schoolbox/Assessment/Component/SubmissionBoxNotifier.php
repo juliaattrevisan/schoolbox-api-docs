@@ -14,7 +14,6 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Alaress_Date_Format;
 use Alaress_Date_Relative;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -694,7 +693,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 	 * @param array $diff
 	 * @return Messenger
 	 */
-	protected function notifyStaffClosed($submissionBox, $user, $diff = null) {
+	public function notifyStaffClosed($submissionBox, $user, $diff = null) {
 		$msgr = new Messenger();
 
 		$boxId = $submissionBox->getId();
