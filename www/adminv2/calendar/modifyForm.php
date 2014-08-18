@@ -12,7 +12,7 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 
 		/* Process multiple Vcals
 		 */
-		if ($attribs['connectorClass'] == 'Vcal') {
+		if ($config instanceof Calendar_Api_Config_Connector_Vcal) {
 
 			/* Add eventType option
 			 */
@@ -40,6 +40,10 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 				$config->setGroups(array());
 			}
 		}
+        elseif ($config instanceof Calendar_Api_Config_Connector_External) {
+            // External connector: only set event type
+            $config->setLuEventType($attribs['luEventType']);
+        }
 
 		/* Update and save config
 		 */
