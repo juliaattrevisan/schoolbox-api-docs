@@ -88,10 +88,10 @@ class Scheduler extends StompScheduler implements CommandableInterface {
     public function __construct($loop, $dispatchStrategy, $log, $conf = null) {
 	    // cast optional param
 	    $this->conf = $conf ?: ConfigMapper::getInstance();
+	    $this->notif = new Notif();
 
 	    // run construction
         parent::__construct($loop, $dispatchStrategy, INSTANCE_ID.self::QUEUE_SCHEDULE, INSTANCE_ID.self::QUEUE_COMMAND, $log);
-        $this->notif = new Notif();
 	    $this->resolvers = new ResolutionManager();
 
 	    self::bindQueues();
