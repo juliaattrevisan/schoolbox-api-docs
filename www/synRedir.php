@@ -13,7 +13,7 @@ $action=Cfg::get('external_portal').'login.aspx';
 $method="POST";
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "$action");
+curl_setopt($ch, CURLOPT_URL, $action);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 $login = curl_exec($ch);
 curl_close($ch);
