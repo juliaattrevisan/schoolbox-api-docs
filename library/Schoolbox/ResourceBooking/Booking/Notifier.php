@@ -16,19 +16,19 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Aura\Router\Router;
 use Monolog\Logger;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
-use Schoolbox\Permission\Access\UserAccess;
-use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 
-class Notifier extends AbstractModuleNotifier {
+class Notifier extends AbstractModuleNotifier
+{
 
     /**
      * Namespace slug, as defined in msg_namespace table.
@@ -45,17 +45,21 @@ class Notifier extends AbstractModuleNotifier {
      */
     protected $router;
 
+
     /**
      * {@inheritdoc}
      */
-    protected function buildTopic($eventLabel, $roleType) {
+    protected function buildTopic($eventLabel, $roleType)
+    {
         // noop, deprecated
     }
+
 
     /**
      * @return string
      */
-    protected function getSlug() {
+    protected function getSlug()
+    {
         return $this->slug;
     }
 
@@ -65,7 +69,8 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @return void
      */
-    public function bundleTriggers($bundle) {
+    public function bundleTriggers($bundle)
+    {
         switch ($bundle->getMethod()) {
             case Mapper::METHOD_CREATE:
                 $bundle->attach('created', self::IMMEDIATELY);
@@ -82,14 +87,13 @@ class Notifier extends AbstractModuleNotifier {
                             $bundle->attach('approved', self::IMMEDIATELY);
                             break;
                         case Status\Model::STATUS_PENDING:
-                            $bundle->attach('pending',  self::IMMEDIATELY);
+                            $bundle->attach('pending', self::IMMEDIATELY);
                             break;
                         case Status\Model::STATUS_REJECTED:
                             $bundle->attach('rejected', self::IMMEDIATELY);
                             break;
                     }
-                }
-                else {
+                } else {
                     $bundle->attach('updated', self::IMMEDIATELY);
                 }
                 break;
@@ -98,6 +102,7 @@ class Notifier extends AbstractModuleNotifier {
                 break;
         }
     }
+
 
     /**
      * Builds a messenger for the given object, user and event.
@@ -112,22 +117,23 @@ class Notifier extends AbstractModuleNotifier {
      * @return Messenger
      * @throws \InvalidArgumentException if $event type isn't recognised
      */
-    protected function buildMessenger(Model $object, User $user, $event) {
-        $messenger      = new Messenger();
+    protected function buildMessenger(Model $object, User $user, $event)
+    {
+        $messenger = new Messenger();
 
         // Hydrate event owner
         /** @var Event $calendarEvent */
         $eventMapper    = $this->mapper->getJoinMapper('event');
         $calendarEvent  = $eventMapper->findById($object->getEvent()->getId());
         $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
-        $key            = $this->slug.'.'.$object->getId().'.'.$event;
+        $key            = $this->slug . '.' . $object->getId() . '.' . $event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
         $startDate      = new \Alaress_Date_Format(
-            $object->getEvent()->getStartDate().' '.$object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
+            $object->getEvent()->getStartDate() . ' ' . $object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
         );
 
-        $resourceUrl = sprintf(
+        $resourceUrl   = sprintf(
             '/resource-booking/item/%d?%s',
             $object->getResource()->getId(),
             http_build_query(
@@ -137,24 +143,12 @@ class Notifier extends AbstractModuleNotifier {
                 )
             )
         );
-        $bookingUrl = '/resource-booking/booking/'.$object->getId().'/edit';
-        $messageParams  = array(
-            'user'     => array(
-                $user->formatName(),
-                '/search/user/'.$user->getId(),
-            ),
-            'resource' => array(
-                $object->getResource()->getName(),
-                $resourceUrl
-            ),
-            'date'     => array(
-                $startDate->getLocal(),
-                '/calendar/full/'.$startDate->getUsingFormat('d-m-Y').'/'.$owner->getId(),
-            ),
-            'owner'    => array(
-                $owner->formatName(),
-                '/search/user/'.$owner->getId(),
-            )
+        $bookingUrl    = '/resource-booking/booking/' . $object->getId() . '/edit';
+        $messageParams = array(
+            'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
+            'resource' => array($object->getResource()->getName(), $resourceUrl),
+            'date'     => array($startDate->getLocal(), '/calendar/full/' . $startDate->getUsingFormat('d-m-Y') . '/' . $owner->getId()),
+            'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
         );
         switch ($event) {
             case 'created':
@@ -186,7 +180,7 @@ class Notifier extends AbstractModuleNotifier {
         // the message to be sent to owners - point this to the resource view
         $ownerMessage = new Message(
             $messageText,
-            '/portrait.php?userId='.$user->getExternalId().'&size=square32',
+            '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
             $resourceUrl
         );
 
@@ -206,7 +200,7 @@ class Notifier extends AbstractModuleNotifier {
         // Moderator message - point this to the actual booking
         $moderatorMessage = new Message(
             $messageText,
-            '/portrait.php?userId='.$user->getExternalId().'&size=square32',
+            '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
             $bookingUrl
         );
 
@@ -235,55 +229,54 @@ class Notifier extends AbstractModuleNotifier {
         return $messenger;
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStaffCreated(Model $object, User $user/*, $diff*/) {
+    public function notifyStaffCreated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'created');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStaffUpdated(Model $object, User $user/*, $diff*/) {
+    public function notifyStaffUpdated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'updated');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStaffApproved(Model $object, User $user/*, $diff*/) {
+    public function notifyStaffApproved(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'approved');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStaffPending(Model $object, User $user/*, $diff*/) {
+    public function notifyStaffPending(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'pending');
     }
 
-    /**
-     * @param Model $object
-     * @param User  $user
-     *
-     * @return Messenger
-     */
-    public function notifyStaffRejected(Model $object, User $user/*, $diff*/) {
-        return $this->buildMessenger($object, $user, 'rejected');
-    }
 
     /**
      * @param Model $object
@@ -291,49 +284,59 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @return Messenger
      */
-    public function notifyStudentCreated(Model $object, User $user/*, $diff*/) {
+    public function notifyStaffRejected(Model $object, User $user /*, $diff*/)
+    {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStudentCreated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'created');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStudentUpdated(Model $object, User $user/*, $diff*/) {
+    public function notifyStudentUpdated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'updated');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStudentApproved(Model $object, User $user/*, $diff*/) {
+    public function notifyStudentApproved(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'approved');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyStudentPending(Model $object, User $user/*, $diff*/) {
+    public function notifyStudentPending(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'pending');
     }
 
-    /**
-     * @param Model $object
-     * @param User  $user
-     *
-     * @return Messenger
-     */
-    public function notifyStudentRejected(Model $object, User $user/*, $diff*/) {
-        return $this->buildMessenger($object, $user, 'rejected');
-    }
 
     /**
      * @param Model $object
@@ -341,49 +344,59 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @return Messenger
      */
-    public function notifyParentCreated(Model $object, User $user/*, $diff*/) {
+    public function notifyStudentRejected(Model $object, User $user /*, $diff*/)
+    {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyParentCreated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'created');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyParentUpdated(Model $object, User $user/*, $diff*/) {
+    public function notifyParentUpdated(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'updated');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyParentApproved(Model $object, User $user/*, $diff*/) {
+    public function notifyParentApproved(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'approved');
     }
 
+
     /**
      * @param Model $object
      * @param User  $user
      *
      * @return Messenger
      */
-    public function notifyParentPending(Model $object, User $user/*, $diff*/) {
+    public function notifyParentPending(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'pending');
     }
 
-    /**
-     * @param Model $object
-     * @param User  $user
-     *
-     * @return Messenger
-     */
-    public function notifyParentRejected(Model $object, User $user/*, $diff*/) {
-        return $this->buildMessenger($object, $user, 'rejected');
-    }
 
     /**
      * @param Model $object
@@ -391,7 +404,20 @@ class Notifier extends AbstractModuleNotifier {
      *
      * @return Messenger
      */
-    public function notifyStaffCancelled(Model $object, User $user/*, $diff*/) {
+    public function notifyParentRejected(Model $object, User $user /*, $diff*/)
+    {
+        return $this->buildMessenger($object, $user, 'rejected');
+    }
+
+
+    /**
+     * @param Model $object
+     * @param User  $user
+     *
+     * @return Messenger
+     */
+    public function notifyStaffCancelled(Model $object, User $user /*, $diff*/)
+    {
         return $this->buildMessenger($object, $user, 'cancelled');
     }
 
