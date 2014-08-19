@@ -1,8 +1,7 @@
 #!/usr/bin/hhvm
 <?php
 
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
-use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Aura\Di;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
@@ -20,12 +19,12 @@ use Schoolbox\Realtime\Pipe\SessionValidator;
  * @version     SVN: $Id$
  */
 
-$opts = getopt('vp::c::', $fields);
-
 $fields = array('porcelain', 'mem', 'truemem', 'pid');
 
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
+$opts = getopt('vp::c::', $fields);
+
+foreach ($fields as $k => $name) {
+    if (!isset($opts[$name])) {
         unset($fields[$k]);
     }
 }
@@ -37,94 +36,86 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Socket', array(
-	'verbose' => isset($opts['v']) ? $opts['v'] : null,
-	'port'    => empty($opts['p']) ? 9081 : $opts['p'],
-	'conf'    => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
+    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+    'port'    => empty($opts['p']) ? 9081 : $opts['p'],
+    'conf'    => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
     'fields'  => array_values($fields),
     'flags'   => $flags
 ));
 
 // CREATE WEBSOCKET APP
-$kernel->run(function($di, $loop, $log, $opts) {
-	/**
-	 * @var Di\Container $di
-	 * @var LoopInterface $loop
-	 * @var \Psr\Log\LoggerInterface $log
-	 * @var array $opts
-	 */
-	$redis = Alaress\Redis::getClientInstance();
-	$redis->connect();
+$kernel->run(
+       function ($di, $loop, $log, $opts) {
+           /**
+            * @var Di\Container             $di
+            * @var LoopInterface            $loop
+            * @var \Psr\Log\LoggerInterface $log
+            * @var array                    $opts
+            */
+           $redis = Alaress\Redis::getClientInstance();
+           $redis->connect();
 
-	if(file_exists($opts['conf']) && is_readable($opts['conf'])) {
-		$fp = fopen($opts['conf'], 'r');
-		while($line = fgets($fp)) {
-			$xpl = explode('=',$line);
-			if(count($xpl) == 2) {
-				${$xpl[0]} = $xpl[1];
-			}
-		}
-		fclose($fp);
+           $stratConfig = array();
+           if (file_exists($opts['conf']) && is_readable($opts['conf'])) {
+               $fp = fopen($opts['conf'], 'r');
+               while ($line = fgets($fp)) {
+                   $xpl = explode('=', $line);
+                   if (count($xpl) == 2) {
+                       $stratConfig[$xpl[0]] = $xpl[1];
+                   }
+               }
+               fclose($fp);
+           } else {
+               $log->warning("Couldn't read config: using default strat");
+           }
 
-		$poolStrat = new ConfiguredDispatchStrategy(
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($maxFlywheel) ? (int)$maxFlywheel : DefaultDispatchStrategy::MAX_FLYWHEEL,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-			isset($queueWarnSize) ? (int)$queueWarnSize : DefaultDispatchStrategy::QUEUE_SIZE_WARN,
-			isset($queueMaxSize)  ? (int)$queueMaxSize  : DefaultDispatchStrategy::QUEUE_SIZE_MAX,
-			isset($idleTimeout) ? (int)$idleTimeout : DefaultDispatchStrategy::IDLE_TIMEOUT,
-            $opts['flags']
-		);
+           $stratBuilder = new ConfiguredDispatchStrategyBuilder($stratConfig);
+           $poolStrat    = $stratBuilder->build($opts['flags']);
 
-		$log->info(sprintf("Current strat: workers [%d - %d], queueing (%dms <= %d)",
-			isset($minWorkers)  ? (int)$minWorkers  : DefaultDispatchStrategy::MIN_WORKERS,
-			isset($maxWorkers)  ? (int)$maxWorkers  : DefaultDispatchStrategy::MAX_WORKERS,
-			isset($queueDelay)  ? (int)$queueDelay  : DefaultDispatchStrategy::QUEUE_DELAY,
-            isset($queueMaxSize)  ? (int)$queueMaxSize  : DefaultDispatchStrategy::QUEUE_SIZE_MAX
-		));
-	}
-	else {
-		$poolStrat = new DefaultDispatchStrategy($opts['flags']);
-		$log->warning("Couldn't read config: using default strat");
-	}
+           $delim = in_array('porcelain', $opts['fields']) ? ' ' : "\n    ";
 
-    $conf = $di->get('config');
-    $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'));
+           $log->info(implode($delim, array("Using strategy:") + $stratBuilder->summarise()), array('char' => '+'));
 
-    $stompFactory = new Factory($loop);
+           $conf             = $di->get('config');
+           $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'));
 
-    // we have but one STOMP client (ie. socket connection) to rabbit for all our subscriptions
-    $client = $stompFactory->createClient(array(
-        'host'      => $conf->get('amqp_host'),
-        'port'      => $conf->get('amqp_stomp_port'),
-        'vhost'     => '/',
-        'login'     => $conf->get('amqp_user'),
-        'passcode'  => $conf->get('amqp_pass'),
-    ));
+           $stompFactory = new Factory($loop);
 
-    $client->connect(2)->then(function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts) {
+           // we have but one STOMP client (ie. socket connection) to rabbit for all our subscriptions
+           $client = $stompFactory->createClient(array(
+               'host'     => $conf->get('amqp_host'),
+               'port'     => $conf->get('amqp_stomp_port'),
+               'vhost'    => '/',
+               'login'    => $conf->get('amqp_user'),
+               'passcode' => $conf->get('amqp_pass'),
+           ));
 
-        $pipeManager = new PipeManager($loop, $sessionValidator, $client, $log, $poolStrat);
+           $client->connect(2)
+                  ->then(
+                  function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts) {
 
-        $wss = new Ratchet\WebSocket\WsServer($pipeManager);
-        $wss->disableVersion(0);
+                      $pipeManager = new PipeManager($loop, $sessionValidator, $client, $log, $poolStrat);
 
-        $https = new Ratchet\Http\HttpServer($wss);
+                      $wss = new Ratchet\WebSocket\WsServer($pipeManager);
+                      $wss->disableVersion(0);
 
-        try {
-            $webSock = new React\Socket\Server($loop);
-            $webSock->listen($opts['port'], '0.0.0.0');
+                      $https = new Ratchet\Http\HttpServer($wss);
 
-            new Ratchet\Server\IoServer($https, $webSock, $loop);
+                      try {
+                          $webSock = new React\Socket\Server($loop);
+                          $webSock->listen($opts['port'], '0.0.0.0');
 
-            $log->info("Listening for incoming websockets on port {$opts['port']}...", '+');
-        }
-        catch(ConnectionException $e) {
-            $log->alert("Unable to launch: " . $e->getMessage(), array($e));
-            throw $e;
-        }
+                          new Ratchet\Server\IoServer($https, $webSock, $loop);
 
-    });
-});
+                          $log->info("Listening for incoming websockets on port {$opts['port']}...", array('char' => '+'));
+                      } catch(ConnectionException $e) {
+                          $log->alert("Unable to launch: " . $e->getMessage(), array($e));
+                          throw $e;
+                      }
+
+                  }
+           );
+       }
+);
 
 

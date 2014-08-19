@@ -25,7 +25,8 @@ use React\EventLoop\Timer\TimerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
-abstract class AbstractScheduler extends SignalEmitter implements SchedulerInterface, TaskResponseHandlerInterface {
+abstract class AbstractScheduler extends SignalEmitter implements SchedulerInterface, TaskResponseHandlerInterface
+{
 
     /** @var LoopInterface */
     protected $loop;
@@ -39,7 +40,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /** @var DispatcherInterface */
     protected $dispatcher;
 
-	// TODO release this dependency on the Schoolbox domain
+    // TODO release this dependency on the Schoolbox domain
     /** @var \Schoolbox\IConfigLoader */
     protected $conf;
 
@@ -48,18 +49,19 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
 
 
     /**
-     * @param LoopInterface $loop
+     * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param LoggerInterface $log
-     * @param IConfigLoader $conf
+     * @param LoggerInterface           $log
+     * @param IConfigLoader             $conf
      */
-    public function __construct($loop, $dispatchStrategy, $log, $conf = null) {
+    public function __construct($loop, $dispatchStrategy, $log, $conf = null)
+    {
         parent::__construct($loop);
 
-        $this->loop = $loop;
-        $this->log = $log;
+        $this->loop       = $loop;
+        $this->log        = $log;
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy);
-	    $this->conf = $conf ?: ConfigMapper::getInstance();
+        $this->conf       = $conf ? : ConfigMapper::getInstance();
     }
 
 
@@ -68,8 +70,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      *
      * @param TriggerInterface[] $triggers
      */
-    public function scheduleNotifications($triggers) {
-        foreach($triggers as $trigger) {
+    public function scheduleNotifications($triggers)
+    {
+        foreach ($triggers as $trigger) {
             $this->scheduleNotification($trigger);
         }
     }
@@ -81,37 +84,42 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param TriggerInterface $trigger
      * @return void
      */
-    public function scheduleNotification($trigger) {
-        if($trigger instanceof CancelTrigger) {
-	        $this->log->info("Unscheduling CancelTrigger");
+    public function scheduleNotification($trigger)
+    {
+        if ($trigger instanceof CancelTrigger) {
+            $this->log->info("Unscheduling CancelTrigger");
             $this->unschedule($trigger);
             return;
         }
         $interval = $trigger->getTimestamp() - time();
 
-        if($interval <= self::IMMEDIATELY) {
-	        $this->log->info("Immediately dispatching trigger");
+        if ($interval <= self::IMMEDIATELY) {
+            $this->log->info("Immediately dispatching trigger");
             $this->dispatchTrigger($trigger);
             return;
         }
 
         $self = $this;
 
-        $this->schedule($trigger, function($timer) use ($self) {
-            /** @var TimerInterface $timer */
-            if(!$timer->getData() instanceof TriggerInterface) {
-                throw new InvalidArgumentException("Trigger must be provided to publish data");
-            }
-            $self->dispatchTrigger($timer->getData());
-        });
+        $this->schedule(
+             $trigger,
+             function ($timer) use ($self) {
+                 /** @var TimerInterface $timer */
+                 if (!$timer->getData() instanceof TriggerInterface) {
+                     throw new InvalidArgumentException("Trigger must be provided to publish data");
+                 }
+                 $self->dispatchTrigger($timer->getData());
+             }
+        );
     }
 
 
     /**
      * @return DispatcherInterface
      */
-    public function getDispatcher() {
-        if(isset($this->dispatcher)) {
+    public function getDispatcher()
+    {
+        if (isset($this->dispatcher)) {
             return $this->dispatcher;
         }
         return null;
@@ -121,15 +129,25 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /**
      * @param TriggerInterface $trigger
      */
-    public function dispatchTrigger($trigger) {
+    public function dispatchTrigger($trigger)
+    {
         $event = $trigger->getEvent();
-        foreach($trigger->getCallbacks() as $callback) {
-            $this->getDispatcher()->enqueue($trigger, $this->method, serialize(array(
-                $callback, $event->getObject(), $event->getEffector(), $event->getDiff()
-            )));
+        foreach ($trigger->getCallbacks() as $callback) {
+            $this->getDispatcher()->enqueue(
+                $trigger,
+                $this->method,
+                serialize(array(
+                    $callback,
+                    $event->getObject(),
+                    $event->getEffector(),
+                    $event->getDiff()
+                ))
+            );
         }
-        if(count($trigger->getCallbacks()) == 0) {
-            $this->log->notice(sprintf("Trigger for '%s' has no callbacks", get_class($event->getObject())));
+        if (count($trigger->getCallbacks()) == 0) {
+            $class = get_class($event->getObject());
+            $label = $trigger->getLabel();
+            $this->log->warning("Trigger for '$class::$label' has no callbacks");
         }
     }
 
@@ -138,12 +156,13 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * Schedules a trigger for deferred execution. Returns success or failure.
      *
      * @param TriggerInterface $trigger
-     * @param callable $callable
+     * @param callable         $callable
      * @return bool
      */
-    protected function schedule($trigger, $callable) {
+    protected function schedule($trigger, $callable)
+    {
         // can't schedule a cancel trigger
-        if($trigger instanceof CancelTrigger) {
+        if ($trigger instanceof CancelTrigger) {
             return false;
         }
 
@@ -171,15 +190,16 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function unschedule($trigger) {
-	    if($trigger instanceof RecurringTrigger) {
+    protected function unschedule($trigger)
+    {
+        if ($trigger instanceof RecurringTrigger) {
 
-	    }
+        }
         $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
         $label = $trigger->getLabel();
 
-        if($this->hasTimer($model, $label)) {
+        if ($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
             $this->log->info("Unscheduling trigger '$class::$label'", array('char' => '-'));
             $this->loop->cancelTimer($timer);
@@ -195,7 +215,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param string $label
      * @return TimerInterface|null
      */
-    protected function getTimer($model, $label) {
+    protected function getTimer($model, $label)
+    {
         $class = get_class($model);
         return $this->hasTimer($model, $label)
             ? $this->timers[$class][$label][$this->hashObject($model)]
@@ -204,13 +225,15 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
 
 
     /**
-     * @param object $model
-     * @param string $label
+     * @param object         $model
+     * @param string         $label
      * @param TimerInterface $timer
      */
-    protected function putTimer($model, $label, $timer) {
+    protected function putTimer($model, $label, $timer)
+    {
         $class = get_class($model);
-        $hash = $this->hashObject($model);
+        $hash  = $this->hashObject($model);
+
         $this->timers[$class][$label][$hash] = $timer;
     }
 
@@ -220,9 +243,10 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param string $label
      * @return bool
      */
-    protected function hasTimer($model, $label) {
+    protected function hasTimer($model, $label)
+    {
         $class = get_class($model);
-        $hash = $this->hashObject($model);
+        $hash  = $this->hashObject($model);
         return isset($this->timers[$class][$label][$hash]);
     }
 
@@ -231,9 +255,10 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param object $model
      * @param string $label
      */
-    public function removeTimer($model, $label) {
+    public function removeTimer($model, $label)
+    {
         $class = get_class($model);
-        $hash = $this->hashObject($model);
+        $hash  = $this->hashObject($model);
         unset($this->timers[$class][$label][$hash]);
     }
 
@@ -244,7 +269,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param object $object
      * @return string
      */
-    public function hashObject($object) {
+    public function hashObject($object)
+    {
         // use json rather than serialize to avoid any side-effects
         return spl_object_hash($object);
     }

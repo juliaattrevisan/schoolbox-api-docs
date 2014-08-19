@@ -28,6 +28,7 @@ class IOStream extends Stream implements Listenable
     /** @var SplObjectStorage|StreamListener[] */
     protected $listenerStore;
 
+
     /**
      * @param resource       $stream
      * @param LoopInterface  $loop
@@ -38,7 +39,7 @@ class IOStream extends Stream implements Listenable
         parent::__construct($stream, $loop);
         $this->listenerStore = new SplObjectStorage();
 
-        if($listener) {
+        if ($listener) {
             $this->attachListener($listener);
         }
 
@@ -49,7 +50,7 @@ class IOStream extends Stream implements Listenable
                  function ($data, $reactStream) use ($listenerStore) {
                      /**
                       * @var string $data
-                      * @var self $reactStream
+                      * @var self   $reactStream
                       */
 
                      // confirm valid resource
@@ -66,39 +67,45 @@ class IOStream extends Stream implements Listenable
                      // don't send null data down the pipe
                      if ($e->isStreamEnded() || strlen($data) === 0) {
                          $reactStream->close();
+                         unset($e);
                          return;
                      }
 
-                     foreach($listenerStore as $listener) {
+                     foreach ($listenerStore as $listener) {
                          $listener->dataReceived($e);
                      }
+
+                     unset($e);
                  }
         );
 
         $this->on(
              'close',
                  function ($reactStream) use ($listenerStore) {
-                     foreach($listenerStore as $listener) {
+                     foreach ($listenerStore as $listener) {
                          $listener->streamClosed(new StreamEvent($reactStream->stream));
                      }
+                     unset($e);
                  }
         );
 
         $this->on(
              'error',
                  function ($error, $reactStream) use ($listenerStore) {
-                     foreach($listenerStore as $listener) {
+                     foreach ($listenerStore as $listener) {
                          $listener->errorOccurred(new StreamEvent($reactStream->stream, $error));
                      }
+                     unset($e);
                  }
         );
 
         $this->on(
              'drain',
                  function () use ($listenerStore) {
-                     foreach($listenerStore as $listener) {
+                     foreach ($listenerStore as $listener) {
                          $listener->streamDrained(new StreamEvent(null));
                      }
+                     unset($e);
                  }
         );
 
