@@ -270,7 +270,7 @@ class SitePage extends Page {
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
             'DEBUGBAR'      => $debug_bar_body,
             'DEBUGBAR_HEAD' => $debug_bar_head,
-            'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
+            'WEBSOCKET_HOST' => self::parseRequestUrl(PHP_URL_HOST),
             'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
             'WEBSOCKET_PORT' => $this->getWebsocketPort(),
 	        'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
@@ -1199,5 +1199,23 @@ class SitePage extends Page {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Attempt to (safely) parse $_SERVER for a URL component
+     *
+     * @param string $component
+     * @return mixed
+     */
+    protected static function parseRequestUrl($component = null) {
+        foreach(array('HTTP_HOST','SCRIPT_URI') as $option) {
+            if(isset($_SERVER[$option])) {
+                if($result = parse_url($_SERVER[$option], $component)) {
+                    return $result;
+                }
+            }
+        }
+        return 'localhost';
     }
 }
