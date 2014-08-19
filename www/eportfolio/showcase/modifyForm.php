@@ -51,3 +51,6 @@ if ($authenticator->canModify()) {
 
 	$page->backToTheFuture(1);
 }
+else {
+    error(19);
+}
