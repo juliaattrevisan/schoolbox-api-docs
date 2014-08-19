@@ -18,6 +18,8 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
 
     /**
      * Creates the hydrator.
+     *
+     * @todo inject user handler as a parameter instead of creating it here
      */
     public function __construct() {
         $this->userHandler = new User();
