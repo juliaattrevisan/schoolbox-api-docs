@@ -121,7 +121,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 					foreach($currentSubject['items'] as $currentItem) {
 						$this->getPage()->setVar(array(
 							'SHOWCASED_WORK_ITEM_ID' => $currentItem['currentShowcasedItem']->getId(),
-							'SHOWCASED_WORK_BOX_NAME' => $currentItem['currentBox']->getName(),
+                            'SHOWCASED_WORK_ITEM_USER_ID' => $currentItem['currentShowcasedItem']->getUid(),
+                            'SHOWCASED_WORK_BOX_NAME' => $currentItem['currentBox']->getName(),
 							'SHOWCASED_WORK_BOX_TYPE' => $currentItem['currentBox']->getWorkType()->getName(),
 							'ON_OFF' => ++$j % 2 ? '' : 'dark'
 						));
