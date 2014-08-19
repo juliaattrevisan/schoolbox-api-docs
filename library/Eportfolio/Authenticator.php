@@ -114,28 +114,26 @@ class Eportfolio_Authenticator {
 		if (!$this->isEportfolioEnabled($this->getOwner())) {
 			return false;
 		}
-		else {
-			if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
+	    elseif (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
 				return true;
-			}
-			else {
-				$pageMapper = new \Eportfolio\PageMapper();
+        }
+        else {
+            $pageMapper = new \Eportfolio\PageMapper();
 
-				try {
-					// Check the page actually exists for the owner.
-					$exists = $pageMapper->findOneByColumnList(
-						array(
-							'uid'     => $this->getOwner(),
-							'page_id' => $this->getPageId(),
-						)
-					);
-					if ($exists && ($exists->getDeletedAt() == null)) {
-						return true;
-					}
-				}
-				catch (Schoolbox\Mapper\Exception $e) {}
-			}
-		}
+            try {
+                // Check the page actually exists for the owner.
+                $exists = $pageMapper->findOneByColumnList(
+                    array(
+                        'uid'     => $this->getOwner(),
+                        'page_id' => $this->getPageId(),
+                    )
+                );
+                if ($exists && ($exists->getDeletedAt() == null)) {
+                    return true;
+                }
+            }
+            catch (Schoolbox\Mapper\Exception $e) {}
+        }
 
 		return false;
 	}
@@ -187,8 +185,14 @@ class Eportfolio_Authenticator {
 	 */
 	public function canView() {
 
-		/* Check whether eportfolio is even enabled in the first place
-		 */
+        /* Hostile welcome for guests
+         */
+        if ($this->getGroupHandler()->isGuest()) {
+            return false;
+        }
+
+        /* Check whether eportfolio is even enabled in the first place
+         */
 		if (!$this->isEportfolioEnabled($this->getOwner())) {
 			return false;
 		}
@@ -300,6 +304,12 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canModify() {
+
+        /* Hostile welcome for guests
+         */
+        if ($this->getGroupHandler()->isGuest()) {
+            return false;
+        }
 
 		/* Check whether eportfolio is even enabled in the first place
 		 */
