@@ -22,6 +22,7 @@ class Synchronise_Base_Hydrator_RandomPassword extends Synchronise_Base_Hydrator
      */
     public function __construct($length = null)
     {
+        parent::__construct();
         $this->length = $length;
     }
 
