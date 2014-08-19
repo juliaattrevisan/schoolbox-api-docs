@@ -35,7 +35,7 @@ class Synchronise_Base_Hydrator_RandomPassword extends Synchronise_Base_Hydrator
     {
         return substr(
             preg_replace(
-                '/[a-z0-9]/i',
+                '/[^a-z0-9]/i',
                 '',
                 // base64ing random bytes gives us a bunch of chars that are
                 // mainly alphanumeric.
