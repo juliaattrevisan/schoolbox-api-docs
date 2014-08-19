@@ -146,6 +146,12 @@ class Eportfolio_Authenticator
     public function canCreate()
     {
 
+        /* Hostile welcome for guests
+         */
+        if ($this->getGroupHandler()->isGuest()) {
+            return false;
+        }
+
         /* Check whether eportfolio is even enabled in the first place
          */
         if (!$this->isEportfolioEnabled($this->getOwner())) {
