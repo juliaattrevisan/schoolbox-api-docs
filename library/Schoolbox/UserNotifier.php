@@ -74,6 +74,9 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function manualNotifyCreated($userId, $currentUser) {
 		try {
+            if(is_null($currentUser)) {
+                throw new \DomainException("No effector specified");
+            }
 			$user = $this->mapper->findById($userId);
 		}
 		catch (\Exception $e) {
@@ -95,6 +98,9 @@ class UserNotifier extends AbstractModuleNotifier {
 	 */
 	public function manualNotifyUpdated($userId, $currentUser) {
 		try {
+            if(is_null($currentUser)) {
+                throw new \DomainException("No effector specified");
+            }
 			$user = $this->mapper->findById($userId);
 		}
 		catch (\Exception $e) {
