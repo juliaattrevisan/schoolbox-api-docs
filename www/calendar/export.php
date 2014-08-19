@@ -105,9 +105,9 @@ try {
 		new SitePage(false)
 	);
 	// for IE8
-//	header('Cache-Control: private');
-//	header('Content-Type: text/calendar; charset=utf-8');
-//	header('Content-Disposition: inline; filename='.$filename);
+	header('Cache-Control: private');
+	header('Content-Type: text/calendar; charset=utf-8');
+	header('Content-Disposition: inline; filename='.$filename);
 	$exporter->renderAll();
 }
 catch (Exception_Schoolbox $e) {
