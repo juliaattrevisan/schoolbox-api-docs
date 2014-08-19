@@ -31,11 +31,14 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
         /* Show visible events only, in export
          */
         if ($this->isVisible($currentEvent)) {
+            $eventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
+            $eventType = $eventTypeMapper->findById($currentEvent->getType());
+
             $e = array();
             // Generate a UID based on $currentEvent->getEventId()
             $e['UID']        = $currentEvent->getEventId().'/'.$currentEvent->getConnectorId();
             $e['DTSTAMP']    = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
-            $e['CATEGORIES'] = array('SCHOOL');
+            $e['CATEGORIES'] = $eventType->getType();
             $e['LOCATION'] = $currentEvent->getLocation();
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
