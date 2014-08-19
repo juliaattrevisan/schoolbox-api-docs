@@ -9,12 +9,11 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
-require_once dirname(__FILE__) . '/../../include/ICal/iCalcreator.class.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
 try {
 	$session     = new Session();
 	$token       = $_GET['token'];
@@ -106,9 +105,9 @@ try {
 		new SitePage(false)
 	);
 	// for IE8
-	header('Cache-Control: private');
-	header('Content-Type: text/calendar; charset=utf-8');
-	header('Content-Disposition: inline; filename='.$filename);
+//	header('Cache-Control: private');
+//	header('Content-Type: text/calendar; charset=utf-8');
+//	header('Content-Disposition: inline; filename='.$filename);
 	$exporter->renderAll();
 }
 catch (Exception_Schoolbox $e) {

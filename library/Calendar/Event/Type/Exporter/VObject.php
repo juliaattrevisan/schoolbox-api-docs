@@ -36,6 +36,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
             $e['UID']        = $currentEvent->getEventId().'/'.$currentEvent->getConnectorId();
             $e['DTSTAMP']    = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
             $e['CATEGORIES'] = array('SCHOOL');
+            $e['LOCATION'] = $currentEvent->getLocation();
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -56,6 +57,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
             }
 
             $e['SUMMARY'] = $currentEvent->getTitle();
+
             return $this->getVCalendar()->add('VEVENT', $e);
         }
     }
