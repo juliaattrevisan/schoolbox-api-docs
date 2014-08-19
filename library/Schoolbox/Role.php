@@ -37,6 +37,15 @@ class Role {
     const DIGEST_DAILY  = 2;
 
     /**
+     * True if role is guest
+     *
+     * @return bool
+     */
+    public function isGuest() {
+        return $this->type == self::GUEST;
+    }
+
+    /**
      * True if role is student
      *
      * @return bool
