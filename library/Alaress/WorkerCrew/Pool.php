@@ -100,9 +100,7 @@ class Pool extends EventEmitter implements PoolInterface
     {
         $this->log->notice("Checking health of " . $this->strat->getName() . " pool", array('char' => '?'));
 
-        $pids = array_keys($this->streams);
-
-        foreach ($pids as $pid) {
+        foreach (array_keys($this->streams) as $pid) {
             try {
                 $worker  = $this->workers->getByProcessId($pid);
                 $status  = $worker->getStatus();
@@ -137,8 +135,8 @@ class Pool extends EventEmitter implements PoolInterface
             }
         }
 
-        // if there's no workers, detach the healthchecker
-        if (!count($pids)) {
+        // if we're now able to accept a new task, detach the healthchecker
+        if ($this->canAccept()) {
             $this->emit('ready');
         }
     }
