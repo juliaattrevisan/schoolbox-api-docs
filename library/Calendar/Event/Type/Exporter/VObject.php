@@ -40,6 +40,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
             $e['DTSTAMP']    = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
             $e['CATEGORIES'] = $eventType->getType();
             $e['LOCATION'] = $currentEvent->getLocation();
+            $e['DESCRIPTION'] = \Scrub::html2text($currentEvent->getDetail());
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
