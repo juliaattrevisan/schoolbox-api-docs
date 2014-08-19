@@ -23,24 +23,24 @@
 <![endif]-->
 </head>
 <body class="login">
-<div id="header">
-    <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" /></a>
-</div>
 <div id="container" class=" login">
+    <div id="login-bg">
+        <div id="login-bg-inner" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;min-width:50%;min-height:50%;background-position:center center;background-size:cover;"></div>
+    </div>
     <div id="content" class="clearfix">
-        <h1 style="text-transform:capitalize">{SITE_NAME}</h1>
+        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" /></a>
         <p class="error">{ERROR}</p>
         <form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
             <fieldset>
-                <label for="username">Login Name:</label>
-                <input type="text" name="username" id="username" />
+                <!--[if lt IE 10]>Username:<![endif]-->
+                <input type="text" name="username" id="username" placeholder="Username" />
             </fieldset>
             <fieldset>
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password" />
+                <!--[if lt IE 10]>Password:<![endif]-->
+                <input type="password" name="password" id="password" placeholder="Password" />
             </fieldset>
             <input type="hidden" name="page" value="{HIDDEN}" />
-            <input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
+            <input class="login submit-btn-plain" type="submit" name="Submit" value="Sign in" alt="Sign in" />
         </form>
         <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
     </div>
@@ -57,5 +57,19 @@
         <li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
     </ul>
 </div>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var images = ['login-1.jpg',
+            'login-2.jpg',
+            'login-3.jpg',
+            'login-4.jpg'];
+
+        $('#login-bg-inner')
+            .css({
+                'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
+            });
+    });
+</script>
 </body>
 </html>

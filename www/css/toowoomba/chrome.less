@@ -20,8 +20,8 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					344px;
-@logo-height: 					80px;
+@logo-width: 					251px;
+@logo-height: 					63px;
 
 // Generic colors
 @body-background: 				#e9e9e9; // Body, but not the content area
@@ -71,7 +71,7 @@
 @footer-links:					@footer-color;
 
 // Optional features
-@login-version: 				1;
+// @login-version: 				1;
 @header-version: 				1;
 // =============================================================================
 // 3. Load core
@@ -103,7 +103,9 @@
   #tabs{
     position: relative;
     top: 36px;
-	  z-index: 1;
+	z-index: 1;
+	border-bottom: 4px solid @navigation-color;
+    height: 24px;
   }
 }
 
@@ -112,9 +114,6 @@
 }
 
 #container{
-  border-top: 4px solid @tab-hover-background;
-  position: relative;
-  top: -4px;
   #category{
     li a{
       color: @link;
@@ -127,46 +126,30 @@
 .admin-nav li a.current{ background: @link; color: #ffffff; }
 
 body.login{
-  background: @banner-background;
-
-  #header {
-    background: none;
-    height: @logo-height + 100px;
-    .logo {
-      left: 50%;
-      top: 50px;
-      margin-left: 0 - @logo-width / 2;
-    }
+  #login-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
   }
   #container {
-    padding: 16px;
+    background: rgba(101, 25, 39, 0.9);
+    border-top: 0px;
     margin: 0 50px;
     text-align: left;
-    h1 {
-      text-align: center;
+    .logo {
+        margin: 0 0 17px 21px;
     }
-    &.login{
-      text-align: center;
-      min-width: 0;
-      width: 300px;
-      margin: 0 auto;
-    }
-  }
-  #content {
-    min-width: 0;
-  }
-  #footer {
-    text-align: center;
-    .absolute(auto,0,0,0);
-    ul {
-      float: none;
+    #loginForm{
+        .submit-btn-plain{
+            background: @navigation-color url(/images/core/icons/chevron.png) 280px 11px no-repeat;
+            font-weight: bold;
+            &:hover{ background: lighten(@navigation-color, 5%) url(/images/core/icons/chevron.png) 280px 11px no-repeat; }
+        }
     }
   }
-  #loginForm label {
-    text-align: left;
-  }
-  #footer ul li { color: @banner-color; }
-  #footer ul li a { color: @banner-links; }
 }
 
 /*
