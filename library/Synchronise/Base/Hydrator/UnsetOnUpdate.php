@@ -36,7 +36,7 @@ class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_
     /**
      * {@inheritdoc}
      */
-    protected function hydrateOnCreate($externalUser, $newUser) {
+    protected function hydrateOnUpdate($externalUser, $newUser) {
         foreach ($this->getClearFields() as $clearField) {
             unset($newUser[$clearField]);
         }

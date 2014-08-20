@@ -50,7 +50,7 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        if ($this->userExists($externalUser, $newUser)) {
+        if (!$this->userExists($externalUser, $newUser)) {
             $newUser = $this->hydrateOnCreate($externalUser, $newUser);
         }
         else {
