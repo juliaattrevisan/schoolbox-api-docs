@@ -57,6 +57,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->categoryMapper = CategoryMapper::getInstance();
+        parent::loadDependencies($dependencies);
 	}
 
 
@@ -399,7 +400,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentDeleted($resource, $effector) {
 		return $this->notifyDeleted(Role::STUDENT, $resource, $effector);
@@ -408,7 +409,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffCreated($resource, $effector) {
 		return $this->notifyCreated(Role::STAFF, $resource, $effector);
@@ -418,7 +419,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffUpdated($resource, $effector, $diff = null) {
 		return $this->notifyUpdated(Role::STAFF, $resource, $effector, $diff);
@@ -427,7 +428,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffDeleted($resource, $effector) {
 		return $this->notifyDeleted(Role::STAFF, $resource, $effector);
@@ -436,7 +437,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentCreated($resource, $effector) {
 		return $this->notifyCreated(Role::PARENT, $resource, $effector);
@@ -446,7 +447,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentUpdated($resource, $effector, $diff = null) {
 		return $this->notifyUpdated(Role::PARENT, $resource, $effector, $diff);
@@ -455,7 +456,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentDeleted($resource, $effector) {
 		return $this->notifyDeleted(Role::PARENT, $resource, $effector);
