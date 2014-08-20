@@ -156,8 +156,37 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 	 * @return string
 	 */
 	private function otherLetterIndex($allAnswers) {
-		return chr(65+(int)count($allAnswers));
+		return $this->findLetterIndex((int)count($allAnswers) + 1);
 	}
+
+    /**
+     * Translate an integer to letters
+     *
+     * @param $num
+     * @return string
+     */
+    protected function findLetterIndex($num) {
+        $firstLetter = floor($num / 26);
+        $lastLetter = $num % 26;
+
+        /* Special case for z, az, bz, etc.
+         */
+        if (!$lastLetter) {
+            $firstLetter--;
+            $lastLetter = 26;
+        }
+
+        /* Convert from numeric to alpha
+         */
+        if ($firstLetter) {
+            $string = chr($firstLetter+64) . chr($lastLetter+64);
+        }
+        else {
+            $string = chr($lastLetter+64);
+        }
+
+        return $string;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking

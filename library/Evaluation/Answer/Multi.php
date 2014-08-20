@@ -160,6 +160,35 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 	}
 
     /**
+     * Translate an integer to letters
+     *
+     * @param $num
+     * @return string
+     */
+    protected function findLetterIndex($num) {
+        $firstLetter = floor($num / 26);
+        $lastLetter = $num % 26;
+
+        /* Special case for z, az, bz, etc.
+         */
+        if (!$lastLetter) {
+            $firstLetter--;
+            $lastLetter = 26;
+        }
+
+        /* Convert from numeric to alpha
+         */
+        if ($firstLetter) {
+            $string = chr($firstLetter+64) . chr($lastLetter+64);
+        }
+        else {
+            $string = chr($lastLetter+64);
+        }
+
+        return $string;
+    }
+
+    /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
@@ -180,12 +209,10 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = $this->getAnswersFromAnswerGroup($answerGroup);
 
-			/* A
-			 */
-			$i = 65;
+			$i = 1;
 
             foreach ($allAnswers as $currentAnswer) {
-				$valueFacade = chr($i);
+				$valueFacade = $this->findLetterIndex($i);
 
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
