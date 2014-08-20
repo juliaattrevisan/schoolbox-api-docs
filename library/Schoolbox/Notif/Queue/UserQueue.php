@@ -10,13 +10,11 @@
 namespace Schoolbox\Notif\Queue;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
-use Exception;
-use InvalidArgumentException;
-use Schoolbox\Notif\Message\External\TargetedConverter;
+use Alaress\Async\Queue\QueueInterface;
+use OutOfBoundsException;
 
 /**
  * This class abstracts several AMQP queues, one for each of 'digest', 'listed', 'unread' and 'to be sorted'.
@@ -38,167 +36,108 @@ class UserQueue {
 	// queue of messages that are pending to be sent by Digest
 	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
 
-	/** @var Notification[] */
+	/** @var array */
 	protected $notifications = array();
 
-	/** @var AMQPInterface */
-	protected $conn;
-
-	/** @var array */
-	protected $bindings;
-
-	/** @var int */
-	protected $userId;
+    /** @var QueueInterface[] */
+    protected $queues;
 
 
-	/**
-	 * @param array $bindings
-	 * @param AMQPInterface $mqConnector
-	 * @param bool $simulate
-	 */
-	public function __construct($bindings, $mqConnector, $simulate = false) {
-		$this->conn = $mqConnector;
-		$this->userId = $bindings['user']['id'];
-
-		unset($bindings['user']);
-
-		// the user's personal routing key
-		$this->bindings = array("*.notify.user.$this->userId.#");
-
-		// all remaining bindings specified
-		foreach($bindings as $type => $binds) {
-			foreach($binds as $id) {
-				$this->bindings[] = "*.notify.$type.$id";
-			}
-		}
-
-		if($simulate) {
-			return;
-		}
-
-		// one connection to declare them all...
-		$exchange = $this->conn->getSecondaryExchange($this->userId);
-		$this->conn->declareExchange($exchange);
-		$exchangeName = $exchange->getName();
-
-		$this->conn->declareQueue($this->getToSortQueueName());
-		$this->conn->declareQueue($this->getDigestQueueName());
-		$this->conn->declareQueue($this->getListedQueueName());
-		$this->conn->declareQueue($this->getUnreadQueueName());
-
-		// ...and in the darkness bind them.
-		foreach($this->bindings as $key) {
-			$this->conn->bindExchange($exchangeName, $key);
-		}
-		$this->conn->bindExchange($exchangeName, "*.digest.user.$this->userId.#");
-		$this->conn->bindExchange($exchangeName, "*.instant.user.$this->userId.#");
-
-		$this->conn->bindQueue($this->getToSortQueueName(), '*.notify.#', $exchangeName);
-		$this->conn->bindQueue($this->getDigestQueueName(), "*.digest.user.$this->userId.#", $exchangeName);
-		$this->conn->bindQueue($this->getListedQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
-		$this->conn->bindQueue($this->getUnreadQueueName(), "*.instant.user.$this->userId.#", $exchangeName);
-
-	}
+    /**
+     * @param QueueInterface[] $userQueues
+     */
+    public function __construct(array $userQueues = array())
+    {
+        foreach ($userQueues as $q) {
+            $this->addQueue($q);
+        }
+    }
 
 
-	/**
-	 * @return array
-	 */
-	public function getBindings() {
-		return $this->bindings;
-	}
+    /**
+     * @param QueueInterface $queue
+     */
+    public function addQueue(QueueInterface $queue)
+    {
+        $this->queues[$queue->getName()] = $queue;
+    }
 
 
-	/**
-	 * Retrieve messages from the queue
-	 *
-	 * @deprecated use getNotifications() instead
-	 * @param int $limit - how many messages to retrieve, from most recent backward
-	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
-	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
-	 * @return Notification[]
-	 */
-	public function getMessages($limit = 10, $forceRefresh = false, $preserveKeys = false) {
-		return $this->getNotifications($limit, $forceRefresh, $preserveKeys);
-	}
+    /**
+     * @return array
+     */
+    public function getQueueNames()
+    {
+        return array_keys($this->queues);
+    }
 
 
-	/**
-	 * Collate notifications from the messages in the queue
-	 *
-	 * @param int $limit - how many messages to retrieve, from most recent backward
-	 * @param bool $forceRefresh - whether or not the list of messages should be repopulated
-	 * @param bool $preserveKeys - whether or not to keep the message ID as the array key
-	 * @return Notification[]
-	 */
-	public function getNotifications($limit = 10, $forceRefresh = false, $preserveKeys = false) {
+    /**
+     * @param string $queueName
+     * @param int    $limit
+     * @param bool   $refresh
+     * @return array
+     * @throws OutOfBoundsException
+     */
+    public function fetchNotifications($queueName, $limit = 10, $refresh = false)
+    {
+        if (empty($this->queues[$queueName])) {
+            throw new OutOfBoundsException("Queue '$queueName' not declared");
+        }
 
-		// retrieve messages and sort
-		if(!count($this->notifications) || $forceRefresh) {
-			$this->retrieveNotifications();
-		}
+        if (empty($this->notifications[$queueName]) || $refresh) {
+            $this->fetchFromSource($this->queues[$queueName]);
+        }
 
-		if($limit) {
-			return array_slice($this->notifications, 0, $limit, $preserveKeys);
-		}
-		return $this->notifications;
-	}
+        if ($limit) {
+            return array_slice($this->notifications[$queueName], 0, $limit);
+        }
+
+        return $this->notifications[$queueName];
+    }
 
 
-	/**
-	 * Populate this user's notification list (idempotent)
-	 */
-	protected function retrieveNotifications() {
-		$nacks = array();
-		$bundle = new NotificationBundle();
+    /**
+     * @param QueueInterface $queue
+     */
+    protected function fetchFromSource(QueueInterface $queue) {
+        $bundle = new NotificationBundle();
 
-		try {
-			while($m = $this->conn->readFromQueue($this->getListedQueueName())) {
-				$nacks[] = $m;
+        $bundle->appendInstances($queue->fetch());
+        $this->notifications[$queue->getName()] = $bundle->getAll();
 
-				// unwrap the formatting
-				$body = json_decode($m->body, true);
-
-				try {
-					// attempt to unserialize the message
-					$bundle->appendInstance(Instance::jsonUnserialize($body['message']));
-				}
-				catch(InvalidArgumentException $e) {
-					// TODO: once TargetedMessage is fully deprecated, this catch can be removed
-					$conv = new TargetedConverter();
-					try {
-						$bundle->appendInstance($conv->convert($body['message']));
-					}
-					catch(InvalidArgumentException $e) {
-						// nothing we can do, message was unparseable
-					}
-				}
-			}
-		}
-		catch(Exception $e) {
-			// regardless of what happens above, it's imperative that we reject the messages we pulled
-			$this->conn->rejectMessages($nacks);
-			// *now* you can freak out
-			throw $e;
-		}
-
-		// now we've collected messages, reject all
-		$this->conn->rejectMessages($nacks);
-
-		$this->notifications = $bundle->getAll();
-
-		// sort descending
-		uasort($this->notifications, function($a, $b) {
+        // sort descending
+        uasort($this->notifications[$queue->getName()], function($a, $b) {
             /**
              * @var Notification $a
              * @var Notification $b
              */
             $at = $a->getTimestamp();
-			$bt = $b->getTimestamp();
-			return $at == $bt ? 0 : $at > $bt ? -1 : 1;
-		});
+            $bt = $b->getTimestamp();
+            return $at == $bt ? 0 : $at > $bt ? -1 : 1;
+        });
+    }
 
-	}
+
+    /**
+     * @param Instance $instance
+     * @return bool
+     */
+    public function contains(Instance $instance) {
+        // only check the redis queues
+        $qs = array_filter($this->queues, function ($v) {
+//            return $v instanceof RedisQueue;
+        });
+
+        foreach($qs as $q) {
+            /** @var QueueInterface $q */
+            if($q->contains($instance)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
 	/**
@@ -254,46 +193,6 @@ class UserQueue {
 	 */
 	public static function getUserDigestQueueName($userId) {
 		return self::getQueueName(self::QUEUE_DIGEST_MESSAGES, $userId);
-	}
-
-
-	/**
-	 * Returns the 'to be sorted' queuename for this UserQueue
-	 *
-	 * @return string
-	 */
-	public function getToSortQueueName() {
-		return self::getQueueName(self::QUEUE_TOSORT_MESSAGES, $this->userId);
-	}
-
-
-	/**
-	 * Returns the 'listed' queuename for this UserQueue
-	 *
-	 * @return string
-	 */
-	public function getListedQueueName() {
-		return self::getQueueName(self::QUEUE_LISTED_MESSAGES, $this->userId);
-	}
-
-
-	/**
-	 * Returns the 'unread' queuename for this UserQueue
-	 *
-	 * @return string
-	 */
-	public function getUnreadQueueName() {
-		return self::getQueueName(self::QUEUE_UNREAD_MESSAGES, $this->userId);
-	}
-
-
-	/**
-	 * Returns the 'digest' queuename for this UserQueue
-	 *
-	 * @return string
-	 */
-	public function getDigestQueueName() {
-		return self::getQueueName(self::QUEUE_DIGEST_MESSAGES, $this->userId);
 	}
 
 }
