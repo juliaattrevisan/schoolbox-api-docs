@@ -154,11 +154,21 @@
             return false;
         });
 
+		/* Add a new answer option
+		 */
         $j(document).on('click', '.makeNewAnswer', function (e) {
-            e.preventDefault();
-            var thing = $j('.hidden-clone ul:first-child').clone();
-            $j('ul#answerCollection').append(thing);
-            refreshList();
+			e.preventDefault();
+
+			var maxItems = 702;
+
+			/* Obey limit
+			 */
+			if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
+				var thing = $j('.hidden-clone ul:first-child').clone();
+				$j('ul#answerCollection').append(thing);
+				refreshList();
+			}
+			
             return false;
         });
 

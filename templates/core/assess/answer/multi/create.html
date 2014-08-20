@@ -151,6 +151,8 @@ $j(document).ready(function() {
     /* Add a new answer option
      */
     $j(document).on('click', '.makeNewAnswer', function() {
+		e.preventDefault();
+
 		var maxItems = 702;
 
 		/* Obey limit
