@@ -17,6 +17,8 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
+        $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unsetOnUpdate->setClearFields(array('password'));
         $this
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeCompanyCodes())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentParents())
@@ -32,6 +34,7 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
             // campus in the same field.
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Campus_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator($unsetOnUpdate)
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             // TASS has no separate spouse entries, so just add a clear one.
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
