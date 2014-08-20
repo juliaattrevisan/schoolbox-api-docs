@@ -149,15 +149,19 @@ $j(document).ready(function() {
    		return this.optional(element) || (parseFloat(value) > 0);
 	}, "Amount must be greater than zero");
 
-
-
-
     /* Add a new answer option
      */
     $j(document).on('click', '.makeNewAnswer', function() {
-		var thing = $j('.hidden-clone li:first-child').clone();
-		$j('ul#answerCollection').append(thing);
-		refreshList();
+		var maxItems = 702;
+
+		/* Obey limit
+		 */
+		if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
+			var thing = $j('.hidden-clone li:first-child').clone();
+			$j('ul#answerCollection').append(thing);
+			refreshList();
+		}
+
 		return false;
     });
 
@@ -175,13 +179,11 @@ $j(document).ready(function() {
 	});
 
 	function refreshList() {
-
 		var i = 1;
 
-		$j('li.inputs > .list-item').each(function() {
-			var $this = $j(this);
-			$this.children('span').html(findLetterIndex(i) + ')');
-			$this.children('input').val(i);
+		$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+			$(element).children('span').html(findLetterIndex(i) + ')');
+			$(element).children('input').val(i);
 			i++;
 		});
 
@@ -216,7 +218,7 @@ $j(document).ready(function() {
 		/* Convert from numeric to alpha
 		 */
 		if (firstLetter) {
-			var string = String.fromCharCode(firstLetter+64) . String.fromCharCode(lastLetter+64);
+			var string = String.fromCharCode(firstLetter+64) + String.fromCharCode(lastLetter+64);
 		}
 		else {
 			var string = String.fromCharCode(lastLetter+64);
