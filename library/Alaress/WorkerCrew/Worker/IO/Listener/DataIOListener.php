@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew\Worker\IO\Listener;
 
 
 use Alaress\Async\Listener\Stream\StreamEvent;
+use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\PoolInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
@@ -64,9 +65,9 @@ class DataIOListener extends AbstractIOStreamListener
         try {
             $pid = $this->pool->getProcessIdByResource($e->getStream());
 
-            $this->pool->setWorkerStatus($pid, Worker::DONE);
+            $this->log->notice("Worker {{$pid}} datastream closed: ensuring worker terminated");
+            $this->pool->releaseWorker($pid, Pool::RELEASE_HARD);
 
-            $this->log->notice("Worker $pid killed");
         } catch(UnexpectedValueException $e) {
             $this->log->critical("Unexpected stream supplied, cannot locate PID");
         }
@@ -129,8 +130,11 @@ class DataIOListener extends AbstractIOStreamListener
                         $task->getCommand(),
                         $this->strat->decodeRecords($task->getData(false))
                     );
-                    $pool->setWorkerStatus($pid, Worker::READY);
-                    $this->log->info("Worker {{$pid}} READY for new task");
+                    $newStatus = $pool->setWorkerStatus($pid, Worker::READY);
+
+                    if ($newStatus == Worker::READY) {
+                        $this->log->info("Worker {{$pid}} READY for new task");
+                    }
 
                 } catch(Exception $e) {
                     // your reactor will explode if you don't catch exceptions coming from your response handler

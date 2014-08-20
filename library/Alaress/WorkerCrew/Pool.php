@@ -114,16 +114,16 @@ class Pool extends EventEmitter implements PoolInterface
 
                 $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
 
-                // check for an unexpected finish state
                 if ($finish && $status != Worker::READY) {
+                    // check for an unexpected finish state
                     $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
-                    $worker->markTaskComplete();
-                } // if it's over the hard limit, terminate it
-                elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD)) {
+                    $worker->setStatus(Worker::READY);
+                } elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD)) {
+                    // if it's over the hard limit, terminate it
                     $this->log->error("Worker {{$pid}} has exceeded hard execution timeout");
                     $this->releaseWorker($pid, self::RELEASE_HARD);
-                } // if it's over the soft limit, let it down gently
-                elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT)) {
+                } elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT)) {
+                    // if it's over the soft limit, let it down gently
                     $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout");
                     $this->releaseWorker($pid, self::RELEASE_SOFT);
                 } else {
@@ -552,12 +552,17 @@ class Pool extends EventEmitter implements PoolInterface
         // first, set the worker to the given state (throws OOB if necessary)
         $worker = $this->workers->getByProcessId($pid);
 
-        $this->log->debug("Attempting {{$pid}} transition from {$worker->getStatus()} to $status");
+        $oldStatus = $worker->getStatus();
+        $newStatus = $worker->setStatus($status);
 
-        $worker->setStatus($status);
+        // don't bother telling us about attempts to change to the same state
+        if ($status != $oldStatus) {
+            $success = $status == $newStatus ? "Successfully" : "UNSUCCESSFULLY";
+            $this->log->debug("$success transitioned {{$pid}} from $oldStatus to $status");
+        }
 
         // return the result, knowing it may not have changed
-        return $worker->getStatus();
+        return $newStatus;
     }
 
 
