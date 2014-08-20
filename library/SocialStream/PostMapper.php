@@ -12,7 +12,7 @@ namespace SocialStream;
 use PDO;
 use Schoolbox;
 use Schoolbox\Collection;
-use SocialStream\Post\SocialStream_Post_Factory;
+use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
 class PostMapper extends Schoolbox\Mapper {
@@ -346,7 +346,17 @@ class PostMapper extends Schoolbox\Mapper {
 	 * @return SocialStream_Post_Abstract
 	 */
 	public function createModel($row) {
-		$factory = new \SocialStream\Post\Factory\Display($row['p.type']);
+        // default
+        $type = 'string';
+
+        foreach (array('p.type', 'type') as $t) {
+            if (isset($row[$t])) {
+                $type = $row[$t];
+                break;
+            }
+        }
+
+        $factory = new Factory\Display($type);
 
 		return $factory->produce();
 	}
