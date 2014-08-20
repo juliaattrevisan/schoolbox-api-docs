@@ -1,29 +1,31 @@
-// Orbit aka Carousel aka Slider
+//
+// ORBIT aka Carousel aka Slider
+//
 
 // $include-html-orbit-classes: $include-html-classes;
 
 // We use these to control the caption styles
 // $orbit-container-bg: none;
-// $orbit-caption-bg: rgba(51,51,51, 0.8);
-// $orbit-caption-font-color: #fff;
-// $orbit-caption-font-size: rem-calc(14);
+$orbit-caption-bg: rgba($primary-color, .7);
+$orbit-caption-font-color: $white;
+$orbit-caption-font-size: rem-calc(16);
 // $orbit-caption-position: "bottom"; // Supported values: "bottom", "under"
-// $orbit-caption-padding: rem-calc(10 14);
+$orbit-caption-padding: rem-calc(16 24);
 // $orbit-caption-height: auto;
 
 // We use these to control the left/right nav styles
 // $orbit-nav-bg: transparent;
 // $orbit-nav-bg-hover: rgba(0,0,0,0.3);
-// $orbit-nav-arrow-color: #fff;
-// $orbit-nav-arrow-color-hover: #fff;
+$orbit-nav-arrow-color: $white;
+$orbit-nav-arrow-color-hover: $white;
 
 // We use these to control the timer styles
 // $orbit-timer-bg: rgba(255,255,255,0.3);
 // $orbit-timer-show-progress-bar: true;
 
 // We use these to control the bullet nav styles
-// $orbit-bullet-nav-color: #ccc;
-// $orbit-bullet-nav-color-active: #999;
+$orbit-bullet-nav-color: $secondary-color;
+$orbit-bullet-nav-color-active: $primary-color;
 // $orbit-bullet-radius: rem-calc(9);
 
 // We use these to controls the style of slide numbers
@@ -75,3 +77,9 @@ $clearing-carousel-thumb-active-border: 4px solid tint($tertiary, 26%);
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/clearing";
 
+//
+// CUSTOM OVERRIDES
+//
+.orbit-container				{
+	.orbit-prev, .orbit-next	{ top: 40%; }
+}

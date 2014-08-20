@@ -68,7 +68,7 @@ $alert-button-border-color: transparent;
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
-$crumb-bg: scale-color($secondary-color, $lightness: 100%);
+//$crumb-bg: scale-color($secondary-color, $lightness: 100%);
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -221,17 +221,76 @@ $f-dropdown-list-hover-bg: tint($primary-color, 32%);
 // We use this to control the styles for when the dropdown has custom content.
 $f-dropdown-content-padding: rem-calc(16);
 
+//
+// PAGINATION
+//
+
+// $include-pagination-classes: $include-html-classes;
+
+// We use these to control the pagination container
+$pagination-height: rem-calc(48);
+$pagination-margin: rem-calc(0);
+
+// We use these to set the list-item properties
+// $pagination-li-float: $default-float;
+$pagination-li-height: rem-calc(48);
+$pagination-li-font-color: $primary-color;
+$pagination-li-font-size: rem-calc(16);
+$pagination-li-margin: rem-calc(0);
+
+// We use these for the pagination anchor links
+$pagination-link-pad: rem-calc(8 16 8);
+$pagination-link-font-color: $primary-color;
+$pagination-link-active-bg: tint($tertiary, 87%);
+
+// We use these for disabled anchor links
+// $pagination-link-unavailable-cursor: default;
+// $pagination-link-unavailable-font-color: #999;
+$pagination-link-unavailable-bg-active: scale-color(#fff, $lightness: -5%);
+
+// We use these for currently selected anchor links
+$pagination-link-current-background: $white;
+$pagination-link-current-font-color: $primary-color;
+// $pagination-link-current-font-weight: $font-weight-bold;
+// $pagination-link-current-cursor: default;
+$pagination-link-current-active-bg: $pagination-link-active-bg;
+
+//
+// TABS
+//
+
+// $include-html-tabs-classes: $include-html-classes;
+
+// $tabs-navigation-padding: rem-calc(16);
+$tabs-navigation-bg-color: tint($tertiary, 74%);
+$tabs-navigation-active-bg-color: $white;
+$tabs-navigation-hover-bg-color: tint($tertiary, 87%);
+// $tabs-navigation-font-color: #222;
+// $tabs-navigation-active-font-color: $tabs-navigation-font-color;
+// $tabs-navigation-font-size: rem-calc(16);
+// $tabs-navigation-font-family: $body-font-family;
+
+// $tabs-content-margin-bottom: rem-calc(24);
+// $tabs-content-padding: $column-gutter/2;
+
+// $tabs-vertical-navigation-margin-bottom: 1.25rem;
+
 @import "../../../javascript/components/foundation/scss/foundation/components/buttons";
 @import "../../../javascript/components/foundation/scss/foundation/components/button-groups";
 @import "../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
 @import "../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
 @import "../../../javascript/components/foundation/scss/foundation/components/dropdown";
 @import "../../../javascript/components/foundation/scss/foundation/components/split-buttons";
+@import "../../../javascript/components/foundation/scss/foundation/components/pagination";
+@import "../../../javascript/components/foundation/scss/foundation/components/tabs";
 
 //
-// Custom overrides
+// CUSTOM OVERRIDES
 //
 .button 						{ padding: 0.825rem 2.5rem;
+	&.secondary 				{ color: $primary-color;
+		&:hover 				{ color: $primary-color; }
+	}
 	&.warning 					{ background-color: $warning-color;
 		&:hover 				{ background-color: tint($warning-color, 11%); }
 	}
@@ -240,37 +299,21 @@ $button-group-border-width: 0;
 
 .breadcrumb 					{ margin: 0; list-style: none; overflow: hidden;
 	li 							{
-		a 						{
-			color: $black;
-			text-decoration: none;
-			padding: 13px 0 13px 50px;
-			background-color: tint($tertiary, 74%);
-			position: relative;
-			display: block;
-			float: left;
-			&:before, &:after {
-				content: " ";
-				display: block;
-				width: 0;
-				height: 0;
-				border-top: 50px solid transparent;
-				border-bottom: 50px solid transparent;
-				position: absolute;
-				top: 50%;
-				margin-top: -50px;
-				left: 100%;
-				z-index: 2;
+		a 						{ color: $black; text-decoration: none; padding: 13px 0 13px 50px; background-color: tint($tertiary, 74%);
+								position: relative;display: block;float: left;
+			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent;
+								border-bottom: 50px solid transparent; position: absolute; top: 50%; margin-top: -50px; left: 100%; z-index: 2;
 			}
-			&:before{
-				margin-left: 1px;
-				border-left: 30px solid $white;
-			}
-			&:after{ border-left: 30px solid tint($tertiary, 74%); }
-			&:hover{ background-color: tint($tertiary, 87%); }
-			&:hover:after { border-left-color: tint($tertiary, 87%) !important; }
+			&:before			{ margin-left: 1px; border-left: 30px solid $white; }
+			&:after 			{ border-left: 30px solid tint($tertiary, 74%); }
+			&:hover 			{ background-color: tint($tertiary, 87%); }
+			&:hover:after 		{ border-left-color: tint($tertiary, 87%) !important; }
 		}
 	}
-	li:first-child a { padding-left: 22px; }
+	li:first-child a 			{ padding-left: 22px; }
 }
 
 .f-dropdown.content 			{ background-color: $f-dropdown-content-bg; }
+
+ul.pagination li a,
+ul.pagination li button 		{ background-color: tint($tertiary, 74%); border-radius: 0px; font-weight: $font-weight-bold; }

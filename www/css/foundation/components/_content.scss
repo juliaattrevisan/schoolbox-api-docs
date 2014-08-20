@@ -22,4 +22,256 @@
 // We use this to control any elments within list items
 // $inline-list-children-display: block;
 
+//
+// PANELS
+//
+
+// $include-html-panel-classes: $include-html-classes;
+
+// We use these to control the background and border styles
+// $panel-bg: scale-color(#fff, $lightness: -5%);
+// $panel-border-style: solid;
+// $panel-border-size: 1px;
+
+// We use this % to control how much we darken things on hover
+// $panel-function-factor: -11%;
+// $panel-border-color: scale-color($panel-bg, $lightness: $panel-function-factor);
+
+// We use these to set default inner padding and bottom margin
+// $panel-margin-bottom: rem-calc(20);
+// $panel-padding: rem-calc(20);
+
+// We use these to set default font colors
+// $panel-font-color: #333;
+// $panel-font-color-alt: #fff;
+
+// $panel-header-adjust: true;
+// $callout-panel-link-color: $primary-color;
+
+//
+// LABELS
+//
+
+// $include-html-label-classes: $include-html-classes;
+
+// We use these to style the labels
+$label-padding: rem-calc(8 24 8);
+// $label-radius: $global-radius;
+
+// We use these to style the label text
+$label-font-sizing: rem-calc(10);
+$label-font-weight: $font-weight-bold;
+// $label-font-color: #333;
+// $label-font-color-alt: #fff;
+// $label-font-family: $body-font-family;
+
+//
+// PRICING TABLES
+//
+
+// $include-html-pricing-classes: $include-html-classes;
+
+// We use this to control the border color
+// $price-table-border: solid 1px #ddd;
+
+// We use this to control the bottom margin of the pricing table
+// $price-table-margin-bottom: rem-calc(20);
+
+// We use these to control the title styles
+// $price-title-bg: #333;
+// $price-title-padding: rem-calc(15 20);
+// $price-title-align: center;
+// $price-title-color: #eee;
+// $price-title-weight: $font-weight-normal;
+// $price-title-size: rem-calc(16);
+// $price-title-font-family: $body-font-family;
+
+// We use these to control the price styles
+// $price-money-bg: #f6f6f6  ;
+// $price-money-padding: rem-calc(15 20);
+// $price-money-align: center;
+// $price-money-color: #333;
+// $price-money-weight: $font-weight-normal;
+// $price-money-size: rem-calc(32);
+// $price-money-font-family: $body-font-family;
+
+
+// We use these to control the description styles
+// $price-bg: #fff;
+// $price-desc-color: #777;
+// $price-desc-padding: rem-calc(15);
+// $price-desc-align: center;
+// $price-desc-font-size: rem-calc(12);
+// $price-desc-weight: $font-weight-normal;
+// $price-desc-line-height: 1.4;
+// $price-desc-bottom-border: dotted 1px #ddd;
+
+// We use these to control the list item styles
+// $price-item-color: #333;
+// $price-item-padding: rem-calc(15);
+// $price-item-align: center;
+// $price-item-font-size: rem-calc(14);
+// $price-item-weight: $font-weight-normal;
+// $price-item-bottom-border: dotted 1px #ddd;
+
+// We use these to control the CTA area styles
+// $price-cta-bg: #fff;
+// $price-cta-align: center;
+// $price-cta-padding: rem-calc(20 20 0);
+
+//
+// PROGRESS BAR
+//
+
+// $include-html-media-classes: $include-html-classes;
+
+// We use this to set the progress bar height
+$progress-bar-height: rem-calc(16);
+$progress-bar-color: tint($tertiary, 87%);
+
+// We use these to control the border styles
+// $progress-bar-border-color: scale-color(#fff, $lightness: 20%);
+$progress-bar-border-size: 0px;
+// $progress-bar-border-style: solid;
+$progress-bar-border-radius: 0px;
+
+// We use these to control the margin & padding
+$progress-bar-pad: rem-calc(0);
+// $progress-bar-margin-bottom: rem-calc(10);
+
+// We use these to set the meter colors
+// $progress-meter-color: $primary-color;
+// $progress-meter-secondary-color: $secondary-color;
+// $progress-meter-success-color: $success-color;
+// $progress-meter-alert-color: $alert-color;
+
+//
+// REVEAL
+//
+
+// $include-html-reveal-classes: $include-html-classes;
+
+// We use these to control the style of the reveal overlay.
+// $reveal-overlay-bg: rgba(#000, .45);
+// $reveal-overlay-bg-old: #000;
+
+// We use these to control the style of the modal itself.
+// $reveal-modal-bg: #fff;
+// $reveal-position-top: rem-calc(100);
+// $reveal-default-width: 80%;
+$reveal-modal-padding: rem-calc(16);
+// $reveal-box-shadow: 0 0 10px rgba(#000,.4);
+
+// We use these to style the reveal close button
+// $reveal-close-font-size: rem-calc(40);
+// $reveal-close-top: rem-calc(8);
+// $reveal-close-side: rem-calc(11);
+$reveal-close-color: $primary-color;
+// $reveal-close-weight: $font-weight-bold;
+
+// We use this to set the default radius used throughout the core.
+$reveal-radius: 0;
+// $reveal-round: $global-rounded;
+
+// We use these to control the modal border
+// $reveal-border-style: solid;
+$reveal-border-width: 9;
+// $reveal-border-color: #666;
+
+// $reveal-modal-class: "reveal-modal";
+// $close-reveal-modal-class: "close-reveal-modal";
+
+//
+// ACCORDION
+//
+
+// $include-html-accordion-classes: $include-html-classes;
+
+// $accordion-navigation-padding: rem-calc(16);
+$accordion-navigation-bg-color: tint($tertiary, 74%);
+$accordion-navigation-hover-bg-color: tint($tertiary, 87%);
+// $accordion-navigation-active-bg-color: scale-color($accordion-navigation-bg-color, $lightness: -3%);
+// $accordion-navigation-font-color: #222;
+// $accordion-navigation-font-size: rem-calc(16);
+// $accordion-navigation-font-family: $body-font-family;
+
+// $accordion-content-padding: $column-gutter/2;
+// $accordion-content-active-bg-color: #fff;
+
+//
+// TABLES
+//
+
+// $include-html-table-classes: $include-html-classes;
+
+// These control the background color for the table and even rows
+// $table-bg: #fff;
+$table-even-row-bg: tint($tertiary, 94%);
+
+// These control the table cell border style
+// $table-border-style: solid;
+$table-border-size: 0;
+// $table-border-color: #ddd;
+
+// These control the table head styles
+$table-head-bg: tint($tertiary, 87%);
+$table-head-font-size: rem-calc(16);
+$table-head-font-color: $black;
+// $table-head-font-weight: $font-weight-bold;
+$table-head-padding: rem-calc(8 16 8);
+
+// These control the row padding and font styles
+// $table-row-padding: rem-calc(9 10);
+// $table-row-font-size: rem-calc(14);
+// $table-row-font-color: #222;
+// $table-line-height: rem-calc(18);
+
+// These are for controlling the display and margin of tables
+// $table-display: table-cell;
+// $table-margin-bottom: rem-calc(20);
+
 @import "../../../javascript/components/foundation/scss/foundation/components/inline-lists";
+@import "../../../javascript/components/foundation/scss/foundation/components/panels";
+@import "../../../javascript/components/foundation/scss/foundation/components/labels";
+@import "../../../javascript/components/foundation/scss/foundation/components/pricing-tables";
+@import "../../../javascript/components/foundation/scss/foundation/components/progress-bars";
+@import "../../../javascript/components/foundation/scss/foundation/components/reveal";
+@import "../../../javascript/components/foundation/scss/foundation/components/accordion";
+@import "../../../javascript/components/foundation/scss/foundation/components/tables";
+
+//
+// CUSTOM OVERRIDES
+//
+.label 				{ text-transform: uppercase; }
+.submitted {
+	@include label(
+		$bg: tint($success-color, 74%)
+	);
+	color: $success-color;
+}
+.submitted-late {
+	@include label(
+		$bg: tint($alert-color, 74%)
+	);
+	color: $alert-color;
+}
+.unsubmitted {
+	@include label(
+		$bg: tint($primary-color, 74%)
+	);
+	color: $primary-color;
+}
+
+.highlight-panel {
+	@include panel(
+		$bg:$ocean-sunset,
+		$adjust:true
+	);
+}
+.alert-panel {
+	@include panel(
+		$bg:$alert-color,
+		$adjust:true
+	);
+}
+
