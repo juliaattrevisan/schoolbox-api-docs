@@ -11,12 +11,9 @@
 class Synchronise_Base_Hydrator_AllowUpdateOnly extends Synchronise_Base_Hydrator_CreateUpdate
 {
     /**
-     * Yes I know this is the wrong way around, that's getting fixed in the
-     * Cathedral sync.
-     *
      * {@inheritdoc}
      */
-    protected function hydrateOnUpdate($externalUser, $newUser)
+    protected function hydrateOnCreate($externalUser, $newUser)
     {
         return array();
     }
