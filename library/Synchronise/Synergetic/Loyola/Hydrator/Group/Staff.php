@@ -2,7 +2,7 @@
 /**
  * Hydrator for group for Loyola staff.
  *
- * @author    Steve Chan <steve.chan@alaress.com.au>
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
