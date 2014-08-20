@@ -115,14 +115,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @throws ScheduleException
-	 * @return bool
+	 * @return void
 	 */
 	protected function notifySystem($action, $resource, $effector) {
 		$notif = new Notif(Notif::TOPIC_CMS);
 
-		return $notif->notice("CRUD", array(
+		$notif->notice("CRUD", array(
 			'object'   => $this->getResourceKind(),
-			'objectId' => $id = $resource->getId(),
+			'objectId' => $resource->getId(),
 			'action'   => $action,
 			'user'     => $effector->getId()
 		));
@@ -215,29 +215,29 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return bool
+	 * @return void
 	 */
 	public function notifySystemCreated($resource, $effector) {
-		return $this->notifySystem(LogMapper::ACTION_CREATE, $resource, $effector);
+		$this->notifySystem(LogMapper::ACTION_CREATE, $resource, $effector);
 	}
 
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
 	 * @param array $diff
-	 * @return bool
+	 * @return void
 	 */
 	public function notifySystemUpdated($resource, $effector, $diff) {
-		return $this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
+		$this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
 	}
 
 	/**
 	 * @param Category|File|Link|Textbox $resource
 	 * @param User $effector
-	 * @return bool
+	 * @return void
 	 */
 	public function notifySystemDeleted($resource, $effector) {
-		return $this->notifySystem(LogMapper::ACTION_DELETE, $resource, $effector);
+		$this->notifySystem(LogMapper::ACTION_DELETE, $resource, $effector);
 	}
 
 
