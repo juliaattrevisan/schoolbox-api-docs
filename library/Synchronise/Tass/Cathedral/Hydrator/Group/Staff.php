@@ -6,7 +6,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Group_Staff implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_Group_Staff implements Synchronise_Base_IHydrator
+{
 
     const GROUP_ADMIN   = 1;
     const GROUP_TEACHER = 2;
@@ -15,7 +16,8 @@ class Synchronise_Tass_Cathedral_Hydrator_Group_Staff implements Synchronise_Bas
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         $groupId = null;
         switch ($externalUser['awd_code']) {
             case "TE":

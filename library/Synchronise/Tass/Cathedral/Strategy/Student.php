@@ -9,11 +9,13 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Strategy_Student extends Synchronise_Base_Strategy_Student {
+class Synchronise_Tass_Cathedral_Strategy_Student extends Synchronise_Base_Strategy_Student
+{
     /**
      * Setup verbose output and hydrator classes.
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
         $this
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeCompanyCodes())

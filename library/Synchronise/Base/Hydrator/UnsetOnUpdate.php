@@ -9,7 +9,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_CreateUpdate {
+class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_CreateUpdate
+{
     /**
      * The fields to clear from the updated user entry.
      *
@@ -21,7 +22,8 @@ class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_
      * @param  array $clearFields
      * @return $this
      */
-    public function setClearFields($clearFields) {
+    public function setClearFields($clearFields)
+    {
         $this->clearFields = $clearFields;
         return $this;
     }
@@ -29,14 +31,16 @@ class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_
     /**
      * @return array
      */
-    public function getClearFields() {
+    public function getClearFields()
+    {
         return $this->clearFields;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function hydrateOnUpdate($externalUser, $newUser) {
+    protected function hydrateOnUpdate($externalUser, $newUser)
+    {
         foreach ($this->getClearFields() as $clearField) {
             unset($newUser[$clearField]);
         }

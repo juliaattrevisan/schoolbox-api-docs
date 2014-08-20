@@ -6,14 +6,16 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Base_IHydrator
+{
 
     protected $field = 'StudentContactPreferred';
 
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         // Example Name: "Cpt A Cripps & Mrs P Cripps"
         // Tass ain't giving me titles, but it does give me
         // "StudentContactPreferred" and "StudentContactSpousePreferred"
@@ -22,16 +24,13 @@ class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Bas
 
         if (isset($externalUser['par_name'])) {
             $newUser['lastname'] = $externalUser['par_name'];
-        }
-        elseif (!$externalUser['StudentContactSpousePreferred']) {
+        } elseif (!$externalUser['StudentContactSpousePreferred']) {
             // Single parent in main contact record
             $newUser['lastname'] = $externalUser['StudentContactPreferred'];
-        }
-        elseif (!$externalUser['StudentContactPreferred']) {
+        } elseif (!$externalUser['StudentContactPreferred']) {
             // Single parent in spouse contact record
             $newUser['lastname'] = $externalUser['StudentContactSpousePreferred'];
-        }
-        else {
+        } else {
             // Two parents which may or may not have the same surname. Find out.
             list($contactFirstName, $contactSurname)
                 = preg_split("/\\s+/", $externalUser['StudentContactPreferred'], 2);
@@ -44,8 +43,7 @@ class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Bas
                     $spouseFirstName,
                     $contactSurname
                 );
-            }
-            else {
+            } else {
                 $newUser['lastname'] = sprintf(
                     '%s & %s',
                     $externalUser['StudentContactPreferred'],

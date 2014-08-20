@@ -6,7 +6,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Campus_Staff implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_Campus_Staff implements Synchronise_Base_IHydrator
+{
 
     const CAMPUS_SENIOR = 1;
     const CAMPUS_MIDDLE = 2;
@@ -17,7 +18,8 @@ class Synchronise_Tass_Cathedral_Hydrator_Campus_Staff implements Synchronise_Ba
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         $campusList = array();
         switch (strtoupper($externalUser['paypoint_text'])) {
             case 'ADMIN':

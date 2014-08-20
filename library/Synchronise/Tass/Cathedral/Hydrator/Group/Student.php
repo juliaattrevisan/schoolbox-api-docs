@@ -6,11 +6,13 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Group_Student implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_Group_Student implements Synchronise_Base_IHydrator
+{
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         $newUser['group_id'] = $this->getGroupIDFromUser($externalUser);
         return $newUser;
     }
@@ -25,7 +27,8 @@ class Synchronise_Tass_Cathedral_Hydrator_Group_Student implements Synchronise_B
      * @param  array $externalUser
      * @return int
      */
-    public function getGroupIDFromUser($externalUser) {
+    public function getGroupIDFromUser($externalUser)
+    {
         $year  = $externalUser['StudentYearLevel'];
         $group = 0;
         if (in_array($year, array(0, 1, 2, 3, 4, 5, 6,))) {
@@ -33,8 +36,7 @@ class Synchronise_Tass_Cathedral_Hydrator_Group_Student implements Synchronise_B
         }
         if (in_array($year, array(7, 8, 9,))) {
             $group = $year;
-        }
-        elseif (in_array($year, array(10, 11, 12,))) {
+        } elseif (in_array($year, array(10, 11, 12,))) {
             $group = 10;
         }
         return $group;

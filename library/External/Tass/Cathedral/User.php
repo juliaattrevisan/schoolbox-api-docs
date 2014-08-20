@@ -10,7 +10,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-class External_Tass_Cathedral_User extends External_Tass_User {
+class External_Tass_Cathedral_User extends External_Tass_User
+{
 
     /**
      * Retrieves staff user account info for sync script.
@@ -20,7 +21,8 @@ class External_Tass_Cathedral_User extends External_Tass_User {
      *
      * @return array
      */
-    public function getStaffUserAccountInfo() {
+    public function getStaffUserAccountInfo()
+    {
 
         // Based on Cathedral sync (SB-4132)
         // Main Differences with Meriden sync: ActiveFlag
@@ -60,7 +62,8 @@ class External_Tass_Cathedral_User extends External_Tass_User {
      *
      * @return array
      */
-    public function getParentUserAccountInfo() {
+    public function getParentUserAccountInfo()
+    {
         // pia_sfaccess:
         // * both add_nums and stud_codes are comma-separated lists, unfortunately
         // joining students to parents:
@@ -111,5 +114,4 @@ class External_Tass_Cathedral_User extends External_Tass_User {
         $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $list;
     }
-
 }

@@ -7,7 +7,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Hydrator_BasicMapping implements Synchronise_Base_IHydrator {
+class Synchronise_Base_Hydrator_BasicMapping implements Synchronise_Base_IHydrator
+{
 
     /**
      * Field name to map from.
@@ -37,7 +38,8 @@ class Synchronise_Base_Hydrator_BasicMapping implements Synchronise_Base_IHydrat
      * @param string $format            Format to use in mapping.
      *                                  newField = sprintf(format, externalField)
      */
-    public function __construct($externalUserField, $newUserField, $format = '%s') {
+    public function __construct($externalUserField, $newUserField, $format = '%s')
+    {
         $this->externalUserField = $externalUserField;
         $this->newUserField      = $newUserField;
         $this->format            = $format;
@@ -46,7 +48,8 @@ class Synchronise_Base_Hydrator_BasicMapping implements Synchronise_Base_IHydrat
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         $newUser[$this->newUserField] = sprintf(
             $this->format,
             $externalUser[$this->externalUserField]

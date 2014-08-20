@@ -6,12 +6,14 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Campus_Student implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_Campus_Student implements Synchronise_Base_IHydrator
+{
 
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         $campus = $this->getDefaultCampusFromUser($externalUser);
         if ($campus) {
             $newUser['campus']        = array($campus);
@@ -31,7 +33,8 @@ class Synchronise_Tass_Cathedral_Hydrator_Campus_Student implements Synchronise_
      * @return int
      * @throws RangeException if student's year isn't in the list above
      */
-    public function getDefaultCampusFromUser($externalUser) {
+    public function getDefaultCampusFromUser($externalUser)
+    {
         $year = $externalUser['StudentYearLevel'];
         if (in_array($year, array(0,1,2,3,4,5,6))) {
             return 5;

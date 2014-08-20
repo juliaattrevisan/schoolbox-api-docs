@@ -9,12 +9,14 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strategy_Staff {
+class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strategy_Staff
+{
 
     /**
      * Setup verbose output
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
         $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
         $unsetOnUpdate->setClearFields(array('campus', 'defaultCampus', 'group_id'));
@@ -42,7 +44,8 @@ class Synchronise_Tass_Cathedral_Strategy_Staff extends Synchronise_Base_Strateg
      *
      * @return array
      */
-    protected function userExists($user) {
+    protected function userExists($user)
+    {
         return $this->user_handler->getByUsername($user['username']);
     }
 }

@@ -6,5 +6,6 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Verbose extends Synchronise_Base_Verbose {
+class Synchronise_Tass_Cathedral_Verbose extends Synchronise_Base_Verbose
+{
 }

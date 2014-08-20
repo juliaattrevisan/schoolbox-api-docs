@@ -7,12 +7,14 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_ExcludeParentAddresses implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_ExcludeParentAddresses implements Synchronise_Base_IHydrator
+{
 
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         if (!in_array($externalUser['add_num'], array(1, 4))) {
             throw new Exception('Parent addresses that are not number 1 or 4 are ignored');
         }

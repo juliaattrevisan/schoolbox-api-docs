@@ -6,12 +6,14 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentStaff implements Synchronise_Base_IHydrator {
+class Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentStaff implements Synchronise_Base_IHydrator
+{
 
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         if ($externalUser['term_date']) {
             throw new Exception('Employees who are no longer at school are not synced');
         }

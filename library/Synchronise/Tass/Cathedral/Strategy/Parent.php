@@ -9,13 +9,15 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
+class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strategy_Parent
+{
     protected $title = "Update Schoolbox Parent Details Synchronisation";
 
     /**
      * Setup verbose output
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->verbose_filter = new Synchronise_Tass_Cathedral_Verbose();
         $unsetOnUpdate = new Synchronise_Base_Hydrator_UnsetOnUpdate();
         $unsetOnUpdate->setClearFields(array('password'));
