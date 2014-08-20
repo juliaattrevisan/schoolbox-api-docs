@@ -9,7 +9,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrator {
+class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrator
+{
 
     /**
      * @var User
@@ -19,7 +20,8 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
     /**
      * Creates the hydrator.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->userHandler = new User();
         $this->setup();
     }
@@ -28,7 +30,9 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
      * Setup hook for this hydrator, after __construct is called.
      * By default does nothing.
      */
-    protected function setup() {}
+    protected function setup()
+    {
+    }
 
     /**
      * Does this user exist in the Schoolbox database?
@@ -37,9 +41,11 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
      * @param  array $newUser      @see $this->hydrate()
      * @return bool
      */
-    protected function userExists($externalUser, $newUser) {
+    protected function userExists($externalUser, $newUser)
+    {
         $row = $this->userHandler->getBySynergyAndGroup(
-            $newUser['synergy_id'], $newUser['group_id']
+            $newUser['synergy_id'],
+            $newUser['group_id']
         );
         return !empty($row);
     }
@@ -47,11 +53,11 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
     /**
      * {@inheritdoc}
      */
-    public function hydrate($externalUser, $newUser) {
+    public function hydrate($externalUser, $newUser)
+    {
         if (!$this->userExists($externalUser, $newUser)) {
             $newUser = $this->hydrateOnCreate($externalUser, $newUser);
-        }
-        else {
+        } else {
             $newUser = $this->hydrateOnUpdate($externalUser, $newUser);
         }
         return $newUser;
@@ -66,7 +72,8 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
      *
      * @see $this->hydrate()
      */
-    protected function hydrateOnCreate($externalUser, $newUser) {
+    protected function hydrateOnCreate($externalUser, $newUser)
+    {
         return $newUser;
     }
 
@@ -79,7 +86,8 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
      *
      * @see $this->hydrate()
      */
-    protected function hydrateOnUpdate($externalUser, $newUser) {
+    protected function hydrateOnUpdate($externalUser, $newUser)
+    {
         return $newUser;
     }
 }
