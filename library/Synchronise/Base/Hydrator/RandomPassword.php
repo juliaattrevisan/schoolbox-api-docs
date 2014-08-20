@@ -1,13 +1,15 @@
 <?php
 /**
- * A basic hydrator that just sets a random value of a given length on a field.
- * Good for password generation.
+ * A hydrator that generates passwords for users.
+ *
+ * Should be combined with Synchronise_Base_Hydrator_UnsetOnUpdate to clear
+ * passwords for users that already exist.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Base_Hydrator_RandomPassword extends Synchronise_Base_Hydrator_CreateUpdate
+class Synchronise_Base_Hydrator_RandomPassword implements Synchronise_Base_IHydrator
 {
 
     /**
@@ -22,7 +24,6 @@ class Synchronise_Base_Hydrator_RandomPassword extends Synchronise_Base_Hydrator
      */
     public function __construct($length = null)
     {
-        parent::__construct();
         $this->length = $length;
     }
 
@@ -49,7 +50,7 @@ class Synchronise_Base_Hydrator_RandomPassword extends Synchronise_Base_Hydrator
     /**
      * {@inheritdoc}
      */
-    public function hydrateOnCreate($externalUser, $newUser)
+    public function hydrate($externalUser, $newUser)
     {
         $newUser['password'] = $this->generatePassword();
         return $newUser;
