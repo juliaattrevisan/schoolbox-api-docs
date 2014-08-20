@@ -8,20 +8,27 @@
  * @version     SVN: $Id$
  */
 
-//$num    $index
-//5       e
-//25      y
-//26      z
-//26+4    ad
-//26+9    ai
-//26+24   ax
-//26+26   az
-//26+26+1 = ba
-//26+26+2 = bb
-//26+26+26 = bz
-//26+26+26+1 = ca
-//26+26+26+26 = cz
-//26+26+26+26+1 = da
+/*
+
+1               a
+2               b
+3               c
+4               d
+5               e
+5+1             aa
+5+5             ae
+5+5+1           ba
+5+5+5           be
+5+5+5+1         ca
+5+5+5+5         ce
+5+5+5+5+1       da
+5+5+5+5+3       dc
+5+5+5+5+5       de
+5+5+5+5+5+1     ea
+5+5+5+5+5+5     ee
+5+5+5+5+5+5+1   aaa
+5+5+5+5+5+5+5   aae
+*/
 
 $kernel = require_once __DIR__ . '/../include/Bootstrap.php';
 
@@ -54,7 +61,7 @@ function findLetterIndex($num) {
     return $string;
 }
 
-for ($num = 1; $num < 702; $num++) {
+for ($num = 1; $num < 703; $num++) {
     echo "{$num}: ". findLetterIndex($num);
     echo "<BR>";
 }
