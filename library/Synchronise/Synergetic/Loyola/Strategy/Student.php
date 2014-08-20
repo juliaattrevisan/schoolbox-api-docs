@@ -17,7 +17,7 @@ class Synchronise_Synergetic_Loyola_Strategy_Student extends Synchronise_Base_St
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
-//            ->addHydrator(new Synchronise_Synergetic_Loyola_Hydrator_NoWebmail())
+            ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new Synchronise_Synergetic_Loyola_Hydrator_House())
             ->addHydrator(new Synchronise_Synergetic_Loyola_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Loyola_Hydrator_Group_Student())
