@@ -15,6 +15,9 @@ class Synchronise_Base_Hydrator_AllowUpdateOnly extends Synchronise_Base_Hydrato
      */
     protected function hydrateOnCreate($externalUser, $newUser)
     {
-        return array();
+        // return a campus array at least to avoid warning later
+        return array(
+            'campus' => array()
+        );
     }
 }
