@@ -160,7 +160,7 @@ class EventNotifier extends AbstractModuleNotifier {
 		if(isset($diff['location'])) {
 			$bob->setTitle(':event has moved from :old to :new')
 			    ->setParams(array(
-				    'user' => new Param($event->getTitle()),
+				    'event' => new Param($event->getTitle()),
 				    'old'  => new Param($diff['location'][1]),
 				    'new'  => new Param($event->getLocation())
 			    ));
