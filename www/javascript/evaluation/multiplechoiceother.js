@@ -58,8 +58,13 @@
 				/* Clear Other value if unchecked
 				 */
 				else {
-					$(this).parent().removeClass('evaluation-selected');
-					config.questionForm.find('input[type=text]').val('').parent().removeClass('evaluation-selected');
+					var isLabelledOther = ($(this).parent().find('span').html() == 'Other');
+					var isLast = $(this).parent().next().find('input[name="answer[other]"]').length;
+
+					if (isLabelledOther && isLast) {
+						$(this).parent().removeClass('evaluation-selected');
+						config.questionForm.find('input[type=text]').val('').parent().removeClass('evaluation-selected');
+					}
 				}
 
 				$.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
