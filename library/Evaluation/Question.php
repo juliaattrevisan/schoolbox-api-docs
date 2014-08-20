@@ -15,7 +15,12 @@ abstract class Evaluation_Question extends DeprecatedModel
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
-    private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
+	/**
+	 * Allowed fields to go into the db
+	 *
+	 * @var array
+	 */
+	protected $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'config', 'deleted_at');
 
     /**
      * Constructor
@@ -254,5 +259,26 @@ abstract class Evaluation_Question extends DeprecatedModel
 
 			$this->db->query($query);
 		}
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set allowed fields
+	 *
+	 * @param array $allowedFields
+	 */
+	public function setAllowedFields($allowedFields) {
+		$this->allowedFields = $allowedFields;
+	}
+
+	/**
+	 * Get allowed fielsd
+	 *
+	 * @return array
+	 */
+	public function getAllowedFields() {
+		return $this->allowedFields;
 	}
 }

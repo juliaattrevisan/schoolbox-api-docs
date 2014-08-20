@@ -41,7 +41,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
                 $answer['sequence']++;
             }
 
-            $answer['answer'] = serialize($answer['answer']);
+            $answer['answer'] = $this->encode($answer['answer']);
 
             // only important on an update but we want to make sure we dont delete anything if there is no answers
             $this->db->delete($this->_table, 'question_id', $question_id);
@@ -101,6 +101,41 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
             }
         }
     }
+
+	/**
+	 * Render answers in the QuestionBank
+	 *
+	 * @param  $page
+	 * @param string $answerGroup
+	 * @return void
+	 */
+	public function modifyInQuestionBank($page, $answerGroup) {
+		if (strlen($answerGroup)) {
+			$allAnswers = unserialize($answerGroup);
+
+			foreach ($allAnswers as $currentAnswer) {
+				$page->setVar(array(
+					'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+					'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
+				));
+
+				$page->parse('answerOption_block', 'answerOption', true);
+			}
+		}
+		else {
+			$page->setVar('answerOption_block', '');
+		}
+	}
+
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return serialize(json_decode($data));
+	}
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking

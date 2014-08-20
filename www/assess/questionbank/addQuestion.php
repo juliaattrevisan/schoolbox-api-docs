@@ -17,6 +17,7 @@ $questionBankHandler = new Assess_Question_Bank();
 
 if (!empty($_POST)) {
     $questionBankHandler->addQuestion(
+		new Assess_Question(),
         $_POST['question_category'],
         $_POST['type_id'],
         $_POST['question_id'],

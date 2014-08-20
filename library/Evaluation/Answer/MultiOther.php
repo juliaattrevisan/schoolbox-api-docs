@@ -109,7 +109,49 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
     }
 
 	/**
+	 * Render answers in the QuestionBank
+	 *
+	 * @param  $page
+	 * @param string $answerGroup
+	 * @return void
+	 */
+	public function modifyInQuestionBank($page, $answerGroup) {
+		if (strlen($answerGroup)) {
+			$allAnswers = unserialize($answerGroup);
+
+			if (is_array($allAnswers) && count($allAnswers)) {
+				foreach ($allAnswers as $currentAnswer) {
+					$page->setVar(array(
+						'ANSWER_VALUE' => $currentAnswer->value,
+						'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+						'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+					));
+
+					$page->parse('answerOption_block', 'answerOption', true);
+				}
+			}
+			else {
+				$page->setVar('answerOption_block', '');
+			}
+		}
+		else {
+			$page->setVar('answerOption_block', '');
+		}
+	}
+
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return serialize(json_decode($data));
+	}
+
+	/**
 	 * Assign a letter to the Other portion of possible answers
+	 *
 	 * @param $allAnswers
 	 * @return string
 	 */

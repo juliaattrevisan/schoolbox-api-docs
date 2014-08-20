@@ -108,6 +108,37 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Render answers in the QuestionBank
+	 *
+	 * @param  $page
+	 * @param string $answerGroup
+	 * @return void
+	 */
+	public function modifyInQuestionBank($page, $answerGroup) {
+		if (strlen($answerGroup)) {
+			$allAnswers = unserialize($answerGroup);
+
+			if (is_array($allAnswers) && count($allAnswers)) {
+				foreach ($allAnswers as $currentAnswer) {
+					$page->setVar(array(
+						'ANSWER_VALUE' => $currentAnswer->value,
+						'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+						'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+					));
+
+					$page->parse('answerOption_block', 'answerOption', true);
+				}
+			}
+			else {
+				$page->setVar('answerOption_block', '');
+			}
+		}
+		else {
+			$page->setVar('answerOption_block', '');
+		}
+	}
+
     /**
      * Gets answers out of the answer group array.
      *
@@ -117,6 +148,16 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
     protected function getAnswersFromAnswerGroup($answerGroup) {
         return unserialize($answerGroup['answer']);
     }
+
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return serialize(json_decode($data));
+	}
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking

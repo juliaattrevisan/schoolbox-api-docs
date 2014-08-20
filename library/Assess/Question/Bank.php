@@ -10,13 +10,36 @@
  * @version     SVN: $Id$
  */
 class Assess_Question_Bank extends Evaluation_Question_Bank {
-    public $_table = 'assess_question_bank';
-    public $_index = 'question_bank_id';
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		parent::__construct();
 
-		$this->questionHandler = new Assess_Question();
-		$this->answerHandler = new Assess_Answer();
+		$this->setup();
+	}
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
+		$this->setQuestionHandler(new Assess_Question());
+		$this->setAnswerHandler(new Assess_Answer());
+		$this->setContext();
+	}
+
+	/**
+	 * Make the assess_question_bank table behave like assess_question
+	 */
+	protected function setContext() {
+
+		/* Use context-specific fields
+		 */
+		$this->getQuestionHandler()->setAllowedFields(array(
+			'question_bank_id', 'question_category_id', 'type_id',
+			'question', 'answer', 'marks',
+			'config', 'deleted_at'
+		));
 	}
 }

@@ -18,6 +18,7 @@ $questionBankHandler = new Survey_Question_Bank();
 
 if (!empty($_POST)) {
     $questionBankHandler->addQuestion(
+		new Survey_Question(),
         $_POST['question_category'],
         $_POST['type_id'],
         $_POST['question_id'],

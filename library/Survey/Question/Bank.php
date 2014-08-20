@@ -10,13 +10,22 @@
  * @version     SVN: $Id$
  */
 class Survey_Question_Bank extends Evaluation_Question_Bank {
-    public $_table = 'assess_question_bank';
-    public $_index = 'question_bank_id';
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		parent::__construct();
 
-		$this->questionHandler = new Survey_Question();
-		$this->answerHandler = new Survey_Answer();
+		$this->setup();
+	}
+
+	/**
+	 * Hook method
+	 */
+	protected function setup() {
+		$this->setQuestionHandler(new Survey_Question());
+		$this->setAnswerHandler(new Survey_Answer());
+		$this->setContext();
 	}
 }

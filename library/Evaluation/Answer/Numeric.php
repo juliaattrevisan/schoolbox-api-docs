@@ -85,6 +85,29 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
         }
     }
 
+	/**
+	 * Render answers in the QuestionBank
+	 *
+	 * @param  $page
+	 * @param string $answer
+	 * @return void
+	 */
+	public function modifyInQuestionBank($page, $answer) {
+		$page->setVar(array(
+			'ANSWER' => Scrub::text($answer),
+		));
+	}
+
+	/**
+	 * Serialize for db storage (we shouldn't be using serialize anymore)
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public function encodeForQuestionBank($data) {
+		return $data;
+	}
+
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.

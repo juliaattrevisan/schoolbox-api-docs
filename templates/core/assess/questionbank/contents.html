@@ -103,7 +103,9 @@
                     <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
                 </div>
 				<!-- END select_question -->
-                <span class="question-content">{QUESTION}</span>
+                <span class="question-content">{QUESTION}</span><br />
+
+				<a href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}">Edit</a>
             </label>
 
 			<!-- BEGIN missing_class -->
@@ -118,7 +120,9 @@
             <div class="question question-answers">
                 <ul>
                     <!-- BEGIN answers -->
-                    <li>{ANSWER_DESCRIPTION}</li>
+                    <li>
+						{ANSWER_DESCRIPTION}
+					</li>
                     <!-- END answers -->
                 </ul>
             </div>
@@ -151,16 +155,14 @@
             <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
             <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
         </p>
-
     </form>
-
-
 
     <h4>Remove</h4>
 
     <form>
-        <p class="clearfix no-marg"><a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}'
-                                       class="submit-btn-plain no-marg delete">Remove this category</a></p>
+        <p class="clearfix no-marg">
+			<a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain no-marg delete">Remove this category</a>
+		</p>
     </form>
     <!-- END category_selected -->
 
@@ -174,7 +176,6 @@
             <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
         </p>
     </form>
-
 </div>
 
 <div class="evaluation-menu">
