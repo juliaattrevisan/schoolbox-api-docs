@@ -188,6 +188,35 @@
 			}
 		}
 	}
+
+	/**
+	 * Translate an integer to letters
+	 *
+	 * @param $num
+	 * @return string
+	 */
+	$j.fn.evaluation.findLetterIndex = function(num) {
+		var firstLetter = Math.floor(num / 26);
+		var lastLetter = num % 26;
+
+		/* Special case for z, az, bz, etc.
+		 */
+		if (!lastLetter) {
+			firstLetter--;
+			lastLetter = 26;
+		}
+
+		/* Convert from numeric to alpha
+		 */
+		if (firstLetter) {
+			var string = String.fromCharCode(firstLetter+64) + String.fromCharCode(lastLetter+64);
+		}
+		else {
+			var string = String.fromCharCode(lastLetter+64);
+		}
+
+		return string;
+	}
 }(jQuery));
 
 

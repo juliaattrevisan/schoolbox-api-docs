@@ -1,3 +1,5 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
+
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -182,7 +184,7 @@ $j(document).ready(function() {
 		var i = 1;
 
 		$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
-			$(element).children('span').html(findLetterIndex(i) + ')');
+			$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
 			$(element).children('input').val(i);
 			i++;
 		});
@@ -196,35 +198,6 @@ $j(document).ready(function() {
 		$j('#wrongCheckbox').css({
 			'top':  pos
 		});
-	}
-
-	/**
-	 * Translate an integer to letters
-	 *
-	 * @param $num
-	 * @return string
-	 */
-	function findLetterIndex(num) {
-		var firstLetter = Math.floor(num / 26);
-		var lastLetter = num % 26;
-
-		/* Special case for z, az, bz, etc.
-		 */
-		if (!lastLetter) {
-			firstLetter--;
-			lastLetter = 26;
-		}
-
-		/* Convert from numeric to alpha
-		 */
-		if (firstLetter) {
-			var string = String.fromCharCode(firstLetter+64) + String.fromCharCode(lastLetter+64);
-		}
-		else {
-			var string = String.fromCharCode(lastLetter+64);
-		}
-
-		return string;
 	}
 });
 
