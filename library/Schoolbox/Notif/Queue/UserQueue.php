@@ -221,18 +221,6 @@ class UserQueue {
 
 
 	/**
-	 * Returns the 'listed' queuename for the given user
-	 *
-     * @deprecated static calls to be removed
-	 * @param $userId
-	 * @return string
-	 */
-	public static function getUserListedQueueName($userId) {
-		return self::getQueueName(self::QUEUE_LISTED_MESSAGES, $userId);
-	}
-
-
-	/**
 	 * Returns the 'unread' queuename for the given user
 	 *
      * @deprecated static calls to be removed

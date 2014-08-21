@@ -210,9 +210,11 @@ class UserQueueFactory {
      */
     public function buildUserQueue($user, $limit = 10)
     {
-        $q = UserQueue::getUserListedQueueName($user->getId());
-        return $this->bindUserQueue($user)
-                    ->fetchNotifications($q, $limit, true);
+        $uq = $this->bindUserQueue($user);
+        if ($limit > 0) {
+            $uq->fetchNotifications($uq->findQueue(UserQueue::Q_LISTED), $limit, true);
+        }
+        return $uq;
     }
 
 
