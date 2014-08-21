@@ -15,7 +15,7 @@ use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Redis;
-use Predis\Client;
+use Predis\ClientInterface;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Notif\MQ\Test\MockAMQPConnector;
 use Schoolbox\Notif\MQ\Test\MockBunnyControl;
@@ -35,7 +35,7 @@ class UserQueueFactory {
 	/** @var AMQPInterface */
 	protected $mqConnector;
 
-    /** @var Client */
+    /** @var ClientInterface */
     protected $redisClient;
 
     /** @var GeneratorInterface */
@@ -53,13 +53,18 @@ class UserQueueFactory {
 
     /**
      * @param AMQPInterface      $mqConnector
-     * @param Client             $redisClient
+     * @param ClientInterface    $redisClient
      * @param GeneratorInterface $generator
      * @param UserQueueBinder    $binder
      */
-    public function __construct($mqConnector = null, $redisClient = null, $generator = null, $binder = null)
+    public function __construct(
+        AMQPInterface $mqConnector = null,
+        ClientInterface $redisClient = null,
+        GeneratorInterface $generator = null,
+        UserQueueBinder $binder = null
+    )
     {
-        if (!$redisClient instanceof Client) {
+        if (!$redisClient instanceof ClientInterface) {
             $r = new Redis();
             $redisClient = $r->getClientInstance();
         }
@@ -112,7 +117,7 @@ class UserQueueFactory {
 
 
     /**
-     * @param Client $redisClient
+     * @param ClientInterface $redisClient
      * @return self
      */
     public function setRedisClient($redisClient)
@@ -123,7 +128,7 @@ class UserQueueFactory {
 
 
     /**
-     * @return Client
+     * @return ClientInterface
      */
     public function getRedisClient()
     {
