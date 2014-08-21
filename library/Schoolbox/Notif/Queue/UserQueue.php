@@ -11,8 +11,6 @@ namespace Schoolbox\Notif\Queue;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Instance\InstanceBundle;
-use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
 use OutOfBoundsException;
@@ -243,18 +241,6 @@ class UserQueue {
 	 */
 	public static function getUserUnreadQueueName($userId) {
 		return self::getQueueName(self::QUEUE_UNREAD_MESSAGES, $userId);
-	}
-
-
-	/**
-	 * Returns the 'digest' queuename for the given user
-	 *
-     * @deprecated static calls to be removed
-	 * @param $userId
-	 * @return string
-	 */
-	public static function getUserDigestQueueName($userId) {
-		return self::getQueueName(self::QUEUE_DIGEST_MESSAGES, $userId);
 	}
 
 }

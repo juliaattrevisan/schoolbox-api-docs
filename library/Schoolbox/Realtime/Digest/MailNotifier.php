@@ -10,17 +10,14 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Lumberjack\Logger;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Message\External\TargetedConverter;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -61,9 +58,6 @@ class MailNotifier implements Serializable {
 	 */
 	public function processDigest($role) {
 
-		// setup
-		$conn = Connector::getInstance();
-
 		// get a list of users
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
@@ -71,46 +65,28 @@ class MailNotifier implements Serializable {
 		$this->log->info("Preparing to digest {$role->getName()}: {$users->count()} users");
 
 		$result = 0;
+        $uqf    = new UserQueueFactory();
+		$dir    = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
-		$decorator = new Decorator();
-		$dir = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
 		// iterate and digest
 		foreach($users as $user) {
-			$email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-			$this->log->info("Digesting {$user->getUsername()}");
-			$q = UserQueue::getUserDigestQueueName($user->getId());
-			$acks = array();
 
-			// collate list of messages
-			while($m = $conn->readFromQueue($q)) {
-				$acks[] = $m;
-				try {
-					if($formatted = json_decode($m->body, true)) {
-						try {
-							$inst = Instance::jsonUnserialize($formatted['message']);
-						}
-						catch(InvalidArgumentException $e) {
-							$conv = new TargetedConverter();
-							$inst = $conv->convert($formatted['message']);
-						}
-						$decorator->appendInstance($inst);
-					}
-				}
-				catch(InvalidArgumentException $e) {
-					// meh. just ignore this message then
-					$this->log->error("Unparseable message instance detected");
-				}
-			}
+            $decorator = new Decorator();
+            $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+            $uq        = $uqf->buildUserQueue($user, 0);
 
-			if(!count($acks)) {
+            $this->log->info("Digesting {$user->getUsername()}");
+
+            $uq->fetchNotificationsIntoBundle(UserQueue::Q_DIGEST, $decorator, true);
+
+			if(!$decorator->count()) {
 				// this user has nothing to digest
 				$this->log->notice("{$user->getUsername()} has nothing to digest");
 				continue;
 			}
 
 			$context = $decorator->renderAsTwigContext($email->getCoreContext(), $dir);
-			$this->log->debug(sprintf('Collated %s instances into %s notifications to digest', count($acks), count($decorator->getAll())));
 
 			// explicitly an rfc822 email spec, so it sets, not adds
 			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
@@ -120,15 +96,18 @@ class MailNotifier implements Serializable {
 
             // if email sent successfully, ACK, otherwise NACK
 			if($sent) {
-				$this->log->notice("Mail sent successfully");
-				$conn->acceptMessages($acks);
+				$this->log->notice("Mail sent successfully, dropping messages from queue");
+                $uq->drain(UserQueue::Q_DIGEST);
 				++$result;
 			}
 			else {
-				$this->log->warning("Failed to email, rejecting messages");
-				$conn->rejectMessages($acks);
+				$this->log->warning("Failed to email");
 			}
+
+            unset($uq, $decorator, $email, $user);
 		}
+
+        unset($uqf, $users);
 
 		// return the number of emails successfully sent
 		$this->log->info("Finished digesting {$role->getName()}: $result emails sent");
