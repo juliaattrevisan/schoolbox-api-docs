@@ -11,6 +11,7 @@ namespace Schoolbox\Notif\Queue;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
@@ -46,7 +47,7 @@ class UserQueue {
 	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
 
 	/** @var array */
-	protected $notifications = array();
+	protected $instanceCache = array();
 
     /** @var QueueInterface[] */
     protected $queues;
@@ -73,6 +74,20 @@ class UserQueue {
 
 
     /**
+     * @param string $label
+     * @throws OutOfBoundsException
+     */
+    public function removeQueue($label)
+    {
+        $queueName = $this->findQueue($label);
+        unset(
+            $this->queues[$queueName],
+            $this->instanceCache[$queueName]
+        );
+    }
+
+
+    /**
      * @return array
      */
     public function getQueueNames()
@@ -82,49 +97,82 @@ class UserQueue {
 
 
     /**
-     * @param string $queueName
-     * @param int    $limit
-     * @param bool   $refresh
-     * @return array
+     * @param $label
+     * @return string
      * @throws OutOfBoundsException
      */
-    public function fetchNotifications($queueName, $limit = 10, $refresh = false)
+    public function findQueue($label)
     {
-        if (empty($this->queues[$queueName])) {
-            throw new OutOfBoundsException("Queue '$queueName' not declared");
+        // finds queues that end in the given label
+        $matchedNames = preg_grep("`$label$`", array_keys($this->queues));
+
+        if (empty($matchedNames)) {
+            throw new OutOfBoundsException("No queue matched label '$label', did you declare it?");
         }
 
-        if (empty($this->notifications[$queueName]) || $refresh) {
-            $this->fetchFromSource($this->queues[$queueName]);
+        if (count($matchedNames) != 1) {
+            throw new OutOfBoundsException("Multiple queues matched label '$label', try being more specific");
         }
 
-        if ($limit) {
-            return array_slice($this->notifications[$queueName], 0, $limit);
-        }
-
-        return $this->notifications[$queueName];
+        return $matchedNames[0];
     }
 
 
     /**
-     * @param QueueInterface $queue
+     * @param string $label
      */
-    protected function fetchFromSource(QueueInterface $queue) {
+    public function drain($label)
+    {
+        $name = $this->findQueue($label);
+        $q = $this->queues[$name];
+
+        $q->drain();
+    }
+
+    /**
+     * @param string $label
+     * @param int    $fetch
+     * @param bool   $refresh
+     * @return array
+     * @throws OutOfBoundsException
+     */
+    public function fetchNotifications($label, $fetch = 10, $refresh = false)
+    {
+        // you asked for zero, so here's zero. but yes, we validated the queue name first
+        if($fetch == 0) {
+            return array();
+        }
+
         $bundle = new NotificationBundle();
 
-        $bundle->appendInstances($queue->fetch());
-        $this->notifications[$queue->getName()] = $bundle->getAll();
+        $this->fetchNotificationsIntoBundle($label, $bundle, $fetch, $refresh);
 
-        // sort descending
-        uasort($this->notifications[$queue->getName()], function($a, $b) {
-            /**
-             * @var Notification $a
-             * @var Notification $b
-             */
-            $at = $a->getTimestamp();
-            $bt = $b->getTimestamp();
-            return $at == $bt ? 0 : $at > $bt ? -1 : 1;
-        });
+        // negative value will be considered "no limit"
+        if ($fetch < 0) {
+            return $bundle->getAll();
+        }
+
+        return array_slice($bundle->getAll(), 0, $fetch);
+
+    }
+
+    /**
+     * @param string             $label
+     * @param NotificationBundle $bundle
+     * @param bool               $refresh
+     * @return void
+     * @throws OutOfBoundsException
+     */
+    public function fetchNotificationsIntoBundle($label, NotificationBundle $bundle, $refresh = false)
+    {
+        $queueName = $this->findQueue($label);
+        $queue = $this->queues[$queueName];
+
+        if (empty($this->instanceCache[$queueName]) || $refresh) {
+            $this->instanceCache[$queueName] = $queue->fetch();
+        }
+
+        $bundle->appendInstances($this->instanceCache[$queueName]);
     }
 
 
