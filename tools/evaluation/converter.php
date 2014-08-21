@@ -12,47 +12,99 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 /* Convert all answers from alpha index to numerical index
  */
-//$answerHandler = new Assess_Answer();
-//
-//$allAnswers = $answerHandler->getAll();
-//
-//foreach($allAnswers as $currentAnswer) {
-//
-//    /* If an answer was provided, try to unserialize
-//     */
-//    if (strlen($currentAnswer['answer'])) {
-//        $result = unserialize($currentAnswer['answer']);
-//
-//        /* Recompile options into this
-//         */
-//        $recompiledAnswer = array();
-//
-//        if ($result && is_array($result)) {
-//            foreach($result as $currentResult) {
-//                $newResult = $currentResult;
-//
-//                /* Translate only alphabetical values, translating A
-//                 * into 1, B into 2, etc. leaving numerical ones untouched
-//                 */
-//                if (ctype_alpha($newResult->value)) {
-//                    $newResult->value = ord($newResult->value)-64;
-//                }
-//
-//                $recompiledAnswer[] = $newResult;
-//            }
-//
-//            /* Update
-//             */
-//            $newAnswer = $currentAnswer;
-//            $newAnswer['answer'] = serialize($recompiledAnswer);
-//
-//            /* Can use either handler to save to this table
-//             */
-//            $answerHandler->update($newAnswer);
-//        }
-//    }
-//}
-//
+$answerHandler = new Assess_Answer();
+
+$allAnswers = $answerHandler->getAll();
+
+foreach($allAnswers as $currentAnswer) {
+
+    /* If an answer was provided, try to unserialize
+     */
+    if (strlen($currentAnswer['answer'])) {
+        $result = unserialize($currentAnswer['answer']);
+
+        /* Recompile options into this
+         */
+        $recompiledAnswer = array();
+
+        if ($result && is_array($result)) {
+            foreach($result as $currentResult) {
+                $newResult = $currentResult;
+
+                /* Translate only alphabetical values, translating A
+                 * into 1, B into 2, etc. leaving numerical ones untouched
+                 */
+                if (ctype_alpha($newResult->value)) {
+                    $newResult->value = ord($newResult->value)-64;
+                }
+
+                $recompiledAnswer[] = $newResult;
+            }
+
+            /* Update
+             */
+            $newAnswer = $currentAnswer;
+            $newAnswer['answer'] = serialize($recompiledAnswer);
+
+            if (!strlen($newAnswer['deleted_at'])) {
+                $newAnswer['deleted_at'] = 'NULL';
+            }
+
+            /* Can use either handler to save to this table
+             */
+            $answerHandler->update($newAnswer);
+        }
+    }
+}
+
+/* Convert all QuestionBank answers from alpha index to numerical index
+ */
+$questionBankHandler = new Assess_Question_Bank();
+
+$allAnswers = $questionBankHandler->getAll();
+
+foreach($allAnswers as $currentAnswer) {
+
+    /* If an answer was provided, try to unserialize
+     */
+    if (strlen($currentAnswer['answer'])) {
+        $result = unserialize($currentAnswer['answer']);
+
+        /* Recompile options into this
+         */
+        $recompiledAnswer = array();
+
+        if ($result && is_array($result)) {
+            foreach($result as $currentResult) {
+                $newResult = $currentResult;
+
+                /* Translate only alphabetical values, translating A
+                 * into 1, B into 2, etc. leaving numerical ones untouched
+                 */
+                if (ctype_alpha($newResult->value)) {
+                    $newResult->value = ord($newResult->value)-64;
+                }
+
+                $recompiledAnswer[] = $newResult;
+            }
+
+            /* Update
+             */
+            $newAnswer = $currentAnswer;
+            $newAnswer['answer'] = serialize($recompiledAnswer);
+
+            if (!strlen($newAnswer['deleted_at'])) {
+                $newAnswer['deleted_at'] = 'NULL';
+            }
+
+            /* Can use either handler to save to this table
+             */
+            $questionBankHandler->update($newAnswer);
+        }
+    }
+}
+
+
 /* Convert all responses from alpha index to numerical index
  */
 $responseHandler = new Assess_Response();
