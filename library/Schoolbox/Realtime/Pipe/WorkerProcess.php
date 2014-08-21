@@ -162,9 +162,9 @@ class WorkerProcess extends AbstractProcess {
 
 		// inject the debugger into the notifier if possible
 		if(is_array($callback) && is_object($callback[0])) {
-			$setDebug = array($callback[0], 'setDebug');
-			if(is_callable($setDebug)) {
-				call_user_func($setDebug, $this->log);
+			$setLogger = array($callback[0], 'setLogger');
+			if(is_callable($setLogger)) {
+				call_user_func($setLogger, $this->log);
 			}
 		}
 
