@@ -209,6 +209,15 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+            /* Just unserialize this once, dude
+             */
+            if ($existing['response']) {
+                $existingAnswer = unserialize($existing['response']);
+            }
+            else {
+                $existingAnswer = false;
+            }
+
 			/* Enforce "Other" - This is assumed to always be the next letter in the sequence
 			 *
 			 * When it gets to Z, you're going to start seeing square brackets and slashes
@@ -217,7 +226,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
  			 */
 			$other = new StdClass();
 			$other->description = 'Other';
-			$other->value = $this->otherLetterIndex($allAnswers);
+			$other->value = count($allAnswers);
 
 			$allAnswers[] = $other;
 
@@ -235,15 +244,13 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']) {
-                    $existingAnswer = unserialize($existing['response']);
-
+                if ($existingAnswer) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
 
-						if (($currentAnswer->value == 'Other') && strlen(trim($existingAnswer['other']))) {
+						if (($currentAnswer->description == 'Other') && strlen(trim($existingAnswer['other']))) {
 							$page->setVar(array(
 								'ANSWER_OTHER' => $existingAnswer['other']
 							));
