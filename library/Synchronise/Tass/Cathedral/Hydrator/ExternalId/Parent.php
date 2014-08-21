@@ -14,8 +14,12 @@ class Synchronise_Tass_Cathedral_Hydrator_ExternalId_Parent implements Synchroni
     public function hydrate($externalUser, $newUser)
     {
         // Is this a single parent (add_num = 4)?
-        // Append '-4' to the synergy ID.
-        $externalId = 'P'.$externalUser['StudentContactID'];
+        // Prepend S, otherwise prepend P.
+        $prefix = 'P';
+        if ($externalUser['add_num'] == 4) {
+            $prefix = 'S';
+        }
+        $externalId = $prefix.$externalUser['StudentContactID'];
         if (isset($externalUser['sfa_num'])) {
             $externalId .= $externalUser['sfa_num'];
         }
