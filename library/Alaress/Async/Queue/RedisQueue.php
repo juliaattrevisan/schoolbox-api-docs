@@ -52,9 +52,9 @@ class RedisQueue implements QueueInterface
     {
         $instances = array();
 
-        $idList = $this->exec("ZRANGE $this->name 0 -1");
+        $idList = $this->fetchIdList();
 
-        if (!$idList) {
+        if (empty($idList)) {
             return $instances;
         }
 
@@ -91,10 +91,10 @@ class RedisQueue implements QueueInterface
     public function drain()
     {
         // capture the ID list
-        $idList = $this->exec("ZRANGE $this->name 0 -1");
+        $idList = $this->fetchIdList();
 
-        // delete the correcpsonding entries in the index
-        if(!empty($idList)) {
+        // delete the corresponding entries in the index
+        if (count($idList)) {
             $this->exec(sprintf("HDEL %s %s", $this->index(), implode(' ', $idList)));
         }
 
@@ -150,6 +150,16 @@ class RedisQueue implements QueueInterface
     protected function index()
     {
         return "msgs:" . INSTANCE_ID;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function fetchIdList()
+    {
+        $list = $this->exec("ZRANGE $this->name 0 -1");
+        return $list ? : array();
     }
 
 }
