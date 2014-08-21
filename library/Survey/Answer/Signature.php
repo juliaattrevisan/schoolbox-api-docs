@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Short
  *
@@ -17,13 +18,14 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
      */
     protected $useLongAnswers = true;
 
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Survey_Response());
-		$this->setQuestionHandler(new Survey_Question());
-	}
+    /**
+     * Setup
+     */
+    protected function setup()
+    {
+        $this->setResponseHandler(new Survey_Response());
+        $this->setQuestionHandler(new Survey_Question());
+    }
 
     /**
      * Graph the results for this answer type
@@ -41,80 +43,81 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         $page->parse('graph_block', $componentHandle);
     }
 
-	/**
-	 * Get the response for a particular question
-	 *
-	 * @param  $attempt_id
-	 * @param  $question_id
-	 *
-	 * @return array
-	 */
-	public function exportResponseToCSV($attempt_id, $question_id) {
-		$response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+    /**
+     * Get the response for a particular question
+     *
+     * @param  $attempt_id
+     * @param  $question_id
+     *
+     * @return array
+     */
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-		/* In case someone saves with empty signature, which is
-		 * represented by an empty array []
-		 */
-		if (strlen($response['response']) > 2) {
-			$data['response'] = 'Signed';
-		}
-		else {
-			$data['response'] = 'Unsigned';
-		}
+        /* In case someone saves with empty signature, which is
+         * represented by an empty array []
+         */
+        if (strlen($response['response']) > 2) {
+            $data['response'] = 'Signed';
+        } else {
+            $data['response'] = 'Unsigned';
+        }
 
-		/* Append commentary
-		 */
-		$data['comment'] = $response['comment'];
+        /* Append commentary
+         */
+        $data['comment'] = $response['comment'];
 
-		/* Append awarded mark
-		 */
-		$data['mark'] = $response['mark'];
+        /* Append awarded mark
+         */
+        $data['mark'] = $response['mark'];
 
-		return $data;
-	}
+        return $data;
+    }
 
-	/**
-	 * Resets answer tokens so a user can fill them in while actually taking
-	 * the test.
-	 *
-	 * Don't scrub this, because it breaks the json object
-	 *
-	 * @param  $page
-	 * @param  $question_id
-	 * @return void
-	 */
-	public function prepareResponse($page, $question_id) {
+    /**
+     * Resets answer tokens so a user can fill them in while actually taking
+     * the test.
+     *
+     * Don't scrub this, because it breaks the json object
+     *
+     * @param  $page
+     * @param  $question_id
+     * @return void
+     */
+    public function prepareResponse($page, $question_id)
+    {
 
-		/* Optional configuration hook
-		 */
-		$this->configureResponse($page, $question_id);
+        /* Optional configuration hook
+         */
+        $this->configureResponse($page, $question_id);
 
-		$existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
-		$currentAnswer = $this->getByQuestionID($question_id);
+        $currentAnswer = $this->getByQuestionID($question_id);
 
-		if ($existing['response']) {
-			$page->setVar(
-				array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
-					'ANSWER_ID' => $currentAnswer['answer_id'],
-					'ANSWER' => $existing['response'],
-				)
-			);
-		} else {
-			$page->setVar(
-				array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
-					'ANSWER_ID' => $currentAnswer['answer_id'],
-					'ANSWER' => '',
-				)
-			);
-		}
+        if ($existing['response']) {
+            $page->setVar(
+                array(
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => $existing['response'],
+                )
+            );
+        } else {
+            $page->setVar(
+                array(
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => '',
+                )
+            );
+        }
 
-		$page->parse('answerOption_block', 'answerOption', true);
-	}
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
 
     /**
      * Show the response someone submitted and also show the correct answer.
@@ -136,70 +139,82 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
          *
          * if ($existing['response'] != null) { ... } else { ... }
          */
-        $page->setVar(array(
-            'ANSWER_ID' => $currentAnswer['answer_id'],
-            'ANSWER' => $existing['response'],
-            'RESPONSE_ID' => $existing['response_id'],
-        ));
+        $page->setVar(
+            array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $existing['response'],
+                'RESPONSE_ID' => $existing['response_id'],
+            )
+        );
     }
 
-	/**
-	 * Configure question/configure answer
-	 *
-	 * @param $page
-	 * @param $config
-	 */
-	public function configure($page, $config) {
-		$options = json_decode($config);
+    /**
+     * Configure question/configure answer
+     *
+     * @param $page
+     * @param $config
+     */
+    public function configure($page, $config)
+    {
+        $options = json_decode($config);
 
-		$page->setVar(array(
-			'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
-		));
-	}
+        $page->setVar(
+            array(
+                'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+            )
+        );
+    }
 
-	/**
-	 * Configure question/configure answer during creation/modification
-	 *
-	 * @param $page
-	 * @param $config
-	 */
-	public function configureXml($page, $config) {
-		$options = json_decode($config);
+    /**
+     * Configure question/configure answer during creation/modification
+     *
+     * @param $page
+     * @param $config
+     */
+    public function configureXml($page, $config)
+    {
+        $options = json_decode($config);
 
-		/* std objects cast as arrays -_- since json.stringify
-		 * compiles them into anonymous objects
-		 */
-		$keys = array_keys((array)$options);
+        /* std objects cast as arrays -_- since json.stringify
+         * compiles them into anonymous objects
+         */
+        $keys = array_keys((array)$options);
 
-		if (is_array($keys) && count($keys)) {
-			foreach($keys as $currentConfigOption) {
-				$page->setVar(array(
-					'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
-					'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
-				));
+        if (is_array($keys) && count($keys)) {
+            foreach ($keys as $currentConfigOption) {
+                $page->setVar(
+                    array(
+                        'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
+                        'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
+                    )
+                );
 
-				$page->parse('answer_configuration_block', 'answer_configuration', true);
-			}
-		}
-		else {
-			$page->setVar(array(
-				'answer_configuration_block' => ''
-			));
-		}
-	}
+                $page->parse('answer_configuration_block', 'answer_configuration', true);
+            }
+        } else {
+            $page->setVar(
+                array(
+                    'answer_configuration_block' => ''
+                )
+            );
+        }
+    }
 
-	/**
-	 * Configure mandatoryness and other settings for this response
-	 *
-	 * @param $page
-	 * @param $question_id
-	 */
-	protected function configureResponse($page, $question_id) {
-		$question = $this->questionHandler->getByID($question_id);
-		$config = json_decode($question['config']);
+    /**
+     * Configure mandatoryness and other settings for this response
+     *
+     * @param $page
+     * @param $question_id
+     */
+    protected function configureResponse($page, $question_id)
+    {
+        $question = $this->questionHandler->getByID($question_id);
+        $config = json_decode($question['config']);
 
-		$page->setVar(array(
-			'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
-		));
-	}
+        $page->setVar(
+            array(
+                'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+            )
+        );
+    }
 }

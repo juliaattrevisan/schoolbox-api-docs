@@ -22,10 +22,13 @@ $groupHandler = new Group();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
-	$section = $sectionHandler->getByID($_POST['section_id']);
+    $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
+                $assess['category_id']
+            ) < WRITE_ACCESS)
+    ) {
         error(130);
     }
 
@@ -40,26 +43,26 @@ if (!empty($_POST)) {
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
-	/* If configuration was provided
-	 */
-	$config = null;
+    /* If configuration was provided
+     */
+    $config = null;
 
-	if (isset($_POST['configuration'])) {
-		$allConfiguration = json_decode($_POST['configuration']);
+    if (isset($_POST['configuration'])) {
+        $allConfiguration = json_decode($_POST['configuration']);
 
-		$config = array();
+        $config = array();
 
-		/* Compress checkboxes
-		 */
-		foreach($allConfiguration as $currentConfiguration) {
-			$config[$currentConfiguration->name] = $currentConfiguration->value;
-		}
-	}
+        /* Compress checkboxes
+         */
+        foreach ($allConfiguration as $currentConfiguration) {
+            $config[$currentConfiguration->name] = $currentConfiguration->value;
+        }
+    }
 
-	/* Put that data in the question
-	 */
-	$data = $_POST;
-	$data['config'] = json_encode($config);
+    /* Put that data in the question
+     */
+    $data = $_POST;
+    $data['config'] = json_encode($config);
 
     $question_id = $questionHandler->create($data);
     $answer_id = $answerHandler->create($_POST, $question_id);
@@ -83,7 +86,10 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID($this->arg[0]);
     $assess = $assessHandler->getByID($section['assess_id']);
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
+                $assess['category_id']
+            ) < WRITE_ACCESS)
+    ) {
         error(130);
     }
 
@@ -101,45 +107,57 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-	$this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
-	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
+    $this->setBlock(TEMPLATE_content, 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
     $this->setTitle('Create Question');
 
-	$this->setVar(array(
-		'has_answer_configuration_block' => ''
-	));
+    $this->setVar(
+        array(
+            'has_answer_configuration_block' => ''
+        )
+    );
 
-    $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'SECTION_ID' => $this->arg[0],
-        'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
-        'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
-        'QUESTION' => '',
-        'MARKS' => '',
-    ));
+    $this->setVar(
+        array(
+            'ASSESS_ASSESS_ID' => $section['assess_id'],
+            'ASSESS_CATEGORY_ID' => $assess['category_id'],
+            'SECTION_ID' => $this->arg[0],
+            'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
+            'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
+            'QUESTION' => '',
+            'MARKS' => '',
+        )
+    );
 
     /* If a particular question type has been selected; otherwise ignore it
      */
     if (is_numeric($this->arg[1])) {
         $answerHandler = $factory->createAnswerModel($this->arg[1]);
 
-        $this->setVar(array(
-            'IMPORT_SELECTED' => '',
-            'DISABLED_SELECTED' => '',
-        ));
-    } else if ($this->arg[1] == 'import') {
-        $this->setVar(array(
-            'IMPORT_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => ''
-        ));
+        $this->setVar(
+            array(
+                'IMPORT_SELECTED' => '',
+                'DISABLED_SELECTED' => '',
+            )
+        );
     } else {
-        $this->setVar(array(
-            'IMPORT_SELECTED' => '',
-            'DISABLED_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => $answerTemplate
-        ));
+        if ($this->arg[1] == 'import') {
+            $this->setVar(
+                array(
+                    'IMPORT_SELECTED' => 'selected=\'selected\'',
+                    'ANSWER_INPUTS' => ''
+                )
+            );
+        } else {
+            $this->setVar(
+                array(
+                    'IMPORT_SELECTED' => '',
+                    'DISABLED_SELECTED' => 'selected=\'selected\'',
+                    'ANSWER_INPUTS' => $answerTemplate
+                )
+            );
+        }
     }
 
     /* Show question type options
@@ -154,7 +172,10 @@ if (!empty($_POST)) {
 
             /* Load answer template into answerOption block
              */
-            $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
+            $this->setFile(
+                'answerFormFragment',
+                'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html'
+            );
             $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
             /* Render existing answers, or clear if none
@@ -163,39 +184,48 @@ if (!empty($_POST)) {
 
             $this->parse('answerInputs_block', 'answerFormFragment', true);
 
-			/* Question-specific answer configuration
-			 *
-			 * Load answer configurations template into answer_configuration_form_fragment
-			 * block if there are configuration options available
-			 */
-			if ($currentQuestionType['has_config'] == 'true') {
-				$this->setFile('answer_configuration_fragment', 'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html');
-				$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
+            /* Question-specific answer configuration
+             *
+             * Load answer configurations template into answer_configuration_form_fragment
+             * block if there are configuration options available
+             */
+            if ($currentQuestionType['has_config'] == 'true') {
+                $this->setFile(
+                    'answer_configuration_fragment',
+                    'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html'
+                );
+                $this->setBlock(
+                    'answer_configuration_fragment',
+                    'answer_configuration_form_fragment',
+                    'answer_configuration_form_fragment_block'
+                );
 
-				$answerHandler->configure($this, json_encode(array()));
+                $answerHandler->configure($this, json_encode(array()));
 
-				$this->parse('answer_configuration_block', 'answer_configuration_fragment');
-				$this->parse('has_answer_configuration_block', 'has_answer_configuration');
-			}
-			else {
-				$this->setVar(array(
-					'has_answer_configuration_block' => ''
-				));
-			}
+                $this->parse('answer_configuration_block', 'answer_configuration_fragment');
+                $this->parse('has_answer_configuration_block', 'has_answer_configuration');
+            } else {
+                $this->setVar(
+                    array(
+                        'has_answer_configuration_block' => ''
+                    )
+                );
+            }
 
             /* We've set the template, so remember this
              */
             $setTemplate = true;
-        }
-		else {
+        } else {
             $selected = '';
         }
 
-        $this->setVar(array(
-            'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-            'QUESTIONTYPE_DESCRIPTION' => Scrub::html($currentQuestionType['description']),
-            'QUESTIONTYPE_SELECTED' => $selected,
-        ));
+        $this->setVar(
+            array(
+                'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
+                'QUESTIONTYPE_DESCRIPTION' => Scrub::html($currentQuestionType['description']),
+                'QUESTIONTYPE_SELECTED' => $selected,
+            )
+        );
 
         $this->parse('questionType_block', 'questionType', true);
     }

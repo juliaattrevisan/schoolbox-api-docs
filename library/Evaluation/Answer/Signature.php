@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_Short
  *
@@ -9,14 +10,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
+abstract class Evaluation_Answer_Signature extends Evaluation_Answer
+{
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationSignature';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationSignature';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -26,7 +28,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id) {
+    public function create($object, $question_id)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -50,7 +53,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -65,7 +69,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -93,11 +98,12 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id)
+    {
 
-		/* Optional configuration hook
-		 */
-		$this->configureResponse($page, $question_id);
+        /* Optional configuration hook
+         */
+        $this->configureResponse($page, $question_id);
 
         $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
@@ -106,8 +112,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
         if ($existing['response']) {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => Scrub::text($existing['response']),
                 )
@@ -115,8 +121,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
         } else {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => '',
                 )
@@ -133,7 +139,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse($page)
+    {
     }
 
     /**
@@ -144,7 +151,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      *
      * @return array
      */
-    public function saveResponse($data) {
+    public function saveResponse($data)
+    {
         $processedResponse = $data['answer'];
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
@@ -158,7 +166,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id)
+    {
         $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
@@ -181,12 +190,13 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id)
+    {
         $object = array(
             'answer_id' => '',
             'question_id' => $question_id,
             'sequence' => 1,
-            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE|ENT_QUOTES),
+            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
         );
 
         return $this->create($object, $question_id);
@@ -200,7 +210,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      *
      * @return array
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         /* Remove tab characters
@@ -226,7 +237,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      *
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = $response['response'];
@@ -242,7 +254,8 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id)
+    {
         $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -274,53 +287,59 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer {
         $page->parse('answerOption_block', 'answerOption', true);
     }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param $page
-	 * @param $attemptId
-	 * @param $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param $page
+     * @param $attemptId
+     * @param $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		/* Removed this check because it was wrongly matching a blank saved
-		 * response with no response at all, preventing reviewed marks from
-		 * displaying properly.
-		 *
-		 * if ($existing['response'] != null) { ... } else { ... }
-		 */
-		$page->setVar(array(
-			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-			'USER_FIRSTNAME' => $currentQuestion['firstname'],
-			'USER_LASTNAME' => $currentQuestion['lastname'],
-			'ANSWER' => Scrub::text($existing['response']),
-			'RESPONSE_ID' => $existing['response_id'],
-			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-			'REVIEWED_MARKS' => $existing['mark'],
-		));
-	}
+        /* Removed this check because it was wrongly matching a blank saved
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
+        $page->setVar(
+            array(
+                'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+                'USER_FIRSTNAME' => $currentQuestion['firstname'],
+                'USER_LASTNAME' => $currentQuestion['lastname'],
+                'ANSWER' => Scrub::text($existing['response']),
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                'REVIEWED_MARKS' => $existing['mark'],
+            )
+        );
+    }
 
-	/**
-	 * The answer for a question during horizontal marking, so it appears at the
-	 * top under the question itself, and not repeated for each attempt
-	 *
-	 * @param $page
-	 * @param $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+    /**
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param $page
+     * @param $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    {
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		/* Show correct answer
-		 */
-		$page->setVar(array(
-			'ANSWER_ID' => $currentAnswer['answer_id'],
-			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-		));
+        /* Show correct answer
+         */
+        $page->setVar(
+            array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+            )
+        );
 
-		$page->parse('answerTop_block', 'answerTop', true);
-	}
+        $page->parse('answerTop_block', 'answerTop', true);
+    }
 }
