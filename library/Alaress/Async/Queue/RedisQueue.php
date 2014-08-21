@@ -84,6 +84,26 @@ class RedisQueue implements QueueInterface
 
 
     /**
+     * Request to drain the queue of its contents.
+     *
+     * @return void
+     */
+    public function drain()
+    {
+        // capture the ID list
+        $idList = $this->exec("ZRANGE $this->name 0 -1");
+
+        // delete the correcpsonding entries in the index
+        if(!empty($idList)) {
+            $this->exec(sprintf("HDEL %s %s", $this->index(), implode(' ', $idList)));
+        }
+
+        // finally delete the list
+        $this->exec("DEL $this->name");
+    }
+
+
+    /**
      * Push a message instance into this queue
      * Note: this isn't an interfaced method; AMQP doesn't support this concept
      *

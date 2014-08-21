@@ -39,4 +39,11 @@ interface QueueInterface
      */
     public function contains(Instance $instance);
 
+
+    /**
+     * Request to drain the queue of its contents.
+     *
+     * @return void
+     */
+    public function drain();
 }

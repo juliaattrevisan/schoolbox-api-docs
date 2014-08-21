@@ -40,7 +40,7 @@ class AMQPQueue implements QueueInterface
     {
         // ensure it exists
         $this->conn = $connector;
-        $this->name = INSTANCE_ID.".u.$id.$label";
+        $this->name = INSTANCE_ID . ".u.$id.$label";
         $this->conn->declareQueue($this->name);
         $this->rkey = $routingKey;
     }
@@ -134,6 +134,21 @@ class AMQPQueue implements QueueInterface
         $this->conn->rejectMessages($nack);
 
         return $result;
+    }
+
+
+    /**
+     * Request to drain the queue of its contents.
+     *
+     * @return void
+     */
+    public function drain()
+    {
+        $ack = array();
+        while ($m = $this->conn->readFromQueue($this->getName())) {
+            $ack[] = $m;
+        }
+        $this->conn->acceptMessages($ack);
     }
 
 }
