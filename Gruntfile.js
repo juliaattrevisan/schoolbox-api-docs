@@ -12,7 +12,7 @@ module.exports = function(grunt) {
                 interval: 5007
             },
             files: ['www/css/core/*.less'],
-            tasks: ['build.css.current']
+            tasks: ['build.css:core', 'build.css.current']
         }
     };
     var buildTasks = {};
