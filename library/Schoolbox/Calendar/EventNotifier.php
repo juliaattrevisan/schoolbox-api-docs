@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -17,6 +17,7 @@ use Calendar;
 use Html2Text\Html2Text;
 use Monolog\Logger;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -24,260 +25,273 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Permission\Access\UserAccess;
 
-class EventNotifier extends AbstractModuleNotifier {
+class EventNotifier extends AbstractModuleNotifier
+{
 
-	const TRIGGER_UPCOMING = 'upcoming';
-	const TRIGGER_UPDATED  = 'updated';
+    const TRIGGER_UPCOMING = 'upcoming';
+    const TRIGGER_UPDATED  = 'updated';
 
-	// how many minutes prior to an event the notification should go out
-	const UPCOMING_WINDOW  = 10;
-
-	/**
-	 * @return string
-	 */
-	protected function getSlug() {
-		return NSMapper::NS_CALENDAR;
-	}
+    // how many minutes prior to an event the notification should go out
+    const UPCOMING_WINDOW = 10;
 
 
-	/**
-	 * @param TriggerBundle $bundle
-	 * @return void
-	 */
-	public function bundleTriggers($bundle) {
-		/** @var Event $event */
-		$event = $bundle->getEvent()->getObject();
-		$start = $event->getStartDateTime()->getUnixTimestamp();
-
-		// if this event is in the past, we don't want to know about it
-		if($start < time()) {
-			return;
-		}
-
-		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
-			// advise 10 minutes before start
-			$bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
-		}
-		elseif($bundle->getMethod() == Mapper::METHOD_UPDATE) {
-			// advise 10 minutes before start, and only advise updated once published
-
-			$pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
-				? $event->getPublishDateTime()->getUnixTimestamp()
-				: self::IMMEDIATELY;
-
-			$bundle->attachEach(array(
-				self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
-				self::TRIGGER_UPDATED  => $pubstamp
-			));
-		}
-	}
+    /**
+     * @return string
+     */
+    protected function getSlug()
+    {
+        return NSMapper::NS_CALENDAR;
+    }
 
 
-	/* ASYNC METHODS */
+    /**
+     * @param TriggerBundle $bundle
+     * @return void
+     */
+    public function bundleTriggers($bundle)
+    {
+        /** @var Event $event */
+        $event = $bundle->getEvent()->getObject();
+        $start = $event->getStartDateTime()->getUnixTimestamp();
+
+        // if this event is in the past, we don't want to know about it
+        if ($start < time()) {
+            return;
+        }
+
+        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
+            // advise 10 minutes before start
+            $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
+        } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+            // advise 10 minutes before start, and only advise updated once published
+
+            $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
+                ? $event->getPublishDateTime()
+                        ->getUnixTimestamp()
+                : self::IMMEDIATELY;
+
+            $bundle->attachEach(array(
+                self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
+                self::TRIGGER_UPDATED  => $pubstamp
+            ));
+        }
+    }
 
 
-	/**
-	 * @param string $trigger
-	 * @param string $roleType
-	 * @param Event $event
-	 * @return Builder
-	 */
-	protected function newBuilder($trigger, $roleType, $event) {
-		$plain = new Html2Text($event->getDetail());
-		$bob = new Builder();
-		$bob->setNamespace(NSMapper::NS_CALENDAR)
-		    ->setIcon('/images/icon.php?size=32&icon=clock')
-		    ->setHref('/calendar/'.$event->getStartDateTime()->getUsingFormat('d-m-Y'))
-		    ->setBody($plain->get_text())
-		    ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-		    ->addTopic("calendar.{$event->getType()->getType()}.{$event->getId()}.$trigger")
-		    ->addFilter('roletype', array($roleType))
-			->setSeverity(Logger::INFO);
-
-		return $bob;
-	}
-
-	/**
-	 * @param string $roleType
-	 * @param Event  $event
-	 * @param User   $author
-	 * @return Envelope
-	 */
-	protected function notifyUpcoming($roleType, $event, $author) {
-		$envelope = new Envelope();
-		$bob = $this->newBuilder('upcoming', $roleType, $event)
-					->setTitle(':name is about to start')
-					->setParam('name', new Param($event->getTitle()));
-
-		$instance = $bob->build();
-
-		switch($event->getAccess()) {
-			case Calendar::ACCESS_CAMPUS:
-				foreach($event->getCampusCollection() as $campus) {
-					$envelope->broadcastToCampus($campus, $instance);
-				}
-				break;
-			case Calendar::ACCESS_GROUP:
-				$envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
-				break;
-			case Calendar::ACCESS_PERSONAL:
-				$envelope->targetToUser($event->getOwner(), $instance);
-				break;
-		}
-
-		return $envelope;
-	}
+    /* ASYNC METHODS */
 
 
-	/**
-	 * @param string $roleType
-	 * @param Event  $event
-	 * @param User   $effector
-	 * @param array  $diff
-	 * @return Envelope
-	 */
-	protected function notifyUpdated($roleType, $event, $effector, $diff = null) {
-		$envelope = new Envelope();
-		$bob = $this->newBuilder('upcoming', $roleType, $event);
+    /**
+     * @param string $trigger
+     * @param string $roleType
+     * @param Event  $event
+     * @return Builder
+     */
+    protected function newBuilder($trigger, $roleType, $event)
+    {
+        $plain = new Html2Text($event->getDetail());
+        $bob   = new Builder();
+        $bob->setNamespace(NSMapper::NS_CALENDAR)
+            ->setIcon('/images/icon.php?size=32&icon=clock')
+            ->setHref('/calendar/' . $event->getStartDateTime()->getUsingFormat('d-m-Y'))
+            ->setBody($plain->get_text())
+            ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
+            ->addTopic("calendar.{$event->getType()->getType()}.{$event->getId()}.$trigger")
+            ->addFilter('roletype', array($roleType))
+            ->setSeverity(Logger::INFO);
 
-		$instances = array();
-
-		// title changed
-		if(isset($diff['note'])) {
-			$bob->setTitle(':user renamed the event :old to :new')
-				->setParams(array(
-					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-					'old'  => new Param($diff['note'][1]),
-					'new'  => new Param($event->getTitle())
-				));
-			$instances[] = $bob->build();
-			unset($diff['note']);
-		}
-
-		// location changed
-		if(isset($diff['location'])) {
-			$bob->setTitle(':event has moved from :old to :new')
-			    ->setParams(array(
-				    'user' => new Param($event->getTitle()),
-				    'old'  => new Param($diff['location'][1]),
-				    'new'  => new Param($event->getLocation())
-			    ));
-			$instances[] = $bob->build();
-			unset($diff['location']);
-		}
-
-		// time changed
-		if(isset($diff['startDate']) && isset($diff['startTime'])) {
-			$bob->setTitle(':user changed the start time of :name to :time')
-				->setParams(array(
-					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-					'name' => new Param($event->getTitle()),
-					'time' => new Param($event->getStartDateTime()->getShort())
-				));
-
-			$instances[] = $bob->build();
-			unset($diff['startDate']);
-			unset($diff['startTime']);
-		}
-
-		// something else changed
-		if(count($diff)) {
-			$bob->setTitle(':user updated the event :name')
-				->setParams(array(
-					'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-					'name' => new Param($event->getTitle())
-				));
-
-			$instances[] = $bob->build();
-		}
+        return $bob;
+    }
 
 
-		switch($event->getAccess()) {
-			case Calendar::ACCESS_CAMPUS:
-				foreach($event->getCampusCollection() as $campus) {
-					foreach($instances as $instance) {
-						$envelope->broadcastToCampus($campus, $instance);
-					}
-				}
-				break;
-			case Calendar::ACCESS_GROUP:
-				foreach($instances as $instance) {
-					$envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
-				}
-				break;
-			case Calendar::ACCESS_PERSONAL:
-				foreach($instances as $instance) {
-					$envelope->targetToUser($event->getOwner(), $instance);
-				}
-				break;
-		}
+    /**
+     * @param string $roleType
+     * @param Event  $event
+     * @param User   $author
+     * @return Envelope
+     */
+    protected function notifyUpcoming($roleType, $event, $author)
+    {
+        $envelope = new Envelope();
+        $bob      = $this->newBuilder('upcoming', $roleType, $event)
+                         ->setTitle(':name is about to start')
+                         ->setParam('name', new Param($event->getTitle()));
 
-		return $envelope;
-	}
+        $instance = $bob->build();
 
+        switch ($event->getAccess()) {
+            case Calendar::ACCESS_CAMPUS:
+                foreach ($event->getCampusCollection() as $campus) {
+                    $envelope->broadcastToCampus($campus, $instance);
+                }
+                break;
+            case Calendar::ACCESS_GROUP:
+                $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
+                break;
+            case Calendar::ACCESS_PERSONAL:
+                $envelope->targetToUser($event->getOwner(), $instance);
+                break;
+        }
 
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @return Envelope
-	 */
-	public function notifyStudentUpcoming($event, $author) {
-		return $this->notifyUpcoming(Role::STUDENT, $event, $author);
-	}
-
-
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @return Envelope
-	 */
-	public function notifyStaffUpcoming($event, $author) {
-		return $this->notifyUpcoming(Role::STAFF, $event, $author);
-	}
+        return $envelope;
+    }
 
 
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @return Envelope
-	 */
-	public function notifyParentUpcoming($event, $author) {
-		return $this->notifyUpcoming(Role::PARENT, $event, $author);
-	}
+    /**
+     * @param string $roleType
+     * @param Event  $event
+     * @param User   $effector
+     * @param array  $diff
+     * @return Envelope
+     */
+    protected function notifyUpdated($roleType, $event, $effector, $diff = null)
+    {
+        $envelope = new Envelope();
+        $bob      = $this->newBuilder('upcoming', $roleType, $event);
+
+        $instances = array();
+
+        // title changed
+        if (isset($diff['note'])) {
+            $bob->setTitle(':user renamed the event :old to :new')
+                ->setParams(array(
+                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                    'old'  => new Param($diff['note'][1]),
+                    'new'  => new Param($event->getTitle())
+                ));
+            $instances[] = $bob->build();
+            unset($diff['note']);
+        }
+
+        // location changed
+        if (isset($diff['location'])) {
+            $bob->setTitle(':event has moved from :old to :new')
+                ->setParams(array(
+                    'event' => new Param($event->getTitle()),
+                    'old'   => new Param($diff['location'][1]),
+                    'new'   => new Param($event->getLocation())
+                ));
+            $instances[] = $bob->build();
+            unset($diff['location']);
+        }
+
+        // time changed
+        if (isset($diff['startDate']) && isset($diff['startTime'])) {
+            $bob->setTitle(':user changed the start time of :name to :time')
+                ->setParams(array(
+                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                    'name' => new Param($event->getTitle()),
+                    'time' => new Param($event->getStartDateTime()->getShort())
+                ));
+
+            $instances[] = $bob->build();
+            unset($diff['startDate']);
+            unset($diff['startTime']);
+        }
+
+        // something else changed
+        if (count($diff)) {
+            $bob->setTitle(':user updated the event :name')
+                ->setParams(array(
+                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                    'name' => new Param($event->getTitle())
+                ));
+
+            $instances[] = $bob->build();
+        }
 
 
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStudentUpdated($event, $author, $diff = null) {
-		return $this->notifyUpdated(Role::STUDENT, $event, $author, $diff);
-	}
+        switch ($event->getAccess()) {
+            case Calendar::ACCESS_CAMPUS:
+                foreach ($event->getCampusCollection() as $campus) {
+                    foreach ($instances as $instance) {
+                        $envelope->broadcastToCampus($campus, $instance);
+                    }
+                }
+                break;
+            case Calendar::ACCESS_GROUP:
+                foreach ($instances as $instance) {
+                    $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
+                }
+                break;
+            case Calendar::ACCESS_PERSONAL:
+                foreach ($instances as $instance) {
+                    $envelope->targetToUser($event->getOwner(), $instance);
+                }
+                break;
+        }
+
+        return $envelope;
+    }
 
 
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyStaffUpdated($event, $author, $diff = null) {
-		return $this->notifyUpdated(Role::STAFF, $event, $author, $diff);
-	}
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @return Envelope
+     */
+    public function notifyStudentUpcoming($event, $author)
+    {
+        return $this->notifyUpcoming(Role::STUDENT, $event, $author);
+    }
 
 
-	/**
-	 * @param Event $event
-	 * @param User $author
-	 * @param array $diff
-	 * @return Envelope
-	 */
-	public function notifyParentUpdated($event, $author, $diff = null) {
-		return $this->notifyUpdated(Role::PARENT, $event, $author, $diff);
-	}
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @return Envelope
+     */
+    public function notifyStaffUpcoming($event, $author)
+    {
+        return $this->notifyUpcoming(Role::STAFF, $event, $author);
+    }
+
+
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @return Envelope
+     */
+    public function notifyParentUpcoming($event, $author)
+    {
+        return $this->notifyUpcoming(Role::PARENT, $event, $author);
+    }
+
+
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStudentUpdated($event, $author, $diff = null)
+    {
+        return $this->notifyUpdated(Role::STUDENT, $event, $author, $diff);
+    }
+
+
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffUpdated($event, $author, $diff = null)
+    {
+        return $this->notifyUpdated(Role::STAFF, $event, $author, $diff);
+    }
+
+
+    /**
+     * @param Event $event
+     * @param User  $author
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentUpdated($event, $author, $diff = null)
+    {
+        return $this->notifyUpdated(Role::PARENT, $event, $author, $diff);
+    }
 
 }
