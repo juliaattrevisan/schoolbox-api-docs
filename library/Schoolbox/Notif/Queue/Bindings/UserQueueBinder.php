@@ -15,9 +15,7 @@ use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
 use Alaress\Async\Queue\QueueInterface;
-//use Alaress\Async\Queue\RedisQueue;
 use OutOfBoundsException;
-//use Predis\Client;
 use RuntimeException;
 
 class UserQueueBinder
@@ -100,25 +98,6 @@ class UserQueueBinder
 
         return $this;
     }
-
-
-// TODO implement Redis queues
-//    /**
-//     * @param Client           $conn
-//     * @param QueueInterface[] $queues
-//     * @return self
-//     */
-//    public function prepareRedis(Client $conn, array $queues)
-//    {
-//        foreach ($queues as $q) {
-//            // ignore non-redis queues
-//            if (!$q instanceof RedisQueue) {
-//                continue;
-//            }
-//        }
-//
-//        return $this;
-//    }
 
 
     /**
