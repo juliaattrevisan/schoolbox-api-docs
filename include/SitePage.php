@@ -1,6 +1,8 @@
 <?php
 
-class SitePage extends Page {
+class SitePage extends Page
+{
+
     private $ajax;
 
     private $lite;
@@ -19,7 +21,9 @@ class SitePage extends Page {
      */
     public $arg = array();
 
-    public function SitePage($login = true) {
+
+    public function SitePage($login = true)
+    {
         parent::Page();
 
         $this->db = DeprecatedDatabase::getInstance();
@@ -31,21 +35,26 @@ class SitePage extends Page {
         $this->setSite();
     }
 
+
     /**
      * @param  Aura\Di\Container $di
      * @return $this
      */
-    public function setDi($di) {
+    public function setDi($di)
+    {
         $this->di = $di;
         return $this;
     }
 
+
     /**
      * @return Aura\Di\Container
      */
-    public function getDi() {
+    public function getDi()
+    {
         return $this->di;
     }
+
 
     /**
      * Detect connection type
@@ -53,7 +62,8 @@ class SitePage extends Page {
      *
      * @return string
      */
-    public function conType() {
+    public function conType()
+    {
         $contype = "http://";
         if (getenv("SERVER_PORT") == 443) {
             $contype = "https://";
@@ -61,21 +71,25 @@ class SitePage extends Page {
 
         return $contype;
     }
-    
+
+
     /**
-    * Get websocket port
-    * 
-    * @return int
-    */
-    public function getWebsocketPort() {
+     * Get websocket port
+     *
+     * @return int
+     */
+    public function getWebsocketPort()
+    {
         if ($this->conType() == 'https://') {
-            return Cfg::get('websocket_port_ssl') ?: 8081;
+            return Cfg::get('websocket_port_ssl') ? : 8081;
         }
 
-        return Cfg::get('websocket_port') ?: 8080;
+        return Cfg::get('websocket_port') ? : 8080;
     }
 
-    function loadContent($pageFile, $execute = true) {
+
+    function loadContent($pageFile, $execute = true)
+    {
         $this->pageName = $pageFile;
 
         /* sanitise data, force all 404s through pageNotFound() */
@@ -84,12 +98,12 @@ class SitePage extends Page {
         }
 
         /* If you try to access the login screen but you are already logged in, just go home */
-        if($pageFile == '/login/' || $pageFile == '/login' ) {
+        if ($pageFile == '/login/' || $pageFile == '/login') {
             $pageFile = '/home/';
         }
 
         $this->arg = array();
-        $path = explode('/', trim($pageFile, '/'));
+        $path      = explode('/', trim($pageFile, '/'));
 
         $total = count($path);
 
@@ -99,26 +113,19 @@ class SitePage extends Page {
             $filename = rtrim(implode("/", $path), '/');
 
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                $this->nameTransaction('/'.$filename.'.php');
+                $this->nameTransaction('/' . $filename . '.php');
                 include(WEB_root . '/' . $filename . '.php');
                 return true;
-            }
-            elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                $this->nameTransaction('/'.$filename.'/index.php');
+            } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
+                $this->nameTransaction('/' . $filename . '/index.php');
                 include(WEB_root . '/' . $filename . '/index.php');
                 return true;
-            }
-            else {
-                if (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
-                    $this->setFile(TEMPLATE_content, $filename . '.html');
-                    return true;
-                }
-                else {
-                    if (is_file($this->templateRoot . '/' . $filename . '/index.html')) {
-                        $this->setFile(TEMPLATE_content, $filename . '/index.html');
-                        return true;
-                    }
-                }
+            } elseif (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
+                $this->setFile(TEMPLATE_content, $filename . '.html');
+                return true;
+            } elseif (is_file($this->templateRoot . '/' . $filename . '/index.html')) {
+                $this->setFile(TEMPLATE_content, $filename . '/index.html');
+                return true;
             }
 
             /* move last element to arguments */
@@ -137,65 +144,72 @@ class SitePage extends Page {
      *
      * @param string $name
      */
-    protected function nameTransaction($name) {
+    protected function nameTransaction($name)
+    {
         if (extension_loaded('newrelic')) {
             newrelic_name_transaction($name);
         }
     }
 
-    function setSite() {
+
+    function setSite()
+    {
         if (Cfg::get('site_detect') == 'domain') {
             //Get site templates via domain name
             if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
                 $this->site = $match[1];
                 return true;
             }
-        } else {
-            if (Cfg::get('site_detect') == 'campus') {
-                //Get site template via users campus
-                // MGS-specific code
-                if (Cfg::get('site_location') == 'mgs') {
-                    // all staff are shown default MGS skin
-                    // exception: teachers (gid 1), who get their campus skin.
-                    $group = new Group();
-                    if ($_SESSION['gid'] != 1 && $group->isStaff()) {
-                        $this->site = 'mgs-staff';
-                    }
-                    elseif ($_SESSION['campus'][0] == 3) {
-                        $this->site = 'grimwade';
-                    }
-                    elseif ($_SESSION['campus'][0] == 2) {
-                        $this->site = 'wadhurst';
-                    }
-                    else {
-                        $this->site = 'mgs-senior';
-                    }
-
-                    return true;
+        } elseif (Cfg::get('site_detect') == 'campus') {
+            //Get site template via users campus
+            // MGS-specific code
+            if (Cfg::get('site_location') == 'mgs') {
+                // all staff are shown default MGS skin
+                // exception: teachers (gid 1), who get their campus skin.
+                $group = new Group();
+                if ($_SESSION['gid'] != 1 && $group->isStaff()) {
+                    $this->site = 'mgs-staff';
+                } elseif ($_SESSION['campus'][0] == 3) {
+                    $this->site = 'grimwade';
+                } elseif ($_SESSION['campus'][0] == 2) {
+                    $this->site = 'wadhurst';
                 } else {
-                    $this->site = Cfg::get('site_location');
+                    $this->site = 'mgs-senior';
                 }
+
+                return true;
+            } else {
+                $this->site = Cfg::get('site_location');
             }
         }
 
         $this->site = Cfg::get('site_location');
     }
 
-    public function getAjax() {
+
+    public function getAjax()
+    {
         return $this->ajax;
     }
 
-    public function getLite() {
+
+    public function getLite()
+    {
         return $this->lite;
     }
 
-    function setAjax($state = true) {
+
+    function setAjax($state = true)
+    {
         $this->ajax = $state;
     }
 
-    function setLite($state) {
+
+    function setLite($state)
+    {
         $this->lite = $state;
     }
+
 
     /**
      * Detects AJAX state based on value of request header X-Requested-With - if
@@ -206,9 +220,11 @@ class SitePage extends Page {
      *
      * @return bool
      */
-    public function detectAjax() {
+    public function detectAjax()
+    {
         return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
+
 
     /**
      * Outputs a JSON response, with appropriate header.
@@ -218,7 +234,8 @@ class SitePage extends Page {
      *                              Exits after output if false.
      * @param int   $responseCode   If set, output this response code.
      */
-    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
+    public function outputJson($output, $keepProcessing = false, $responseCode = null)
+    {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
             header(':', true, $responseCode);
@@ -226,13 +243,14 @@ class SitePage extends Page {
         $jsonOutput = json_encode($output);
         if (!$keepProcessing) {
             echo $jsonOutput;
-        }
-        else {
+        } else {
             $this->keepProcessingInBackground($jsonOutput);
         }
     }
 
-    function outputPage($lite = false) {
+
+    function outputPage($lite = false)
+    {
         if ($this->ajax) {
             return true;
         }
@@ -257,26 +275,26 @@ class SitePage extends Page {
         }
 
         $templateVar = array(
-            'TEMPLATE_YEAR' => date('Y'),
-            'SITE_NAME' => Cfg::get('school_name'),
-            'SITE_TITLE' => Cfg::get('title'),
-            'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-            'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
-            'SITE_USERNAME' => $_SESSION['username'],
-            'SITE_LOCATION' => $this->site,
-            'USER_ID' => $_SESSION['id'],
-            'EXTERNAL_ID' => $_SESSION['sid'],
-            'SITE_VERSION' => Cfg::get('site_version'),
-            'SCHOOL_ADDRESS' => Cfg::get('school_address'),
-            'DEBUGBAR'      => $debug_bar_body,
-            'DEBUGBAR_HEAD' => $debug_bar_head,
-            'WEBSOCKET_HOST' => $_SERVER['HTTP_HOST'] ?: parse_url($_SERVER['REQUEST_URI'], PHP_URL_HOST),
-            'WEBSOCKET_PATH' => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
-            'WEBSOCKET_PORT' => $this->getWebsocketPort(),
-	        'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?: 0,
-	        'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?: '',
-	        'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-            'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true'
+            'TEMPLATE_YEAR'          => date('Y'),
+            'SITE_NAME'              => Cfg::get('school_name'),
+            'SITE_TITLE'             => Cfg::get('title'),
+            'SITE_GREETING'          => TextFormatter::greeting(), // TODO: This should be an object
+            'SITE_LOGINNAME'         => $userHandler->formatName($_SESSION),
+            'SITE_USERNAME'          => $_SESSION['username'],
+            'SITE_LOCATION'          => $this->site,
+            'USER_ID'                => $_SESSION['id'],
+            'EXTERNAL_ID'            => $_SESSION['sid'],
+            'SITE_VERSION'           => Cfg::get('site_version'),
+            'SCHOOL_ADDRESS'         => Cfg::get('school_address'),
+            'DEBUGBAR'               => $debug_bar_body,
+            'DEBUGBAR_HEAD'          => $debug_bar_head,
+            'WEBSOCKET_HOST'         => self::parseRequestUrl(PHP_URL_HOST),
+            'WEBSOCKET_PATH'         => Cfg::get('websocket_path') ? Cfg::get('websocket_path') : '/',
+            'WEBSOCKET_PORT'         => $this->getWebsocketPort(),
+            'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ? : 0,
+            'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ? : '',
+            'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
+            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true'
         );
 
         $this->setVar($templateVar);
@@ -290,7 +308,9 @@ class SitePage extends Page {
         $this->template->pparse('finaloutput', TEMPLATE_body);
     }
 
-    function buildPage($customHead = true) {
+
+    function buildPage($customHead = true)
+    {
 
         $this->groupHandler = new Group;
 
@@ -300,7 +320,7 @@ class SitePage extends Page {
         $this->setFile('bannerTpl', 'include/banner.html');
         $this->setFile('navTpl', 'include/nav.html');
         $this->setFile('tabTpl', 'include/tab.html');
-	    $this->setFile('instantTpl', 'include/instant.html');
+        $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
         $this->renderSideNav();
@@ -316,12 +336,11 @@ class SitePage extends Page {
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
         $this->setBlock('bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
-	    if(Cfg::get('messaging_enabled')) {
-		    $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
-	    }
-	    else {
-		    $this->setVar('INSTANTMESSAGE_BLOCK', '');
-	    }
+        if (Cfg::get('messaging_enabled')) {
+            $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
+        } else {
+            $this->setVar('INSTANTMESSAGE_BLOCK', '');
+        }
 
         if ($_SESSION['id']) {
 
@@ -344,11 +363,15 @@ class SitePage extends Page {
         }
     }
 
-    function setTab($tab) {
+
+    function setTab($tab)
+    {
         $this->currentTab = $tab;
     }
 
-    function initSession() {
+
+    function initSession()
+    {
         session_start();
 
         if (!isset($_SESSION['id'])) {
@@ -380,7 +403,7 @@ class SitePage extends Page {
         // Is this a URL in the form of /?page=urlencode($url)?
         // If so, redirect to $url.
         $url = parse_url($_SERVER['REQUEST_URI']);
-        if ($url['path'] === '/login' || $url['path'] === '/login/' ) {
+        if ($url['path'] === '/login' || $url['path'] === '/login/') {
             parse_str($url['query'], $query);
             if (count($query) === 1 && isset($query['page']) && preg_match('|^/|', $query['page'])) {
                 $this->localRedir($query['page']);
@@ -391,7 +414,9 @@ class SitePage extends Page {
         $_SESSION['lasttime'] = mktime();
     }
 
-    function saveHistory($override = '') {
+
+    function saveHistory($override = '')
+    {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
             $_SESSION['history'] = array();
@@ -410,7 +435,9 @@ class SitePage extends Page {
         }
     }
 
-    function backToTheFuture($page) {
+
+    function backToTheFuture($page)
+    {
         /* In Dans honour, time is ours */
         if (is_array($_SESSION['history'])) {
             if (count($_SESSION['history']) >= $page) {
@@ -424,18 +451,20 @@ class SitePage extends Page {
 
     }
 
+
     /**
      * Outputs an error message.
      *
      * @param mixed  $ec
-     *   Integer: retrieves error text from code from database
-     *   null:    outputs whatever's in $message as error
+     *                        Integer: retrieves error text from code from database
+     *                        null:    outputs whatever's in $message as error
      * @param string $message Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
-    function error($ec, $message = "", $code = 400) {
+    function error($ec, $message = "", $code = 400)
+    {
         if (isset($ec)) {
-            $db = DeprecatedDatabase::getInstance();
+            $db    = DeprecatedDatabase::getInstance();
             $query = "SELECT message FROM error WHERE id = '$ec'";
             $error = $db->getRow($query);
         }
@@ -450,7 +479,7 @@ class SitePage extends Page {
 
         $this->setFile(TEMPLATE_content, 'common/error.html');
         $this->setTitle('Error Encountered');
-        $this->setVar("CODE",   $ec);
+        $this->setVar("CODE", $ec);
         $this->setVar("OUTPUT", $output);
         $this->buildPage(false);
         $this->outputPage(true);
@@ -458,24 +487,22 @@ class SitePage extends Page {
 
     }
 
-    function renderSideNav() {
+
+    function renderSideNav()
+    {
         //this section handles the drop down menu
         if ($_SESSION['su']) {
             $query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
+        } elseif (is_array($_SESSION['campus'])) {
+            $query = "SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
+                      WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(',', $_SESSION['campus']) . ") )
+                      AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
+                      ORDER BY parent, sequence, txt";
         } else {
-            if (is_array($_SESSION['campus'])) {
-                $query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(
-                    ',', $_SESSION['campus']
-                ) . ") )
-                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
-                             ORDER BY parent, sequence, txt";
-            } else {
-                $query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus = 1)
-                               AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
-                             ORDER BY parent, sequence, txt";
-            }
+            $query = "SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
+                      WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus = 1)
+                      AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
+                      ORDER BY parent, sequence, txt";
         }
         $this->db->query($query);
 
@@ -491,7 +518,9 @@ class SitePage extends Page {
         $this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
     }
 
-    function renderTabBar() {
+
+    function renderTabBar()
+    {
 
         //this section hanldes the display of the timetable tab
         $this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
@@ -508,77 +537,75 @@ class SitePage extends Page {
         if ($this->groupHandler->isStaff()) {
             $this->parse('sm_tab', 'submission_tab');
             $this->setVar('dw_tab', '');
+        } elseif ($this->groupHandler->isStudent()) {
+            $this->parse('dw_tab', 'duework_tab');
+            $this->setVar('sm_tab', '');
         } else {
-            if ($this->groupHandler->isStudent()) {
-                $this->parse('dw_tab', 'duework_tab');
-                $this->setVar('sm_tab', '');
-            } else {
-                $this->setVar('sm_tab', '');
-                $this->setVar('dw_tab', '');
-            }
-	}
+            $this->setVar('sm_tab', '');
+            $this->setVar('dw_tab', '');
+        }
 
-	$this->setBlock('tabTpl', 'parent_tab', 'p_tab');
-	if ($this->groupHandler->isParent()) {
-		$this->parse('p_tab', 'parent_tab');
-	} else {
-		$this->setVar('p_tab', '');
-	}
+        $this->setBlock('tabTpl', 'parent_tab', 'p_tab');
+        if ($this->groupHandler->isParent()) {
+            $this->parse('p_tab', 'parent_tab');
+        } else {
+            $this->setVar('p_tab', '');
+        }
 
         //this section handles the display of the webmail tab
         // if configuration states mail is available and user has access to local mail account display it
         $this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
         $this->setVar('wm_tab', '');
 
-        if($_SESSION['webmail'] ) {
+        if ($_SESSION['webmail']) {
             $location = ''; //Webmail location
 
             switch ($this->site) {
                 case 'shore':
                     if ($this->groupHandler->isStaff()) {
                         $location = 'https://mail.shore.nsw.edu.au/exchange/';
-                    } else if ($this->groupHandler->isStudent()) {
+                    } elseif ($this->groupHandler->isStudent()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
                         } else {
                             $location = 'http://cassandra.student.shore.nsw.edu.au/exchange/';
                         }
                     }
-                break;
+                    break;
 
                 case 'moriah':
                     if ($this->groupHandler->isStaff()) {
                         $location = 'https://mail.moriah.nsw.edu.au/owa';
-                    } else if ($this->groupHandler->isStudent()) {
+                    } elseif ($this->groupHandler->isStudent()) {
                         $location = 'http://www.google.com/a/student.moriah.nsw.edu.au/';
                     }
-                break;
+                    break;
 
                 case 'cedars':
                     if ($this->groupHandler->isStaff()) {
                         $location = 'https://mail.cedars.nsw.edu.au/owa';
-                    } else if ($this->groupHandler->isStudent()) {
+                    } elseif ($this->groupHandler->isStudent()) {
                         $location = 'https://portal.microsoftonline.com';
                     }
 
-                break;
+                    break;
 
                 case 'oakburn':
                     if ($this->groupHandler->isStaff()) {
                         $location = 'https://mail.soc.tas.edu.au/owa/';
-                    } else if ($this->groupHandler->isStudent()) {
+                    } elseif ($this->groupHandler->isStudent()) {
                         $location = 'https://www.outlook.com/my.soc.tas.edu.au';
                     }
-                break;
+                    break;
 
                 default:
                     $location = Cfg::get('mail_webmail');
-                break;
+                    break;
             }
 
             /* Only set webmail tab if we have a location set and user has webmail enabled */
-            if($location) {
-                $this->setVar('WEBMAIL_LOCATION', 'href="'.$location.'" rel="external"');
+            if ($location) {
+                $this->setVar('WEBMAIL_LOCATION', 'href="' . $location . '" rel="external"');
                 $this->parse('wm_tab', 'webmail_tab');
             }
         }
@@ -588,14 +615,15 @@ class SitePage extends Page {
             require_once WEB_root . '/include/wenona.php';
             //provide encoded login details for intranet
             $this->setVar(
-                "ENC_LOGIN", urlencode(
-                    base64_encode(
-                        xorEncrypt(
-                            INTRANET_encryption_key,
-                            $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
-                        )
-                    )
-                )
+                 "ENC_LOGIN",
+                 urlencode(
+                     base64_encode(
+                         xorEncrypt(
+                             INTRANET_encryption_key,
+                             $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
+                         )
+                     )
+                 )
             );
 
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
@@ -615,19 +643,17 @@ class SitePage extends Page {
                 }
 
                 $this->parse('mf_tab', 'myfiles_tab');
-            } else {
-                if ($this->groupHandler->isStudent()) {
-                    if (strpos(Session::getIP(), '192.168.') === false) {
-                        $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
-                    } else {
-                        $this->setVar('MYFILES_LOCATION', 'http://cassandra.student.shore.nsw.edu.au/fileway');
-                    }
-
-                    $this->parse('mf_tab', 'myfiles_tab');
+            } elseif ($this->groupHandler->isStudent()) {
+                if (strpos(Session::getIP(), '192.168.') === false) {
+                    $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
                 } else {
-                    $this->setVar('MYFILES_LOCATION', '#');
-                    $this->setVar('mf_tab', '');
+                    $this->setVar('MYFILES_LOCATION', 'http://cassandra.student.shore.nsw.edu.au/fileway');
                 }
+
+                $this->parse('mf_tab', 'myfiles_tab');
+            } else {
+                $this->setVar('MYFILES_LOCATION', '#');
+                $this->setVar('mf_tab', '');
             }
 
             /* Remove these links if parent logged in:
@@ -644,9 +670,7 @@ class SitePage extends Page {
 
             }
 
-
-        }
-        else {
+        } else {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
             if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
                 $this->parse('mf_tab', 'myfiles_tab');
@@ -676,24 +700,26 @@ class SitePage extends Page {
 
         // choose tab to highlight
         $output = array(
-            'TAB_MAIN_ON' => '',
-            'TAB_NEWS_ON' => '',
-            'TAB_WEBMAIL_ON' => '',
-            'TAB_CALENDAR_ON' => '',
-            'TAB_TIMETABLE_ON' => '',
-            'TAB_RESOURCES_ON' => '',
-            'TAB_MYFILES_ON' => '',
-            'TAB_NETWORK_ON' => '',
-            'TAB_PORTFOLIO_ON' => '',
-            'TAB_EPORTFOLIO_ON' => '',
-            'TAB_SUBMISSION_ON' => '',
+            'TAB_MAIN_ON'                                  => '',
+            'TAB_NEWS_ON'                                  => '',
+            'TAB_WEBMAIL_ON'                               => '',
+            'TAB_CALENDAR_ON'                              => '',
+            'TAB_TIMETABLE_ON'                             => '',
+            'TAB_RESOURCES_ON'                             => '',
+            'TAB_MYFILES_ON'                               => '',
+            'TAB_NETWORK_ON'                               => '',
+            'TAB_PORTFOLIO_ON'                             => '',
+            'TAB_EPORTFOLIO_ON'                            => '',
+            'TAB_SUBMISSION_ON'                            => '',
             'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
         );
 
         $this->setVar($output);
     }
 
-    function renderGroupList() {
+
+    function renderGroupList()
+    {
         //this section handle mygroups section in the template
         $this->setBlock("navTpl", "mgroup", "mgroup_section");
         $this->setBlock("mgroup", "mgroup_block", "my_groups");
@@ -721,16 +747,20 @@ class SitePage extends Page {
         }
     }
 
-	/**
-	 * Render "My Subjects" list in the side navigation
-	 * (not to be confused with "My Groups")
-	 */
-	public function renderSubjectList() {
-		$renderer = new \Schoolbox\SubjectList\SideNav($this, $_SESSION['subjects']);
-		$renderer->render();
-	}
 
-    function renderLinkList() {
+    /**
+     * Render "My Subjects" list in the side navigation
+     * (not to be confused with "My Groups")
+     */
+    public function renderSubjectList()
+    {
+        $renderer = new \Schoolbox\SubjectList\SideNav($this, $_SESSION['subjects']);
+        $renderer->render();
+    }
+
+
+    function renderLinkList()
+    {
         $this->setBlock("navTpl", "mlink_block", "my_links");
         $query = "SELECT url, description FROM bookmarks WHERE owner = '" . $_SESSION['id'] . "'";
         $this->db->query($query);
@@ -740,16 +770,11 @@ class SitePage extends Page {
 
                 if ($url->isLocalURL()) {
                     $this->setVar(
-                        "MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text(
-                        $link['description']
-                    ) . "</span></a>"
+                        "MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text($link['description']) . "</span></a>"
                     );
                 } else {
                     $this->setVar(
-                        "MLINK",
-                        "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text(
-                            $link['description']
-                        ) . "</span></a>"
+                        "MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text($link['description']) . "</span></a>"
                     );
                 }
 
@@ -760,7 +785,9 @@ class SitePage extends Page {
         }
     }
 
-    public function renderStudents() {
+
+    public function renderStudents()
+    {
         /* My students section
                        */
         $this->setBlock('navTpl', 'mstudent', 'mstudent_section');
@@ -771,7 +798,7 @@ class SitePage extends Page {
 
             foreach ($_SESSION['children'] as $child) {
                 $query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-                $user = $this->db->getRow($query);
+                $user  = $this->db->getRow($query);
                 $this->setVar("MSTUDENT_ID", $child['id']);
                 $this->setVar("MSTUDENT_NAME", $userHandler->formatName($user, '{firstname}'));
                 $this->setVar("MSTUDENT_YEAR", $user['year']);
@@ -785,7 +812,9 @@ class SitePage extends Page {
         }
     }
 
-    function renderScriptIncludes() {
+
+    function renderScriptIncludes()
+    {
         $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
         $this->setBlock('headerTpl', 'header_css', 'header_css_block');
 
@@ -810,15 +839,20 @@ class SitePage extends Page {
     }
 
 
-    function setJavascript($file) {
+    function setJavascript($file)
+    {
         $this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
     }
 
-    function setCSS($file, $type = 'screen') {
+
+    function setCSS($file, $type = 'screen')
+    {
         $this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
     }
 
-    function setFile($handle, $file) {
+
+    function setFile($handle, $file)
+    {
         if (!$this->template->setFile($handle, $this->getTemplate($file))) {
             return false;
         }
@@ -832,11 +866,15 @@ class SitePage extends Page {
         return true;
     }
 
-    function setTitle($title = '') {
+
+    function setTitle($title = '')
+    {
         $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
     }
 
-    function getTemplate($template) {
+
+    function getTemplate($template)
+    {
         if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
             return $this->site . '/' . $template;
         } else {
@@ -850,9 +888,12 @@ class SitePage extends Page {
         }
     }
 
-    function getVar($varname) {
+
+    function getVar($varname)
+    {
         return $this->template->getVar($varname);
     }
+
 
     /**
      * Redirect to a specific url
@@ -867,7 +908,8 @@ class SitePage extends Page {
      * @param  int    $responseCode   If set, output this response code.
      * @return void
      */
-    static public function localRedir($file, $keepProcessing = false, $responseCode = null) {
+    static public function localRedir($file, $keepProcessing = false, $responseCode = null)
+    {
         header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
         // don't quit
@@ -879,13 +921,15 @@ class SitePage extends Page {
         }
     }
 
+
     /**
      * Keeps the script running in the background, and switches off the ability
      * for the user to terminate the script. After this, no more output is sent.
      *
      * @param string $output Final output to send, if any
      */
-    public static function keepProcessingInBackground($output = '') {
+    public static function keepProcessingInBackground($output = '')
+    {
         ob_end_clean();
         header("Connection: close\r\n");
         ignore_user_abort();
@@ -899,19 +943,22 @@ class SitePage extends Page {
         session_write_close();
     }
 
+
     /**
      * Redirects to a broken image with a given size.
      *
-     * @param int  $width  Width of image to show
-     * @param int  $height Height of image to show
-     * @param int  $code   The HTTP error number
+     * @param int $width  Width of image to show
+     * @param int $height Height of image to show
+     * @param int $code   The HTTP error number
      */
-    public static function redirectToBrokenImageOfSize($width, $height, $code = 500) {
+    public static function redirectToBrokenImageOfSize($width, $height, $code = 500)
+    {
         static::redirectToBrokenImage(
-            $code,
-            array('width' => $width, 'height' => $height,)
+              $code,
+                  array('width' => $width, 'height' => $height,)
         );
     }
+
 
     /**
      * Redirects to a broken image with a given transform.
@@ -920,12 +967,14 @@ class SitePage extends Page {
      * @param string $transform      A key associated with a list of transforms to execute upon an image
      * @param int    $code           The HTTP error number
      */
-    public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500) {
+    public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500)
+    {
         static::redirectToBrokenImage(
-            $code,
-            array('transform_type' => $transform_type, 'transform' => $transform,)
+              $code,
+                  array('transform_type' => $transform_type, 'transform' => $transform,)
         );
     }
+
 
     /**
      * Redirects to a broken image.
@@ -934,8 +983,9 @@ class SitePage extends Page {
      * @param array $options Options for the size and transformation of the
      *                       broken image.
      */
-    public static function redirectToBrokenImage($code = 500, $options = array()) {
-        $query = array(
+    public static function redirectToBrokenImage($code = 500, $options = array())
+    {
+        $query           = array(
             'code'           => true,
             'width'          => true,
             'height'         => true,
@@ -943,26 +993,26 @@ class SitePage extends Page {
             'transform_type' => true,
         );
         $options['code'] = $code;
-        $options = array_intersect_key($options, $query);
-        static::localRedir("/images/fail.php?".http_build_query($options));
+        $options         = array_intersect_key($options, $query);
+        static::localRedir("/images/fail.php?" . http_build_query($options));
     }
+
 
     /**
      *
      * @param string $error An error message to display on the login page.
      * @param string $page  If set, this page is set as the path to redirect to.
      */
-    function goLoginPage($error = '', $page = '') {
+    function goLoginPage($error = '', $page = '')
+    {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
         if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
             $this->setVar('HIDDEN', htmlspecialchars($page, ENT_QUOTES));
-        }
-        elseif (preg_match('#^[\w_=\-:\/.\&\?]+$#i', $_GET['page'])) {
+        } elseif (preg_match('#^[\w_=\-:\/.\&\?]+$#i', $_GET['page'])) {
             $this->setVar('HIDDEN', htmlspecialchars($_GET['page'], ENT_QUOTES));
-        }
-        else {
+        } else {
             $this->setVar('HIDDEN', '');
         }
 
@@ -972,18 +1022,16 @@ class SitePage extends Page {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             // Redirect to base path, with current URI in page param, if not
             // currently on the base path.
-            if (!$page && !($parts['path'] == '/login/' || $parts['path'] == '/login') ) {
-                if ($parts['path'] != '/' ) {
-                     $this->localRedir('/login/?page='.urlencode($_SERVER['REQUEST_URI']));
+            if (!$page && !($parts['path'] == '/login/' || $parts['path'] == '/login')) {
+                if ($parts['path'] != '/') {
+                    $this->localRedir('/login/?page=' . urlencode($_SERVER['REQUEST_URI']));
+                } else {
+                    $this->localRedir('/login/');
                 }
-                else {
-                     $this->localRedir('/login/');
-                }
-            }
-            else {
-                $error = isset($_GET['page']) ?
-                    'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.':
-                    'To begin a new session please login with your username and password.';
+            } else {
+                $error = isset($_GET['page'])
+                    ? 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.'
+                    : 'To begin a new session please login with your username and password.';
                 $this->setVar('ERROR', $error);
             }
         }
@@ -994,18 +1042,19 @@ class SitePage extends Page {
         if (strlen(Config::get('saml_sso_url')) && $_GET['samlAuth'] !== '0') {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
-                $redirectUrl .= '?page='.urlencode($_GET['page']);
+                $redirectUrl .= '?page=' . urlencode($_GET['page']);
             }
             $this->localRedir($redirectUrl);
-        }
-        else {
+        } else {
             $this->parseFooterMobileLink(TEMPLATE_body);
             $this->outputPage(true);
         }
         exit;
     }
 
-    function pageNotFound() {
+
+    function pageNotFound()
+    {
         header("HTTP/1.0 404 Not Found");
         $this->setVar(TEMPLATE_content, '');
         $this->setFile(TEMPLATE_content, 'common/404.html');
@@ -1016,7 +1065,9 @@ class SitePage extends Page {
         exit;
     }
 
-    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
+
+    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
+    {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
         if (is_array($data) && count($data) > 0) {
@@ -1037,10 +1088,12 @@ class SitePage extends Page {
         }
     }
 
-    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array()) {
+
+    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
+    {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
-        if ((is_array($data) && count($data) > 0 ) || $data instanceof Traversable) {
+        if ((is_array($data) && count($data) > 0) || $data instanceof Traversable) {
             foreach ($data as $row) {
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
@@ -1048,26 +1101,23 @@ class SitePage extends Page {
                         $this->setVar($key, $value);
                         if (in_array($value, $selected)) {
                             $this->setVar($key . '_SELECTED', 'selected="selected"');
-                        }
-                        else {
+                        } else {
                             $this->setVar($key . '_SELECTED', '');
                         }
                     }
-                }
-                elseif (is_object($row)) {
+                } elseif (is_object($row)) {
                     //
                     // This is an object of some sort.
                     // SitePage is going to have to learn how to traverse models
                     // before it dies, because I'm not going to give every model
                     // array access.
                     foreach ($mapping as $property => $template_var) {
-                        $get_method = 'get'.ucfirst($property);
+                        $get_method = 'get' . ucfirst($property);
                         $value      = $row->$get_method();
                         $this->setVar($template_var, $value);
                         if (in_array($value, $selected)) {
                             $this->setVar($template_var . '_SELECTED', 'selected="selected"');
-                        }
-                        else {
+                        } else {
                             $this->setVar($template_var . '_SELECTED', '');
                         }
                     }
@@ -1080,19 +1130,25 @@ class SitePage extends Page {
         }
     }
 
-    function canRead($perm) {
+
+    function canRead($perm)
+    {
         return $perm >= 1 ? true : false;
     }
 
-    function canWrite($perm) {
+
+    function canWrite($perm)
+    {
         return $perm >= 2 ? true : false;
     }
+
 
     //Private Functions
 
 
     //function used to create data structure for drop down menu
-    function __insertChild($list, $element) {
+    function __insertChild($list, $element)
+    {
         for ($i = 0; $list[$i]; $i++) {
             //if item is parent insert item
             if ($list[$i]['id'] == $element['parent']) {
@@ -1101,14 +1157,16 @@ class SitePage extends Page {
             }
 
             if (is_array($list[$i]['children'])) {
-                $sublist = $this->__insertChild($list[$i]['children'], $element);
+                $sublist              = $this->__insertChild($list[$i]['children'], $element);
                 $list[$i]['children'] = $sublist;
             }
         }
         return $list;
     }
 
-    function __outputMenu($list, $level) {
+
+    function __outputMenu($list, $level)
+    {
 
         $text = "<ul>\n";
 
@@ -1143,14 +1201,15 @@ class SitePage extends Page {
         return $text;
     }
 
-    public function parseFooterMobileLink($parent = TEMPLATE_content) {
+
+    public function parseFooterMobileLink($parent = TEMPLATE_content)
+    {
         // determine whether or not to show a mobile switch link
         $this->setBlock($parent, 'mobile_switch', "mobile_switch_{$parent}_block");
 
-        if(Cfg::get('mobile_enabled')) {
+        if (Cfg::get('mobile_enabled')) {
             $this->parse("mobile_switch_{$parent}_block", 'mobile_switch');
-        }
-        else {
+        } else {
             $this->setVar("mobile_switch_{$parent}_block", '');
         }
     }
@@ -1167,13 +1226,15 @@ class SitePage extends Page {
      * * If the referrer contained "create" or "modify", protection is removed
      *
      * Want more information?
-     * @see http://stackoverflow.com/questions/1547884/refused-to-execute-a-javascript-script-source-code-of-script-found-within-reque
+     *
+     * @see  http://stackoverflow.com/questions/1547884/refused-to-execute-a-javascript-script-source-code-of-script-found-within-reque
      *
      * @todo consider using Content-Security-Policy header instead of this
      *
      * @return bool True if protection was disabled, false if not.
      */
-    protected static function disableXssProtectionAfterForm() {
+    protected static function disableXssProtectionAfterForm()
+    {
         // Is this a form? If so, disable for NEXT page load
         if (stripos($_SERVER['REQUEST_URI'], 'form.php') !== false) {
             $_SESSION['disableXssProtectionForNextPage'] = true;
@@ -1199,5 +1260,24 @@ class SitePage extends Page {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Attempt to (safely) parse $_SERVER for a URL component
+     *
+     * @param string $component
+     * @return mixed
+     */
+    protected static function parseRequestUrl($component = null)
+    {
+        foreach (array('HTTP_HOST', 'SCRIPT_URI') as $option) {
+            if (isset($_SERVER[$option])) {
+                if ($result = parse_url($_SERVER[$option], $component)) {
+                    return $result;
+                }
+            }
+        }
+        return 'localhost';
     }
 }
