@@ -41,7 +41,8 @@ class OneLogin_Saml_Metadata
         <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                                      Location="{$this->_settings->spReturnUrl}"
-                                     index="1"/>
+				     index="1"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="{$this->_settings->spReturnUrl}" ResponseLocation="{$this->_settings->spReturnUrl}"/>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
