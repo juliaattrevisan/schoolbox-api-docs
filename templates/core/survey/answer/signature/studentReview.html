@@ -1,5 +1,25 @@
+<!--[if lt IE 9]><script src="/javascript/signature/assets/flashcanvas.js"></script><![endif]-->
+<script src="/javascript/signature/jquery.signaturepad.min.js"></script>
+<script src="/javascript/signature/assets/json2.min.js"></script>
+<link rel="stylesheet" href="/javascript/signature/signaturepad.css">
+
+<script type='text/javascript'>
+	$j(function() {
+		$('.sigPad').signaturePad({
+			displayOnly: true
+		}).regenerate({ANSWER});
+	});
+</script>
+
 <strong>Your answer:</strong>
-<div class="answer-given-container">{ANSWER}</div>
+<div class="answer-given-container">
+	<label class="sigPad">
+		<div class="sigPadWrapper">
+			<div class="typed"></div>
+			<canvas class="pad" width="500" height="100"></canvas>
+		</div>
+	</label>
+</div>
 
 <!-- BEGIN answerOption -->
 <div class="correct-answer-container">{CORRECT_ANSWER}</div>
