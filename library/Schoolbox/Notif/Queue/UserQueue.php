@@ -24,6 +24,15 @@ use OutOfBoundsException;
  */
 class UserQueue {
 
+    // queue of messages that have been accepted by broadcast, but need to be filtered onto the other queues
+    const Q_TOSORT = 'tosort';
+    // queue of messages that have been received by Instant but have not yet expired
+    const Q_LISTED = 'listed';
+    // queue of messages that have been received by Instant and have not yet been read
+    const Q_UNREAD = 'unread';
+    // queue of messages that are pending to be sent by Digest
+    const Q_DIGEST = 'digest';
+
 	// queue of messages that have been accepted by broadcast, but need to be filtered onto the other queues
 	const QUEUE_TOSORT_MESSAGES = '%s.u.%s.tosort';
 
@@ -143,6 +152,7 @@ class UserQueue {
 	/**
 	 * Helper method to construct a queuename based on a pattern
 	 *
+     * @deprecated static calls to be removed
 	 * @param $pattern
 	 * @param $userId
 	 * @return string
@@ -155,6 +165,7 @@ class UserQueue {
 	/**
 	 * Returns the 'to be sorted' queuename for the given user
 	 *
+     * @deprecated static calls to be removed
 	 * @param $userId
 	 * @return string
 	 */
@@ -166,6 +177,7 @@ class UserQueue {
 	/**
 	 * Returns the 'listed' queuename for the given user
 	 *
+     * @deprecated static calls to be removed
 	 * @param $userId
 	 * @return string
 	 */
@@ -177,6 +189,7 @@ class UserQueue {
 	/**
 	 * Returns the 'unread' queuename for the given user
 	 *
+     * @deprecated static calls to be removed
 	 * @param $userId
 	 * @return string
 	 */
@@ -188,6 +201,7 @@ class UserQueue {
 	/**
 	 * Returns the 'digest' queuename for the given user
 	 *
+     * @deprecated static calls to be removed
 	 * @param $userId
 	 * @return string
 	 */
