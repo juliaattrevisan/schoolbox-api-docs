@@ -209,18 +209,6 @@ class UserQueue {
 
 
 	/**
-	 * Returns the 'to be sorted' queuename for the given user
-	 *
-     * @deprecated static calls to be removed
-	 * @param $userId
-	 * @return string
-	 */
-	public static function getUserToSortQueueName($userId) {
-		return self::getQueueName(self::QUEUE_TOSORT_MESSAGES, $userId);
-	}
-
-
-	/**
 	 * Returns the 'unread' queuename for the given user
 	 *
      * @deprecated static calls to be removed

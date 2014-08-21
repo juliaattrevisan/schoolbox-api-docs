@@ -11,12 +11,26 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Stomp\SubscriptionList;
+use OutOfBoundsException;
 use Schoolbox\Collection;
 use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class UserSubscriptionList extends SubscriptionList {
+
+    /** @var UserQueueFactory */
+    protected $uqf;
+
+
+    /**
+     * @param UserQueueFactory $uqf
+     */
+    public function __construct(UserQueueFactory $uqf)
+    {
+        $this->uqf = $uqf;
+    }
 
 
 	/**
@@ -33,8 +47,13 @@ class UserSubscriptionList extends SubscriptionList {
 		$users = $source->findAll();
 
 		foreach($users as $user) {
-			$queue = UserQueue::getUserToSortQueueName($user->getId());
-			$this->queues[$queue] = $source->findById($user->getId()); // TODO srsly. this has to change.
+            try {
+                // construct the queue, but don't prepopulate it
+                $name = $this->uqf->buildUserQueue($user, 0)->findQueue(UserQueue::Q_TOSORT);
+                $this->queues[$name] = $source->findById($user->getId()); // TODO srsly. this has to change.
+            } catch (OutOfBoundsException $e) {
+                // noop: no sorting queue found for this user
+            }
 		}
 	}
 
