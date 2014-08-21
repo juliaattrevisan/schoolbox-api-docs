@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -25,176 +25,183 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class WorkerProcess extends AbstractProcess {
+class WorkerProcess extends AbstractProcess
+{
 
-	/** @var UserQueueFactory  */
-	protected $mqf;
+    /** @var UserQueueFactory */
+    protected $mqf;
 
 
     /**
-     * @param LoopInterface $loop
-     * @param LoggerInterface $log
-     * @param PipeWriter $writer
+     * @param LoopInterface             $loop
+     * @param LoggerInterface           $log
+     * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      */
-    public function __construct($loop, $log, $writer, $strat) {
-		parent::__construct($loop, $log, $writer, $strat);
-		$this->mqf = new UserQueueFactory();
-	}
+    public function __construct($loop, $log, $writer, $strat)
+    {
+        parent::__construct($loop, $log, $writer, $strat);
+        $this->mqf = new UserQueueFactory();
+    }
 
 
-	/**
-	 * @param string $command
-	 * @param array $args
-	 * @throws RuntimeException
-	 * @throws InvalidArgumentException
-	 * @return mixed
-	 */
-	protected function process($command, $args) {
-		$this->log->debug("Received $command command");
+    /**
+     * @param string $command
+     * @param array  $args
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @return mixed
+     */
+    protected function process($command, $args)
+    {
+        $this->log->debug("Received $command command");
 
-		switch($command) {
+        switch ($command) {
 
-			// retrieve messages
-			case DefaultDispatchStrategy::TASK_FETCH:
-				list($userId, $count) = $args;
-				return $this->fetch($userId, $count);
+            // retrieve messages
+            case DefaultDispatchStrategy::TASK_FETCH:
+                list($userId, $count) = $args;
+                return $this->fetch($userId, $count);
 
-			// publish messages
-			case DefaultDispatchStrategy::TASK_PUBLISH:
-				$data = unserialize($args[0]);
-				if(!(is_array($data) && count($data) == 4)) {
-					throw new RuntimeException("Data should be array(4); is ".gettype($data)."(".count($data).")");
-				}
-				list($callback, $model, $user, $diff) = $data;
-				return $this->publish($callback, $model, $user, $diff);
+            // publish messages
+            case DefaultDispatchStrategy::TASK_PUBLISH:
+                $data = unserialize($args[0]);
+                if (!(is_array($data) && count($data) == 4)) {
+                    throw new RuntimeException("Data should be array(4); is " . gettype($data) . "(" . count($data) . ")");
+                }
+                list($callback, $model, $user, $diff) = $data;
+                return $this->publish($callback, $model, $user, $diff);
 
-			// digest messages
-			case DefaultDispatchStrategy::TASK_DIGEST:
-				$data = unserialize($args[0]);
-				if(!(is_array($data) && count($data) >= 2)) {
-					throw new RuntimeException("Data should be array(2+); is ".gettype($data)."(".count($data).")");
-				}
-				return $this->digest($data[0], $data[1]);
-		}
+            // digest messages
+            case DefaultDispatchStrategy::TASK_DIGEST:
+                $data = unserialize($args[0]);
+                if (!(is_array($data) && count($data) >= 2)) {
+                    throw new RuntimeException("Data should be array(2+); is " . gettype($data) . "(" . count($data) . ")");
+                }
+                return $this->digest($data[0], $data[1]);
+        }
 
-		throw new InvalidArgumentException("Can't process '$command'.");
-	}
-
-
-	/**
-	 * Process fetch
-	 *
-	 * @param $userId
-	 * @param $count
-	 * @return array
-	 */
-	protected function fetch($userId, $count) {
-		$this->log->debug("Fetching $count for user $userId");
-		$decorator = new Decorator();
-
-		$queue = $this->mqf->buildUserQueue($userId, $count, false);
-
-		// make messages pretty
-		$decorator->appendNotifications($queue->getNotifications($count, true, true));
-		// wrap in an array to preserve keys
-		return array($decorator->renderAsSocketArray(false));
-	}
+        throw new InvalidArgumentException("Can't process '$command'.");
+    }
 
 
-	/**
-	 * Process publish/digest
-	 *
-	 * @param callable $callback
-	 * @param object $model
-	 * @param User $user
-	 * @param array $diff
-	 * @return string
-	 * @throws RuntimeException
-	 * @throws InvalidArgumentException
-	 */
-	protected function publish($callback, $model, $user, $diff) {
+    /**
+     * Process fetch
+     *
+     * @param $userId
+     * @param $count
+     * @return array
+     */
+    protected function fetch($userId, $count)
+    {
+        $this->log->debug("Fetching $count for user $userId");
+        $decorator = new Decorator();
 
-		if(!is_callable($callback)) {
-			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
-		}
+        $queue = $this->mqf->buildUserQueue($userId, $count, false);
 
-		$this->log->debug("Executing ".$this->callable2string($callback));
-
-		// this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
-		$return = call_user_func($callback, $model, $user, $diff);
-		$this->log->debug("Callback complete");
-
-		if(is_null($return)) {
-			$this->log->debug("Response is NULL, casting to empty Envelope");
-			$return = new Envelope();
-		}
-
-		if($return instanceof InstanceBundle) {
-			$this->log->debug("InstanceBundle ". ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
-
-			$serial = serialize($return);
-			if($serial === false) {
-				throw new RuntimeException("Failed to serialize InstanceBundle");
-			}
-
-			return $serial;
-		}
-
-		throw new InvalidArgumentException(
-			"Async publish response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
-			. (is_object($return) ? get_class($return) : gettype($return))
-		);
-	}
+        // make messages pretty
+        $decorator->appendNotifications($queue->getNotifications($count, true, true));
+        // wrap in an array to preserve keys
+        return array($decorator->renderAsSocketArray(false));
+    }
 
 
-	/**
-	 * @param callable $callback
-	 * @param Role $role
-	 * @throws RuntimeException
-	 * @throws InvalidArgumentException
-	 * @return string
-	 */
-	protected function digest($callback, $role) {
-		if(!is_callable($callback)) {
-			throw new RuntimeException("Unable to execute callback, got ".json_encode($callback));
-		}
+    /**
+     * Process publish/digest
+     *
+     * @param callable $callback
+     * @param object   $model
+     * @param User     $user
+     * @param array    $diff
+     * @return string
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    protected function publish($callback, $model, $user, $diff)
+    {
 
-		// inject the debugger into the notifier if possible
-		if(is_array($callback) && is_object($callback[0])) {
-			$setLogger = array($callback[0], 'setLogger');
-			if(is_callable($setLogger)) {
-				call_user_func($setLogger, $this->log);
-			}
-		}
+        if (!is_callable($callback)) {
+            throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+        }
 
-		$this->log->debug("Executing ".$this->callable2string($callback));
-		// this call MUST return an integer
-		$return = call_user_func($callback, $role);
-		$this->log->debug("Callback complete");
-		// handle standard digest case
+        $this->log->debug("Executing " . $this->callable2string($callback));
 
-		if(is_integer($return)) {
-			$this->log->debug("Response is numeric, returning as is");
-			$serial = serialize($return);
-			return $serial;
-		}
+        // this call SHOULD return an instance of InstanceBundle (be that Messenger or Envelope)
+        $return = call_user_func($callback, $model, $user, $diff);
+        $this->log->debug("Callback complete");
 
-		throw new InvalidArgumentException(
-			"Async digest response must be an integer; got "
-			. (is_object($return) ? get_class($return) : gettype($return))
-		);
-	}
+        if (is_null($return)) {
+            $this->log->debug("Response is NULL, casting to empty Envelope");
+            $return = new Envelope();
+        }
+
+        if ($return instanceof InstanceBundle) {
+            $this->log->debug("InstanceBundle " . ($return->isEmpty() ? 'does not contain messages' : 'contains messages'));
+
+            $serial = serialize($return);
+            if ($serial === false) {
+                throw new RuntimeException("Failed to serialize InstanceBundle");
+            }
+
+            return $serial;
+        }
+
+        throw new InvalidArgumentException(
+            "Async publish response must be an instance of Alaress\\Async\\Notification\\InstanceBundle; got "
+            . (is_object($return) ? get_class($return) : gettype($return))
+        );
+    }
 
 
-	/**
-	 * @param callable $callable
-	 * @return string
-	 */
-	protected function callable2string($callable) {
-		if(is_array($callable)) {
-			return get_class($callable[0]) . '::' . $callable[1];
-		}
-		return (string)$callable;
-	}
+    /**
+     * @param callable $callback
+     * @param Role     $role
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @return string
+     */
+    protected function digest($callback, $role)
+    {
+        if (!is_callable($callback)) {
+            throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+        }
+
+        // inject the debugger into the notifier if possible
+        if (is_array($callback) && is_object($callback[0])) {
+            $setLogger = array($callback[0], 'setLogger');
+            if (is_callable($setLogger)) {
+                call_user_func($setLogger, $this->log);
+            }
+        }
+
+        $this->log->debug("Executing " . $this->callable2string($callback));
+        // this call MUST return an integer
+        $return = call_user_func($callback, $role);
+        $this->log->debug("Callback complete");
+        // handle standard digest case
+
+        if (is_integer($return)) {
+            $this->log->debug("Response is numeric, returning as is");
+            $serial = serialize($return);
+            return $serial;
+        }
+
+        throw new InvalidArgumentException(
+            "Async digest response must be an integer; got "
+            . (is_object($return) ? get_class($return) : gettype($return))
+        );
+    }
+
+
+    /**
+     * @param callable $callable
+     * @return string
+     */
+    protected function callable2string($callable)
+    {
+        if (is_array($callable)) {
+            return get_class($callable[0]) . '::' . $callable[1];
+        }
+        return (string)$callable;
+    }
 }
