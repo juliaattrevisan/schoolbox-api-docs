@@ -13,7 +13,7 @@ use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\AMQP\Bunny\BunnyControl;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
-//use Alaress\Async\Queue\RedisQueue;
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Redis;
 use Predis\Client;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
@@ -179,7 +179,7 @@ class UserQueueFactory {
     protected function bindUserQueue($user)
     {
         $mqConn   = $this->getMessageQueueConnector();
-//        $redis    = $this->getRedisClient();
+        $redis    = $this->getRedisClient();
         $userId   = $user->getId();
         $bindings = $this->getGenerator()->generateBindingsForUser($user);
         $exchange = $mqConn->getSecondaryExchange($userId);
@@ -187,15 +187,14 @@ class UserQueueFactory {
         $mqConn->declareExchange($exchange);
 
         $queues = array(
-            new AMQPQueue($mqConn, UserQueue::getUserUnreadQueueName($userId), "*.instant.user.$userId.#"),
-            new AMQPQueue($mqConn, UserQueue::getUserToSortQueueName($userId), '*.notify.#'),
-//            new RedisQueue($redis, UserQueue::getUserListedQueueName($userId)),
-//            new RedisQueue($redis, UserQueue::getUserDigestQueueName($userId))
+            new AMQPQueue($mqConn, UserQueue::Q_UNREAD, $userId, "*.instant.user.$userId.#"),
+            new AMQPQueue($mqConn, UserQueue::Q_TOSORT, $userId, '*.notify.#'),
+            new RedisQueue($redis, UserQueue::Q_LISTED, $userId),
+            new RedisQueue($redis, UserQueue::Q_DIGEST, $userId)
         );
 
         $this->getBinder()
              ->setBindings($bindings)
-//             ->prepareRedis($redis, $queues)
              ->prepareAMQP($mqConn, $exchange, $queues);
 
         return new UserQueue($queues);
