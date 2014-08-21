@@ -1,0 +1,57 @@
+<script type='text/javascript'>
+
+	/* Timeout closure
+	 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+	 */
+	var createDelayManager = function() {
+		var timer = 0;
+		return function(callback, ms) {
+			clearTimeout(timer);
+			timer = setTimeout(callback, ms);
+		};
+	}
+
+	var dm1 = createDelayManager();
+
+	$j(function() {
+		$('.sigPad').signaturePad({
+			drawOnly: true,
+			onDrawEnd: function() {
+
+				/* Apply delay to auto-save, so the signature
+				 * process remains fluid
+				 *
+				 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+				 */
+				dm1(function() {
+					$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+						id: {QUESTION_ID}
+					});
+				}, 1500);
+			}
+		}).regenerate({ANSWER});
+	});
+</script>
+
+<!--[if lt IE 9]><script src="/javascript/signature/assets/flashcanvas.js"></script><![endif]-->
+<script src="/javascript/signature/jquery.signaturepad.min.js"></script>
+<script src="/javascript/signature/assets/json2.min.js"></script>
+<link rel="stylesheet" href="/javascript/signature/signaturepad.css">
+
+<span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+<label class="sigPad">
+
+    <!-- BEGIN answerOption -->
+	<div class="sigPadWrapper">
+		<div class="typed"></div>
+		<canvas class="pad" width="500" height="100"></canvas>
+
+		<!-- opacity:0, for validator to work - it doesn't like hidden fields -->
+		<input type="text" name="answer" class="output" style="opacity:0;">
+	</div>
+
+	<p class="clearButton">
+		<a href="#clear">Clear Signature</a>
+	</p>
+    <!-- END answerOption -->
+</label>
