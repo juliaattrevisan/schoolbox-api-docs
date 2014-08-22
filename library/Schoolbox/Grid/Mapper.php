@@ -94,26 +94,5 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
-
-//        // Joins
-//        $this->hasJoin(
-//            'related_resource',
-//            array(
-//                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RelatedResource\\Mapper',
-//                'this_key'  => 'id',
-//                'other_key' => 'resource_id',
-//                'multiple'  => true,
-//            )
-//        );
-//        $this->hasJoin(
-//            'role',
-//            array(
-//                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RolePermission\\Mapper',
-//                'this_key'  => 'id',
-//                'other_key' => 'resource_id',
-//                'multiple'  => true,
-//            )
-//        );
-//        $this->registerCallback('postSave', array($this, 'postSave'));
     }
 }
