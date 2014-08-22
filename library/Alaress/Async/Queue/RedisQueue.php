@@ -11,12 +11,12 @@ namespace Alaress\Async\Queue;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Predis\Client;
+use Predis\ClientInterface;
 
 class RedisQueue implements QueueInterface
 {
 
-    /** @var Client */
+    /** @var ClientInterface */
     protected $redis;
 
     /** @var string */
@@ -24,14 +24,13 @@ class RedisQueue implements QueueInterface
 
 
     /**
-     * @param Client $redis
-     * @param string $label
-     * @param int    $id
+     * @param ClientInterface $redis
+     * @param string $name
      */
-    public function __construct(Client $redis, $label, $id)
+    public function __construct(ClientInterface $redis, $name)
     {
         $this->redis = $redis;
-        $this->name  = 'q:' . INSTANCE_ID . ":$id:$label";
+        $this->name  = $name;
     }
 
 
