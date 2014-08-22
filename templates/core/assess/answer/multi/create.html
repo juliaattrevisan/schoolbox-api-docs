@@ -15,6 +15,7 @@ $j(document).ready(function() {
 	}).validate({
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
+
         	/* Form preprocessing
              */
 			var answerCollection = new Array();
@@ -52,7 +53,7 @@ $j(document).ready(function() {
 				question: tinyMCE.get('question').getContent(),
 				marks: theForm.find('input[name=marks]').val(),
 				allAnswers: JSON.stringify(answerCollection),
-				configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+				configuration: JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 			};
 
 			/* Submit via POST and redirect to question creation screen upon done
@@ -93,7 +94,6 @@ $j(document).ready(function() {
 				error.insertAfter(element.closest('#answerCollection'))
 			} else if (element.hasClass("answerCorrect") ) {
 				error.insertAfter(element.closest('#answerCollection'))
-
 			} else {
 				 error.insertAfter(element.parent().children(':last-child'))
 			}
@@ -141,7 +141,6 @@ $j(document).ready(function() {
 		}
 
 		return oneFieldChecked;
-
     }, 'Tick at least one checkbox');
 
 	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
@@ -150,7 +149,7 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j(document).on('click', '.makeNewAnswer', function() {
+    $j(document).on('click', '.makeNewAnswer', function(e) {
 		e.preventDefault();
 
 		var maxItems = 702;
@@ -172,6 +171,7 @@ $j(document).ready(function() {
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
 		}
+
 		refreshList();
     });
 
@@ -203,32 +203,32 @@ $j(document).ready(function() {
 </script>
 
 <label>Answer</label>
-    <div class="answer-collection">
-        <ul id="answerCollection" >
-			<li class="inputs clearfix">
-				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<label class="check-it"><input name="answer[]" class="answerCorrect" checkbox="checkbox" type="checkbox" value="" /></label>
-				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
-				<div class="delete"></div>
-			</li>
-        </ul>
+<div class="answer-collection">
+	<ul id="answerCollection" >
+		<li class="inputs clearfix">
+			<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
+			<label class="check-it"><input name="answer[]" class="answerCorrect" checkbox="checkbox" type="checkbox" value="" /></label>
+			<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
+			<div class="delete"></div>
+		</li>
+	</ul>
 
-		<label generated="true" id="listItems" class="error">Please fill out all answers</label>
-		<label generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
+	<label generated="true" id="listItems" class="error">Please fill out all answers</label>
+	<label generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
 
-		<p class="clearfix">
-            <a class="add-answer btn add float-left makeNewAnswer" href="#"><span></span>Add answer option</a>
-		</p>
-    </div>
+	<p class="clearfix">
+		<a class="add-answer btn add float-left makeNewAnswer" href="#"><span></span>Add answer option</a>
+	</p>
+</div>
 
-	<div class="hide hidden-clone">
-        <ul>
-			<li class="inputs clearfix">
-				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
-				<label class="check-it"><input name="answer[]" class="answerCorrect " checkbox="checkbox" type="checkbox" value="" /></label>
-				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
-				<div class="delete"></div>
-			</li>
-        </ul>
-        <a class="add-answer makeNewAnswer">Add answer option</a>
-    </div>
+<div class="hide hidden-clone">
+	<ul>
+		<li class="inputs clearfix">
+			<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
+			<label class="check-it"><input name="answer[]" class="answerCorrect " checkbox="checkbox" type="checkbox" value="" /></label>
+			<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
+			<div class="delete"></div>
+		</li>
+	</ul>
+	<a class="add-answer makeNewAnswer">Add answer option</a>
+</div>
