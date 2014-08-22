@@ -84,6 +84,11 @@ $tableList = array(
         'index' => 'grade_id'
     ),
     array(
+        'name' => 'lu_submission_type',
+        'title' => 'Submission Types',
+        'index' => 'id'
+    ),
+    array(
         'name' => 'component_definition',
         'title' => 'Components',
         'index' => 'id',
