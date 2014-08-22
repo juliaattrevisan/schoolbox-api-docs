@@ -55,7 +55,13 @@ class AttemptMapper extends Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 		$this->hasSoftDeleteDateField('deleted_at');
-	}
+
+        $this->hasJoin('assessment', array(
+            'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
+            'this_key'  => 'assess_id',
+            'other_key' => 'assess_id'
+        ));
+    }
 
 	/**
 	 * Gets a string of placeholders for an array - usually used for creating a
