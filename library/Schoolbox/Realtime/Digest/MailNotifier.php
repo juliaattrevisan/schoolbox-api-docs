@@ -11,11 +11,13 @@ namespace Schoolbox\Realtime\Digest;
 
 
 use Alaress\Lumberjack\Logger;
+use Alaress\Redis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
+use Schoolbox\Notif\Queue\Builder\Plan;
 use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -32,13 +34,15 @@ class MailNotifier implements Serializable {
 	/** @var LoggerInterface */
 	protected $log;
 
+    /** @var UserQueueFactory */
+    protected $uqf;
+
 	/**
 	 * @param IConfigLoader   $configLoader
 	 * @param LoggerInterface $log
 	 */
     public function __construct($configLoader = null, $log = null) {
         $this->conf = $configLoader ?: ConfigMapper::getInstance();
-	    $this->setLogger($log ?: new Logger(null));
     }
 
 
@@ -48,6 +52,33 @@ class MailNotifier implements Serializable {
 	public function setLogger($debug) {
 		$this->log = $debug;
 	}
+
+
+    /**
+     * @return LoggerInterface
+     */
+    public function log()
+    {
+        // lazyload
+        if (empty($this->log)) {
+            $this->log = new Logger(null);
+        }
+        return $this->log;
+    }
+
+
+    /**
+     * @return UserQueueFactory
+     */
+    public function getUserQueueFactory()
+    {
+        // lazyload
+        if (empty($this->uqf)) {
+            $r = new Redis();
+            $this->uqf = new UserQueueFactory(new Plan\DigestPlan($r->getClientInstance()));
+        }
+        return $this->uqf;
+    }
 
 
 	/**
@@ -62,27 +93,25 @@ class MailNotifier implements Serializable {
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
 
-		$this->log->info("Preparing to digest {$role->getName()}: {$users->count()} users");
+		$this->log()->info("Preparing to digest {$role->getName()}: {$users->count()} users");
 
-		$result = 0;
-        $uqf    = new UserQueueFactory();
+        $result = 0;
 		$dir    = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
-
 
 		// iterate and digest
 		foreach($users as $user) {
 
             $decorator = new Decorator();
             $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-            $uq        = $uqf->buildUserQueue($user, 0);
+            $uq        = $this->getUserQueueFactory()->buildUserQueue($user, 0);
 
-            $this->log->info("Digesting {$user->getUsername()}");
+            $this->log()->info("Digesting {$user->getUsername()}");
 
             $uq->fetchNotificationsIntoBundle(UserQueue::Q_DIGEST, $decorator, true);
 
 			if(!$decorator->count()) {
 				// this user has nothing to digest
-				$this->log->notice("{$user->getUsername()} has nothing to digest");
+				$this->log()->notice("{$user->getUsername()} has nothing to digest");
 				continue;
 			}
 
@@ -96,21 +125,21 @@ class MailNotifier implements Serializable {
 
             // if email sent successfully, ACK, otherwise NACK
 			if($sent) {
-				$this->log->notice("Mail sent successfully, dropping messages from queue");
+				$this->log()->notice("Mail sent successfully, dropping messages from queue");
                 $uq->drain(UserQueue::Q_DIGEST);
 				++$result;
 			}
 			else {
-				$this->log->warning("Failed to email");
+				$this->log()->warning("Failed to email");
 			}
 
             unset($uq, $decorator, $email, $user);
 		}
 
-        unset($uqf, $users);
+        unset($users);
 
 		// return the number of emails successfully sent
-		$this->log->info("Finished digesting {$role->getName()}: $result emails sent");
+		$this->log()->info("Finished digesting {$role->getName()}: $result emails sent");
 		return $result;
 	}
 
