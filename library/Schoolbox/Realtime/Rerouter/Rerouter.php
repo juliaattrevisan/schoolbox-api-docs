@@ -10,7 +10,6 @@
 namespace Schoolbox\Realtime\Rerouter;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\SignalEmitter;
 use Alaress\Async\Stomp\Subscriber;
 use Alaress\WorkerCrew\Dispatcher;
@@ -25,7 +24,6 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
@@ -58,9 +56,6 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var UserQueueFactory */
 	protected $uqf;
 
-	/** @var Connector */
-	protected $conn;
-
 	/** @var Subscriber */
 	protected $subscriber;
 
@@ -73,22 +68,20 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	 * @param DispatchStrategyInterface $dispatchStrategy
 	 * @param LoggerInterface           $log
 	 * @param Subscriber                $subscriber
-	 * @param LoggerInterface           $notif
-	 * @param AMQPInterface             $conn
 	 * @param UserQueueFactory          $uqFactory
+     * @param LoggerInterface           $notif
 	 */
-	public function __construct($loop, $dispatchStrategy, $log, $subscriber, $notif = null, $conn = null, $uqFactory = null) {
+	public function __construct($loop, $dispatchStrategy, $log, $subscriber, $uqFactory, $notif = null) {
 		parent::__construct($loop);
 
 		$this->loop       = $loop;
 		$this->running    = false;
 		$this->subscriber = $subscriber;
 		$this->log        = $log;
+        $this->uqf        = $uqFactory;
 
-		// cast optional params
+		// cast optional param
 		$this->notif      = $notif ?: new Notif();
-		$this->conn       = $conn ?: new Connector();
-		$this->uqf        = $uqFactory ?: new UserQueueFactory($this->conn);
 
 		// register signal listeners
 		$this->on(SIGTSTP, array($this, 'onPause'));
