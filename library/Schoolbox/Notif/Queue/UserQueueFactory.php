@@ -9,19 +9,10 @@
 
 namespace Schoolbox\Notif\Queue;
 
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\AMQP\Bunny\BunnyControl;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
-use Alaress\Async\Queue\AMQPQueue;
-use Alaress\Async\Queue\RedisQueue;
-use Alaress\Redis;
-use Predis\ClientInterface;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
-use Schoolbox\Notif\MQ\Test\MockAMQPConnector;
-use Schoolbox\Notif\MQ\Test\MockBunnyControl;
-use Schoolbox\Notif\Queue\Bindings\Generator;
-use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
+use Schoolbox\Notif\Queue\Builder\Plan;
 use Schoolbox\User;
 
 /**
@@ -32,14 +23,8 @@ use Schoolbox\User;
  */
 class UserQueueFactory {
 
-	/** @var AMQPInterface */
-	protected $mqConnector;
-
-    /** @var ClientInterface */
-    protected $redisClient;
-
-    /** @var GeneratorInterface */
-    protected $generator;
+    /** @var Plan */
+    protected $plan;
 
     /** @var UserQueueBinder */
     protected $binder;
@@ -52,49 +37,27 @@ class UserQueueFactory {
 
 
     /**
-     * @param AMQPInterface      $mqConnector
-     * @param ClientInterface    $redisClient
-     * @param GeneratorInterface $generator
-     * @param UserQueueBinder    $binder
+     * @param Plan             $plan
+     * @param UserQueueBinder  $binder
+     * @param ControlInterface $rabbit
      */
-    public function __construct(
-        AMQPInterface $mqConnector = null,
-        ClientInterface $redisClient = null,
-        GeneratorInterface $generator = null,
-        UserQueueBinder $binder = null
-    )
+    public function __construct(Plan $plan, UserQueueBinder $binder = null, ControlInterface $rabbit = null)
     {
-        if (!$redisClient instanceof ClientInterface) {
-            $r = new Redis();
-            $redisClient = $r->getClientInstance();
-        }
-
-        $this->setMessageQueueConnector($mqConnector ? : MQConnector::getInstance())
-             ->setRedisClient($redisClient)
-             ->setGenerator($generator ? : new Generator())
-             ->setBinder($binder ? : new UserQueueBinder());
+        $this->setPlan($plan)
+             ->setBinder($binder)
+             ->setRabbitController($rabbit);
     }
 
 
     /**
-     * @param GeneratorInterface $generator
+     * @param Plan $plan
      * @return self
      */
-    public function setGenerator($generator)
+    public function setPlan(Plan $plan)
     {
-        $this->generator = $generator;
+        $this->plan = $plan;
         return $this;
     }
-
-
-    /**
-     * @return GeneratorInterface
-     */
-    public function getGenerator()
-    {
-        return $this->generator;
-    }
-
 
     /**
      * @param UserQueueBinder $binder
@@ -112,46 +75,11 @@ class UserQueueFactory {
      */
     public function getBinder()
     {
+        if (!$this->binder) {
+            $this->binder = new UserQueueBinder();
+        }
         return $this->binder;
     }
-
-
-    /**
-     * @param ClientInterface $redisClient
-     * @return self
-     */
-    public function setRedisClient($redisClient)
-    {
-        $this->redisClient = $redisClient;
-        return $this;
-    }
-
-
-    /**
-     * @return ClientInterface
-     */
-    public function getRedisClient()
-    {
-        return $this->redisClient;
-    }
-
-
-	/**
-	 * @param AMQPInterface $mqConnector
-	 * @return self
-	 */
-	public function setMessageQueueConnector($mqConnector) {
-		$this->mqConnector = $mqConnector;
-		return $this;
-	}
-
-
-	/**
-	 * @return AMQPInterface
-	 */
-	public function getMessageQueueConnector() {
-		return $this->mqConnector;
-	}
 
 
 	/**
@@ -181,29 +109,20 @@ class UserQueueFactory {
      * @param User $user - do yourself a favour and make sure this is fully hydrated, otherwise your bindings will be whack
      * @return UserQueue
      */
-    protected function bindUserQueue($user)
+    protected function prepareUserQueue(User $user)
     {
-        $mqConn   = $this->getMessageQueueConnector();
-        $redis    = $this->getRedisClient();
-        $userId   = $user->getId();
-        $bindings = $this->getGenerator()->generateBindingsForUser($user);
-        $exchange = $mqConn->getSecondaryExchange($userId);
+        return new UserQueue($user->getId(), $this->plan->generateQueues($user));
+    }
 
-        $mqConn->declareExchange($exchange);
 
-        $queues = array(
-            new AMQPQueue($mqConn, UserQueue::Q_UNREAD, $userId, "*.instant.user.$userId.#"),
-            new AMQPQueue($mqConn, UserQueue::Q_TOSORT, $userId, '*.notify.#'),
-            new RedisQueue($redis, UserQueue::Q_LISTED, $userId),
-            new RedisQueue($redis, UserQueue::Q_DIGEST, $userId)
-        );
-
-        $this->getBinder()
-             ->setBindings($bindings)
-             ->prepareAMQP($mqConn, $exchange, $queues);
-
-        return new UserQueue($queues);
-}
+    /**
+     * @param int $userId
+     * @return array
+     */
+    public function generateUserQueueNames($userId)
+    {
+        return $this->plan->generateQueueNames($userId);
+    }
 
 
     /**
@@ -213,31 +132,13 @@ class UserQueueFactory {
      * @param int  $limit
      * @return UserQueue
      */
-    public function buildUserQueue($user, $limit = 10)
+    public function buildUserQueue(User $user, $limit = 10)
     {
-        $uq = $this->bindUserQueue($user);
+        $uq = $this->prepareUserQueue($user);
         if ($limit > 0) {
             $uq->fetchNotifications($uq->findQueue(UserQueue::Q_LISTED), $limit, true);
         }
         return $uq;
-    }
-
-
-    /**
-     * Destroy all routing bindings for the given user.
-     * Returns the number of bindings deleted, or -1 on error.
-     *
-     * @param int $userId
-     * @param bool $simulate
-     * @return int
-     */
-    public function destroyUserBindings($userId, $simulate = false)
-    {
-        // this is now a (semi-intelligent) passthrough
-        $conn = $simulate ? new MockAMQPConnector() : $this->getMessageQueueConnector();
-        $ctrl = $simulate ? new MockBunnyControl() : $this->getRabbitController();
-
-        return $this->getBinder()->destroyUserBindings($conn, $ctrl, $userId);
     }
 
 }
