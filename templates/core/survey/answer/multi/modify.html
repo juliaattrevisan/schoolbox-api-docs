@@ -205,16 +205,9 @@
     <ul id="answerCollection">
         <!-- BEGIN answerOption -->
         <li class="inputs clearfix">
-            <label class="list-item">
-                <input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}"/>
-
-                <span>{ANSWER_VALUE})</span>
-            </label>
-            <label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect hide" type="checkbox"
-                /></label>
-            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text"
-                                               value="{ANSWER_DESCRIPTION}"/></label>
-
+            <label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}"/><span>{ANSWER_VALUE})</span></label>
+            <label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect hide" type="checkbox" /></label>
+            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}"/></label>
             <div class="delete"></div>
         </li>
         <!-- END answerOption -->
@@ -231,17 +224,13 @@
 <div class="hide hidden-clone">
     <ul>
         <li class="inputs clearfix">
-            <label class="list-item">
-                <input name="answerCode[]" class="answerCode text-box" type="hidden" value=""/>
-                <span>{ANSWER_VALUE})</span>
-            </label>
+            <label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value=""/><span>{ANSWER_VALUE})</span></label>
             <label class="check-it"><input name="answer[]" class="answerCorrect  hide" type="checkbox"/></label>
-            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text"
-                                               value=""/></label>
-
+            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value=""/></label>
             <div class="delete"></div>
         </li>
     </ul>
+
     <p class="clearfix">
         <a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
     </p>
