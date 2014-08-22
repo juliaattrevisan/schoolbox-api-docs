@@ -18,6 +18,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\SelfResponder;
 
@@ -38,19 +39,33 @@ class SubscriptionManager {
     /** @var LoggerInterface */
     protected $log;
 
-	/**
-     * @param Client $stompClient
-	 * @param AMQPResponseHandlerInterface $handler
-     * @param LoggerInterface $log
-	 */
-	public function __construct(Client $stompClient, AMQPResponseHandlerInterface $handler, LoggerInterface $log) {
-		// this factory requires its own loop to work
-		$this->subscriptions = array();
-		$this->handler = $handler;
-		$this->stompClient = $stompClient;
-		$this->conf = ConfigMapper::getInstance();
-        $this->log = $log;
-	}
+    /** @var UserQueueFactory */
+    protected $uqf;
+
+
+    /**
+     * @param Client                       $stompClient
+     * @param AMQPResponseHandlerInterface $handler
+     * @param UserQueueFactory             $uqf
+     * @param LoggerInterface              $log
+     * @param IConfigLoader                $conf
+     */
+    public function __construct(
+        Client $stompClient,
+        AMQPResponseHandlerInterface $handler,
+        UserQueueFactory $uqf,
+        LoggerInterface $log,
+        IConfigLoader $conf = null
+    ) {
+        // this factory requires its own loop to work
+        $this->subscriptions = array();
+        $this->handler       = $handler;
+        $this->stompClient   = $stompClient;
+        $this->conf          = $conf ? : ConfigMapper::getInstance();
+        $this->uqf           = $uqf;
+        $this->log           = $log;
+    }
+
 
 	/**
 	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
@@ -72,8 +87,10 @@ class SubscriptionManager {
 		}
 
 		try {
+            $destination = $this->userSubscriptionDestination($userId);
+
             // this closure is executed when a stomp client connection is established
-            $this->putSubscription(new Subscription($this->stompClient, $userId, $this->handler, $this->log));
+            $this->putSubscription(new Subscription($userId, $destination, $this->stompClient, $this->handler, $this->log));
             // if a responder is provided, use it as a callback for success
             if($responder instanceof SelfResponder) {
                 $responder->notifyPipe(json_encode(array('subscribe' => true)));
@@ -166,7 +183,9 @@ class SubscriptionManager {
 	 * @return string
 	 */
 	protected function userSubscriptionDestination($userId) {
-		return sprintf("/amq/queue/".UserQueue::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $userId);
+        $label = UserQueue::Q_UNREAD;
+        $matched = preg_grep("`$label$`", $this->uqf->generateUserQueueNames($userId));
+        return count($matched) ? $matched[0] : null;
 	}
 
 	/**
