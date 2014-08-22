@@ -32,33 +32,35 @@ class UserQueue {
     // queue of messages that are pending to be sent by Digest
     const Q_DIGEST = 'digest';
 
-	// queue of messages that have been accepted by broadcast, but need to be filtered onto the other queues
-	const QUEUE_TOSORT_MESSAGES = '%s.u.%s.tosort';
+    /** @var int */
+    protected $userId;
 
-	// queue of messages that have been received by Instant but have not yet expired
-	const QUEUE_LISTED_MESSAGES = '%s.u.%s.listed';
-
-	// queue of messages that have been received by Instant and have not yet been read
-	const QUEUE_UNREAD_MESSAGES = '%s.u.%s.unread';
-
-	// queue of messages that are pending to be sent by Digest
-	const QUEUE_DIGEST_MESSAGES = '%s.u.%s.digest';
-
-	/** @var array */
-	protected $instanceCache = array();
+    /** @var array */
+    protected $instanceCache = array();
 
     /** @var QueueInterface[] */
     protected $queues;
 
 
     /**
+     * @param int              $userId
      * @param QueueInterface[] $userQueues
      */
-    public function __construct(array $userQueues = array())
+    public function __construct($userId, array $userQueues = array())
     {
+        $this->userId = $userId;
         foreach ($userQueues as $q) {
             $this->addQueue($q);
         }
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->userId;
     }
 
 
@@ -193,30 +195,5 @@ class UserQueue {
 
         return false;
     }
-
-
-	/**
-	 * Helper method to construct a queuename based on a pattern
-	 *
-     * @deprecated static calls to be removed
-	 * @param $pattern
-	 * @param $userId
-	 * @return string
-	 */
-	protected static function getQueueName($pattern, $userId) {
-		return sprintf($pattern, INSTANCE_ID, $userId);
-	}
-
-
-	/**
-	 * Returns the 'unread' queuename for the given user
-	 *
-     * @deprecated static calls to be removed
-	 * @param $userId
-	 * @return string
-	 */
-	public static function getUserUnreadQueueName($userId) {
-		return self::getQueueName(self::QUEUE_UNREAD_MESSAGES, $userId);
-	}
 
 }
