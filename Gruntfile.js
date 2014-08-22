@@ -12,7 +12,7 @@ module.exports = function(grunt) {
                 interval: 5007
             },
             files: ['www/css/core/*.less'],
-            tasks: ['build.css.current']
+            tasks: ['build.css:core', 'build.css.current']
         }
     };
     var buildTasks = {};
@@ -25,6 +25,15 @@ module.exports = function(grunt) {
             continue;
         }
         var cssDir = matches[1];
+        buildTasks[cssDir] = {
+            files: [{
+                expand: true,
+                cwd: 'www/css',
+                src: [cssDir+'/{chrome,mchrome,print}.less'],
+                dest: 'www/css/',
+                ext: '.css'
+            }]
+        }
         // Don't clobber core's watcher
         if (cssDir === 'core') {
             continue;
@@ -36,15 +45,6 @@ module.exports = function(grunt) {
             },
             files: ['www/css/'+cssDir+'/*.less'],
             tasks: ['build.css:'+cssDir]
-        }
-        buildTasks[cssDir] = {
-            files: [{
-                expand: true,
-                cwd: 'www/css',
-                src: [cssDir+'/{chrome,mchrome,print}.less'],
-                dest: 'www/css/',
-                ext: '.css'
-            }]
         }
     }
 
