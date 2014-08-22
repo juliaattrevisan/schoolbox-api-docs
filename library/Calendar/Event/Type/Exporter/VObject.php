@@ -25,7 +25,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
      * Render this event
      *
      * @param Calendar_Event_Type_Abstract $currentEvent
-     * @return \vevent
+     * @return Sabre\VObject\Component\Vevent
      */
     public function visit($currentEvent)
     {
@@ -35,14 +35,14 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
         if ($this->isVisible($currentEvent)) {
             $eventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
             $eventType = $eventTypeMapper->findById($currentEvent->getType());
-
-            $e = array();
+            /** @var Sabre\VObject\Component\Vevent $vevent */
+            $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $currentEvent->getEventId()
-            $e['UID'] = $currentEvent->getEventId() . '/' . $currentEvent->getConnectorId();
-            $e['DTSTAMP'] = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
-            $e['CATEGORIES'] = $eventType->getType();
-            $e['LOCATION'] = $currentEvent->getLocation();
-            $e['DESCRIPTION'] = \Scrub::html2text($currentEvent->getDetail());
+            $vevent->add('UID', $currentEvent->getEventId() . '/' . $currentEvent->getConnectorId());
+            $vevent->add('DTSTAMP', DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']));
+            $vevent->add('CATEGORIES', $eventType->getType());
+            $vevent->add('LOCATION', $currentEvent->getLocation());
+            $vevent->add('DESCRIPTION', \Scrub::html2text($currentEvent->getDetail()));
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -53,17 +53,17 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $end_time = new DateTime($currentEvent->getEndTime()->getDatabase());
             }
             if (!$currentEvent->getAllday()) {
-                $e['DTSTART'] = $start_time;
-                $e['DTEND'] = $end_time;
+                $vevent->add('DTSTART', $start_time);
+                $vevent->add('DTEND', $end_time);
             } else {
                 $end_time->add(new DateInterval('P1D'));
-                $e['DTSTART'] = array('DATE' => $start_time->format('Ymd'));
-                $e['DTEND'] = array('DATE' => $end_time->format('Ymd'));
+                $vevent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
+                $vevent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
             }
 
-            $e['SUMMARY'] = $currentEvent->getTitle();
+            $vevent->add('SUMMARY', $currentEvent->getTitle());
 
-            return $this->getVCalendar()->add('VEVENT', $e);
+            return $this->getVCalendar()->add($vevent);
         }
     }
 
