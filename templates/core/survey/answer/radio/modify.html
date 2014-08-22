@@ -1,31 +1,27 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript">
     $j(document).ready(function () {
-
         //add in one clone to start with
         $j('.answerCorrect').prop('checked', false);
-        refreshList();
+		refreshList();
 
         var validator = $j("#createQuestionForm").submit(function () {
             // update underlying textarea before submit validation
             tinyMCE.triggerSave();
         }).validate({
 			submitHandler:function () {
-				var theForm = $j('#createQuestionForm');
-				/* Form preprocessing
-				 */
-				var answerCollection = new Array();
-				tinyMCE.triggerSave();
+				var theForm = $j('#createQuestionForm'),
+					answerCollection = new Array(),
+					content = tinyMCE.activeEditor.getContent(); // get the content
 
-				var content = tinyMCE.activeEditor.getContent(); // get the content
 				$j('#question').val(content); // put it in the textarea
 
 				/* Collate possible answers and their correctness status
 				 */
 				$j.each($j('#answerCollection').find('li'), function (index, element) {
-					var elem = $j(element);
-
-					var description = elem.find('.answerDescription').val();
-					var code = elem.find('.answerCode').val();
+					var elem = $j(element),
+						description = elem.find('.answerDescription').val(),
+						code = elem.find('.answerCode').val();
 
 					/* Ignore empty answers that weren't removed
 					 */
@@ -77,7 +73,6 @@
 
 				return false;
 			},
-
 			rules:{
 				question:{
 					required:true,
@@ -87,7 +82,6 @@
 					emptyInputs:true
 				}
 			},
-
 			errorPlacement:function (error, element) {
 				error.addClass('message');  // add a class to the wrapper
 
@@ -145,7 +139,6 @@
             }
 
             return oneFieldChecked;
-
         }, 'Tick at least one checkbox');
 
         jQuery.validator.addMethod("greaterThanZero", function (value, element) {
@@ -172,21 +165,17 @@
         });
 
         $j(document).on('click', '.answerCorrect', function () {
-            refreshList();
             $j(this).parent().parent().toggleClass("highlight");
         });
 
         function refreshList() {
+			var i = 1;
 
-            var alphabetStart = 65;
-
-            $j('li.inputs > .list-item').each(function () {
-                var $this = $j(this);
-                $this.children('span').html('&#' + alphabetStart + ';)');
-                var convert = String.fromCharCode(alphabetStart);
-                $this.children('input').val(convert);
-                alphabetStart++;
-            });
+			$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+				$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
+				$(element).children('input').val(i);
+				i++;
+			});
 
             var pos = $j('#answerCollection').height();
 
@@ -198,6 +187,8 @@
                 'top':pos
             });
         }
+
+		refreshList();
     });
 </script>
 <fieldset>
