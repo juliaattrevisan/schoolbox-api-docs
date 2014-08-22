@@ -15,13 +15,9 @@ $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
 
-//$this->setBlock(TEMPLATE_content, 'summary', 'summary_block');
-//$this->setBlock('summary', 'summary_due', 'summary_due_block');
-
 $this->setBlock(TEMPLATE_content, 'activity', 'activity_block');
 $this->setBlock(TEMPLATE_content, 'is_parent', 'is_parent_block');
 
-$this->setVar('summary_block', '');
 $this->setVar('activity_block', '');
 $this->setVar('is_parent_block', '');
 
@@ -245,7 +241,7 @@ for ($i = 0; $i < $totalDays; $i++) {
             'name' => $event->getCategoryName(),
             'cid'   => $category_id,
             'total' => ++$summary[$category_id]['total'],
-            'code' => $event->getCategoryCodes(),
+            'code' => $event->getCategoryCodeString(),
         );
     }
 
