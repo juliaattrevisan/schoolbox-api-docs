@@ -25,6 +25,7 @@ use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Client;
+use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
@@ -71,22 +72,31 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
     /** @var TimerInterface[] */
     protected $userTimeouts = array();
 
-	/**
-	 * @param LoopInterface $reactLoop
-	 * @param SessionValidator $sessionValidator
-	 * @param LoggerInterface $log
-     * @param Client $stompClient
-	 * @param DispatchStrategyInterface $strat
-	 */
-	public function __construct($reactLoop, $sessionValidator, $stompClient, $log, $strat = null) {
-		$this->pipes = new PipeCollection($sessionValidator, $log);
-		$this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log);
-		$this->reactLoop = $reactLoop;
-		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
-		$this->log = $log;
 
-		$this->log->debug('Instantiated PipeManager');
-	}
+    /**
+     * @param LoopInterface             $reactLoop
+     * @param SessionValidator          $sessionValidator
+     * @param LoggerInterface           $log
+     * @param Client                    $stompClient
+     * @param UserQueueFactory          $uqf
+     * @param DispatchStrategyInterface $strat
+     */
+    public function __construct(
+        LoopInterface $reactLoop,
+        SessionValidator $sessionValidator,
+        Client $stompClient,
+        LoggerInterface $log,
+        UserQueueFactory $uqf,
+        DispatchStrategyInterface $strat = null
+    ) {
+        $this->pipes               = new PipeCollection($sessionValidator, $log);
+        $this->subscriptionManager = new SubscriptionManager($stompClient, $this, $uqf, $log);
+        $this->reactLoop           = $reactLoop;
+        $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->log                 = $log;
+
+        $this->log->debug('Instantiated PipeManager');
+    }
 
 
 	/**
