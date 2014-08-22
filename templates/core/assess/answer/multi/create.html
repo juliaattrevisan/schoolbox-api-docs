@@ -1,5 +1,4 @@
 <script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
-
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -13,9 +12,7 @@ $j(document).ready(function() {
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-
-	 }).validate({
-
+	}).validate({
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
         	/* Form preprocessing
