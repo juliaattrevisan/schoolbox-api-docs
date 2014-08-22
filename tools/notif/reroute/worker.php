@@ -5,6 +5,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\Builder\Plan\ReroutePlan;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
@@ -48,13 +49,16 @@ $kernel->run(function($di, $loop, $log, $opts) {
      * @var array $opts
      */
 
+    $redis = new \Alaress\Redis();
+    $uqf   = new UserQueueFactory(new ReroutePlan($redis->getClientInstance()));
+
 	$rerouteFilters = array(
 		new Filter\AlreadyReroutedFilter(),
 		new Filter\SelfSendFilter(),
 		new Filter\CampusMembershipFilter(),
 		new Filter\RoleMembershipFilter(),
 		new Filter\RoletypeFilter(),
-		new Filter\DuplicateFilter(new UserQueueFactory())
+		new Filter\DuplicateFilter($uqf)
 	);
 
     $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), RoutePermissionMapper::getInstance());

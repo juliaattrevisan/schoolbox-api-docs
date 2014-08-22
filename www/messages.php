@@ -26,13 +26,16 @@ $this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
+$redis = new \Alaress\Redis();
+$plan  = new \Schoolbox\Notif\Queue\Builder\Plan\ListedPlan($redis->getClientInstance());
 
-$qf = new \Schoolbox\Notif\Queue\UserQueueFactory();
-$q = $qf->bindUserQueue($_SESSION['user']);
+$qf = new \Schoolbox\Notif\Queue\UserQueueFactory($plan);
+$q = $qf->buildUserQueue($_SESSION['user'], 20);
 
 // load the 20 most recent notifications into a decorator
 $decorator = new \Schoolbox\Realtime\Notification\Decorator();
-$decorator->appendNotifications($q->getNotifications(20, true, true));
+
+$q->fetchNotificationsIntoBundle(\Schoolbox\Notif\Queue\UserQueue::Q_LISTED, $decorator);
 
 $notifications = $decorator->renderAsSitePageArray();
 
