@@ -23,7 +23,7 @@
 @search-width: 					256px;
 @logo-width: 					192px;
 @logo-height: 					192px;
-@infopanel-bellsprite:			'/images/demo/bell.png';
+@infopanel-bellsprite:			'/images/meggs/bell.png';
 
 // Generic colors
 @dark-blue:                     #013A63; // Dark Schoolbox Blue
@@ -49,7 +49,7 @@
 // Modules
 @module-heading: 				@banner-color;
 @module-background: 			@link;
-@admin-nav:                     @link;
+@admin-nav:                     #afabab;
 
 // Refers to the left navigation
 @navigation-width:				200px;
@@ -118,6 +118,9 @@ h1,h2,
                 font-size: 14px;
             }
         }
+        #infoPanel > li {
+            line-height: 32px;
+        }
         .header-top{
             height: 48px;
             background: #d32424 url("/images/meggs/header-logo.png") no-repeat 207px 15px;
@@ -133,7 +136,6 @@ h1,h2,
                 height: 32px;
             }
             .bell{
-                background-image: url('/images/meggs/bell.png');
                 &.open{
                     background-position: 0 -63px;
                 }
@@ -147,7 +149,6 @@ h1,h2,
         top: 172px;
         width: 192px;
         font-weight: normal;
-        font-size: 14px;
         ul{
             width: 192px;
             li a{ width: 160px; }
@@ -156,8 +157,15 @@ h1,h2,
     }
     #container {
         margin-left: 192px;
-        h2{
+        h2, .btn{
             .border-radius(3px);
+        }
+        .admin-nav{
+            li a{
+                .border-radius(3px);
+                background: #e8e7e7;
+                &.current{ background: @admin-nav; }
+            }
         }
     }
 }
