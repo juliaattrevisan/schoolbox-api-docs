@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -29,7 +30,7 @@ class WorkerProcess extends AbstractProcess
 {
 
     /** @var UserQueueFactory */
-    protected $mqf;
+    protected $uqf;
 
 
     /**
@@ -37,11 +38,12 @@ class WorkerProcess extends AbstractProcess
      * @param LoggerInterface           $log
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
+     * @param UserQueueFactory          $uqf
      */
-    public function __construct($loop, $log, $writer, $strat)
+    public function __construct($loop, $log, $writer, $strat, $uqf)
     {
         parent::__construct($loop, $log, $writer, $strat);
-        $this->mqf = new UserQueueFactory();
+        $this->uqf = $uqf;
     }
 
 
@@ -97,10 +99,10 @@ class WorkerProcess extends AbstractProcess
         $this->log->debug("Fetching $count for user $userId");
         $decorator = new Decorator();
 
-        $queue = $this->mqf->buildUserQueue($userId, $count, false);
+        $queue = $this->uqf->buildUserQueue($userId, $count, false);
 
         // make messages pretty
-        $decorator->appendNotifications($queue->getNotifications($count, true, true));
+        $decorator->appendNotifications($queue->fetchNotifications(UserQueue::Q_LISTED, $count, true));
         // wrap in an array to preserve keys
         return array($decorator->renderAsSocketArray(false));
     }
