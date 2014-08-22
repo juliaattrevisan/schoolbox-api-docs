@@ -53,20 +53,11 @@
 					var total = datasets[1].data + used;
 					var percentage = Math.round(100*used/total).toString();
 
-					var html = '\
-						<div>\
-							<h3>{TITLE}</h3>\
-							<p class="amount">\
-								{USED} / {TOTAL}\
-							</p>\
-							{BAR}\
-						</div>\
-					';
-
-					var html = html.replace('{TITLE}', config.title);
-					var html = html.replace('{USED}', $.fn.formatBytes(used));
-					var html = html.replace('{TOTAL}', $.fn.formatBytes(total));
-					var html = html.replace('{BAR}', $.fn.bargraph(percentage));
+					var html = $('<div><h3></h3><p class="amount"></p></div>');
+					html.find('h3').text(config.title);
+					html.find('.amount')
+						.text($.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total))
+						.after($.fn.bargraph(percentage));
 
 					config.element.html(html);
 				}

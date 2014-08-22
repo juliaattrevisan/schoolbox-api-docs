@@ -6,12 +6,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_Statistics_RecentVisitorsController extends Component_Homepage_Statistics_ControllerAbstract {
-
+class Component_Homepage_Statistics_RecentVisitorsController extends Component_Homepage_Statistics_ControllerAbstract
+{
     private $visitors;
 
-    public function execute() {
-
+    public function execute()
+    {
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
@@ -46,7 +46,8 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
         $this->visitors = $visitors;
     }
 
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'recentVisitors')) {
             return false;
         }
@@ -61,7 +62,7 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
                     'VISITOR_ID' => $this->visitors[$i]['id'],
                     'VISITOR_THUMB' => sprintf('/portrait.php?userId=%s&size=square64', $this->visitors[$i]['synid']),
                     'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
-                    'VISITOR_GROUP' => $this->visitors[$i]['gname'],
+                    'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['gname']),
                     'VISITOR_TOOLTIP' => sprintf(
                         "%s (last visited %s)", $uHandler->formatName($this->visitors[$i]),
                         lcfirst($dtime->getRelativeTime())

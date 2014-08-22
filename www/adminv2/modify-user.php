@@ -8,18 +8,18 @@ if(!$groupHandler->isSuperuser())
     error(19);
 
 if(is_numeric($this->arg[0])) {
-	$this->setTitle('Admin - Modify User');
+    $this->setTitle('Admin - Modify User');
     $this->setFile(TEMPLATE_content, 'adminv2/modify-user.html');
 
-	/* Permissions clone
+    /* Permissions clone
 	 */
-	$this->setBlock(TEMPLATE_content, 'campusPermsList','campusPermsList_block');
+    $this->setBlock(TEMPLATE_content, 'campusPermsList','campusPermsList_block');
 
-	/* Output permissions
+    /* Output permissions
 	 */
-	$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
-	$this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
-	$this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
+    $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+    $this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
+    $this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
     $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
     $this->setBlock(TEMPLATE_content, 'user_resource_booking', 'user_resource_booking_block');
 
@@ -28,12 +28,12 @@ if(is_numeric($this->arg[0])) {
     $nav->parse($this, 'user');
 
     $this->setVar(array(
-		'user_calendar_block' => '',
-		'user_news_block' => '',
-		'user_cms_block'=> '',
+        'user_calendar_block' => '',
+        'user_news_block' => '',
+        'user_cms_block'=> '',
         'user_housemaster_block'=> '',
         'user_resource_booking_block'=> '',
-	));
+    ));
 
     /* Modify existing user
 	 */
@@ -41,11 +41,11 @@ if(is_numeric($this->arg[0])) {
 
     if (is_array($user)) {
 
-		/* Prepend a please select at the start of every campus list
+        /* Prepend a please select at the start of every campus list
 		 */
-		$campusList = $userHandler->getCampusList();
+        $campusList = $userHandler->getCampusList();
 
-		/* User data
+        /* User data
 		 */
         $output = array('USERID'            => $user['uid'],
                         'FIRSTNAME'         => $user['firstname'],
@@ -62,12 +62,12 @@ if(is_numeric($this->arg[0])) {
                         'EPORTFOLIO_CHECKED'=> $user['eportfolio_enabled']==1?'checked="checked"':'',
                         'LOCAL_EMAIL_CHECKED'=> $user['local_email']==1?'checked="checked"':'',
                         'WEBMAIL_CHECKED'   => $user['webmail']==1?'checked="checked"':'',
-	                    'MAILHANDLER_CHECKED'=> $user['mail_handler']==1?'checked="checked"':'',
-	                    'ACCOUNT_ENABLED_CHECKED'=> $user['enabled']==1?'checked="checked"':'',
+                        'MAILHANDLER_CHECKED'=> $user['mail_handler']==1?'checked="checked"':'',
+                        'ACCOUNT_ENABLED_CHECKED'=> $user['enabled']==1?'checked="checked"':'',
                         'YEAR'              => $user['year'],
                         'DATABASE_TYPE'     => ucfirst(Cfg::get('external_type')),
-	                    'ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
-	                    'ASSUME_CLASS'      => $user['enabled'] ? 'submit' : 'disabled' // doesn't affect admin ability to assume user
+                        'ASSUME_PROMPT'     => $user['enabled'] ? 'Login as user' : 'Account disabled',
+                        'ASSUME_CLASS'      => $user['enabled'] ? 'submit' : 'disabled' // doesn't affect admin ability to assume user
             );
         $this->setVar($output);
 
@@ -90,31 +90,31 @@ if(is_numeric($this->arg[0])) {
         $this->dropDown('residential_house', HouseResidentialMapper::getInstance()->findAll(), $user['residential_house'], TEMPLATE_content, array('id' => 'RESIDENT_HOUSE_ID', 'house' => 'RESIDENT_HOUSE_NAME'));
 
         /* Output campus list */
-		$this->setBlock(TEMPLATE_content, 'campus','campus_block');
+        $this->setBlock(TEMPLATE_content, 'campus','campus_block');
 
-		/* User campuses
+        /* User campuses
 		 */
-		$userCampus = $userHandler->getUserCampus($user['uid']);
+        $userCampus = $userHandler->getUserCampus($user['uid']);
 
-		foreach($userHandler->getCampusList() as $campus) {
-			$outcampus = array(
-				'CAMPUS_ID'         => $campus['id'],
-				'CAMPUS_NAME'           => $campus['name'],
-				'CAMPUS_ID_CHECKED'     => '',
-				'CAMPUS_DEFAULT_CHECKED'    => '',
-			);
+        foreach($userHandler->getCampusList() as $campus) {
+            $outcampus = array(
+                'CAMPUS_ID'         => $campus['id'],
+                'CAMPUS_NAME'           => Scrub::text($campus['name']),
+                'CAMPUS_ID_CHECKED'     => '',
+                'CAMPUS_DEFAULT_CHECKED'    => '',
+            );
 
-			if (($key = array_search($campus['id'],$userCampus)) !== false) {
-				$outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
+            if (($key = array_search($campus['id'],$userCampus)) !== false) {
+                $outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
 
-				if ($key == 0) {
-					$outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
-				}
-			}
+                if ($key == 0) {
+                    $outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
+                }
+            }
 
-			$this->setVar($outcampus);
-			$this->parse('campus_block','campus',true);
-		}
+            $this->setVar($outcampus);
+            $this->parse('campus_block','campus',true);
+        }
 
          /* Output group list */
          $this->setBlock(TEMPLATE_content, 'user_group', 'user_group_block');
@@ -132,8 +132,7 @@ if(is_numeric($this->arg[0])) {
                  $this->setVar($outputGroup);
                  $this->parse('user_group_block','user_group',true);
              }
-         }
-         else {
+         } else {
              $this->setVar('user_group_block','');
          }
 
@@ -142,99 +141,98 @@ if(is_numeric($this->arg[0])) {
 
 
 
-		/* Get a list of permissions
+        /* Get a list of permissions
 		 */
-		$permList = $groupHandler->getAllUserAccess($user['uid']);
+        $permList = $groupHandler->getAllUserAccess($user['uid']);
 
-		/* Clone-able permissions dropdown
+        /* Clone-able permissions dropdown
 		 * Remove existing options
 		 */
-		$this->dropDown('perm_campus', $campusList, 0, 'campusPermsList', array(
-			 'id' => 'PERM_CAMPUS_ID',
-			 'name' => 'PERM_CAMPUS_NAME'
-		));
+        $this->dropDown('perm_campus', $campusList, 0, 'campusPermsList', array(
+             'id' => 'PERM_CAMPUS_ID',
+             'name' => 'PERM_CAMPUS_NAME'
+        ));
 
-		$this->parse('campusPermsList_block', 'campusPermsList');
+        $this->parse('campusPermsList_block', 'campusPermsList');
 
 
-		if (is_array($permList)) {
-			foreach($permList as $perm) {
+        if (is_array($permList)) {
+            foreach($permList as $perm) {
 
-				/* Radio boxes
+                /* Radio boxes
 				 */
-				$this->setVar(array(
-					'SERVICE_ID'    => $perm['service'],
-					'READ_CHECKED'  => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
-					'WRITE_CHECKED' => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
-					'ADMIN_CHECKED' => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
-					'SID'			=> $perm['sid']
-				));
+                $this->setVar(array(
+                    'SERVICE_ID'    => $perm['service'],
+                    'READ_CHECKED'  => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
+                    'WRITE_CHECKED' => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
+                    'ADMIN_CHECKED' => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+                    'SID'            => $perm['sid']
+                ));
 
-				/* Show campus name
+                /* Show campus name
 				 */
-				foreach($campusList as $campus) {
-					if ($campus['id'] == $perm['sid']) {
-						$this->setVar(array(
-							'PERM_CAMPUS_NAME' => $campus['name'],
-						));
-					}
-				}
+                foreach($campusList as $campus) {
+                    if ($campus['id'] == $perm['sid']) {
+                        $this->setVar(array(
+                            'PERM_CAMPUS_NAME' => $campus['name'],
+                        ));
+                    }
+                }
 
-				/* Render out service blocx
+                /* Render out service blocx
 				 */
-				switch($perm['service']) {
+                switch($perm['service']) {
 
-					/* Calendar
+                    /* Calendar
 					 */
-					case CALENDAR_SERVICE:
-						$this->parse('user_calendar_block', 'user_calendar', true);
-						break;
+                    case CALENDAR_SERVICE:
+                        $this->parse('user_calendar_block', 'user_calendar', true);
+                        break;
 
-					/* News
+                    /* News
 					 */
-					case NEWS_SERVICE:
-						$this->parse('user_news_block', 'user_news', true);
-						break;
+                    case NEWS_SERVICE:
+                        $this->parse('user_news_block', 'user_news', true);
+                        break;
 
-					/* CMS
+                    /* CMS
 					 */
-					case CMS_SERVICE:
-						$this->parse('user_cms_block', 'user_cms', true);
-						break;
+                    case CMS_SERVICE:
+                        $this->parse('user_cms_block', 'user_cms', true);
+                        break;
 
-					/* Housemaster
+                    /* Housemaster
 					 */
-					case HOUSEMASTER_SERVICE:
-						$this->parse('user_housemaster_block', 'user_housemaster', true);
-						break;
+                    case HOUSEMASTER_SERVICE:
+                        $this->parse('user_housemaster_block', 'user_housemaster', true);
+                        break;
 
-					/* Resource Booking
+                    /* Resource Booking
 					 */
-					case RESOURCE_BOOKING_SERVICE:
-						$this->parse('user_resource_booking_block', 'user_resource_booking', true);
-						break;
-				}
+                    case RESOURCE_BOOKING_SERVICE:
+                        $this->parse('user_resource_booking_block', 'user_resource_booking', true);
+                        break;
+                }
 
-				/* Clear child blocks after parsing out parent
+                /* Clear child blocks after parsing out parent
 				 */
-				$this->setVar('perm_campus_block', '');
-			}
-		}
+                $this->setVar('perm_campus_block', '');
+            }
+        }
 
          /* Output login log */
         $this->setBlock(TEMPLATE_content, 'login_log', 'login_log_block');
         $loginLog = $userHandler->getUserLogins($user['username']);
         if(is_array($loginLog)) {
             foreach($loginLog as $result) {
-                    $output = array (   'LOGIN_DATE' 	=> date('d/m/Y G:i',strtotime( $result['date'] )),
+                    $output = array (   'LOGIN_DATE'    => date('d/m/Y G:i',strtotime( $result['date'] )),
                                         'LOGIN_IP' => $result['ip'],
                                         'LOGIN_RESULT' => $result['login']?'Success':'Failed',
                                                     );
                     $this->setVar($output);
                     $this->parse('login_log_block', 'login_log', true);
             }
-        }
-        else
+        } else
             $this->setVar('login_log_block', '');
 
 
@@ -247,19 +245,17 @@ if(is_numeric($this->arg[0])) {
 
         if(is_array($activityLog)) {
             foreach($activityLog as $result) {
-                    $output = array (	'ACTION_DATE' 	=> date('d/m/Y G:i',strtotime( $result['time'] )),
+                    $output = array (    'ACTION_DATE'    => date('d/m/Y G:i',strtotime( $result['time'] )),
                                             'ACTION_ACTION' => $lookupAction[$result['action']].' '.$result['object'].' '.$result[$result['object']],
                                                     );
                     $this->setVar($output);
                     $this->parse('action_log_block', 'action_log', true);
             }
-        }
-        else
+        } else
                 $this->setVar('action_log_block', '');
 
     }
-}
-else {
+} else {
     $this->setFile(TEMPLATE_content, 'adminv2/new-user.html');
     $this->setTitle('Admin - New User');
 
@@ -286,7 +282,7 @@ else {
      foreach($campusList as $campus ) {
 
          $outcampus = array('CAMPUS_ID'         => $campus['id'],
-                        'CAMPUS_NAME'           => $campus['name'],
+                        'CAMPUS_NAME'           => Scrub::text($campus['name']),
                         'CAMPUS_ID_CHECKED'     => '',
                         'CAMPUS_DEFAULT_CHECKED'    => '',);
 
@@ -294,4 +290,3 @@ else {
          $this->parse('campus_block','campus',true);
      }
 }
-?>

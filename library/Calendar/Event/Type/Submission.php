@@ -71,7 +71,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
         /* Optional categoryCodes suffix
          */
         if (count($this->getCategoryCodes())) {
-            $extended = ' (' . implode(', ', $this->getCategoryCodes()) . ')';
+            $extended = ' (' . $this->getCategoryCodeString() . ')';
         } else {
             $extended = '';
         }
@@ -103,10 +103,18 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
     /**
      * Get category codes
      *
-     * @return string
+     * @return array
      */
     public function getCategoryCodes() {
         return $this->categoryCodes;
+    }
+
+    /**
+     * Get category string
+     * @return string
+     */
+    public function getCategoryCodeString() {
+        return implode(', ', $this->getCategoryCodes());
     }
 
     /**

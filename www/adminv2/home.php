@@ -51,26 +51,23 @@ if(is_readable('/proc/meminfo')) {
     );
     $this->setVar($memory);
     $this->parse('memory_block', 'memory');
-}
-else {
+} else {
     $this->setVar('memory_block', '');
 }
 
 /* External system checks */
 if(Cfg::get('external_enable')) {
-	$external_ping = new External_Ping();
+    $external_ping = new External_Ping();
     if ($external_ping->isResponsive()) {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
                     'EXTERNAL_DB_LIGHT' => 'on',
                     'EXTERNAL_DB_STATUS' => 'Online',);
-    }
-    else {
+    } else {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
                     'EXTERNAL_DB_LIGHT' => '',
                     'EXTERNAL_DB_STATUS' => 'Offline',);
     }
-}
-else {
+} else {
     $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
             'EXTERNAL_DB_LIGHT' => '',
             'EXTERNAL_DB_STATUS' => 'Disabled',);
@@ -84,14 +81,12 @@ if(Cfg::get('mail_enable') && Cfg::get('mail_smtp_host')) {
     if(@socket_connect($socket, Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port'))) {
        $email = array('EMAIL_LIGHT'    => 'on',
                        'EMAIL_STATUS'    => 'Online');
-    }
-    else {
+    } else {
        $email = array('EMAIL_LIGHT'    => '',
                       'EMAIL_STATUS'    => 'Offline');
     }
     socket_close($socket);
-}
-else {
+} else {
        $email = array('EMAIL_LIGHT'    => '',
                 'EMAIL_STATUS'    => 'Disabled');
 }
@@ -110,12 +105,11 @@ if(Cfg::get('ldap_enable')) {
         $ds=ldap_connect(Cfg::get('ldap_host'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass'))); 
+        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
         if($ldapbind) {
             $ldap1 = array('LDAP_LIGHT'    => 'on',
                         'LDAP_STATUS'    => 'Online');
-        }
-        else {
+        } else {
             $ldap1 = array('LDAP_LIGHT'    => '',
                         'LDAP_STATUS'    => 'Offline');
         }
@@ -127,12 +121,11 @@ if(Cfg::get('ldap_enable')) {
         $ds=ldap_connect(Cfg::get('ldap_host_alt'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user_alt')), utf8_encode(Cfg::get('ldap_pass'))); 
+        $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user_alt')), utf8_encode(Cfg::get('ldap_pass')));
         if($ldapbind) {
             $ldap2 = array('LDAP_ALT_LIGHT'    => 'on',
                         'LDAP_ALT_STATUS'    => 'Online');
-        }
-        else {
+        } else {
             $ldap2 = array('LDAP_ALT_LIGHT'    => '',
                         'LDAP_ALT_STATUS'    => 'Offline');
         }
@@ -146,15 +139,14 @@ unset($tempsession);
 /* WWW access check */
 if(in_array('nojscript', $this->arg)) {
 
-	// Believe it or not, this is actually really slow!
+    // Believe it or not, this is actually really slow!
 
     $context = \Proxy\Server::getInstance()->getContext();
     if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
         $www = array('WWW_LIGHT'  => 'on',
                     'WWW_STATUS' => 'Available'
         );
-    }
-    else {
+    } else {
         $www = array('WWW_LIGHT'  => '',
                     'WWW_STATUS' => 'Inaccessible');
     }
@@ -177,7 +169,7 @@ if(in_array('nojscript', $this->arg)) {
 
     foreach($summary as $group) {
         $groupOut = array('GROUP_ID'        => $group['id'],
-                          'GROUP_NAME'      => $group['name'],
+                          'GROUP_NAME'      => Scrub::text($group['name']),
                           'GROUP_USER'      => $group['total'],
                           'GROUP_LOGGED_IN' => $group['logged_in']);
         $totalUser += $group['total'];
@@ -248,8 +240,3 @@ if(is_array($recentLog) ) {
         }
     }
 }
-
-
-
-
-?>

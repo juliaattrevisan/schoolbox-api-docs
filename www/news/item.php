@@ -97,7 +97,7 @@ array_unshift($topicList, array('name' => 'All'));
 foreach ($topicList as $sidebarTopic) {
     $topicUrl = new Url($sidebarTopic['name'], false);
     $output = array(
-        'LIST_TOPIC_NAME' => $sidebarTopic['name'],
+        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $topicUrl->getSlug(),
         'LIST_TOPIC_SELECTED' => $topicUrl->getSlug() == $url->getSlug() ? 'current' : '',
     );
@@ -110,16 +110,16 @@ $prevNext = array();
 $current = -1;
 $allNews = $newsHandler->getNewsListing($expired, $topic['name']);
 if($allNews != false) {
-	foreach ($allNews as $newsItem) {
-	    $prevNext[] = array(
-	        $newsItem['item_id'],
-	        $newsItem['item_heading']
-	    );
-	    // current article in the list?
-	    if ($newsItem['item_id'] == $article['item_id']) {
-	        $current = count($prevNext) - 1;
-	    }
-	}
+    foreach ($allNews as $newsItem) {
+        $prevNext[] = array(
+            $newsItem['item_id'],
+            $newsItem['item_heading']
+        );
+        // current article in the list?
+        if ($newsItem['item_id'] == $article['item_id']) {
+            $current = count($prevNext) - 1;
+        }
+    }
 }
 
 // setup "objects" for output
@@ -143,4 +143,3 @@ if ($next) {
 } else {
     $this->setVar('next_article_block', '');
 }
-

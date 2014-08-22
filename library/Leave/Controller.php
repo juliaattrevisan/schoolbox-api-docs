@@ -7,8 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Leave_Controller extends Controller {
-
+class Leave_Controller extends Controller
+{
     /**
 	 * Unused constants which document when morning, day and night occur
      * for Leave Reports and Catering Reports respectively
@@ -107,7 +107,8 @@ class Leave_Controller extends Controller {
      *
      * @param Page $page
      */
-    public function __construct($page = null) {
+    public function __construct($page = null)
+    {
         parent::__construct($page);
 
         $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
@@ -120,11 +121,11 @@ class Leave_Controller extends Controller {
         $emptyTravelType->setName('Not specified');
         $travelMethods = array(0 => $emptyTravelType);
 
-		$allTravelTypes = Leave_Request_TravelTypeMapper::getInstance()->findAll(array(
-			'order' => array(
-				'sequence' => 'asc'
-			)
-		));
+        $allTravelTypes = Leave_Request_TravelTypeMapper::getInstance()->findAll(array(
+            'order' => array(
+                'sequence' => 'asc'
+            )
+        ));
 
         foreach ($allTravelTypes as $method) {
             $travelMethods[$method->getId()] = $method;
@@ -133,10 +134,11 @@ class Leave_Controller extends Controller {
         $this->setTravelTypes($travelMethods);
     }
 
-	/**
+    /**
      * Test email deployments
      */
-    public function executeEmailTest() {
+    public function executeEmailTest()
+    {
         $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
 
         $email->setFrom(Cfg::get('mail_from_address'), 'Test Schoolbox');
@@ -148,16 +150,16 @@ class Leave_Controller extends Controller {
      *
      * @param $request
      */
-    private function renderHostTypeDropdown($request) {
+    private function renderHostTypeDropdown($request)
+    {
         $this->getPage()->setBlock(TEMPLATE_content, 'host_type', 'host_type_block');
 
-		/* Iterate through each option and preselect
+        /* Iterate through each option and preselect
 		 */
-		foreach($request->getAllHostTypes() as $currentHostType) {
+        foreach($request->getAllHostTypes() as $currentHostType) {
             if ($request->getHostType() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
-            }
-			else {
+            } else {
                 $selected = '';
             }
 
@@ -178,7 +180,8 @@ class Leave_Controller extends Controller {
      *
      * @param null $startTime
      */
-    private function renderStartTimeDropdown($startTime = null) {
+    private function renderStartTimeDropdown($startTime = null)
+    {
         $this->getPage()->setBlock(TEMPLATE_content, 'request_start_time', 'request_start_time_block');
 
         /* Iterate through each option and preselect
@@ -207,7 +210,8 @@ class Leave_Controller extends Controller {
      *
      * @param null $finishTime
      */
-    private function renderFinishTimeDropdown($finishTime = null) {
+    private function renderFinishTimeDropdown($finishTime = null)
+    {
         $this->getPage()->setBlock(TEMPLATE_content, 'request_finish_time', 'request_finish_time_block');
 
         /* Iterate through each option and preselect
@@ -237,7 +241,8 @@ class Leave_Controller extends Controller {
      *
      * @return Array
      */
-    public function executeCreateRequest() {
+    public function executeCreateRequest()
+    {
         return array();
     }
 
@@ -247,7 +252,8 @@ class Leave_Controller extends Controller {
      * @param Array $data
      * @return void
      */
-    public function renderCreateRequest($data) {
+    public function renderCreateRequest($data)
+    {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student_selector', 'student_selector_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
@@ -303,8 +309,7 @@ class Leave_Controller extends Controller {
 
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
-        }
-        elseif ($this->getGroup()->isParent()) {
+        } elseif ($this->getGroup()->isParent()) {
             $this->getPage()->dropDown(
                 'student_drop',
                 $_SESSION['children'],
@@ -330,7 +335,8 @@ class Leave_Controller extends Controller {
      * @param  int  $userId The user's ID
      * @return bool
      */
-    protected function hasViewPermission($userId) {
+    protected function hasViewPermission($userId)
+    {
         return $_SESSION['user']->getId() == $userId
             || $this->getGroup()->getPermission(null)
             || $this->getGroup()->isParentOfChild($userId);
@@ -344,11 +350,12 @@ class Leave_Controller extends Controller {
      *
      * @return bool
      */
-    protected function hasApprovePermission() {
+    protected function hasApprovePermission()
+    {
         return $this->getGroup()->getPermission(null);
     }
 
-	/**
+    /**
 	 * Determine whether the leave start date is inside or outside the
 	 * creation threshold. If it's outside, you can create it
 	 *
@@ -358,40 +365,40 @@ class Leave_Controller extends Controller {
 	 * @param $startDate
 	 * @return bool
 	 */
-	private function isOutsideCreationThreshold($startDate) {
-		$thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
+    private function isOutsideCreationThreshold($startDate)
+    {
+        $thresholdHours = \Cfg::get('boarder_leave_creation_threshold');
 
-		/* Use 0 to deactivate this feature
+        /* Use 0 to deactivate this feature
 		 */
-		if (!$thresholdHours) {
-			return true;
-		}
+        if (!$thresholdHours) {
+            return true;
+        }
 
-		$thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/y');
-		$weekdayIndex = $thresholdDateTime->getUsingFormat('N');
+        $thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/y');
+        $weekdayIndex = $thresholdDateTime->getUsingFormat('N');
 
-		/* Get back to nearest Friday, which comes after furthest Thursday
+        /* Get back to nearest Friday, which comes after furthest Thursday
 		 */
-		if ($weekdayIndex == 6) {
-			$thresholdDateTime->addDays(-1);
-		}
-		else if ($weekdayIndex == 7) {
-			$thresholdDateTime->addDays(-2);
-		}
+        if ($weekdayIndex == 6) {
+            $thresholdDateTime->addDays(-1);
+        } elseif ($weekdayIndex == 7) {
+            $thresholdDateTime->addDays(-2);
+        }
 
-		/* Subtract number of hours from config to determine outer limits
+        /* Subtract number of hours from config to determine outer limits
 		 * Measure it from high noon
 		 */
-		$thresholdDateTime->addHours(12 - $thresholdHours);
+        $thresholdDateTime->addHours(12 - $thresholdHours);
 
-		/* If you're outside the threshold, you can create it
+        /* If you're outside the threshold, you can create it
 		 */
-		if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimestamp()) {
-			return true;
-		}
+        if ($_SERVER['REQUEST_TIME'] < $thresholdDateTime->getUnixTimestamp()) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * Processes form data submitted from renderCreateRequest
@@ -400,60 +407,60 @@ class Leave_Controller extends Controller {
      *
      * @return void
      */
-    public function processCreateRequest($data) {
+    public function processCreateRequest($data)
+    {
         if (!is_array($data) || empty($data['request'])) {
             $this->getPage()->error(2);
         }
 
-		/* Limit leave creation to a threshold
+        /* Limit leave creation to a threshold
 		 */
-		if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-			$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-			$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
-			$created = new Alaress_Date_Format(time(), 'U');
-			$request = new Leave_Request();
+        if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
+            $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+            $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+            $created = new Alaress_Date_Format(time(), 'U');
+            $request = new Leave_Request();
 
-			/* Use the userId field when submitting on someone else's behalf,
+            /* Use the userId field when submitting on someone else's behalf,
 			 * otherwise just your own id
 			 */
-			$userId = $data['userId'];
-			$request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
-			$request->setAuthor($_SESSION['user']);
-			$request->setStart($start->getDatabase());
-			$request->setFinish($finish->getDatabase());
-			$request->setHostType($data['request']['hostType']);
-			$request->setHostName($data['request']['hostName']);
-			$request->setHostAddress($data['request']['hostAddress']);
-			$request->setHostPhone($data['request']['hostPhone']);
-			$request->setHostMobile($data['request']['hostMobile']);
-			$request->setUserPhone($data['request']['userPhone']);
-			$request->setReason($data['request']['reason']);
-			$request->setDescription($data['request']['description']);
-			$request->setCollectorName($data['request']['collectorName']);
-			$request->setReturnerName($data['request']['returnerName']);
-			$request->setStatus(Leave_Request::STATUS_PENDING);
-			$request->setCreated($created->getDatabase());
+            $userId = $data['userId'];
+            $request->setUser($this->hasViewPermission($userId) ? $userId : $_SESSION['user']->getId());
+            $request->setAuthor($_SESSION['user']);
+            $request->setStart($start->getDatabase());
+            $request->setFinish($finish->getDatabase());
+            $request->setHostType($data['request']['hostType']);
+            $request->setHostName($data['request']['hostName']);
+            $request->setHostAddress($data['request']['hostAddress']);
+            $request->setHostPhone($data['request']['hostPhone']);
+            $request->setHostMobile($data['request']['hostMobile']);
+            $request->setUserPhone($data['request']['userPhone']);
+            $request->setReason($data['request']['reason']);
+            $request->setDescription($data['request']['description']);
+            $request->setCollectorName($data['request']['collectorName']);
+            $request->setReturnerName($data['request']['returnerName']);
+            $request->setStatus(Leave_Request::STATUS_PENDING);
+            $request->setCreated($created->getDatabase());
 
-			$travelType  = $data['request']['travelType'];
-			$travelTypes = $this->getTravelTypes();
+            $travelType  = $data['request']['travelType'];
+            $travelTypes = $this->getTravelTypes();
 
-			if ($travelType && array_key_exists($travelType, $travelTypes)) {
-				$request->setTravelType($travelTypes[$travelType]);
-			}
+            if ($travelType && array_key_exists($travelType, $travelTypes)) {
+                $request->setTravelType($travelTypes[$travelType]);
+            }
 
-			$this->getRequestMapper()->save($request);
+            $this->getRequestMapper()->save($request);
 
-			$request = $this->getRequestMapper()->findById($request->getId());
+            $request = $this->getRequestMapper()->findById($request->getId());
 
-			$this->sendUserNotice($request);
-			$this->sendParentNotice($request);
-			$this->sendAdminNotice($request);
+            $this->sendUserNotice($request);
+            $this->sendParentNotice($request);
+            $this->sendAdminNotice($request);
 
-			SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
-		}
-		else {
-			error(162);
-		}
+            SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
+        } else {
+            error(162);
+        }
     }
 
     /**
@@ -463,11 +470,11 @@ class Leave_Controller extends Controller {
      * @return Array
      * @throws Exception_Schoolbox_NotFound if the request doesn't exist.
      */
-    public function executeModifyRequest($requestId) {
+    public function executeModifyRequest($requestId)
+    {
         try {
             $request = $this->getRequestMapper()->findById($requestId);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
         return array('request' => $request);
@@ -480,7 +487,8 @@ class Leave_Controller extends Controller {
      * @return void
      * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
      */
-    public function renderModifyRequest($data) {
+    public function renderModifyRequest($data)
+    {
         if ($this->hasApprovePermission()) {
             /** @var Leave_Request $request */
             $request = $data['request'];
@@ -490,8 +498,7 @@ class Leave_Controller extends Controller {
             }
             try {
                 $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-            }
-            catch (Schoolbox\Mapper\Exception $e) {
+            } catch (Schoolbox\Mapper\Exception $e) {
                 throw new Exception_Schoolbox_NotFound('User\'s house not found');
             }
 
@@ -518,27 +525,27 @@ class Leave_Controller extends Controller {
             $this->renderConfirmedByCheckboxes($request);
 
             $this->getPage()->setVar(array(
-				'REQUEST_ID' => $request->getId(),
-				'REQUEST_STATUS' => $request->getStatus(true),
-				'AUTHOR_NAME' => $request->getAuthor()->formatName(),
-				'USER_NAME' => $user->formatName(),
-				'USER_EXTERNAL_ID' => $user->getExternalId(),
-				'USER_YEAR' => $user->getYear(),
-				'USER_HOUSE' => $house->getHouse(),
-				'USER_HOUSE_ID' => $house->getId(),
-				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
-				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
-				'REQUEST_HOST_NAME' => $request->getHostName(),
-				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-				'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
-				'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
-				'REQUEST_USER_PHONE' => $request->getUserPhone(),
-				'REQUEST_DESCRIPTION' => $request->getDescription(),
-				'REQUEST_NOTES' => $request->getNotes(),
-				'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
-				'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
-				'REQUEST_REASON' => $request->getReason(),
-			));
+                'REQUEST_ID' => $request->getId(),
+                'REQUEST_STATUS' => $request->getStatus(true),
+                'AUTHOR_NAME' => $request->getAuthor()->formatName(),
+                'USER_NAME' => $user->formatName(),
+                'USER_EXTERNAL_ID' => $user->getExternalId(),
+                'USER_YEAR' => $user->getYear(),
+                'USER_HOUSE' => Scrub::text($house->getHouse()),
+                'USER_HOUSE_ID' => $house->getId(),
+                'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
+                'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
+                'REQUEST_HOST_NAME' => $request->getHostName(),
+                'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+                'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+                'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
+                'REQUEST_USER_PHONE' => $request->getUserPhone(),
+                'REQUEST_DESCRIPTION' => $request->getDescription(),
+                'REQUEST_NOTES' => $request->getNotes(),
+                'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+                'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+                'REQUEST_REASON' => $request->getReason(),
+            ));
 
             /* What is the next/previous pending request?
              */
@@ -548,8 +555,8 @@ class Leave_Controller extends Controller {
 
             if ($nextRequest) {
                 $this->getPage()->setVar(array(
-					'NEXT_PENDING_ID' => $nextRequest->getId()
-				));
+                    'NEXT_PENDING_ID' => $nextRequest->getId()
+                ));
 
                 $this->getPage()->parse('next_pending_block', 'next_pending');
             } else {
@@ -583,8 +590,8 @@ class Leave_Controller extends Controller {
      * @return void
      * @throws Exception_Schoolbox_NotFound if the user or their house doesn't exist.
      */
-    public function renderViewRequest($data) {
-
+    public function renderViewRequest($data)
+    {
         /* Allow the user and staff to view requests
          */
 
@@ -596,8 +603,7 @@ class Leave_Controller extends Controller {
         }
         try {
             $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
 
@@ -614,7 +620,7 @@ class Leave_Controller extends Controller {
                     'USER_NAME' => $request->getAuthor()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
-                    'USER_HOUSE' => $house->getHouse(),
+                    'USER_HOUSE' => Scrub::text($house->getHouse()),
                     'USER_HOUSE_ID' => $house->getId(),
                     'HOST_TYPE' => $request->getHostType(),
                     'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
@@ -623,13 +629,13 @@ class Leave_Controller extends Controller {
                     'REQUEST_FINISH_TIME' => $request->getFinish()->getTimeOnly(),
                     'REQUEST_HOST_NAME' => $request->getHostName(),
                     'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-					'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
-					'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
+                    'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
+                    'REQUEST_HOST_ADDRESS' => $request->getHostAddress(),
                     'REQUEST_USER_PHONE' => $request->getUserPhone(),
                     'REQUEST_DESCRIPTION' => $request->getDescription(),
-					'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
-					'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
-					'REQUEST_REASON' => $request->getReason(),
+                    'REQUEST_COLLECTOR_NAME' => $request->getCollectorName(),
+                    'REQUEST_RETURNER_NAME' => $request->getReturnerName(),
+                    'REQUEST_REASON' => $request->getReason(),
                     'REQUEST_NOTES' => $request->getNotes(),
                     'REQUEST_TRAVEL_TYPE' => $travelType->getName(),
                 )
@@ -646,71 +652,70 @@ class Leave_Controller extends Controller {
      * @return void
      * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
-    public function processModifyRequest($data) {
+    public function processModifyRequest($data)
+    {
         /** @var Leave_Request $request */
         try {
             $request = $this->getRequestMapper()->findById($data['request']['id']);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
-		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 
-		$request->setStart($start->getDatabase());
-		$request->setFinish($finish->getDatabase());
-		$request->setHostType($data['request']['hostType']);
-		$request->setHostName($data['request']['hostName']);
-		$request->setHostPhone($data['request']['hostPhone']);
-		$request->setHostMobile($data['request']['hostMobile']);
-		$request->setHostAddress($data['request']['hostAddress']);
-		$request->setUserPhone($data['request']['userPhone']);
-		$request->setDescription($data['request']['description']);
-		$request->setNotes($data['request']['notes']);
-		$request->setConfirmedBy($data['request']['confirmedBy']);
-		$request->setReturnerName($data['request']['returnerName']);
-		$request->setCollectorName($data['request']['collectorName']);
-		$request->setReason($data['request']['reason']);
+        $request->setStart($start->getDatabase());
+        $request->setFinish($finish->getDatabase());
+        $request->setHostType($data['request']['hostType']);
+        $request->setHostName($data['request']['hostName']);
+        $request->setHostPhone($data['request']['hostPhone']);
+        $request->setHostMobile($data['request']['hostMobile']);
+        $request->setHostAddress($data['request']['hostAddress']);
+        $request->setUserPhone($data['request']['userPhone']);
+        $request->setDescription($data['request']['description']);
+        $request->setNotes($data['request']['notes']);
+        $request->setConfirmedBy($data['request']['confirmedBy']);
+        $request->setReturnerName($data['request']['returnerName']);
+        $request->setCollectorName($data['request']['collectorName']);
+        $request->setReason($data['request']['reason']);
 
-		$travelType  = $data['request']['travelType'];
-		$travelTypes = $this->getTravelTypes();
-		if ($travelType && array_key_exists($travelType, $travelTypes)) {
-			$request->setTravelType($travelTypes[$travelType]);
-		}
-		else {
-			$request->setTravelType(null);
-		}
+        $travelType  = $data['request']['travelType'];
+        $travelTypes = $this->getTravelTypes();
+        if ($travelType && array_key_exists($travelType, $travelTypes)) {
+            $request->setTravelType($travelTypes[$travelType]);
+        } else {
+            $request->setTravelType(null);
+        }
 
-		if (isset($data['approve']) || isset($data['reject'])) {
-			$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
+        if (isset($data['approve']) || isset($data['reject'])) {
+            $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
-			$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-			$request->setAuthorisationUser($_SESSION['user']);
+            $request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
+            $request->setAuthorisationUser($_SESSION['user']);
 
-			if (isset($data['approve'])) {
-				$request->setStatus(Leave_Request::STATUS_APPROVED);
-			} elseif (isset($data['reject'])) {
-				$request->setStatus(Leave_Request::STATUS_REJECTED);
-			}
-		} else {
-			if (isset($data['delete'])) {
-				$request->setStatus(Leave_Request::STATUS_DELETED);
-			}
-		}
+            if (isset($data['approve'])) {
+                $request->setStatus(Leave_Request::STATUS_APPROVED);
+            } elseif (isset($data['reject'])) {
+                $request->setStatus(Leave_Request::STATUS_REJECTED);
+            }
+        } else {
+            if (isset($data['delete'])) {
+                $request->setStatus(Leave_Request::STATUS_DELETED);
+            }
+        }
 
 
-		$this->getRequestMapper()->save($request);
+        $this->getRequestMapper()->save($request);
 
-		$request = $this->getRequestMapper()->findById($request->getId());
+        $request = $this->getRequestMapper()->findById($request->getId());
 
-		if (isset($data['approve']) || isset($data['reject'])) {
-			$this->sendUserNotice($request);
-			$this->sendParentNotice($request);
-			$this->sendAdminNotice($request);
-		}
+        if (isset($data['approve']) || isset($data['reject'])) {
+            $this->sendUserNotice($request);
+            $this->sendParentNotice($request);
+            $this->sendAdminNotice($request);
+        }
 
-		$this->getPage()->backToTheFuture(2);
+        $this->getPage()->backToTheFuture(2);
     }
 
     /**
@@ -724,11 +729,11 @@ class Leave_Controller extends Controller {
      *
      * @throws Exception_Schoolbox_NotFound if the house $houseID doesn't exist.
      */
-    public function executeHouseRequestList($houseId) {
+    public function executeHouseRequestList($houseId)
+    {
         try {
             $house = $this->getHouseMapper()->findById($houseId);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
@@ -739,7 +744,8 @@ class Leave_Controller extends Controller {
         );
     }
 
-    public function exportHouseRequestList($data) {
+    public function exportHouseRequestList($data)
+    {
         $house = $data['house'];
         $requestList = $data['requestList'];
         $allRows = array();
@@ -790,7 +796,8 @@ class Leave_Controller extends Controller {
      * @param $filename
      * @param $allRows
      */
-    private function dumpCSV($filename, $allRows) {
+    private function dumpCSV($filename, $allRows)
+    {
         $name = new Url($filename);
 
         header('Content-type: application/csv');
@@ -808,7 +815,8 @@ class Leave_Controller extends Controller {
      * @param Array $data
      * @return void
      */
-    public function renderHouseRequestList($data) {
+    public function renderHouseRequestList($data)
+    {
         $house = $data['house'];
         $requestList = $data['requestList'];
 
@@ -822,7 +830,7 @@ class Leave_Controller extends Controller {
         $this->getPage()->setVar(
             array(
                 'HOUSE_ID' => $house->getId(),
-                'HOUSE_NAME' => $house->getHouse()
+                'HOUSE_NAME' => Scrub::text($house->getHouse())
             )
         );
 
@@ -834,15 +842,15 @@ class Leave_Controller extends Controller {
 
             foreach ($requestList as $request) {
                 $this->getPage()->setVar(array(
-					'USER_ID' => $request->getUser()->getId(),
-					'USER_NAME' => $request->getUser()->formatName(),
-					'USER_YEAR' => $request->getUser()->getYear(),
-					'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
-					'REQUEST_ID' => $request->getId(),
-					'REQUEST_START' => $request->getStart()->getAustralian(),
-					'REQUEST_DURATION' => $request->getDuration(),
-					'REQUEST_HOST_TYPE' => $request->getAllHostTypes()->getBy('id', $request->getHostType())->getName()
-				));
+                    'USER_ID' => $request->getUser()->getId(),
+                    'USER_NAME' => $request->getUser()->formatName(),
+                    'USER_YEAR' => $request->getUser()->getYear(),
+                    'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
+                    'REQUEST_ID' => $request->getId(),
+                    'REQUEST_START' => $request->getStart()->getAustralian(),
+                    'REQUEST_DURATION' => $request->getDuration(),
+                    'REQUEST_HOST_TYPE' => $request->getAllHostTypes()->getBy('id', $request->getHostType())->getName()
+                ));
 
                 if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
                     $this->getPage()->parse('pending_request_block', 'pending_request', true);
@@ -891,17 +899,16 @@ class Leave_Controller extends Controller {
      * @return array
      * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
      */
-    public function executeUserRequestList($userId) {
+    public function executeUserRequestList($userId)
+    {
         try {
             $user = $this->getUserMapper()->findById($userId);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
         try {
-			$house = $this->getHouseMapper()->findById($user->getResidentialHouse());
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
@@ -918,7 +925,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function exportUserRequestList($data) {
+    public function exportUserRequestList($data)
+    {
         /** @var Schoolbox\User $user */
         $user = $data['user'];
         if ($this->hasViewPermission($user->getId())) {
@@ -971,8 +979,8 @@ class Leave_Controller extends Controller {
      * @param $data
      * @return void
      */
-    public function renderUserRequestList($data) {
-
+    public function renderUserRequestList($data)
+    {
         /* Only allow students to see their own leave requests
            * Allow staff/superusers to see anyone's
            */
@@ -1003,7 +1011,7 @@ class Leave_Controller extends Controller {
                 array(
                     'USER_ID' => $user->getId(),
                     'USER_NAME' => $user->formatName(),
-                    'HOUSE_NAME' => $house->getHouse(),
+                    'HOUSE_NAME' => Scrub::text($house->getHouse()),
                     'HOUSE_ID' => $house->getId(),
                     'ALLOWED_ACTION' => $this->hasApprovePermission() ? 'modify' : 'view',
                 )
@@ -1081,8 +1089,8 @@ class Leave_Controller extends Controller {
      * @return void
      * @throws Exception_Schoolbox_NotFound if request isn't found
      */
-    public function processModifyRequestList($data) {
-
+    public function processModifyRequestList($data)
+    {
         /* Only allow Teachers/Staff to approve/reject requests
            */
         if ($this->hasApprovePermission()) {
@@ -1094,8 +1102,7 @@ class Leave_Controller extends Controller {
                     /** @var Leave_Request $request */
                     try {
                         $request = $this->getRequestMapper()->findById($request['id']);
-                    }
-                    catch (Schoolbox\Mapper\Exception $e) {
+                    } catch (Schoolbox\Mapper\Exception $e) {
                         throw new Exception_Schoolbox_NotFound('Request not found');
                     }
 
@@ -1136,7 +1143,8 @@ class Leave_Controller extends Controller {
      *
      * @param $request
      */
-    private function renderConfirmedByCheckboxes($request) {
+    private function renderConfirmedByCheckboxes($request)
+    {
         $this->getPage()->setBlock(TEMPLATE_content, 'confirmed_by', 'confirmed_by_block');
 
         /* Iterate through options
@@ -1172,11 +1180,11 @@ class Leave_Controller extends Controller {
      * @return array
      * @throws Exception_Schoolbox_NotFound if house isn't found
      */
-    public function executeHouseReport($houseId, $date) {
+    public function executeHouseReport($houseId, $date)
+    {
         try {
             $house = $this->getHouseMapper()->findById($houseId);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
 
@@ -1211,8 +1219,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function renderHouseReport($data) {
-
+    public function renderHouseReport($data)
+    {
         /* Can wrap this in a factory to provide school-level customisation
            */
         $factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
@@ -1224,8 +1232,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function exportHouseReport($data) {
-
+    public function exportHouseReport($data)
+    {
         /* Can wrap this in a factory to provide school-level customisation
            */
         $factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
@@ -1239,8 +1247,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function printHouseReport($data) {
-
+    public function printHouseReport($data)
+    {
         /* Can wrap this in a factory to provide school-level customisation
            */
         $factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
@@ -1254,8 +1262,8 @@ class Leave_Controller extends Controller {
      * @param $date
      * @return array
      */
-    public function executeCateringReport($date) {
-
+    public function executeCateringReport($date)
+    {
         /* Collate results for each day
            */
         $data = array();
@@ -1296,7 +1304,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function renderCateringReport($data) {
+    public function renderCateringReport($data)
+    {
         $report = new Leave_Report_Catering_Web($this->getPage(), $data);
         $report->render();
     }
@@ -1308,7 +1317,8 @@ class Leave_Controller extends Controller {
      *
      * @param $data
      */
-    public function exportCateringReport($data) {
+    public function exportCateringReport($data)
+    {
         $report = new Leave_Report_Catering_CSV($this->getPage(), $data);
         $report->render();
     }
@@ -1318,8 +1328,8 @@ class Leave_Controller extends Controller {
      *
      * @param $request
      */
-    public function sendUserNotice($request) {
-
+    public function sendUserNotice($request)
+    {
         /* Choose the Factory, have it produce() the notice object and send
          */
         $leaveFactory = new Leave_Notice_Factory($request);
@@ -1334,7 +1344,8 @@ class Leave_Controller extends Controller {
      *
      * @param $request
      */
-    public function sendParentNotice($request) {
+    public function sendParentNotice($request)
+    {
         if ((Cfg::get('parent_notification') == 0) || (Cfg::get('parent_notification') == 'false')) {
 
             /* Choose the Factory, have it produce() the notice object and send
@@ -1352,7 +1363,8 @@ class Leave_Controller extends Controller {
      *
      * @param $request
      */
-    public function sendAdminNotice($request) {
+    public function sendAdminNotice($request)
+    {
         $leaveFactory = new Leave_Notice_Factory($request);
         $leaveFactory->produceAdminFactory()->produce()->send();
     }
@@ -1365,7 +1377,8 @@ class Leave_Controller extends Controller {
      *
      * @param $externalUser
      */
-    public function setExternalUser($externalUser) {
+    public function setExternalUser($externalUser)
+    {
         $this->externalUser = $externalUser;
     }
 
@@ -1374,7 +1387,8 @@ class Leave_Controller extends Controller {
      *
      * @return mixed
      */
-    public function getExternalUser() {
+    public function getExternalUser()
+    {
         return $this->externalUser;
     }
 
@@ -1383,7 +1397,8 @@ class Leave_Controller extends Controller {
      *
      * @param Group $group
      */
-    private function setGroup($group) {
+    private function setGroup($group)
+    {
         $this->group = $group;
     }
 
@@ -1392,7 +1407,8 @@ class Leave_Controller extends Controller {
      *
      * @return Group
      */
-    private function getGroup() {
+    private function getGroup()
+    {
         return $this->group;
     }
 
@@ -1403,7 +1419,8 @@ class Leave_Controller extends Controller {
      *
      * @return void
      */
-    protected function setRequestMapper($requestMapper) {
+    protected function setRequestMapper($requestMapper)
+    {
         $this->requestMapper = $requestMapper;
     }
 
@@ -1412,7 +1429,8 @@ class Leave_Controller extends Controller {
      *
      * @return Leave_RequestMapper
      */
-    protected function getRequestMapper() {
+    protected function getRequestMapper()
+    {
         return $this->requestMapper;
     }
 
@@ -1423,7 +1441,8 @@ class Leave_Controller extends Controller {
      *
      * @return void
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
     }
 
@@ -1432,7 +1451,8 @@ class Leave_Controller extends Controller {
      *
      * @return \Schoolbox\UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
@@ -1443,7 +1463,8 @@ class Leave_Controller extends Controller {
      *
      * @return void
      */
-    public function setHouseMapper($houseMapper) {
+    public function setHouseMapper($houseMapper)
+    {
         $this->houseMapper = $houseMapper;
     }
 
@@ -1452,7 +1473,8 @@ class Leave_Controller extends Controller {
      *
      * @return HouseMapper
      */
-    public function getHouseMapper() {
+    public function getHouseMapper()
+    {
         return $this->houseMapper;
     }
 
@@ -1461,7 +1483,8 @@ class Leave_Controller extends Controller {
      *
      * @param $timeMap
      */
-    private function setTimeMap($timeMap) {
+    private function setTimeMap($timeMap)
+    {
         $this->timeMap = $timeMap;
     }
 
@@ -1470,7 +1493,8 @@ class Leave_Controller extends Controller {
      *
      * @return array
      */
-    private function getTimeMap() {
+    private function getTimeMap()
+    {
         return $this->timeMap;
     }
 
@@ -1478,7 +1502,8 @@ class Leave_Controller extends Controller {
      * @param  array $travelTypes
      * @return $this
      */
-    public function setTravelTypes($travelTypes) {
+    public function setTravelTypes($travelTypes)
+    {
         $this->travelTypes = $travelTypes;
         return $this;
     }
@@ -1486,7 +1511,8 @@ class Leave_Controller extends Controller {
     /**
      * @return array
      */
-    public function getTravelTypes() {
+    public function getTravelTypes()
+    {
         return $this->travelTypes;
     }
 }

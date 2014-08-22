@@ -6,8 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract {
-
+class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
+{
     /**
      * @var Group
      */
@@ -18,7 +18,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
     }
 
@@ -27,7 +28,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'classList')) {
             return false;
         }
@@ -63,11 +65,11 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             ),
         );
 
-		$this->setVar(
-			array(
-				'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
-			)
-		);
+        $this->setVar(
+            array(
+                'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+            )
+        );
 
         /* Get all the students belonging to this category code
          */
@@ -80,7 +82,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $allStudentEmails = array();
 
         if (is_array($allStudents)) {
-			$j = 0;
+            $j = 0;
             foreach ($allStudents as $currentStudent) {
                 $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
 
@@ -102,11 +104,11 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     $this->setVar(
                         array(
-							'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
                             'PERSON_UID' => $user['uid'],
                             'PERSON_EXTERNAL_ID' => $user['synergy_id'],
                             'PERSON_NAME' => $name,
-                            'PERSON_GROUP' => $user['gname'],
+                            'PERSON_GROUP' => Scrub::text($user['gname']),
                         )
                     );
 
@@ -116,8 +118,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         $this->parse('has_thumbnail_block', 'has_thumbnail');
                         $this->setVar('has_icon_block', '');
                     } else {
-						$this->setVar('has_thumbnail_block', '');
-						$this->parse('has_icon_block', 'has_icon');
+                        $this->setVar('has_thumbnail_block', '');
+                        $this->parse('has_icon_block', 'has_icon');
                     }
 
                     $this->parse('person_block', 'person', true);
@@ -149,19 +151,19 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
               */
             if (count($synergyIds) && $this->groupHandler->isStaff() && (Cfg::get('email_all_parents') == 1) && \Cfg::get('mail_enable')) {
-	            $externalHandler = new External_User();
-	            $allParents = $externalHandler->getParentEmails($synergyIds);
+                $externalHandler = new External_User();
+                $allParents = $externalHandler->getParentEmails($synergyIds);
 
-	            /* Uniquify emails
+                /* Uniquify emails
 				*/
-	            $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
+                $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
 
-	            $this->setVar(
-		            array(
-			            'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
-			            'EMAIL_ALL_PARENTS' => $emailAllParents,
-		            )
-	            );
+                $this->setVar(
+                    array(
+                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+                        'EMAIL_ALL_PARENTS' => $emailAllParents,
+                    )
+                );
 
                 $this->parse('parent_email_block', 'parent_email');
             } else {

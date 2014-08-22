@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Leave_Kings_Report_House_Web {
+class Leave_Kings_Report_House_Web
+{
     protected $templateFile = '../kings/modules/leave/report/house/web.html';
     protected $page = null;
     protected $data = array();
@@ -43,7 +44,8 @@ class Leave_Kings_Report_House_Web {
      * @param $data
      * @param $range
      */
-    public function __construct($page, $data, $range) {
+    public function __construct($page, $data, $range)
+    {
         $this->setPage($page);
         $this->setData($data);
         $this->setRange($range);
@@ -65,7 +67,8 @@ class Leave_Kings_Report_House_Web {
      * Combine multiple leave requests for the same person into one row.
      * We do this by preprocessing each request and collating the information.
      */
-    protected function recombination() {
+    protected function recombination()
+    {
         $combined = array();
 
         foreach ($this->getRequestList() as $i => $request) {
@@ -281,7 +284,8 @@ class Leave_Kings_Report_House_Web {
      *
      * Render house report
      */
-    public function render() {
+    public function render()
+    {
         $this->renderHouseList();
         $this->renderHeadings();
         $this->renderRequests();
@@ -291,7 +295,8 @@ class Leave_Kings_Report_House_Web {
     /**
      * Set up blocks and stuff
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
@@ -340,7 +345,8 @@ class Leave_Kings_Report_House_Web {
     /**
      * Render leave requests
      */
-    protected function renderRequests() {
+    protected function renderRequests()
+    {
         if (count($this->getRequestList())) {
             $allPeople = $this->getCombined();
             $totalPeople = count($allPeople);
@@ -352,13 +358,13 @@ class Leave_Kings_Report_House_Web {
 
             if (is_array($allPeople) && $totalPeople) {
                 foreach ($allPeople as $currentPerson) {
-					$hostTypes = array();
+                    $hostTypes = array();
 
-					foreach($currentPerson['request_host_type'] as $currentHostType) {
-						if ($currentHostType !== null) {
-							$hostTypes[] = $currentHostType->getName();
-						}
-					}
+                    foreach($currentPerson['request_host_type'] as $currentHostType) {
+                        if ($currentHostType !== null) {
+                            $hostTypes[] = $currentHostType->getName();
+                        }
+                    }
 
                     $this->getPage()->setVar(
                         array(
@@ -367,7 +373,7 @@ class Leave_Kings_Report_House_Web {
                             'USER_YEAR' => $currentPerson['user_year'],
                             'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
                             'REQUEST_STATUS' => implode('<hr />', $currentPerson['request_status']),
-							'REQUEST_HOST' => implode('<hr />', $hostTypes),
+                            'REQUEST_HOST' => implode('<hr />', $hostTypes),
                             'REQUEST_ACTIVITY' => implode('<hr />', $currentPerson['request_description']),
                             'CLASS' => implode(' ', $currentPerson['row_css_class']),
                         )
@@ -488,7 +494,8 @@ class Leave_Kings_Report_House_Web {
     /**
      * Render headings for each day in the specified range
      */
-    protected function renderHeadings() {
+    protected function renderHeadings()
+    {
         $data = $this->getData();
 
         if (count($this->getRequestList())) {
@@ -542,13 +549,14 @@ class Leave_Kings_Report_House_Web {
     /**
      * Render the house list dropdown selector
      */
-    protected function renderHouseList() {
+    protected function renderHouseList()
+    {
         if (count($this->getHouseList())) {
             foreach ($this->getHouseList() as $house) {
                 $this->getPage()->setVar(
                     array(
                         'HOUSE_ID' => $house->getId(),
-                        'HOUSE_NAME' => $house->getHouse()
+                        'HOUSE_NAME' => Scrub::text($house->getHouse())
                     )
                 );
 
@@ -566,12 +574,13 @@ class Leave_Kings_Report_House_Web {
     /**
      * Render extra information about the report
      */
-    protected function renderMetaDetails() {
+    protected function renderMetaDetails()
+    {
         $currentTime = new Alaress_Date_Format(time(), 'U');
 
         $this->getPage()->setVar(
             array(
-                'HOUSE_NAME' => $this->getCurrentHouse()->getHouse(),
+                'HOUSE_NAME' => Scrub::text($this->getCurrentHouse()->getHouse()),
                 'HOUSE_ID' => $this->getCurrentHouse()->getId(),
                 'GENERATED_AT' => $currentTime->getShort(),
                 'REPORT_DATE' => $this->getReportDate(),
@@ -587,7 +596,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getReportDate() {
+    protected function getReportDate()
+    {
         return $this->data['date'];
     }
 
@@ -596,7 +606,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getReportStart() {
+    protected function getReportStart()
+    {
         return $this->data['reportStart'];
     }
 
@@ -605,7 +616,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $page
      */
-    protected function setPage($page) {
+    protected function setPage($page)
+    {
         $this->page = $page;
     }
 
@@ -614,7 +626,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return null
      */
-    protected function getPage() {
+    protected function getPage()
+    {
         return $this->page;
     }
 
@@ -623,7 +636,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $data
      */
-    protected function setData($data) {
+    protected function setData($data)
+    {
         $this->data = $data;
     }
 
@@ -632,7 +646,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getData() {
+    protected function getData()
+    {
         return $this->data;
     }
 
@@ -641,7 +656,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $range
      */
-    protected function setRange($range) {
+    protected function setRange($range)
+    {
         $this->range = $range;
     }
 
@@ -650,7 +666,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getRange() {
+    protected function getRange()
+    {
         return $this->range;
     }
 
@@ -659,7 +676,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $requestList
      */
-    protected function setRequestList($requestList) {
+    protected function setRequestList($requestList)
+    {
         $this->requestList = $requestList;
     }
 
@@ -668,7 +686,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getRequestList() {
+    protected function getRequestList()
+    {
         return $this->requestList;
     }
 
@@ -677,7 +696,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $combined
      */
-    protected function setCombined($combined) {
+    protected function setCombined($combined)
+    {
         $this->combined = $combined;
     }
 
@@ -686,7 +706,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return array
      */
-    protected function getCombined() {
+    protected function getCombined()
+    {
         return $this->combined;
     }
 
@@ -695,7 +716,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $houseList
      */
-    protected function setHouseList($houseList) {
+    protected function setHouseList($houseList)
+    {
         $this->houseList = $houseList;
     }
 
@@ -704,7 +726,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return array
      */
-    protected function getHouseList() {
+    protected function getHouseList()
+    {
         return $this->houseList;
     }
 
@@ -713,7 +736,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @param $currentHouse
      */
-    protected function setCurrentHouse($currentHouse) {
+    protected function setCurrentHouse($currentHouse)
+    {
         $this->currentHouse = $currentHouse;
     }
 
@@ -722,7 +746,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return null
      */
-    protected function getCurrentHouse() {
+    protected function getCurrentHouse()
+    {
         return $this->currentHouse;
     }
 
@@ -731,7 +756,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getDecorationPendingStart() {
+    protected function getDecorationPendingStart()
+    {
         return $this->decoration['pendingStart'];
     }
 
@@ -740,7 +766,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getDecorationPendingEnd() {
+    protected function getDecorationPendingEnd()
+    {
         return $this->decoration['pendingEnd'];
     }
 
@@ -749,7 +776,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getDecorationApprovedStart() {
+    protected function getDecorationApprovedStart()
+    {
         return $this->decoration['approvedStart'];
     }
 
@@ -758,7 +786,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return mixed
      */
-    protected function getDecorationApprovedEnd() {
+    protected function getDecorationApprovedEnd()
+    {
         return $this->decoration['approvedEnd'];
     }
 
@@ -767,7 +796,8 @@ class Leave_Kings_Report_House_Web {
      *
      * @return string
      */
-    protected function getTemplateFile() {
+    protected function getTemplateFile()
+    {
         return $this->templateFile;
     }
 }

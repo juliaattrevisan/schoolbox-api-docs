@@ -19,9 +19,10 @@ use News;
 use Alaress_Date_Relative;
 use TextFormatter;
 
-class API extends Generic\API {
-
-    public function School($categoryName = '') {
+class API extends Generic\API
+{
+    public function School($categoryName = '')
+    {
         $response = new Response_HTTP();
 
         $newsHandler = new News();
@@ -36,7 +37,7 @@ class API extends Generic\API {
                 if(!isset($articles[$headline['newsTopicID']])) {
                     // create an article for this topic
                     $articles[$headline['newsTopicID']] = array(
-                        'title'   => $headline['topicName'],
+                        'title'   => Scrub::text($headline['topicName']),
                         'aside'   => '',
                         'class'   => 'news',
                         'icon'    => '',
@@ -50,8 +51,7 @@ class API extends Generic\API {
                 $headline['poster'] = $userHandler->formatName($headline);
                 $articles[$headline['newsTopicID']]['content'][] = $headline;
             }
-        }
-        else {
+        } else {
             $articles = array(
                 array(
                     'title'   => 'all',

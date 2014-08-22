@@ -22,12 +22,12 @@ $userHandler = new User();
 $allGroups = $userHandler->getGroupList();
 
 foreach($allGroups as $currentGroup) {
-	$this->setVar(array(
-		'GROUP_ID' => $currentGroup['id'],
-		'GROUP_NAME' => $currentGroup['name'],
-	));
+    $this->setVar(array(
+        'GROUP_ID' => $currentGroup['id'],
+        'GROUP_NAME' => Scrub::text($currentGroup['name']),
+    ));
 
-	$this->parse('group_block', 'group', true);
+    $this->parse('group_block', 'group', true);
 }
 
 /* Show all the possible templates a homepage can have

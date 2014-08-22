@@ -45,195 +45,190 @@ $this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
 if ($this->arg[0]) {
-	$selectedType = urldecode($this->arg[0]);
-}
-else {
-	$selectedType = 'Import';
+    $selectedType = urldecode($this->arg[0]);
+} else {
+    $selectedType = 'Import';
 }
 
 $typeList = array(
-	array(
-		'type' => 'Import'
-	),
-	array(
-		'type' => 'Subscribe'
-	),
-	array(
-		'type' => 'Cleanup'
-	),
+    array(
+        'type' => 'Import'
+    ),
+    array(
+        'type' => 'Subscribe'
+    ),
+    array(
+        'type' => 'Cleanup'
+    ),
 );
 
 if (is_array($typeList)) {
-	foreach ($typeList as $type) {
+    foreach ($typeList as $type) {
 
-		/* Navigation stuff
+        /* Navigation stuff
  		 */
-		$this->setVar(array(
-			'SETTING_TAB_NAME' => $type['type'],
-			'SETTING_TAB_URL' => urlencode($type['type']),
-			'SETTING_TAB_CURRENT' => '',
-		));
+        $this->setVar(array(
+            'SETTING_TAB_NAME' => $type['type'],
+            'SETTING_TAB_URL' => urlencode($type['type']),
+            'SETTING_TAB_CURRENT' => '',
+        ));
 
-		if ($selectedType == $type['type']) {
-			$this->setVar('SETTING_TAB_CURRENT', 'current');
-		}
+        if ($selectedType == $type['type']) {
+            $this->setVar('SETTING_TAB_CURRENT', 'current');
+        }
 
-		$this->parse('setting_tab_block', 'setting_tab', true);
+        $this->parse('setting_tab_block', 'setting_tab', true);
 
-		/* Individual pages
+        /* Individual pages
 		 * Import page
 		 */
-		if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
-			$this->parse('import_block', 'import');
-		}
-		/* Subscribe page
+        if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
+            $this->parse('import_block', 'import');
+        }
+        /* Subscribe page
 	 	 */
-		else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
-			$allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
+        else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+            $allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
 
-			/* All calendar subscription options go here
+            /* All calendar subscription options go here
 			 */
-			foreach($allApi as $currentEventType => $allConnectors) {
+            foreach($allApi as $currentEventType => $allConnectors) {
 
-				/* Render titles etc
+                /* Render titles etc
 				 * Put a space between CamelCase names so they become Camel Case
 				 */
-				$this->setVar(array(
-					'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
-					'EVENTTYPE_NAME'  => $currentEventType,
-				));
+                $this->setVar(array(
+                    'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
+                    'EVENTTYPE_NAME'  => $currentEventType,
+                ));
 
-				/* Inject individual templates just like before -_-
+                /* Inject individual templates just like before -_-
 				 */
-				foreach($allConnectors as $currentConnector) {
+                foreach($allConnectors as $currentConnector) {
 
-					/* Render titles etc
+                    /* Render titles etc
 					 *
 					 * Some kind of rendering issue exists where I can't combine it with the other
 					 * setVar() further down. It leads to the wrong connector name being used.
 					 */
-					$this->setVar(array(
-						'CONNECTOR_NAME' => $currentConnector,
-					));
+                    $this->setVar(array(
+                        'CONNECTOR_NAME' => $currentConnector,
+                    ));
 
-					/* Process each config for this kind of connector
+                    /* Process each config for this kind of connector
 					 */
-					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
+                    $allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
 
-					if (count($allConfigs)) {
-						foreach($allConfigs as $currentConfig) {
-							$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
-							$this->setBlock('configFragment', 'luEventType', 'luEventType_block');
-							$this->setBlock('configFragment', 'campus_list', 'campus_list_block');
-							$this->setBlock('configFragment', 'group_list', 'group_list_block');
+                    if (count($allConfigs)) {
+                        foreach($allConfigs as $currentConfig) {
+                            $this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
+                            $this->setBlock('configFragment', 'luEventType', 'luEventType_block');
+                            $this->setBlock('configFragment', 'campus_list', 'campus_list_block');
+                            $this->setBlock('configFragment', 'group_list', 'group_list_block');
 
-							/* Render individual connector inputs
+                            /* Render individual connector inputs
 							 */
-							$currentConfig->render($this);
+                            $currentConfig->render($this);
 
-							/* Parse connector row
+                            /* Parse connector row
 							 */
-							$this->parse('connectorConfig_block', 'configFragment', true);
+                            $this->parse('connectorConfig_block', 'configFragment', true);
 
-							/* Clear children after parsing out the parent
+                            /* Clear children after parsing out the parent
 							 */
-							$this->setVar('luEventType_block', '');
-							$this->setVar('campus_list_block', '');
-							$this->setVar('group_list_block', '');
-						}
+                            $this->setVar('luEventType_block', '');
+                            $this->setVar('campus_list_block', '');
+                            $this->setVar('group_list_block', '');
+                        }
 
-						/* Whether this connector displays at Ticked or not
+                        /* Whether this connector displays at Ticked or not
 						 */
-						$connectorActive = 'connector-active';
-						$connectorChecked = 'checked="checked"';
-					}
-					else {
-						$connectorActive = '';
-						$connectorChecked = '';
-					}
+                        $connectorActive = 'connector-active';
+                        $connectorChecked = 'checked="checked"';
+                    } else {
+                        $connectorActive = '';
+                        $connectorChecked = '';
+                    }
 
-					/* Render checkbox setting
+                    /* Render checkbox setting
 					 */
-					$this->setVar(array(
-						'CONNECTOR_CHECKED' => $connectorChecked,
-						'CONNECTOR_ACTIVE' => $connectorActive,
-					));
+                    $this->setVar(array(
+                        'CONNECTOR_CHECKED' => $connectorChecked,
+                        'CONNECTOR_ACTIVE' => $connectorActive,
+                    ));
 
-					$this->parse('connector_block', 'connector', true);
+                    $this->parse('connector_block', 'connector', true);
 
-					/* Clear children after parsing out the parent
+                    /* Clear children after parsing out the parent
 					 */
-					$this->setVar('connectorConfig_block', '');
-					$this->setVar('configFragment', '');
-					$this->setVar('has_multiple_options_block', '');
-				}
+                    $this->setVar('connectorConfig_block', '');
+                    $this->setVar('configFragment', '');
+                    $this->setVar('has_multiple_options_block', '');
+                }
 
-				$this->parse('eventType_block', 'eventType', true);
+                $this->parse('eventType_block', 'eventType', true);
 
-				/* Clear children after parsing out the parent
+                /* Clear children after parsing out the parent
 				 */
-				$this->setVar('connector_block', '');
-			}
+                $this->setVar('connector_block', '');
+            }
 
-			$this->parse('subscribe_block', 'subscribe');
-		}
-		/* Cleanup page
+            $this->parse('subscribe_block', 'subscribe');
+        }
+        /* Cleanup page
 		 */
-		else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+        else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
 
-			/* If both dates specified, find events between those two dates inclusive
+            /* If both dates specified, find events between those two dates inclusive
 			 */
-			if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
-				$from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
-				$to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+            if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
+                $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
+                $to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
 
-				$this->setVar(array(
-					'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
-					'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
-				));
+                $this->setVar(array(
+                    'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
+                    'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
+                ));
 
-				$eventMapper = new \Schoolbox\Calendar\EventMapper();
-				$allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+                $eventMapper = new \Schoolbox\Calendar\EventMapper();
+                $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
-				foreach($allEvents as $currentEvent) {
-					$this->setVar(array(
-						'CLEANUP_EVENT_ID' => $currentEvent['event']->getId(),
-						'CLEANUP_EVENT_TITLE' => $currentEvent['event']->getTitle(),
-						'CLEANUP_EVENT_START' => $currentEvent['event']->getStartDateTime()->getShort(),
-						'CLEANUP_EVENT_END' => $currentEvent['event']->getEndDateTime()->getShort(),
-						'CLEANUP_EVENT_AUTHOR' => $currentEvent['event']->getAuthor()->getFullName(),
-						'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent['event']->getAuthor()->getId(),
-						'CLEANUP_EVENT_EVENTTYPE' => $currentEvent['event']->getType()->getType(),
-						'CLEANUP_EVENT_CAMPUSES' => $currentEvent['auxiliary']['campuses'],
-					));
+                foreach($allEvents as $currentEvent) {
+                    $this->setVar(array(
+                        'CLEANUP_EVENT_ID' => $currentEvent['event']->getId(),
+                        'CLEANUP_EVENT_TITLE' => $currentEvent['event']->getTitle(),
+                        'CLEANUP_EVENT_START' => $currentEvent['event']->getStartDateTime()->getShort(),
+                        'CLEANUP_EVENT_END' => $currentEvent['event']->getEndDateTime()->getShort(),
+                        'CLEANUP_EVENT_AUTHOR' => $currentEvent['event']->getAuthor()->getFullName(),
+                        'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent['event']->getAuthor()->getId(),
+                        'CLEANUP_EVENT_EVENTTYPE' => $currentEvent['event']->getType()->getType(),
+                        'CLEANUP_EVENT_CAMPUSES' => Scrub::text($currentEvent['auxiliary']['campuses']),
+                    ));
 
-					$this->parse('cleanup_event_block', 'cleanup_event', true);
-				}
+                    $this->parse('cleanup_event_block', 'cleanup_event', true);
+                }
 
-				if ($allEvents->count()) {
-					$this->parse('cleanup_has_events_block', 'cleanup_has_events');
+                if ($allEvents->count()) {
+                    $this->parse('cleanup_has_events_block', 'cleanup_has_events');
 
-					$this->setVar(array(
-						'cleanup_has_no_events_block' => ''
-					));
-				}
-				else {
-					$this->setVar(array(
-						'cleanup_has_events_block' => ''
-					));
+                    $this->setVar(array(
+                        'cleanup_has_no_events_block' => ''
+                    ));
+                } else {
+                    $this->setVar(array(
+                        'cleanup_has_events_block' => ''
+                    ));
 
-					$this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
-				}
-			}
-			else {
-				$this->setVar(array(
-					'CLEANUP_HAS_DATES_FROM' => '',
-					'CLEANUP_HAS_DATES_TO' => ''
-				));
-			}
+                    $this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
+                }
+            } else {
+                $this->setVar(array(
+                    'CLEANUP_HAS_DATES_FROM' => '',
+                    'CLEANUP_HAS_DATES_TO' => ''
+                ));
+            }
 
-			$this->parse('cleanup_block', 'cleanup');
-		}
-	}
+            $this->parse('cleanup_block', 'cleanup');
+        }
+    }
 }
-

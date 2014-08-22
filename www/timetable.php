@@ -249,7 +249,7 @@ if (is_array($outputList)) {
                             'PERIOD_CODE' => '(' . Scrub::Text($period['code']) . ')',
                             'PERIOD_ROOM' => Scrub::Text($period['room']),
                             'PERIOD_STAFF' => Scrub::Text($period_staff),
-                            'PERIOD_COLOUR' => '#' . $subjectColourMap[$period['code']],
+                            'PERIOD_COLOUR' => '#' . Scrub::text($subjectColourMap[$period['code']]),
                         );
 
                         /* Lookup subject code and check permissions, if read access provide a link to the user */

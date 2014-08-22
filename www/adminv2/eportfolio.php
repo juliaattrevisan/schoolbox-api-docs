@@ -55,7 +55,8 @@ foreach($definitionCollection as $definition) {
     /* @var $definition Component_Definition */
     $this->setVar(array(
         'definition.id'          => $definition->getId(),
-        'definition.name'        => $definition->getName(),
+        'definition.name'        => Scrub::text($definition->getName()),
+        // description deliberately not scrubbed
         'definition.description' => $definition->getDescription(),
         'definition.singleton'   => $definition->getMultiple() == 'true' ? '' : 'single-instance'
     ));
@@ -96,7 +97,7 @@ foreach($componentCollection as $component) {
         'COMPONENT_HANDLE'          => $instance_id,
         'component.instance.id'     => $instance_id,
         'component.definition.id'   => $component->getInstance()->getDefinition()->getId(),
-        'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
+        'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
     ));
 
 

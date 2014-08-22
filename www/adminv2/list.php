@@ -59,8 +59,8 @@ $tableList = array(
         'fields' => array(
             'id' => array('readonly' => '1'),
             'name' => array('caption' => 'Name'),
-	        'ext_timetable_code' => array('caption'=>'External Timetable Code'),
-	        'timetable_day' => array('caption'=>'Timetable Days'),
+            'ext_timetable_code' => array('caption'=>'External Timetable Code'),
+            'timetable_day' => array('caption'=>'Timetable Days'),
         )
     ),
     array(
@@ -82,6 +82,11 @@ $tableList = array(
         'name' => 'submission_grade',
         'title' => 'Submission Grades',
         'index' => 'grade_id'
+    ),
+    array(
+        'name' => 'lu_submission_type',
+        'title' => 'Submission Types',
+        'index' => 'id'
     ),
     array(
         'name' => 'component_definition',
@@ -180,7 +185,7 @@ if (isset($selectedTable['fields'])) {
 if ($table) {
     foreach ($table as $row) {
         foreach ($row as $keys => $data) {
-            $this->setVar('TABLE_DATA', $data);
+            $this->setVar('TABLE_DATA',   Scrub::text($data));
             $this->setVar('TABLE_COLUMN', $keys);
 
             $currentColumn = $selectedTable['fields'][$keys];
@@ -224,8 +229,7 @@ if ($table) {
                         $this->setVar('TYPE', 'hidden');
                         $this->setVar('READONLY', 'readonly="readonly"');
                         $this->parse('newInput_block', 'newInput', true);
-                    }
-                    else {
+                    } else {
                         // if the field is an enum, explode it, and iteratively create select options for the list
                         // Also do this if fields were provided explicitly.
                         if (!empty($option_list)) {
@@ -331,5 +335,3 @@ if (isset($selectedTable['create']) && $selectedTable['create'] == false) {
 } else {
     $this->parse('create_new_block', 'create_new', false);
 }
-
-?>

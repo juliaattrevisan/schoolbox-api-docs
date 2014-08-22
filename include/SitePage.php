@@ -204,9 +204,7 @@ class SitePage extends Page
         $this->ajax = $state;
     }
 
-
-    function setLite($state)
-    {
+    function setLite($state) {
         $this->lite = $state;
     }
 
@@ -234,8 +232,7 @@ class SitePage extends Page
      *                              Exits after output if false.
      * @param int   $responseCode   If set, output this response code.
      */
-    public function outputJson($output, $keepProcessing = false, $responseCode = null)
-    {
+    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
             header(':', true, $responseCode);
@@ -320,7 +317,7 @@ class SitePage extends Page
         $this->setFile('bannerTpl', 'include/banner.html');
         $this->setFile('navTpl', 'include/nav.html');
         $this->setFile('tabTpl', 'include/tab.html');
-        $this->setFile('instantTpl', 'include/instant.html');
+	    $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
         $this->renderSideNav();
@@ -414,8 +411,7 @@ class SitePage extends Page
         $_SESSION['lasttime'] = mktime();
     }
 
-
-    function saveHistory($override = '')
+    function saveHistory($override = '') 
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
@@ -1074,7 +1070,7 @@ class SitePage extends Page
             foreach ($data as $row) {
                 foreach ($row as $key => $value) {
                     $mapping[$key] ? $key = $mapping[$key] : '';
-                    $this->setVar($key, $value);
+                    $this->setVar($key, Scrub::text($value));
                     if (in_array($value, $selected)) {
                         $this->setVar($key . '_SELECTED', 'checked="checked"');
                     } else {
@@ -1098,7 +1094,7 @@ class SitePage extends Page
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
-                        $this->setVar($key, $value);
+                        $this->setVar($key, Scrub::text($value));
                         if (in_array($value, $selected)) {
                             $this->setVar($key . '_SELECTED', 'selected="selected"');
                         } else {
@@ -1114,7 +1110,7 @@ class SitePage extends Page
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get' . ucfirst($property);
                         $value      = $row->$get_method();
-                        $this->setVar($template_var, $value);
+                        $this->setVar($template_var, Scrub::text($value));
                         if (in_array($value, $selected)) {
                             $this->setVar($template_var . '_SELECTED', 'selected="selected"');
                         } else {
@@ -1181,7 +1177,7 @@ class SitePage extends Page
 
             if ($url->isLocalUrl()) {
                 $linkUrl = $url->getRelativeURL();
-            } else if ($url->isFTPURL()) {
+            } elseif ($url->isFTPURL()) {
                 $linkUrl = $url->getUrl();
             } else {
                 $linkUrl = $url->getBase64EncodedRedirect();

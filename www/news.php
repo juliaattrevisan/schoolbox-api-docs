@@ -58,7 +58,7 @@ $topicSlugMap = array();
 foreach ($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
     $output = array(
-        'LIST_TOPIC_NAME' => $sidebarTopic['name'],
+        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $url->getSlug(),
         'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'current' : '',
     );
@@ -140,7 +140,7 @@ if (is_array($items)) {
             $url = new Url($previous['topicName']);
 
             $formatter = new TextFormatter();
-            
+
             $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
             $output = array(
@@ -168,4 +168,3 @@ if (is_array($items)) {
 } else {
     $this->setVar('news_block', 'No current news in this topic.');
 }
-
