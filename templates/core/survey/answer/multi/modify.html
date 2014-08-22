@@ -69,7 +69,6 @@
 
 				return false;
 			},
-
 			rules: {
 				question: {
 					required: true,
@@ -80,19 +79,16 @@
 					emptyInputs: true
 				}
 			},
-
 			errorPlacement: function (error, element) {
 				error.addClass('message');  // add a class to the wrapper
 				var pos = $j('ul#answerCollection').height();
 
 				if (element.hasClass("answerDescription")) {
-					error.insertAfter(element.closest('#answerCollection'))
-				}
-				else if (element.hasClass("answerCorrect")) {
-					error.insertAfter(element.closest('#answerCollection'))
-				}
-				else {
-					error.insertAfter(element.parent().children(':last-child'))
+					error.insertAfter(element.closest('#answerCollection'));
+				} else if (element.hasClass("answerCorrect")) {
+					error.insertAfter(element.closest('#answerCollection'));
+				} else {
+					error.insertAfter(element.parent().children(':last-child'));
 				}
 			}
 		});
@@ -176,10 +172,10 @@
             }
         });
 
-        $j(document).on('click', '.answerCorrect', function () {
-            $j(this).closest('li').toggleClass("highlight");
-        });
-
+		$j(document).on('click', '.answerCorrect', function () {
+			$j(this).closest('li').toggleClass("highlight");
+		});
+		
         function refreshList() {
 			var i = 1;
 

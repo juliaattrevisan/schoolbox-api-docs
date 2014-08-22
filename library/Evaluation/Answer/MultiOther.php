@@ -221,11 +221,16 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
 			$allAnswers[] = $other;
 
+            $i = 1;
+
             foreach ($allAnswers as $currentAnswer) {
+                $valueFacade = $this->findLetterIndex($i);
+
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
+                    'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
@@ -263,6 +268,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
+
+                $i++;
             }
         } else {
             $page->setVar('answerOption_block', '');
