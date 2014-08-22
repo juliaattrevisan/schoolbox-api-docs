@@ -14,7 +14,6 @@ use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
-use Alaress\Async\Queue\QueueInterface;
 use OutOfBoundsException;
 use RuntimeException;
 
@@ -62,13 +61,22 @@ class UserQueueBinder
 
 
     /**
+     * @return array
+     */
+    public function getBindings()
+    {
+        return $this->bindings;
+    }
+
+
+    /**
      * @param AMQPInterface    $conn
      * @param AMQPExchange     $exchange
-     * @param QueueInterface[] $queues
+     * @param AMQPQueue[]      $queues
      * @throws OutOfBoundsException
      * @return self
      */
-    public function prepareAMQP(AMQPInterface $conn, AMQPExchange $exchange, array $queues)
+    public function bindToAMQP(AMQPInterface $conn, AMQPExchange $exchange, array $queues)
     {
         if (empty($this->bindings) || !$this->userId) {
             throw new OutOfBoundsException("Must have valid bindings");
@@ -85,11 +93,6 @@ class UserQueueBinder
 
         // queue things
         foreach ($queues as $q) {
-            // ignore non-amqp queues
-            if (!$q instanceof AMQPQueue) {
-                continue;
-            }
-
             $queueName = $q->getName();
             $routeKey  = $q->getRoutingKey();
             $conn->declareQueue($queueName);
