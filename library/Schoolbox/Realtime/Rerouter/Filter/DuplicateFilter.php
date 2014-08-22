@@ -38,7 +38,7 @@ class DuplicateFilter implements FilterInterface {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		if($this->uqf->buildUserQueue($user)->contains($message)) {
+		if($this->uqf->buildUserQueue($user, 0)->contains($message)) {
 			throw new FilterException("User has already seen this message");
 		}
 		return true;
