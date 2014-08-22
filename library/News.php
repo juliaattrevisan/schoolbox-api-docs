@@ -233,11 +233,11 @@ class News extends DeprecatedModel
         if ($topic == '' || $topic == 'all') {
             $topicFilter = '';
         } else {
-            $topicFilter = " AND newsTopic.name = '$topic' ";
+            $topicFilter = " AND newsTopic.name = ".$this->db->smartQuote($topic)." ";
         }
 
-        $yearFilter = $year != 0 ? " AND YEAR(news_items.item_datetime_published) = $year " : '';
-        $monthFilter = $month != 0 ? " AND MONTH(news_items.item_datetime_published) = $month " : '';
+        $yearFilter = $year != 0 ? " AND YEAR(news_items.item_datetime_published) = ".$this->db->smartQuote($year)." " : '';
+        $monthFilter = $month != 0 ? " AND MONTH(news_items.item_datetime_published) = ".$this->db->smartQuote($month)." " : '';
         $beforeOrAfter = $archive ? '<' : '>=';
 
         if (!$userHandler->isSuperuser()) {
