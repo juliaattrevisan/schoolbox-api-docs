@@ -72,7 +72,7 @@ class External_Tass_Cathedral_User extends External_Tass_User
 
         // pia_sfaccess: only join the relevant paraddress
         // no pia_sfaccess: get all paraddress
-
+        $database = $this->getDatabase();
         $query = "
             SELECT
                 p.par_code AS StudentContactID,
@@ -92,6 +92,7 @@ class External_Tass_Cathedral_User extends External_Tass_User
                 s.sex AS StudentGender,
 
                 sf.sfa_num,
+                sf.stud_codes AS SplitStudentIDList,
 
                 p.*,
                 pa.*
@@ -102,16 +103,47 @@ class External_Tass_Cathedral_User extends External_Tass_User
                 ON p.par_code = sf.par_code
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                 AND p.cmpy_code = sf.cmpy_code
-            INNER JOIN student as s
+            LEFT JOIN student as s
                 ON p.par_code = s.par_code
                 AND p.cmpy_code = s.cmpy_code
-                AND (
-                    sf.stud_codes IS NULL
-                    OR (CHARINDEX(','+RTRIM(s.stud_code)+',', ','+RTRIM(sf.stud_codes)+',') > 0)
-                )
             ORDER BY p.par_code ASC
         ";
-        $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-        return $list;
+        $list = $database->trimAll($database->getAll($query));
+
+        // Inject pia_sfaccess address numbers separately?
+
+        // Inject student campuses, year levels, etc.
+        $newList = array();
+        foreach ($list as $listItem) {
+            if (!empty($listItem['StudentYearLevel'])) {
+                // Base related student accounts are fetched in base query.
+                $newList[] = $listItem;
+            }
+            if (!empty($listItem['SplitStudentIDList'])) {
+                // Inject pia_sfaccess children separately, because they may
+                // not belong to the same parent account
+                // (but they are still allowed access)
+                $codes = array_map(
+                    function ($code) use ($database) {
+                        return "'".$database->quote($code)."'";
+                    },
+                    explode(',', $listItem['SplitStudentIDList'])
+                );
+                $splitStudentQuery = sprintf(
+                    "SELECT
+                        s.year_grp AS StudentYearLevel,
+                        s.campus_code AS StudentCampus,
+                        s.sex AS StudentGender
+                    FROM student as s
+                    WHERE s.stud_code IN (%s)",
+                    implode(',', $codes)
+                );
+                foreach ($database->trimAll($database->getAll($splitStudentQuery)) as $child) {
+                    $newList[] = array_merge($listItem, $child);
+                }
+            }
+        }
+
+        return $newList;
     }
 }
