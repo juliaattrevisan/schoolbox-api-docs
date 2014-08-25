@@ -10,16 +10,16 @@
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $component = array(
-    'name'               => 'Grid',
+    'name'               => 'Tiles',
     'module'             => 'homepage',
     'component_category' => '1',
-    'class'              => 'Component_Homepage_GridController',
-    'description'        => 'Shows a grid of tiles',
+    'class'              => 'Component_Homepage_TileController',
+    'description'        => 'Shows a list of tiles, arranged in either a fixed-width grid or spanned across a number of columns.',
     'multiple'           => 'true',
     'visible'            => 'true',
     'config'             => array(
         'componentname'  => array(
-            'default_value' => 'Grid',
+            'default_value' => 'Tiles',
             'label'         => 'Heading',
         ),
     )

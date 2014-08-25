@@ -1,13 +1,13 @@
 <?php
 /**
- * Mapper for grid items in Schoolbox.
+ * Mapper for tile items in Schoolbox.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Grid\Item;
+namespace Schoolbox\Tile;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -15,8 +15,8 @@ class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('grid_item');
-        $this->hasModel('Schoolbox\\Grid\\Item\\Model');
+        $this->hasTable('tile');
+        $this->hasModel('Schoolbox\\Tile\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',
@@ -27,12 +27,12 @@ class Mapper extends BaseMapper
         );
         $this->hasMap(
             array(
-                'column'   => 'grid_id',
-                'property' => 'grid',
+                'column'   => 'tile_layout_id',
+                'property' => 'tileLayout',
                 'type'     => self::TYPE_MODEL,
-                'join'     => 'grid',
+                'join'     => 'tile_container',
                 'join_def' => array(
-                    'mapper'    => 'Schoolbox\\Grid\\Mapper',
+                    'mapper'    => 'Schoolbox\\Tile\\Layout\\Model',
                     'other_key' => 'id',
                 )
             )

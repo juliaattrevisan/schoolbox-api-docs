@@ -1,6 +1,6 @@
 <?php
 /**
- * Grid component
+ * Tile component
  *
  * Uses Twig for output instead of the PHPLib suckfest.
  *
@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-class Component_Homepage_GridController extends Component_Homepage_ControllerAbstract
+class Component_Homepage_TileController extends Component_Homepage_ControllerAbstract
 {
     /**
      * @var Twig_Environment
@@ -45,7 +45,7 @@ class Component_Homepage_GridController extends Component_Homepage_ControllerAbs
     public function renderTemplate($templateHandle)
     {
         // Don't mess about with blocks, shove this into Twig
-        if (!$this->loadTemplate($templateHandle, 'grid')) {
+        if (!$this->loadTemplate($templateHandle, 'tile')) {
             return false;
         }
 
@@ -55,7 +55,7 @@ class Component_Homepage_GridController extends Component_Homepage_ControllerAbs
         $content = '';
         if ($di instanceof Aura\Di\ContainerInterface) {
             $content = $di->get('templateEngine')->render(
-                'component/homepage/grid.twig',
+                'component/homepage/tile.twig',
                 array('component' => $this,)
             );
         }

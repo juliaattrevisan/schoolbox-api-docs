@@ -1,13 +1,13 @@
 <?php
 /**
- * Model for grid layouts in Schoolbox.
+ * Model for tile layouts in Schoolbox.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
  
-namespace Schoolbox\Grid;
+namespace Schoolbox\Tile\Layout;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;

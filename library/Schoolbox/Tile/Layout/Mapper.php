@@ -1,13 +1,13 @@
 <?php
 /**
- * Mapper for grid layouts in Schoolbox.
+ * Mapper for tile layouts in Schoolbox.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Grid;
+namespace Schoolbox\Tile\Layout;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -15,8 +15,8 @@ class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('grid');
-        $this->hasModel('Schoolbox\\Grid\\Model');
+        $this->hasTable('tile_layout');
+        $this->hasModel('Schoolbox\\Tile\\Layout\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',

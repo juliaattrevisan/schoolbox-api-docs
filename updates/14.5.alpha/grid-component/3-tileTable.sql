@@ -1,7 +1,7 @@
--- The grid item table
-CREATE TABLE `grid_item` (
+-- The tile container item table
+CREATE TABLE `tile` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `grid_id` INT(11) NOT NULL,
+  `tile_layout_id` INT(11) NOT NULL,
   `title_text` VARCHAR(250) NOT NULL,
   `title_color` VARCHAR(8) NOT NULL COMMENT 'RRGGBBAA',
   `title_background_color` VARCHAR(8) NOT NULL COMMENT 'RRGGBBAA',
@@ -14,8 +14,8 @@ CREATE TABLE `grid_item` (
   `deleted_at` DATETIME,
   PRIMARY KEY (`id`),
   INDEX (`background_image_id`),
-  CONSTRAINT `grid_item_grid`
-    FOREIGN KEY (`grid_id`)
-    REFERENCES `grid` (`id`)
+  CONSTRAINT `tile_tile_layout`
+    FOREIGN KEY (`tile_layout_id`)
+    REFERENCES `tile_layout` (`id`)
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;

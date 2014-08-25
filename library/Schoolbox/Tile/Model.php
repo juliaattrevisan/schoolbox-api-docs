@@ -1,17 +1,17 @@
 <?php
 /**
- * Model for grid items in Schoolbox.
+ * Model for tiles in Schoolbox.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
  
-namespace Schoolbox\Grid\Item;
+namespace Schoolbox\Tile;
 
 use Alaress_Date_Format;
 use Schoolbox\Storage;
-use Schoolbox\Grid\Model as GridModel;
+use Schoolbox\Tile\Layout;
 use Schoolbox\ISoftDeletable;
 
 class Model implements ISoftDeletable
@@ -31,18 +31,18 @@ class Model implements ISoftDeletable
     const TITLE_POSITION_TOP = 1;
 
     /**
-     * The primary key of this grid item
+     * The primary key of this tile
      *
      * @var int
      */
     protected $id;
 
     /**
-     * The grid this item belongs to.
+     * The layout this tile belongs to.
      *
-     * @var GridModel
+     * @var Layout\Model
      */
-    protected $grid;
+    protected $tileLayout;
 
     /**
      * @var string
@@ -111,21 +111,21 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  GridModel $grid
+     * @param  Layout\Model $tileLayout
      * @return $this
      */
-    public function setGrid($grid)
+    public function setTileLayout($tileLayout)
     {
-        $this->grid = $grid;
+        $this->tileLayout = $tileLayout;
         return $this;
     }
 
     /**
-     * @return GridModel
+     * @return Layout\Model
      */
-    public function getGrid()
+    public function getTileLayout()
     {
-        return $this->grid;
+        return $this->tileLayout;
     }
 
     /**

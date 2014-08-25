@@ -1,5 +1,5 @@
--- The grid component
-CREATE TABLE `grid` (
+-- The tile layout component
+CREATE TABLE `tile_layout` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `layout_type` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '1: grid, 2: column',
   `grid_width` INT(4) NOT NULL DEFAULT 0,
