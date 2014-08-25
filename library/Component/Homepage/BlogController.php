@@ -160,7 +160,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                         $this->setVar(
                             array(
                                 'COMMENT_COMMENT_ID' => $currentComment->getId(),
-                                'COMMENT_BODY' => Scrub::text($currentComment->getBody()),
+                                'COMMENT_BODY' => nl2br(Scrub::text($currentComment->getBody())),
                                 'COMMENT_AUTHOR_ID' => $currentComment->getOwner()->getId(),
                                 'COMMENT_AUTHOR_NAME' => $currentComment->getOwner()->formatName(),
                                 'COMMENT_CREATED' => $createdTime->getRelativeTime(),

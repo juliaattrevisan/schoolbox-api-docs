@@ -120,7 +120,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 							'COMMENT_AUTHOR_ID' => $currentComment->getAuthor()->getId(),
 							'COMMENT_EXTERNAL_USER_ID' => $currentComment->getAuthor()->getExternalId(),
 							'COMMENT_AUTHOR_FULLNAME' => $currentComment->getAuthor()->getFullname(),
-							'COMMENT_CONTENT' => Scrub::text($currentComment->getContent()),
+							'COMMENT_CONTENT' => nl2br(Scrub::text($currentComment->getContent())),
 							'COMMENT_CREATED_AT' => $createdAt->getRelativeTime(),
 						));
 
