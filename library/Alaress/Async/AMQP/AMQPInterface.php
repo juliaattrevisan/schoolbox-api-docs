@@ -24,7 +24,7 @@ interface AMQPInterface {
 	/**
 	 * Declare an exchange
 	 *
-	 * @param $exchange
+	 * @param AMQPExchange $exchange
 	 * @param string $channelId
 	 * @return self
 	 */
