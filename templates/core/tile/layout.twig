@@ -118,5 +118,6 @@
            value="Save"
            class="submit-btn-plain"
     />
-    <a href="/homepage/" class="btn go-to"><span></span>Back to Homepage</a>
+    {# Link depends on identifier #}
+    <a href="/homepage/{{ component.identifier }}" class="btn no-icon float-left"><span></span>Cancel</a>
 </form>
