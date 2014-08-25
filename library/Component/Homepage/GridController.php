@@ -49,28 +49,13 @@ class Component_Homepage_GridController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        // Which view do i display? Depends on URL
-        $view = 'component/homepage/grid/view.twig';
-        list(, $argCommand, $argTargetComponent) = $this->sitepage->arg;
-        if (!empty($argCommand) && $argTargetComponent == $this->getInstance()->getId()) {
-            switch ($argCommand) {
-                case 'gridModify':
-                case 'gridCreate':
-                    $view = 'component/homepage/grid/edit.twig';
-                    break;
-                default:
-                    break;
-            }
-        }
-
         // There should at least be a sitepage I can get a container out of!
         // And that container always ought to be there!
-        // It ain't though.
         $di      = $this->sitepage->getDi();
         $content = '';
         if ($di instanceof Aura\Di\ContainerInterface) {
             $content = $di->get('templateEngine')->render(
-                $view,
+                'component/homepage/grid.twig',
                 array('component' => $this,)
             );
         }
