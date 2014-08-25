@@ -244,7 +244,7 @@ class Generator implements GeneratorInterface
                 }
                 $roles = $this->getRoleCache();
                 if (array_key_exists(Role::STUDENT, $roles)) {
-                    $childCollection = $this->userMapper->findByColumnList(array(
+                    $childCollection = $this->getUserMapper()->findByColumnList(array(
                         'synergy_id' => $childIds,
                         'group_id'   => $roles[Role::STUDENT]
                     ));
