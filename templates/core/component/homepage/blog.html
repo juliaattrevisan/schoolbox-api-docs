@@ -1,27 +1,65 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-    $j(function(){
+
+<div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<script type="text/javascript">
+	$j(function() {
         $j('a.delete-comment').click(function(event) {
             event.preventDefault();
             $j(this).confirmDialog({text:'Delete this comment?'});
         });
 
-        $j(document).on('click', "#component{COMPONENT_INSTANCE_ID} a.show-comments", function(e) {
-            $j(this).siblings('ul.comments').show(100);
-            $j(this).siblings('form').show(100);
-            $j(this).hide();
-            e.preventDefault();
-        });
-    });
-</script>
+		var component = $j('#component{COMPONENT_INSTANCE_ID}');
 
-<div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
+		/* For viewing comment form
+		 *
+		 * When you have $j(function() inside the <body> tags the onclick
+		 * event runs twice. Unbind it and rebind it is a convenient solution.
+		 *
+		 * By Shahbaz Saleem
+		 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
+		 */
+		component.find('.closeComment').unbind('click').click(function() {
+			var id = $j(this).attr('rel');
+			component.find('#' + id).toggle();
+		});
+
+		/* For viewing comment thread
+		 */
+		component.find('.viewCommentThread').hide();
+		component.find('.viewComments').unbind('click').click(function(event) {
+			event.preventDefault();
+
+			var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/);
+
+			if (matches) {
+				var postId = matches[1];
+
+				var element = component.find('#blogComment_' + postId + ' .viewCommentThread');
+				element.toggle();
+
+				/* Update button text when toggling
+				 */
+				var button = component.find('a[rel=viewComments_' + postId + ']');
+
+				if ($j(element).is(':visible')) {
+					var state = 'Hide';
+				}
+				else {
+					var state = 'Show';
+				}
+
+				button.html('<span></span>' + state + ' Comments');
+			}
+		});
+	});
+	</script>
+
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
 	<ul class="information-list">
 		<!-- BEGIN blog -->
-		<li class="{BLOG_SHADING}">
+		<li class="{BLOG_SHADING}" id="blog_{BLOG_ID}">
 			<span class="actions">
 				{MODIFY_BLOG}
 			</span>
@@ -38,18 +76,19 @@
 
 			<div class="wysiwyg">{BLOG_BODY}</div>
 
-			<ul class="comments" style="display: none;">
+			<!-- BEGIN has_comments -->
+			<ul class="comments" id="blogComment_{BLOG_ID}">
 				<!-- BEGIN comment -->
-				<li class="{ON_OFF}">
+				<li class="viewCommentThread {ON_OFF}">
+					<!-- BEGIN has_comment_delete -->
 					<span class="actions">
-						<!-- BEGIN has_comment_delete -->
 						<a class="delete-comment btn delete no-text" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"><span></span></a>
-						<!-- END has_comment_delete -->
 					</span>
+					<!-- END has_comment_delete -->
 
 					<p class="meta">
 						<a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
-							<img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
+							<img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" />
 							{COMMENT_AUTHOR_NAME}
 						</a>
 						Commented {COMMENT_CREATED}
@@ -59,11 +98,19 @@
 				</li>
 				<!-- END comment -->
 			</ul>
-			<form method="post" action="/blog/comment/new/{BLOG_ID}" style="display: none;">
-				<p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-					<input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
+			<!-- END has_comments -->
+
+			<form id='modify_blogcomment_form_{BLOG_ID}' class="modifyForm hide" action="/blog/comment/new/{BLOG_ID}" method="post">
+				<p>
+					<textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+					<input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/>
+				</p>
 			</form>
-			<a href="#" class="btn chat show-comments"><span></span>Show comments ({BLOG_TOTAL_COMMENTS})</a>
+
+			<p class="interact">
+				<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{BLOG_ID}'><span></span>Show Comments ({BLOG_TOTAL_COMMENTS})</a>
+				<a rel='modify_blogcomment_form_{BLOG_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
+			</p>
 		</li>
 		<!-- END blog -->
 	</ul>
