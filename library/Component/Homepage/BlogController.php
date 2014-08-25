@@ -66,16 +66,28 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         if(!parent::loadTemplate($templateHandle, 'blog')) {
             return false;
         }
+
         $this->parseConfig();
 
-		if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		if ($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
 			return false;
 		}
 
+        /* Set up blocks and stuff
+         */
         $this->setBlock($templateHandle, 'blog', 'blog_block');
-        $this->setBlock($templateHandle, 'submit', 'submit_block');
-        $this->setBlock('blog', 'comment', 'comment_block');
+        $this->setBlock($templateHandle, 'create_text', 'create_text_block');
+        $this->setBlock('blog', 'has_comments', 'has_comments_block');
+        $this->setBlock('has_comments', 'comment', 'comment_block');
 		$this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
+
+        $this->setVar(array(
+            'create_text_block' => '',
+            'has_comments_block' => '',
+            'comment_block' => '',
+            'has_comment_delete_block' => '',
+            'blog_block' => '',
+        ));
 
         /* Set up component name
          */
@@ -89,32 +101,23 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             'BLOG_CATEGORY_ID' => $this->source['id'],
         ));
 
-        /* Prevent multiple blog entries from other categories stacking up in the wrong place
-        * and initialise empty blog roll by default
-        */
-        $this->setVar('blog_block', '');
-
         $this->blogHandler->config(array('size' => $this->getConfig('size')));
         $blogs = $this->blogHandler->getByCID($this->source['id']);
 
         /* Have update form to back to this homepage, not the wiki's homepage
-       */
+         */
         $this->setVar(array(
             'BLOG_CATEGORY_ID' => $this->source['id']
         ));
 
         /* Controls such as Post News
-       */
-        if ($this->permission < WRITE_ACCESS) {
-            $this->setVar("submit_block", "");
+         */
+        if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('create_text_block', 'create_text');
         }
-        else {
-            $this->parse("submit_block", "submit");
-        }
-
 
         /* Iterate
-        */
+         */
         if(!empty($blogs)) {
             $userHandler = new User();
             $i = 0;
@@ -135,7 +138,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     'BLOG_ID'		=> $blog['id'],
                     'BLOG_HEADING'  => Scrub::text($blog['heading']),
                     'BLOG_BODY'     => Scrub::html($blog['body']),
-                    // 'BLOG_OWNER'    => "<a href=\"/search/user/{}\">{}</a>",
                     'BLOG_AUTHOR_ID' => $blog['owner'],
                     'BLOG_AUTHOR_NAME' => $blog['name'],
                     'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
@@ -150,12 +152,11 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
                 $comments = $this->commentHandler->getByBID($blog['id']);
                 $totalComments = $this->commentHandler->count($blog['id']);
-                $showingComments = count($comments);
 
                 $this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
                 $j = 0;
 
-                if(!empty($comments)) {
+                if (!empty($comments)) {
                     foreach($comments as $comment) {
                         $createdTime = new Alaress_Date_Relative($comment['created']);
 
@@ -187,9 +188,20 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 							'has_comment_delete_block' => ''
 						));
                     }
-                } else {
-                    $this->setVar('comment_block', '');
+
+                    $this->parse('has_comments_block', 'has_comments');
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->setVar(array(
+                        'comment_block' => '',
+                        'has_comment_delete_block' => '',
+                    ));
                 }
+                else {
+                    $this->setVar('has_comments_block', '');
+                }
+
                 $this->parse('blog_block', 'blog', true);
             }
         }
