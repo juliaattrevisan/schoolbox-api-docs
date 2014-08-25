@@ -45,28 +45,34 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private $userMapper = null;
 
     /**
+     * Category Mapper
+     *
+     * @var null
+     */
+    private $categoryMapper = null;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute() {
         $this->groupHandler = new Group();
-        $this->catHandler = new Category();
-
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
-        );
-
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
 
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
         $this->setUserMapper(new \Schoolbox\UserMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+
+        // remove any non-numeric values from the source config
+        $sourceId = $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id');
+
+        try {
+            $this->source = $this->getCategoryMapper()->findById($sourceId);
+        }
+        catch (\Exception $e) {
+            $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
+        }
     }
 
     /**
@@ -81,7 +87,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         $this->parseConfig();
 
-		if ($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+		if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
 			return false;
 		}
 
@@ -107,18 +113,18 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Blog',
 
             // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id') ? 'Local' : $this->source['name'],
+            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id') ? 'Local' : $this->source->getName(),
 
-            'BLOG_CATEGORY_ID' => $this->source['id'],
+            'BLOG_CATEGORY_ID' => $this->source->getId(),
         ));
 
-        $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source['id']);
+        $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source->getId());
 
         /* Have update form to back to this homepage, not the wiki's homepage
          */
         $this->setVar(array(
-            'BLOG_CATEGORY_ID' => $this->source['id']
+            'BLOG_CATEGORY_ID' => $this->source->getId(),
         ));
 
         /* Controls such as Post News
@@ -277,5 +283,25 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private function getUserMapper()
     {
         return $this->userMapper;
+    }
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
