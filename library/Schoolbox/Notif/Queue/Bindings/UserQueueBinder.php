@@ -85,7 +85,7 @@ class UserQueueBinder
         $exchangeName = $exchange->getName();
 
         // exchange things
-        $conn->declareExchange($exchangeName);
+        $conn->declareExchange($exchange);
 
         foreach ($this->bindings as $key) {
             $conn->bindExchange($exchangeName, $key);
