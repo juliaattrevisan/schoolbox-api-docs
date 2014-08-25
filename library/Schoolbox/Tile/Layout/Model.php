@@ -49,7 +49,7 @@ class Model implements ISoftDeletable
      *
      * @var int
      */
-    protected $layoutType;
+    protected $layoutType = self::LAYOUT_TYPE_GRID;
 
     /**
      * The number of columns in this layout (if using column layout)
@@ -70,14 +70,14 @@ class Model implements ISoftDeletable
      *
      * @var int
      */
-    protected $aspectRatioX;
+    protected $aspectRatioX = 16;
 
     /**
      * The height ratio of the items within this grid.
      *
      * @var int
      */
-    protected $aspectRatioY;
+    protected $aspectRatioY = 9;
 
     /**
      * @var Alaress_Date_Format
