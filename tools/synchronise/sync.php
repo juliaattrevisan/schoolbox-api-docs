@@ -36,9 +36,9 @@ if (Cfg::get('external_sync_data') == 1) {
         $sync->execute();
     }
 
-	// advise Scheduler that all bindings need to be rerun
-	$cmdr = new \Schoolbox\Realtime\Schedule\SchedulerCommander();
-	$cmdr->adviseBindAll();
+	// advise Rerouter that all bindings need to be rerun
+    $cmdr = new \Schoolbox\Realtime\Rerouter\RerouterCommander(\Schoolbox\UserMapper::getInstance());
+    $cmdr->adviseBindAll();
 }
 else {
     die("Data synchronisation is not enabled.\n");

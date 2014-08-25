@@ -39,7 +39,7 @@ $cmdr = new \Schoolbox\Realtime\Digest\DigestCommander();
 $cmdr->adviseReload();
 
 // advise schedule daemon to reload as well
-$cmdr = new \Schoolbox\Realtime\Schedule\SchedulerCommander();
+$cmdr = new \Schoolbox\Realtime\Rerouter\RerouterCommander(\Schoolbox\UserMapper::getInstance());
 $cmdr->adviseReload();
 
 SitePage::localRedir('/adminv2/messages');

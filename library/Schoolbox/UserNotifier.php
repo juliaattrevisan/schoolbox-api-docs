@@ -10,8 +10,10 @@
 namespace Schoolbox;
 
 
+use DomainException;
+use Exception;
+use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\SchedulerCommander;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 
 class UserNotifier extends AbstractModuleNotifier
@@ -81,10 +83,10 @@ class UserNotifier extends AbstractModuleNotifier
     {
         try {
             if (is_null($currentUser)) {
-                throw new \DomainException("No effector specified");
+                throw new DomainException("No effector specified");
             }
             $user = $this->mapper->findById($userId);
-        } catch(\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
         $this->notifyCreated($user, $currentUser);
@@ -105,10 +107,10 @@ class UserNotifier extends AbstractModuleNotifier
     {
         try {
             if (is_null($currentUser)) {
-                throw new \DomainException("No effector specified");
+                throw new DomainException("No effector specified");
             }
             $user = $this->mapper->findById($userId);
-        } catch(\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
         $this->notifyUpdated($user, $currentUser);
@@ -123,7 +125,7 @@ class UserNotifier extends AbstractModuleNotifier
      */
     public function notifyCreated($user, $effector, $diff = null)
     {
-        $cmdr = new SchedulerCommander();
+        $cmdr = new RerouterCommander($this->mapper);
         $cmdr->adviseBindUser($user->getId());
         $cmdr->adviseSubscribeUser($user->getId());
     }
@@ -137,7 +139,7 @@ class UserNotifier extends AbstractModuleNotifier
     public function notifyUpdated($user, $effector, $diff = null)
     {
         // as above, only executed if externalId changed
-        $cmdr = new SchedulerCommander();
+        $cmdr = new RerouterCommander($this->mapper);
         $cmdr->adviseBindUser($user->getId());
     }
 
