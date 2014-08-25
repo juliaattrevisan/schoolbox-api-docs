@@ -34,11 +34,13 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'has_pinterest', 'has_pinterest_block');
+        $this->setBlock($templateHandle, 'has_pinterest_user', 'has_pinterest_user_block');
+        $this->setBlock($templateHandle, 'has_pinterest_board', 'has_pinterest_board_block');
 
         $this->setVar(
             array(
-                'has_pinterest_block' => ''
+                'has_pinterest_user_block' => '',
+                'has_pinterest_board_block' => '',
             )
         );
 
@@ -49,7 +51,33 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                 )
             );
 
-            $this->parse('has_pinterest_block', 'has_pinterest');
+            /* Determine whether it's a user profile or a board
+             * Remove domain, check how may parts there are
+             */
+            $url = trim($this->getConfig('url'));
+            $url = preg_replace('#https?://www.pinterest.com/?#', '', $url);
+
+            $parts = array_filter(explode('/', $url));
+
+            switch(count($parts)) {
+
+                /* User
+                 */
+                case 1:
+                    $this->parse('has_pinterest_user_block', 'has_pinterest_user');
+                    break;
+
+                /* Board
+                 */
+                case 2:
+                    $this->parse('has_pinterest_board_block', 'has_pinterest_board');
+                    break;
+
+                /* Otherwise unknown
+                 */
+                default:
+                    break;
+            }
         }
 
         return true;

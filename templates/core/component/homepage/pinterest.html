@@ -2,10 +2,16 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<!-- BEGIN has_pinterest -->
+	<!-- BEGIN has_pinterest_user -->
+	<a data-pin-do="embedUser" href="{PINTEREST_URL}"></a>
+	<!-- Please call pinit.js only once per page -->
+	<script type="text/javascript" async src="//assets.pinterest.com/js/pinit.js"></script>
+	<!-- END has_pinterest_user -->
+
+	<!-- BEGIN has_pinterest_board -->
 	<a data-pin-do="embedBoard" href="{PINTEREST_URL}"></a>
 	<!-- Please call pinit.js only once per page -->
 	<script type="text/javascript" async src="//assets.pinterest.com/js/pinit.js"></script>
-	<!-- END has_pinterest -->
+	<!-- END has_pinterest_board -->
 </div>
 
