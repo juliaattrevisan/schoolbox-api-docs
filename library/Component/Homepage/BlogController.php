@@ -19,19 +19,30 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private $catHandler;
 
     /**
-     * @var Blog
-     */
-    private $blogHandler;
-
-    /**
-     * @var Comment
-     */
-    private $commentHandler;
-
-    /**
      * @var array
      */
     private $source;
+
+    /**
+     * Blog Mapper
+     *
+     * @var null
+     */
+    private $blogMapper = null;
+
+    /**
+     * Comment Mapper
+     *
+     * @var null
+     */
+    private $commentMapper = null;
+
+    /**
+     * User Mapper
+     *
+     * @var null
+     */
+    private $userMapper = null;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -41,8 +52,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     public function execute() {
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
-        $this->blogHandler = new Blog();
-        $this->commentHandler = new Comment();
 
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
@@ -55,6 +64,9 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
 
+        $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
+        $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
+        $this->setUserMapper(new \Schoolbox\UserMapper());
     }
 
     /**
@@ -101,8 +113,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             'BLOG_CATEGORY_ID' => $this->source['id'],
         ));
 
-        $this->blogHandler->config(array('size' => $this->getConfig('size')));
-        $blogs = $this->blogHandler->getByCID($this->source['id']);
+        $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source['id']);
 
         /* Have update form to back to this homepage, not the wiki's homepage
          */
@@ -118,60 +129,56 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         /* Iterate
          */
-        if(!empty($blogs)) {
-            $userHandler = new User();
+        if ($allItems->count()) {
             $i = 0;
 
-            foreach($blogs as $blog) {
-                if($blog['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS)
-                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/'.$blog['id'].'" title="Modify Blog post"><span></span></a>');
-                else
+            foreach($allItems as $currentItem) {
+                if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
+                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/' . $currentItem->getId() . '" title="Modify Blog post"><span></span></a>');
+                }
+                else {
                     $this->setVar('MODIFY_BLOG', '');
+                }
 
-                $blog['name'] = $userHandler->formatName($blog);
-                $createdTime = new Alaress_Date_Relative($blog['created']);
+                $createdTime = new Alaress_Date_Relative($currentItem->getCreated()->getDatabase());
+                $owner = $this->getUserMapper()->findById($currentItem->getOwner()->getId());
 
-                $user = $userHandler->getByID($blog['owner']);
-                $synID = $user['synergy_id'];
+                $this->setVar(
+                    array(
+                        'BLOG_ID' => $currentItem->getId(),
+                        'BLOG_HEADING' => Scrub::text($currentItem->getHeading()),
+                        'BLOG_BODY' => Scrub::html($currentItem->getBody()),
+                        'BLOG_AUTHOR_ID' => $owner->getId(),
+                        'BLOG_AUTHOR_EXTERNAL_ID' => $owner->getExternalId(),
+                        'BLOG_AUTHOR_NAME' => $owner->formatName(),
+                        'BLOG_AUTHOR_THUMB' => "/portrait.php?userId={$owner->getExternalId()}&size=square32",
+                        'BLOG_CREATED' => $createdTime->getRelativeTime(),
+                        'BLOG_SHADING' => ++$i % 2 ? '' : 'dark',
+                        'BLOG_COMMENTS' => '',
+                    )
+                );
 
-                $this->setVar(array(
-                    'BLOG_ID'		=> $blog['id'],
-                    'BLOG_HEADING'  => Scrub::text($blog['heading']),
-                    'BLOG_BODY'     => Scrub::html($blog['body']),
-                    'BLOG_AUTHOR_ID' => $blog['owner'],
-                    'BLOG_AUTHOR_NAME' => $blog['name'],
-                    'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
-                    'BLOG_CREATED'  => $createdTime->getRelativeTime(),
-                    'BLOG_SHADING'  => ++$i % 2 ? '' : 'dark',
-                    'BLOG_COMMENTS' => '',
-                    'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
-                ));
+                $allComments = $this->getCommentMapper()->findByColumn('bid', $currentItem->getId());
 
-                // comments
-                $this->setVar('comment_block','');
-
-                $comments = $this->commentHandler->getByBID($blog['id']);
-                $totalComments = $this->commentHandler->count($blog['id']);
-
-                $this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
+                $this->setVar('BLOG_TOTAL_COMMENTS', $allComments->count());
                 $j = 0;
 
-                if (!empty($comments)) {
-                    foreach($comments as $comment) {
-                        $createdTime = new Alaress_Date_Relative($comment['created']);
+                if ($allComments->count()) {
+                    foreach($allComments as $currentComment) {
+                        $createdTime = new Alaress_Date_Relative($currentComment->getCreated()->getDatabase());
+                        $commentOwner = $this->getUserMapper()->findById($currentComment->getOwner()->getId());
 
-                        $comment['name'] = $userHandler->formatName($comment);
                         $this->setVar(array(
-							'COMMENT_COMMENT_ID' => $comment['id'],
-							'COMMENT_BODY' => Scrub::text($comment['body']),
-							'COMMENT_AUTHOR_ID' => $comment['owner'],
-							'COMMENT_AUTHOR_NAME' => $comment['name'],
+							'COMMENT_COMMENT_ID' => $currentComment->getId(),
+							'COMMENT_BODY' => Scrub::text($currentComment->getBody()),
+							'COMMENT_AUTHOR_ID' => $commentOwner->getId(),
+							'COMMENT_AUTHOR_NAME' => $commentOwner->formatName(),
 							'COMMENT_CREATED' => $createdTime->getRelativeTime(),
-							'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+							'COMMENT_AUTHOR_EXTERNAL_ID' => $commentOwner->getExternalId(),
 							'ON_OFF' => ++$j % 2 ? 'dark' : ''
                         ));
 
-                        if ($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
+                        if ($currentComment->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
                             $this->parse('has_comment_delete_block', 'has_comment_delete');
 						}
                         else {
@@ -209,4 +216,66 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         return true;
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set blog mapper
+     *
+     * @param null $blogMapper
+     */
+    private function setBlogMapper($blogMapper)
+    {
+        $this->blogMapper = $blogMapper;
+    }
+
+    /**
+     * Get blog mapper
+     *
+     * @return null
+     */
+    private function getBlogMapper()
+    {
+        return $this->blogMapper;
+    }
+
+    /**
+     * Set comment mapper
+     *
+     * @param null $commentMapper
+     */
+    private function setCommentMapper($commentMapper)
+    {
+        $this->commentMapper = $commentMapper;
+    }
+
+    /**
+     * Get comment mapper
+     *
+     * @return null
+     */
+    private function getCommentMapper()
+    {
+        return $this->commentMapper;
+    }
+
+    /**
+     * Set user mapper
+     *
+     * @param null $userMapper
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * Get user mapper
+     *
+     * @return null
+     */
+    private function getUserMapper()
+    {
+        return $this->userMapper;
+    }
 }
