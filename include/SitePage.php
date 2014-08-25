@@ -37,7 +37,7 @@ class SitePage extends Page
 
 
     /**
-     * @param  Aura\Di\Container $di
+     * @param  Aura\Di\ContainerInterface $di
      * @return $this
      */
     public function setDi($di)
@@ -48,13 +48,33 @@ class SitePage extends Page
 
 
     /**
-     * @return Aura\Di\Container
+     * @return Aura\Di\ContainerInterface
+     * @throws RuntimeException if this SitePage has no DI container.
      */
     public function getDi()
     {
+        if (!($this->di instanceof Aura\Di\ContainerInterface)) {
+            throw new RuntimeException('This SitePage does not have a dependency injector');
+        }
         return $this->di;
     }
 
+    /**
+     * Gets a Twig renderer out of this sitepage's dependency injector,
+     * if there is one.
+     *
+     * @return Twig_Environment
+     * @throws RuntimeException if Twig renderer wasn't found in this Sitepage
+     *                          object's dependency injector.
+     */
+    public function getTwig()
+    {
+        $twig = $this->getDi()->get('templateEngine');
+        if ($twig instanceof Twig_Environment) {
+            return $twig;
+        }
+        throw new RuntimeException('Twig was not found in dependency injector');
+    }
 
     /**
      * Detect connection type
