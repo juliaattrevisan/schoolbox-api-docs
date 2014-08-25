@@ -16,11 +16,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private $groupHandler;
 
     /**
-     * @var Category
-     */
-    private $catHandler;
-
-    /**
      * @var array
      */
     private $source;
@@ -40,13 +35,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private $commentMapper = null;
 
     /**
-     * User Mapper
-     *
-     * @var null
-     */
-    private $userMapper = null;
-
-    /**
      * Category Mapper
      *
      * @var null
@@ -64,7 +52,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
-        $this->setUserMapper(new \Schoolbox\UserMapper());
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         // remove any non-numeric values from the source config
@@ -136,7 +123,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             )
         );
 
-        $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source->getId());
+        $allItems = $this->getBlogMapper()->findForCategory($this->source);
 
         /* Iterate
          */
@@ -145,17 +132,17 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
             foreach ($allItems as $currentItem) {
                 $createdTime = new Alaress_Date_Relative($currentItem->getCreated()->getDatabase());
-                $owner = $this->getUserMapper()->findById($currentItem->getOwner()->getId());
 
                 $this->setVar(
                     array(
                         'BLOG_ID' => $currentItem->getId(),
                         'BLOG_HEADING' => Scrub::text($currentItem->getHeading()),
                         'BLOG_BODY' => Scrub::html($currentItem->getBody()),
-                        'BLOG_AUTHOR_ID' => $owner->getId(),
-                        'BLOG_AUTHOR_EXTERNAL_ID' => $owner->getExternalId(),
-                        'BLOG_AUTHOR_NAME' => $owner->formatName(),
-                        'BLOG_AUTHOR_THUMB' => "/portrait.php?userId={$owner->getExternalId()}&size=square32",
+                        'BLOG_AUTHOR_ID' => $currentItem->getOwner()->getId(),
+                        'BLOG_AUTHOR_EXTERNAL_ID' => $currentItem->getOwner()->getExternalId(),
+                        'BLOG_AUTHOR_NAME' => $currentItem->getOwner()->formatName(),
+                        'BLOG_AUTHOR_THUMB' => "/portrait.php?userId={$currentItem->getOwner()->getExternalId(
+                            )}&size=square32",
                         'BLOG_CREATED' => $createdTime->getRelativeTime(),
                         'BLOG_SHADING' => ++$i % 2 ? '' : 'dark',
                         'BLOG_COMMENTS' => '',
@@ -182,8 +169,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                             )
                         );
 
-                        if ($currentComment->getOwner()->getId(
-                            ) == $_SESSION['id'] || $this->permission >= WRITE_ACCESS
+                        if ($currentComment->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS
                         ) {
                             $this->parse('has_comment_delete_block', 'has_comment_delete');
                         } else {
@@ -305,26 +291,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     private function getCommentMapper()
     {
         return $this->commentMapper;
-    }
-
-    /**
-     * Set user mapper
-     *
-     * @param null $userMapper
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Get user mapper
-     *
-     * @return null
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
     }
 
     /**
