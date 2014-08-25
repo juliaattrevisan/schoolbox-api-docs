@@ -129,9 +129,7 @@ class Notifier extends AbstractModuleNotifier
         $key            = $this->slug . '.' . $object->getId() . '.' . $event;
         $level          = Logger::NOTICE;
         $isOwnerCreator = $owner->getId() == $calendarEvent->getAuthor()->getId();
-        $startDate      = new \Alaress_Date_Format(
-            $object->getEvent()->getStartDate() . ' ' . $object->getEvent()->getStartTime(), 'Y-m-d H:i:s'
-        );
+        $startDate      = $calendarEvent->getStartDateTime();
 
         $resourceUrl   = sprintf(
             '/resource-booking/item/%d?%s',
