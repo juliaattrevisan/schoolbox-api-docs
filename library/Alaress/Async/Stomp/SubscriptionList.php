@@ -59,4 +59,12 @@ abstract class SubscriptionList {
 	 * @return void
 	 */
 	public abstract function importFromSource($source, $clear = true);
+
+
+    /**
+     * @param int $userId
+     * @return string
+     */
+    public abstract function createQueueName($userId);
+
 } 

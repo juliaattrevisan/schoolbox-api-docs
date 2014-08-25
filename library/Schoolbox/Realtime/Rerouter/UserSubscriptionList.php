@@ -11,27 +11,35 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Stomp\SubscriptionList;
-use OutOfBoundsException;
 use Schoolbox\Collection;
+use Schoolbox\Notif\Queue\Builder\BuilderInterface;
 use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class UserSubscriptionList extends SubscriptionList {
 
-    /** @var UserQueueFactory */
-    protected $uqf;
+    /** @var BuilderInterface */
+    protected $builder;
 
 
     /**
-     * @param UserQueueFactory $uqf
+     * @param BuilderInterface $builder
      */
-    public function __construct(UserQueueFactory $uqf)
+    public function __construct(BuilderInterface $builder)
     {
-        $this->uqf = $uqf;
+        $this->builder = $builder;
     }
 
+
+    /**
+     * @param int $userId
+     * @return string
+     */
+    public function createQueueName($userId)
+    {
+        return $this->builder->createQueueName(UserQueue::Q_TOSORT, $userId);
+    }
 
 	/**
 	 * @param UserMapper $source
@@ -44,16 +52,12 @@ class UserSubscriptionList extends SubscriptionList {
 		}
 
 		/** @var Collection|User[] $users */
-		$users = $source->findAll();
+		$users   = $source->findAll();
 
 		foreach($users as $user) {
-            try {
-                // construct the queue, but don't prepopulate it
-                $name = $this->uqf->buildUserQueue($user, 0)->findQueue(UserQueue::Q_TOSORT);
-                $this->queues[$name] = $source->findById($user->getId()); // TODO srsly. this has to change.
-            } catch (OutOfBoundsException $e) {
-                // noop: no sorting queue found for this user
-            }
+            $user = $source->findById($user->getId()); // TODO srsly. this has to change.
+            $name = $this->createQueueName($user->getId());
+            $this->queues[$name] = $user;
 		}
 	}
 
