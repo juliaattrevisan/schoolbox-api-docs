@@ -196,7 +196,7 @@ switch($this->arg[0]) {
 
 $direction = ConfigMapper::getInstance()->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
-$email->setContext($decorator->renderAsTwigContext($cctx, $direction));
+$email->setContext($decorator->renderAsTwigContext($cctx, 0, $direction));
 
 if(isset($this->arg[1]) && $this->arg[1] == 'context') {
 	header('Content-Type: text/plain');

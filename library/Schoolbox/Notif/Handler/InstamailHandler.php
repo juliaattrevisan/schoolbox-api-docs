@@ -83,7 +83,7 @@ class InstamailHandler extends MailHandler {
 			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));
 
 			// there should only be one notification
-			$n = reset($decorator->getAll());
+			$n = reset($decorator->getNotifications());
 
 			$this->email->setSubject($decorator->renderTitleAsPlaintext($n));
 

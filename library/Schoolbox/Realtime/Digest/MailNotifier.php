@@ -115,7 +115,7 @@ class MailNotifier implements Serializable {
 				continue;
 			}
 
-			$context = $decorator->renderAsTwigContext($email->getCoreContext(), $dir);
+			$context = $decorator->renderAsTwigContext($email->getCoreContext(), 0, $dir);
 
 			// explicitly an rfc822 email spec, so it sets, not adds
 			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));

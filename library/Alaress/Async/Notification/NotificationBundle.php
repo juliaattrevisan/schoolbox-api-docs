@@ -81,10 +81,13 @@ class NotificationBundle {
 	}
 
 	/**
+     * @param int $limit
+     * @param int $dir
 	 * @return Notification[]
 	 */
-	public function getAll() {
-		return array_values($this->notifications);
+	public function getNotifications($limit = 0, $dir = SORT_DESC) {
+        $this->sort($dir);
+		return array_slice($this->notifications, 0, $limit ?: null, false);
 	}
 
 

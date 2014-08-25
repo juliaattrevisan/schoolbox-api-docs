@@ -102,7 +102,7 @@ class WorkerProcess extends AbstractProcess
         $queue = $this->uqf->buildUserQueue($userId, $count, false);
 
         // make messages pretty
-        $decorator->appendNotifications($queue->fetchNotifications(UserQueue::Q_LISTED, $count, true));
+        $queue->fetchNotificationsIntoBundle(UserQueue::Q_LISTED, $decorator, true);
         // wrap in an array to preserve keys
         return array($decorator->renderAsSocketArray(false));
     }

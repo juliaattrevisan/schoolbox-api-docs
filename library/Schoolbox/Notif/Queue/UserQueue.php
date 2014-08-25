@@ -145,15 +145,14 @@ class UserQueue {
 
         $bundle = new NotificationBundle();
 
-        $this->fetchNotificationsIntoBundle($label, $bundle, $fetch, $refresh);
+        $this->fetchNotificationsIntoBundle($label, $bundle, $refresh);
 
         // negative value will be considered "no limit"
         if ($fetch < 0) {
-            return $bundle->getAll();
+            return $bundle->getNotifications();
         }
 
-        return array_slice($bundle->getAll(), 0, $fetch);
-
+        return $bundle->getNotifications($fetch);
     }
 
     /**
