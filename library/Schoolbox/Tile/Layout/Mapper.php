@@ -94,5 +94,16 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
+
+        // Join to tiles as well
+        $this->hasJoin(
+            'tile',
+            array(
+                'mapper'    => 'Schoolbox\\Tile\\Model',
+                'this_key'  => 'id',
+                'other_key' => 'tile_layout_id',
+                'multiple'  => 'true',
+            )
+        );
     }
 }

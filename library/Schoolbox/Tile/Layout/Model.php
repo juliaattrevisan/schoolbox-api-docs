@@ -10,7 +10,9 @@
 namespace Schoolbox\Tile\Layout;
 
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Tile\Model as TileModel;
 
 class Model implements ISoftDeletable
 {
@@ -34,6 +36,13 @@ class Model implements ISoftDeletable
      * @var int
      */
     protected $id;
+
+    /**
+     * The list of tiles that belong to this layout.
+     *
+     * @var Collection|TileModel[]
+     */
+    protected $tileList;
 
     /**
      * The layout type of this grid, either 'grid' or 'column'
@@ -84,6 +93,15 @@ class Model implements ISoftDeletable
      * @var Alaress_Date_Format
      */
     protected $deletedAt;
+
+    /**
+     * Constructor: creates this layout with an empty tile list
+     * (which can be overridden with setTileList())
+     */
+    public function __construct()
+    {
+        $this->setTileList(new Collection());
+    }
 
     /**
      * @param  int $aspectRatioX
@@ -245,6 +263,34 @@ class Model implements ISoftDeletable
     public function getModifiedAt()
     {
         return $this->modifiedAt;
+    }
+
+    /**
+     * @param  Collection|TileModel[] $tileList
+     * @return $this
+     */
+    public function setTileList($tileList)
+    {
+        $this->tileList = $tileList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|TileModel[]
+     */
+    public function getTileList()
+    {
+        return $this->tileList;
+    }
+
+    /**
+     * @param  TileModel $tile
+     * @return $this
+     */
+    public function addTile(TileModel $tile)
+    {
+        $this->getTileList()->add($tile);
+        return $this;
     }
 
     /**
