@@ -12,7 +12,6 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
-use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
@@ -33,7 +32,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
@@ -46,33 +44,12 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
  *
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends StompScheduler implements CommandableInterface
+class Scheduler extends StompScheduler
 {
 
     const MODULE_NS      = 'Schoolbox\\Realtime\\Schedule\\Module\\';
-    const QUEUE_SCHEDULE = '.sb.sched';
-    const QUEUE_COMMAND  = '.sb.cmd.sched';
 
     const COMPRESSION_LEVEL = 9;
-
-
-    /**
-     * Binds the queues that the Scheduler requires
-     */
-    public static function bindQueues()
-    {
-        // make sure our endpoints exist
-        $mqc    = Connector::getInstance();
-        $queues = array(
-            INSTANCE_ID . self::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
-            INSTANCE_ID . self::QUEUE_COMMAND  => '*.' . Notif::TOPIC_CMD_SCHED
-        );
-
-        foreach ($queues as $q => $route) {
-            $mqc->declareQueue($q)
-                ->bindQueue($q, $route);
-        }
-    }
 
 
     /** @var Notif */
@@ -86,19 +63,18 @@ class Scheduler extends StompScheduler implements CommandableInterface
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
+     * @param string                    $scheduleQueue - don't forget to declare this in rabbit!
      * @param IConfigLoader             $conf
      */
-    public function __construct($loop, $dispatchStrategy, $log, $conf = null)
+    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf = null)
     {
         // cast optional param
         $this->conf  = $conf ? : ConfigMapper::getInstance();
         $this->notif = new Notif();
 
         // run construction
-        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID . self::QUEUE_SCHEDULE, INSTANCE_ID . self::QUEUE_COMMAND, $log);
+        parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log);
         $this->resolvers = new ResolutionManager();
-
-        self::bindQueues();
 
         // register signal listeners
         $this->on(SIGHUP, array($this, 'onHangup'));
@@ -151,7 +127,7 @@ class Scheduler extends StompScheduler implements CommandableInterface
      */
     public function onMessage($frame, $resolver)
     {
-        $this->log->info('Received message from ' . INSTANCE_ID . self::QUEUE_SCHEDULE, array('char' => '>'));
+        $this->log->info("Received event from $this->scheduleQueue", array('char' => '>'));
         try {
             $formatted = CompressedFormatter::uncompress($frame->body);
             $event     = unserialize($formatted['message']);
@@ -162,7 +138,7 @@ class Scheduler extends StompScheduler implements CommandableInterface
             $triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
 
             // retrieve, populate, and schedule this bundle of triggers
-            $this->log->info("Retrieving triggers");
+            $this->log->debug("Retrieving triggers");
             $triggers = $triggerFactory->buildTriggers($event->getAction())->getTriggers();
             $this->scheduleNotifications($triggers, $resolver);
             $triggerFactory->cleanup($triggers);
@@ -188,29 +164,6 @@ class Scheduler extends StompScheduler implements CommandableInterface
         }
 
         $resolver->ack();
-    }
-
-
-    /**
-     * Callback executed when a command is received from RabbitMQ on the command queue
-     *
-     * @param Frame $frame
-     */
-    public function onCommand($frame)
-    {
-        $this->log->info('Received command from ' . INSTANCE_ID . self::QUEUE_COMMAND, array('char' => '>'));
-        $cmdr = new SchedulerCommander();
-        try {
-            $body   = CompressedFormatter::uncompress($frame->body);
-            $result = $cmdr->exec($this, $body['message']);
-            if ($result) {
-                $this->log->debug("Command executed successfully");
-                return;
-            }
-        } catch(CompressionException $e) {
-            // noop
-        }
-        $this->log->error("Command failed to execute");
     }
 
 
@@ -324,14 +277,9 @@ class Scheduler extends StompScheduler implements CommandableInterface
 
         $postman = new Postman($this->notif, $this->log);
 
-        $count = $postman->deliver(
-                         $bundle,
-                             array(
-                                 'user' => $trigger->getEvent()
-                                                   ->getEffector()
-                                                   ->getId()
-                             )
-        );
+        $count = $postman->deliver($bundle, array(
+            'user' => $trigger->getEvent()->getEffector()->getId()
+        ));
 
         if (is_null($count)) {
             $this->log->debug("No messages to broadcast");
@@ -363,11 +311,8 @@ class Scheduler extends StompScheduler implements CommandableInterface
         $pregClass  = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
 
         // first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
-        if ($event->getMapper() instanceof Mapper && $event->getMapper()
-                                                           ->getModuleNotifier()
-        ) {
-            $classname = $event->getMapper()
-                               ->getModuleNotifier();
+        if ($event->getMapper() instanceof Mapper && $event->getMapper()->getModuleNotifier()) {
+            $classname = $event->getMapper()->getModuleNotifier();
         } // next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
         elseif (class_exists($modelClass . 'Notifier')) {
             $classname = $modelClass . 'Notifier';
@@ -426,6 +371,8 @@ class Scheduler extends StompScheduler implements CommandableInterface
 
 
     /**
+     * TODO put this method on the Trigger itself
+     *
      * @param TriggerInterface $trigger
      * @return string
      */
