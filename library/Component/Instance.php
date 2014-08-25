@@ -62,7 +62,7 @@ class Component_Instance {
 	}
 
 	/**
-	 * @param  \Schoolbox\Collection $config
+	 * @param  \Schoolbox\Collection|Component_ConfigDefinition[] $config
 	 *
 	 * @return $this
 	 */
@@ -72,7 +72,7 @@ class Component_Instance {
 	}
 
 	/**
-	 * @return \Schoolbox\Collection
+	 * @return \Schoolbox\Collection|Component_ConfigDefinition[]
 	 */
 	public function getConfig() {
 		return $this->config;
