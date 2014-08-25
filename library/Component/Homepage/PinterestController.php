@@ -59,7 +59,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
             $parts = array_filter(explode('/', $url));
 
-            switch(count($parts)) {
+            switch (count($parts)) {
 
                 /* User
                  */
