@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,7 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_BlogController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_BlogController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -56,7 +58,8 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
 
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
@@ -65,12 +68,15 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         // remove any non-numeric values from the source config
-        $sourceId = $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id');
+        $sourceId = $this->getConfig('src') ? preg_replace(
+            '#[/a-zA-Z]#',
+            '',
+            $this->getConfig('src')
+        ) : $this->getContext('id');
 
         try {
             $this->source = $this->getCategoryMapper()->findById($sourceId);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
         }
     }
@@ -80,16 +86,17 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'blog')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'blog')) {
             return false;
         }
 
         $this->parseConfig();
 
-		if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
-			return false;
-		}
+        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
+            return false;
+        }
 
         /* Set up blocks and stuff
          */
@@ -98,30 +105,36 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setBlock('blog', 'modify_text', 'modify_text_block');
         $this->setBlock('blog', 'has_comments', 'has_comments_block');
         $this->setBlock('has_comments', 'comment', 'comment_block');
-		$this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
+        $this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
 
-        $this->setVar(array(
-            'modify_text_block' => '',
-            'create_text_block' => '',
-            'has_comments_block' => '',
-            'comment_block' => '',
-            'has_comment_delete_block' => '',
-            'blog_block' => '',
-        ));
+        $this->setVar(
+            array(
+                'modify_text_block' => '',
+                'create_text_block' => '',
+                'has_comments_block' => '',
+                'comment_block' => '',
+                'has_comment_delete_block' => '',
+                'blog_block' => '',
+            )
+        );
 
         /* Set up component name
          */
-        $this->setVar(array(
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Blog',
-
-            // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id') ? 'Local' : $this->source->getName(),
-
-            /* Have update form to back to this homepage, not the wiki's homepage
-             */
-            'BLOG_CATEGORY_ID' => $this->source->getId(),
-        ));
+        $this->setVar(
+            array(
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
+                        'componentname'
+                    ) : 'Blog',
+                // These are for the Select Alternate Source resourcebrowser
+                'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext(
+                        'id'
+                    ) ? 'Local' : $this->source->getName(),
+                /* Have update form to back to this homepage, not the wiki's homepage
+                 */
+                'BLOG_CATEGORY_ID' => $this->source->getId(),
+            )
+        );
 
         $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source->getId());
 
@@ -130,7 +143,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         if ($allItems->count()) {
             $i = 0;
 
-            foreach($allItems as $currentItem) {
+            foreach ($allItems as $currentItem) {
                 $createdTime = new Alaress_Date_Relative($currentItem->getCreated()->getDatabase());
                 $owner = $this->getUserMapper()->findById($currentItem->getOwner()->getId());
 
@@ -154,55 +167,67 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 if ($allComments->count()) {
                     $j = 0;
 
-                    foreach($allComments as $currentComment) {
+                    foreach ($allComments as $currentComment) {
                         $createdTime = new Alaress_Date_Relative($currentComment->getCreated()->getDatabase());
                         $commentOwner = $this->getUserMapper()->findById($currentComment->getOwner()->getId());
 
-                        $this->setVar(array(
-							'COMMENT_COMMENT_ID' => $currentComment->getId(),
-							'COMMENT_BODY' => Scrub::text($currentComment->getBody()),
-							'COMMENT_AUTHOR_ID' => $commentOwner->getId(),
-							'COMMENT_AUTHOR_NAME' => $commentOwner->formatName(),
-							'COMMENT_CREATED' => $createdTime->getRelativeTime(),
-							'COMMENT_AUTHOR_EXTERNAL_ID' => $commentOwner->getExternalId(),
-							'ON_OFF' => ++$j % 2 ? 'dark' : ''
-                        ));
+                        $this->setVar(
+                            array(
+                                'COMMENT_COMMENT_ID' => $currentComment->getId(),
+                                'COMMENT_BODY' => Scrub::text($currentComment->getBody()),
+                                'COMMENT_AUTHOR_ID' => $commentOwner->getId(),
+                                'COMMENT_AUTHOR_NAME' => $commentOwner->formatName(),
+                                'COMMENT_CREATED' => $createdTime->getRelativeTime(),
+                                'COMMENT_AUTHOR_EXTERNAL_ID' => $commentOwner->getExternalId(),
+                                'ON_OFF' => ++$j % 2 ? 'dark' : ''
+                            )
+                        );
 
-                        if ($currentComment->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
+                        if ($currentComment->getOwner()->getId(
+                            ) == $_SESSION['id'] || $this->permission >= WRITE_ACCESS
+                        ) {
                             $this->parse('has_comment_delete_block', 'has_comment_delete');
-						}
-                        else {
-							$this->setVar(array(
-								'has_comment_delete_block' => ''
-							));
-						}
+                        } else {
+                            $this->setVar(
+                                array(
+                                    'has_comment_delete_block' => ''
+                                )
+                            );
+                        }
 
                         $this->parse('comment_block', 'comment', true);
 
-						/* Clear children after parsing out the parent
-						 */
-						$this->setVar(array(
-							'has_comment_delete_block' => ''
-						));
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->setVar(
+                            array(
+                                'has_comment_delete_block' => ''
+                            )
+                        );
                     }
 
-                    $this->setVar(array(
-                        'BLOG_TOTAL_COMMENTS' => $allComments->count(),
-                    ));
+                    $this->setVar(
+                        array(
+                            'BLOG_TOTAL_COMMENTS' => $allComments->count(),
+                        )
+                    );
 
                     $this->parse('has_comments_block', 'has_comments');
 
                     /* Clear children after parsing out the parent
                      */
-                    $this->setVar(array(
-                        'comment_block' => '',
-                        'has_comment_delete_block' => '',
-                    ));
-                }
-                else {
-                    $this->setVar(array(
-                        'BLOG_TOTAL_COMMENTS' => $allComments->count(),
-                    ));
+                    $this->setVar(
+                        array(
+                            'comment_block' => '',
+                            'has_comment_delete_block' => '',
+                        )
+                    );
+                } else {
+                    $this->setVar(
+                        array(
+                            'BLOG_TOTAL_COMMENTS' => $allComments->count(),
+                        )
+                    );
                 }
 
                 /* Controls such as Post Blog
@@ -215,22 +240,25 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                  */
                 if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
                     $this->parse('modify_text_block', 'modify_text');
-                }
-                else {
-                    $this->setVar(array(
-                        'modify_text_block' => ''
-                    ));
+                } else {
+                    $this->setVar(
+                        array(
+                            'modify_text_block' => ''
+                        )
+                    );
                 }
 
                 $this->parse('blog_block', 'blog', true);
 
                 /* Clear children after parsing out the parent
                  */
-                $this->setVar(array(
-                    'modify_text_block' => '',
-                    'has_comments_block' => '',
-                    'comment_block' => ''
-                ));
+                $this->setVar(
+                    array(
+                        'modify_text_block' => '',
+                        'has_comments_block' => '',
+                        'comment_block' => ''
+                    )
+                );
             }
         }
 
