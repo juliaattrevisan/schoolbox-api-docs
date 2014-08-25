@@ -314,7 +314,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Gets the aspect ratio of grid items in this grid
+     * Gets the aspect ratio of tiles in this layout
      *
      * @return string
      */
@@ -324,54 +324,73 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Is this a landscape layout (16:9)?
+     * Sets the aspect ratio of tiles in this layout
+     *
+     * @param  string $aspectRatio A string in format "x:y"
+     * @return $this
+     * @throws \InvalidArgumentException if $aspectRatio isn't in format "x:y"
+     */
+    public function setAspectRatio($aspectRatio)
+    {
+        if (!preg_match('/^(?P<x>\\d+):(?P<y>\\d+)$/', $aspectRatio, $matches)) {
+            throw new \InvalidArgumentException('Aspect ratio must be in format "x:y"');
+        }
+        $this->setAspectRatioX($matches['x'])->setAspectRatioY($matches['y']);
+        return $this;
+    }
+
+    /**
+     * Does this layout have tiles in a landscape shape (aspect ratio 16:9)?
      *
      * @return bool
      */
-    public function isLandscape()
+    public function isLandscapeShape()
     {
         return $this->getAspectRatio() === '16:9';
     }
 
     /**
-     * Is this a portrait layout (9:16)?
+     * Does this layout have tiles in a portrait shape (aspect ratio 9:16)?
      *
      * @return bool
      */
-    public function isPortrait()
+    public function isPortraitShape()
     {
         return $this->getAspectRatio() === '9:16';
     }
 
     /**
-     * Is this a square layout (1:1)?
+     * Does this layout have tiles in a square shape (aspect ratio 1:1)?
      *
      * @return bool
      */
-    public function isSquare()
+    public function isSquareShape()
     {
         return $this->getAspectRatio() === '1:1';
     }
 
     /**
-     * Is this a panoramic layout (16:5)?
+     * Does this layout have tiles in a panoramic shape (aspect ratio 16:5)?
      *
      * @return bool
      */
-    public function isPanoramic()
+    public function isPanoramicShape()
     {
         return $this->getAspectRatio() === '16:5';
     }
 
     /**
-     * Is this a custom layout (none of portrait, square, landscape, panorama?)
+     * Is this a custom shape (none of portrait, square, landscape, panorama?)
      *
      * @return bool
      */
-    public function isCustomLayout()
+    public function isCustomShape()
     {
         return !(
-            $this->isPortrait() || $this->isLandscape() || $this->isSquare() || $this->isPanoramic()
+            $this->isPortraitShape()
+            || $this->isLandscapeShape()
+            || $this->isSquareShape()
+            || $this->isPanoramicShape()
         );
     }
 
