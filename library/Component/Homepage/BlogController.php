@@ -116,22 +116,12 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
             'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id') ? 'Local' : $this->source->getName(),
 
+            /* Have update form to back to this homepage, not the wiki's homepage
+             */
             'BLOG_CATEGORY_ID' => $this->source->getId(),
         ));
 
         $allItems = $this->getBlogMapper()->findByColumn('cid', $this->source->getId());
-
-        /* Have update form to back to this homepage, not the wiki's homepage
-         */
-        $this->setVar(array(
-            'BLOG_CATEGORY_ID' => $this->source->getId(),
-        ));
-
-        /* Controls such as Post News
-         */
-        if ($this->permission >= WRITE_ACCESS) {
-            $this->parse('create_text_block', 'create_text');
-        }
 
         /* Iterate
          */
@@ -139,13 +129,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             $i = 0;
 
             foreach($allItems as $currentItem) {
-                if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
-                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/' . $currentItem->getId() . '" title="Modify Blog post"><span></span></a>');
-                }
-                else {
-                    $this->setVar('MODIFY_BLOG', '');
-                }
-
                 $createdTime = new Alaress_Date_Relative($currentItem->getCreated()->getDatabase());
                 $owner = $this->getUserMapper()->findById($currentItem->getOwner()->getId());
 
@@ -166,10 +149,9 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
                 $allComments = $this->getCommentMapper()->findByColumn('bid', $currentItem->getId());
 
-                $this->setVar('BLOG_TOTAL_COMMENTS', $allComments->count());
-                $j = 0;
-
                 if ($allComments->count()) {
+                    $j = 0;
+
                     foreach($allComments as $currentComment) {
                         $createdTime = new Alaress_Date_Relative($currentComment->getCreated()->getDatabase());
                         $commentOwner = $this->getUserMapper()->findById($currentComment->getOwner()->getId());
@@ -202,6 +184,10 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 						));
                     }
 
+                    $this->setVar(array(
+                        'BLOG_TOTAL_COMMENTS' => $allComments->count(),
+                    ));
+
                     $this->parse('has_comments_block', 'has_comments');
 
                     /* Clear children after parsing out the parent
@@ -212,10 +198,34 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     ));
                 }
                 else {
-                    $this->setVar('has_comments_block', '');
+                    $this->setVar(array(
+                        'BLOG_TOTAL_COMMENTS' => $allComments->count(),
+                    ));
+                }
+
+                /* Controls such as Post Blog
+                 */
+                if ($this->permission >= WRITE_ACCESS) {
+                    $this->parse('create_text_block', 'create_text');
+                }
+
+                /* Control for modifying a blog
+                 */
+                if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
+                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/' . $currentItem->getId() . '" title="Modify Blog post"><span></span></a>');
+                }
+                else {
+                    $this->setVar('MODIFY_BLOG', '');
                 }
 
                 $this->parse('blog_block', 'blog', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->setVar(array(
+                    'has_comments_block' => '',
+                    'comment_block' => ''
+                ));
             }
         }
 
