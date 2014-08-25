@@ -1,4 +1,4 @@
-#!/usr/bin/hhvm
+#!/usr/bin/php
 <?php
 
 use Alaress\Async\Stomp\Subscriber;
@@ -27,7 +27,7 @@ use Schoolbox\Realtime\Rerouter\UserSubscriptionList;
  */
 
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
+$fields = array('porcelain', 'mem', 'truemem', 'pid', 'bind');
 
 $opts = getopt('v', $fields);
 
@@ -43,10 +43,11 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Reroute', array(
-	'verbose' => isset($opts['v']),
+	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'errors'  => E_ALL,
     'fields'  => array_values($fields),
-    'flags'   => $flags
+    'flags'   => $flags,
+    'bind'    => isset($opts['bind'])
 ));
 
 $rerouter = null;
@@ -85,21 +86,29 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
             'passcode' => $conf->get('amqp_pass'),
         ));
 
-        // amqp
-        $amqp = Connector::getInstance();
+        $stompc->connect()->then(function ($client) use (&$rerouter, $loop, $log, $opts) {
 
-        // redis
-        $redisf = new Redis();
-        $redisc = $redisf->getClientInstance();
+            // amqp
+            $amqp = Connector::getInstance();
 
-        // setup dependencies
-        $binder     = new UserQueueBinder();
-        $uqf        = new UserQueueFactory(new FullPlan($amqp, $redisc, $binder));
-        $subscriber = new Subscriber($stompc, new UserSubscriptionList(new AMQPBuilder($amqp)));
-        $strat      = new RerouterDispatchStrategy($opts['flags']);
+            // redis
+            $redisf = new Redis();
+            $redisc = $redisf->getClientInstance();
 
-        // throw all the above into the class we wanted in the first place
-        $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $stompc, $amqp, $binder);
+            // setup dependencies
+            $binder     = new UserQueueBinder();
+            $uqf        = new UserQueueFactory(new FullPlan($amqp, $redisc, $binder));
+            $subscriber = new Subscriber($client, new UserSubscriptionList(new AMQPBuilder($amqp)));
+            $strat      = new RerouterDispatchStrategy($opts['flags']);
+
+            // throw all the above into the class we wanted in the first place
+            $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $client, $amqp, $binder);
+
+            if ($opts['bind']) {
+                $rerouter->onHangup();
+            }
+        });
+
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.", array($e));
