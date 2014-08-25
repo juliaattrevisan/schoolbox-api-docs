@@ -178,4 +178,13 @@ class UserQueueBinder
         return $count;
     }
 
+
+    /**
+     * Drop the cache of existing bindings
+     */
+    public function dropCache()
+    {
+        $this->existingBindings = null;
+    }
+
 }
