@@ -51,7 +51,15 @@ $kernel->run(function($di, $loop, $log, $opts) {
 	 */
 
 	try {
-		new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $log);
+
+        // make sure our endpoint exists
+        $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
+        $q   = INSTANCE_ID . DigestScheduler::QUEUE_COMMAND;
+
+        $mqc->declareQueue($q)
+            ->bindQueue($q, '*.' . Notif::TOPIC_CMD_DIGEST);
+
+        new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $log);
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.");

@@ -28,7 +28,7 @@ use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
-class DigestScheduler extends CronScheduler implements CommandableInterface {
+class DigestScheduler extends CronScheduler {
 
 	const NEVER  = '0 1 31 2 *'; // 1am, Feb 31st (good luck)
 	const DAILY  = '0 6 * * 1-5'; // 6am, weekdays
@@ -39,23 +39,6 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 	/** @var DigestTrigger[] */
 	protected $triggers = array();
 
-	/**
-	 * Binds the queues that the Scheduler requires
-	 */
-	public static function bindQueues() {
-		// make sure our endpoints exist
-		$mqc = Connector::getInstance();
-		$queues = array(
-			INSTANCE_ID . self::QUEUE_COMMAND       => '*.' . Notif::TOPIC_CMD_DIGEST
-		);
-
-		foreach($queues as $q => $route) {
-			$mqc
-				->declareQueue($q)
-				->bindQueue($q, $route);
-		}
-	}
-
 
     /**
      * @param LoopInterface $loop
@@ -65,7 +48,6 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
     public function __construct($loop, $dispatchStrategy, $log) {
         parent::__construct($loop, $dispatchStrategy, $log);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-	    self::bindQueues();
 
 	    $stompFactory = new Factory($this->loop);
 	    $client = $stompFactory->createClient(array(
@@ -136,10 +118,10 @@ class DigestScheduler extends CronScheduler implements CommandableInterface {
 				$this->scheduleNotification($this->triggers[$role->getId()]);
 			}
 			catch(InvalidArgumentException $e) {
-				echo $e->getMessage(), "\n";
+				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
 			}
 			catch(RuntimeException $e) {
-				echo $e->getMessage(), "\n";
+				$this->log->error(get_class($e) . "in DigestScheduler: " . $e->getMessage());
 			}
 		}
 	}
