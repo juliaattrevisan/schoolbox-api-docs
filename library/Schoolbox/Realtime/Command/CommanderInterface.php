@@ -15,9 +15,9 @@ use Alaress\Scheduler\CommandableInterface;
 interface CommanderInterface {
 
 	/**
-	 * @param $scheduler CommandableInterface
+	 * @param $commandable CommandableInterface
 	 * @param string $command
 	 * @return bool
 	 */
-	public function exec($scheduler, $command);
+	public function exec($commandable, $command);
 } 
