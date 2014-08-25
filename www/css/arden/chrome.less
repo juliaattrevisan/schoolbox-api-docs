@@ -21,8 +21,8 @@
 // =============================================================================
 // Dimensions
 @search-width: 					200px;
-@logo-width: 					118px;
-@logo-height: 					167px;
+@logo-width: 					98px;
+@logo-height: 					80px;
 @infopanel-bellsprite:			'/images/arden/bell.png';
 
 // Generic colors
@@ -44,7 +44,7 @@
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @search-color:                  @banner-color;
-@banner-height:     			100px;
+@banner-height:     			146px;
 
 // Modules
 @module-heading: 				@banner-background;
@@ -117,14 +117,19 @@ body{
     background: @white;
     font-family: Georgia, serif;
     font-size: 14px;
-    h1{ color: @banner-background; font-size: 22px; }
+    h1{
+        color: @banner-background;
+        font-size: 22px;
+        font-weight: normal;
+        padding-left: 15px;
+    }
     h2{ padding: 4px 16px; }
     .banner-top{
         background: @tab-hover-color;
         height: 32px;
         #infoPanel {
             margin: 0;
-            right: 510px;
+            right: 235px;
             z-index: 3;
             height: 32px;
             > li{
@@ -143,7 +148,7 @@ body{
             background: transparent;
             width: 200px;
             z-index: 3;
-            right: 300px;
+            right: 24px;
             margin: 0;
             #search-button {
                 background: url("/images/core/search-button.png") no-repeat 0px 8px;
@@ -161,22 +166,22 @@ body{
         }
     }
     #header {
+        min-width: 944px;
         z-index: 1;
         .logo {
-            right: 17px;
-            left: auto;
-            top: -32px;
+            right: auto;
+            left: 68px;
+            top: 49px;
         }
         #tabs{
-            margin: 40px 0 0 230px;
-            padding-right: 138px;
+            margin: 45px 0 0 244px;
             li a{ padding: 0 12px; }
         }
     }
     #nav {
         background: @white;
         border: 10px solid #e0d6bc;
-        top: 76px;
+        top: 167px;
         text-align: left;
         left: 20px;
         margin: 0;
