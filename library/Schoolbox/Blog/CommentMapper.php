@@ -14,6 +14,7 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
+use Schoolbox\Blog\Blog;
 
 class CommentMapper extends Mapper implements FeedableMapperInterface {
 
@@ -136,4 +137,39 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
 		return $c;
 	}
 
+    /**
+     * Find all the comments for a particular blog
+     *
+     * @param Blog $blog
+     * @return Collection
+     */
+    public function findForBlog(Blog $blog) {
+        $stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('c')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `c`
+            LEFT JOIN {$this->getJoinSql('owner', 'c', 'u')}
+			WHERE
+				`c`.`deleted` IS NULL
+				AND `c`.bid = :blogId
+			ORDER BY `c`.`created` DESC
+		");
+
+        $stmt->execute(array(
+            'blogId' => $blog->getId()
+        ));
+
+        $c = $this->createCollection();
+
+        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Comment $comment */
+            $comment = $this->hydrate($r, 'c');
+            $comment->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+            $c->add($comment);
+        }
+
+        return $c;
+    }
 }

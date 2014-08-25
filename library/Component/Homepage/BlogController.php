@@ -162,23 +162,22 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     )
                 );
 
-                $allComments = $this->getCommentMapper()->findByColumn('bid', $currentItem->getId());
+                $allComments = $this->getCommentMapper()->findForBlog($currentItem);
 
                 if ($allComments->count()) {
                     $j = 0;
 
                     foreach ($allComments as $currentComment) {
                         $createdTime = new Alaress_Date_Relative($currentComment->getCreated()->getDatabase());
-                        $commentOwner = $this->getUserMapper()->findById($currentComment->getOwner()->getId());
 
                         $this->setVar(
                             array(
                                 'COMMENT_COMMENT_ID' => $currentComment->getId(),
                                 'COMMENT_BODY' => Scrub::text($currentComment->getBody()),
-                                'COMMENT_AUTHOR_ID' => $commentOwner->getId(),
-                                'COMMENT_AUTHOR_NAME' => $commentOwner->formatName(),
+                                'COMMENT_AUTHOR_ID' => $currentComment->getOwner()->getId(),
+                                'COMMENT_AUTHOR_NAME' => $currentComment->getOwner()->formatName(),
                                 'COMMENT_CREATED' => $createdTime->getRelativeTime(),
-                                'COMMENT_AUTHOR_EXTERNAL_ID' => $commentOwner->getExternalId(),
+                                'COMMENT_AUTHOR_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
                                 'ON_OFF' => ++$j % 2 ? 'dark' : ''
                             )
                         );
@@ -230,12 +229,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     );
                 }
 
-                /* Controls such as Post Blog
-                 */
-                if ($this->permission >= WRITE_ACCESS) {
-                    $this->parse('create_text_block', 'create_text');
-                }
-
                 /* Control for modifying a blog
                  */
                 if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
@@ -260,6 +253,12 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     )
                 );
             }
+        }
+
+        /* Controls such as Post Blog
+         */
+        if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('create_text_block', 'create_text');
         }
 
         return true;
