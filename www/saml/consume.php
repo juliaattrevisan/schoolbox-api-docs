@@ -12,8 +12,7 @@ error_reporting(E_ALL);
 $settings = NULL;
 require 'settings.php';
 
-//print_r($_POST);
-//var_dump(base64_decode($_POST['SAMLResponse']));
+SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
 try {
@@ -24,17 +23,23 @@ try {
             if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'] && substr($_GET['page'],0,6) != '/login')) {
                 $page = $_GET['page'];
             }
+            SAMLDebugLog("SAML auth successful");
             SitePage::localRedir($page);
         }
         else {
-            echo 'Invalid SAML user.';
+            $msg = 'Invalid SAML user.';
+            echo $msg;
+            SAMLDebugLog($msg);
         }
     }
     else {
-        echo 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
+        $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
+        echo $msg;
+        SAMLDebugLog($msg);
     }
 }
 catch (Exception $e) {
-    echo 'Invalid SAML response: ' . $e->getMessage();
-//var_dump($samlResponse);
+    $msg = 'Invalid SAML response: ' . $e->getMessage();
+    echo $msg;
+    SAMLDebugLog($msg);
 }
