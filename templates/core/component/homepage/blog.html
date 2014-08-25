@@ -48,7 +48,7 @@
 					var state = 'Show';
 				}
 
-				button.html('<span></span>' + state + ' Comments');
+				button.html('<span></span>' + state + ' Comments (' + button.data('numcomments') + ')');
 			}
 		});
 	});
@@ -110,7 +110,7 @@
 			</form>
 
 			<p class="interact">
-				<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{BLOG_ID}'><span></span>Show Comments ({BLOG_TOTAL_COMMENTS})</a>
+				<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{BLOG_ID}' data-numcomments="{BLOG_TOTAL_COMMENTS}"><span></span>Show Comments ({BLOG_TOTAL_COMMENTS})</a>
 				<a rel='modify_blogcomment_form_{BLOG_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
 			</p>
 		</li>
