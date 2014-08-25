@@ -99,7 +99,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
         $strat      = new RerouterDispatchStrategy($opts['flags']);
 
         // throw all the above into the class we wanted in the first place
-        $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $amqp, $binder);
+        $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $stompc, $amqp, $binder);
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.", array($e));

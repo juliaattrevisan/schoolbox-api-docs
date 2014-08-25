@@ -27,6 +27,7 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\Notif\Queue\UserQueueFactory;
@@ -35,6 +36,7 @@ use Schoolbox\UserMapper;
 
 class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
+    const QUEUE_COMMAND             = '.sb.cmd.reroute';
 	const TRANSACTION_CACHE_TIMEOUT = 0.5;
 	const TRANSACTION_COUNT_LIMIT   = 80;
 
@@ -75,6 +77,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
      * @param Subscriber                $subscriber
      * @param UserQueueFactory          $uqf
      * @param LoggerInterface           $log
+     * @param Client                    $stomp
      * @param AMQPInterface             $amqpConn
      * @param UserQueueBinder           $binder
      * @param ControlInterface          $rabbitControl
@@ -85,6 +88,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         Subscriber $subscriber,
         UserQueueFactory $uqf,
         LoggerInterface $log,
+        Client $stomp,
         AMQPInterface $amqpConn = null,
         UserQueueBinder $binder = null,
         ControlInterface $rabbitControl = null
@@ -105,6 +109,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         // TODO transpose these NEWs and getInstances into a factory
         $this->userMapper      = UserMapper::getInstance();
         $this->dispatcher = $d = new Dispatcher($loop, $this, $log, $dispatchStrategy);
+
+        // connect to the command queue - make sure you've already registered this queue
+        $stomp->subscribe(INSTANCE_ID.self::QUEUE_COMMAND, array($this, 'onCommand'));
 
         // register signal listeners
 		$this->on(SIGTSTP, array($this, 'onPause'));
@@ -369,6 +376,18 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 		$this->loop->stop();
 
 	}
+
+
+    /**
+     * @param Frame $frame
+     */
+    public function onCommand(Frame $frame)
+    {
+        $this->log->info("Received command");
+        $commander = new RerouterCommander($this->userMapper);
+        $body = CompressedFormatter::uncompress($frame->body);
+        $commander->exec($this, $body['message']);
+    }
 
 
 	/**
