@@ -18,9 +18,13 @@ $component = array(
     'multiple'           => 'true',
     'visible'            => 'true',
     'config'             => array(
-        'componentname'  => array(
+        'componentname' => array(
             'default_value' => 'Tiles',
             'label'         => 'Heading',
+        ),
+        'layout' => array(
+            'default_value' => 0,
+            'label'         => 'Layout ID',
         ),
     )
 );
