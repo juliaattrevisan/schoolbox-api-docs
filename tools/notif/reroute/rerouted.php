@@ -94,13 +94,12 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 
         // setup dependencies
         $binder     = new UserQueueBinder();
-        $notif      = new Notif(Notif::TOPIC_SYSTEM, $conf);
         $uqf        = new UserQueueFactory(new FullPlan($amqp, $redisc, $binder));
         $subscriber = new Subscriber($stompc, new UserSubscriptionList(new AMQPBuilder($amqp)));
         $strat      = new RerouterDispatchStrategy($opts['flags']);
 
         // throw all the above into the class we wanted in the first place
-        $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $amqp, $binder, $notif);
+        $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $amqp, $binder);
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.", array($e));

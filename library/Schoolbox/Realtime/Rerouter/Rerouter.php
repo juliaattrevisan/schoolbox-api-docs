@@ -10,6 +10,9 @@
 namespace Schoolbox\Realtime\Rerouter;
 
 
+use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\AMQP\Bunny\BunnyControl;
+use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\SignalEmitter;
 use Alaress\Async\Stomp\Subscriber;
 use Alaress\WorkerCrew\Dispatcher;
@@ -24,9 +27,9 @@ use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\Notif\Queue\UserQueueFactory;
-use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -38,14 +41,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var LoopInterface */
 	protected $loop;
 
-	/** @var RoutePermissionMapper */
-	protected $permissionMapper;
-
 	/** @var UserMapper */
 	protected $userMapper;
-
-	/** @var Notif */
-	protected $notif;
 
 	/** @var LoggerInterface */
 	public $log;
@@ -56,6 +53,15 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var UserQueueFactory */
 	protected $uqf;
 
+    /** @var AMQPInterface */
+    protected $amqp;
+
+    /** @var ControlInterface */
+    protected $bunny;
+
+    /** @var UserQueueBinder */
+    protected $binder;
+
 	/** @var Subscriber */
 	protected $subscriber;
 
@@ -63,38 +69,50 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	protected $running;
 
 
-	/**
-	 * @param LoopInterface             $loop
-	 * @param DispatchStrategyInterface $dispatchStrategy
-	 * @param LoggerInterface           $log
-	 * @param Subscriber                $subscriber
-	 * @param UserQueueFactory          $uqFactory
-     * @param LoggerInterface           $notif
-	 */
-	public function __construct($loop, $dispatchStrategy, $log, $subscriber, $uqFactory, $notif = null) {
+    /**
+     * @param LoopInterface             $loop
+     * @param DispatchStrategyInterface $dispatchStrategy
+     * @param Subscriber                $subscriber
+     * @param UserQueueFactory          $uqf
+     * @param LoggerInterface           $log
+     * @param AMQPInterface             $amqpConn
+     * @param UserQueueBinder           $binder
+     * @param ControlInterface          $rabbitControl
+     */
+	public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        Subscriber $subscriber,
+        UserQueueFactory $uqf,
+        LoggerInterface $log,
+        AMQPInterface $amqpConn = null,
+        UserQueueBinder $binder = null,
+        ControlInterface $rabbitControl = null
+    ) {
 		parent::__construct($loop);
 
 		$this->loop       = $loop;
 		$this->running    = false;
 		$this->subscriber = $subscriber;
+        $this->uqf        = $uqf;
 		$this->log        = $log;
-        $this->uqf        = $uqFactory;
 
 		// cast optional param
-		$this->notif      = $notif ?: new Notif();
+        $this->amqp       = $amqpConn ? : Connector::getInstance();
+        $this->bunny      = $rabbitControl ? : new BunnyControl();
+        $this->binder     = $binder ? : new UserQueueBinder();
 
-		// register signal listeners
+        // TODO transpose these NEWs and getInstances into a factory
+        $this->userMapper      = UserMapper::getInstance();
+        $this->dispatcher = $d = new Dispatcher($loop, $this, $log, $dispatchStrategy);
+
+        // register signal listeners
 		$this->on(SIGTSTP, array($this, 'onPause'));
 		$this->on(SIGCONT, array($this, 'onResume'));
 		$this->on(SIGHUP,  array($this, 'onHangup'));
 		$this->on(SIGPOLL, array($this, 'onPoll'));
 		$this->on(SIGINT,  array($this, 'onInterrupt'));
 		$this->on(SIGTERM, array($this, 'onTerminate'));
-
-		// TODO transpose these NEWs and getInstances into a factory
-		$this->permissionMapper = RoutePermissionMapper::getInstance();
-		$this->userMapper       = UserMapper::getInstance();
-		$this->dispatcher =  $d = new Dispatcher($loop, $this, $log, $dispatchStrategy);
 
 		$this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
 
@@ -162,6 +180,18 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	}
 
 
+    /**
+     * @param int $userId
+     * @return bool
+     */
+    public function unsubscribeUser($userId)
+    {
+        $subscriber = $this->subscriber;
+        $subList    = $subscriber->getSubscriptionList();
+        return $subscriber->unsubscribe($subList->createQueueName($userId));
+    }
+
+
 	/**
 	 * Callback executed when SIGCONT received by the process
 	 */
@@ -201,6 +231,29 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	}
 
 
+    /**
+     * @param int $userId
+     * @return bool
+     */
+    public function subscribeUser($userId)
+    {
+        $tx         = $this->transaction;
+        $subscriber = $this->subscriber;
+        $subList    = $subscriber->getSubscriptionList();
+
+        return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
+            /**
+             * This closure is executed every time a message is sent to the client based on the given subscription
+             * Adds the frame to a loop cache, and dispatches appropriately
+             *
+             * @var Frame $frame
+             * @var User  $data
+             */
+            $tx->put(sha1($frame->dump()), array($data, $frame));
+        });
+    }
+
+
 	/**
 	 * @return void
 	 */
@@ -226,14 +279,65 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	}
 
 
-	/**
-	 * @return void
-	 */
-	protected function rebind() {
-		$this->log->notice("Releasing workers");
-		$this->getDispatcher()->releaseWorkerPool(false);
-		$this->log->debug("Rebind should be performed");
-	}
+    /**
+     * @return void
+     */
+    protected function rebind()
+    {
+        $this->log->notice("Releasing workers");
+        $this->getDispatcher()
+             ->releaseWorkerPool(false);
+
+        $this->log->notice("Rebinding all users");
+
+        // recache the user list into the subscription list
+        $this->log->debug("Reloading user list from database");
+
+        $subList = $this->subscriber->getSubscriptionList();
+
+        $subList->importFromSource($this->userMapper);
+
+        // drop the cache of existing bindings
+        $this->binder->dropCache();
+
+        $this->log->debug("Iterating users to bind");
+
+        // iterate the set and
+        foreach ($subList->getAllQueueNames() as $queue) {
+            /** @var User $user */
+            $user = $subList->getQueueData($queue);
+
+            $this->rebindUser($user, $queue);
+        }
+
+        $this->log->debug("Full rebind complete");
+    }
+
+
+    /**
+     * @param User $user
+     */
+    public function rebindUser(User $user)
+    {
+        $binder = $this->binder;
+
+        // pause the current subscription
+        $this->unsubscribeUser($user->getId());
+
+        // remove the current user's bindings
+        $removed = $binder->destroyUserBindings($this->amqp, $this->bunny, $user->getId());
+
+        // build the queue, which will generate and attach the bindings we require
+        $this->uqf->buildUserQueue($user, 0);
+
+        // resume the current subscription
+        $this->subscribeUser($user->getId());
+
+        // the binder inside UQF is the same object as $this->binder, so we can extract and count its current set of bindings
+        $added = count($binder->getBindings());
+
+        $this->log->debug(sprintf("Bind: -%3d/+%3d: %s", $removed, $added, $user->getUsername()));
+    }
 
 
 	/**
