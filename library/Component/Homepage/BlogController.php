@@ -95,11 +95,13 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
          */
         $this->setBlock($templateHandle, 'blog', 'blog_block');
         $this->setBlock($templateHandle, 'create_text', 'create_text_block');
+        $this->setBlock('blog', 'modify_text', 'modify_text_block');
         $this->setBlock('blog', 'has_comments', 'has_comments_block');
         $this->setBlock('has_comments', 'comment', 'comment_block');
 		$this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
 
         $this->setVar(array(
+            'modify_text_block' => '',
             'create_text_block' => '',
             'has_comments_block' => '',
             'comment_block' => '',
@@ -212,10 +214,12 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 /* Control for modifying a blog
                  */
                 if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
-                    $this->setVar("MODIFY_BLOG", '<a class="btn no-text modify" href="/blog/modify/' . $currentItem->getId() . '" title="Modify Blog post"><span></span></a>');
+                    $this->parse('modify_text_block', 'modify_text');
                 }
                 else {
-                    $this->setVar('MODIFY_BLOG', '');
+                    $this->setVar(array(
+                        'modify_text_block' => ''
+                    ));
                 }
 
                 $this->parse('blog_block', 'blog', true);
@@ -223,6 +227,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 /* Clear children after parsing out the parent
                  */
                 $this->setVar(array(
+                    'modify_text_block' => '',
                     'has_comments_block' => '',
                     'comment_block' => ''
                 ));
