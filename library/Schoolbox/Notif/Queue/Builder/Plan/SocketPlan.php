@@ -12,6 +12,8 @@ namespace Schoolbox\Notif\Queue\Builder\Plan;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use Predis\ClientInterface;
+use Schoolbox\Notif\Queue\Bindings\Generator;
+use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\Notif\Queue\Builder\AMQPBuilder;
 use Schoolbox\Notif\Queue\Builder\Plan;
 use Schoolbox\Notif\Queue\Builder\RedisBuilder;
@@ -25,10 +27,12 @@ class SocketPlan extends Plan
      *
      * @param AMQPInterface   $amqp
      * @param ClientInterface $redis
+     * @param UserQueueBinder $binder
+     * @param Generator       $generator
      */
-    function __construct(AMQPInterface $amqp, ClientInterface $redis)
+    function __construct(AMQPInterface $amqp, ClientInterface $redis, UserQueueBinder $binder = null, Generator $generator = null)
     {
-        $this->setBuilder(AMQPBuilder::STORE, new AMQPBuilder($amqp));
+        $this->setBuilder(AMQPBuilder::STORE, new AMQPBuilder($amqp, $binder, $generator));
         $this->setBuilder(RedisBuilder::STORE, new RedisBuilder($redis));
 
         $this->addIntention(AMQPBuilder::STORE, UserQueue::Q_UNREAD, "*.instant.#");

@@ -32,14 +32,14 @@ class AMQPBuilder implements BuilderInterface
 
     /**
      * @param AMQPInterface   $conn
-     * @param Generator       $generator
      * @param UserQueueBinder $binder
+     * @param Generator       $generator
      */
-    public function __construct(AMQPInterface $conn, Generator $generator = null, UserQueueBinder $binder = null)
+    public function __construct(AMQPInterface $conn, UserQueueBinder $binder = null, Generator $generator = null)
     {
         $this->conn      = $conn;
-        $this->generator = $generator ? : new Generator();
         $this->binder    = $binder ? : new UserQueueBinder();
+        $this->generator = $generator ? : new Generator();
     }
 
 
