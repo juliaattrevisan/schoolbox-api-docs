@@ -23,7 +23,7 @@ $definition = array(
         ),
         'url' => array(
             'default_value' => '',
-            'label' => 'Board URL',
+            'label' => 'URL',
         ),
     ),
 );
