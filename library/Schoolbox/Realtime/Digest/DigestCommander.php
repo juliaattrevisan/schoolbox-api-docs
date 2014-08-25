@@ -24,16 +24,6 @@ class DigestCommander extends AbstractCommander {
 
 
 	/**
-	 * Call through to scheduler to statically bind queues
-	 *
-	 * @return void
-	 */
-	protected function bindQueues() {
-		DigestScheduler::bindQueues();
-	}
-
-
-	/**
 	 * Alias of advise(self::CMD_RELOAD)
 	 */
 	public function adviseReload() {

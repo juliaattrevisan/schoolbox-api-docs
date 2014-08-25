@@ -21,6 +21,7 @@ use React\Stomp\Client;
 use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
@@ -43,20 +44,13 @@ class DigestScheduler extends CronScheduler {
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
+     * @param Client $client
      * @param LoggerInterface $log
+     * @param IConfigLoader $conf
      */
-    public function __construct($loop, $dispatchStrategy, $log) {
-        parent::__construct($loop, $dispatchStrategy, $log);
+    public function __construct($loop, $dispatchStrategy, $client, $log, $conf = null) {
+        parent::__construct($loop, $dispatchStrategy, $log, $conf);
         $this->method = DefaultDispatchStrategy::TASK_DIGEST;
-
-	    $stompFactory = new Factory($this->loop);
-	    $client = $stompFactory->createClient(array(
-		    'host'      => $this->conf->get('amqp_host'),
-		    'port'      => $this->conf->get('amqp_stomp_port'),
-		    'vhost'     => '/',
-		    'login'     => $this->conf->get('amqp_user'),
-		    'passcode'  => $this->conf->get('amqp_pass'),
-	    ));
 
 	    $self = $this;
 	    $client->connect()->then(function($client) use ($self) {
@@ -143,7 +137,7 @@ class DigestScheduler extends CronScheduler {
 	 */
 	public function onCommand($frame) {
 		$this->log->info("Received command");
-		$commander = new DigestCommander($this);
+		$commander = new DigestCommander();
 		$body = CompressedFormatter::uncompress($frame->body);
 		$commander->exec($this, $body['message']);
 	}
