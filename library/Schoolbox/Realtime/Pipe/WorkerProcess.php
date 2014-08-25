@@ -99,12 +99,13 @@ class WorkerProcess extends AbstractProcess
         $this->log->debug("Fetching $count for user $userId");
         $decorator = new Decorator();
 
-        $queue = $this->uqf->buildUserQueue($userId, $count, false);
+        // get ALL messages in this queue
+        $queue = $this->uqf->buildUserQueue($userId, -1, false);
 
         // make messages pretty
         $queue->fetchNotificationsIntoBundle(UserQueue::Q_LISTED, $decorator, true);
         // wrap in an array to preserve keys
-        return array($decorator->renderAsSocketArray(false));
+        return array($decorator->renderAsSocketArray(false, $count));
     }
 
 
