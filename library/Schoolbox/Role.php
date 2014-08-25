@@ -8,16 +8,17 @@
  */
 namespace Schoolbox;
 
-class Role {
+class Role
+{
 
-	/** @var int */
+    /** @var int */
     private $id;
-	/** @var string */
+    /** @var string */
     private $name;
-	/** @var string */
-    private $type;          //Type of user group, guest, student, parent, staff
-	/** @var bool */
-    private $canChangePassword;  //Users can change passwords (bool)
+    /** @var string */
+    private $type; //Type of user group, guest, student, parent, staff
+    /** @var bool */
+    private $canChangePassword; //Users can change passwords (bool)
 
     /**
      * What's the digest schedule for this group?
@@ -32,16 +33,17 @@ class Role {
     const PARENT = 'parent';
     const STAFF = 'staff';
 
-    const DIGEST_NEVER  = 0;
+    const DIGEST_NEVER = 0;
     const DIGEST_WEEKLY = 1;
-    const DIGEST_DAILY  = 2;
+    const DIGEST_DAILY = 2;
 
     /**
      * True if role is guest
      *
      * @return bool
      */
-    public function isGuest() {
+    public function isGuest()
+    {
         return $this->type == self::GUEST;
     }
 
@@ -50,7 +52,8 @@ class Role {
      *
      * @return bool
      */
-    public function isStudent() {
+    public function isStudent()
+    {
         return $this->type == self::STUDENT;
     }
 
@@ -59,7 +62,8 @@ class Role {
      *
      * @return bool
      */
-    public function isStaff() {
+    public function isStaff()
+    {
         return $this->type == self::STAFF;
     }
 
@@ -68,79 +72,89 @@ class Role {
      *
      * @return bool
      */
-    public function isParent() {
+    public function isParent()
+    {
         return $this->type == self::PARENT;
     }
 
-	/**
-	 * @param bool $canChangePassword
-	 * @return self
-	 */
-	public function setCanChangePassword($canChangePassword) {
+    /**
+     * @param bool $canChangePassword
+     * @return self
+     */
+    public function setCanChangePassword($canChangePassword)
+    {
         $this->canChangePassword = $canChangePassword;
-	    return $this;
+        return $this;
     }
 
-	/**
-	 * @return bool
-	 */
-	public function getCanChangePassword() {
+    /**
+     * @return bool
+     */
+    public function getCanChangePassword()
+    {
         return $this->canChangePassword;
     }
 
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
         $this->id = $id;
-	    return $this;
+        return $this;
     }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
+    /**
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-	/**
-	 * @param string $name
-	 * @return self
-	 */
-	public function setName($name) {
+    /**
+     * @param string $name
+     * @return self
+     */
+    public function setName($name)
+    {
         $this->name = $name;
-	    return $this;
+        return $this;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getName() {
+    /**
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-	/**
-	 * @param string $type
-	 * @return self
-	 */
-	public function setType($type) {
+    /**
+     * @param string $type
+     * @return self
+     */
+    public function setType($type)
+    {
         $this->type = $type;
-	    return $this;
+        return $this;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getType() {
+    /**
+     * @return string
+     */
+    public function getType()
+    {
         return $this->type;
     }
 
     /**
-     * @param  string   $digestSchedule
+     * @param  string $digestSchedule
      * @return self
      */
-    public function setDigestSchedule($digestSchedule) {
+    public function setDigestSchedule($digestSchedule)
+    {
         $this->digestSchedule = $digestSchedule;
         return $this;
     }
@@ -148,7 +162,8 @@ class Role {
     /**
      * @return string
      */
-    public function getDigestSchedule() {
+    public function getDigestSchedule()
+    {
         return $this->digestSchedule;
     }
 

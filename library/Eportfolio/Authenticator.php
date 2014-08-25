@@ -239,8 +239,7 @@ class Eportfolio_Authenticator
             else {
                 $youCanView = true;
             }
-        }
-        /* User-created pages have their own unique permissions
+        } /* User-created pages have their own unique permissions
 		 */
         else {
 
