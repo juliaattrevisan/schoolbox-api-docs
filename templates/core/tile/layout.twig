@@ -22,11 +22,23 @@
                 </em>
             </td>
             <td>
-                <input type="radio" id="layout_type_grid" name="layout_type" value="1" />
+                <input
+                    type="radio"
+                    id="layout_type_grid"
+                    name="layout_type"
+                    value="{{ item.LAYOUT_TYPE_GRID|e('html_attr') }}"
+                    {% if item.isGridLayoutType() %}checked{% endif %}
+                />
                 <label for="layout_type_grid">Grid</label>
                 <input name="grid_width" value="{{ item.gridWidth|e('html_attr') }}" />
 
-                <input type="radio" id="layout_type_column" name="layout_type" value="2" />
+                <input
+                    type="radio"
+                    id="layout_type_column"
+                    name="layout_type"
+                    value="{{ item.LAYOUT_TYPE_COLUMN|e('html_attr') }}"
+                    {% if item.isColumnLayoutType() %}checked{% endif %}
+                />
                 <label for="layout_type_column">Columns</label>
                 <input name="column_count" value="{{ item.columnCount|e('html_attr') }}" />
             </td>
@@ -39,19 +51,49 @@
                 </em>
             </td>
             <td>
-                <input type="radio" id="tile_shape_landscape" name="tile_shape" value="landscape" />
+                <input
+                    type="radio"
+                    id="tile_shape_landscape"
+                    name="tile_shape"
+                    value="landscape"
+                    {% if item.isLandscapeShape() %}checked{% endif %}
+                />
                 <label for="tile_shape_landscape">Landscape</label>
 
-                <input type="radio" id="tile_shape_portrait" name="tile_shape" value="portrait" />
+                <input
+                    type="radio"
+                    id="tile_shape_portrait"
+                    name="tile_shape"
+                    value="portrait"
+                    {% if item.isPortraitShape() %}checked{% endif %}
+                />
                 <label for="tile_shape_portrait">Portrait</label>
 
-                <input type="radio" id="tile_shape_square" name="tile_shape" value="square" />
+                <input
+                    type="radio"
+                    id="tile_shape_square"
+                    name="tile_shape"
+                    value="square"
+                    {% if item.isSquareShape() %}checked{% endif %}
+                />
                 <label for="tile_shape_square">Square</label>
 
-                <input type="radio" id="tile_shape_panorama" name="tile_shape" value="panorama" />
+                <input
+                    type="radio"
+                    id="tile_shape_panorama"
+                    name="tile_shape"
+                    value="panorama"
+                    {% if item.isPanoramicShape() %}checked{% endif %}
+                />
                 <label for="tile_shape_panorama">Panorama</label>
 
-                <input type="radio" id="tile_shape_custom" name="tile_shape" value="custom" />
+                <input
+                    type="radio"
+                    id="tile_shape_custom"
+                    name="tile_shape"
+                    value="custom"
+                    {% if item.isCustomShape() %}checked{% endif %}
+                />
                 <label for="tile_shape_custom">Custom</label>
 
                 <input name="aspect_ratio_x" value="{{ item.aspectRatioX|e('html_attr') }}" />
