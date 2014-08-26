@@ -121,12 +121,12 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 		$this->on(SIGINT,  array($this, 'onInterrupt'));
 		$this->on(SIGTERM, array($this, 'onTerminate'));
 
-		$this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
-
 		$this->transaction = new Transaction($loop, function($timer) use ($d) {
 			/** @var $timer TimerInterface */
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
 		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
+
+        $this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
 	}
 
 
@@ -193,6 +193,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
      */
     public function unsubscribeUser($userId)
     {
+        $this->log->debug("Unsubscribing user $userId");
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
         return $subscriber->unsubscribe($subList->createQueueName($userId));
@@ -214,10 +215,12 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	protected function resume() {
 		$this->log->notice($this->isRunning() ? 'Cannot resume, already running' : 'Resuming');
 		// if paused
+
 		if(!$this->isRunning()) {
 			// pick up all subscriptions
 			$tx = $this->transaction;
 
+            $this->log->debug("Importing user data");
 			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper);
 			$count = $this->subscriber->subscribeAll(function($frame, $data) use ($tx) {
 				/**
@@ -244,6 +247,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
      */
     public function subscribeUser($userId)
     {
+        $this->log->debug("Subscribing user $userId");
+
         $tx         = $this->transaction;
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
@@ -343,7 +348,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         // the binder inside UQF is the same object as $this->binder, so we can extract and count its current set of bindings
         $added = count($binder->getBindings());
 
-        $this->log->debug(sprintf("Bind: -%3d/+%3d: %s", $removed, $added, $user->getUsername()));
+        $this->log->debug(sprintf("BIND %4s %4d  %s", "-{$removed}", "+{$added}", $user->getUsername()));
     }
 
 
