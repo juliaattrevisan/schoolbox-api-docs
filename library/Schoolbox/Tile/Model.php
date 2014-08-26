@@ -75,6 +75,11 @@ class Model implements ISoftDeletable
     protected $backgroundImage;
 
     /**
+     * @var int
+     */
+    protected $order;
+
+    /**
      * @param  string $backgroundColor
      * @return $this
      */
@@ -309,6 +314,24 @@ class Model implements ISoftDeletable
     public function getModifiedAt()
     {
         return $this->modifiedAt;
+    }
+
+    /**
+     * @param  int $order
+     * @return $this
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**

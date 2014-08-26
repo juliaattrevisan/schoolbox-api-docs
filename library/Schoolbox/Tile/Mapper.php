@@ -99,6 +99,15 @@ class Mapper extends BaseMapper
             )
         );
 
+        // Order
+        $this->hasMap(
+            array(
+                'column'   => 'order',
+                'property' => 'order',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
+
         // Created/Modified/Deleted
         $this->hasMap(
             array(
