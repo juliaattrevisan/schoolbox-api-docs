@@ -34,6 +34,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
         while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $this->files[$i] = $link;
             $this->files[$i]['progress'] = (int)$this->files[$i]['count'] / $this->files[0]['count'] * 100;
+            $this->files[$i]['hits'] = (int)$this->files[$i]['count'];
             ++$i;
         }
 
@@ -65,7 +66,8 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
                     'FILE_NAME'     => $this->files[$i]['realname'],
                     'FILE_SIZE'     => Alaress_Byte_Format::bytesToString($this->files[$i]['file_size']),
                     'FILE_DATE'     => $rel->getLong(),
-                    'FILE_PROGRESS' => $this->files[$i]['progress']
+                    'FILE_PROGRESS' => $this->files[$i]['progress'],
+                    'FILE_HITS' => $this->files[$i]['hits'],
                 ));
                 $this->parse('top_file_block','top_file',true);
             }
