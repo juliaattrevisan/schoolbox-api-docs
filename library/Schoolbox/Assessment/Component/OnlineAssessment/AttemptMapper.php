@@ -61,6 +61,12 @@ class AttemptMapper extends Mapper {
             'this_key'  => 'assess_id',
             'other_key' => 'assess_id'
         ));
+
+        $this->hasJoin('user', array(
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'user_id',
+            'other_key' => 'id'
+        ));
     }
 
 	/**
