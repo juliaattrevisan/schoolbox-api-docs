@@ -98,6 +98,7 @@
 			/* Combined init literal
 			 */
 			var merged = $.extend(standard, defaults, derived, options);
+			merged.file_browser_category_id = parseInt(merged.file_browser_category_id);
 
 			return merged;
 		}
