@@ -18,6 +18,7 @@ use Schoolbox\User;
 
 class AMQPBuilder implements BuilderInterface
 {
+
     const STORE = 'amqp';
 
     /** @var AMQPInterface */
@@ -73,13 +74,25 @@ class AMQPBuilder implements BuilderInterface
         $queues = array();
 
         foreach ($plan->getIntention(self::STORE) as $label => $routingKey) {
-            $queues[] = new AMQPQueue($this->conn, $this->createQueueName($label, $user->getId()), $routingKey);
+            $queues[] = $this->createQueue($this->createQueueName($label, $user->getId()), $routingKey);
         }
 
         $this->binder->setBindings($userBindings)
                      ->bindToAMQP($this->conn, $userExchange, $queues);
 
         return $queues;
+    }
+
+
+    /**
+     * @param string $label
+     * @param User   $user
+     * @param string $routingKey
+     * @return AMQPQueue
+     */
+    public function createQueue($label, $user, $routingKey = '')
+    {
+        return new AMQPQueue($this->conn, $this->createQueueName($label, $user->getId()), $routingKey);
     }
 
 

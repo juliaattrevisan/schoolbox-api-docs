@@ -33,6 +33,14 @@ interface BuilderInterface
 
 
     /**
+     * @param string $label
+     * @param User   $user
+     * @return QueueInterface
+     */
+    public function createQueue($label, $user);
+
+
+    /**
      * @param Plan $plan
      * @param int  $userId
      * @return array

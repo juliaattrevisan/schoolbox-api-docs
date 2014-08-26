@@ -44,6 +44,17 @@ class RedisBuilder implements BuilderInterface
 
 
     /**
+     * @param string $label
+     * @param User   $user
+     * @return RedisQueue
+     */
+    public function createQueue($label, $user)
+    {
+        return new RedisQueue($this->redis, $this->createQueueName($label, $user->getId()));
+    }
+
+
+    /**
      * @param Plan $plan
      * @param User $user
      * @return RedisQueue[]
@@ -56,7 +67,7 @@ class RedisBuilder implements BuilderInterface
         }
 
         foreach (array_keys($plan->getIntention(self::STORE)) as $label) {
-            $queues[] = new RedisQueue($this->redis, $this->createQueueName($label, $user->getId()));
+            $queues[] = $this->createQueue($label, $user);
         }
 
         return $queues;
