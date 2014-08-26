@@ -12,23 +12,25 @@
         categoryId: '{ID}',
         url: '/socialstream/tree.php?nofiles=1',
         submitCallback: function(url, filename) {
-          $j('#src-{COMPONENT_HANDLE}').val(url);
-          $j('#text-{COMPONENT_HANDLE}').attr('href', url).html(filename);
+
+          var src = $j('#src-{COMPONENT_HANDLE}');
+          var lbl = $j('#text-{COMPONENT_HANDLE}');
+
+          src.val(url);
+          lbl.attr('href', url).html(filename);
+
+          var select = $j('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select');
+
+          if (select) {
+            src.availableByCategory({
+              categoryId: src.val().toString().replace('/homepage/', ''),
+              target: select
+            });
+          }
         }
       });
     });
 
-    $j('#src-{COMPONENT_HANDLE}').change(function () {
-
-      /* Forgive me, for I have sinned
-       */
-      $j(this).availableByCategory({
-        categoryId: this.value.toString().replace('/homepage/', ''),
-        target: $j('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select')
-      });
-
-      $j('#text-{COMPONENT_HANDLE}').attr('href', this.value);
-    });
 
   });
 </script>
