@@ -36,15 +36,6 @@ class UserAccess {
 
 	/**
 	 * Value for $this->service:
-	 * $this->user has $this->accessLevel permission for tutorials for campus
-	 * $this->itemId.
-	 *
-	 * @todo check if this is actually used
-	 */
-	const SERVICE_TUTORIAL = 4;
-
-	/**
-	 * Value for $this->service:
 	 * $this->user has $this->accessLevel permission for all homepages.
 	 *
 	 * @todo confirm if this is the case

@@ -478,14 +478,6 @@ class Group extends DeprecatedModel
             $permission = WRITE_ACCESS;
         }
 
-        // check synergy tutor list
-        if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && Cfg::get('external_enable')) {
-            $tutorialPermission = $this->getTutorialPermission($userID);
-            if ($tutorialPermission) {
-                $permission = $tutorialPermission;
-            }
-        }
-
         /* Set cache */
         $this->cache[$this->_service][$relationID][$userID] = $permission;
         return $permission;
