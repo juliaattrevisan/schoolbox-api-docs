@@ -23,7 +23,6 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
             WHERE l.id IS NOT NULL
             AND l.`category` = :cid
             $dateFilter
-            -- AND `action` = 'access'
             GROUP BY l.id
             ORDER BY `count` DESC"
         );
@@ -31,9 +30,13 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
         $stmt->execute(array('cid' => $this->getContext('id')));
 
         $i = 0;
+
         while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $this->links[$i] = $link;
             $this->links[$i]['progress'] = (int)$this->links[$i]['count'] / $this->links[0]['count'] * 100;
+            $this->links[$i]['hits'] = (int)$this->links[$i]['count'];
+
+            $i++;
         }
 
         return true;
@@ -52,7 +55,8 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
                     'LINK_ID'       => $this->links[$i]['id'],
                     'LINK_THUMB'    => '/images/icons/60x60/link.png',
                     'LINK_NAME'     => $this->links[$i]['url'],
-                    'LINK_PROGRESS' => $this->links[$i]['progress']
+                    'LINK_PROGRESS' => $this->links[$i]['progress'],
+                    'LINK_HITS' => $this->links[$i]['hits'],
                 ));
                 $this->parse('top_link_block','top_link',true);
             }
