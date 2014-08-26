@@ -50,8 +50,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('tile.layout', $basePath.'/layout/{componentId}');
-        $router->addPost('tile.layoutForm', $basePath.'/layoutForm/{componentId}');
+        $router->addGet('tile.layout', $basePath . '/layout/{componentId}');
+        $router->addPost('tile.layoutForm', $basePath . '/layoutForm/{componentId}');
     }
 
     /**
