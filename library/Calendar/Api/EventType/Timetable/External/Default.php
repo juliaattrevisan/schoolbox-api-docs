@@ -132,7 +132,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
                         );
                         $event->setPublishDate(null);
-                        $event->setNote($period['description']);
+                        $event->setTitle($period['description']);
                         $event->setCampusList($campusId);
                         if ($period['staff'] instanceof Schoolbox\User) {
                             $event->setAuthorId($period['staff']->getId());
