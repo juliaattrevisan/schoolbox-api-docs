@@ -99,6 +99,60 @@ class Controller extends Base
     }
 
     /**
+     * Displays a form for adding a tile
+     *
+     * @param Component_Instance $component
+     */
+    public function add(Component_Instance $component)
+    {
+        $this->getResponse()->content->set(
+            array(
+                'title'    => 'Add Tile',
+                'template' => '@tile/modify.twig',
+                'data'     => array(
+                    'item'      => $this->getMapper()->createModel(),
+                    'component' => $component,
+                ),
+            )
+        );
+    }
+
+    /**
+     * Create form for a new tile.
+     *
+     * @param Component_Instance $component
+     * @throws \RuntimeException if tile is added to non-existent layout
+     */
+    public function create(Component_Instance $component)
+    {
+        /** @var Model $item */
+        $item   = $this->getMapper()->createModel();
+        $post   = $this->getRequest()->post;
+        $layout = $this->getLayoutFromComponent($component);
+        if (!($layout->getId())) {
+            throw new \RuntimeException('Layout must be created before adding a tile');
+        }
+        $item
+            ->setTileLayout($layout)
+            ->setTitleText($post['title_text'])
+            ->setTitleColor($post['title_color'])
+            ->setTitleBackgroundColor($post['title_background_color'])
+            ->setTitlePosition($post['title_position'])
+            ->setLink($post['link'])
+            ->setBackgroundColor($post['background_color'])
+        ;
+        $this->getMapper()->save($item);
+
+        // and redirect back to the layout page.
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'tile.layout',
+                array('componentId' => $component->getId())
+            )
+        );
+    }
+
+    /**
      * Retrieves the model layout object associated with this component, or an
      * empty one if none is associated.
      *
