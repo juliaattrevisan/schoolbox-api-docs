@@ -93,13 +93,40 @@ class Kernel extends \Alaress\Application\Kernel {
 					$session->updateLastTime();
 				}
 
+				// The preloader may throw an exception.
+				// It should be ignored if the user is not authorized,
+				// because we always want a login screen.
 				/** @var \Alaress\Web\Router\PathMatcher $preloader */
-				$preloader = $this->di->get('preloader');
-				$params    = $preloader->check($route->name, $route->params);
+				$preloader          = $this->di->get('preloader');
+				$preloaderException = null;
+				try {
+					$params = $preloader->check($route->name, $route->params);
+				} catch (\Exception $preloaderException) {
+					// Store the preloader exception for later
+				}
 
+				// Authorize, throwing whatever exceptions might be thrown.
 				/** @var \Alaress\Authorizer\Authorizer $authorizer */
-				$authorizer = $this->di->get('authorizer');
-				$authorizer->authorizePathForUser($route->name, $params, $user);
+				$auth = $this->di->get('authorizer');
+				try {
+					$auth->authorizePathForUser($route->name, $params, $user);
+				} catch (Unauthorized $ue) {
+					// Unauthorized:
+					// always throw this, even if there was preloader exception
+					throw $ue;
+				} catch (\Exception $ae) {
+					// Some other exception:
+					// throw the preloader exception in preference to this
+					if ($preloaderException instanceof \Exception) {
+						throw $preloaderException;
+					}
+					throw $ae;
+				}
+				// No auth exception:
+				// throw the preloader exception if there was one
+				if ($preloaderException instanceof \Exception) {
+					throw $preloaderException;
+				}
 
 				// If authorizePathForUser() threw no exception, authorization passed!
 
