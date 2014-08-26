@@ -483,28 +483,6 @@ class Group extends DeprecatedModel
         return $permission;
     }
 
-    function getTutorialPermission($userID)
-    {
-
-        $userHandler = new User;
-        $mssql = MSSQL::getInstance();
-
-        $user = $userHandler->getByID($userID);
-
-        $query = "SELECT ID
-					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009'))
-					  AND ID = " . $user['synergy_id'];
-
-        $tutor = $mssql->getRow($query);
-
-        if (isset($tutor['ID'])) {
-            return WRITE_ACCESS;
-        } else {
-            return DENY_ACCESS;
-        }
-    }
-
     /**
      * Synonymous for isGuest(), isStudent(), isParent() and isStaff()
      *
