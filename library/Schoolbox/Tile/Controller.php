@@ -33,7 +33,9 @@ class Controller extends Base
     protected $componentConfigMapper;
 
     /**
-     * Displays a form for editing a tile component.
+     * Displays a form for editing a tile layout.
+     *
+     * @param Component_Instance $component
      */
     public function layout(Component_Instance $component)
     {
@@ -51,7 +53,9 @@ class Controller extends Base
     }
 
     /**
-     * Save form for editing a tile component.
+     * Save form for tile layout.
+     *
+     * @param Component_Instance $component
      */
     public function layoutForm(Component_Instance $component)
     {
