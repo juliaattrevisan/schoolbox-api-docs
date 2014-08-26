@@ -71,9 +71,9 @@ class Module extends BaseModule
         $router->addGet('tile.layout', $basePath . '/layout/{componentId}');
         $router->addPost('tile.layoutForm', $basePath . '/layout/{componentId}');
         $router->addGet('tile.add', $basePath . '/add/{componentId}');
-        $router->addPost('tile.addForm', $basePath . '/add/{componentId}');
-        $router->addGet('tile.modify', $basePath . '/modify/{itemId}');
-        $router->addPost('tile.modifyForm', $basePath . '/modify/{itemId}');
+        $router->addPost('tile.create', $basePath . '/add/{componentId}');
+        $router->addGet('tile.edit', $basePath . '/modify/{itemId}');
+        $router->addPost('tile.update', $basePath . '/modify/{itemId}');
     }
 
     /**
@@ -86,16 +86,17 @@ class Module extends BaseModule
         $mapper          = $this->getMapper();
         $catMapper       = $this->getCategoryMapper();
         $componentMapper = $this->getComponentInstanceMapper();
+
+//        $matcher->add(
+//            '/^tile\\.(?:modify|modifyForm)$/',
+//            function ($params) use ($mapper) {
+//                return array(
+//                    'item' => $mapper->findById($params['itemId']),
+//                );
+//            }
+//        );
         $matcher->add(
-            '/^tile\\.(?:modify|modifyForm)$/',
-            function ($params) use ($mapper) {
-                return array(
-                    'item' => $mapper->findById($params['itemId']),
-                );
-            }
-        );
-        $matcher->add(
-            '/^tile\\.(?:add|addForm|layout|layoutForm)$/',
+            '/^tile\\.(?:add|create|layout|layoutForm)$/',
             function ($params) use ($componentMapper, $catMapper) {
                 $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
 
