@@ -9,52 +9,56 @@
 
 
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use \Schoolbox\Mapper;
 
-class AttemptMapper extends Mapper {
-	protected function mapping() {
-		$this->hasTable('assess_attempt');
-		$this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\Attempt');
-		$this->hasMap(array(
-			'column'     => 'attempt_id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'assess_id',
-			'property'   => 'assessment',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'assessment',
-		));
-		$this->hasMap(array(
-			'column'     => 'user_id',
-			'property'   => 'user',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'user',
-		));
-		$this->hasMap(array(
-			'column'     => 'start',
-			'property'   => 'start',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'finish',
-			'property'   => 'finish',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'reviewed_at',
-			'property'   => 'reviewed',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasSoftDeleteDateField('deleted_at');
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Mapper;
+
+class AttemptMapper extends Mapper
+{
+
+    protected function mapping()
+    {
+        $this->hasTable('assess_attempt');
+        $this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment\\Attempt');
+        $this->hasMap(array(
+            'column'     => 'attempt_id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ));
+        $this->hasMap(array(
+            'column'   => 'assess_id',
+            'property' => 'assessment',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'assessment',
+        ));
+        $this->hasMap(array(
+            'column'   => 'user_id',
+            'property' => 'user',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'user',
+        ));
+        $this->hasMap(array(
+            'column'   => 'start',
+            'property' => 'start',
+            'type'     => self::TYPE_DATETIME,
+        ));
+        $this->hasMap(array(
+            'column'   => 'finish',
+            'property' => 'finish',
+            'type'     => self::TYPE_DATETIME,
+        ));
+        $this->hasMap(array(
+            'column'   => 'reviewed_at',
+            'property' => 'reviewed',
+            'type'     => self::TYPE_DATETIME,
+        ));
+        $this->hasMap(array(
+            'column'   => 'deleted_at',
+            'property' => 'deleted',
+            'type'     => self::TYPE_DATETIME,
+        ));
+        $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin('assessment', array(
             'mapper'    => '\\Schoolbox\\Assessment\\Component\\OnlineAssessmentMapper',
@@ -69,195 +73,203 @@ class AttemptMapper extends Mapper {
         ));
     }
 
-	/**
-	 * Gets a string of placeholders for an array - usually used for creating a
-	 * list of placeholders for an IN condition.
-	 *
-	 * @param array  $input
-	 * @param string $prefix If not supplied, ? will be used as the placeholder
-	 *                       for all values.
-	 *
-	 * @return string Something like "(:id_0, :id_1, :id_2)".
-	 */
-	public function getArrayPlaceholders($input, $prefix = null) {
-		$placeholders = array();
-		foreach ($input as $i => $param) {
-			$placeholders[] = isset($prefix) ? (':'.$prefix.'_'.$i) : '?';
-		}
-		return '('.implode(',', $placeholders).')';
-	}
 
-	/**
-	 * Builds list of student's marks for all attempts in the given category.
-	 *
-	 * @param int   $category_id
-	 * @param int   $student_id
-	 * @param array $extra_params Any extra filters:
-	 *                            * year
-	 *                            * semester
-	 *                            * owner - the creator of the submission box
-	 *
-	 * @return array
-	 */
-	public function getStudentMarks($category_id, $student_id, $extra_params = array()) {
-		//
-		// Move getSemesterMonths() to some sort of helper method
-		$submission_box_mapper = new SubmissionBoxMapper();
+    /**
+     * Gets a string of placeholders for an array - usually used for creating a
+     * list of placeholders for an IN condition.
+     *
+     * @param array  $input
+     * @param string $prefix If not supplied, ? will be used as the placeholder
+     *                       for all values.
+     *
+     * @return string Something like "(:id_0, :id_1, :id_2)".
+     */
+    public function getArrayPlaceholders($input, $prefix = null)
+    {
+        $placeholders = array();
+        foreach ($input as $i => $param) {
+            $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . $i) : '?';
+        }
+        return '(' . implode(',', $placeholders) . ')';
+    }
 
-		//
-		// Build filters for query
-		$params = array(
-			'category' => $category_id,
-			'student'  => $student_id,
-		);
-		$filters = array(
-			'a.category_id = :category',
-			'aa.user_id = :student',
-			'aa.deleted_at IS NULL',
-			'aq.deleted_at IS NULL',
-		);
-		if (!empty($extra_params['year'])) {
-			$params['year'] = $extra_params['year'];
-			$filters[]      = 'YEAR(a.start) = :year';
-		}
-		if (!empty($extra_params['semester'])) {
-			$semester_params       = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
-			$params['month_start'] = $semester_params['start'];
-			$params['month_end']   = $semester_params['end'];
-			$filters[]             = 'MONTH(a.start) BETWEEN :month_start AND :month_end';
-		}
-		if (!empty($extra_params['owner'])) {
-			$params['owner'] = $extra_params['owner'];
-			$filters[]       = 'a.user_id = :owner';
-		}
-		if (!empty($extra_params['visibility'])) {
-			$params = array_merge($params,  $this->getArrayParameters($extra_params['visibility'], 'vis'));
-			$filters[] = 'a.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
-		}
 
-		$filters = implode(' AND ', $filters);
+    /**
+     * Builds list of student's marks for all attempts in the given category.
+     *
+     * @param int   $category_id
+     * @param int   $student_id
+     * @param array $extra_params Any extra filters:
+     *                            * year
+     *                            * semester
+     *                            * owner - the creator of the submission box
+     *
+     * @return array
+     */
+    public function getStudentMarks($category_id, $student_id, $extra_params = array())
+    {
+        //
+        // Move getSemesterMonths() to some sort of helper method
+        $submission_box_mapper = new SubmissionBoxMapper();
 
-		$query = "
-			SELECT
-				aa.attempt_id,
-				aa.assess_id,
-				aa.start,
-				a.weight,
-				SUM(ar.mark)  AS mark,
-				SUM(aq.marks) AS max_mark
-			FROM assess_attempt aa
-				LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-				LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-				LEFT JOIN assess          a  ON aa.assess_id   = a.assess_id
-			WHERE $filters
-			GROUP BY aa.assess_id, aa.attempt_id
-			ORDER BY aa.start DESC
-		";
-		$statement = $this->database->prepare($query);
-		$statement->execute($params);
+        //
+        // Build filters for query
+        $params  = array(
+            'category' => $category_id,
+            'student'  => $student_id,
+        );
+        $filters = array(
+            'a.category_id = :category',
+            'aa.user_id = :student',
+            'aa.deleted_at IS NULL',
+            'aq.deleted_at IS NULL',
+        );
+        if (!empty($extra_params['year'])) {
+            $params['year'] = $extra_params['year'];
+            $filters[]      = 'YEAR(a.start) = :year';
+        }
+        if (!empty($extra_params['semester'])) {
+            $semester_params       = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
+            $params['month_start'] = $semester_params['start'];
+            $params['month_end']   = $semester_params['end'];
+            $filters[]             = 'MONTH(a.start) BETWEEN :month_start AND :month_end';
+        }
+        if (!empty($extra_params['owner'])) {
+            $params['owner'] = $extra_params['owner'];
+            $filters[]       = 'a.user_id = :owner';
+        }
+        if (!empty($extra_params['visibility'])) {
+            $params    = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
+            $filters[] = 'a.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+        }
 
-		$attempts = array();
-		foreach ($statement as $row) {
-			if (!array_key_exists($row['assess_id'], $attempts) && $row['max_mark'] != 0) {
-				$attempts[$row['assess_id']] = array(
-					'mark'        => ($row['mark'] / $row['max_mark']) * 100,
-					'pretty_mark' => "{$row['mark']} / {$row['max_mark']}",
-					'date'        => $row['start'],
-					'weight'      => $row['weight'],
-				);
-			}
-		}
-		return $attempts;
-	}
+        $filters = implode(' AND ', $filters);
 
-	public function getAllAttempts($assess_id, $extra_params = array()) {
-		//
-		// Build filters for query
-		$params = array(
-			'assess_id' => $assess_id,
-		);
+        $query     = "
+            SELECT
+                aa.attempt_id,
+                aa.assess_id,
+                aa.start,
+                a.weight,
+                SUM(ar.mark)  AS mark,
+                SUM(aq.marks) AS max_mark
+            FROM assess_attempt aa
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+                LEFT JOIN assess          a  ON aa.assess_id   = a.assess_id
+            WHERE $filters
+            GROUP BY aa.assess_id, aa.attempt_id
+            ORDER BY aa.start DESC
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
 
-		$query = "
-			SELECT
-				aa.user_id,
-				aa.attempt_id,
-				aq.section_id,
-				SUM(ar.mark)  AS mark,
-				SUM(aq.marks) AS max_mark
-			FROM assess_attempt aa
-				LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-				LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-				RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
-			WHERE a.assess_id = :assess_id
-			AND a.availability = 'assess'
-			AND aa.deleted_at IS NULL
-			GROUP BY aa.assess_id, aa.attempt_id
-			ORDER BY aa.start DESC
-		";
-		$stmt = $this->database->prepare($query);
-		$stmt->execute($params);
+        $attempts = array();
+        foreach ($statement as $row) {
+            if (!array_key_exists($row['assess_id'], $attempts) && $row['max_mark'] != 0) {
+                $attempts[$row['assess_id']] = array(
+                    'mark'        => ($row['mark'] / $row['max_mark']) * 100,
+                    'pretty_mark' => "{$row['mark']} / {$row['max_mark']}",
+                    'date'        => $row['start'],
+                    'weight'      => $row['weight'],
+                );
+            }
+        }
+        return $attempts;
+    }
 
-		$attempts = array();
 
-		$sum = 0;
-		$count = 0;
+    public function getAllAttempts($assess_id, $extra_params = array())
+    {
+        //
+        // Build filters for query
+        $params = array(
+            'assess_id' => $assess_id,
+        );
 
-		foreach($stmt as $row) {
-			// only include the most recent attempt for each user (ie. first seen)
-			if(!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
-				// if the user is already in the array (ie already seen), just increment the attempt count
-				if(array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
-					$attempts[$row['user_id']][0]['attempts']++;
-					continue;
-				}
-			}
+        $query = "
+            SELECT
+                aa.user_id,
+                aa.attempt_id,
+                aq.section_id,
+                SUM(ar.mark)  AS mark,
+                SUM(aq.marks) AS max_mark
+            FROM assess_attempt aa
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+                RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
+            WHERE a.assess_id = :assess_id
+            AND a.availability = 'assess'
+            AND aa.deleted_at IS NULL
+            GROUP BY aa.assess_id, aa.attempt_id
+            ORDER BY aa.start DESC
+        ";
+        $stmt  = $this->database->prepare($query);
+        $stmt->execute($params);
 
-			// include
-			$mark = ($row['mark'] / $row['max_mark']) * 100;
-			$attempts[$row['user_id']][] = array(
-				'section_id' => $row['section_id'],
-				'attempt_id' => $row['attempt_id'],
-				'mark' => $mark,
-				'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
-				'comment' => '',
-				'attempts' => 1
-			);
+        $attempts = array();
 
-			// add to averages vars
-			++$count;
-			$sum += $mark;
-		}
-		if(!empty($extra_params['calc_average']) && $extra_params['calc_average'] == true) {
-			$attempts['avg'] = $count ? $sum / $count : 0;
-		}
+        $sum   = 0;
+        $count = 0;
 
-		return $attempts;
-	}
+        foreach ($stmt as $row) {
+            // only include the most recent attempt for each user (ie. first seen)
+            if (!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
+                // if the user is already in the array (ie already seen), just increment the attempt count
+                if (array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
+                    $attempts[$row['user_id']][0]['attempts']++;
+                    continue;
+                }
+            }
 
-	/**
-	 * Gets number of attempts this student has made on this assessment. Doesn't
-	 * include deleted assessments.
-	 *
-	 * @param int $assess_id  The assessment to check.
-	 * @param int $student_id The student to check.
-	 *
-	 * @return int
-	 */
-	public function getAttemptCountForStudent($assess_id, $student_id) {
-		$query = "
-			SELECT COUNT(*) AS attempts
-			FROM {$this->getTable()} AS aa
-			WHERE aa.assess_id = :assess_id
-			AND aa.user_id = :student_id
-			AND aa.deleted_at IS NULL
-		";
-		$statement = $this->database->prepare($query);
-		$statement->bindValue('assess_id',  $assess_id,  \PDO::PARAM_INT);
-		$statement->bindValue('student_id', $student_id, \PDO::PARAM_INT);
-		$statement->execute();
-		if ($row = $statement->fetch()) {
-			return intval($row['attempts']);
-		}
-		return 0;
-	}
+            // include
+            $mark = ($row['mark'] / $row['max_mark']) * 100;
+            $attempts[$row['user_id']][] = array(
+                'section_id'   => $row['section_id'],
+                'attempt_id'   => $row['attempt_id'],
+                'mark'         => $mark,
+                'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
+                'comment'      => '',
+                'attempts'     => 1
+            );
+
+            // add to averages vars
+            ++$count;
+            $sum += $mark;
+        }
+        if (!empty($extra_params['calc_average']) && $extra_params['calc_average'] == true) {
+            $attempts['avg'] = $count ? $sum / $count : 0;
+        }
+
+        return $attempts;
+    }
+
+
+    /**
+     * Gets number of attempts this student has made on this assessment. Doesn't
+     * include deleted assessments.
+     *
+     * @param int $assess_id  The assessment to check.
+     * @param int $student_id The student to check.
+     *
+     * @return int
+     */
+    public function getAttemptCountForStudent($assess_id, $student_id)
+    {
+        $query = "
+            SELECT COUNT(*) AS attempts
+            FROM {$this->getTable()} AS aa
+            WHERE aa.assess_id = :assess_id
+            AND aa.user_id = :student_id
+            AND aa.deleted_at IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('assess_id', $assess_id, \PDO::PARAM_INT);
+        $statement->bindValue('student_id', $student_id, \PDO::PARAM_INT);
+        $statement->execute();
+        if ($row = $statement->fetch()) {
+            return intval($row['attempts']);
+        }
+        return 0;
+    }
 }
