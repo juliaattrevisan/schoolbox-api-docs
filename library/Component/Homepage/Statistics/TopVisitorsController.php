@@ -45,7 +45,10 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         while ($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if($visitor['hits'] > 0) {
                 $visitors[] = $visitor;
-                $visitors[$i++]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+                $visitors[$i]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+                $visitors[$i]['hits'] = $visitor['hits'];
+
+                $i++;
             }
         }
 
@@ -71,7 +74,8 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
                     'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
                     'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
                     'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['group_name']),
-                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100)
+                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100),
+                    'VISITOR_HITS' => $this->visitors[$i]['hits'],
                 )
             );
             $this->parse('top_visitor_block', 'top_visitor', true);
