@@ -63,10 +63,10 @@
 @submit-btn:                    @banner-background;
 
 // Flyout Menus and Messages
-@notify-color:					@negative-color;
-@notify-text-color:				@banner-color;
+@notify-color:					@link;
+@notify-text-color:				@notify-color;
 @notify-open-text-color:		@banner-background;
-@flyout-color:					@navigation-links;
+@flyout-color:					@link;
 @flyout-header-color:			@navigation-color;
 @flyout-background:				@content-background;
 @flyout-hover-color:			@navigation-hover-color;
@@ -99,11 +99,16 @@
 
 body{ background: @body-background url("/images/kags/bg.png") 0% 100% no-repeat; }
 #wrap-inner{ padding: 0; }
-#container{ background: @content-background url("/images/kags/ribbon.png") 0% 100% no-repeat; padding: 16px 16px 40px 16px; }
+#container{ background: @content-background url("/images/kags/ribbon.png") 0% 100% no-repeat; padding: 40px 16px 40px 16px; }
 #footer{ background: @content-background; }
 h1{ font-size: 32px; padding-left: 14px; }
 h2{ font-size: 24px; border-bottom: 1px solid #cacaca; line-height: 38px; }
 h3{ font-size: 18px !important; }
+
+// Just incase - these are set in the fonts.com account also
+#tabs li a, h1, h2, h3{
+    font-family:'Swiss 721 W01 Light';
+}
 
 #header{
     #search-field{
