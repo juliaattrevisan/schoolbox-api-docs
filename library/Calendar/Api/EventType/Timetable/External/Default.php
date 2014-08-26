@@ -139,13 +139,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setAuthorName($period['staff']->formatName());
                         }
                         if ($period['category'] instanceof Schoolbox\Resource\Category) {
-                            $event->setSid($period['category']->getId());
                             $event->setCategoryId($period['category']->getId());
                             $event->setCategoryName($period['category']->getName());
                             $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
                         } else {
                             // Make this up as a campus event if it has no category
-                            $event->setSid($campusId);
                             $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                         }
                         $event->setType($eventType);
