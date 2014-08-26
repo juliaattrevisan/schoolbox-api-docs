@@ -76,11 +76,21 @@ class Module extends BaseModule
             '/^tile\\.(?:layout|layoutForm)$/',
             function ($params) use ($mapper, $catMapper) {
                 $component = array_pop($mapper->findByInstanceId($params['componentId']));
+
+                // Component must actually exist.
+                // This should cause an error that is recorded, but doesn't
+                // prevent a login check.
                 if (!($component instanceof Component_Instance)) {
-                    // error out.
-                    // This should cause an error that is recorded, but doesn't
-                    // prevent a login check.
+                    throw new \RuntimeException('Component does not exist');
                 }
+
+                // Also, this component needs to be a tile grid.
+                $className = 'Schoolbox\\Tile\\Component\\TileController';
+                if ($component->getDefinition()->getClass() != $className) {
+                    throw new \RuntimeException('Component exists, but is not a tile layout');
+                }
+
+                // Now we can augment params with a component and homepage
                 return array(
                     'component' => $component,
                     'homepage'  => $catMapper->findById($component->getIdentifier()),
