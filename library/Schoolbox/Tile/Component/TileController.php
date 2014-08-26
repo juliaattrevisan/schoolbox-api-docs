@@ -9,10 +9,14 @@
  * @link      http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Tile\Component;
+
+use Component_Homepage_ControllerAbstract;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
+use Twig_Environment;
 
-class Component_Homepage_TileController extends Component_Homepage_ControllerAbstract
+class TileController extends Component_Homepage_ControllerAbstract
 {
     /**
      * @var Layout\Model
@@ -83,10 +87,10 @@ class Component_Homepage_TileController extends Component_Homepage_ControllerAbs
         $content = '';
         try {
             $content = $this->sitepage->getTwig()->render(
-                'component/homepage/tile.twig',
+                '@tile/component/tile.twig',
                 array('component' => $this,)
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Don't update content
         }
         $this->setVar('COMPONENT_CONTENT', $content);
