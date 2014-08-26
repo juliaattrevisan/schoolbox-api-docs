@@ -72,30 +72,41 @@ class Module extends BaseModule
                 }
                 return array(
                     'component' => $component,
+                    'homepage'  => CategoryMapper::getInstance()->findById($component->getIdentifier()),
                 );
             }
         );
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function initRoutePermissions(Authorizer $authorizer)
-//    {
-//        // Layouts:
-//        // editable by anyone who has write permission on the homepage
-//        // this can include teachers?
-//        $rule = new Rule\Any(
-//            new Rule\IsSuperuser(),
-//            new Rule\HasServicePermission(
-//                UserAccess::SERVICE_HOMEPAGE,
-//                UserAccess::ACCESS_WRITE
-//            )
-//        );
-////        $authorizer
-////            ->addRule('/^resourceCategory(?:$|\.)/', new Rule\IsLoggedIn())
-////            ->addRule('/^resourceCategory\.(?:add|edit|delete)/', $resourceManageRule);
-//    }
+    /**
+     * Layouts are editable by:
+     * * Superusers
+     * * Any user who has write permission to that homepage
+     * * Any user who is the teacher of a class connected to that page
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        // Layouts are editable by anyone with write permission on the homepage.
+        // If it's a subject, this could include people involved in subject.
+        $rule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasServicePermission(
+                UserAccess::SERVICE_HOMEPAGE,
+                UserAccess::ACCESS_WRITE,
+                function ($params) {
+                    return $params['homepage']->getId();
+                }
+            ),
+            new Rule\IsTeacherOfClass(
+                $this->getExternalDb(),
+                function ($params) {
+                    return $params['homepage'];
+                }
+            )
+        );
+        $authorizer->addRule('/^tile\\..*/', new Rule\IsLoggedIn());
+        $authorizer->addRule('/^tile\\..*/', $rule);
+    }
 
     /**
      * {@inheritdoc}
