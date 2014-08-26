@@ -10,6 +10,8 @@
 namespace Schoolbox\Tile\Layout;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Tile\Model as TileModel;
+use Schoolbox\Tile\Mapper as TileMapper;
 
 class Mapper extends BaseMapper
 {
@@ -105,5 +107,27 @@ class Mapper extends BaseMapper
                 'multiple'  => 'true',
             )
         );
+    }
+
+    /**
+     * Gets the tile layout, and fetches any tiles that are a part of it.
+     *
+     * @param  mixed $identifierValue
+     * @return Model
+     */
+    public function findById($identifierValue)
+    {
+        /** @var Model $model */
+        /** @var TileMapper $tileMapper */
+        $model      = parent::findById($identifierValue);
+        $tileMapper = $this->getJoinMapper('tile');
+        $model->setTileList(
+            $tileMapper->findByColumn(
+                'tile_layout_id',
+                $model->getId(),
+                array('order' => array('order' => 'asc'))
+            )
+        );
+        return $model;
     }
 }
