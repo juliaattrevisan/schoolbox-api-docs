@@ -11,6 +11,7 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Component_InstanceMapper;
+use External_User;
 use Schoolbox\Tile\Module;
 
 class Tile implements ModuleConfigInterface
@@ -25,7 +26,9 @@ class Tile implements ModuleConfigInterface
     public function configure($kernel)
     {
         $module = new Module($kernel->getDependencyInjector());
-        $module->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
+        $module
+            ->setComponentInstanceMapper(Component_InstanceMapper::getInstance())
+            ->setExternalDb(new External_User());
         $module->init('/tile');
     }
 }
