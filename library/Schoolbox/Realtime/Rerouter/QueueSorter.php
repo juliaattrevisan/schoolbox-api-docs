@@ -11,13 +11,18 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\RedisQueue;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\Builder\Plan\FullPlan;
+use Schoolbox\Notif\Queue\Builder\RedisBuilder;
+use Schoolbox\Notif\Queue\UserQueue;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\Filter\FilterException;
 use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
@@ -38,15 +43,19 @@ class QueueSorter implements FilterInterface {
 	/** @var Notif */
 	protected $notif;
 
+    /** @var RedisBuilder */
+    protected $redisBuilder;
+
 
 	/**
 	 * @param FilterInterface[]      $filters
 	 * @param LoggerInterface        $log
 	 * @param Notif                  $notif
+     * @param RedisBuilder           $redisBuilder
 	 * @param RoutePermissionMapper  $permMapper
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct($filters, $log, $notif, $permMapper) {
+	public function __construct($filters, $log, $notif, $redisBuilder, $permMapper) {
 		$this->filters = array();
 
 		foreach($filters as $filter) {
@@ -59,9 +68,10 @@ class QueueSorter implements FilterInterface {
 			throw new InvalidArgumentException("At least one valid filter must be specified");
 		}
 
-		$this->log        = $log;
-		$this->permMapper = $permMapper;
-		$this->notif      = $notif;
+		$this->log          = $log;
+		$this->permMapper   = $permMapper;
+		$this->notif        = $notif;
+        $this->redisBuilder = $redisBuilder;
 	}
 
 
@@ -92,7 +102,7 @@ class QueueSorter implements FilterInterface {
 			switch($newLevel) {
 				// digest
 				case Logger::INFO:
-					$method = 'digest';
+					$method = UserQueue::Q_DIGEST;
 					break;
 
 				// instant
@@ -112,10 +122,18 @@ class QueueSorter implements FilterInterface {
 					throw new FilterException("Reroute level is unacceptable ($newLevel)");
 			}
 
+            // put the instance in redis: it will always end up being stored in one queue or the other
+            $qLabel = $method == UserQueue::Q_DIGEST ? UserQueue::Q_DIGEST : UserQueue::Q_LISTED;
+            $redisQ = $this->redisBuilder->createQueue($qLabel, $user);
+
+            $redisQ->push($instance);
+
 			$newTopic = "$method.user.{$user->getId()}";
 
 			$this->log->info("Rerouting message to '$newTopic' at level $newLevel");
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
+
+
 
 			return true;
 		}
