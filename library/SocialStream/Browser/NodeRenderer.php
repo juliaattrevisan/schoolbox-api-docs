@@ -17,17 +17,6 @@ class NodeRenderer extends Browser\NodeRenderer
 {
 
     /**
-     * Set the various blocks that need setting
-     */
-    protected function setupBlocks()
-    {
-        parent::setupBlocks();
-        $this->getPage()->setBlock($this->getHandle(), 'node_file', 'node_file_block');
-        $this->getPage()->setVar('node_file_block', '');
-    }
-
-
-    /**
      * Render all the contents of the current node
      */
     protected function renderContents()
