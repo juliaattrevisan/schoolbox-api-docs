@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,18 +7,25 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_Statistics_TopLinksController extends Component_Homepage_Statistics_ControllerAbstract {
+class Component_Homepage_Statistics_TopLinksController extends Component_Homepage_Statistics_ControllerAbstract
+{
 
     private $links;
 
-    public function execute() {
+    public function execute()
+    {
 
         $dateFilter = '';
-        if(count($this->dateRange)) {
-            $dateFilter = sprintf("AND time BETWEEN '%s' AND '%s'",date('Y-m-d', $this->dateRange[0]), date('Y-m-d', $this->dateRange[1]));
+        if (count($this->dateRange)) {
+            $dateFilter = sprintf(
+                "AND time BETWEEN '%s' AND '%s'",
+                date('Y-m-d', $this->dateRange[0]),
+                date('Y-m-d', $this->dateRange[1])
+            );
         }
 
-        $stmt = Database::getInstance()->prepare("
+        $stmt = Database::getInstance()->prepare(
+            "
             SELECT l.id, l.url, COUNT(l.id) AS `count` FROM cmsLog cl
             LEFT JOIN link l ON cl.`objectId` = l.id AND cl.`object` = 'link'
             WHERE l.id IS NOT NULL
@@ -31,7 +39,7 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
 
         $i = 0;
 
-        while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $this->links[$i] = $link;
             $this->links[$i]['progress'] = (int)$this->links[$i]['count'] / $this->links[0]['count'] * 100;
             $this->links[$i]['hits'] = (int)$this->links[$i]['count'];
@@ -42,26 +50,28 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
         return true;
     }
 
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'topLinks')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'topLinks')) {
             return false;
         }
 
-        $this->setBlock($templateHandle, 'top_link','top_link_block');
+        $this->setBlock($templateHandle, 'top_link', 'top_link_block');
 
-        if(count($this->links)) {
-            for($i = 0; $i < 5 && $i < count($this->links); ++$i) {
-                $this->setVar(array(
-                    'LINK_ID'       => $this->links[$i]['id'],
-                    'LINK_THUMB'    => '/images/icons/60x60/link.png',
-                    'LINK_NAME'     => $this->links[$i]['url'],
-                    'LINK_PROGRESS' => $this->links[$i]['progress'],
-                    'LINK_HITS' => $this->links[$i]['hits'],
-                ));
-                $this->parse('top_link_block','top_link',true);
+        if (count($this->links)) {
+            for ($i = 0; $i < 5 && $i < count($this->links); ++$i) {
+                $this->setVar(
+                    array(
+                        'LINK_ID' => $this->links[$i]['id'],
+                        'LINK_THUMB' => '/images/icons/60x60/link.png',
+                        'LINK_NAME' => $this->links[$i]['url'],
+                        'LINK_PROGRESS' => $this->links[$i]['progress'],
+                        'LINK_HITS' => $this->links[$i]['hits'],
+                    )
+                );
+                $this->parse('top_link_block', 'top_link', true);
             }
-        }
-        else {
+        } else {
             $this->setVar('top_link_block', '<p>No links followed.</p>');
         }
 
