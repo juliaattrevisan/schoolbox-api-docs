@@ -9,10 +9,12 @@
  */
 
 namespace Alaress\Authorizer\Rule;
+
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Forbidden;
 
-class HasServicePermission implements IAuthorizationRule {
+class HasServicePermission implements IAuthorizationRule
+{
 
     /**
      * A value of Schoolbox\Permission\Access\UserAccess::SERVICE_*
@@ -31,12 +33,42 @@ class HasServicePermission implements IAuthorizationRule {
      */
     protected $accessLevel;
 
-    public function __construct($service, $accessLevel) {
-        $this->service     = $service;
-        $this->accessLevel = $accessLevel;
+    /**
+     * Optional service identifier.
+     *
+     * It can be a callable which takes route params as the first parameter,
+     * and the user being authorized as the second, and returns an identifier.
+     *
+     * If it's not callable, it is the static value of the identifier.
+     *
+     * What exactly this identifies depends on the value of $this->service:
+     * * UserAccess::SERVICE_HOMEPAGE: a homepage ID
+     * * UserAccess::SERVICE_CALENDAR and UserAccess::SERVICE_NEWS: a campus ID
+     * * Anything else: not used
+     *
+     * @var int|callable
+     */
+    protected $serviceIdentifier = null;
+
+    /**
+     * Constructor (obviously)
+     *
+     * @param int          $service
+     * @param int          $accessLevel
+     * @param int|callable $serviceIdentifier
+     */
+    public function __construct($service, $accessLevel, $serviceIdentifier = null)
+    {
+        $this->service           = $service;
+        $this->accessLevel       = $accessLevel;
+        $this->serviceIdentifier = $serviceIdentifier;
     }
 
-    public function authorize(array $params = array(), User $user = null) {
+    /**
+     * {@inheritdoc}
+     */
+    public function authorize(array $params = array(), User $user = null)
+    {
         if ($user instanceof User) {
             // Check this user's permissions against this item's service and
             // access level.
@@ -46,12 +78,21 @@ class HasServicePermission implements IAuthorizationRule {
                     if ($access->getService() == $this->service
                         && $access->getAccessLevel() >= $this->accessLevel
                     ) {
-                        return true;
+                        if (!isset($this->serviceIdentifier)) {
+                            return true;
+                        }
+                        if (is_callable($this->serviceIdentifier)) {
+                            $identifier = call_user_func($this->serviceIdentifier, $params, $user);
+                        } else {
+                            $identifier = $this->serviceIdentifier;
+                        }
+                        if ($identifier == $access->getServiceIdentifier()) {
+                            return true;
+                        }
                     }
                 }
             }
         }
         throw new Forbidden();
     }
-
 }
