@@ -16,6 +16,8 @@ use Predis\ClientInterface;
 class RedisQueue implements QueueInterface
 {
 
+    const TTL = 1209600; // 2 weeks
+
     /** @var ClientInterface */
     protected $redis;
 
@@ -57,13 +59,11 @@ class RedisQueue implements QueueInterface
             return $instances;
         }
 
-        foreach ($this->exec(sprintf("HMGET %s %s", $this->index(), implode(' ', $idList))) as $data) {
+        $result = $this->exec("MGET", $idList);
 
-            // unwrap the formatting
-            $body = json_decode($data, true);
-
+        foreach ($result as $data) {
             // attempt to unserialize the message
-            $instances[] = Instance::jsonUnserialize($body['message']);
+            $instances[] = Instance::jsonUnserialize(gzuncompress($data));
         }
 
         return $instances;
@@ -78,7 +78,20 @@ class RedisQueue implements QueueInterface
      */
     public function contains(Instance $instance)
     {
-        return !!$this->exec(sprintf('HEXISTS %s %s:%s', $this->index(), $instance->getBaseHash(), $instance->getParamHash()));
+        $index = $this->index();
+        $hash  = $this->getFullHash($instance);
+        $queue = "$index:$this->name";
+        $id    = "$index:$hash";
+
+        $exists = !!$this->exec('EXISTS', $id);
+        $listed = !!$this->exec('SISMEMBER', $queue, $id);
+
+        // a little housekeeping: if the 'queue' contains the reference, but the msg has expired, drop the reference
+        if ($listed && !$exists) {
+            $this->exec('SREM', $queue, $id);
+        }
+
+        return $exists && $listed;
     }
 
 
@@ -89,16 +102,8 @@ class RedisQueue implements QueueInterface
      */
     public function drain()
     {
-        // capture the ID list
-        $idList = $this->fetchIdList();
-
-        // delete the corresponding entries in the index
-        if (count($idList)) {
-            $this->exec(sprintf("HDEL %s %s", $this->index(), implode(' ', $idList)));
-        }
-
-        // finally delete the list
-        $this->exec("DEL $this->name");
+        // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
+        $this->exec("DEL", $this->index() . ':' . $this->name);
     }
 
 
@@ -111,31 +116,34 @@ class RedisQueue implements QueueInterface
      */
     public function push(Instance $instance)
     {
-        $id    = $instance->getBaseHash() . ':' . $instance->getParamHash();
-        $time  = $instance->getTime();
-        $json  = $instance->jsonSerialize();
+        $id    = $this->getFullHash($instance);
         $index = $this->index();
+        $data  = gzcompress("$instance", 9);
 
-        // insert the msg body into the index
-        $this->exec("HSET $index $id $json");
+        // insert the msg body into storage, with expiry automatically set
+        $this->exec("SET", "$index:$id", $data, self::TTL);
 
-        // insert the reference into this queue
-        $this->exec("ZADD $this->name $time $id");
+        // insert the msg reference into this 'queue'
+        $this->exec("SADD", "$index:$this->name", "$index:$id");
     }
 
 
     /**
-     * Simple wrapper to cast string to Predis interfaces
+     * Simple wrapper to encapsulate Predis interfaces
      *
-     * @param string $string
+     * @param string $cmd
+     * @param mixed $_args
      * @return mixed
      */
-    protected function exec($string)
+    protected function exec($cmd, $_args = null)
     {
-        $xpl  = explode(' ', $string);
-        $task = array_shift($xpl);
+        // if the args just got put in this var, use that; otherwise, read func_args
+        if (!is_array($_args)) {
+            $_args = func_get_args();
+            array_shift($_args);
+        }
 
-        $cmd = $this->redis->createCommand($task, $xpl);
+        $cmd = $this->redis->createCommand($cmd, $_args);
 
         return $this->redis->executeCommand($cmd);
     }
@@ -157,8 +165,17 @@ class RedisQueue implements QueueInterface
      */
     protected function fetchIdList()
     {
-        $list = $this->exec("ZRANGE $this->name 0 -1");
-        return $list ? : array();
+        return $this->exec("SMEMBERS", $this->index() . ':' . $this->name) ? : array();
+    }
+
+
+    /**
+     * @param Instance $instance
+     * @return string
+     */
+    protected function getFullHash(Instance $instance)
+    {
+        return 'm:' . $instance->getBaseHash() . ':' . $instance->getParamHash();
     }
 
 }
