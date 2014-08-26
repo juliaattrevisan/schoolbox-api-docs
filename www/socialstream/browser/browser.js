@@ -159,7 +159,7 @@ if (socialstreamSession === undefined) {
 						 */
 						config.submitCallback(url, name, meta);
 
-                        if (this.modal) {
+                        if (config.modal) {
                             $j(config.element).dialog('close');
                         }
 					});
@@ -202,5 +202,5 @@ if (socialstreamSession === undefined) {
          */
         loadNode(socialstreamSession.categoryId);
 
-    }
+    };
 }(jQuery));
