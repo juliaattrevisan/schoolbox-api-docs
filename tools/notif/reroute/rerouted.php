@@ -97,8 +97,9 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 
             // setup dependencies
             $binder     = new UserQueueBinder();
-            $uqf        = new UserQueueFactory(new FullPlan($amqp, $redisc, $binder));
-            $subscriber = new Subscriber($client, new UserSubscriptionList(new AMQPBuilder($amqp)));
+            $plan       = new FullPlan($amqp, $redisc, $binder);
+            $uqf        = new UserQueueFactory($plan);
+            $subscriber = new Subscriber($client, new UserSubscriptionList($plan->getBuilder(AMQPBuilder::STORE)));
             $strat      = new RerouterDispatchStrategy($opts['flags']);
 
             // throw all the above into the class we wanted in the first place
