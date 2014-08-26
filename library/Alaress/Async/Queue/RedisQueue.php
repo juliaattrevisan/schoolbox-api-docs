@@ -121,7 +121,8 @@ class RedisQueue implements QueueInterface
         $data  = gzcompress("$instance", 9);
 
         // insert the msg body into storage, with expiry automatically set
-        $this->exec("SET", "$index:$id", $data, self::TTL);
+        $this->exec("SET", "$index:$id", $data);
+        $this->exec("EXPIRE", "$index:$id", self::TTL);
 
         // insert the msg reference into this 'queue'
         $this->exec("SADD", "$index:$this->name", "$index:$id");
