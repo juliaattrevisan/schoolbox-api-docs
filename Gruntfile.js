@@ -125,6 +125,8 @@ module.exports = function(grunt) {
                     'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
                     // Moment
                     'www/javascript/components/momentjs/moment.js',
+                    // Dropzone
+                    'www/javascript/components/dropzone/downloads/dropzone.js',
                     // Notifier
                     'www/javascript/jquery.notifier.js'
                 ],
