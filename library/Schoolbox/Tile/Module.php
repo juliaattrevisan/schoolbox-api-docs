@@ -26,6 +26,15 @@ use Twig_Loader_Filesystem;
 class Module extends BaseModule
 {
     /**
+     * Dependency on category mapper.
+     *
+     * Required for fetching the category that the component belongs to.
+     *
+     * @var CategoryMapper
+     */
+    protected $categoryMapper;
+
+    /**
      * Dependency on component instance mapper.
      *
      * Required for fetching the component from the database so that access
@@ -59,11 +68,13 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        // Add the component to params, as it's used in permission checks
-        $mapper = $this->getComponentInstanceMapper();
+        // Add the component and homepage to params,
+        // as they're used in permission checks
+        $mapper    = $this->getComponentInstanceMapper();
+        $catMapper = $this->getCategoryMapper();
         $matcher->add(
             '/^tile\\.(?:layout|layoutForm)$/',
-            function ($params) use ($mapper) {
+            function ($params) use ($mapper, $catMapper) {
                 $component = array_pop($mapper->findByInstanceId($params['componentId']));
                 if (!($component instanceof Component_Instance)) {
                     // error out.
@@ -72,7 +83,7 @@ class Module extends BaseModule
                 }
                 return array(
                     'component' => $component,
-                    'homepage'  => CategoryMapper::getInstance()->findById($component->getIdentifier()),
+                    'homepage'  => $catMapper->findById($component->getIdentifier()),
                 );
             }
         );
@@ -133,6 +144,24 @@ class Module extends BaseModule
             'controller:tile',
             $injector->lazyNew('Schoolbox\\Tile\\Controller')
         );
+    }
+
+    /**
+     * @param  CategoryMapper $categoryMapper
+     * @return $this
+     */
+    public function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+    /**
+     * @return CategoryMapper
+     */
+    public function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 
     /**
