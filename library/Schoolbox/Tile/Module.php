@@ -62,7 +62,7 @@ class Module extends BaseModule
         // Add the component to params, as it's used in permission checks
         $mapper = $this->getComponentInstanceMapper();
         $matcher->add(
-            '/^tile.(?:layout|layoutForm)$/',
+            '/^tile\\.(?:layout|layoutForm)$/',
             function ($params) use ($mapper) {
                 $component = array_pop($mapper->findByInstanceId($params['componentId']));
                 if (!($component instanceof Component_Instance)) {
