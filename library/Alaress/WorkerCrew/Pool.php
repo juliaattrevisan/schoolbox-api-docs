@@ -164,7 +164,7 @@ class Pool extends EventEmitter implements PoolInterface
             }
         }
 
-        if (is_object($args)) {
+        elseif (is_object($args)) {
             $value = get_class($args);
             if (method_exists($args, 'getId')) {
                 $value .= "({$args->getId()})";
@@ -174,7 +174,9 @@ class Pool extends EventEmitter implements PoolInterface
             $value = "$args";
         }
 
-        $values[] = substr($value, 0, 128);
+        if(isset($value)) {
+            $values[] = substr($value, 0, 128);
+        }
 
         return implode(', ', $values);
     }
