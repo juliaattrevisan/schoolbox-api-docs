@@ -26,6 +26,15 @@ use Twig_Loader_Filesystem;
 class Module extends BaseModule
 {
     /**
+     * Dependency on tile mapper.
+     *
+     * Required for fetching the tile to insert into.
+     *
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
      * Dependency on category mapper.
      *
      * Required for fetching the category that the component belongs to.
@@ -60,7 +69,11 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $router->addGet('tile.layout', $basePath . '/layout/{componentId}');
-        $router->addPost('tile.layoutForm', $basePath . '/layoutForm/{componentId}');
+        $router->addPost('tile.layoutForm', $basePath . '/layout/{componentId}');
+        $router->addGet('tile.add', $basePath . '/add/{componentId}');
+        $router->addPost('tile.addForm', $basePath . '/add/{componentId}');
+        $router->addGet('tile.modify', $basePath . '/modify/{itemId}');
+        $router->addPost('tile.modifyForm', $basePath . '/modify/{itemId}');
     }
 
     /**
@@ -70,12 +83,21 @@ class Module extends BaseModule
     {
         // Add the component and homepage to params,
         // as they're used in permission checks
-        $mapper    = $this->getComponentInstanceMapper();
-        $catMapper = $this->getCategoryMapper();
+        $mapper          = $this->getMapper();
+        $catMapper       = $this->getCategoryMapper();
+        $componentMapper = $this->getComponentInstanceMapper();
         $matcher->add(
-            '/^tile\\.(?:layout|layoutForm)$/',
-            function ($params) use ($mapper, $catMapper) {
-                $component = array_pop($mapper->findByInstanceId($params['componentId']));
+            '/^tile\\.(?:modify|modifyForm)$/',
+            function ($params) use ($mapper) {
+                return array(
+                    'item' => $mapper->findById($params['itemId']),
+                );
+            }
+        );
+        $matcher->add(
+            '/^tile\\.(?:add|addForm|layout|layoutForm)$/',
+            function ($params) use ($componentMapper, $catMapper) {
+                $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
 
                 // Component must actually exist.
                 // This should cause an error that is recorded, but doesn't
@@ -190,6 +212,24 @@ class Module extends BaseModule
     public function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
+    }
+
+    /**
+     * @param  Mapper $mapper
+     * @return $this
+     */
+    public function setMapper($mapper)
+    {
+        $this->mapper = $mapper;
+        return $this;
+    }
+
+    /**
+     * @return Mapper
+     */
+    public function getMapper()
+    {
+        return $this->mapper;
     }
 
     /**
