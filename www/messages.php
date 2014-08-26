@@ -30,14 +30,15 @@ $redis = new \Alaress\Redis();
 $plan  = new \Schoolbox\Notif\Queue\Builder\Plan\ListedPlan($redis->getClientInstance());
 
 $qf = new \Schoolbox\Notif\Queue\UserQueueFactory($plan);
-$q = $qf->buildUserQueue($_SESSION['user'], 20);
+$q = $qf->buildUserQueue($_SESSION['user'], -1);
 
-// load the 20 most recent notifications into a decorator
+// load into the decorator
 $decorator = new \Schoolbox\Realtime\Notification\Decorator();
 
 $q->fetchNotificationsIntoBundle(\Schoolbox\Notif\Queue\UserQueue::Q_LISTED, $decorator);
 
-$notifications = $decorator->renderAsSitePageArray();
+// pull out the 20 most recent notifications
+$notifications = $decorator->renderAsSitePageArray(20);
 
 $msgsByDay = array();
 
