@@ -22,7 +22,6 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
             LEFT JOIN `file` f ON cl.`objectId` = f.id AND cl.`object` = 'file'
             WHERE f.id IS NOT NULL
             AND f.`category` = :cid
-            -- AND `action` = 'modify'
             $dateFilter
             GROUP BY f.id
             ORDER BY `count` DESC"
@@ -31,8 +30,8 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
         $stmt->execute(array('cid' => $this->getContext('id')));
 
         $i = 0;
-        while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->files[$i] = $link;
+        while($file = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $this->files[$i] = $file;
             $this->files[$i]['progress'] = (int)$this->files[$i]['count'] / $this->files[0]['count'] * 100;
             $this->files[$i]['hits'] = (int)$this->files[$i]['count'];
             ++$i;
