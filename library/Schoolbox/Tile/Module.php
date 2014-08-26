@@ -17,24 +17,33 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
+use External_UserInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\CategoryMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
-
-    // This module accesses component instance mapper
-
     /**
+     * Dependency on component instance mapper.
+     *
+     * Required for fetching the component from the database so that access
+     * permission to this page may be checked.
+     *
      * @var Component_InstanceMapper
      */
     protected $componentInstanceMapper;
 
-//    public function __construct(ContainerInterface $injector, Component_InstanceMapper $componentInstanceMapper)
-//    {
-//        $this->setComponentInstanceMapper()
-//    }
+    /**
+     * Dependency on external user database.
+     *
+     * Required for checking that the requesting user is a teacher of the class
+     * homepage that this component is on.
+     *
+     * @var External_UserInterface
+     */
+    protected $externalDb;
 
     /**
      * {@inheritdoc}
@@ -43,8 +52,6 @@ class Module extends BaseModule
     {
         $router->addGet('tile.layout', $basePath.'/layout/{componentId}');
         $router->addPost('tile.layoutForm', $basePath.'/layoutForm/{componentId}');
-//        $router->attachResource('tile', $basePath);
-//        $router->attachResourcePostAlias('resourceCategory', $basePath);
     }
 
     /**
@@ -133,5 +140,23 @@ class Module extends BaseModule
     public function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
+    }
+
+    /**
+     * @param  External_UserInterface $externalDb
+     * @return $this
+     */
+    public function setExternalDb($externalDb)
+    {
+        $this->externalDb = $externalDb;
+        return $this;
+    }
+
+    /**
+     * @return External_UserInterface
+     */
+    public function getExternalDb()
+    {
+        return $this->externalDb;
     }
 }
