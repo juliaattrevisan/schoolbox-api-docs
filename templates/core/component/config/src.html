@@ -1,54 +1,41 @@
 <script type="text/javascript" src="/textbox/javascript/availableByCategory.js"></script>
 <script type="text/javascript">
-    $j(function () {
-        /* Modal for URL homepage selection
-         */
-        $j('#resource-browser').dialog({
-            width: 650,
-            autoOpen: false,
-            title: "Select a homepage",
-            modal: true,
-            resizable: false
-        });
+  $j(function () {
+    /* Modal for URL homepage selection
+     */
 
-        $j('#src-{COMPONENT_HANDLE}').change(function(){
+    $j('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
+      var self = $j(this);
 
-			/* Forgive me, for I have sinned
-			 */
-			$j(this).availableByCategory({
-				categoryId: this.value.toString().replace('/homepage/', ''),
-				target: $j('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select')
-			});
-
-            $j('#text-{COMPONENT_HANDLE}').attr('href', this.value);
-        });
-
-        $j('#launch-browser-{COMPONENT_HANDLE}').click(function() {
-            $j('#resource-browser').load(
-                '/ajax/resourceBrowser',
-                {
-                    destination:     '#src-{COMPONENT_HANDLE}',
-                    destinationText: '#text-{COMPONENT_HANDLE}',
-                    triggerChange:   true
-                },
-                function() {
-                    $j('#resource-browser').dialog('open');
-
-					/* auto scroll to open branch */
-					var selectedNode = $('#tree tr.selected');
-
-					if (selectedNode.length) {
-						$j("#category-window").scrollTo($j('#'+ selectedNode.attr('id')), 200);
-					}
-					else {
-						$j("#category-window").scrollTo($j("#node-0"), 200);
-					}
-                }
-            );
-            return false;
-        });
+      $j('#resource-browser').socialstreamBrowser({
+        title: 'Choose a source',
+        categoryId: '{ID}',
+        url: '/socialstream/tree.php?nofiles=1',
+        submitCallback: function(url, filename) {
+          $j('#src-{COMPONENT_HANDLE}').val(url);
+          $j('#text-{COMPONENT_HANDLE}').attr('href', url).html(filename);
+        }
+      });
     });
+
+    $j('#src-{COMPONENT_HANDLE}').change(function () {
+
+      /* Forgive me, for I have sinned
+       */
+      $j(this).availableByCategory({
+        categoryId: this.value.toString().replace('/homepage/', ''),
+        target: $j('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select')
+      });
+
+      $j('#text-{COMPONENT_HANDLE}').attr('href', this.value);
+    });
+
+  });
 </script>
-<span><a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
-<input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+<span>
+  <a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}">
+    <img src="/images/mime/22x22/folder.png" alt="{COMPONENT_CONFIG_SRC_NAME}">{COMPONENT_CONFIG_SRC_NAME}
+  </a>
+</span>
+<input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}"/>
 <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="src" id="src-{COMPONENT_HANDLE}"/>
