@@ -72,8 +72,8 @@ class Module extends BaseModule
         $router->addPost('tile.layoutForm', $basePath . '/layout/{componentId}');
         $router->addGet('tile.add', $basePath . '/add/{componentId}');
         $router->addPost('tile.create', $basePath . '/add/{componentId}');
-        $router->addGet('tile.edit', $basePath . '/modify/{itemId}');
-        $router->addPost('tile.update', $basePath . '/modify/{itemId}');
+        $router->addGet('tile.edit', $basePath . '/modify/{id}');
+        $router->addPost('tile.update', $basePath . '/modify/{id}');
     }
 
     /**
@@ -87,17 +87,30 @@ class Module extends BaseModule
         $catMapper       = $this->getCategoryMapper();
         $componentMapper = $this->getComponentInstanceMapper();
 
-//        $matcher->add(
-//            '/^tile\\.(?:modify|modifyForm)$/',
-//            function ($params) use ($mapper) {
-//                return array(
-//                    'item' => $mapper->findById($params['itemId']),
-//                );
-//            }
-//        );
+        // Routes that take a tile ID:
+        // Look up the tile, and reverse lookup the component from its layout
+        $matcher->add(
+            '/^tile\\.(?:edit|update)$/',
+            function ($params) use ($mapper, $componentMapper) {
+                $item      = $mapper->findById($params['id']);
+                $component = $componentMapper->findComponentByConfigValue(
+                    'layout',
+                    $item->getTileLayout()->getId()
+                )->first();
+                if (!($component instanceof Component_Instance)) {
+                    throw new \RuntimeException('Component does not exist');
+                }
+                return array(
+                    'item'      => $item,
+                    'component' => $component,
+                );
+            }
+        );
+
+        // Routes that take a component ID: look up component from it
         $matcher->add(
             '/^tile\\.(?:add|create|layout|layoutForm)$/',
-            function ($params) use ($componentMapper, $catMapper) {
+            function ($params) use ($componentMapper) {
                 $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
 
                 // Component must actually exist.
@@ -113,10 +126,20 @@ class Module extends BaseModule
                     throw new \RuntimeException('Component exists, but is not a tile layout');
                 }
 
-                // Now we can augment params with a component and homepage
+                // augment params with component
                 return array(
                     'component' => $component,
-                    'homepage'  => $catMapper->findById($component->getIdentifier()),
+                );
+            }
+        );
+
+        // All routes: look up homepage from component
+        $matcher->add(
+            '/^tile\\.(?:add|create|layout|layoutForm|edit|update)$/',
+            function ($params) use ($catMapper) {
+                // augment params with homepage from category
+                return array(
+                    'homepage' => $catMapper->findById($params['component']->getIdentifier()),
                 );
             }
         );
