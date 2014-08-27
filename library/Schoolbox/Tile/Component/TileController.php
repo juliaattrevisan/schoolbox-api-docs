@@ -49,15 +49,16 @@ class TileController extends Component_Homepage_ControllerAbstract
         $layoutId = $this->getConfig('layout');
 
         // empty layout by default
-        $this->layout = new Layout\Model();
+        $mapper = Layout\Mapper::getInstance();
+        $this->setLayout($mapper->createModel());
         if (!empty($layoutId)) {
             try {
                 // Load the layout if it's there
                 // This load should include each tile.
-                $this->layout = Layout\Mapper::getInstance()->findById(
-                    $this->getConfig($layoutId),
-                    array(
-                        'joins' => array('tile'),
+                $this->setLayout(
+                    $mapper->findById(
+                        $layoutId,
+                        array('joins' => array('tile'),)
                     )
                 );
             } catch (MapperException $e) {
@@ -95,5 +96,23 @@ class TileController extends Component_Homepage_ControllerAbstract
         }
         $this->setVar('COMPONENT_CONTENT', $content);
         return true;
+    }
+
+    /**
+     * @return Layout\Model
+     */
+    public function getLayout()
+    {
+        return $this->layout;
+    }
+
+    /**
+     * @param  Layout\Model $layout
+     * @return $this
+     */
+    public function setLayout($layout)
+    {
+        $this->layout = $layout;
+        return $this;
     }
 }
