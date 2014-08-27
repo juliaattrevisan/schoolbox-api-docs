@@ -1,6 +1,15 @@
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
 $j(function() {
-	
+	$.fn.alaressTiny({
+		mode: 'textareas',
+		elements: 'richtext-answer',
+		file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+		removeformat_selector: 'b,strong,em,i,span,ins',
+		width: "100%",
+		disable_toolbars: [2, 3, 4]
+	});
+
 	$j(document).on('click', '#create', function() {
 		var content = tinyMCE.activeEditor.getContent(); // get the content
    		$j('#question').val(content); // put it in the textarea
