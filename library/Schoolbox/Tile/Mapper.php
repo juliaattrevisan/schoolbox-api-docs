@@ -188,7 +188,9 @@ class Mapper extends BaseMapper
      */
     public function findForLayout($layoutId)
     {
-        $query     = $this->getBaseQuery() . ' WHERE `t`.`tile_layout_id` = :layoutId';
+        $query = $this->getBaseQuery()
+                . ' WHERE `t`.`tile_layout_id` = :layoutId'
+                . ' ORDER BY `t`.`order` ASC';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array('layoutId' => $layoutId));
         return $this->hydrateList(
