@@ -26,7 +26,7 @@
 			var standard = {
 				theme: "advanced",
 				skin: "cirkuit",
-				plugins: "table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
 				browser_spellcheck: true,
 				content_css: "/css/core/tiny.css",
 				accessibility_warnings: false,
@@ -68,6 +68,8 @@
 				theme_advanced_buttons2: "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
 				theme_advanced_buttons3: "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
 				theme_advanced_buttons4: "tablecontrols",
+				pdw_toggle_on: 1,
+				pdw_toggle_toolbars: "2, 3, 4",
 
 				/* Formatting stuff
 				 */
@@ -107,16 +109,6 @@
 			 */
 			var merged = $.extend(standard, defaults, derived, options);
 			merged.file_browser_category_id = parseInt(merged.file_browser_category_id);
-
-			/* Disable toolbars without needing that stupid pdw plugin
-			 */
-			if ((merged.disable_toolbars != undefined) && (merged.disable_toolbars.length)) {
-				for (var i = 0; i < merged.disable_toolbars.length; i++) {
-					var key = 'theme_advanced_buttons' + merged.disable_toolbars[i];
-
-					delete(merged[key]);
-				}
-			}
 
 			return merged;
 		}
