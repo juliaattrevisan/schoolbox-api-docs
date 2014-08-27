@@ -1,1 +1,6 @@
-<li>{{ tile.titleText }}</li>
+<li>
+    {{ tile.titleText }}
+    {% if editable %}
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit</a>
+    {% endif %}
+</li>
