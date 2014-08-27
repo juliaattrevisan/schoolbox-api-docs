@@ -133,5 +133,26 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerCallback('preSave', array($this, 'preSave'));
+    }
+
+    /**
+     * Pre-save: ensures that an order is set for this tile if it doesn't have
+     * one already.
+     *
+     * @param Model $object
+     */
+    public function preSave(Model $object)
+    {
+        $order = $object->getOrder();
+        if (!isset($order)) {
+            $statement = $this->getDatabase()->prepare(
+                "SELECT COALESCE(MAX(`order`), -1)
+                 FROM `{$this->getTable()}` WHERE `tile_layout_id` = :id"
+            );
+            $statement->bindValue('id', $object->getTileLayout()->getId(), \PDO::PARAM_INT);
+            $statement->execute();
+            $object->setOrder(intval($statement->fetchColumn())+1);
+        }
     }
 }
