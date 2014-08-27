@@ -6,15 +6,25 @@
 <style type="text/css">
     .tileList.column {
         width: auto;
-        display: inline-block;
     }
-    .tileList.column .tile {
+    .tileList.column li {
+        position: relative;
         display: inline-block;
-        width: 30%;
         height: auto;
     }
+    .tileList.column .tile .title {
+        width: 100%;
+    }
+    #tileList-{{ layout.id }}.tileList.column li {
+        /*
+         * Width: 100/column_count
+         * Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
+         */
+        width: {{ 100 // layout.columnCount }}%;
+        padding-bottom: {{ 100 // layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
+    }
 </style>
-<ul class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
+<ul id="tileList-{{ layout.id }}" class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
     style="
     {% if layout.isGridLayoutType() %}
         width: {{ layout.gridWidth|e('css') }}px;
@@ -24,6 +34,6 @@
     "
 >
     {% for tile in tileList %}
-        <li>{% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}</li>
+        {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
     {% endfor %}
 </ul>

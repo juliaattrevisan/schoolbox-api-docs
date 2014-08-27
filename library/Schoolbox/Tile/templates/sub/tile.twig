@@ -1,4 +1,4 @@
-<div class="tile"
+<li class="tile"
     style="
         {% if tile.backgroundColor %}
             background-color: {{ tile.backgroundColor|e('css') }};
@@ -6,25 +6,26 @@
         {% if tile.backgroundImage.id %}
             background-image: url({{ "/storage/image.php?size=constrain200&hash=" ~ tile.backgroundImage.hash|e('css') }});
         {% endif %}
-        background-repeat: none;
-        background-size: contain;
+        background-repeat: no-repeat;
+        background-size: 100%;
     ">
     <span class="title"
         style="
             color: {{ tile.titleColor|e('css') }};
             background-color: {{ tile.titleBackgroundColor|e('css') }};
             position: absolute;
-            {% if tile.isTitlePositionBottom() %}top: 0;
+            {% if tile.isTitlePositionTop() %}top: 0;
             {% elseif tile.isTitlePositionBottom() %}bottom: 0;
             {% endif %}
     ">
-        {% if tile.link %}
+        {% if tile.link and not editable %}
         <a href="{{ tile.link|e('html_attr') }}">{{ tile.titleText }}</a>
         {% else %}
         {{ tile.titleText }}
         {% endif %}
     </span>
+
     {% if editable %}
-        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit</a>
+    <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit this tile</a>
     {% endif %}
-</div>
+</li>
