@@ -24,6 +24,20 @@
         top:0;
         bottom: 0;
         width: 100%;
+        transition: background-color 0.1s;
+    }
+    .tileList .tile a.edit:hover {
+        background-color: rgba(0, 102, 176, 0.8);
+    }
+    .tileList .tile.add {
+        background-color: rgba(0,0,0,0.1);
+    }
+    .tileList .tile.add .title {
+        position: absolute;
+        bottom: 50%;
+        width: 100%;
+        text-align: center;
+        vertical-align: middle;
     }
     #tileList-{{ layout.id }}.tileList.column li {
         /*
@@ -33,15 +47,12 @@
         width: {{ 100 // layout.columnCount }}%;
         padding-bottom: {{ 100 // layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
     }
-</style>
-<ul id="tileList-{{ layout.id }}" class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
-    style="
-    {% if layout.isGridLayoutType() %}
+    #tileList-{{ layout.id }}.tileList.grid {
         width: {{ layout.gridWidth|e('css') }}px;
-    {% else %}
-
-    {% endif %}
-    "
+    }
+</style>
+<ul id="tileList-{{ layout.id }}"
+    class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
 >
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
