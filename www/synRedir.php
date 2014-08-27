@@ -15,6 +15,7 @@ $method="POST";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $action);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
 $login = curl_exec($ch);
 curl_close($ch);
 unset($ch);
