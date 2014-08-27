@@ -1,0 +1,85 @@
+{# I need some way of adding custom_head #}
+<h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
+
+<form id="tile-layout-form"
+      action="{% if item.id %}{{ routeLookup('tile.update', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}"
+      method="post"
+      name="form"
+      class="clearfix"
+      enctype="multipart/form-data"
+>
+    <input type="hidden" name="id" value="{{ item.id|e('html_attr') }}"/>
+    <table class="standardForm table">
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Title</h4>
+                <em>
+                    Add an optional title to appear above the tile background.
+                </em>
+            </td>
+            <td>
+                <input name="title_text"
+                       value="{{ item.titleText|e('html_attr') }}"
+                       placeholder="enter text..." />
+
+                Colour:
+                <input type="color"
+                       name="title_color"
+                       value="{{ item.titleColor|e('html_attr') }}"
+                />
+
+                Background Colour:
+                <input type="color"
+                       name="title_background_color"
+                       value="{{ item.titleBackgroundColor|e('html_attr') }}"
+                />
+
+                Position:
+                <input type="radio"
+                       id="title_position_top"
+                       name="title_position"
+                       value="{{ constant('TITLE_POSITION_TOP', item) }}"
+                       {% if item.isTitlePositionTop() %}checked{% endif %}
+                />
+                <label for="title_position_top">Top</label>
+                <input type="radio"
+                       id="title_position_bottom"
+                       name="title_position"
+                       value="{{ constant('TITLE_POSITION_BOTTOM', item) }}"
+                       {% if item.isTitlePositionBottom() %}checked{% endif %}
+                        />
+                <label for="title_position_bottom">Bottom</label>
+
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Link</h4>
+            </td>
+            <td>
+                <input name="link" value="{{ item.link|e('html_attr') }}" placeholder="http://" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Background</h4>
+            </td>
+            <td>
+                {# really basic upload, etc #}
+                Colour:
+                <input type="color"
+                       name="background_color"
+                       value="{{ item.backgroundColor|e('html_attr') }}"
+                />
+            </td>
+        </tr>
+    </table>
+
+    <input id="resource-save"
+           type="submit"
+           value="Save"
+           class="submit-btn-plain"
+    />
+    {# Link depends on identifier #}
+    <a href="/homepage/{{ component.identifier }}" class="btn no-icon float-left"><span></span>Cancel</a>
+</form>
