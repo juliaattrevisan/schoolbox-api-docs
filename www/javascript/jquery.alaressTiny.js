@@ -26,12 +26,9 @@
 			var standard = {
 				theme: "advanced",
 				skin: "cirkuit",
-				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
 				browser_spellcheck: true,
 				content_css: "/css/core/tiny.css",
 				accessibility_warnings: false,
-				pdw_toggle_on: 1,
-				pdw_toggle_toolbars: '2, 3, 4',
 				extended_valid_elements: "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
 				theme_advanced_blockformats: "h3,h4,p,address,pre",
 				tabfocus_elements: ":prev,:next",
@@ -83,10 +80,20 @@
 				theme_advanced_toolbar_align: 'left',
 				theme_advanced_statusbar_location: 'bottom'
 
+				/* Width
+				 * Specify in options
+				 * width: '100%'
+				 */
+
 				/* Setup callback
 				 * Specify in options
 				 *
 				 * setup: function() ...
+				 */
+
+				/* Disable toolbars
+				 * Specify in options as an array of ints
+				 * e.g. disable_toolbars = [2,3,4]
 				 */
 			}
 
@@ -99,6 +106,16 @@
 			 */
 			var merged = $.extend(standard, defaults, derived, options);
 			merged.file_browser_category_id = parseInt(merged.file_browser_category_id);
+
+			/* Disable toolbars without needing that stupid pdw plugin
+			 */
+			if ((merged.disable_toolbars != undefined) && (merged.disable_toolbars.length)) {
+				for (var i = 0; i < merged.disable_toolbars.length; i++) {
+					var key = 'theme_advanced_buttons' + merged.disable_toolbars[i];
+
+					delete(merged[key]);
+				}
+			}
 
 			return merged;
 		}
