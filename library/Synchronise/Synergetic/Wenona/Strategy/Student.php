@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * Synchronise_Synergetic_Wenona_Strategy_Student
@@ -9,8 +10,8 @@
  * @version     SVN: $Id$
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  */
-
-class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synergetic_Wenona_Strategy_Abstract {
+class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synergetic_Wenona_Strategy_Abstract
+{
 
     /**
      * Get a list of users' Synergy IDs to sync
@@ -19,7 +20,8 @@ class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synerge
      */
 
 
-    public function generateList() {
+    public function generateList()
+    {
         $this->collateList($this->getExternalUserHandler()->getStudentUserAccountInfo());
     }
 
@@ -29,7 +31,8 @@ class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synerge
      * @param  $currentUser
      * @return array
      */
-    public function setupUserDetails($currentUser) {
+    public function setupUserDetails($currentUser)
+    {
         $newUser = array();
 
         // login details
@@ -53,7 +56,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synerge
             $newUser['eportfolio_enabled'] = self::STUDENT_EPORTFOLIO;
         }
 
-        if($newUser['year'] == 7) {
+        if ($newUser['year'] == 7) {
             //Turn on ePortfolios for year 7 automatically
             $newUser['eportfolio_enabled'] = 1;
         }
@@ -70,7 +73,8 @@ class Synchronise_Synergetic_Wenona_Strategy_Student extends Synchronise_Synerge
      *
      * @return void
      */
-    public function createIfExists() {
+    public function createIfExists()
+    {
         $this->getVerboseFilter()->intro();
 
         foreach ($this->getList() as $currentUser) {
