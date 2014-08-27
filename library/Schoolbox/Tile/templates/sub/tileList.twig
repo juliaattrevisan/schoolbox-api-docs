@@ -46,4 +46,15 @@
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
     {% endfor %}
+
+    {% if editable %}
+    {# This button should transparently save layout before adding tile #}
+    <li class="tile add">
+        <span class="title">+ Add Tile</span>
+        <a class="edit"
+           href="{{ routeLookup('tile.add', {componentId: component.id}) }}"
+           title="Add a new tile"
+        ></a>
+    </li>
+    {% endif %}
 </ul>
