@@ -12,7 +12,17 @@
         display: inline-block;
         height: auto;
     }
+    .tileList.column .tile {
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
     .tileList.column .tile .title {
+        width: 100%;
+    }
+    .tileList .tile a.edit {
+        position: absolute;
+        top:0;
+        bottom: 0;
         width: 100%;
     }
     #tileList-{{ layout.id }}.tileList.column li {

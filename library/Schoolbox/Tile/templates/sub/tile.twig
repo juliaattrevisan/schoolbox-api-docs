@@ -6,8 +6,6 @@
         {% if tile.backgroundImage.id %}
             background-image: url({{ "/storage/image.php?size=constrain200&hash=" ~ tile.backgroundImage.hash|e('css') }});
         {% endif %}
-        background-repeat: no-repeat;
-        background-size: 100%;
     ">
     <span class="title"
         style="
@@ -18,7 +16,7 @@
             {% elseif tile.isTitlePositionBottom() %}bottom: 0;
             {% endif %}
     ">
-        {% if tile.link and not editable %}
+        {% if tile.link %}
         <a href="{{ tile.link|e('html_attr') }}">{{ tile.titleText }}</a>
         {% else %}
         {{ tile.titleText }}
@@ -26,6 +24,7 @@
     </span>
 
     {% if editable %}
-    <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit this tile</a>
+    {# Show an edit link over the entire tile #}
+    <a class="edit" href="{{ routeLookup('tile.edit', {id: tile.id}) }}" title="Edit this tile"></a>
     {% endif %}
 </li>
