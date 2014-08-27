@@ -92,7 +92,10 @@ class Module extends BaseModule
         $matcher->add(
             '/^tile\\.(?:edit|update)$/',
             function ($params) use ($mapper, $componentMapper) {
-                $item      = $mapper->findById($params['id']);
+                $item = $mapper->findById(
+                    $params['id'],
+                    array('joins' => array('backgroundImage',),)
+                );
                 $component = $componentMapper->findComponentByConfigValue(
                     'layout',
                     $item->getTileLayout()->getId()
