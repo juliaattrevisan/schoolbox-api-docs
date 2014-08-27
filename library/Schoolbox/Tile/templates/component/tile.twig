@@ -1,1 +1,7 @@
-{% include '@tile/sub/tileList.twig' with {tileList: component.layout.tileList, editable: false} %}
+{% include '@tile/sub/tileList.twig'
+    with {
+        layout:   component.layout,
+        tileList: component.layout.tileList,
+        editable: false
+    }
+%}
