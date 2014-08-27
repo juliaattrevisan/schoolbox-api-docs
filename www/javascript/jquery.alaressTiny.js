@@ -80,6 +80,11 @@
 				theme_advanced_toolbar_location: 'top',
 				theme_advanced_toolbar_align: 'left',
 				theme_advanced_statusbar_location: 'bottom'
+			}
+
+			/* Computed/derived/optional values
+			 */
+			var derived = {
 
 				/* Width
 				 * Specify in options
@@ -96,11 +101,6 @@
 				 * Specify in options as an array of ints
 				 * e.g. disable_toolbars = [2,3,4]
 				 */
-			}
-
-			/* Computed values
-			 */
-			var derived = {
 			}
 
 			/* Combined init literal
