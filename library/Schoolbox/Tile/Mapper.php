@@ -84,7 +84,7 @@ class Mapper extends BaseMapper
                 'column'   => 'background_image_id',
                 'property' => 'backgroundImage',
                 'type'     => self::TYPE_MODEL,
-                'join'     => 'image',
+                'join'     => 'backgroundImage',
                 'join_def' => array(
                     'mapper'    => '\\Schoolbox\\StorageMapper',
                     'other_key' => 'storage_id',
