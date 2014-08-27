@@ -62,7 +62,7 @@ class Model implements ISoftDeletable
     /**
      * @var int
      */
-    protected $titlePosition;
+    protected $titlePosition = self::TITLE_POSITION_TOP;
 
     /**
      * @var string
