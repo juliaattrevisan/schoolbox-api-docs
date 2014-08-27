@@ -1,10 +1,18 @@
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-$j(function() {
-	
+$(function() {
+	$.fn.alaressTiny({
+		mode: 'textareas',
+		elements: 'richtext-answer',
+		file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+		removeformat_selector: 'b,strong,em,i,span,ins',
+		width: "100%",
+		disable_toolbars: [2, 3, 4]
+	});
+
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave(); 
-		 
 	}).validate({
 		rules: { 
 			question: {
@@ -17,12 +25,10 @@ $j(function() {
 				greaterThanZero:true
 			}
 		},
-		
 		messages: {
 			question: "Please enter a question.",
 			answer: "Please fill out an answer."
 		},
-		
         errorPlacement: function(error, element) {
             offset = element.offset();
             error.insertAfter(element.parent().children(':last-child'))
@@ -35,7 +41,6 @@ $j(function() {
 	}, "Amount must be greater than zero");
 });
 </script>
-
 <label>Suggested Answer
 	<div class="textarea-container"><textarea class="richtext-answer" name="answer">{ANSWER}</textarea></div>
 </label>
