@@ -132,38 +132,21 @@ class Controller extends Base
     public function create(Component_Instance $component)
     {
         /** @var Model $item */
-        $item   = $this->getMapper()->createModel();
-        $post   = $this->getRequest()->post;
-        $files  = $this->getRequest()->files;
+        $item = $this->getMapper()->createModel();
+        $this->updateItemWithFormValues(
+            $item,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
+
+        // updateItemWithFormValues() doesn't set the layout item - set it here.
         $layout = $this->getLayoutFromComponent($component);
         if (!($layout->getId())) {
             throw new \RuntimeException('Layout must be created before adding a tile');
         }
-        $item
-            ->setTileLayout($layout)
-            ->setTitleText($post['title_text'])
-            ->setTitleColor($post['title_color'])
-            ->setTitleBackgroundColor($post['title_background_color'])
-            ->setTitlePosition($post['title_position'])
-            ->setLink($post['link'])
-            ->setBackgroundColor($post['background_color'])
-        ;
-
-        // Upload a file if there was one
-        if (($upload = $files['background_image']) && empty($upload['error'])) {
-            $image = $this->getStorageMapper()->upload(
-                $upload['name'],
-                $upload['tmp_name'],
-                $this->getUser()->getId()
-            );
-            $item->setBackgroundImage($image);
-        } else {
-            $item->setBackgroundImage($post['background_image'] ?: null);
-        }
+        $item->setTileLayout($layout);
 
         $this->getMapper()->save($item);
-
-        // and redirect back to the layout page.
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
@@ -190,6 +173,59 @@ class Controller extends Base
                 ),
             )
         );
+    }
+
+    /**
+     * Update action for tiles
+     *
+     * @param Model              $item
+     * @param Component_Instance $component
+     */
+    public function update(Model $item, Component_Instance $component)
+    {
+        $this->updateItemWithFormValues(
+            $item,
+            $this->getRequest()->post,
+            $this->getRequest()->files
+        );
+
+        $this->getMapper()->save($item);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'tile.layout',
+                array('componentId' => $component->getId())
+            )
+        );
+    }
+
+    /**
+     * Updates an item with values passed from the form.
+     *
+     * @param Model        $item  The tile to update
+     * @param \ArrayObject $post  An array-like object that abstracts $_POST
+     * @param \ArrayObject $files An array-like object that abstracts $_FILES
+     */
+    protected function updateItemWithFormValues(Model $item, $post, $files)
+    {
+        $item
+            ->setTitleText($post['title_text'])
+            ->setTitleColor($post['title_color'])
+            ->setTitleBackgroundColor($post['title_background_color'])
+            ->setTitlePosition($post['title_position'])
+            ->setLink($post['link'])
+            ->setBackgroundColor($post['background_color']);
+
+        // Upload a file if there was one
+        if (($upload = $files['background_image']) && empty($upload['error'])) {
+            $image = $this->getStorageMapper()->upload(
+                $upload['name'],
+                $upload['tmp_name'],
+                $this->getUser()->getId()
+            );
+            $item->setBackgroundImage($image);
+        } else {
+            $item->setBackgroundImage($post['background_image'] ?: null);
+        }
     }
 
     /**
