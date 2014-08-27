@@ -10,6 +10,8 @@
 
 class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synergetic_Toorak_Strategy_Abstract {
 
+    const PASSWORD_KEY 20108;
+
 	/**
 	 * Get a list of users' Synergy IDs to sync
 	 *
@@ -37,12 +39,14 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 		$newUser['firstname']  = $currentUser['StudentContactPreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSurname'];
 		$newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
+        $newUser['password']   = $currentUser['StudentContactSpouseID'] + self::PASSWORD_KEY;
 
 		// get campuses of attached children
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
 		$newUser['defaultCampus'] = $newUser['campus'][0];
 		$newUser['group_id']      = self::PARENT_GROUP_ID;
 		$newUser['su']            = false;
+
 
 		return $newUser;
 	}
@@ -65,8 +69,10 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 		$newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
 		$newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
 		$newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
+        $newUser['password']   = $currentUser['StudentContactSpouseID'] + self::PASSWORD_KEY;
 
-		// get campuses of kids
+
+        // get campuses of kids
 		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
 		$newUser['defaultCampus'] = $newUser['campus'][0];
 		$newUser['group_id']      = self::PARENT_GROUP_ID;
@@ -113,17 +119,27 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
 				$previousUser['campus'] = array_unique($previousUser['campus']);
 				$previousSpouse['campus'] = array_unique($previousSpouse['campus']);
 
-				/* Update previous user
+				/* Update/Create previous user
 					 */
 				if ($this->userExistsBySynergyAndGroup($previousUser)) {
-					$this->executeCreateUpdate($previousUser);
-				}
-				if ($this->userExistsBySynergyAndGroup($previousSpouse)) {
-					$this->executeCreateUpdate($previousSpouse);
+                    //Don't update passwords, only set on create
+                    unset($previousUser['password']);
 				}
 
-				/* Recompile
-					 */
+                $this->executeCreateUpdate($previousUser);
+
+                if ($this->userExistsBySynergyAndGroup($previousSpouse)) {
+                    //Don't update passwords, only set on create
+                    unset($previousSpouse['password']);
+
+                }
+
+                $this->executeCreateUpdate($previousSpouse);
+
+
+
+                /* Recompile
+                     */
 				$compiledCampus = $newUser['campus'];
 
 				$previousUser = $newUser;
