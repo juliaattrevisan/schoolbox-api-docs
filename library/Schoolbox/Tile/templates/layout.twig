@@ -108,6 +108,7 @@
                 </em>
             </td>
             <td>
+                {% include '@tile/sub/tileList.twig' with {tileList: item.tileList, editable: true} %}
                 {# This button should transparently save layout before adding tile #}
                 <a href="{{ routeLookup('tile.add', {componentId: component.id}) }}">Add tile</a>
             </td>
