@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'tile_container',
                 'join_def' => array(
-                    'mapper'    => 'Schoolbox\\Tile\\Layout\\Model',
+                    'mapper'    => 'Schoolbox\\Tile\\Layout\\Mapper',
                     'other_key' => 'id',
                 )
             )

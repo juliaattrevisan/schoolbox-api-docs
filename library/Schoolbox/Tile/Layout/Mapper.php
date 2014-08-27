@@ -101,7 +101,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'tile',
             array(
-                'mapper'    => 'Schoolbox\\Tile\\Model',
+                'mapper'    => 'Schoolbox\\Tile\\Mapper',
                 'this_key'  => 'id',
                 'other_key' => 'tile_layout_id',
                 'multiple'  => 'true',
