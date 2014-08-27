@@ -90,6 +90,7 @@
 
 				/* Width
 				 * Specify in options
+				 *
 				 * width: '100%'
 				 */
 
@@ -101,7 +102,14 @@
 
 				/* Disable toolbars
 				 * Specify in options as an array of ints
-				 * e.g. disable_toolbars = [2,3,4]
+				 *
+				 * disable_toolbars = [2,3,4]
+				 */
+
+				/* Protect elements from tiny conversion
+				 * Specify in options
+				 *
+				 * editor_deselector: 'myClass'
 				 */
 			}
 
