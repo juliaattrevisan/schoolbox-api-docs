@@ -121,13 +121,7 @@ class Mapper extends BaseMapper
         /** @var TileMapper $tileMapper */
         $model      = parent::findById($identifierValue);
         $tileMapper = $this->getJoinMapper('tile');
-        $model->setTileList(
-            $tileMapper->findByColumn(
-                'tile_layout_id',
-                $model->getId(),
-                array('order' => array('order' => 'asc'))
-            )
-        );
+        $model->setTileList($tileMapper->findForLayout($model->getId()));
         return $model;
     }
 }
