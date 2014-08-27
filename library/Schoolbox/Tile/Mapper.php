@@ -136,6 +136,71 @@ class Mapper extends BaseMapper
         $this->registerCallback('preSave', array($this, 'preSave'));
     }
 
+    // When this item is fetched, in list or by ID: fetch all uploaded images
+    // How do I do that?
+
+    /**
+     * Helper method for getting a query that retrieves a tile, and joins to
+     * the background image view.
+     *
+     * @return string
+     */
+    protected function getBaseQuery()
+    {
+        return "
+            SELECT
+                {$this->getColumnString('t')},
+                {$this->getJoinColumnString('backgroundImage', 'bi')}
+            FROM `{$this->getTable()}` `t`
+            LEFT JOIN {$this->getJoinSql('backgroundImage', 't', 'bi')}
+        ";
+    }
+
+    /**
+     * Gets the tile and its image.
+     *
+     * @param  int $identifierValue
+     * @return Model
+     * @throws BaseMapper\Exception if tile doesn't exist
+     * @throws BaseMapper\Exception\Deleted if tile was soft deleted
+     */
+    public function findById($identifierValue)
+    {
+        $query     = $this->getBaseQuery() . ' WHERE `t`.`id` = :id';
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array('id' => $identifierValue));
+
+        if ($row = $statement->fetch()) {
+            /** @var Model $model */
+            $model = $this->hydrate($row, 't');
+            $model->setBackgroundImage($this->hydrateJoin($row, 'backgroundImage', 'bi'));
+            $this->throwIfDeleted($model);
+            return $model;
+        }
+        throw new BaseMapper\Exception('Instance of object not found');
+    }
+
+    /**
+     * Gets all tiles for this layout ID, as well as all of its images.
+     *
+     * @param  int $layoutId
+     * @return Model[]|\Schoolbox\Collection
+     */
+    public function findForLayout($layoutId)
+    {
+        $query     = $this->getBaseQuery() . ' WHERE `t`.`tile_layout_id` = :layoutId';
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array('layoutId' => $layoutId));
+        return $this->hydrateList(
+            $statement,
+            't',
+            function ($mapper, $model, $row) {
+                $model->setBackgroundImage($mapper->hydrateJoin($row, 'backgroundImage', 'bi'));
+                return $model;
+            }
+        );
+    }
+
     /**
      * Pre-save: ensures that an order is set for this tile if it doesn't have
      * one already.
