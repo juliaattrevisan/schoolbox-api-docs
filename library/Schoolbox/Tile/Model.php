@@ -80,6 +80,26 @@ class Model implements ISoftDeletable
     protected $order;
 
     /**
+     * @var string
+     */
+    protected $backgroundColor;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $createdAt;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $modifiedAt;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $deletedAt;
+
+    /**
      * @param  string $backgroundColor
      * @return $this
      */
@@ -224,27 +244,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @var string
-     */
-    protected $backgroundColor;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
-
-
-    /**
      * @param  Alaress_Date_Format $createdAt
      * @return $this
      */
@@ -333,6 +332,23 @@ class Model implements ISoftDeletable
     {
         return $this->order;
     }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionTop()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_TOP;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionBottom()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOM;
+    }
+
 
     /**
      * Is this object deleted?
