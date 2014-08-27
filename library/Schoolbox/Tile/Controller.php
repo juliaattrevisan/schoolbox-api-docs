@@ -134,6 +134,7 @@ class Controller extends Base
         /** @var Model $item */
         $item   = $this->getMapper()->createModel();
         $post   = $this->getRequest()->post;
+        $files  = $this->getRequest()->files;
         $layout = $this->getLayoutFromComponent($component);
         if (!($layout->getId())) {
             throw new \RuntimeException('Layout must be created before adding a tile');
@@ -147,6 +148,19 @@ class Controller extends Base
             ->setLink($post['link'])
             ->setBackgroundColor($post['background_color'])
         ;
+
+        // Upload a file if there was one
+        if (($upload = $files['background_image']) && empty($upload['error'])) {
+            $image = $this->getStorageMapper()->upload(
+                $upload['name'],
+                $upload['tmp_name'],
+                $this->getUser()->getId()
+            );
+            $item->setBackgroundImage($image);
+        } else {
+            $item->setBackgroundImage($post['background_image'] ?: null);
+        }
+
         $this->getMapper()->save($item);
 
         // and redirect back to the layout page.
