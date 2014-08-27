@@ -14,6 +14,7 @@ use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\StorageMapper;
 
 class Controller extends Base
 {
@@ -31,6 +32,11 @@ class Controller extends Base
      * @var Component_ConfigMapper
      */
     protected $componentConfigMapper;
+
+    /**
+     * @var StorageMapper
+     */
+    protected $storageMapper;
 
     /**
      * Displays a form for editing a tile layout.
@@ -225,5 +231,23 @@ class Controller extends Base
     public function getComponentConfigMapper()
     {
         return $this->componentConfigMapper;
+    }
+
+    /**
+     * @param  StorageMapper $storageMapper
+     * @return $this
+     */
+    public function setStorageMapper($storageMapper)
+    {
+        $this->storageMapper = $storageMapper;
+        return $this;
+    }
+
+    /**
+     * @return StorageMapper
+     */
+    public function getStorageMapper()
+    {
+        return $this->storageMapper;
     }
 }
