@@ -17,6 +17,7 @@ class Synchronise_Synergetic_Genazzano_Strategy_Staff extends Synchronise_Base_S
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
             ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_EnableEportfolio())
+            ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_StaffDefaultEmail())
             ->addHydrator(new Synchronise_Base_Hydrator_Webmail())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
