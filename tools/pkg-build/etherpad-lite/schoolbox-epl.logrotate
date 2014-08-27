@@ -2,7 +2,7 @@
   daily
   rotate 7
   missingok
+  copytruncate
   compress
-  delaycompress
   missingok
 }
