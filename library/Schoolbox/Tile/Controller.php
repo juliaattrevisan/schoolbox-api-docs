@@ -173,6 +173,26 @@ class Controller extends Base
     }
 
     /**
+     * Form for editing a tile
+     *
+     * @param Model              $item
+     * @param Component_Instance $component
+     */
+    public function edit(Model $item, Component_Instance $component)
+    {
+        $this->getResponse()->content->set(
+            array(
+                'title'    => 'Add Tile',
+                'template' => '@tile/modify.twig',
+                'data'     => array(
+                    'item'      => $item,
+                    'component' => $component,
+                ),
+            )
+        );
+    }
+
+    /**
      * Retrieves the model layout object associated with this component, or an
      * empty one if none is associated.
      *
