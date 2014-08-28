@@ -1,0 +1,50 @@
+<h1>Mass Modify</h1>
+
+<h2>Search</h2>
+<form action="/adminv2/user/bulk/modify" method="post">
+	<label>
+	Campus
+		<select name="campus">
+			<!-- BEGIN search_campus -->
+			<option value="{SEARCH_CAMPUS_ID}">{SEARCH_CAMPUS_NAME}</option>
+			<!-- END search_campus -->
+		</select>
+	</label>
+	<label>
+	Group
+		<select name="role">
+			<!-- BEGIN search_role -->
+			<option value="{SEARCH_ROLE_ID}">{SEARCH_ROLE_NAME}</option>
+			<!-- END search_role -->
+		</select>
+	</label>
+	<label>
+	ePortfolio
+	</label>
+	<label>
+	Year
+	</label>
+
+	<input type="submit" value="Search Users" />
+</form>
+
+<h2>Users</h2>
+<table>
+	<thead>
+		<tr>
+			<th>Checkbox</th>
+			<th>Firstname</th>
+			<th>Lastname</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>New Values</h2>
+<form action="/adminv2/user/bulk/modifyForm.php?action=update" method="post"
