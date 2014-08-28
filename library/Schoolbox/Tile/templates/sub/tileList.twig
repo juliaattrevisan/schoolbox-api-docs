@@ -4,8 +4,15 @@
  # Columns: responsive layout? Width
  #}
 <style type="text/css">
+    /*
     .tileList.column {
         width: auto;
+    }
+    */
+
+    .tileList {
+        word-spacing: 0;
+        line-height: 0;
     }
     .tileList.column li {
         position: relative;
@@ -18,6 +25,8 @@
     }
     .tileList.column .tile .title {
         width: 100%;
+        word-spacing: normal;
+        line-height: normal;
     }
     .tileList .tile a.edit {
         position: absolute;
@@ -44,13 +53,15 @@
          * Width: 100/column_count
          * Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
          */
-        width: {{ 100 // layout.columnCount }}%;
-        padding-bottom: {{ 100 // layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
+        width: {{ 100 / layout.columnCount }}%;
+        padding-bottom: {{ 100 / layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
     }
     #tileList-{{ layout.id }}.tileList.grid {
         width: {{ layout.gridWidth|e('css') }}px;
     }
 </style>
+{# spaceless because spaces between inline-block elements split the element. WTF #}
+{% spaceless %}
 <ul id="tileList-{{ layout.id }}"
     class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
 >
@@ -69,3 +80,4 @@
     </li>
     {% endif %}
 </ul>
+{% endspaceless %}
