@@ -2,37 +2,67 @@
 
 <h2>Search</h2>
 <form action="/adminv2/user/bulk/modify" method="post">
-	<label>
-	Campus
-		<select name="campus">
-			<!-- BEGIN search_campus -->
-			<option value="{SEARCH_CAMPUS_ID}">{SEARCH_CAMPUS_NAME}</option>
-			<!-- END search_campus -->
-		</select>
-	</label>
-	<label>
-	Group
-		<select name="role">
-			<!-- BEGIN search_role -->
-			<option value="{SEARCH_ROLE_ID}">{SEARCH_ROLE_NAME}</option>
-			<!-- END search_role -->
-		</select>
-	</label>
-	<label>
-	ePortfolio
-	</label>
-	<label>
-	Year
-	</label>
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Campus</h4>
+			</td>
+			<td>
+				<select name="search_campus">
+					<option value="-1">Any</option>
+					<!-- BEGIN search_campus -->
+					<option value="{SEARCH_CAMPUS_ID}">{SEARCH_CAMPUS_NAME}</option>
+					<!-- END search_campus -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Group</h4>
+			</td>
+			<td>
+				<select name="search_role">
+					<option value="-1">Any</option>
+					<!-- BEGIN search_role -->
+					<option value="{SEARCH_ROLE_ID}">{SEARCH_ROLE_NAME}</option>
+					<!-- END search_role -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>ePortfolio</h4>
+			</td>
+			<td>
+				<select name="search_eportfolio">
+					<option value="-1">Any</option>
+					<!-- BEGIN search_eportfolio -->
+					<option value="{SEARCH_EPORTFOLIO_ID}">{SEARCH_EPORTFOLIO_NAME}</option>
+					<!-- END search_eportfolio -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Year</h4>
+			</td>
+			<td>
+				<input name='search_year' type="text" value="" />
+			</td>
+		</tr>
+	</table>
 
-	<input type="submit" value="Search Users" />
+	<input type="submit" class="submit-btn-plain" value="Search Users" />
 </form>
 
+<div class="clearfix"></div>
+
+<!-- BEGIN has_results -->
 <h2>Users</h2>
 <table>
 	<thead>
 		<tr>
-			<th>Checkbox</th>
+			<th><input type="checkbox"></th>
 			<th>Firstname</th>
 			<th>Lastname</th>
 		</tr>
@@ -46,5 +76,61 @@
 	</tbody>
 </table>
 
+<div class="clearfix"></div>
+
 <h2>New Values</h2>
-<form action="/adminv2/user/bulk/modifyForm.php?action=update" method="post"
+<form action="/adminv2/user/bulk/modifyForm.php?action=update" method="post">
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Campus</h4>
+			</td>
+			<td>
+				<select name="apply_campus">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_campus -->
+					<option value="{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</option>
+					<!-- END apply_campus -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Group</h4>
+			</td>
+			<td>
+				<select name="apply_role">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_role -->
+					<option value="{APPLY_ROLE_ID}">{APPLY_ROLE_NAME}</option>
+					<!-- END apply_role -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>ePortfolio</h4>
+			</td>
+			<td>
+				<select name="apply_eportfolio">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_eportfolio -->
+					<option value="{APPLY_EPORTFOLIO_ID}">{APPLY_EPORTFOLIO_NAME}</option>
+					<!-- END apply_eportfolio -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Year</h4>
+				<em>Leave blank if you don't want to update their year.</em>
+			</td>
+			<td>
+				<input name='apply_year' type="text" value="" />
+			</td>
+		</tr>
+	</table>
+
+	<input type="submit" class="submit-btn-plain" value="Apply To Selected" />
+</form>
+<!-- END has_results -->
