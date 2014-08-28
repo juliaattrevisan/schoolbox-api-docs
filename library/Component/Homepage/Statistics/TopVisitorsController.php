@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -17,7 +18,8 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s 00:00:00' AND '%s 23:59:59'", date('Y-m-d', $this->dateRange[0]),
+                "AND datetime BETWEEN '%s 00:00:00' AND '%s 23:59:59'",
+                date('Y-m-d', $this->dateRange[0]),
                 date('Y-m-d', $this->dateRange[1])
             );
         }
@@ -43,9 +45,12 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
 
         $i = 0;
         while ($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if($visitor['hits'] > 0) {
+            if ($visitor['hits'] > 0) {
                 $visitors[] = $visitor;
-                $visitors[$i++]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+                $visitors[$i]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+                $visitors[$i]['hits'] = $visitor['hits'];
+
+                $i++;
             }
         }
 
@@ -71,7 +76,8 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
                     'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
                     'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
                     'VISITOR_GROUP' => Scrub::text($this->visitors[$i]['group_name']),
-                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100)
+                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100),
+                    'VISITOR_HITS' => $this->visitors[$i]['hits'],
                 )
             );
             $this->parse('top_visitor_block', 'top_visitor', true);
