@@ -50,7 +50,7 @@ class Mapper extends BaseMapper
             array(
                 'column'   => 'title_color',
                 'property' => 'titleColor',
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_COLOR,
             )
         );
         // Hydrate as a color object?
@@ -58,7 +58,7 @@ class Mapper extends BaseMapper
             array(
                 'column'   => 'title_background_color',
                 'property' => 'titleBackgroundColor',
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_COLOR,
             )
         );
         $this->hasMap(
@@ -95,7 +95,7 @@ class Mapper extends BaseMapper
             array(
                 'column'   => 'background_color',
                 'property' => 'backgroundColor',
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_COLOR,
             )
         );
 
