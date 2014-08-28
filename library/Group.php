@@ -478,39 +478,9 @@ class Group extends DeprecatedModel
             $permission = WRITE_ACCESS;
         }
 
-        // check synergy tutor list
-        if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && Cfg::get('external_enable')) {
-            $tutorialPermission = $this->getTutorialPermission($userID);
-            if ($tutorialPermission) {
-                $permission = $tutorialPermission;
-            }
-        }
-
         /* Set cache */
         $this->cache[$this->_service][$relationID][$userID] = $permission;
         return $permission;
-    }
-
-    function getTutorialPermission($userID)
-    {
-
-        $userHandler = new User;
-        $mssql = MSSQL::getInstance();
-
-        $user = $userHandler->getByID($userID);
-
-        $query = "SELECT ID
-					  FROM SynergyOne.dbo.vCommunityAddressesConstit vCommunityAddressesConstit
-					  WHERE ((vCommunityAddressesConstit.ConstitCode='TUTRES2009') OR (vCommunityAddressesConstit.ConstitCode='TUTNONRES2009'))
-					  AND ID = " . $user['synergy_id'];
-
-        $tutor = $mssql->getRow($query);
-
-        if (isset($tutor['ID'])) {
-            return WRITE_ACCESS;
-        } else {
-            return DENY_ACCESS;
-        }
     }
 
     /**
