@@ -166,7 +166,9 @@ class Mapper extends BaseMapper
      */
     public function findById($identifierValue)
     {
-        $query     = $this->getBaseQuery() . ' WHERE `t`.`id` = :id';
+        $query = $this->getBaseQuery()
+                . ' WHERE `t`.`deleted_at` IS NULL'
+                . ' AND `t`.`id` = :id';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array('id' => $identifierValue));
 
@@ -189,7 +191,8 @@ class Mapper extends BaseMapper
     public function findForLayout($layoutId)
     {
         $query = $this->getBaseQuery()
-                . ' WHERE `t`.`tile_layout_id` = :layoutId'
+                . ' WHERE `t`.`deleted_at` IS NULL'
+                . ' AND `t`.`tile_layout_id` = :layoutId'
                 . ' ORDER BY `t`.`order` ASC';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array('layoutId' => $layoutId));
