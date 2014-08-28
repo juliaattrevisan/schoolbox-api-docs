@@ -1,7 +1,12 @@
 <li class="tile"
     style="
         {% if tile.backgroundColor %}
-            background-color: {{ tile.backgroundColor|e('css') }};
+            background-color: rgba(
+                {{ tile.backgroundColor.red|e('css') }},
+                {{ tile.backgroundColor.green|e('css') }},
+                {{ tile.backgroundColor.blue|e('css') }},
+                {{ tile.backgroundColor.alpha|e('css') }}
+            );
         {% endif %}
         {% if tile.backgroundImage.id %}
             background-image: url({{ "/storage/image.php?size=constrain200&hash=" ~ tile.backgroundImage.hash|e('css') }});
@@ -9,8 +14,18 @@
     ">
     <span class="title"
         style="
-            color: {{ tile.titleColor|e('css') }};
-            background-color: {{ tile.titleBackgroundColor|e('css') }};
+            color: rgba(
+                {{ tile.titleColor.red|e('css') }},
+                {{ tile.titleColor.green|e('css') }},
+                {{ tile.titleColor.blue|e('css') }},
+                {{ tile.titleColor.alpha|e('css') }}
+            );
+            background-color: rgba(
+                {{ tile.titleBackgroundColor.red|e('css') }},
+                {{ tile.titleBackgroundColor.green|e('css') }},
+                {{ tile.titleBackgroundColor.blue|e('css') }},
+                {{ tile.titleBackgroundColor.alpha|e('css') }}
+            );
             position: absolute;
             {% if tile.isTitlePositionTop() %}top: 0;
             {% elseif tile.isTitlePositionBottom() %}bottom: 0;
