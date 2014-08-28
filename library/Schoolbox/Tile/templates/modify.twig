@@ -140,5 +140,5 @@
            class="submit-btn-plain"
     />
     {# Link depends on identifier #}
-    <a href="/homepage/{{ component.identifier }}" class="btn no-icon float-left"><span></span>Cancel</a>
+    <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="btn no-icon float-left"><span></span>Cancel</a>
 </form>
