@@ -64,7 +64,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     /* Default DateTime */
 	$publishedDate = new Alaress_Date_Format(time(), 'U');
-	$expiryDate = new Alaress_Date_Format(strtotime('+7 days'), 'U');
+	$expiryDate = new Alaress_Date_Format(strtotime(Cfg::get('homepage_news_expiry')), 'U');
 
     /* Set default output */
 	$output = array(	'ACTION'				=> 'Create',
