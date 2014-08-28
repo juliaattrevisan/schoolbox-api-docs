@@ -60,6 +60,7 @@ class Mapper implements Serializable {
 	const TYPE_SERIALIZED = 30;
 	const TYPE_MODEL      = 40;
 	const TYPE_COLLECTION = 41;
+	const TYPE_COLOR      = 50;
 
 	const METHOD_CREATE = 'create';
 	const METHOD_READ   = 'read';

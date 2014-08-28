@@ -26,16 +26,37 @@ class Color implements IColumnType
         $this->colorFactory = new ColorFactory();
     }
 
-    public function hydrate($value, $mapper = null)
+    /**
+     * Builds a value from the color factory. If that fails, default to black.
+     *
+     * @param  string $value
+     * @return ColorObject
+     */
+    public function buildFromValue($value)
     {
-        return $this->colorFactory->build($value);
+        try {
+            return $this->colorFactory->build($value);
+        } catch (\InvalidArgumentException $e) {
+            return $this->colorFactory->build('000000');
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function hydrate($value, $mapper = null)
+    {
+        return $this->buildFromValue($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function dehydrate($value, $mapper = null)
     {
         if ($value instanceof ColorObject) {
             return $value->getAsHexAlpha();
         }
-        return $this->colorFactory->build($value)->getAsHexAlpha();
+        return $this->buildFromValue($value)->getAsHexAlpha();
     }
 }
