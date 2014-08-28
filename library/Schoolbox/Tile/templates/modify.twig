@@ -1,20 +1,31 @@
 {# I need some way of adding custom_head #}
-
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript">
-    (function($) {
-        $(function() {
-            var form = $('form#tile-layout-form');
-            form.find('input[type="file"].prettify').prettyFileInput({
-                additionalButtonClasses: 'up-arrow no-marg float-right',
-                buttonActiveClass: 'tick',
-                defaultText: '<span></span>Upload Image',
-                defaultFileSelectedText: '<span></span>File selected'
-            });
-        })
-    })(jQuery);
-</script>
+(function($) {
+    $(function() {
+        var form = $('form#tile-layout-form');
+        form.find('input[type="file"].prettify').prettyFileInput({
+            additionalButtonClasses: 'up-arrow no-marg float-right',
+            buttonActiveClass: 'tick',
+            defaultText: '<span></span>Upload Image',
+            defaultFileSelectedText: '<span></span>File selected'
+        });
 
+        // Init colorpickers
+        $('input[data-colorpicker]').spectrum({
+            showPalette: false,
+            showSelectionPalette: false,
+            showButtons: false,
+            showAlpha: true,
+            showInitial: true,
+            showInput: true,
+            preferredFormat: "rgb"
+        });
+    })
+})(jQuery);
+</script>
 
 <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
 
@@ -40,13 +51,15 @@
                        placeholder="enter text..." />
 
                 Colour:
-                <input type="color"
+                <input type="text"
+                       data-colorpicker
                        name="title_color"
                        value="{{ item.titleColor|e('html_attr') }}"
                 />
 
                 Background Colour:
-                <input type="color"
+                <input type="text"
+                       data-colorpicker
                        name="title_background_color"
                        value="{{ item.titleBackgroundColor|e('html_attr') }}"
                 />
@@ -97,7 +110,8 @@
                 {% endif %}
 
                 Colour:
-                <input type="color"
+                <input type="text"
+                       data-colorpicker
                        name="background_color"
                        value="{{ item.backgroundColor|e('html_attr') }}"
                 />
