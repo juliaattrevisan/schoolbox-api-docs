@@ -46,40 +46,47 @@
                 </em>
             </td>
             <td>
-                <input name="title_text"
-                       value="{{ item.titleText|e('html_attr') }}"
-                       placeholder="enter text..." />
-
-                Colour:
-                <input type="text"
-                       data-colorpicker
-                       name="title_color"
-                       value="{{ item.titleColor|e('html_attr') }}"
-                />
-
-                Background Colour:
-                <input type="text"
-                       data-colorpicker
-                       name="title_background_color"
-                       value="{{ item.titleBackgroundColor|e('html_attr') }}"
-                />
-
-                Position:
-                <input type="radio"
-                       id="title_position_top"
-                       name="title_position"
-                       value="{{ constant('TITLE_POSITION_TOP', item) }}"
-                       {% if item.isTitlePositionTop() %}checked{% endif %}
-                />
-                <label for="title_position_top">Top</label>
-                <input type="radio"
-                       id="title_position_bottom"
-                       name="title_position"
-                       value="{{ constant('TITLE_POSITION_BOTTOM', item) }}"
-                       {% if item.isTitlePositionBottom() %}checked{% endif %}
-                        />
-                <label for="title_position_bottom">Bottom</label>
-
+                <dl>
+                    <dt>Text</dt>
+                    <dd>
+                        <input name="title_text"
+                               value="{{ item.titleText|e('html_attr') }}"
+                               class="fullwidth"
+                               placeholder="enter text..." />
+                    </dd>
+                    <dt>Colour</dt>
+                    <dd>
+                        <input type="text"
+                               id="title_color"
+                               name="title_color"
+                               data-colorpicker
+                               value="{{ item.titleColor|e('html_attr') }}" />
+                        <label for="title_color">text</label>
+                    </dd>
+                    <dd>
+                        <input type="text"
+                               id="title_background_color"
+                               name="title_background_color"
+                               data-colorpicker
+                               value="{{ item.titleBackgroundColor|e('html_attr') }}" />
+                        <label for="title_background_color">background</label>
+                    </dd>
+                    <dt>Position</dt>
+                    <dd>
+                        <input type="radio"
+                               id="title_position_top"
+                               name="title_position"
+                               value="{{ constant('TITLE_POSITION_TOP', item) }}"
+                               {% if item.isTitlePositionTop() %}checked{% endif %} />
+                        <label for="title_position_top">Top</label>
+                        <input type="radio"
+                               id="title_position_bottom"
+                               name="title_position"
+                               value="{{ constant('TITLE_POSITION_BOTTOM', item) }}"
+                               {% if item.isTitlePositionBottom() %}checked{% endif %} />
+                        <label for="title_position_bottom">Bottom</label>
+                    </dd>
+                </dl>
             </td>
         </tr>
         <tr>
@@ -87,7 +94,10 @@
                 <h4>Link</h4>
             </td>
             <td>
-                <input name="link" value="{{ item.link|e('html_attr') }}" placeholder="http://" />
+                <input name="link"
+                       value="{{ item.link|e('html_attr') }}"
+                       class="fullwidth"
+                       placeholder="http://" />
             </td>
         </tr>
         <tr>
@@ -95,26 +105,31 @@
                 <h4>Background</h4>
             </td>
             <td>
-                {# really basic upload, etc #}
-                {# Extract into a sub-template #}
-                {% if item.backgroundImage.hash %}
-                    <input type="hidden"
-                           name="background_image"
-                           value="{{ item.backgroundImage.id|e('html_attr') }}"
-                    />
-                    <img src="/storage/image.php?size=constrain200&amp;hash={{ item.backgroundImage.hash|e('url') }}" />
-                    <label><input type="checkbox" name="background_image" value="" /> Delete Image</label>
-                    <input type="file" name="background_image" class="prettify">
-                {% else %}
-                    <input type="file" name="background_image" class="prettify">
-                {% endif %}
-
-                Colour:
-                <input type="text"
-                       data-colorpicker
-                       name="background_color"
-                       value="{{ item.backgroundColor|e('html_attr') }}"
-                />
+                <dl>
+                    <dt>Colour</dt>
+                    <dd>
+                        <input type="text"
+                               id="background_color"
+                               name="background_color"
+                               data-colorpicker
+                               value="{{ item.backgroundColor|e('html_attr') }}" />
+                    </dd>
+                    <dt>Image</dt>
+                    <dd>
+                        {# really basic upload, etc #}
+                        {# Extract into a sub-template #}
+                        {% if item.backgroundImage.hash %}
+                            <input type="hidden"
+                                   name="background_image"
+                                   value="{{ item.backgroundImage.id|e('html_attr') }}" />
+                            <img src="/storage/image.php?size=constrain200&amp;hash={{ item.backgroundImage.hash|e('url') }}" />
+                            <label><input type="checkbox" name="background_image" value="" /> Delete Image</label>
+                            <input type="file" name="background_image" class="prettify">
+                        {% else %}
+                            <input type="file" name="background_image" class="prettify">
+                        {% endif %}
+                    </dd>
+                </dl>
             </td>
         </tr>
     </table>
