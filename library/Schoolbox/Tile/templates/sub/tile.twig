@@ -12,7 +12,7 @@
             background-image: url({{ "/storage/image.php?size=maxsize&hash=" ~ tile.backgroundImage.hash|e('css') }});
         {% endif %}
     ">
-    <span class="title"
+    <span class="title {% if tile.isTitlePositionTop() %}position-top{% elseif tile.isTitlePositionBottom() %}position-bottom{% endif %}"
         style="
             color: rgba(
                 {{ tile.titleColor.red|e('css') }},
@@ -26,10 +26,6 @@
                 {{ tile.titleBackgroundColor.blue|e('css') }},
                 {{ tile.titleBackgroundColor.alpha|e('css') }}
             );
-            position: absolute;
-            {% if tile.isTitlePositionTop() %}top: 0;
-            {% elseif tile.isTitlePositionBottom() %}bottom: 0;
-            {% endif %}
     ">
         {% if tile.link %}
         <a href="{{ tile.link|e('html_attr') }}">{{ tile.titleText }}</a>

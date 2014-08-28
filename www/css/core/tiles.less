@@ -1,0 +1,70 @@
+/**
+ * Styles for the tile component.
+ */
+.tileList {
+  // Get rid of spacing between tiles
+  word-spacing: 0;
+  line-height: 0;
+
+  &.ui-sortable li {
+    // Get rid of border and background on sortable tiles
+    background-image: none;
+    border: none;
+  }
+
+  // Column layout styles
+  &.column {
+    li {
+      // Each tile is a block
+      position: relative;
+      display: inline-block;
+      height: auto;
+      padding: 0;
+    }
+    .tile {
+      // Background images (if provided)
+      background-repeat: no-repeat;
+      background-size: 100%;
+      .title {
+        // Title: revert spacing back to normal
+        position: absolute;
+        width: 100%;
+        word-spacing: normal;
+        line-height: normal;
+        &.position-top {
+          top: 0;
+        }
+        &.position-bottom {
+          bottom: 0;
+        }
+      }
+    }
+  }
+
+  // Styles for individual tiles
+  .tile {
+    &.add {
+      // Add new tile link looks like a tile
+      background-color: rgba(0, 0, 0, 0.1);
+      .title {
+        // its title is just a link in the middle of it
+        bottom: 50%;
+        width: 100%;
+        text-align: center;
+        vertical-align: middle;
+      }
+    }
+    .edit {
+      // Tile edit partition
+      position: absolute;
+      top:0;
+      bottom: 0;
+      width: 100%;
+      transition: background-color 0.1s;
+      &:hover {
+        // Replace with some hover color
+        background-color: rgba(0, 102, 176, 0.8);
+      }
+    }
+  }
+}

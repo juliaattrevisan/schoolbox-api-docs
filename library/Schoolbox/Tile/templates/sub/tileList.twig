@@ -4,55 +4,6 @@
  # Columns: responsive layout? Width
  #}
 <style type="text/css">
-    /*
-    .tileList.column {
-        width: auto;
-    }
-    */
-
-    .tileList {
-        word-spacing: 0;
-        line-height: 0;
-    }
-    .tileList.column li {
-        position: relative;
-        display: inline-block;
-        height: auto;
-    }
-    .tileList.column.ui-sortable li {
-        background-image: none;
-        border: none;
-        padding: 0;
-    }
-    .tileList.column .tile {
-        background-repeat: no-repeat;
-        background-size: 100%;
-    }
-    .tileList.column .tile .title {
-        width: 100%;
-        word-spacing: normal;
-        line-height: normal;
-    }
-    .tileList .tile .edit {
-        position: absolute;
-        top:0;
-        bottom: 0;
-        width: 100%;
-        transition: background-color 0.1s;
-    }
-    .tileList .tile .edit:hover {
-        background-color: rgba(0, 102, 176, 0.8);
-    }
-    .tileList .tile.add {
-        background-color: rgba(0,0,0,0.1);
-    }
-    .tileList .tile.add .title {
-        position: absolute;
-        bottom: 50%;
-        width: 100%;
-        text-align: center;
-        vertical-align: middle;
-    }
     #tileList-{{ layout.id }}.tileList.column li {
         {#
          # Width: 100/column_count
