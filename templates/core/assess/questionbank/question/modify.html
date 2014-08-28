@@ -2,64 +2,15 @@
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-    tinyMCE.init({
-		mode : "exact",
-		elements: "question",
-		theme : "advanced",
-		skin : "cirkuit",
-		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
-        browser_spellcheck : true,
-		content_css : "/css/core/tiny.css",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-		theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
-		theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-		theme_advanced_buttons4 : "tablecontrols",
-        accessibility_warnings : false,
-		pdw_toggle_on : 1,
-		pdw_toggle_toolbars : '2, 3, 4',
-		extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-		file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
-		file_browser_category_id : '{ASSESS_CATEGORY_ID}',
-		tabfocus_elements : ":prev,:next",
-		convert_urls : false,
-		force_br_newlines : false,
-		force_p_newlines : true
-	});
-
-	tinyMCE.init({
-		mode : "textareas",
-		editor_selector: "richtext-answer",
-		theme : "advanced",
-		skin : "cirkuit",
-		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
-        browser_spellcheck : true,
-		content_css : "/css/core/tiny.css",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-		theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
-		theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-		theme_advanced_buttons4 : "tablecontrols",
-        accessibility_warnings : false,
-		pdw_toggle_on : 1,
-		pdw_toggle_toolbars : '2, 3, 4',
-		extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-		file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
-		file_browser_category_id : 0,
-		tabfocus_elements : ":prev,:next",
-		convert_urls : false,
-		force_br_newlines : false,
-		force_p_newlines : true
-	});
-
 	$j(function() {
+		$.fn.alaressTiny({
+			mode: 'exact',
+			elements: 'question',
+			file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+		});
+
 		/* Enforce two decimal places
 		 */
 		$j('input[name=marks]').change(function() {

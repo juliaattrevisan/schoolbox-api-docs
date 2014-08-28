@@ -1,43 +1,18 @@
 <!-- BEGIN custom_head -->
 <!-- BEGIN modify_layout -->
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/farbtastic/farbtastic.css" />
+<script type="text/javascript" src="/javascript/components/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/tinycolor/tinycolor.js"></script>
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
-<link rel="stylesheet" type="text/css" href="/javascript/components/farbtastic/farbtastic.css" />
-<script type="text/javascript" src="/javascript/components/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript">
-	tinyMCE.init({
-		mode : "specific_textareas",
-		editor_selector : "mceEditor",
-		theme : "advanced",
-		skin : "cirkuit",
-		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
-        browser_spellcheck : true,
-		content_css : "/css/core/tiny.css",
-        media_strict : false,
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_statusbar_location : "bottom",
-		theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-		theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
-		theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-		theme_advanced_buttons4 : "tablecontrols",
-        accessibility_warnings : false,
-		pdw_toggle_on : 1,
-		pdw_toggle_toolbars : '2, 3, 4',
-		extended_valid_elements : "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-        theme_advanced_blockformats : "h3,h4,p,address,pre",
-        file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-        file_uploader_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
-		file_browser_category_id : 0,
-		tabfocus_elements : ":prev,:next",
-		convert_urls : false
-	});
-</script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+
 <script type="text/javascript">
     $j(function() {
         /* Set up variables and urls
@@ -64,13 +39,32 @@
         /* The controls for the individual components ie. edit, delete
          */
         setupCustomise.activeComponents();
+
+		$.fn.alaressTiny({
+			mode: "specific_textareas",
+			editor_selector: "mceEditor"
+		});
+
+		// all forms should submit without prevention
+		$j(".eportfolio form").submit(function() {
+			window.check = false;
+		});
+
+		$j('#addIndividualPermission').selectizeSelector({
+			multiple: true,
+			value: {USER_LIST},
+			ajax: {
+				url:      '/eportfolio/search.php',
+				type:     'GET',
+				data:     {groupID: '{STUDENT_GROUP_IDS}'},
+				dataType: 'json'
+			}
+		})
     });
 </script>
-
 <!-- END modify_layout -->
 
 <style type="text/css">
-
     .top h2                                              { color: #{top_head_font}; background-color: #{top_head_bg}; }
     .top p, .top h3, .top .listing p.small               { color: #{top_font}; }
     .top a, .top .listing p.small a                      { color: #{top_link}; }
@@ -130,25 +124,8 @@
         'right_hover'        : '#{right_hover}'
     };
     <!-- END colour_list -->
-
 </script>
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type='text/javascript'>
-    $j(function() {
-        $j('#addIndividualPermission').selectizeSelector({
-            multiple: true,
-            value: {USER_LIST},
-            ajax: {
-                url:      '/eportfolio/search.php',
-                type:     'GET',
-                data:     {groupID: '{STUDENT_GROUP_IDS}'},
-                dataType: 'json'
-            }
-        })
-    });
-</script>
 <!-- END custom_head -->
 <ul class='admin-nav'>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
@@ -479,9 +456,3 @@
 </div>
 <input type="hidden" id="userID" value="{ID}" />
 <div id="resource-browser" class="hide"></div>
-<script type="text/javascript">
-    // all forms should submit without prevention
-    $j(".eportfolio form").submit(function() {
-        window.check = false;
-    });
-</script>
