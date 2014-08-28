@@ -17,6 +17,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Category;
 
 class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
@@ -227,5 +228,39 @@ class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
 		return $c;
 	}
+
+    /**
+     * Find all the blog entries for a homepage
+     *
+     * @param \Schoolbox\Resource\Category $category
+     * @return Collection
+     */
+    public function findForCategory(Category $category) {
+        $stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('b')},
+				{$this->getJoinColumnString('user',     'u')}
+			FROM `{$this->getTable()}` AS `b`
+            LEFT JOIN {$this->getJoinSql('user',     'b', 'u')}
+			WHERE `b`.`deleted` IS NULL
+				AND `b`.`cid` = :cat_id
+			ORDER BY `b`.`created` DESC
+		");
+
+        $stmt->execute(array(
+                'cat_id' => $category->getId(),
+            ));
+
+        $c = $this->createCollection();
+
+        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Blog $blog */
+            $blog = $this->hydrate($r, 'b');
+            $blog->setOwner($this->hydrateJoin($r, 'user', 'u'));
+            $c->add($blog);
+        }
+
+        return $c;
+    }
 
 }

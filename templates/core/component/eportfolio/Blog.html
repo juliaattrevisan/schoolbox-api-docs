@@ -1,49 +1,8 @@
 <div class="box" id="component{COMPONENT_INSTANCE_ID}">
+	<script type="text/javascript" src="/javascript/jquery.blogCommentary.js"></script>
 	<script type='text/javascript'>
 		$j(function() {
-
-			var component = $j('#component{COMPONENT_INSTANCE_ID}');
-
-			/* For viewing comment form
-			 *
-			 * When you have $j(function() inside the <body> tags the onclick
-			 * event runs twice. Unbind it and rebind it is a convenient solution.
-			 *
-			 * By Shahbaz Saleem
-			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
-			 */
-			component.find('.closeComment').unbind('click').click(function() {
-				var id = $j(this).attr('rel');
-				component.find('#' + id).toggle();
-			});
-
-			/* For viewing comment thread
-			 */
-			component.find('.viewCommentThread').hide();
-			component.find('.viewComments').unbind('click').click(function(event) {
-				event.preventDefault();
-
-				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/)
-				if (matches) {
-					var postId = matches[1]
-
-					var element = component.find('#blogComment_' + postId + ' .viewCommentThread');
-					element.toggle();
-
-					/* Update button text when toggling
-					 */
-					var button = component.find('a[rel=viewComments_' + postId + ']');
-
-					if ($j(element).is(':visible')) {
-						var state = 'Hide';
-					}
-					else {
-						var state = 'Show';
-					}
-
-					button.html('<span></span>' + state + ' Comments');
-				}
-			});
+			$j('#component{COMPONENT_INSTANCE_ID}').blogCommentary();
 		});
 	</script>
 	<h2>{COMPONENT_NAME}</h2>
@@ -125,7 +84,7 @@
 				</form>
 
 				<p class='interact'>
-					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show Comments  ({COMMENT_TOTAL})</a>
+					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}' data-numcomments="{COMMENT_TOTAL}"><span></span>Show Comments ({COMMENT_TOTAL})</a>
 					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
 				</p>
 
