@@ -10,12 +10,17 @@
             var xInput   = form.find('input[name="aspect_ratio_x"]');
             var yInput   = form.find('input[name="aspect_ratio_y"]');
             $().add(colInput).add(xInput).add(yInput).change(function() {
-                var width  = (100/Number(colInput.val()));
-                var height = width * (Number(yInput.val()) / Number(xInput.val()));
-                tileList.find('li').css({
-                    "width":          String(width)+"%",
-                    "padding-bottom": String(height)+"%",
-                });
+                var colCount = Number(colInput.val());
+                var xAspect  = Number(xInput.val());
+                var yAspect  = Number(yInput.val());
+                if (colCount > 0 && xAspect > 0 && yAspect > 0) {
+                    var width  = (100/colCount);
+                    var height = width * (yAspect / xAspect);
+                    tileList.find('li').css({
+                        "width":          String(width)+"%",
+                        "padding-bottom": String(height)+"%",
+                    });
+                }
             });
 
             // Update x and y input based on selected shape
