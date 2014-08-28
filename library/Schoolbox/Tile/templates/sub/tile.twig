@@ -38,8 +38,16 @@
         {% endif %}
     </span>
 
-    {% if editable %}
-    {# Show an edit link over the entire tile #}
-    <a class="edit" href="{{ routeLookup('tile.edit', {id: tile.id}) }}" title="Edit this tile"></a>
+    {% if editable and tile.id %}
+    <div class="edit">
+        {# Hidden form input for this tile - used in sorting #}
+        <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
+        <input type="checkbox" name="deleteTile[]" value="{{ tile.id|e('html_attr') }}" />
+        {#
+        <a href="#">Copy</a>
+        <a href="#">Delete</a>
+        #}
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit</a>
+    </div>
     {% endif %}
 </li>
