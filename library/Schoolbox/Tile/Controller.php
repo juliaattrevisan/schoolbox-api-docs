@@ -75,29 +75,6 @@ class Controller extends Base
         ;
         $this->getLayoutMapper()->save($layout);
 
-        // Update the component's configuration too.
-        // (Should this be done in postSave?)
-        $configMapper = $this->getComponentConfigMapper();
-        foreach ($component->getConfig() as $configDefinition) {
-            if ($configDefinition->getKey() == 'layout') {
-                /** @var Component_Config $confI */
-                $config = $configMapper->findByColumnList(
-                    array(
-                        'component_config_definition_id' => $configDefinition->getId(),
-                        'component_instance_id'          => $component->getId()
-                    )
-                )->first();
-                if (!($config instanceof Component_Config)) {
-                    $config = new Component_Config();
-                    $config->setConfigDefinitionId($configDefinition->getId());
-                    $config->setInstanceId($component->getId());
-                }
-                $config->setValue($layout->getId());
-                $configMapper->save($config);
-                break;
-            }
-        }
-
         // and redirect back to the homepage
         $this->getResponse()->redirect->afterPost(
             '/homepage/'.$component->getIdentifier()
@@ -239,13 +216,39 @@ class Controller extends Base
     {
         $config   = $component->getConfigArray();
         $layoutId = $config['layout']['value'];
+        $mapper   = $this->getLayoutMapper();
         try {
-            return $this->getLayoutMapper()->findById(
+            return $mapper->findById(
                 $layoutId,
                 array('joins' => array('tile'))
             );
         } catch (MapperException $e) {
-            return $this->getLayoutMapper()->createModel();
+            $model = $mapper->createModel();
+            $mapper->save($model);
+
+            // Update the component's configuration.
+            // (Should this be done in postSave?)
+            $configMapper = $this->getComponentConfigMapper();
+            foreach ($component->getConfig() as $configDefinition) {
+                if ($configDefinition->getKey() == 'layout') {
+                    /** @var Component_Config $confI */
+                    $config = $configMapper->findByColumnList(
+                        array(
+                            'component_config_definition_id' => $configDefinition->getId(),
+                            'component_instance_id'          => $component->getId()
+                        )
+                    )->first();
+                    if (!($config instanceof Component_Config)) {
+                        $config = new Component_Config();
+                        $config->setConfigDefinitionId($configDefinition->getId());
+                        $config->setInstanceId($component->getId());
+                    }
+                    $config->setValue($model->getId());
+                    $configMapper->save($config);
+                    break;
+                }
+            }
+            return $model;
         }
     }
 
