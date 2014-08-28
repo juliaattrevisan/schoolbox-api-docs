@@ -132,20 +132,26 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
                         );
                         $event->setPublishDate(null);
-                        $event->setNote($period['description']);
+                        $event->setTitle($period['description']);
                         $event->setCampusList($campusId);
                         if ($period['staff'] instanceof Schoolbox\User) {
                             $event->setAuthorId($period['staff']->getId());
                             $event->setAuthorName($period['staff']->formatName());
                         }
                         if ($period['category'] instanceof Schoolbox\Resource\Category) {
-                            $event->setSid($period['category']->getId());
+                            // Put this into a category
                             $event->setCategoryId($period['category']->getId());
                             $event->setCategoryName($period['category']->getName());
+
+                            // Finagle a category collection for this event
+                            $eventCategory = new \Schoolbox\Calendar\Relation\Category();
+                            $eventCategory->setCategoryId($period['category']->getId());
+                            $event->setCategoryCollection(
+                                new Schoolbox\Collection(array($eventCategory))
+                            );
                             $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
                         } else {
                             // Make this up as a campus event if it has no category
-                            $event->setSid($campusId);
                             $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                         }
                         $event->setType($eventType);
