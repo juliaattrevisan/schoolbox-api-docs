@@ -16,7 +16,25 @@
                     "width":          String(width)+"%",
                     "padding-bottom": String(height)+"%",
                 });
-            })
+            });
+
+            // Update x and y input based on selected shape
+            form.find('#tile_shape_landscape').change(function() {
+                xInput.val(16);
+                yInput.val(9).change();
+            });
+            form.find('#tile_shape_portrait').change(function() {
+                xInput.val(9);
+                yInput.val(16).change();
+            });
+            form.find('#tile_shape_square').change(function() {
+                xInput.val(1);
+                yInput.val(1).change();
+            });
+            form.find('#tile_shape_panorama').change(function() {
+                xInput.val(16);
+                yInput.val(5).change();
+            });
         })
     })(jQuery);
 </script>
