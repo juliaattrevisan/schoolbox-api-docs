@@ -113,3 +113,55 @@
 	box-shadow: 0px 0px 4px @shadow-color;
 }
 #nav h4{ padding: 0 0 0 32px; }
+.elc-tile{
+    background: url('/images/moriah/elc-tile.png') top left no-repeat !important;
+    display: table-cell;
+    vertical-align: bottom;
+    padding-top: 15px;
+    text-align: center;
+    height: 106px;
+    width: 106px;
+}
+.elc-icons{
+    ul{
+        list-style: none;
+        margin: 0;
+        li{
+            display: inline-block;
+            a{
+                background-image: url('/images/moriah/elc-sprite.png');
+                display: block;
+                margin: 0 10px 18px 0;
+                text-indent: -9999px;
+                &.parenting{
+                    background-position: 0px 0px; height: 254px; width: 194px;
+                    &:hover{ background-position: 0px -254px; }
+                }
+                &.elc-news{
+                    background-position: -194px 0px; height: 263px; width: 174px;
+                    &:hover{ background-position: -194px -263px; }
+                }
+                &.class-news{
+                    background-position: -368px 0px; height: 220px; width: 246px;
+                    &:hover{ background-position: -368px -220px; }
+                }
+                &.centre-news{
+                    background-position: -614px 0px; height: 220px; width: 246px;
+                    &:hover{ background-position: -614px -220px; }
+                }
+                &.calendar-operation{
+                    background-position: -860px 0px; height: 238px; width: 229px;
+                    &:hover{ background-position: -860px -238px; }
+                }
+                &.school-program{
+                    background-position: -1089px 0px; height: 248px; width: 174px;
+                    &:hover{ background-position: -1089px -248px; }
+                }
+                &.news-events{
+                    background-position: -1262px 0px; height: 178px; width: 266px;
+                    &:hover{ background-position: -1262px -178px; }
+                }
+            }
+        }
+    }
+}
