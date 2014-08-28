@@ -75,6 +75,32 @@ class Controller extends Base
         ;
         $this->getLayoutMapper()->save($layout);
 
+        // Rearrange tiles
+        $tilesOrder = array();
+        $order      = 0;
+        foreach ($this->getRequest()->post['tile'] as $tileId) {
+            $tilesOrder[$tileId] = $order++;
+        }
+        foreach ($layout->getTileList() as $tile) {
+            $tileId = $tile->getId();
+            if (isset($tilesOrder[$tileId])) {
+                $tile->setOrder($tilesOrder[$tileId]);
+            }
+        }
+        $this->getMapper()->save($layout->getTileList());
+
+        // Delete tiles
+        $tilesDeleted = array();
+        foreach ($this->getRequest()->post['deleteTile'] as $tileId) {
+            $tilesDeleted[$tileId] = true;
+        }
+        foreach ($layout->getTileList() as $tile) {
+            $tileId = $tile->getId();
+            if (isset($tilesDeleted[$tileId])) {
+                $this->getMapper()->delete($tile);
+            }
+        }
+
         // and redirect back to the homepage
         $this->getResponse()->redirect->afterPost(
             '/homepage/'.$component->getIdentifier()
