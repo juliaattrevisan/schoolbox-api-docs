@@ -40,7 +40,7 @@
 @link-hover: 					lighten(@link, 5%);
 
 // Main banner & Search
-@banner-background: 			#e2dde0;
+@banner-background: 			#e2ddd6;
 @banner-color:      			@link;
 @banner-links:      			@banner-color;
 @search-color:                  @black;
@@ -64,8 +64,8 @@
 
 // Flyout Menus and Messages
 @notify-color:					@link;
-@notify-text-color:				@notify-color;
-@notify-open-text-color:		@banner-background;
+@notify-text-color:				@white;
+@notify-open-text-color:		@link;
 @flyout-color:					@link;
 @flyout-header-color:			@navigation-color;
 @flyout-background:				@content-background;
@@ -157,7 +157,15 @@ h3{ font-size: 18px !important; }
 
 .admin-nav li a{
     border: 0;
-    background: @banner-background;
+    background: #ece9e4;
+}
+
+
+.btn.submit,
+.btn.submit:hover,
+.submit-btn-plain,
+.submit-btn-plain:hover{
+	color: @link !important;
 }
 
 body.login{
@@ -171,8 +179,8 @@ body.login{
             background: @border-color;
         }
         input.login{
-            background-color: @link;
-            &:hover{ background-color: @link-hover; }
+            background-color: @link; color: @white !important;
+            &:hover{ background-color: @link-hover; color: @white !important; }
         }
     }
     #footer{
