@@ -1,4 +1,5 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 <script type="text/javascript">
     (function($) {
         $(function() {
@@ -45,6 +46,11 @@
             tileList.sortable({
                 items:  '> li:not(.add)'
             })
+
+            // Greenerize
+            form.find('.checkboxes').greenerize({
+                applyClasses: false
+            });
         })
     })(jQuery);
 </script>
@@ -150,13 +156,22 @@
             </td>
         </tr>
         <tr>
-            <td class="formLabelWidth">
+            <td class="formLabelWidth wysiwyg">
                 <h4>Modify tiles</h4>
                 <em>
-                    Add, edit and remove tiles. Click and hold to drag and rearrange tiles.
+                    Add, edit and remove tiles.
                 </em>
+                <ul>
+                    <li><em>Click and hold to drag and rearrange tiles.</em></li>
+                    <li><em>Check a tile's checkbox to mark it for deletion.</em></li>
+                </ul>
             </td>
-            <td>
+            <td class="checkboxes">
+                <input type="checkbox"
+                       id="select_all_tiles"
+                       class="select_all"
+                       />
+                <label for="select_all_tiles">Select all tiles</label>
                 {% include '@tile/sub/tileList.twig'
                     with {
                         layout:   item,
