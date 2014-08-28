@@ -1,4 +1,25 @@
 {# I need some way of adding custom_head #}
+<script type="text/javascript">
+    (function($) {
+        $(function() {
+            var form = $('form#tile-layout-form');
+
+            // Updater for tile shape and layout
+            var tileList = form.find('.tileList');
+            var colInput = form.find('input[name="column_count"]');
+            var xInput   = form.find('input[name="aspect_ratio_x"]');
+            var yInput   = form.find('input[name="aspect_ratio_y"]');
+            $().add(colInput).add(xInput).add(yInput).change(function() {
+                var width  = (100/Number(colInput.val()));
+                var height = width * (Number(yInput.val()) / Number(xInput.val()));
+                tileList.find('li').css({
+                    "width":          String(width)+"%",
+                    "padding-bottom": String(height)+"%",
+                });
+            })
+        })
+    })(jQuery);
+</script>
 <h1>Modify Tile Component</h1>
 
 <form id="tile-layout-form"
