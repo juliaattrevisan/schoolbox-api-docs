@@ -51,6 +51,11 @@
             form.find('.checkboxes').greenerize({
                 applyClasses: false
             });
+
+            tileList.find(':checkbox')
+                .change(function() {
+                    $(this).closest('.tile').toggleClass('marked-for-delete');
+                })
         })
     })(jQuery);
 </script>

@@ -43,6 +43,10 @@
 
   // Styles for individual tiles
   .tile {
+    &.marked-for-delete {
+      filter: grayscale(1);
+      opacity: 0.3;
+    }
     &.add {
       // Add new tile link looks like a tile
       background-color: rgba(0, 0, 0, 0.1);
