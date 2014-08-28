@@ -73,6 +73,10 @@ class Factory implements IFactory {
 				$column->setPlaces(2);
 				break;
 
+            case Mapper::TYPE_COLOR:
+                $column = new Color();
+                break;
+
 			default:
 				break;
 		}
