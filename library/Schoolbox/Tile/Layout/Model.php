@@ -49,21 +49,21 @@ class Model implements ISoftDeletable
      *
      * @var int
      */
-    protected $layoutType = self::LAYOUT_TYPE_GRID;
+    protected $layoutType = self::LAYOUT_TYPE_COLUMN;
 
     /**
      * The number of columns in this layout (if using column layout)
      *
      * @var int
      */
-    protected $columnCount;
+    protected $columnCount = 3;
 
     /**
      * The number of pixels wide this layout is (if using grid layout)
      *
      * @var int
      */
-    protected $gridWidth;
+    protected $gridWidth = 500;
 
     /**
      * The width ratio of the items within this grid.
