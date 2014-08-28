@@ -2,6 +2,7 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -23,6 +24,23 @@
             showInput: true,
             preferredFormat: "rgb"
         });
+
+        // Yes, this is a global variable, it's needed for the
+        // social stream browser to work
+        socialstreamSession = {categoryId: 0};
+        var socialstream_browser = form.find('.resource_browser');
+        if (socialstream_browser.length && $.fn.socialstreamBrowser) {
+            form.find('a[data-function="browse"]')
+                .click(
+                    function(event) {
+                        event.preventDefault();
+                        socialstream_browser.socialstreamBrowser({
+                            submitCallback: function(url) {
+                                form.find('input[name="link"]').val(url);
+                            }
+                        });
+                    });
+        }
     })
 })(jQuery);
 </script>
@@ -98,6 +116,7 @@
                        value="{{ item.link|e('html_attr') }}"
                        class="fullwidth"
                        placeholder="http://" />
+                <a href="#" data-function="browse" class="btn folder float-left"><span></span>Browse Resources</a>
             </td>
         </tr>
         <tr>
@@ -141,4 +160,8 @@
     />
     {# Link depends on identifier #}
     <a href="{{ routeLookup('tile.layout', {componentId: component.id}) }}" class="btn no-icon float-left"><span></span>Cancel</a>
+
+    {# Dialog for resource browser #}
+    <div class="resource_browser hide">
+    </div>
 </form>
