@@ -76,28 +76,24 @@ class Controller extends Base
         $this->getLayoutMapper()->save($layout);
 
         // Rearrange tiles
-        $tilesOrder = array();
-        $order      = 0;
-        foreach ($this->getRequest()->post['tile'] as $tileId) {
-            $tilesOrder[$tileId] = $order++;
-        }
-        foreach ($layout->getTileList() as $tile) {
-            $tileId = $tile->getId();
-            if (isset($tilesOrder[$tileId])) {
-                $tile->setOrder($tilesOrder[$tileId]);
+        $tilesOrder = $this->getRequest()->post['tile'];
+        if (!empty($tilesOrder)) {
+            foreach ($layout->getTileList() as $tile) {
+                $order = array_search($tile->getId(), $tilesOrder);
+                if ($order !== false) {
+                    $tile->setOrder($order);
+                }
             }
+            $this->getMapper()->save($layout->getTileList());
         }
-        $this->getMapper()->save($layout->getTileList());
 
         // Delete tiles
-        $tilesDeleted = array();
-        foreach ($this->getRequest()->post['deleteTile'] as $tileId) {
-            $tilesDeleted[$tileId] = true;
-        }
-        foreach ($layout->getTileList() as $tile) {
-            $tileId = $tile->getId();
-            if (isset($tilesDeleted[$tileId])) {
-                $this->getMapper()->delete($tile);
+        $tilesDeleted = $this->getRequest()->post['deleteTile'];
+        if (!empty($tilesDeleted)) {
+            foreach ($layout->getTileList() as $tile) {
+                if (array_search($tile->getId(), $tilesDeleted) !== false) {
+                    $this->getMapper()->delete($tile);
+                }
             }
         }
 
