@@ -40,6 +40,11 @@
                 xInput.val(16);
                 yInput.val(5).change();
             });
+
+            // Sortability
+            tileList.sortable({
+                items:  '> li:not(.add)'
+            })
         })
     })(jQuery);
 </script>
