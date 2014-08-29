@@ -145,59 +145,67 @@
                         data-function="update-layout"
                         {% if item.isLandscapeShape() %}checked{% endif %} />
                     <label for="tile_shape_landscape">Landscape</label>
+
+                    <div style="width: 50px; height: 28px; background-color: white; border: 1px solid black;"></div>
                 </div>
 
                 <div class="pane">
-                <input
-                    type="radio"
-                    id="tile_shape_portrait"
-                    name="tile_shape"
-                    value="portrait"
-                    data-function="update-layout"
-                    {% if item.isPortraitShape() %}checked{% endif %} />
-                <label for="tile_shape_portrait">Portrait</label>
+                    <input
+                        type="radio"
+                        id="tile_shape_portrait"
+                        name="tile_shape"
+                        value="portrait"
+                        data-function="update-layout"
+                        {% if item.isPortraitShape() %}checked{% endif %} />
+                    <label for="tile_shape_portrait">Portrait</label>
+
+                    <div style="width: 28px; height: 50px; background-color: white; border: 1px solid black;"></div>
                 </div>
 
                 <div class="pane">
-                <input
-                    type="radio"
-                    id="tile_shape_square"
-                    name="tile_shape"
-                    value="square"
-                    data-function="update-layout"
-                    {% if item.isSquareShape() %}checked{% endif %} />
-                <label for="tile_shape_square">Square</label>
+                    <input
+                        type="radio"
+                        id="tile_shape_square"
+                        name="tile_shape"
+                        value="square"
+                        data-function="update-layout"
+                        {% if item.isSquareShape() %}checked{% endif %} />
+                    <label for="tile_shape_square">Square</label>
+
+                    <div style="width: 38px; height: 38px; background-color: white; border: 1px solid black;"></div>
                 </div>
 
                 <div class="pane">
-                <input
-                    type="radio"
-                    id="tile_shape_panorama"
-                    name="tile_shape"
-                    value="panorama"
-                    data-function="update-layout"
-                    {% if item.isPanoramicShape() %}checked{% endif %} />
-                <label for="tile_shape_panorama">Panorama</label>
+                    <input
+                        type="radio"
+                        id="tile_shape_panorama"
+                        name="tile_shape"
+                        value="panorama"
+                        data-function="update-layout"
+                        {% if item.isPanoramicShape() %}checked{% endif %} />
+                    <label for="tile_shape_panorama">Panorama</label>
+
+                    <div style="width: 75px; height: 24px; background-color: white; border: 1px solid black;"></div>
                 </div>
 
                 <div class="pane">
-                <input
-                    type="radio"
-                    id="tile_shape_custom"
-                    name="tile_shape"
-                    value="custom"
-                    data-function="update-layout"
-                    {% if item.isCustomShape() %}checked{% endif %} />
-                <label for="tile_shape_custom">Custom</label>
+                    <input
+                        type="radio"
+                        id="tile_shape_custom"
+                        name="tile_shape"
+                        value="custom"
+                        data-function="update-layout"
+                        {% if item.isCustomShape() %}checked{% endif %} />
+                    <label for="tile_shape_custom">Custom</label>
 
-                <input name="aspect_ratio_x"
-                       value="{{ item.aspectRatioX|e('html_attr') }}"
-                       class="aspect-ratio"
-                       data-function="update-layout" /> :
-                <input name="aspect_ratio_y"
-                       value="{{ item.aspectRatioY|e('html_attr') }}"
-                       class="aspect-ratio"
-                       data-function="update-layout" />
+                    <input name="aspect_ratio_x"
+                           value="{{ item.aspectRatioX|e('html_attr') }}"
+                           class="aspect-ratio"
+                           data-function="update-layout" /> :
+                    <input name="aspect_ratio_y"
+                           value="{{ item.aspectRatioY|e('html_attr') }}"
+                           class="aspect-ratio"
+                           data-function="update-layout" />
                 </div>
             </td>
         </tr>
