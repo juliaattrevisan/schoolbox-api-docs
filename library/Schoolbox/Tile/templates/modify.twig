@@ -6,7 +6,7 @@
 <script type="text/javascript">
 (function($) {
     $(function() {
-        var form = $('form#tile-layout-form');
+        var form = $('form#tile-modify-form');
         form.find('input[type="file"].prettify').prettyFileInput({
             additionalButtonClasses: 'up-arrow no-marg float-right',
             buttonActiveClass: 'tick',
@@ -47,7 +47,7 @@
 
 <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
 
-<form id="tile-layout-form"
+<form id="tile-modify-form"
       action="{% if item.id %}{{ routeLookup('tile.update', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}"
       method="post"
       name="form"
