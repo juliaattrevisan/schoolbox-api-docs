@@ -46,11 +46,24 @@ ul.tileList {
       width: 100%;
       word-spacing: normal;
       line-height: normal;
+      // Font size: I assume some will want to change this and the font family
+      font-size: 2em;
+      padding: 1em;
+      box-sizing: border-box;
       &.position-top {
         top: 0;
       }
       &.position-bottom {
         bottom: 0;
+      }
+      &.align-left {
+        text-align: left;
+      }
+      &.align-center {
+        text-align: center;
+      }
+      &.align-right {
+        text-align: right;
       }
     }
     .edit {
