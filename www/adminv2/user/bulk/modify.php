@@ -16,6 +16,7 @@ $this->setBlock(TEMPLATE_content, 'search_role', 'search_role_block');
 $this->setBlock(TEMPLATE_content, 'search_eportfolio', 'search_eportfolio_block');
 
 $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
+$this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
@@ -103,7 +104,24 @@ $this->setVar(array(
 if (!empty($_POST)) {
     $userMapper = new \Schoolbox\UserMapper();
 
-    $query = $userMapper->bulkModifySearch($_POST['search_campus'], $_POST['search_role'], $_POST['search_eportfolio'], $_POST['search_year']);
+    $allUsers = $userMapper->bulkModifySearch($_POST['search_campus'], $_POST['search_role'], $_POST['search_eportfolio'], $_POST['search_year']);
+
+    if ($allUsers->count()) {
+        foreach ($allUsers as $currentUser) {
+            $this->setVar(array(
+                'USER_ID' => $currentUser->getId(),
+                'USER_FIRSTNAME' => $currentUser->getFirstname(),
+                'USER_LASTNAME' => $currentUser->getLastname()
+            ));
+
+            $this->parse('user_block', 'user', true);
+        }
+    }
+    else {
+        $this->setVar(array(
+            'user_block' => ''
+        ));
+    }
 
     $this->parse('has_results_block', 'has_results');
 }
