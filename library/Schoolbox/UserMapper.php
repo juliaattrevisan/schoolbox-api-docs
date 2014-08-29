@@ -342,4 +342,64 @@ class UserMapper extends Mapper {
         $statement->execute($params);
         return $this->hydrateList($statement, 'u');
     }
+
+    /**
+     * Cheesy query agglutination
+     *
+     * @param $searchCampus
+     * @param $searchRole
+     * @param $searchEportfolio
+     * @param $searchYear
+     * @return \Schoolbox\Collection
+     */
+    public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear) {
+
+        /* Find search results
+         */
+        $query = "
+            SELECT {$this->getColumnString('u')}
+            FROM {$this->getTable()} u
+        ";
+
+        if ($searchCampus != -1) {
+            $query .= "
+                LEFT JOIN userCampus ON u.id = userCampus.uid AND userCampus.campus = :searchCampus
+            ";
+
+            $params['searchCampus'] = $searchCampus;
+        }
+
+        /* Augmented where
+         */
+        $query .= "WHERE 1 = 1";
+
+        if ($searchRole != -1) {
+            $query .= "
+                AND u.group_id = :searchRole
+            ";
+
+            $params['searchRole'] = $searchRole;
+        }
+
+        if ($searchEportfolio != -1) {
+            $query .= "
+                AND u.eportfolio_enabled = :searchEportfolio
+            ";
+
+            $params['searchEportfolio'] = $searchEportfolio;
+        }
+
+        if (strlen(trim($searchYear))) {
+            $query .= "
+                AND u.year = :searchYear
+            ";
+
+            $params['searchYear'] = $searchYear;
+        }
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        return $this->hydrateList($statement, 'u');
+    }
 }
