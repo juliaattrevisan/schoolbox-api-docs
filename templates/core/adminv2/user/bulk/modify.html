@@ -1,3 +1,13 @@
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('table[data-users="true"]').selectAll({
+			key: 'selectall',
+			checkboxName: 'userId[]'
+		});
+	});
+</script>
+
 <h1>Mass Modify</h1>
 
 <h2>Search</h2>
@@ -59,10 +69,15 @@
 
 <!-- BEGIN has_results -->
 <h2>Users</h2>
-<table>
+<table data-users="true" class="table ruler">
+	<colgroup>
+		<col width="50" />
+		<col />
+		<col />
+	</colgroup>
 	<thead>
 		<tr>
-			<th><input type="checkbox"></th>
+			<th><input type="checkbox" data-selectall="true"></th>
 			<th>Firstname</th>
 			<th>Lastname</th>
 		</tr>
@@ -70,7 +85,7 @@
 	<tbody>
 		<!-- BEGIN user -->
 		<tr>
-			<td><input type="checkbox" value="{USER_ID}" /></td>
+			<td><input name='userId[]' type="checkbox" value="{USER_ID}" /></td>
 			<td>{USER_FIRSTNAME}</td>
 			<td>{USER_LASTNAME}</td>
 		</tr>
