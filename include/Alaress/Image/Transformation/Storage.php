@@ -128,5 +128,18 @@ class Alaress_Image_Transformation_Storage extends Alaress_Image_Transformation_
 				'method' => 'Sharpen'
 			),
 		),
+
+		/* Test to find out whether Constrain skipped canvas creation
+		 * when resultant image dimension was the same as the original
+		 */
+		'cacheTest' => array(
+			array(
+				'method' => 'Constrain',
+				'args' => array(
+					'width' => 247,
+					'height' => 204
+				)
+			)
+		),
     );
 }
