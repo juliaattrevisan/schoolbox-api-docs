@@ -18,8 +18,13 @@ $this->setBlock(TEMPLATE_content, 'search_eportfolio', 'search_eportfolio_block'
 $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
 $this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
+$this->setBlock('has_results', 'apply_defaultcampus', 'apply_defaultcampus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
+$this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
+$this->setBlock('has_results', 'apply_accountenabled', 'apply_accountenabled_block');
+$this->setBlock('has_results', 'apply_emailfromusername', 'apply_emailfromusername_block');
+$this->setBlock('has_results', 'apply_externalmailclient', 'apply_externalmailclient_block');
 
 /* Campus Search options
  */
@@ -35,6 +40,17 @@ foreach($allCampuses as $currentCampus) {
 
     $this->parse('search_campus_block', 'search_campus', true);
 
+    /* New Default Campus setting
+     */
+    $this->setVar(array(
+        'APPLY_DEFAULTCAMPUS_ID' => $currentCampus->getId(),
+        'APPLY_DEFAULTCAMPUS_NAME' => $currentCampus->getName()
+    ));
+
+    $this->parse('apply_defaultcampus_block', 'apply_defaultcampus', true);
+
+    /* New Campus setting
+     */
     $this->setVar(array(
         'APPLY_CAMPUS_ID' => $currentCampus->getId(),
         'APPLY_CAMPUS_NAME' => $currentCampus->getName()
@@ -65,9 +81,15 @@ foreach($allRoles as $currentRole) {
     $this->parse('apply_role_block', 'apply_role', true);
 }
 
-/* ePortfolio options
+/* Year
  */
-$allEportfolio = new \Schoolbox\Collection(array(
+$this->setVar(array(
+    'SEARCH_YEAR_SELECTED' => $_POST['searchYear']
+));
+
+/* Boolean options
+ */
+$allBoolean = new \Schoolbox\Collection(array(
     array(
         'key' => 1,
         'label' => 'Enabled'
@@ -78,7 +100,9 @@ $allEportfolio = new \Schoolbox\Collection(array(
     )
 ));
 
-foreach($allEportfolio as $currentEportfolio) {
+/* A whole bunch of boolean options
+ */
+foreach($allBoolean as $currentEportfolio) {
     $this->setVar(array(
         'SEARCH_EPORTFOLIO_ID' => $currentEportfolio['key'],
         'SEARCH_EPORTFOLIO_NAME' => $currentEportfolio['label'],
@@ -95,9 +119,43 @@ foreach($allEportfolio as $currentEportfolio) {
     $this->parse('apply_eportfolio_block', 'apply_eportfolio', true);
 }
 
-$this->setVar(array(
-    'SEARCH_YEAR_SELECTED' => $_POST['searchYear']
-));
+/* Modify-only booleans
+ */
+foreach($allBoolean as $currentEmailFromUsername) {
+    $this->setVar(array(
+        'APPLY_EMAILFROMUSERNAME_ID' => $currentEmailFromUsername['key'],
+        'APPLY_EMAILFROMUSERNAME_NAME' => $currentEmailFromUsername['label'],
+    ));
+
+    $this->parse('apply_emailfromusername_block', 'apply_emailfromusername', true);
+}
+
+foreach($allBoolean as $currentExternalMailClient) {
+    $this->setVar(array(
+        'APPLY_EXTERNALMAILCLIENT_ID' => $currentExternalMailClient['key'],
+        'APPLY_EXTERNALMAILCLIENT_NAME' => $currentExternalMailClient['label'],
+    ));
+
+    $this->parse('apply_externalmailclient_block', 'apply_externalmailclient', true);
+}
+
+foreach($allBoolean as $currentWebmail) {
+    $this->setVar(array(
+        'APPLY_WEBMAIL_ID' => $currentWebmail['key'],
+        'APPLY_WEBMAIL_NAME' => $currentWebmail['label'],
+    ));
+
+    $this->parse('apply_webmail_block', 'apply_webmail', true);
+}
+
+foreach($allBoolean as $currentAccountEnabled) {
+    $this->setVar(array(
+        'APPLY_ACCOUNTENABLED_ID' => $currentAccountEnabled['key'],
+        'APPLY_ACCOUNTENABLED_NAME' => $currentAccountEnabled['label'],
+    ));
+
+    $this->parse('apply_accountenabled_block', 'apply_accountenabled', true);
+}
 
 /* If there were any search results, display control options
  */

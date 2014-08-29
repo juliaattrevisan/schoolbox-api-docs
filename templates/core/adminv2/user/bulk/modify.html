@@ -100,15 +100,28 @@
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth">
+				<h4>Default Campus</h4>
+			</td>
+			<td>
+				<select name="apply_defaultcampus">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_defaultcampus -->
+					<option value="{APPLY_DEFAULTCAMPUS_ID}" />{APPLY_DEFAULTCAMPUS_NAME}</option>
+					<!-- END apply_defaultcampus -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
 				<h4>Campus</h4>
 			</td>
 			<td>
-				<select name="apply_campus">
-					<option value="-1">Unchanged</option>
+				<ul>
+					<li><input name='apply_campus[]' type="checkbox" value="-1" />Unchanged</li>
 					<!-- BEGIN apply_campus -->
-					<option value="{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</option>
+					<li><input name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />{APPLY_CAMPUS_NAME}</li>
 					<!-- END apply_campus -->
-				</select>
+				</ul>
 			</td>
 		</tr>
 		<tr>
@@ -126,6 +139,15 @@
 		</tr>
 		<tr>
 			<td class="formLabelWidth">
+				<h4>Year</h4>
+				<em>Leave blank if you don't want to update their year.</em>
+			</td>
+			<td>
+				<input name='apply_year' type="text" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
 				<h4>ePortfolio</h4>
 			</td>
 			<td>
@@ -139,11 +161,54 @@
 		</tr>
 		<tr>
 			<td class="formLabelWidth">
-				<h4>Year</h4>
-				<em>Leave blank if you don't want to update their year.</em>
+				<h4>Email Address From Username</h4>
 			</td>
 			<td>
-				<input name='apply_year' type="text" value="" />
+				<select name="apply_emailfromusername">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_emailfromusername -->
+					<option value="{APPLY_EMAILFROMUSERNAME_ID}">{APPLY_EMAILFROMUSERNAME_NAME}</option>
+					<!-- END apply_emailfromusername -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Use External Mail Client</h4>
+			</td>
+			<td>
+				<select name="apply_externalmailclient">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_externalmailclient -->
+					<option value="{APPLY_EXTERNALMAILCLIENT_ID}">{APPLY_EXTERNALMAILCLIENT_NAME}</option>
+					<!-- END apply_externalmailclient -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Enable Webmail Tab</h4>
+			</td>
+			<td>
+				<select name="apply_webmail">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_webmail -->
+					<option value="{APPLY_WEBMAIL_ID}">{APPLY_WEBMAIL_NAME}</option>
+					<!-- END apply_webmail -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Account Enabled</h4>
+			</td>
+			<td>
+				<select name="apply_accountenabled">
+					<option value="-1">Unchanged</option>
+					<!-- BEGIN apply_accountenabled -->
+					<option value="{APPLY_ACCOUNTENABLED_ID}">{APPLY_ACCOUNTENABLED_NAME}</option>
+					<!-- END apply_accountenabled -->
+				</select>
 			</td>
 		</tr>
 	</table>
