@@ -68,6 +68,7 @@
             applyClasses: false
         });
 
+        // Change styling of elements marked for delete
         tileList.find(':checkbox')
             .change(function() {
                 $(this).closest('.tile').toggleClass('marked-for-delete');
@@ -93,30 +94,38 @@
                     Create a predefined grid of tiles or span your tiles across a set number of colums.
                 </em>
             </td>
-            <td>
-                <input
-                    type="radio"
-                    id="layout_type_grid"
-                    name="layout_type"
-                    value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
-                    data-function="update-layout"
-                    {% if item.isGridLayoutType() %}checked{% endif %} />
-                <label for="layout_type_grid">Grid</label>
-                <input name="grid_width"
-                       value="{{ item.gridWidth|e('html_attr') }}"
-                       data-function="update-layout" />
+            <td class="layout-selector">
+                <div class="pane">
+                    <input
+                        type="radio"
+                        id="layout_type_grid"
+                        name="layout_type"
+                        value="{{ constant('LAYOUT_TYPE_GRID', item)|e('html_attr') }}"
+                        data-function="update-layout"
+                        {% if item.isGridLayoutType() %}checked{% endif %} />
+                    <label for="layout_type_grid">Grid</label>
+                    <input name="grid_width"
+                           value="{{ item.gridWidth|e('html_attr') }}"
+                           class="layout-width"
+                           data-function="update-layout" />
+                    <label for="layout_type_grid">px</label>
+                </div>
 
-                <input
-                    type="radio"
-                    id="layout_type_column"
-                    name="layout_type"
-                    value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
-                    data-function="update-layout"
-                    {% if item.isColumnLayoutType() %}checked{% endif %} />
-                <label for="layout_type_column">Columns</label>
-                <input name="column_count"
-                       value="{{ item.columnCount|e('html_attr') }}"
-                       data-function="update-layout" />
+                <div class="pane">
+                    <input
+                        type="radio"
+                        id="layout_type_column"
+                        name="layout_type"
+                        value="{{ constant('LAYOUT_TYPE_COLUMN', item)|e('html_attr') }}"
+                        data-function="update-layout"
+                        {% if item.isColumnLayoutType() %}checked{% endif %} />
+                    <label for="layout_type_column">Columns</label>
+                    <input name="column_count"
+                           value="{{ item.columnCount|e('html_attr') }}"
+                           class="layout-width"
+                           data-function="update-layout" />
+                    <label for="layout_type_column">tiles per row</label>
+                </div>
             </td>
         </tr>
         <tr>
@@ -126,16 +135,19 @@
                     Select a tile shape. Consider the content going into them.
                 </em>
             </td>
-            <td>
-                <input
-                    type="radio"
-                    id="tile_shape_landscape"
-                    name="tile_shape"
-                    value="landscape"
-                    data-function="update-layout"
-                    {% if item.isLandscapeShape() %}checked{% endif %} />
-                <label for="tile_shape_landscape">Landscape</label>
+            <td class="shape-selector">
+                <div class="pane">
+                    <input
+                        type="radio"
+                        id="tile_shape_landscape"
+                        name="tile_shape"
+                        value="landscape"
+                        data-function="update-layout"
+                        {% if item.isLandscapeShape() %}checked{% endif %} />
+                    <label for="tile_shape_landscape">Landscape</label>
+                </div>
 
+                <div class="pane">
                 <input
                     type="radio"
                     id="tile_shape_portrait"
@@ -144,7 +156,9 @@
                     data-function="update-layout"
                     {% if item.isPortraitShape() %}checked{% endif %} />
                 <label for="tile_shape_portrait">Portrait</label>
+                </div>
 
+                <div class="pane">
                 <input
                     type="radio"
                     id="tile_shape_square"
@@ -153,7 +167,9 @@
                     data-function="update-layout"
                     {% if item.isSquareShape() %}checked{% endif %} />
                 <label for="tile_shape_square">Square</label>
+                </div>
 
+                <div class="pane">
                 <input
                     type="radio"
                     id="tile_shape_panorama"
@@ -162,7 +178,9 @@
                     data-function="update-layout"
                     {% if item.isPanoramicShape() %}checked{% endif %} />
                 <label for="tile_shape_panorama">Panorama</label>
+                </div>
 
+                <div class="pane">
                 <input
                     type="radio"
                     id="tile_shape_custom"
@@ -174,10 +192,13 @@
 
                 <input name="aspect_ratio_x"
                        value="{{ item.aspectRatioX|e('html_attr') }}"
-                       data-function="update-layout" />
+                       class="aspect-ratio"
+                       data-function="update-layout" /> :
                 <input name="aspect_ratio_y"
                        value="{{ item.aspectRatioY|e('html_attr') }}"
+                       class="aspect-ratio"
                        data-function="update-layout" />
+                </div>
             </td>
         </tr>
         <tr>

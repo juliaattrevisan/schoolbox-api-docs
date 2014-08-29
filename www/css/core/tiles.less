@@ -68,10 +68,24 @@ ul.tileList {
 }
 
 // Form styles
-#tile-layout-form, #tile-modify-form {
+#tile-modify-form {
   .title-position, .title-color {
     label {
       display: inline;
     }
+  }
+}
+#tile-layout-form {
+  .shape-selector, .layout-selector {
+    label {
+      display: inline;
+    }
+  }
+  input.layout-width {
+    width: 4em;
+  }
+  input.aspect-ratio {
+    width: 2em;
+//    text-align: right;
   }
 }
