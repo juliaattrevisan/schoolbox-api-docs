@@ -353,12 +353,20 @@ class UserMapper extends Mapper {
      * @return \Schoolbox\Collection
      */
     public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear) {
+        $roleMapper = new RoleMapper();
+        $campusMapper = new CampusMapper();
 
         /* Find search results
          */
         $query = "
-            SELECT {$this->getColumnString('u')}
+            SELECT
+                {$this->getColumnString('u')},
+                {$roleMapper->getColumnString('g')},
+                {$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`
             FROM {$this->getTable()} u
+            LEFT JOIN `groups` g ON u.`group_id` = g.`id`
+            LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`
+            LEFT JOIN luCampus c ON c.id = uc.`campus`
         ";
 
         if ($searchCampus != -1) {
@@ -400,6 +408,37 @@ class UserMapper extends Mapper {
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
-        return $this->hydrateList($statement, 'u');
+        $userCollection = new \Schoolbox\Collection();
+
+        foreach($statement as $row) {
+            $user = $this->hydrate($row, 'u');
+            $user->setRole($roleMapper->hydrate($row, 'g'));
+
+            $campus = $campusMapper->hydrate($row, 'c');
+
+            /* Put this user in his place
+             */
+            $userOffset = $userCollection->getOffset($user->getId());
+
+            if (!($userOffset instanceof User)) {
+                $userCollection->setOffset($user->getId(), $user);
+                $userOffset = $userCollection->getOffset($user->getId());
+            }
+
+            /* If the campus object has no id, then it spawned a campus
+             * object from nonexistent data (e.g. a user with no campus)
+             * In this case, the campus object will be totally empty but
+             * still occupy slots in the user's campus collection stack
+             */
+            if ($campus->getId()) {
+                $userOffset->getCampusCollection()->add($campus);
+
+                if ($row['uc.defaultCampus'] == 1) {
+                    $user->setDefaultCampus($campus);
+                }
+            }
+        }
+
+        return $userCollection;
     }
 }
