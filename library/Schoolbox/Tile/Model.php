@@ -101,6 +101,21 @@ class Model implements ISoftDeletable
     protected $deletedAt;
 
     /**
+     * Creates this object with sensible default colors.
+     * * Tile background: transparent
+     * * Title text: black
+     * * Title background: transparent
+     */
+    public function __construct()
+    {
+        $this
+            ->setBackgroundColor(new Color(0, 0, 0, 0))
+            ->setTitleBackgroundColor(new Color(0, 0, 0, 0))
+            ->setTitleColor(new Color(0, 0, 0, 1))
+        ;
+    }
+
+    /**
      * @param  Color $backgroundColor
      * @return $this
      */
