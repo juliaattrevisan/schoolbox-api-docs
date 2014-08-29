@@ -12,12 +12,23 @@
 namespace Schoolbox\Tile\Component;
 
 use Component_Homepage_ControllerAbstract;
+use Component_Instance;
+use Group as GroupHandler;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use SitePage;
 use Twig_Environment;
 
 class TileController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Deprecated group handler, used for fetching user's permissions
+     *
+     * @var GroupHandler
+     */
+    protected $groupHandler;
+
     /**
      * @var Layout\Model
      */
@@ -32,6 +43,24 @@ class TileController extends Component_Homepage_ControllerAbstract
      * @var array[Collection|Booking\Model[]]
      */
     protected $bookings;
+
+    /**
+     * Injectable constructor
+     *
+     * @param Component_Instance $instance
+     * @param User               $user
+     * @param SitePage           $sitepage
+     * @param GroupHandler       $group
+     */
+    public function __construct(
+        Component_Instance $instance,
+        User $user,
+        SitePage $sitepage,
+        GroupHandler $group
+    ) {
+        parent::__construct($instance, $user, $sitepage);
+        $this->groupHandler = $group;
+    }
 
     /**
      * Loads the grid component into its set configuration.
@@ -85,6 +114,11 @@ class TileController extends Component_Homepage_ControllerAbstract
         // And that container always ought to be there!
         // It won't be though, if this page wasn't loaded through
         // Schoolbox\Application\WebRequest\Kernel.
+        // Therefore I have to do this PHPLib/Twig hybrid thing.
+        $this->setBlock($templateHandle, 'header', 'header_block');
+        $this->setBlock($templateHandle, 'buttons', 'buttons_block');
+
+        // Load content into Twig
         $content = '';
         try {
             $content = $this->sitepage->getTwig()->render(
@@ -94,7 +128,23 @@ class TileController extends Component_Homepage_ControllerAbstract
         } catch (\Exception $e) {
             // Don't update content
         }
-        $this->setVar('COMPONENT_CONTENT', $content);
+
+        // Necessary blockage for readonly vs. write
+        $this->setVar(
+            array(
+                'COMPONENT_CONTENT' => $content,
+                'header_block'      => '',
+                'buttons_block'     => '',
+            )
+        );
+        $permission = $this->groupHandler->getPermission(
+            $this->getContext('id'),
+            $this->user->getId()
+        );
+        if ($permission >= WRITE_ACCESS) {
+            $this->parse('header_block', 'header');
+            $this->parse('buttons_block', 'buttons');
+        }
         return true;
     }
 
