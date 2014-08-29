@@ -21,7 +21,7 @@
                     // grid layout
                     var gridWidth = Number(form.find('input[name="grid_width"]').val());
                     if (gridWidth > 0) {
-                        tileList.find('li').css({
+                        tileList.find('.tile').css({
                             "width":          String(gridWidth)+"px",
                             "padding-bottom": String(gridWidth * aspect)+"px",
                         })
