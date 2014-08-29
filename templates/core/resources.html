@@ -6,8 +6,39 @@
 <script type="text/javascript" src="/javascript/jquery.tree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
 $j(function() {
+
+  var relationID = '{OPEN}';
+
+  $j('#drop-center').fileDrop({
+    previewsContainer: '#file-window .scroller',
+    tplWrap: '<div class="dz-preview" />',
+
+    addedfile: function(file) {
+      $(file.previewElement).addClass('category-'+relationID).data('node', relationID);
+    },
+
+    // callbacks
+    sending: function (file, xhr, formData) {
+      var el = $(file.previewElement);
+
+      formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+      formData.append('category', el.data('node'));
+      formData.append('comment', '');
+      formData.append('hidden', 0);
+    },
+
+    complete: function (file, response) {
+      $(file.previewElement).find('img').attr('src', '');
+      if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+        $('#node-'+relationID).trigger('click');
+      }
+    }
+
+  });
+
 
   var threePanel = new ThreePanelView('/ajax/resource/meta.php', 'resources')
 
@@ -22,75 +53,30 @@ $j(function() {
 	/* load right panel file list */
 	$j(document).on('click', '#tree tr:not(.server)', function () {
 
+    var find = 'tbody tr, div.dz-preview';
+
 		/* select folder */
 		$j('#tree .selected').removeClass('selected');
 		$j(this).addClass('selected');
 
-		/* hide and deselect all files */
-		$j('#file-list tbody tr').removeClass('selected').hide();
+    // if changing relationID, deselect things
+    if(relationID != $j(this).attr('id').substring(5)) {
+      $j('#file-window').find(find).removeClass('selected');
+    }
 
-		var relationID = $j(this).attr('id').substring(5);
-		var files = $j('tr.category-' + relationID);
+		relationID = $j(this).attr('id').substring(5);
 
     threePanel.getMeta(relationID);
+    /* remember tree branch */
+    $j.post('/ajax/tree.php', {resourcesID: relationID});
 
-		if (files.length > 0) {
-			/* files exist, show them */
-			files.show();
+    loadFileList(relationID, find);
 
-			/* re-apply on off */
-			$j('#file-list tbody tr').removeClass('dark');
-			$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
+    /* re-apply on off */
+    $j('#file-window').find(find).removeClass('dark');
+    $j('#file-window').find(find).filter(':visible:odd:not(.empty)').addClass('dark');
 
-			/* remember tree branch */
-			$j.post('/ajax/tree.php', {resourcesID : relationID});
-
-		} else {
-
-			/* ajax load files */
-			$j.post('/ajax/file.php', {categoryID : relationID}, function (data) {
-
-				if (data.error) {
-					alert(data.error);
-				} else if (data.length == 0) {
-					/* display empty message */
-					$j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
-
-				} else {
-					var template = $j('#file-template');
-					for (i in data) {
-						var row = data[i];
-
-						/* build new file (row) */
-						var clone = template.clone();
-						clone.attr('id', 'file-' + row.id);
-						clone.find('span.file').text(row.description);
-						clone.find('td:eq(1)').text(row.user);
-						clone.find('td:eq(2)').text(row.relative);
-						clone.addClass('category-' + relationID);
-						clone.addClass(row.mimeClass);
-
-						if (row.url)
-							clone.addClass('link');
-
-						if (row.hidden == 1)
-							clone.addClass('hidden');
-
-						clone.appendTo($j('#file-list')).show();
-					}
-				}
-
-				/* re-apply on off */
-				$j('#file-list tbody tr').removeClass('dark');
-				$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
-
-
-				initialiseFiles(relationID);
-
-			}, 'json');
-		}
-
-	});
+  });
 
   // explicit case for server node
   $j(document).on('click', '#tree tr.server', function () {
@@ -100,6 +86,66 @@ $j(function() {
     $j('#file-list tbody tr').hide();
 
   });
+
+  function loadFileList(categoryID, find) {
+    /* ajax load files */
+    $j.post('/ajax/file.php?min=1', {categoryID : categoryID}, function (data) {
+
+      var shows = [];
+
+      if (data.error) {
+        alert(data.error);
+      } else if (data.length == 0 && $j('#file-window').find('.category-'+ categoryID).length == 0) {
+        /* display empty message */
+        $j('<tr class="category-' + categoryID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+
+      } else {
+        $j('#file-window').find('tr.empty.category-'+categoryID).remove();
+        var template = $j('#file-template');
+        for (i in data) {
+          var row = data[i], clone, old;
+
+          if ($j('#file-'+row.id).length) {
+            // this file node exists, but we can update it
+            clone = $j('#file-'+row.id);
+            old = true;
+          }
+          else {
+            clone = template.clone();
+            clone.attr('id', 'file-' + row.id);
+            old = false;
+          }
+
+          /* build new file (row) */
+          clone.find('span.file').text(row.description);
+          clone.find('td:eq(1)').text(row.user);
+          clone.find('td:eq(2)').text(row.relative);
+          clone.addClass('category-' + categoryID);
+          clone.addClass(row.mimeClass);
+
+          if (row.url)
+            clone.addClass('link');
+
+          if (row.hidden == 1)
+            clone.addClass('hidden');
+
+          if(old) {
+          } else {
+            $j('#file-window').find('div[data-file=' + row.id + ']').remove();
+            clone.appendTo($j('#file-list'));
+          }
+
+        }
+      }
+
+      /* hide all files */
+      $j('#file-window').find(find).hide();
+      $j('#file-window').find('.category-'+categoryID).show();
+
+      initialiseFiles(categoryID);
+
+    }, 'json');
+  }
 
 	var initialiseFiles = function (relationID) {
 
@@ -378,147 +424,157 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
 <div class="template3">
   <div class="left">
     <div id="category-window">
-    <div class="loading"></div>
+      <div class="loading"></div>
       <table id="category-head" class="table">
-      	<thead>
-        	<th>Folders</th>
+        <thead>
+        <th>Folders</th>
         </thead>
       </table>
       <div class="scroller">
-      <table id="tree" class="table">
-        <tbody>
+        <table id="tree" class="table">
+          <tbody>
           <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
             <td><span class="server label">Resources</span></td>
           </tr>
           <!-- BEGIN category_list -->
           <tr id="node-{CATEGORY_ID}" class="{CLASS}">
             <td>
-                <span class="elbow"></span>
-                <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
+              <span class="elbow"></span>
+              <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
             </td>
           </tr>
           <!-- END category_list -->
-        </tbody>
-        <tfoot>
+          </tbody>
+          <tfoot>
           <tr id="node-template">
             <td>
-                <span class="elbow"></span>
-                <a href="#"><span class="label"></span></a>
+              <span class="elbow"></span>
+              <a href="#"><span class="label"></span></a>
             </td>
           </tr>
-        </tfoot>
-      </table>
+          </tfoot>
+        </table>
       </div>
     </div>
   </div>
-
-  <div class="center">
-    <div id="file-window">
-      <div class="loading"></div>
-      <table id="file-head" class="table">
-        <col width="55%" />
-        <col width="23%" />
-        <col width="22%" />
-      	<thead>
+  <div class="center-right">
+    <form action="/cms/fileForm.php?ajax=1" id="drop-center" method="post" class="dropzone"></form>
+    <div class="center">
+      <div id="file-window">
+        <table id="file-head" class="table">
+          <col width="55%"/>
+          <col width="23%"/>
+          <col width="22%"/>
+          <thead>
           <th>Name</th>
-        </thead>
-      </table>
-      <div class="scroller">
-      <table id="file-list" class="table">
-      	<col width="100%" />
+          </thead>
+        </table>
+        <div class="scroller">
+          <table id="file-list" class="table">
+            <col width="100%"/>
 
-        <tbody>
-          <!-- BEGIN file_list -->
-          <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID} {FILE_LIST_TYPE}">
-            <td><span class="file">{FILE_NAME}</span></td>
-          </tr>
-          <!-- END file_list -->
-         </tbody>
-         <tfoot>
-          <tr id="file-template">
-            <td><span class="file"></span></td>
-          </tr>
-         </tfoot>
-      </table>
+            <tbody>
+            <!-- BEGIN file_list -->
+            <tr id="{TYPE}-{FILE_ID}" class="category-{CATEGORY_ID} {FILE_LIST_TYPE}">
+              <td><span class="file">{FILE_NAME}</span></td>
+            </tr>
+            <!-- END file_list -->
+            </tbody>
+            <tfoot>
+            <tr id="file-template">
+              <td><span class="file"></span></td>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div id="underway" data-count="0">
+          <span></span> uploads in progress
+        </div>
       </div>
     </div>
-  </div>
-  <div class="right">
-    <div id="detail-window">
-      <div class="loading">
-        <img src="/images/resources/ajax.gif" />
-      </div>
-
-      <!-- BEGIN folder_detail -->
-      <div class="rfolder detail" id="folder-detail">
-        <img src="{FOLDER_MIME_IMG}" alt="{FOLDER_NAME}" />
-        <h3 class="rfolder name">{FOLDER_NAME}</h3>
-        <p class="rfolder type">
-          <span class="rfolder type">{FOLDER_TYPE}</span>
-          <a data-action="join" class="rfolder join-btn btn groups">
-            <span></span>Join
-          </a>
-          <span class="pending">Membership pending approval</span>
-        </p>
-
-        <div class="rfolder actions clearfix">
-          <h4 class="rfolder">Actions</h4>
-          <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
-          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
-          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
-          <a class="btn delete rdelete_all" data-action="delete_all"><span></span>Delete</a>
-          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
-          <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
-          <a class="btn create rfile" data-action="file"><span></span>Post File</a>
-          <a class="btn up-arrow rmulti" data-action="multi"><span></span>Upload Multiple Files</a>
-          <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
+    <div class="right">
+      <div id="detail-window">
+        <div class="loading">
+          <img src="/images/resources/ajax.gif"/>
         </div>
+        <!-- BEGIN folder_detail -->
+        <div class="rfolder detail" id="folder-detail">
+          <img src="{FOLDER_MIME_IMG}" alt="{FOLDER_NAME}"/>
 
+          <h3 class="rfolder name">{FOLDER_NAME}</h3>
+
+          <p class="rfolder type">
+            <span class="rfolder type">{FOLDER_TYPE}</span>
+            <a data-action="join" class="rfolder join-btn btn groups">
+              <span></span>Join
+            </a>
+            <span class="pending">Membership pending approval</span>
+          </p>
+
+          <div class="rfolder actions clearfix">
+            <h4 class="rfolder">Actions</h4>
+            <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
+            <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+            <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+            <a class="btn delete rdelete_all" data-action="delete_all"><span></span>Delete</a>
+            <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+            <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
+            <a class="btn create rfile" data-action="file"><span></span>Post File</a>
+            <a class="btn up-arrow rmulti" data-action="multi"><span></span>Upload Multiple Files</a>
+            <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
+          </div>
           <h4 class="rfolder perms">Permissions</h4>
           <table class="rfolder perms table">
-              <!-- BEGIN folder_detail_perms -->
-              <tr class="{ON_OFF}">
-                  <th scope="row">{FOLDER_PERM_GROUP}:</th><td>{FOLDER_PERM_ACCESS}</td>
-              </tr>
-              <!-- END folder_detail_perms -->
+            <!-- BEGIN folder_detail_perms -->
+            <tr class="{ON_OFF}">
+              <th scope="row">{FOLDER_PERM_GROUP}:</th>
+              <td>{FOLDER_PERM_ACCESS}</td>
+            </tr>
+            <!-- END folder_detail_perms -->
           </table>
-      </div>
-      <!-- END folder_detail -->
-
-      <!-- BEGIN file_detail -->
-      <div class="rfile detail" id="file-detail">
-        <img src="{FILE_MIME_IMG}" alt="{FILE_NAME}" />
-        <h3 class="rfile name">{FILE_NAME}</h3>
-        <p class="rfile filesize">({FILE_SIZE})</p>
-        <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
-        <p class="rfile description">{FILE_DESCRIPTION}</p>
-        <p class="rfile meta">
-			Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span>,
-			last modified <span class="meta-modified-when">{FILE_MODIFIED_DATE}</span>
-		</p>
-        <div class="rfile actions">
-          <h4 class="rfile">Actions</h4>
-          <a class="btn open ropen" data-action="open"><span></span>Open</a>
-          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
-          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
-          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
-          <a class="btn report rproperties" data-action="properties"><span></span>Properties</a>
         </div>
-      </div>
-      <!-- END file_detail -->
+        <!-- END folder_detail -->
+        <!-- BEGIN file_detail -->
+        <div class="rfile detail" id="file-detail">
+          <img src="{FILE_MIME_IMG}" alt="{FILE_NAME}"/>
 
-      <!-- BEGIN multi_file_detail -->
-      <div class="rmultifile detail" id="multi-file-detail">
-        <img src="{MULTIFILE_MIME_IMG}" alt="Multiple files selected" />
-        <h3 class="rmultifile count">{MULTIFILE_COUNT}</h3>
-        <div class="rmultifile actions">
-          <h4 class="rmultifile actions">Actions</h4>
-          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <h3 class="rfile name">{FILE_NAME}</h3>
+
+          <p class="rfile filesize">({FILE_SIZE})</p>
+
+          <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
+
+          <p class="rfile description">{FILE_DESCRIPTION}</p>
+
+          <p class="rfile meta">
+            Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span>,
+            last modified <span class="meta-modified-when">{FILE_MODIFIED_DATE}</span>
+          </p>
+
+          <div class="rfile actions">
+            <h4 class="rfile">Actions</h4>
+            <a class="btn open ropen" data-action="open"><span></span>Open</a>
+            <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+            <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+            <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+            <a class="btn report rproperties" data-action="properties"><span></span>Properties</a>
+          </div>
         </div>
-      </div>
-      <!-- END multi_file_detail -->
+        <!-- END file_detail -->
+        <!-- BEGIN multi_file_detail -->
+        <div class="rmultifile detail" id="multi-file-detail">
+          <img src="{MULTIFILE_MIME_IMG}" alt="Multiple files selected"/>
 
+          <h3 class="rmultifile count">{MULTIFILE_COUNT}</h3>
+
+          <div class="rmultifile actions">
+            <h4 class="rmultifile actions">Actions</h4>
+            <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          </div>
+        </div>
+        <!-- END multi_file_detail -->
+      </div>
     </div>
   </div>
-
 </div>
+
