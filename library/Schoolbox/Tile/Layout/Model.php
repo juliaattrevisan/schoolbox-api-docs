@@ -59,11 +59,11 @@ class Model implements ISoftDeletable
     protected $columnCount = 3;
 
     /**
-     * The number of pixels wide this layout is (if using grid layout)
+     * The number of pixels wide each tile in layout is (if using grid layout)
      *
      * @var int
      */
-    protected $gridWidth = 500;
+    protected $gridWidth = 100;
 
     /**
      * The width ratio of the items within this grid.
