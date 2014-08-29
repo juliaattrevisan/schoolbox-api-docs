@@ -1,7 +1,7 @@
 /**
  * Styles for the tile component.
  */
-.tileList {
+ul.tileList {
   // Get rid of spacing between tiles
   word-spacing: 0;
   line-height: 0;
@@ -13,13 +13,15 @@
   }
 
   // Styles for individual tiles
-  .tile {
+  li.tile {
     padding: 0;
     position: relative;
     display: inline-block;
     height: auto;
     // Styles for the tile's background image (if provided)
     background-repeat: no-repeat;
+    // This tends to get clobbered by more specific styles which set a
+    // background as a color and nothing else.
     background-size: cover;
     background-position: center;
     &.marked-for-delete {
