@@ -15,7 +15,14 @@ if ( isset( $_GET[session_name()] ) ) {
     session_id($_GET[session_name()]);
 }
 
+$ajax = isset($_GET['ajax']) && $_GET['ajax'];
+
+if($ajax) {
+    header("Content-Type: application/json");
+}
+
 $page = new SitePage();
+$page->setAjax($ajax);
 $fileHandler = new File();
 $groupHandler = new Group();
 
@@ -139,14 +146,19 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         else {
             /* Added to a single folder */
             if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
-                error(6);
+                if($ajax) {
+                    header(':', true, 400);
+                    die(json_encode('You do not have write permission to this category.'));
+                } else {
+                    error(6);
+                }
             }
 
             $file->setFolder($_POST['category']);
         }
 
         try {
-            FileMapper::getInstance()->save($file);
+            $affectedIds = FileMapper::getInstance()->save($file);
 
             /* For some reason this is necessary for upload indication to reach completed status */
             if ( $_POST['uploadifydie'] == true ) {
@@ -156,6 +168,10 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
             if ( isset( $_POST['return'] ) ) {
                 SitePage::localRedir($_POST['return']);
             }
+            elseif($ajax) {
+                header(':', true, 201);
+                die(json_encode(array('id' => $affectedIds[0])));
+            }
             else {
                 $page->backToTheFuture(2);
             }
@@ -164,14 +180,27 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         catch (Exception $e) {
             // Output errors
             if($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-                error(11, "Your file, '{$file->getFilename()}'");
+                $code = 11;
+                $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
             }
             else if($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
-                error(10, 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.');
+                $code = 10;
+                $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.';
             }
             else {
-                error(9, $e->getMessage());
+                $code = 9;
+                $msg  = $e->getMessage();
             }
+
+            if($ajax) {
+                header(':', true, 400);
+                die(json_encode(array('code' => $code, 'error' => $msg)));
+            }
+            else {
+                error($code, $msg);
+            }
+
+
         }
     }
 }
