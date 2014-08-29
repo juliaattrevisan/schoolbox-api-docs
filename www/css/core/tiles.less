@@ -66,10 +66,17 @@ ul.tileList {
         text-align: right;
       }
     }
+    .tile-link {
+      // The tile's link overlaps the entire tile (if it has one)
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
     .edit {
       // Tile edit partition
       position: absolute;
-      top:0;
+      top: 0;
       bottom: 0;
       width: 100%;
       transition: background-color 0.1s;
