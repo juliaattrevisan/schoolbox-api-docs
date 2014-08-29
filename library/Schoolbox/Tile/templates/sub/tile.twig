@@ -12,6 +12,10 @@
             background-image: url({{ "/storage/image.php?size=maxsize&hash=" ~ tile.backgroundImage.hash|e('css') }});
         {% endif %}
     ">
+
+    {% if tile.link %}
+    <a href="{{ tile.link|e('html_attr') }}">
+    {% endif %}
     <span class="title {% if tile.isTitlePositionTop() %}position-top{% elseif tile.isTitlePositionBottom() %}position-bottom{% endif %}"
         style="
             color: rgba(
@@ -26,13 +30,11 @@
                 {{ tile.titleBackgroundColor.blue|e('css') }},
                 {{ tile.titleBackgroundColor.alpha|e('css') }}
             );
-    ">
-        {% if tile.link %}
-        <a href="{{ tile.link|e('html_attr') }}">{{ tile.titleText }}</a>
-        {% else %}
-        {{ tile.titleText }}
-        {% endif %}
-    </span>
+    ">{{ tile.titleText }}</span>
+
+    {% if tile.link %}
+    </a>
+    {% endif %}
 
     {% if editable and tile.id %}
     <div class="edit">
