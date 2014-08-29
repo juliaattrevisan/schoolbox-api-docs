@@ -26,7 +26,12 @@ if (count($this->arg) < 3) {
  * but only if this class exists
  */
 $externalClass = new External_Synergetic_Class();
-$class = $externalClass->getClass($this->arg[0].'/'.$this->arg[1]);
+if($this->arg[0]) {
+    $class = $externalClass->getClass($this->arg[0].'/'.$this->arg[1]);
+}
+else {
+    $class = $externalClass->getClass($this->arg[1]);
+}
 
 if (!$class) {
 	error(148);
