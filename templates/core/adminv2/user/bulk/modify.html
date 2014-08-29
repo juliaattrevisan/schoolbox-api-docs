@@ -11,7 +11,7 @@
 				<select name="search_campus">
 					<option value="-1">Any</option>
 					<!-- BEGIN search_campus -->
-					<option value="{SEARCH_CAMPUS_ID}">{SEARCH_CAMPUS_NAME}</option>
+					<option value="{SEARCH_CAMPUS_ID}" {SEARCH_CAMPUS_SELECTED}>{SEARCH_CAMPUS_NAME}</option>
 					<!-- END search_campus -->
 				</select>
 			</td>
@@ -24,7 +24,7 @@
 				<select name="search_role">
 					<option value="-1">Any</option>
 					<!-- BEGIN search_role -->
-					<option value="{SEARCH_ROLE_ID}">{SEARCH_ROLE_NAME}</option>
+					<option value="{SEARCH_ROLE_ID}" {SEARCH_ROLE_SELECTED}>{SEARCH_ROLE_NAME}</option>
 					<!-- END search_role -->
 				</select>
 			</td>
@@ -37,7 +37,7 @@
 				<select name="search_eportfolio">
 					<option value="-1">Any</option>
 					<!-- BEGIN search_eportfolio -->
-					<option value="{SEARCH_EPORTFOLIO_ID}">{SEARCH_EPORTFOLIO_NAME}</option>
+					<option value="{SEARCH_EPORTFOLIO_ID}" {SEARCH_EPORTFOLIO_SELECTED}>{SEARCH_EPORTFOLIO_NAME}</option>
 					<!-- END search_eportfolio -->
 				</select>
 			</td>
@@ -47,7 +47,7 @@
 				<h4>Year</h4>
 			</td>
 			<td>
-				<input name='search_year' type="text" value="" />
+				<input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
 			</td>
 		</tr>
 	</table>

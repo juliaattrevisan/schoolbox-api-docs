@@ -28,7 +28,8 @@ $allCampuses = $campusMapper->findAll();
 foreach($allCampuses as $currentCampus) {
     $this->setVar(array(
         'SEARCH_CAMPUS_ID' => $currentCampus->getId(),
-        'SEARCH_CAMPUS_NAME' => $currentCampus->getName()
+        'SEARCH_CAMPUS_NAME' => $currentCampus->getName(),
+        'SEARCH_CAMPUS_SELECTED' => ($currentCampus->getId() == $_POST['search_campus']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_campus_block', 'search_campus', true);
@@ -49,7 +50,8 @@ $allRoles = $roleMapper->findAll();
 foreach($allRoles as $currentRole) {
     $this->setVar(array(
         'SEARCH_ROLE_ID' => $currentRole->getId(),
-        'SEARCH_ROLE_NAME' => $currentRole->getName()
+        'SEARCH_ROLE_NAME' => $currentRole->getName(),
+        'SEARCH_ROLE_SELECTED' => ($currentRole->getId() == $_POST['search_role']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_role_block', 'search_role', true);
@@ -66,11 +68,11 @@ foreach($allRoles as $currentRole) {
  */
 $allEportfolio = new \Schoolbox\Collection(array(
     array(
-        'key' => 0,
+        'key' => 1,
         'label' => 'Enabled'
     ),
     array(
-        'key' => 1,
+        'key' => 0,
         'label' => 'Disabled'
     )
 ));
@@ -79,6 +81,7 @@ foreach($allEportfolio as $currentEportfolio) {
     $this->setVar(array(
         'SEARCH_EPORTFOLIO_ID' => $currentEportfolio['key'],
         'SEARCH_EPORTFOLIO_NAME' => $currentEportfolio['label'],
+        'SEARCH_EPORTFOLIO_SELECTED' => ($currentEportfolio['key'] == $_POST['search_eportfolio']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_eportfolio_block', 'search_eportfolio', true);
@@ -91,9 +94,17 @@ foreach($allEportfolio as $currentEportfolio) {
     $this->parse('apply_eportfolio_block', 'apply_eportfolio', true);
 }
 
+$this->setVar(array(
+    'SEARCH_YEAR_SELECTED' => $_POST['searchYear']
+));
+
 /* If there were any search results, display control options
  */
-if ($searchResults) {
+if (!empty($_POST)) {
+    $userMapper = new \Schoolbox\UserMapper();
+
+    $query = $userMapper->bulkModifySearch($_POST['search_campus'], $_POST['search_role'], $_POST['search_eportfolio'], $_POST['search_year']);
+
     $this->parse('has_results_block', 'has_results');
 }
 else {
