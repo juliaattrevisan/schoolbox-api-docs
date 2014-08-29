@@ -110,12 +110,14 @@ function useSAMLKerberos() {
 
     // If whitelist not in use, don't use kerberos at all
     if (trim(Config::get('saml_krb_whitelist'))==''){
+        SAMLDebugLog("Kerberos whitelist not in use");
         return false;
     }
 
     // Check if the user is in the IP whitelist
     $tempsession = new Session;
     if (!ipInCIDRList($tempsession->getIP(), Config::get('saml_krb_whitelist'))) {
+        SAMLDebugLog("IP not in kerberos whitelist");
         return false;
     }
     unset($tempsession);
@@ -133,6 +135,7 @@ function useSAMLKerberos() {
     * 
     * Errs on the side of kerberos than non-kerberos
     */
+    SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
     $bc = new Browscap(Config::get('file_dir'));
     // Don't attempt to update
     $bc->doAutoUpdate = false;
@@ -142,6 +145,7 @@ function useSAMLKerberos() {
     $bc->updateInterval = '31536000';
 
     $current_browser = $bc->getBrowser();
+    SAMLDebugLog(json_encode($current_browser));
     if ($current_browser->Device_Type == 'Desktop') {
         if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
             switch($current_browser->Browser) {
@@ -166,6 +170,13 @@ function useSAMLKerberos() {
     }
 }
 
+function SAMLDebugLog($msg) {
+    if (Config::get('saml_debug')) {
+        file_put_contents(Config::get('logs_dir')."/saml.log", "[".date("Y-m-d H:i:s")."] ".$_SERVER['REMOTE_ADDR']." ".$msg."\n", FILE_APPEND);
+    }
+}
+
 $settings->useKerberos = useSAMLKerberos();
+SAMLDebugLog(json_encode("Attempt to use kerberos? ".json_encode($settings->useKerberos)));
 
 return $settings;
