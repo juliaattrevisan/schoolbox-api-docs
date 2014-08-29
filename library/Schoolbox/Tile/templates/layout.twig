@@ -73,6 +73,26 @@
             .change(function() {
                 $(this).closest('.tile').toggleClass('marked-for-delete');
             })
+
+        // Panes with buttons inside them
+        form.find('[data-role="pane-container"]').each(function() {
+            var element       = $(this);
+            var panes         = element.find('[data-role="pane"]');
+            var hiddenContent = panes.find('[data-role="hidden-content"]')
+            panes.find(':radio').change(function() {
+                var element     = $(this);
+                var thisPane    = element.closest('[data-role="pane"]');
+                var thisContent = thisPane.find('[data-role="hidden-content"]');
+
+                // Hide all hidden content not inside this pane
+                thisContent.show();
+                hiddenContent.not(thisContent).hide();
+
+                // Toggle classes for selected pane
+                thisPane.addClass('selected');
+                panes.not(thisPane).removeClass('selected');
+            }).change();
+        })
     })
 })(jQuery);
 </script>
@@ -94,8 +114,8 @@
                     Create a predefined grid of tiles or span your tiles across a set number of colums.
                 </em>
             </td>
-            <td class="layout-selector">
-                <div class="pane">
+            <td class="layout-selector" data-role="pane-container">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="layout_type_grid"
@@ -104,14 +124,17 @@
                         data-function="update-layout"
                         {% if item.isGridLayoutType() %}checked{% endif %} />
                     <label for="layout_type_grid">Grid</label>
-                    <input name="grid_width"
-                           value="{{ item.gridWidth|e('html_attr') }}"
-                           class="layout-width"
-                           data-function="update-layout" />
-                    <label for="layout_type_grid">px</label>
+
+                    <div class="hidden-content" data-role="hidden-content">
+                        <input name="grid_width"
+                               value="{{ item.gridWidth|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_grid">px</label>
+                    </div>
                 </div>
 
-                <div class="pane">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="layout_type_column"
@@ -120,11 +143,14 @@
                         data-function="update-layout"
                         {% if item.isColumnLayoutType() %}checked{% endif %} />
                     <label for="layout_type_column">Columns</label>
-                    <input name="column_count"
-                           value="{{ item.columnCount|e('html_attr') }}"
-                           class="layout-width"
-                           data-function="update-layout" />
-                    <label for="layout_type_column">tiles per row</label>
+
+                    <div class="hidden-content" data-role="hidden-content">
+                        <input name="column_count"
+                               value="{{ item.columnCount|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_column">tiles/row</label>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -135,8 +161,8 @@
                     Select a tile shape. Consider the content going into them.
                 </em>
             </td>
-            <td class="shape-selector">
-                <div class="pane">
+            <td class="shape-selector" data-role="pane-container">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="tile_shape_landscape"
@@ -146,10 +172,10 @@
                         {% if item.isLandscapeShape() %}checked{% endif %} />
                     <label for="tile_shape_landscape">Landscape</label>
 
-                    <div style="width: 50px; height: 28px; background-color: white; border: 1px solid black;"></div>
+                    <div class="shape shape-landscape"></div>
                 </div>
 
-                <div class="pane">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="tile_shape_portrait"
@@ -159,10 +185,10 @@
                         {% if item.isPortraitShape() %}checked{% endif %} />
                     <label for="tile_shape_portrait">Portrait</label>
 
-                    <div style="width: 28px; height: 50px; background-color: white; border: 1px solid black;"></div>
+                    <div class="shape shape-portrait"></div>
                 </div>
 
-                <div class="pane">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="tile_shape_square"
@@ -172,10 +198,10 @@
                         {% if item.isSquareShape() %}checked{% endif %} />
                     <label for="tile_shape_square">Square</label>
 
-                    <div style="width: 38px; height: 38px; background-color: white; border: 1px solid black;"></div>
+                    <div class="shape shape-square"></div>
                 </div>
 
-                <div class="pane">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="tile_shape_panorama"
@@ -185,10 +211,10 @@
                         {% if item.isPanoramicShape() %}checked{% endif %} />
                     <label for="tile_shape_panorama">Panorama</label>
 
-                    <div style="width: 75px; height: 24px; background-color: white; border: 1px solid black;"></div>
+                    <div class="shape shape-panorama"></div>
                 </div>
 
-                <div class="pane">
+                <div class="pane" data-role="pane">
                     <input
                         type="radio"
                         id="tile_shape_custom"
@@ -198,14 +224,16 @@
                         {% if item.isCustomShape() %}checked{% endif %} />
                     <label for="tile_shape_custom">Custom</label>
 
-                    <input name="aspect_ratio_x"
-                           value="{{ item.aspectRatioX|e('html_attr') }}"
-                           class="aspect-ratio"
-                           data-function="update-layout" /> :
-                    <input name="aspect_ratio_y"
-                           value="{{ item.aspectRatioY|e('html_attr') }}"
-                           class="aspect-ratio"
-                           data-function="update-layout" />
+                    <div class="hidden-content" data-role="hidden-content">
+                        <input name="aspect_ratio_x"
+                               value="{{ item.aspectRatioX|e('html_attr') }}"
+                               class="aspect-ratio"
+                               data-function="update-layout" /> :
+                        <input name="aspect_ratio_y"
+                               value="{{ item.aspectRatioY|e('html_attr') }}"
+                               class="aspect-ratio"
+                               data-function="update-layout" />
+                    </div>
                 </div>
             </td>
         </tr>
