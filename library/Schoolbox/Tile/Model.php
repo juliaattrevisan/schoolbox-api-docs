@@ -10,6 +10,7 @@
 namespace Schoolbox\Tile;
 
 use Alaress_Date_Format;
+use Alaress\Color\Color;
 use Schoolbox\Storage;
 use Schoolbox\Tile\Layout;
 use Schoolbox\ISoftDeletable;
@@ -50,12 +51,12 @@ class Model implements ISoftDeletable
     protected $titleText;
 
     /**
-     * @var string
+     * @var Color
      */
     protected $titleColor;
 
     /**
-     * @var string
+     * @var Color
      */
     protected $titleBackgroundColor;
 
@@ -80,7 +81,7 @@ class Model implements ISoftDeletable
     protected $order;
 
     /**
-     * @var string
+     * @var Color
      */
     protected $backgroundColor;
 
@@ -100,7 +101,7 @@ class Model implements ISoftDeletable
     protected $deletedAt;
 
     /**
-     * @param  string $backgroundColor
+     * @param  Color $backgroundColor
      * @return $this
      */
     public function setBackgroundColor($backgroundColor)
@@ -110,7 +111,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return Color
      */
     public function getBackgroundColor()
     {
@@ -172,7 +173,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  string $titleBackgroundColor
+     * @param  Color $titleBackgroundColor
      * @return $this
      */
     public function setTitleBackgroundColor($titleBackgroundColor)
@@ -182,7 +183,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return Color
      */
     public function getTitleBackgroundColor()
     {
@@ -190,7 +191,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  string $titleColor
+     * @param  Color $titleColor
      * @return $this
      */
     public function setTitleColor($titleColor)
@@ -200,7 +201,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return Color
      */
     public function getTitleColor()
     {
