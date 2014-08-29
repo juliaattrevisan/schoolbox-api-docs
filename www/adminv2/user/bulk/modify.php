@@ -166,10 +166,19 @@ if (!empty($_POST)) {
 
     if ($allUsers->count()) {
         foreach ($allUsers as $currentUser) {
+            $campusNames = array();
+
+            foreach($currentUser->getCampusCollection() as $currentCampus) {
+                $campusNames[] = $currentCampus->getName();
+            }
+
             $this->setVar(array(
                 'USER_ID' => $currentUser->getId(),
                 'USER_FIRSTNAME' => $currentUser->getFirstname(),
-                'USER_LASTNAME' => $currentUser->getLastname()
+                'USER_LASTNAME' => $currentUser->getLastname(),
+                'USER_CAMPUS' => implode(', ', $campusNames),
+                'USER_GROUP' => $currentUser->getRole()->getName(),
+                'USER_YEAR' => $currentUser->getYear(),
             ));
 
             $this->parse('user_block', 'user', true);

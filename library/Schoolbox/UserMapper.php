@@ -369,17 +369,17 @@ class UserMapper extends Mapper {
             LEFT JOIN luCampus c ON c.id = uc.`campus`
         ";
 
+        /* Augmented where
+         */
+        $query .= "WHERE 1 = 1";
+
         if ($searchCampus != -1) {
             $query .= "
-                LEFT JOIN userCampus ON u.id = userCampus.uid AND userCampus.campus = :searchCampus
+                AND uc.campus = :searchCampus
             ";
 
             $params['searchCampus'] = $searchCampus;
         }
-
-        /* Augmented where
-         */
-        $query .= "WHERE 1 = 1";
 
         if ($searchRole != -1) {
             $query .= "
