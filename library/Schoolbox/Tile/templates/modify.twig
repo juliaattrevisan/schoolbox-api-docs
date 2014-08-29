@@ -66,14 +66,14 @@
             <td>
                 <dl>
                     <dt>Text</dt>
-                    <dd>
+                    <dd class="title-text">
                         <input name="title_text"
                                value="{{ item.titleText|e('html_attr') }}"
                                class="fullwidth"
                                placeholder="enter text..." />
                     </dd>
                     <dt>Colour</dt>
-                    <dd>
+                    <dd class="title-color">
                         <input type="text"
                                id="title_color"
                                name="title_color"
@@ -81,7 +81,7 @@
                                value="{{ item.titleColor|e('html_attr') }}" />
                         <label for="title_color">text</label>
                     </dd>
-                    <dd>
+                    <dd class="title-color">
                         <input type="text"
                                id="title_background_color"
                                name="title_background_color"
@@ -90,7 +90,7 @@
                         <label for="title_background_color">background</label>
                     </dd>
                     <dt>Position</dt>
-                    <dd>
+                    <dd class="title-position">
                         <input type="radio"
                                id="title_position_top"
                                name="title_position"
@@ -126,7 +126,7 @@
             <td>
                 <dl>
                     <dt>Colour</dt>
-                    <dd>
+                    <dd class="background-color">
                         <input type="text"
                                id="background_color"
                                name="background_color"
@@ -134,7 +134,7 @@
                                value="{{ item.backgroundColor|e('html_attr') }}" />
                     </dd>
                     <dt>Image</dt>
-                    <dd>
+                    <dd class="background-upload">
                         {# really basic upload, etc #}
                         {# Extract into a sub-template #}
                         {% if item.backgroundImage.hash %}
