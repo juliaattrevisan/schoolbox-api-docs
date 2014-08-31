@@ -8,7 +8,7 @@
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract {
 
 	/**
-	 * @var \Schoolbox\Collection
+	 * @var \Schoolbox\Collection|\Schoolbox\Video\ResourceVideo[]
 	 */
 	protected $outputList;
 
@@ -72,16 +72,29 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->outputList = new \Schoolbox\Collection(array());
         }
 
+        // Select a video to play by default.
+        // Only show a video that has actually finished encoding, though.
+        $this->defaultVideo = null;
         if ($this->getConfig('video')) {
             try {
-                $this->defaultVideo = $videoResourceMapper->findByFileId($this->getConfig('video'));
+                $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
+                if ($video->isComplete()) {
+                    $this->defaultVideo = $video;
+                }
             }
             catch (\Schoolbox\Mapper\Exception $e) {
-                $this->defaultVideo = $this->outputList->first();
+                // passthru: figure out which video later
             }
         }
-        else {
-            $this->defaultVideo = $this->outputList->first();
+        if (!isset($this->defaultVideo)) {
+            // Show the first video that has completed encoding
+            foreach ($this->outputList as $video) {
+                /** @var \Schoolbox\Video\ResourceVideo $video */
+                if ($video->isComplete()) {
+                    $this->defaultVideo = $video;
+                    break;
+                }
+            }
         }
 
         $group_handler = new Group();
