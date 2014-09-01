@@ -177,6 +177,7 @@ class Scrub {
                     'magnet' => true,
                     'feed' => true,
                     'dvcplay' => true,
+                    'data'  => true,
                 )
             );
             //
