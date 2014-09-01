@@ -44,7 +44,7 @@ if ($currentQuestion['type_id']) {
 	$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
 	$this->setVar(array(
-		'QUESTION_QUESTION' => $currentQuestion['question'],
+		'QUESTION_QUESTION' => Scrub::text($currentQuestion['question']),
 		'QUESTION_MARKS' => $currentQuestion['marks'],
 		'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
 		'QUESTION_TYPE_MOODLE' => $factory->getMoodleQuestionType($currentQuestion['type_id']),
