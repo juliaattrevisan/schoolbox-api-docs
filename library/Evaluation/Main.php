@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation
  *
@@ -42,13 +43,14 @@ abstract class Evaluation_Main extends DeprecatedModel
     public $_index = 'assess_id';
 
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
-    const UNLIMITED_DURATION = -1;
+    const UNLIMITED_DURATION        = -1;
 
     /**
      * A list of assessments available for a category
      *
-     * @param  $category_id
+     * @param      $category_id
      * @param bool $limit
+     *
      * @return array|bool
      */
     public function getList($category_id, $limit = false)
@@ -80,6 +82,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      * Get an introduction to an Assess.
      *
      * @param  $assess_id
+     *
      * @return array|bool
      */
     public function getIntro($assess_id)
@@ -95,23 +98,24 @@ abstract class Evaluation_Main extends DeprecatedModel
      * Loads the summary for the test
      *
      * @param  $assess_id
+     *
      * @return array|bool
      */
     public function getIntroSummary($assess_id)
     {
         $query = "
-			SELECT
-				assess_section.section_id,
-				assess_section.title,
-				assess_section.sequence,
-				assess_section.pool,
-				SUM(IF (assess_question.deleted_at IS NULL AND assess_question.question_id IS NOT NULL, 1, 0)) AS numQuestions
-			FROM assess_section
-			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess_section.assess_id = " . $this->db->smartQuote($assess_id) . "
-			AND assess_section.deleted_at IS NULL
-			GROUP BY assess_section.section_id
-		";
+            SELECT
+                assess_section.section_id,
+                assess_section.title,
+                assess_section.sequence,
+                assess_section.pool,
+                SUM(IF (assess_question.deleted_at IS NULL AND assess_question.question_id IS NOT NULL, 1, 0)) AS numQuestions
+            FROM assess_section
+            LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+            WHERE assess_section.assess_id = " . $this->db->smartQuote($assess_id) . "
+            AND assess_section.deleted_at IS NULL
+            GROUP BY assess_section.section_id
+        ";
 
         return $this->db->getAll($query);
     }
@@ -121,6 +125,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      *
      * @param  $assess_id
      * @param  $page
+     *
      * @return void
      */
     public function renderAssessContents($assess_id, $page)
@@ -133,7 +138,7 @@ abstract class Evaluation_Main extends DeprecatedModel
            */
         $page->setVar('question_block', '');
 
-		$j = 0;
+        $j = 0;
         for ($i = 0, $questionNumber = 1; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
 
@@ -142,11 +147,13 @@ abstract class Evaluation_Main extends DeprecatedModel
             if ($currentQuestion['section_id'] != $currentSection) {
                 $questionNumber = 1;
 
-                $page->setVar(array(
-                    'SECTION_TITLE' => Scrub::text($allQuestions[$i - 1]['title']),
-                    'SECTION_SEQUENCE' => $allQuestions[$i - 1]['sectionSequence'],
-                    'SECTION_SECTION_ID' => $allQuestions[$i - 1]['section_id'],
-                ));
+                $page->setVar(
+                    array(
+                        'SECTION_TITLE'      => Scrub::text($allQuestions[$i - 1]['title']),
+                        'SECTION_SEQUENCE'   => $allQuestions[$i - 1]['sectionSequence'],
+                        'SECTION_SECTION_ID' => $allQuestions[$i - 1]['section_id'],
+                    )
+                );
 
                 $page->parse('section_block', 'section', true);
                 $page->setVar('question_block', '');
@@ -155,22 +162,27 @@ abstract class Evaluation_Main extends DeprecatedModel
             }
 
             /* If section contains a deleted question, $allQuestions query is
-                * empty. So we actually need to include the deleted questions to
-                * get all the sections contained deleted questions.
-                */
+             * empty. So we actually need to include the deleted questions to
+             * get all the sections contained deleted questions.
+             */
 
             /* Put the current Question into a new Section and parse it out. If
              * it's empty, just do nothing
              */
             if ($currentQuestion['questionDeletedAt'] == null) {
                 if (is_numeric($currentQuestion['question_id'])) {
-                    $page->setVar(array(
-						'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
-                        'QUESTION_SEQUENCE' => $questionNumber,
-                        'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-                        'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                        'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
-                    ));
+                    $page->setVar(
+                        array(
+                            'ON_OFF'               => ++$j % 2 ? '' : 'dark',
+                            'QUESTION_SEQUENCE'    => $questionNumber,
+                            'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+                            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                            'QUESTION_MARKS'       =>
+                                floor($currentQuestion['marks']) < $currentQuestion['marks']
+                                    ? $currentQuestion['marks']
+                                    : floor($currentQuestion['marks']),
+                        )
+                    );
 
                     $page->parse('question_block', 'question', true);
 
@@ -179,7 +191,7 @@ abstract class Evaluation_Main extends DeprecatedModel
             }
 
             /* A section with no questions in
-                */
+             */
             if (!is_numeric($currentQuestion['question_id'])) {
                 $page->setVar('question_block', '');
             }
@@ -188,11 +200,13 @@ abstract class Evaluation_Main extends DeprecatedModel
         /* Finally, parse out this Section's info
          */
         if (is_numeric($currentQuestion['section_id'])) {
-            $page->setVar(array(
-                'SECTION_TITLE' => Scrub::text($currentQuestion['title']),
-                'SECTION_SEQUENCE' => $currentQuestion['sectionSequence'],
-                'SECTION_SECTION_ID' => $currentQuestion['section_id'],
-            ));
+            $page->setVar(
+                array(
+                    'SECTION_TITLE'      => Scrub::text($currentQuestion['title']),
+                    'SECTION_SEQUENCE'   => $currentQuestion['sectionSequence'],
+                    'SECTION_SECTION_ID' => $currentQuestion['section_id'],
+                )
+            );
 
             $page->parse('section_block', 'section', true);
         } else {
@@ -205,6 +219,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      * on the create question screens as a table of contents.
      *
      * @param  $assess_id
+     *
      * @return array|bool
      */
     public function getContents($assess_id)
@@ -218,7 +233,7 @@ abstract class Evaluation_Main extends DeprecatedModel
                          type_id,
                          marks,
                          assess_question.sequence AS questionSequence,
-						 assess_question.deleted_at AS questionDeletedAt
+                         assess_question.deleted_at AS questionDeletedAt
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
@@ -234,8 +249,9 @@ abstract class Evaluation_Main extends DeprecatedModel
      *
      * but slightly modified for formatting.
      *
-     * @param  $sec
+     * @param      $sec
      * @param bool $padHours
+     *
      * @return string
      */
     public function sec2hms($sec, $padHours = false)
@@ -286,7 +302,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         preg_match('/(\d+)hrs\ (\d+)min (\d+)sec/', $val, $matches);
 
-        $formatted['hours'] = $matches[1];
+        $formatted['hours']   = $matches[1];
         $formatted['minutes'] = $matches[2];
         $formatted['seconds'] = $matches[3];
 
@@ -296,7 +312,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     /**
      * Finds out if the specified user owns the assessment.
      *
-     * @param $assess_id
+     * @param        $assess_id
      * @param string $user_id
      *
      * @return mixed
@@ -322,12 +338,13 @@ abstract class Evaluation_Main extends DeprecatedModel
      * categories the current user belongs to.
      *
      * @param  $assess_id
+     *
      * @return bool
      */
     public function canDoAssessment($assess_id)
     {
         $groupHandler = new Group();
-        $assess = $this->getByID($assess_id);
+        $assess       = $this->getByID($assess_id);
 
         $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
 
@@ -348,6 +365,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      * Find out whether this assessment has expired.
      *
      * @param  $assess_id
+     *
      * @return bool
      */
     public function isExpired($assess_id)
@@ -370,6 +388,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      * Find out whether this assessment has been deleted.
      *
      * @param  $assess_id
+     *
      * @return bool
      */
     public function isDeleted($assess_id)
@@ -391,7 +410,8 @@ abstract class Evaluation_Main extends DeprecatedModel
     /**
      * Find out if this assess can be started
      *
-     * @param $assess_id
+     * @param  array $assess
+     *
      * @return bool
      */
     public function isOpen($assess)
