@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Scrub
  *
@@ -16,7 +17,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Scrub {
+class Scrub
+{
 
     /**
      * Singleton HTMLPurifier instance used by this class.
@@ -32,12 +34,13 @@ class Scrub {
      * @param  $text
      * @return string
      */
-    static public function text($text) {
+    static public function text($text)
+    {
         //
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
         // are escaped regardless.
-        return htmlentities($text, ENT_IGNORE|ENT_QUOTES, "UTF-8");
+        return htmlentities($text, ENT_IGNORE | ENT_QUOTES, "UTF-8");
     }
 
     /**
@@ -46,7 +49,8 @@ class Scrub {
      * @param  $text
      * @return string
      */
-    static public function xml($text) {
+    static public function xml($text)
+    {
         //
         // Don't think ENT_IGNORE is a problem here.
         // This is used to escape output as text or as an attribute - HTML tags
@@ -61,7 +65,8 @@ class Scrub {
      * @param $html
      * @return string
      */
-    static public function html2text($html) {
+    static public function html2text($html)
+    {
         // 0: replace all text-style block-level elements with newlines
         $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html);
         // 1: remove all remaining tags from input
@@ -72,7 +77,7 @@ class Scrub {
         // Apparently ENT_IGNORE can be unsafe
         // (@see http://unicode.org/reports/tr36/#Deletion_of_Noncharacters)
         // but tags have already been stripped, so this should be fine.
-        $text = htmlentities($text, ENT_IGNORE|ENT_QUOTES, "UTF-8");
+        $text = htmlentities($text, ENT_IGNORE | ENT_QUOTES, "UTF-8");
         // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
         return html_entity_decode($text);
     }
@@ -84,7 +89,8 @@ class Scrub {
      * @param $text
      * @return mixed
      */
-    static public function smartQuotes($text) {
+    static public function smartQuotes($text)
+    {
         $search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
         $replace = array("'", "'", '"', '"', '-');
 
@@ -102,14 +108,15 @@ class Scrub {
      *
      * @return HTMLPurifier
      */
-    public static function getHtmlPurifierInstance() {
+    public static function getHtmlPurifierInstance()
+    {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
 
             $config = HTMLPurifier_Config::createDefault();
 
-			/* http://htmlpurifier.org/phorum/read.php?3,6724
-			 */
-			$config->set('CSS.AllowTricky', true);
+            /* http://htmlpurifier.org/phorum/read.php?3,6724
+             */
+            $config->set('CSS.AllowTricky', true);
 
             $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
             $config->set('AutoFormat.Linkify', true);
@@ -168,15 +175,16 @@ class Scrub {
 
 
             $config->set(
-                'URI.AllowedSchemes', array (
-                    'http' => true,
-                    'https' => true,
-                    'mailto' => true,
-                    'ftp'   => true,
-                    'ed2k' => true,
-                    'magnet' => true,
-                    'feed' => true,
+                'URI.AllowedSchemes', array(
+                    'http'    => true,
+                    'https'   => true,
+                    'mailto'  => true,
+                    'ftp'     => true,
+                    'ed2k'    => true,
+                    'magnet'  => true,
+                    'feed'    => true,
                     'dvcplay' => true,
+                    'data'    => true,
                 )
             );
             //
@@ -184,7 +192,7 @@ class Scrub {
             // HTMLPurifier definition allows.
             // Include modules this way because adding modules doesn't work in a
             // logical manner.
-            $config->set('HTML.DefinitionID',  'HTML + Extended Embeds + Extended Objects');
+            $config->set('HTML.DefinitionID', 'HTML + Extended Embeds + Extended Objects');
             $config->set('HTML.DefinitionRev', 1);
             if ($def = $config->maybeGetRawHTMLDefinition()) {
                 $max = $config->get('HTML.MaxImgLength');
@@ -194,15 +202,15 @@ class Scrub {
                 $embed = $def->addElement(
                     'embed', 'Inline', 'Empty', 'Common',
                     array(
-                        'src*' => 'URI#embedded',
-                        'type' => 'ContentType',
-                        'width' => 'Pixels#' . $max,
-                        'height' => 'Pixels#' . $max,
+                        'src*'              => 'URI#embedded',
+                        'type'              => 'ContentType',
+                        'width'             => 'Pixels#' . $max,
+                        'height'            => 'Pixels#' . $max,
                         'allowscriptaccess' => 'Enum#never',
-                        'allownetworking' => 'Enum#internal',
-                        'flashvars' => 'Text',
-                        'wmode' => 'Enum#window,transparent,opaque',
-                        'name' => 'ID',
+                        'allownetworking'   => 'Enum#internal',
+                        'flashvars'         => 'Text',
+                        'wmode'             => 'Enum#window,transparent,opaque',
+                        'name'              => 'ID',
                     )
                 );
                 $embed->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeEmbed();
@@ -215,10 +223,10 @@ class Scrub {
                     array(
                         // While technically not required by the spec, we're forcing
                         // it to this value.
-                        'type' => 'ContentType',
-                        'width' => 'Pixels#' . $max,
-                        'height' => 'Pixels#' . $max,
-                        'data' => 'URI#embedded',
+                        'type'    => 'ContentType',
+                        'width'   => 'Pixels#' . $max,
+                        'height'  => 'Pixels#' . $max,
+                        'data'    => 'URI#embedded',
                         'classid' => 'Text',
                     )
                 );
@@ -227,13 +235,13 @@ class Scrub {
                 $param = $def->addElement(
                     'param', false, 'Empty', false,
                     array(
-                        'id' => 'ID',
+                        'id'    => 'ID',
                         'name*' => 'Text',
                         'value' => 'Text',
                     )
                 );
                 $param->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeParam();
-                $def->info_injector[]         = new Alaress_HTMLPurifier_Injector_SafeObject();
+                $def->info_injector[] = new Alaress_HTMLPurifier_Injector_SafeObject();
             }
 
             self::$htmlpurifier_instance = new HTMLPurifier($config);
@@ -253,11 +261,12 @@ class Scrub {
      *
      * @return mixed
      */
-    static public function html($html) {
+    static public function html($html)
+    {
         $classname = get_called_class();
         return Alaress\Redis::getInstance()->cacheFunctionCall(
             'scrub.html',
-            function($param) use($classname) {
+            function ($param) use ($classname) {
                 $purifier = call_user_func(array($classname, 'getHtmlPurifierInstance'));
                 return $purifier->purify($param);
             },
