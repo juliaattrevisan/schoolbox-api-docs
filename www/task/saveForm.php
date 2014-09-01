@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
@@ -42,7 +43,11 @@ else {
         foreach ($_POST['id'] as $id) {
             // Ensure that this task is within the requested unit
             /** @var Task $task */
-            $task = TaskMapper::getInstance()->findById($id);
+            try {
+                $task = TaskMapper::getInstance()->findById($id);
+            } catch (MapperException $e) {
+                continue;
+            }
             if ($task->getCategory()->getId() != $category_id) {
                 $permission_denied = true;
                 break;
