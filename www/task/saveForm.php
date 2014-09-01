@@ -21,12 +21,11 @@ $page = new SitePage();
 $category_id = $_POST['category'];
 
 // Shitty permission handling
-$group = new Group();
+$group             = new Group();
 $permission_denied = false;
 if ($group->getPermission($category_id) < WRITE_ACCESS) {
     $permission_denied = true;
-}
-else {
+} else {
     if ($_POST['action'] === 'delete') {
         TaskMapper::getInstance()->delete(
             TaskMapper::getInstance()->findByColumnList(
@@ -36,9 +35,8 @@ else {
                 )
             )
         );
-    }
-    elseif ($_POST['action'] === 'reorder') {
-        $i = 1;
+    } elseif ($_POST['action'] === 'reorder') {
+        $i                 = 1;
         $update_collection = new \Schoolbox\Collection();
         foreach ($_POST['id'] as $id) {
             // Ensure that this task is within the requested unit
@@ -58,19 +56,16 @@ else {
         if (!$permission_denied) {
             TaskMapper::getInstance()->save($update_collection);
         }
-    }
-    else {
+    } else {
         $task_id = $_POST['id'];
         if ($task_id) {
             $task = TaskMapper::getInstance()->findById($task_id);
             $task
                 ->setTitle($_POST['title'])
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
+                ->setRequiresConfirmation(!$_POST['self_assess']);
             $category_id = $task->getCategory()->getId();
-        }
-        else {
+        } else {
             // Make the task and set various fields
             $category_id = $_POST['category'];
             $category    = CategoryMapper::getInstance()->findById($category_id);
@@ -80,8 +75,7 @@ else {
                 ->setTitle($_POST['title'])
                 ->setCategory($category)
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
+                ->setRequiresConfirmation(!$_POST['self_assess']);
         }
         TaskMapper::getInstance()->save($task);
 
@@ -115,8 +109,7 @@ if ($page->detectAjax()) {
     if ($permission_denied) {
         $result['error']   = 403;
         $result['message'] = 'Permission Denied';
-    }
-    else {
+    } else {
         // Load the component that this task was added to.
         /** @var Component_Instance[] $component_list */
         $component_id   = $_POST['component'];
@@ -152,8 +145,7 @@ if ($page->detectAjax()) {
     header(':', true, $result['error']);
     echo json_encode($result);
     exit;
-}
-else {
+} else {
     if ($permission_denied) {
         error(6);
     }
