@@ -20,7 +20,14 @@ if (is_array($_POST['userId']) && count($_POST['userId'])) {
 
         $userMapper->bulkModifyUpdate($user,
             $_POST['apply_defaultcampus'],
-            $_POST['apply_campus']
+            $_POST['apply_campus'],
+            $_POST['apply_role'],
+            $_POST['apply_year'],
+            $_POST['apply_eportfolio'],
+            $_POST['apply_emailfromusername'],
+            $_POST['apply_externalmailclient'],
+            $_POST['apply_webmail'],
+            $_POST['apply_accountenabled']
         );
     }
 }

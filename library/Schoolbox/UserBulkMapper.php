@@ -260,8 +260,25 @@ class UserBulkMapper extends UserMapper {
      * @param $user
      * @param $defaultCampusId
      * @param $allCampusIds
+     * @param $roleId
+     * @param $year
+     * @param $eportfolioEnabled
+     * @param $emailFromUsername
+     * @param $externalMailClient
+     * @param $webmail
+     * @param $enabled
      */
-    public function bulkModifyUpdate($user, $defaultCampusId, $allCampusIds) {
+    public function bulkModifyUpdate($user,
+        $defaultCampusId,
+        $allCampusIds,
+        $roleId,
+        $year,
+        $eportfolioEnabled,
+        $emailFromUsername,
+        $externalMailClient,
+        $webmail,
+        $enabled
+    ) {
 
         /* If a default campus AND a set of campuses were chosen,
          * apply campus updates and then assign the default.
@@ -292,6 +309,52 @@ class UserBulkMapper extends UserMapper {
         else if (count($allCampusIds)) {
             $this->updateCampusInvolvementOnly($user, $allCampusIds);
         }
+
+        /* Update group settings
+         */
+        if ($roleId != $this->getUnchanged()) {
+            $user->setRole($roleId);
+        }
+
+        /* Update year settings
+         */
+        $newYear = trim($year);
+
+        if (strlen($newYear)) {
+            $user->setYear($newYear);
+        }
+
+        /* Update eportfolio settings
+         */
+        if ($eportfolioEnabled != $this->getUnchanged()) {
+            $user->setEportfolioEnable($eportfolioEnabled);
+        }
+
+        /* Update emailFromUsername settings
+         */
+        if ($emailFromUsername != $this->getUnchanged()) {
+            $user->setLocalEmail($emailFromUsername);
+        }
+
+        /* Update externalMailClient settings
+         */
+        if ($externalMailClient != $this->getUnchanged()) {
+            $user->setUseInternalMail($externalMailClient);
+        }
+
+        /* Update webmail settings
+         */
+        if ($webmail != $this->getUnchanged()) {
+            $user->setWebmail($webmail);
+        }
+
+        /* Update enabled settings
+         */
+        if ($enabled != $this->getUnchanged()) {
+            $user->setEnabled($enabled);
+        }
+
+        $this->save($user);
     }
 
     /* Getters/Setters
