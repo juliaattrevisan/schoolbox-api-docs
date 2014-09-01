@@ -16,6 +16,9 @@
             previewsContainer: '.dropzone',
             createImageThumbnails: false,
             parallelUploads: 1,
+            acceptedFiles: null,
+            fallback: noop,
+            forceFallback: false,
 
             // custom handling for dropzone
             navWarning: "You still have files uploading, which will be cancelled if you leave this page.",
@@ -55,7 +58,7 @@
     function FileDrop(element, options) {
 
         // sigh
-        self = this;
+        var self = this;
 
         // setup standard vars
         this.element = element;
@@ -66,6 +69,7 @@
         this._name = plugin;
         this._wrap = $(this.options.wrap);
         this._previewsContainer = $(this.options.previewContainer);
+        this._dragging = [];
 
         // only allow global window listeners once
         if(!$.data(window, 'listening_'+plugin)) {
@@ -91,13 +95,16 @@
         }
 
         // add THIS detect to the window listener
-        $(window).on('dragenter dragend drop dragleave mouseenter', this.detect);
+        $(window).on('dragenter dragend drop dragleave mouseenter', null, this, this.detect);
 
         $(this.element).dropzone({
             clickable: this.options.clickable,
             previewsContainer: this.options.previewsContainer,
             createImageThumbnails: this.options.createImageThumbnails,
             parallelUploads: this.options.parallelUploads,
+            acceptedFiles: this.options.acceptedFiles,
+            fallback: this.options.fallback,
+            forceFallback: this.options.forceFallback,
 
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,
@@ -131,15 +138,82 @@
 
     FileDrop.prototype.detect = function (event) {
         event.preventDefault();
-        if (drag) {
-            self._wrap.addClass(self.options.wrapClass);
-        }
-        else {
+
+        var i,
+            self     = event.data,
+            dragging = [],
+            native   = event.originalEvent;
+
+        // read global state
+        if (!drag) {
+            // no drag operation in progress
             self._wrap.removeClass(self.options.wrapClass);
+
+            for (i = 0; i < self._dragging.length; ++i) {
+                self._wrap.removeClass(self._dragging[i]);
+            }
+
+            self._dragging = [];
+            return;
         }
+
+        // we're dragging files, so add the 'dragging' class
+        self._wrap.addClass(self.options.wrapClass);
+
+        // no datatransfer object available, ignore this
+        if (typeof native.dataTransfer == 'undefined' || native.dataTransfer == null) {
+            return;
+        }
+
+        var dt = native.dataTransfer;
+
+        // don't got files, ignore this
+        if(!containsFiles(native)) {
+            return;
+        }
+
+        // drop event, will be picked up by dropzone
+        if(!(typeof dt.files == 'undefined' || dt.files == null || dt.files.length == 0)) {
+            return;
+        }
+
+        // attempt to read the items array, if data not available, defer back to generic
+        var fileItems = dt.items || [{type: 'unknown/mime'}],
+            mime = '';
+
+        // update wrapper with reference to what we're dragging around
+        for (i = 0; i < fileItems.length || 0; ++i) {
+            mime = 'mime-' + (fileItems[i].type.match(/[^//]+/) || 'binary');
+            self._wrap.addClass(mime);
+            dragging.push(mime);
+        }
+
+        self._dragging = dragging;
+
+//        var accepts;
+//
+//        if (accepts = $(self.element).attr('data-accepts') || '') {
+//            accepts = accepts.split(' ');
+//        } else {
+//            accepts = (self.options.acceptedFiles || '').split(',');
+//        }
+//
+//        for (i = 0; i < accepts.length; ++i) {
+//            accepts[i] = 'mime-' + accepts[i].match(/[^//]+/);
+//        }
+
+
     }
 
     FileDrop.prototype.createTemplate = function(tpl) {
+        var e = $(this.element);
+
+        if(e.find('.dz-preview').length) {
+            var template = outerHTML(e.find('.dz-preview')[0]);
+            e.html('');
+            return template;
+        }
+
         var t = $(tpl);
 
         var isself = t.find('.dz-preview').length ? false : true;
@@ -149,7 +223,7 @@
         e.addClass('dz-file-preview')
             .append($('<div class="dz-details" />')
                 .append($('<div class="dz-filename" />').html('<span data-dz-name></span>'))
-                .append('<img width="16" height="16" src="/images/resources/ajax.gif" />'))
+                .append('<img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" />'))
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 
         if(isself) {
@@ -190,6 +264,22 @@
                 div = null;
                 return h;
             })(node);
+    }
+
+    /**
+     * @see http://css-tricks.com/snippets/javascript/test-if-dragenterdragover-event-contains-files/
+     * @param event
+     * @returns {boolean}
+     */
+    function containsFiles(event) {
+        if (event.dataTransfer.types) {
+            for (var i = 0; i < event.dataTransfer.types.length; i++) {
+                if (event.dataTransfer.types[i] == "Files") {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }(jQuery, window, document, Dropzone));
