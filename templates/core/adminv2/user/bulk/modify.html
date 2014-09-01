@@ -5,6 +5,17 @@
 			key: 'selectall',
 			checkboxName: 'userId[]'
 		});
+
+		$('input[name=deleteUsers]').click(function(event) {
+			event.preventDefault();
+
+			if (confirm('Are you sure you want to delete the selected users?')) {
+				var theForm = $j(this).closest('form');
+
+				theForm.append('<input name="deleteUsers" value="1" />');
+				theForm.submit();
+			}
+		});
 	});
 </script>
 
@@ -226,6 +237,6 @@
 	</table>
 
 	<input name='updateUsers' type="submit" class="submit-btn-plain" value="Apply To Selected" />
-	<input name='deleteUsers' type="submit" class="submit-btn-plain" value="Delete Selected Users" />
+	<input name='deleteUsers' type="button" class="submit-btn-plain" value="Delete Selected Users" />
 </form>
 <!-- END has_results -->
