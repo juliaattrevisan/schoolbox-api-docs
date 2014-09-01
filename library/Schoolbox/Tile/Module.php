@@ -124,8 +124,11 @@ class Module extends BaseModule
                 }
 
                 // Also, this component needs to be a tile grid.
-                $className = 'Schoolbox\\Tile\\Component\\TileController';
-                if ($component->getDefinition()->getClass() != $className) {
+                if (!is_a(
+                    $component->getDefinition()->getClass(),
+                    'Schoolbox\\Tile\\Component\\TileControllerInterface',
+                    true
+                )) {
                     throw new \RuntimeException('Component exists, but is not a tile layout');
                 }
 
