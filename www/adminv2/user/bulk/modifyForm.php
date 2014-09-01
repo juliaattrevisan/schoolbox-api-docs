@@ -10,6 +10,8 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
 
+$page = new SitePage();
+
 if (is_array($_POST['userId']) && count($_POST['userId'])) {
     $userMapper = new \Schoolbox\UserBulkMapper();
 
@@ -22,4 +24,5 @@ if (is_array($_POST['userId']) && count($_POST['userId'])) {
         );
     }
 }
-new \Alaress_Probe($_POST);
+
+$page->localRedir('/adminv2/user/bulk/modify');
