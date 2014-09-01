@@ -167,7 +167,7 @@ abstract class Evaluation_Main extends DeprecatedModel
                     $page->setVar(array(
 						'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
                         'QUESTION_SEQUENCE' => $questionNumber,
-                        'QUESTION_QUESTION' => $currentQuestion['question'],
+                        'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
                         'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
                         'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
                     ));
