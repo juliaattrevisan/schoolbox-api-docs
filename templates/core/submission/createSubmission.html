@@ -91,7 +91,7 @@
         // validation rules
         $j.validator.addMethod("markTypeTotalCheck", function(value, element) {
             if(marktype.total.is(':visible')) {
-                return value != '';
+                return value > 0;
             }
             else {
                 return true;
