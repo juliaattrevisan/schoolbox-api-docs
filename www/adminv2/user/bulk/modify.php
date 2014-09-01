@@ -160,7 +160,7 @@ foreach($allBoolean as $currentAccountEnabled) {
 /* If there were any search results, display control options
  */
 if (!empty($_POST)) {
-    $userMapper = new \Schoolbox\UserMapper();
+    $userMapper = new \Schoolbox\UserBulkMapper();
 
     $allUsers = $userMapper->bulkModifySearch($_POST['search_campus'], $_POST['search_role'], $_POST['search_eportfolio'], $_POST['search_year']);
 

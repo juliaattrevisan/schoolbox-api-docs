@@ -11,7 +11,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
 
 if (is_array($_POST['userId']) && count($_POST['userId'])) {
-    $userMapper = new \Schoolbox\UserMapper();
+    $userMapper = new \Schoolbox\UserBulkMapper();
 
     foreach($_POST['userId'] as $currentUserId) {
         $user = $userMapper->findById($currentUserId);
