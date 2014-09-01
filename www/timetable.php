@@ -54,44 +54,41 @@ if ($groupHandler->isParent()) {
         error(19);
     }
 
-}
-else {
+} else {
     if ($child_id) {
         if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
-			//Output a timetable for each campus user is involved in
-	        $user = $userHandler->getByID($child_id);
-	        $campusList = $userHandler->getUserCampus($child_id);
+            //Output a timetable for each campus user is involved in
+            $user = $userHandler->getByID($child_id);
+            $campusList = $userHandler->getUserCampus($child_id);
 
             /* Don't output if multiple timetables if external campus code is the same */
             $checked_campus_list = array();
-	        foreach($campusList as $campus ) {
+            foreach ($campusList as $campus) {
                 $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
                 if ($campusObj instanceof Schoolbox\Campus) {
                     $campus_code = $campusObj->getExtTimetableCode();
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
 
-		                $user['campus'] = $campus;
+                        $user['campus'] = $campus;
                         $user['campusName'] = $campusObj->getName();
-		                $outputList[] = $user;
+                        $outputList[] = $user;
 
                     }
                 }
-	        }
-        }
-        else {
+            }
+        } else {
             error(19);
         }
-    }
-    else {
-	    //Output a timetable for each campus a staff is involved in
-	    if($groupHandler->isStaff()) {
-	        $user = $userHandler->getByID($_SESSION['id']);
-	        $campusList = $userHandler->getUserCampus($_SESSION['id']);
+    } else {
+        //Output a timetable for each campus a staff is involved in
+        if ($groupHandler->isStaff()) {
+            $user = $userHandler->getByID($_SESSION['id']);
+            $campusList = $userHandler->getUserCampus($_SESSION['id']);
 
             /* Don't output if multiple timetables if external campus code is the same */
             $checked_campus_list = array();
-            foreach($campusList as $campus ) {
+            foreach ($campusList as $campus) {
                 $campusObj = Schoolbox\CampusMapper::getInstance()->findById($campus);
                 if ($campusObj instanceof Schoolbox\Campus) {
                     $campus_code = $campusObj->getExtTimetableCode();
@@ -103,10 +100,9 @@ else {
                     }
                 }
             }
-	    }
-		else {
-			$outputList[] = $userHandler->getByID($_SESSION['id']);
-		}
+        } else {
+            $outputList[] = $userHandler->getByID($_SESSION['id']);
+        }
     }
 }
 
@@ -120,7 +116,7 @@ if (is_array($outputList)) {
 
         $outputUser = array(
             'PERSON' => $userHandler->formatName($user),
-            'YEAR' => $user['year'] ? ', Year ' . $user['year'] : '',
+            'YEAR'   => $user['year'] ? ', Year ' . $user['year'] : '',
         );
         $this->setVar($outputUser);
 
@@ -129,29 +125,28 @@ if (is_array($outputList)) {
         $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
         $dayCurrent = $timetableHandler->getDayNumber($user['campus']);
 
-	    try {
+        try {
             $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
-	    }
-	    catch(\Schoolbox\External\Exception $e) {
-			error(22);
-	    }
+        } catch (\Schoolbox\External\Exception $e) {
+            error(22);
+        }
 
-		$classCount = 0;
+        $classCount = 0;
 
-		/* Find out if the current campus timetable has any classes associated
-		 * with the timetable definition. If not, skip its rendering altogether
-		 */
-		if (is_array($timetable) && count($timetable)) {
-			foreach($timetable as $currentDay) {
-				if (is_array($currentDay['day']) && count($currentDay['day'])) {
-					foreach($currentDay['day'] as $currentPeriod) {
-						if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
-							$classCount++;
-						}
-					}
-				}
-			}
-		}
+        /* Find out if the current campus timetable has any classes associated
+         * with the timetable definition. If not, skip its rendering altogether
+         */
+        if (is_array($timetable) && count($timetable)) {
+            foreach ($timetable as $currentDay) {
+                if (is_array($currentDay['day']) && count($currentDay['day'])) {
+                    foreach ($currentDay['day'] as $currentPeriod) {
+                        if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
+                            $classCount++;
+                        }
+                    }
+                }
+            }
+        }
 
         if (is_array($timetable) && !empty($timetable) && $classCount) {
             $days = count($timetable[1]['day']);
@@ -160,11 +155,10 @@ if (is_array($outputList)) {
             $periodCount = 1;
             //for each period
             foreach ($timetable as $row) {
-                if($row['periodSequence']==1) {
+                if ($row['periodSequence'] == 1) {
                     $is_current_period =
                         $row['periodNumber'] == $periodCurrent['PeriodNumber']
-                        && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']
-                    ;
+                        && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'];
                     $outputPeriodDefinition = array(
                         'PERIOD_NAME'  => $row['periodName'],
                         'PERIOD_START' => $row['periodStart'],
@@ -181,8 +175,7 @@ if (is_array($outputList)) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
                                 $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
-                            }
-                            else {
+                            } else {
                                 $this->setVar('TIMETABLE_CLASS', 'normal');
                             }
                             $this->setVar("DAY_NUMBER", $dayCount);
@@ -190,12 +183,12 @@ if (is_array($outputList)) {
                         }
 
                         $outputPeriod = array(
-                            'PERIOD_DESC' => '',
-                            'PERIOD_CODE' => '',
-                            'PERIOD_ROOM' => '',
-                            'PERIOD_ONCLICK' => '',
-                            'PERIOD_STAFF' => '',
-                            'PERIOD_COLOUR' => '',
+                            'PERIOD_DESC'     => '',
+                            'PERIOD_CODE'     => '',
+                            'PERIOD_ROOM'     => '',
+                            'PERIOD_ONCLICK'  => '',
+                            'PERIOD_STAFF'    => '',
+                            'PERIOD_COLOUR'   => '',
                             'TIMETABLE_CLASS' => '',
                         );
 
@@ -220,7 +213,7 @@ if (is_array($outputList)) {
                                     case 'synergetic':
                                         $period_staff = $userHandler->formatName(
                                             array(
-                                                'title' => $period['staffTitle'],
+                                                'title'    => $period['staffTitle'],
                                                 'lastname' => $period['staffSurname']
                                             )
                                         );
@@ -239,10 +232,10 @@ if (is_array($outputList)) {
                             }
 
                             $outputPeriod = array(
-                                'PERIOD_DESC' => Scrub::Text($period['description']),
-                                'PERIOD_CODE' => '(' . Scrub::Text($period['code']) . ')',
-                                'PERIOD_ROOM' => Scrub::Text($period['room']),
-                                'PERIOD_STAFF' => Scrub::Text($period_staff),
+                                'PERIOD_DESC'   => Scrub::Text($period['description']),
+                                'PERIOD_CODE'   => '(' . Scrub::Text($period['code']) . ')',
+                                'PERIOD_ROOM'   => Scrub::Text($period['room']),
+                                'PERIOD_STAFF'  => Scrub::Text($period_staff),
                                 'PERIOD_COLOUR' => '#' . Scrub::text($subjectColourMap[$period['code']]),
                             );
 
@@ -251,14 +244,13 @@ if (is_array($outputList)) {
                                 $cat = $categoryHandler->getByCode($period['code']);
                                 $catCache[$period['code']] = $cat['id'];
                             }
-                        }
-                        else {
+                        } else {
                             $outputPeriod = array(
-                                'PERIOD_DESC' => '',
-                                'PERIOD_CODE' => '',
-                                'PERIOD_ROOM' => '',
-                                'PERIOD_STAFF' => '',
-                                'PERIOD_URL' => '',
+                                'PERIOD_DESC'   => '',
+                                'PERIOD_CODE'   => '',
+                                'PERIOD_ROOM'   => '',
+                                'PERIOD_STAFF'  => '',
+                                'PERIOD_URL'    => '',
                                 'PERIOD_COLOUR' => '',
                             );
                         }
@@ -287,8 +279,7 @@ if (is_array($outputList)) {
                             $this->setVar('PERIOD_URL', '/homepage/code/' . $period['code']);
                             $this->parse('period_class_link_block', 'period_class_link');
                             $this->setVar('period_class_block', '');
-                        }
-                        else {
+                        } else {
                             $this->setVar('period_class_link_block', '');
                             $this->parse('period_class_block', 'period_class');
                         }
@@ -307,7 +298,7 @@ if (is_array($outputList)) {
             //reset blocks in case we coming back...
             $this->setVar('period_listing', '');
             $this->setVar('day_header_listing', '');
-        } else if($days == 0) {
+        } else if ($days == 0) {
             //In case no timetable has been output for what ever reason
             $this->setVar('timetable_listing', '');
         }
