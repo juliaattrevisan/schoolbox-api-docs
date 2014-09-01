@@ -116,6 +116,7 @@ class Controller extends Base
                 'template' => '@tile/modify.twig',
                 'data'     => array(
                     'item'      => $this->getMapper()->createModel(),
+                    'layout'    => $this->getLayoutFromComponent($component),
                     'component' => $component,
                 ),
             )
