@@ -77,7 +77,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
            */
         if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
             foreach ($currentSection['questions'] as $currentQuestion) {
-                $questionList = $currentQuestion['question'];
+                $questionList = Scrub::html($currentQuestion['question']);
             }
         }
 
