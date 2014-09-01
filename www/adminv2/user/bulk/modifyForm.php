@@ -7,13 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
-
-$page = new SitePage();
-
 if (is_array($_POST['userId']) && count($_POST['userId'])) {
     $userMapper = new \Schoolbox\UserBulkMapper();
+
+    $i = 0;
 
     foreach($_POST['userId'] as $currentUserId) {
         $user = $userMapper->findById($currentUserId);
@@ -29,7 +26,15 @@ if (is_array($_POST['userId']) && count($_POST['userId'])) {
             $_POST['apply_webmail'],
             $_POST['apply_accountenabled']
         );
+
+        $i++;
     }
 }
 
-$page->localRedir('/adminv2/user/bulk/modify');
+/* Show some confirmation stuff
+ */
+$this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modifyResults.html');
+
+$this->setVar(array(
+    'MODIFIED_COUNT' => $i,
+));
