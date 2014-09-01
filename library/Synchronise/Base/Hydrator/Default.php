@@ -25,7 +25,7 @@ class Synchronise_Base_Hydrator_Default implements Synchronise_Base_IHydrator {
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['username']             = $externalUser['NetworkLogin'];
+        $newUser['username']             = isset($externalUser['NetworkLogin']) ? $externalUser['NetworkLogin'] : '';
         $newUser['title']                = '';
         $newUser['firstname']            = '';
         $newUser['lastname']             = '';
