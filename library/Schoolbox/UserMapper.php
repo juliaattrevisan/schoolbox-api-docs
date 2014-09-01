@@ -441,4 +441,51 @@ class UserMapper extends Mapper {
 
         return $userCollection;
     }
+
+    public function bulkModifyUpdate($user, $defaultCampusId, $allCampusIds) {
+
+        /* If a default campus AND a set of campuses were chosen,
+         * apply campus updates and then assign the default.
+         */
+        if (($defaultCampusId != -1) && is_array($allCampusIds) && count($allCampusIds)) {
+
+            /* Clear existing campus
+             */
+            $query = "
+                DELETE FROM userCampus WHERE uid = :userId
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute(array(
+                'userId' => $user->getId()
+            ));
+
+            /* Apply new choices
+             */
+            foreach($allCampusIds as $currentCampusId) {
+                $query = "
+                    INSERT INTO userCampus (uid, campus, defaultCampus)
+                    VALUES (:userId, :campus, :defaultCampus)
+                ";
+
+                $statement = $this->getDatabase()->prepare($query);
+                $statement->execute(array(
+                    'userId' => $user->getId(),
+                    'campus' => $currentCampusId,
+                    'defaultCampus' => $currentCampusId == $defaultCampusId ? 1 : 0
+                ));
+            }
+        }
+        /* If a default campus was chosen, update it
+         */
+        else if ($defaultCampusId != -1) {
+            new \Alaress_Probe('Apply new default campus');
+        }
+
+        /* Otherwise if a set of campuses were chosen, apply campus updates
+         */
+        else if (count($allCampusIds)) {
+            new \Alaress_Probe('Apply new campus involvement');
+        }
+    }
 }

@@ -68,41 +68,43 @@
 <div class="clearfix"></div>
 
 <!-- BEGIN has_results -->
-<h2>Users</h2>
-<table data-users="true" class="table ruler">
-	<colgroup>
-		<col width="50" />
-		<col />
-		<col />
-	</colgroup>
-	<thead>
-		<tr>
-			<th><input type="checkbox" data-selectall="true"></th>
-			<th>Firstname</th>
-			<th>Lastname</th>
-			<th>Campuses</th>
-			<th>Group</th>
-			<th>Year</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN user -->
-		<tr>
-			<td><input name='userId[]' type="checkbox" value="{USER_ID}" /></td>
-			<td>{USER_FIRSTNAME}</td>
-			<td>{USER_LASTNAME}</td>
-			<td>{USER_CAMPUS}</td>
-			<td>{USER_GROUP}</td>
-			<td>{USER_YEAR}</td>
-		</tr>
-		<!-- END user -->
-	</tbody>
-</table>
-
-<div class="clearfix"></div>
-
-<h2>New Values</h2>
 <form action="/adminv2/user/bulk/modifyForm.php?action=update" method="post">
+	<h2>Users</h2>
+
+	<table data-users="true" class="table ruler">
+		<colgroup>
+			<col width="50" />
+			<col />
+			<col />
+		</colgroup>
+		<thead>
+			<tr>
+				<th><input type="checkbox" data-selectall="true"></th>
+				<th>Firstname</th>
+				<th>Lastname</th>
+				<th>Campuses</th>
+				<th>Group</th>
+				<th>Year</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN user -->
+			<tr>
+				<td><input name='userId[]' type="checkbox" value="{USER_ID}" /></td>
+				<td>{USER_FIRSTNAME}</td>
+				<td>{USER_LASTNAME}</td>
+				<td>{USER_CAMPUS}</td>
+				<td>{USER_GROUP}</td>
+				<td>{USER_YEAR}</td>
+			</tr>
+			<!-- END user -->
+		</tbody>
+	</table>
+
+	<div class="clearfix"></div>
+
+	<h2>New Values</h2>
+
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth">
