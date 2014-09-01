@@ -442,27 +442,126 @@ class UserMapper extends Mapper {
         return $userCollection;
     }
 
-    public function bulkModifyUpdate($user, $defaultCampusId, $allCampusIds) {
+    /**
+     * Update defaultCampus only, for this user
+     *
+     * @param $user
+     * @param $defaultCampusId
+     */
+    private function updateDefaultCampusOnly($user, $defaultCampusId) {
 
-        /* If a default campus AND a set of campuses were chosen,
-         * apply campus updates and then assign the default.
+        /* Ensure that the user is involved with the defaultCampus,
+         * in case you select a default campus that the user isn't
+         * currently involved in
          */
-        if (($defaultCampusId != -1) && is_array($allCampusIds) && count($allCampusIds)) {
+        $query = "
+            INSERT IGNORE userCampus (uid, campus, defaultCampus)
+            VALUES (:userId, :campus, :defaultCampusSetting)
+        ";
 
-            /* Clear existing campus
-             */
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'userId' => $user->getId(),
+            'campus' => $defaultCampusId,
+            'defaultCampusSetting' => 0
+        ));
+
+        /* Reset defaultCampus to 0 for all campuses
+         */
+        $query = "
+            UPDATE userCampus
+            SET defaultCampus = :defaultCampusSetting
+            WHERE uid = :userId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'userId' => $user->getId(),
+            'defaultCampusSetting' => 0
+        ));
+
+        /* Apply new choices
+         */
+        $query = "
+            UPDATE userCampus
+            SET defaultCampus = :defaultCampusSetting
+            WHERE uid = :userId
+            AND campus = :defaultCampusId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'userId' => $user->getId(),
+            'defaultCampusId' => $defaultCampusId,
+            'defaultCampusSetting' => 1
+        ));
+    }
+
+    /**
+     * Only update campus involvement, leaving the defaultCampus unchanged
+     * for this user
+     *
+     * @param $user
+     * @param $allCampusIds
+     */
+    private function updateCampusInvolvementOnly($user, $allCampusIds) {
+
+        /* Clear existing campuses that aren't the default
+         */
+        $query = "
+            DELETE FROM userCampus
+            WHERE uid = :userId
+            AND defaultCampus = :defaultCampus
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'userId' => $user->getId(),
+            'defaultCampus' => 0
+        ));
+
+        /* Apply new choices
+         */
+        foreach($allCampusIds as $currentCampusId) {
             $query = "
-                DELETE FROM userCampus WHERE uid = :userId
+                INSERT IGNORE INTO userCampus (uid, campus, defaultCampus)
+                VALUES (:userId, :campus, :defaultCampus)
             ";
 
             $statement = $this->getDatabase()->prepare($query);
             $statement->execute(array(
-                'userId' => $user->getId()
+                'userId' => $user->getId(),
+                'campus' => $currentCampusId,
+                'defaultCampus' => 0
             ));
+        }
+    }
 
-            /* Apply new choices
-             */
-            foreach($allCampusIds as $currentCampusId) {
+    /**
+     * Update defaultCampus and other campus involvement for this user
+     *
+     * @param $user
+     * @param $defaultCampusId
+     * @param $allCampusIds
+     */
+    private function updateAllCampusOptions($user, $defaultCampusId, $allCampusIds) {
+
+        /* Clear existing campus
+         */
+        $query = "
+            DELETE FROM userCampus
+            WHERE uid = :userId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'userId' => $user->getId()
+        ));
+
+        /* Apply new choices (ignore Unchanged option)
+         */
+        foreach($allCampusIds as $currentCampusId) {
+            if ($currentCampusId != -1) {
                 $query = "
                     INSERT INTO userCampus (uid, campus, defaultCampus)
                     VALUES (:userId, :campus, :defaultCampus)
@@ -476,46 +575,45 @@ class UserMapper extends Mapper {
                 ));
             }
         }
-        /* If a default campus was chosen, update it
+    }
+
+    /**
+     * Mass Modify 3
+     *
+     * @param $user
+     * @param $defaultCampusId
+     * @param $allCampusIds
+     */
+    public function bulkModifyUpdate($user, $defaultCampusId, $allCampusIds) {
+
+        /* If a default campus AND a set of campuses were chosen,
+         * apply campus updates and then assign the default.
+         */
+        if (($defaultCampusId != -1) && is_array($allCampusIds) && count($allCampusIds)) {
+            $campusInvolvementUnchanged = in_array(-1, array_values($allCampusIds));
+
+            /* Only update the defaultCampus
+             */
+            if ($campusInvolvementUnchanged) {
+                $this->updateDefaultCampusOnly($user, $defaultCampusId);
+            }
+            /* Update defaultCampus and campus involvement
+             */
+            else {
+                $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
+            }
+        }
+        /* Only update the defaultCampus
          */
         else if ($defaultCampusId != -1) {
-            new \Alaress_Probe('Apply new default campus');
+            $this->updateDefaultCampusOnly($user, $defaultCampusId);
         }
         /* Otherwise if a set of campuses were chosen, apply campus updates
          * defaultCampus, if unchanged, will always persist in campus choices.
          * This results in the defaultCampus + any other new campuses chosen
          */
         else if (count($allCampusIds)) {
-
-            /* Clear existing campuses that aren't the default
-             */
-            $query = "
-                DELETE FROM userCampus
-                WHERE uid = :userId
-                AND defaultCampus = :defaultCampus
-            ";
-
-            $statement = $this->getDatabase()->prepare($query);
-            $statement->execute(array(
-                'userId' => $user->getId(),
-                'defaultCampus' => 0
-            ));
-
-            /* Apply new choices
-             */
-            foreach($allCampusIds as $currentCampusId) {
-                $query = "
-                    INSERT IGNORE INTO userCampus (uid, campus, defaultCampus)
-                    VALUES (:userId, :campus, :defaultCampus)
-                ";
-
-                $statement = $this->getDatabase()->prepare($query);
-                $statement->execute(array(
-                    'userId' => $user->getId(),
-                    'campus' => $currentCampusId,
-                    'defaultCampus' => 0
-                ));
-            }
+            $this->updateCampusInvolvementOnly($user, $allCampusIds);
         }
     }
 }
