@@ -3,7 +3,7 @@
   {CONFIGURATION}
   <div class="dz-wrap">
     <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
-    <ul class="information-list">
+    <ul class="information-list dz-container">
       <!-- BEGIN files -->
       <li class="{ON_OFF} clearfix">
         <!-- BEGIN modify_file -->
@@ -34,30 +34,26 @@
     <!-- BEGIN submit_file -->
     <a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post File</a>
     <a href="/cms/file/multi/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Multiple Files</a>
+    <script type="text/javascript">
+      $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+        wrapClass: 'dragging',
+        previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+        tplWrap: '<li class="dz-preview" />',
+        addedfile: function (file) {
+          $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+        },
+        sending: function (file, xhr, formData) {
+          formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+          formData.append('category', $(file.previewElement).data('node'));
+          formData.append('comment', '');
+          formData.append('hidden', 0);
+        },
+        complete: function (file) {
+          $(file.previewElement).find('img').remove();
+        }
+      });
+    </script>
     <!-- END submit_file -->
   </p>
 
-  <script type="text/javascript">
-      $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-          wrapClass: 'dragging',
-          previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
-          tplWrap: '<li class="dz-preview" />',
-          addedfile: function (file) {
-              $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-          },
-          sending: function (file, xhr, formData) {
-              formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-              formData.append('category', $(file.previewElement).data('node'));
-              formData.append('comment', '');
-              formData.append('hidden', 0);
-          },
-          complete: function (file) {
-              $(file.previewElement).find('img').remove();
-
-              if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                  $('#file-window').find('div.dz-preview:not(.empty)').remove();
-              }
-          }
-      });
-  </script>
 </div>
