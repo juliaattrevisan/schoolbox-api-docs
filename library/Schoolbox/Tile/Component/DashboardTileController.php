@@ -18,7 +18,7 @@ use Schoolbox\User;
 use SitePage;
 use Twig_Environment;
 
-class DashboardTileController extends Component_Dashboard_ControllerAbstract
+class DashboardTileController extends Component_Dashboard_ControllerAbstract implements TileControllerInterface
 {
     /**
      * Deprecated group handler, used for fetching user's permissions

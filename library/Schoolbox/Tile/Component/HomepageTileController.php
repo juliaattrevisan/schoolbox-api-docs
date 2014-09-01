@@ -18,7 +18,7 @@ use Schoolbox\User;
 use SitePage;
 use Twig_Environment;
 
-class HomepageTileController extends Component_Homepage_ControllerAbstract
+class HomepageTileController extends Component_Homepage_ControllerAbstract implements TileControllerInterface
 {
     /**
      * Deprecated group handler, used for fetching user's permissions
