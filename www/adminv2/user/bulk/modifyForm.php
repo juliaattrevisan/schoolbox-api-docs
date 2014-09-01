@@ -7,28 +7,36 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-if (is_array($_POST['userId']) && count($_POST['userId'])) {
-    $userMapper = new \Schoolbox\UserBulkMapper();
+$userMapper = new \Schoolbox\UserBulkMapper();
 
-    $i = 0;
+if (isset($_POST['updateUsers'])) {
+    if (is_array($_POST['userId']) && count($_POST['userId'])) {
+        $i = 0;
 
-    foreach($_POST['userId'] as $currentUserId) {
-        $user = $userMapper->findById($currentUserId);
+        foreach($_POST['userId'] as $currentUserId) {
+            $user = $userMapper->findById($currentUserId);
 
-        $userMapper->bulkModifyUpdate($user,
-            $_POST['apply_defaultcampus'],
-            $_POST['apply_campus'],
-            $_POST['apply_role'],
-            $_POST['apply_year'],
-            $_POST['apply_eportfolio'],
-            $_POST['apply_emailfromusername'],
-            $_POST['apply_externalmailclient'],
-            $_POST['apply_webmail'],
-            $_POST['apply_accountenabled']
-        );
+            $userMapper->bulkModifyUpdate($user,
+                $_POST['apply_defaultcampus'],
+                $_POST['apply_campus'],
+                $_POST['apply_role'],
+                $_POST['apply_year'],
+                $_POST['apply_eportfolio'],
+                $_POST['apply_emailfromusername'],
+                $_POST['apply_externalmailclient'],
+                $_POST['apply_webmail'],
+                $_POST['apply_accountenabled']
+            );
 
-        $i++;
+            $i++;
+        }
     }
+}
+else if (isset($_POST['deleteUsers'])) {
+    $userCollection = $userMapper->findByColumn('id', $_POST['userId']);
+    $userMapper->hardDelete($userCollection);
+
+    $i = $userCollection->count();
 }
 
 /* Show some confirmation stuff
