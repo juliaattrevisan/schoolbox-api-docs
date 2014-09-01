@@ -11601,13 +11601,59 @@ textarea.event-detail {
 
 /* fileDrop.js */
 
+
+
+.dropzone-active() {
+	//		transition:
+	//			opacity          150ms ease-out,
+	//			background-color 150ms ease-out,
+	//			border-color     150ms ease-out,
+	//			z-index            0ms linear 150ms;
+
+	z-index: 2;
+	opacity: 0.7;
+	border-color: #888;
+	background-color: #fff;
+
+	&.dz-drag-hover {
+		z-index: 2;
+		border-color: #383;
+		background-color: #F0FFFA;
+	}
+
+	+ .dz-container {
+		min-height: 48px;
+	}
+}
+
 // is class is applied to the body when the user drags a file over the window
 .dragging {
-	.dropzone {
-		z-index: 2;
-		opacity: 0.7;
-		border-color: #888;
-		background-color: #fff;
+
+	// special multimedia selectors should render as:
+	//   &.mime-image .dropzone[data-accepts~="image"] {...}
+	//   &.mime-audio .dropzone[data-accepts~="audio"] {...}
+	//   &.mime-video .dropzone[data-accepts~="video"] {...}
+
+	// add to this list to filter by more (top-level) mimetypes
+	@mimes: 'image', 'audio', 'video';
+
+	.-(@i: length(@mimes)) when (@i > 0) {
+		@name: e(extract(@mimes, @i));
+
+		// special selectors to only allow certain mimes in certain zones
+		&.mime-@{name} .dropzone[data-accepts~="@{name}"] {
+			.dropzone-active();
+		}
+		.-((@i - 1));
+	} .-;
+
+	&.mime-unknown .dropzone {
+		.dropzone-active();
+	}
+
+	// generic selector
+	.dropzone:not([data-accepts]) {
+		.dropzone-active();
 	}
 	&.debug {
 		.dropzone {
@@ -11619,6 +11665,10 @@ textarea.event-detail {
 
 // this class should be put on any <form> that is to be activated with fileDrop
 .dropzone {
+	transition:
+//		opacity          150ms ease-out,
+		background-color 150ms ease-out,
+		border-color     150ms ease-out;
 	z-index: -1;
 	position: absolute;
 	top: 0;
@@ -11629,11 +11679,6 @@ textarea.event-detail {
 	box-sizing: border-box;
 	border: dashed 2px transparent;
 	opacity: 0.01;
-	&.dz-drag-hover {
-		z-index: 2;
-		border-color: #383;
-		background-color: #F0FFFA;
-	}
 }
 .dz-details img {
 	position: absolute;
@@ -11683,14 +11728,14 @@ textarea.event-detail {
 
 
 /* fileDrop + .information-list */
-.dropzone + .information-list {
-	transition: min-height 150ms ease-out
+.dropzone + .dz-container {
+	transition:
+//		opacity          150ms ease-out,
+//		background-color 150ms ease-out,
+//		border-color     150ms ease-out,
+		min-height       150ms ease-out;
 }
-.dragging .dropzone, .dz-drag-hover {
-	+ .information-list {
-		min-height: 48px;
-	}
-}
+
 .information-list {
 	.dz-preview {
 		height: 24px;
