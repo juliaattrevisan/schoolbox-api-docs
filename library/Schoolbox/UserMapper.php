@@ -481,11 +481,41 @@ class UserMapper extends Mapper {
         else if ($defaultCampusId != -1) {
             new \Alaress_Probe('Apply new default campus');
         }
-
         /* Otherwise if a set of campuses were chosen, apply campus updates
+         * defaultCampus, if unchanged, will always persist in campus choices.
+         * This results in the defaultCampus + any other new campuses chosen
          */
         else if (count($allCampusIds)) {
-            new \Alaress_Probe('Apply new campus involvement');
+
+            /* Clear existing campuses that aren't the default
+             */
+            $query = "
+                DELETE FROM userCampus
+                WHERE uid = :userId
+                AND defaultCampus = :defaultCampus
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute(array(
+                'userId' => $user->getId(),
+                'defaultCampus' => 0
+            ));
+
+            /* Apply new choices
+             */
+            foreach($allCampusIds as $currentCampusId) {
+                $query = "
+                    INSERT IGNORE INTO userCampus (uid, campus, defaultCampus)
+                    VALUES (:userId, :campus, :defaultCampus)
+                ";
+
+                $statement = $this->getDatabase()->prepare($query);
+                $statement->execute(array(
+                    'userId' => $user->getId(),
+                    'campus' => $currentCampusId,
+                    'defaultCampus' => 0
+                ));
+            }
         }
     }
 }
