@@ -9,10 +9,10 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
-$factory = new Survey_Factory();
+$assessHandler   = new Survey_Main();
+$factory         = new Survey_Factory();
 $questionHandler = new Survey_Question();
-$groupHandler = new Group();
+$groupHandler    = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -28,11 +28,19 @@ if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($assess['assess_id'])
+    && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)
+) {
     error(125);
 }
 
-$surveyExporter = new Survey_Export_Graph($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);
+$surveyExporter = new Survey_Export_Graph(
+    $assess,
+    $factory,
+    new Survey_Section(),
+    new Survey_Attempt(),
+    $questionHandler
+);
 $surveyExporter->setLegendHTML(false);
 
 /* Optionally filter by question
@@ -62,7 +70,6 @@ if ($assess['anonymous_result']) {
 $this->setVar('respondent_block', '');
 
 if (is_array($sectionValues) && count($sectionValues)) {
-
     // manual array flip
     if (isset($allLegendItems)) {
         foreach ($allLegendItems as $key => $item) {
@@ -89,18 +96,20 @@ if (is_array($sectionValues) && count($sectionValues)) {
            */
         if (count($currentQuestion['attempts'])) {
             foreach ($currentQuestion['attempts'] as $currentAttempt) {
-                $start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+                $start  = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
                 $finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
-                $this->setVar(array(
-                    'RESPONDENT_NAME' => Scrub::text($currentAttempt['name']),
-                    'RESPONDENT_RESPONSE' => Scrub::text($currentAttempt['responses']),
-                    'RESPONDENT_START_DATETIME' => $start->getShort(),
-                    'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
-                ));
+                $this->setVar(
+                    array(
+                        'RESPONDENT_NAME'            => Scrub::text($currentAttempt['name']),
+                        'RESPONDENT_RESPONSE'        => Scrub::text($currentAttempt['responses']),
+                        'RESPONDENT_START_DATETIME'  => $start->getShort(),
+                        'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
+                    )
+                );
 
                 /* If not using Anonymous Result, set respondent details
-                     */
+                 */
                 if ($assess['anonymous_result']) {
                     $this->setVar('respondent_name_block', '');
                 } else {
@@ -110,18 +119,20 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 $this->parse('respondent_block', 'respondent', true);
 
                 /* Clear children after parsing out the parent
-                     */
+                 */
                 $this->setVar('respondent_name_block', '');
             }
         }
     }
 }
 
-$this->setVar(array(
-    'SURVEY_NAME' => Scrub::text($assess['title']),
-    'SURVEY_ID' => $assess['assess_id'],
-    'QUESTION_QUESTION' => $questionList
-));
+$this->setVar(
+    array(
+        'SURVEY_NAME'       => Scrub::text($assess['title']),
+        'SURVEY_ID'         => $assess['assess_id'],
+        'QUESTION_QUESTION' => $questionList
+    )
+);
 
 
 /**
@@ -129,6 +140,7 @@ $this->setVar(array(
  *
  * @param  $a
  * @param  $b
+ *
  * @return int
  */
 function cmp($a, $b)
