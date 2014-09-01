@@ -82,6 +82,12 @@ class UserBulkMapper extends UserMapper {
             $params['searchYear'] = $searchYear;
         }
 
+        /* Always order by lastname
+         */
+        $query .= "
+            ORDER BY u.lastname
+        ";
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 

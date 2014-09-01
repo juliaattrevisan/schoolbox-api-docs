@@ -177,6 +177,7 @@ if (!empty($_POST)) {
                 'USER_ID' => $currentUser->getId(),
                 'USER_FIRSTNAME' => $currentUser->getFirstname(),
                 'USER_LASTNAME' => $currentUser->getLastname(),
+                'USER_EXTERNAL_ID' => $currentUser->getExternalId(),
                 'USER_CAMPUS' => implode(', ', $campusNames),
                 'USER_GROUP' => $currentUser->getRole()->getName(),
                 'USER_YEAR' => $currentUser->getYear(),
