@@ -92,6 +92,11 @@ class UserMapper extends Mapper {
 				'property'   => 'altEmail',
 				'type'       => Mapper::TYPE_STRING,
 			));
+        $this->hasMap(array(
+                'column'     => 'webmail',
+                'property'   => 'webmail',
+                'type'       => Mapper::TYPE_INTEGER,
+            ));
 
 		$this->hasMap(array(
 				'column'     => 'mail_handler',
