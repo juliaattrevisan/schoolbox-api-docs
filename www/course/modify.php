@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 
 /** @var SitePage $this */
 //list($component_id) = $this->arg;
@@ -54,19 +54,19 @@ $course_list = UnitInstanceMapper::getInstance()->findByColumn(
 
 // block setup (PHPLib sucks)
 $this->setFile(TEMPLATE_content, "course/modify.html");
-$this->setBlock(TEMPLATE_content, 'course',            'course_block');
-$this->setBlock('course',         'course_breadcrumb', 'course_breadcrumb_block');
-$this->setBlock(TEMPLATE_content, 'class_breadcrumb',  'class_breadcrumb_block');
-$this->setBlock(TEMPLATE_content, 'unit',              'unit_block');
+$this->setBlock(TEMPLATE_content, 'course', 'course_block');
+$this->setBlock('course', 'course_breadcrumb', 'course_breadcrumb_block');
+$this->setBlock(TEMPLATE_content, 'class_breadcrumb', 'class_breadcrumb_block');
+$this->setBlock(TEMPLATE_content, 'unit', 'unit_block');
 $this->setBlock('unit', 'task', 'task_block');
 
 $this->setVar(
     array(
-        'class_breadcrumb_block'  => '',
-        'course_block'            => '',
-        'HOMEPAGE_ID'             => '',
-        'COURSE_HOMEPAGE_ID'      => '',
-        'COMPONENT_ID'            => Scrub::text($component_id),
+        'class_breadcrumb_block' => '',
+        'course_block'           => '',
+        'HOMEPAGE_ID'            => '',
+        'COURSE_HOMEPAGE_ID'     => '',
+        'COMPONENT_ID'           => Scrub::text($component_id),
     )
 );
 
@@ -76,7 +76,7 @@ $homepage_path = CategoryMapper::getInstance()->findParents($homepage);
 $homepage_path->add($homepage);
 foreach ($homepage_path as $parent) {
     /** @var Category $parent */
-    $this->setVar('CLASS_CATEGORY_ID',   Scrub::text($parent->getId()));
+    $this->setVar('CLASS_CATEGORY_ID', Scrub::text($parent->getId()));
     $this->setVar('CLASS_CATEGORY_NAME', Scrub::text($parent->getName()));
     $this->parse('class_breadcrumb_block', 'class_breadcrumb', true);
 }
@@ -113,7 +113,7 @@ foreach ($course_list as $unit) {
 
     // Now, finally show the breadcrumb.
     foreach (CategoryMapper::getInstance()->findParents($unitCategory, $courseBaseHomepage) as $parent) {
-        $this->setVar('COURSE_CATEGORY_ID',   Scrub::text($parent->getId()));
+        $this->setVar('COURSE_CATEGORY_ID', Scrub::text($parent->getId()));
         $this->setVar('COURSE_CATEGORY_NAME', Scrub::text($parent->getName()));
         $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
     }
@@ -121,7 +121,7 @@ foreach ($course_list as $unit) {
 }
 
 $this->setVar('unit_block', '');
-$count = 0;
+$count                   = 0;
 $displayed_category_list = array();
 foreach ($course_list as $unit) {
     $unit_id = $unit->getId();
