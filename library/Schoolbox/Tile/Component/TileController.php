@@ -40,11 +40,6 @@ class TileController extends Component_Homepage_ControllerAbstract
     protected $templateEngine;
 
     /**
-     * @var array[Collection|Booking\Model[]]
-     */
-    protected $bookings;
-
-    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
