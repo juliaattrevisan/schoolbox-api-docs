@@ -35,7 +35,7 @@ foreach($allCampuses as $currentCampus) {
     $this->setVar(array(
         'SEARCH_CAMPUS_ID' => $currentCampus->getId(),
         'SEARCH_CAMPUS_NAME' => $currentCampus->getName(),
-        'SEARCH_CAMPUS_SELECTED' => ($currentCampus->getId() == $_POST['search_campus']) ? 'selected="selected"' : '',
+        'SEARCH_CAMPUS_SELECTED' => ($currentCampus->getId() == $_POST['search_campus']) && isset($_POST['search_campus']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_campus_block', 'search_campus', true);
@@ -68,7 +68,7 @@ foreach($allRoles as $currentRole) {
     $this->setVar(array(
         'SEARCH_ROLE_ID' => $currentRole->getId(),
         'SEARCH_ROLE_NAME' => $currentRole->getName(),
-        'SEARCH_ROLE_SELECTED' => ($currentRole->getId() == $_POST['search_role']) ? 'selected="selected"' : '',
+        'SEARCH_ROLE_SELECTED' => ($currentRole->getId() == $_POST['search_role']) && isset($_POST['search_role']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_role_block', 'search_role', true);
@@ -103,10 +103,11 @@ $allBoolean = new \Schoolbox\Collection(array(
 /* A whole bunch of boolean options
  */
 foreach($allBoolean as $currentEportfolio) {
+
     $this->setVar(array(
         'SEARCH_EPORTFOLIO_ID' => $currentEportfolio['key'],
         'SEARCH_EPORTFOLIO_NAME' => $currentEportfolio['label'],
-        'SEARCH_EPORTFOLIO_SELECTED' => ($currentEportfolio['key'] == $_POST['search_eportfolio']) ? 'selected="selected"' : '',
+        'SEARCH_EPORTFOLIO_SELECTED' => ($currentEportfolio['key'] == $_POST['search_eportfolio']) && isset($_POST['search_eportfolio']) ? 'selected="selected"' : '',
     ));
 
     $this->parse('search_eportfolio_block', 'search_eportfolio', true);
