@@ -22,7 +22,7 @@ $j(function() {
 			/* Collate the usual fields containing ids.
 			 * Collate the checkboxes too but append all the possibilities as well!
 			 */
-			if (questionBank == undefined) {
+			if (typeof questionBank == "undefined") {
 				var data = {
 					section_id: theForm.find('input[name=section_id]').val(),
 					question_id: theForm.find('input[name=question_id]').val(),

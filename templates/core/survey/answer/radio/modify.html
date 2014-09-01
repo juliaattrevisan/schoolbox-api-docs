@@ -40,7 +40,7 @@
 				/* Collate the usual fields containing ids.
 				 * Collate the checkboxes too but append all the possibilities as well!
 				 */
-				if (questionBank == undefined) {
+				if (typeof questionBank == "undefined") {
 					var data = {
 						question:tinyMCE.get('question').getContent(),
 						question_id:theForm.find('input[name=question_id]').val(),
