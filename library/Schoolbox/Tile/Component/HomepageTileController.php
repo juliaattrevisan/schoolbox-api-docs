@@ -1,8 +1,6 @@
 <?php
 /**
- * Tile component
- *
- * Uses Twig for output instead of the PHPLib suckfest.
+ * Tile component for homepage
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -20,7 +18,7 @@ use Schoolbox\User;
 use SitePage;
 use Twig_Environment;
 
-class TileController extends Component_Homepage_ControllerAbstract
+class HomepageTileController extends Component_Homepage_ControllerAbstract
 {
     /**
      * Deprecated group handler, used for fetching user's permissions
@@ -111,6 +109,7 @@ class TileController extends Component_Homepage_ControllerAbstract
         // Schoolbox\Application\WebRequest\Kernel.
         // Therefore I have to do this PHPLib/Twig hybrid thing.
         $this->setBlock($templateHandle, 'header', 'header_block');
+        $this->setBlock($templateHandle, 'config', 'config_block');
         $this->setBlock($templateHandle, 'buttons', 'buttons_block');
 
         // Load content into Twig
@@ -129,6 +128,7 @@ class TileController extends Component_Homepage_ControllerAbstract
             array(
                 'COMPONENT_CONTENT' => $content,
                 'header_block'      => '',
+                'config_block'      => '',
                 'buttons_block'     => '',
             )
         );
@@ -138,6 +138,7 @@ class TileController extends Component_Homepage_ControllerAbstract
         );
         if ($permission >= WRITE_ACCESS) {
             $this->parse('header_block', 'header');
+            $this->parse('config_block', 'config');
             $this->parse('buttons_block', 'buttons');
         }
         return true;
