@@ -175,49 +175,41 @@ setupCustomise = {
 				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
 			});
 
-            var is_colorpicker_present = ($j('#picker').length > 0);
-            var colorpicker            = null;
-            //
-            // Return early if colorpicker is not there, because none of this
-            // does anything.
-            if (is_colorpicker_present) {
-                colorpicker = $j.farbtastic('#picker');
-                colorpicker.setColor("#b6b6ff");
-            }
-            else {
-                return;
-            }
-
-			$j('#top_head_font').parent().addClass('active-box');
+			// Set up current color
+			$j('.selected').removeClass('selected');
+			$j('.active-box').removeClass('active-box');
+			$j('#top_head_font').addClass('selected').parent().addClass('active-box');
 			var instantColour = new tinycolor($j('#top_head_font').css('background-color'));
 			var initialColour = instantColour.toHexString();
-			$j('#currentColour').css('background-color',initialColour);
-			$j('#currentColour').val(initialColour);
-			checkTextColour();
 
-			colorpicker.linkTo(onColorChange);
-
-			$j('#currentColour').keyup(function() {
-				colorpicker.setColor($j(this).val());
-			});
+			// Set up colorpicker
+			var is_colorpicker_present = ($j('#picker').length > 0);
+			var colorpicker            = null;
+			if (is_colorpicker_present) {
+				colorpicker = $j('#picker').spectrum({
+					showPalette: false,
+					showSelectionPalette: false,
+					showButtons: false,
+					showAlpha: false,
+					showInitial: true,
+					showInput: true,
+					flat: true,
+					clickoutFiresChange: true,
+					preferredFormat: "hex",
+					color: initialColour,
+					change: onColorChange,
+					move: onColorChange
+				});
+			} else {
+				return;
+			}
 
 			function h2d(h) {return parseInt(h,16);}
 
-			function checkTextColour() {
-				var currentColour = $j('#currentColour').val().substr(1);
-					if (h2d(currentColour) < 4473924) {
-					$j('#currentColour').css('color', '#ffffff');
-				} else {
-					$j('#currentColour').css('color', '#000000');
-				};
-			};
-
-			function onColorChange(color) {
-				checkTextColour();
+			function onColorChange(colorObject) {
+				var color = '#'+colorObject.toHex();
 				var current = $j('.selected');
 				current.css('background-color', color);
-				$j('#currentColour').val(color);
-				$j('#currentColour').css('background-color', color);
 				pickers[current.attr('ID')] = color;
 				setupCustomise.updateColor(current.attr('ID'), color)
 			}
@@ -233,9 +225,7 @@ setupCustomise = {
 
 				var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
 
-				colorpicker.setColor(color.toHexString());
-				checkTextColour()
-				return false;
+				colorpicker.spectrum('set', '#'+color.toHexString());
 			});
 
             // copy top colours to left/right
