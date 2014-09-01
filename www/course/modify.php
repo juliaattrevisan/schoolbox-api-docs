@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /** @var SitePage $this */
 //list($component_id) = $this->arg;
@@ -98,8 +99,13 @@ foreach ($course_list as $unit) {
     $unitCategoryIdList[$unitCategoryId] = $unitCategoryId;
 
     // Find the course for this unit, and show its breadcrumb if it isn't shown
-    $unitCategory = CategoryMapper::getInstance()->findById($unitCategoryId);
-    $courseId     = $unitCategory->getParent()->getId();
+    // I am not showing anything if this category doesn't exist
+    try {
+        $unitCategory = CategoryMapper::getInstance()->findById($unitCategoryId);
+    } catch (MapperException $e) {
+        continue;
+    }
+    $courseId = $unitCategory->getParent()->getId();
     if (array_key_exists($courseId, $courseIdList)) {
         continue;
     }
@@ -119,7 +125,15 @@ $count = 0;
 $displayed_category_list = array();
 foreach ($course_list as $unit) {
     $unit_id = $unit->getId();
-    $unit->setUnitCategory(CategoryMapper::getInstance()->findById($unit->getUnitCategory()->getId()));
+    try {
+        $unit->setUnitCategory(
+            CategoryMapper::getInstance()->findById(
+                $unit->getUnitCategory()->getId()
+            )
+        );
+    } catch (MapperException $e) {
+        continue;
+    }
     $displayed_category_list[$unit->getUnitCategory()->getId()] = true;
     $this->setVar(
         array(
