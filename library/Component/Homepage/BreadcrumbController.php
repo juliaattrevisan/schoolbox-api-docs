@@ -28,7 +28,17 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext('id');
 
         if ($categoryId > 0) {
-            $this->category = CategoryMapper::getInstance()->findById($categoryId);
+            try {
+                $this->category = CategoryMapper::getInstance()->findById($categoryId);
+            } catch (Exception $e) {
+                // if alternate source cannot be found revert to yourself
+                try {
+                    $this->category = CategoryMapper::getInstance()->findById($this->getContext('id'));
+                }
+                catch (Exception $e) {
+                    return false;
+                }
+            }
         }
     }
 
