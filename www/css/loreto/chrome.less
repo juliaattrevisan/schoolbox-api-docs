@@ -130,9 +130,7 @@
           width: 245px;
           height: 19px;
           background: #fff;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          border-radius: 3px;
+          .border-radius(3px);
           -webkit-box-shadow: inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
           -moz-box-shadow:    inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
           box-shadow:         inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
@@ -164,20 +162,8 @@
             -moz-border-radius-topright: 3px;
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
-
-            -webkit-box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);
-            -moz-box-shadow:    0px -4px 6px 0px rgba(0, 0, 0, 0.1);
-            box-shadow:         0px -4px 6px 0px rgba(0, 0, 0, 0.1);
-
-            background: #fff1bd; /* Old browsers */
-            background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZjFiZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmU4OTUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-            background: -moz-linear-gradient(top,  #fff1bd 0%, #ffe895 100%); /* FF3.6+ */
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fff1bd), color-stop(100%,#ffe895)); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(top,  #fff1bd 0%,#ffe895 100%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(top,  #fff1bd 0%,#ffe895 100%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(top,  #fff1bd 0%,#ffe895 100%); /* IE10+ */
-            background: linear-gradient(to bottom,  #fff1bd 0%,#ffe895 100%); /* W3C */
-            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fff1bd', endColorstr='#ffe895',GradientType=0 ); /* IE6-8 */
+            .box-shadow(0px, -4px, 6px, rgba(0, 0, 0, 0.1));
+            .gradient(#fff1bd, #ffe895);
 
           }
         }
@@ -198,10 +184,7 @@
       padding: 8px 15px;
       height: 16px;
       line-height: 16px;
-
-      -webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
-      -moz-box-shadow:    0px 0px 3px 0px rgba(0, 0, 0, 0.1);
-      box-shadow:         0px 0px 3px 0px rgba(0, 0, 0, 0.1);
+      .box-shadow(0px, 0px, 3px, rgba(0, 0, 0, 0.1));
 
       -webkit-border-top-left-radius: 3px;
       -webkit-border-top-right-radius: 3px;
@@ -210,14 +193,7 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
 
-      background: #fffbef; /* Old browsers */
-      background: -moz-linear-gradient(top,  #fffbef 0%, #fff6db 100%); /* FF3.6+ */
-      background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fffbef), color-stop(100%,#fff6db)); /* Chrome,Safari4+ */
-      background: -webkit-linear-gradient(top,  #fffbef 0%,#fff6db 100%); /* Chrome10+,Safari5.1+ */
-      background: -o-linear-gradient(top,  #fffbef 0%,#fff6db 100%); /* Opera 11.10+ */
-      background: -ms-linear-gradient(top,  #fffbef 0%,#fff6db 100%); /* IE10+ */
-      background: linear-gradient(to bottom,  #fffbef 0%,#fff6db 100%); /* W3C */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fffbef', endColorstr='#fff6db',GradientType=0 ); /* IE6-8 */
+      .gradient(#fffbef, #fff6db);
     }
 
   ul{
@@ -225,10 +201,7 @@
     border: 1px solid #e5e5e5;
     margin: 0 15px;
     top: -1px;
-
-    -webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow:    0px 0px 3px 0px rgba(0, 0, 0, 0.1);
-    box-shadow:         0px 0px 3px 0px rgba(0, 0, 0, 0.1);
+    .box-shadow(0px, 0px, 3px, rgba(0, 0, 0, 0.1));
 
     -webkit-border-bottom-left-radius: 3px;
     -webkit-border-bottom-right-radius: 3px;
@@ -243,15 +216,14 @@
   }
 }
 
+.cal-bubble h3{ color: @black; }
+
 body{
   background: url('/images/loreto/crest.png') 1% 99% no-repeat;
 
   #container{
     margin-left: 232px;
-
-    -webkit-box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow:    0px 0px 6px 0px rgba(0, 0, 0, 0.3);
-    box-shadow:         0px 0px 6px 0px rgba(0, 0, 0, 0.3);
+    .box-shadow(0px, 0px, 6px, rgba(0, 0, 0, 0.3));
 
     .box{
       a.edit,
@@ -264,19 +236,11 @@ body{
         min-height: 28px;
         line-height: 28px;
 
-        -webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.3);
-        -moz-box-shadow:    0px 0px 3px 0px rgba(0, 0, 0, 0.3);
-        box-shadow:         0px 0px 3px 0px rgba(0, 0, 0, 0.3);
-
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
-
+        .box-shadow(0px, 0px, 3px, rgba(0, 0, 0, 0.3));
+        .border-radius(3px);
         .gradient (#d4eeff, @module-background);
       }
     }
-
-    .cal-bubble h3{ color: @black; }
 
     .admin-nav{
       li a{ color: @link; }
