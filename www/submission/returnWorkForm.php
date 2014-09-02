@@ -43,10 +43,9 @@ $file = $_FILES['file'];
 /* Crocodoc uuid, to view return independently of submission
  */
 if (isset($_POST['crocodoc'])) {
-	$crocodoc = $_POST['crocodoc']['uuid'];
-}
-else {
-	$crocodoc = null;
+    $crocodoc = $_POST['crocodoc']['uuid'];
+} else {
+    $crocodoc = null;
 }
 
 /* A url to visit after submitting
@@ -67,25 +66,23 @@ $returnedWork = $returnedWorkFactory->start();
 /* Deal with crocodoc specifically
  */
 if (isset($_POST['crocodoc'])) {
-	try {
-		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-		$submission = $submissionMapper->findById($_POST['crocodoc']['submissionId']);
+    try {
+        $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+        $submission = $submissionMapper->findById($_POST['crocodoc']['submissionId']);
 
-		/* Feed it a returnedWork record to which the downloaded file
-		 * should be attached
-		 */
-		$downloader = new Crocodoc\Download($submission, $returnedWork);
-		$downloader->start();
-	}
-	catch(\Exception $e) {
-	}
+        /* Feed it a returnedWork record to which the downloaded file
+         * should be attached
+         */
+        $downloader = new Crocodoc\Download($submission, $returnedWork);
+        $downloader->start();
+    } catch (\Exception $e) {
+    }
 }
 
 /* Go to St. Albans when finished
  */
 if ($redirect) {
     $page->localRedir($redirect);
-}
-else {
+} else {
     echo "data stored";
 }

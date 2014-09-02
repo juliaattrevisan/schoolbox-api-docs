@@ -36,13 +36,13 @@ $currentStudent = $userMapper->findById($currentUid);
 /* Augment navigation data
  */
 $currentAugmented = array(
-	'currentStudent' => $currentStudent,
-	'submission' => null,
-	'navigation' => array(
-		'id' => $currentStudent->getId(),
-		'label' => $currentStudent->getLastname() . ', ' . $currentStudent->getFirstname(),
-		'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent->getId()
-	),
+    'currentStudent' => $currentStudent,
+    'submission' => null,
+    'navigation' => array(
+        'id' => $currentStudent->getId(),
+        'label' => $currentStudent->getLastname() . ', ' . $currentStudent->getFirstname(),
+        'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent->getId()
+    ),
 );
 
 /* Trim out only this student
@@ -52,20 +52,20 @@ $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission
 /* Load a specific submission for this box/person
  */
 if (is_numeric($this->arg[2])) {
-	$submission = $submissionMapper->findById($this->arg[2]);
+    $submission = $submissionMapper->findById($this->arg[2]);
 
-	if ($submission) {
+    if ($submission) {
 
-		/* Apply mime type
-		 */
-		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-		$mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
-		$submission->setMimetype($mime);
+        /* Apply mime type
+         */
+        $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+        $mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
+        $submission->setMimetype($mime);
 
-		/* Stack it
-		 */
-		$currentAugmented['submission'] = $submission;
-	}
+        /* Stack it
+         */
+        $currentAugmented['submission'] = $submission;
+    }
 }
 
 /* Rendering things out
@@ -73,7 +73,7 @@ if (is_numeric($this->arg[2])) {
 $user = $userMapper->findById($submission->getOwner()->getId());
 
 if ($currentAugmented['submission'] != null) {
-	$submissionId = $currentAugmented['submission']->getId();
+    $submissionId = $currentAugmented['submission']->getId();
 }
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
@@ -84,10 +84,12 @@ $templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['subm
 $renderer = $templateFactory->produce();
 $renderer->render();
 
-$this->setVar(array(
-	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
-	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
-	'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
-	'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
-	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
-));
+$this->setVar(
+    array(
+        'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
+        'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
+        'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
+        'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
+        'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+    )
+);
