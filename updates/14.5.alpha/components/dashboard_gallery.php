@@ -7,31 +7,27 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $definition = array(
-	'name'               => 'Twitter',
+	'name'               => 'Image Gallery',
 	'module'             => 'dashboard',
 	'component_category' => null,
-	'class'              => 'Component_Dashboard_TwitterController',
-	'description'        => 'Completely configurable image display, select the image, control the size and link to another location',
+	'class'              => 'Component_Dashboard_ImageGalleryController',
+	'description'        => 'Show a grid of image thumbnails sourced from the files uploaded into the Resource Browser.',
 	'multiple'           => 'true',
 	'config'             => array(
 		'componentname' => array(
-			'default_value' => 'Twitter',
+			'default_value' => 'Image Gallery',
 			'label' => 'Heading',
 		),
 		'size' => array(
-			'default_value' => '3',
+			'default_value' => '10',
 			'label' => 'Limit',
 		),
-		'keywords' => array(
-			'default_value' => '',
-			'label' => 'Hashtag',
-		),
-		'username' => array(
-			'default_value' => '',
-			'label' => 'Author',
+		'src' => array(
+			'default_value' => '200',
+			'label' => 'Source',
 		),
 	),
 );

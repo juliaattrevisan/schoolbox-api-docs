@@ -7,27 +7,35 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $definition = array(
-	'name'               => 'Image Gallery',
-	'module'             => 'dashboard',
+	'name'               => 'Video',
+	'module'             => 'eportfolio',
 	'component_category' => null,
-	'class'              => 'Component_Dashboard_ImageGalleryController',
-	'description'        => 'Show a grid of image thumbnails sourced from the files uploaded into the Resource Browser.',
+	'class'              => 'Component_Eportfolio_VideoController',
+	'description'        => 'Upload and play videos directly in your ePortfolio',
 	'multiple'           => 'true',
 	'config'             => array(
 		'componentname' => array(
-			'default_value' => 'Image Gallery',
+			'default_value' => 'Video',
 			'label' => 'Heading',
 		),
 		'size' => array(
 			'default_value' => '10',
 			'label' => 'Limit',
 		),
-		'src' => array(
-			'default_value' => '200',
-			'label' => 'Source',
+		'eportfolioVideo' => array(
+			'default_value' => '',
+			'label' => 'Video',
+		),
+		'sort' => array(
+			'default_value' => 'date',
+			'label' => 'Sort By',
+		),
+		'sortdir' => array(
+			'default_value' => 'desc',
+			'label' => 'Direction',
 		),
 	),
 );
