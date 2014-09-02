@@ -81,7 +81,6 @@ $user = $userHandler->getByID($attempt['user_id']);
 $this->setFile(TEMPLATE_content, 'assess/review.html');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
-$this->setBlock('question', 'writable_update', 'writable_update_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
@@ -128,7 +127,6 @@ if ($allQuestions) {
         /* Reset answer options and marks from previous iteration
          */
         $this->setVar('answerOption_block', '');
-        $this->setVar('writable_update_block', '');
         $this->setVar('writable_comment_block', '');
         $this->setVar('writable_mark_block', '');
         $this->setVar('readonly_comment_block', '');
@@ -164,7 +162,6 @@ if ($allQuestions) {
             $this->parse('readonly_mark_block',    'readonly_mark');
         }
         else {
-            $this->parse('writable_update_block',  'writable_update');
             $this->parse('writable_comment_block', 'writable_comment');
             $this->parse('writable_mark_block',    'writable_mark');
         }
