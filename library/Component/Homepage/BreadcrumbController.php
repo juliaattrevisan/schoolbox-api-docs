@@ -8,7 +8,8 @@
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
-class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
+{
 
 
     /**
@@ -22,13 +23,21 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
      *
      * @return void
      */
-    public function execute() {
-
-
+    public function execute()
+    {
         $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext('id');
 
         if ($categoryId > 0) {
-            $this->category = CategoryMapper::getInstance()->findById($categoryId);
+            try {
+                $this->category = CategoryMapper::getInstance()->findById($categoryId);
+            } catch (Exception $e) {
+                // if alternate source cannot be found revert to yourself
+                try {
+                    $this->category = CategoryMapper::getInstance()->findById($this->getContext('id'));
+                } catch (Exception $e) {
+                    return false;
+                }
+            }
         }
     }
 
@@ -37,8 +46,9 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'breadcrumb')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'breadcrumb')) {
             return false;
         }
         $this->parseConfig();
@@ -50,13 +60,13 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
 
             foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
                 /** @var Category $parent */
-                $this->setVar('BREADCRUMB_CATEGORY_ID',   $parent->getId());
+                $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
                 $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());
                 $this->setVar('BREADCRUMB_CATEGORY_CLASS', '');
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             }
 
-            $this->setVar('BREADCRUMB_CATEGORY_ID',   $this->category->getId());
+            $this->setVar('BREADCRUMB_CATEGORY_ID', $this->category->getId());
             $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->category->getName());
             $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
             $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
