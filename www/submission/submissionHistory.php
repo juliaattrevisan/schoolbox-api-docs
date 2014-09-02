@@ -21,6 +21,7 @@ $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock('returned_work', 'return_file','return_file_block');
+$this->setBlock('return_file', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
@@ -574,7 +575,6 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 
 /* Detect returned work
  */
-
 if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
@@ -595,6 +595,29 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
         'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
         'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
     ));
+
+    /* If there's a crocodoc document, display a link to it
+     */
+    if ($return->getUuid()) {
+        try {
+            $associatedSubmission = $submit_mapper->findOneByColumn('uuid', $return->getUuid());
+
+            $this->setVar(array(
+                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
+                ));
+        }
+        catch (\Exception $e) {
+            error(44);
+        }
+
+        $this->parse('return_file_uuid_block', 'return_file_uuid');
+    }
+    else {
+        $this->setVar(array(
+                'RETURNED_WORK_SUBMISSION_ID' => '',
+                'return_file_uuid_block' => '',
+            ));
+    }
 
     if ($return->getFilename() && !$parentOnly) {
         $this->parse('return_file_block', 'return_file');

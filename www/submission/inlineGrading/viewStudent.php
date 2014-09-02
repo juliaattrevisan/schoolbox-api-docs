@@ -75,7 +75,7 @@ $user = $userMapper->findById($this->arg[1]);
 if ($currentAugmented['submission'] != null) {
 	$submissionId = $currentAugmented['submission']->getId();
 }
-var_dump($this->arg);
+
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
 
 /* Render injectable views
