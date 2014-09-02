@@ -8,168 +8,218 @@
  */
 
 namespace Schoolbox;
+
 use Schoolbox;
 
-class UserMapper extends Mapper {
+class UserMapper extends Mapper
+{
 
-	protected function mapping () {
+    protected function mapping()
+    {
 
-		$this->hasTable('user');
-		$this->hasModel('\Schoolbox\User');
+        $this->hasTable('user');
+        $this->hasModel('\Schoolbox\User');
 
-		$this->hasMap(array(
-				'column'     => 'id',
-				'property'   => 'id',
-				'type'       => Mapper::TYPE_INTEGER,
-				'identifier' => true
-			));
+        $this->hasMap(
+            array(
+                'column' => 'id',
+                'property' => 'id',
+                'type' => Mapper::TYPE_INTEGER,
+                'identifier' => true
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'username',
-				'property'   => 'username',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'username',
+                'property' => 'username',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'password',
-				'property'   => 'password',
-				'type'       => Mapper::TYPE_STRING,
-			));
-
-
-		$this->hasMap(array(
-				'column'     => 'title',
-				'property'   => 'title',
-				'type'       => Mapper::TYPE_STRING,
-			));
-
-		$this->hasMap(array(
-				'column'     => 'firstname',
-				'property'   => 'firstname',
-				'type'       => Mapper::TYPE_STRING,
-			));
-
-		$this->hasMap(array(
-				'column'     => 'lastname',
-				'property'   => 'lastname',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'password',
+                'property' => 'password',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
 
-		$this->hasMap(array(
-				'column'     => 'synergy_id',
-				'property'   => 'externalId',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'title',
+                'property' => 'title',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'year',
-				'property'   => 'year',
-				'type'       => Mapper::TYPE_INTEGER,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'firstname',
+                'property' => 'firstname',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'house',
-				'property'   => 'schoolHouse',
-				'type'       => Mapper::TYPE_INTEGER,
-			));
-
-		$this->hasMap(array(
-				'column' => 'residential_house_id',
-				'property' => 'residentialHouse',
-				'type' => Mapper::TYPE_INTEGER,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'lastname',
+                'property' => 'lastname',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
 
-		$this->hasMap(array(
-				'column'     => 'local_email',
-				'property'   => 'localEmail',
-				'type'       => Mapper::TYPE_BOOLEAN,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'synergy_id',
+                'property' => 'externalId',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'alt_email',
-				'property'   => 'altEmail',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'year',
+                'property' => 'year',
+                'type' => Mapper::TYPE_INTEGER,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'mail_handler',
-				'property'   => 'useInternalMail',
-				'type'       => Mapper::TYPE_INTEGER,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'house',
+                'property' => 'schoolHouse',
+                'type' => Mapper::TYPE_INTEGER,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'hash',
-				'property'   => 'hash',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'residential_house_id',
+                'property' => 'residentialHouse',
+                'type' => Mapper::TYPE_INTEGER,
+            )
+        );
 
-		$this->hasMap(array(
-				'column'     => 'key',
-				'property'   => 'key',
-				'type'       => Mapper::TYPE_STRING,
-			));
 
-		$this->hasMap(array(
-				'column'     => 'eportfolio_enabled',
-				'property'   => 'eportfolioEnable',
-				'type'       => Mapper::TYPE_STRING,
-			));
+        $this->hasMap(
+            array(
+                'column' => 'local_email',
+                'property' => 'localEmail',
+                'type' => Mapper::TYPE_BOOLEAN,
+            )
+        );
 
-		$this->hasMap(array(
-			'column'     => 'group_id',
-			'property'   => 'role',
-			'type'       => Mapper::TYPE_MODEL,
-			'join'       => 'role',
-		));
+        $this->hasMap(
+            array(
+                'column' => 'alt_email',
+                'property' => 'altEmail',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column' => 'webmail',
+                'property' => 'webmail',
+                'type' => Mapper::TYPE_INTEGER,
+            )
+        );
 
-		$this->hasMap(array(
-			'column'     => 'enabled',
-			'property'   => 'enabled',
-			'type'       => Mapper::TYPE_BOOLEAN,
-		));
+        $this->hasMap(
+            array(
+                'column' => 'mail_handler',
+                'property' => 'useInternalMail',
+                'type' => Mapper::TYPE_INTEGER,
+            )
+        );
 
-		//
-		// Boarder leave field is only there if the boarder leave module is
-		// enabled.
-		$this_object = $this;
-		$this->hasMap(array(
-			'column'   => 'boarding_status',
-			'property' => 'boardingStatus',
-			'type'     => self::TYPE_STRING,
-			'enabled'  => function() use ($this_object) {
-				return $this_object->getConfigLoader()->get('boarder_leave_enabled');
-			}
-		));
-		unset($this_object);
+        $this->hasMap(
+            array(
+                'column' => 'hash',
+                'property' => 'hash',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$this->hasJoin(
-			'role',
-			array(
-				'mapper'    => '\\Schoolbox\\RoleMapper',
-				'this_key'  => 'group_id',
-				'other_key' => 'id',
-			)
-		);
-		$this->hasJoin(
-			'userAccess',
-			array(
-				'mapper'    => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
-				'this_key'  => 'id',
-				'other_key' => 'uid',
-				'multiple'  => true,
-			)
-		);
-	}
+        $this->hasMap(
+            array(
+                'column' => 'key',
+                'property' => 'key',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-	public function findById($id) {
+        $this->hasMap(
+            array(
+                'column' => 'eportfolio_enabled',
+                'property' => 'eportfolioEnable',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
 
-		$user = false;
-		$roleMapper = new RoleMapper;
-		$campusMapper = new CampusMapper;
+        $this->hasMap(
+            array(
+                'column' => 'group_id',
+                'property' => 'role',
+                'type' => Mapper::TYPE_MODEL,
+                'join' => 'role',
+            )
+        );
 
-		$statement = $this->database->prepare( "
+        $this->hasMap(
+            array(
+                'column' => 'enabled',
+                'property' => 'enabled',
+                'type' => Mapper::TYPE_BOOLEAN,
+            )
+        );
+
+        //
+        // Boarder leave field is only there if the boarder leave module is
+        // enabled.
+        $this_object = $this;
+        $this->hasMap(
+            array(
+                'column' => 'boarding_status',
+                'property' => 'boardingStatus',
+                'type' => self::TYPE_STRING,
+                'enabled' => function () use ($this_object) {
+                        return $this_object->getConfigLoader()->get('boarder_leave_enabled');
+                    }
+            )
+        );
+        unset($this_object);
+
+        $this->hasJoin(
+            'role',
+            array(
+                'mapper' => '\\Schoolbox\\RoleMapper',
+                'this_key' => 'group_id',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'userAccess',
+            array(
+                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+                'this_key' => 'id',
+                'other_key' => 'uid',
+                'multiple' => true,
+            )
+        );
+    }
+
+    public function findById($id)
+    {
+
+        $user = false;
+        $roleMapper = new RoleMapper;
+        $campusMapper = new CampusMapper;
+
+        $statement = $this->database->prepare(
+            "
 			SELECT {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
 					{$roleMapper->getColumnString('g')},
 					{$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`
@@ -179,84 +229,87 @@ class UserMapper extends Mapper {
 			LEFT JOIN superusers su ON su.id = u.id
 			LEFT JOIN luCampus c ON c.id = uc.`campus`
 			WHERE u.id = ?
-			" );
+			"
+        );
 
-		$statement->execute(array($id));
+        $statement->execute(array($id));
 
-		/** @var User $user */
-		foreach( $statement as $row ) {
-			if (!($user instanceof User)) {
-				$user = $this->hydrate($row, 'u');
-				$user->setSuperUser($row['u.superuser'] == 1);
-				$user->setRole($roleMapper->hydrate($row, 'g'));
-				$user->setAccessList(
-					$this->getJoinMapper('userAccess')
-						->findByColumn('uid', $user->getId())
-				);
-			}
+        /** @var User $user */
+        foreach ($statement as $row) {
+            if (!($user instanceof User)) {
+                $user = $this->hydrate($row, 'u');
+                $user->setSuperUser($row['u.superuser'] == 1);
+                $user->setRole($roleMapper->hydrate($row, 'g'));
+                $user->setAccessList(
+                    $this->getJoinMapper('userAccess')
+                        ->findByColumn('uid', $user->getId())
+                );
+            }
 
-			$campus = $campusMapper->hydrate($row, 'c');
+            $campus = $campusMapper->hydrate($row, 'c');
 
-			/* If the campus object has no id, then it spawned a campus
-			 * object from nonexistent data (e.g. a user with no campus)
-			 * In this case, the campus object will be totally empty but
-			 * still occupy slots in the user's campus collection stack
-			 */
-			if ($campus->getId()) {
-				$user->getCampusCollection()->add($campus);
+            /* If the campus object has no id, then it spawned a campus
+             * object from nonexistent data (e.g. a user with no campus)
+             * In this case, the campus object will be totally empty but
+             * still occupy slots in the user's campus collection stack
+             */
+            if ($campus->getId()) {
+                $user->getCampusCollection()->add($campus);
 
-                if($row['uc.defaultCampus'] == 1) {
+                if ($row['uc.defaultCampus'] == 1) {
                     $user->setDefaultCampus($campus);
                 }
-			}
+            }
 
 
-		}
-		if (!($user instanceof User)) {
-			throw new Schoolbox\Mapper\Exception('Instance of object not found');
-		}
-		return $user;
-	}
+        }
+        if (!($user instanceof User)) {
+            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $user;
+    }
 
 
-	/**
-	 * Fetches the user, and all of the user's subjects.
-	 *
-	 * @throws Schoolbox\Mapper\Exception if user wasn't found
-	 * @param  int $id
-	 * @return \Schoolbox\User
-	 */
-	public function findWithSubjects($id) {
-		$statement = $this->database->prepare(
-			"SELECT {$this->getColumnString('u')} FROM {$this->table} AS u WHERE u.id=?"
-		);
-		$statement->execute(array($id));
+    /**
+     * Fetches the user, and all of the user's subjects.
+     *
+     * @throws Schoolbox\Mapper\Exception if user wasn't found
+     * @param  int $id
+     * @return \Schoolbox\User
+     */
+    public function findWithSubjects($id)
+    {
+        $statement = $this->database->prepare(
+            "SELECT {$this->getColumnString('u')} FROM {$this->table} AS u WHERE u.id=?"
+        );
+        $statement->execute(array($id));
 
-		if ($row = $statement->fetch()) {
-			$user = $this->hydrate($row, 'u');
-			//
-			// Set subject collection here.
-			$subject_mapper = new External\SubjectMapper();
-			$user->setSubjectCollection($subject_mapper->findAllForStudent($user));
-			return $user;
-		}
-		throw new Schoolbox\Mapper\Exception();
-	}
+        if ($row = $statement->fetch()) {
+            $user = $this->hydrate($row, 'u');
+            //
+            // Set subject collection here.
+            $subject_mapper = new External\SubjectMapper();
+            $user->setSubjectCollection($subject_mapper->findAllForStudent($user));
+            return $user;
+        }
+        throw new Schoolbox\Mapper\Exception();
+    }
 
-	/**
-	 * Find all the users which match $name and are in group_id array $permittedValues
-	 *
-	 * @param $name
-	 * @param $permittedValues
-	 * @return Schoolbox\Collection
-	 */
-	public function findByNameAndGroup($name, $permittedValues) {
-		$collection = new Schoolbox\Collection();
-		$roleMapper = new RoleMapper();
+    /**
+     * Find all the users which match $name and are in group_id array $permittedValues
+     *
+     * @param $name
+     * @param $permittedValues
+     * @return Schoolbox\Collection
+     */
+    public function findByNameAndGroup($name, $permittedValues)
+    {
+        $collection = new Schoolbox\Collection();
+        $roleMapper = new RoleMapper();
 
-		$permittedValuesSql = implode(',', $permittedValues);
+        $permittedValuesSql = implode(',', $permittedValues);
 
-		$query = "
+        $query = "
 			SELECT
 				{$this->getColumnString('u')},
 				{$roleMapper->getColumnString('g')}
@@ -266,44 +319,46 @@ class UserMapper extends Mapper {
 			AND group_id IN ({$permittedValuesSql})
         ";
 
-		$statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
 
-		$statement->execute(array("%$name%", "%$name%"));
+        $statement->execute(array("%$name%", "%$name%"));
 
-		foreach ($statement as $row) {
-			$user = $this->hydrate($row, 'u');
-			$user->setRole($roleMapper->hydrate($row, 'g'));
+        foreach ($statement as $row) {
+            $user = $this->hydrate($row, 'u');
+            $user->setRole($roleMapper->hydrate($row, 'g'));
 
-			$collection->add($user);
-		}
+            $collection->add($user);
+        }
 
-		return $collection;
-	}
+        return $collection;
+    }
 
-	/**
-	 * Fetches a single user ID, for use by GizaUser_DataMapper.
-	 *
-	 * This is to be @deprecated when the whole User object is stored in the
-	 * session, but has been added for now because it's injection safe (unlike
-	 * the Giza mappers)
-	 *
-	 * @param string $username
-	 * @return int
-	 */
-	public function getIdForUsername($username) {
-		$query = "SELECT `id` FROM `{$this->getTable()}` WHERE `username` = :username";
-		$statement = $this->database->prepare($query);
-		$statement->bindValue('username', $username, \PDO::PARAM_STR);
-		$statement->execute();
-		return $statement->fetchColumn();
-	}
+    /**
+     * Fetches a single user ID, for use by GizaUser_DataMapper.
+     *
+     * This is to be @deprecated when the whole User object is stored in the
+     * session, but has been added for now because it's injection safe (unlike
+     * the Giza mappers)
+     *
+     * @param string $username
+     * @return int
+     */
+    public function getIdForUsername($username)
+    {
+        $query = "SELECT `id` FROM `{$this->getTable()}` WHERE `username` = :username";
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('username', $username, \PDO::PARAM_STR);
+        $statement->execute();
+        return $statement->fetchColumn();
+    }
 
     /**
      * Get a user object stub, for when a user does not exist
      *
      * @return User
      */
-    public function getUnknownUser() {
+    public function getUnknownUser()
+    {
         $user = new User;
         $user->setLastname('Unknown User');
         return $user;
@@ -313,16 +368,17 @@ class UserMapper extends Mapper {
      * Retrieves all users who have the given level of access (or higher) to the
      * requested service.
      *
-     * @param  int $service           The service level. A UserAccess::SERVICE_*
+     * @param  int $service The service level. A UserAccess::SERVICE_*
      *                                constant.
-     * @param  int $accessLevel       The access level. A UserAccess::ACCESS_*
+     * @param  int $accessLevel The access level. A UserAccess::ACCESS_*
      *                                constant.
      * @param  int $serviceIdentifier If provided, the campus or homepage that
      *                                $service is for.
      * @return Collection|User[] A list of users who have this level of access
      *                           to the given service.
      */
-    public function findByAccess($service, $accessLevel, $serviceIdentifier = null) {
+    public function findByAccess($service, $accessLevel, $serviceIdentifier = null)
+    {
         $query = "
             SELECT DISTINCT {$this->getColumnString('u')}
             FROM {$this->getTable()} u
@@ -331,7 +387,7 @@ class UserMapper extends Mapper {
             AND ua.type >=:accessLevel
         ";
         $params = array(
-            'service'     => $service,
+            'service' => $service,
             'accessLevel' => $accessLevel,
         );
         if (isset($serviceIdentifier)) {
