@@ -100,8 +100,8 @@ class External_Maze_Class implements External_ClassInterface {
 			foreach($allStudents as $currentStudent) {
 				$student = array(
 					'synergy_id' => $currentStudent['ID'],
-					'lastname' => $currentStudent['Firstname'],
-					'firstname' => $currentStudent['Surname'],
+					'firstname' => $currentStudent['Firstname'],
+					'lastname' => $currentStudent['Surname'],
 					'yearlevel' => $currentStudent['YearLevel'],
 					'house' => $currentStudent['House'],
 					'StudentMedicalAlert' => $currentStudent['MedicalAlert'],
