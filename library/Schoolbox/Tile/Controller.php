@@ -97,10 +97,19 @@ class Controller extends Base
             }
         }
 
-        // and redirect back to the homepage
-        $this->getResponse()->redirect->afterPost(
-            '/homepage/'.$component->getIdentifier()
-        );
+        // and redirect back to wherever
+        switch ($component->getModule()) {
+            case 'dashboard':
+                $href = '/adminv2/dashboard#'.$component->getIdentifier();
+                break;
+            case 'homepage_template':
+                $href = '/adminv2/homepage#'.$component->getIdentifier();
+                break;
+            case 'homepage':
+            default:
+                $href = '/homepage/'.$component->getIdentifier();
+        }
+        $this->getResponse()->redirect->afterPost($href);
     }
 
     /**
