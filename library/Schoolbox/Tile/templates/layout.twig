@@ -274,6 +274,10 @@
            value="Save"
            class="submit-btn-plain"
     />
-    {# Link depends on identifier #}
-    <a href="/homepage/{{ component.identifier }}" class="btn no-icon float-left"><span></span>Cancel</a>
+    {# Link depends on module and identifier #}
+
+    <a href="{% if component.module == 'dashboard' %}/{% else %}/homepage/{{ component.identifier }}{% endif %}"
+       class="btn no-icon float-left">
+        <span></span>Cancel
+    </a>
 </form>
