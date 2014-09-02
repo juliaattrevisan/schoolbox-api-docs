@@ -1,9 +1,36 @@
 <h1>Results</h1>
 
 <p>
-	{MODIFIED_COUNT} users were modified.
+	{MODIFIED_COUNT} users were processed.
 </p>
+
+<!-- BEGIN has_users -->
+<table class="table ruler">
+	<colgroup>
+		<col width="150" />
+		<col />
+		<col />
+	</colgroup>
+	<thead>
+		<tr>
+			<th>External ID</th>
+			<th>Firstname</th>
+			<th>Lastname</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- BEGIN user -->
+		<tr>
+			<td>{USER_EXTERNAL_ID}</td>
+			<td>{USER_FIRSTNAME}</td>
+			<td>{USER_LASTNAME}</td>
+		</tr>
+		<!-- END user -->
+	</tbody>
+</table>
+<!-- END has_users -->
 
 <p>
 	<a href="/adminv2/user/bulk/modify" class="submit-btn-plain">Back to Search</a>
 </p>
+
