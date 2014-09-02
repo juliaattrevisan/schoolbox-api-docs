@@ -16,7 +16,6 @@ use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
-use Twig_Environment;
 
 class HomepageTileController extends Component_Homepage_ControllerAbstract implements TileControllerInterface
 {
@@ -36,11 +35,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      * @var TileControllerDelegate
      */
     protected $delegate;
-
-    /**
-     * @var Twig_Environment
-     */
-    protected $templateEngine;
 
     /**
      * Injectable constructor
