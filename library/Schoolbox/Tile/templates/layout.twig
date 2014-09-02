@@ -275,9 +275,12 @@
            class="submit-btn-plain"
     />
     {# Link depends on module and identifier #}
-
-    <a href="{% if component.module == 'dashboard' %}/{% else %}/homepage/{{ component.identifier }}{% endif %}"
-       class="btn no-icon float-left">
-        <span></span>Cancel
-    </a>
+    {% if component.module == 'dashboard' %}
+        {% set href='/adminv2/dashboard#'~component.identifier %}
+    {% elseif component.module == 'homepage_template' %}
+        {% set href='/adminv2/homepage#'~component.identifier %}
+    {% else %}
+        {% set href='/homepage/'~component.identifier %}
+    {% endif %}
+    <a href="{{ href|e('html_attr') }}" class="btn no-icon float-left"><span></span>Cancel</a>
 </form>
