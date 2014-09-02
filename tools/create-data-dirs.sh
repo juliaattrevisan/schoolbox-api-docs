@@ -35,6 +35,6 @@ mkdir -p $datadir/cache/stream/socialstream/thumbnails
 mkdir -p $datadir/cache/submission_upload
 
 # Create logs files so they have the correct perms SB-5193
-touch $datadir/cache/logs/{sys,notif,db,sb,syn,admin,login,cms,cmd.sched,cmd.digest}.log
+touch $datadir/cache/logs/{sys,notif,db,sb,syn,admin,login,cms,cmd.sched,cmd.digest,audit}.log
 
 # End of script

@@ -13,6 +13,12 @@ $modified = new \Schoolbox\Collection();
 
 if (isset($_POST['updateUsers'])) {
     if (is_array($_POST['userId']) && count($_POST['userId'])) {
+        $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
+
+        $userMapper->log($message);
+
+        /* Modify each user
+         */
         foreach ($_POST['userId'] as $currentUserId) {
             $user = $userMapper->findById($currentUserId);
 

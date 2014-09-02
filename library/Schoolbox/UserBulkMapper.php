@@ -11,6 +11,7 @@
 namespace Schoolbox;
 
 use Schoolbox;
+use \Alaress\Lumberjack\Logger;
 
 class UserBulkMapper extends UserMapper
 {
@@ -317,20 +318,17 @@ class UserBulkMapper extends UserMapper
              */
             if ($campusInvolvementUnchanged) {
                 $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Update defaultCampus and campus involvement
+            } /* Update defaultCampus and campus involvement
              */
             else {
                 $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
             }
-        }
-        /* Only update the defaultCampus
+        } /* Only update the defaultCampus
          */
         else {
             if ($defaultCampusId != $this->getUnchanged()) {
                 $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Otherwise if a set of campuses were chosen, apply campus updates
+            } /* Otherwise if a set of campuses were chosen, apply campus updates
              * defaultCampus, if unchanged, will always persist in campus choices.
              * This results in the defaultCampus + any other new campuses chosen
              */
@@ -386,6 +384,25 @@ class UserBulkMapper extends UserMapper
         }
 
         $this->save($user);
+
+        /* Logging for Samuel
+         */
+        $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) modified user {$user->getFullname()} ({$user->getId()})";
+
+        $this->log($message);
+    }
+
+    /**
+     * Log to file
+     *
+     * @param $message
+     */
+    public function log($message)
+    {
+        $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
+
+        $log = new Logger($file, null, 200, array(), true);
+        $log->info($message);
     }
 
     /* Getters/Setters
