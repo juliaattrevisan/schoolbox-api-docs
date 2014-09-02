@@ -318,17 +318,20 @@ class UserBulkMapper extends UserMapper
              */
             if ($campusInvolvementUnchanged) {
                 $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            } /* Update defaultCampus and campus involvement
+            }
+            /* Update defaultCampus and campus involvement
              */
             else {
                 $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
             }
-        } /* Only update the defaultCampus
+        }
+        /* Only update the defaultCampus
          */
         else {
             if ($defaultCampusId != $this->getUnchanged()) {
                 $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            } /* Otherwise if a set of campuses were chosen, apply campus updates
+            }
+            /* Otherwise if a set of campuses were chosen, apply campus updates
              * defaultCampus, if unchanged, will always persist in campus choices.
              * This results in the defaultCampus + any other new campuses chosen
              */
