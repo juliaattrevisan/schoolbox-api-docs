@@ -244,6 +244,10 @@
      * @returns {each|*}
      */
     $.fn[plugin] = function(options) {
+        if(!Dropzone.isBrowserSupported()) {
+            return this;
+        }
+
         return this.each(function() {
             if(!$.data(this, 'plugin_' + plugin) && $(this).is('form')) {
                 $.data(this, 'plugin_' + plugin, new FileDrop(this, options));
