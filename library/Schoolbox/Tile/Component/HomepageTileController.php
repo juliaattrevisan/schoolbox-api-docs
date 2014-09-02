@@ -109,7 +109,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         // Schoolbox\Application\WebRequest\Kernel.
         // Therefore I have to do this PHPLib/Twig hybrid thing.
         $this->setBlock($templateHandle, 'header', 'header_block');
-        $this->setBlock($templateHandle, 'config', 'config_block');
         $this->setBlock($templateHandle, 'buttons', 'buttons_block');
 
         // Load content into Twig
@@ -138,7 +137,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         );
         if ($permission >= WRITE_ACCESS) {
             $this->parse('header_block', 'header');
-            $this->parse('config_block', 'config');
             $this->parse('buttons_block', 'buttons');
         }
         return true;
