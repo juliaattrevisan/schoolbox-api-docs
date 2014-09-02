@@ -34,10 +34,9 @@ class None extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-		/* Upload file
- 		 */
-		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
-		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+		/* Upload File
+		 */
+		$this->parseInjectableUpload();
 
 		/* Control how Return Work is done
 		 */

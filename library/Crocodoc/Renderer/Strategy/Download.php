@@ -63,10 +63,9 @@ class Download extends Base {
 
 		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-		/* Upload file
+		/* Upload File
 		 */
-		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
-		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+		$this->parseInjectableUpload();
 
 		/* Control how Return Work is done
 		 */
@@ -82,7 +81,7 @@ class Download extends Base {
 		$isStaff = $_SESSION['user']->getRole()->isStaff();
 		$isOwner = $this->getSubmission()->getOwner()->getId() == $_SESSION['user']->getId();
 
-		if ($isStaff || ($isOwner && Config::get('plagscan_student_visible'))) {
+		if ($isStaff || ($isOwner && \Config::get('plagscan_student_visible'))) {
 
 			// retrieve plagiarism score, if available
 			$docMapper = \Plagscan_DocumentMapper::getInstance();

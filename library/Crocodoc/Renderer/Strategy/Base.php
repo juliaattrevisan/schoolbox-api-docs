@@ -10,6 +10,9 @@
 
 namespace Crocodoc\Renderer\Strategy;
 
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\File\MimetypeMapper;
 
 abstract class Base {
 
@@ -26,6 +29,13 @@ abstract class Base {
 	 * @var null
 	 */
 	protected $submission = null;
+
+	/**
+	 * Returned work
+	 *
+	 * @var null
+	 */
+	protected $returnedWork = null;
 
 	/**
 	 * An array of previous, current and next students
@@ -59,13 +69,23 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+	 * @param Submission $submission
+	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission = null, $navigationElements) {
+	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
+		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
+
+        /* Fetch mimetype
+         */
+        if (($this->getReturnedWork() != null) && strlen($this->getReturnedWork()->getMimetype()->getMime())) {
+            $mimetypeMapper = new MimetypeMapper();
+            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWork()->getMimeType()->getMime());
+            $this->getReturnedWork()->setMimetype($mime);
+        }
 	}
 
 	/**
@@ -74,6 +94,42 @@ abstract class Base {
 	 * @return mixed
 	 */
 	abstract public function render();
+
+	/**
+	 * Parse the Upload File injectable
+	 */
+	protected function parseInjectableUpload() {
+		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
+		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
+
+		if ($this->getReturnedWork() !== null) {
+			$returnDate = new \Alaress_Date_Relative($this->getReturnedWork()->getReturned(), 'U');
+
+            if ($this->getReturnedWork()->getFilename() != null) {
+                $this->getPage()->setVar(array(
+                    'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
+                    'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
+                    'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
+                    'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
+                    'MOST_RECENT_RETURN_FILE_DATE'  => $returnDate->getRelativeTime(),
+                ));
+
+                $this->getPage()->parse('returned_work_block', 'returned_work');
+            }
+            else {
+                $this->getPage()->setVar(array(
+                    'returned_work_block' => ''
+                ));
+            }
+		}
+		else {
+			$this->getPage()->setVar(array(
+				'returned_work_block' => ''
+			));
+		}
+
+		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+	}
 
 	/**
 	 * Determine what the next person's url is
@@ -202,5 +258,23 @@ abstract class Base {
 	 */
 	protected function getUploadFile() {
 		return $this->uploadFile;
+	}
+
+	/**
+	 * Set returned work
+	 *
+	 * @param null $returnedWork
+	 */
+	protected function setReturnedWork($returnedWork) {
+		$this->returnedWork = $returnedWork;
+	}
+
+	/**
+	 * Get returned work
+	 *
+	 * @return null
+	 */
+	protected function getReturnedWork() {
+		return $this->returnedWork;
 	}
 }
