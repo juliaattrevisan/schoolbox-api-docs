@@ -140,13 +140,17 @@ class Module extends BaseModule
         );
 
         // All routes: look up homepage from component
+        // (if this component belongs to the homepage!)
         $matcher->add(
             '/^tile\\.(?:add|create|layout|layoutForm|edit|update)$/',
             function ($params) use ($catMapper) {
                 // augment params with homepage from category
-                return array(
-                    'homepage' => $catMapper->findById($params['component']->getIdentifier()),
-                );
+                if ($params['component']->getModule() == 'homepage') {
+                    return array(
+                        'homepage' => $catMapper->findById($params['component']->getIdentifier()),
+                    );
+                }
+                return array();
             }
         );
     }
@@ -161,18 +165,26 @@ class Module extends BaseModule
     {
         // Layouts are editable by anyone with write permission on the homepage.
         // If it's a subject, this could include people involved in subject.
+        // For dashboards: the homepage rules don't apply, therefore only
+        // superusers may edit dashboard tiles
         $rule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_WRITE,
                 function ($params) {
+                    if ($params['component']->getModule() != 'homepage') {
+                        throw new \Exception('homepage permission does not apply to dashboard tiles');
+                    }
                     return $params['homepage']->getId();
                 }
             ),
             new Rule\IsTeacherOfClass(
                 $this->getExternalDb(),
                 function ($params) {
+                    if ($params['component']->getModule() != 'homepage') {
+                        throw new \Exception('homepage permission does not apply to dashboard tiles');
+                    }
                     return $params['homepage'];
                 }
             )
