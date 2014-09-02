@@ -389,19 +389,31 @@ class UserBulkMapper extends UserMapper
          */
         $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) modified user {$user->getFullname()} ({$user->getId()})";
 
-        $this->log($message);
+        $data = array(
+            $defaultCampusId,
+            $allCampusIds,
+            $roleId,
+            $year,
+            $eportfolioEnabled,
+            $emailFromUsername,
+            $externalMailClient,
+            $webmail,
+            $enabled
+        );
+
+        $this->log($message, $data);
     }
 
     /**
      * Log to file
      *
-     * @param $message
+     * @param $data
      */
-    public function log($message)
+    public function log($message, $data)
     {
         $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
 
-        $log = new Logger($file, null, 200, array(), true);
+        $log = new Logger($file, null, 200, $data, true);
         $log->info($message);
     }
 
