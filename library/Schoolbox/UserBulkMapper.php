@@ -9,9 +9,11 @@
  */
 
 namespace Schoolbox;
+
 use Schoolbox;
 
-class UserBulkMapper extends UserMapper {
+class UserBulkMapper extends UserMapper
+{
 
     /**
      * Value of "Unchanged" option
@@ -29,7 +31,8 @@ class UserBulkMapper extends UserMapper {
      * @param $searchYear
      * @return \Schoolbox\Collection
      */
-    public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear) {
+    public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear)
+    {
         $roleMapper = new RoleMapper();
         $campusMapper = new CampusMapper();
 
@@ -93,7 +96,7 @@ class UserBulkMapper extends UserMapper {
 
         $userCollection = new Collection();
 
-        foreach($statement as $row) {
+        foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
             $user->setRole($roleMapper->hydrate($row, 'g'));
 
@@ -131,7 +134,8 @@ class UserBulkMapper extends UserMapper {
      * @param $user
      * @param $defaultCampusId
      */
-    private function updateDefaultCampusOnly($user, $defaultCampusId) {
+    private function updateDefaultCampusOnly($user, $defaultCampusId)
+    {
 
         /* Ensure that the user is involved with the defaultCampus,
          * in case you select a default campus that the user isn't
@@ -143,11 +147,13 @@ class UserBulkMapper extends UserMapper {
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'userId' => $user->getId(),
-            'campus' => $defaultCampusId,
-            'defaultCampusSetting' => 0
-        ));
+        $statement->execute(
+            array(
+                'userId' => $user->getId(),
+                'campus' => $defaultCampusId,
+                'defaultCampusSetting' => 0
+            )
+        );
 
         /* Reset defaultCampus to 0 for all campuses
          */
@@ -158,10 +164,12 @@ class UserBulkMapper extends UserMapper {
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'userId' => $user->getId(),
-            'defaultCampusSetting' => 0
-        ));
+        $statement->execute(
+            array(
+                'userId' => $user->getId(),
+                'defaultCampusSetting' => 0
+            )
+        );
 
         /* Apply new choices
          */
@@ -173,11 +181,13 @@ class UserBulkMapper extends UserMapper {
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'userId' => $user->getId(),
-            'defaultCampusId' => $defaultCampusId,
-            'defaultCampusSetting' => 1
-        ));
+        $statement->execute(
+            array(
+                'userId' => $user->getId(),
+                'defaultCampusId' => $defaultCampusId,
+                'defaultCampusSetting' => 1
+            )
+        );
     }
 
     /**
@@ -187,7 +197,8 @@ class UserBulkMapper extends UserMapper {
      * @param $user
      * @param $allCampusIds
      */
-    private function updateCampusInvolvementOnly($user, $allCampusIds) {
+    private function updateCampusInvolvementOnly($user, $allCampusIds)
+    {
 
         /* Clear existing campuses that aren't the default
          */
@@ -198,25 +209,29 @@ class UserBulkMapper extends UserMapper {
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'userId' => $user->getId(),
-            'defaultCampus' => 0
-        ));
+        $statement->execute(
+            array(
+                'userId' => $user->getId(),
+                'defaultCampus' => 0
+            )
+        );
 
         /* Apply new choices
          */
-        foreach($allCampusIds as $currentCampusId) {
+        foreach ($allCampusIds as $currentCampusId) {
             $query = "
                 INSERT IGNORE INTO userCampus (uid, campus, defaultCampus)
                 VALUES (:userId, :campus, :defaultCampus)
             ";
 
             $statement = $this->getDatabase()->prepare($query);
-            $statement->execute(array(
-                'userId' => $user->getId(),
-                'campus' => $currentCampusId,
-                'defaultCampus' => 0
-            ));
+            $statement->execute(
+                array(
+                    'userId' => $user->getId(),
+                    'campus' => $currentCampusId,
+                    'defaultCampus' => 0
+                )
+            );
         }
     }
 
@@ -227,7 +242,8 @@ class UserBulkMapper extends UserMapper {
      * @param $defaultCampusId
      * @param $allCampusIds
      */
-    private function updateAllCampusOptions($user, $defaultCampusId, $allCampusIds) {
+    private function updateAllCampusOptions($user, $defaultCampusId, $allCampusIds)
+    {
 
         /* Clear existing campus
          */
@@ -237,13 +253,15 @@ class UserBulkMapper extends UserMapper {
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array(
-            'userId' => $user->getId()
-        ));
+        $statement->execute(
+            array(
+                'userId' => $user->getId()
+            )
+        );
 
         /* Apply new choices (ignore Unchanged option)
          */
-        foreach($allCampusIds as $currentCampusId) {
+        foreach ($allCampusIds as $currentCampusId) {
             if ($currentCampusId != $this->getUnchanged()) {
                 $query = "
                     INSERT INTO userCampus (uid, campus, defaultCampus)
@@ -251,11 +269,13 @@ class UserBulkMapper extends UserMapper {
                 ";
 
                 $statement = $this->getDatabase()->prepare($query);
-                $statement->execute(array(
-                    'userId' => $user->getId(),
-                    'campus' => $currentCampusId,
-                    'defaultCampus' => $currentCampusId == $defaultCampusId ? 1 : 0
-                ));
+                $statement->execute(
+                    array(
+                        'userId' => $user->getId(),
+                        'campus' => $currentCampusId,
+                        'defaultCampus' => $currentCampusId == $defaultCampusId ? 1 : 0
+                    )
+                );
             }
         }
     }
@@ -274,7 +294,8 @@ class UserBulkMapper extends UserMapper {
      * @param $webmail
      * @param $enabled
      */
-    public function bulkModifyUpdate($user,
+    public function bulkModifyUpdate(
+        $user,
         $defaultCampusId,
         $allCampusIds,
         $roleId,
@@ -305,15 +326,19 @@ class UserBulkMapper extends UserMapper {
         }
         /* Only update the defaultCampus
          */
-        else if ($defaultCampusId != $this->getUnchanged()) {
-            $this->updateDefaultCampusOnly($user, $defaultCampusId);
-        }
-        /* Otherwise if a set of campuses were chosen, apply campus updates
-         * defaultCampus, if unchanged, will always persist in campus choices.
-         * This results in the defaultCampus + any other new campuses chosen
-         */
-        else if (count($allCampusIds)) {
-            $this->updateCampusInvolvementOnly($user, $allCampusIds);
+        else {
+            if ($defaultCampusId != $this->getUnchanged()) {
+                $this->updateDefaultCampusOnly($user, $defaultCampusId);
+            }
+            /* Otherwise if a set of campuses were chosen, apply campus updates
+             * defaultCampus, if unchanged, will always persist in campus choices.
+             * This results in the defaultCampus + any other new campuses chosen
+             */
+            else {
+                if (count($allCampusIds)) {
+                    $this->updateCampusInvolvementOnly($user, $allCampusIds);
+                }
+            }
         }
 
         /* Update group settings
