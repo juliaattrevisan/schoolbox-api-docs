@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+ini_set('max_execution_time', 300);
+
 $userMapper = new \Schoolbox\UserBulkMapper();
 
 $modified = new \Schoolbox\Collection();
