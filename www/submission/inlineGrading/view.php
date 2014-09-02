@@ -133,11 +133,14 @@ $latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submiss
 if ($latestReturnedActivity instanceof Activity) {
 	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
 
-	/* Find the Mime again
+	/* Find the Mime again if a file was returned with the Return
 	 */
 	$mimetypeMapper = new MimetypeMapper();
-	$mime = $mimetypeMapper->findOneByColumn('mime', $latestReturnedWork->getMimeType()->getMime());
-	$latestReturnedWork->setMimetype($mime);
+
+    if ($latestReturnedWork->getMimeType()->getFileTypeID() !== null) {
+        $mime = $mimetypeMapper->findOneByColumn('mime', $latestReturnedWork->getMimeType()->getMime());
+        $latestReturnedWork->setMimetype($mime);
+    }
 }
 
 /* Augment array with data

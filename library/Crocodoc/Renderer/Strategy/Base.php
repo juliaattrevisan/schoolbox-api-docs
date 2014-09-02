@@ -12,6 +12,7 @@ namespace Crocodoc\Renderer\Strategy;
 
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\File\MimetypeMapper;
 
 abstract class Base {
 
@@ -77,6 +78,14 @@ abstract class Base {
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
+
+        /* Fetch mimetype
+         */
+        if (($this->getReturnedWork() != null) && strlen($this->getReturnedWork()->getMimetype()->getMime())) {
+            $mimetypeMapper = new MimetypeMapper();
+            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWork()->getMimeType()->getMime());
+            $this->getReturnedWork()->setMimetype($mime);
+        }
 	}
 
 	/**
@@ -96,15 +105,22 @@ abstract class Base {
 		if ($this->getReturnedWork() !== null) {
 			$returnDate = new \Alaress_Date_Relative($this->getReturnedWork()->getReturned(), 'U');
 
-			$this->getPage()->setVar(array(
-				'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
-				'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
-				'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
-				'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
-				'MOST_RECENT_RETURN_FILE_DATE'  => $returnDate->getRelativeTime(),
-			));
+            if ($this->getReturnedWork()->getFilename() != null) {
+                $this->getPage()->setVar(array(
+                    'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
+                    'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
+                    'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
+                    'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
+                    'MOST_RECENT_RETURN_FILE_DATE'  => $returnDate->getRelativeTime(),
+                ));
 
-			$this->getPage()->parse('returned_work_block', 'returned_work');
+                $this->getPage()->parse('returned_work_block', 'returned_work');
+            }
+            else {
+                $this->getPage()->setVar(array(
+                    'returned_work_block' => ''
+                ));
+            }
 		}
 		else {
 			$this->getPage()->setVar(array(
