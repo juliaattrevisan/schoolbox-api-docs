@@ -196,6 +196,10 @@ if (!empty($_POST)) {
         $_POST['search_year']
     );
 
+    $this->setVar(array(
+        'NUM_FOUND' => $allUsers->count()
+    ));
+
     if ($allUsers->count()) {
         foreach ($allUsers as $currentUser) {
             $campusNames = array();
