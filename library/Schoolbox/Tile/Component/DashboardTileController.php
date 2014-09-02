@@ -16,7 +16,6 @@ use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
-use Twig_Environment;
 
 class DashboardTileController extends Component_Dashboard_ControllerAbstract implements TileControllerInterface
 {
@@ -33,9 +32,9 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     protected $layout;
 
     /**
-     * @var Twig_Environment
+     * @var TileControllerDelegate
      */
-    protected $templateEngine;
+    protected $delegate;
 
     /**
      * Injectable constructor
@@ -53,6 +52,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     ) {
         parent::__construct($instance, $user, $sitepage);
         $this->groupHandler = $group;
+        $this->delegate = new TileControllerDelegate();
     }
 
     /**
@@ -62,31 +62,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        // configuration:
-        // gridId
-        // tileLayout:
-        //  don't quite understand this
-        // tileShape
-        //  landscape?
-        $layoutId = $this->getConfig('layout');
-
-        // empty layout by default
-        $mapper = Layout\Mapper::getInstance();
-        $this->setLayout($mapper->createModel());
-        if (!empty($layoutId)) {
-            try {
-                // Load the layout if it's there
-                // This load should include each tile.
-                $this->setLayout(
-                    $mapper->findById(
-                        $layoutId,
-                        array('joins' => array('tile'),)
-                    )
-                );
-            } catch (MapperException $e) {
-                // if it wasn't, use the empty layout
-            }
-        }
+        $this->setLayout($this->delegate->fetchLayout($this));
         return true;
     }
 
@@ -97,44 +73,20 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function renderTemplate($templateHandle)
     {
-        // Don't mess about with blocks, shove this into Twig
         if (!$this->loadTemplate($templateHandle, 'tile')) {
             return false;
         }
         $this->parseConfig();
-
-        // There should at least be a sitepage I can get a container out of!
-        // And that container always ought to be there!
-        // It won't be though, if this page wasn't loaded through
-        // Schoolbox\Application\WebRequest\Kernel.
-        // Therefore I have to do this PHPLib/Twig hybrid thing.
-        $this->setBlock($templateHandle, 'buttons', 'buttons_block');
-
-        // Load content into Twig
-        $content = '';
-        try {
-            $content = $this->sitepage->getTwig()->render(
-                '@tile/component/tile.twig',
-                array('component' => $this,)
+        $this->delegate
+            ->setupBlocks($this, $templateHandle)
+            ->parseBlocks(
+                $this,
+                $this->delegate->fetchTwigContent($this, $this->sitepage),
+                $this->groupHandler->getPermission(
+                    $this->getContext('id'),
+                    $this->user->getId()
+                )
             );
-        } catch (\Exception $e) {
-            // Don't update content
-        }
-
-        // Necessary blockage for readonly vs. write
-        $this->setVar(
-            array(
-                'COMPONENT_CONTENT' => $content,
-                'buttons_block'     => '',
-            )
-        );
-        $permission = $this->groupHandler->getPermission(
-            $this->getContext('id'),
-            $this->user->getId()
-        );
-        if ($permission >= WRITE_ACCESS) {
-            $this->parse('buttons_block', 'buttons');
-        }
         return true;
     }
 
