@@ -395,8 +395,6 @@ setupCustomise = {
 					tinyMCE.execCommand( 'mceAddControl', true, $j(this).attr('id') );
 					$j(this).sortable("refresh");
 				});
-			},
-			update: function () {
 				var left = '';
 				var right = '';
 				var top = '';
