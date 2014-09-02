@@ -97,7 +97,7 @@ foreach ($allRoles as $currentRole) {
  */
 $this->setVar(
     array(
-        'SEARCH_YEAR_SELECTED' => $_POST['searchYear']
+        'SEARCH_YEAR_SELECTED' => Scrub::html($_POST['search_year']),
     )
 );
 
