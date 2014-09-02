@@ -108,7 +108,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
         // It won't be though, if this page wasn't loaded through
         // Schoolbox\Application\WebRequest\Kernel.
         // Therefore I have to do this PHPLib/Twig hybrid thing.
-        $this->setBlock($templateHandle, 'header', 'header_block');
         $this->setBlock($templateHandle, 'buttons', 'buttons_block');
 
         // Load content into Twig
@@ -126,7 +125,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
         $this->setVar(
             array(
                 'COMPONENT_CONTENT' => $content,
-                'header_block'      => '',
                 'buttons_block'     => '',
             )
         );
@@ -135,7 +133,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
             $this->user->getId()
         );
         if ($permission >= WRITE_ACCESS) {
-            $this->parse('header_block', 'header');
             $this->parse('buttons_block', 'buttons');
         }
         return true;
