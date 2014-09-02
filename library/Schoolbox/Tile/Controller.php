@@ -238,7 +238,7 @@ class Controller extends Base
     protected function getLayoutFromComponent(Component_Instance $component)
     {
         $config   = $component->getConfigArray();
-        $layoutId = $config['layout']['value'];
+        $layoutId = $config['layoutId']['value'];
         $mapper   = $this->getLayoutMapper();
         try {
             return $mapper->findById(
@@ -253,7 +253,7 @@ class Controller extends Base
             // (Should this be done in postSave?)
             $configMapper = $this->getComponentConfigMapper();
             foreach ($component->getConfig() as $configDefinition) {
-                if ($configDefinition->getKey() == 'layout') {
+                if ($configDefinition->getKey() == 'layoutId') {
                     /** @var Component_Config $confI */
                     $config = $configMapper->findByColumnList(
                         array(

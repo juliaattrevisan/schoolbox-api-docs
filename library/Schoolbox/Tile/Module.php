@@ -97,7 +97,7 @@ class Module extends BaseModule
                     array('joins' => array('backgroundImage',),)
                 );
                 $component = $componentMapper->findComponentByConfigValue(
-                    'layout',
+                    'layoutId',
                     $item->getTileLayout()->getId()
                 )->first();
                 if (!($component instanceof Component_Instance)) {

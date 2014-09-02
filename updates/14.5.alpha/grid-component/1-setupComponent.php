@@ -22,9 +22,9 @@ $component = array(
             'default_value' => 'Tiles',
             'label'         => 'Heading',
         ),
-        'layout' => array(
+        'layoutId' => array(
             'default_value' => 0,
-            'label'         => 'Layout ID',
+            'label'         => 'Layout',
         ),
     )
 );

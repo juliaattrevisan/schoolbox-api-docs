@@ -18,9 +18,9 @@ $component = array(
     'multiple'           => 'true',
     'visible'            => 'true',
     'config'             => array(
-        'layout' => array(
+        'layoutId' => array(
             'default_value' => 0,
-            'label'         => 'Layout ID',
+            'label'         => 'Layout',
         ),
     )
 );

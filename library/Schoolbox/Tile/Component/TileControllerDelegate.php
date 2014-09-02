@@ -49,7 +49,7 @@ class TileControllerDelegate
      */
     public function fetchLayout(Component_ControllerAbstract $controller)
     {
-        $layoutId = $controller->getConfig('layout');
+        $layoutId = $controller->getConfig('layoutId');
 
         // empty layout by default
         $mapper = Layout\Mapper::getInstance();
