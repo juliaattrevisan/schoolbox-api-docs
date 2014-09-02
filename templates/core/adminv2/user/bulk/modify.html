@@ -6,6 +6,14 @@
 			checkboxName: 'userId[]'
 		});
 
+		/* Count number of things selected
+		 */
+		$('table[data-users="true"] tbody tr input, input[data-selectall="true"]').click(function(event) {
+			var num = $('table[data-users="true"] tbody tr').find('input:checked').length;
+
+			$('span[data-selected="true"]').text(num);
+		});
+
 		$('input[name=deleteUsers]').click(function(event) {
 			event.preventDefault();
 
@@ -130,6 +138,12 @@
 <div class="clearfix"></div>
 
 <!-- BEGIN has_results -->
+<h1>Search Results</h1>
+<p>
+	Found: {NUM_FOUND}<br />
+	Selected: <span data-selected="true">0</span>
+</p>
+
 <form id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
 	<h2>Users</h2>
 

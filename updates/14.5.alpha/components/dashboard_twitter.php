@@ -7,27 +7,31 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $definition = array(
-	'name'               => 'Image',
-	'module'             => 'eportfolio',
+	'name'               => 'Twitter',
+	'module'             => 'dashboard',
 	'component_category' => null,
-	'class'              => 'Component_Eportfolio_ImageController',
+	'class'              => 'Component_Dashboard_TwitterController',
 	'description'        => 'Completely configurable image display, select the image, control the size and link to another location',
 	'multiple'           => 'true',
 	'config'             => array(
-		'eportfolioImage' => array(
-			'default_value' => 'Preview Image',
-			'label' => 'Image',
+		'componentname' => array(
+			'default_value' => 'Twitter',
+			'label' => 'Heading',
 		),
-		'align' => array(
-			'default_value' => 'left',
-			'label' => 'Align',
+		'size' => array(
+			'default_value' => '3',
+			'label' => 'Limit',
 		),
-		'pixel' => array(
-			'default_value' => '200',
-			'label' => 'Max width/height',
+		'keywords' => array(
+			'default_value' => '',
+			'label' => 'Hashtag',
+		),
+		'username' => array(
+			'default_value' => '',
+			'label' => 'Author',
 		),
 	),
 );

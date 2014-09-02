@@ -7,14 +7,14 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $definition = array(
 	'name'               => 'Video',
-	'module'             => 'eportfolio',
+	'module'             => 'Dashboard',
 	'component_category' => null,
-	'class'              => 'Component_Eportfolio_VideoController',
-	'description'        => 'Upload and play videos directly in your ePortfolio',
+	'class'              => 'Component_Dashboard_VideoController',
+	'description'        => 'Upload and play videos directly in your Dashboard',
 	'multiple'           => 'true',
 	'config'             => array(
 		'componentname' => array(
@@ -25,7 +25,11 @@ $definition = array(
 			'default_value' => '10',
 			'label' => 'Limit',
 		),
-		'eportfolioVideo' => array(
+		'src' => array(
+			'default_value' => '',
+			'label' => 'Source',
+		),
+		'video' => array(
 			'default_value' => '',
 			'label' => 'Video',
 		),

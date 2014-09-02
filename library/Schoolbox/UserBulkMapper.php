@@ -11,6 +11,7 @@
 namespace Schoolbox;
 
 use Schoolbox;
+use \Alaress\Lumberjack\Logger;
 
 class UserBulkMapper extends UserMapper
 {
@@ -386,6 +387,37 @@ class UserBulkMapper extends UserMapper
         }
 
         $this->save($user);
+
+        /* Logging for Samuel
+         */
+        $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) modified user {$user->getFullname()} ({$user->getId()})";
+
+        $data = array(
+            $defaultCampusId,
+            $allCampusIds,
+            $roleId,
+            $year,
+            $eportfolioEnabled,
+            $emailFromUsername,
+            $externalMailClient,
+            $webmail,
+            $enabled
+        );
+
+        $this->log($message, $data);
+    }
+
+    /**
+     * Log to file
+     *
+     * @param $data
+     */
+    public function log($message, $data)
+    {
+        $file = fopen(\Config::get('logs_dir') . '/audit.log', 'a');
+
+        $log = new Logger($file, null, 200, $data, true);
+        $log->info($message);
     }
 
     /* Getters/Setters
