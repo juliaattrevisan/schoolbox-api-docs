@@ -86,6 +86,8 @@ class Video extends Base {
 			$this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
 		}
 
-
+		/* Upload File
+		 */
+		$this->parseInjectableUpload();
 	}
 }

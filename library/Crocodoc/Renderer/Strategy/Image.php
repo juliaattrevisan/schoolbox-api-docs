@@ -40,10 +40,9 @@ class Image extends Base {
 			'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
 		));
 
-		/* Upload file
+		/* Upload File
 		 */
-		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
-		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+		$this->parseInjectableUpload();
 
 		/* Control how Return Work is done
 		 */

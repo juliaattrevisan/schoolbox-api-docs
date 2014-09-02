@@ -87,6 +87,35 @@ abstract class Base {
 	abstract public function render();
 
 	/**
+	 * Parse the Upload File injectable
+	 */
+	protected function parseInjectableUpload() {
+		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
+		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
+
+		if ($this->getReturnedWork() !== null) {
+			$returnDate = new \Alaress_Date_Relative($this->getReturnedWork()->getReturned(), 'U');
+
+			$this->getPage()->setVar(array(
+				'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
+				'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
+				'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
+				'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
+				'MOST_RECENT_RETURN_FILE_DATE'  => $returnDate->getRelativeTime(),
+			));
+
+			$this->getPage()->parse('returned_work_block', 'returned_work');
+		}
+		else {
+			$this->getPage()->setVar(array(
+				'returned_work_block' => ''
+			));
+		}
+
+		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
+	}
+
+	/**
 	 * Determine what the next person's url is
 	 *
 	 * @return string
