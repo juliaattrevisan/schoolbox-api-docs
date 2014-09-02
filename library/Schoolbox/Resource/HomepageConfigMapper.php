@@ -292,10 +292,31 @@ class HomepageConfigMapper extends Mapper {
 
 			foreach($configs as $c) {
 				if($c->getId()) {
+					// Gross special case for tile component:
+					// copy the homepage template's tile layout
+					// TODO move this somewhere it actually belongs
+					$value = $c->getValue();
+					if ($c->getKey() === 'layoutId') {
+						$layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
+						$tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
+						try {
+							$layout = $layoutMapper->findById($c->getValue());
+							$layout->setId(null);
+							$layoutMapper->save($layout);
+							$value = $layout->getId();
+							foreach ($layout->getTileList() as $tile) {
+								$tile->setId(null)->setTileLayout($layout);
+							}
+							$tileMapper->save($layout->getTileList());
+						} catch (Mapper\Exception $e) {
+							// Don't save anything
+							continue;
+						}
+					}
 					$conf = new Component_Config();
 					$conf
 						->setInstanceId($id)
-						->setValue($c->getValue())
+						->setValue($value)
 						->setConfigDefinitionId($c->getId());
 					$ccm->save($conf);
 				}
