@@ -108,6 +108,7 @@ class Controller extends Base
             case 'homepage':
             default:
                 $href = '/homepage/'.$component->getIdentifier();
+                break;
         }
         $this->getResponse()->redirect->afterPost($href);
     }
