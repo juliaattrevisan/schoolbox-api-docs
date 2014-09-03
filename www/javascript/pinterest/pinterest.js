@@ -38,7 +38,7 @@
 			var derived = {
 				availableColumnWidth: $(defaults.element).parent('div').width(),
 				maxWidth: 518,
-				maxHeight: 450
+				maxHeight: 300
 			}
 
 			var merged = $.extend(defaults, derived, options);
@@ -80,7 +80,7 @@
 			var derived = {
 				availableColumnWidth: $(defaults.element).parent('div').parent('div').width(),
 				maxWidth: 750,
-				maxHeight: 570
+				maxHeight: 300
 			}
 
 			var merged = $.extend(defaults, derived, options);
