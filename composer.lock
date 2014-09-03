@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d59b70a8b4ebef06e45a8e94e009088b",
+    "hash": "0c5a6d8f22d63e1814e4b1e21a993845",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -102,16 +102,16 @@
         },
         {
             "name": "aura/router",
-            "version": "2.0.0-beta1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Router.git",
-                "reference": "c20cb8579f0d06ee02b79350b43f76e36e5d7e1a"
+                "reference": "df890a9f2da9be049fc1ede9c4813a037800de99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/c20cb8579f0d06ee02b79350b43f76e36e5d7e1a",
-                "reference": "c20cb8579f0d06ee02b79350b43f76e36e5d7e1a",
+                "url": "https://api.github.com/repos/auraphp/Aura.Router/zipball/df890a9f2da9be049fc1ede9c4813a037800de99",
+                "reference": "df890a9f2da9be049fc1ede9c4813a037800de99",
                 "shasum": ""
             },
             "require": {
@@ -120,16 +120,20 @@
             "type": "library",
             "extra": {
                 "aura": {
-                    "type": "library"
+                    "type": "library",
+                    "config": {
+                        "common": "Aura\\Router\\_Config\\Common"
+                    }
                 },
                 "branch-alias": {
                     "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
-                "files": [
-                    "autoload.php"
-                ]
+                "psr-4": {
+                    "Aura\\Router\\": "src/",
+                    "Aura\\Router\\_Config\\": "config/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -142,21 +146,34 @@
                 }
             ],
             "description": "A web router implementation; given a URI path and a copy of $_SERVER, it will extract path-info parameter values for a specific route.",
-            "homepage": "https://github.com/auraphp/Aura.Router/releases",
+            "homepage": "https://github.com/auraphp/Aura.Router",
             "keywords": [
                 "route",
                 "router",
                 "routing"
             ],
-            "time": "2014-01-08 16:29:06"
+            "time": "2014-08-29 21:16:03"
         },
         {
             "name": "aura/session",
-            "version": "2.0.0",
+            "version": "2.0.0-beta1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/auraphp/Aura.Session",
-                "reference": "eabfa445582ff398b025eee2cb57c294d98c5375"
+                "url": "https://github.com/auraphp/Aura.Session.git",
+                "reference": "20d4325e7417bc78af4fdfb050c4a42d3381d3ec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/20d4325e7417bc78af4fdfb050c4a42d3381d3ec",
+                "reference": "20d4325e7417bc78af4fdfb050c4a42d3381d3ec",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "ext-mcrypt": "Mcrypt generates the next best secure CSRF tokens.",
+                "ext-openssl": "OpenSSL generates the best secure CSRF tokens."
             },
             "type": "library",
             "extra": {
@@ -165,6 +182,9 @@
                     "config": {
                         "common": "Aura\\Session\\_Config\\Common"
                     }
+                },
+                "branch-alias": {
+                    "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -172,7 +192,27 @@
                     "Aura\\Session\\": "src/",
                     "Aura\\Session\\_Config\\": "config/"
                 }
-            }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Aura.Session Contributors",
+                    "homepage": "https://github.com/auraphp/Aura.Session/contributors"
+                }
+            ],
+            "description": "Provides session management functionality, including lazy session starting, session segments, next-request-only (\"flash\") values, and CSRF tools.",
+            "homepage": "https://github.com/auraphp/Aura.Session",
+            "keywords": [
+                "csrf",
+                "flash",
+                "flash message",
+                "session",
+                "sessions"
+            ],
+            "time": "2014-08-31 17:10:14"
         },
         {
             "name": "aura/sqlquery",
@@ -3791,8 +3831,8 @@
         "shareworks/xml-security": 20,
         "react/stomp": 20,
         "aura/di": 10,
-        "aura/router": 10,
         "aura/web": 10,
+        "aura/session": 10,
         "0x46616c6b/etherpad-lite-client": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
