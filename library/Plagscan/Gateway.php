@@ -147,7 +147,7 @@ class Plagscan_Gateway {
 
     public function delete($documentId) {
         $parameterList = $this->createParameters(array(
-            'METHOD' => self::METHOD_CHECK,
+            'METHOD' => self::METHOD_DELETE,
             'PID'    => $documentId,
         ));
 
