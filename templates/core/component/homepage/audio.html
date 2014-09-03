@@ -17,7 +17,9 @@ function loadSWF(audioID, url){
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Audio</h2>
 	{CONFIGURATION}
-	<ul class="information-list">
+  <div class="dz-wrap">
+    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+	<ul class="information-list dz-container">
 		<!-- BEGIN audio_list -->
 		<li class="{ON_OFF}">
 			<div class="play-button actions">
@@ -30,9 +32,30 @@ function loadSWF(audioID, url){
 		</li>
 		<!-- END audio_list -->
 	</ul>
+  </div>
 	<!-- BEGIN submit_file -->
 	<p class="interact">
 		<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
 	</p>
+  <script type="text/javascript">
+    $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+      wrapClass: 'dragging',
+      previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+//      acceptedFiles: 'audio/*',
+      tplWrap: '<li class="dz-preview" />',
+      addedfile: function (file) {
+        $(file.previewElement).addClass('category-{ID}').data('node', {ID});
+      },
+      sending: function (file, xhr, formData) {
+        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+        formData.append('category', $(file.previewElement).data('node'));
+        formData.append('comment', '');
+        formData.append('hidden', 0);
+      },
+      complete: function (file) {
+        $(file.previewElement).find('img').remove();
+      }
+    });
+  </script>
 	<!-- END submit_file -->
 </div>

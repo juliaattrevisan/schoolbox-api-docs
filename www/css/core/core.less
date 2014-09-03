@@ -1202,6 +1202,14 @@ Notifications
                   float: left;
                   margin-left: 1.2%;
   }
+  .center-right { width: 59%;
+                  float: left;
+                  margin-left: 0.5%;
+                  position: relative;
+    > div       { width: 49.5%;
+                  margin: 0;
+    }
+  }
 }
 
 .template4 {
@@ -1278,8 +1286,7 @@ Notifications
         list-style: none;
         margin: 0;
         li {
-
-            padding: 7px 16px;
+            padding: 12px 16px 11px;
             line-height: 16px;
         }
     }
@@ -1758,6 +1765,12 @@ td,li,span {
     z-index: 1;
     float: right;
     // Put all buttons on the one row
+    &.oneline {
+        line-height: 0;
+        .btn {
+            margin-top: 0;
+        }
+    }
     .btn {
       background-color: transparent;
       border-color: transparent;
@@ -3011,7 +3024,7 @@ input.timeField {
 
 a.icons {
     display: block;
-    padding: 6px 0 6px 30px;
+    padding: 4px 0 4px 30px;
     background-repeat: no-repeat;
     background-position: 0 50%;
     background-image: url(/images/mime/22x22/txt.png);
@@ -11551,5 +11564,190 @@ textarea.event-detail {
 	span {
 		float: left;
 		display: block;
+	}
+}
+
+/* fileDrop.js */
+
+
+
+.dropzone-active() {
+	//		transition:
+	//			opacity          150ms ease-out,
+	//			background-color 150ms ease-out,
+	//			border-color     150ms ease-out,
+	//			z-index            0ms linear 150ms;
+
+	z-index: 2;
+	opacity: 0.7;
+	border-color: #888;
+	background-color: #fff;
+
+	&.dz-drag-hover {
+		z-index: 2;
+		border-color: #383;
+		background-color: #F0FFFA;
+	}
+
+	+ .dz-container {
+		min-height: 48px;
+	}
+}
+
+// is class is applied to the body when the user drags a file over the window
+.dragging {
+
+	// special multimedia selectors should render as:
+	//   &.mime-image .dropzone[data-accepts~="image"] {...}
+	//   &.mime-audio .dropzone[data-accepts~="audio"] {...}
+	//   &.mime-video .dropzone[data-accepts~="video"] {...}
+
+	// add to this list to filter by more (top-level) mimetypes
+	@mimes: 'image', 'audio', 'video';
+
+	.-(@i: length(@mimes)) when (@i > 0) {
+		@name: e(extract(@mimes, @i));
+
+		// special selectors to only allow certain mimes in certain zones
+		&.mime-@{name} .dropzone[data-accepts~="@{name}"] {
+			.dropzone-active();
+		}
+		.-((@i - 1));
+	} .-;
+
+	&.mime-unknown .dropzone {
+		.dropzone-active();
+	}
+
+	// generic selector
+	.dropzone:not([data-accepts]) {
+		.dropzone-active();
+	}
+	&.debug {
+		.dropzone {
+			background-color: #f0f;
+			border-color: #909;
+		}
+	}
+}
+
+// this class should be put on any <form> that is to be activated with fileDrop
+.dropzone {
+	transition:
+//		opacity          150ms ease-out,
+		background-color 150ms ease-out,
+		border-color     150ms ease-out;
+	z-index: -1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: transparent;
+	box-sizing: border-box;
+	border: dashed 2px transparent;
+	opacity: 0.01;
+}
+.dz-details img {
+	position: absolute;
+}
+.dz-filename {
+	transition: color 200ms linear;
+	position: absolute;
+	color: #888;
+	&.started {
+		color: #000;
+	}
+}
+.dz-upload {
+	transition: width 150ms ease-out, background-color 800ms;
+	position: absolute;
+	width: 0;
+	background-color: rgba(0, 102, 176, 0.10);
+
+	&:before {
+		display: block;
+		position: absolute;
+		text-align: center;
+		font-size: 20px;
+	}
+	&.complete {
+		background-color: rgba(100, 200, 100, 0.1);
+		&:before {
+			content: "\2714";
+			color: #282;
+		}
+	}
+	&.error {
+		background-color: rgba(200, 100, 100, 0.1);
+		&:before {
+			content: "\2718";
+			color: #822;
+		}
+	}
+}
+.dz-preview {
+	border-bottom: 1px solid #eeeeee;
+	position: relative;
+}
+.dz-wrap {
+	position: relative;
+}
+
+
+/* fileDrop + .information-list */
+.dropzone + .dz-container {
+	transition:
+//		opacity          150ms ease-out,
+//		background-color 150ms ease-out,
+//		border-color     150ms ease-out,
+		min-height       150ms ease-out;
+}
+
+.information-list {
+	.dz-preview {
+		height: 24px;
+	}
+	.dz-progress {
+		margin: -12px -16px;
+	}
+	.dz-details img {
+		top: 15px;
+		left: 16px;
+	}
+	.dz-filename {
+		padding-left: 30px;
+		line-height: 24px;
+	}
+	.dz-upload {
+		height: 47px;
+	}
+	.dz-upload:before {
+		width: 53px;
+		height: 48px;
+		line-height: 48px;
+	}
+}
+
+/* fileDrop + resourceBrowser */
+.template3 .center-right {
+	.dz-preview {
+		height: 29px;
+	}
+	.dz-details img {
+		top: 6px;
+		left: 11px;
+	}
+	.dz-filename {
+		padding-left: 36px;
+		line-height: 30px;
+	}
+	.dz-upload {
+		height: 30px;
+	}
+	.dz-upload:before {
+		width: 37px;
+		height: 32px;
+		line-height: 30px;
 	}
 }

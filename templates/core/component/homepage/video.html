@@ -13,7 +13,9 @@
     <script> var video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}", {width: '100%', height: '400px'}); </script>
 </div>
 <!-- END default_video -->
-<ul class="information-list">
+  <div class="dz-wrap">
+    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="video"></form>
+<ul class="information-list dz-container">
     <!-- BEGIN video_list -->
     <li class="{ON_OFF}">
         <a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
@@ -33,6 +35,7 @@
     </li>
     <!-- END video_pending_list -->
 </ul>
+</div>
 <script type="text/javascript">
     $j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function() {
         var $target = "/cms/sendVideo.php?type=sbfs&id="+$j(this).attr("rel");
@@ -52,5 +55,24 @@
 <p class="interact">
 <a href="/cms/file/new/{FILE_CAT_ID}" class="btn up-arrow"><span></span>Post Video</a>
 </p>
-<!-- END submit_video -->
+  <script type="text/javascript">
+    $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+      wrapClass: 'dragging',
+      previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+      tplWrap: '<li class="dz-preview" />',
+      addedfile: function (file) {
+        $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
+      },
+      sending: function (file, xhr, formData) {
+        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+        formData.append('category', $(file.previewElement).data('node'));
+        formData.append('comment', '');
+        formData.append('hidden', 0);
+      },
+      complete: function (file) {
+        $(file.previewElement).find('img').remove();
+      }
+    });
+  </script>
+  <!-- END submit_video -->
 </div>
