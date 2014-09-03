@@ -17,6 +17,7 @@ $nav->parse($this, 'user');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
+	ini_set('max_execution_time', 120);
 	$bulkHandler = new Bulk_User($_FILES['bulkadd']['tmp_name']);
 	$allUsers = $bulkHandler->addUsers();
 
