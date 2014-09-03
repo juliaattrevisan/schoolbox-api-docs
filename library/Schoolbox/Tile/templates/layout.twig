@@ -1,5 +1,4 @@
 {# I need some way of adding custom_head #}
-<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 <script type="text/javascript" src="/javascript/jquery.cheatsResize.js"></script>
 <script type="text/javascript">
 (function($) {
@@ -64,17 +63,6 @@
         tileList.sortable({
             items:  '> li:not(.add)'
         })
-
-        // Greenerize
-        form.find('.checkboxes').greenerize({
-            applyClasses: false
-        });
-
-        // Change styling of elements marked for delete
-        tileList.find(':checkbox')
-            .change(function() {
-                $(this).closest('.tile').toggleClass('marked-for-delete');
-            })
 
         // Panes with buttons inside them
         form.find('[data-role="pane-container"]').each(function() {
