@@ -73,6 +73,9 @@ class Module extends BaseModule
         // Attach standard REST routes
         $router->attachResource('tile', $basePath);
         $router->attachResourcePostAlias('tile', $basePath);
+        // but have separate add tile paths
+        $router->addGet('tile.add', $basePath.'/add/{componentId}');
+        $router->addPost('tile.create', $basePath.'/add/{componentId}');
     }
 
     /**
