@@ -1,5 +1,6 @@
 {# I need some way of adding custom_head #}
 <script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.cheatsResize.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -37,6 +38,7 @@
                         });
                     }
                 }
+                tileList.find('.tile .title').cheatsResize();
             }
         })
 
