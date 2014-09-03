@@ -137,10 +137,11 @@
         }
 
         // AJAX form submissions
+        // Only show the dialog if there's a class using this unit.
         component.on('submit.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
             var form = $(this);
             event.preventDefault();
-            if (form.hasClass("create_task_form")) {
+            if (form.hasClass("create_task_form") && settings.units.length > 0) {
                 copyTaskDialog
                     .dialog(
                         'option', 'buttons',
