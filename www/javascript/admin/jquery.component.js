@@ -441,7 +441,7 @@ setupCustomise = {
             start: function() {
                 $j('.marker').text('This is the new position of your component');
             },
-            update: function () {
+            stop: function () {
                 var left = '';
                 var right = '';
                 var top = '';
