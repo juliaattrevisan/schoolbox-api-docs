@@ -85,6 +85,11 @@ switch($_POST['action']) {
 		$startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
 		$endDate = new Alaress_Date_Format($end, 'd/m/y h:i z');
 
+        // Don't allow start to be after end
+        if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
+            error(145);
+        }
+
 		/* Ensure at least one group is selected
 		 */
 		if ($_POST['level'] == 2) {
