@@ -56,12 +56,17 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
-	    if(!$this->textbox instanceof \Schoolbox\Resource\Textbox) {
+	    if($this->textbox instanceof \Schoolbox\Resource\Textbox) {
 			$sourceCategory = $this->textbox->getCategory()->getId();
 	    }
 	    else {
 		    $sourceCategory = $this->getContext('id');
 	    }
+
+        /* If user does not have access to the source, do not output anything */
+        if($this->groupHandler->getPermission($sourceCategory) < READ_ACCESS) {
+            return false;
+        }
 
 		/* Remember where the texbox came from - if you modify a streamed
 		 * textbox which comes from another homepage, you were able to
