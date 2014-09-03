@@ -30,7 +30,9 @@ $j(document).ready(function() {
 
     }).change();
 
-    $j('#addUser')
+    var addUserSelector = $j('#addUser');
+    var addUserButton   = addUserSelector.closest('form').find(':submit');
+    addUserSelector
         .selectizeSelector({
             multiple: true,
             ajax: {
@@ -38,6 +40,15 @@ $j(document).ready(function() {
                 type:     'GET',
                 data:     {groupID: 0},
                 dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            addUserButton.prop('disabled', false).removeClass('disabled');
+        })
+        .on('selectize.item_remove', function() {
+            // Disable only if empty
+            if ($(this).data('selectize').items.length === 0) {
+                addUserButton.prop('disabled', true).addClass('disabled');
             }
         })
 
@@ -85,7 +96,7 @@ $j(document).ready(function() {
 			<td>
 				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
                     <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-					<input type="submit" value="Add Users" class="submit-btn-plain" />
+					<input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
 				</form>
 
 
