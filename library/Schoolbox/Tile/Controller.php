@@ -209,6 +209,23 @@ class Controller extends Base
     }
 
     /**
+     * Delete action for tiles
+     *
+     * @param Model              $item
+     * @param Component_Instance $component
+     */
+    public function delete(Model $item, Component_Instance $component)
+    {
+        $this->getMapper()->delete($item);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'tile.layout',
+                array('componentId' => $component->getId())
+            )
+        );
+    }
+
+    /**
      * Updates an item with values passed from the form.
      *
      * @param Model        $item  The tile to update

@@ -92,7 +92,7 @@ class Module extends BaseModule
         // Routes that take a tile ID:
         // Look up the tile, and reverse lookup the component from its layout
         $matcher->add(
-            '/^tile\\.(?:edit|update|update:post)$/',
+            '/^tile\\.(?:edit|update|update:post|delete|delete:post)$/',
             function ($params) use ($mapper, $componentMapper) {
                 $item = $mapper->findById(
                     $params['id'],
@@ -144,7 +144,7 @@ class Module extends BaseModule
         // All routes: look up homepage from component
         // (if this component belongs to the homepage!)
         $matcher->add(
-            '/^tile\\.(?:add|create|layout|layoutForm|edit|update|update:post)$/',
+            '/^tile\\.(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)$/',
             function ($params) use ($catMapper) {
                 // augment params with homepage from category
                 if ($params['component']->getModule() == 'homepage') {
