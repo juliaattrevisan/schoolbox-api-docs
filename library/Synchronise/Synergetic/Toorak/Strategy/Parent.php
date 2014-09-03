@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synchronise_Synergetic_Toorak_Strategy_Parent
  *
@@ -7,135 +8,148 @@
  * @link      http://www.alaress.com.au/
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
+class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synergetic_Toorak_Strategy_Abstract
+{
 
-class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synergetic_Toorak_Strategy_Abstract {
+    const PASSWORD_KEY = 20108;
 
-	/**
-	 * Get a list of users' Synergy IDs to sync
-	 *
-	 * @return void
-	 */
-	public function generateList() {
-		$this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
-	}
+    /**
+     * Get a list of users' Synergy IDs to sync
+     *
+     * @return void
+     */
+    public function generateList()
+    {
+        $this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
+    }
 
-	/**
-	 * Set up the new user's details
-	 *
-	 * @param  $currentUser
-	 * @return array
-	 */
-	public function setupUserDetails($currentUser) {
-		$newUser = array();
+    /**
+     * Set up the new user's details
+     *
+     * @param  $currentUser
+     * @return array
+     */
+    public function setupUserDetails($currentUser)
+    {
+        $newUser = array();
 
-		$parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactID']);
+        $parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactID']);
 
-		// User details
-		$newUser['username']   = $currentUser['StudentContactID'];
-		$newUser['synergy_id'] = $currentUser['StudentContactID'];
-		$newUser['title']      = $currentUser['StudentContactTitle'];
-		$newUser['firstname']  = $currentUser['StudentContactPreferred'];
-		$newUser['lastname']   = $currentUser['StudentContactSurname'];
-		$newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
+        // User details
+        $newUser['username'] = $currentUser['StudentContactID'];
+        $newUser['synergy_id'] = $currentUser['StudentContactID'];
+        $newUser['title'] = $currentUser['StudentContactTitle'];
+        $newUser['firstname'] = $currentUser['StudentContactPreferred'];
+        $newUser['lastname'] = $currentUser['StudentContactSurname'];
+        $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
+        $newUser['password'] = $currentUser['StudentContactSpouseID'] + self::PASSWORD_KEY;
 
-		// get campuses of attached children
-		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-		$newUser['defaultCampus'] = $newUser['campus'][0];
-		$newUser['group_id']      = self::PARENT_GROUP_ID;
-		$newUser['su']            = false;
-
-		return $newUser;
-	}
-
-	/**
-	 * Set up the new user's spouse's details
-	 *
-	 * @param $currentUser
-	 * @return array
-	 */
-	public function setupSpouseDetails($currentUser) {
-		$newUser = array();
-
-		$parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactSpouseID']);
-
-		// User details
-		$newUser['username']   = $currentUser['StudentContactSpouseID'];
-		$newUser['synergy_id'] = $currentUser['StudentContactSpouseID'];
-		$newUser['title']      = $currentUser['StudentContactSpouseTitle'];
-		$newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
-		$newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
-		$newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
-
-		// get campuses of kids
-		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-		$newUser['defaultCampus'] = $newUser['campus'][0];
-		$newUser['group_id']      = self::PARENT_GROUP_ID;
-		$newUser['su']            = false;
-
-		return $newUser;
-	}
+        // get campuses of attached children
+        $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $newUser['group_id'] = self::PARENT_GROUP_ID;
+        $newUser['su'] = false;
 
 
-	/**
-	 * If the users exist in Synergy but not in Schoolbox, create an account for
-	 * them
-	 *
-	 * @return void
-	 */
-	public function createIfExists() {
-		$previousUser = null;
-		$compiledCampus = array();
+        return $newUser;
+    }
 
-		$this->getVerboseFilter()->intro();
+    /**
+     * Set up the new user's spouse's details
+     *
+     * @param $currentUser
+     * @return array
+     */
+    public function setupSpouseDetails($currentUser)
+    {
+        $newUser = array();
 
-		foreach($this->getList() as $currentUser) {
-			$newUser = $this->setupUserDetails($currentUser);
-			$newSpouse = $this->setupSpouseDetails($currentUser);
+        $parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactSpouseID']);
 
-			/* First iteration
-				*/
-			if ($previousUser == null) {
-				if (is_array($newUser['campus'])) {
-					$compiledCampus = $newUser['campus'];
-				}
+        // User details
+        $newUser['username'] = $currentUser['StudentContactSpouseID'];
+        $newUser['synergy_id'] = $currentUser['StudentContactSpouseID'];
+        $newUser['title'] = $currentUser['StudentContactSpouseTitle'];
+        $newUser['firstname'] = $currentUser['StudentContactSpousePreferred'];
+        $newUser['lastname'] = $currentUser['StudentContactSpouseSurname'];
+        $newUser['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
+        $newUser['password'] = $currentUser['StudentContactSpouseID'] + self::PASSWORD_KEY;
 
-				$previousUser = $newUser;
-				$previousSpouse = $newSpouse;
-			}
-			/* Previous was different person to Current
-				*/
-			else if ($previousUser['synergy_id'] != $newUser['synergy_id']) {
-				$previousUser['campus'] = $compiledCampus;
-				$previousSpouse['campus'] = $compiledCampus;
 
-				/* Uniquify campus list
-					 */
-				$previousUser['campus'] = array_unique($previousUser['campus']);
-				$previousSpouse['campus'] = array_unique($previousSpouse['campus']);
+        // get campuses of kids
+        $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $newUser['group_id'] = self::PARENT_GROUP_ID;
+        $newUser['su'] = false;
 
-				/* Update previous user
-					 */
-				if ($this->userExistsBySynergyAndGroup($previousUser)) {
-					$this->executeCreateUpdate($previousUser);
-				}
-				if ($this->userExistsBySynergyAndGroup($previousSpouse)) {
-					$this->executeCreateUpdate($previousSpouse);
-				}
+        return $newUser;
+    }
 
-				/* Recompile
-					 */
-				$compiledCampus = $newUser['campus'];
 
-				$previousUser = $newUser;
-				$previousSpouse = $newSpouse;
-			}
-			/* They are the same person
-				*/
-			else {
-				$compiledCampus = array_merge($compiledCampus, $newUser['campus']);
-			}
-		}
+    /**
+     * If the users exist in Synergy but not in Schoolbox, create an account for
+     * them
+     *
+     * @return void
+     */
+    public function createIfExists()
+    {
+        $previousUser = null;
+        $compiledCampus = array();
 
-		$this->getVerboseFilter()->summary();
-	}
+        $this->getVerboseFilter()->intro();
+
+        foreach ($this->getList() as $currentUser) {
+            $newUser = $this->setupUserDetails($currentUser);
+            $newSpouse = $this->setupSpouseDetails($currentUser);
+
+            /* First iteration
+                */
+            if ($previousUser == null) {
+                if (is_array($newUser['campus'])) {
+                    $compiledCampus = $newUser['campus'];
+                }
+
+                $previousUser = $newUser;
+                $previousSpouse = $newSpouse;
+            } elseif ($previousUser['synergy_id'] != $newUser['synergy_id']) {
+                /* Previous was different person to Current */
+                $previousUser['campus'] = $compiledCampus;
+                $previousSpouse['campus'] = $compiledCampus;
+
+                /* Uniquify campus list */
+                $previousUser['campus'] = array_unique($previousUser['campus']);
+                $previousSpouse['campus'] = array_unique($previousSpouse['campus']);
+
+                /* Update/Create previous user */
+                if ($this->userExistsBySynergyAndGroup($previousUser)) {
+                    //Don't update passwords, only set on create
+                    unset($previousUser['password']);
+                }
+
+                $this->executeCreateUpdate($previousUser);
+
+                if ($this->userExistsBySynergyAndGroup($previousSpouse)) {
+                    //Don't update passwords, only set on create
+                    unset($previousSpouse['password']);
+
+                }
+
+                $this->executeCreateUpdate($previousSpouse);
+
+
+                /* Recompile */
+                $compiledCampus = $newUser['campus'];
+
+                $previousUser = $newUser;
+                $previousSpouse = $newSpouse;
+            }
+            else {
+                /* They are the same person*/
+                $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
+            }
+        }
+
+        $this->getVerboseFilter()->summary();
+    }
 }
