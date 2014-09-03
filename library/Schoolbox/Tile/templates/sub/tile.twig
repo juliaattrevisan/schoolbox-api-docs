@@ -37,12 +37,8 @@
     <div class="edit">
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
-        <input type="checkbox" name="deleteTile[]" value="{{ tile.id|e('html_attr') }}" />
-        {#
-        <a href="#">Copy</a>
-        <a href="#">Delete</a>
-        #}
-        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}">Edit</a>
+        <a href="#" class="btn no-text delete float-right" title="Delete"><span></span></a>
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}" class="btn no-text modify float-right" title="Modify"><span></span></a>
     </div>
     {% endif %}
 </li>
