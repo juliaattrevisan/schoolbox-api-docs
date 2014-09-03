@@ -611,8 +611,13 @@ CREATE TABLE `class_period` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `class_id` int(11) NOT NULL,
   `period_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `teacher_id` int(11) DEFAULT NULL,
+  `room` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `class_period_teacher_id` (`teacher_id`),
+  KEY `class_period_class_id` (`class_id`),
+  KEY `class_period_period_id` (`period_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3985 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4233,6 +4238,28 @@ DROP TABLE IF EXISTS `user_profile`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_profile` (
   `user_id` int(11) NOT NULL,
+  `dob` date DEFAULT NULL,
+  `level` int(20) DEFAULT NULL,
+  `homegroup` varchar(255) DEFAULT NULL,
+  `house` varchar(255) DEFAULT NULL,
+  `guardian1Name` varchar(255) DEFAULT NULL,
+  `guardian1HomePhone` varchar(255) DEFAULT NULL,
+  `guardian1WorkPhone` varchar(255) DEFAULT NULL,
+  `guardian1MobilePhone` varchar(255) DEFAULT NULL,
+  `guardian1Address` varchar(255) DEFAULT NULL,
+  `guardian1Suburb` varchar(255) DEFAULT NULL,
+  `guardian1Postcode` varchar(255) DEFAULT NULL,
+  `guardian1Email` varchar(255) DEFAULT NULL,
+  `guardian1MailAddress` varchar(255) DEFAULT NULL,
+  `guardian2Name` varchar(255) DEFAULT NULL,
+  `guardian2HomePhone` varchar(255) DEFAULT NULL,
+  `guardian2WorkPhone` varchar(255) DEFAULT NULL,
+  `guardian2MobilePhone` varchar(255) DEFAULT NULL,
+  `guardian2Address` varchar(255) DEFAULT NULL,
+  `guardian2Suburb` varchar(255) DEFAULT NULL,
+  `guardian2Postcode` varchar(255) DEFAULT NULL,
+  `guardian2Email` varchar(255) DEFAULT NULL,
+  `guardian2MailAddress` varchar(255) DEFAULT NULL,
   `title` varchar(16) DEFAULT NULL,
   `given_name` varchar(128) DEFAULT NULL,
   `preferred_name` varchar(32) DEFAULT NULL,
