@@ -2999,7 +2999,7 @@ input.timeField {
         right: 2px;
         top: 3px;
     }
-    &.disabled {
+    &.disabled, &[disabled] {
         color: @mgrey !important;
         border-color: @lgrey;
     }
@@ -3909,7 +3909,8 @@ ADMINV2/MESSAGES
 	}
 	.perms {
 		width: 300px;
-		&.disabled * {
+		&.disabled *,
+		&[disabled] * {
 			opacity: 0;
 		}
 		div {
@@ -4026,7 +4027,7 @@ HOMEPAGE TEMPLATES
         font-size: 14px;
         font-weight: bold;
         background: @module-background url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
-        &.disabled {
+        &.disabled, &[disabled] {
             background: @lgrey;
             border-color: @std-grey;
             color: @mgrey;
@@ -6834,13 +6835,15 @@ HOMEPAGE CUSTOMISE
     border: 0;
 }
 
-.add-component.disabled {
+.add-component.disabled,
+.add-component[disabled] {
     background: lighten(@neutral-color,@lighten-value);
     border-color: @neutral-color;
     color: @dgrey;
 }
 
-.add-component.disabled .btn {
+.add-component.disabled .btn,
+.add-component[disabled] .btn {
     display: none;
 }
 
@@ -9189,7 +9192,7 @@ td.name {
         padding: 2px;
         width: 250px;
 
-        &[disabled=disabled] {
+        &.disabled, &[disabled] {
             background: transparent;
             color: @dgrey;
             border: solid 1px transparent;
@@ -9233,7 +9236,7 @@ td.name {
             left: 5px;
         }
     }
-    &.disabled {
+    &.disabled, &[disabled] {
         &.delete:hover span {
             background-position: 0 -336px;
         }
