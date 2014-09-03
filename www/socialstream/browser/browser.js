@@ -81,11 +81,18 @@
 		 */
 		function initModal() {
 			$j(config.element).dialog({
-				width: 650,
+				width: 800,
+				height: $j(window).height() * 0.75,
 				autoOpen: false,
 				title: config.title,
 				modal: true,
 				resizable: false
+			});
+
+			 /* Resize dialog proportionally to window
+			  */
+			$j(window).resize(function(event) {
+				$j('.socialstream-browser').height($j(window).height() * 0.75);
 			});
 		}
 
