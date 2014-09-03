@@ -48,7 +48,7 @@
 <h1>{% if item.id %}Modify Tile{% else %}Add Tile{% endif %}</h1>
 
 <form id="tile-modify-form"
-      action="{% if item.id %}{{ routeLookup('tile.update', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}"
+      action="{% if item.id %}{{ routeLookup('tile.update:post', {id: item.id}) }}{% else %}{{ routeLookup('tile.create', {componentId: component.id}) }}{% endif %}"
       method="post"
       name="form"
       class="clearfix"
