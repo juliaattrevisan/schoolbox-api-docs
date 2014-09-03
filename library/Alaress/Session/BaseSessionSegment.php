@@ -11,9 +11,11 @@
  */
 
 namespace Alaress\Session;
+
 use Aura\Session as BaseSession;
 
-class BaseSessionSegment extends BaseSession\Segment {
+class BaseSessionSegment extends BaseSession\Segment
+{
 
     /**
      * Constructor - doesn't take a name parameter, because it works on
@@ -21,21 +23,54 @@ class BaseSessionSegment extends BaseSession\Segment {
      *
      * @param BaseSession\Session $session
      */
-    public function __construct(BaseSession\Session $session) {
+    public function __construct(BaseSession\Session $session)
+    {
         $this->session = $session;
     }
 
     /**
      * Overrides Aura's session segments to work with base $_SESSION.
      *
-     * @return void
+     * {@inheritdoc}
      */
-    protected function load() {
+    protected function load()
+    {
         if (!isset($_SESSION)) {
             $_SESSION = array();
         }
-        // set $data as a reference to the $_SESSION key
-        $this->data = &$_SESSION;
     }
 
+    /**
+     * Copied from base implementation to work with base $_SESSION.
+     *
+     * {@inheritdoc}
+     */
+    public function get($key, $alt = null)
+    {
+        $this->resumeSession();
+        return isset($_SESSION[$key]) ? $_SESSION[$key] : $alt;
+    }
+
+    /**
+     * Copied from base implementation to work with base $_SESSION.
+     *
+     * {@inheritdoc}
+     */
+    public function set($key, $val)
+    {
+        $this->resumeOrStartSession();
+        $_SESSION[$key] = $val;
+    }
+
+    /**
+     * Copied from base implementation to work with base $_SESSION.
+     *
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        if ($this->resumeSession()) {
+            $_SESSION = array();
+        }
+    }
 }

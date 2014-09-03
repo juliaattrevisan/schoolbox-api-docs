@@ -53,31 +53,6 @@
             }
         },
         {
-            "type": "package",
-            "package": {
-                "name": "aura/session",
-                "version": "2.0.0",
-                "source": {
-                    "url": "https://github.com/auraphp/Aura.Session",
-                    "type": "git",
-                    "reference": "eabfa445582ff398b025eee2cb57c294d98c5375"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Aura\\Session\\": "src/",
-                        "Aura\\Session\\_Config\\": "config/"
-                    }
-                },                "extra": {
-                    "aura": {
-                        "type": "library",
-                        "config": {
-                            "common": "Aura\\Session\\_Config\\Common"
-                        }
-                    }
-                }
-            }
-        },
-        {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
         }
@@ -106,9 +81,9 @@
         "html2text/html2text": "1.0.*",
         "browscap/browscap-php": "~2.0.2",
         "aura/di": "~2.0.0@beta",
-        "aura/router": "~2.0.0@beta",
+        "aura/router": "~2.0.0",
         "aura/web": "~2.0.0@beta",
-        "aura/session": "2.0.0",
+        "aura/session": "~2.0.0@beta",
         "aura/sqlquery": "~2.0.0",
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master"
     },

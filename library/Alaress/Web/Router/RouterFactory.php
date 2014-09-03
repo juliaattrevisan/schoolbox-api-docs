@@ -12,16 +12,19 @@
 
 namespace Alaress\Web\Router;
 
-use Aura\Router\Router;
+use Aura\Router\Generator;
 use Aura\Router\RouteFactory;
+use Aura\Router\Router;
 
-class RouterFactory {
+class RouterFactory
+{
     /**
      * Returns a new Router instance.
      *
      * @return Router
      */
-    public function newInstance() {
-        return new Router(new RouteCollection(new RouteFactory()));
+    public function newInstance()
+    {
+        return new Router(new RouteCollection(new RouteFactory()), new Generator());
     }
 }
