@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,38 +7,39 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
+{
 
-	/** @var \Schoolbox\Resource\Textbox */
-	protected $textbox;
+    /** @var \Schoolbox\Resource\Textbox */
+    protected $textbox;
 
-	/** @var Group */
-	protected $groupHandler;
+    /** @var Group */
+    protected $groupHandler;
 
     /**
      * Prepares data for the render function. Business logic.
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
 
-	    try {
-		    $this->textbox = \Schoolbox\Resource\TextboxMapper::getInstance()->findById($this->getConfig('textbox'));
-		    if($this->getTextbox()->getDeleted()) {
-			    throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
-		    }
-	    }
-	    catch(\Schoolbox\Mapper\Exception $e) {
-		    // didn't find it or it's been deleted: create a blank template box instead
-		    $this->textbox = new \Schoolbox\Resource\Textbox();
-		    $this->textbox
-			    ->setHeading('Text Box')
-		        ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext('id')));
-	    }
+        try {
+            $this->textbox = \Schoolbox\Resource\TextboxMapper::getInstance()->findById($this->getConfig('textbox'));
+            if ($this->getTextbox()->getDeleted()) {
+                throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // didn't find it or it's been deleted: create a blank template box instead
+            $this->textbox = new \Schoolbox\Resource\Textbox();
+            $this->textbox
+                ->setHeading('Text Box')
+                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext('id')));
+        }
 
-	    if(!$this->getTextbox()->getHeading()) {
-		    $this->getTextbox()->setHeading('Text Box');
-	    }
+        if (!$this->getTextbox()->getHeading()) {
+            $this->getTextbox()->setHeading('Text Box');
+        }
     }
 
     /**
@@ -45,8 +47,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'textBox')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'textBox')) {
             return false;
         }
         $this->parseConfig();
@@ -56,22 +59,26 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
-	    if(!$this->textbox instanceof \Schoolbox\Resource\Textbox) {
-			$sourceCategory = $this->textbox->getCategory()->getId();
-	    }
-	    else {
-		    $sourceCategory = $this->getContext('id');
-	    }
+        if ($this->textbox instanceof \Schoolbox\Resource\Textbox) {
+            $sourceCategory = $this->textbox->getCategory()->getId();
+        } else {
+            $sourceCategory = $this->getContext('id');
+        }
 
-		/* Remember where the texbox came from - if you modify a streamed
-		 * textbox which comes from another homepage, you were able to
-		 * inadvertently steal ownership of it
-		 */
+        /* If user does not have access to the source, do not output anything */
+        if ($this->groupHandler->getPermission($sourceCategory) < READ_ACCESS) {
+            return false;
+        }
+
+        /* Remember where the texbox came from - if you modify a streamed
+         * textbox which comes from another homepage, you were able to
+         * inadvertently steal ownership of it
+         */
         $output = array(
-			'TEXTBOX_HEADING'     => Scrub::text($this->getTextbox()->getHeading()),
-			'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
-			'TEXTBOX_ID'          => $this->getTextbox()->getId(),
-			'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
+            'TEXTBOX_HEADING'     => Scrub::text($this->getTextbox()->getHeading()),
+            'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
+            'TEXTBOX_ID'          => $this->getTextbox()->getId(),
+            'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
 
             'text_editable_block' => '',
             'modify_text_block'   => '',
@@ -81,33 +88,34 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         $this->setVar($output);
 
-		/* To edit someone else's textbox, you need write access to both homepages.
-		 * To just edit one homepage's textbox, you need write access to that homepage.
-		 */
+        /* To edit someone else's textbox, you need write access to both homepages.
+         * To just edit one homepage's textbox, you need write access to that homepage.
+         */
         if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
 
             if ($this->sitepage->arg[1] == 'textBoxModify') {
-                $this->setVar(array(
-                    'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
-                ));
-            }
-            else if($this->sitepage->arg[1] == 'textBoxCreate') {
-                $this->setVar(array(
-                    'TEXTBOX_HEADING' => '',
-                    'TEXTBOX_BODY' => '',
-                    'TEXTBOX_ID' => '',
-                    'TEXTBOX_CATEGORY_ID' => $sourceCategory,
-                ));
+                $this->setVar(
+                    array(
+                        'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
+                    )
+                );
+            } else if ($this->sitepage->arg[1] == 'textBoxCreate') {
+                $this->setVar(
+                    array(
+                        'TEXTBOX_HEADING'     => '',
+                        'TEXTBOX_BODY'        => '',
+                        'TEXTBOX_ID'          => '',
+                        'TEXTBOX_CATEGORY_ID' => $sourceCategory,
+                    )
+                );
             }
             $this->parse('text_editable_block', 'text_editable');
-        }
-        else {
+        } else {
             // modify links
             if ($this->groupHandler->getPermission($sourceCategory) >= WRITE_ACCESS) {
-                if($this->getTextbox()->getId()) {
+                if ($this->getTextbox()->getId()) {
                     $this->parse('modify_text_block', 'modify_text');
-                }
-                else {
+                } else {
                     $this->parse('create_text_block', 'create_text');
                 }
             }
@@ -119,11 +127,12 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         return true; // everything went according to plan
     }
 
-	/**
-	 * @return \Schoolbox\Resource\Textbox
-	 */
-	protected function getTextbox() {
-		return $this->textbox;
-	}
+    /**
+     * @return \Schoolbox\Resource\Textbox
+     */
+    protected function getTextbox()
+    {
+        return $this->textbox;
+    }
 
 }
