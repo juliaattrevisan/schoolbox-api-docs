@@ -11,9 +11,11 @@
  */
 
 namespace Alaress\Session;
+
 use Aura\Session as BaseSession;
 
-class BaseSessionSegment extends BaseSession\Segment {
+class BaseSessionSegment extends BaseSession\Segment
+{
 
     /**
      * Constructor - doesn't take a name parameter, because it works on
@@ -21,7 +23,8 @@ class BaseSessionSegment extends BaseSession\Segment {
      *
      * @param BaseSession\Session $session
      */
-    public function __construct(BaseSession\Session $session) {
+    public function __construct(BaseSession\Session $session)
+    {
         $this->session = $session;
     }
 
@@ -30,7 +33,8 @@ class BaseSessionSegment extends BaseSession\Segment {
      *
      * {@inheritdoc}
      */
-    protected function load() {
+    protected function load()
+    {
         if (!isset($_SESSION)) {
             $_SESSION = array();
         }
