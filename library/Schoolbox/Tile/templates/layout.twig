@@ -64,6 +64,20 @@
             items:  '> li:not(.add)'
         })
 
+        // Delete buttons
+        form.find('[data-role="delete"]').click(function(event) {
+            event.preventDefault();
+            var element = $(this);
+            // Add some sort of deleting animation
+            $.post(element.attr('href'))
+                .done(function() {
+                    var deletedTile = element.closest('.tile');
+                    element.fadeOut('slow', function() {
+                        deletedTile.remove();
+                    })
+                })
+        });
+
         // Panes with buttons inside them
         form.find('[data-role="pane-container"]').each(function() {
             var element       = $(this);
