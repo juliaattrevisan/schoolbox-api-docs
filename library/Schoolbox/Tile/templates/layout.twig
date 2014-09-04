@@ -60,8 +60,27 @@
         });
 
         // Sortability
+        var reorderFeedbackSaving = form.find('[data-role="reorder-feedback-saving"]');
+        var reorderFeedbackSaved  = form.find('[data-role="reorder-feedback-saved"]');
+        var reorderFeedbackFailed = form.find('[data-role="reorder-feedback-failed"]');
         tileList.sortable({
-            items:  '> li:not(.add)'
+            items:  '> li:not(.add)',
+            stop: function(event, ui) {
+                // save this form
+                reorderFeedbackSaving.fadeIn('fast');
+                $.post(form.attr('action'), form.serializeArray())
+                    .always(function() {
+                        reorderFeedbackSaving.hide();
+                    })
+                    .done(function() {
+                        reorderFeedbackSaved.show();
+                        setTimeout(function() { reorderFeedbackSaved.hide(); }, 2000);
+                    })
+                    .fail(function() {
+                        reorderFeedbackFailed.show();
+                        setTimeout(function() { reorderFeedbackFailed.hide(); }, 2000);
+                    })
+            }
         })
 
         // Confirm delete dialog
@@ -294,7 +313,10 @@
                 </ul>
             </td>
             <td class="checkboxes">
-                <label for="select_all_tiles">Select all tiles</label>
+                {# Feedback for saving order of tiles #}
+                <div class="hide" data-role="reorder-feedback-saving">Saving order...</div>
+                <div class="hide" data-role="reorder-feedback-saved">Saved!</div>
+                <div class="hide" data-role="reorder-feedback-failed">Failed!</div>
                 {% include '@tile/sub/tileList.twig'
                     with {
                         layout:   item,
