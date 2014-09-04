@@ -25,12 +25,11 @@ $category_id = $component->getIdentifier();
 
 // Lame permission handling
 // Current user needs write access to the category this task instance is in.
-$group = new Group();
+$group             = new Group();
 $permission_denied = false;
 if ($group->getPermission($category_id) < WRITE_ACCESS) {
     $permission_denied = true;
-}
-else {
+} else {
     if ($_POST['action'] === 'delete') {
         Task\InstanceMapper::getInstance()->delete(
             Task\InstanceMapper::getInstance()->findByColumnList(
@@ -40,9 +39,8 @@ else {
                 )
             )
         );
-    }
-    elseif ($_POST['action'] === 'reorder') {
-        $i = 1;
+    } elseif ($_POST['action'] === 'reorder') {
+        $i                 = 1;
         $update_collection = new \Schoolbox\Collection();
         foreach ($_POST['id'] as $id) {
             // Ensure that this task is within the requested unit
@@ -58,8 +56,7 @@ else {
         if (!$permission_denied) {
             Task\InstanceMapper::getInstance()->save($update_collection);
         }
-    }
-    else {
+    } else {
         $task_instance_id = $_POST['id'];
         if ($task_instance_id) {
             /** @var Task\Instance $task_instance */
@@ -72,10 +69,8 @@ else {
             $task_instance
                 ->setTitle($_POST['title'])
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
-        }
-        else {
+                ->setRequiresConfirmation(!$_POST['self_assess']);
+        } else {
             // Make the task and set various fields
             $task_instance = new Task\Instance();
             $task_instance
@@ -84,8 +79,7 @@ else {
                 ->setUnitInstance($course_instance)
                 ->setTitle($_POST['title'])
                 ->setLink($_POST['link'])
-                ->setRequiresConfirmation(!$_POST['self_assess'])
-            ;
+                ->setRequiresConfirmation(!$_POST['self_assess']);
         }
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
@@ -104,8 +98,7 @@ if ($page->detectAjax()) {
     if ($permission_denied) {
         $result['error']   = 403;
         $result['message'] = 'Permission Denied';
-    }
-    else {
+    } else {
         // Load the component that this task was added to.
         /** @var Component_Instance[] $component_list */
         $component_id   = $component->getId();
@@ -119,8 +112,18 @@ if ($page->detectAjax()) {
 
             /** @var Component_Homepage_CourseInstanceController $controller */
             $controller = $chf->buildComponent($component);
+            $codeString = '';
+            try {
+                $codeString = CategoryMapper::getInstance()->findById($category_id)
+                    ->getCodeString();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
             $controller->setup(
-                array('id' => $category_id),
+                array(
+                    'id'   => $category_id,
+                    'code' => $codeString,
+                ),
                 $controller->getInstance()->getConfigArray()
             );
 
@@ -142,8 +145,7 @@ if ($page->detectAjax()) {
     header(':', true, $result['error']);
     echo json_encode($result);
     exit;
-}
-else {
+} else {
     if ($permission_denied) {
         error(6);
     }
