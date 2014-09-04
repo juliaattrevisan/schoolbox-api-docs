@@ -61,7 +61,7 @@
                         responsive: false
                     }
                 },
-                plugins : ['dnd', 'sort', 'types', 'wholerow'],
+                plugins : ['dnd', 'sort', 'types'],
                 dnd: {
                     copy: false,
                     is_draggable: function(nodes) {
