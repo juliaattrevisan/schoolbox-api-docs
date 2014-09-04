@@ -52,6 +52,9 @@ $(function() {
             threePanel: threePanel,
             selected: {OPEN_CATEGORY}
         })
+        .on('select_node.jstree', function(event, jstree) {
+            relationID = jstree.node.id;
+        })
     threePanel.getMeta({OPEN_CATEGORY});
 
 	/* resize left column on window resize */
