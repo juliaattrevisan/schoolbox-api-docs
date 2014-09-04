@@ -55,6 +55,7 @@
                     multiple: false,
                     check_callback: true,
                     themes: {
+                        variant: "resourcetree",
                         dots: true,
                         icons: true,
                         responsive: false
