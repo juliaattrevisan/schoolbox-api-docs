@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Tile\Model as TileModel;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     /**
      * Value of $layoutType for grid layouts.
@@ -402,5 +402,18 @@ class Model implements ISoftDeletable
     public function isDeleted()
     {
         return $this->getDeletedAt() instanceof Alaress_Date_Format;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @return mixed
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id'       => $this->getId(),
+            'tileList' => $this->getTileList(),
+        );
     }
 }
