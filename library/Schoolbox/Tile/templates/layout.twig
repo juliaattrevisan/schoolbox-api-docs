@@ -79,7 +79,9 @@
         // Delete buttons
         form.find('[data-role="delete"]').click(function(event) {
             event.preventDefault();
-            var element = $(this);
+            var element     = $(this);
+            var deletedTile = element.closest('.tile');
+            var tileTitle   = deletedTile.find('.title');
 
             // Add confirmation dialog
             confirmDeleteDialog
@@ -89,12 +91,18 @@
                         click: function(event) {
                             // Add some sort of deleting animation
                             confirmDeleteDialog.dialog('close');
+                            deletedTile.addClass('marked-for-delete');
+                            tileTitle.text('Deleting...');
+                            // Send delete request
                             $.post(element.attr('href'))
                                 .done(function() {
-                                    var deletedTile = element.closest('.tile');
                                     deletedTile.fadeOut('slow', function() {
                                         deletedTile.remove();
                                     })
+                                })
+                                .fail(function() {
+                                    deletedTile.removeClass('marked-for-delete');
+                                    tileTitle.text('Delete failed!');
                                 })
                         }
                     },
