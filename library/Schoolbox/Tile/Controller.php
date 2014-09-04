@@ -87,16 +87,6 @@ class Controller extends Base
             $this->getMapper()->save($layout->getTileList());
         }
 
-        // Delete tiles
-        $tilesDeleted = $this->getRequest()->post['deleteTile'];
-        if (!empty($tilesDeleted)) {
-            foreach ($layout->getTileList() as $tile) {
-                if (array_search($tile->getId(), $tilesDeleted) !== false) {
-                    $this->getMapper()->delete($tile);
-                }
-            }
-        }
-
         // and redirect back to wherever
         switch ($component->getModule()) {
             case 'dashboard':
@@ -216,13 +206,26 @@ class Controller extends Base
      */
     public function delete(Model $item, Component_Instance $component)
     {
-        $this->getMapper()->delete($item);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'tile.layout',
-                array('componentId' => $component->getId())
-            )
-        );
+        $code = 200;
+        if (!$this->getMapper()->delete($item)) {
+            $code = 500;
+        }
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(),
+                )
+            );
+        } else {
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'tile.layout',
+                    array('componentId' => $component->getId())
+                )
+            );
+        }
     }
 
     /**
