@@ -77,14 +77,11 @@ class Healthcheck {
     private function SynergeticCheckTables(){
         echo "\nSynergetic Permission Check - Tables\n";
         $list[] = 'Addresses';
-        $list[] = 'AttendanceMaster';
         $list[] = 'CalendarEvents';
         $list[] = 'Community';
         $list[] = 'CommunityAlerts';
         $list[] = 'Constituencies';
         $list[] = 'FileSemesters';
-        $list[] = 'luAbsenceReason';
-        $list[] = 'luAbsenceType';
 	$list[] = 'luBuilding';
 	$list[] = 'luCountry';
         $list[] = 'luDepartment';
@@ -97,11 +94,9 @@ class Healthcheck {
         $list[] = 'StudentClasses';
         $list[] = 'SubjectClasses';
         $list[] = 'SubjectClassStaff';
-        $list[] = 'tAttendances';
         $list[] = 'Timetable';
         $list[] = 'TimetableDefinition';
         $list[] = 'luTimetableGroup';
-        $list[] = 'luFileType';
         sort($list);
 
         foreach($list as $table){
@@ -163,7 +158,7 @@ class Healthcheck {
             )
         );
 
-		foreach($splist as $sp){
+        foreach($splist as $sp){
             $result = $db->executeProcedure($sp[0],$sp[1]);
             echo "  ".$sp[0]." : ";
             if($result['success']){
@@ -172,6 +167,117 @@ class Healthcheck {
                 echo "\n    Failed - ".mssql_get_last_message()."\n";
             }
         }
+    }
+
+    private function SynergeticCheckAttendance(){
+        // Attendance Specifc (Optional)
+        echo "\nSynergetic Permission Check - Attendance - Tables (Optional)\n";
+        $list[] = 'luAbsenceReason';
+        $list[] = 'luAbsenceType';
+        $list[] = 'TimetableSubstitutes';
+        $list[] = 'wkAttendances';
+        $list[] = 'AttendanceMaster'; // ?not list on wiki anymore
+        $list[] = 'tAttendances'; // ?not list on wiki anymore
+        sort($list);
+
+        foreach($list as $table){
+            echo "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if($result){
+                echo "OK\n";
+            }else{
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+        unset($list);
+
+        echo "\nSynergetic Permission Check - Attendance - Views (Optional)\n";
+        $list[] = 'pvTimetableDefinitionAll';
+        sort($list);
+
+        foreach($list as $view){
+            echo "  $view : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $view");
+            if($result){
+                echo "OK\n";
+            }else{
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+        unset($list);
+
+        echo "\nSynergetic Permission Check - Attendance - Stored Procedures (Optional)\n";
+        $db = new MSSQL();
+        $db->debug = true;
+        $list[] = array(
+            'spiwkAttendances',
+            array(
+                array('@FileType', '', SQLVARCHAR, false, false, -1),
+                array('@FileYear', 1, SQLINT4, false, false, -1),
+                array('@FileSemester', 1, SQLINT4, false, false, -1),
+                array('@ClassCampus', '', SQLVARCHAR, false, false, -1),
+                array('@ClassCode', '', SQLVARCHAR, false, false, -1),
+                array('@AttendanceDate', date('Y-m-d'), SQLVARCHAR, false, false, -1),
+                array('@AttendancePeriod', 1, SQLINT4, false, false, -1),
+                array('@AttendanceDayNumber', 1, SQLINT4, false, false, -1),
+                array('@StaffID', 1, SQLINT4, false, false, -1),
+                array('@AttendedFlag', 1, SQLINT4, false, false, -1),
+                array('@TimeTableGroup', '', SQLVARCHAR, false, false, -1),
+                array('@SynWebFlag', 1, SQLINT4, false, false, -1),
+                array('@wkAttendanceMasterSeq', 1, SQLINT4, true, true, -1 ),
+            )
+        );
+        $list[] = array(
+            'spswkAttendances_ws',
+            array(
+                array('@wkAttendanceMasterSeq', 1, SQLINT4, false, false, -1),
+                array('@CheckPossibleNonAttendFlag', 1, SQLINT1, false, false, -1),
+                array('@OnlyReturnNonAttendedFlag', 1, SQLINT1, false, false, -1),
+                array('@OnlyReturnAttendedFlag', 1, SQLINT1, false, false, -1),
+                array('@OnlyReturnPossibleNonAttendedButMarkedPresentFlag', 1, SQLINT1, false, false, -1),
+                array('@OnlyReturnUnMarkedFlag', 1, SQLINT1, false, false, -1),
+                array('@FillActualAbsenceColumnsFlag', 1, SQLINT1, false, false, -1),
+                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT1, false, false, -1),
+                array('@OnlyReturnEditedRecordsFlag', 1, SQLINT1, false, false, -1)
+            )
+        );
+        $list[] = array(
+            'sptwkAttendances',
+            array(
+                array('@wkAttendanceMasterSeq', 1, SQLINT4, false, false, -1),
+                array('@AttendanceSeq', '', SQLINT4, false, false, -1),
+                array('@AttendanceMasterSeq', 'seq', SQLINT4, true, true, -1),
+                array('@HoldFlag', 0, SQLINT1, false, false, -1),
+                array('@ClassCancelledFlag', 0, SQLINT1, false, false, -1),
+                array('@SystemProcessNumber', 0, SQLINT1, false, false, -1),
+                array('@AllowMultiPeriodFlag', 0, SQLINT1, false, false, -1),
+                array('@DebugPrintFlag', 0, SQLINT1, false, false, -1),
+                array('@GroupCount', 0, SQLINT4, true, true, -1)
+            )
+        );
+        $list[] = array(
+            'fnTimeStr',
+            array(
+                array('@ADateTime', date('Y-m-d'), SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        foreach($list as $sp){
+            $result = $db->executeProcedure($sp[0],$sp[1]);
+            echo "  ".$sp[0]." : ";
+            if($result['success']){
+                echo "OK\n";
+            }else{
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+        }
+        unset($list);
     }
 
 	/**
