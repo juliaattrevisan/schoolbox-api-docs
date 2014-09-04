@@ -17,6 +17,10 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
      */
     public function visit($currentEvent)
     {
-        new \Alaress_Probe($currentEvent);
+        $this->getPage()->setVar(array(
+            'EVENT_TITLE' => $currentEvent->getTitle()
+        ));
+
+        $this->getPage()->parse('event_block', 'event', true);
     }
 } 
