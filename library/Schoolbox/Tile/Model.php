@@ -86,6 +86,11 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $backgroundColor;
 
     /**
+     * @var Color
+     */
+    protected $hoverColor;
+
+    /**
      * @var Alaress_Date_Format
      */
     protected $createdAt;
@@ -105,6 +110,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      * * Tile background: transparent
      * * Title text: black
      * * Title background: transparent
+     * * Hover background: transparent
      */
     public function __construct()
     {
@@ -112,6 +118,7 @@ class Model implements ISoftDeletable, \JsonSerializable
             ->setBackgroundColor(new Color(0, 0, 0, 0))
             ->setTitleBackgroundColor(new Color(0, 0, 0, 0))
             ->setTitleColor(new Color(0, 0, 0, 1))
+            ->setHoverColor(new Color(0, 0, 0, 0))
         ;
     }
 
@@ -131,6 +138,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getBackgroundColor()
     {
         return $this->backgroundColor;
+    }
+
+    /**
+     * @param  Color $hoverColor
+     * @return $this
+     */
+    public function setHoverColor($hoverColor)
+    {
+        $this->hoverColor = $hoverColor;
+        return $this;
+    }
+
+    /**
+     * @return Color
+     */
+    public function getHoverColor()
+    {
+        return $this->hoverColor;
     }
 
     /**

@@ -99,6 +99,15 @@ class Mapper extends BaseMapper
             )
         );
 
+        // Hover color
+        $this->hasMap(
+            array(
+                'column'   => 'hover_color',
+                'property' => 'hoverColor',
+                'type'     => self::TYPE_COLOR,
+            )
+        );
+
         // Order
         $this->hasMap(
             array(
