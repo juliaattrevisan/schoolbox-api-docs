@@ -14,7 +14,7 @@ $form-label-font-weight: $font-weight-bold;
 $form-label-line-height: 1.5;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
-$form-label-bottom-margin: 8px;
+$form-label-bottom-margin: 0px;
 // $input-font-family: inherit;
 $input-font-color: $body-grey;
 $input-font-size: rem-calc(16);
@@ -37,7 +37,7 @@ $input-box-shadow: none;
 // $fieldset-border-width: 1px;
 // $fieldset-border-color: #ddd;
 // $fieldset-padding: rem-calc(20);
-// $fieldset-margin: rem-calc(18 0);
+$fieldset-margin: rem-calc(16 0);
 
 // We use these to style the legends when you use them
 // $legend-bg: #fff;
@@ -71,8 +71,8 @@ $input-include-glowing-effect: false;
 // $glowing-effect-color: $input-focus-border-color;
 
 // Select variables
-// $select-bg-color: #fafafa;
-// $select-hover-bg-color: scale-color($select-bg-color, $lightness: -3%);
+$select-bg-color: $input-bg-color;
+$select-hover-bg-color: tint($warning-color, 50%);
 
 //
 // SWITCH
@@ -126,8 +126,34 @@ $switch-negative-color: tint($secondary-color, 74%);
 //
 
 form 							{ @include placeholder-color($body-grey); @include placeholder-hover-color($black);
-	input, textarea				{ @include single-transition(all, 0.15s, linear);
+	input,
+	textarea,
+	select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
 		&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
-		&:focus 				{ color: $input-focus-color; }
+		&:focus 				{ color: $input-focus-color; outline-color: none; }
 	}
+	select option				{
+		&:hover 				{ background: $input-hover-bg-color; }
+	}
+	input[type=radio],
+	input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
+	label.radio-label,
+	label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
+	input[type=radio] +
+	label.radio-label,
+	input[type=checkbox] +
+	label.checkbox-label		{ padding-left: 29px; height: 24px; display: inline-block; line-height: 24px;
+								background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
+								vertical-align: middle; cursor: pointer; margin: 16px 1.375rem 16px 0;
+	}
+	input[type=checkbox] +
+	label.checkbox-label		{ background-position: 0 -72px; }
+	//	input[type=radio]:hover +
+//	label.checkbox-label:hover	{ background-position: 0 -24px; }
+	input[type=radio]:checked +
+	label.radio-label			{ background-position: 0 -48px; }
+	input[type=checkbox]:checked +
+	label.checkbox-label		{ background-position: 0 -120px; }
 }
+
+

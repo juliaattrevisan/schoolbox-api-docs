@@ -12,7 +12,7 @@ $alert-padding-bottom: $alert-padding-top;
 
 // We use these to control text style.
 $alert-font-weight: $font-weight-normal;
-$alert-font-size: rem-calc(13);
+$alert-font-size: rem-calc(16);
 $alert-font-color: #fff;
 $alert-font-color-alt: scale-color($secondary-color, $lightness: -66%);
 
@@ -26,13 +26,13 @@ $alert-border-color: scale-color($primary-color, $lightness: $alert-function-fac
 $alert-bottom-margin: rem-calc(20);
 
 // We use these to style the close buttons
-$alert-close-color: $white;
+$alert-close-color: $primary-color;
 $alert-close-top: 50%;
 $alert-close-position: rem-calc(4);
-$alert-close-font-size: rem-calc(22);
-$alert-close-opacity: 0.8;
+$alert-close-font-size: rem-calc(30);
+$alert-close-opacity: 1.0;
 $alert-close-opacity-hover: 1.0;
-$alert-close-padding: 9px 6px 4px;
+$alert-close-padding: 14px 11px 4px;
 
 // We use this to control border radius
 $alert-radius: $global-radius;
@@ -44,3 +44,20 @@ $alert-transition-ease: ease-out;
 .alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
 
 @import "../../../javascript/components/foundation/scss/foundation/components/alert-boxes";
+
+//
+// Custom overrides
+//
+
+.alert-box 						{ background-color: tint($primary-color, 74%); color: $primary-color;
+	&.secondary 				{ background-color: tint($secondary-color, 74%); }
+	&.success 					{ background-color: tint($success-color, 74%); color: $success-color;
+		.close 					{ color: $success-color; }
+	}
+	&.warning 					{ background-color: tint($warning-color, 74%); color: $warning-color;
+		.close 					{ color: $warning-color; }
+	}
+	&.alert 					{ background-color: tint($alert-color, 74%); color: $alert-color;
+		.close 					{ color: $alert-color; }
+	}
+}

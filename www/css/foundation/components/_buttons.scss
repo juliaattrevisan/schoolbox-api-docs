@@ -271,7 +271,7 @@ $tabs-navigation-hover-bg-color: tint($tertiary, 87%);
 // $tabs-navigation-font-family: $body-font-family;
 
 // $tabs-content-margin-bottom: rem-calc(24);
-// $tabs-content-padding: $column-gutter/2;
+$tabs-content-padding: $column-gutter/5;
 
 // $tabs-vertical-navigation-margin-bottom: 1.25rem;
 
@@ -297,11 +297,12 @@ $tabs-navigation-hover-bg-color: tint($tertiary, 87%);
 }
 $button-group-border-width: 0;
 
+// Custom SB breadcrumbs
 .breadcrumb 					{ margin: 0; list-style: none; overflow: hidden;
 	li 							{
 		a 						{ color: $black; text-decoration: none; padding: 13px 0 13px 50px; background-color: tint($tertiary, 74%);
-								position: relative;display: block;float: left;
-			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent;
+								position: relative;display: block;float: left; @include single-transition(all, 0.15s, linear);
+			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent; @include single-transition(all, 0.15s, linear);
 								border-bottom: 50px solid transparent; position: absolute; top: 50%; margin-top: -50px; left: 100%; z-index: 2;
 			}
 			&:before			{ margin-left: 1px; border-left: 30px solid $white; }

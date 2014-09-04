@@ -111,46 +111,68 @@
             <hr>
             <h4 id="forms">Forms</h4>
             <form>
-                <fieldset>
-                    <legend>Fieldset</legend>
-
-                    <div class="row">
-                        <div class="large-12 columns">
-                            <label>Input Label</label>
-                            <input type="text" placeholder="large-12.columns">
-                        </div>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label>Input Label
+                            <input type="text" placeholder="large-12.columns" />
+                        </label>
                     </div>
-
-                    <div class="row">
-                        <div class="large-4 columns">
+                </div>
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label>Input Label
+                            <input type="text" placeholder="large-4.columns" />
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label>Input Label
+                            <input type="text" placeholder="large-4.columns" aria-describedby="nameHelpText" />
+                        </label>
+                        <p id="nameHelpText">HAHA! <i>Business</i></p>
+                    </div>
+                    <div class="large-4 columns">
+                        <div class="row collapse">
                             <label>Input Label</label>
-                            <input type="text" placeholder="large-4.columns">
-                        </div>
-                        <div class="large-4 columns">
-                            <label>Input Label</label>
-                            <input type="text" placeholder="large-4.columns">
-                        </div>
-                        <div class="large-4 columns">
-                            <div class="row collapse">
-                                <label>Input Label</label>
-                                <div class="small-9 columns">
-                                    <input type="text" placeholder="small-9.columns">
-                                </div>
-                                <div class="small-3 columns">
-                                    <span class="postfix">.com</span>
-                                </div>
+                            <div class="small-9 columns">
+                                <input type="text" placeholder="small-9.columns" />
+                            </div>
+                            <div class="small-3 columns">
+                                <span class="postfix">.com</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="large-12 columns">
-                            <label>Textarea Label</label>
-                            <textarea placeholder="small-12.columns"></textarea>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label>Select Box
+                            <select>
+                                <option value="husker">Husker</option>
+                                <option value="starbuck">Starbuck</option>
+                                <option value="hotdog">Hot Dog</option>
+                                <option value="apollo">Apollo</option>
+                            </select>
+                        </label>
                     </div>
-
-                </fieldset>
+                </div>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label>Choose Your Favorite</label>
+                        <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
+                        <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
+                    </div>
+                    <div class="large-6 columns">
+                        <label>Check these out</label>
+                        <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
+                        <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <label>Textarea Label
+                            <textarea placeholder="small-12.columns"></textarea>
+                        </label>
+                    </div>
+                </div>
             </form>
             <!--<h4 id="block-grid">Block Grid</h4>-->
             <!--<ul class="small-block-grid-2 large-block-grid-4">-->
@@ -308,32 +330,32 @@
                     <p>It works as a modal too!</p>
                 </li>
             </ol>
-            <div id="firstStop" class="panel"><p>Ride the whale.</p></div>
-            <p id="numero1" class="panel">Megalodon<p>
-            <p id="numero2" class="panel">Kraken</p>
-            <p id="End" class="panel">Whale</p>
-            <!-- At the bottom of your page but inside of the body tag -->
-            <div id="joyride-go">
-                <ol class="joyride-list" data-joyride>
-                    <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
-                        <p>Welcome to Rapture, the home of Schoolbox.</p>
-                        <p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>
-                    </li>
-                    <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
-                        <h4>Stop #1</h4>
-                        <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
-                    </li>
-                    <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
-                        <h4>Stop #2</h4>
-                        <p>Get the details right by styling Joyride with a custom stylesheet!</p>
-                    </li>
-                    <li data-button="End" data-prev-text="Prev">
-                        <h4>Stop #3</h4>
-                        <p>It works as a modal too!</p>
-                        <p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>
-                    </li>
-                </ol>
-            </div>
+            <!--<div id="firstStop" class="panel"><p>Ride the whale.</p></div>-->
+            <!--<p id="numero1" class="panel">Megalodon<p>-->
+            <!--<p id="numero2" class="panel">Kraken</p>-->
+            <!--<p id="End" class="panel">Whale</p>-->
+            <!--&lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;-->
+            <!--<div id="joyride-go">-->
+                <!--<ol class="joyride-list" data-joyride>-->
+                    <!--<li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">-->
+                        <!--<p>Welcome to Rapture, the home of Schoolbox.</p>-->
+                        <!--<p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>-->
+                    <!--</li>-->
+                    <!--<li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">-->
+                        <!--<h4>Stop #1</h4>-->
+                        <!--<p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>-->
+                    <!--</li>-->
+                    <!--<li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">-->
+                        <!--<h4>Stop #2</h4>-->
+                        <!--<p>Get the details right by styling Joyride with a custom stylesheet!</p>-->
+                    <!--</li>-->
+                    <!--<li data-button="End" data-prev-text="Prev">-->
+                        <!--<h4>Stop #3</h4>-->
+                        <!--<p>It works as a modal too!</p>-->
+                        <!--<p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>-->
+                    <!--</li>-->
+                <!--</ol>-->
+            <!--</div>-->
             <!--<p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>-->
             <hr>
             <h4 id="labels">Labels</h4>
@@ -348,7 +370,7 @@
             </p>
 
             <hr>
-            <h4 id="magellan">Magellan</h4>
+            <h4 id="magellan">Magellan (Sticky Nav)</h4>
             <div class="magellan-container" data-magellan-expedition="fixed">
                 <ul class="sub-nav inline-list"">
                     <li data-magellan-arrival="build"><a href="#build">Build with HTML</a></li>
@@ -592,14 +614,14 @@
             </div>
 
             <hr>
-            <h4 id="sub-nav">Sub Nav</h4>
-            <dl class="sub-nav">
-                <dt>Filter:</dt>
-                <dd class="active"><a href="#">All</a></dd>
-                <dd><a href="#">Active</a></dd>
-                <dd><a href="#">Pending</a></dd>
-                <dd><a href="#">Suspended</a></dd>
-            </dl>
+            <!--<h4 id="sub-nav">Sub Nav</h4>-->
+            <!--<dl class="sub-nav">-->
+                <!--<dt>Filter:</dt>-->
+                <!--<dd class="active"><a href="#">All</a></dd>-->
+                <!--<dd><a href="#">Active</a></dd>-->
+                <!--<dd><a href="#">Pending</a></dd>-->
+                <!--<dd><a href="#">Suspended</a></dd>-->
+            <!--</dl>-->
 
             <hr>
             <h4 id="tables">Tables</h4>
@@ -639,7 +661,7 @@
             <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
             <hr>
             <h4 id="tooltips">Tooltips</h4>
-            <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="210" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="120" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
+            <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="120" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
 
             <hr>
             <h4 id="top-bar">Top Bar</h4>
