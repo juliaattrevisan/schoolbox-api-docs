@@ -99,7 +99,6 @@ else {
 	$this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
 	$this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
 	$this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
-	$this->setBlock('attempt', 'writable_update', 'writable_update_block');
 	$this->setVar('writable_finalise_block', '');
 	$this->setTitle('Assessment: ' . $assess['title']);
 
@@ -152,7 +151,6 @@ else {
 			/* Reset answer options and marks from previous iteration
 			 */
 			$this->setVar('answerOption_block', '');
-			$this->setVar('writable_update_block', '');
 			$this->setVar('writable_comment_block', '');
 			$this->setVar('writable_mark_block', '');
 			$this->setVar('readonly_comment_block', '');
@@ -180,7 +178,6 @@ else {
 				$this->parse('readonly_mark_block',    'readonly_mark');
 			}
 			else {
-				$this->parse('writable_update_block',  'writable_update');
 				$this->parse('writable_comment_block', 'writable_comment');
 				$this->parse('writable_mark_block',    'writable_mark');
 			}
