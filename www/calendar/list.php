@@ -30,9 +30,6 @@ else {
 $factory = new Calendar_Api_Factory($user);
 $api = $factory->produce();
 
-$calendar = new Calendar_Event_Collection_Lister($api, $_SERVER['REQUEST_TIME'],  strtotime('+1 year', $_SERVER['REQUEST_TIME']), $this);
+$calendar = new Calendar_Event_Collection_Lister($api, $_SERVER['REQUEST_TIME'],  strtotime('+1 year', $_SERVER['REQUEST_TIME']), $this, $user);
 $calendar->renderAll();
 
-$this->setVar(array(
-    'USER_FULLNAME' => $user->getFullname()
-));

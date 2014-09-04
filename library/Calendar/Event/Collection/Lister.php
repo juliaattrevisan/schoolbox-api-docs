@@ -11,6 +11,19 @@
 class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Renderer {
 
     /**
+     * Constructor
+     *
+     * @param $api
+     * @param $startTimestamp
+     * @param $endTimestamp
+     * @param $page
+     */
+    public function __construct($api, $startTimestamp, $endTimestamp, $page, $user) {
+        parent::__construct($api, $startTimestamp, $endTimestamp, $page);
+        $this->user = $user;
+    }
+
+    /**
      * Render all the events in a list format
      */
     public function renderAll() {
@@ -43,5 +56,43 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
             $currentEvent->accept($renderer);
         }
+
+        /* Render everything else out
+         */
+        $groupHandler = new Group();
+        $category_list = $groupHandler->involvedInCategoryList($this->user->getId());
+
+        $calendarHandler = new Calendar();
+        $campus_list = $calendarHandler->getFilterCampusList($this->user->getId());
+
+        $this->getPage()->checkList(
+            'filter_group',
+            $category_list,
+            null,
+            TEMPLATE_content,
+            array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
+        );
+        $this->getPage()->checkList(
+            'filter_campus',
+            $campus_list,
+            null,
+            TEMPLATE_content,
+            array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
+        );
+        $this->getPage()->checkList(
+            'filter_event_type',
+            $calendarHandler->getTypeList(),
+            null,
+            TEMPLATE_content,
+            array(
+                'eventType'   => 'EVENT_TYPE_NAME',
+                'eventTypeID' => 'EVENT_TYPE_ID',
+                'eventColour' => 'EVENT_TYPE_COLOUR'
+            )
+        );
+
+        $this->getPage()->setVar(array(
+            'USER_FULLNAME' => $this->user->getFullname()
+        ));
     }
 }
