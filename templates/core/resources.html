@@ -9,6 +9,35 @@
 <script type="text/javascript">
 $(function() {
 
+    var relationID = {OPEN};
+
+    $j('#drop-center').fileDrop({
+        previewsContainer: '#file-window .scroller',
+        tplWrap: '<div class="dz-preview" />',
+
+        addedfile: function(file) {
+            $(file.previewElement).addClass('category-'+relationID).data('node', relationID);
+        },
+
+        // callbacks
+        sending: function (file, xhr, formData) {
+            var el = $(file.previewElement);
+
+            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+            formData.append('category', el.data('node'));
+            formData.append('comment', '');
+            formData.append('hidden', 0);
+        },
+
+        complete: function (file, response) {
+            $(file.previewElement).find('img').attr('src', '');
+            if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                $('#node-'+relationID).trigger('click');
+            }
+        }
+
+    });
+
     var threePanel = new ThreePanelView('/ajax/resource/meta.php', 'resources');
 
     // Select a node: update the second and third panels.
