@@ -85,7 +85,8 @@ class Healthcheck {
         $list[] = 'FileSemesters';
         $list[] = 'luAbsenceReason';
         $list[] = 'luAbsenceType';
-        $list[] = 'luBuilding';
+	$list[] = 'luBuilding';
+	$list[] = 'luCountry';
         $list[] = 'luDepartment';
         $list[] = 'luFileType';
         $list[] = 'luForm';
