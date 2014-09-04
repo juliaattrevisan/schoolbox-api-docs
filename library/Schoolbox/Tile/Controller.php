@@ -65,6 +65,7 @@ class Controller extends Base
      */
     public function layoutForm(Component_Instance $component)
     {
+        $code   = 200;
         $layout = $this->getLayoutFromComponent($component);
         $layout
             ->setLayoutType($this->getRequest()->post['layout_type'])
@@ -73,34 +74,50 @@ class Controller extends Base
             ->setAspectRatioX($this->getRequest()->post['aspect_ratio_x'])
             ->setAspectRatioY($this->getRequest()->post['aspect_ratio_y'])
         ;
-        $this->getLayoutMapper()->save($layout);
 
-        // Rearrange tiles
-        $tilesOrder = $this->getRequest()->post['tile'];
-        if (!empty($tilesOrder)) {
-            foreach ($layout->getTileList() as $tile) {
-                $order = array_search($tile->getId(), $tilesOrder);
-                if ($order !== false) {
-                    $tile->setOrder($order);
+        if ($this->getLayoutMapper()->save($layout)) {
+            // Rearrange tiles
+            $tilesOrder = $this->getRequest()->post['tile'];
+            if (!empty($tilesOrder)) {
+                foreach ($layout->getTileList() as $tile) {
+                    $order = array_search($tile->getId(), $tilesOrder);
+                    if ($order !== false) {
+                        $tile->setOrder($order);
+                    }
+                }
+                if (!$this->getMapper()->save($layout->getTileList())) {
+                    $code = 500;
                 }
             }
-            $this->getMapper()->save($layout->getTileList());
+        } else {
+            $code = 500;
         }
 
-        // and redirect back to wherever
-        switch ($component->getModule()) {
-            case 'dashboard':
-                $href = '/adminv2/dashboard#'.$component->getIdentifier();
-                break;
-            case 'homepage_template':
-                $href = '/adminv2/homepage#'.$component->getIdentifier();
-                break;
-            case 'homepage':
-            default:
-                $href = '/homepage/'.$component->getIdentifier();
-                break;
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => $layout,
+                )
+            );
+        } else {
+            // redirect back to wherever
+            switch ($component->getModule()) {
+                case 'dashboard':
+                    $href = '/adminv2/dashboard#'.$component->getIdentifier();
+                    break;
+                case 'homepage_template':
+                    $href = '/adminv2/homepage#'.$component->getIdentifier();
+                    break;
+                case 'homepage':
+                default:
+                    $href = '/homepage/'.$component->getIdentifier();
+                    break;
+            }
+            $this->getResponse()->redirect->afterPost($href);
         }
-        $this->getResponse()->redirect->afterPost($href);
+
+
     }
 
     /**
