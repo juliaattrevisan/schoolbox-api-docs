@@ -15,7 +15,7 @@ use Schoolbox\Storage;
 use Schoolbox\Tile\Layout;
 use Schoolbox\ISoftDeletable;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     /**
      * Value of $titlePosition for when it's at the bottom.
@@ -374,5 +374,18 @@ class Model implements ISoftDeletable
     public function isDeleted()
     {
         return $this->getDeletedAt() instanceof Alaress_Date_Format;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @return mixed
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id'        => $this->getId(),
+            'titleText' => $this->getTitleText(),
+        );
     }
 }
