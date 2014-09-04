@@ -117,41 +117,44 @@ class External_Schoolbox_User implements External_UserInterface {
 	 * @return array
 	 */
 	public function getStudentContactList($externalUserId) {
-		$statement = $this->getDatabase()->prepare("
-			SELECT
-				1 AS StudentContactID,
-				'' AS StudentContactTitle,
-				'' AS StudentContactPreferred,
-				'' AS StudentContactSurname,
-				guardian1Name AS StudentContactPreferred,
-				'' AS StudentContactSurname,
-				guardian1Email AS StudentContactDefaultEmail,
-				guardian1Address AS StudentContactAddress1,
-				guardian1Suburb AS StudentContactSuburb,
-				guardian1Postcode AS StudentContactPostCode,
-				'' AS StudentContactState,
-				guardian1HomePhone AS StudentContactPhoneActual,
-				guardian1MobilePhone AS StudentContactMobilePhone,
-				guardian1WorkPhone AS StudentContactOccupPhone,
-				2 AS StudentContactSpouseID,
-				'' AS StudentContactSpouseTitle,
-				'' AS StudentContactSpousePreferred,
-				'' AS StudentContactSpouseSurname,
-				guardian2Name AS StudentContactSpousePreferred,
-				'' AS StudentContactSpouseSurname,
-				guardian2Email AS StudentContactSpouseDefaultEmail,
-				guardian2Address AS StudentContactSpouseAddress1,
-				guardian2Suburb AS StudentContactSpouseSuburb,
-				guardian2Postcode AS StudentContactSpousePostCode,
-				'' AS StudentContactSpouseState,
-				guardian2HomePhone AS StudentContactSpousePhoneActual,
-				guardian2MobilePhone AS StudentContactSpouseMobilePhone,
-				guardian2WorkPhone AS StudentContactSpouseOccupPhone
-			FROM `user`
-			LEFT JOIN user_profile ON user.id = user_profile.user_id
-			WHERE user.synergy_id = :externalUserId
-		");
-
+        // Updated query:
+        // no longer relies on user_profile being populated to fetch parent ID
+        $statement = $this->getDatabase()->prepare("
+            SELECT
+                parent.synergy_id AS StudentContactID,
+                '' AS StudentContactTitle,
+                '' AS StudentContactPreferred,
+                '' AS StudentContactSurname,
+                pp.guardian1Name AS StudentContactPreferred,
+                '' AS StudentContactSurname,
+                pp.guardian1Email AS StudentContactDefaultEmail,
+                pp.guardian1Address AS StudentContactAddress1,
+                pp.guardian1Suburb AS StudentContactSuburb,
+                pp.guardian1Postcode AS StudentContactPostCode,
+                '' AS StudentContactState,
+                pp.guardian1HomePhone AS StudentContactPhoneActual,
+                pp.guardian1MobilePhone AS StudentContactMobilePhone,
+                pp.guardian1WorkPhone AS StudentContactOccupPhone,
+                '' AS StudentContactSpouseID,
+                '' AS StudentContactSpouseTitle,
+                '' AS StudentContactSpousePreferred,
+                '' AS StudentContactSpouseSurname,
+                pp.guardian2Name AS StudentContactSpousePreferred,
+                '' AS StudentContactSpouseSurname,
+                pp.guardian2Email AS StudentContactSpouseDefaultEmail,
+                pp.guardian2Address AS StudentContactSpouseAddress1,
+                pp.guardian2Suburb AS StudentContactSpouseSuburb,
+                pp.guardian2Postcode AS StudentContactSpousePostCode,
+                '' AS StudentContactSpouseState,
+                pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
+                pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
+                pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
+            FROM `user` child
+            INNER JOIN user_relation ur ON child.id = ur.relation_id
+            INNER JOIN `user` parent on ur.user_id = parent.id
+            LEFT JOIN user_profile pp ON `parent`.id = pp.user_id
+            WHERE child.synergy_id = :externalUserId
+        ");
 		$statement->execute(array(
 			':externalUserId' => $externalUserId
 		));
