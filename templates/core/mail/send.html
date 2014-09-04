@@ -1,36 +1,76 @@
 <!-- BEGIN custom_head -->
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'textareas'
-		});
+$(function() {
+    $.fn.alaressTiny({
+        mode: 'textareas'
+    });
 
-		var options = {
-			ajax: {
-				url:      '/ajax/user.php',
-				type:     'GET',
-				data:     {groupID: 0, email: 1},
-				dataType: 'json'
-			},
-			multiple: true,
-			selectize: {
-				plugins: ['remove_button', 'restore_on_backspace'],
-				create: function(input) {
-					var freeEntry = {};
-					freeEntry[this.settings.valueField]  = input;
-					freeEntry[this.settings.searchField] = input;
-					return freeEntry;
-				}
-			}
-		}
-		$j('#to').selectizeSelector($j.extend({}, options, {value: {REPLYTO}}))
-		$j('#cc').selectizeSelector(options)
-		$j('#bcc').selectizeSelector($j.extend({}, options, {value: {BCC}}))
-	});
+    var options = {
+        ajax: {
+            url:      '/ajax/user.php',
+            type:     'GET',
+            data:     {groupID: 0, email: 1},
+            dataType: 'json'
+        },
+        multiple: true,
+        selectize: {
+            plugins: ['remove_button', 'restore_on_backspace'],
+            create: function(input) {
+                var freeEntry = {};
+                freeEntry[this.settings.valueField]  = input;
+                freeEntry[this.settings.searchField] = input;
+                return freeEntry;
+            }
+        }
+    }
+    $j('#to').selectizeSelector($j.extend({}, options, {value: {REPLYTO}}))
+    $j('#cc').selectizeSelector(options)
+    $j('#bcc').selectizeSelector($j.extend({}, options, {value: {BCC}}))
+
+    // dialogs for copying email fields
+    $j('label[data-role="copy-emails"]').click(function(event) {
+        event.preventDefault();
+        var element = $(this);
+        var target  = $('#'+element.attr('for'));
+        // get html-escaped version of text, really annoying
+        var text = $('<div />').text(target.val()).html();
+        if (text.length > 0) {
+            element
+                .qtip({
+                    content: {
+                        title: target.attr('name'),
+                        text: text,
+                        button: true
+                    },
+                    position: {
+                        my: 'top right',
+                        at: 'bottom left'
+                    },
+                    style: {
+                        classes: 'qtip-light qtip-shadow'
+                    },
+                    show: {
+                        event: 'click'
+                    },
+                    hide: {
+                        event: 'unfocus'
+                    },
+                    events: {
+                        hide: function(event, api) {
+                            api.destroy();
+                        }
+                    }
+                })
+                .qtip('show');
+        }
+    })
+});
 
 function verify()
 {
@@ -56,16 +96,25 @@ function verify()
   <table class="table">
     <tr>
       <td class="formLabelWidth"><h4>To:</h4></td>
-	  <td><input name="to" id="to" size="90" /></td>
+	  <td>
+          <input name="to" id="to" size="90" class="email-input" />
+          <label for="to" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
+      </td>
     </tr>
     <tr>
       <td><h4>CC:</h4></td>
-	  <td><input name="cc" id="cc" size="90" /></td>
+	  <td>
+          <input name="cc" id="cc" size="90" class="email-input" />
+          <label for="cc" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
+      </td>
     </tr>
     <tr>
       <td><h4>BCC:</h4>
 	  </td>
-	  <td><input name="bcc" id="bcc" size="90" /></td>
+	  <td>
+          <input name="bcc" id="bcc" size="90" class="email-input" />
+          <label for="bcc" data-role="copy-emails" class="btn modify no-text" title="Show addresses for copy"><span></span></label>
+      </td>
     </tr>
     <tr>
       <td><h4>Subject:</h4>
