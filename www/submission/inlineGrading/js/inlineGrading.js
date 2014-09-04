@@ -140,6 +140,10 @@
 			var merged = $j.extend(defaults, derived, options);
 			merged.currentId = parseInt(merged.currentId);
 
+			/* Force parse of array as string into actual array structure
+			 */
+			merged.disabled = JSON.parse(merged.disabled);
+
 			/* Do some preprocessing first by indicating which people
 			 * can be selected from the dropdown
 			 */
