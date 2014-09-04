@@ -135,11 +135,15 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                 }
        //
        // Overwrite default campus
-                $parents[$user_id]['defaultCampus'] = $newUser['campus'];
-                $parents[$user_id]['campus'] = array_unique(array_merge(
-                    $parents[$user_id]['campus'],
-                    $newUser['campus']
-                ));
+                if (!empty($newUser['campus'])) {
+                    $parents[$user_id]['defaultCampus'] = $newUser['campus'];
+                    $parents[$user_id]['campus'] = array_unique(
+                        array_merge(
+                            $parents[$user_id]['campus'],
+                            $newUser['campus']
+                        )
+                    );
+                }
             }
         }
      //
