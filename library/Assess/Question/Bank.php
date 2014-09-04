@@ -28,18 +28,4 @@ class Assess_Question_Bank extends Evaluation_Question_Bank {
 		$this->setAnswerHandler(new Assess_Answer());
 		$this->setContext();
 	}
-
-	/**
-	 * Make the assess_question_bank table behave like assess_question
-	 */
-	protected function setContext() {
-
-		/* Use context-specific fields
-		 */
-		$this->getQuestionHandler()->setAllowedFields(array(
-			'question_bank_id', 'question_category_id', 'type_id',
-			'question', 'answer', 'marks',
-			'config', 'deleted_at'
-		));
-	}
 }
