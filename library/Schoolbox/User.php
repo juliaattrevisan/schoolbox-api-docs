@@ -469,24 +469,26 @@ private $enabled;               //Bool
 
 				/* Add parent
 				 */
-				$parentCollection = UserMapper::getInstance()->findByColumnList(array(
-					'synergy_id' => $currentParent['StudentContactID'],
-					'group_id'   => $parentRoles
-				));
-
-				if ($parentCollection->count()) {
-					$this->parent_collection->add($parentCollection->first());
+				if (!empty($currentParent['StudentContactID'])) {
+					$parentCollection = UserMapper::getInstance()->findByColumnList(array(
+						'synergy_id' => $currentParent['StudentContactID'],
+						'group_id'   => $parentRoles
+					));
+					if ($parentCollection->count()) {
+						$this->parent_collection->add($parentCollection->first());
+					}
 				}
 
 				/* Add speece
 				 */
-				$spouseCollection = UserMapper::getInstance()->findByColumnList(array(
-					'synergy_id' => $currentParent['StudentContactSpouseID'],
-					'group_id'   => $parentRoles
-				));
-
-				if ($spouseCollection->count()) {
-					$this->parent_collection->add($spouseCollection->first());
+				if (!empty($currentParent['StudentContactSpouseID'])) {
+					$spouseCollection = UserMapper::getInstance()->findByColumnList(array(
+						'synergy_id' => $currentParent['StudentContactSpouseID'],
+						'group_id'   => $parentRoles
+					));
+					if ($spouseCollection->count()) {
+						$this->parent_collection->add($spouseCollection->first());
+					}
 				}
 			}
 		}
