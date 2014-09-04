@@ -132,6 +132,13 @@
                                name="background_color"
                                data-colorpicker
                                value="{{ item.backgroundColor|e('html_attr') }}" />
+                        <label for="background_color">background</label>
+                        <input type="text"
+                               id="hover_color"
+                               name="hover_color"
+                               data-colorpicker
+                               value="{{ item.hoverColor|e('html_attr') }}" />
+                        <label for="hover_color">hover</label>
                     </dd>
                     <dt>Image</dt>
                     <dd class="background-upload">

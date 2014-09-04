@@ -260,7 +260,8 @@ class Controller extends Base
             ->setTitleBackgroundColor($post['title_background_color'])
             ->setTitlePosition($post['title_position'])
             ->setLink($post['link'])
-            ->setBackgroundColor($post['background_color']);
+            ->setBackgroundColor($post['background_color'])
+            ->setHoverColor($post['hover_color']);
 
         // Upload a file if there was one
         if (($upload = $files['background_image']) && empty($upload['error'])) {
