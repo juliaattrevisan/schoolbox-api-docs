@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>Google Drive Picker</title>
+
+  <style type="text/css">
+
+    div.picker-dialog {
+      box-shadow: none;
+      -o-box-shadow: none;
+      -moz-box-shadow: none;
+      -webkit-box-shadow: none;
+      border: none;
+      min-width: 566px;
+      width: 100%;
+      top: 0 !important;
+      left: 0 !important;
+    }
+    div.picker-dialog-content {
+      min-height: 350px;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    #auth-btn {
+      padding: 8px 12px;
+      background: #0066b0;
+      color: #fff;
+      display: none;
+    }
+    #auth-btn.need-auth {
+      display: inline;
+    }
+
+  </style>
+
+  <script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/javascript/google/apiloader.js"></script>
+
+  <script type="text/javascript">
+
+      loadGoogleApi(['auth', 'picker'], function () {
+          jQuery
+          .ajax({
+              url: '/javascript/resource/jquery.gpick.js',
+              dataType: 'script',
+              cache: true,
+          })
+          .then(function () {
+              $('#content').gpick({
+                  developerKey: '{DEV_KEY}',
+                  clientId: '{CLIENT_ID}',
+                  scopes: ['{SCOPES}'],
+                  views: [{VIEWS}],
+                  features: [{FEATURES}],
+                  title: null,
+                  authBtn: '#auth-btn',
+                  authNeededClass: 'need-auth',
+                  onSelect: function (docs) {
+                      if(top.gpick.picked) {
+                          top.gpick.picked.call(top, docs);
+                      } else {
+                        console.log(docs);
+                      }
+                  },
+                  onCancel: function () {
+                      if(top.gpick.cancelled) {
+                          top.gpick.cancelled.call(top);
+                      } else {
+                          console.error(this);
+                      }
+                  },
+                  onLoaded: function (picker) {
+                      // that which has been seen cannot be unseen
+                      picker.setVisible(true);
+
+                      if(top.gpick.loaded) {
+                          top.gpick.loaded.call(top);
+                      }
+                  }
+              });
+          });
+      });
+
+  </script>
+
+</head>
+<body>
+<pre id="result"></pre>
+<div id="content">
+  <a href="#" role="button" id="auth-btn">Authorize Google account</a>
+</div>
+<!-- The Google API Loader script. -->
+</body>
+</html>
