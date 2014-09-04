@@ -136,7 +136,8 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
        //
        // Overwrite default campus
                 if (!empty($newUser['campus'])) {
-                    $parents[$user_id]['defaultCampus'] = $newUser['campus'];
+                    // Default campus: whatever the first in the list is
+                    $parents[$user_id]['defaultCampus'] = current($newUser['campus']);
                     $parents[$user_id]['campus'] = array_unique(
                         array_merge(
                             $parents[$user_id]['campus'],
