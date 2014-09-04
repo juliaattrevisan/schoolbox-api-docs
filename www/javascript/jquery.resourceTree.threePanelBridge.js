@@ -107,6 +107,7 @@
         self.options = $.extend(true, {}, defaults, options);
         self.threePanel = self.options.threePanel;
         self.hoveredId  = null;
+        self.selectedId = null;
 
         // Ensure callbacks are bound to this object, instead of to the DOM node
         // they were triggered on.
@@ -158,6 +159,18 @@
 
         // threePanel.getFiles(relationId);
         var files = $('tr.category-' + relationID);
+
+        // Is there a dropzone preview?
+        // Remove it and all files in the previous selected directory,
+        // so they get reloaded.
+        if (self.selectedId) {
+            var preview = $('.dz-preview');
+            if (preview.length) {
+                preview.remove();
+                $('tr.category-'+String(self.selectedId)).remove();
+            }
+        }
+        self.selectedId = relationID;
 
         self.threePanel.getMeta(relationID);
 
