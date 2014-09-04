@@ -176,8 +176,8 @@ class Healthcheck {
         $list[] = 'luAbsenceType';
         $list[] = 'TimetableSubstitutes';
         $list[] = 'wkAttendances';
-        $list[] = 'AttendanceMaster'; // ?not list on wiki anymore
-        $list[] = 'tAttendances'; // ?not list on wiki anymore
+        $list[] = 'AttendanceMaster'; // not listed on wiki - not sure if required
+        $list[] = 'tAttendances'; // not listed on wiki - not sure if required
         sort($list);
 
         foreach($list as $table){
