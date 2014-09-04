@@ -119,8 +119,18 @@ if ($page->detectAjax()) {
 
             /** @var Component_Homepage_CourseInstanceController $controller */
             $controller = $chf->buildComponent($component);
+            $codeString = '';
+            try {
+                $codeString = CategoryMapper::getInstance()->findById($category_id)
+                    ->getCodeString();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
             $controller->setup(
-                array('id' => $category_id),
+                array(
+                    'id'   => $category_id,
+                    'code' => $codeString,
+                ),
                 $controller->getInstance()->getConfigArray()
             );
 
