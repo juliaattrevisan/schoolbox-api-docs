@@ -24,6 +24,7 @@ ul.tileList {
     // background as a color and nothing else.
     background-size: cover;
     background-position: center;
+    transition: background-color 0.1s;
     &.marked-for-delete {
       // Fade out tiles marked for delete
       filter: grayscale(1);
@@ -77,10 +78,6 @@ ul.tileList {
       top: 0;
       bottom: 0;
       width: 100%;
-      transition: background-color 0.1s;
-      &:hover {
-        background-color: fade(@link, 30%);
-      }
     }
   }
 }
