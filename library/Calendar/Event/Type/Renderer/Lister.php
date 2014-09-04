@@ -18,7 +18,9 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     public function visit($currentEvent)
     {
         $this->getPage()->setVar(array(
-            'EVENT_TITLE' => $currentEvent->getTitle()
+            'EVENT_TITLE' => $currentEvent->getTitle(),
+            'EVENT_TYPE' => $currentEvent->getType(),
+            'EVENT_COLOUR' => $currentEvent->getColour(),
         ));
 
         $this->getPage()->parse('event_block', 'event', true);
