@@ -12,6 +12,16 @@ error_reporting(E_ALL);
 $settings = NULL;
 require 'settings.php';
 
+/* Handle Single Logout commands */
+if(isset($_POST['SAMLRequest'])){
+    SAMLDebugLog('SAMLRequest assertion received, assuming logout');
+    SAMLDebugLog(base64_decode($_POST['SAMLRequest']));
+    session_start();
+    session_destroy();
+    header('Location: ' . Config::get('saml_logout_url'));
+    exit;
+}
+
 SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
 
