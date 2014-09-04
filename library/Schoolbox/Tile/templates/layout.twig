@@ -64,18 +64,48 @@
             items:  '> li:not(.add)'
         })
 
+        // Confirm delete dialog
+        var confirmDeleteDialog = form.find('#dialog-confirm-delete').dialog({
+            autoOpen:false,
+            resizable:false,
+            width:400,
+            modal:true,
+            draggable:false,
+            close: function() {
+                return false;
+            }
+        });
+
         // Delete buttons
         form.find('[data-role="delete"]').click(function(event) {
             event.preventDefault();
             var element = $(this);
-            // Add some sort of deleting animation
-            $.post(element.attr('href'))
-                .done(function() {
-                    var deletedTile = element.closest('.tile');
-                    element.fadeOut('slow', function() {
-                        deletedTile.remove();
-                    })
-                })
+
+            // Add confirmation dialog
+            confirmDeleteDialog
+                .dialog('option', 'buttons', [
+                    {
+                        text: "Yes",
+                        click: function(event) {
+                            // Add some sort of deleting animation
+                            confirmDeleteDialog.dialog('close');
+                            $.post(element.attr('href'))
+                                .done(function() {
+                                    var deletedTile = element.closest('.tile');
+                                    deletedTile.fadeOut('slow', function() {
+                                        deletedTile.remove();
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        text: "No",
+                        click: function(event) {
+                            confirmDeleteDialog.dialog('close');
+                        }
+                    }
+                ])
+                .dialog('open');
         });
 
         // Panes with buttons inside them
@@ -282,4 +312,8 @@
         {% set href='/homepage/'~component.identifier %}
     {% endif %}
     <a href="{{ href|e('html_attr') }}" class="btn no-icon float-left"><span></span>Cancel</a>
+
+    <div id="dialog-confirm-delete" title="Delete Tile" class="wysiwyg">
+        Are you sure you wish to delete this tile? You will not be able to undo this operation.
+    </div>
 </form>
