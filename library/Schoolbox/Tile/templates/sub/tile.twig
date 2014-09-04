@@ -1,0 +1,66 @@
+{% set baseStyle="#tile-"~tile.id %}
+<style type="text/css">
+.tile#tile-{{ tile.id|e('css') }} {
+    {% if tile.backgroundColor %}
+    background-color: rgba(
+        {{ tile.backgroundColor.red|e('css') }},
+        {{ tile.backgroundColor.green|e('css') }},
+        {{ tile.backgroundColor.blue|e('css') }},
+        {{ tile.backgroundColor.alpha|e('css') }}
+    );
+    {% endif %}
+    {% if tile.backgroundImage.id %}
+    background-image: url("/storage/image.php?size=maxsize&hash={{ tile.backgroundImage.hash|e('css') }}");
+    {% endif %}
+}
+
+{% if tile.hoverColor %}
+.tile#tile-{{ tile.id|e('css') }}:hover,
+.tile#tile-{{ tile.id|e('css') }} .tile-link:hover,
+.tile#tile-{{ tile.id|e('css') }} .edit:hover {
+    background-color: rgba(
+        {{ tile.hoverColor.red|e('css') }},
+        {{ tile.hoverColor.green|e('css') }},
+        {{ tile.hoverColor.blue|e('css') }},
+        {{ tile.hoverColor.alpha|e('css') }}
+    );
+}
+{% endif %}
+
+.tile#tile-{{ tile.id|e('css') }} .title {
+    color: rgba(
+        {{ tile.titleColor.red|e('css') }},
+        {{ tile.titleColor.green|e('css') }},
+        {{ tile.titleColor.blue|e('css') }},
+        {{ tile.titleColor.alpha|e('css') }}
+    );
+    background-color: rgba(
+        {{ tile.titleBackgroundColor.red|e('css') }},
+        {{ tile.titleBackgroundColor.green|e('css') }},
+        {{ tile.titleBackgroundColor.blue|e('css') }},
+        {{ tile.titleBackgroundColor.alpha|e('css') }}
+    );
+}
+
+</style>
+<li class="tile" id="tile-{{ tile.id|e('html_attr') }}">
+    <span class="title {% if tile.isTitlePositionTop() %}position-top{% elseif tile.isTitlePositionBottom() %}position-bottom{% endif %}">{{ tile.titleText }}</span>
+
+    {% if tile.link %}
+    <a href="{{ tile.link|e('html_attr') }}" class="tile-link"></a>
+    {% endif %}
+
+    {% if editable and tile.id %}
+    <div class="edit">
+        {# Hidden form input for this tile - used in sorting #}
+        <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
+        <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}"
+           class="btn no-text delete float-right"
+           data-role="delete"
+           title="Delete"><span></span></a>
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}"
+           class="btn no-text modify float-right"
+           title="Modify"><span></span></a>
+    </div>
+    {% endif %}
+</li>

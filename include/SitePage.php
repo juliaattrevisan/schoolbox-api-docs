@@ -37,7 +37,7 @@ class SitePage extends Page
 
 
     /**
-     * @param  Aura\Di\Container $di
+     * @param  Aura\Di\ContainerInterface $di
      * @return $this
      */
     public function setDi($di)
@@ -48,13 +48,33 @@ class SitePage extends Page
 
 
     /**
-     * @return Aura\Di\Container
+     * @return Aura\Di\ContainerInterface
+     * @throws RuntimeException if this SitePage has no DI container.
      */
     public function getDi()
     {
+        if (!($this->di instanceof Aura\Di\ContainerInterface)) {
+            throw new RuntimeException('This SitePage does not have a dependency injector');
+        }
         return $this->di;
     }
 
+    /**
+     * Gets a Twig renderer out of this sitepage's dependency injector,
+     * if there is one.
+     *
+     * @return Twig_Environment
+     * @throws RuntimeException if Twig renderer wasn't found in this Sitepage
+     *                          object's dependency injector.
+     */
+    public function getTwig()
+    {
+        $twig = $this->getDi()->get('templateEngine');
+        if ($twig instanceof Twig_Environment) {
+            return $twig;
+        }
+        throw new RuntimeException('Twig was not found in dependency injector');
+    }
 
     /**
      * Detect connection type
@@ -109,7 +129,6 @@ class SitePage extends Page
 
         /* iterate backwards through the path */
         for ($i = 0; $i < $total; $i++) {
-
             $filename = rtrim(implode("/", $path), '/');
 
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
@@ -204,7 +223,8 @@ class SitePage extends Page
         $this->ajax = $state;
     }
 
-    function setLite($state) {
+    function setLite($state)
+    {
         $this->lite = $state;
     }
 
@@ -232,7 +252,8 @@ class SitePage extends Page
      *                              Exits after output if false.
      * @param int   $responseCode   If set, output this response code.
      */
-    public function outputJson($output, $keepProcessing = false, $responseCode = null) {
+    public function outputJson($output, $keepProcessing = false, $responseCode = null)
+    {
         header('Content-Type: application/json');
         if (isset($responseCode)) {
             header(':', true, $responseCode);
@@ -317,7 +338,7 @@ class SitePage extends Page
         $this->setFile('bannerTpl', 'include/banner.html');
         $this->setFile('navTpl', 'include/nav.html');
         $this->setFile('tabTpl', 'include/tab.html');
-	    $this->setFile('instantTpl', 'include/instant.html');
+        $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
         $this->renderSideNav();
@@ -340,7 +361,6 @@ class SitePage extends Page
         }
 
         if ($_SESSION['id']) {
-
             $this->parse('MAIN_NAV_REGION', 'navTpl');
             $this->parse('MAIN_TAB_REGION', 'tabTpl');
             $this->parse('banner_logged_in_block', 'banner_logged_in');
@@ -374,7 +394,6 @@ class SitePage extends Page
         if (!isset($_SESSION['id'])) {
             //Catch already logged in users via kerberos or other means
             if (Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
-
                 $sessionHandler = new Session;
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
@@ -411,7 +430,7 @@ class SitePage extends Page
         $_SESSION['lasttime'] = mktime();
     }
 
-    function saveHistory($override = '') 
+    function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
@@ -422,7 +441,6 @@ class SitePage extends Page
 
         /* Dont handle duplicates (page refreshes) */
         if ($_SESSION['history'][0] != $requestUri) {
-
             array_unshift($_SESSION['history'], $requestUri);
 
             if (count($_SESSION['history']) > 3) {
@@ -611,15 +629,15 @@ class SitePage extends Page
             require_once WEB_root . '/include/wenona.php';
             //provide encoded login details for intranet
             $this->setVar(
-                 "ENC_LOGIN",
-                 urlencode(
-                     base64_encode(
-                         xorEncrypt(
-                             INTRANET_encryption_key,
-                             $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
-                         )
-                     )
-                 )
+                "ENC_LOGIN",
+                urlencode(
+                    base64_encode(
+                        xorEncrypt(
+                            INTRANET_encryption_key,
+                            $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
+                        )
+                    )
+                )
             );
 
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
@@ -731,7 +749,6 @@ class SitePage extends Page
         ";
         $this->db->query(sprintf($query, $_SESSION['id'], HOMEPAGE_SERVICE));
         if ($this->db->countRows() > 0) {
-
             while ($group = $this->db->getNextArray()) {
                 $this->setVar("MGNAME", Scrub::text($group['name']));
                 $this->setVar("MGID", $group['sid']);
@@ -874,9 +891,8 @@ class SitePage extends Page
         if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
             return $this->site . '/' . $template;
         } else {
-            if (is_file($this->templateRoot . '/core/' . $template)
-            ) //change this back to "core" for the rest of the releases.
-            {
+            if (is_file($this->templateRoot . '/core/' . $template)) {
+                // change this back to "core" for the rest of the releases.
                 return 'core/' . $template;
             } else {
                 return false;
@@ -904,7 +920,7 @@ class SitePage extends Page
      * @param  int    $responseCode   If set, output this response code.
      * @return void
      */
-    static public function localRedir($file, $keepProcessing = false, $responseCode = null)
+    public static function localRedir($file, $keepProcessing = false, $responseCode = null)
     {
         header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
@@ -950,8 +966,8 @@ class SitePage extends Page
     public static function redirectToBrokenImageOfSize($width, $height, $code = 500)
     {
         static::redirectToBrokenImage(
-              $code,
-                  array('width' => $width, 'height' => $height,)
+            $code,
+            array('width' => $width, 'height' => $height,)
         );
     }
 
@@ -966,8 +982,8 @@ class SitePage extends Page
     public static function redirectToBrokenImageWithTransform($transform_type, $transform, $code = 500)
     {
         static::redirectToBrokenImage(
-              $code,
-                  array('transform_type' => $transform_type, 'transform' => $transform,)
+            $code,
+            array('transform_type' => $transform_type, 'transform' => $transform,)
         );
     }
 

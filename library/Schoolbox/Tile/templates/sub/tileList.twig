@@ -1,0 +1,58 @@
+{##
+ # Grid Layout:
+ # Tile width: gridWidth px
+ # Padding-bottom (height): gridWidth*aspectRatioY/aspectRatioX
+ # Column Layout:
+ # Tile width: 100/column_count
+ # Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
+ #}
+{% if layout.aspectRatioY > 0 and layout.aspectRatioX > 0 %}
+<style type="text/css">
+#tileList-{{ layout.id }}.tileList .tile {
+    {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
+    width: {{ layout.gridWidth|e('css') }}px;
+    padding-bottom: {{ layout.gridWidth * (layout.aspectRatioY/layout.aspectRatioX) }}px;
+    {% endif %}
+
+    {% if layout.isColumnLayoutType and layout.columnCount > 0 %}
+    width: {{ 100 / layout.columnCount }}%;
+    padding-bottom: {{ 100 / layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
+    {% endif %}
+}
+</style>
+<script type="text/javascript" src="/javascript/jquery.cheatsResize.js"></script>
+<script type="text/javascript">
+    (function($) {
+        // Cheat's responsive text size:
+        // Constrain font size based on width of tile
+        $(function() {
+            $('.tile .title').cheatsResize();
+            $(window).resize(function() {
+                $('.tile .title').cheatsResize();
+            });
+        });
+    })(jQuery);
+</script>
+{% endif %}
+
+{# spaceless because spaces between inline-block elements split the element. WTF #}
+{% spaceless %}
+<ul id="tileList-{{ layout.id }}"
+    class="clearfix tileList {{ layout.isGridLayoutType() ? 'grid' : 'column' }}"
+>
+    {% for tile in tileList %}
+        {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
+    {% endfor %}
+
+    {% if editable %}
+    {# This button should transparently save layout before adding tile #}
+    <li class="tile add">
+        <span class="title position-top">+ Add Tile</span>
+        <a class="edit"
+           href="{{ routeLookup('tile.add', {componentId: component.id}) }}"
+           title="Add a new tile"
+        ></a>
+    </li>
+    {% endif %}
+</ul>
+{% endspaceless %}

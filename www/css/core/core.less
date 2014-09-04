@@ -3,6 +3,7 @@
 @import url("jquery-ui.customisation.less");
 @import (inline) url("magnific-popup.customisation.css");
 @import url("selectize.customisation.less");
+@import url("tiles.less");
 
 
 /*
@@ -2677,6 +2678,9 @@ input.timeField {
 
 	&.no-icon {
 		padding: 0 16px;
+		span {
+			background-image: none;
+		}
 	}
 
 	&.marg {
@@ -2697,6 +2701,11 @@ input.timeField {
 		width: auto;
 		float: none;
 		display: inline;
+	}
+	&.inline-block {
+		width: auto;
+		float: none;
+		display: inline-block;
 	}
 }
 

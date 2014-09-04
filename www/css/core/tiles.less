@@ -1,0 +1,138 @@
+/**
+ * Styles for the tile component.
+ */
+ul.tileList {
+  // Get rid of spacing between tiles
+  word-spacing: 0;
+  line-height: 0;
+
+  &.ui-sortable li {
+    // Get rid of border and background on sortable tiles
+    background-image: none;
+    border: none;
+  }
+
+  // Styles for individual tiles
+  li.tile {
+    padding: 0;
+    position: relative;
+    display: inline-block;
+    height: auto;
+    // Styles for the tile's background image (if provided)
+    background-repeat: no-repeat;
+    // This tends to get clobbered by more specific styles which set a
+    // background as a color and nothing else.
+    background-size: cover;
+    background-position: center;
+    transition: background-color 0.1s;
+    &.marked-for-delete {
+      // Fade out tiles marked for delete
+      filter: grayscale(1);
+      opacity: 0.3;
+    }
+    &.add {
+      // Add new tile link looks like a tile
+      background-color: rgba(0, 0, 0, 0.1);
+      .title {
+        // its title is just a link in the middle of it
+        text-align: center;
+        vertical-align: middle;
+      }
+    }
+    .title {
+      // Title: revert spacing back to normal
+      position: absolute;
+      width: 100%;
+      word-spacing: normal;
+      line-height: normal;
+      // Font size: I assume some will want to change this and the font family
+      font-size: 2em;
+      padding: 1em;
+      box-sizing: border-box;
+      &.position-top {
+        top: 0;
+      }
+      &.position-bottom {
+        bottom: 0;
+      }
+      &.align-left {
+        text-align: left;
+      }
+      &.align-center {
+        text-align: center;
+      }
+      &.align-right {
+        text-align: right;
+      }
+    }
+    .tile-link, .edit {
+      // The tile's link and edit partition overlap the entire tile
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      transition: background-color 0.1s;
+    }
+  }
+}
+
+// Form styles
+#tile-modify-form,
+#tile-layout-form {
+  div.pane {
+    // Tile layout and shape selector panes
+    width: 10em;
+    height: 10em;
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px;
+    &.selected {
+      // Selected: ensure weight is normal, and add light yellow background
+      font-weight: normal;
+      background-color: #ffffcc;
+    }
+    .shape {
+      // Shapes for tile shape selector
+      background-color: white;
+      border: 1px solid black;
+      margin: 5px;
+      &.shape-landscape {
+        width: 50px;
+        height: 28px;
+      }
+      &.shape-portrait {
+        width: 28px;
+        height: 50px;
+      }
+      &.shape-square {
+        width: 38px;
+        height: 38px;
+      }
+      &.shape-panorama {
+        width: 65px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+#tile-modify-form {
+  .title-position, .title-color {
+    label {
+      display: inline;
+    }
+  }
+}
+#tile-layout-form {
+  .shape-selector, .layout-selector {
+    label {
+      display: inline;
+    }
+  }
+  input.layout-width {
+    width: 4em;
+  }
+  input.aspect-ratio {
+    width: 2em;
+  }
+}
