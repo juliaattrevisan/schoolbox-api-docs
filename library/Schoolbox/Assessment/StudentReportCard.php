@@ -280,11 +280,16 @@ class StudentReportCard {
 			}
 		}
 
+		// Disable back and forward buttons if I can't go back or forward
+		$disabledBack = $this->targetSemester == 1 && $this->targetYear = min($years);
+		$disabledFwd  = $this->targetSemester == 2 && $this->targetYear = max($years);
 		$page->setVar(array(
 			'WORK_YEAR' => $this->targetYear,
 			'WORK_SEMESTER' => $this->targetSemester,
 			'SEMESTER_BACK' => $this->targetYear-($this->targetSemester==1?1:0).'/'.($this->targetSemester==1?2:1),
 			'SEMESTER_FWD'  => $this->targetYear+($this->targetSemester==2?1:0).'/'.($this->targetSemester==1?2:1),
+			'SEMESTER_BACK_DISABLED' => $disabledBack ? 'disabled' : '',
+			'SEMESTER_FWD_DISABLED'  => $disabledFwd  ? 'disabled' : '',
 		));
 
 	}
