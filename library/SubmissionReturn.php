@@ -137,32 +137,42 @@ class SubmissionReturn extends DeprecatedModel {
     }
 
     function getLetterGradeByUser($user_id, $box_id = 0) {
-        // First: join on submission_errors
-        $query = "
-            SELECT e.*, r.mark, r.comment
+        // join on submission_errors and both grades table.
+        // Return whichever one is most recent.
+        $errorResult = $this->db->getRow("
+            SELECT e.*, r.returned, r.mark, r.comment
             FROM submission_return r
             INNER JOIN submission_errors e ON r.mark = e.display_as
             WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
             ORDER BY returned DESC
             LIMIT 1
-        ";
-        $result = $this->db->getRow($query);
+        ");
+        $gradeResult = $this->db->getRow("
+            SELECT g.*, r.returned, r.mark, r.comment
+            FROM submission_return r, submission_grade g
+            WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+            AND r.box_id = " . $this->db->smartQuote($box_id) . "
+            AND g.lower_bound <= r.norm_mark
+            ORDER BY returned DESC, lower_bound DESC
+            LIMIT 1
+        ");
 
-        if (empty($result)) {
-            // Did that not return anything?
-            // Try searching the grades table as before.
-            $query = "
-                SELECT g.*, r.mark, r.comment FROM submission_return r, submission_grade g
-                WHERE r.owner = " . $this->db->smartQuote($user_id) . "
-                AND r.box_id = " . $this->db->smartQuote($box_id) . "
-                AND g.lower_bound <= r.norm_mark
-                ORDER BY returned DESC, lower_bound DESC
-                LIMIT 1
-            ";
-            $result = $this->db->getRow($query);
+        // Do both error and grade result exist? Use most recent of the two.
+        if (!empty($errorResult) && !empty($gradeResult)) {
+            if ($gradeResult['returned'] > $errorResult['returned']) {
+                $errorResult = false;
+            }
+            else {
+                $gradeResult = false;
+            }
+        }
+
+        if (empty($errorResult)) {
+            $result = $gradeResult;
         }
         else {
+            $result = $errorResult;
             $result['grade_id'] = $result['caption'] = $result['mark'];
         }
         unset($result['mark']);
