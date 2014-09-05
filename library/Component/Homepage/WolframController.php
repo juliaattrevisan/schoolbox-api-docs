@@ -46,12 +46,20 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
 
             $matches = array();
 
-            if (preg_match($pattern, $this->getConfig('url'), $matches)) {
+            $url = $this->getConfig('url');
+            if (preg_match($pattern, $url, $matches)) {
                 $this->setVar(
                     array(
                         'WIDGET_ID' => $matches[2],
                     )
                 );
+
+                // Allow output type to be set too
+                $outputType = 'popup';
+                if (preg_match('/(?:\?|&)output=(?P<output>[a-zA-Z0-9]+)/', $url, $matches)) {
+                    $outputType = $matches['output'];
+                }
+                $this->setVar('WIDGET_OUTPUT_TYPE', $outputType);
 
                 $this->parse('has_wolfram_block', 'has_wolfram');
             }
