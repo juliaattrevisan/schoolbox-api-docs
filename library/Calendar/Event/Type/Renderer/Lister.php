@@ -9,6 +9,45 @@
  */
 
 class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_Abstract {
+
+    /**
+     * Classes to be used as filter selectors
+     *
+     * @param $currentEvent
+     * @return array|string
+     */
+    private function determineSelectors($currentEvent) {
+        $selectors = array(
+            'type' . $currentEvent->getType()
+        );
+
+        /* Merge levels
+         */
+        $allLevels = explode(' ' , $currentEvent->getDerivedEventLevel());
+        $selectors = array_merge($selectors, $allLevels);
+
+        /* Merge groups
+         */
+        
+        /* Merge campuses
+         */
+        $allCampuses = explode(',', $currentEvent->getCampusList());
+
+        foreach ($allCampuses as $currentCampus) {
+            $selectors[] = 'campus' . trim($currentCampus);
+        }
+
+        /* Properly trim out spaces and stuff
+         */
+        foreach($selectors as &$currentSelector) {
+            $currentSelector = trim($currentSelector);
+        }
+
+        $selectors = array_filter(array_unique($selectors));
+
+        return implode(' ', $selectors);
+    }
+
     /**
      * Render this event
      *
@@ -17,11 +56,19 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
      */
     public function visit($currentEvent)
     {
+        if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+            $cssClass = 'translucent';
+        }
+        else {
+            $cssClass = '';
+        }
+
         $this->getPage()->setVar(array(
             'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
             'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
             'EVENT_TITLE' => $currentEvent->getTitle(),
-            'EVENT_TYPE' => $currentEvent->getType(),
+            'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
+            'EVENT_CLASS' => $cssClass,
             'EVENT_COLOUR' => $currentEvent->getColour(),
         ));
 
