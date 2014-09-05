@@ -61,8 +61,8 @@
 	<h2>{EVENT_DATE}</h2>
 	<ul>
 		<!-- BEGIN event -->
-		<li>
-			<p class="type{EVENT_TYPE}" style="background-color:{EVENT_COLOUR}">
+		<li class="type{EVENT_TYPE}" style="background-color:{EVENT_COLOUR}">
+			<p>
 				<!-- BEGIN event_allday -->
 				<span class="duration">All Day</span>
 				<!-- END event_allday -->
@@ -76,6 +76,10 @@
 		</li>
 		<!-- END event -->
 	</ul>
-	<br/>
 	<!-- END date -->
 </div>
+<style type="text/css">
+	.printEventList h2 {
+		margin-top: 10px;
+	}
+</style>
