@@ -9,8 +9,18 @@
 
 error_reporting(E_ALL);
 
-$settings = NULL;
+$settings = null;
 require 'settings.php';
+
+/* Handle Single Logout commands */
+if (isset($_POST['SAMLRequest'])) {
+    SAMLDebugLog('SAMLRequest assertion received, assuming logout');
+    SAMLDebugLog(base64_decode($_POST['SAMLRequest']));
+    session_start();
+    session_destroy();
+    header('Location: ' . Config::get('saml_logout_url'));
+    exit;
+}
 
 SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 $samlResponse = new OneLogin_Saml_Response($settings, $_POST['SAMLResponse']);
@@ -20,25 +30,22 @@ try {
         $sessionHandler = new Session();
         if ($sessionHandler->create($samlResponse->getNameId())) {
             $page = '/';
-            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'] && substr($_GET['page'],0,6) != '/login')) {
+            if (isset($_GET['page']) && preg_match('|^/|', $_GET['page'] && substr($_GET['page'], 0, 6) != '/login')) {
                 $page = $_GET['page'];
             }
             SAMLDebugLog("SAML auth successful");
             SitePage::localRedir($page);
-        }
-        else {
+        } else {
             $msg = 'Invalid SAML user.';
             echo $msg;
             SAMLDebugLog($msg);
         }
-    }
-    else {
+    } else {
         $msg = 'Invalid SAML response: Single Sign-On IDP certificate does not match certificate supplied in SAML request.';
         echo $msg;
         SAMLDebugLog($msg);
     }
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     $msg = 'Invalid SAML response: ' . $e->getMessage();
     echo $msg;
     SAMLDebugLog($msg);
