@@ -11763,8 +11763,15 @@ textarea.event-detail {
 /* Print Event List
  */
 #content .printEventList .calendar-controls .link-case .filter-drop {
-	top: 0px;
+	top: -18px;
 	right: 0px;
+}
+
+/* Fix weird hack that someone put in which takes advantage of
+ * coincidental fullcalendar grid view
+ */
+#content .printEventList .calendar-controls .link-case .filter-drop .filter-list {
+	border-top-width: 1px;
 }
 
 .printEventList .duration {
