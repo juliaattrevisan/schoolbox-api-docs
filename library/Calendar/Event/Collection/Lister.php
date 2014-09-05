@@ -17,6 +17,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      * @param $startTimestamp
      * @param $endTimestamp
      * @param $page
+     * @param $user
      */
     public function __construct($api, $startTimestamp, $endTimestamp, $page, $user) {
         parent::__construct($api, $startTimestamp, $endTimestamp, $page);
@@ -51,7 +52,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             }
 
             $this->getPage()->setVar(array(
-                'EVENT_DATE' => $currentEvent->getStartTime()->getShort()
+                'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
             ));
 
             $currentEvent->accept($renderer);
