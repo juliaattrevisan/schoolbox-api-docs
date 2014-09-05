@@ -25,6 +25,28 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             'EVENT_COLOUR' => $currentEvent->getColour(),
         ));
 
+        if ($currentEvent->getAllday()) {
+            $this->getPage()->parse('event_allday_block', 'event_allday');
+
+            $this->getPage()->setVar(array(
+                'event_timed_block' => ''
+            ));
+        }
+        else {
+            $this->getPage()->parse('event_timed_block', 'event_timed');
+
+            $this->getPage()->setVar(array(
+                'event_allday_block' => '',
+            ));
+        }
+
         $this->getPage()->parse('event_block', 'event', true);
+
+        /* Clear children after parsing out the parent
+         */
+        $this->getPage()->setVar(array(
+            'event_allday_block' => '',
+            'event_timed_block' => ''
+        ));
     }
 } 

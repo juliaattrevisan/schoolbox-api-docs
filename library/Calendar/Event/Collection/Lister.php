@@ -31,6 +31,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         $this->getPage()->setFile(TEMPLATE_content, 'calendar/list.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'date', 'date_block');
         $this->getPage()->setBlock('date', 'event', 'event_block');
+        $this->getPage()->setBlock('event', 'event_allday', 'event_allday_block');
+        $this->getPage()->setBlock('event', 'event_timed', 'event_timed_block');
 
         $renderer = new Calendar_Event_Type_Renderer_Lister($this->getPage());
 

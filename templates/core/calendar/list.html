@@ -99,6 +99,16 @@
 		top: 0px;
 		right: 0px;
 	}
+
+	.printEventList .duration {
+		width: 130px;
+		display: inline-block;
+	}
+
+	.printEventList p {
+		padding: 4px;
+		margin-bottom: 0px;
+	}
 </style>
 
 <h1>Calendar for {USER_FULLNAME}</h1>
@@ -157,7 +167,15 @@
 		<!-- BEGIN event -->
 		<li>
 			<p class="type{EVENT_TYPE}" style="background-color:{EVENT_COLOUR}">
-				{EVENT_START}&ndash;{EVENT_END} {EVENT_TITLE}
+				<!-- BEGIN event_allday -->
+				<span class="duration">All Day</span>
+				<!-- END event_allday -->
+
+				<!-- BEGIN event_timed -->
+				<span class="duration">{EVENT_START}&ndash;{EVENT_END}</span>
+				<!-- END event_timed -->
+
+				{EVENT_TITLE}
 			</p>
 		</li>
 		<!-- END event -->
