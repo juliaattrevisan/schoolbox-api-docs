@@ -125,6 +125,10 @@ a {
     &:hover {
         text-decoration: underline;
     }
+    &[disabled] {
+        // Make disabled links not clickable
+        pointer-events: none;
+    }
 }
 
 /*--------------------------------------------------------------
