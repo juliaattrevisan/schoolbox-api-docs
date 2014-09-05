@@ -163,6 +163,7 @@ class DueWork_Rubric_Handler {
 				AND sb.mark_type = :mark_type
 				AND rm.student_id = :student_id
 				AND sb.category = :category_id
+				AND sb.deleted IS FALSE
 			ORDER BY
 				sb.id ASC,
 				rm.criterion_id ASC,
