@@ -30,7 +30,7 @@ class Session
         return $ip;
     }
 
-    public function create($username)
+    public function create($username, $bypassLoginLog = false)
     {
         $userHandler = new User;
         $groupHandler = new Group;
@@ -85,12 +85,14 @@ class Session
                 $this->setSynergyInfo($userHandler);
 			}
 
-	        $notif = new Notif(Notif::TOPIC_AUTH);
-	        $notif->notice("Login success for $username", array(
-		        'username' => $user['username'],
-		        'ip'       => $ip,
-		        'login'    => 1,
-	        ));
+            if (!$bypassLoginLog) {
+                $notif = new Notif(Notif::TOPIC_AUTH);
+                $notif->notice("Login success for $username", array(
+                    'username' => $user['username'],
+                    'ip'       => $ip,
+                    'login'    => 1,
+                ));
+            }
 
 	        // add mobile session data
             $sbmAuth = new Authenticator();

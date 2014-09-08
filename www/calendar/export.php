@@ -40,7 +40,7 @@ try {
     // Register a shutdown function so that user's session is restored.
     // (If PHP < 5.5 supported finally blocks, I'd use that.)
     $old_session = $_SESSION;
-    $session->create($user->getUsername());
+    $session->create($user->getUsername(), true);
     register_shutdown_function(
         function () use ($old_session) {
             $_SESSION = $old_session;
