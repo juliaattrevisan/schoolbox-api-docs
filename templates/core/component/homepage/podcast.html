@@ -1,28 +1,16 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/swfobject/swfobject/swfobject.js"></script>
-<script type="text/javascript">
-    function loadPodcastSWF(audioID, url){
-        var flashvars = {
-            filename: url
-        };
-        var params = {
-            movie: "/flash/player_mp3.swf",
-            wmode: "transparent"
-        };
-
-        swfobject.embedSWF("/flash/mp3small.swf", "podcast-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
-    }
-</script>
+<link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
+<script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
 <!-- END custom_head -->
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>{PODCAST_COMPONENT_TITLE}</h2>
-    {CONFIGURATION}
+	<h2>{PODCAST_COMPONENT_TITLE}</h2>
+	{CONFIGURATION}
 	<ul class="information-list">
 		<!-- BEGIN podcast_list -->
 		<li class="{ON_OFF}">
-			<div class="play-button actions">
-				<div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
-			</div>
+			<audio id="audio-player-{PODCAST_ID}" controls preload="none">
+				<source src="{PODCAST_URL}" type="audio/mp3" />
+			</audio>
 
 			<h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
 
@@ -30,4 +18,8 @@
 		</li>
 		<!-- END podcast_list -->
 	</ul>
+	<script type="text/javascript">
+		// Turn all audio components into media elements
+		$("#component{COMPONENT_INSTANCE_ID} audio").mediaelementplayer();
+	</script>
 </div>
