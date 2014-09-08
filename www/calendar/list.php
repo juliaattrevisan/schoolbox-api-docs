@@ -27,7 +27,6 @@ else {
     $user = $_SESSION['user'];
 }
 
-
 $factory = new Calendar_Api_Factory($user);
 $api = $factory->produce();
 
@@ -36,12 +35,8 @@ if (empty($_POST)) {
     $finish = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
 }
 else {
-    var_dump($_POST);
     $start = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
     $finish = new \Alaress_Date_Format($_POST['finish_date'], 'd/m/y');
-
-    new \Alaress_Probe($start->getDatabase());
-    new \Alaress_Probe($finish->getDatabase());
 }
 
 $this->setVar(array(
