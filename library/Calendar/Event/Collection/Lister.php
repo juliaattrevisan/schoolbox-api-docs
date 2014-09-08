@@ -29,35 +29,46 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      */
     public function renderAll() {
         $this->getPage()->setFile(TEMPLATE_content, 'calendar/list.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'has_no_events', 'has_no_events_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'date', 'date_block');
         $this->getPage()->setBlock('date', 'event', 'event_block');
         $this->getPage()->setBlock('event', 'event_allday', 'event_allday_block');
         $this->getPage()->setBlock('event', 'event_timed', 'event_timed_block');
 
+        $this->getPage()->setVar(array(
+            'date_block' => '',
+            'has_no_events_block' => ''
+        ));
+
         $renderer = new Calendar_Event_Type_Renderer_Lister($this->getPage());
 
         $lastDate = 0;
 
-        foreach ($this->getAllEvents() as $currentEvent) {
-            $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
+        if ($this->getAllEvents()->count()) {
+            foreach ($this->getAllEvents() as $currentEvent) {
+                $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
 
-            if ($lastDate != $currentDate) {
-                $this->getPage()->parse('date_block', 'date', true);
-
-                /* Clear children after parsing out the parent
-                 */
                 $this->getPage()->setVar(array(
-                    'event_block' => ''
+                    'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
                 ));
 
-                $lastDate = $currentDate;
+                $currentEvent->accept($renderer);
+
+                if ($lastDate != $currentDate) {
+                    $this->getPage()->parse('date_block', 'date', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->getPage()->setVar(array(
+                        'event_block' => ''
+                    ));
+
+                    $lastDate = $currentDate;
+                }
             }
-
-            $this->getPage()->setVar(array(
-                'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
-            ));
-
-            $currentEvent->accept($renderer);
+        }
+        else {
+            $this->getPage()->parse('has_no_events_block', 'has_no_events');
         }
 
         /* Render everything else out
