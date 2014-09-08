@@ -18,7 +18,7 @@ if(isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 	$revision
 		->setHeading($_POST['heading'])
 		->setCreated($now)
-		->setBody($revisionMapper->createStubLinks($_POST['body']))
+		->setBody($revisionMapper->createStubLinks($_POST['body'], $_POST['categoryID']))
 		->setUser($_SESSION['user']);
 
 	// wiki ostensibly already exists: retrieve if possible

@@ -131,9 +131,10 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface {
 	 * If a title attribute is provided, use that as the stub wiki heading
 	 *
 	 * @param string $body
+	 * @param int    $categoryId
 	 * @return string
 	 */
-	public function createStubLinks($body) {
+	public function createStubLinks($body, $categoryId) {
 		preg_match_all('/<a title="([^"]*)">/', $body, $matches);
 
 		if(!count($matches[1])) {
@@ -154,7 +155,7 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface {
 			$slug = $url->getSlug();
 
 			$pattern[] = $matches[0][$i];
-			$replace[] = "<a href='/wiki/{$body['categoryID']}/{$slug}'>";
+			$replace[] = "<a href='/wiki/{$categoryId}/{$slug}'>";
 		}
 
 		// Perform replacements if required
