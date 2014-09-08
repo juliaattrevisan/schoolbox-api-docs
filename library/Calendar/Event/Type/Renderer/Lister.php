@@ -26,9 +26,6 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         $allLevels = explode(' ' , $currentEvent->getDerivedEventLevel());
         $selectors = array_merge($selectors, $allLevels);
 
-        /* Merge groups
-         */
-        
         /* Merge campuses
          */
         $allCampuses = explode(',', $currentEvent->getCampusList());
