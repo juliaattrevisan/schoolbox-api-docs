@@ -1,0 +1,17 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Attachment\Internal;
+
+
+use Schoolbox\Resource\Attachment\ControllerInterface;
+
+interface InternalInterface extends ControllerInterface {
+
+} 
