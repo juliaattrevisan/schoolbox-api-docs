@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lister
  *
@@ -7,8 +8,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_Abstract
+{
 
     /**
      * Classes to be used as filter selectors
@@ -16,14 +17,15 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
      * @param $currentEvent
      * @return array|string
      */
-    private function determineSelectors($currentEvent) {
+    private function determineSelectors($currentEvent)
+    {
         $selectors = array(
             'type' . $currentEvent->getType()
         );
 
         /* Merge levels
          */
-        $allLevels = explode(' ' , $currentEvent->getDerivedEventLevel());
+        $allLevels = explode(' ', $currentEvent->getDerivedEventLevel());
         $selectors = array_merge($selectors, $allLevels);
 
         /* Merge campuses
@@ -36,7 +38,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
 
         /* Properly trim out spaces and stuff
          */
-        foreach($selectors as &$currentSelector) {
+        foreach ($selectors as &$currentSelector) {
             $currentSelector = trim($currentSelector);
         }
 
@@ -55,42 +57,48 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     {
         if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
-        }
-        else {
+        } else {
             $cssClass = '';
         }
 
-        $this->getPage()->setVar(array(
-            'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
-            'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
-            'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
-            'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
-            'EVENT_CLASS' => $cssClass,
-            'EVENT_COLOUR' => $currentEvent->getColour(),
-        ));
+        $this->getPage()->setVar(
+            array(
+                'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
+                'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
+                'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
+                'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
+                'EVENT_CLASS' => $cssClass,
+                'EVENT_COLOUR' => $currentEvent->getColour(),
+            )
+        );
 
         if ($currentEvent->getAllday()) {
             $this->getPage()->parse('event_allday_block', 'event_allday');
 
-            $this->getPage()->setVar(array(
-                'event_timed_block' => ''
-            ));
-        }
-        else {
+            $this->getPage()->setVar(
+                array(
+                    'event_timed_block' => ''
+                )
+            );
+        } else {
             $this->getPage()->parse('event_timed_block', 'event_timed');
 
-            $this->getPage()->setVar(array(
-                'event_allday_block' => '',
-            ));
+            $this->getPage()->setVar(
+                array(
+                    'event_allday_block' => '',
+                )
+            );
         }
 
         $this->getPage()->parse('event_block', 'event', true);
 
         /* Clear children after parsing out the parent
          */
-        $this->getPage()->setVar(array(
-            'event_allday_block' => '',
-            'event_timed_block' => ''
-        ));
+        $this->getPage()->setVar(
+            array(
+                'event_allday_block' => '',
+                'event_timed_block' => ''
+            )
+        );
     }
 } 

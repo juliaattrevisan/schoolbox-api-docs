@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lister
  *
@@ -7,8 +8,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Renderer {
+class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Renderer
+{
 
     /**
      * @var \Schoolbox\User
@@ -24,7 +25,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      * @param $page
      * @param $user
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, $page, $user) {
+    public function __construct($api, $startTimestamp, $endTimestamp, $page, $user)
+    {
         parent::__construct($api, $startTimestamp, $endTimestamp, $page);
 
         $this->setUser($user);
@@ -33,7 +35,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
     /**
      * Render all the events in a list format
      */
-    public function renderAll() {
+    public function renderAll()
+    {
         $this->getPage()->setFile(TEMPLATE_content, 'calendar/list.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_no_events', 'has_no_events_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'date', 'date_block');
@@ -41,10 +44,12 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         $this->getPage()->setBlock('event', 'event_allday', 'event_allday_block');
         $this->getPage()->setBlock('event', 'event_timed', 'event_timed_block');
 
-        $this->getPage()->setVar(array(
-            'date_block' => '',
-            'has_no_events_block' => ''
-        ));
+        $this->getPage()->setVar(
+            array(
+                'date_block' => '',
+                'has_no_events_block' => ''
+            )
+        );
 
         $renderer = new Calendar_Event_Type_Renderer_Lister($this->getPage());
 
@@ -54,9 +59,11 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             foreach ($this->getAllEvents() as $currentEvent) {
                 $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
 
-                $this->getPage()->setVar(array(
-                    'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
-                ));
+                $this->getPage()->setVar(
+                    array(
+                        'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
+                    )
+                );
 
                 $currentEvent->accept($renderer);
 
@@ -65,15 +72,16 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
                     /* Clear children after parsing out the parent
                      */
-                    $this->getPage()->setVar(array(
-                        'event_block' => ''
-                    ));
+                    $this->getPage()->setVar(
+                        array(
+                            'event_block' => ''
+                        )
+                    );
 
                     $lastDate = $currentDate;
                 }
             }
-        }
-        else {
+        } else {
             $this->getPage()->parse('has_no_events_block', 'has_no_events');
         }
 
@@ -105,15 +113,17 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             null,
             TEMPLATE_content,
             array(
-                'eventType'   => 'EVENT_TYPE_NAME',
+                'eventType' => 'EVENT_TYPE_NAME',
                 'eventTypeID' => 'EVENT_TYPE_ID',
                 'eventColour' => 'EVENT_TYPE_COLOUR'
             )
         );
 
-        $this->getPage()->setVar(array(
-            'USER_FULLNAME' => $this->getUser()->getFullname()
-        ));
+        $this->getPage()->setVar(
+            array(
+                'USER_FULLNAME' => $this->getUser()->getFullname()
+            )
+        );
     }
 
     /* Getters/Setters
