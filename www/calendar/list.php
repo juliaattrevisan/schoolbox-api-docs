@@ -27,9 +27,24 @@ else {
     $user = $_SESSION['user'];
 }
 
+
 $factory = new Calendar_Api_Factory($user);
 $api = $factory->produce();
 
-$calendar = new Calendar_Event_Collection_Lister($api, $_SERVER['REQUEST_TIME'],  strtotime('+1 year', $_SERVER['REQUEST_TIME']), $this, $user);
+if (empty($_POST)) {
+    $start = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+    $end = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
+}
+else {
+    $start = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
+    $end = new \Alaress_Date_Format($_POST['end_date'], 'd/m/y');
+}
+
+$this->setVar(array(
+    'SELECTED_START' => $start->getUsingFormat('d/m/Y'),
+    'SELECTED_END' => $end->getUsingFormat('d/m/Y'),
+));
+
+$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $end->getUnixTimestamp(), $this, $user);
 $calendar->renderAll();
 

@@ -1,9 +1,29 @@
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$('[data-filters="true"]').filterSelector({
 			filterContainer: '.filter-drop',
 			eventContainer: $('[data-eventlist="true"]')
+		});
+
+		/* date picker */
+		$j('#start_date, #finish_date').datepicker({
+			dateFormat: 'dd/mm/yy',
+			showOn: 'both',
+			buttonImage: '/images/core/calendar/calendar-click.png',
+			buttonImageOnly: true,
+			constrainInput: false,
+			onClose: function (string) {
+				var input = $j(this);
+				$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+					input.val(data.time);
+				})
+			}
+		});
+
+		$j('#start_date').syncDates({
+			endDate: $j('#finish_date')
 		});
 	});
 </script>
@@ -13,6 +33,15 @@
 		Calendar for {USER_FULLNAME}
 		<a href="#" class='btn list' data-filters="true"><span></span>Filters</a>
 	</h1>
+</div>
+
+<div>
+	<form action="/calendar/list" method="post">
+		Display events between <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
+		and <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_END}" />
+
+		<input type="submit" value="Change Dates" />
+	</form>
 </div>
 
 <div class="clearfix"></div>
