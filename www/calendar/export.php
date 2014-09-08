@@ -16,6 +16,11 @@ use Schoolbox\UserMapper;
 
 try {
     $session = new Session();
+
+    /* Don't log in the loginLog table for these accesses
+     */
+    $session->disableLoginLog();
+
     $token = $_GET['token'];
     $export_type = $_GET['export'];
     $api = null;
