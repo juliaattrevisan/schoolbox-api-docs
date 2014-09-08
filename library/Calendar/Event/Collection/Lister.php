@@ -11,6 +11,11 @@
 class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Renderer {
 
     /**
+     * @var \Schoolbox\User
+     */
+    private $user = null;
+
+    /**
      * Constructor
      *
      * @param $api
@@ -21,7 +26,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      */
     public function __construct($api, $startTimestamp, $endTimestamp, $page, $user) {
         parent::__construct($api, $startTimestamp, $endTimestamp, $page);
-        $this->user = $user;
+
+        $this->setUser($user);
     }
 
     /**
@@ -74,10 +80,10 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         /* Render everything else out
          */
         $groupHandler = new Group();
-        $category_list = $groupHandler->involvedInCategoryList($this->user->getId());
+        $category_list = $groupHandler->involvedInCategoryList($this->getUser()->getId());
 
         $calendarHandler = new Calendar();
-        $campus_list = $calendarHandler->getFilterCampusList($this->user->getId());
+        $campus_list = $calendarHandler->getFilterCampusList($this->getUser()->getId());
 
         $this->getPage()->checkList(
             'filter_group',
@@ -106,7 +112,30 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         );
 
         $this->getPage()->setVar(array(
-            'USER_FULLNAME' => $this->user->getFullname()
+            'USER_FULLNAME' => $this->getUser()->getFullname()
         ));
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set user
+     *
+     * @param \Schoolbox\User $user
+     */
+    private function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Schoolbox\User
+     */
+    private function getUser()
+    {
+        return $this->user;
     }
 }
