@@ -38,13 +38,13 @@ class Queue extends ResourceVideo
         // exists or not.
         // FFMpeg needs strict flag, as MP4 is technically experimental
         $executable = 'avconv';
-        $info_exec = 'avprobe';
-        $strict = false;
+        $info_exec  = 'avprobe';
+        $strict     = false;
         exec('which avconv', $unused, $errorcode);
         if ($errorcode) {
             $executable = 'ffmpeg';
-            $info_exec = 'ffprobe';
-            $strict = true;
+            $info_exec  = 'ffprobe';
+            $strict     = true;
         }
 
         //
@@ -54,9 +54,9 @@ class Queue extends ResourceVideo
         if (!($info_return == 0)) {
             return false;
         }
-        $width = 0;
+        $width  = 0;
         $height = 0;
-        $scale = '';
+        $scale  = '';
         if ($info_return == 0) {
             if (preg_match('/width=(\\d+)/', $info_message, $matches)) {
                 list(, $width) = $matches;
@@ -80,7 +80,7 @@ class Queue extends ResourceVideo
 
         // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
         $rotation = 0;
-        $rotate = '';
+        $rotate   = '';
         exec('which exiftool', $unused, $errorcode);
         if (!$errorcode) {
             $rotationCmd = 'exiftool -Rotation ' . escapeshellarg($sourceFile) . "|sed 's/^[^:]*: //'";
@@ -90,7 +90,6 @@ class Queue extends ResourceVideo
             }
 
             if ($rotation) {
-
                 switch ($rotation) {
                     case 90:
                         $rotate = 'transpose=1';
@@ -136,16 +135,15 @@ class Queue extends ResourceVideo
 
         /* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
         $thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
-        $thumbnailString = "nice $executable -y -i " . escapeshellarg(
-                $sourceFile
-            ) . ' -f image2 -ss ' . $thumbnailSeconds . ' -vf scale=-1:64,crop=64:64' . (($rotate) ? ',' . $rotate : '') . ' -frames:v 1 ' . escapeshellarg(
-                $this->getThumbnailLocation()
-            ) . ' 2>&1';
-        $posterString = "nice $executable -y -i " . escapeshellarg(
-                $sourceFile
-            ) . ' -f image2 -ss ' . $thumbnailSeconds . ' -frames:v 1 ' . (($rotate) ? '-vf ' . $rotate : '') . ' ' . escapeshellarg(
-                $this->getPosterLocation()
-            ) . ' 2>&1';
+        $thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) .
+            ' -f image2 -ss ' . $thumbnailSeconds .
+            ' -vf scale=-1:64,crop=64:64' . (($rotate) ? ',' . $rotate : '') .
+            ' -frames:v 1 ' .
+            escapeshellarg($this->getThumbnailLocation()) . ' 2>&1';
+        $posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) .
+            ' -f image2 -ss ' . $thumbnailSeconds .
+            ' -frames:v 1 ' . (($rotate) ? '-vf ' . $rotate : '') . ' ' .
+            escapeshellarg($this->getPosterLocation()) . ' 2>&1';
 
         if ($return == 0) {
             exec($thumbnailString, $output, $return);
@@ -168,8 +166,8 @@ class Queue extends ResourceVideo
             $sourceStore = $this->config->get('file_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-                $sourceStore = $this->config->get('storage_dir');
-                return $sourceStore . '/' . $this->fileID . '.dat';
+            $sourceStore = $this->config->get('storage_dir');
+            return $sourceStore . '/' . $this->fileID . '.dat';
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             $sourceStore = $this->config->get('submission_dir');
             return $sourceStore . '/' . $this->fileID . '.dat';
@@ -201,6 +199,4 @@ class Queue extends ResourceVideo
     {
         return $this->modified;
     }
-
-
 }
