@@ -8,12 +8,12 @@
 	<ul class="information-list">
 		<!-- BEGIN podcast_list -->
 		<li class="{ON_OFF}">
-			<audio id="audio-player-{PODCAST_ID}" controls preload="none">
-				<source src="{PODCAST_URL}" type="audio/mp3" />
-			</audio>
-
-			<h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
-
+			<div class="clearfix">
+				<h4 class="float-left"><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
+				<audio id="audio-player-{PODCAST_ID}" controls preload="none" class="float-right">
+					<source src="{PODCAST_URL}" type="audio/mp3" />
+				</audio>
+			</div>
 			<div class="wysiwyg {COMPONENT_COMPACTMODE}">{PODCAST_DESCRIPTION}</div>
 		</li>
 		<!-- END podcast_list -->

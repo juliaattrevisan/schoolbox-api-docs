@@ -11,12 +11,12 @@
 	<ul class="information-list dz-container">
 		<!-- BEGIN audio_list -->
 		<li class="{ON_OFF}">
-			<audio id="audio-player-{AUDIO_ID}" controls preload="none">
-				<source src="{AUDIO_URL}" type="audio/mp3" />
-			</audio>
-
-			<h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
-
+			<div class="clearfix">
+				<h4 class="float-left"><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
+				<audio id="audio-player-{AUDIO_ID}" controls preload="none" class="float-right">
+					<source src="{AUDIO_URL}" type="audio/mp3" />
+				</audio>
+			</div>
 			<p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
 		</li>
 		<!-- END audio_list -->
