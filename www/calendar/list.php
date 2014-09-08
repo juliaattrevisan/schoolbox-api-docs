@@ -33,18 +33,22 @@ $api = $factory->produce();
 
 if (empty($_POST)) {
     $start = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-    $end = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
+    $finish = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
 }
 else {
+    var_dump($_POST);
     $start = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
-    $end = new \Alaress_Date_Format($_POST['end_date'], 'd/m/y');
+    $finish = new \Alaress_Date_Format($_POST['finish_date'], 'd/m/y');
+
+    new \Alaress_Probe($start->getDatabase());
+    new \Alaress_Probe($finish->getDatabase());
 }
 
 $this->setVar(array(
     'SELECTED_START' => $start->getUsingFormat('d/m/Y'),
-    'SELECTED_END' => $end->getUsingFormat('d/m/Y'),
+    'SELECTED_FINISH' => $finish->getUsingFormat('d/m/Y'),
 ));
 
-$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $end->getUnixTimestamp(), $this, $user);
+$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $finish->getUnixTimestamp(), $this, $user);
 $calendar->renderAll();
 
