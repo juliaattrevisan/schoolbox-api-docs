@@ -63,7 +63,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         $this->getPage()->setVar(array(
             'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
             'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
-            'EVENT_TITLE' => $currentEvent->getTitle(),
+            'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
             'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
             'EVENT_CLASS' => $cssClass,
             'EVENT_COLOUR' => $currentEvent->getColour(),
