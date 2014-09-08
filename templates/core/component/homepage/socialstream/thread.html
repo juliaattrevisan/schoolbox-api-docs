@@ -52,12 +52,18 @@
 				<!-- BEGIN socialstream_post_has_video -->
 				<div class="videoWrapper">
 					<video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
-						class="video-js vjs-default-skin" controls preload="none"
+						controls
+						preload="none"
 						poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
+						width="100%"
+						height="400"
 					>
 						<source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
 					</video>
-					<script> var video = _V_("socialstream_video{SOCIALSTREAM_POST_POST_ID}", {width: '100%', height: '400px'}); </script>
+					<script>
+						var videoElement = $("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
+						var video        = videoElement.data('mediaelementplayer');
+					</script>
 				</div>
 				<!-- END socialstream_post_has_video -->
 
@@ -126,12 +132,18 @@
 						<!-- BEGIN socialstream_comment_has_video -->
 						<div class="videoWrapper">
 							<video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
-								class="video-js vjs-default-skin" controls preload="none"
+								controls
+								preload="none"
 								poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
+								width="100%"
+								height="400"
 							>
-								<source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
+								<source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
 							</video>
-							<script> var video = _V_("socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}", {width: '100%', height: '400px'}); </script>
+							<script>
+								var videoElement = $("#schoolbox_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
+								var video        = videoElement.data('mediaelementplayer');
+							</script>
 						</div>
 						<!-- END socialstream_comment_has_video -->
 
@@ -198,12 +210,18 @@
 								<!-- BEGIN socialstream_reply_has_video -->
 								<div class="videoWrapper">
 									<video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}"
-										class="video-js vjs-default-skin" controls preload="none"
+										controls
+										preload="none"
 										poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}"
+										width="100%"
+										height="400"
 									>
 										<source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
 									</video>
-									<script> var video = _V_("socialstream_video{SOCIALSTREAM_REPLY_POST_ID}", {width: '100%', height: '400px'}); </script>
+									<script>
+										var videoElement = $("#schoolbox_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
+										var video        = videoElement.data('mediaelementplayer');
+									</script>
 								</div>
 								<!-- END socialstream_reply_has_video -->
 
