@@ -93,19 +93,10 @@
 		 */
 		function toggleHeaders() {
 			$.each($(config.eventContainer).find('ul'), function(index, element) {
-
 				if ($(element).find('li').not(':hidden').length) {
-//					$(element).find('li').not(':hidden').css({
-//						border: '10px solid #f00'
-//					});
-
 					$(element).prev('h2').show();
 				}
 				else {
-//					$(element).find('li:hidden').css({
-//						border: '0px'
-//					});
-
 					$(element).prev('h2').hide();
 				}
 			});
