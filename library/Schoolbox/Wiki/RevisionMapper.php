@@ -135,7 +135,24 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface {
 	 * @return string
 	 */
 	public function createStubLinks($body, $categoryId) {
-		preg_match_all('/<a title="([^"]*)">/', $body, $matches);
+
+        // DomDocument based parsing
+//        $dom = new \DOMDocument();
+//        $dom->loadHTML($body);
+//        $xpath = new \DOMXPath($dom);
+//        foreach ($xpath->query('//a[@title]') as $linkNode) {
+//            /** @var \DOMElement $linkNode */
+//            $title = trim($linkNode->getAttribute('title'));
+//            if (strlen($title) === 0) {
+//                continue;
+//            }
+//            $linkNode->removeAttribute('title');
+//            $url = new \Url($title);
+//            $linkNode->setAttribute('href', "/wiki/{$categoryId}/{$url->getSlug()}");
+//        }
+//        return $dom->saveHTML();
+
+        preg_match_all('/<a title="([^"]*)">/', $body, $matches);
 
 		if(!count($matches[1])) {
 			return $body;
