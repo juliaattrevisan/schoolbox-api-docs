@@ -30,7 +30,7 @@ $api = $factory->produce();
 
 if (empty($_POST)) {
     $start = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-    $finish = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
+    $finish = new \Alaress_Date_Format(strtotime('+1 month', $_SERVER['REQUEST_TIME']), 'U');
 } else {
     $start = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
     $finish = new \Alaress_Date_Format($_POST['finish_date'], 'd/m/y');
