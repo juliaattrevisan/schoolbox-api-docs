@@ -314,21 +314,32 @@ class External_Synergetic_User implements External_UserInterface {
 					AND vStudents.FileSemester=" . $_SESSION['FileSemester'] . "
 					AND vStudents.FileYear=" . $_SESSION['FileYear'] . "
 		";
-		$student = $this->getDatabase()->getRow($query);
 
-		if (is_array($student)) {
-			if ($student['StudentBirthDate']
-				&& preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-			) {
-				$student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+		$student = false;
+		foreach ($this->getDatabase()->getAll($query) as $row) {
+			if (empty($student)) {
+				// fill in student record
+				$student = $row;
+				if ($student['StudentBirthDate']
+					&& preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
+				) {
+					$student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+				} else {
+					$student['StudentBirthDate'] = false;
+				}
+				$student['AlertMessage'] = array($student['AlertMessage']);
+			} else {
+				// join subsequent alerts
+				$student['AlertMessage'][] = $row['AlertMessage'];
 			}
-			else {
-				$student['StudentBirthDate'] = false;
-			}
-			return $student;
 		}
-
-		return false;
+		if (!empty($student)) {
+			$student['AlertMessage'] = implode(
+				"\n",
+				array_unique(array_filter($student['AlertMessage']))
+			);
+		}
+		return $student;
 	}
 
 	function getStaff($synID) {
