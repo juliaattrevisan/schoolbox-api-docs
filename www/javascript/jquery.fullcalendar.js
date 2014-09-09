@@ -367,19 +367,6 @@ Calendar.prototype.init = function() {
     var c = this
     this.dom.fullCalendar(this.options.fullCalendar)
 
-	/* Button for list view
-	 */
-	var headerRight = this.dom.find('td.fc-header-right');
-	var baseButton  = headerRight.children('.fc-button').first();
-
-	headerRight.prepend(
-		baseButton.clone()
-			.html('list')
-			.removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-			.addClass(' fc-corner-left fc-corner-right btn')
-			.attr('id','fc-button-list')
-	);
-
     if(this.options.filter.enabled) {
         // mash the filters in (if they're enabled)
         var headerRight = this.dom.find('td.fc-header-right');
@@ -412,9 +399,25 @@ Calendar.prototype.init = function() {
         self.addClass('filter-change '+text).html('<span></span>'+text)
     })
 
+	/* Button for list view
+	 */
+	var headerRight = this.dom.find('td.fc-header-right');
+	var baseButton  = headerRight.children('.fc-button').first();
+
+	headerRight.append(
+		baseButton.clone()
+			.html('list')
+			.removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+			.addClass(' fc-corner-left fc-corner-right btn no-icon')
+			.attr('id','fc-button-list')
+	);
+
 	/* Special case for list view, it's the only button with an anchor
 	 */
-	$('#fc-button-list').removeAttr('unselectable').html('<span></span><a href="/calendar/list">List View</a>');
+	$('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
+		event.preventDefault();
+		window.location.href = '/calendar/list';
+	});
 
     // mash in the datepicker
     var headerCenter = this.dom.find('td.fc-header-center')
