@@ -31,17 +31,8 @@
 <div class="navHelp">
 	<h1>
 		Calendar for {USER_FULLNAME}
-		<a href="#" class='btn list' data-filters="true"><span></span>Filters</a>
+
 	</h1>
-</div>
-
-<div>
-	<form action="/calendar/list" method="post">
-		Display events between <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
-		and <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
-
-		<input type="submit" value="Change Dates" />
-	</form>
 </div>
 
 <div class="clearfix"></div>
@@ -81,14 +72,24 @@
 						</div>
 						<!--/filter-list-->
 					</form>
-					<p class="clearfix">
-						<a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-					</p>
 					<!--/filter-drop-->
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<a href="#" class='btn list' data-filters="true"><span></span>Filters</a>
+
+	<form action="/calendar/list" method="post">
+		<div class="float-left dateSelector">
+			Display events between <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
+			and <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
+		</div>
+
+		<input type="submit" class="btn submit-btn-plain" value="Change Dates" />
+	</form>
+
+	<div class="clearfix"></div>
 
 	<!-- BEGIN date -->
 	<h2>{EVENT_DATE}</h2>
