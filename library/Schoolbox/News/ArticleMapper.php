@@ -443,6 +443,12 @@ class ArticleMapper extends Mapper implements Searchable {
             $categoryMapper = new CategoryMapper();
             $allArticles = new Collection();
 
+            /* User campuses
+             */
+            $campusMapper = new \Schoolbox\CampusMapper();
+            $userCampuses = $campusMapper->getAvailableCampusesForUser($user);
+            $user->setCampusCollection($userCampuses);
+
             /* Find all the news relevant to all categories
              */
             $allCategories = $categoryMapper->findForUser($user);
@@ -457,6 +463,7 @@ class ArticleMapper extends Mapper implements Searchable {
             $allRecords = array();
 
             $userMapper = $this->getJoinMapper('users');
+            $imageMapper = $this->getJoinMapper('image');
             $campusMapper = $this->getJoinMapper('campuses');
             $roleMapper = $this->getJoinMapper('roles');
 
@@ -466,10 +473,12 @@ class ArticleMapper extends Mapper implements Searchable {
             $query = "
                 SELECT
                     {$this->getColumnString('a')},
+                    {$imageMapper->getColumnString('i')},
                     {$userMapper->getColumnString('u')},
                     {$campusMapper->getColumnString('c')},
                     {$roleMapper->getColumnString('r')}
                 FROM `{$this->getTable()}` a
+                LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
                 LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
                 LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
@@ -500,7 +509,14 @@ class ArticleMapper extends Mapper implements Searchable {
             /* Hydrate
              */
             foreach($allRecords as $currentRecord) {
-                $allArticles->add($this->hydrate($currentRecord, 'a'));
+                $article = $this->hydrate($currentRecord, 'a');
+                $image = $imageMapper->hydrate($currentRecord, 'i');
+
+                if (is_numeric($image->getId())) {
+                    $article->setImage($image);
+                }
+
+                $allArticles->add($article);
             }
         }
 

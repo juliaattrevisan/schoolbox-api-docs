@@ -9,9 +9,13 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+$page = new SitePage(false);
+
 $user = null;
 $category = null;
 
+/* Param explosion
+ */
 $params = explode('/', $_SERVER['REQUEST_URI']);
 
 if (strlen($params[3])) {
@@ -39,10 +43,48 @@ if (strlen($params[3])) {
     $articleMapper = new \Schoolbox\News\ArticleMapper();
     $allNews = $articleMapper->findAllForUserAndCategory($user, $category);
 
-    foreach($allNews as $currentNews) {
-        new \Alaress_Probe($currentNews->getHeading());
+    /* Render all this stuff
+     */
+    $page->setFile(TEMPLATE_body, 'feed/rss.xml');
+    $page->setBlock(TEMPLATE_body, 'rss_item', 'rss_item_block');
+
+    $page->setVar(array(
+        'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - News'),
+        'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
+        'DATE' => Scrub::xml(date('r')),
+        'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
+        'SELF' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']),
+    ));
+
+    if ($allNews->count()) {
+        foreach($allNews as $currentNews) {
+
+            /* Image detection (category news has no images)
+             */
+            $imageStr = '';
+
+            if (($currentNews instanceof Schoolbox\News\Article) && is_numeric($currentNews->getImage()->getId())) {
+                $imageStr = "<img src=\"" . $page->conType() . $_SERVER['HTTP_HOST'] ."/storage/image.php?hash={$currentNews->getImage()->getHash()}&size=constrain200\">";
+            }
+
+            $page->setVar(array(
+                'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
+                'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
+                'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
+                'ITEM_LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $currentNews->getId()),
+            ));
+
+            $page->parse('rss_item_block', 'rss_item', true);
+        }
+    }
+    else {
+        $page->setVar('rss_item_block', '');
     }
 }
 else {
     error(31);
 }
+
+header('Content-type: application/rss+xml; charset=UTF-8');
+$page->outputPage(true);
+exit();
