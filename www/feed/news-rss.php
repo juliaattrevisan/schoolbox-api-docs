@@ -9,10 +9,15 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-if (strlen($this->arg[0])) {
+$user = null;
+$category = null;
+
+$params = explode('/', $_SERVER['REQUEST_URI']);
+
+if (strlen($params[3])) {
     try {
         $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('hash', $this->arg[0]);
+        $user = $userMapper->findOneByColumn('hash', $params[3]);
     }
     catch (\Exception $e) {
         error(31);
@@ -20,19 +25,22 @@ if (strlen($this->arg[0])) {
 
     /* Optional category filter
      */
-    try {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($this->arg[1]);
-    }
-    catch (\Exception $e) {
-        $category = null;
+    if (is_numeric($params[4])) {
+        try {
+            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $category = $categoryMapper->findById($params[4]);
+        }
+        catch (\Exception $e) {
+        }
     }
 
+    /* Find the articles
+     */
     $articleMapper = new \Schoolbox\News\ArticleMapper();
     $allNews = $articleMapper->findAllForUserAndCategory($user, $category);
 
     foreach($allNews as $currentNews) {
-        new \Alaress_Probe($currentNews->getPublishDate()->getDatabase());
+        new \Alaress_Probe($currentNews->getHeading());
     }
 }
 else {
