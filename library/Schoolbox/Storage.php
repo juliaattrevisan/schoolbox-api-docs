@@ -8,9 +8,7 @@
  */
 
 namespace Schoolbox;
-use Schoolbox\ConfigLoader;
 use Schoolbox\File\Mimetype;
-use Schoolbox\File\MimetypeMapper;
 
 class Storage implements FileInterface {
 
@@ -33,11 +31,6 @@ class Storage implements FileInterface {
 	 * @var int
 	 */
 	protected $filesize;
-
-	/**
-	 * @var string
-	 */
-	protected $mime;
 
 	/**
 	 * @var int
@@ -156,22 +149,6 @@ class Storage implements FileInterface {
 	 */
 	public function getLastAccessed() {
 		return $this->last_accessed;
-	}
-
-	/**
-	 * @param  string $mime
-	 * @return $this
-	 */
-	public function setMime($mime) {
-		$this->mime = $mime;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMime() {
-		return $this->mime;
 	}
 
 	/**
@@ -309,7 +286,7 @@ class Storage implements FileInterface {
      * @return $this;
      */
     public function setMimetype(Mimetype $mimetype) {
-        $this->mime = $mimetype;
+        $this->mimetype = $mimetype;
         return $this;
     }
 
@@ -318,8 +295,8 @@ class Storage implements FileInterface {
 	 * @return \Schoolbox\File\Mimetype
 	 */
 	public function getMimetype() {
-        if($this->mime instanceof Mimetype)
-		    return $this->mime;
+        if($this->mimetype instanceof Mimetype)
+		    return $this->mimetype;
         else
             return new Mimetype();
     }

@@ -63,7 +63,7 @@ class StorageMapper extends Mapper {
         $hydrator->setIdentifierProperty('mime');
         $this->hasMap(array(
                 'column'     => 'mime',
-                'property'   => 'mime',
+                'property'   => 'mimetype',
                 'hydrator'   => $hydrator,
                 'join'       => 'allowedFileType',
         ));
