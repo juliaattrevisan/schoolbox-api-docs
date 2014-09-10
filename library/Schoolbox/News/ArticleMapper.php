@@ -484,6 +484,7 @@ class ArticleMapper extends Mapper implements Searchable {
                 LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
                 WHERE a.item_deleted = 0
                     AND a.item_datetime_published <= :publishDate
+                    AND a.item_datetime_expires > :now
                     AND (
                         u.id = :userId
                         OR a.item_owner = :userId
@@ -500,7 +501,8 @@ class ArticleMapper extends Mapper implements Searchable {
                     'userId' => $user->getId(),
                     'roleId' => $user->getRole()->getId(),
                     'campusId' => $campus->getId(),
-                    'publishDate' => $now->getDatabaseDate()
+                    'publishDate' => $now->getDatabaseDate(),
+                    'now' => $now->getDatabaseDate(),
                 ));
 
                 $allRecords = array_merge($statement->fetchAll(PDO::FETCH_ASSOC));
