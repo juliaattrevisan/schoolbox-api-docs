@@ -11763,10 +11763,42 @@ textarea.event-detail {
 
 /* Print Event List
  */
+#content .printEventList .calendar-controls  {
+  background: @module-background;
+}
+
 #content .printEventList .calendar-controls .link-case .filter-drop {
 	top: 27px;
 	right: 0px;
 }
+#content .printEventList .calendar-controls .list {
+  float: left;
+}
+#content .printEventList .calendar-controls .float-left {
+  width: 250px;
+}
+
+#content .printEventList .calendar-controls .small {
+  margin:  4px 3px;
+  padding: 0px 8px 0px 8px;
+}
+
+#content .printEventList .calendar-controls .export {
+  float: left;
+}
+
+.printEventList .calendar-controls .ui-datepicker-trigger {
+  display: inline;
+  padding: 0px 3px;
+}
+.printEventList .calendar-controls .active {
+  color: @banner-color;
+  background: @link;
+  border-color: @link;
+  line-height: 24px;
+  margin: 5px 3px;
+}
+
 
 /* Fix weird hack that someone put in which takes advantage of
  * coincidental fullcalendar grid view
@@ -11790,5 +11822,5 @@ textarea.event-detail {
 }
 
 .printEventList .dateSelector {
-	margin-right: 16px;
+	padding-left: 4px;
 }
