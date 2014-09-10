@@ -405,24 +405,36 @@ if (count($submission_history)) {
 
         }
         // return by teacher
-        if ($activity_item->isReturn()) {
+        $parentsCanSee =  !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent());
+        $isSuperuser = $groupHandler->isSuperuser();
 
-            // file return rather than mark
-            if ($history['HISTORY_RETURN_FILE_NAME']) {
-                if ($parentOnly) {
-                    $this->setVar('history_returned_block', 'returned work');
-                } else {
-                    $this->parse('history_returned_block', 'history_returned');
+        if ($activity_item->isReturn()) {
+            if ($isSuperuser || $parentsCanSee) {
+                if ($history['HISTORY_COMMENT']) {
+                    $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
                 }
-            } else {
-                if (!(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
-                    if ($history['HISTORY_COMMENT']) {
-                        $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
+
+                // file return rather than mark
+                if($history['HISTORY_RETURN_FILE_NAME']) {
+                    if($parentOnly) {
+                        $this->setVar('history_returned_block', 'returned work');
+                    } else {
+                        $this->parse('history_returned_block', 'history_returned');
                     }
-                    $this->parse('history_marked_block', 'history_marked');
-                    $this->parse('work_grade_block', 'work_grade');
                 }
+
+                $this->parse('work_grade_block', 'work_grade');
             }
+            else {
+
+                /* For styling reasons
+                 */
+                $this->setVar(array(
+                    'HAS_GRADE' => ''
+                ));
+            }
+
+            $this->parse('history_marked_block', 'history_marked');
 
             /* Remember the most recent returned work, because we need it
              * later on
