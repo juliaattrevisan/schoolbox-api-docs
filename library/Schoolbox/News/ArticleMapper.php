@@ -18,6 +18,8 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Category\NewsMapper;
 
 class ArticleMapper extends Mapper implements Searchable {
 
@@ -416,4 +418,86 @@ class ArticleMapper extends Mapper implements Searchable {
 		return $c;
 	}
 
+    /**
+     * Find all the news relevant to a particular user
+     * by finding news they are directly related to, that their group/role is,
+     * and optionally for a particular category
+     *
+     * @param User $user
+     * @param $category
+     * @return \Schoolbox\Collection
+     */
+    public function findAllForUserAndCategory(User $user, $category) {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $subjectNewsMapper = new NewsMapper();
+
+        $allArticles = new Collection();
+
+        /* Find all the news relevant only optional categories
+         */
+        $allCategories = $categoryMapper->findForUser($user);
+
+        foreach ($allCategories as $currentCategory) {
+            $allArticles = $allArticles->merge($subjectNewsMapper->findForFeed($currentCategory->getId(), 9999));
+        }
+
+        /* A combination of news related to you, specifically;
+         * and roles within campuses; and your associated categories
+         */
+        if (!($category instanceof Category)) {
+            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            $allRecords = array();
+
+            $userMapper = $this->getJoinMapper('users');
+            $campusMapper = $this->getJoinMapper('campuses');
+            $roleMapper = $this->getJoinMapper('roles');
+
+            /* Find all the news relevant to you specifically by id,
+             * or by role type in your campus
+             */
+            $query = "
+                SELECT
+                    {$this->getColumnString('a')},
+                    {$userMapper->getColumnString('u')},
+                    {$campusMapper->getColumnString('c')},
+                    {$roleMapper->getColumnString('r')}
+                FROM `{$this->getTable()}` a
+                LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
+                LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
+                LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
+                WHERE a.item_deleted = 0
+                    AND a.item_datetime_published <= :publishDate
+                    AND (
+                        u.id = :userId
+                        OR a.item_owner = :userId
+                        OR (c.id = :campusId AND r.id = :roleId)
+                    )
+                ORDER BY a.item_datetime_posted DESC
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+
+            // iterate by campus
+            foreach($user->getCampusCollection() as $campus) {
+                $statement->execute(array(
+                    'userId' => $user->getId(),
+                    'roleId' => $user->getRole()->getId(),
+                    'campusId' => $campus->getId(),
+                    'publishDate' => $now->getDatabaseDate()
+                ));
+
+                $allRecords = array_merge($statement->fetchAll(PDO::FETCH_ASSOC));
+            }
+
+            /* Hydrate
+             */
+            foreach($allRecords as $currentRecord) {
+                $allArticles->add($this->hydrate($currentRecord, 'a'));
+            }
+        }
+
+        $allArticles->sortBy('publishDate', 'DESC');
+
+        return $allArticles;
+    }
 }
