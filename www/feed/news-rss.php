@@ -16,12 +16,19 @@ $category = null;
 
 /* Param explosion
  */
-$params = explode('/', $_SERVER['REQUEST_URI']);
+$params = parse_url($_SERVER['QUERY_STRING']);
 
-if (strlen($params[3])) {
+preg_match('/user=([a-zA-Z0-9]+)(&category=)?(\d*)/', $params['path'], $matches);
+
+$userHash = $matches[1];
+$categoryId = $matches[3];
+
+/* Find all the bits
+ */
+if (strlen($userHash)) {
     try {
         $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('hash', $params[3]);
+        $user = $userMapper->findOneByColumn('hash', $userHash);
     }
     catch (\Exception $e) {
         error(31);
@@ -29,10 +36,10 @@ if (strlen($params[3])) {
 
     /* Optional category filter
      */
-    if (is_numeric($params[4])) {
+    if (is_numeric($categoryId)) {
         try {
             $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-            $category = $categoryMapper->findById($params[4]);
+            $category = $categoryMapper->findById($categoryId);
         }
         catch (\Exception $e) {
         }
