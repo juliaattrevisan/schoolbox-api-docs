@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Category\NewsMapper;
 
 class ArticleMapper extends Mapper implements Searchable {
@@ -428,23 +429,30 @@ class ArticleMapper extends Mapper implements Searchable {
      * @return \Schoolbox\Collection
      */
     public function findAllForUserAndCategory(User $user, $category) {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
         $subjectNewsMapper = new NewsMapper();
 
-        $allArticles = new Collection();
-
-        /* Find all the news relevant only optional categories
+        /* Find all the news relevant to a specific category
          */
-        $allCategories = $categoryMapper->findForUser($user);
-
-        foreach ($allCategories as $currentCategory) {
-            $allArticles = $allArticles->merge($subjectNewsMapper->findForFeed($currentCategory->getId(), 9999));
+        if ($category instanceof Category) {
+            $allArticles = $subjectNewsMapper->findForFeed($category->getId(), 9999);
         }
-
         /* A combination of news related to you, specifically;
          * and roles within campuses; and your associated categories
          */
-        if (!($category instanceof Category)) {
+        else {
+            $categoryMapper = new CategoryMapper();
+            $allArticles = new Collection();
+
+            /* Find all the news relevant to all categories
+             */
+            $allCategories = $categoryMapper->findForUser($user);
+
+            foreach ($allCategories as $currentCategory) {
+                $allArticles = $allArticles->merge($subjectNewsMapper->findForFeed($currentCategory->getId(), 9999));
+            }
+
+            /* Find all the news relevant to roles and campuses
+             */
             $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
             $allRecords = array();
 
