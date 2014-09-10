@@ -87,7 +87,8 @@
         "aura/web": "~2.0.0@beta",
         "aura/session": "~2.0.0@beta",
         "aura/sqlquery": "~2.0.0",
-        "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master"
+        "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master",
+        "easyrdf/easyrdf": "~0.8.0"
     },
     "require-dev": {
         "sebastian/phpcpd": "2.*",
