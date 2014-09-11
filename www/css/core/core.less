@@ -11793,6 +11793,7 @@ textarea.event-detail {
   display: inline;
   padding: 0px 3px;
 }
+
 .printEventList .calendar-controls .active {
   color: @banner-color;
   background: @link;
@@ -11800,7 +11801,6 @@ textarea.event-detail {
   line-height: 24px;
   margin: 5px 3px;
 }
-
 
 /* Fix weird hack that someone put in which takes advantage of
  * coincidental fullcalendar grid view
@@ -11825,4 +11825,11 @@ textarea.event-detail {
 
 .printEventList .dateSelector {
 	padding-left: 4px;
+}
+
+/* Fix top margin difference between export and filter popups
+ * This specificity is out of control
+ */
+#content #calendar-export .link-case .filter-drop {
+	top: 32px;
 }
