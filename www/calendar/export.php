@@ -16,6 +16,11 @@ use Schoolbox\UserMapper;
 
 try {
     $session = new Session();
+
+    /* Don't log in the loginLog table for these accesses
+     */
+    $session->disableLoginLog();
+
     $token = $_GET['token'];
     $export_type = $_GET['export'];
     $api = null;
@@ -40,7 +45,7 @@ try {
     // Register a shutdown function so that user's session is restored.
     // (If PHP < 5.5 supported finally blocks, I'd use that.)
     $old_session = $_SESSION;
-    $session->create($user->getUsername());
+    $session->create($user->getUsername(), true);
     register_shutdown_function(
         function () use ($old_session) {
             $_SESSION = $old_session;

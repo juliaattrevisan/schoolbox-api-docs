@@ -4,7 +4,18 @@ use Schoolbox\Notif\Notif;
 
 class Session
 {
-    function  __construct()
+    /**
+     * Set useLoginLog to true to skip logging
+     * in the loginLog log table
+     *
+     * @var bool
+     */
+    private $useLoginLog = true;
+
+    /**
+     * Constructor
+     */
+    public function  __construct()
     {
         $this->db = DeprecatedDatabase::getInstance();
     }
@@ -85,12 +96,14 @@ class Session
                 $this->setSynergyInfo($userHandler);
 			}
 
-	        $notif = new Notif(Notif::TOPIC_AUTH);
-	        $notif->notice("Login success for $username", array(
-		        'username' => $user['username'],
-		        'ip'       => $ip,
-		        'login'    => 1,
-	        ));
+            if ($this->getUseLoginLog()) {
+                $notif = new Notif(Notif::TOPIC_AUTH);
+                $notif->notice("Login success for $username", array(
+                    'username' => $user['username'],
+                    'ip'       => $ip,
+                    'login'    => 1,
+                ));
+            }
 
 	        // add mobile session data
             $sbmAuth = new Authenticator();
@@ -466,4 +479,42 @@ class Session
 
         }
     }
+
+    /**
+     * Enable login log logging
+     */
+    public function enableLoginLog() {
+        $this->setUseLoginLog(true);
+    }
+
+    /**
+     * Disable login log logging
+     */
+    public function disableLoginLog() {
+        $this->setUseLoginLog(false);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set useLoginLog
+     *
+     * @param boolean $useLoginLog
+     */
+    private function setUseLoginLog($useLoginLog)
+    {
+        $this->useLoginLog = $useLoginLog;
+    }
+
+    /**
+     * Get useLoginLog
+     *
+     * @return boolean
+     */
+    private function getUseLoginLog()
+    {
+        return $this->useLoginLog;
+    }
+
 }
