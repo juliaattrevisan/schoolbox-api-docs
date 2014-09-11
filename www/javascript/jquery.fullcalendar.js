@@ -413,17 +413,21 @@ Calendar.prototype.init = function() {
 
     /* Special case for list view, it's the only button with an anchor
      */
+	var userId = this.options.userId;
+	var selectedDate = [
+		this.options.fullCalendar.date,
+		parseInt(this.options.fullCalendar.month)+1,
+		this.options.fullCalendar.year
+	].join('-');
+
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list';
+        window.location.href = '/calendar/list/' + selectedDate + '/' + userId;
     });
-
-
 
     // mash in the datepicker
     var headerCenter = this.dom.find('td.fc-header-center')
     headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
-
 
     // Event creation form listeners
     $j.each(this.getForms(), function(k, v) {

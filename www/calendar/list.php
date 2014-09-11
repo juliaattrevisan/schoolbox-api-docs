@@ -15,8 +15,9 @@ $user_mapper = new \Schoolbox\UserMapper();
 if (count($this->arg) == 2) {
     $selectedDate = $this->arg[0];
     try {
-        Calendar_Layout_List::permissionCheck($this->arg[1], $_SESSION['user'], new Group());
         $user = $user_mapper->findById($this->arg[1]);
+        Calendar_Layout_Full_Javascript::permissionCheck($this->arg[1], $_SESSION['user'], new Group());
+
     } catch (Exception $e) {
         error($e->getCode());
     }
@@ -29,8 +30,10 @@ $factory = new Calendar_Api_Factory($user);
 $api = $factory->produce();
 
 if (empty($_POST)) {
-    $start = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-    $finish = new \Alaress_Date_Format(strtotime('+1 month', $_SERVER['REQUEST_TIME']), 'U');
+    $date = new \Alaress_Date_Format($selectedDate, 'd-m-y');
+
+    $start = new \Alaress_Date_Format($date->getUnixTimestamp(), 'U');
+    $finish = new \Alaress_Date_Format(strtotime('+1 month', $date->getUnixTimestamp()), 'U');
 } else {
     $start = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
     $finish = new \Alaress_Date_Format($_POST['finish_date'], 'd/m/y');
@@ -38,6 +41,8 @@ if (empty($_POST)) {
 
 $this->setVar(
     array(
+        'USER_ID' => $user->getId(),
+        'CALENDAR_PARAMS' => implode('/', $this->arg),
         'SELECTED_START' => $start->getUsingFormat('d/m/Y'),
         'SELECTED_FINISH' => $finish->getUsingFormat('d/m/Y'),
     )

@@ -76,12 +76,14 @@
         <div class="float-right">
         <a href="#" class='btn list' data-filters="true"><span></span>Filters</a>
         <a href="#" class='active'><span></span>List</a>
-        <a href="/calendar/full#month" class='btn small no-icon'><span></span>Month</a>
-        <a href="/calendar/full#agendaWeek" class='btn small no-icon'><span></span>Week</a>
-        <a href="/calendar/full#agendaDay" class='btn small no-icon'><span></span>Day</a>
+        <a href="/calendar/full/{CALENDAR_PARAMS}#month" class='btn small no-icon'><span></span>Month</a>
+        <a href="/calendar/full/{CALENDAR_PARAMS}#agendaWeek" class='btn small no-icon'><span></span>Week</a>
+        <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='btn small no-icon'><span></span>Day</a>
         <a href="#" class='btn export'><span></span>Export</a>
         </div>
         <form action="/calendar/list" method="post">
+			<input type="hidden" name='userKey' value='{USER_ID}' />
+
             <div class="float-left dateSelector">
                 <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
                 to <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
