@@ -93,6 +93,21 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         $calendarHandler = new Calendar();
         $campus_list = $calendarHandler->getFilterCampusList($this->getUser()->getId());
 
+        $this->getPage()->dropDown(
+            'export_group',
+            $category_list,
+            array(),
+            TEMPLATE_content,
+            array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
+        );
+        $this->getPage()->dropDown(
+            'export_campus',
+            $campus_list,
+            array(),
+            TEMPLATE_content,
+            array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
+        );
+
         $this->getPage()->checkList(
             'filter_group',
             $category_list,
