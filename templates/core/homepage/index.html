@@ -144,38 +144,33 @@
     <!-- END edit_page -->
 </h1>
 <!-- BEGIN customise_page -->
-<div id="tabs-NOOO">
-
+<div id="tabs-homepage">
 <ul class="clearfix">
-    <li><a href="#tabs-1">Components</a></li>
     <!-- BEGIN homepage_color_link -->
-    <li><a href="#tabs-2">Colours</a></li>
+    <li><a href="#tabs-2" class="btn homepage-overflow no-text"><span></span></a></li>
     <!-- END homepage_color_link -->
-    <li><a href="#tabs-3">Column Widths</a></li>
+    <li><a href="#tabs-3" class="btn homepage-columns no-text"><span></span></a></li>
+    <li><a href="#tabs-1" class="btn homepage-component no-text"><span></span></a></li>
 </ul>
+<h2>Add Components</h2>
 
 <div id="tabs-1" class="customise-components">
-    <h2>Add Components</h2>
-    <div id="mort"> <!-- tabs-sub -->
-        <ul class="admin-nav">
+    <div id="tabs-sub"> <!-- tabs-sub -->
+        <ul class="ui-tabs admin-nav">
             <!-- BEGIN homepage_component_tab -->
             <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
             <!-- END homepage_component_tab -->
         </ul>
-        <td valign="top"><ul class="component-categories">
-            <!-- BEGIN homepage_component_tab -->
-            <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-            <!-- END homepage_component_tab -->
-        </ul>
+        <div class="clearfix"></div>
         <div class="components clearfix">
             <!-- BEGIN homepage_component_page -->
             <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
                 <!-- BEGIN homepage_component -->
                 <div class="add-component {HOMEPAGE_COMPONENT_CLASS} clearfix">
-                    <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
-                    <p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
-                    <span class="notification"><strong></strong>Added</span>
-                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" title="Add">
+                        <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+                        <span class="notification"><strong></strong>Added</span>
+                    </a>
                 </div>
                 <!-- END homepage_component -->
             </div>
