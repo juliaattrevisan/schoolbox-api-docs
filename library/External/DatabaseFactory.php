@@ -7,7 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-class External_DatabaseFactory {
+class External_DatabaseFactory
+{
 
     /**
      * Builds a database connector to a particular part of an external database.
@@ -29,22 +30,29 @@ class External_DatabaseFactory {
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
      */
-    protected function buildConnector($databaseType, $databaseName = '') {
-        $offlineClass = "External_Offline_$databaseType";
+    protected function buildConnector($databaseType, $databaseName = '')
+    {
+        $offlineClass    = "External_Offline_$databaseType";
+        $databaseClasses = array();
         if (!Config::get('external_enable')) {
-            $databaseClass = $offlineClass;
-        }
-        else {
+            $databaseClasses[] = $offlineClass;
+        } else {
             if (empty($databaseName)) {
                 $databaseName = Config::get('external_type');
             }
-            $databaseClass = "External_".ucfirst($databaseName)."_".$databaseType;
+            // Enable school-specific connection classes
+            $databaseClasses[] = "External_".ucfirst($databaseName)."_".ucfirst(Config::get('site_location'))."_".$databaseType;
+            $databaseClasses[] = "External_".ucfirst($databaseName)."_".$databaseType;
         }
-        if (class_exists($databaseClass, true)) {
-            try {
-                return new $databaseClass();
+
+        // Try each database class in order of definition
+        foreach ($databaseClasses as $databaseClass) {
+            if (class_exists($databaseClass, true)) {
+                try {
+                    return new $databaseClass();
+                } catch (\Schoolbox\External\Exception $e) {
+                }
             }
-            catch (\Schoolbox\External\Exception $e) {}
         }
 
         // At this point: return an offline class.
@@ -61,7 +69,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_AttendanceInterface
      */
-    public function buildAttendanceConnector($databaseName = '') {
+    public function buildAttendanceConnector($databaseName = '')
+    {
         return $this->buildConnector('Attendance', $databaseName);
     }
 
@@ -71,7 +80,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_ClassInterface
      */
-    public function buildClassConnector($databaseName = '') {
+    public function buildClassConnector($databaseName = '')
+    {
         return $this->buildConnector('Class', $databaseName);
     }
 
@@ -81,7 +91,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_PingInterface
      */
-    public function buildPingConnector($databaseName = '') {
+    public function buildPingConnector($databaseName = '')
+    {
         return $this->buildConnector('Ping', $databaseName);
     }
 
@@ -91,7 +102,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_TimetableInterface
      */
-    public function buildTimetableConnector($databaseName = '') {
+    public function buildTimetableConnector($databaseName = '')
+    {
         return $this->buildConnector('Timetable', $databaseName);
     }
 
@@ -101,7 +113,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_UserInterface
      */
-    public function buildUserConnector($databaseName = '') {
+    public function buildUserConnector($databaseName = '')
+    {
         return $this->buildConnector('User', $databaseName);
     }
 
@@ -111,8 +124,8 @@ class External_DatabaseFactory {
      * @param  string $databaseName
      * @return External_UserDetentionInterface
      */
-    public function buildUserDetentionConnector($databaseName = '') {
+    public function buildUserDetentionConnector($databaseName = '')
+    {
         return $this->buildConnector('UserDetention', $databaseName);
     }
-
 }
