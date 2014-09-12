@@ -79,6 +79,8 @@ SELECT DISTINCT ?level WHERE {
 SPARQL
         ;
 
+        // I wish I could join to learning level here, but I don't know how
+
         // Did I supply a learning area?
         // Only return levels in that area.
         $learningAreaQuery = '';
@@ -106,15 +108,18 @@ SELECT * WHERE {
     {
         ?subject asn:statementLabel "Strand"@en-au .
         ?subject dct:description ?description .
-        ?subject dct:isPartOf <$learningArea> .
+        ?subject dct:isPartOf ?part .
+        ?part    dct:description ?learningArea .
     }
     UNION {
         ?subject asn:statementLabel "Year level strand"@en-au .
         ?subject dct:description ?description .
         ?subject dct:educationLevel ?level .
-        ?subject dct:isPartOf <$learningArea> .
+        ?subject dct:isPartOf ?part .
+        ?part    dct:description ?learningArea .
     }
 }
+ORDER BY ASC(?learningArea) ASC(?description)
 SPARQL
         ;
         // Create a recursive tree of strands?
