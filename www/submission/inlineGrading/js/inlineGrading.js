@@ -63,6 +63,10 @@
 					$(config.viewElement).remove();
 				}
 				else {
+					$('#returnWorkForm').find("input[name='crocodoc[uuid]']").val(data.uuid);
+
+					/* Inject uuid into Return Work form
+					 */
 					$(config.viewElement).attr('src', data.url);
 				}
 			});

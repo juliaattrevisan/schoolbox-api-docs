@@ -76,8 +76,8 @@ class Loader
             $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
         } else {
             if ($this->getGroupHandler()->isStaff($this->getUser()->getId()) || $this->getGroupHandler()->isSuperuser(
-                        $this->getUser()->getId()
-                    )
+                    $this->getUser()->getId()
+                )
             ) {
                 $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
@@ -103,7 +103,11 @@ class Loader
             array(
                 'url' => "https://crocodoc.com/view/{$result->session}",
                 'errors' => $this->getCurl()->getErrors(),
-                'path' => getcwd()
+                'path' => getcwd(),
+                /* Pass this so that crocodoc uuid gets phplibbed upon
+                 * first load in Inline Grader, for student view
+                 */
+                'uuid' => $this->getUuid()
             )
         );
     }
