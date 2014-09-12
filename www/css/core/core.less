@@ -5789,7 +5789,8 @@ CALENDAR
       }
     }
     .export,
-    .filters {
+    .filters,
+    .list {
         float: none;
         position: relative;
         padding: 0 8px 0 27px;
@@ -10688,6 +10689,8 @@ ul.activity-list li,
 	}
 }
 
+/* Socialstream Browser
+ */
 .socialstream-node li {
 	list-style: none;
 }
@@ -11756,4 +11759,77 @@ textarea.event-detail {
 #mailForm .email-input {
     width: 92%;
     display: inline-block;
+}
+
+/* Print Event List
+ */
+#content .printEventList .calendar-controls  {
+  background: @module-background;
+}
+
+#content .printEventList .calendar-controls .link-case .filter-drop {
+	top: 27px;
+	right: 0px;
+}
+
+#content .printEventList .calendar-controls .list {
+  float: left;
+}
+
+#content .printEventList .calendar-controls .float-left {
+  width: 270px;
+}
+
+#content .printEventList .calendar-controls .small {
+  margin:  4px 3px;
+  padding: 0px 8px 0px 8px;
+}
+
+#content .printEventList .calendar-controls .export {
+  float: left;
+}
+
+.printEventList .calendar-controls .ui-datepicker-trigger {
+  display: inline;
+  padding: 0px 3px;
+}
+
+.printEventList .calendar-controls .active {
+  color: @banner-color;
+  background: @link;
+  border-color: @link;
+  line-height: 24px;
+  margin: 5px 3px;
+}
+
+/* Fix weird hack that someone put in which takes advantage of
+ * coincidental fullcalendar grid view
+ */
+#content .printEventList .calendar-controls .link-case .filter-drop .filter-list {
+	border-top-width: 1px;
+}
+
+.printEventList .duration {
+	width: 130px;
+	display: inline-block;
+}
+
+.printEventList p {
+	padding: 4px;
+	margin-bottom: 0px;
+}
+
+.printEventList h2 {
+	margin-top: 10px;
+}
+
+.printEventList .dateSelector {
+	padding-left: 4px;
+}
+
+/* Fix top margin difference between export and filter popups
+ * This specificity is out of control
+ */
+#content #calendar-export .link-case .filter-drop {
+	top: 32px;
 }

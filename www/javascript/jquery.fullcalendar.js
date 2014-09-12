@@ -366,6 +366,17 @@ function Calendar(id, bubbleId, opts) {
 Calendar.prototype.init = function() {
     var c = this
     this.dom.fullCalendar(this.options.fullCalendar)
+    /* Button for list view
+     */
+    var headerRight = this.dom.find('td.fc-header-right');
+    var baseButton  = headerRight.children('.fc-button').first();
+    headerRight.prepend(
+        baseButton.clone()
+            .html('list')
+            .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+            .addClass(' fc-corner-left no-icon')
+            .attr('id','fc-button-list')
+    );
 
     if(this.options.filter.enabled) {
         // mash the filters in (if they're enabled)
@@ -375,7 +386,7 @@ Calendar.prototype.init = function() {
             headerRight.prepend(
                 baseButton.clone()
                     .html('filters')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
                     .attr('id','fc-button-filter')
             );
@@ -384,7 +395,7 @@ Calendar.prototype.init = function() {
             headerRight.append(
                 baseButton.clone()
                     .html('export')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
                     .attr('id','fc-button-export')
             );
@@ -399,10 +410,24 @@ Calendar.prototype.init = function() {
         self.addClass('filter-change '+text).html('<span></span>'+text)
     })
 
+
+    /* Special case for list view, it's the only button with an anchor
+     */
+	var userId = this.options.userId;
+	var selectedDate = [
+		this.options.fullCalendar.date,
+		parseInt(this.options.fullCalendar.month)+1,
+		this.options.fullCalendar.year
+	].join('-');
+
+    $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
+        event.preventDefault();
+        window.location.href = '/calendar/list/' + selectedDate + '/' + userId;
+    });
+
     // mash in the datepicker
     var headerCenter = this.dom.find('td.fc-header-center')
     headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
-
 
     // Event creation form listeners
     $j.each(this.getForms(), function(k, v) {
