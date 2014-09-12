@@ -6712,8 +6712,11 @@ HOMEPAGE CUSTOMISE
     margin: 0 auto;
 }
 
+#tabs-sub-1{
+
+}
+
 .add-component {
-    background: transparent;
     border-right: 1px solid @lgrey;
     position: relative;
     float: left;
@@ -6722,31 +6725,40 @@ HOMEPAGE CUSTOMISE
     height: 135px;
     margin: 0 0 15px 0;
     .transition(opacity 0.5s);
-    &:hover{
-        background: url('/images/core/component/add.png') 44px 50% no-repeat;
-    }
     a{
-        background: url('/images/core/component/component-img.png') 44px 50% no-repeat;
+        background: url('/images/core/component/component-img.png') 44px 40% no-repeat;
         display: block;
         height: 100%;
         width: 100%;
-        text-align: center;
-        .transition(opacity 0.5s);
-        &:hover{
-            background: lighten(@highlight-color,@lighten-value);
-            opacity: 0.1;
+        &:hover{ text-decoration: none; }
+        &:hover .plus{
+            opacity: 1;
+        }
+        .plus{
+            background: rgba(255,255,229,0.9);
+            color: #1c9e1c;
+            display: block;
+            font-size: 97px;
+            font-weight: bold;
+            opacity: 0;
+            text-align: center;
+            height: 100%;
+            .transition(opacity 0.5s);
+        }
+        h4 {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
         }
     }
     &.disabled {
         color: @dgrey;
         opacity: 0.5;
     }
-}
-
-.add-component h4 {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 16px;
 }
 
 .add-component p {
