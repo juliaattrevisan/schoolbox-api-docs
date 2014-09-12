@@ -1,6 +1,6 @@
 @charset "utf-8";
 // =============================================================================
-// Legacy Schoolbox skin loader
+// Default v2 Schoolbox skin
 // =============================================================================
 //*
 //*   Ride The Whale                         ~777IIIIIIIIIII7~_
@@ -20,81 +20,227 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					193px;
-@logo-height: 					63px;
+@search-width: 					256px;
+@logo-width: 					144px;
+@logo-height: 					56px;
+@infopanel-bellsprite:			'/images/seymour/bell.png';
+@infopanel-height:              32px;
 
 // Generic colors
-@body-background: 				#F6F6F6; // Body, but not the content area
-@content-background: 			#F0F7FE; // Used for forms
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
-@alternate-background: 			#EEEEEE; // Sections such as admin
+@alternate-background: 			#FFFFFF; // Sections such as admin
 
 // Basic type
 @body-text: 					@black;
 @secondary-text: 				#797979;
-@link: 							#002C76;
-@link-hover: 					#002C76;
+@link: 							#004169;
+@link-hover: 					saturate(@link, 15%);
 
 // Main banner & Search
-@banner-background: 			#002C76;
-@banner-color:      			#B2C5D6;
-@banner-links:      			#FFFFFF;
-@banner-height:     			108px;
-@search-color:                  #404040;
+@banner-background: 			@link;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:                  @link;
+@banner-height:     			120px;
 
 // Modules
-@module-heading: 				#FFFFFF;
-@module-background: 			#002C76;
+@module-heading: 				@link;
+@module-background: 			#e5ecf0;
+@admin-nav:                     #007663;
 
 // Refers to the left navigation
-@navigation-width:				212px;
-@navigation-padding:			8px;
-@navigation-background:  		#FFFFFF;
-@navigation-color:  			#006C56;
-@navigation-links:  			#006C56;
-@navigation-hover-background: 	#F1F1F1;
-@navigation-hover-color:  		@navigation-links;
-@navigation-sub-background:  	@navigation-background;
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			@link;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	#265d7f;
+@submit-btn:                    @banner-background;
+
+// Flyout Menus and Messages
+@notify-color:					@negative-color;
+@notify-text-color:				@banner-color;
+@notify-open-text-color:		@banner-background;
+@flyout-color:					@navigation-links;
+@flyout-header-color:			@navigation-color;
+@flyout-background:				@content-background;
+@flyout-hover-color:			@navigation-hover-color;
+@flyout-hover-background:		@navigation-hover-background;
+@flyout-pad-height:				2px;
+@flyout-highlight:				@dark;
 
 // Main "Tab" Navigation
 @tab-background:				transparent;
 @tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-background;
-@tab-hover-color:				@tab-color;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
 
-@infopanel-height:				24px;
-@notify-text-color:				@tab-color;
-@notify-color:					rgba(224, 20, 20, 0.9);
-
-	// Footer text
-@footer-color:					#929292;
+// Footer text
+@footer-color:					#797979;
 @footer-links:					@footer-color;
 
 // Optional features
-@login-version: 				1;
+//@header-version: 				2;
 
 // =============================================================================
 // 3. Load core
 // =============================================================================
 @import "../core/core.less";
-@import "../core/legacy.less";
-@import "screen.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
 // =============================================================================
 
-.admin-nav li a.current {
-  border: 1px solid @content-background;
+#header{
+    background: @link url('/images/seymour/header-bg.png') top left repeat-x;
+    .logo{
+        left: 17px;
+        top: 16px;
+    }
+    h1{
+        position: relative;
+        top: 34px;
+        left: 200px;
+        font-weight: bold;
+        font-size: 18px;
+        color: @banner-color;
+        width: 370px;
+    }
+    #tabs {
+        margin: 68px 0 0 0;
+        padding-left: 200px;
+        border-top: 2px solid @banner-color;
+        li a{
+            padding: 6px 12px;
+            font-size: 15px;
+        }
+    }
+    #search{
+        #search-field{ background: @banner-color; }
+        #search-button{ background: url("/images/seymour/search-btn.png") no-repeat 0px 8px; }
+    }
 }
 
-#infoPanel {
-	margin: 5px 16px -3px 0;
-	.bell {
-		margin: 0;
-		background-image: url('/images/seymour/bell.png');
+#nav{
+    ul ul a {
+        color: @navigation-hover-color;
+    }
+}
+
+.admin-nav li a{ color: @admin-nav; }
+h2{ border-top-right-radius: 16px; }
+
+body.login{
+  #container{
+    background: transparent;
+    width: 100% !important;
+    padding: 0;
+
+    a{ text-decoration: underline; }
+
+    #login-bg{
+      float: left;
+      width: 65%;
+      text-align: center;
+      height: 100%;
+      z-index: -1;
+      height:100%;
+    }
+
+    #content{
+      background: url("/images/seymour/login-bg.png") top left repeat;
+      float: left;
+      width: 25%;
+      height: 100%;
+      position: fixed;
+      right: 0;
+      top: 0;
+      left: auto;
+      padding: 32px 5% 0 5%;
+      h1{ color: @banner-color; margin-top: 24px; }
+      .error, .forgotten a{
+        color: @banner-color;
+        margin: 35px 0;
+        text-align: center;
+      }
+      #loginForm{
+        ::-webkit-input-placeholder { color: @black; font-size: 17px; } //need these so I can include font size
+        :-moz-placeholder { color: @black; font-size: 17px; }
+        ::-moz-placeholder { color: @black; font-size: 17px; }
+        :-ms-input-placeholder { color: @black; font-size: 17px; }
+        input{
+          background: #eee;
+          color: @black;
+          font-size: 17px;
+          width: 90%;
+          margin: 0 0 16px 0;
+          padding: 10px 5%;
+        }
+        .submit-btn-plain{
+          background: #004684 url("/images/seymour/chevron.png") 97% 12px no-repeat;
+          color: @banner-color;
+          width: 100%;
+          font-weight: bold;
+          height: 44px;
+          &:hover{background: lighten(#004684, 5%) url("/images/seymour/chevron.png") 97% 12px no-repeat;}
+        }
+        fieldset{ padding: 0; color: #ffffff; }
+      }
+    }
+  }
+  #footer{
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: 56%;
+    position: fixed;
+  }
+}
+
+/*
+ * Dashboard Icons
+ */
+
+.dash-icons{
+    margin: 0 !important;
+	li{
+	    float: left;
+		padding: 7px 4px !important;
+		list-style: none;
+		a{  display: block;
+            float: left;
+            text-align: center;
+            padding: 77px 0 0 0;
+            margin: 0 22px 22px 0;
+            font-size: 12px;
+            width: 72px;
+            min-height: 34px;
+            .transition (opacity 0.5s);
+            &:hover{
+                cursor: pointer;
+                opacity: 0.8;
+            }
+        }
+        .buzz-book{ background: url('/images/seymour/dashboard-icons.png') 0px 0px no-repeat; }
+        .dash-cal{ background: url('/images/seymour/dashboard-icons.png') -72px 0px no-repeat; }
+        .due-work{ background: url('/images/seymour/dashboard-icons.png') -144px 0px no-repeat; }
+        .events{ background: url('/images/seymour/dashboard-icons.png') -216px 0px no-repeat; }
+        .forms-flyers{ background: url('/images/seymour/dashboard-icons.png') -288px 0px no-repeat; }
+        .it-services{ background: url('/images/seymour/dashboard-icons.png') -360px 0px no-repeat; }
+        .leave{ background: url('/images/seymour/dashboard-icons.png') -432px 0px no-repeat; }
+        .network{ background: url('/images/seymour/dashboard-icons.png') -504px 0px no-repeat; }
+        .dash-news{ background: url('/images/seymour/dashboard-icons.png') -576px 0px no-repeat; }
+        .resources{ background: url('/images/seymour/dashboard-icons.png') -648px 0px no-repeat; }
+        .sport{ background: url('/images/seymour/dashboard-icons.png') -720px 0px no-repeat; }
+        .staff-dir{ background: url('/images/seymour/dashboard-icons.png') -792px 0px no-repeat; }
+        .submissions{ background: url('/images/seymour/dashboard-icons.png') -144px 0px no-repeat; }
+        .synergetic{ background: url('/images/seymour/dashboard-icons.png') -864px 0px no-repeat; }
+        .timetable{ background: url('/images/seymour/dashboard-icons.png') -936px 0px no-repeat; }
 	}
 }
-#message-list {
-	top: 26px;
-}
-
-#nav h4{ background: transparent; padding: 0 0 0 14px; }
