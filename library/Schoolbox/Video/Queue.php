@@ -116,7 +116,7 @@ class Queue extends ResourceVideo
 
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
-            " -c:v libx264 $scale -preset slow -b:v 512k -b:a 128k -r 24 -ar:a 11025" .
+            " -c:v libx264 $scale -preset slow -b:v 512k -b:a 128k -r 24 -ar:a 44100" .
             " -timelimit " . escapeshellarg($this->config->get('video_processing_timeout')) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
