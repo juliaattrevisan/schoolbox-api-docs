@@ -42,6 +42,7 @@ if (empty($_POST)) {
 $this->setVar(
     array(
         'USER_ID' => $user->getId(),
+        'USER_TOKEN' => $user->getKey(),
         'CALENDAR_PARAMS' => implode('/', $this->arg),
         'SELECTED_START' => $start->getUsingFormat('d/m/Y'),
         'SELECTED_FINISH' => $finish->getUsingFormat('d/m/Y'),
