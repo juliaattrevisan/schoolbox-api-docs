@@ -97,25 +97,27 @@ SPARQL
      */
     public function getStrands($learningArea)
     {
+        // Get the learning area, then get all the strands that are part of it?
         // Get all strands of the given learning area
         $sparql = <<<SPARQL
 prefix asn: <http://purl.org/ASN/schema/core/>
 prefix dct: <http://purl.org/dc/terms/>
-SELECT ?strand WHERE {
-    ?subject a asn:StandardDocument .
-    ?subject dct:description \"$learningArea\"@en-au
-    { ?subject dct:educationLevel ?level . }
+SELECT * WHERE {
+    {
+        ?subject asn:statementLabel "Strand"@en-au .
+        ?subject dct:description ?description .
+        ?subject dct:isPartOf <$learningArea> .
+    }
+    UNION {
+        ?subject asn:statementLabel "Year level strand"@en-au .
+        ?subject dct:description ?description .
+        ?subject dct:educationLevel ?level .
+        ?subject dct:isPartOf <$learningArea> .
+    }
 }
 SPARQL
         ;
-
-        // Did I supply a learning area?
-        // Only return levels in that area.
-        $learningAreaQuery = '';
-        if ($learningArea) {
-            $learningAreaQuery = "?subject dct:description \"$learningArea\"@en-au";
-        }
-        $sparql = sprintf($sparql, $learningAreaQuery);
+        // Create a recursive tree of strands?
         $result = $this->getClient()->query($sparql);
         return $result;
     }
