@@ -103,7 +103,6 @@ class Loader
             array(
                 'url' => "https://crocodoc.com/view/{$result->session}",
                 'errors' => $this->getCurl()->getErrors(),
-                'path' => getcwd(),
                 /* Pass this so that crocodoc uuid gets phplibbed upon
                  * first load in Inline Grader, for student view
                  */
