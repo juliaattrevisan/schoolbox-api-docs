@@ -80,7 +80,7 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
 
 /* Render injectable views
  */
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], array());
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], null, array());
 $renderer = $templateFactory->produce();
 $renderer->render();
 
