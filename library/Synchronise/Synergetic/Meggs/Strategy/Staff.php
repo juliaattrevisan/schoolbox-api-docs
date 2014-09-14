@@ -21,6 +21,7 @@ class Synchronise_Synergetic_Meggs_Strategy_Staff extends Synchronise_Base_Strat
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('local_email', false))
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('mail_handler', false))
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('webmail', true))
+            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Staff_Role())
 //            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Staff_Campus())
 //            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Staff_Eportfolio())
 //            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_StaffDefaultEmail())
