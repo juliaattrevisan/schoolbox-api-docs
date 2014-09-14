@@ -21,6 +21,8 @@ class Synchronise_Synergetic_Meggs_Strategy_Student extends Synchronise_Base_Str
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('local_email', false))
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('mail_handler', false))
             ->addHydrator(new Synchronise_Base_Hydrator_BasicValue('webmail', true))
+            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_House())
+            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Student_Campus())
             ->addHydrator(new Synchronise_Base_Hydrator_Webmail())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
