@@ -128,7 +128,7 @@ class MyFileMapper extends Mapper {
 
 		// copy file into location
 		if( is_readable($file->getTempFileLocation())) {
-			$filename = $this->getSaveLocation() . $file->getId() . '.dat';
+			$filename = $file->getFileLocation();
 			@unlink($filename);
 
 			$mimetype = Schoolbox\File\MimetypeMapper::getInstance()->findOneByColumn('mime', $file->getMime());

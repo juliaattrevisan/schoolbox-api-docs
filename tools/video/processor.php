@@ -56,7 +56,7 @@ foreach ($pendingQueue as $vid) {
 
 	/* Process video */
 	try {
-		if ($vid->processVideo() == true) {
+		if ($vid->process() == true) {
 			$vid->setStatus(QueueMapper::STATUS_COMPLETED);
 		}
 		else {

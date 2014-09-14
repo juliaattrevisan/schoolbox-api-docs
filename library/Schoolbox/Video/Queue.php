@@ -21,6 +21,77 @@ class Queue extends ResourceVideo
     protected $created;
     protected $modified;
 
+    /**
+     * Primary binary program used for conversion
+     * @var string
+     */
+    private $converterExec  = 'avconv';
+
+    /**
+     * Secondary fallback used for conversion, found on systems other than ubuntu (like rhel)
+     * @var string
+     */
+    private $fallbackConv   = 'ffmpeg';
+
+    /**
+     * Primary binary used to finding out details of provided file
+     * @var string
+     */
+    private $infoExec       = 'avprobe';
+
+    /**
+     * Secondary fallback binary for finding out details of provided file
+     * @var string
+     */
+    private $fallbackInfo   = 'ffprobe';
+
+
+    /**
+     * Determines if file is audio or video and does corresponding processing
+     * @returns boolean
+     * @throws Exception_Schoolbox
+     */
+    public function process()
+    {
+        $sourceFile = $this->sourceFile();
+
+        if(stristr($sourceFile->getMime(),'audio/')){
+            $this->processAudio($this->sourceLocation($sourceFile));
+        }
+        else if(stristre($sourceFile->getMime(), 'video/')){
+            $this->processVideo($this->sourceLocation($sourceFile));
+        }
+
+    }
+
+
+    /**
+     * Takes audio file and transcodes into mp3 for playback via <audio>
+     * @returns boolean
+     * @throws Exception_Schoolbox
+     */
+    public function processAudio($sourceFile)
+    {
+        $executable = $this->getConverterExecutable();
+
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 128k -ar:a 44100';
+
+        exec($processString, $message, $return);
+        $this->setMessage(implode("\n", $message));
+
+        preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
+
+        if (isset($match[1])) {
+            $hours = $minutes = $seconds = 0;
+            sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
+            $duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
+            $this->setDuration($duration);
+        }
+
+        return true;
+
+    }
+
 
     /**
      * Takes existing file and transcodes into web format and creates thumbnail
@@ -29,25 +100,20 @@ class Queue extends ResourceVideo
      * @throws Exception_Schoolbox
      */
 
-    public function processVideo()
+    public function processVideo($sourceFile)
     {
-        $sourceFile = $this->getSourceFile();
+        $executable = $this->getConverterExecutable();
+        $info_exec  = $this->getInfoExecutable();
 
-        //
-        // Choose whether to use AVconv or FFMpeg, depending on whether AVconv
-        // exists or not.
         // FFMpeg needs strict flag, as MP4 is technically experimental
-        $executable = 'avconv';
-        $info_exec  = 'avprobe';
-        $strict     = false;
-        exec('which avconv', $unused, $errorcode);
-        if ($errorcode) {
-            $executable = 'ffmpeg';
-            $info_exec  = 'ffprobe';
-            $strict     = true;
+        if($executable == $this->fallbackConv) {
+            $strict = true;
+        }
+        else {
+            $strict = false;
         }
 
-        //
+
         // Get information about width and height of video file
         exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
         $info_message = implode("\n", $info_message);
@@ -163,22 +229,75 @@ class Queue extends ResourceVideo
     private function getSourceFile()
     {
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
-            $sourceStore = $this->config->get('file_dir');
-            return $sourceStore . '/' . $this->fileID . '.dat';
+            return \Schoolbox\Resource\FileMapper::getInstance()->findById($this->fileID);
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            $sourceStore = $this->config->get('storage_dir');
-            return $sourceStore . '/' . $this->fileID . '.dat';
+            return \Schoolbox\StorageMapper::getInstance()->findById($this->fileID);
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
-            $sourceStore = $this->config->get('submission_dir');
-            return $sourceStore . '/' . $this->fileID . '.dat';
+            return \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper::getInstance()->findById($this->fileID);
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
-            $sourceStore = $this->config->get('myfile_dir');
-            return $sourceStore . '/' . $this->fileID . '.dat';
+            return \Schoolbox\MyFileMapper::getInstance()->findById($this->fileID);
         } else {
-            throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
+            throw new \Exception_Schoolbox('Processing of this type of file is not implemented');
         }
     }
 
+    private function getSourceLocation($sourceObject)
+    {
+        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
+            return $sourceObject->getFileLocation();
+        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
+            return $sourceObject->getFileLocation();
+        } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
+            return $sourceObject->getFileLocation();
+        } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
+            return $sourceObject->getFileLoaction();
+        } else {
+            throw new \Exception_Schoolbox('Processing of this type of file is not implemented');
+        }
+    }
+
+    /**
+     * Returns converter executable
+     * @return string
+     */
+    private function getConverterExecutable()
+    {
+        if($this->isExecAvailable($this->converterExec)){
+            return $this->converterExec;
+        }
+        else {
+            return $this->fallbackConv;
+        }
+    }
+
+    /**
+     * Returns info retrieval executable
+     * @return string
+     */
+    private function getInfoExecutable() {
+        if($this->isExecAvailable($this->infoExec)) {
+            return $this->infoExec;
+        }
+        else {
+            return $this->fallbackInfo;
+        }
+    }
+
+    /**
+     * Tests is a given executable is available on the system
+     * @param $executable
+     * @return bool
+     */
+    private function isExecAvailable($executable)
+    {
+        exec('which '.escapeshellarg($executable), $unused, $errorcode);
+        if ($errorcode) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
     public function setCreated($created)
     {

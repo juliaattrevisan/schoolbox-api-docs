@@ -9,12 +9,13 @@
 
 namespace Schoolbox\Resource;
 use Schoolbox\ConfigLoader;
+use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 use Schoolbox\File\Mimetype;
 
-class File implements ISoftDeletable {
+class File implements ISoftDeletable, FileInterface {
 	/**
 	 * @var int
 	 */
@@ -156,6 +157,11 @@ class File implements ISoftDeletable {
         else
             return new Mimetype();
     }
+
+    public function getMime() {
+        return $this->getMimeType()->getMime();
+    }
+
 
 	/**
 	 * @param  \Alaress_Date_Format $modified

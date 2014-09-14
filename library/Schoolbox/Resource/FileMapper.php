@@ -271,7 +271,7 @@ class FileMapper extends Mapper {
                 throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
             }
             // If video add to video processing queue */
-            if ($file->getMimeType()->isVideo()) {
+            if ($file->getMimeType()->isVideo() || $file->getMimetype()->isAudio()) {
                 $mapper = new Schoolbox\Video\QueueMapper();
                 $videoQ = new Schoolbox\Video\Queue();
                 $videoQ->setFileID($file->getId());

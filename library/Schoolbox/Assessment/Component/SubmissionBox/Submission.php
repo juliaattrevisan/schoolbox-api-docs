@@ -10,12 +10,13 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\ConfigLoader;
 use Schoolbox\File\MimetypeMapper;
 
-class Submission {
+class Submission implements FileInterface {
 
 	/**
 	 * @var int
@@ -53,7 +54,7 @@ class Submission {
 	protected $late;
 
 	/**
-	 * @var string
+	 * @var AllowedFile
 	 */
 	protected $mimetype;
 
@@ -252,7 +253,7 @@ class Submission {
 	}
 
 	/**
-	 * @param  string $mimetype
+	 * @param \Schoolbox\File\Mimetype $mimetype
 	 *
 	 * @return $this
 	 */
@@ -262,11 +263,20 @@ class Submission {
 	}
 
 	/**
-	 * @return string
+     * This should be hydrated with the mime object
+     * @return \Schoolbox\File\Mimetype
 	 */
 	public function getMimetype() {
 		return $this->mimetype;
 	}
+
+    /**
+     * Fetch the mime string
+     * @return string
+     */
+    public function getMime() {
+        return $this->getMimetype()->getMime();
+    }
 
 	/**
 	 * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
