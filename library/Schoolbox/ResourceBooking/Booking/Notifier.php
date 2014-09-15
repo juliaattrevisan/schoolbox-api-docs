@@ -119,6 +119,9 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function buildMessenger(Model $object, User $user, $event)
     {
+        // Ensure that object is hydrated. Why does this happen?
+        /** @var Model $object */
+        $object    = $this->mapper->findById($object->getId());
         $messenger = new Messenger();
 
         // Hydrate event owner
