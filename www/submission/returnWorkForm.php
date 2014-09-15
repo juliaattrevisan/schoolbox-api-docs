@@ -57,28 +57,6 @@ $redirect = $_POST['redirect'];
 $returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $crocodoc);
 $returnedWork = $returnedWorkFactory->start();
 
-/* An array of crocodoc-specific controls
- array(
-	'submissionId' => ...
- );
- */
-
-/* Deal with crocodoc specifically
- */
-if (isset($_POST['crocodoc'])) {
-    try {
-        $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-        $submission = $submissionMapper->findById($_POST['crocodoc']['submissionId']);
-
-        /* Feed it a returnedWork record to which the downloaded file
-         * should be attached
-         */
-        $downloader = new Crocodoc\Download($submission, $returnedWork);
-        $downloader->start();
-    } catch (\Exception $e) {
-    }
-}
-
 /* Go to St. Albans when finished
  */
 if ($redirect) {

@@ -21,7 +21,7 @@ $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
-$this->setBlock('return_file', 'return_file_uuid', 'return_file_uuid_block');
+$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
