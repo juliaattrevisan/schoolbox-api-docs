@@ -1,8 +1,10 @@
 <?php
 
+use Schoolbox\Assessment\Component;
+
 // not in sitepage context, redirect
 if (!isset($this)) {
-    require_once(dirname(__FILE__). '/../../include/Bootstrap.php');
+    require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
     SitePage::localRedir('/submission/submissionHistory');
 }
 
@@ -57,8 +59,6 @@ if ($this->arg[0] == false) {
     error(2);
 }
 
-use Schoolbox\Assessment\Component;
-
 $mapper           = new Component\SubmissionBoxMapper();
 $submissionMapper = new Component\SubmissionBox\SubmissionMapper();
 $work_mapper      = new Component\SubmissionBox\WorkTypeMapper();
@@ -76,14 +76,17 @@ if ($this->arg[1] == false && $groupHandler->isStudent()) {
     SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$currentUserId}");
 }
 
-if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff(
-        ) || $currentUserId == $this->arg[1])
+if (is_numeric($this->arg[1])
+    && ($groupHandler->isParentOfChild($this->arg[1])
+        || $groupHandler->isStaff()
+        || $currentUserId == $this->arg[1]
+    )
 ) {
     $userID = $this->arg[1];
 } else {
     //displaying users on due work, so log this as the last time they viewed due work
     // logger, level, event, message, extras = array()
-//	Logger::log('info', 'view_due_work');
+//    Logger::log('info', 'view_due_work');
     $submissionHandler->logPageView(1);
     $submissionHandler->logPageView(2);
     $userID = $currentUserId;
@@ -240,7 +243,7 @@ if ($file_links->count() > 0) {
     }
     $this->setVar('legacy_download_block', '');
 } elseif ($legacy_file_id && is_numeric($legacy_file_id)) {
-    $fileHandler = new File;
+    $fileHandler = new File();
     $file        = $fileHandler->getByID($legacy_file_id);
 
     $this->setVar(
@@ -302,7 +305,6 @@ if (count($submission_history)) {
     $errors = $dem->listDisplayValues();
 
     foreach ($submission_history as $activity_item) {
-
         // reset blocks
         foreach ($historyActivityTypes as $historyType) {
             $this->setVar("history_{$historyType}_block", '');
@@ -351,14 +353,14 @@ if (count($submission_history)) {
             //
             // Name, icon and ID of user: use student's
             $owner = $activity_item->getSubmission()->getOwner()->getId();
-        } // if return item
-        elseif ($activity_item->isReturn()) {
-            // work returned
+        } elseif ($activity_item->isReturn()) {
+            // if return item
             if ($activity_item->getReturnedWork()->getFilename()) {
+                // work returned
                 $history['HISTORY_CLASS'] = 'return';
                 $history['HISTORY_ICON']  = 'submitted';
-            } // mark given
-            else {
+            } else {
+                // mark given
                 $history['HISTORY_CLASS'] = 'mark';
                 $history['HISTORY_ICON'] = 'tick';
             }
@@ -384,8 +386,8 @@ if (count($submission_history)) {
             $history['HISTORY_RETURN_FILE_NAME'] = Scrub::text($activity_item->getReturnedWork()->getFilename());
 
             $owner = $activity_item->getReturnedWork()->getMarker()->getId();
-        } // otherwise extension
-        else {
+        } else {
+            // otherwise extension
             $history['HISTORY_CLASS'] = 'extend';
             $history['HISTORY_ICON'] = 'clock';
         }
@@ -407,7 +409,7 @@ if (count($submission_history)) {
 
         // submission by student
         if ($activity_item->isSubmission()) {
-// if you are a parent (and only a parent), you can only see plaintext, not a link
+            // if you are a parent (and only a parent), you can only see plaintext, not a link
             if ($parentOnly) {
                 $this->setVar('history_submitted_block', 'submitted work');
             } else {
@@ -461,7 +463,7 @@ if (count($submission_history)) {
         }
 
         /* Alternating row color
-		 */
+         */
         $this->setVar(
             array(
                 'ROW_COLOR' => !($j % 2) ? 'dark' : ''
@@ -485,10 +487,10 @@ if (count($submission_history)) {
 
 if (isset($recent_submission)) {
     /* Show most recent submission
-        * Hide Submit form
-        * If multi-submit is enabled, show the Resubmit form
-        * Find out whether the latest submission was overdue
-        */
+     * Hide Submit form
+     * If multi-submit is enabled, show the Resubmit form
+     * Find out whether the latest submission was overdue
+     */
 
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
@@ -529,14 +531,13 @@ if (isset($recent_submission)) {
 
     // if we are the owning student, display plagiarism details if they are available
     if ($userID == $currentUserId && Config::get('plagscan_student_visible')) {
-// retrieve plagiarism score, if available
+        // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
         try {
             /* @var $plagDoc Plagscan_Document */
             $plagDoc = $docMapper->findOneByColumn('file_id', $recent_submission->getSubmission()->getId());
             if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
-
                 // what colour should the plagiarism text be, and what should the tooltip say?
                 if ($plagDoc->getScore() > 60) {
                     $status  = 'critical';
@@ -569,7 +570,10 @@ if (isset($recent_submission)) {
 
     $submission->getOpenDate();
     $submission->getAcceptMultiple();
-    // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
+    // only allow a resubmission:
+    // if the current user is the owner
+    // if the submission box is accepting submissions
+    // and if the current time is between open and late
     if (
         $userID == $currentUserId &&
         (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
