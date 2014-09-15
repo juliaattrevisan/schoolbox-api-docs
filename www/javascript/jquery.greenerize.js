@@ -9,7 +9,8 @@ $.fn.greenerize = function(options) {
     "use strict";
 
     var defaults = {
-        applyClasses: true
+        applyClasses: true,
+        triggerChange: false
     };
     var settings = $.merge({}, defaults, options);
 
@@ -45,6 +46,11 @@ $.fn.greenerize = function(options) {
             if (settings.applyClasses) {
                 checkboxes.parent().removeClass('active-checkbox');
             }
+        }
+        if (settings.triggerChange) {
+            checkboxes.each(function() {
+                $(this).change();
+            });
         }
     });
     return this;
