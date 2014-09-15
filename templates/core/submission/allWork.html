@@ -166,14 +166,14 @@
 		</div>
 		<div id="enrolment">
 			<form id="semesters">
-				<a class="sem-back" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
+				<a class="sem-back" {SEMESTER_BACK_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_BACK}">&lsaquo;</a>
 				<select id="semester">
 					<!-- BEGIN semester_option -->
 					<option value="{SEMESTER_SLUG}"
 					{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
 					<!-- END semester_option -->
 				</select>
-				<a class="sem-fwd" href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
+				<a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/submission/allWork/{WORK_USER_ID}/{SEMESTER_FWD}">&rsaquo;</a>
 			</form>
 			<form id="subjects" action="/submission/allWork/" method="get">
 				<span class="elbow">&#9492;</span>

@@ -1,12 +1,12 @@
 <!-- BEGIN semester_context -->
 <form class="context ctx-semesters">
-  <a class="sem-back" href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}">&lsaquo;</a>
+  <a class="sem-back" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}">&lsaquo;</a>
   <select id="semester">
     <!-- BEGIN semester_option -->
     <option value="{SUBJECT_PART}{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
     <!-- END semester_option -->
   </select>
-  <a class="sem-fwd" href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}">&rsaquo;</a>
+  <a class="sem-fwd" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}">&rsaquo;</a>
 </form>
 <!-- END semester_context -->
 <!-- BEGIN subject_context -->

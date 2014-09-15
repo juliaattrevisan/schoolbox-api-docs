@@ -205,15 +205,16 @@ class ContextSelector {
 
 				if(array($year, $semester) == $selection) {
 					$option['SEMESTER_SELECTED'] = 'selected="selected"';
-					$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection);
+					$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
 				}
 
 				$output['options'][] = $option;
 			}
 		}
 
+        // Nothing was selected? Calculate navigation
 		if(!isset($output['nav'])) {
-			$output['nav'] = $this->calculateSemesterNavigation(count($iterate), array(reset($years), reset($semesters)));
+			$output['nav'] = $this->calculateSemesterNavigation(count($iterate), array(reset($years), reset($semesters)), $years);
 		}
 
 		return $output;
@@ -270,23 +271,29 @@ class ContextSelector {
 	/**
 	 * Figure out the BACK and FORWARD nav elements for the given parameters
 	 *
-	 * @param int $size
-	 * @param array $selection
+	 * @param int   $size      The number of semesters
+	 * @param array $selection The selected year and semester
+	 * @param array $years     The available years - used to calculate if a
+	 *                         back or forward nav should be disabled.
 	 * @return array
 	 */
-	protected function calculateSemesterNavigation($size, $selection) {
+	protected function calculateSemesterNavigation($size, $selection, $years) {
 		list($year, $semester) = $selection;
 
 		$nextYear = $year + 1;
 		$lastYear = $year - 1;
-
+		$backDisabled = false;
+		$fwdDisabled  = false;
 		if(is_numeric($semester)) {
 			$nextSemester = $semester + 1;
 			$lastSemester = $semester - 1;
 
 			// wrapping backwards
-			if($lastSemester <= 0) {
+			if ($lastSemester <= 0) {
 				$back = "$lastYear/" . $size;
+				if ($lastYear < min($years)) {
+					$backDisabled = true;
+				}
 			}
 			else {
 				$back = "$year/$lastSemester";
@@ -295,6 +302,9 @@ class ContextSelector {
 			// wrapping forwards
 			if($nextSemester > $size){
 				$fwd = "$nextYear/1";
+				if ($nextYear > max($years)) {
+					$fwdDisabled = true;
+				}
 			}
 			else {
 				$fwd = "$year/$nextSemester";
@@ -305,11 +315,19 @@ class ContextSelector {
 		else {
 			$back = $lastYear;
 			$fwd = $nextYear;
+			if ($year < min($years)) {
+				$backDisabled = true;
+			}
+			if ($year > max($years)) {
+				$fwdDisabled = true;
+			}
 		}
 
 		return array(
 			'SEMESTER_BACK' => $back,
-			'SEMESTER_FWD'  => $fwd
+			'SEMESTER_FWD'  => $fwd,
+			'SEMESTER_BACK_DISABLED' => ($backDisabled ? 'disabled' : ''),
+			'SEMESTER_FWD_DISABLED'  => ($fwdDisabled  ? 'disabled' : ''),
 		);
 
 	}
