@@ -3,6 +3,7 @@
  *
  * Options:
  * * applyClasses: defaults to true. If false, doesn't apply classes.
+ * * triggerChange: defaults to false. If true, triggers change event on the checkbox.
  */
 (function($) {
 $.fn.greenerize = function(options) {
