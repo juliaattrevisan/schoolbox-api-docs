@@ -131,12 +131,17 @@
                         <span class="time">{RETURNED_WORK_FILE_DATE}</span>
                         <span class="icon"></span>
                     </a>
-
-					<!-- BEGIN return_file_uuid -->
-					<a href="/submission/inlineGrading/viewStudent/{BOX_ID}/{OWNER_ID}/{RETURNED_WORK_SUBMISSION_ID}">View Online</a>
-					<!-- END return_file_uuid -->
                 </li>
                 <!-- END return_file -->
+				<!-- BEGIN return_file_uuid -->
+				<li>
+					<a data-icon='download' href="/submission/inlineGrading/viewStudent/{BOX_ID}/{OWNER_ID}/{RETURNED_WORK_SUBMISSION_ID}">
+						<img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/notepaper_homework.png"/>
+						<span>View Online</span>
+						<span class="icon"></span>
+					</a>
+				</li>
+				<!-- END return_file_uuid -->
             </ul>
             <!-- END returned_work -->
 

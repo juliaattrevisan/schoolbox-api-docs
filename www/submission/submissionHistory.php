@@ -21,7 +21,7 @@ $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
-$this->setBlock('return_file', 'return_file_uuid', 'return_file_uuid_block');
+$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
@@ -151,7 +151,7 @@ if ($codes && count($codes)) {
                     'TEACHER_ID' => $teacher['uid'],
                     'TEACHER_NAME' => $userHandler->formatName($meta),
                     'TEACHER_EXTERNAL_ID' => $synid,
-                    'TEACHER_GROUP' => $meta['gname'],
+                    'TEACHER_GROUP' => Scrub::text($meta['gname']),
                     'TEACHER_AVATAR' => "/portrait?userId=$synid&size=square32",
                     'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta),
                     'TEACHER_URL' => $_SESSION['mailhandle'] . $emailObj->formatEmailFromArray($teacher),
