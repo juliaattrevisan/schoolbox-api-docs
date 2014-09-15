@@ -73,12 +73,10 @@ $currentUserId = $_SESSION['user']->getId();
 
 // if no second argument supplied and student, assume current user rather than just dying
 if($this->arg[1] == false && $groupHandler->isStudent()) {
-    SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$_SESSION['id']}");
+    SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$currentUserId}");
 }
 
-if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff(
-        ) || $_SESSION['id'] == $this->arg[1])
-) {
+if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff() || $currentUserId == $this->arg[1])) {
     $userID = $this->arg[1];
 } else {
     //displaying users on due work, so log this as the last time they viewed due work
@@ -86,7 +84,7 @@ if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) 
 //	Logger::log('info', 'view_due_work');
     $submissionHandler->logPageView(1);
     $submissionHandler->logPageView(2);
-    $userID = $_SESSION['id'];
+    $userID = $currentUserId;
 }
 
 /* Check if system config restrict_student_submissions is on
@@ -213,7 +211,7 @@ $this->setVar(
 );
 
 // determine whether to display the name of the user we're looking at
-if ($userID == $_SESSION['id']) {
+if($userID == $currentUserId) {
     $this->setVar('show_owner_block', '');
 } else {
     $this->parse('show_owner_block', 'show_owner');
@@ -530,7 +528,7 @@ if (isset($recent_submission)) {
 
 
     // if we are the owning student, display plagiarism details if they are available
-    if ($userID == $_SESSION['id'] && Config::get('plagscan_student_visible')) {
+    if($userID == $currentUserId && Config::get('plagscan_student_visible')) {
 
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
@@ -573,8 +571,8 @@ if (isset($recent_submission)) {
     $submission->getOpenDate();
     $submission->getAcceptMultiple();
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
-    if (
-        $userID == $_SESSION['id'] &&
+    if(
+        $userID == $currentUserId &&
         (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
         (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
         $submission->getAcceptOnline() &&
@@ -612,7 +610,7 @@ if (isset($recent_submission)) {
      * Show Submit form
      * Hide the Resubmit form
      */
-    if ($userID == $_SESSION['id']
+    if ($userID == $currentUserId
         && mktime() > $submission->getOpenDate()->getUnixTimestamp()
         && mktime() < $submission->getLateDate()->getUnixTimestamp()
         && $submission->getAcceptOnline())
