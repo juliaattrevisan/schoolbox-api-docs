@@ -1,4 +1,8 @@
 <?php
+use Alaress\File\Remote\GDriveFetcher;
+use Schoolbox\IConfigLoader;
+use Schoolbox\StorageMapper;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,32 +11,45 @@
  * @version     SVN: $Id$
  */
 
-if (empty($this)) {
-    require_once __DIR__ . '/../../../include/Bootstrap.php';
+if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+    require_once __DIR__ . '/../../../../include/Bootstrap.php';
     // nope. go away
-    SitePage::localRedir('/resources/external/google');
+    SitePage::localRedir('/resource/external/google');
 }
 
 /** @var SitePage $this */
 
-$this->setAjax(true);
+/** @var IConfigLoader $conf */
+$conf    = $this->getDi()->get('config');
+$headers = apache_request_headers();
+$proxy   = new Proxy\Server($conf);
+$grive   = new GDriveFetcher('/vagrant/data/storage/grive', $proxy->curl_init(), $headers['Authorization']);
+$mapper  = StorageMapper::getInstance();
+$files   = array();
 
-$this->setFile(TEMPLATE_content, 'resources/external/google.html');
+foreach ($_POST['docs'] as $doc) {
+    $meta = $grive->fetchMetaData($doc['id']);
+    $dest = $grive->fetchToFile($doc['id']);
 
-$scopes   = array('https://www.googleapis.com/auth/drive.readonly');
-$views    = array('google.picker.ViewId.DOCS');
-$features = array('google.picker.Feature.NAV_HIDDEN', 'google.picker.Feature.MINE_ONLY');
+    try {
+        // this will return an existing record if the file previously existed
+        $storageFile      = $mapper->upload(basename($dest), $dest, $_SESSION['id']);
+        $meta['hash']     = $storageFile->getHash();
+        $meta['filesize'] = $storageFile->getFilesize();
 
-if (in_array('multi', $this->arg)) {
-    $features[] = 'google.picker.Feature.MULTISELECT_ENABLED';
+        $files[] = $meta;
+    }
+    catch (Schoolbox\File\Exception $e) {
+        $files[] = array(
+            'title' => $meta['title'],
+            'size'  => 0,
+            'type'  => 'unknown/binary',
+            'err'   => $e->getMessage()
+        );
+    }
+
 }
 
-$this->setVar(array(
-    'DEV_KEY'   => 'AIzaSyA3cpR5FFE_TN3j-gT7txu4EKpDEiXB3J0', // TODO replace dev credentials
-    'CLIENT_ID' => '430767258977-8gphor0062gte810jf8b40okpkprbmfs.apps.googleusercontent.com', // TODO replace dev credentials
-    'SCOPES'    => implode("','", $scopes),
-    'VIEWS'     => implode(',', $views),
-    'FEATURES'  => implode(',', $features),
-));
+header('Content-Type: application/json');
+die(json_encode($files));
 
-$this->template->pparse('finaloutput', TEMPLATE_content);
