@@ -77,6 +77,10 @@ Mixarns
     background-position: 0 -(@number*14px);
 }
 
+.component-icon(@number){
+    background-position: 0 -(@number*48px);
+}
+
 .rounded-corners(@radius: 4px){
     border-radius: @radius;
     -webkit-border-radius: @radius;
@@ -2098,6 +2102,109 @@ li:hover > .actions .btn
 /*--------------------------------------------------------------
  RESOURCE BOOKING
 --------------------------------------------------------------*/
+
+/**
+ * Styles for the resource management booking component.
+ */
+.component-resource-management {
+    overflow: visible;
+    .resource h3 {
+        float: none;
+        display: inline-block;
+    }
+    .resource.no-image h3 {
+        margin-left: 32px;
+    }
+    .resource .resource-image {
+        display: inline-block;
+    }
+    .booking-details {
+        display: flex;
+        justify-content: space-between;
+    }
+    .booking-event {
+        display: inline-flex;
+        .portrait {
+            float:left;
+            padding-right: 1em;
+        }
+        .event-timespan {
+            display: block;
+            font-weight: bold;
+        }
+        .event-data {
+            display: block;
+        }
+        .booking-controls {
+            display: inline-flex;
+        }
+    }
+}
+
+/** styles for menu rollover **/
+.status-buttons {
+    display: none;
+    position: absolute;
+    text-align: right;
+    top: 27px;
+    right: 0;
+    background-color: #FAFAFA;
+    border: 1px solid #DEDEDE;
+    z-index:199;
+    li {
+        padding: 0;
+    }
+    .status-header {
+        font-weight: bold;
+        text-align: center;
+        padding: 2px;
+        display: block;
+    }
+    .status-option {
+        display: flex;
+        justify-content: space-between;
+        white-space: nowrap;
+        padding: 2px;
+    }
+    .status-option:hover {
+        background-color: white;
+    }
+}
+
+.status-buttons .status-option .status-label,
+.status-buttons .status-option .btn {
+    float: none;
+    display: inline-flex;
+    margin: 2px;
+    line-height: 28px;
+}
+.status-selector {
+    cursor: pointer;
+    margin-left: 0;
+    /** Something for absolute positioned rollover to be relative to **/
+    position: relative;
+}
+.status-selector:hover .status-buttons,
+.status-buttons:hover {
+    display: block;
+}
+
+/** IE9 styles using inline-block instead of flexbox. Looks okay. **/
+html.lt-ie10 .component-resource-management .booking-controls {
+    display: inline-block;
+    float: right;
+}
+html.lt-ie10 .component-resource-management .booking-event {
+    display: inline-block;
+}
+html.lt-ie10 .component-resource-management .status-selector {
+    display: inline-block;
+}
+html.lt-ie10 .component-resource-management .status-buttons .status-option .status-label,
+html.lt-ie10 .component-resource-management .status-buttons .status-option .btn {
+    display: inline-block;
+}
+
 .resource-list{
     li{
         .meta{
@@ -6597,61 +6704,38 @@ HOMEPAGE COLUMN SLIDER
 }
 
 #tabs-homepage #slider {
-    height: 14px;
-    border: 1px solid @lgrey;
-    background: @lgrey;
+    .gradient(#005ea3, #1371b5);
+    border-radius: 0;
+    height: 16px;
     width: 100%;
     position: relative;
-    background-color: @lgrey;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(@lgrey), to(@dark));
-    background-image: -webkit-linear-gradient(top, @lgrey, @dark);
-    background-image: -moz-linear-gradient(top, @lgrey, @dark);
-    background-image: -ms-linear-gradient(top, @lgrey, @dark);
-    background-image: -o-linear-gradient(top, @lgrey, @dark);
-    background-image: linear-gradient(top, @lgrey, @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = '@{lgrey}', EndColorStr = '@{dark}')";
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-
-}
-
-#tabs-homepage #slider .ui-slider-handle {
-    border: 1px solid @lgrey;
-    margin-top: -9px;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    width: 38px;
-    height: 30px;
-    background: @std-grey;
-    top: 0;
-    position: absolute;
-    margin-left: -21px;
-
-    background-color:  @dark;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
-    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -ms-linear-gradient(top,  @dark,  @dark);
-    background-image: -o-linear-gradient(top,  @dark,  @dark);
-    background-image: linear-gradient(top,  @dark,  @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
-
-    -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, .04);
-    -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, .04);
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, .04);
-
-}
-
-#tabs-homepage #slider .ui-slider-handle span {
-    position: absolute;
-    width: 15px;
-    height: 11px;
-    display: block;
-    top: 10px;
-    left: 11px;
-    background: url(/images/core/component/slider-handle-background.png) no-repeat 50% 50%;
+    .ui-slider-handle {
+        background: lighten(@lgrey,@lighten-value);
+        border: 1px solid @lgrey;
+        border-radius: 0;
+        margin-top: -9px;
+        -moz-background-clip: padding;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        width: 32px;
+        height: 32px;
+        top: 0;
+        position: absolute;
+        margin-left: -21px;
+        .box-shadow(2px, 2px, 2px, rgba(0, 0, 0, .04));
+        span {
+            position: absolute;
+            width: 18px;
+            height: 16px;
+            display: block;
+            top: 8px;
+            left: 7px;
+            background: url(/images/core/component/slider-handle-background.png) no-repeat 50% 50%;
+        }
+    }
 }
 
 .slide-guide {
@@ -6682,10 +6766,43 @@ HOMEPAGE CUSTOMISE
     border-radius: 0;
     li,
     .ui-tabs-panel{ border: 0; }
-    .ui-tabs-active{
-        .btn.homepage-overflow span{ .btn-icon(93); }
-        .btn.homepage-columns span{ .btn-icon(91); }
-        .btn.homepage-component span{ .btn-icon(89); }
+    .homepage-controls{
+        .no-text{
+            height: 29px;
+            width: 4px;
+            span{ top: 8px; left: 8px; }
+        }
+        .ui-tabs-active{
+            .btn.homepage-overflow span{ .btn-icon(93); }
+            .btn.homepage-columns span{ .btn-icon(91); }
+            .btn.homepage-component span{ .btn-icon(89); }
+        }
+        .status-buttons{
+            top: 34px;
+            right: -15px;
+            .status-header{
+                background: @module-background;
+                border-top: 1px solid @lgrey;
+                color: @black;
+                font-weight: bold;
+                text-align: left;
+                padding: 4px 10px;
+            }
+            .status-option{
+                background: transparent;
+                border-top: 1px solid @lgrey;
+                color: @black;
+                text-align: left;
+                justify-content: inherit;
+                white-space: nowrap;
+                &:hover{
+                    background: lighten(@lgrey,15%);
+                    text-decoration: underline;
+                    .btn{ background-color: transparent;  }
+                }
+                .btn{ border: 0; padding: 0 16px 0 12px; }
+            }
+        }
     }
     .customise-components{
         border: 1px solid @std-grey;
@@ -6695,6 +6812,30 @@ HOMEPAGE CUSTOMISE
 }
 
 /*CUSTOMISE COMPONENT*/
+
+.column-colours{
+    .columns{
+        background: lighten(@lgrey,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
+        border: 1px solid @lgrey;
+        color: @link;
+        padding: 8px 0;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 15px;
+        &:hover{
+            background: lighten(@highlight-color,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
+        }
+    }
+    #left{ margin-right: 15px; }
+    .left-right{
+        width: 48.1%;
+        float: left;
+    }
+    #top,
+    #bottom{
+        width: 98.7%;
+    }
+}
 
 .saved-colours, .saved-layout {
     color: @white;
@@ -6712,8 +6853,8 @@ HOMEPAGE CUSTOMISE
     margin: 0 auto;
 }
 
-#tabs-sub-1{
-
+#tabs-sub{
+    .ui-tabs{ margin-bottom: 8px; }
 }
 
 .add-component {
@@ -6725,15 +6866,69 @@ HOMEPAGE CUSTOMISE
     height: 135px;
     margin: 0 0 15px 0;
     .transition(opacity 0.5s);
+
     a{
-        background: url('/images/core/component/component-img.png') 44px 40% no-repeat;
         display: block;
         height: 100%;
         width: 100%;
         &:hover{ text-decoration: none; }
+        &:hover .icon{
+            opacity: 0;
+        }
         &:hover .plus{
             opacity: 1;
         }
+        .icon{
+            background-image: url('/images/core/icons/component-icons.png');
+            background-repeat: no-repeat;
+            display: block;
+            width: 48px;
+            height: 48px;
+            position: absolute;
+            top: 36px;
+            left: 43px;
+        }
+        &.Component_Homepage_BreadcrumbController .icon{ .component-icon(1); }
+        &.Component_Homepage_NewsController .icon{ .component-icon(2); }
+        &.Component_Homepage_LinkListController .icon{ .component-icon(2); }
+        &.Component_Homepage_FileListController .icon{ .component-icon(2); }
+        &.Component_Homepage_MembersController .icon{ .component-icon(2); }
+        &.Component_Homepage_ForumListController .icon{ .component-icon(2); }
+        &.Component_Homepage_ManageClassController .icon{ .component-icon(2); }
+        &.Component_Homepage_ManageFolderController .icon{ .component-icon(2); }
+        &.Component_Homepage_ManagersController .icon{ .component-icon(2); }
+        &.Component_Homepage_ImageController .icon{ .component-icon(2); }
+        &.Component_Homepage_FolderListController .icon{ .component-icon(2); }
+        &.Component_Homepage_EventListController .icon{ .component-icon(2); }
+        &.Component_Homepage_ClickviewController .icon{ .component-icon(2); }
+        &.Component_Homepage_ImageGalleryController .icon{ .component-icon(2); }
+        &.Component_Homepage_RandImageController .icon{ .component-icon(2); }
+        &.Component_Homepage_DropBoxController .icon{ .component-icon(2); }
+        &.Component_Homepage_DueWorkListController .icon{ .component-icon(2); }
+        &.Component_Homepage_RSSController .icon{ .component-icon(2); }
+        &.Component_Homepage_TeachersController .icon{ .component-icon(2); }
+        &.Component_Homepage_PollController .icon{ .component-icon(2); }
+        &.Component_Homepage_WikiController .icon{ .component-icon(2); }
+        &.Component_Homepage_FeedController .icon{ .component-icon(2); }
+        &.Component_Homepage_TextBoxController .icon{ .component-icon(2); }
+        &.Component_Homepage_AudioController .icon{ .component-icon(2); }
+        &.Component_Homepage_PodcastController .icon{ .component-icon(2); }
+        &.Component_Homepage_BlogController .icon{ .component-icon(2); }
+        &.Component_Homepage_ScrollerController .icon{ .component-icon(2); }
+        &.Component_Homepage_AssessController .icon{ .component-icon(2); }
+        &.Component_Homepage_CountdownController .icon{ .component-icon(2); }
+        &.Component_Homepage_ChatController .icon{ .component-icon(2); }
+        &.Component_Homepage_SurveyController .icon{ .component-icon(2); }
+        &.Component_Homepage_TwitterController .icon{ .component-icon(2); }
+        &.Component_Homepage_ClassListController .icon{ .component-icon(2); }
+        &.Component_Homepage_VideoController .icon{ .component-icon(2); }
+        &.Component_Homepage_WolframController .icon{ .component-icon(2); }
+        &.Component_Homepage_CourseInstanceController .icon{ .component-icon(2); }
+        &.Component_Homepage_CourseTaskListController .icon{ .component-icon(2); }
+        &.Component_Homepage_RubricController .icon{ .component-icon(2); }
+        &.Component_Homepage_SocialStreamController .icon{ .component-icon(2); }
+        &.Component_Homepage_EtherpadController .icon{ .component-icon(2); }
+        &.Component_Homepage_PinterestController .icon{ .component-icon(2); }
         .plus{
             background: rgba(255,255,229,0.9);
             color: #1c9e1c;
