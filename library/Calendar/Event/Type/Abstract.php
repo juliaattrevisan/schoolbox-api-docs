@@ -56,6 +56,13 @@ abstract class Calendar_Event_Type_Abstract
     protected $type = -1;
 
     /**
+     * The ID of the calendar connector this event came from
+     *
+     * @var int
+     */
+    protected $connectorId;
+
+    /**
      * Author's name
      *
      * @var string
