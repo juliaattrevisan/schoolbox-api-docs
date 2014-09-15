@@ -151,7 +151,7 @@ if ($codes && count($codes)) {
                     'TEACHER_ID' => $teacher['uid'],
                     'TEACHER_NAME' => $userHandler->formatName($meta),
                     'TEACHER_EXTERNAL_ID' => $synid,
-                    'TEACHER_GROUP' => $meta['gname'],
+                    'TEACHER_GROUP' => Scrub::text($meta['gname']),
                     'TEACHER_AVATAR' => "/portrait?userId=$synid&size=square32",
                     'TEACHER_AVATAR_TITLE' => $userHandler->formatName($meta),
                     'TEACHER_URL' => $_SESSION['mailhandle'] . $emailObj->formatEmailFromArray($teacher),
