@@ -217,7 +217,7 @@ function Calendar(id, bubbleId, opts) {
 
             // run the filter checker to show and hide the items, if it exists
             if (cal.options.filter.checkboxSelector) {
-                calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
+                calendarControls.on('change', cal.options.filter.checkboxSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups"])
                 })
             }
