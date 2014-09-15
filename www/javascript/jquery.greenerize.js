@@ -12,7 +12,7 @@ $.fn.greenerize = function(options) {
         applyClasses: true,
         triggerChange: false
     };
-    var settings = $.merge({}, defaults, options);
+    var settings = $.extend({}, defaults, options);
 
     if (settings.applyClasses) {
         this.find(':checkbox').each(function () {
