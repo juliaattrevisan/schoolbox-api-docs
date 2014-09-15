@@ -194,7 +194,7 @@ function Calendar(id, bubbleId, opts) {
             var exportControls   = $j(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
-            cal.dom.delegate(cal.options.filter.btnSelector, 'click', function() {
+            cal.dom.on('click', cal.options.filter.btnSelector, function() {
                 cal.bubble.hide()
                 calendarControls.find(cal.options.filter.boxSelector).toggle()
                 exportControls.find(cal.options.filter.boxSelector).hide()
@@ -205,7 +205,7 @@ function Calendar(id, bubbleId, opts) {
 
             // Show the export filter, if it exists
             if (cal.options.filter.exportButtonSelector) {
-                cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
+                cal.dom.on('click', cal.options.filter.exportButtonSelector, function() {
                     cal.bubble.hide()
                     calendarControls.find(cal.options.filter.boxSelector).hide()
                     exportControls.find(cal.options.filter.boxSelector).toggle()
@@ -223,7 +223,7 @@ function Calendar(id, bubbleId, opts) {
             }
 
             if (cal.options.filter.applyFiltersSelector) {
-                calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
+                calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups"])
                     calendarControls.find(cal.options.filter.boxSelector).hide()
                     $j(cal.options.filter.btnSelector).removeClass('engaged')
@@ -237,7 +237,7 @@ function Calendar(id, bubbleId, opts) {
             })
 
             if (cal.options.filter.boxSelector) {
-                calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
+                calendarControls.add(exportControls).on('click', cal.options.filter.boxSelector, function(e) {
                     e.stopPropagation()
                 })
             }
