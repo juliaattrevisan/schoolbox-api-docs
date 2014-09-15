@@ -97,7 +97,15 @@ if ($_POST['heading']) {
 		$article->setModifiedDate(new Alaress_Date_Format(time(), 'U'));
 	}
 
-    if (is_readable($_FILES['file']['tmp_name'])) {
+    if (count($_POST['attachment'])) {
+        try {
+            $article->setImage(\Schoolbox\StorageMapper::getInstance()->findByHash($_POST['attachment'][0]));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+
+        }
+    }
+    // retained case for browsers that require fallback
+    elseif (is_readable($_FILES['file']['tmp_name'])) {
 
 	    $allowedFiles = new \Schoolbox\File\MimetypeMapper();
 	    $mime = $allowedFiles->getByFilename($_FILES['file']['name']);
@@ -119,24 +127,6 @@ if ($_POST['heading']) {
 	$newsId = $affectedIds[0];
 
     SitePage::localRedir("/news/item/$newsId");
-}
-
-// request to remove the image from a news article
-elseif (is_numeric($_GET['removeImage'])) {
-	$newsId = $_GET['removeImage'];
-	try {
-		/** @var \Schoolbox\News\Article $article */
-		$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($newsId);
-	}
-	catch(\Schoolbox\Mapper\Exception $e) {
-		error(41);
-		exit;
-	}
-
-	$article->setImage(null);
-	\Schoolbox\News\ArticleMapper::getInstance()->save($article);
-
-	SitePage::localRedir("/news/item/$newsId");
 }
 
 // request to delete the news item

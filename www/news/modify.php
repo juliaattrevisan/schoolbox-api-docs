@@ -9,16 +9,21 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 	error(23);
 }
 
+$this->setFile(TEMPLATE_content, 'news/modify.html');
+$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
+$this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
+$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+$this->setTab('news');
+
+$zone = new \Schoolbox\Resource\Attachment\Zone('news-feature');
+$zone->setThumbnailSize(64);
+$zone->setAttachPrompt('Click or drag here to attach a feature image');
+$zone->setAttachmentsLabel('');
+$zone->setModalTitle('Select feature image');
+
 // if we are editing an existing news article
 if (is_numeric($this->arg[0])) {
-	$this->setFile(TEMPLATE_content, 'news/modify.html');
-    $this->setBlock(TEMPLATE_content, 'image', 'image_block');
-	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
-	$this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
-	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-
 	$this->setTitle('Modify News');
-	$this->setTab('news');
 
 	$news = $newsHandler->getByID($this->arg[0]);
 
@@ -46,12 +51,8 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-    if($news['item_image']) {
-        $this->parse('image_block','image');
-    }
-    else {
-        $this->setVar('image_block','');
-    }
+    $zone->attachFiles(array($news['item_image']));
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
@@ -103,15 +104,7 @@ if (is_numeric($this->arg[0])) {
 
 // if we are creating a new news article
 else {
-	$this->setFile(TEMPLATE_content, 'news/modify.html');
-	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
-    $this->setBlock(TEMPLATE_content, 'image', 'image_block');
-	$this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
-	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
-
 	$this->setTitle('Add News');
-	$this->setTab('news');
-
 
     $pubTime = time();
     $expTime = strtotime(Cfg::get('news_default_expiry'));
@@ -131,7 +124,9 @@ else {
 
 	$this->setVar($output);
 
-	$groupList = $newsHandler->getGroupList();
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
+    $groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();
 
 	$this->checkList('group_selection', $groupList);
@@ -144,8 +139,6 @@ else {
 
 	$this->parse('campus_row_block', 'campus_row');
 
-    $this->setVar('image_block','');
-    
 	$this->setVar('delete_button_block', '');
 
 
