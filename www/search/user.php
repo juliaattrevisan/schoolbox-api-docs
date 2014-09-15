@@ -322,7 +322,11 @@ if (is_numeric($this->arg[0])) {
 	                    'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
 	                    'BIRTHDATE' => '',
 	                    'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
-	                    'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
+                        'CONTACT_ALERT_MESSAGE' => preg_replace(
+                            '/[\\n\\r]+/',
+                            '<hr/>',
+                            Scrub::text($synInfo['AlertMessage'])
+                        ),
 	                    'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
 	                );
                     if ($synInfo['StudentBirthDate']) {
