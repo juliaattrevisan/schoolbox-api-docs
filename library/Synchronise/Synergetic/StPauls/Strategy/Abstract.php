@@ -129,6 +129,8 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 				return 16;
 			case '12':
 				return 17;
+            case '13':
+                return 15;
 			default:
 				return false;
 		}
