@@ -9,117 +9,208 @@
  */
 namespace Crocodoc;
 
-class Loader {
+use \Schoolbox\User;
 
-	/**
-	 * Contains API keys
-	 *
-	 * @var null
-	 */
-	private $authenticator = null;
+class Loader
+{
 
-	/**
-	 * The user doing the marking
-	 *
-	 * @var null
-	 */
-	private $user = null;
+    /**
+     * Contains API keys
+     *
+     * @var null
+     */
+    private $authenticator = null;
 
-	/**
-	 * A unique identifier for a resource uploaded to Crocodoc
-	 * @var string
-	 */
-	private $uuid = '';
+    /**
+     * The user doing the marking
+     *
+     * @var null
+     */
+    private $user = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $uuid
-	 * @param \Schoolbox\User $user
-	 */
-	public function __construct($uuid, \Schoolbox\User $user) {
-		$this->setAuthenticator(new Authenticator());
-		$this->setUuid($uuid);
-		$this->setUser($user);
-	}
+    /**
+     * A unique identifier for a resource uploaded to Crocodoc
+     *
+     * @var string
+     */
+    private $uuid = '';
 
-	/**
-	 * Spawn an iframe
-	 */
-	public function render() {
-		$userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+    /**
+     * A group handler
+     *
+     * @var null
+     */
+    private $groupHandler = null;
 
-		$curl = new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create');
+    /**
+     * Curl object
+     *
+     * @var null
+     */
+    private $curl = null;
 
-		$curl->addOptions(array(
-			CURLOPT_POSTFIELDS => "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}",
-			CURLOPT_POST => true,
-		));
+    /**
+     * Constructor
+     *
+     * @param $uuid
+     * @param User $user
+     */
+    public function __construct($uuid, User $user)
+    {
+        $this->setAuthenticator(new Authenticator());
+        $this->setUuid($uuid);
+        $this->setUser($user);
+        $this->setGroupHandler(new \Group());
+        $this->setCurl(new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
+    }
 
-		$curl->exec();
+    /**
+     * Spawn an iframe
+     */
+    public function render()
+    {
 
-		$result = json_decode($curl->getResult());
+        /* Handle postfields different from student viewers and teacher/superuser viewers
+         */
+        if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+        } else {
+            if ($this->getGroupHandler()->isStaff($this->getUser()->getId()) || $this->getGroupHandler()->isSuperuser(
+                    $this->getUser()->getId()
+                )
+            ) {
+                $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
 
-		return json_encode(array(
-			'url' => "https://crocodoc.com/view/{$result->session}",
-			'errors' => $curl->getErrors()
-		));
-	}
+                $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid(
+                )}&editable=true&user={$userTuple}";
+            }
+        }
 
-	/* Getters/Setters
-	 */
+        /* Bicep curl
+         */
+        $this->getCurl()->addOptions(
+            array(
+                CURLOPT_POSTFIELDS => $postFields,
+                CURLOPT_POST => true,
+            )
+        );
 
-	/**
-	 * Set user
-	 *
-	 * @param null $user
-	 */
-	private function setUser($user) {
-		$this->user = $user;
-	}
+        $this->getCurl()->exec();
 
-	/**
-	 * Get user
-	 *
-	 * @return null
-	 */
-	private function getUser() {
-		return $this->user;
-	}
+        $result = json_decode($this->getCurl()->getResult());
 
-	/**
-	 * Set uuid
-	 *
-	 * @param string $uuid
-	 */
-	private function setUuid($uuid) {
-		$this->uuid = $uuid;
-	}
+        return json_encode(
+            array(
+                'url' => "https://crocodoc.com/view/{$result->session}",
+                'errors' => $this->getCurl()->getErrors(),
+                /* Pass this so that crocodoc uuid gets phplibbed upon
+                 * first load in Inline Grader, for student view
+                 */
+                'uuid' => $this->getUuid()
+            )
+        );
+    }
 
-	/**
-	 * Get uuid
-	 *
-	 * @return string
-	 */
-	private function getUuid() {
-		return $this->uuid;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set authenticator
-	 *
-	 * @param null $authenticator
-	 */
-	private function setAuthenticator($authenticator) {
-		$this->authenticator = $authenticator;
-	}
+    /**
+     * Set user
+     *
+     * @param null $user
+     */
+    private function setUser($user)
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * Get authenticator
-	 *
-	 * @return null
-	 */
-	private function getAuthenticator() {
-		return $this->authenticator;
-	}
+    /**
+     * Get user
+     *
+     * @return null
+     */
+    private function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set uuid
+     *
+     * @param string $uuid
+     */
+    private function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
+     * Get uuid
+     *
+     * @return string
+     */
+    private function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * Set authenticator
+     *
+     * @param null $authenticator
+     */
+    private function setAuthenticator($authenticator)
+    {
+        $this->authenticator = $authenticator;
+    }
+
+    /**
+     * Get authenticator
+     *
+     * @return null
+     */
+    private function getAuthenticator()
+    {
+        return $this->authenticator;
+    }
+
+    /**
+     * Set group handler
+     *
+     * @param null $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * Get group handler
+     *
+     * @return null
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+
+    /**
+     * Set curl
+     *
+     * @param null $curl
+     */
+    private function setCurl($curl)
+    {
+        $this->curl = $curl;
+    }
+
+    /**
+     * Get curl
+     *
+     * @return null
+     */
+    private function getCurl()
+    {
+        return $this->curl;
+    }
 }

@@ -11,50 +11,55 @@
 namespace Crocodoc\Renderer\Strategy;
 
 
-class Crocodoc extends Base {
+class Crocodoc extends Base
+{
 
-	/**
-	 * The template file to inject
-	 *
-	 * @var string
-	 */
-	protected $templateFile = 'submission/inlineGrading/injectables/views/crocodoc.html';
+    /**
+     * The template file to inject
+     *
+     * @var string
+     */
+    protected $templateFile = 'submission/inlineGrading/injectables/views/crocodoc.html';
 
-	/**
-	 * Control file, to determine how to return work
-	 *
-	 * @var string
-	 */
-	protected $controlFile = 'submission/inlineGrading/injectables/controls/crocodoc-return-control.html';
+    /**
+     * Control file, to determine how to return work
+     *
+     * @var string
+     */
+    protected $controlFile = 'submission/inlineGrading/injectables/controls/crocodoc-return-control.html';
 
-	/**
-	 * Render injectable
-	 *
-	 * @return mixed|void
-	 */
-	public function render() {
-		$this->getPage()->setFile('injectable', $this->getTemplateFile());
-		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+    /**
+     * Render injectable
+     *
+     * @return mixed|void
+     */
+    public function render()
+    {
+        $this->getPage()->setFile('injectable', $this->getTemplateFile());
+        $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
 		/* Upload File
 		 */
 		$this->parseInjectableUpload();
 
-		/* Control how Return Work is done
-		 */
-		$this->getPage()->setFile('injectableControl', $this->getControlFile());
+        /* Control how Return Work is done
+         */
+        $this->getPage()->setFile('injectableControl', $this->getControlFile());
 
-		/* Determine download url
-		 * This downloads it from crocodoc to Schoolbox
-		 */
-		$downloadUrl = '/submission/inlineGrading/download/' . $this->getSubmission()->getId();
+        /* Determine download url
+         * This downloads it from crocodoc to Schoolbox
+         */
+        $downloadUrl = '/submission/inlineGrading/download/' . $this->getSubmission()->getId();
 
-		$this->getPage()->setVar(array(
-			'INJECTABLE_CONTROL_URL' => $downloadUrl,
-			'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
-			'INJECTABLE_CONTROL_SUBMISSION_ID' => $this->getSubmission()->getId(),
-		));
+        $this->getPage()->setVar(
+            array(
+                'INJECTABLE_CONTROL_URL' => $downloadUrl,
+                'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
+                'INJECTABLE_CONTROL_SUBMISSION_ID' => $this->getSubmission()->getId(),
+                'INJECTABLE_CONTROL_UUID' => $this->getSubmission()->getUuid(),
+            )
+        );
 
-		$this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
-	}
+        $this->getPage()->parse('INJECTED_INTERFACE_CONTROL', 'injectableControl');
+    }
 }
