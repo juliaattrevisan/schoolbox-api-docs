@@ -1,0 +1,124 @@
+<script type="text/javascript">
+    $(function () {
+
+        var abUpload          = $('#ab-upload'),
+            abUploadForm      = abUpload.find('form.dropzone'),
+            abUploadControls  = abUpload.siblings('div.ctrl'),
+            abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
+            abUploadCancelBtn = abUploadControls.children('a.cancel');
+
+        abUploadCancelBtn.one('click', function () {
+            window.top.postMessage(JSON.stringify({data: []}), location.origin);
+        });
+
+        abUploadForm.dropzone({
+            paramName: 'upload',
+            dictDefaultMessage: 'Click or drag here to upload',
+            dictFallbackMessage: null,
+            dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
+            maxFiles: {MAX_FILES},
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            acceptedFiles: {ACCEPTED_FILES},
+
+            init: function () {
+                var dz = this;
+
+                abUploadCancelBtn.on('click', function (e) {
+                    dz.removeAllFiles(true);
+                });
+
+                this.on('addedfile', function (file) {
+                    var img = $(file.previewElement).find('img[data-dz-thumbnail]');
+                    img.attr('src', '/ajax/mime/' + file.type);
+                    checkState.call(this);
+                });
+
+                this.on('removedfile', function (file) {
+                    checkState.call(this);
+                });
+
+                this.on('error', function (file, msg, xhr) {
+                    checkState.call(this);
+                });
+
+                this.on('maxfilesreached', function (file) {
+                    checkState.call(this);
+                });
+
+                this.on('sending', function (file, xhr, formData) {
+                    $(file.previewElement).find('a[data-dz-remove]').detach()
+                });
+
+                this.on('success', function (file, xhr) {
+                    try {
+                        data = JSON.parse(xhr);
+                        file.hash = data.hash;
+                    }
+                    catch (err) {
+                    }
+                });
+
+                this.on('queuecomplete', function () {
+                  var accepted = this.getAcceptedFiles(),
+                      data = [],
+                      i;
+
+                  for (i = 0; i < accepted.length; ++i) {
+                    data.push({
+                        title: accepted[i].name,
+                        mimeType: accepted[i].type,
+                        filesize: accepted[i].size,
+                        hash: accepted[i].hash
+                    });
+                  }
+                  setTimeout(function () {
+                      postMessage(JSON.stringify({ data: data }), location.origin);
+                  }, 1000);
+                });
+            }
+        });
+
+        function checkState() {
+            var ql, dz;
+
+            if (abUploadSubmitBtn.data('uploading')) {
+                return;
+            }
+
+            ql = this.getQueuedFiles().length;
+            if (ql == 0) {
+                abUploadSubmitBtn
+                    .html('Upload')
+                    .attr('disabled', 'disabled')
+                    .off('click');
+            }
+            else {
+                dz = this;
+
+                abUploadSubmitBtn
+                    .html('Upload (' + ql + ')')
+                    .removeAttr('disabled')
+                    .one('click', function (e) {
+                        abUploadSubmitBtn
+                            .data('uploading', dz.getQueuedFiles())
+                            .html('Uploading')
+                            .attr('disabled', 'disabled');
+                        abUploadCancelBtn.attr('disabled', 'disabled');
+                        dz.processQueue();
+                    });
+            }
+
+          }
+
+
+    });
+</script>
+
+<div id="ab-upload">
+  <form class="dropzone" action="/storage/asyncUpload"></form>
+</div>
+<div class="ctrl">
+  <a role="button" class="submit-btn-plain" href="#">Upload</a>
+  <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+</div>

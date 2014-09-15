@@ -47,7 +47,7 @@ abstract class AbstractController implements ControllerInterface {
      */
     public function getUrl()
     {
-        return sprintf('/ajax/resource/%s/%s%s', $this->getSlug(), $this->multi ? 'multi' : 'single', $this->mimeFilter ? "/{$this->mimeFilter}" : '');
+        return sprintf('/ajax/resources/%s/%s%s', $this->getSlug(), $this->multi ? 'multi' : 'single', $this->mimeFilter ? "/{$this->mimeFilter}" : '');
     }
 
 

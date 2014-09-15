@@ -3,9 +3,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <title>Google Drive Picker</title>
-
   <style type="text/css">
-
     div.picker-dialog {
       box-shadow: none;
       -o-box-shadow: none;
@@ -32,20 +30,21 @@
     #auth-btn.need-auth {
       display: inline;
     }
-
   </style>
-
   <script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/javascript/google/apiloader.js"></script>
-
   <script type="text/javascript">
+
+      if (window.top && window.top.postMessage) {
+          window.top.postMessage(JSON.stringify({text: 'Connecting to your Google Drive...'}), location.origin);
+      }
 
       loadGoogleApi(['auth', 'picker'], function () {
           jQuery
           .ajax({
               url: '/javascript/resource/jquery.gpick.js',
               dataType: 'script',
-              cache: true,
+              cache: true
           })
           .then(function () {
               $('#content').gpick({
@@ -57,36 +56,33 @@
                   title: null,
                   authBtn: '#auth-btn',
                   authNeededClass: 'need-auth',
-                  onSelect: function (docs) {
-                      if(top.gpick.picked) {
-                          top.gpick.picked.call(top, docs);
-                      } else {
-                        console.log(docs);
-                      }
+
+                  onSelect: function (docs, token) {
+                      window.top.postMessage(JSON.stringify({text: 'Collecting files from Google, please wait...'}), location.origin);
+                      jQuery.ajax({
+                          type: 'POST',
+                          url: '/ajax/resource/external/google',
+                          headers: {
+                            'Authorization': token.token_type + ' ' + token.access_token
+                          },
+                          data: {docs: docs},
+                          success: function(data) {
+                              window.top.postMessage(JSON.stringify({data: data}), location.origin);
+                          }
+                      });
                   },
                   onCancel: function () {
-                      if(top.gpick.cancelled) {
-                          top.gpick.cancelled.call(top);
-                      } else {
-                          console.error(this);
-                      }
+                      window.top.postMessage(JSON.stringify({data: []}), location.origin);
                   },
                   onLoaded: function (picker) {
-                      // that which has been seen cannot be unseen
                       picker.setVisible(true);
-
-                      if(top.gpick.loaded) {
-                          top.gpick.loaded.call(top);
-                      }
                   }
               });
           });
       });
-
   </script>
-
 </head>
-<body>
+<body class="gframe">
 <pre id="result"></pre>
 <div id="content">
   <a href="#" role="button" id="auth-btn">Authorize Google account</a>
