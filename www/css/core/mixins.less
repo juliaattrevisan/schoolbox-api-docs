@@ -62,21 +62,33 @@
 	-o-transform-origin: @transform-origin;
 	transform-origin: @transform-origin;
 }
-.transition (@transition) {
+.transition(...) {
+	@transition: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
 	-webkit-transition: @transition;
+	-moz-transition: @transition;
+	-o-transition: @transition;
 	transition: @transition;
 }
-.transition-property(@transition-property: all) {
-	-webkit-transition-property: @transition-property;
-	transition-property: @transition-property;
+.transition-property(...) {
+	@props: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+	-webkit-transition-property: @props;
+	-moz-transition-property: @props;
+	-o-transition-property: @props;
+	transition-property: @props;
 }
-.transition-duration(@transition-duration: 0s) {
-	-webkit-transition-duration: @transition-duration;
-	transition-duration: @transition-duration;
+.transition-duration(...) {
+	@duration: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+	-webkit-transition-duration: @duration;
+	-moz-transition-duration: @duration;
+	-o-transition-duration: @duration;
+	transition-duration: @duration;
 }
-.transition-timing-function(@transition-timing-function: ease) {
-	-webkit-transition-timing-function: @transition-timing-function;
-	transition-timing-function: @transition-timing-function;
+.transition-timing-function(...) {
+	@timing: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+	-webkit-transition-timing-function: @timing;
+	-moz-transition-timing-function: @timing;
+	-o-transition-timing-function: @timing;
+	transition-timing-function: @timing;
 }
 .opacity (@opacity) {
 	@ie-opacity: @opacity * 100;
