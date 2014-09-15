@@ -25,7 +25,7 @@
             views: [picker.ViewId.DOCS],
             relayUrl: null,
             origin: null,
-            allowedTypes: null,
+            allowedTypes: null
         };
 
 
@@ -41,14 +41,14 @@
 
 
     GPick.prototype.build = function () {
-        var self = this;
+        var self = this, i, o, builder;
 
         if (!this.oauthToken) {
             return false;
         }
 
-        var i, o = this.options,
-            builder = new picker.PickerBuilder();
+        o = this.options;
+        builder = new picker.PickerBuilder();
 
         // conditionally set or hide title
         if (o.title === null) {
@@ -91,19 +91,27 @@
 
 
     GPick.prototype.handleResponse = function (data) {
+        var docs,
+            token,
+            elem = $(this.element);
+
+
+
         if (data[picker.Response.ACTION] == picker.Action.LOADED) {
-            this.options.onLoaded.call($(this.element), this.pickerInstance);
+            this.options.onLoaded.call(elem, this.pickerInstance);
             return;
         }
 
         if (data[picker.Response.ACTION] == picker.Action.PICKED) {
-            this.options.onSelect.call($(this.element), data.docs);
+            docs  = data.docs;
+            token = auth.getToken();
+
+            this.options.onSelect.call(elem, docs, token);
             return;
         }
 
         if (data[picker.Response.ACTION] == picker.Action.CANCEL) {
-            this.options.onCancel.call($(this.element));
-            return;
+            this.options.onCancel.call(elem);
         }
     }
 
@@ -141,7 +149,7 @@
                 self.handleAuthResult(authResult);
             }
         );
-    }
+    };
 
 
     $.fn[pluginName] = function (options) {
