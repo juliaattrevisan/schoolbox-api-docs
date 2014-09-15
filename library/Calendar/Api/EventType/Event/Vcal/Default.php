@@ -301,6 +301,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		/* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
+		 * (and also filter by event source on main calendar)
 		 */
 		$event->setConnectorId($this->getConnectorId());
 
