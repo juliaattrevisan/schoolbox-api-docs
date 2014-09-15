@@ -63,6 +63,12 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
 			}
 
+			// Set classes
+			$classes = array('group' . $categoryId,);
+			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
+				$classes[] = 'source' . $connectorId;
+			}
+
 			$event = array(
 				'title' => $currentEvent->getTitle(),
 				'start' => "$start",
@@ -84,7 +90,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 				 */
 				'color' => $currentEvent->getColour(),
 
-				'className' => array('group'.$categoryId,),
+				'className' => $classes,
 
 				/* Extra data that the Event Object doesn't directly support
 				 */

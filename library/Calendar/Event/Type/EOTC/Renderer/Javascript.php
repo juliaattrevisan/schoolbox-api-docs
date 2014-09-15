@@ -57,8 +57,11 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 			// Add campus list to list of classes
 			$classes = array(
 				$currentEvent->getDerivedEventLevel(),
-				'type' . $currentEvent->getType()
+				'type' . $currentEvent->getType(),
 			);
+			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
+				$classes[] = 'source' . $connectorId;
+			}
 
 			$campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
 
