@@ -251,7 +251,7 @@
                         })
 
                         // reapply filters
-                        c.filters.organise(c, ["campus", "groups"], false)
+                        c.filters.organise(c, ["campus", "groups", "sources"], false)
 
                         // update datepicker
                         var d = c.dom.fullCalendar('getDate')
@@ -267,7 +267,7 @@
                 viewDisplay: function(view) {
                     // apply filters, which will also ajax the change of view to store in the db
                     if(c !== undefined) {
-                        c.filters.organise(c, ["campus", "groups"])
+                        c.filters.organise(c, ["campus", "groups", "sources"])
                     }
                 },
 
