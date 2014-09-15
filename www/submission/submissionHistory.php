@@ -28,6 +28,20 @@ $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block')
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
 
+// Blocks for online editor buttons
+$this->setBlock('action_submit', 'action_submit_online_create', 'action_submit_online_create_block');
+$this->setBlock('action_submit', 'action_submit_online_update', 'action_submit_online_update_block');
+$this->setBlock('action_resubmit', 'action_resubmit_online_create', 'action_resubmit_online_create_block');
+$this->setBlock('action_resubmit', 'action_resubmit_online_update', 'action_resubmit_online_update_block');
+$this->setVar(
+    array(
+        'action_submit_online_create_block'   => '',
+        'action_submit_online_update_block'   => '',
+        'action_resubmit_online_create_block' => '',
+        'action_resubmit_online_update_block' => '',
+    )
+);
+
 // the whole manual block setting idea is entirely overrated...
 $historyActivityTypes = array('submitted', 'returned', 'marked', 'extended');
 foreach ($historyActivityTypes as $historyType) {
@@ -46,6 +60,7 @@ if ($this->arg[0] == false) {
 use Schoolbox\Assessment\Component;
 
 $mapper = new Component\SubmissionBoxMapper();
+$submissionMapper = new Component\SubmissionBox\SubmissionMapper();
 $work_mapper = new Component\SubmissionBox\WorkTypeMapper();
 
 $userHandler = new User;
@@ -53,6 +68,8 @@ $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
 $allowedHandler = new AllowedFile;
+
+$currentUserId = $_SESSION['user']->getId();
 
 // if no second argument supplied and student, assume current user rather than just dying
 if($this->arg[1] == false && $groupHandler->isStudent()) {
@@ -563,6 +580,20 @@ if (isset($recent_submission)) {
         $submission->getAcceptOnline() &&
         $submission->getAcceptMultiple()
     ) {
+        // Which edit button gets shown?
+        $drafts = $submissionMapper->getDrafts($userID, $submission->getId(), 1);
+        if (count($drafts) === 0) {
+            $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
+        } else {
+            /** @var Component\SubmissionBox\Submission $draft */
+            $draft = $drafts->first();
+            // Is draft before most recent submission? show create new draft
+            if ($draft->getSubmitted()->getUnixTimestamp() < $recentSubmissionDate->getUnixTimestamp()) {
+                $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
+            } else {
+                $this->parse('action_resubmit_online_update_block', 'action_resubmit_online_update');
+            }
+        }
         $this->parse('action_resubmit_block', 'action_resubmit');
     } else {
         $this->setVar('action_resubmit_block', '');
@@ -584,8 +615,15 @@ if (isset($recent_submission)) {
     if ($userID == $_SESSION['id']
         && mktime() > $submission->getOpenDate()->getUnixTimestamp()
         && mktime() < $submission->getLateDate()->getUnixTimestamp()
-        && $submission->getAcceptOnline()
-    ) {
+        && $submission->getAcceptOnline())
+    {
+        // Which edit button gets shown (is there already a draft?)
+        $drafts = $submissionMapper->getDrafts($userID, $submission->getId(), 1);
+        if (count($drafts) === 0) {
+            $this->parse('action_submit_online_create_block', 'action_submit_online_create');
+        } else {
+            $this->parse('action_submit_online_update_block', 'action_submit_online_update');
+        }
         $this->parse('action_submit_block', 'action_submit');
     } else {
         $this->setVar('action_submit_block', '');
