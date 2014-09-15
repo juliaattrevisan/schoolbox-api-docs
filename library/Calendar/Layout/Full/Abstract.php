@@ -142,26 +142,50 @@ abstract class Calendar_Layout_Full_Abstract {
 	 * Setup movement buttons
 	 */
 	protected function setupMovementButtons() {
+		// Load sources
+		$configs       = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+		$sourceList    = $configs->map(
+			function ($record) {
+				/** @var Calendar_Api_Config_Record $record */
+				return array(
+					'id'   => $record->getId(),
+					'name' => sprintf(
+						"%s: %s",
+						$record->getConnectorClass(),
+						$record->getEventType()
+					)
+				);
+			}
+		)->getAll();
 		if (isset($_SESSION['calendarFilter'])) {
 			$selected['group'] = $_SESSION['calendarFilter']['groups'];
 			$selected['campus'] = $_SESSION['calendarFilter']['campus'];
 			$selected['event_type'] = $_SESSION['calendarFilter']['events'];
+			$selected['source'] = $_SESSION['calendarFilter']['sources'];
 		}
 		else {
+			// select all groups
 			if (count($this->getCategoryList())) {
 				foreach($this->getCategoryList() as $cat) {
 					$selected['group'][] = $cat['id'];
 				}
 			}
 
+			// select all campuses
 			$selected['campus'] = $_SESSION['campus'];
 
+			// select all types
 			$typeList = $this->getCalendarHandler()->getTypeList();
 
 			if (count($typeList)) {
 				foreach($typeList as $type) {
 					$selected['event_type'][] = $type['eventTypeID'];
 				}
+			}
+
+			// select all sources
+			foreach ($sourceList as $source) {
+				$selected['source'][] = $source['id'];
 			}
 		}
 
@@ -182,6 +206,14 @@ abstract class Calendar_Layout_Full_Abstract {
 			array(),
 			TEMPLATE_content,
 			array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
+		);
+		// Might need special PHPLibs here
+		$this->getPage()->checkList(
+			'filter_source',
+			$sourceList,
+			$selected['source'],
+			TEMPLATE_content,
+			array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
 		);
 		$this->getPage()->checkList(
 			'filter_group',
