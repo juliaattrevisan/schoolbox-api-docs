@@ -72,7 +72,7 @@ $allowedHandler = new AllowedFile;
 $currentUserId = $_SESSION['user']->getId();
 
 // if no second argument supplied and student, assume current user rather than just dying
-if($this->arg[1] == false && $groupHandler->isStudent()) {
+if ($this->arg[1] == false && $groupHandler->isStudent()) {
     SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$currentUserId}");
 }
 
@@ -211,7 +211,7 @@ $this->setVar(
 );
 
 // determine whether to display the name of the user we're looking at
-if($userID == $currentUserId) {
+if ($userID == $currentUserId) {
     $this->setVar('show_owner_block', '');
 } else {
     $this->parse('show_owner_block', 'show_owner');
@@ -354,7 +354,7 @@ if (count($submission_history)) {
             // work returned
             if ($activity_item->getReturnedWork()->getFilename()) {
                 $history['HISTORY_CLASS'] = 'return';
-                $history['HISTORY_ICON'] = 'submitted';
+                $history['HISTORY_ICON']  = 'submitted';
             } // mark given
             else {
                 $history['HISTORY_CLASS'] = 'mark';
@@ -389,7 +389,7 @@ if (count($submission_history)) {
         }
         $this->setVar($history);
 
-        // if the user in question has not previously been seen, retrieve
+         // if the user in question has not previously been seen, retrieve
         if (!isset($usersList[$owner])) {
             $usersList[$owner] = $userHandler->getByID($owner);
         }
@@ -405,8 +405,7 @@ if (count($submission_history)) {
 
         // submission by student
         if ($activity_item->isSubmission()) {
-
-            // if you are a parent (and only a parent), you can only see plaintext, not a link
+// if you are a parent (and only a parent), you can only see plaintext, not a link
             if ($parentOnly) {
                 $this->setVar('history_submitted_block', 'submitted work');
             } else {
@@ -497,7 +496,7 @@ if (isset($recent_submission)) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     } else {
-        $this->setVar('OVERDUE', '');
+        $this->setVar('OVERDUE','');
         $this->setVar('overdue_block', '');
     }
 
@@ -528,9 +527,8 @@ if (isset($recent_submission)) {
 
 
     // if we are the owning student, display plagiarism details if they are available
-    if($userID == $currentUserId && Config::get('plagscan_student_visible')) {
-
-        // retrieve plagiarism score, if available
+    if ($userID == $currentUserId && Config::get('plagscan_student_visible')) {
+// retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc = null;
         try {
@@ -542,7 +540,7 @@ if (isset($recent_submission)) {
                 if ($plagDoc->getScore() > 60) {
                     $status = 'critical';
                     $tooltip = 'Your submission is extremely similar to other documents scanned.';
-                } elseif ($plagDoc->getScore() > 20) {
+                } elseif($plagDoc->getScore() > 20) {
                     $status = 'warn';
                     $tooltip = 'Your submission is somewhat similar to other documents scanned.';
                 } else {
@@ -571,7 +569,7 @@ if (isset($recent_submission)) {
     $submission->getOpenDate();
     $submission->getAcceptMultiple();
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
-    if(
+    if (
         $userID == $currentUserId &&
         (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
         (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
@@ -598,7 +596,7 @@ if (isset($recent_submission)) {
     }
 
     // if parent, hide the "view submitted work" button
-    if ($parentOnly) {
+    if($parentOnly) {
         $this->setVar('recent_submission_block', '');
     } else {
         $this->parse('recent_submission_download_block', 'recent_submission_download');
@@ -613,8 +611,7 @@ if (isset($recent_submission)) {
     if ($userID == $currentUserId
         && mktime() > $submission->getOpenDate()->getUnixTimestamp()
         && mktime() < $submission->getLateDate()->getUnixTimestamp()
-        && $submission->getAcceptOnline())
-    {
+        && $submission->getAcceptOnline()) {
         // Which edit button gets shown (is there already a draft?)
         $drafts = $submissionMapper->getDrafts($userID, $submission->getId(), 1);
         if (count($drafts) === 0) {
@@ -624,7 +621,7 @@ if (isset($recent_submission)) {
         }
         $this->parse('action_submit_block', 'action_submit');
     } else {
-        $this->setVar('action_submit_block', '');
+        $this->setVar('action_submit_block','');
     }
 
     $this->setVar('recent_submission_block', '');
@@ -651,7 +648,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     $ftype = $allowedHandler->getByField('mime', $mime);
     $size = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
-    $returnDate = new Alaress_Date_Relative($submission->getDueDate(), 'y-m-d');
+    $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 
     $this->setVar(
         array(
@@ -694,7 +691,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     if ($return->getFilename() && !$parentOnly) {
         $this->parse('return_file_block', 'return_file');
     } else {
-        $this->setVar('return_file_block', '');
+        $this->setVar('return_file_block','');
     }
 
     $this->parse('returned_work_block', 'returned_work');
@@ -703,7 +700,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
 }
 
 // do fun rubric things
-if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
+if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rb = new DueWork_Rubric_Lightbox($this);
     $rb->render('rubric_block', $submission->getId(), $user['uid']);
 } else {
