@@ -204,9 +204,12 @@ class EventNotifier extends AbstractModuleNotifier
 
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
-                foreach ($event->getCampusCollection() as $campus) {
-                    foreach ($instances as $instance) {
-                        $envelope->broadcastToCampus($campus, $instance);
+                $collection = $event->getCampusCollection();
+                if (!($collection instanceof \Traversable || is_array($collection))) {
+                    foreach ($event->getCampusCollection() as $campus) {
+                        foreach ($instances as $instance) {
+                            $envelope->broadcastToCampus($campus, $instance);
+                        }
                     }
                 }
                 break;
