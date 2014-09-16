@@ -167,47 +167,33 @@ abstract class Synchronise_Base_Strategy
     protected function executeCreateUpdate($newUser)
     {
         $this->verbose_filter->setNewUser($newUser);
-
-        // Does this person have a username? If not, skip them
+     //
+     // Does this person have a username? If not, skip them
         if ($this->hasUsername($newUser)) {
             $existing = $this->userExists($newUser);
+   //
+   // If the current user exists in Schoolbox, update them
             if ($existing) {
-                // If the current user exists in Schoolbox, update them
-                $this->verbose_filter->performUpdate();
                 if ($this->perform_update) {
                     $newUser['id'] = $existing['uid'];
-                    if ($this->user_handler->update($newUser)) {
-                        $this->verbose_filter->incrementUpdated();
-                    } else {
-                        $this->verbose_filter->outputSkipMessage(
-                            'user - failed because user exists with different username.'
-                        );
-                        $this->verbose_filter->incrementSkipped();
-                    }
+                    $this->user_handler->update($newUser);
+                    $this->verbose_filter->performUpdate();
                     return $existing['uid'];
                 } else {
                     $this->verbose_filter->planUpdate();
-                    $this->verbose_filter->incrementUpdated();
                 }
+                $this->verbose_filter->incrementUpdated();
             } else {
-                // Perform action; report what happened
+       //
+       // Perform action; report what happened
                 if ($this->perform_update) {
-                    $this->verbose_filter->performCreation();
                     $user_id = $this->user_handler->create($newUser);
-                    if ($user_id) {
-                        $this->verbose_filter->incrementCreated();
-                    } else {
-                        // User wasn't created - output a fail message
-                        $this->verbose_filter->outputSkipMessage(
-                            'user - failed because user either already exists or campus is not set.'
-                        );
-                        $this->verbose_filter->incrementSkipped();
-                    }
+                    $this->verbose_filter->performCreation();
                     return $user_id;
                 } else {
                     $this->verbose_filter->planCreation();
-                    $this->verbose_filter->incrementCreated();
                 }
+                $this->verbose_filter->incrementCreated();
             }
         } else {
             $this->verbose_filter->skip();
