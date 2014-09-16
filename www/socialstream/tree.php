@@ -15,12 +15,17 @@ $page = new \SitePage();
 
 /* Get the stuff in this node
  */
-$browser = new Node($_REQUEST['relationID']);
-$nodeData = $browser->render();
+try {
+    $browser = new Node($_REQUEST['relationID']);
+    $nodeData = $browser->render();
 
-/* Render the stuff in this node
- */
-$renderer = new NodeRenderer($page, $nodeData);
-$renderer->render();
+    /* Render the stuff in this node
+     */
+    $renderer = new NodeRenderer($page, $nodeData);
+    $renderer->render();
+} catch (\Schoolbox\Resource\Exception $e) {
+    $page->setAjax(true);
+    $page->error(6);
+}
 
 

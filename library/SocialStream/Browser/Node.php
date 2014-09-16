@@ -14,6 +14,8 @@
 namespace SocialStream\Browser;
 
 
+use Schoolbox\File\Exception;
+
 class Node {
 
 	/**
@@ -33,11 +35,17 @@ class Node {
 	/**
 	 * An instance of a category mapper
 	 *
-	 * @var null
+	 * @var \Schoolbox\Resource\CategoryMapper
 	 */
 	private $categoryMapper = null;
 
-	/**
+    /**
+     * Old school group handler reference
+     * @var \Group
+     */
+    private $groupHandler;
+
+    /**
 	 * Constructor
 	 *
 	 * $nodeId is the primary key of the category whose contents
@@ -49,6 +57,13 @@ class Node {
 		if (is_numeric($nodeId)) {
 			$this->setNodeId($nodeId);
 			$this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+            $this->setGroupHandler(new \Group());
+
+            // Check we have permission to render node
+            if( $nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
+                throw new \Schoolbox\Resource\Exception('Permission denied');
+            }
+
 
 			$this->processNode();
 		}
@@ -102,14 +117,16 @@ class Node {
 			);
 
 			for ($i = 0; ($category->getParent()->getId() > 0) && ($i < 100); $i++) {
-				$currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
+                if( $this->getGroupHandler()->getPermission($category->getParent()->getId()) >= READ_ACCESS) {
+                    $currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
 
-				$breadcrumbs[] = array(
-					'categoryId' => $currentCategory->getId(),
-					'name' => $currentCategory->getName(),
-				);
+                    $breadcrumbs[] = array(
+                        'categoryId' => $currentCategory->getId(),
+                        'name' => $currentCategory->getName(),
+                    );
 
-				$category = $currentCategory;
+                    $category = $currentCategory;
+                }
 			}
 		}
 
@@ -127,13 +144,15 @@ class Node {
 		$allCategories = $this->getCategoryMapper()->findByParent($this->getNodeId());
 
 		foreach($allCategories as $currentCategory) {
-			$record = array(
-				'type' => 'category',
-				'categoryId' => $currentCategory->getId(),
-				'name' => $currentCategory->getName()
-			);
+            if( $this->getGroupHandler()->getPermission($currentCategory->getId()) >= READ_ACCESS) {
+                    $record = array(
+                    'type' => 'category',
+                    'categoryId' => $currentCategory->getId(),
+                    'name' => $currentCategory->getName()
+                );
 
-			$output[] = $record;
+                $output[] = $record;
+            }
 		}
 
 		return $output;
@@ -149,6 +168,11 @@ class Node {
 
 		$fileMapper = new \Schoolbox\Resource\FileMapper();
 		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+
+        //Double check perms, should not get here but just incase
+        if( $this->getGroupHandler()->getPermission($this->getNodeId()) < READ_ACCESS) {
+            return $output;
+        }
 
 		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
@@ -226,7 +250,7 @@ class Node {
 	/**
 	 * Set category mapper
 	 *
-	 * @param null $categoryMapper
+	 * @param \Schoolbox\Resource\Category $categoryMapper
 	 */
 	private function setCategoryMapper($categoryMapper) {
 		$this->categoryMapper = $categoryMapper;
@@ -235,9 +259,28 @@ class Node {
 	/**
 	 * Get category mapper
 	 *
-	 * @return null
+	 * @return \Schoolbox\Resource\Category
 	 */
 	private function getCategoryMapper() {
 		return $this->categoryMapper;
 	}
+
+    /**
+     * @param \Group $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return \Group
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+
+
+
 }
