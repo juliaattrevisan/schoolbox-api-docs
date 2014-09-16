@@ -115,7 +115,7 @@ class External_Tass_Cathedral_User extends External_Tass_User
         // Inject student campuses, year levels, etc.
         $newList = array();
         foreach ($list as $listItem) {
-            if (!empty($listItem['StudentYearLevel'])) {
+            if (isset($listItem['StudentYearLevel'])) {
                 // Base related student accounts are fetched in base query.
                 $newList[] = $listItem;
             }
