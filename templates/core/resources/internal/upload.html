@@ -2,7 +2,8 @@
     $(function () {
 
         var abUpload          = $('#ab-upload'),
-            abUploadForm      = abUpload.find('form.dropzone'),
+            abUploadExplorer  = abUpload.closest('.explorer'),
+            abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
             abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
             abUploadCancelBtn = abUploadControls.children('a.cancel');
@@ -14,12 +15,25 @@
         abUploadForm.dropzone({
             paramName: 'upload',
             dictDefaultMessage: 'Click or drag here to upload',
-            dictFallbackMessage: null,
             dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
             maxFiles: {MAX_FILES},
             autoProcessQueue: false,
             addRemoveLinks: true,
             acceptedFiles: {ACCEPTED_FILES},
+
+            fallback: function () {
+                // TODO this fallback needs to be an iframe'd form
+                $(this.element)
+                    .append($('<div/>').addClass('dz-fallback')
+                        .append($('<p/>').text(this.options.dictFallbackText)
+                            .append($('<input type="file" name="upload" />'))
+                        )
+                    );
+
+                abUploadSubmitBtn.one('click', function () {
+                    $.post(abUploadForm.attr('action'), abUploadForm.serialize())
+                });
+            },
 
             init: function () {
                 var dz = this;
@@ -73,7 +87,7 @@
                     });
                   }
                   setTimeout(function () {
-                      postMessage(JSON.stringify({ data: data }), location.origin);
+                      window.top.postMessage(JSON.stringify({ data: data }), location.origin);
                   }, 1000);
                 });
             }
@@ -116,9 +130,11 @@
 </script>
 
 <div id="ab-upload">
-  <form class="dropzone" action="/storage/asyncUpload"></form>
+  <form class="dzone" action="/storage/asyncUpload">
+    <div class="dz-default"><span>Click or drag here to upload</span></div>
+  </form>
 </div>
 <div class="ctrl">
-  <a role="button" class="submit-btn-plain" href="#">Upload</a>
+  <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>

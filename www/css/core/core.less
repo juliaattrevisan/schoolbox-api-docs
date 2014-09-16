@@ -11735,12 +11735,13 @@ textarea.event-detail {
 	overflow-y: auto;
 	overflow-x: hidden;
 	height: ~'calc(100% - 70px)';
+	position: relative;
 	+ .ctrl {
 		height: 70px;
 		padding: 19px 10px;
 		box-sizing: border-box;
 	}
-	.dropzone {
+	.dzone {
 		min-height: 100%;
 		border: dashed 2px #aaa;
 		background-color: #efefef;
@@ -11770,7 +11771,7 @@ textarea.event-detail {
 			}
 		}
 	}
-	form.dropzone.dz-drag-hover {
+	form.dzone.dz-drag-hover {
 		border-color: #393;
 		background-color: #efe;
 	}
@@ -11832,14 +11833,17 @@ textarea.event-detail {
 		margin: 9px;
 		max-width: 100px;
 	}
-	.dz-filename span {
-		display: block;
-		width: 100%;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		padding: 4px;
-		box-sizing: border-box;
+	.dz-filename {
+		position: static;
+		span {
+			display: block;
+			width: 100%;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			padding: 4px;
+			box-sizing: border-box;
+		}
 	}
 	.dz-size {
 		font-size: 0.8em;
@@ -12180,10 +12184,11 @@ textarea.event-detail {
 
 // this class should be put on any <form> that is to be activated with fileDrop
 .dropzone {
-	transition:
+	.transition(
 //		opacity          150ms ease-out,
 		background-color 150ms ease-out,
-		border-color     150ms ease-out;
+		border-color     150ms ease-out
+	);
 	z-index: -1;
 	position: absolute;
 	top: 0;
@@ -12199,7 +12204,7 @@ textarea.event-detail {
 	position: absolute;
 }
 .dz-filename {
-	transition: color 200ms linear;
+	.transition(color 200ms linear);
 	position: absolute;
 	color: #888;
 	&.started {
@@ -12207,7 +12212,7 @@ textarea.event-detail {
 	}
 }
 .dz-upload {
-	transition: width 150ms ease-out, background-color 800ms;
+	.transition(width 150ms ease-out, background-color 800ms);
 	position: absolute;
 	width: 0;
 	background-color: rgba(0, 102, 176, 0.10);
@@ -12244,11 +12249,12 @@ textarea.event-detail {
 
 /* fileDrop + .information-list */
 .dropzone + .dz-container {
-	transition:
+	.transition(
 //		opacity          150ms ease-out,
 //		background-color 150ms ease-out,
 //		border-color     150ms ease-out,
-		min-height       150ms ease-out;
+		min-height       150ms ease-out
+	);
 }
 
 .information-list {
