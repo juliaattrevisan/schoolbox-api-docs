@@ -42,4 +42,15 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
+
+    /**
+     * User exists check - for parents, I care only about the username.
+     *
+     * @param  array $user
+     * @return array
+     */
+    protected function userExists($user)
+    {
+        return $this->user_handler->getByUsername($user['username']);
+    }
 }
