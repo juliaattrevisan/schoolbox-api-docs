@@ -184,16 +184,24 @@ abstract class Synchronise_Base_Strategy
                 }
                 $this->verbose_filter->incrementUpdated();
             } else {
-       //
-       // Perform action; report what happened
+                // Perform action; report what happened
                 if ($this->perform_update) {
-                    $user_id = $this->user_handler->create($newUser);
                     $this->verbose_filter->performCreation();
+                    $user_id = $this->user_handler->create($newUser);
+                    if ($user_id) {
+                        $this->verbose_filter->incrementCreated();
+                    } else {
+                        // User wasn't created - output a fail message
+                        $this->verbose_filter->outputSkipMessage(
+                            'user - failed because user either already exists or campus is not set.'
+                        );
+                        $this->verbose_filter->incrementSkipped();
+                    }
                     return $user_id;
                 } else {
                     $this->verbose_filter->planCreation();
+                    $this->verbose_filter->incrementCreated();
                 }
-                $this->verbose_filter->incrementCreated();
             }
         } else {
             $this->verbose_filter->skip();
