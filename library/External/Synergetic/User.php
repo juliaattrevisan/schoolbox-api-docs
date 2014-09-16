@@ -574,7 +574,11 @@ class External_Synergetic_User implements External_UserInterface {
                         )
             );
 
-            if ($result['success'] && isset($result['result'][0]['UserFileSemester']) && isset($result['result'][0]['UserFileYear']) ) {
+            if ($result['success']
+                && isset($result['result'][0]['UserFileSemester'])
+                && $result['result'][0]['UserFileSemester']
+                && isset($result['result'][0]['UserFileYear'])
+                && $result['result'][0]['UserFileSemester']) {
                 $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
                 $_SESSION['FileYear'] = $result['result'][0]['UserFileYear'];
 
@@ -608,11 +612,11 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
         /* Temporarily switch the filesemester to the requested user */
-        if(isset($_SESSION['sid']) && isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear'])) {
+        if(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear'])) {
             $originalFileSemester = $_SESSION['FileSemester'];
             $originalFileYear = $_SESSION['FileYear'];
             /* If no synergy set in session or requested ID is not current user setup the current semester */
-            if($synergyID != $_SESSION['sid']) {
+            if(!isset($_SESSION['sid']) || $synergyID != $_SESSION['sid']) {
                 $this->getCurrentSemester($synergyID);
             }
         }
