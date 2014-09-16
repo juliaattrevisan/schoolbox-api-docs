@@ -93,7 +93,7 @@
                 // mimic dropzone behaviour
                 azone.addClass('dz-unsupported');
 
-                $(opt.dropzone).addClass('clearfix').append(btn);
+                $(opt.dropzoneSelector).addClass('clearfix').append(btn);
                 opt.trigger = opt.fallbackButtonSelector;
             },
 
@@ -195,15 +195,25 @@
                     hash: hash
                 };
 
-            self.dropzone.files.push(file);
+            if(self.dropzone) {
+                self.dropzone.files.push(file);
 
-            dbtn.one('click', function (e) {
-                self.dropzone.removeFile(file);
-            });
+                dbtn.one('click', function (e) {
+                    self.dropzone.removeFile(file);
+                });
+            }
+            else {
+                dbtn.one('click', function (e) {
+                    self.detach(file);
+                });
+            }
+
 
         });
 
-        this.dropzone._updateMaxFilesReachedClass();
+        if(this.dropzone) {
+            this.dropzone._updateMaxFilesReachedClass();
+        }
 
         // prepare the dialog in the background
         this.build();
@@ -275,17 +285,34 @@
 
 
     ResourceAttach.prototype.attach = function (list) {
-        var i;
+        var i, data, self = this;
 
         this.close();
 
         for (i = 0; i < list.length; ++i) {
-            this.dropzone.addFile({
+            data = {
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
-                hash: list[i].hash
-            });
+                hash: list[i].hash,
+            };
+
+            if (this.dropzone) {
+                this.dropzone.addFile(data);
+            }
+            else {
+                data.previewElement = $(this.tpl.html());
+
+                this.renderFile(data);
+
+                $(this.element)
+                    .find(this.options.previewsContainerSelector)
+                    .append(data.previewElement);
+
+                data.previewElement.find('[data-dz-remove]').on('click', function () {
+                    self.detach(this);
+                });
+            }
         }
 
     };
@@ -296,7 +323,10 @@
         elem = $(elem);
         elem.addClass(this.options.detachClass);
 
-        this.dropzone._updateMaxFilesReachedClass();
+        if (this.dropzone) {
+            this.dropzone._updateMaxFilesReachedClass();
+        }
+
         setTimeout(function () {
             elem.remove();
         }, this.options.detachDelay);
