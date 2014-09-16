@@ -13,231 +13,283 @@
 
 namespace SocialStream\Browser;
 
+class Node
+{
 
-class Node {
+    /**
+     * A node id, usually a primary key
+     *
+     * @var int
+     */
+    private $nodeId = 0;
 
-	/**
-	 * A node id, usually a primary key
-	 *
-	 * @var int
-	 */
-	private $nodeId = 0;
+    /**
+     * Resultant node information
+     *
+     * @var array
+     */
+    private $result = array();
 
-	/**
-	 * Resultant node information
-	 *
-	 * @var array
-	 */
-	private $result = array();
+    /**
+     * An instance of a category mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
-	/**
-	 * An instance of a category mapper
-	 *
-	 * @var null
-	 */
-	private $categoryMapper = null;
+    /**
+     * Old school group handler reference
+     * @var \Group
+     */
+    private $groupHandler;
 
-	/**
-	 * Constructor
-	 *
-	 * $nodeId is the primary key of the category whose contents
-	 * you wish to present
-	 *
-	 * @param $nodeId
-	 */
-	public function __construct($nodeId) {
-		if (is_numeric($nodeId)) {
-			$this->setNodeId($nodeId);
-			$this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+    /**
+     * Constructor
+     *
+     * $nodeId is the primary key of the category whose contents
+     * you wish to present
+     *
+     * @param $nodeId
+     */
+    public function __construct($nodeId)
+    {
+        if (is_numeric($nodeId)) {
+            $this->setNodeId($nodeId);
+            $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+            $this->setGroupHandler(new \Group());
 
-			$this->processNode();
-		}
-	}
+            // Check we have permission to render node
+            if ($nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
+                throw new \Schoolbox\Resource\Exception('Permission denied');
+            }
 
-	/**
-	 * Render it out in a json format in case you need it
-	 */
-	public function ajax() {
-		header("Content-type: application/json");
-		echo json_encode($this->getResult());
-	}
 
-	/**
-	 * Render it out so phplib can do it
-	 *
-	 * @return array
-	 */
-	public function render() {
-		return $this->getResult();
-	}
+            $this->processNode();
+        }
+    }
 
-	/**
-	 * Combine the categories and files into a single list
-	 */
-	private function processNode() {
-		$output = array(
-			'breadcrumbs' => array_reverse($this->getBreadcrumbs()),
-			'records' => array_merge($this->getCategories(), $this->getFiles()),
-		);
+    /**
+     * Render it out in a json format in case you need it
+     */
+    public function ajax()
+    {
+        header("Content-type: application/json");
+        echo json_encode($this->getResult());
+    }
 
-		$this->setResult($output);
-	}
+    /**
+     * Render it out so phplib can do it
+     *
+     * @return array
+     */
+    public function render()
+    {
+        return $this->getResult();
+    }
 
-	/**
-	 * Get a list of breadcrumbs for this node
-	 *
-	 * @return array
-	 */
-	private function getBreadcrumbs() {
-		$breadcrumbs = array();
+    /**
+     * Combine the categories and files into a single list
+     */
+    private function processNode()
+    {
+        $output = array(
+            'breadcrumbs' => array_reverse($this->getBreadcrumbs()),
+            'records'     => array_merge($this->getCategories(), $this->getFiles()),
+        );
 
-		/* Special case for root node
-		 */
-		if ($this->getNodeId()) {
-			$category = $this->getCategoryMapper()->findById($this->getNodeId());
+        $this->setResult($output);
+    }
 
-			$breadcrumbs[] = array(
-				'categoryId' => $category->getId(),
-				'name' => $category->getName(),
-			);
+    /**
+     * Get a list of breadcrumbs for this node
+     *
+     * @return array
+     */
+    private function getBreadcrumbs()
+    {
+        $breadcrumbs = array();
 
-			for ($i = 0; ($category->getParent()->getId() > 0) && ($i < 100); $i++) {
-				$currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
+        /* Special case for root node
+         */
+        if ($this->getNodeId()) {
+            $category = $this->getCategoryMapper()->findById($this->getNodeId());
 
-				$breadcrumbs[] = array(
-					'categoryId' => $currentCategory->getId(),
-					'name' => $currentCategory->getName(),
-				);
+            $breadcrumbs[] = array(
+                'categoryId' => $category->getId(),
+                'name'       => $category->getName(),
+            );
 
-				$category = $currentCategory;
-			}
-		}
+            for ($i = 0; ($category->getParent()->getId() > 0) && ($i < 100); $i++) {
+                if ($this->getGroupHandler()->getPermission($category->getParent()->getId()) >= READ_ACCESS) {
+                    $currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
 
-		return $breadcrumbs;
-	}
+                    $breadcrumbs[] = array(
+                        'categoryId' => $currentCategory->getId(),
+                        'name'       => $currentCategory->getName(),
+                    );
 
-	/**
-	 * Get all the subcategories for a particular category
-	 *
-	 * @return array
-	 */
-	private function getCategories() {
-		$output = array();
+                    $category = $currentCategory;
+                }
+            }
+        }
 
-		$allCategories = $this->getCategoryMapper()->findByParent($this->getNodeId());
+        return $breadcrumbs;
+    }
 
-		foreach($allCategories as $currentCategory) {
-			$record = array(
-				'type' => 'category',
-				'categoryId' => $currentCategory->getId(),
-				'name' => $currentCategory->getName()
-			);
+    /**
+     * Get all the subcategories for a particular category
+     *
+     * @return array
+     */
+    private function getCategories()
+    {
+        $output = array();
 
-			$output[] = $record;
-		}
+        $allCategories = $this->getCategoryMapper()->findByParent($this->getNodeId());
 
-		return $output;
-	}
+        foreach ($allCategories as $currentCategory) {
+            if ($this->getGroupHandler()->getPermission($currentCategory->getId()) >= READ_ACCESS) {
+                $record = array(
+                    'type'       => 'category',
+                    'categoryId' => $currentCategory->getId(),
+                    'name'       => $currentCategory->getName()
+                );
 
-	/**
-	 * Get all the files for a particular category
-	 *
-	 * @return array
-	 */
-	private function getFiles() {
-		$output = array();
+                $output[] = $record;
+            }
+        }
 
-		$fileMapper = new \Schoolbox\Resource\FileMapper();
-		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+        return $output;
+    }
 
-		$allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
+    /**
+     * Get all the files for a particular category
+     *
+     * @return array
+     */
+    private function getFiles()
+    {
+        $output = array();
 
-		foreach($allFiles as $currentFile) {
+        $fileMapper = new \Schoolbox\Resource\FileMapper();
+        $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
 
-			/* Use a generic default icon for unknown filetypes that
- 			 * could accumulate in the schoolbox
- 			 */
-			try {
-				$mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
-			}
-			catch (\Exception $e) {
-				$mimetype = $mimetypeMapper->getUnknownMime();
-			}
+        //Double check perms, should not get here but just incase
+        if ($this->getGroupHandler()->getPermission($this->getNodeId()) < READ_ACCESS) {
+            return $output;
+        }
 
-			/* If the mimetype table is empty, it'll spawn with a dunce object
-			 * SB-3911
-			 */
-			if (!is_numeric($mimetype->getFileTypeID())) {
-				$mimetype = $mimetypeMapper->getUnknownMime();
-			}
+        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
 
-			$record = array(
-				'type' => 'file',
-				'fileId' => $currentFile->getId(),
-				'name' => $currentFile->getDescription(),
-				'icon' => $mimetype->getIconFile(),
-			);
+        foreach ($allFiles as $currentFile) {
 
-			$output[] = $record;
-		}
+            /* Use a generic default icon for unknown filetypes that
+              * could accumulate in the schoolbox
+              */
+            try {
+                $mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
+            } catch (\Exception $e) {
+                $mimetype = $mimetypeMapper->getUnknownMime();
+            }
 
-		return $output;
-	}
+            /* If the mimetype table is empty, it'll spawn with a dunce object
+             * SB-3911
+             */
+            if (!is_numeric($mimetype->getFileTypeID())) {
+                $mimetype = $mimetypeMapper->getUnknownMime();
+            }
 
-	/* Getters/Setters
-	 */
+            $record = array(
+                'type'   => 'file',
+                'fileId' => $currentFile->getId(),
+                'name'   => $currentFile->getDescription(),
+                'icon'   => $mimetype->getIconFile(),
+            );
 
-	/**
-	 * Set node id
-	 *
-	 * @param int $nodeId
-	 */
-	private function setNodeId($nodeId) {
-		$this->nodeId = $nodeId;
-	}
+            $output[] = $record;
+        }
 
-	/**
-	 * Get node id
-	 *
-	 * @return int
-	 */
-	private function getNodeId() {
-		return $this->nodeId;
-	}
+        return $output;
+    }
 
-	/**
-	 * Set result
-	 *
-	 * @param array $result
-	 */
-	private function setResult($result) {
-		$this->result = $result;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get result
-	 *
-	 * @return array
-	 */
-	private function getResult() {
-		return $this->result;
-	}
+    /**
+     * Set node id
+     *
+     * @param int $nodeId
+     */
+    private function setNodeId($nodeId)
+    {
+        $this->nodeId = $nodeId;
+    }
 
-	/**
-	 * Set category mapper
-	 *
-	 * @param null $categoryMapper
-	 */
-	private function setCategoryMapper($categoryMapper) {
-		$this->categoryMapper = $categoryMapper;
-	}
+    /**
+     * Get node id
+     *
+     * @return int
+     */
+    private function getNodeId()
+    {
+        return $this->nodeId;
+    }
 
-	/**
-	 * Get category mapper
-	 *
-	 * @return null
-	 */
-	private function getCategoryMapper() {
-		return $this->categoryMapper;
-	}
+    /**
+     * Set result
+     *
+     * @param array $result
+     */
+    private function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    /**
+     * Get result
+     *
+     * @return array
+     */
+    private function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * Set category mapper
+     *
+     * @param \Schoolbox\Resource\Category $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return \Schoolbox\Resource\Category
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
+
+    /**
+     * @param \Group $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return \Group
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+
+
 }
