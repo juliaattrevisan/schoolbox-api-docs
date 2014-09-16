@@ -129,6 +129,17 @@
 			<div class="filter-drop clearfix">
 				<div class="filter-list">
 					<form class="clearfix">
+						<div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
+							<label>
+								<input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+							</label>
+							<!-- BEGIN filter_source -->
+							<label title="{SOURCE_NAME}">
+								<input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
+								{SOURCE_NAME}
+							</label>
+							<!-- END filter_source -->
+						</div>
 						<div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
 							<label>
 								<input type="checkbox" class="select_all checkbox"/>Select all
