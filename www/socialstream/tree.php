@@ -1,6 +1,6 @@
 <?php
 /**
- * ${NAME}
+ * AJAX folder browser used for quick breadcrumb based browsing of resources in SBFS
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
