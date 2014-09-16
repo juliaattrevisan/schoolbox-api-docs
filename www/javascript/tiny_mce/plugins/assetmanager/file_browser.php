@@ -20,58 +20,12 @@ $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
 				);
 $page->setVar($output);
 
-/* get a list of open ids */
-$parentList[] = $parentID = $_GET['categoryID'];
-$i = 0;
-while ($parentID > 0) {
-	if ($i++ > 100) break;
-	$parentList[] = $parentID = (int)$categoryHandler->getParent($parentID);
-}
-
-/* output folders */
-$categoryList = $categoryHandler->getCategoryNode($_GET['categoryID']);
-
-$page->setVar('folder_list_block', '');
-if (is_array($categoryList)) {
-
-    foreach ($categoryList as $category) {
-
-		$permission[$category['id']] = $groupHandler->getPermission($category['id']);
-		if ($permission[$category['id']] >= READ_ACCESS) {
-
-			$class = array();
-
-			$class[] = 'child-of-node-' . $category['parent'];
-
-			/* check upload permissions */
-			if ($permission[$category['id']] == WRITE_ACCESS)
-				$class[] = 'write';
-
-			/* add plus sign to parent nodes */
-			if ($category['isParent'] == '1')
-				$class[] = in_array($category['id'], $parentList) ? 'expanded loaded' : 'collapsed';
-
-			/* append code to name */
-			$name = Scrub::text($category['name']);
-			if(!empty($category['code']) && $category['code'] != $category['name'])
-				$name .= ' ('.Scrub::text($category['code']).')';
-
-			/* select default dir */
-			if ($category['id'] == $_GET['categoryID'])
-				$class[] = 'selected';
-
-			$output = array('CATEGORY_ID'	=> $category['id'],
-							'TITLE'			=> $name,
-							'CLASS'			=> implode(" ", $class),
-							);
-			$page->setVar($output);
-			$page->parse('folder_list_block', 'folder_list', true);
-
-		}
-	}
-}
-
-
+$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
+    Schoolbox\Resource\CategoryMapper::getInstance(),
+    Schoolbox\Assessment\Course\TaskMapper::getInstance(),
+    $groupHandler
+);
+$page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 
 $category = $categoryHandler->getByID($_GET['categoryID']);
 

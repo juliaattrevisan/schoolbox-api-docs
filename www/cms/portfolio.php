@@ -2,7 +2,6 @@
 
 
 $this->setFile(TEMPLATE_content, 'cms/portfolio.html');
-$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
@@ -13,7 +12,6 @@ $this->setTab('myfiles');
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
-unset($_SESSION['portfolioID']);
 if (isset($this->arg[0])) {
     $_SESSION['portfolioID'] = $this->arg[0];
     SitePage::localRedir('/cms/portfolio/');
@@ -21,66 +19,27 @@ if (isset($this->arg[0])) {
     $openFolder = $_SESSION['portfolioID'];
 }
 
-$folderHandler = new MyFolder;
-$fileHandler = new MyFile;
+//$folderHandler = new MyFolder;
+$fileHandler = new MyFile();
+$openFolder  = (int)$openFolder;
 
-$openFolder = (int)$openFolder;
-
-// get parentIDs from openFolder to 0
-$parentList[] = $parentID = $openFolder;
-while ($parentID > 0) {
-    $parentList[] = $parentID = $folderHandler->getParent($parentID);
+// Build a tree up to the last resource we looked at
+$partialTree = array();
+if ($_SESSION['user'] instanceof Schoolbox\User) {
+    $treeBuilder = new Schoolbox\MyFolderTreeBuilder(
+        Schoolbox\MyFolderMapper::getInstance(),
+        $_SESSION['user']
+    );
+    $partialTree = $treeBuilder->buildPartialTree($openFolder);
 }
 
-
-// output folders, column 1
-$folderList = $folderHandler->getFolderNode($openFolder);
-if (!is_array($folderList)) {
-    $parentList = array(0);
-    $openFolder = 0;
-    $folderList = $folderHandler->getFolderNode($openFolder);
-}
-
-if (is_array($folderList)) {
-    foreach ($folderList as $folder) {
-
-        $folder['children'] = $folderHandler->hasChildren($folder['id']);
-
-        $class = array();
-
-        // set parent folder
-        $class[] = "child-of-node-{$folder['parent']}";
-
-        // has children
-        if ($folder['children'] > 0) {
-
-            // is currently expanded
-            if (in_array($folder['id'], $parentList)) {
-                $class[] = "populated expanded";
-            } else {
-                $class[] = "collapsed";
-            }
-
-        }
-
-        // has files showing
-        $folder["id"] == $openFolder ? $class[] = "opened selected" : null;
-
-        // write access
-        $class[] = "write";
-
-        $output = array(
-            'CATEGORY_ID' => $folder['id'],
-            'CATEGORY_NAME' => Scrub::text($folder['name']),
-            'CLASS' => implode(" ", $class),
-        );
-        $this->setVar($output);
-        $this->parse('category_list_block', 'category_list', true);
-    }
-} else {
-    $this->setVar('category_list_block', '');
-}
-
+// output folders, column 1 - now done via jsTree and TREEDATA
+$this->setVar(
+    array(
+        'TREEDATA'      => json_encode($partialTree),
+        'OPEN_CATEGORY' => intval($openFolder),
+    )
+);
 
 $fileList = $fileHandler->getAllInFolder($openFolder);
 if (is_array($fileList) && count($fileList) > 0) {

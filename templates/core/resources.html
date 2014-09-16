@@ -1,278 +1,75 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
-<script type="text/javascript">
-	var date1 = new Date;
-</script>
-<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.threePanelBridge.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
-  var relationID = '{OPEN}';
+    var relationID = {OPEN_CATEGORY};
 
-  $j('#drop-center').fileDrop({
-    previewsContainer: '#file-window .scroller',
-    tplWrap: '<div class="dz-preview" />',
+    $j('#drop-center').fileDrop({
+        previewsContainer: '#file-window .scroller',
+        tplWrap: '<div class="dz-preview" />',
 
-    addedfile: function(file) {
-      $(file.previewElement).addClass('category-'+relationID).data('node', relationID);
-    },
+        addedfile: function(file) {
+            $(file.previewElement).addClass('category-'+relationID).data('node', relationID);
+        },
 
-    // callbacks
-    sending: function (file, xhr, formData) {
-      var el = $(file.previewElement);
+        // callbacks
+        sending: function (file, xhr, formData) {
+            var el = $(file.previewElement);
 
-      formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-      formData.append('category', el.data('node'));
-      formData.append('comment', '');
-      formData.append('hidden', 0);
-    },
+            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+            formData.append('category', el.data('node'));
+            formData.append('comment', '');
+            formData.append('hidden', 0);
+        },
 
-    complete: function (file, response) {
-      $(file.previewElement).find('img').attr('src', '');
-      if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-        $('#node-'+relationID).trigger('click');
-      }
-    }
-
-  });
-
-
-  var threePanel = new ThreePanelView('/ajax/resource/meta.php', 'resources')
-
-	/* left tree navigation */
-	$j('#tree').tree({
-		type	 : 'table',
-		node 	 : 'tr',
-		onOff	 : 'dark',
-		sequencing	: false
-	});
-
-	/* load right panel file list */
-	$j(document).on('click', '#tree tr:not(.server)', function () {
-
-    var find = 'tbody tr, div.dz-preview';
-
-		/* select folder */
-		$j('#tree .selected').removeClass('selected');
-		$j(this).addClass('selected');
-
-    // if changing relationID, deselect things
-    if(relationID != $j(this).attr('id').substring(5)) {
-      $j('#file-window').find(find).removeClass('selected');
-    }
-
-		relationID = $j(this).attr('id').substring(5);
-
-    threePanel.getMeta(relationID);
-    /* remember tree branch */
-    $j.post('/ajax/tree.php', {resourcesID: relationID});
-
-    loadFileList(relationID, find);
-
-    /* re-apply on off */
-    $j('#file-window').find(find).removeClass('dark');
-    $j('#file-window').find(find).filter(':visible:odd:not(.empty)').addClass('dark');
-
-  });
-
-  // explicit case for server node
-  $j(document).on('click', '#tree tr.server', function () {
-    threePanel.getMeta(0);
-    $j('#tree .selected').removeClass('selected');
-    $j(this).addClass('selected');
-    $j('#file-list tbody tr').hide();
-
-  });
-
-  function loadFileList(categoryID, find) {
-    /* ajax load files */
-    $j.post('/ajax/file.php?min=1', {categoryID : categoryID}, function (data) {
-
-      var shows = [];
-
-      if (data.error) {
-        alert(data.error);
-      } else if (data.length == 0 && $j('#file-window').find('.category-'+ categoryID).length == 0) {
-        /* display empty message */
-        $j('<tr class="category-' + categoryID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
-
-      } else {
-        $j('#file-window').find('tr.empty.category-'+categoryID).remove();
-        var template = $j('#file-template');
-        for (i in data) {
-          var row = data[i], clone, old;
-
-          if ($j('#file-'+row.id).length) {
-            // this file node exists, but we can update it
-            clone = $j('#file-'+row.id);
-            old = true;
-          }
-          else {
-            clone = template.clone();
-            clone.attr('id', 'file-' + row.id);
-            old = false;
-          }
-
-          /* build new file (row) */
-          clone.find('span.file').text(row.description);
-          clone.find('td:eq(1)').text(row.user);
-          clone.find('td:eq(2)').text(row.relative);
-          clone.addClass('category-' + categoryID);
-          clone.addClass(row.mimeClass);
-
-          if (row.url)
-            clone.addClass('link');
-
-          if (row.hidden == 1)
-            clone.addClass('hidden');
-
-          if(old) {
-          } else {
-            $j('#file-window').find('div[data-file=' + row.id + ']').remove();
-            clone.appendTo($j('#file-list'));
-          }
-
+        complete: function (file, response) {
+            $(file.previewElement).find('img').attr('src', '');
+            if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                $('#node-'+relationID).trigger('click');
+            }
         }
-      }
 
-      /* hide all files */
-      $j('#file-window').find(find).hide();
-      $j('#file-window').find('.category-'+categoryID).show();
+    });
 
-      initialiseFiles(categoryID);
+    var threePanel = new ThreePanelView('/ajax/resource/meta.php', 'resources');
 
-    }, 'json');
-  }
-
-	var initialiseFiles = function (relationID) {
-
-		var newChildren = $j('tr.category-' + relationID + ':not(.empty)'), categoryNode = $j('#node-' + relationID);
-
-		/* double click files, default action */
-		newChildren.dblclick(function () {
-			if ($j(this).hasClass("link"))
-				window.open("/redir.php?id="+$j(this).attr("id").substring(5),"_blank");
-			else
-				window.open("/send.php?id="+$j(this).attr("id").substring(5),"_blank");
-		});
-
-		/* select files */
-		newChildren.click(function (event) {
-
-			/* allow multiple select */
-			if (!event.ctrlKey && !event.shiftKey)
-				$j('#file-list tr.selected').removeClass('selected');
-
-			if (event.ctrlKey)
-				$j(this).toggleClass('selected');
-			else
-				$j(this).addClass('selected');
-
-			/* select range */
-			if (event.shiftKey) {
-
-				var node1 = $j('#file-list tr').index($j('#file-list tr.current'));
-				var node2 = $j('#file-list tr').index(this);
-
-				if (node1 > node2)
-					$j('#file-list tr').slice(node2, node1).addClass('selected');
-				else
-					$j('#file-list tr').slice(node1, node2).addClass('selected');
-			}
-
-			$j('#file-list tr.current').removeClass('current');
-			$j(this).addClass('current');
-
-      threePanel.getMeta(relationID, $j('#file-list tr.selected'))
-
-		});
-
-		/* drag files */
-		if (categoryNode.hasClass('full') || categoryNode.hasClass('write')) {
-
-			newChildren.find('span.file').draggable({
-				cursor: 'move',
-				cursorAt: {top: 5, left: 5},
-				helper: function (event) {
-					// How many items are selected?
-					// More than one - show the number of files, not the name.
-					var length = $j('#file-list tr.selected').length;
-					var node   = $j(event.currentTarget).clone().addClass('accept').css('z-index', 100);
-					if (length > 1) {
-						node.text('('+String(length)+' files)');
-					}
-					return node;
-				},
-				opacity: 1,
-				revert: "invalid",
-				revertDuration: 300,
-				scroll: true
-
-			});
-		}
-	};
-
-
-	/* get resourcesID */
-	var resourcesID = 0, selected = $j('#tree tbody tr.selected');
-	if (selected.length > 0)
-		resourcesID = selected.attr('id').substring(5);
-
-	initialiseFiles(resourcesID);
-
-	/* triggered after a new branch is loaded */
-	$j('#tree').bind('loaded', function () {
-		var table = $j(this), scroller = $j('#category-window div.scroller');
-
-		/* fix left panel width */
-		var scrollerWidth = parseInt(scroller.width()) - 1;
-		if (table.height() > scroller.height())
-			scrollerWidth -= 16; // scroller width
-
-		if (table.width() < scrollerWidth)
-			table.width(scrollerWidth);
-		else {
-			var maxWidth = 0, width;
-			table.find('tr').each(function () {
-				width = 0;
-				$j(this).find('span').each(function () {
-					width += $j(this).width();
-				});
-				width += 39 ; // cell padding, highlight border
-				if (width > maxWidth)
-					maxWidth = width;
-			});
-			if (maxWidth > scrollerWidth)
-				table.width(maxWidth);
-		}
-	});
-
-	$j('#tree').triggerHandler('loaded');
+    // Select a node: update the second and third panels.
+    var tree = $('#tree');
+    tree
+        .resourceTree({
+            data: {
+                cache: {TREEDATA}
+            }
+        })
+        .resourceTreeThreePanelBridge({
+            threePanel: threePanel,
+            selected: {OPEN_CATEGORY}
+        })
+        .on('select_node.jstree', function(event, jstree) {
+            relationID = jstree.node.id;
+        })
+    threePanel.getMeta({OPEN_CATEGORY});
 
 	/* resize left column on window resize */
-	$j(window).resize(function () {
-		$j('#tree').triggerHandler('loaded');
+	$(window).resize(function () {
+		tree.triggerHandler('loaded.jstree');
 	});
 
-	$j("div.loading").hide();
+	$("div.loading").hide();
 
 	/* auto scroll to open branch */
-	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
+//	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
 
-  // retrieve meta for open branch
-  threePanel.getMeta({OPEN});
-
-	var date2 = new Date;
-
-	if (window.location.href.indexOf('debug') != -1)
-		alert((date2.getTime() - date1.getTime()) / 1000);
-
-  // set up resizing
-  threePanel.resizePanels()
-	$j(window).resize(threePanel.resizePanels());
+    // set up resizing
+    threePanel.resizePanels()
+    $(window).resize(threePanel.resizePanels);
 
   var actions = {
     cms : {
@@ -303,9 +100,9 @@ $j(function() {
       },
       f_properties : function(kind, id) {
         var path = '/cms/properties.php?' + kind + 'ID=' + id
-        $j.get(path, function(data) {
+        $.get(path, function(data) {
 
-          $j('<div />').append(data).dialog({
+          $('<div />').append(data).dialog({
               modal:  true,
               title:  'Properties',
               width:  'auto',
@@ -323,14 +120,14 @@ $j(function() {
         return true
       },
       f_delete : function(id) {
-        var name = $j('#folder-detail h3.name').html()
+        var name = $('#folder-detail h3.name').html()
         if(confirm("Are you sure you want to delete " + name + "?")) {
           window.open("/cms/categoryForm.php?delete=" + id, "_self")
         }
         return true
       },
       f_delete_all : function(id) {
-        var name = $j('#folder-detail h3.name').html()
+        var name = $('#folder-detail h3.name').html()
         if(confirm("Are you sure you want to delete " + name + "? This will also delete all subfolders and their contents.")) {
           var path = '/cms/categoryForm.php?deleteAll=' + id
           window.open(path, "_self")
@@ -358,7 +155,7 @@ $j(function() {
       f_join : function(id) {
         var target = threePanel.folderDetail.find('a.join-btn')
         // do this one via ajax
-        $j.get('/group/joinForm.php', {join : id, ajax : 1})
+        $.get('/group/joinForm.php', {join : id, ajax : 1})
             .done(function(data) {
               if(typeof(data.status) !== 'undefined') {
                 target.hide()
@@ -374,13 +171,13 @@ $j(function() {
     },
     multi : {
       f_delete : function() {
-        var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
+        var selected = $('#file-list tr.selected'), fileList = '', linkList = '', id
 
         if(selected.length > 1) {
           selected.each(function() {
-            id = $j(this).attr("id").substring(5) + ','
+            id = $(this).attr("id").substring(5) + ','
 
-            if ($j(this).hasClass('link'))
+            if ($(this).hasClass('link'))
               linkList += id
             else
               fileList += id
@@ -395,7 +192,7 @@ $j(function() {
   }
 
   // bind actions to buttons
-  $j(document).ready(function() {
+  $(document).ready(function() {
     threePanel.actionBind(actions)
   })
 });
@@ -408,18 +205,7 @@ tr.binary span.file { background-image: url(/images/mime/22x22/binary.png); }
 tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
 <!-- END allowed_files -->
 </style>
-<!--[if lt IE 7]>
-<style type='text/css'>
-	#simplemodal-container a.modalCloseImg {
-    	background:none;
-        right:-14px;
-        width:22px;
-        height:26px;
-        filter:
-        progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/images/resources/x.png',sizingMethod='scale');
-    }
-</style>
-<![endif]-->
+
 <!-- END custom_head -->
 <div class="template3">
   <div class="left">
@@ -431,29 +217,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
         </thead>
       </table>
       <div class="scroller">
-        <table id="tree" class="table">
-          <tbody>
-          <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
-            <td><span class="server label">Resources</span></td>
-          </tr>
-          <!-- BEGIN category_list -->
-          <tr id="node-{CATEGORY_ID}" class="{CLASS}">
-            <td>
-              <span class="elbow"></span>
-              <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
-            </td>
-          </tr>
-          <!-- END category_list -->
-          </tbody>
-          <tfoot>
-          <tr id="node-template">
-            <td>
-              <span class="elbow"></span>
-              <a href="#"><span class="label"></span></a>
-            </td>
-          </tr>
-          </tfoot>
-        </table>
+          <div id="tree"></div>
       </div>
     </div>
   </div>
@@ -575,3 +339,6 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
   </div>
 </div>
 
+<div id="test-tree" style="clear:both"></div>
+<h3 id="test-tree-meta"></h3>
+<ul id="test-tree-files"></ul>

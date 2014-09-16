@@ -8,7 +8,14 @@
  */
 
 $this->setFile(TEMPLATE_content, 'resource_browser.html');
-$rb = new Resource_Browser($this);
+
+$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
+    Schoolbox\Resource\CategoryMapper::getInstance(),
+    Schoolbox\Assessment\Course\TaskMapper::getInstance(),
+    new Group()
+);
+
+$rb = new Resource_Browser($this, $treeBuilder);
 
 // Options:
 // destination:     a destination selector, this element is updated

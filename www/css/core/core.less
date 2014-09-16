@@ -6125,7 +6125,7 @@ ul.js_happening li span:hover {
     border: 1px solid @std-grey;
     position: relative;
     overflow: auto;
-    overflow-x: hidden;
+    // overflow-x: hidden;
     text-align: left;
 }
 
@@ -11363,6 +11363,12 @@ textarea.event-detail {
     }
     .jstree-clicked {
         background-color: #ffffb2;
+    }
+}
+.jstree-default.jstree-default-resourcetree {
+    .jstree-container-ul .jstree-loading > .jstree-ocl {
+        // Replace the throbber with our ajax loader
+        background-image: url(/images/resources/ajax.gif);
     }
 }
 

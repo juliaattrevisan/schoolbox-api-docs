@@ -1,65 +1,76 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css"/>
-<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.threePanelBridge.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
 $j(function() {
-
-  var threePanel = new ThreePanelView('/ajax/resource/networkMeta.php', 'network')
-
-    /* left tree navigation */
-    $j('#tree').tree({
-        type:'table',
-        node:'tr',
-        onOff:'dark',
-        sequencing:false,
-        url:'/cms/networkForm.php',
-        fileAjax:'/cms/networkFileForm.php',
-        categoryAjax:'/cms/networkFolderForm.php'
-    });
-
-    /* load right panel file list */
-    $j(document).on('click', '#tree tr', function () {
-
-        /* select folder */
-        $j('#tree .selected').removeClass('selected');
-        $j(this).addClass('selected');
-
-        /* hide and deselect all files */
-        $j('#file-list tbody tr').removeClass('selected').hide();
-
-        var relationID = $j(this).attr('id').substring(5);
-        var files = $j('tr.category-' + relationID + ':not(.empty)');
-
-        threePanel.getMeta(relationID);
-
-        if (files.length > 0) {
-            /* files exist, show them */
-            files.show();
-
-            /* re-apply on off */
-            $j('#file-list tbody tr').removeClass('dark');
-            $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
-
-            /* remember tree branch */
-            $j.post('/cms/networkFolderForm.php', {portfolioID:relationID});
-        }
-        else {
-
-            /* ajax load files */
-            $j.post('/cms/networkForm.php', {categoryID:relationID}, function (data) {
-
+    var threePanel = new ThreePanelView('/ajax/resource/networkMeta.php', 'network')
+    var tree       = $('#tree');
+    tree
+        .resourceTree({
+            data: {
+                cache: {TREEDATA},
+                ajaxParams: {
+                    url: '/ajax/jstreeWebdav.php',
+                },
+                ajaxDataParam: 'relationID'
+            }
+        })
+        .resourceTreeThreePanelBridge({
+            selected:   {OPEN},
+            threePanel: threePanel,
+            moveFolder: function(self, folderNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFolderForm.php',
+                    data: {
+                        move:       folderNode.attr('id'),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
+            moveFile: function(self, fileNode, destinationNode) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFileForm.php',
+                    data: {
+                        move:       fileNode.attr('id').substring(5),
+                        categoryID: destinationNode.attr('id')
+                    },
+                    dataType: 'json'
+                }
+            },
+            loadFolderFiles: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkForm.php',
+                    data: {categoryID : folderId},
+                    dataType: 'json'
+                }
+            },
+            savePosition: function(self, folderId) {
+                return {
+                    type: 'post',
+                    url:  '/cms/networkFolderForm.php',
+                    data: {portfolioID : folderId},
+                    dataType: 'json'
+                }
+            },
+            drawFiles: function(self, categoryId, data) {
                 if (data.error) {
                     alert(data.error);
                 }
                 else if (data.length == 0) {
                     /* display empty message */
-                    var empty = $j('#file-list tr.category-' + relationID + '.empty');
+                    var empty = $j('#file-list tr.category-' + categoryId + '.empty');
                     if (empty.length) {
                         empty.show();
                     } else {
-                        $j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                        $j('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
                     }
                 }
                 else {
@@ -73,7 +84,7 @@ $j(function() {
                         clone.attr('id', 'file-' + row.id);
                         clone.find('span.file').text(row.name).addClass(row.icon);
                         clone.find('td:eq(1)').text(row.modified);
-                        clone.addClass('category-' + relationID);
+                        clone.addClass('category-' + categoryId);
 
                         if (row.url) {
                             clone.addClass('link');
@@ -86,156 +97,8 @@ $j(function() {
                         clone.appendTo($j('#file-list')).show();
                     }
                 }
-
-                /* re-apply on off */
-                $j('#file-list tbody tr').removeClass('dark');
-                $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
-
-                initialiseFiles(relationID);
-
-            }, 'json');
-        }
-    });
-
-    var initialiseFiles = function (relationID) {
-
-        var newChildren = $j('tr.category-' + relationID + ':not(.empty)'), categoryNode = $j('#node-' + relationID);
-
-        /* re-apply on off */
-        $j('#file-list tbody tr').removeClass('dark');
-        $j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
-
-        /* apply file context menus */
-
-        /* double click files, default action */
-        newChildren.dblclick(function () {
-            if ($j(this).hasClass("link")) {
-                window.open("/redir.php?myFile=1&id=" + $j(this).attr("id").substring(5), "_blank");
             }
-            else {
-                window.open("/cms/sendNetworkFile.php?id=" + $j(this).attr("id").substring(5), "_blank");
-            }
-        });
-
-        /* select files */
-        newChildren.click(function (event) {
-
-            /* allow multiple select */
-            if (!event.ctrlKey && !event.shiftKey) {
-                $j('#file-list tr.selected').removeClass('selected');
-            }
-
-            if (event.ctrlKey) {
-                $j(this).toggleClass('selected');
-            }
-            else {
-                $j(this).addClass('selected');
-            }
-
-            /* select range */
-            if (event.shiftKey) {
-                var node1 = $j('#file-list tr').index($j('#file-list tr.current'));
-                var node2 = $j('#file-list tr').index(this);
-
-                if (node1 > node2) {
-                    $j('#file-list tr').slice(node2, node1).addClass('selected');
-                }
-                else {
-                    $j('#file-list tr').slice(node1, node2).addClass('selected');
-                }
-            }
-
-            $j('#file-list tr.current').removeClass('current');
-            $j(this).addClass('current');
-
-            threePanel.getMeta(relationID, $j('#file-list tr.selected'));
-        });
-
-        /* drag files */
-
-        newChildren.find('span.file').draggable({
-            cursor:'move',
-            cursorAt:{top:5, left:5},
-            helper:function (event) {
-                // How many items are selected?
-                // More than one - show the number of files, not the name.
-                var length = $j('#file-list tr.selected').length;
-                var node   = $j(event.currentTarget).clone().addClass('accept').css('z-index', 100);
-                if (length > 1) {
-                    node.text('('+String(length)+' files)');
-                }
-                return node;
-            },
-            opacity:1,
-            revert:"invalid",
-            revertDuration:300,
-            scroll:true
-        });
-    };
-
-    /* get resourcesID
-     */
-    var resourcesID = 0, selected = $j('#tree tbody tr.selected');
-
-    if (selected.length > 0) {
-        resourcesID = selected.attr('id').substring(5);
-    }
-
-    initialiseFiles(resourcesID);
-
-    /* triggered after a new branch is loaded
-     */
-    $j('#tree').bind('loaded', function () {
-        var table = $j(this), scroller = $j('#category-window div.scroller');
-
-        /* fix left panel width
-         */
-        var scrollerWidth = parseInt(scroller.width()) - 1;
-
-        if (table.height() > scroller.height()) {
-            scrollerWidth -= 16; // scroller width
-        }
-
-        if (table.width() < scrollerWidth) {
-            table.width(scrollerWidth);
-        }
-        else {
-            var maxWidth = 0, width;
-
-            table.find('tr').each(function () {
-                width = 0;
-
-                $j(this).find('span').each(function () {
-                    width += $j(this).width();
-                });
-
-                width += 39; // cell padding, highlight border
-
-                if (width > maxWidth) {
-                    maxWidth = width;
-                }
-            });
-
-            if (maxWidth > scrollerWidth) {
-                table.width(maxWidth);
-            }
-        }
-
-    });
-
-    $j('#tree').triggerHandler('loaded');
-
-    /* resize left column on window resize
-     */
-    $j(window).resize(function () {
-        $j('#tree').triggerHandler('loaded');
-    });
-
-    $j("div.loading").hide();
-
-    /* auto scroll to open branch
-     */
-    $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+        })
 
   threePanel.getMeta({OPEN});
 
@@ -349,31 +212,7 @@ $j(function() {
             </table>
 
             <div class="scroller">
-                <table id="tree" class="table">
-                    <tbody>
-                    <tr id="node-0" class="server expanded loaded full write">
-                        <td>
-                            <span class="server label no-drop">Top</span>
-                        </td>
-                    </tr>
-                    <!-- BEGIN category_list -->
-                    <tr id="node-{CATEGORY_ID}" class="{CLASS} full write">
-                        <td>
-                            <span class="elbow"></span>
-                            <a href="#"><span class="label">{CATEGORY_NAME}</span></a>
-                        </td>
-                    </tr>
-                    <!-- END category_list -->
-                    </tbody>
-                    <tfoot>
-                    <tr id="node-template" class=" full write">
-                        <td>
-                            <span class="elbow"></span>
-                            <a href="#"><span class="label"></span></a>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
+                <div id="tree" class="table"></div>
             </div>
         </div>
     </div>

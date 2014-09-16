@@ -89,7 +89,7 @@ class MyFolder extends DeprecatedModel {
 	function hasChildren($folderID) {
 		$query = "SELECT f.id as children
 				  FROM myFolder f
-				  WHERE parent = $folderID
+				  WHERE parent = {$this->db->quote($folderID)}
 				  LIMIT 1";
 
 		return $this->db->getOne($query);

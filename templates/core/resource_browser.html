@@ -1,4 +1,7 @@
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <div class="left">
     <div id="category-window">
         <div class="loading"></div>
@@ -8,23 +11,8 @@
             </thead>
         </table>
         <div class="scroller">
-            <table id="tree" class="table">
-                <tbody>
-                <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
-                    <td><span class="server label">Resources</span></td>
-                </tr>
-                <!-- BEGIN category_list -->
-                <tr id="node-{CATEGORY_ID}" class="{CLASS}">
-                    <td><span class="elbow"></span><span class="label">{CATEGORY_NAME}</span></td>
-                </tr>
-                <!-- END category_list -->
-                </tbody>
-                <tfoot>
-                <tr id="node-template">
-                    <td><span class="elbow"></span><span class="label"></span></td>
-                </tr>
-                </tfoot>
-            </table>
+            <div id="tree" class="table">
+            </div>
         </div>
     </div>
     <input id="destination" type="hidden" readonly="readonly" value="" />
@@ -32,6 +20,33 @@
     <a href="#" id="select-resource" class="submit-btn-plain"><span></span>Select</a>
 </div>
 <script type="text/javascript">
+
+    $(function(){
+
+        /* left tree navigation */
+        $j('#tree')
+            .resourceTree({
+                data: {
+                    cache: {TREEDATA}
+                }
+            })
+            .on('select_node.jstree', function(event, jstree) {
+                var relationID = jstree.node.id;
+
+                $j.post('/ajax/tree.php', {resourcesID : relationID});
+
+                $j('#destination').val(relationID);
+                $j('#destination-text').val($j(this).find('.label').text());
+            });
+
+        $j("div.loading").hide();
+
+        $j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50);
+
+        $j(window).resize(function() {
+            $j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50)
+        });
+    })
     // listener for submit
     $j('#destination').val($j('{DESTINATION}').val());
     $j('#select-resource').click(function(event) {
@@ -61,4 +76,3 @@
         $j('#resource-browser').dialog('close');
     });
 </script>
-<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
