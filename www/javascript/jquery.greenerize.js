@@ -57,11 +57,6 @@ $.fn.greenerize = function(options) {
                 checkboxes.parent().removeClass('active-checkbox');
             }
         }
-        if (settings.triggerChange) {
-            checkboxes.each(function() {
-                $(this).change();
-            });
-        }
     });
     return this;
 }
