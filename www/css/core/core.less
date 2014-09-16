@@ -3141,6 +3141,12 @@ input.timeField {
     &.homepage-overflow:hover span {
       .btn-icon(93);
     }
+    &.attach span {
+      .btn-icon(94);
+    }
+    &.attach:hover span {
+      .btn-icon(95);
+    }
     &.submit {
         .submit-btn-plain();
         padding: 0 16px 0 30px;
@@ -11730,17 +11736,24 @@ textarea.event-detail {
 	}
 }
 
-// attach-browser upload
-#ab-upload {
+.ab-pane {
+	height: ~'calc(100% - 70px)';
 	overflow-y: auto;
 	overflow-x: hidden;
-	height: ~'calc(100% - 70px)';
 	position: relative;
 	+ .ctrl {
 		height: 70px;
 		padding: 19px 10px;
 		box-sizing: border-box;
+		[role=button] {
+			min-width: 40px;
+			text-align: center;
+		}
 	}
+}
+
+// attach-browser upload
+#ab-upload {
 	.dzone {
 		min-height: 100%;
 		border: dashed 2px #aaa;
@@ -11939,6 +11952,7 @@ textarea.event-detail {
 		margin-left: 40px;
 	}
 	.dzone {
+		background-image: url("/images/core/files/paperclip-32.png");
 		background-position: 8px;
 		background-size: 22px;
 		line-height: 40px;
@@ -11966,6 +11980,7 @@ textarea.event-detail {
 		margin-left: 72px;
 	}
 	.dzone {
+		background-image: url("/images/core/files/paperclip-64.png");
 		background-size: 48px;
 		background-position: 10px;
 		line-height: 72px;
@@ -12014,7 +12029,6 @@ textarea.event-detail {
 		overflow: hidden;
 		border: dashed 1px #ccc;
 		background-color: rgba(240, 240, 240, 0.5);
-		background-image: url("/__paper-clip-1.png");
 		background-repeat: no-repeat;
 		display: block;
 		box-sizing: border-box;
