@@ -122,6 +122,10 @@ if ($_POST['heading']) {
             }
         }
     }
+    else {
+        // remove the image
+        $article->setImage(null);
+    }
 
 	$affectedIds = \Schoolbox\News\ArticleMapper::getInstance()->save($article);
 	$newsId = $affectedIds[0];
