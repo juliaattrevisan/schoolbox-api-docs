@@ -47,6 +47,9 @@ class Storage implements FileInterface {
 	 */
 	protected $last_accessed;
 
+    /** @var  \Alaress_Date_Format */
+    protected $expired_at;
+
 	/**
 	 * Temporary location for the file. Never persisted
 	 *
@@ -198,6 +201,27 @@ class Storage implements FileInterface {
 	public function getUploadedOn() {
 		return $this->uploaded_on;
 	}
+
+
+    /**
+     * @param \Alaress_Date_Format $expired_at
+     * @return self
+     */
+    public function setExpiredAt($expired_at)
+    {
+        $this->expired_at = $expired_at;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getExpiredAt()
+    {
+        return $this->expired_at;
+    }
+
 
 	/**
 	 * Gets the location at which this file would be stored.

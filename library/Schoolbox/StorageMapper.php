@@ -50,12 +50,19 @@ class StorageMapper extends Mapper {
 			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
-		$this->hasMap(array(
-			'column'            => 'last_accessed',
-			'property'          => 'lastAccessed',
-			'type'              => self::TYPE_DATETIME,
-			'created_timestamp' => true,
-		));
+        $this->hasMap(array(
+            'column'            => 'last_accessed',
+            'property'          => 'lastAccessed',
+            'type'              => self::TYPE_DATETIME,
+            'created_timestamp' => true,
+        ));
+        $this->hasMap(array(
+            'column'            => 'expired_at',
+            'property'          => 'expiredAt',
+            'type'              => self::TYPE_DATETIME,
+        ));
+
+        $this->hasSoftDeleteDateField('expired_at');
 
         // Relation to Allowed Files
 
