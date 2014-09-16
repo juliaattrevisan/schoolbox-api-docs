@@ -3,7 +3,12 @@
  *
  * Options:
  * * applyClasses: defaults to true. If false, doesn't apply classes.
- * * triggerChange: defaults to false. If true, triggers change event on the checkbox.
+ *
+ * Events:
+ * * greenerizeChange: triggers when the select all checkbox is changed.
+ *   Params:
+ *   * element: the select all checkbox
+ *   * checkboxes: the checkboxes that were affected by the change
  */
 (function($) {
 $.fn.greenerize = function(options) {
@@ -14,6 +19,7 @@ $.fn.greenerize = function(options) {
         triggerChange: false
     };
     var settings = $.extend({}, defaults, options);
+    var self     = this;
 
     if (settings.applyClasses) {
         this.find(':checkbox').each(function () {
@@ -36,14 +42,17 @@ $.fn.greenerize = function(options) {
     }
 
     this.find('.select_all').change(function(){
-        var checkboxes = $(this).closest('.checkboxes').find(':checkbox').not('.select_all')
-        if ($(this).is(':checked')) {
+        var element    = $(this);
+        var checkboxes = element.closest('.checkboxes').find(':checkbox').not('.select_all')
+        if (element.is(':checked')) {
             checkboxes.prop('checked', true);
+            self.trigger('greenerizeChange', [element, checkboxes]);
             if (settings.applyClasses) {
                 checkboxes.parent().addClass('active-checkbox');
             }
         } else {
             checkboxes.prop('checked', false);
+            self.trigger('greenerizeChange', [element, checkboxes]);
             if (settings.applyClasses) {
                 checkboxes.parent().removeClass('active-checkbox');
             }
