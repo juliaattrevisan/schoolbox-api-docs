@@ -54,6 +54,7 @@ $(function() {
         })
         .on('select_node.jstree', function(event, jstree) {
             relationID = jstree.node.id;
+            jstree.instance.open_node(jstree.node.id);
         })
     threePanel.getMeta({OPEN_CATEGORY});
 

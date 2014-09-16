@@ -100,6 +100,9 @@ $j(document).ready(function() {
                 }
             }
         })
+        .on('select_node.jstree', function(event, jstree) {
+            jstree.instance.open_node(jstree.node.id);
+        })
     threePanel.getMeta({OPEN_CATEGORY});
 
     // set up resizing
