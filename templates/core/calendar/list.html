@@ -52,10 +52,14 @@
 			});
 		});
 
-		$('.checkboxes').greenerize({
-			applyClasses: false,
-			triggerChange: true
-		});
+		$('.checkboxes')
+			.greenerize({ applyClasses: false })
+			.on(
+				'greenerizeChange',
+				function(event, selectAll, checkboxes) {
+					checkboxes.first().change();
+				}
+			)
 	});
 </script>
 
