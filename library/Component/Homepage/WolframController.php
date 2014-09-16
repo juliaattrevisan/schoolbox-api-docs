@@ -61,7 +61,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
                 );
 
                 // Allow output type to be set too
-                $outputType = 'popup';
+                $outputType = 'lightbox';
                 if (preg_match('/(?:\?|&)output=(?P<output>[a-zA-Z0-9]+)/', $url, $matches)) {
                     $outputType = $matches['output'];
                 }
