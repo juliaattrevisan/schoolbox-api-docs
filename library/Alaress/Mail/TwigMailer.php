@@ -12,6 +12,8 @@ namespace Alaress\Mail;
 
 use Html2Text\Html2Text;
 use Twig_Environment;
+use Twig_SimpleFilter;
+use Scrub;
 
 class TwigMailer extends AbstractMailer {
 
@@ -47,6 +49,25 @@ class TwigMailer extends AbstractMailer {
 
 		// load up a twig environment that will search for school-specific templates if the directory exists
 		$this->twig = new Twig_Environment(new \Twig_Loader_Filesystem($paths));
+
+        //TODO: Refactor to use the Twig Environment from the bootstrap
+        // HTML Purifier filter - known to output safe HTML
+        $this->twig->addFilter(
+            new Twig_SimpleFilter(
+                'purify',
+                array('Scrub', 'html'),
+                array('is_safe' => array('html'))
+            )
+        );
+
+        // HTML2Text filter
+        $this->twig->addFilter(
+            new Twig_SimpleFilter(
+                'html2text',
+                array('Scrub', 'html2text')
+            )
+        );
+
 	}
 
 	/**
