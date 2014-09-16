@@ -73,7 +73,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
                 $this->getPage()->setVar(
                     array(
-                        'EVENT_DATE' => $currentEvent->getStartTime()->getDateOnly()
+                        'EVENT_DATE' => $currentEvent->getStartTime()->getLongDateOnly()
                     )
                 );
 
