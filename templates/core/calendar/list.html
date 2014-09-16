@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
+<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$('[data-filters="true"]').filterSelector({
@@ -49,6 +50,11 @@
 				minWidth: 400,
 				modal: true
 			});
+		});
+
+		$('.checkboxes').greenerize({
+			applyClasses: false,
+			triggerChange: true
 		});
 	});
 </script>
@@ -119,8 +125,10 @@
 			<div class="filter-drop clearfix">
 				<div class="filter-list">
 					<form class="clearfix">
-						<div class="filter-cat groups clearfix">
-							<span class="filter-title">Groups</span>
+						<div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
+							<label>
+								<input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+							</label>
 							<!-- BEGIN filter_group -->
 							<label title="{GROUP_NAME}">
 								<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
@@ -128,8 +136,10 @@
 							</label>
 							<!-- END filter_group -->
 						</div>
-						<div class="filter-cat campus">
-							<span class="filter-title">Campus</span>
+						<div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
+							<label>
+								<input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+							</label>
 							<!-- BEGIN filter_campus -->
 							<label title="{CAMPUS_NAME}">
 								<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
@@ -137,8 +147,10 @@
 							</label>
 							<!-- END filter_campus -->
 						</div>
-						<div class="filter-cat events last">
-							<span class="filter-title">Event</span>
+						<div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
+							<label>
+								<input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+							</label>
 							<!-- BEGIN filter_event_type -->
 							<label title="{EVENT_TYPE_NAME}">
 								<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
