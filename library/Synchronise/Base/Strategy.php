@@ -167,22 +167,28 @@ abstract class Synchronise_Base_Strategy
     protected function executeCreateUpdate($newUser)
     {
         $this->verbose_filter->setNewUser($newUser);
-     //
-     // Does this person have a username? If not, skip them
+
+        // Does this person have a username? If not, skip them
         if ($this->hasUsername($newUser)) {
             $existing = $this->userExists($newUser);
-   //
-   // If the current user exists in Schoolbox, update them
             if ($existing) {
+                // If the current user exists in Schoolbox, update them
+                $this->verbose_filter->performUpdate();
                 if ($this->perform_update) {
                     $newUser['id'] = $existing['uid'];
-                    $this->user_handler->update($newUser);
-                    $this->verbose_filter->performUpdate();
+                    if ($this->user_handler->update($newUser)) {
+                        $this->verbose_filter->incrementUpdated();
+                    } else {
+                        $this->verbose_filter->outputSkipMessage(
+                            'user - failed because user exists with different username.'
+                        );
+                        $this->verbose_filter->incrementSkipped();
+                    }
                     return $existing['uid'];
                 } else {
                     $this->verbose_filter->planUpdate();
+                    $this->verbose_filter->incrementUpdated();
                 }
-                $this->verbose_filter->incrementUpdated();
             } else {
                 // Perform action; report what happened
                 if ($this->perform_update) {
