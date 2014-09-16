@@ -33,15 +33,42 @@ setupCustomise = {
 		init: function() {
 			$j('#tabs-homepage').tabs();
 			$j('#tabs-sub').tabs();
-			$j('.customise').click(function(event) {
-				$j('#tabs-homepage, .empty-column').slideToggle();
-				$j(this).children('span').toggle();
-				$j('h2.hide').each(function () {
-					$j(this).toggle();
-				});
-				return false;
-			});
+//			$j('.customise').click(function(event) {
+//				$j('#tabs-homepage, .empty-column').slideToggle();
+//				$j(this).children('span').toggle();
+//				$j('h2.hide').each(function () {
+//					$j(this).toggle();
+//				});
+//				return false;
+//			});
+            $j('#tab-component').click(function() {
+                var openMe = true;
+                if($(this).hasClass('hover')) {
+                    openMe = false;
+                }
 
+                $(this).toggleClass('hover');
+                $('#tabs-homepage').children('.customise-components').removeClass('open');
+
+                if(openMe) {
+                    $('#tabs-1').addClass('open');
+                }
+                return false;
+            });
+            $j('#tab-columns').click(function() {
+                var openMe = true;
+                if($(this).hasClass('hover')) {
+                    openMe = false;
+                }
+
+                $(this).toggleClass('hover');
+                $('#tabs-homepage').children('.customise-components').removeClass('open');
+
+                if(openMe) {
+                    $('#tabs-2').addClass('open');
+                }
+                return false;
+            });
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();

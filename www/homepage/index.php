@@ -89,7 +89,7 @@ $componentCollection = $componentFactory->buildComponentList($categoryID);
 if ($permission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
-    $this->setBlock('customise_page', 'homepage_color_link', 'homepage_color_link_block');
+    $this->setBlock(TEMPLATE_content, 'homepage_color_link', 'homepage_color_link_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
     $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
     $this->parse('edit_page_block', 'edit_page');

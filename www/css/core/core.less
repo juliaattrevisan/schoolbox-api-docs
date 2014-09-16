@@ -6761,53 +6761,70 @@ HOMEPAGE COLUMN SLIDER
 /********************************************
 HOMEPAGE CUSTOMISE
 *********************************************/
+.homepage-controls{
+    position: absolute;
+    right: 0;
+    top: 0px;
+    width: 200px;
+    .no-text{
+        height: 29px;
+        width: 4px;
+        span{ top: 8px; left: 8px !important; }
+        &:hover{ background-color: @link; }
+    }
+    .ui-tabs-active{
+        .btn.homepage-overflow span{ .btn-icon(93); }
+        .btn.homepage-columns span{ .btn-icon(91); }
+        .btn.homepage-component span{ .btn-icon(89); }
+    }
 
+    .status-buttons{
+        top: 34px;
+        right: -15px;
+        .status-header{
+            background: @module-background;
+            border-top: 1px solid @lgrey;
+            color: @black;
+            font-weight: bold;
+            text-align: left;
+            padding: 4px 10px;
+        }
+        .status-option{
+            background: transparent;
+            border-top: 1px solid @lgrey;
+            color: @black;
+            text-align: left;
+            justify-content: inherit;
+            white-space: nowrap;
+            &:hover{
+                background: lighten(@lgrey,15%);
+                text-decoration: underline;
+                .btn{ background-color: transparent;  }
+            }
+            .btn{ border: 0; padding: 0 16px 0 12px; }
+        }
+    }
+}
 #tabs-homepage{
     border-radius: 0;
     li,
     .ui-tabs-panel{ border: 0; }
-    .homepage-controls{
-        .no-text{
-            height: 29px;
-            width: 4px;
-            span{ top: 8px; left: 8px; }
-        }
-        .ui-tabs-active{
-            .btn.homepage-overflow span{ .btn-icon(93); }
-            .btn.homepage-columns span{ .btn-icon(91); }
-            .btn.homepage-component span{ .btn-icon(89); }
-        }
-        .status-buttons{
-            top: 34px;
-            right: -15px;
-            .status-header{
-                background: @module-background;
-                border-top: 1px solid @lgrey;
-                color: @black;
-                font-weight: bold;
-                text-align: left;
-                padding: 4px 10px;
-            }
-            .status-option{
-                background: transparent;
-                border-top: 1px solid @lgrey;
-                color: @black;
-                text-align: left;
-                justify-content: inherit;
-                white-space: nowrap;
-                &:hover{
-                    background: lighten(@lgrey,15%);
-                    text-decoration: underline;
-                    .btn{ background-color: transparent;  }
-                }
-                .btn{ border: 0; padding: 0 16px 0 12px; }
-            }
-        }
-    }
     .customise-components{
-        border: 1px solid @std-grey;
+        overflow: hidden;
+        border: 1px solid transparent;
         border-radius: 0;
-        padding: 15px;
+        box-sizing: border-box;
+        padding: 0px 15px;
+        transition: all 500ms ease;
+        max-height: 0px;
+        &.open{
+            border: 1px solid @std-grey;
+            padding: 15px;
+            //display: block;
+        	max-height: 500px;
+        	-webkit-transition: all 1s cubic-bezier(.10, .10, .25, .90);
+            -moz-transition: all 1s cubic-bezier(.10, .10, .25, .90);
+        }
     }
 }
 
@@ -6888,47 +6905,47 @@ HOMEPAGE CUSTOMISE
             top: 36px;
             left: 43px;
         }
-        &.Component_Homepage_BreadcrumbController .icon{ .component-icon(1); }
-        &.Component_Homepage_NewsController .icon{ .component-icon(2); }
-        &.Component_Homepage_LinkListController .icon{ .component-icon(2); }
-        &.Component_Homepage_FileListController .icon{ .component-icon(2); }
-        &.Component_Homepage_MembersController .icon{ .component-icon(2); }
-        &.Component_Homepage_ForumListController .icon{ .component-icon(2); }
-        &.Component_Homepage_ManageClassController .icon{ .component-icon(2); }
-        &.Component_Homepage_ManageFolderController .icon{ .component-icon(2); }
-        &.Component_Homepage_ManagersController .icon{ .component-icon(2); }
-        &.Component_Homepage_ImageController .icon{ .component-icon(2); }
-        &.Component_Homepage_FolderListController .icon{ .component-icon(2); }
-        &.Component_Homepage_EventListController .icon{ .component-icon(2); }
-        &.Component_Homepage_ClickviewController .icon{ .component-icon(2); }
-        &.Component_Homepage_ImageGalleryController .icon{ .component-icon(2); }
-        &.Component_Homepage_RandImageController .icon{ .component-icon(2); }
-        &.Component_Homepage_DropBoxController .icon{ .component-icon(2); }
-        &.Component_Homepage_DueWorkListController .icon{ .component-icon(2); }
-        &.Component_Homepage_RSSController .icon{ .component-icon(2); }
-        &.Component_Homepage_TeachersController .icon{ .component-icon(2); }
-        &.Component_Homepage_PollController .icon{ .component-icon(2); }
-        &.Component_Homepage_WikiController .icon{ .component-icon(2); }
-        &.Component_Homepage_FeedController .icon{ .component-icon(2); }
-        &.Component_Homepage_TextBoxController .icon{ .component-icon(2); }
-        &.Component_Homepage_AudioController .icon{ .component-icon(2); }
-        &.Component_Homepage_PodcastController .icon{ .component-icon(2); }
-        &.Component_Homepage_BlogController .icon{ .component-icon(2); }
-        &.Component_Homepage_ScrollerController .icon{ .component-icon(2); }
-        &.Component_Homepage_AssessController .icon{ .component-icon(2); }
-        &.Component_Homepage_CountdownController .icon{ .component-icon(2); }
-        &.Component_Homepage_ChatController .icon{ .component-icon(2); }
-        &.Component_Homepage_SurveyController .icon{ .component-icon(2); }
-        &.Component_Homepage_TwitterController .icon{ .component-icon(2); }
-        &.Component_Homepage_ClassListController .icon{ .component-icon(2); }
-        &.Component_Homepage_VideoController .icon{ .component-icon(2); }
-        &.Component_Homepage_WolframController .icon{ .component-icon(2); }
-        &.Component_Homepage_CourseInstanceController .icon{ .component-icon(2); }
-        &.Component_Homepage_CourseTaskListController .icon{ .component-icon(2); }
-        &.Component_Homepage_RubricController .icon{ .component-icon(2); }
-        &.Component_Homepage_SocialStreamController .icon{ .component-icon(2); }
-        &.Component_Homepage_EtherpadController .icon{ .component-icon(2); }
-        &.Component_Homepage_PinterestController .icon{ .component-icon(2); }
+        &.Component_Homepage_AudioController .icon{ .component-icon(0); }
+        &.Component_Homepage_BlogController .icon{ .component-icon(1); }
+        &.Component_Homepage_BreadcrumbController .icon{ .component-icon(2); }
+        &.Component_Homepage_EventListController .icon{ .component-icon(3); }
+        &.Component_Homepage_ChatController .icon{ .component-icon(4); }
+        &.Component_Homepage_ClassListController .icon{ .component-icon(5); }
+        &.Component_Homepage_TeachersController .icon{ .component-icon(6); }
+        &.Component_Homepage_ClickviewController .icon{ .component-icon(7); }
+        &.Component_Homepage_EtherpadController .icon{ .component-icon(8); }
+        &.Component_Homepage_CountdownController .icon{ .component-icon(9); }
+        &.Component_Homepage_CourseTaskListController .icon{ .component-icon(10); }
+        &.Component_Homepage_CourseInstanceController .icon{ .component-icon(11); }
+        &.Component_Homepage_DueWorkListController .icon{ .component-icon(12); }
+        &.Component_Homepage_DropBoxController .icon{ .component-icon(13); }
+        &.Component_Homepage_FileListController .icon{ .component-icon(14); }
+        &.Component_Homepage_FolderListController .icon{ .component-icon(15); }
+        &.Component_Homepage_ForumListController .icon{ .component-icon(16); }
+        &.Component_Homepage_ManagersController .icon{ .component-icon(17); }
+        &.Component_Homepage_MembersController .icon{ .component-icon(18); }
+        &.Component_Homepage_FeedController .icon{ .component-icon(19); }
+        &.Component_Homepage_ImageController .icon{ .component-icon(20); }
+        &.Component_Homepage_ImageGalleryController .icon{ .component-icon(21); }
+        &.Component_Homepage_ScrollerController .icon{ .component-icon(22); }
+        &.Component_Homepage_LinkListController .icon{ .component-icon(23); }
+        &.Component_Homepage_NewsController .icon{ .component-icon(24); }
+        &.Component_Homepage_PinterestController .icon{ .component-icon(25); }
+        &.Component_Homepage_PodcastController .icon{ .component-icon(26); }
+        &.Component_Homepage_PollController .icon{ .component-icon(27); }
+        &.Component_Homepage_AssessController .icon{ .component-icon(28); }
+        &.Component_Homepage_RandImageController .icon{ .component-icon(29); }
+        &.Component_Homepage_RSSController .icon{ .component-icon(30); }
+        &.Component_Homepage_RubricController .icon{ .component-icon(31); }
+        &.Component_Homepage_SocialStreamController .icon{ .component-icon(32); }
+        &.Component_Homepage_SurveyController .icon{ .component-icon(33); }
+        &.Component_Homepage_TextBoxController .icon{ .component-icon(34); }
+        &.Component_Homepage_HomepageTileController .icon{ .component-icon(35); }
+        &.Component_Homepage_TwitterController .icon{ .component-icon(36); }
+        &.Component_Homepage_VideoController .icon{ .component-icon(37); }
+        &.Component_Homepage_WikiController .icon{ .component-icon(38); }
+        &.Component_Homepage_WolframController .icon{ .component-icon(39); }
+
         .plus{
             background: rgba(255,255,229,0.9);
             color: #1c9e1c;
@@ -6953,6 +6970,13 @@ HOMEPAGE CUSTOMISE
     &.disabled {
         color: @dgrey;
         opacity: 0.5;
+        &:hover .icon{
+            opacity: 0.5;
+        }
+        .plus{
+            background: rgba(222,222,222,0.1);
+            text-indent: -90000px;
+        }
     }
 }
 
