@@ -77,10 +77,15 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 $person = "{$user['firstname']} {$user['lastname']} - ";
 
                 if ($user['year']) {
-                    $person .= "Year {$user['year']},";
+                    $person .= "Year {$user['year']}, ";
                 }
 
                 $person .= $user['gname'];
+
+                if ($user['synergy_id']) {
+                    $person .= ", ({$user['synergy_id']})";
+                }
+
                 $return[] = array(
                     'name' => $person,
                     'id'   => intval($user['uid']),
