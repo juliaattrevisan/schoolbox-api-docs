@@ -86,8 +86,17 @@ class CategoryMapper extends Mapper {
 			'other_key' => 'id',
 		));
 
-		$this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
+        $this->hasMap(array(
+            'column'     => 'deleted_at',
+            'property'   => 'deletedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
+
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
 		$this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+
+        $this->hasSoftDeleteDateField('deleted_at');
 	}
 
 	/**

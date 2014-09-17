@@ -12,9 +12,10 @@ namespace Schoolbox\Resource;
 use Schoolbox\Collection;
 use Schoolbox\External\Mapper;
 use Schoolbox\UserMapper;
+use Schoolbox\ISoftDeletable;
 
 
-class Category {
+class Category implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
@@ -39,6 +40,13 @@ class Category {
 	 * @var Collection
 	 */
 	protected $codes;
+
+    /**
+     * Deleted at
+     *
+     * @var
+     */
+    protected $deletedAt;
 
     /**
      *
@@ -223,9 +231,30 @@ class Category {
 
 	}
 
+    /**
+     * @param mixed $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
 	//
 	// TODO implement group type, user access joins
 //	protected $user_access;
 
-
+    /**
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+    }
 }
