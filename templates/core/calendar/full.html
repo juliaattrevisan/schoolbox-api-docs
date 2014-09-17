@@ -58,7 +58,10 @@
                 date: '{SELECTED_DAY}',
                 month: '{SELECTED_MONTH}',
                 year: '{SELECTED_YEAR}',
-                columnFormat: 'ddd d/M',
+                columnFormat: {
+                    month: 'ddd',
+                    '':    'ddd d/M'
+                },
                 defaultView: anchor || '{CALENDAR_VIEW}',
                 timeFormat: { month: 'h(:mm)tt' },
 

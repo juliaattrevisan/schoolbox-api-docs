@@ -61,7 +61,10 @@ $(document).ready(function() {
             date:  calendarDate.getDate(),
             month: calendarDate.getMonth(),
             year:  calendarDate.getFullYear(),
-            columnFormat: 'ddd d/M',
+            columnFormat: {
+                month: 'ddd',
+                '':    'ddd d/M'
+            },
             defaultView: calendarView,
             timeFormat: { month: 'h(:mm)tt' },
             events: function(start, end, callback) {
