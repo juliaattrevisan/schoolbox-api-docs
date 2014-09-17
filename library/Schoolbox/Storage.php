@@ -12,7 +12,7 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class Storage {
+class Storage implements FileInterface {
 
 	/**
 	 * @var int

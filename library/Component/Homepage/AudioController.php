@@ -36,26 +36,44 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         $this->setBlock($templateHandle, 'audio_list', 'audio_list_block');
 
-        $fileHandler = new File;
+        $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-        //
-        // WAV: no longer supported because Flash no longer supports WAV
-        // playback. Long term fix - add a transcoder.
-        $config['filter'] = array(
-            'audio/mpeg', 'audio/mpa',
-            'audio/aac', 'audio/mp4',
-//            'audio/wav', 'audio/wave', 'audio/x-wav'
+        $source = $this->getConfig('src');
+        if (empty($source)) {
+            $source = $this->getContext('id');
+        }
+
+        /* Sort order
+         */
+        $sortConfig = array(
+            'sort'    => $this->getConfig('sort'),
+            'sortdir' => $this->getConfig('sortdir'),
+            'mime'    => 'audio',
         );
 
-        $fileList = $fileHandler->getAllInCategory($this->getContext('id'), $config);
-        if (is_array($fileList)) {
+        $this->source_category_id = $source;
+
+        if ($this->getConfig('size') > 1) {
+            $this->outputList = $videoResourceMapper->findByCategory(
+                $source,
+                $sortConfig,
+                $this->getConfig('size') - 1
+            );
+        } elseif ($this->getConfig('size') == 0) {
+            $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
+        } else {
+            $this->outputList = new \Schoolbox\Collection(array());
+        }
+
+        if (count($this->outputList)) {
             $j = 0;
-            foreach ($fileList as $file) {
-                $output = array('AUDIO_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file['iconFile']),
-                    'AUDIO_URL'			=> '/send.php?id=' . $file['id'],
-                    'AUDIO_DESCRIPTION'	=> Scrub::text($file['description']),
-                    'AUDIO_COMMENT'		=> Scrub::text($file['comment']),
-                    'AUDIO_ID'			=> $file['id'],
+            foreach ($this->outputList as $file) {
+                $output = array(
+                    'AUDIO_MIME_IMAGE'	=> '',
+                    'AUDIO_URL'			=> '/send.php?id=' .$file->getFile()->getId(),
+                    'AUDIO_DESCRIPTION'	=> Scrub::text($file->getFile()->getDescription()),
+                    'AUDIO_COMMENT'		=> Scrub::text($file->getFile()->getComment()),
+                    'AUDIO_ID'			=> $file->getFile()->getId(),
                     'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
                 );
 
@@ -64,9 +82,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             }
         } else
             $this->setVar('audio_list_block', '');
-
-        if (!empty($config['url']))
-            $this->setVar('AUDIO_URL', !empty($config['url']) ? $config['url'] : '/homepage/playlist.php?categoryID=' . $this->getContext('id'));
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");

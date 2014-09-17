@@ -86,7 +86,7 @@ class ResourceVideoMapper extends Mapper {
 			FROM `{$this->getTable()}` vq
 			JOIN {$this->getJoinSQL('file','vq','f')}
 			LEFT JOIN {$fileMapper->getJoinSQL('user','f','u')}
-			WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0'
+			WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND f.mime_type like :mime
 		";
 
 		/* Sort order
@@ -111,8 +111,10 @@ class ResourceVideoMapper extends Mapper {
 			$query .= "LIMIT 0,:lim";
 		}
 
+        $mime = $options['mime'].'/%';
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(':cat',$category);
+        $statement->bindParam(':mime',$mime);
 
 		if ($limit != false) {
 			$statement->bindParam(':lim', $limit, \PDO::PARAM_INT);

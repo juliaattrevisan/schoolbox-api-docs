@@ -11,7 +11,7 @@ namespace Schoolbox;
 use Schoolbox\ConfigLoader;
 use Schoolbox\File\MimetypeMapper;
 
-class MyFile {
+class MyFile implements FileInterface {
 
 	/**
 	 * @var int
@@ -284,4 +284,13 @@ class MyFile {
 	public function getTempFileLocation() {
 		return $this->tempFileLocation;
 	}
+
+    /**
+     * Return location of file in filesystem
+     * @return string
+     */
+    public function getFileLocation()
+    {
+        return \Config::get('myfile_dir') . $this->getId() . '.dat';
+    }
 }

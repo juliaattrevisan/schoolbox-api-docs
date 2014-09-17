@@ -29,9 +29,22 @@ class ResourceVideo {
 	}
 
 
+    public function getFileLocation() {
+        if(is_readable($this->getVideoLocation())) {
+             return $this->getVideoLocation();
+        }
+        elseif(is_readable($this->getAudioLocation())) {
+            return $this->getAudioLocation();
+        }
+    }
+
 	public function getVideoLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
 	}
+
+    public function getAudioLocation() {
+        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp3';
+    }
 
 	public function getThumbnailLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
