@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment;
 
 
 use OutOfRangeException;
+use Schoolbox\IConfigLoader;
 
 class Factory {
 
@@ -31,6 +32,9 @@ class Factory {
     /** @var bool */
     protected $multi;
 
+    /** @var IConfigLoader */
+    protected $conf;
+
 
     /**
      * @param array $classmap
@@ -41,7 +45,8 @@ class Factory {
 
         $this->setSource('', '')
              ->setMimeFilter(null)
-             ->allowMulti(false);
+             ->allowMulti(false)
+             ->setConfig(null);
     }
 
     /**
@@ -80,6 +85,17 @@ class Factory {
 
 
     /**
+     * @param IConfigLoader $conf
+     * @return self
+     */
+    public function setConfig(IConfigLoader $conf)
+    {
+        $this->conf = $conf;
+        return $this;
+    }
+
+
+    /**
      * @throws OutOfRangeException
      * @return ControllerInterface
      */
@@ -95,7 +111,7 @@ class Factory {
             throw new OutOfRangeException("No controller found for " . implode(':', array($this->location, $this->source)));
         }
 
-        $controller = new $classname($this->multi, $this->mime);
+        $controller = new $classname($this->multi, $this->mime, $this->conf);
 
         if (!$controller instanceof ControllerInterface) {
             throw new OutOfRangeException("Controller does not implement ControllerInterface");

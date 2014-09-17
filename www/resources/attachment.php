@@ -40,7 +40,8 @@ $factory = new \Schoolbox\Resource\Attachment\Factory(array(
 ));
 
 $factory->allowMulti($multi)
-        ->setMimeFilter($mimeFilter);
+        ->setMimeFilter($mimeFilter)
+        ->setConfig(new \Schoolbox\Config\Loader());
 
 foreach ($factory->getMappedControllers() as $controller) {
 

@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource\Attachment\External;
 
 
+use OutOfRangeException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
 
@@ -28,12 +30,20 @@ class GoogleController extends AbstractController implements ExternalInterface {
     /** @var array  */
     protected $features = array();
 
+    /** @var string */
+    protected $gAppsApiKey;
+
+    /** @var string */
+    protected $gAppsClientId;
+
 
     /**
-     * @param bool $multi
-     * @param string $mimeFilter
+     * @param bool          $multi
+     * @param string        $mimeFilter
+     * @param IConfigLoader $conf
+     * @throws OutOfRangeException
      */
-    public function __construct($multi, $mimeFilter = null)
+    public function __construct($multi, $mimeFilter = null, $conf = null)
     {
         parent::__construct($multi, $mimeFilter);
         $this->addScope('drive.readonly')
@@ -41,6 +51,13 @@ class GoogleController extends AbstractController implements ExternalInterface {
              ->addFeature('MINE_ONLY');
 
         $this->setViewsFromMimeFilter($mimeFilter);
+
+        $this->gAppsApiKey   = $conf->get('googleapps_api_key');
+        $this->gAppsClientId = $conf->get('googleapps_client_id');
+
+        if(!($this->gAppsApiKey && $this->gAppsClientId)) {
+            throw new OutOfRangeException("Google Apps credentials not specified");
+        }
     }
 
 
@@ -89,8 +106,8 @@ class GoogleController extends AbstractController implements ExternalInterface {
         }
 
         $page->setVar(array(
-            'DEV_KEY'   => 'AIzaSyA3cpR5FFE_TN3j-gT7txu4EKpDEiXB3J0', // TODO replace dev credentials
-            'CLIENT_ID' => '430767258977-8gphor0062gte810jf8b40okpkprbmfs.apps.googleusercontent.com', // TODO replace dev credentials
+            'API_KEY'   => $this->gAppsApiKey,
+            'CLIENT_ID' => $this->gAppsClientId,
             'SCOPES'    => implode("','", array_keys($this->scopes)),
             'VIEWS'     => implode(',',   array_keys($this->views)),
             'FEATURES'  => implode(',',   array_keys($this->features)),
