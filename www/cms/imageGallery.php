@@ -33,7 +33,16 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar('FOLDER_NAME', $category['name']);
 	$this->setVar('CATEGORY_ID',	$category['id']);
 
-	$imageList = $categoryHandler->getImages($category['id']);
+    // which homepage do I return to?
+    $returnId = $category['id'];
+    if (isset($this->arg[1])
+        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
+    ) {
+        $returnId = $matches['returnId'];
+    }
+    $this->setVar('RETURN_CATEGORY_ID', $returnId);
+
+    $imageList = $categoryHandler->getImages($category['id']);
 
 	if (is_array($imageList)) {
 		foreach($imageList as $thumbnail) {
