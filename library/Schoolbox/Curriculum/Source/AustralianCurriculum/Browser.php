@@ -71,15 +71,20 @@ SPARQL
         $sparql = <<<SPARQL
 prefix asn: <http://purl.org/ASN/schema/core/>
 prefix dct: <http://purl.org/dc/terms/>
-SELECT DISTINCT ?level WHERE {
+prefix sko: <http://www.w3.org/2004/02/skos/core#>
+SELECT DISTINCT ?subject ?level ?label WHERE {
     ?subject a asn:StandardDocument .
     %s
-    { ?subject dct:educationLevel ?level . }
+    {
+        ?subject dct:educationLevel ?level .
+        OPTIONAL { ?level sko:prefLabel ?label }
+    }
 }
 SPARQL
         ;
 
-        // I wish I could join to learning level here, but I don't know how
+        // I wish I could join to learning level here, but I don't know how.
+        // The query errors out.
 
         // Did I supply a learning area?
         // Only return levels in that area.
@@ -88,7 +93,13 @@ SPARQL
             $learningAreaQuery = "?subject dct:description \"$learningArea\"@en-au";
         }
         $sparql = sprintf($sparql, $learningAreaQuery);
-        $result = $this->getClient()->query($sparql);
+        try {
+            $result = $this->getClient()->query($sparql);
+        } catch (\Exception $e) {
+            var_dump($e);
+            throw $e;
+        }
+
         return $result;
     }
 
