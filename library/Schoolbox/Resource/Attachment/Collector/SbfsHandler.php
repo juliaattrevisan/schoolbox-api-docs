@@ -44,7 +44,7 @@ class SbfsHandler implements TypeHandlerInterface {
      */
     public function matches($id)
     {
-        return substr($id, 0, 5) === 'sbfs:';
+        return substr($id, 0, 5) == 'sbfs.';
     }
 
 
@@ -56,7 +56,7 @@ class SbfsHandler implements TypeHandlerInterface {
      */
     public function fetch($id)
     {
-        $sbfsFile = $this->fileMapper->findById(substr($id, 5));
+        $sbfsFile = $this->fileMapper->findById(substr($id, 8));
 
         $pattern  = $this->conf->get('file_dir') . '/%d.dat';
         $filename = $sbfsFile->getFilename();

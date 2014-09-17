@@ -45,8 +45,8 @@ class Collector
     public function getFirst($filter = self::TYPE_ALL)
     {
         foreach (array_keys($this->source) as $index) {
-            if ($this->detectType($index) & $filter) {
-                return $this->get($index);
+            if ($result = $this->get($index, $filter)) {
+                return $result;
             }
         }
 
@@ -63,9 +63,7 @@ class Collector
         $result = array();
 
         foreach (array_keys($this->source) as $index) {
-            if ($this->detectType($index) & $filter) {
-                $result[] = $this->get($index);
-            }
+            $result[] = $this->get($index, $filter);
         }
 
         return $result;
@@ -74,13 +72,14 @@ class Collector
 
     /**
      * @param int $i
-     * @return object
+     * @param int $filter
+     * @return Storage
      */
-    protected function get($i)
+    protected function get($i, $filter = self::TYPE_ALL)
     {
         $type = $this->detectType($this->source[$i]);
 
-        if (empty($handlers[$type])) {
+        if (empty($this->handlers[$type]) || !($type & $filter)) {
             return null;
         }
 
