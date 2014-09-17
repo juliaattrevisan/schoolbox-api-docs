@@ -22,14 +22,7 @@ abstract class NavigatorController extends AbstractController {
      */
     protected function pparse(SitePage $page)
     {
-        /* Get the stuff in this node */
-        $browser = new Node(0);
-        $nodeData = $browser->render();
-
-        /* Render the stuff in this node */
-        $renderer = new NodeRenderer($page, $nodeData);
-
-        $renderer->render('BROWSER');
+        // explicitly do nothing; data is AJAX'd in
     }
 
 }
