@@ -119,6 +119,9 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function buildMessenger(Model $object, User $user, $event)
     {
+        // Ensure that object is hydrated. Why does this happen?
+        /** @var Model $object */
+        $object    = $this->mapper->findById($object->getId());
         $messenger = new Messenger();
 
         // Hydrate event owner
@@ -145,7 +148,10 @@ class Notifier extends AbstractModuleNotifier
         $messageParams = array(
             'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
             'resource' => array($object->getResource()->getName(), $resourceUrl),
-            'date'     => array($startDate->getLocal(), '/calendar/full/' . $startDate->getUsingFormat('d-m-Y') . '/' . $owner->getId()),
+            'date'     => array(
+                $startDate->getLocal(),
+                '/calendar/full/' . $startDate->getUsingFormat('d-m-Y') . '/' . $owner->getId()
+            ),
             'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
         );
         switch ($event) {
@@ -418,5 +424,4 @@ class Notifier extends AbstractModuleNotifier
     {
         return $this->buildMessenger($object, $user, 'cancelled');
     }
-
 }
