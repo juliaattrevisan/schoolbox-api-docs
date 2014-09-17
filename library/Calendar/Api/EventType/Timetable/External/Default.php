@@ -156,6 +156,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         }
                         $event->setType($eventType);
                         $event->setColour($period['color']);
+                        $event->setConnectorId($this->getConnectorId());
                         $stack->add($event);
                     }
                 }

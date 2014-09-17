@@ -218,13 +218,13 @@ function Calendar(id, bubbleId, opts) {
             // run the filter checker to show and hide the items, if it exists
             if (cal.options.filter.checkboxSelector) {
                 calendarControls.on('change', cal.options.filter.checkboxSelector, function() {
-                    cal.filters.organise(cal, ["campus", "groups"])
+                    cal.filters.organise(cal, ["campus", "groups", "sources"])
                 })
             }
 
             if (cal.options.filter.applyFiltersSelector) {
                 calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
-                    cal.filters.organise(cal, ["campus", "groups"])
+                    cal.filters.organise(cal, ["campus", "groups", "sources"])
                     calendarControls.find(cal.options.filter.boxSelector).hide()
                     $j(cal.options.filter.btnSelector).removeClass('engaged')
                     return false
@@ -242,7 +242,7 @@ function Calendar(id, bubbleId, opts) {
                 })
             }
 
-            cal.filters.organise(cal, ["campus", "groups"])
+            cal.filters.organise(cal, ["campus", "groups", "sources"])
         },
 
         organise: function(cal, filterArray, performAjax) {

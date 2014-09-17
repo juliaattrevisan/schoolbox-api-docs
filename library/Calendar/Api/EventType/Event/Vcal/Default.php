@@ -129,97 +129,90 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		$collection = new Calendar_Event_Collection();
 
-		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
-			'event_type' => 'Event',
-			'connector_class' => 'Vcal',
-			'status' => 1
-		));
-
+		$currentConfig = Calendar_Api_Config_Mapper::getInstance()->findById($this->getConnectorId());
 		$group_handler = new Group();
 		$is_superuser  = $group_handler->isSuperuser();
 
-		foreach ($allConfigs as $currentConfig) {
-			$decodedConfig = $currentConfig->decodeConfig();
+		$decodedConfig = $currentConfig->decodeConfig();
 
-			/* Check permissions - if you can view these events according to the Permissions
-			 * settings then accumulate the events. Otherwise ignore them.
-			 * (Superusers can view all events, so skip permissions on those)
+		/* Check permissions - if you can view these events according to the Permissions
+		 * settings then accumulate the events. Otherwise ignore them.
+		 * (Superusers can view all events, so skip permissions on those)
+		 */
+		if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
+
+			/* Load calendar from locker cache
+			 * Cache step 1: cache load of VCAL file from URL
 			 */
-			if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
+			$cache = new Calendar_Api_Cache();
+			$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+			/* Parse it all
+			 */
+			try {
+				// Cache step 2: Expand VCAL into event collection.
+				// The expanded events depend on the start and end time, not
+				// just the VCAL file.
+				$serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
+					'vcal.'.$decodedConfig->getUrl(),
+					function($params) {
+						list($source, $startTimestamp, $endTimestamp) = $params;
+                        // You provided UTF-16? Proceed to UTF-8
+                        if(preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
+                            $source = mb_convert_encoding($source, 'UTF-8', 'UTF-16');
+                        }
+                        else {
+                            // Just remove UTF8 BOM if it exists
+                            $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
+                        }
 
-				/* Load calendar from locker cache
-				 * Cache step 1: cache load of VCAL file from URL
-				 */
-				$cache = new Calendar_Api_Cache();
-				$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
-				/* Parse it all
-				 */
-				try {
-					// Cache step 2: Expand VCAL into event collection.
-					// The expanded events depend on the start and end time, not
-					// just the VCAL file.
-					$serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
-						'vcal.'.$decodedConfig->getUrl(),
-						function($params) {
-							list($source, $startTimestamp, $endTimestamp) = $params;
-                            // You provided UTF-16? Proceed to UTF-8
-                            if(preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
-                                $source = mb_convert_encoding($source, 'UTF-8', 'UTF-16');
-                            }
-                            else {
-                                // Just remove UTF8 BOM if it exists
-                                $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
-                            }
-
-							$allEvents = Sabre\VObject\Reader::read(
-								$source, Sabre\VObject\Reader::OPTION_FORGIVING
+						$allEvents = Sabre\VObject\Reader::read(
+							$source, Sabre\VObject\Reader::OPTION_FORGIVING
+						);
+						if ($startTimestamp && $endTimestamp) {
+							$allEvents->expand(
+								new DateTime('@'.$startTimestamp),
+								new DateTime('@'.$endTimestamp)
 							);
-							if ($startTimestamp && $endTimestamp) {
-								$allEvents->expand(
-									new DateTime('@'.$startTimestamp),
-									new DateTime('@'.$endTimestamp)
-								);
-							}
-							return serialize($allEvents);
-						},
-						array($source, $startTimestamp, $endTimestamp),
-						$cache->getCachedTime()
-					);
-					$allEvents = unserialize($serializedEvents);
-				}
-				catch(Exception $e) {
+						}
+						return serialize($allEvents);
+					},
+					array($source, $startTimestamp, $endTimestamp),
+					$cache->getCachedTime()
+				);
+				$allEvents = unserialize($serializedEvents);
+			}
+			catch(Exception $e) {
 
-					/* Some google calendars don't follow sabre's expected format?
-					echo $decodedConfig->getUrl();
-					echo $e->getMessage();
+				/* Some google calendars don't follow sabre's expected format?
+				echo $decodedConfig->getUrl();
+				echo $e->getMessage();
+				 */
+			}
+
+			if ($allEvents !== null) {
+				foreach($allEvents->children as $currentEvent) {
+
+					/*
+					 * $currentEvent \Sabre\VObject\Component\VEvent
 					 */
-				}
 
-				if ($allEvents !== null) {
-					foreach($allEvents->children as $currentEvent) {
-
-						/*
-						 * $currentEvent \Sabre\VObject\Component\VEvent
-						 */
-
-						/* gloop returns a whole bunch of stuff all mixed up
-						 *
-						 * We only want to deal with Sabre\VObject\Component\VEvent objects
-						 * as they seem to be the calendar items themselves
-						 */
-						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-							$isAdded = true;
-							if (is_callable($filterFunction)) {
-								$isAdded = $filterFunction($currentEvent, $decodedConfig);
-							}
-							if ($isAdded) {
-								$collection->add(
-									$this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
-								);
-							}
-							if (isset($limit) && $collection->getCount() >= $limit) {
-								return $collection;
-							}
+					/* gloop returns a whole bunch of stuff all mixed up
+					 *
+					 * We only want to deal with Sabre\VObject\Component\VEvent objects
+					 * as they seem to be the calendar items themselves
+					 */
+					if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
+						$isAdded = true;
+						if (is_callable($filterFunction)) {
+							$isAdded = $filterFunction($currentEvent, $decodedConfig);
+						}
+						if ($isAdded) {
+							$collection->add(
+								$this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
+							);
+						}
+						if (isset($limit) && $collection->getCount() >= $limit) {
+							return $collection;
 						}
 					}
 				}
@@ -301,6 +294,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		/* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
+		 * (and also filter by event source on main calendar)
 		 */
 		$event->setConnectorId($this->getConnectorId());
 

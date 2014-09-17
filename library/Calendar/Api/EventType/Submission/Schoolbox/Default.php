@@ -91,6 +91,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
 			$event->setAuthorId($owner->getId());
 			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
+			$event->setConnectorId($this->getConnectorId());
 
 			$stack->add($event);
 		}

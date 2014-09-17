@@ -154,6 +154,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
             }
         );
 
+        foreach ($collection as $current) {
+            $current->setConnectorId($this->getConnectorId());
+        }
+
         return $collection;
     }
 

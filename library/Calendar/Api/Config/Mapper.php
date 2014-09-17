@@ -54,25 +54,15 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Return a set of unique types of config records being used
+	 * Return a set of config records being used
+	 *
+	 * Un-uniqueified because this was ramming all vCal sources into the same
+	 * connector, and they should be unique (for filtering by source).
 	 *
 	 * @return \Schoolbox\Collection
 	 */
 	public function getAllConfigRecords() {
-		$query = "
-			SELECT *, CONCAT(event_type, '_', connector_class) AS unified
-			FROM `{$this->table}`
-			WHERE status = 1
-			GROUP BY unified
-		";
-
-		$statement = $this->database->prepare($query);
-
-		$statement->execute();
-
-		$rowset = $statement->fetchAll();
-
-		return $this->hydrateList($rowset);
+		return $this->findByColumn('status', 1);
 	}
 
 	/**

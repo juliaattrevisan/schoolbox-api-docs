@@ -147,6 +147,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                     $event->setCategoryName($categoryList[$categoryCode]->getName());
                 }
 //                $event->setColour($period['color']);
+                $event->setConnectorId($this->getConnectorId());
                 $stack->add($event);
             }
 
