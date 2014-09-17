@@ -305,8 +305,7 @@ setupCustomise = {
                 $j('input[data-colorpicker]').each(function() {
                     $j(this).spectrum('set', defaults[this.id])
                 })
-                resetColours(['.top', '.left' ,'.right']);
-
+                resetColours(['.top', '.left' ,'.right'], defaults);
                 // copy values from defaults into pickers
                 pickers = $j.extend({}, pickers, defaults);
 			});
@@ -346,17 +345,12 @@ setupCustomise = {
 			}
 
 			$j('#cancel').click(function() {
-				$j('.colorBox').each(function () {
-					$j(this).css('background-color', original[$j(this).attr('id')]);
-				});
-
-				$j('.text, .dark, h2:not(.hide), a, p').each(function () {
-                      $j(this).removeAttr("style");
-                });
-
+                $j('input[data-colorpicker]').each(function() {
+                    $j(this).spectrum('set', original[this.id])
+                })
+                resetColours(['.top', '.left' ,'.right'], original);
                 // copy values from original into pickers
                 pickers = $j.extend({}, pickers, original);
-
 			});
 
 
