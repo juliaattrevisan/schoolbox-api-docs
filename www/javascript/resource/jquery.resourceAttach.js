@@ -254,6 +254,10 @@
             }
         });
 
+        this.modal.on('click', '.cancel[role=button]', function (e) {
+            window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
+        });
+
         $(this.element).on('click', this.options.trigger, function (e) {
             self.open();
         });

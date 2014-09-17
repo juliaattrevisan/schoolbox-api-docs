@@ -8,10 +8,6 @@
             abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
             abUploadCancelBtn = abUploadControls.children('a.cancel');
 
-        abUploadCancelBtn.one('click', function () {
-            window.top.postMessage(JSON.stringify({data: []}), location.origin);
-        });
-
         abUploadForm.dropzone({
             paramName: 'upload',
             dictDefaultMessage: 'Click or drag here to upload',
@@ -129,7 +125,7 @@
     });
 </script>
 
-<div id="ab-upload">
+<div id="ab-upload" class="ab-pane">
   <form class="dzone" action="/storage/asyncUpload">
     <div class="dz-default"><span>Click or drag here to upload</span></div>
   </form>
