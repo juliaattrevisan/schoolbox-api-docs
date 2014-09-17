@@ -19,45 +19,49 @@ $.fn.greenerize = function(options) {
         triggerChange: false
     };
     var settings = $.extend({}, defaults, options);
-    var self     = this;
 
-    if (settings.applyClasses) {
-        this.find(':checkbox').each(function () {
-            if ($(this).is(':checked')) {
-                $(this).parent().addClass('active-checkbox');
-            }
-        });
+    // Set up greenerizing on each greenerized list independently. How green!
+    this.each(function() {
+        var self = $(this);
+        if (settings.applyClasses) {
+            self.find(':checkbox').each(function () {
+                if ($(this).is(':checked')) {
+                    $(this).parent().addClass('active-checkbox');
+                }
+            });
 
-        this.find(':checkbox').click(function () {
-            if ($(this).parent().hasClass('active-checkbox')) {
-                $(this).parent().removeClass('active-checkbox')
-                if ($(this).closest('.checkboxes').find('.select_all').is(':checked')) {
-                    $(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+            this.find(':checkbox').click(function () {
+                if ($(this).parent().hasClass('active-checkbox')) {
+                    $(this).parent().removeClass('active-checkbox')
+                    if ($(this).closest('.checkboxes').find('.select_all').is(':checked')) {
+                        $(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+                    }
+                }
+                else {
+                    $(this).parent().addClass('active-checkbox');
+                }
+            });
+        }
+
+        self.find('.select_all').change(function(){
+            var element    = $(this);
+            var checkboxes = element.closest('.checkboxes').find(':checkbox').not('.select_all')
+            if (element.is(':checked')) {
+                checkboxes.prop('checked', true);
+                self.trigger('greenerizeChange', [element, checkboxes]);
+                if (settings.applyClasses) {
+                    checkboxes.parent().addClass('active-checkbox');
+                }
+            } else {
+                checkboxes.prop('checked', false);
+                self.trigger('greenerizeChange', [element, checkboxes]);
+                if (settings.applyClasses) {
+                    checkboxes.parent().removeClass('active-checkbox');
                 }
             }
-            else {
-                $(this).parent().addClass('active-checkbox');
-            }
         });
-    }
+    })
 
-    this.find('.select_all').change(function(){
-        var element    = $(this);
-        var checkboxes = element.closest('.checkboxes').find(':checkbox').not('.select_all')
-        if (element.is(':checked')) {
-            checkboxes.prop('checked', true);
-            self.trigger('greenerizeChange', [element, checkboxes]);
-            if (settings.applyClasses) {
-                checkboxes.parent().addClass('active-checkbox');
-            }
-        } else {
-            checkboxes.prop('checked', false);
-            self.trigger('greenerizeChange', [element, checkboxes]);
-            if (settings.applyClasses) {
-                checkboxes.parent().removeClass('active-checkbox');
-            }
-        }
-    });
     return this;
 }
 })(jQuery);
