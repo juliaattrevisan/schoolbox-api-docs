@@ -131,7 +131,7 @@ setupCustomise = {
 					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left'), $j('div.bottom')]);
 							$j(this).animate({opacity:1}, 300);
 							/*
 							* When a new component is added in we need it to
@@ -439,18 +439,25 @@ setupCustomise = {
 					}
 				});
 
+                $j('.homepage div.bottom').children('div.box').each(function () {
+                    if ($j(this).attr('id') != undefined) {
+                        top += $j(this).attr('id').substring(9) + ',';
+                    }
+                });
+
 				var data = {
 					type: 'components',
 					column1: left,
 					column2: right,
-					column3: top
+					column3: top,
+                    column4: bottom
 				}
 
 				data[setupCustomise.key] = setupCustomise.id;
 
 				$j.post(setupCustomise.ajaxURL, data);
 
-				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
+				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'),  $j('.homepage div.bottom')])
 
 				// Reapply colors as well.
 				$.each(pickers, function(element, color) {
