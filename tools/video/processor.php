@@ -50,7 +50,7 @@ foreach ($pendingQueue as $vid) {
 	$file_id = $vid->getFileID();
 
 	/* Update video to indicate processing has begun */
-	echo strftime("[%F %T] Starting process of video #$file_id\n");
+	echo strftime("[%F %T] Starting process of media #$file_id\n");
 	$vid->setStatus(QueueMapper::STATUS_PROCESSING);
 	$mapper->save($vid);
 
@@ -68,11 +68,11 @@ foreach ($pendingQueue as $vid) {
 	}
 
 	if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
-		fwrite(STDERR, strftime("[%F %T] ERROR: process of video #$file_id failed\n"));
+		fwrite(STDERR, strftime("[%F %T] ERROR: process of media #$file_id failed\n"));
 		$failed++;
 	}
 	else {
-		echo strftime("[%F %T] process of video #$file_id completed\n");
+		echo strftime("[%F %T] process of media #$file_id completed\n");
 		$success++;
 	}
 

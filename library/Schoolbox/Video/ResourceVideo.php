@@ -33,6 +33,10 @@ class ResourceVideo {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
 	}
 
+    public function getAudioLocation() {
+        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp3';
+    }
+
 	public function getThumbnailLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
 	}

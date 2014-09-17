@@ -61,7 +61,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
          */
         $sortConfig = array(
             'sort'    => $this->getConfig('sort'),
-            'sortdir' => $this->getConfig('sortdir')
+            'sortdir' => $this->getConfig('sortdir'),
+            'mime'    => 'video',
         );
 
         $this->source_category_id = $source;

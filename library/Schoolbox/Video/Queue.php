@@ -53,13 +53,13 @@ class Queue extends ResourceVideo
      */
     public function process()
     {
-        $sourceFile = $this->sourceFile();
+        $sourceFile = $this->getSourceFile();
 
         if(stristr($sourceFile->getMime(),'audio/')){
-            $this->processAudio($this->sourceLocation($sourceFile));
+            return $this->processAudio($this->getSourceLocation($sourceFile));
         }
-        else if(stristre($sourceFile->getMime(), 'video/')){
-            $this->processVideo($this->sourceLocation($sourceFile));
+        else if(stristr($sourceFile->getMime(), 'video/')){
+            return $this->processVideo($this->getSourceLocation($sourceFile));
         }
 
     }
@@ -74,7 +74,9 @@ class Queue extends ResourceVideo
     {
         $executable = $this->getConverterExecutable();
 
-        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 128k -ar:a 44100';
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 128k -ar:a 44100'
+            . ' -timelimit ' . escapeshellarg($this->config->get('video_processing_timeout')) . ' '
+            . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
         $this->setMessage(implode("\n", $message));
@@ -88,7 +90,11 @@ class Queue extends ResourceVideo
             $this->setDuration($duration);
         }
 
-        return true;
+        if ($return == 0) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
