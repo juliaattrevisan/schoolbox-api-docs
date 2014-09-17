@@ -56,10 +56,11 @@ class Node
      * $nodeId is the primary key of the category whose contents
      * you wish to present
      *
-     * @param $nodeId
+     * @param int $nodeId
+     * @param string $mimeFilter
      * @throws Exception
      */
-    public function __construct($nodeId)
+    public function __construct($nodeId, $mimeFilter = null)
     {
         if (is_numeric($nodeId)) {
             $this->setNodeId($nodeId);
@@ -72,7 +73,7 @@ class Node
             }
 
 
-            $this->processNode();
+            $this->processNode($mimeFilter);
         }
     }
 
@@ -97,12 +98,14 @@ class Node
 
     /**
      * Combine the categories and files into a single list
+     *
+     * @param string $mimeFilter
      */
-    protected function processNode()
+    protected function processNode($mimeFilter = null)
     {
         $output = array(
             'breadcrumbs' => array_reverse($this->getBreadcrumbs()),
-            'records'     => array_merge($this->getCategories(), $this->getFiles()),
+            'records'     => array_merge($this->getCategories(), $this->getFiles($mimeFilter)),
         );
 
         $this->setResult($output);
@@ -173,9 +176,10 @@ class Node
     /**
      * Get all the files for a particular category
      *
+     * @param string $mimeFilter
      * @return array
      */
-    protected function getFiles()
+    protected function getFiles($mimeFilter = null)
     {
         $output = array();
 
@@ -187,8 +191,14 @@ class Node
             return $output;
         }
 
+        $options = array();
+
+        if ($mimeFilter) {
+            $options['mime'] = $mimeFilter;
+        }
+
         /** @var Collection|File[] $allFiles */
-        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId());
+        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), $options);
 
         foreach ($allFiles as $currentFile) {
 

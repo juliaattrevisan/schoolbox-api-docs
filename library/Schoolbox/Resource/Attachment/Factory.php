@@ -45,8 +45,7 @@ class Factory {
 
         $this->setSource('', '')
              ->setMimeFilter(null)
-             ->allowMulti(false)
-             ->setConfig(null);
+             ->allowMulti(false);
     }
 
     /**

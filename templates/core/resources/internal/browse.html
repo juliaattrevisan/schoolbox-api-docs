@@ -1,3 +1,4 @@
+<script type="application/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
 <script type="application/javascript">
   // -_-
   var socialstreamSession = { categoryId: 0 };
@@ -7,6 +8,7 @@
   $(function () {
       $('#ab-browse').socialstreamBrowser({
           modal: false,
+          mimeFilter: {MIME_FILTER},
           submitCallback: function (url, filename, meta) {
               var data = [{
                 title:    $(filename).text(),

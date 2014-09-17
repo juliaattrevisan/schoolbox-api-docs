@@ -64,7 +64,11 @@ if (socialstreamSession === undefined) {
 
                 /* If the thing should be loaded into a dialog or not
                  */
-                modal: true
+                modal: true,
+
+                /* An optional mime to be filtering on
+                 */
+                mimeFilter: null
 			};
 
 			/* Type casting
@@ -109,7 +113,8 @@ if (socialstreamSession === undefined) {
 			/* The thing you clicked on
 			 */
 			var args = {
-				relationID: node
+				relationID: node,
+                mimeFilter: config.mimeFilter
 			};
 
 			/* Remember where we left off and reopen from here

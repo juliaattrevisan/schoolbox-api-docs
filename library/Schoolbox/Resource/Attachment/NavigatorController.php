@@ -22,7 +22,7 @@ abstract class NavigatorController extends AbstractController {
      */
     protected function pparse(SitePage $page)
     {
-        // explicitly do nothing; data is AJAX'd in
+        $page->setVar('MIME_FILTER', is_null($this->mimeFilter) ? 'null' : "'{$this->mimeFilter}'");
     }
 
 }
