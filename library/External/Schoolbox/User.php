@@ -103,9 +103,9 @@ class External_Schoolbox_User implements External_UserInterface
                             '' AS StudentSpecialNeedsFlag,
                             '' AS AlertMessage,
                             '' AS StudentBoarder
-                        FROM `USER`
-                        LEFT JOIN user_profile ON USER.id = user_profile.user_id
-                        WHERE USER.synergy_id = :externalUserId
+                        FROM `user`
+                        LEFT JOIN user_profile ON user.id = user_profile.user_id
+                        WHERE user.synergy_id = :externalUserId
                     "
         );
         $statement->execute(
@@ -158,9 +158,9 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
                             pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
-                        FROM `USER` child
+                        FROM `user` child
                         INNER JOIN user_relation ur ON child.id = ur.relation_id
-                        INNER JOIN `USER` parent ON ur.user_id = parent.id
+                        INNER JOIN `user` parent ON ur.user_id = parent.id
                         LEFT JOIN user_profile pp ON `parent`.id = pp.user_id
                         WHERE child.synergy_id = :externalUserId
                     "
