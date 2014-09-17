@@ -74,7 +74,7 @@ class Queue extends ResourceVideo
     {
         $executable = $this->getConverterExecutable();
 
-        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 128k -ar:a 44100'
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 96k -ar:a 44100'
             . ' -timelimit ' . escapeshellarg($this->config->get('video_processing_timeout')) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 

@@ -48,7 +48,12 @@ if (isset($type) && isset($id)) {
 	ini_set('zlib.output_compression', 0);
 	apache_setenv('no-gzip', 1);
 
-	$filename = $video->getVideoLocation();
+    if(is_readable($video->getVideoLocation())) {
+	    $filename = $video->getVideoLocation();
+    }
+    elseif(is_readable($video->getAudioLocation())) {
+        $filename = $video->getAudioLocation();
+    }
 
 	$fileHandler->logAction($id, 'access');
 
