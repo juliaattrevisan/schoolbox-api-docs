@@ -6559,6 +6559,7 @@ COLOUR ADJUSTMENT BOX
 
 .colours {
     float: left;
+    width:  29%;
     height: 350px;
     position: relative;
     zoom: 1;
@@ -6820,6 +6821,7 @@ HOMEPAGE CUSTOMISE
     .customise-components{
         overflow: hidden;
         border: 1px solid transparent;
+        background: none;
         border-radius: 0;
         box-sizing: border-box;
         padding: 0px 15px;
@@ -6828,6 +6830,7 @@ HOMEPAGE CUSTOMISE
         &.open{
             border: 1px solid @std-grey;
             padding: 15px;
+            background-color: @dark;
             //display: block;
         	max-height: 500px;
         	-webkit-transition: all 1s cubic-bezier(.10, .10, .25, .90);
@@ -6839,7 +6842,8 @@ HOMEPAGE CUSTOMISE
 /*CUSTOMISE COMPONENT*/
 
 .column-colours{
-    width: 70%;
+    width: 69%;
+    float: left;
     .columns{
         background: lighten(@lgrey,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
         border: 1px solid @lgrey;
@@ -10760,7 +10764,6 @@ table img { max-width: none; }
 .blog-comments .box,
 .post-left,
 #category,
-#tabs-homepage .customise-components,
 .mark-sheet.assessments .dark td,
 .search-item:nth-child(2n){
 	background: none repeat scroll 0 0 @dark;

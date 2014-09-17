@@ -139,7 +139,6 @@
 <!-- END custom_head -->
 
 <h1><span>{HEADING}</span></h1>
-
 <!-- BEGIN edit_page -->
     <ul class="homepage-controls clearfix">
         <li>
@@ -263,8 +262,7 @@
         <a href="#" id="right" class="columns left-right">Right</a>
         <a href="#" id="bottom" class="columns left-right">Bottom</a>
     </div>
-    <div class="colours topColumn">
-        <h3>Top Column</h3>
+    <div class="colours">
         <div class="colours-split top-split">
             <h3>Heading</h3>
             <div class="colour clearfix">
@@ -306,6 +304,7 @@
                 <p>Link Hover</p>
             </div>
         </div>
+        <!--
         <div class="colours-buttons">
             <form method="POST" action="" name="saveColours">
                 <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
@@ -313,29 +312,26 @@
                 <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
             </form>
             <div class="saved-colours">Saved colour set!</div>
-        </div>
+        </div> -->
     </div>
+    <div style="clear:both;">
+        <form method="POST" action="" >
+            <p class="information-notification pad-it ">In order to adjust the
+                widths of the left and right columns on the page, drag the slider
+                below left and right. </p>
+            <div class="clearfix slide-guide">
+                <h3>Column width slider</h3>
+                <div class="slider-house">
+                    <div id="slider"></div>
+                </div>
+            </div>
+            <div class="saved-layout">Saved layout</div>
+
+        </form>
+    </div>
+    <div class="clearfix"></div>
 </div>
 <!-- END homepage_color_selector -->
-
-
-<!--/tabs-2-->
-<div id="tabs-3" class="customise-components layouts">
-    <form method="POST" action="" >
-        <p class="information-notification pad-it ">In order to adjust the
-            widths of the left and right columns on the page, drag the slider
-            below left and right. </p>
-        <div class="clearfix slide-guide">
-            <h3>Column width slider</h3>
-            <div class="slider-house">
-                <div id="slider"></div>
-            </div>
-        </div>
-        <div class="saved-layout">Saved layout</div>
-
-    </form>
-</div>
-<!--/tabs-3-->
 </div>
 <!-- END customise_page -->
 
