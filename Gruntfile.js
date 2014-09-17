@@ -78,22 +78,6 @@ module.exports = function(grunt) {
                         cwd: 'www/javascript/components/jquery.ui/'
                     }
                 }
-            },
-            "videojs.install": {
-                command: 'npm install',
-                options: {
-                    execOptions: {
-                        cwd: 'www/javascript/components/video.js/'
-                    }
-                }
-            },
-            "videojs.build": {
-                command: 'grunt',
-                options: {
-                    execOptions: {
-                        cwd: 'www/javascript/components/video.js/'
-                    }
-                }
             }
         },
         uglify: {
@@ -145,8 +129,7 @@ module.exports = function(grunt) {
 
     // Build tasks
     grunt.registerTask('build.deps', [
-        'shell:jqueryui.install', 'shell:jqueryui.build',
-        'shell:videojs.install', 'shell:videojs.build'
+        'shell:jqueryui.install', 'shell:jqueryui.build'
     ]);
     grunt.registerTask('build.js',   ['uglify']);
     grunt.registerTask('build.css', 'Builds CSS (build.css:$skin builds for $skin only)', function(skin) {
