@@ -302,16 +302,13 @@ setupCustomise = {
 			});
 
 			$j('#restore').click(function() {
-				$j('.colorBox').each(function () {
-					$j(this).css('background-color', defaults[$j(this).attr('id')]);
-				});
-
+                $j('input[data-colorpicker]').each(function() {
+                    $j(this).spectrum('set', defaults[this.id])
+                })
                 resetColours(['.top', '.left' ,'.right']);
 
                 // copy values from defaults into pickers
                 pickers = $j.extend({}, pickers, defaults);
-
-
 			});
 
 			function resetColours(area, colours) {
