@@ -4,10 +4,6 @@
 
 		var config = init(options, this);
 
-		/* All checkboxes on by default
-		 */
-		applyDefaultCheckboxState();
-
 		applyPopupToggle();
 		applyCheckboxToggle();
 

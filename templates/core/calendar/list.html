@@ -103,7 +103,7 @@
 							<select name="campus">
 								<option value="">-- select --</option>
 								<!-- BEGIN export_campus -->
-								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}" >{EXPORT_CAMPUS_NAME}</option>
 								<!-- END export_campus -->
 							</select>
 						</label>
@@ -131,18 +131,18 @@
 					<form class="clearfix">
 						<div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox applyFilters"/>Select all
+								<input type="checkbox" class="select_all checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_source -->
 							<label title="{SOURCE_NAME}">
-								<input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
-								{SOURCE_NAME}
+                                <input type="checkbox" name="source" id="{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="checkbox applyFilters"/>
+                                {SOURCE_NAME}
 							</label>
 							<!-- END filter_source -->
 						</div>
 						<div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox"/>Select all
+								<input type="checkbox" class="select_all checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_group -->
 							<label title="{GROUP_NAME}">
@@ -153,7 +153,7 @@
 						</div>
 						<div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox"/>Select all
+								<input type="checkbox" class="select_all checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_campus -->
 							<label title="{CAMPUS_NAME}">
@@ -164,7 +164,7 @@
 						</div>
 						<div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox"/>Select all
+								<input type="checkbox" class="select_all checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_event_type -->
 							<label title="{EVENT_TYPE_NAME}">

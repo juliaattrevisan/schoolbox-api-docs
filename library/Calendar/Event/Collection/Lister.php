@@ -85,13 +85,63 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             $this->getPage()->parse('has_no_events_block', 'has_no_events');
         }
 
-        /* Render everything else out
-         */
+
+
         $groupHandler = new Group();
         $category_list = $groupHandler->involvedInCategoryList($this->getUser()->getId());
 
         $calendarHandler = new Calendar();
         $campus_list = $calendarHandler->getFilterCampusList($this->getUser()->getId());
+
+        /* Render everything else out
+         */
+        // Load sources
+        $configs       = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $sourceList    = $configs->map(
+            function ($record) {
+                /** @var Calendar_Api_Config_Record $record */
+                return array(
+                    'id'   => $record->getId(),
+                    'name' => sprintf(
+                        "%s: %s",
+                        $record->getConnectorClass(),
+                        $record->getEventType()
+                    )
+                );
+            }
+        )->getAll();
+
+        if (isset($_SESSION['calendarFilter'])) {
+            $selected['group'] = $_SESSION['calendarFilter']['groups'];
+            $selected['campus'] = $_SESSION['calendarFilter']['campus'];
+            $selected['event_type'] = $_SESSION['calendarFilter']['events'];
+            $selected['source'] = $_SESSION['calendarFilter']['sources'];
+        }
+        else {
+            // select all groups
+            if (count($category_list)) {
+                foreach($category_list as $cat) {
+                    $selected['group'][] = $cat['id'];
+                }
+            }
+
+            // select all campuses
+            $selected['campus'] = $_SESSION['campus'];
+
+            // select all types
+            $typeList = $this->getCalendarHandler()->getTypeList();
+
+            if (count($typeList)) {
+                foreach($typeList as $type) {
+                    $selected['event_type'][] = $type['eventTypeID'];
+                }
+            }
+
+            // select all sources
+            foreach ($sourceList as $source) {
+                $selected['source'][] = $source['id'];
+            }
+        }
 
         $this->getPage()->dropDown(
             'export_group',
@@ -111,21 +161,29 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         $this->getPage()->checkList(
             'filter_group',
             $category_list,
-            null,
+            $selected['group'],
             TEMPLATE_content,
             array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
+        );
+        // Might need special PHPLibs here
+        $this->getPage()->checkList(
+            'filter_source',
+            $sourceList,
+            $selected['source'],
+            TEMPLATE_content,
+            array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
         );
         $this->getPage()->checkList(
             'filter_campus',
             $campus_list,
-            null,
+            $selected['campus'],
             TEMPLATE_content,
             array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
         );
         $this->getPage()->checkList(
             'filter_event_type',
             $calendarHandler->getTypeList(),
-            null,
+            $selected['event_type'],
             TEMPLATE_content,
             array(
                 'eventType' => 'EVENT_TYPE_NAME',

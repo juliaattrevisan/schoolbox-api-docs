@@ -49,7 +49,6 @@ $this->setVar(
     )
 );
 
-$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $finish->getUnixTimestamp(
-), $this, $user);
+$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $finish->getUnixTimestamp(), $this, $user);
 $calendar->renderAll();
 
