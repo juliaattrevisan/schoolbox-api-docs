@@ -95,6 +95,20 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
 
+    //Setup control buttons
+    $manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
+    $manageFolderController->setup($category, array());
+    $manageFolderController->execute();
+    $manageFolderController->renderTemplate('edit_page_block');
+
+    //Setup class list buttons
+    $manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
+    $manageClassController->setup($category, array());
+    $manageClassController->execute();
+    $manageClassController->renderTemplate('edit_page_block');
+
+
+
     if (Cfg::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
     } else {
@@ -360,7 +374,7 @@ foreach ($componentCollection as $component) {
     }
 }
 
-$emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+$emptyPositionList = array_diff(array('top', 'left', 'right','bottom'), $occupiedPositionList);
 
 foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("component_position_{$emptyPosition}", '');

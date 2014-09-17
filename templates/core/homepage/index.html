@@ -210,8 +210,12 @@
                         </a>
                         <!-- END unsubscribed -->
                     <li class="status-header">Manage Class</li>
-                    <a href="/subject/classList/EN344" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
-                    <a href="/submission/markSheet/43" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Class Mark Sheet</span></a>
+                    <!-- BEGIN class_list -->
+                    <a href="/subject/classList/{CODE}" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
+                    <!-- END class_list -->
+                    <!-- BEGIN class_mark -->
+                    <a href="/submission/markSheet/{ID}" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Class Mark Sheet</span></a>
+                    <!-- END class_mark -->
                     </li>
                 </ul>
             </div>
@@ -222,7 +226,7 @@
         <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-2"><span></span></a></li>
     </ul>
 
-    <!-- END edit_page -->
+<!-- END edit_page -->
 
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
