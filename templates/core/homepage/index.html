@@ -28,7 +28,7 @@
 
         /* If a column is empty, insert placeholder into the space where you can drag components to.
          */
-        setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')]);
+        setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'), $j('.homepage div.bottom')]);
 
         /* setup the ability to sort components, drag them around across columns.
          */
@@ -138,230 +138,210 @@
 </script>
 <!-- END custom_head -->
 
-<h1> <span>{HEADING}</span>
-    <!-- BEGIN edit_page -->
-    <a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a>
-    <!-- END edit_page -->
-</h1>
+<h1><span>{HEADING}</span></h1>
+
+    <ul class="homepage-controls clearfix">
+        <!-- BEGIN page_controls -->
+        <li>
+        <span class="booking-controls">
+            <div class="status-selector">
+                <a href="#" class="btn homepage-overflow no-text"><span></span></a>
+
+                <ul class="status-buttons">
+                    <li class="status-header">Folder Actions</li>
+                    <li>
+                        <!-- BEGIN stats_data -->
+                        <a href="/cms/category/{ID}" class="status-option">
+                            <span class="btn modify"><span></span></span>
+                            <span class="status-label">Modify Folder</span>
+                        </a>
+                        <!-- END stats_data -->
+                    </li>
+                    <li>
+                        <!-- BEGIN manage_page -->
+                        <a href="/group/modify/{ID}" class="status-option">
+                            <span class="btn groups"><span></span></span>
+                            <span class="status-label">Manage Group</span>
+                        </a>
+                        <!-- END manage_page -->
+                    </li>
+                    <li>
+                        <!-- BEGIN addmylinks -->
+                        <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="status-option">
+                            <span class="btn add"><span></span></span>
+                            <span class="status-label">Add to My Links</span>
+                        </a>
+                        <!-- END addmylinks -->
+                    </li>
+                    <li>
+                        <!-- BEGIN view_stats -->
+                        <a href="/statistics/homepage/{ID}" class="status-option">
+                            <span class="btn line-graph"><span></span></span>
+                            <span class="status-label">View Statistics</span>
+                        </a>
+                        <!-- END view_stats -->
+                    </li>
+                    <li>
+                        <a href="/resources/{ID}" class="status-option">
+                            <span class="btn folder"><span></span></span>
+                            <span class="status-label">Browse Resources</span>
+                        </a>
+                    </li>
+                    <li>
+                        <!-- BEGIN subscribedModerated -->
+                        <a href="/group/joinForm.php?leave={ID}&return=true" class="status-option">
+                            <span class="btn delete"><span></span></span>
+                            <span class="status-label">Awaiting approval</span>
+                        </a>
+                        <!-- END subscribedModerated -->
+                    </li>
+                    <li>
+                        <!-- BEGIN subscribed -->
+                        <a href="/group/joinForm.php?leave={ID}" class="status-option">
+                            <span class="btn delete"><span></span></span>
+                            <span class="status-label">Leave Group</span>
+                        </a>
+                        <!-- END subscribed -->
+                    </li>
+                    <li>
+                        <!-- BEGIN unsubscribed -->
+                        <a href="/group/joinForm.php?join={ID}&return=true" class="status-option">
+                            <span class="btn add"><span></span></span>
+                            <span class="status-label">Join Group</span>
+                        </a>
+                        <!-- END unsubscribed -->
+                    <!-- BEGIN manage_class -->
+                    <li class="status-header">Class Actions</li>
+                    <!-- BEGIN class_list -->
+                    <a href="/subject/classList/{CODE}" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
+                    <!-- END class_list -->
+                    <!-- BEGIN class_mark -->
+                    <a href="/submission/markSheet/{ID}" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Class Mark Sheet</span></a>
+                    <!-- END class_mark -->
+                    </li>
+                    <!-- END manage_class -->
+                </ul>
+            </div>
+
+        </span>
+        </li>
+        <!-- END page_controls -->
+        <!-- BEGIN edit_page -->
+        <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-1"><span></span></a></li>
+        <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-2"><span></span></a></li>
+        <!-- END edit_page -->
+    </ul>
+
+
+
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
-<ul class="clearfix">
-    <li><a href="#tabs-1">Components</a></li>
-    <!-- BEGIN homepage_color_link -->
-    <li><a href="#tabs-2">Colours</a></li>
-    <!-- END homepage_color_link -->
-    <li><a href="#tabs-3">Column Widths</a></li>
-</ul>
 <div id="tabs-1" class="customise-components">
-    <div id="tabs-sub">
-        <table border="0" cellpadding="0" cellspacing="0" class="table">
-            <colgroup>
-                <col width="128" />
-            </colgroup>
-            <tr>
-                <td valign="top"><ul class="component-categories">
-                    <!-- BEGIN homepage_component_tab -->
-                    <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-                    <!-- END homepage_component_tab -->
-                </ul></td>
-                <td><div class="components clearfix">
-                    <!-- BEGIN homepage_component_page -->
-                    <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                        <!-- BEGIN homepage_component -->
-                        <div class="add-component {HOMEPAGE_COMPONENT_CLASS} clearfix">
-                            <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
-                            <p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
-                            <span class="notification"><strong></strong>Added</span>
-                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
-
-                        </div>
-                        <!-- END homepage_component -->
-                    </div>
-                    <!-- END homepage_component_page -->
+    <div id="tabs-sub"> <!-- tabs-sub -->
+        <ul class="ui-tabs admin-nav">
+            <!-- BEGIN homepage_component_tab -->
+            <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+            <!-- END homepage_component_tab -->
+        </ul>
+        <div class="clearfix"></div>
+        <div class="components clearfix">
+            <!-- BEGIN homepage_component_page -->
+            <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                <!-- BEGIN homepage_component -->
+                <div class="add-component {HOMEPAGE_COMPONENT_MULTIPLE_STATE} clearfix">
+                    <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
+                        <span class="icon"></span>
+                        <span class="notification"><strong></strong>Added</span>
+                        <!-- <div class="plus">+</div> -->
+                        <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+                    </a>
                 </div>
-                </td>
-            </tr>
-        </table>
+                <!-- END homepage_component -->
+            </div>
+            <!-- END homepage_component_page -->
+        </div>
     </div>
 </div>
 <!--/tabs-1-->
 
 <!-- BEGIN homepage_color_selector -->
 <div id="tabs-2" class="customise-components clearfix">
-    <div class="clearfix">
-        <div class="colours topColumn clearfix">
-            <h3>Top Column</h3>
-            <div class="colours-split top-split">
-                <h3>Heading</h3>
-                <div class="colour clearfix">
-                    <div id="top_head_font" class="colorBox"></div>
-                    <input name="colors[top_head_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="top_head_bg" class="colorBox"></div>
-                    <input name="colors[top_head_bg]" type="hidden" />
-                    <p>Background</p>
-                </div>
-            </div>
-            <div class="colours-split">
-                <h3>Content</h3>
-                <div class="colour clearfix">
-                    <div id="top_bg_primary" class="colorBox"></div>
-                    <input name="colors[top_bg_primary]" type="hidden" />
-                    <p>Primary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="top_bg_secondary" class="colorBox"></div>
-                    <input name="colors[top_bg_secondary]" type="hidden" />
-                    <p>Secondary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="top_font" class="colorBox"></div>
-                    <input name="colors[top_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="top_link" class="colorBox"></div>
-                    <input name="colors[top_link]" type="hidden" />
-                    <p>Link</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="top_hover" class="colorBox"></div>
-                    <input name="colors[top_hover]" type="hidden" />
-                    <p>Link Hover</p>
-                </div>
-            </div>
-        </div>
-        <div class="colours leftColumn">
-            <h3>Left Column</h3>
-            <div class="colours-split top-split">
-                <h3>Heading</h3>
-                <div class="colour clearfix">
-                    <div id="left_head_font" class="colorBox  selected"></div>
-                    <input name="colors[left_head_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="left_head_bg" class="colorBox"></div>
-                    <input name="colors[left_head_bg]" type="hidden" />
-                    <p>Background</p>
-                </div>
-            </div>
-            <div class="colours-split ">
-                <h3>Content</h3>
-                <div class="colour clearfix">
-                    <div id="left_bg_primary" class="colorBox"></div>
-                    <input name="colors[left_bg_primary]" type="hidden" />
-                    <p>Primary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="left_bg_secondary" class="colorBox"></div>
-                    <input name="colors[left_bg_secondary]" type="hidden" />
-                    <p>Secondary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="left_font" class="colorBox"></div>
-                    <input name="colors[left_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="left_link" class="colorBox"></div>
-                    <input name="colors[left_link]" type="hidden" />
-                    <p>Link</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="left_hover" class="colorBox"></div>
-                    <input name="colors[left_hover]" type="hidden" />
-                    <p>Link Hover</p>
-                </div>
-            </div>
-        </div>
-        <div class="colours clearfix">
-            <h3>Right Column</h3>
-            <div class="colours-split top-split">
-                <h3>Heading</h3>
-                <div class="colour clearfix">
-                    <div id="right_head_font" class="colorBox"></div>
-                    <input name="colors[right_head_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="right_head_bg" class="colorBox"></div>
-                    <input name="colors[right_head_bg]" type="hidden" />
-                    <p>Background</p>
-                </div>
-            </div>
-            <div class="colours-split">
-                <h3>Content</h3>
-                <div class="colour clearfix">
-                    <div id="right_bg_primary" class="colorBox"></div>
-                    <input name="colors[right_bg_primary]" type="hidden" />
-                    <p>Primary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="right_bg_secondary" class="colorBox"></div>
-                    <input name="colors[right_bg_secondary]" type="hidden" />
-                    <p>Secondary Background</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="right_font" class="colorBox"></div>
-                    <input name="colors[right_font]" type="hidden" />
-                    <p>Text</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="right_link" class="colorBox"></div>
-                    <input name="colors[right_link]" type="hidden" />
-                    <p>Link</p>
-                </div>
-                <div class="colour clearfix">
-                    <div id="right_hover" class="colorBox"></div>
-                    <input name="colors[right_hover]" type="hidden" />
-                    <p>Link Hover</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="colours">
-            <div id="picker"></div>
-            <!--
-            <input type="text" id="currentColour" value="#123456" maxlength="7" class="input_text" />
-            -->
-        </div>
+    <div class="column-colours">
+        <a href="#" id="top" class="columns left-right">Top</a>
+        <a href="#" id="left" class="columns left-right">Left</a>
+        <a href="#" id="right" class="columns left-right">Right</a>
+        <a href="#" id="bottom" class="columns left-right">Bottom</a>
     </div>
-
-    <div class="colours-buttons clearfix">
-        <form method="POST" class="clearfix" action="" name="saveColours">
-
-            <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
-            <button class="submit-btn-plain" type="button" id="leftRight" >Copy top colours &gt; left &amp; right</button>
-            <button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
-            <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+    <div class="colours">
+        <div class="colours-split top-split">
+            <h3>Heading</h3>
+            <div class="colour clearfix">
+                <div id="top_head_font" class="colorBox"></div>
+                <input name="colors[top_head_font]" type="hidden" />
+                <p>Text</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_head_bg" class="colorBox"></div>
+                <input name="colors[top_head_bg]" type="hidden" />
+                <p>Background</p>
+            </div>
+        </div>
+        <div class="colours-split">
+            <h3>Content</h3>
+            <div class="colour clearfix">
+                <div id="top_bg_primary" class="colorBox"></div>
+                <input name="colors[top_bg_primary]" type="hidden" />
+                <p>Primary Background</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_bg_secondary" class="colorBox"></div>
+                <input name="colors[top_bg_secondary]" type="hidden" />
+                <p>Secondary Background</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_font" class="colorBox"></div>
+                <input name="colors[top_font]" type="hidden" />
+                <p>Text</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_link" class="colorBox"></div>
+                <input name="colors[top_link]" type="hidden" />
+                <p>Link</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_hover" class="colorBox"></div>
+                <input name="colors[top_hover]" type="hidden" />
+                <p>Link Hover</p>
+            </div>
+        </div>
+        <!--
+        <div class="colours-buttons">
+            <form method="POST" action="" name="saveColours">
+                <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
+                <button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
+                <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+            </form>
+            <div class="saved-colours">Saved colour set!</div>
+        </div> -->
+    </div>
+    <div style="clear:both;">
+        <form method="POST" action="" >
+            <p class="information-notification pad-it ">In order to adjust the
+                widths of the left and right columns on the page, drag the slider
+                below left and right. </p>
+            <div class="clearfix slide-guide">
+                <h3>Column width slider</h3>
+                <div class="slider-house">
+                    <div id="slider"></div>
+                </div>
+            </div>
+            <div class="saved-layout">Saved layout</div>
 
         </form>
-
-        <div class="saved-colours">Saved colour set!</div>
     </div>
+    <div class="clearfix"></div>
 </div>
 <!-- END homepage_color_selector -->
-
-<!--/tabs-2-->
-<div id="tabs-3" class="customise-components layouts">
-    <form method="POST" action="" >
-        <p class="information-notification pad-it ">In order to adjust the
-            widths of the left and right columns on the page, drag the slider
-            below left and right. </p>
-        <div class="clearfix slide-guide">
-            <h3>Column width slider</h3>
-            <div class="slider-house">
-                <div id="slider"></div>
-            </div>
-        </div>
-        <div class="saved-layout">Saved layout</div>
-
-    </form>
-</div>
-<!--/tabs-3-->
 </div>
 <!-- END customise_page -->
 
@@ -369,6 +349,7 @@
     <div class="top clearfix">{component_position_top}</div>
     <div class="left clearfix" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
     <div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
+    <div class="bottom clearfix">{component_position_bottom}</div>
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
 <div id="resource-browser" class="hide"></div>

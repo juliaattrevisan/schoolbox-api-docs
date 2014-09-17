@@ -78,6 +78,9 @@ $this->setTitle($category['name']);
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
+$this->setBlock(TEMPLATE_content, 'page_controls', 'page_controls_block');
+$this->setBlock('page_controls', 'manage_class', 'manage_class_block');
+
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
@@ -89,18 +92,16 @@ $componentCollection = $componentFactory->buildComponentList($categoryID);
 if ($permission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
-    $this->setBlock('customise_page', 'homepage_color_link', 'homepage_color_link_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
     $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
 
+
     if (Cfg::get('homepage_enable_colour')) {
-        $this->parse('homepage_color_link_block',     'homepage_color_link');
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
     } else {
-        $this->setVar('homepage_color_link_block', '');
         $this->setVar('homepage_color_selector_block', '');
     }
 
@@ -136,8 +137,9 @@ if ($permission >= WRITE_ACCESS) {
                 'HOMEPAGE_COMPONENT_ID' => Scrub::text($component->getId()),
                 'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->getName()),
                 'HOMEPAGE_COMPONENT_COUNT' => $component->getInstanceCount(),
-                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::html($component->getDescription()),
-                'HOMEPAGE_COMPONENT_CLASS' => $class,
+                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component->getDescription()),
+                'HOMEPAGE_COMPONENT_CLASS' => str_replace('\\','_',$component->getClass()),
+                'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->getComponentCategory(),
             );
 
@@ -242,6 +244,26 @@ if ($permission >= WRITE_ACCESS) {
         'colour_list_block' => '',
     ));
 }
+
+//Setup control buttons
+$manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
+$manageFolderController->setup($category, array());
+$manageFolderController->execute();
+$manageFolderController->renderTemplate('page_controls');
+
+//Setup class list buttons
+$manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
+$manageClassController->setup($category, array());
+$manageClassController->execute();
+if($manageClassController->renderTemplate('manage_class')){
+    $this->parse('manage_class_block', 'manage_class');
+}
+else {
+    $this->setVar('manage_class_block','');
+}
+
+$this->parse('page_controls_block','page_controls');
+
 
 //set the page-level parameters in the template
 $categoryCodes = $catHandler->getCodeForCategory($categoryID);
@@ -362,7 +384,7 @@ foreach ($componentCollection as $component) {
     }
 }
 
-$emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+$emptyPositionList = array_diff(array('top', 'left', 'right','bottom'), $occupiedPositionList);
 
 foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("component_position_{$emptyPosition}", '');

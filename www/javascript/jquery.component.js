@@ -33,15 +33,42 @@ setupCustomise = {
 		init: function() {
 			$j('#tabs-homepage').tabs();
 			$j('#tabs-sub').tabs();
-			$j('.customise').click(function(event) {
-				$j('#tabs-homepage, .empty-column').slideToggle();
-				$j(this).children('span').toggle();
-				$j('h2.hide').each(function () {
-					$j(this).toggle();
-				});
-				return false;
-			});
+//			$j('.customise').click(function(event) {
+//				$j('#tabs-homepage, .empty-column').slideToggle();
+//				$j(this).children('span').toggle();
+//				$j('h2.hide').each(function () {
+//					$j(this).toggle();
+//				});
+//				return false;
+//			});
+            $j('#tab-component').click(function() {
+                var openMe = true;
+                if($(this).hasClass('hover')) {
+                    openMe = false;
+                }
 
+                $(this).toggleClass('hover');
+                $('#tabs-homepage').children('.customise-components').removeClass('open');
+
+                if(openMe) {
+                    $('#tabs-1').addClass('open');
+                }
+                return false;
+            });
+            $j('#tab-columns').click(function() {
+                var openMe = true;
+                if($(this).hasClass('hover')) {
+                    openMe = false;
+                }
+
+                $(this).toggleClass('hover');
+                $('#tabs-homepage').children('.customise-components').removeClass('open');
+
+                if(openMe) {
+                    $('#tabs-2').addClass('open');
+                }
+                return false;
+            });
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
@@ -104,7 +131,7 @@ setupCustomise = {
 					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left'), $j('div.bottom')]);
 							$j(this).animate({opacity:1}, 300);
 							/*
 							* When a new component is added in we need it to
@@ -388,6 +415,7 @@ setupCustomise = {
 				var left = '';
 				var right = '';
 				var top = '';
+                var bottom = '';
 				$j('.homepage div.left').children('div.box').each(function () {
 
 					/* Two components in ePorfolio have no id's (My Profile, Teacher Notes)
@@ -412,18 +440,25 @@ setupCustomise = {
 					}
 				});
 
+                $j('.homepage div.bottom').children('div.box').each(function () {
+                    if ($j(this).attr('id') != undefined) {
+                        top += $j(this).attr('id').substring(9) + ',';
+                    }
+                });
+
 				var data = {
 					type: 'components',
 					column1: left,
 					column2: right,
-					column3: top
+					column3: top,
+                    column4: bottom
 				}
 
 				data[setupCustomise.key] = setupCustomise.id;
 
 				$j.post(setupCustomise.ajaxURL, data);
 
-				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
+				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'),  $j('.homepage div.bottom')])
 
 				// Reapply colors as well.
 				$.each(pickers, function(element, color) {
@@ -433,6 +468,7 @@ setupCustomise = {
 			sort: function (event, ui) {
 				var leftOffset = $j('.homepage div.left').offset();
 				var topOffset = $j('.homepage div.top').offset();
+                var bottomOffset = $j('.homepage div.bottom').offset();
 
 				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
 					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
@@ -450,7 +486,13 @@ setupCustomise = {
 					if ($j('.homepage div.top').find('.box').length == 0) {
 						ui.placeholder.appendTo($j('.homepage div.top'));
 					}
-				}
+                } else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
+                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
+                    // top bottom
+                    if ($j('.homepage div.bottom').find('.box').length == 0) {
+                        ui.placeholder.appendTo($j('.homepage div.bottom'));
+                    }
+                }
 				$j('.cal-bubble').hide();
 
 			}
