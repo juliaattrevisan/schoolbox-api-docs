@@ -415,6 +415,7 @@ setupCustomise = {
 				var left = '';
 				var right = '';
 				var top = '';
+                var bottom = '';
 				$j('.homepage div.left').children('div.box').each(function () {
 
 					/* Two components in ePorfolio have no id's (My Profile, Teacher Notes)
@@ -467,6 +468,7 @@ setupCustomise = {
 			sort: function (event, ui) {
 				var leftOffset = $j('.homepage div.left').offset();
 				var topOffset = $j('.homepage div.top').offset();
+                var bottomOffset = $j('.homepage div.bottom').offset();
 
 				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
 					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
@@ -484,7 +486,13 @@ setupCustomise = {
 					if ($j('.homepage div.top').find('.box').length == 0) {
 						ui.placeholder.appendTo($j('.homepage div.top'));
 					}
-				}
+                } else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
+                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
+                    // top bottom
+                    if ($j('.homepage div.bottom').find('.box').length == 0) {
+                        ui.placeholder.appendTo($j('.homepage div.bottom'));
+                    }
+                }
 				$j('.cal-bubble').hide();
 
 			}
