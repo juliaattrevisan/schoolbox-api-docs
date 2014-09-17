@@ -29,6 +29,15 @@ class ResourceVideo {
 	}
 
 
+    public function getFileLocation() {
+        if(is_readable($this->getVideoLocation())) {
+             return $this->getVideoLocation();
+        }
+        elseif(is_readable($this->getAudioLocation())) {
+            return $this->getAudioLocation();
+        }
+    }
+
 	public function getVideoLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
 	}
