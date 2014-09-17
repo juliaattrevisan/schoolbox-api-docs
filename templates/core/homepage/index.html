@@ -141,7 +141,6 @@
 <h1><span>{HEADING}</span></h1>
 
 <!-- BEGIN edit_page -->
-
     <ul class="homepage-controls clearfix">
         <li>
         <span class="booking-controls">
@@ -212,8 +211,8 @@
                         </a>
                         <!-- END unsubscribed -->
                     <li class="status-header">Manage Class</li>
-                    <a href="/subject/classList/EN344" class="status-option"><span class="btn report"></span><span class="status-label">Class List</span></a>
-                    <a href="/submission/markSheet/43" class="status-option"><span class="btn modify"></span><span class="status-label">Class Mark Sheet</span></a>
+                    <a href="/subject/classList/EN344" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
+                    <a href="/submission/markSheet/43" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Class Mark Sheet</span></a>
                     </li>
                 </ul>
             </div>
@@ -228,7 +227,6 @@
 
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
-
 <div id="tabs-1" class="customise-components">
     <div id="tabs-sub"> <!-- tabs-sub -->
         <ul class="ui-tabs admin-nav">
@@ -245,7 +243,7 @@
                     <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="{HOMEPAGE_COMPONENT_CLASS}" title="{HOMEPAGE_COMPONENT_DESCRIPTION}">
                         <span class="icon"></span>
                         <span class="notification"><strong></strong>Added</span>
-                        <div class="plus">+</div>
+                        <!-- <div class="plus">+</div> -->
                         <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
                     </a>
                 </div>
@@ -259,168 +257,64 @@
 
 <!-- BEGIN homepage_color_selector -->
 <div id="tabs-2" class="customise-components clearfix">
-    <div class="clearfix">
-        <div class="left">
-            <div class="column-colours">
-                <a href="#" id="top" class="columns left-right">Top</a>
-                <a href="#" id="left" class="columns left-right">Left</a>
-                <a href="#" id="right" class="columns left-right">Right</a>
-                <a href="#" id="bottom" class="columns left-right">Bottom</a>
-            </div>
-        </div>
-        <div class="right">
-            <div class="colours topColumn clearfix">
-                <h3>Top Column</h3>
-                <div class="colours-split top-split">
-                    <h3>Heading</h3>
-                    <div class="colour clearfix">
-                        <div id="top_head_font" class="colorBox"></div>
-                        <input name="colors[top_head_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="top_head_bg" class="colorBox"></div>
-                        <input name="colors[top_head_bg]" type="hidden" />
-                        <p>Background</p>
-                    </div>
-                </div>
-                <div class="colours-split">
-                    <h3>Content</h3>
-                    <div class="colour clearfix">
-                        <div id="top_bg_primary" class="colorBox"></div>
-                        <input name="colors[top_bg_primary]" type="hidden" />
-                        <p>Primary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="top_bg_secondary" class="colorBox"></div>
-                        <input name="colors[top_bg_secondary]" type="hidden" />
-                        <p>Secondary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="top_font" class="colorBox"></div>
-                        <input name="colors[top_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="top_link" class="colorBox"></div>
-                        <input name="colors[top_link]" type="hidden" />
-                        <p>Link</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="top_hover" class="colorBox"></div>
-                        <input name="colors[top_hover]" type="hidden" />
-                        <p>Link Hover</p>
-                    </div>
-                </div>
-            </div>
-            <div class="colours leftColumn">
-                <h3>Left Column</h3>
-                <div class="colours-split top-split">
-                    <h3>Heading</h3>
-                    <div class="colour clearfix">
-                        <div id="left_head_font" class="colorBox  selected"></div>
-                        <input name="colors[left_head_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="left_head_bg" class="colorBox"></div>
-                        <input name="colors[left_head_bg]" type="hidden" />
-                        <p>Background</p>
-                    </div>
-                </div>
-                <div class="colours-split ">
-                    <h3>Content</h3>
-                    <div class="colour clearfix">
-                        <div id="left_bg_primary" class="colorBox"></div>
-                        <input name="colors[left_bg_primary]" type="hidden" />
-                        <p>Primary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="left_bg_secondary" class="colorBox"></div>
-                        <input name="colors[left_bg_secondary]" type="hidden" />
-                        <p>Secondary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="left_font" class="colorBox"></div>
-                        <input name="colors[left_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="left_link" class="colorBox"></div>
-                        <input name="colors[left_link]" type="hidden" />
-                        <p>Link</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="left_hover" class="colorBox"></div>
-                        <input name="colors[left_hover]" type="hidden" />
-                        <p>Link Hover</p>
-                    </div>
-                </div>
-            </div>
-            <div class="colours clearfix">
-                <h3>Right Column</h3>
-                <div class="colours-split top-split">
-                    <h3>Heading</h3>
-                    <div class="colour clearfix">
-                        <div id="right_head_font" class="colorBox"></div>
-                        <input name="colors[right_head_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="right_head_bg" class="colorBox"></div>
-                        <input name="colors[right_head_bg]" type="hidden" />
-                        <p>Background</p>
-                    </div>
-                </div>
-                <div class="colours-split">
-                    <h3>Content</h3>
-                    <div class="colour clearfix">
-                        <div id="right_bg_primary" class="colorBox"></div>
-                        <input name="colors[right_bg_primary]" type="hidden" />
-                        <p>Primary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="right_bg_secondary" class="colorBox"></div>
-                        <input name="colors[right_bg_secondary]" type="hidden" />
-                        <p>Secondary Background</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="right_font" class="colorBox"></div>
-                        <input name="colors[right_font]" type="hidden" />
-                        <p>Text</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="right_link" class="colorBox"></div>
-                        <input name="colors[right_link]" type="hidden" />
-                        <p>Link</p>
-                    </div>
-                    <div class="colour clearfix">
-                        <div id="right_hover" class="colorBox"></div>
-                        <input name="colors[right_hover]" type="hidden" />
-                        <p>Link Hover</p>
-                    </div>
-                </div>
-            </div>
-            <div class="colours-buttons clearfix">
-                <form method="POST" class="clearfix" action="" name="saveColours">
-
-                    <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
-                    <button class="submit-btn-plain" type="button" id="leftRight" >Copy top colours &gt; left &amp; right</button>
-                    <button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
-                    <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
-
-                </form>
-
-                <div class="saved-colours">Saved colour set!</div>
-            </div>
-        </div>
-
-        <!--<div class="colours">-->
-            <!--<div id="picker"></div>-->
-            <!--<input type="text" id="currentColour" value="#123456" maxlength="7" class="input_text" />-->
-        <!--</div>-->
+    <div class="column-colours">
+        <a href="#" id="top" class="columns left-right">Top</a>
+        <a href="#" id="left" class="columns left-right">Left</a>
+        <a href="#" id="right" class="columns left-right">Right</a>
+        <a href="#" id="bottom" class="columns left-right">Bottom</a>
     </div>
-
+    <div class="colours topColumn">
+        <h3>Top Column</h3>
+        <div class="colours-split top-split">
+            <h3>Heading</h3>
+            <div class="colour clearfix">
+                <div id="top_head_font" class="colorBox"></div>
+                <input name="colors[top_head_font]" type="hidden" />
+                <p>Text</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_head_bg" class="colorBox"></div>
+                <input name="colors[top_head_bg]" type="hidden" />
+                <p>Background</p>
+            </div>
+        </div>
+        <div class="colours-split">
+            <h3>Content</h3>
+            <div class="colour clearfix">
+                <div id="top_bg_primary" class="colorBox"></div>
+                <input name="colors[top_bg_primary]" type="hidden" />
+                <p>Primary Background</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_bg_secondary" class="colorBox"></div>
+                <input name="colors[top_bg_secondary]" type="hidden" />
+                <p>Secondary Background</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_font" class="colorBox"></div>
+                <input name="colors[top_font]" type="hidden" />
+                <p>Text</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_link" class="colorBox"></div>
+                <input name="colors[top_link]" type="hidden" />
+                <p>Link</p>
+            </div>
+            <div class="colour clearfix">
+                <div id="top_hover" class="colorBox"></div>
+                <input name="colors[top_hover]" type="hidden" />
+                <p>Link Hover</p>
+            </div>
+        </div>
+        <div class="colours-buttons">
+            <form method="POST" action="" name="saveColours">
+                <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
+                <button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
+                <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
+            </form>
+            <div class="saved-colours">Saved colour set!</div>
+        </div>
+    </div>
 </div>
 <!-- END homepage_color_selector -->
 
