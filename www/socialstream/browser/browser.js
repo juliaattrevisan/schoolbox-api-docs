@@ -147,7 +147,7 @@ if (socialstreamSession === undefined) {
 						name = self.html();
                         meta = {
                             mime: self.data('mime'),
-                            size: self.data('size'),
+                            size: self.data('size')
                         };
 
 						/* Chooze and cloze
