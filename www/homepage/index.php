@@ -78,6 +78,9 @@ $this->setTitle($category['name']);
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
+$this->setBlock(TEMPLATE_content, 'page_controls', 'page_controls_block');
+$this->setBlock('page_controls', 'manage_class', 'manage_class_block');
+
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
@@ -94,19 +97,6 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
-
-    //Setup control buttons
-    $manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
-    $manageFolderController->setup($category, array());
-    $manageFolderController->execute();
-    $manageFolderController->renderTemplate('edit_page_block');
-
-    //Setup class list buttons
-    $manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
-    $manageClassController->setup($category, array());
-    $manageClassController->execute();
-    $manageClassController->renderTemplate('edit_page_block');
-
 
 
     if (Cfg::get('homepage_enable_colour')) {
@@ -254,6 +244,26 @@ if ($permission >= WRITE_ACCESS) {
         'colour_list_block' => '',
     ));
 }
+
+//Setup control buttons
+$manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
+$manageFolderController->setup($category, array());
+$manageFolderController->execute();
+$manageFolderController->renderTemplate('page_controls');
+
+//Setup class list buttons
+$manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
+$manageClassController->setup($category, array());
+$manageClassController->execute();
+if($manageClassController->renderTemplate('manage_class')){
+    $this->parse('manage_class_block', 'manage_class');
+}
+else {
+    $this->setVar('manage_class_block','');
+}
+
+$this->parse('page_controls_block','page_controls');
+
 
 //set the page-level parameters in the template
 $categoryCodes = $catHandler->getCodeForCategory($categoryID);

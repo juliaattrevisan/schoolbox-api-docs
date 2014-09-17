@@ -139,15 +139,16 @@
 <!-- END custom_head -->
 
 <h1><span>{HEADING}</span></h1>
-<!-- BEGIN edit_page -->
+
     <ul class="homepage-controls clearfix">
+        <!-- BEGIN page_controls -->
         <li>
         <span class="booking-controls">
             <div class="status-selector">
                 <a href="#" class="btn homepage-overflow no-text"><span></span></a>
 
                 <ul class="status-buttons">
-                    <li class="status-header">Manage Folder</li>
+                    <li class="status-header">Folder Actions</li>
                     <li>
                         <!-- BEGIN stats_data -->
                         <a href="/cms/category/{ID}" class="status-option">
@@ -209,7 +210,8 @@
                             <span class="status-label">Join Group</span>
                         </a>
                         <!-- END unsubscribed -->
-                    <li class="status-header">Manage Class</li>
+                    <!-- BEGIN manage_class -->
+                    <li class="status-header">Class Actions</li>
                     <!-- BEGIN class_list -->
                     <a href="/subject/classList/{CODE}" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
                     <!-- END class_list -->
@@ -217,16 +219,20 @@
                     <a href="/submission/markSheet/{ID}" class="status-option"><span class="btn modify"><span></span></span><span class="status-label">Class Mark Sheet</span></a>
                     <!-- END class_mark -->
                     </li>
+                    <!-- END manage_class -->
                 </ul>
             </div>
 
         </span>
         </li>
+        <!-- END page_controls -->
+        <!-- BEGIN edit_page -->
         <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-1"><span></span></a></li>
         <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-2"><span></span></a></li>
+        <!-- END edit_page -->
     </ul>
 
-<!-- END edit_page -->
+
 
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">

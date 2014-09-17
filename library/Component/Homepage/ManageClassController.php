@@ -34,7 +34,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return false;
         }
 
-        if($this->permission < WRITE_ACCESS) {
+        if($this->permission < WRITE_ACCESS || $this->getContext('code') == '') {
             return false;
         }
 
