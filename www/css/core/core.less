@@ -11894,6 +11894,16 @@ textarea.event-detail {
 
 }
 
+// selective reset to account for global `li ul` margins
+.ab-pane > ul {
+	margin: 0;
+}
+
+.explorer .file-browser {
+	overflow-y: auto;
+	height: ~'calc(100% - 26px)';
+}
+
 // attach-zone
 .az-list {
 	position: relative;
