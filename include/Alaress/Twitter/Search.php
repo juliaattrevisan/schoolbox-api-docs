@@ -49,17 +49,9 @@ class Alaress_Twitter_Search {
 			$search .= "from:{$this->getUser()} ";
 		}
 
-		/* https://dev.twitter.com/docs/using-search
-		 */
-		if (strlen($this->getKeywords())) {
-			$allHashtags = preg_split('/\s+/', $this->getKeywords(), null, PREG_SPLIT_NO_EMPTY);
+        $search = urlencode(trim($this->getKeywords()));
 
-			/* Prefix everything with hashes and urlencode for twitter api
-			 */
-			$search .= urlencode('#' . implode(' #', $allHashtags));
-		}
-
-		return array('q' => trim($search));
+		return array('q' => $search);
 	}
 
 	/**
@@ -75,22 +67,28 @@ class Alaress_Twitter_Search {
 			$cache->init($resource, $params);
 
 			$all_tweets = $cache->load();
+            $tweetText = array();
 
 			if (is_array($all_tweets)) {
-	            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets())) {
-					$all_tweets = array_slice($all_tweets, 0, $this->getMaxTweets());
+				foreach ($all_tweets as $result) {
+                    if(!in_array($result->text,$tweetText)) {
+                        $processed[] = array(
+                            'text' => $this->getFilter()->filterText($result->text),
+                            'date' => $result->created_at,
+                            'fullname' => $result->user->name,
+                            'author' => $result->user->screen_name,
+                            'avatar' => $result->user->profile_image_url,
+                            'media' => $result->entities->media,
+                        );
+                        $tweetText[] = $result->text;
+                    }
 				}
 
-				foreach ($all_tweets as $result) {
-					$processed[] = array(
-						'text' => $this->getFilter()->filterText($result->text),
-						'date' => $result->created_at,
-                        'fullname' => $result->user->name,
-						'author' => $result->user->screen_name,
-						'avatar' => $result->user->profile_image_url,
-						'media' => $result->entities->media,
-					);
-				}
+
+                if ($this->getMaxTweets() && is_numeric($this->getMaxTweets())) {
+                    $processed = array_slice($processed, 0, $this->getMaxTweets());
+                }
+
 			}
 		}
 
