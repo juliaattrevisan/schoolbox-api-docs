@@ -71,7 +71,7 @@ class CategoryTreeBuilder {
                 // Get the permission this user has on this folder.
                 // No permission: don't show it at all!
                 $permission = $this->getPermissionString($this->handler->getPermission($category->getId()));
-                if (empty($permission)) {
+                if (empty($permission) || $category->isDeleted()) {
                     continue;
                 }
 
