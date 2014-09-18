@@ -41,34 +41,26 @@ setupCustomise = {
 //				});
 //				return false;
 //			});
-            $j('#tab-component').click(function() {
-                var openMe = true;
-                if($(this).hasClass('hover')) {
-                    openMe = false;
-                }
 
-                $(this).toggleClass('hover');
-                $('#tabs-homepage').children('.customise-components').removeClass('open');
+			// Component and column buttons
+			var buttons = $j('#tab-component, #tab-columns');
+			buttons.click(function(event) {
+				event.preventDefault;
+				var openMe = true;
+				if ($(this).hasClass('hover')) {
+					openMe = false;
+				}
 
-                if(openMe) {
-                    $('#tabs-1').addClass('open');
-                }
-                return false;
-            });
-            $j('#tab-columns').click(function() {
-                var openMe = true;
-                if($(this).hasClass('hover')) {
-                    openMe = false;
-                }
+				// Set hover classes, and remove it from other buttons
+				$(this).toggleClass('hover', openMe);
+				buttons.not(this).removeClass('hover');
 
-                $(this).toggleClass('hover');
-                $('#tabs-homepage').children('.customise-components').removeClass('open');
-
-                if(openMe) {
-                    $('#tabs-2').addClass('open');
-                }
-                return false;
-            });
+				// Close all other tabs, and open this tab if needed
+				$('#tabs-homepage').children('.customise-components').removeClass('open');
+				if (openMe) {
+					$('#'+$(this).data('tab')).addClass('open');
+				}
+			});
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
