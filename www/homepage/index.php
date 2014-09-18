@@ -62,14 +62,11 @@ else if (!is_numeric($this->arg[0])) {
     $this->localRedir("/homepage/{$prefix}/$code");
 }
 
-// if we still have no category, advise that these are not the droids you're looking for
-if (!($category instanceof \Schoolbox\Resource\Category)) {
-    error(18);
-}
-
-/* Check that it's not softdeleted
+/* if we still have no category, advise that these are not the droids you're looking for
+ *
+ * Check that it's not softdeleted
  */
-if ($category->isDeleted()) {
+if (!($category instanceof \Schoolbox\Resource\Category) || $category->isDeleted()) {
     error(18);
 }
 
