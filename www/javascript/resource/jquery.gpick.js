@@ -123,6 +123,7 @@
         if (authResult && !authResult.error) {
             this.oauthToken = authResult.access_token;
             this.show();
+            authBtn.removeClass(this.options.authNeededClass);
         }
         else {
             authBtn
