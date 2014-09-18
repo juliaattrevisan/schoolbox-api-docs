@@ -44,4 +44,5 @@ elseif (is_readable($_FILES['upload']['tmp_name'])) {
     }
 }
 
-echo json_encode($result);
+header(':', true, $result['error']);
+die(json_encode($result));

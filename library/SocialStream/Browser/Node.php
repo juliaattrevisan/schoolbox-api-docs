@@ -13,6 +13,13 @@
 
 namespace SocialStream\Browser;
 
+use Schoolbox\Collection;
+use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Exception;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\FileMapper;
+
 class Node
 {
 
@@ -21,27 +28,27 @@ class Node
      *
      * @var int
      */
-    private $nodeId = 0;
+    protected $nodeId = 0;
 
     /**
      * Resultant node information
      *
      * @var array
      */
-    private $result = array();
+    protected $result = array();
 
     /**
      * An instance of a category mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var CategoryMapper
      */
-    private $categoryMapper = null;
+    protected $categoryMapper = null;
 
     /**
      * Old school group handler reference
      * @var \Group
      */
-    private $groupHandler;
+    protected $groupHandler;
 
     /**
      * Constructor
@@ -49,22 +56,24 @@ class Node
      * $nodeId is the primary key of the category whose contents
      * you wish to present
      *
-     * @param $nodeId
+     * @param int $nodeId
+     * @param string $mimeFilter
+     * @throws Exception
      */
-    public function __construct($nodeId)
+    public function __construct($nodeId, $mimeFilter = null)
     {
         if (is_numeric($nodeId)) {
             $this->setNodeId($nodeId);
-            $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+            $this->setCategoryMapper(new CategoryMapper());
             $this->setGroupHandler(new \Group());
 
             // Check we have permission to render node
             if ($nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
-                throw new \Schoolbox\Resource\Exception('Permission denied');
+                throw new Exception('Permission denied');
             }
 
 
-            $this->processNode();
+            $this->processNode($mimeFilter);
         }
     }
 
@@ -89,12 +98,14 @@ class Node
 
     /**
      * Combine the categories and files into a single list
+     *
+     * @param string $mimeFilter
      */
-    private function processNode()
+    protected function processNode($mimeFilter = null)
     {
         $output = array(
             'breadcrumbs' => array_reverse($this->getBreadcrumbs()),
-            'records'     => array_merge($this->getCategories(), $this->getFiles()),
+            'records'     => array_merge($this->getCategories(), $this->getFiles($mimeFilter)),
         );
 
         $this->setResult($output);
@@ -105,7 +116,7 @@ class Node
      *
      * @return array
      */
-    private function getBreadcrumbs()
+    protected function getBreadcrumbs()
     {
         $breadcrumbs = array();
 
@@ -141,7 +152,7 @@ class Node
      *
      * @return array
      */
-    private function getCategories()
+    protected function getCategories()
     {
         $output = array();
 
@@ -165,21 +176,29 @@ class Node
     /**
      * Get all the files for a particular category
      *
+     * @param string $mimeFilter
      * @return array
      */
-    private function getFiles()
+    protected function getFiles($mimeFilter = null)
     {
         $output = array();
 
-        $fileMapper = new \Schoolbox\Resource\FileMapper();
-        $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
+        $fileMapper = new FileMapper();
+        $mimetypeMapper = new MimetypeMapper();
 
         //Double check perms, should not get here but just incase
         if ($this->getGroupHandler()->getPermission($this->getNodeId()) < READ_ACCESS) {
             return $output;
         }
 
-        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), false);
+        $options = array();
+
+        if ($mimeFilter) {
+            $options['mime'] = $mimeFilter;
+        }
+
+        /** @var Collection|File[] $allFiles */
+        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), $options);
 
         foreach ($allFiles as $currentFile) {
 
@@ -203,7 +222,9 @@ class Node
                 'type'   => 'file',
                 'fileId' => $currentFile->getId(),
                 'name'   => $currentFile->getDescription(),
+                'mime'   => $mimetype->getMime(),
                 'icon'   => $mimetype->getIconFile(),
+                'size'   => $currentFile->getFilesize(),
             );
 
             $output[] = $record;
@@ -220,7 +241,7 @@ class Node
      *
      * @param int $nodeId
      */
-    private function setNodeId($nodeId)
+    protected function setNodeId($nodeId)
     {
         $this->nodeId = $nodeId;
     }
@@ -230,7 +251,7 @@ class Node
      *
      * @return int
      */
-    private function getNodeId()
+    protected function getNodeId()
     {
         return $this->nodeId;
     }
@@ -240,7 +261,7 @@ class Node
      *
      * @param array $result
      */
-    private function setResult($result)
+    protected function setResult($result)
     {
         $this->result = $result;
     }
@@ -250,7 +271,7 @@ class Node
      *
      * @return array
      */
-    private function getResult()
+    protected function getResult()
     {
         return $this->result;
     }
@@ -258,9 +279,9 @@ class Node
     /**
      * Set category mapper
      *
-     * @param \Schoolbox\Resource\Category $categoryMapper
+     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
      */
-    private function setCategoryMapper($categoryMapper)
+    protected function setCategoryMapper($categoryMapper)
     {
         $this->categoryMapper = $categoryMapper;
     }
@@ -268,9 +289,9 @@ class Node
     /**
      * Get category mapper
      *
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\CategoryMapper
      */
-    private function getCategoryMapper()
+    protected function getCategoryMapper()
     {
         return $this->categoryMapper;
     }
@@ -278,7 +299,7 @@ class Node
     /**
      * @param \Group $groupHandler
      */
-    private function setGroupHandler($groupHandler)
+    protected function setGroupHandler($groupHandler)
     {
         $this->groupHandler = $groupHandler;
     }
@@ -286,7 +307,7 @@ class Node
     /**
      * @return \Group
      */
-    private function getGroupHandler()
+    protected function getGroupHandler()
     {
         return $this->groupHandler;
     }

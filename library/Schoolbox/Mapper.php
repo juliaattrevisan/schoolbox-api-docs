@@ -989,7 +989,7 @@ class Mapper implements Serializable
             // If it underflows, someone passed an empty column value - return an
             // empty set.
             try {
-                $where = $this->buildWherePart($columnList);
+                $where = $this->buildWherePart($columnList, $options);
             } catch (\UnderflowException $e) {
                 return $this->hydrateList(array());
             }
@@ -1100,7 +1100,7 @@ class Mapper implements Serializable
         // empty set.
         if (!empty($columnList)) {
             try {
-                $where = $this->buildWherePart($columnList);
+                $where = $this->buildWherePart($columnList, $options);
             } catch (\UnderflowException $e) {
                 return 0;
             }
@@ -1126,12 +1126,13 @@ class Mapper implements Serializable
      * Builds a where part and params for this query out of a column list
      *
      * @param  array $columnList
+     * @param  array $options
      *
      * @return array where:  The where parts of the query
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart($columnList)
+    protected function buildWherePart($columnList, $options)
     {
         $where_parts = array();
         $params      = array();

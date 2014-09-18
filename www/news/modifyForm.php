@@ -1,4 +1,10 @@
 <?php
+use Schoolbox\Resource\Attachment\Collector\Collector;
+use Schoolbox\Resource\Attachment\Collector\SbfsHandler;
+use Schoolbox\Resource\Attachment\Collector\StorageHandler;
+use Schoolbox\Resource\FileMapper;
+use Schoolbox\StorageMapper;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
@@ -97,7 +103,25 @@ if ($_POST['heading']) {
 		$article->setModifiedDate(new Alaress_Date_Format(time(), 'U'));
 	}
 
-    if (is_readable($_FILES['file']['tmp_name'])) {
+    if (count($_POST['attachment'])) {
+
+        $smap = StorageMapper::getInstance();
+        $fmap = FileMapper::getInstance();
+        $conf = new \Schoolbox\Config\Loader();
+
+        $collector = new Collector($_POST['attachment'], array(
+            Collector::TYPE_STORAGE => new StorageHandler($smap),
+            Collector::TYPE_SBFS    => new SbfsHandler($fmap, $smap, $conf)
+        ));
+
+        try {
+            $article->setImage($collector->getFirst());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+        }
+    }
+    // retained case for browsers that require fallback
+    // TODO replace this with async iframe windows that upload the files elsewhere
+    elseif (is_readable($_FILES['file']['tmp_name'])) {
 
 	    $allowedFiles = new \Schoolbox\File\MimetypeMapper();
 	    $mime = $allowedFiles->getByFilename($_FILES['file']['name']);
@@ -114,29 +138,15 @@ if ($_POST['heading']) {
             }
         }
     }
+    else {
+        // remove the image
+        $article->setImage(null);
+    }
 
 	$affectedIds = \Schoolbox\News\ArticleMapper::getInstance()->save($article);
 	$newsId = $affectedIds[0];
 
     SitePage::localRedir("/news/item/$newsId");
-}
-
-// request to remove the image from a news article
-elseif (is_numeric($_GET['removeImage'])) {
-	$newsId = $_GET['removeImage'];
-	try {
-		/** @var \Schoolbox\News\Article $article */
-		$article = \Schoolbox\News\ArticleMapper::getInstance()->findById($newsId);
-	}
-	catch(\Schoolbox\Mapper\Exception $e) {
-		error(41);
-		exit;
-	}
-
-	$article->setImage(null);
-	\Schoolbox\News\ArticleMapper::getInstance()->save($article);
-
-	SitePage::localRedir("/news/item/$newsId");
 }
 
 // request to delete the news item

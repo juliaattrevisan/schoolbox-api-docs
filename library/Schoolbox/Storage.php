@@ -8,9 +8,7 @@
  */
 
 namespace Schoolbox;
-use Schoolbox\ConfigLoader;
 use Schoolbox\File\Mimetype;
-use Schoolbox\File\MimetypeMapper;
 
 class Storage implements FileInterface {
 
@@ -35,11 +33,6 @@ class Storage implements FileInterface {
 	protected $filesize;
 
 	/**
-	 * @var string
-	 */
-	protected $mime;
-
-	/**
 	 * @var int
 	 */
 	protected $uploaded_by;
@@ -53,6 +46,9 @@ class Storage implements FileInterface {
 	 * @var \Alaress_Date_Format
 	 */
 	protected $last_accessed;
+
+    /** @var  \Alaress_Date_Format */
+    protected $expired_at;
 
 	/**
 	 * Temporary location for the file. Never persisted
@@ -159,22 +155,6 @@ class Storage implements FileInterface {
 	}
 
 	/**
-	 * @param  string $mime
-	 * @return $this
-	 */
-	public function setMime($mime) {
-		$this->mime = $mime;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMime() {
-		return $this->mime;
-	}
-
-	/**
 	 * @param  string $temp_location
 	 * @return $this
 	 */
@@ -221,6 +201,27 @@ class Storage implements FileInterface {
 	public function getUploadedOn() {
 		return $this->uploaded_on;
 	}
+
+
+    /**
+     * @param \Alaress_Date_Format $expired_at
+     * @return self
+     */
+    public function setExpiredAt($expired_at)
+    {
+        $this->expired_at = $expired_at;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getExpiredAt()
+    {
+        return $this->expired_at;
+    }
+
 
 	/**
 	 * Gets the location at which this file would be stored.
@@ -309,7 +310,7 @@ class Storage implements FileInterface {
      * @return $this;
      */
     public function setMimetype(Mimetype $mimetype) {
-        $this->mime = $mimetype;
+        $this->mimetype = $mimetype;
         return $this;
     }
 
@@ -318,13 +319,25 @@ class Storage implements FileInterface {
 	 * @return \Schoolbox\File\Mimetype
 	 */
 	public function getMimetype() {
-        if($this->mime instanceof Mimetype)
-		    return $this->mime;
+        if($this->mimetype instanceof Mimetype)
+		    return $this->mimetype;
         else
             return new Mimetype();
     }
 
-	/**
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getMimetype()->getMime();
+    }
+
+
+    /**
 	 * Is this file's name an allowed file name?
 	 *
 	 * @return bool

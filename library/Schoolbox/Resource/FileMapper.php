@@ -295,4 +295,24 @@ class FileMapper extends Mapper {
     }
 
 
+    /**
+     * @param array $columnList
+     * @param array $options
+     * @return array
+     */
+    protected function buildWherePart($columnList, $options)
+    {
+        $parts = parent::buildWherePart($columnList, $options);
+
+        if (isset($options['mime'])) {
+            $mime = str_replace('*', '%', $options['mime']);
+            $parts['where'][] = sprintf("%s LIKE %s",
+                $this->database->quoteIdentifier('mime_type'),
+                $this->database->quote($mime)
+            );
+        }
+
+        return $parts;
+    }
+
 }

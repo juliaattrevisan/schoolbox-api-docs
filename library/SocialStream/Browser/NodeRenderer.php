@@ -11,13 +11,15 @@
 namespace SocialStream\Browser;
 
 
+use SitePage;
+
 class NodeRenderer
 {
 
     /**
      * The usual sitepage
      *
-     * @var null
+     * @var SitePage
      */
     private $page = null;
 
@@ -40,23 +42,21 @@ class NodeRenderer
         $this->setNodeData($nodeData);
     }
 
+
     /**
      * Render tree and excrete it
      */
-    public function render()
+    public function render($handle = TEMPLATE_content)
     {
-        $this->getPage()->setFile(TEMPLATE_content, 'component/homepage/socialstream/node.html');
-        $this->getPage()->setBlock(TEMPLATE_content, 'breadcrumb', 'breadcrumb_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'node_category', 'node_category_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'node_file', 'node_file_block');
+        $this->getPage()->setFile($handle, 'component/homepage/socialstream/node.html');
 
-        $this->getPage()->setVar(
-            array(
-                'breadcrumb_block'    => '',
-                'node_category_block' => '',
-                'node_file_block'     => ''
-            )
-        );
+        $blocks = array('breadcrumb', 'node_category', 'node_file', 'use_folder');
+
+        foreach ($blocks as $b) {
+            $bk = $b . '_block';
+            $this->getPage()->setBlock($handle, $b, $bk);
+            $this->getPage()->setVar($bk, '');
+        }
 
         /* Current node is breadcrumbs[0]
          */
@@ -73,8 +73,9 @@ class NodeRenderer
         /* Send it out
          */
         $this->getPage()->setAjax();
-        $this->getPage()->template->pparse('finaloutput', TEMPLATE_content);
+        $this->getPage()->template->pparse('finaloutput', $handle);
     }
+
 
     /**
      * Render the title of the node you're currently in
@@ -183,6 +184,8 @@ class NodeRenderer
                 'NODE_FILE_ID'     => $currentRecord['fileId'],
                 'NODE_FILE_NAME'   => $currentRecord['name'],
                 'NODE_FILE_ICON'   => $currentRecord['icon'],
+                'NODE_MIME_TYPE'   => $currentRecord['mime'],
+                'NODE_FILE_SIZE'   => $currentRecord['size'],
             )
         );
 
@@ -192,7 +195,7 @@ class NodeRenderer
     /**
      * Set page
      *
-     * @param null $page
+     * @param SitePage $page
      */
     private function setPage($page)
     {
@@ -202,7 +205,7 @@ class NodeRenderer
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     private function getPage()
     {

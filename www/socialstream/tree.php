@@ -16,7 +16,7 @@ $page = new \SitePage();
 /* Get the stuff in this node
  */
 try {
-    $browser = new Node($_REQUEST['relationID']);
+    $browser = new Node($_REQUEST['relationID'], $_REQUEST['mimeFilter']);
     $nodeData = $browser->render();
 
     /* Render the stuff in this node
