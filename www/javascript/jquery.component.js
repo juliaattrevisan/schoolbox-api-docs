@@ -72,6 +72,7 @@ setupCustomise = {
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
+            this.columnSelectors();
 		},
 
 		/**
@@ -371,7 +372,31 @@ setupCustomise = {
 				}
 			});
 
-		}
+		},
+
+        columnSelectors: function() {
+            var self = this;
+            $j('[data-column-selector]').click(function(event) {
+                event.preventDefault();
+                // Don't allow deselect of the only column selected
+                var element  = $(this);
+                var deselect = element.data('interaction-state') === 'selected';
+                if (!(deselect && self.getSelectedColumns().length <= 1)) {
+                    element
+                        .toggleClass('selected', !deselect)
+                        .data('interaction-state', deselect ? '' : 'selected');
+                }
+            });
+        },
+
+        getSelectedColumns: function() {
+            return $j('[data-column-selector]')
+                .filter(function() {
+                    return $(this).data('interaction-state') === 'selected';
+                })
+                .map(function() { return this.id; })
+                .toArray();
+        }
 	},
 
 	sortComponents: function() {

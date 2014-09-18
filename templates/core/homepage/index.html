@@ -267,10 +267,11 @@
 <div id="tabs-2" class="customise-components clearfix">
     <!-- BEGIN homepage_color_selector -->
     <div class="column-colours">
-        <a href="#" id="top" class="columns left-right">Top</a>
-        <a href="#" id="left" class="columns left-right">Left</a>
-        <a href="#" id="right" class="columns left-right">Right</a>
-        <a href="#" id="bottom" class="columns left-right">Bottom</a>
+        <!-- These are selectable items - default to top selected only -->
+        <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
+        <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
+        <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+        <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
     </div>
     <div class="colours">
         <div class="colours-split top-split">
