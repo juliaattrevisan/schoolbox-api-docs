@@ -234,13 +234,10 @@ setupCustomise = {
 			}
 
 			$j('#restore').click(function() {
-                // move to resetColors?
-                $j('input[data-colorpicker]').each(function() {
-                    $j(this).spectrum('set', defaults[this.id])
-                })
                 resetColours(['.top', '.left' ,'.right'], defaults);
                 // copy values from defaults into pickers
                 pickers = $j.extend({}, pickers, defaults);
+                self.loadColorpickerColors();
 			});
 
 			function resetColours(area, colours) {
@@ -278,12 +275,10 @@ setupCustomise = {
 			}
 
 			$j('#cancel').click(function() {
-                $j('input[data-colorpicker]').each(function() {
-                    $j(this).spectrum('set', original[this.id])
-                })
                 resetColours(['.top', '.left' ,'.right'], original);
                 // copy values from original into pickers
                 pickers = $j.extend({}, pickers, original);
+                self.loadColorpickerColors();
 			});
 
 
