@@ -276,32 +276,8 @@ setupCustomise = {
 //				colorpicker.spectrum('set', '#'+color.toHexString());
 //			});
 
-            // copy top colours to left/right
-			$j("#leftRight").click(function () {
-
-                // iterate top colours
-                $j('div.topColumn div.colorBox').each(function () {
-                    var suffix = $j(this).attr('id').substr(4);
-
-                    // update pickers config
-                    pickers['left_' + suffix]
-                        = pickers['right_' + suffix]
-                        = (new tinycolor($j(this).css('background-color'))).toHexString();
-
-                    // update left/right colours
-                    $j('#left_'+suffix+', #right_'+suffix)
-                        .css('backgroundColor', pickers['left_' + suffix])
-                        // set hidden field value
-                        .next()
-                        .val($j(this).next().val());
-                });
-
-                // update components on page
-                resetColours(['.top', '.left' ,'.right'], pickers);
-
-			});
-
 			$j('#restore').click(function() {
+                // move to resetColors?
                 $j('input[data-colorpicker]').each(function() {
                     $j(this).spectrum('set', defaults[this.id])
                 })
