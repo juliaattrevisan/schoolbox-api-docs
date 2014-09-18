@@ -15,7 +15,8 @@ use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use \External_UserInterface;
 use Schoolbox\Resource\Category;
-
+use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\FileMapper;
 
 class CategoryMapper extends Mapper {
 
@@ -468,4 +469,50 @@ class CategoryMapper extends Mapper {
 		return new Collection($stack);
 	}
 
+    /**
+     * Recursive delete of a category and its contents
+     *
+     * @param Category $category
+     */
+    public function recursiveDelete(Category $category) {
+        $groupHandler = new Group();
+
+        if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
+            error(6);
+        }
+
+        $allChildren = $this->findByColumn('parent', $category->getId());
+
+        /* Recurse into child folders
+         */
+        foreach ($allChildren as $currentChild) {
+            $this->recursiveDelete($currentChild->getId());
+        }
+
+        /* Soft delete all files
+         */
+        $fileMapper = new FileMapper();
+        $allFiles = $fileMapper->findByColumn('category', $category->getId());
+
+        foreach ($allFiles as $currentFile) {
+            $fileMapper->delete($currentFile);
+        }
+
+        /* Soft delete all links
+         */
+        $linkMapper = new LinkMapper();
+        $allLinks = $linkMapper->findByColumn('category', $category->getId());
+
+        foreach ($allLinks as $currentLink) {
+            $linkMapper->delete($currentLink);
+        }
+
+        /* Delete folder
+         * This used to be optional, but it was always used in this context
+         *
+         * This also just marks the category as deleted, and leaves homepage
+         * configs, components, groups etc. untouched
+         */
+        $this->delete($category->getId());
+    }
 }
