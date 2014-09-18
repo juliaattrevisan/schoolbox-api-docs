@@ -23,7 +23,7 @@ if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
 $conf    = $this->getDi()->get('config');
 $headers = apache_request_headers();
 $proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher('/vagrant/data/storage/grive', $proxy->curl_init(), $headers['Authorization']);
+$grive   = new GDriveFetcher($conf->get('storage_dir') . '/grive', $proxy->curl_init(), $headers['Authorization']);
 $mapper  = StorageMapper::getInstance();
 $files   = array();
 
