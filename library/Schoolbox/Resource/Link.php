@@ -9,10 +9,10 @@
 
 namespace Schoolbox\Resource;
 
-
 use Schoolbox\User;
+use Schoolbox\ISoftDeletable;
 
-class Link {
+class Link implements ISoftDeletable {
 	/**
 	 * @var int
 	 */
@@ -60,6 +60,24 @@ class Link {
    	 */
    	protected $modified;
 
+    /**
+     * Deleted at
+     *
+     * @var
+     */
+    protected $deletedAt;
+
+    /**
+     * Is deleted
+     *
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+    }
+
+    /* Getters/Setters
+     */
 
 	/**
 	 * @param  int $id
@@ -192,4 +210,24 @@ class Link {
    	public function getModified() {
    		return $this->modified;
    	}
+
+    /**
+     * Set deleted at
+     *
+     * @param mixed $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * Get deleted at
+     *
+     * @return mixed
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
 }
