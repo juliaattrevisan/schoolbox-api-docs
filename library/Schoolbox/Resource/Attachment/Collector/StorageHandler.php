@@ -32,7 +32,7 @@ class StorageHandler implements TypeHandlerInterface {
      */
     public function matches($id)
     {
-        return preg_match('`^[0-9a-f]{20}$`i', $id);
+        return preg_match('`^[0-9a-f]{40}$`i', $id);
     }
 
 
