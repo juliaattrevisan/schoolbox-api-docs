@@ -171,17 +171,20 @@ if ($_POST['name']) {
 
     $_SESSION['resourcesID'] = $category['parent'];
 } elseif (is_numeric($_GET['deleteAll'])) {
-    if (!$category = $categoryHandler->getByID($_GET['deleteAll'])) {
-        error(2);
-    }
 
     // only superusers can do this no matter what
     if (!$groupHandler->isSuperuser()) {
         error(12);
     }
 
-    $categoryHandler->recursiveDelete($_GET['deleteAll']);
-    $_SESSION['resourcesID'] = $category['parent'];
+    try {
+        $category = $categoryMapper->findById($_GET['deleteAll']);
+        $categoryMapper->recursiveDelete($category);
+        $_SESSION['resourcesID'] = $category->getParent();
+    }
+    catch (Exception $e) {
+        error(2);
+    }
 } else {
     error(2);
 }
