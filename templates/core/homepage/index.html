@@ -28,7 +28,7 @@
 
         /* If a column is empty, insert placeholder into the space where you can drag components to.
          */
-        setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'), $j('.homepage div.bottom')]);
+        setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')/*, $j('.homepage div.bottom')*/]);
 
         /* setup the ability to sort components, drag them around across columns.
          */
@@ -271,7 +271,9 @@
         <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
         <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
         <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+        <!--
         <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
+        -->
     </div>
     <div class="colours">
         <div class="colours-split top-split">
@@ -342,7 +344,9 @@
     <div class="top clearfix">{component_position_top}</div>
     <div class="left clearfix" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
     <div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
+    <!--
     <div class="bottom clearfix">{component_position_bottom}</div>
+    -->
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
 <div id="resource-browser" class="hide"></div>
