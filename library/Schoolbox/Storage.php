@@ -325,7 +325,19 @@ class Storage implements FileInterface {
             return new Mimetype();
     }
 
-	/**
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getMimetype()->getMime();
+    }
+
+
+    /**
 	 * Is this file's name an allowed file name?
 	 *
 	 * @return bool
