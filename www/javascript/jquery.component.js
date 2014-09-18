@@ -72,7 +72,7 @@ setupCustomise = {
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
-            this.columnSelectors();
+			this.columnSelectors();
 		},
 
 		/**
@@ -199,86 +199,86 @@ setupCustomise = {
 		},
 
 		colours: function() {
-            // Each colorpicker can represent colors for multiple sections.
-            $j('input[data-colorpicker]').each(function () {
-                $j(this).spectrum({
-                    showPalette: false,
-                    showSelectionPalette: false,
-                    showButtons: false,
-                    showAlpha: false,
-                    showInitial: true,
-                    showInput: true,
-                    clickoutFiresChange: true,
-                    preferredFormat: "hex",
-                    replacerClassName: 'colorBox',
-                    allowEmpty: true,
-                    change: onColorChange,
-                    move: onColorChange
-                })
+			// Each colorpicker can represent colors for multiple sections.
+			$j('input[data-colorpicker]').each(function () {
+				$j(this).spectrum({
+					showPalette: false,
+					showSelectionPalette: false,
+					showButtons: false,
+					showAlpha: false,
+					showInitial: true,
+					showInput: true,
+					clickoutFiresChange: true,
+					preferredFormat: "hex",
+					replacerClassName: 'colorBox',
+					allowEmpty: true,
+					change: onColorChange,
+					move: onColorChange
+				})
 			});
 
-            // trigger the change event for whatever columns are selected
-            // This will load colors for whatever's selected
-            var self = this;
-            self.loadColorpickerColors();
+			// trigger the change event for whatever columns are selected
+			// This will load colors for whatever's selected
+			var self = this;
+			self.loadColorpickerColors();
 
 			function onColorChange(colorObject) {
-                // Change the colors for the selected items
+				// Change the colors for the selected items
 				var color = '#'+colorObject.toHex();
-                var id    = this.id;
-                self.getSelectedColumns().forEach(function(column) {
-                    var colorId = column+'_'+id;
-                    pickers[colorId] = color;
-                    setupCustomise.updateColor(colorId, color)
-                });
+				var id    = this.id;
+				self.getSelectedColumns().forEach(function(column) {
+					var colorId = column+'_'+id;
+					pickers[colorId] = color;
+					setupCustomise.updateColor(colorId, color)
+				});
 			}
 
 			$j('#restore').click(function() {
-                resetColours(['.top', '.left' ,'.right'], defaults);
-                // copy values from defaults into pickers
-                pickers = $j.extend({}, pickers, defaults);
-                self.loadColorpickerColors();
+				resetColours(['.top', '.left' ,'.right'], defaults);
+				// copy values from defaults into pickers
+				pickers = $j.extend({}, pickers, defaults);
+				self.loadColorpickerColors();
 			});
 
 			function resetColours(area, colours) {
 
-                colours = colours || defaults;
+				colours = colours || defaults;
 
-                $j.each(area, function(index, value) {
+				$j.each(area, function(index, value) {
 
-                    var areaClass = value,
-                    areaVariable = value.substr(1);
+					var areaClass = value,
+					areaVariable = value.substr(1);
 
-                    $j(areaClass).find('h2').css({
-                        "color": colours[areaVariable+'_head_font'],
-                        "background-color": colours[areaVariable+'_head_bg']
-                    });
+					$j(areaClass).find('h2').css({
+						"color": colours[areaVariable+'_head_font'],
+						"background-color": colours[areaVariable+'_head_bg']
+					});
 
-                    $j(areaClass).find('p, h3, .listing p.small').css({
-                        "color": colours[areaVariable+'_font']
-                    });
+					$j(areaClass).find('p, h3, .listing p.small').css({
+						"color": colours[areaVariable+'_font']
+					});
 
-                    $j(areaClass).find('a, .listing p.small a').css({
-                        'color': colours[areaVariable+'_link']
-                    });
+					$j(areaClass).find('a, .listing p.small a').css({
+						'color': colours[areaVariable+'_link']
+					});
 
-                    $j(areaClass).find('.text, .listing').css({
-                        'background': colours[areaVariable+'_bg_primary']
-                    });
+					$j(areaClass).find('.text, .listing').css({
+						'background': colours[areaVariable+'_bg_primary']
+					});
 
-                    $j(areaClass).find('.dark').css({
-                        'background':  colours[areaVariable+'_bg_secondary']
-                    });
+					$j(areaClass).find('.dark').css({
+						'background':  colours[areaVariable+'_bg_secondary']
+					});
 
-                });
-                return false;
+				});
+				return false;
 			}
 
 			$j('#cancel').click(function() {
-                resetColours(['.top', '.left' ,'.right'], original);
-                // copy values from original into pickers
-                pickers = $j.extend({}, pickers, original);
-                self.loadColorpickerColors();
+				resetColours(['.top', '.left' ,'.right'], original);
+				// copy values from original into pickers
+				pickers = $j.extend({}, pickers, original);
+				self.loadColorpickerColors();
 			});
 
 
@@ -325,67 +325,67 @@ setupCustomise = {
 
 		},
 
-        /**
-         * Sets up the column selectors.
-         */
-        columnSelectors: function() {
-            var self = this;
-            $j('[data-column-selector]').click(function(event) {
-                event.preventDefault();
-                // Don't allow deselect of the only column selected
-                var element  = $(this);
-                var deselect = element.data('interaction-state') === 'selected';
-                if (!(deselect && self.getSelectedColumns().length <= 1)) {
-                    element
-                        .toggleClass('selected', !deselect)
-                        .data('interaction-state', deselect ? '' : 'selected');
-                    self.loadColorpickerColors();
-                }
-            });
-        },
+		/**
+		 * Sets up the column selectors.
+		 */
+		columnSelectors: function() {
+			var self = this;
+			$j('[data-column-selector]').click(function(event) {
+				event.preventDefault();
+				// Don't allow deselect of the only column selected
+				var element  = $(this);
+				var deselect = element.data('interaction-state') === 'selected';
+				if (!(deselect && self.getSelectedColumns().length <= 1)) {
+					element
+						.toggleClass('selected', !deselect)
+						.data('interaction-state', deselect ? '' : 'selected');
+					self.loadColorpickerColors();
+				}
+			});
+		},
 
-        /**
-         * Loads picked colors for selected columns into colorpickers.
-         * If multiple columns are selected, and their colors are different,
-         * the colorpicker will be blank.
-         */
-        loadColorpickerColors: function() {
-            var columns = this.getSelectedColumns();
-            $j('input[data-colorpicker]').each(function() {
-                var id     = this.id;
-                var colors = columns.map(function(column) {
-                    var thisId    = column + '_' + id;
-                    var thisColor = pickers[thisId];
-                    return thisColor;
-                });
-                // If this isn't the first instance of color in colors:
-                // filter it out (thus getting unique array)
-                var uniqueColors = colors.filter(function(color, index) {
-                    return colors.indexOf(color) === index;
-                });
+		/**
+		 * Loads picked colors for selected columns into colorpickers.
+		 * If multiple columns are selected, and their colors are different,
+		 * the colorpicker will be blank.
+		 */
+		loadColorpickerColors: function() {
+			var columns = this.getSelectedColumns();
+			$j('input[data-colorpicker]').each(function() {
+				var id     = this.id;
+				var colors = columns.map(function(column) {
+					var thisId    = column + '_' + id;
+					var thisColor = pickers[thisId];
+					return thisColor;
+				});
+				// If this isn't the first instance of color in colors:
+				// filter it out (thus getting unique array)
+				var uniqueColors = colors.filter(function(color, index) {
+					return colors.indexOf(color) === index;
+				});
 
-                var element = $(this);
-                if (uniqueColors.length === 1) {
-                    element.spectrum('set', uniqueColors.pop());
-                } else {
-                    element.spectrum('set', null);
-                }
-            });
-        },
+				var element = $(this);
+				if (uniqueColors.length === 1) {
+					element.spectrum('set', uniqueColors.pop());
+				} else {
+					element.spectrum('set', null);
+				}
+			});
+		},
 
-        /**
-         * Gets the columns that are currently selected.
-         *
-         * @returns array
-         */
-        getSelectedColumns: function() {
-            return $j('[data-column-selector]')
-                .filter(function() {
-                    return $(this).data('interaction-state') === 'selected';
-                })
-                .map(function() { return this.id; })
-                .toArray();
-        }
+		/**
+		 * Gets the columns that are currently selected.
+		 *
+		 * @returns array
+		 */
+		getSelectedColumns: function() {
+			return $j('[data-column-selector]')
+				.filter(function() {
+					return $(this).data('interaction-state') === 'selected';
+				})
+				.map(function() { return this.id; })
+				.toArray();
+		}
 	},
 
 	sortComponents: function() {
