@@ -132,7 +132,7 @@ setupCustomise = {
 					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left'), $j('div.bottom')]);
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')/*, $j('div.bottom')*/]);
 							$j(this).animate({opacity:1}, 300);
 							/*
 							* When a new component is added in we need it to
@@ -444,11 +444,11 @@ setupCustomise = {
 					}
 				});
 
-                $j('.homepage div.bottom').children('div.box').each(function () {
-                    if ($j(this).attr('id') != undefined) {
-                        top += $j(this).attr('id').substring(9) + ',';
-                    }
-                });
+//                $j('.homepage div.bottom').children('div.box').each(function () {
+//                    if ($j(this).attr('id') != undefined) {
+//                        top += $j(this).attr('id').substring(9) + ',';
+//                    }
+//                });
 
 				var data = {
 					type: 'components',
@@ -462,7 +462,7 @@ setupCustomise = {
 
 				$j.post(setupCustomise.ajaxURL, data);
 
-				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'),  $j('.homepage div.bottom')])
+				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')/*,  $j('.homepage div.bottom')*/])
 
 				// Reapply colors as well.
 				$.each(pickers, function(element, color) {
@@ -472,7 +472,7 @@ setupCustomise = {
 			sort: function (event, ui) {
 				var leftOffset = $j('.homepage div.left').offset();
 				var topOffset = $j('.homepage div.top').offset();
-                var bottomOffset = $j('.homepage div.bottom').offset();
+//                var bottomOffset = $j('.homepage div.bottom').offset();
 
 				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
 					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
@@ -490,13 +490,14 @@ setupCustomise = {
 					if ($j('.homepage div.top').find('.box').length == 0) {
 						ui.placeholder.appendTo($j('.homepage div.top'));
 					}
-                } else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
-                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
-                    // top bottom
-                    if ($j('.homepage div.bottom').find('.box').length == 0) {
-                        ui.placeholder.appendTo($j('.homepage div.bottom'));
-                    }
                 }
+//                else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
+//                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
+//                    // top bottom
+//                    if ($j('.homepage div.bottom').find('.box').length == 0) {
+//                        ui.placeholder.appendTo($j('.homepage div.bottom'));
+//                    }
+//                }
 				$j('.cal-bubble').hide();
 
 			}
