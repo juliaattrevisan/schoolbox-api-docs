@@ -57,7 +57,11 @@
         var frm = $('#'+this.element.id.replace('dropzone','component')+' > .settings > form');
         frm.find('select[name=image]').remove();
         frm.append($('<input/>').attr('name', 'image').val(file.name.substr(0, file.name.lastIndexOf('.'))));
-        frm.submit();
+        $.ajax({
+          type: frm.attr('method'),
+          url: frm.attr('action'),
+          data: frm.serialize()
+        });
       }
     });
   </script>
