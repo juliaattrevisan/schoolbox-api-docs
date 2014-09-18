@@ -199,6 +199,7 @@ setupCustomise = {
 		},
 
 		colours: function() {
+            // Each colorpicker can represent colors for multiple sections.
             $j('input[data-colorpicker]').each(function () {
                 $j(this).spectrum({
                     showPalette: false,
@@ -209,73 +210,23 @@ setupCustomise = {
                     showInput: true,
                     clickoutFiresChange: true,
                     preferredFormat: "hex",
-                    color: pickers[this.id],
                     replacerClassName: 'colorBox',
+                    allowEmpty: true,
                     change: onColorChange,
                     move: onColorChange
                 })
 			});
 
-//			// Set up current color
-//			$j('.selected').removeClass('selected');
-//			$j('.active-box').removeClass('active-box');
-//			$j('#top_head_font').addClass('selected').parent().addClass('active-box');
-//			var instantColour = new tinycolor($j('#top_head_font').css('background-color'));
-//			var initialColour = instantColour.toHexString();
-//
-//			// Set up colorpickers (one for each box?)
-//            $j('input[data-colorpicker]').spectrum({
-//                showPalette: false,
-//                showSelectionPalette: false,
-//                showButtons: false,
-//                showAlpha: false,
-//                showInitial: true,
-//                showInput: true,
-//                clickoutFiresChange: true,
-//                preferredFormat: "hex"
-//            })
-//			var is_colorpicker_present = ($j('#picker').length > 0);
-//			var colorpicker            = null;
-//			if (is_colorpicker_present) {
-//				colorpicker = $j('#picker').spectrum({
-//					showPalette: false,
-//					showSelectionPalette: false,
-//					showButtons: false,
-//					showAlpha: false,
-//					showInitial: true,
-//					showInput: true,
-//					flat: true,
-//					clickoutFiresChange: true,
-//					preferredFormat: "hex",
-//					color: initialColour,
-//					change: onColorChange,
-//					move: onColorChange
-//				});
-//			} else {
-//				return;
-//			}
+            // trigger the change event for whatever columns are selected
+            // This will load colors for whatever's selected
+            this.loadColorpickerColors();
 
-			function h2d(h) {return parseInt(h,16);}
 
 			function onColorChange(colorObject) {
 				var color = '#'+colorObject.toHex();
 				pickers[this.id] = color;
 				setupCustomise.updateColor(this.id, color)
 			}
-
-
-//			$j('.colour').click(function(event) {
-//				event.preventDefault();
-//				$j('.selected').removeClass('selected');
-//				$j('.active-box').removeClass('active-box');
-//				$j(this).addClass('active-box');
-//				$j(this).children('.colorBox').addClass('selected');
-//				$j(this).next().next('p').addClass('selected');
-//
-//				var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
-//
-//				colorpicker.spectrum('set', '#'+color.toHexString());
-//			});
 
 			$j('#restore').click(function() {
                 // move to resetColors?
@@ -374,6 +325,9 @@ setupCustomise = {
 
 		},
 
+        /**
+         * Sets up the column selectors.
+         */
         columnSelectors: function() {
             var self = this;
             $j('[data-column-selector]').click(function(event) {
@@ -385,10 +339,45 @@ setupCustomise = {
                     element
                         .toggleClass('selected', !deselect)
                         .data('interaction-state', deselect ? '' : 'selected');
+                    self.loadColorpickerColors();
                 }
             });
         },
 
+        /**
+         * Loads picked colors for selected columns into colorpickers.
+         * If multiple columns are selected, and their colors are different,
+         * the colorpicker will be blank.
+         */
+        loadColorpickerColors: function() {
+            var columns = this.getSelectedColumns();
+            $j('input[data-colorpicker]').each(function() {
+                var id     = this.id;
+                var colors = columns.map(function(column) {
+                    var thisId    = column + '_' + id;
+                    var thisColor = pickers[thisId];
+                    return thisColor;
+                });
+                // If this isn't the first instance of color in colors:
+                // filter it out (thus getting unique array)
+                var uniqueColors = colors.filter(function(color, index) {
+                    return colors.indexOf(color) === index;
+                });
+
+                var element = $(this);
+                if (uniqueColors.length === 1) {
+                    element.spectrum('set', uniqueColors.pop());
+                } else {
+                    element.spectrum('set', null);
+                }
+            });
+        },
+
+        /**
+         * Gets the columns that are currently selected.
+         *
+         * @returns array
+         */
         getSelectedColumns: function() {
             return $j('[data-column-selector]')
                 .filter(function() {
