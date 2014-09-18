@@ -223,14 +223,16 @@ setupCustomise = {
 			self.loadColorpickerColors();
 
 			function onColorChange(colorObject) {
-				// Change the colors for the selected items
-				var color = '#'+colorObject.toHex();
-				var id    = this.id;
-				self.getSelectedColumns().forEach(function(column) {
-					var colorId = column+'_'+id;
-					pickers[colorId] = color;
-					setupCustomise.updateColor(colorId, color)
-				});
+				if (colorObject instanceof tinycolor) {
+					// Change the colors for the selected items
+					var color = '#'+colorObject.toHex();
+					var id    = this.id;
+					self.getSelectedColumns().forEach(function(column) {
+						var colorId = column+'_'+id;
+						pickers[colorId] = color;
+						setupCustomise.updateColor(colorId, color)
+					});
+				}
 			}
 
 			$j('#restore').click(function() {
