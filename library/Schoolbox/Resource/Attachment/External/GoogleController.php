@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment\External;
 
 
 use OutOfRangeException;
+use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
@@ -52,8 +53,10 @@ class GoogleController extends AbstractController implements ExternalInterface {
 
         $this->setViewsFromMimeFilter($mimeFilter);
 
-        $this->gAppsApiKey   = $conf->get('googleapps_api_key');
-        $this->gAppsClientId = $conf->get('googleapps_client_id');
+        if ($conf) {
+            $this->gAppsApiKey   = $conf->get('googleapps_api_key');
+            $this->gAppsClientId = $conf->get('googleapps_client_id');
+        }
 
         if(!($this->gAppsApiKey && $this->gAppsClientId)) {
             throw new OutOfRangeException("Google Apps credentials not specified");

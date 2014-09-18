@@ -49,6 +49,7 @@ $factory = new Schoolbox\Resource\Attachment\Factory();
 
 $factory->setSource($location, $source)
         ->setMimeFilter($mime)
-        ->allowMulti($multi);
+        ->allowMulti($multi)
+        ->setConfig(new \Schoolbox\Config\Loader());
 
 $factory->build()->parse($this);
