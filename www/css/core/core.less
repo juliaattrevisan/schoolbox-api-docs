@@ -3597,9 +3597,9 @@ ADMIN BODY
 .level table {
 	td, th {
 		padding: 0 8px 0 0;
-		&.colours-buttons {
-			padding: 16px;
-		}
+//		&.colours-buttons {
+//			padding: 16px;
+//		}
 	}
 }
 
@@ -6564,7 +6564,7 @@ COLOUR ADJUSTMENT BOX
 .colours {
     float: left;
     width:  29%;
-    height: 350px;
+//    height: 350px;
     position: relative;
     zoom: 1;
 }
@@ -6623,19 +6623,19 @@ COLOUR ADJUSTMENT BOX
     cursor: pointer;
 }
 
-.colours-buttons {
-    background: @white;
-    padding: 16px;
-    padding-bottom: 8px;
-}
-
-.colours-buttons .submit-btn-plain {
-    margin-bottom: 8px;
-}
-
-.colours-buttons .save-colours, .colours-buttons .save-layout {
-    margin-right: 32px;
-}
+//.colours-buttons {
+//    background: @white;
+//    padding: 16px;
+//    padding-bottom: 8px;
+//}
+//
+//.colours-buttons .submit-btn-plain {
+//    margin-bottom: 8px;
+//}
+//
+//.colours-buttons .save-colours, .colours-buttons .save-layout {
+//    margin-right: 32px;
+//}
 
 #tabs-2, #tabs-3 {
     padding: 16px 0 0 0;
@@ -6856,7 +6856,7 @@ HOMEPAGE CUSTOMISE
         font-weight: bold;
         text-align: center;
         margin-bottom: 15px;
-        &:hover{
+        &:hover, &.selected {
             background: lighten(@highlight-color,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
         }
     }
@@ -9924,6 +9924,15 @@ img.mimetype {
     height: 15px;
     border: 1px solid @black;
     cursor: pointer;
+    &.sp-replacer {
+        // Special styles for spectrum colorpicker
+        padding: 0;
+        border: 1px solid black;
+        margin-right: 1em;
+        .sp-preview {
+            border-width: 0;
+        }
+    }
 }
 .selected {
     font-weight: bold;

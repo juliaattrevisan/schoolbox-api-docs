@@ -41,37 +41,30 @@ setupCustomise = {
 //				});
 //				return false;
 //			});
-            $j('#tab-component').click(function() {
-                var openMe = true;
-                if($(this).hasClass('hover')) {
-                    openMe = false;
-                }
 
-                $(this).toggleClass('hover');
-                $('#tabs-homepage').children('.customise-components').removeClass('open');
+			// Component and column buttons
+			var buttons = $j('#tab-component, #tab-columns');
+			buttons.click(function(event) {
+				event.preventDefault;
+				var openMe = true;
+				if ($(this).hasClass('hover')) {
+					openMe = false;
+				}
 
-                if(openMe) {
-                    $('#tabs-1').addClass('open');
-                }
-                return false;
-            });
-            $j('#tab-columns').click(function() {
-                var openMe = true;
-                if($(this).hasClass('hover')) {
-                    openMe = false;
-                }
+				// Set hover classes, and remove it from other buttons
+				$(this).toggleClass('hover', openMe);
+				buttons.not(this).removeClass('hover');
 
-                $(this).toggleClass('hover');
-                $('#tabs-homepage').children('.customise-components').removeClass('open');
-
-                if(openMe) {
-                    $('#tabs-2').addClass('open');
-                }
-                return false;
-            });
+				// Close all other tabs, and open this tab if needed
+				$('#tabs-homepage').children('.customise-components').removeClass('open');
+				if (openMe) {
+					$('#'+$(this).data('tab')).addClass('open');
+				}
+			});
 			this.colours(setupCustomise.id);
 			this.components();
 			this.columnWidths();
+			this.columnSelectors();
 		},
 
 		/**
@@ -131,7 +124,7 @@ setupCustomise = {
 					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left'), $j('div.bottom')]);
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')/*, $j('div.bottom')*/]);
 							$j(this).animate({opacity:1}, 300);
 							/*
 							* When a new component is added in we need it to
@@ -198,147 +191,88 @@ setupCustomise = {
 		},
 
 		colours: function() {
-			$j('div.colorBox').each(function () {
-				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
-			});
-
-			// Set up current color
-			$j('.selected').removeClass('selected');
-			$j('.active-box').removeClass('active-box');
-			$j('#top_head_font').addClass('selected').parent().addClass('active-box');
-			var instantColour = new tinycolor($j('#top_head_font').css('background-color'));
-			var initialColour = instantColour.toHexString();
-
-			// Set up colorpicker
-			var is_colorpicker_present = ($j('#picker').length > 0);
-			var colorpicker            = null;
-			if (is_colorpicker_present) {
-				colorpicker = $j('#picker').spectrum({
+			// Each colorpicker can represent colors for multiple sections.
+			$j('input[data-colorpicker]').each(function () {
+				$j(this).spectrum({
 					showPalette: false,
 					showSelectionPalette: false,
 					showButtons: false,
 					showAlpha: false,
 					showInitial: true,
 					showInput: true,
-					flat: true,
 					clickoutFiresChange: true,
 					preferredFormat: "hex",
-					color: initialColour,
+					replacerClassName: 'colorBox',
+					allowEmpty: true,
 					change: onColorChange,
 					move: onColorChange
-				});
-			} else {
-				return;
-			}
+				})
+			});
 
-			function h2d(h) {return parseInt(h,16);}
+			// trigger the change event for whatever columns are selected
+			// This will load colors for whatever's selected
+			var self = this;
+			self.loadColorpickerColors();
 
 			function onColorChange(colorObject) {
-				var color = '#'+colorObject.toHex();
-				var current = $j('.selected');
-				current.css('background-color', color);
-				pickers[current.attr('ID')] = color;
-				setupCustomise.updateColor(current.attr('ID'), color)
+				if (colorObject instanceof tinycolor) {
+					// Change the colors for the selected items
+					var color = '#'+colorObject.toHex();
+					var id    = this.id;
+					self.getSelectedColumns().forEach(function(column) {
+						var colorId = column+'_'+id;
+						pickers[colorId] = color;
+						setupCustomise.updateColor(colorId, color)
+					});
+				}
 			}
 
-
-			$j('.colour').click(function(event) {
-				event.preventDefault();
-				$j('.selected').removeClass('selected');
-				$j('.active-box').removeClass('active-box');
-				$j(this).addClass('active-box');
-				$j(this).children('.colorBox').addClass('selected');
-				$j(this).next().next('p').addClass('selected');
-
-				var color = new tinycolor($j(this).children('.colorBox').css('background-color'));
-
-				colorpicker.spectrum('set', '#'+color.toHexString());
-			});
-
-            // copy top colours to left/right
-			$j("#leftRight").click(function () {
-
-                // iterate top colours
-                $j('div.topColumn div.colorBox').each(function () {
-                    var suffix = $j(this).attr('id').substr(4);
-
-                    // update pickers config
-                    pickers['left_' + suffix]
-                        = pickers['right_' + suffix]
-                        = (new tinycolor($j(this).css('background-color'))).toHexString();
-
-                    // update left/right colours
-                    $j('#left_'+suffix+', #right_'+suffix)
-                        .css('backgroundColor', pickers['left_' + suffix])
-                        // set hidden field value
-                        .next()
-                        .val($j(this).next().val());
-                });
-
-                // update components on page
-                resetColours(['.top', '.left' ,'.right'], pickers);
-
-			});
-
 			$j('#restore').click(function() {
-				$j('.colorBox').each(function () {
-					$j(this).css('background-color', defaults[$j(this).attr('id')]);
-				});
-
-                resetColours(['.top', '.left' ,'.right']);
-
-                // copy values from defaults into pickers
-                pickers = $j.extend({}, pickers, defaults);
-
-
+				resetColours(['.top', '.left' ,'.right'], defaults);
+				// copy values from defaults into pickers
+				pickers = $j.extend({}, pickers, defaults);
+				self.loadColorpickerColors();
 			});
 
 			function resetColours(area, colours) {
 
-                colours = colours || defaults;
+				colours = colours || defaults;
 
-                $j.each(area, function(index, value) {
+				$j.each(area, function(index, value) {
 
-                    var areaClass = value,
-                    areaVariable = value.substr(1);
+					var areaClass = value,
+					areaVariable = value.substr(1);
 
-                    $j(areaClass).find('h2').css({
-                        "color": colours[areaVariable+'_head_font'],
-                        "background-color": colours[areaVariable+'_head_bg']
-                    });
+					$j(areaClass).find('h2').css({
+						"color": colours[areaVariable+'_head_font'],
+						"background-color": colours[areaVariable+'_head_bg']
+					});
 
-                    $j(areaClass).find('p, h3, .listing p.small').css({
-                        "color": colours[areaVariable+'_font']
-                    });
+					$j(areaClass).find('p, h3, .listing p.small').css({
+						"color": colours[areaVariable+'_font']
+					});
 
-                    $j(areaClass).find('a, .listing p.small a').css({
-                        'color': colours[areaVariable+'_link']
-                    });
+					$j(areaClass).find('a, .listing p.small a').css({
+						'color': colours[areaVariable+'_link']
+					});
 
-                    $j(areaClass).find('.text, .listing').css({
-                        'background': colours[areaVariable+'_bg_primary']
-                    });
+					$j(areaClass).find('.text, .listing').css({
+						'background': colours[areaVariable+'_bg_primary']
+					});
 
-                    $j(areaClass).find('.dark').css({
-                        'background':  colours[areaVariable+'_bg_secondary']
-                    });
+					$j(areaClass).find('.dark').css({
+						'background':  colours[areaVariable+'_bg_secondary']
+					});
 
-                });
-                return false;
+				});
+				return false;
 			}
 
 			$j('#cancel').click(function() {
-				$j('.colorBox').each(function () {
-					$j(this).css('background-color', original[$j(this).attr('id')]);
-				});
-
-				$j('.text, .dark, h2:not(.hide), a, p').each(function () {
-                      $j(this).removeAttr("style");
-                });
-
-                // copy values from original into pickers
-                pickers = $j.extend({}, pickers, original);
-
+				resetColours(['.top', '.left' ,'.right'], original);
+				// copy values from original into pickers
+				pickers = $j.extend({}, pickers, original);
+				self.loadColorpickerColors();
 			});
 
 
@@ -383,6 +317,68 @@ setupCustomise = {
 				}
 			});
 
+		},
+
+		/**
+		 * Sets up the column selectors.
+		 */
+		columnSelectors: function() {
+			var self = this;
+			$j('[data-column-selector]').click(function(event) {
+				event.preventDefault();
+				// Don't allow deselect of the only column selected
+				var element  = $(this);
+				var deselect = element.data('interaction-state') === 'selected';
+				if (!(deselect && self.getSelectedColumns().length <= 1)) {
+					element
+						.toggleClass('selected', !deselect)
+						.data('interaction-state', deselect ? '' : 'selected');
+					self.loadColorpickerColors();
+				}
+			});
+		},
+
+		/**
+		 * Loads picked colors for selected columns into colorpickers.
+		 * If multiple columns are selected, and their colors are different,
+		 * the colorpicker will be blank.
+		 */
+		loadColorpickerColors: function() {
+			var columns = this.getSelectedColumns();
+			$j('input[data-colorpicker]').each(function() {
+				var id     = this.id;
+				var colors = columns.map(function(column) {
+					var thisId    = column + '_' + id;
+					var thisColor = pickers[thisId];
+					return thisColor;
+				});
+				// If this isn't the first instance of color in colors:
+				// filter it out (thus getting unique array)
+				var uniqueColors = colors.filter(function(color, index) {
+					return colors.indexOf(color) === index;
+				});
+
+				var element = $(this);
+				if (uniqueColors.length === 1) {
+					element.spectrum('set', uniqueColors.pop());
+				} else {
+					element.spectrum('set', null);
+				}
+			});
+		},
+
+		/**
+		 * Gets the columns that are currently selected.
+		 *
+		 * @returns array
+		 */
+		getSelectedColumns: function() {
+			return $j('[data-column-selector]')
+				.filter(function() {
+					return $(this).data('interaction-state') === 'selected';
+				})
+				.map(function() { return this.id; })
+				.toArray();
 		}
 	},
 
@@ -440,11 +436,11 @@ setupCustomise = {
 					}
 				});
 
-                $j('.homepage div.bottom').children('div.box').each(function () {
-                    if ($j(this).attr('id') != undefined) {
-                        top += $j(this).attr('id').substring(9) + ',';
-                    }
-                });
+//                $j('.homepage div.bottom').children('div.box').each(function () {
+//                    if ($j(this).attr('id') != undefined) {
+//                        top += $j(this).attr('id').substring(9) + ',';
+//                    }
+//                });
 
 				var data = {
 					type: 'components',
@@ -458,7 +454,7 @@ setupCustomise = {
 
 				$j.post(setupCustomise.ajaxURL, data);
 
-				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left'),  $j('.homepage div.bottom')])
+				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')/*,  $j('.homepage div.bottom')*/])
 
 				// Reapply colors as well.
 				$.each(pickers, function(element, color) {
@@ -468,7 +464,7 @@ setupCustomise = {
 			sort: function (event, ui) {
 				var leftOffset = $j('.homepage div.left').offset();
 				var topOffset = $j('.homepage div.top').offset();
-                var bottomOffset = $j('.homepage div.bottom').offset();
+//                var bottomOffset = $j('.homepage div.bottom').offset();
 
 				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
 					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
@@ -486,13 +482,14 @@ setupCustomise = {
 					if ($j('.homepage div.top').find('.box').length == 0) {
 						ui.placeholder.appendTo($j('.homepage div.top'));
 					}
-                } else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
-                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
-                    // top bottom
-                    if ($j('.homepage div.bottom').find('.box').length == 0) {
-                        ui.placeholder.appendTo($j('.homepage div.bottom'));
-                    }
                 }
+//                else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
+//                    event.pageY < (bottomOffset.top + $j('.homepage div.bottom').height())) {
+//                    // top bottom
+//                    if ($j('.homepage div.bottom').find('.box').length == 0) {
+//                        ui.placeholder.appendTo($j('.homepage div.bottom'));
+//                    }
+//                }
 				$j('.cal-bubble').hide();
 
 			}
