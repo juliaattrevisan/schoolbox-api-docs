@@ -7,24 +7,33 @@
  * @version     SVN: $Id$
  *
  */
-$this->setFile(TEMPLATE_content, 'homepage/index.html');
-
-$groupID = $_SESSION['gid'];
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 $catHandler = new Category();
 
+$groupID = $_SESSION['gid'];
 $prefix = 'code';
 
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
  * e.g. /homepage/43
  */
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
-    $category = $catHandler->getByID($this->arg[0]);
+    try {
+        $category = $categoryMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        error(18);
+    }
 
     /* If the category wasn't found, try searching for a category code with this
 	 * numerical value i.e. treat the int as if it were a category code string
 	 */
-    if (!$category) {
-        $category = $catHandler->getByCode($this->arg[0]);
+    try {
+        if (!$category) {
+            $category = $categoryMapper->findByCode($this->arg[0]);
+        }
+    }
+    catch (\Exception $e) {
+        error(18);
     }
 }
 /* If a prefixed argument is given, load category code directly
@@ -35,7 +44,13 @@ else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
     array_shift($items);
 
     $code = implode('/', $items);
-    $category = $catHandler->getByCode(urldecode(urldecode($code)));
+
+    try {
+        $category = $categoryMapper->findByCode(urldecode(urldecode($code)));
+    }
+    catch (\Exception $e) {
+        error(18);
+    }
 }
 /* When just an alphabetical category code provided
  * e.g. /homepage/EN344
@@ -48,33 +63,38 @@ else if (!is_numeric($this->arg[0])) {
 }
 
 // if we still have no category, advise that these are not the droids you're looking for
-if (!isset($category['id'])) {
+if (!($category instanceof \Schoolbox\Resource\Category)) {
     error(18);
 }
 
-$categoryID = $category['id'];
+/* Check that it's not softdeleted
+ */
+if ($category->isDeleted()) {
+    error(18);
+}
 
 // confirm that the user has permission to view this page
 $g = new Group();
-if (($permission = $g->getPermission($categoryID)) < READ_ACCESS) {
+if (($permission = $g->getPermission($category->getId())) < READ_ACCESS) {
     error(14);
 }
 
 // setup the homepage handler
-$homepageHandler = new Homepage($categoryID);
+$homepageHandler = new Homepage($category->getId());
 
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
 if(!$homepageHandler->getTemplate()) {
-    $this->localRedir('/resources/'.$categoryID);
+    $this->localRedir('/resources/'.$category->getId());
 }
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\CategoryLogMapper();
-$mapper->incrementHitcount($_SESSION['user'], $categoryID);
-$catHandler->logPageView($categoryID);
+$mapper->incrementHitcount($_SESSION['user'], $category->getId());
+$catHandler->logPageView($category->getId());
 
 /* BUILD PAGE */
-$this->setTitle($category['name']);
+$this->setFile(TEMPLATE_content, 'homepage/index.html');
+$this->setTitle($category->getName());
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -86,7 +106,7 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$componentCollection = $componentFactory->buildComponentList($categoryID);
+$componentCollection = $componentFactory->buildComponentList($category->getId());
 
 // User has elevated priviliges: can write to page
 if ($permission >= WRITE_ACCESS) {
@@ -245,15 +265,19 @@ if ($permission >= WRITE_ACCESS) {
     ));
 }
 
+/* Homepage setup must be an array
+ */
+$categoryArray = $catHandler->getByID($category->getId());
+
 //Setup control buttons
 $manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
-$manageFolderController->setup($category, array());
+$manageFolderController->setup($categoryArray, array());
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
 //Setup class list buttons
 $manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
-$manageClassController->setup($category, array());
+$manageClassController->setup($categoryArray, array());
 $manageClassController->execute();
 if($manageClassController->renderTemplate('manage_class')){
     $this->parse('manage_class_block', 'manage_class');
@@ -264,25 +288,25 @@ else {
 
 $this->parse('page_controls_block','page_controls');
 
-
 //set the page-level parameters in the template
-$categoryCodes = $catHandler->getCodeForCategory($categoryID);
-$code = $categoryCodes['codes'];
-$category['code'] = $code; /* Make sure category has all codes, not just the one requested */
-$codeArray = explode(',', $code);
+$codeArray = array();
+
+foreach ($category->getCodes() as $currentCode) {
+    $codeArray[] = $currentCode->getCode();
+}
 
 if(count($codeArray) > 4) {
     $codeString = Scrub::text(implode(',',array_slice($codeArray, 0, 4)).'....');
 } else {
-    $codeString = Scrub::text($code);
+    $codeString = Scrub::text($category->getCodes()->first()->getCode());
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING' => Scrub::text($category['name']) . (isset($code) ? ' (' . $codeString . ')' : ''),
-    'CODE' => urlencode(urlencode($code)),
-    'ID' => $categoryID,
+    'HEADING' => Scrub::text($category->getName()) . ($category->getCodes()->count() ? ' (' . $codeString . ')' : ''),
+    'CODE' => urlencode(urlencode($category->getCodes()->first()->getCode())),
+    'ID' => $category->getId(),
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
@@ -371,7 +395,7 @@ foreach ($componentCollection as $component) {
     $templateHandle = "component_{$instance->getDefinitionId()}";
 
 
-    $component->setup($category, $instance->getConfigArray());
+    $component->setup($categoryArray, $instance->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {
