@@ -219,13 +219,18 @@ setupCustomise = {
 
             // trigger the change event for whatever columns are selected
             // This will load colors for whatever's selected
-            this.loadColorpickerColors();
-
+            var self = this;
+            self.loadColorpickerColors();
 
 			function onColorChange(colorObject) {
+                // Change the colors for the selected items
 				var color = '#'+colorObject.toHex();
-				pickers[this.id] = color;
-				setupCustomise.updateColor(this.id, color)
+                var id    = this.id;
+                self.getSelectedColumns().forEach(function(column) {
+                    var colorId = column+'_'+id;
+                    pickers[colorId] = color;
+                    setupCustomise.updateColor(colorId, color)
+                });
 			}
 
 			$j('#restore').click(function() {
