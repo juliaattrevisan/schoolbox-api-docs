@@ -475,7 +475,7 @@ class CategoryMapper extends Mapper {
      * @param Category $category
      */
     public function recursiveDelete(Category $category) {
-        $groupHandler = new Group();
+        $groupHandler = new \Group();
 
         if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
             error(6);
@@ -486,7 +486,7 @@ class CategoryMapper extends Mapper {
         /* Recurse into child folders
          */
         foreach ($allChildren as $currentChild) {
-            $this->recursiveDelete($currentChild->getId());
+            $this->recursiveDelete($currentChild);
         }
 
         /* Soft delete all files
@@ -513,6 +513,6 @@ class CategoryMapper extends Mapper {
          * This also just marks the category as deleted, and leaves homepage
          * configs, components, groups etc. untouched
          */
-        $this->delete($category->getId());
+        $this->delete($category);
     }
 }
