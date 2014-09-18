@@ -35,6 +35,8 @@
       wrapClass: 'dragging',
       previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
 //      acceptedFiles: 'audio/*',
+      refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+      refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
       tplWrap: '<li class="dz-preview" />',
       addedfile: function (file) {
         $(file.previewElement).addClass('category-{ID}').data('node', {ID});

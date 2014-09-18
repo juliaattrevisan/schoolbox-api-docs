@@ -39,6 +39,8 @@
         wrapClass: 'dragging',
         previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
         tplWrap: '<li class="dz-preview" />',
+        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+        refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
         addedfile: function (file) {
           $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
         },

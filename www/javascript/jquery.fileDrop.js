@@ -26,10 +26,17 @@
             navWarning: "You still have files uploading, which will be cancelled if you leave this page.",
             tplWrap: '<div class="dz-preview" />',
 
+            // componentry
+            refreshSelector: null,
+            refreshUrl: '/homepage/configForm.php',
+            refreshData: {},
+            refreshTimeout: 2000,
+
             // dropzone callbacks
             addedfile: noop,
             sending: noop,
             complete: noop,
+            queuecomplete: noop,
 
             uploadprogress: function (file, progress, bytesSent) {
                 var el = $(file.previewElement);
@@ -72,6 +79,7 @@
         this._wrap = $(this.options.wrap);
         this._previewsContainer = $(this.options.previewContainer);
         this._dragging = [];
+        this._tt = null;
 
         // only allow global window listeners once
         if(!$.data(window, 'listening_'+plugin)) {
@@ -79,7 +87,7 @@
             window.onbeforeunload = function() {
                 // check if there are outstanding uploads
                 return pending <= 0 ? null : self.options.navWarning;
-            }
+            };
 
             // detect dragstart
             $(window).on('dragenter', function(e) {
@@ -123,12 +131,25 @@
 
                 this.on('addedfile', function(file) {
                     ++pending;
+                    if (self.options.refreshSelector) {
+                        window.clearTimeout(self._tt);
+                    }
                     self.options.addedfile.apply(this, [file]);
                 });
 
                 this.on('complete', function(file) {
                     --pending;
                     self.options.complete.apply(this, [file])
+                });
+
+                this.on('queuecomplete',  function() {
+                    if (self.options.refreshSelector) {
+                        self._tt = window.setTimeout(function () {
+                            $(self.options.refreshSelector).load(self.options.refreshUrl, self.options.refreshData);
+                        }, self.options.refreshTimeout);
+                    }
+
+                    self.options.queuecomplete.apply(this, arguments);
                 });
 
                 // affect global state

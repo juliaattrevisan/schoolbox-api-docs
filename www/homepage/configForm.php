@@ -64,25 +64,30 @@ if (is_numeric($_REQUEST['cid'])) {
 
 
 	// POST new component to page and output render of component
-	else if (is_numeric($_POST['cid']) && is_numeric($_POST['add'])) {
+	else if (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
 
-        $newComp = new Component_Instance();
-        $newComp
-            ->setDefinitionId($_POST['add'])
-            ->setIdentifier($_POST['cid'])
-            ->setModule('homepage')
-            ->setSequence(0)
-            ->setPosition('left');
+        if (is_numeric($_POST['add'])) {
+            $newComp = new Component_Instance();
+            $newComp
+                ->setDefinitionId($_POST['add'])
+                ->setIdentifier($_POST['cid'])
+                ->setModule('homepage')
+                ->setSequence(0)
+                ->setPosition('left');
 
-        // check perms
-        if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
-            exit;
+            // check perms
+            if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
+                exit;
+            }
+
+            $ids = $componentInstanceMapper->save($newComp);
+            $instanceID = $ids[0];
+
+            $componentInstanceMapper->cascadeSequence($_POST['cid']);
         }
-
-        $ids = $componentInstanceMapper->save($newComp);
-        $instanceID = $ids[0];
-
-        $componentInstanceMapper->cascadeSequence($_POST['cid']);
+        else {
+            $instanceID = $_POST['reload'];
+        }
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));

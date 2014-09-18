@@ -31,6 +31,8 @@
       previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
       acceptedFiles: 'image/*',
       createImageThumbnails: true,
+      refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+      refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
 
       addedfile: function (file) {
         $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
