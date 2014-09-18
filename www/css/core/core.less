@@ -9918,6 +9918,15 @@ img.mimetype {
     height: 15px;
     border: 1px solid @black;
     cursor: pointer;
+    &.sp-replacer {
+        // Special styles for spectrum colorpicker
+        padding: 0;
+        border: 1px solid black;
+        margin-right: 1em;
+        .sp-preview {
+            border-width: 0;
+        }
+    }
 }
 .selected {
     font-weight: bold;
