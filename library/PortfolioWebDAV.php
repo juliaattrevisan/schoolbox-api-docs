@@ -189,18 +189,18 @@ class PortfolioWebDAV
         } else if ($site_location == 'jpc') {
             $settings = array(
                 'baseUri' => 'https://malastare/',
-                'userName' => "jpc/" . $_SESSION['username'],
+                'userName' => "jpc/" . strtolower($_SESSION['username']),
                 'password' => $_SESSION['password'],
             );
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    '/Staff/' . $_SESSION['username'] . '/',
+                    '/Staff/' . strtolower($_SESSION['username']) . '/',
                     '/doclib/',
                 );
             } else {
                 $paths = array(
-                    '/Students/' . (date('Y') - ($_SESSION['year'] - 7)) . '/' . $_SESSION['username'] . '/',
+                    '/Students/' . (date('Y') - ($_SESSION['year'] - 7)) . '/' . strtolower($_SESSION['username']) . '/',
                 );
             }
         } else if ($site_location == 'cathedral') {
