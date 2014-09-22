@@ -143,7 +143,9 @@
 
 <ul class="homepage-controls clearfix">
     <!-- BEGIN edit_page -->
-    <li><a id="tab-permissions" class="btn groups no-text" data-tab="tabs-3" title="Change Permissions"><span></span></a></li>
+    <li><a id="tab-delete" class="btn delete no-text" data-tab="tabs-5" title="Delete this page"><span></span></a></li>
+    <li><a id="tab-permissions" class="btn groups no-text" data-tab="tabs-4" title="Change Permissions"><span></span></a></li>
+    <li><a id="tab-update" class="btn modify no-text" data-tab="tabs-3" title="Edit the page title"><span></span></a></li>
     <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns"><span></span></a></li>
     <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
     <!-- END edit_page -->
@@ -183,45 +185,6 @@
 	<!--/tabs-1-->
 
 	<div id="tabs-2" class="customise-components">
-		<div class="clearfix">
-			<form method='post' action='/eportfolio/configForm.php'>
-                <table class="standardForm table">
-					<tr>
-						<td class="formLabelWidth">
-							<h4>Page Title</h4>
-							<em>Specify a title for this page</em>
-						</td>
-						<td>
-							<p>
-								<input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-								<input type='hidden' name='user_id' value='{ID}' />
-								<input type='hidden' name='page_id' value='{PAGE_ID}' />
-								<input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
-							</p>
-						</td>
-					</tr>
-                </table>
-            </form>
-
-			<form method='post' action='/eportfolio/configForm.php'>
-				<table class="standardForm table">
-					<tr>
-						<td class="formLabelWidth">
-							<h4>Delete Page</h4>
-							<em>Remove this page from your ePortfolio</em>
-						</td>
-						<td>
-							<p>
-								<input type='hidden' name='page_id' value='{PAGE_ID}' />
-								<input type='hidden' name='deletePage' value='true' />
-								<input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
-							</p>
-						</td>
-					</tr>
-				</table>
-			</form>
-		</div>
-
         <div class="column-colours">
             <!-- These are selectable items - default to top selected only -->
             <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
@@ -293,7 +256,30 @@
         <div class="clearfix"></div>
 	</div>
 
-	<div id="tabs-3" class="customise-components">
+    <div id="tabs-3" class="customise-components">
+        <div class="clearfix">
+            <form method='post' action='/eportfolio/configForm.php'>
+                <table class="standardForm table">
+                    <tr>
+                        <td class="formLabelWidth">
+                            <h4>Page Title</h4>
+                            <em>Specify a title for this page</em>
+                        </td>
+                        <td>
+                            <p>
+                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                                <input type='hidden' name='user_id' value='{ID}' />
+                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                                <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+	<div id="tabs-4" class="customise-components">
 		<div class="clearfix">
 			<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
 				<input type='hidden' name='page_id' value='{PAGE_ID}' />
@@ -340,7 +326,29 @@
 			</form>
 		</div>
 	</div>
-</div>
+
+    <div id="tabs-5" class="customise-components">
+        <div class="clearfix">
+            <form method='post' action='/eportfolio/configForm.php'>
+                <table class="standardForm table">
+                    <tr>
+                        <td class="formLabelWidth">
+                            <h4>Delete Page</h4>
+                            <em>Remove this page from your ePortfolio</em>
+                        </td>
+                        <td>
+                            <p>
+                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                                <input type='hidden' name='deletePage' value='true' />
+                                <input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+    </div>
 <!-- END customise_page -->
 
 <div class="homepage clearfix">
