@@ -330,7 +330,7 @@ class Calendar extends DeprecatedModel {
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
-				u.title, u.firstname, u.lastname
+				u.title AS userTitle, u.firstname, u.lastname
 			FROM {$this->_table} e
 			LEFT JOIN user u ON u.id = e.owner
 			WHERE e.{$this->_index} = $eventID
