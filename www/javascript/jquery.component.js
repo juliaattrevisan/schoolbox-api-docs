@@ -43,7 +43,7 @@ setupCustomise = {
 //			});
 
 			// Component and column buttons
-			var buttons = $j('#tab-component, #tab-columns');
+			var buttons = $j('.homepage-controls .btn');
 			buttons.click(function(event) {
 				event.preventDefault;
 				var openMe = true;

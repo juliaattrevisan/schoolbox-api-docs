@@ -139,21 +139,18 @@
 
 <div class='clearfix'></div>
 
-<h1>
-	<span>{HEADING}</span> - {PAGE_TITLE}
+<h1><span>{HEADING}</span> - {PAGE_TITLE}</h1>
+
+<ul class="homepage-controls clearfix">
     <!-- BEGIN edit_page -->
-    <a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a>
+    <li><a id="tab-permissions" class="btn groups no-text" data-tab="tabs-3" title="Change Permissions"><span></span></a></li>
+    <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns"><span></span></a></li>
+    <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
     <!-- END edit_page -->
-</h1>
+</ul>
+
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
-	<ul class="clearfix">
-		<li><a href="#tabs-1">Components</a></li>
-		<li><a href='#tabs-2'>Page Settings</a></li>
-		<li><a href="#tabs-3">Colours</a></li>
-		<li><a href="#tabs-4">Permissions</a></li>
-	</ul>
-
 	<div id="tabs-1" class="customise-components">
 		<div id="tabs-sub">
 			<table border="0" cellpadding="0" cellspacing="0" class="table">
@@ -243,9 +240,6 @@
 				<div class="saved-layout">Saved layout</div>
 			</form>
 		</div>
-	</div>
-
-	<div id="tabs-3" class="customise-components clearfix">
 		<div class="clearfix">
 			<div class="colours topColumn clearfix">
 				<h3>Top Column</h3>
@@ -397,7 +391,7 @@
 		</div>
 	</div>
 
-	<div id="tabs-4" class="clearfix">
+	<div id="tabs-3" class="customise-components">
 		<div class="clearfix">
 			<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
 				<input type='hidden' name='page_id' value='{PAGE_ID}' />
