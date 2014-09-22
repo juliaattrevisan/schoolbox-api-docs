@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synchronise_Synergetic_Scs_Strategy_Parent
  *
@@ -6,12 +7,13 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
-	
+class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strategy_Parent
+{
     /**
      * Setup verbose output
      */
-    protected function setup() {
+    protected function setup()
+    {
         $unset = new Synchronise_Base_Hydrator_UnsetOnUpdate();
         $unset->setClearFields(array('webmail', 'eportfolio_enabled'));
         $this->verbose_filter = new Synchronise_Synergetic_Scs_Verbose();
@@ -29,7 +31,6 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_BasicMapping('NetworkLogin', 'username'))
             ->addSpouseHydrator($unset)
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
-            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
-        ;
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear());
     }
 }
