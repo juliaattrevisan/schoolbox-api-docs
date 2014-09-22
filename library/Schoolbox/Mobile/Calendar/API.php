@@ -487,7 +487,6 @@ class API extends Generic\API {
 					'detail' => Scrub::html($event->getDetail()),
 					'publish_date' => $event->getPublishDate(),
 					'allDay' => $event->getAllday(),
-					'date' => $event->getStartTime()->getDatabaseDate(),
 					'startTime' => $event->getStartTime()->getUsingFormat('h:iA'),
 					'endTime' => $event->getEndTime()->getUsingFormat('h:iA'),
 
