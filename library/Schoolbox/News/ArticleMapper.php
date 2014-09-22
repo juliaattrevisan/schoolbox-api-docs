@@ -20,6 +20,9 @@ use Schoolbox\User;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Category\NewsMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\News\Topic;
+use Schoolbox\News\TopicMapper;
 
 class ArticleMapper extends Mapper implements Searchable
 {
@@ -449,7 +452,7 @@ class ArticleMapper extends Mapper implements Searchable
 
             /* User campuses
              */
-            $campusMapper = new \Schoolbox\CampusMapper();
+            $campusMapper = new CampusMapper();
             $userCampuses = $campusMapper->getAvailableCampusesForUser($user);
             $user->setCampusCollection($userCampuses);
 
@@ -529,5 +532,160 @@ class ArticleMapper extends Mapper implements Searchable
         $allArticles->sortBy('publishDate', 'DESC');
 
         return $allArticles;
+    }
+
+    /**
+     * Find all the news relevant to a particular user
+     * by finding news they are directly related to, that their group/role is,
+     * and optionally for a particular news topic
+     *
+     * @param User $user
+     * @param $topic
+     * @return \Schoolbox\Collection
+     */
+    public function findAllForUserAndTopic(User $user, $topic)
+    {
+        /* Find all the news relevant to a specific topic
+         */
+        if ($topic instanceof Topic) {
+            $allArticles = $this->findForTopic($topic->getId(), 9999);
+        }
+        /* A combination of news related to you, specifically;
+         * and roles within campuses; and your associated categories
+         */
+        else {
+            $allArticles = new Collection();
+
+            /* User campuses
+             */
+            $campusMapper = new CampusMapper();
+            $userCampuses = $campusMapper->getAvailableCampusesForUser($user);
+            $user->setCampusCollection($userCampuses);
+
+            /* Find all the news relevant to all topics
+             */
+            $topicMapper = new TopicMapper();
+            $allTopics = $topicMapper->findAll();
+
+            foreach ($allTopics as $currentTopic) {
+                $allArticles = $allArticles->merge($this->findForTopic($currentTopic->getId(), 9999));
+            }
+
+            /* Find all the news relevant to roles and campuses
+             */
+            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            $allRecords = array();
+
+            $userMapper = $this->getJoinMapper('users');
+            $imageMapper = $this->getJoinMapper('image');
+            $campusMapper = $this->getJoinMapper('campuses');
+            $roleMapper = $this->getJoinMapper('roles');
+
+            /* Find all the news relevant to you specifically by id,
+             * or by role type in your campus
+             */
+            $query = "
+                SELECT
+                    {$this->getColumnString('a')},
+                    {$imageMapper->getColumnString('i')},
+                    {$userMapper->getColumnString('u')},
+                    {$campusMapper->getColumnString('c')},
+                    {$roleMapper->getColumnString('r')}
+                FROM `{$this->getTable()}` a
+                LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
+                LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
+                LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
+                LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
+                WHERE a.item_deleted = 0
+                    AND a.item_datetime_published <= :publishDate
+                    AND a.item_datetime_expires > :now
+                    AND (
+                        u.id = :userId
+                        OR a.item_owner = :userId
+                        OR (c.id = :campusId AND r.id = :roleId)
+                    )
+                ORDER BY a.item_datetime_posted DESC
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+
+            // iterate by campus
+            foreach ($user->getCampusCollection() as $campus) {
+                $statement->execute(
+                    array(
+                        'userId' => $user->getId(),
+                        'roleId' => $user->getRole()->getId(),
+                        'campusId' => $campus->getId(),
+                        'publishDate' => $now->getDatabaseDate(),
+                        'now' => $now->getDatabaseDate(),
+                    )
+                );
+
+                $allRecords = array_merge($statement->fetchAll(PDO::FETCH_ASSOC));
+            }
+
+            /* Hydrate
+             */
+            foreach ($allRecords as $currentRecord) {
+                $article = $this->hydrate($currentRecord, 'a');
+                $image = $imageMapper->hydrate($currentRecord, 'i');
+
+                if (is_numeric($image->getId())) {
+                    $article->setImage($image);
+                }
+
+                $allArticles->add($article);
+            }
+        }
+
+        $allArticles->sortBy('publishDate', 'DESC');
+
+        return $allArticles;
+    }
+
+    /**
+     * @param $topicId
+     * @param $limit
+     * @param int $offset
+     * @param int $time
+     * @return Collection|News[]
+     */
+    public function findForTopic($topicId, $limit, $offset = 0, $time = 0) {
+        $time = date('Y-m-d H:i:s', $time ?: time());
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
+        $stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('n')},
+				{$this->getJoinColumnString('owner', 'u')},
+				{$this->getJoinColumnString('topic', 't')}
+			FROM
+				`{$this->getTable()}` `n`
+				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
+				LEFT JOIN {$this->getJoinSql('topic', 'n', 't')}
+			WHERE
+				`n`.`item_deleted` = FALSE
+				AND `n`.`item_datetime_published` < :time
+				AND `n`.`item_topic_id` = :topicId
+			ORDER BY `n`.`item_datetime_published` DESC
+			LIMIT $offset, $limit
+		");
+
+        $stmt->execute(array(
+            'time' => $time,
+            'topicId' => $topicId
+        ));
+
+        $c = $this->createCollection();
+
+        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var News $news */
+            $news = $this->hydrate($r, 'n');
+            $news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+            $news->setTopic($this->hydrateJoin($r, 'topic', 't'));
+            $c->add($news);
+        }
+        return $c;
     }
 }

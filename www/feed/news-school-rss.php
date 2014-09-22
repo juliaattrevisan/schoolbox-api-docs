@@ -12,16 +12,16 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $page = new SitePage(false);
 
 $user = null;
-$category = null;
+$topic = null;
 
 /* Param explosion
  */
 $params = parse_url($_SERVER['QUERY_STRING']);
 
-preg_match('/user=([a-zA-Z0-9]+)(&category=)?(\d*)/', $params['path'], $matches);
+preg_match('/user=([a-zA-Z0-9]+)(&topic=)?(\d*)/', $params['path'], $matches);
 
 $userHash = $matches[1];
-$categoryId = $matches[3];
+$topicId = $matches[3];
 
 /* Find all the bits
  */
@@ -35,17 +35,18 @@ if (strlen($userHash)) {
 
     /* Optional category filter
      */
-    if (is_numeric($categoryId)) {
+    if (is_numeric($topicId)) {
         try {
-            /* TODO: Find category in newsTopic
-             */
-
+            $newsTopicMapper = new \Schoolbox\News\TopicMapper();
+            $newsTopic = $newsTopicMapper->findById($topicId);
         } catch (\Exception $e) {
         }
     }
 
-    /* TODO: Find the articles
+    /* Find the articles
      */
+    $articleMapper = new \Schoolbox\News\ArticleMapper();
+    $allNews = $articleMapper->findAllForUserAndTopic($user, $newsTopic);
 
     /* Render all this stuff
      */
@@ -63,30 +64,38 @@ if (strlen($userHash)) {
     );
 
     if ($allNews->count()) {
+        $processedIds = array();
+
+        /* Remove dupes
+         */
         foreach ($allNews as $currentNews) {
+            if (!in_array($currentNews->getId(), $processedIds)) {
 
-            /* Image detection (category news has no images)
-             */
-            $imageStr = '';
+                /* Image detection (category news has no images)
+                 */
+                $imageStr = '';
 
-            if (($currentNews instanceof Schoolbox\News\Article) && is_numeric($currentNews->getImage()->getId())) {
-                $imageStr = "<img src=\"" . $page->conType(
-                    ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
-                    )}&size=constrain200\">";
+                if (($currentNews instanceof Schoolbox\News\Article) && is_numeric($currentNews->getImage()->getId())) {
+                    $imageStr = "<img src=\"" . $page->conType(
+                        ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
+                        )}&size=constrain200\">";
+                }
+
+                $page->setVar(
+                    array(
+                        'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
+                        'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
+                        'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
+                        'ITEM_LINK' => Scrub::xml(
+                                $page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $currentNews->getId()
+                            ),
+                    )
+                );
+
+                $processedIds[] = $currentNews->getId();
+
+                $page->parse('rss_item_block', 'rss_item', true);
             }
-
-            $page->setVar(
-                array(
-                    'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
-                    'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
-                    'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
-                    'ITEM_LINK' => Scrub::xml(
-                            $page->conType() . $_SERVER['HTTP_HOST'] . '/news/item/' . $currentNews->getId()
-                        ),
-                )
-            );
-
-            $page->parse('rss_item_block', 'rss_item', true);
         }
     } else {
         $page->setVar('rss_item_block', '');
