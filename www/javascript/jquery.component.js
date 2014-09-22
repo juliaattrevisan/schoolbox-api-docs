@@ -192,21 +192,19 @@ setupCustomise = {
 
 		colours: function() {
 			// Each colorpicker can represent colors for multiple sections.
-			$j('input[data-colorpicker]').each(function () {
-				$j(this).spectrum({
-					showPalette: false,
-					showSelectionPalette: false,
-					showButtons: false,
-					showAlpha: false,
-					showInitial: true,
-					showInput: true,
-					clickoutFiresChange: true,
-					preferredFormat: "hex",
-					replacerClassName: 'colorBox',
-					allowEmpty: true,
-					change: onColorChange,
-					move: onColorChange
-				})
+			$j('input[data-colorpicker]').spectrum({
+				showPalette: false,
+				showSelectionPalette: false,
+				showButtons: false,
+				showAlpha: false,
+				showInitial: true,
+				showInput: true,
+				clickoutFiresChange: true,
+				preferredFormat: "hex",
+				replacerClassName: 'colorBox',
+				allowEmpty: true,
+				change: onColorChange,
+				move: onColorChange
 			});
 
 			// trigger the change event for whatever columns are selected
