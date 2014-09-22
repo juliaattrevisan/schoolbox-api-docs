@@ -152,42 +152,32 @@
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
 	<div id="tabs-1" class="customise-components">
-		<div id="tabs-sub">
-			<table border="0" cellpadding="0" cellspacing="0" class="table">
-				<colgroup>
-					<col width="128" />
-				</colgroup>
-				<tr>
-					<td valign="top">
-						<ul class="component-categories">
-							<!-- BEGIN eportfolio_component_tab -->
-							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-							<!-- END eportfolio_component_tab -->
-						</ul>
-					</td>
-					<td>
-						<div class="components clearfix">
-							<!-- BEGIN eportfolio_component_page -->
-							<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-								<!-- BEGIN eportfolio_component -->
-								<div class="add-component clearfix">
-									<a href="#"
-									   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
-									   class="{EPORTFOLIO_COMPONENT_CLASS}"
-									   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
-									>
-										<span class="icon"></span>
-										<span class="notification"><strong></strong>Added</span>
-										<h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
-									</a>
-								</div>
-								<!-- END eportfolio_component -->
-							</div>
-							<!-- END eportfolio_component_page -->
-						</div>
-					</td>
-				</tr>
-			</table>
+		<div id="tabs-sub"> <!-- tabs-sub -->
+			<ul class="ui-tabs admin-nav">
+				<!-- BEGIN eportfolio_component_tab -->
+				<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+				<!-- END eportfolio_component_tab -->
+			</ul>
+			<div class="clearfix"></div>
+			<div class="components clearfix">
+				<!-- BEGIN eportfolio_component_page -->
+				<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+					<!-- BEGIN eportfolio_component -->
+					<div class="add-component clearfix">
+						<a href="#"
+						   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
+						   class="{EPORTFOLIO_COMPONENT_CLASS}"
+						   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
+								>
+							<span class="icon"></span>
+							<span class="notification"><strong></strong>Added</span>
+							<h4>{EPORTFOLIO_COMPONENT_NAME}</strong></h4>
+						</a>
+					</div>
+					<!-- END eportfolio_component -->
+				</div>
+				<!-- END eportfolio_component_page -->
+			</div>
 		</div>
 	</div>
 	<!--/tabs-1-->
