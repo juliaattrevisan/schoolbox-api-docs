@@ -31,6 +31,9 @@
         <colgroup>
             <col width="54px">
             <col>
+            <col width="64px">
+            <col>
+            <col>
             <col>
             <col>
         </colgroup>
@@ -38,7 +41,7 @@
         <tr>
             <th></th>
             <th>Name</th>
-            <th>Attendance String</th>
+            <th colspan="2">Attendance String</th>
             <th>Late Arrival</th>
             <th>Early Departure</th>
             <th>Reason</th>
@@ -50,7 +53,8 @@
 	<tr class='{ON_OFF}'>
 		<td><img src='/portrait.php?userId={STUDENT_SYNERGY_ID}&size=square64' width='32' height='32' alt="{STUDENT_NAME}" /></td>
 		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_NAME}</a></td>
-        <td><p style="font-size:12pt">{STUDENT_ATTENDANCESTRING}</p></td>
+        <td><p style="font-size:12pt;white-space: nowrap;">{STUDENT_ATTENDANCESTRING}</p></td>
+        <td><em>{STUDENT_NONATTENDREASON}</em></td>
         <td><input type='text' maxlength='10' size="8" name='LateArrivalTime[]' class="timepicker ui-timepicker-input" value="{STUDENT_ARRIVAL_TIME}" /></td>
 		<td><input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' class="timepicker ui-timepicker-input"  value="{STUDENT_DEPT_TIME}" /></td>
         <td>
