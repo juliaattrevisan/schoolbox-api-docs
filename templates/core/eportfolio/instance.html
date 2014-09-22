@@ -170,11 +170,16 @@
 							<!-- BEGIN eportfolio_component_page -->
 							<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
 								<!-- BEGIN eportfolio_component -->
-								<div class="add-component {EPORTFOLIO_COMPONENT_CLASS} clearfix">
-									<h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
-									<p>{EPORTFOLIO_COMPONENT_DESCRIPTION}</p>
-									<span class="notification"><strong></strong>Added</span>
-									<a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+								<div class="add-component clearfix">
+									<a href="#"
+									   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
+									   class="{HOMEPAGE_COMPONENT_CLASS}"
+									   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
+									>
+										<span class="icon"></span>
+										<span class="notification"><strong></strong>Added</span>
+										<h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
+									</a>
 								</div>
 								<!-- END eportfolio_component -->
 							</div>
