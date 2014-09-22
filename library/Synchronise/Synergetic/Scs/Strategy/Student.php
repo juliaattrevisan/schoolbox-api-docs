@@ -12,7 +12,8 @@ class Synchronise_Synergetic_Scs_Strategy_Student extends Synchronise_Base_Strat
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Synergetic_Scs_Verbose();
-
+        $unset = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unset->setClearFields(array('webmail', 'eportfolio_enabled'));
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
@@ -22,6 +23,7 @@ class Synchronise_Synergetic_Scs_Strategy_Student extends Synchronise_Base_Strat
 			->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
 			->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Group_Student())
 			->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_House())
+            ->addHydrator($unset)
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;

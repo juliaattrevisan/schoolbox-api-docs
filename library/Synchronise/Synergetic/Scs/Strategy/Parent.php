@@ -12,15 +12,21 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
      * Setup verbose output
      */
     protected function setup() {
+        $unset = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unset->setClearFields(array('webmail', 'eportfolio_enabled'));
         $this->verbose_filter = new Synchronise_Synergetic_Scs_Verbose();
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
+            ->addHydrator($unset)
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
             ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
+            ->addSpouseHydrator($unset)
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
