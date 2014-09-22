@@ -57,6 +57,7 @@ $topicSlugMap = array();
 // output the list of topics for the sidebar
 foreach ($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
+
     $output = array(
         'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $url->getSlug(),
@@ -66,6 +67,31 @@ foreach ($topicList as $sidebarTopic) {
     $topicSlugMap[$url->getSlug()] = $sidebarTopic['name'];
     $this->parse('topic_list_block', 'topic_list', true);
 }
+
+/* Create the feed url
+ */
+$url = "{$_SERVER['HTTP_HOST']}/feed/news-school-rss.php?user={$_SESSION['user']->getHash()}";
+
+if ($selectedTopic != 'all') {
+    $topicMapper = new \Schoolbox\News\TopicMapper();
+    $allTopics = $topicMapper->findAll();
+
+    foreach ($allTopics as $currentTopic) {
+        $slug = new Url($currentTopic->getName());
+
+        if ($slug->getSlug() == $selectedTopic) {
+            $topic = $currentTopic;
+
+            break;
+        }
+    }
+
+    $url .= "&topic={$topic->getId()}";
+}
+
+$this->setVar(array(
+    'SCHOOL_NEWS_RSS_FEED_URL' => $url
+));
 
 // forcibly remap 'all' to blank
 $topicSlugMap['all'] = '';
