@@ -2,7 +2,7 @@
     {% if not event.allDay %}
     <time>{{ event.startTime.timeOnly }}</time>
     {% endif %}
-    {{ event.note|raw }}
+    {{ event.title|raw }}
     {% if event.topic %}
     <aside>{{ event.topic }}</aside>
     {% endif %}

@@ -480,7 +480,7 @@ class API extends Generic\API {
 					'owner' => $event->getAuthorId(),
 					'access' => $event->getAccess(),
 					'type' => $event->getType(),
-					'note' => $event->getTitle(),
+					'title' => $event->getTitle(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'location' => $event->getLocation(),
 					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',
@@ -492,7 +492,7 @@ class API extends Generic\API {
 
 					/* The author's title - mr, mrs, etc.
 					 */
-					'title' => '',
+					//'title' => '',
 					'firstname' => $event->getAuthorName(),
 					'lastname' => '',
 				);
@@ -516,7 +516,7 @@ class API extends Generic\API {
 				);
 
 				$response = new Response_HTTP();
-				$response->setPage('title', $standardisedEvent['note']);
+				$response->setPage('title', $standardisedEvent['title'] ?: 'Event');
 				$response->setResponse('articles', array($time, $detail));
 			}
 	        else {
