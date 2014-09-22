@@ -479,7 +479,6 @@ class API extends Generic\API {
 					'series_id' => '',
 					'owner' => $event->getAuthorId(),
 					'access' => $event->getAccess(),
-					'sid' => $event->getSid(),
 					'type' => $event->getType(),
 					'note' => $event->getTitle(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
