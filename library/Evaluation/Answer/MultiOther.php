@@ -156,8 +156,37 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 	 * @return string
 	 */
 	private function otherLetterIndex($allAnswers) {
-		return chr(65+(int)count($allAnswers));
+		return $this->findLetterIndex((int)count($allAnswers) + 1);
 	}
+
+    /**
+     * Translate an integer to letters
+     *
+     * @param $num
+     * @return string
+     */
+    protected function findLetterIndex($num) {
+        $firstLetter = floor($num / 26);
+        $lastLetter = $num % 26;
+
+        /* Special case for z, az, bz, etc.
+         */
+        if (!$lastLetter) {
+            $firstLetter--;
+            $lastLetter = 26;
+        }
+
+        /* Convert from numeric to alpha
+         */
+        if ($firstLetter) {
+            $string = chr($firstLetter+64) . chr($lastLetter+64);
+        }
+        else {
+            $string = chr($lastLetter+64);
+        }
+
+        return $string;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -180,6 +209,15 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+            /* Just unserialize this once, dude
+             */
+            if ($existing['response']) {
+                $existingAnswer = unserialize($existing['response']);
+            }
+            else {
+                $existingAnswer = false;
+            }
+
 			/* Enforce "Other" - This is assumed to always be the next letter in the sequence
 			 *
 			 * When it gets to Z, you're going to start seeing square brackets and slashes
@@ -188,28 +226,31 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
  			 */
 			$other = new StdClass();
 			$other->description = 'Other';
-			$other->value = $this->otherLetterIndex($allAnswers);
+			$other->value = count($allAnswers);
 
 			$allAnswers[] = $other;
 
+            $i = 1;
+
             foreach ($allAnswers as $currentAnswer) {
+                $valueFacade = $this->findLetterIndex($i);
+
                 $page->setVar(array(
 					'QUESTION_ID' => $question_id,
 					'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
+                    'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']) {
-                    $existingAnswer = unserialize($existing['response']);
-
+                if ($existingAnswer) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
 
-						if (($currentAnswer->value == 'Other') && strlen(trim($existingAnswer['other']))) {
+						if (($currentAnswer->description == 'Other') && strlen(trim($existingAnswer['other']))) {
 							$page->setVar(array(
 								'ANSWER_OTHER' => $existingAnswer['other']
 							));
@@ -234,6 +275,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
+
+                $i++;
             }
         } else {
             $page->setVar('answerOption_block', '');

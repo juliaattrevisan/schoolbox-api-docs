@@ -1,27 +1,23 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript">
     $j(document).ready(function () {
-
         var validator = $j("#createQuestionForm").submit(function () {
             // update underlying textarea before submit validation
             tinyMCE.triggerSave();
         }).validate({
 			submitHandler: function () {
-				var theForm = $j('#createQuestionForm');
+				var theForm = $j('#createQuestionForm'),
+					answerCollection = new Array(),
+					content = tinyMCE.activeEditor.getContent(); // get the content
 
-				/* Form preprocessing
-				*/
-				var answerCollection = new Array();
-
-				var content = tinyMCE.activeEditor.getContent(); // get the content
 				$j('#question').val(content); // put it in the textarea
 
 				/* Collate possible answers and their correctness status
 				 */
 				$j.each($j('#answerCollection').find('li'), function (index, element) {
-					var elem = $j(element);
-
-					var description = elem.find('.answerDescription').val();
-					var code = elem.find('.answerCode').val();
+					var elem = $j(element),
+						description = elem.find('.answerDescription').val(),
+					    code = elem.find('.answerCode').val();
 
 					/* Ignore empty answers that weren't removed
 					 */
@@ -45,7 +41,7 @@
 						type_id: theForm.find('input[name=type_id]').val(),
 						marks: theForm.find('input[name=marks]').val(),
 						allAnswers: JSON.stringify(answerCollection),
-						configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+						configuration: JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 					};
 
 					/* Submit via POST and redirect to question creation screen upon done
@@ -73,7 +69,6 @@
 
 				return false;
 			},
-
 			rules: {
 				question: {
 					required: true,
@@ -84,19 +79,16 @@
 					emptyInputs: true
 				}
 			},
-
 			errorPlacement: function (error, element) {
 				error.addClass('message');  // add a class to the wrapper
 				var pos = $j('ul#answerCollection').height();
 
 				if (element.hasClass("answerDescription")) {
-					error.insertAfter(element.closest('#answerCollection'))
-				}
-				else if (element.hasClass("answerCorrect")) {
-					error.insertAfter(element.closest('#answerCollection'))
-				}
-				else {
-					error.insertAfter(element.parent().children(':last-child'))
+					error.insertAfter(element.closest('#answerCollection'));
+				} else if (element.hasClass("answerCorrect")) {
+					error.insertAfter(element.closest('#answerCollection'));
+				} else {
+					error.insertAfter(element.parent().children(':last-child'));
 				}
 			}
 		});
@@ -117,11 +109,8 @@
                 }
             });
 
-            /* Reposition bubble here somewhere
-             */
             return fieldsAreFilled;
         }, 'Please fill out all answers');
-
 
         jQuery.validator.addMethod('nothingChecked', function (value, element) {
             var countDracula = 0;
@@ -137,7 +126,6 @@
                 if (checkit == true) {
                     countDracula++
                 }
-
             });
 
             if (countDracula == 0) {
@@ -145,7 +133,6 @@
             }
 
             return oneFieldChecked;
-
         }, 'Tick at least one checkbox');
 
         jQuery.validator.addMethod("greaterThanZero", function (value, element) {
@@ -154,41 +141,48 @@
 
         /* Add a new answer option
          */
-        $j(document).on('click', '.makeNewAnswer', function () {
-            var thing = $j('.hidden-clone ul:first-child').clone();
-            $j('ul#answerCollection').append(thing);
-            refreshList();
+        $j(document).on('click', '.makeNewAnswer', function(e) {
+			e.preventDefault();
+
+			var maxItems = 702;
+
+			/* Obey limit
+			 */
+			if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
+				var thing = $j('.hidden-clone ul:first-child').clone();
+				$j('ul#answerCollection').append(thing);
+				refreshList();
+			}
+
             return false;
         });
 
+		/* Remove an answer option
+		 */
+		$j(document).on('click', '.delete', function () {
+			if (($j('.inputs').length) !== 3) {
+				$j(this).parent().remove();
+				refreshList()
+			}
+		});
+		
         $j('.answerCorrect').each(function () {
             if ($j(this).is(':checked')) {
                 $j(this).parent().parent().addClass("highlight");
             }
         });
 
-        $j(document).on('click', '.answerCorrect', function () {
-            $j(this).closest('li').toggleClass("highlight");
-        });
-
-        /* Remove an answer option
-         */
-        $j(document).on('click', '.delete', function () {
-            if (($j('.inputs').length) !== 3) {
-                $j(this).parent().remove();
-                refreshList()
-            }
-        });
-
+		$j(document).on('click', '.answerCorrect', function () {
+			$j(this).closest('li').toggleClass("highlight");
+		});
+		
         function refreshList() {
-            var alphabetStart = 65;
+			var i = 1;
 
-            $j('li.inputs > .list-item').each(function () {
-                var $this = $j(this);
-                $this.children('span').html('&#' + alphabetStart + ';)');
-                var convert = String.fromCharCode(alphabetStart);
-                $this.children('input').val(convert);
-                alphabetStart++;
+			$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+				$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
+				$(element).children('input').val(i);
+				i++;
             });
 
             var pos = $j('ul#answerCollection').height();
@@ -202,8 +196,7 @@
             });
         }
 
-        refreshList()
-
+        refreshList();
     });
 </script>
 
@@ -212,16 +205,9 @@
     <ul id="answerCollection">
         <!-- BEGIN answerOption -->
         <li class="inputs clearfix">
-            <label class="list-item">
-                <input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}"/>
-
-                <span>{ANSWER_VALUE})</span>
-            </label>
-            <label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect hide" type="checkbox"
-                /></label>
-            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text"
-                                               value="{ANSWER_DESCRIPTION}"/></label>
-
+            <label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}"/><span>{ANSWER_VALUE})</span></label>
+            <label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect hide" type="checkbox" /></label>
+            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}"/></label>
             <div class="delete"></div>
         </li>
         <!-- END answerOption -->
@@ -238,17 +224,13 @@
 <div class="hide hidden-clone">
     <ul>
         <li class="inputs clearfix">
-            <label class="list-item">
-                <input name="answerCode[]" class="answerCode text-box" type="hidden" value=""/>
-                <span>{ANSWER_VALUE})</span>
-            </label>
+            <label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value=""/><span>{ANSWER_VALUE})</span></label>
             <label class="check-it"><input name="answer[]" class="answerCorrect  hide" type="checkbox"/></label>
-            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text"
-                                               value=""/></label>
-
+            <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value=""/></label>
             <div class="delete"></div>
         </li>
     </ul>
+
     <p class="clearfix">
         <a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
     </p>

@@ -150,6 +150,36 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 	}
 
 	/**
+    /**
+     * Translate an integer to letters
+     *
+     * @param $num
+     * @return string
+     */
+    protected function findLetterIndex($num) {
+        $firstLetter = floor($num / 26);
+        $lastLetter = $num % 26;
+
+        /* Special case for z, az, bz, etc.
+         */
+        if (!$lastLetter) {
+            $firstLetter--;
+            $lastLetter = 26;
+        }
+
+        /* Convert from numeric to alpha
+         */
+        if ($firstLetter) {
+            $string = chr($firstLetter+64) . chr($lastLetter+64);
+        }
+        else {
+            $string = chr($lastLetter+64);
+        }
+
+        return $string;
+    }
+
+    /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
@@ -170,12 +200,17 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
+            $i = 1;
+
             foreach ($allAnswers as $currentAnswer) {
+                $valueFacade = $this->findLetterIndex($i);
+
                 $page->setVar(
                     array(
 						'QUESTION_ID' => $question_id,
 						'QUESTION_PLUGIN' => $this->plugin,
                         'ANSWER_ID' => $answerGroup['answer_id'],
+                        'ANSWER_VALUE_FACADE' => $valueFacade,
                         'ANSWER_VALUE' => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                     )
@@ -206,6 +241,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
+
+                $i++;
             }
         } else {
             $page->setVar('answerOption_block', '');
