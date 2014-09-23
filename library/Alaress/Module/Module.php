@@ -35,11 +35,22 @@ class Module {
      */
     public function init($basePath) {
         $injector = $this->getInjector();
+        $this->initSubmodules($injector, $basePath);
         $this->initRoutes($injector->get('router'), $basePath);
         $this->initRoutePreloads($injector->get('preloader'));
         $this->initRoutePermissions($injector->get('authorizer'));
         $this->initTemplatePaths($injector->get('templateEngine:loader'));
         $this->initControllers($injector);
+    }
+
+    /**
+     * Initializes any submodules of this module.
+     *
+     * @param ContainerInterface $injector
+     * @param string             $basePath The base route for this module
+     */
+    public function initSubmodules(ContainerInterface $injector, $basePath)
+    {
     }
 
     /**
