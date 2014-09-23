@@ -347,8 +347,9 @@ class External_Tass_Timetable implements External_TimetableInterface
             SELECT
                 subtab.sub_desc AS Description,
                 ttmast.day_code AS DayNumber,
-                ttmast.prd_code AS PeriodNumber,
-                ttmast.sub_code AS TimetableGroup,
+                RTRIM(CAST(ttmast.cmpy_code AS VARCHAR(20)))
+                    + '-'
+                    + RTRIM(CAST(ttmast.tt_id AS VARCHAR(20))) AS TimetableGroup,
                 ttmast.cmpy_code AS ClassCampus,
                 RTRIM(CAST(ttmast.year_grp AS VARCHAR(20)))
                     + '-'
