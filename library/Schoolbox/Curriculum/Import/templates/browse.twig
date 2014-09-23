@@ -1,3 +1,73 @@
-<h1>
-    This is a curriculum import template
-</h1>
+<script type="text/javascript">
+    (function($) {
+        $(function() {
+            var form = $('form#curriculum-import-form');
+            form.on('change', 'select[name="source"]', function() {
+                // Load the learning areas and levels for the selected source.
+                $.get(
+                    {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
+                    {id: this.value},
+                    $.noop,
+                    'json'
+                )
+                    .done(function(data) {
+                        console.log(data);
+                    })
+                    .fail(function() {
+                        // some error message
+                    })
+            })
+        })
+    })(jQuery);
+</script>
+
+<h1>Import Curriculum</h1>
+
+<form id="curriculum-import-form"
+      action="{{ saveAction }}"
+      method="post"
+      name="form" class="clearfix"
+>
+    <table class="standardForm table" data-wizard>
+        <tr data-wizard-step="1">
+            <td class="formLabelWidth">
+                <h4>Source</h4>
+                <em>Choose a curriculum source to import your curriculum from.</em>
+            </td>
+            <td>
+                <select name="source">
+                    <option value="">-- select --</option>
+                    {% for item in sourceList %}
+                        <option value="{{ item.id|e('html_attr') }}"
+                                label="{{ item.name|e('html_attr') }}"
+                                title="{{ item.description|e('html_attr') }}"
+                                >{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr data-wizard-step="2">
+            <td class="formLabelWidth">
+                <h4>Learning Area</h4>
+                <em>Choose a curriculum source to import your curriculum from.</em>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr data-wizard-step="2">
+            <td class="formLabelWidth">
+                <h4>Learning Level</h4>
+                <em>Choose a curriculum source to import your curriculum from.</em>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr data-wizard-step="3">
+            <td class="formLabelWidth">
+                <h4>Outcomes</h4>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+</form>

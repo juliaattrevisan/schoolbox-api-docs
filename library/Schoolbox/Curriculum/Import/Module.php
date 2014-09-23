@@ -25,6 +25,8 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $router->addGet('curriculumImport.browse', $basePath . '/?');
+        $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels.json');
+//        $router->addGet('curriculumImport.learningAreas', $basePath . '/learningAreas.json');
 //        // Attach standard REST routes
 //        $router->attachResource('tile', $basePath);
 //        $router->attachResourcePostAlias('tile', $basePath);
@@ -61,5 +63,7 @@ class Module extends BaseModule
             'controller:curriculumImport',
             $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
         );
+        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Mapper');
     }
 }
