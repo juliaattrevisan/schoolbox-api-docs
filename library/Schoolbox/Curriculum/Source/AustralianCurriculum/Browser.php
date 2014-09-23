@@ -12,6 +12,8 @@
 namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 
 use EasyRdf_Sparql_Client;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\LearningArea;
 
 class Browser
 {
@@ -35,7 +37,7 @@ class Browser
      *
      * Optionally, it may only return areas that apply to a learning level?
      *
-     * @return object
+     * @return Collection|LearningArea\Model[]
      */
     public function getLearningAreas()
     {
@@ -51,14 +53,17 @@ SELECT * WHERE {
 }
 SPARQL
         ;
-        return $this->getClient()->query($sparql);
-
-//        foreach ($client->query($sparql) as $row) {
-//
-//        }
-//        $uri->setQuery(array('query' => $sparql));
-//        $document = EasyRdf_Graph::newAndLoad($uri->toString());
-//        foreach ($document->)
+        $collection = new Collection();
+        foreach ($this->getClient()->query($sparql) as $row) {
+            // Use an existing area if possible.
+            // Otherwise, use a new one.
+            $area = new LearningArea\Model();
+            $area
+//                ->setSource($this->getSource())
+                ->setName($row->description->getValue());
+            $collection->add($area);
+        }
+        return $collection;
     }
 
     /**
