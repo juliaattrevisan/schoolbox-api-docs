@@ -834,20 +834,22 @@ class External_Synergetic_User implements External_UserInterface
     {
         $query = "
             SELECT DISTINCT
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseSurname,
-                StudentContactSpouseDefaultEmail,
-                StudentYearLevel,
-                StudentCampus,
-                StudentGender
-            FROM SynergyOne.dbo.vStudentContactAllAddress
+				c.NetworkLogin,
+				s.StudentContactID,
+				s.StudentContactTitle,
+				s.StudentContactPreferred,
+				s.StudentContactSurname,
+				s.StudentContactDefaultEmail,
+				s.StudentContactSpouseID,
+				s.StudentContactSpouseTitle,
+				s.StudentContactSpousePreferred,
+				s.StudentContactSpouseSurname,
+				s.StudentContactSpouseDefaultEmail,
+				s.StudentYearLevel,
+				s.StudentCampus,
+				s.StudentGender
+			FROM SynergyOne.dbo.vStudentContactAllAddress s
+			LEFT JOIN SynergyOne.dbo.Community c ON s.StudentContactID = c.ID
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
             AND FileSemester = '{$_SESSION['FileSemester']}'
             AND FileYear = '{$_SESSION['FileYear']}'
