@@ -14,6 +14,7 @@ namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 use EasyRdf_Sparql_Client;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
+use Schoolbox\Curriculum\LearningLevel;
 
 class Browser
 {
@@ -70,16 +71,20 @@ SPARQL
      * Returns a collection of learning levels.
      *
      * Optionally, it may only return levels that apply to a learning area?
+     *
+     * @return Collection|LearningLevel\Model[]
      */
-    public function getLearningLevels($learningArea = null)
+    public function getLearningLevels()
     {
+        // Fetch all unique learning levels from the curriculum here.
+        // I'd like to fetch the label from the level document too, but I don't
+        // know how.
         $sparql = <<<SPARQL
 prefix asn: <http://purl.org/ASN/schema/core/>
 prefix dct: <http://purl.org/dc/terms/>
 prefix sko: <http://www.w3.org/2004/02/skos/core#>
-SELECT DISTINCT ?subject ?level ?label WHERE {
+SELECT DISTINCT ?level ?label WHERE {
     ?subject a asn:StandardDocument .
-    %s
     {
         ?subject dct:educationLevel ?level .
         OPTIONAL { ?level sko:prefLabel ?label }
@@ -87,25 +92,32 @@ SELECT DISTINCT ?subject ?level ?label WHERE {
 }
 SPARQL
         ;
-
-        // I wish I could join to learning level here, but I don't know how.
-        // The query errors out.
-
-        // Did I supply a learning area?
-        // Only return levels in that area.
-        $learningAreaQuery = '';
-        if ($learningArea) {
-            $learningAreaQuery = "?subject dct:description \"$learningArea\"@en-au";
+        $collection = new Collection();
+        foreach ($this->getClient()->query($sparql) as $row) {
+            $level = new LearningLevel\Model();
+            $label = null;
+            if (isset($row->label)) {
+                $label = $row->label->getValue();
+            } else {
+                // fetch the label in a separate request.
+                // TODO get the query working properly
+                $curl = new \Alaress_Curl_Url($row->level->getUri().'.rdf');
+                $curl->exec();
+                if (!count($curl->getErrors())) {
+                    $document = simplexml_load_string($curl->getResult());
+                    foreach ($document->xpath('//skos:prefLabel') as $labelElement) {
+                        $label = "$labelElement";
+                        break;
+                    }
+                }
+            }
+            // No label - don't add
+            if (isset($label)) {
+                $level->setName($label);
+                $collection->add($level);
+            }
         }
-        $sparql = sprintf($sparql, $learningAreaQuery);
-        try {
-            $result = $this->getClient()->query($sparql);
-        } catch (\Exception $e) {
-            var_dump($e);
-            throw $e;
-        }
-
-        return $result;
+        return $collection;
     }
 
     /**
@@ -115,6 +127,8 @@ SPARQL
      */
     public function getStrands($learningArea)
     {
+        // Given learning area and learning level:
+
         // Get the learning area, then get all the strands that are part of it?
         // Get all strands of the given learning area
         $sparql = <<<SPARQL
