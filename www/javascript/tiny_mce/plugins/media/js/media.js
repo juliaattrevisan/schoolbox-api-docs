@@ -307,14 +307,14 @@
 					setVal('media_type', data.type);
 				} else {
 					// YouTube *NEW*
-					if (src.match(/youtu\.be\/[a-z1-9.\-_]+/i)) {
+					if (src.match(/youtu\.be\/[a-z0-9.\-_]+/i)) {
 						if (!(data.width || data.height)) {
 							data.width = 425;
 							data.height = 350;
 						}
 						data.params.frameborder = '0';
 						data.type = 'iframe';
-						src = '//www.youtube.com/embed/' + src.match(/youtu.be\/([a-z1-9.\-_]+)/i)[1];
+						src = '//www.youtube.com/embed/' + src.match(/youtu.be\/([a-z0-9.\-_]+)/i)[1];
 						setVal('src', src);
 						setVal('media_type', data.type);
 					}
