@@ -262,19 +262,19 @@ if ($permission >= WRITE_ACCESS) {
     ));
 }
 
-/* Homepage setup must be an array
- */
-$categoryArray = $catHandler->getByID($category->getId());
+$categoryContext = array(   'id'   => $category->getID(),
+                            'code' => $category->getCodeString()
+);
 
 //Setup control buttons
 $manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
-$manageFolderController->setup($categoryArray, array());
+$manageFolderController->setup($categoryContext, array());
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
 //Setup class list buttons
 $manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
-$manageClassController->setup($categoryArray, array());
+$manageClassController->setup($categoryContext, array());
 $manageClassController->execute();
 if($manageClassController->renderTemplate('manage_class')){
     $this->parse('manage_class_block', 'manage_class');
@@ -285,24 +285,22 @@ else {
 
 $this->parse('page_controls_block','page_controls');
 
-//set the page-level parameters in the template
-$codeArray = array();
-
-foreach ($category->getCodes() as $currentCode) {
-    $codeArray[] = $currentCode->getCode();
-}
-
-if(count($codeArray) > 4) {
-    $codeString = Scrub::text(implode(',',array_slice($codeArray, 0, 4)).'....');
+if($category->getCodes()->count() > 4) {
+    //Get first 4 codes
+    $subCodes = $category->getCodes()->slice(0, 4);
+    foreach($subCodes as $subCode) {
+        $subCodeString[] = $subCode->getCode();
+    }
+    $codeString = Scrub::text(implode(',',$subCodeString).'....');
 } else {
-    $codeString = Scrub::text($category->getCodes()->first()->getCode());
+    $codeString = Scrub::text($category->getCodeString());
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
     'HEADING' => Scrub::text($category->getName()) . ($category->getCodes()->count() ? ' (' . $codeString . ')' : ''),
-    'CODE' => urlencode(urlencode($category->getCodes()->first()->getCode())),
+    'CODE' => urlencode(urlencode($category->getCodeString())),
     'ID' => $category->getId(),
     'USER_TOKEN' => $_SESSION['key'],
 ));
@@ -392,7 +390,7 @@ foreach ($componentCollection as $component) {
     $templateHandle = "component_{$instance->getDefinitionId()}";
 
 
-    $component->setup($categoryArray, $instance->getConfigArray());
+    $component->setup($categoryContext, $instance->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {
