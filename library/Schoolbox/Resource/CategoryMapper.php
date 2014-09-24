@@ -222,7 +222,7 @@ class CategoryMapper extends Mapper {
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
 			LEFT JOIN {$this->getJoinSql('groups', 'c','ug')}
-			WHERE c.deleted_at = NULL AND c.parent=?
+			WHERE c.deleted_at IS NULL AND c.parent=?
 			ORDER BY c.name
 		";
 
@@ -357,7 +357,7 @@ class CategoryMapper extends Mapper {
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes',     'c', 'cc')}
 			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-			WHERE c.deleted_at = NULL AND a.uid = :user AND a.type >= :access
+			WHERE c.deleted_at IS NULL AND a.uid = :user AND a.type >= :access
 		";
 		$params = array(
 			'user'    => $user->getId(),
