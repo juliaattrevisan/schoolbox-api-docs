@@ -21,7 +21,12 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
-            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('NetworkLogin', 'username'))
+            ->addHydrator(
+                new Synchronise_Base_Hydrator_BasicMapping(
+                    'StudentContactNetworkLogin',
+                    'username'
+                )
+            )
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Password_Parent())
             ->addHydrator($unset)
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
@@ -29,7 +34,12 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
             ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
-            ->addSpouseHydrator(new Synchronise_Base_Hydrator_BasicMapping('NetworkLogin', 'username'))
+            ->addSpouseHydrator(
+                new Synchronise_Base_Hydrator_BasicMapping(
+                    'StudentContactSpouseNetworkLogin',
+                    'username'
+                )
+            )
             ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Password_Parent())
             ->addSpouseHydrator($unset)
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
