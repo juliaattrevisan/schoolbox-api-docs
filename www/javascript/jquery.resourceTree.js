@@ -52,6 +52,7 @@
                                 })
                         }
                     },
+                    force_text: true,
                     multiple: false,
                     check_callback: true,
                     themes: {
