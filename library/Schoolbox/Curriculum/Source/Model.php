@@ -15,9 +15,10 @@
 namespace Schoolbox\Curriculum\Source;
 
 use Alaress_Date_Format;
+use JsonSerializable;
 use Schoolbox\ISoftDeletable;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, JsonSerializable
 {
     /**
      * Primary key
@@ -199,5 +200,22 @@ class Model implements ISoftDeletable
     public function isDeleted()
     {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     *
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     *       which is a value of any type other than a resource.
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id'          => $this->getId(),
+            'name'        => $this->getName(),
+            'description' => $this->getDescription(),
+        );
     }
 }
