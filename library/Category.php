@@ -288,6 +288,7 @@ class Category extends DeprecatedModel {
 				  WHERE category.id = '$categoryID'
 				  AND	category.id = homepage_log.cid
 				  AND   homepage_log.user = '$userID'
+				  AND   category.deleted_at IS NULL
 		";
         return $this->db->getOne($query);
     }
