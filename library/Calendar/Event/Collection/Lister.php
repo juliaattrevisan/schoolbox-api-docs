@@ -129,12 +129,9 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             $selected['campus'] = $_SESSION['campus'];
 
             // select all types
-            $typeList = $this->getCalendarHandler()->getTypeList();
-
-            if (count($typeList)) {
-                foreach($typeList as $type) {
-                    $selected['event_type'][] = $type['eventTypeID'];
-                }
+            $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+            foreach($typeList as $type) {
+                $selected['event_type'][] = $type->getId();
             }
 
             // select all sources
@@ -182,13 +179,13 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         );
         $this->getPage()->checkList(
             'filter_event_type',
-            $calendarHandler->getTypeList(),
+            $typeList,
             $selected['event_type'],
             TEMPLATE_content,
             array(
-                'eventType' => 'EVENT_TYPE_NAME',
-                'eventTypeID' => 'EVENT_TYPE_ID',
-                'eventColour' => 'EVENT_TYPE_COLOUR'
+                'type' => 'EVENT_TYPE_NAME',
+                'id' => 'EVENT_TYPE_ID',
+                'color' => 'EVENT_TYPE_COLOUR'
             )
         );
 

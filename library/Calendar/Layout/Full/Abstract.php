@@ -175,13 +175,11 @@ abstract class Calendar_Layout_Full_Abstract {
 			$selected['campus'] = $_SESSION['campus'];
 
 			// select all types
-			$typeList = $this->getCalendarHandler()->getTypeList();
+			$typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
-			if (count($typeList)) {
-				foreach($typeList as $type) {
-					$selected['event_type'][] = $type['eventTypeID'];
-				}
-			}
+            foreach($typeList as $type) {
+                $selected['event_type'][] = $type->getId();
+            }
 
 			// select all sources
 			foreach ($sourceList as $source) {
@@ -231,13 +229,13 @@ abstract class Calendar_Layout_Full_Abstract {
 		);
 		$this->getPage()->checkList(
 			'filter_event_type',
-			$this->getCalendarHandler()->getTypeList(),
+			$typeList,
 			$selected['event_type'],
 			TEMPLATE_content,
 			array(
-				'eventType'   => 'EVENT_TYPE_NAME',
-				'eventTypeID' => 'EVENT_TYPE_ID',
-				'eventColour' => 'EVENT_TYPE_COLOUR'
+				'type'  => 'EVENT_TYPE_NAME',
+				'id'    => 'EVENT_TYPE_ID',
+				'color' => 'EVENT_TYPE_COLOUR'
 			)
 		);
 		$this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));

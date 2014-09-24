@@ -81,24 +81,24 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             'USER_TOKEN'    => $this->getUser()->getKey(),
         ));
 
-        /* Render event types to chooze from
+        /* Render event types to choose from
 		 */
-        $allTypes = $this->getCalendarHandler()->getTypeList();
+        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
-        if (is_array($allTypes) && count($allTypes)) {
+        if ($allTypes->count()) {
             foreach($allTypes as $currentType) {
                 $this->getPage()->setVar(array(
-                    'EVENT_TYPE_ID' => $currentType['eventTypeID'],
-                    'EVENT_TYPE_NAME' => Scrub::text($currentType['eventType']),
+                    'EVENT_TYPE_ID' => $currentType->getId(),
+                    'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
                 ));
 
                 $this->getPage()->parse('event_type_block', 'event_type', true);
 
                 /* Event Task id
 				 */
-                if ($currentType['eventType'] == 'Task') {
+                if ($currentType->getType() == 'Task') {
                     $this->getPage()->setVar(array(
-                        'TASK_TYPE_ID' => $currentType['eventTypeID'],
+                        'TASK_TYPE_ID' => $currentType->getId(),
                     ));
                 }
             }
