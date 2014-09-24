@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Layout_Full_Javascript
  *
@@ -8,16 +9,16 @@
  *
  * The javascript calendar is all self contained.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {
     /**
-	 * Choose template file
-	 */
+     * Choose template file
+     */
     protected function setupTemplateFile()
     {
         $this->setTemplateFile('calendar/full.html');
@@ -25,24 +26,26 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     }
 
     /**
-	 * Set up blocks and stuff
-	 */
+     * Set up blocks and stuff
+     */
     protected function setupBlocks()
     {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
 
-        $this->getPage()->setVar(array(
-            'USER_CALENDAR_ID' => $this->getUser()->getId(),
-            'USER_FULLNAME' => $this->getUser()->getFullname(),
-        ));
+        $this->getPage()->setVar(
+            array(
+                'USER_CALENDAR_ID' => $this->getUser()->getId(),
+                'USER_FULLNAME'    => $this->getUser()->getFullname(),
+            )
+        );
 
         $this->setupSelectedDayMonthYear();
     }
 
     /**
-	 * Set up selected day/month/year
-	 */
+     * Set up selected day/month/year
+     */
     protected function setupSelectedDayMonthYear()
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
@@ -61,45 +64,51 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 
         $this->getPage()->setVar(
             array(
-                'SELECTED_DAY' => $selectedDay,
+                'SELECTED_DAY'   => $selectedDay,
                 'SELECTED_MONTH' => $selectedMonth - 1,
-                'SELECTED_YEAR' => $selectedYear,
+                'SELECTED_YEAR'  => $selectedYear,
             )
         );
     }
 
     /**
-	 * Render calendar
-	 */
+     * Render calendar
+     */
     public function render()
     {
         $this->setupMovementButtons();
 
-        $this->getPage()->setVar(array(
-            'CALENDAR_USER_ID' => $this->getUser()->getId(),
-            'CALENDAR_VIEW' => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
-            'USER_TOKEN'    => $this->getUser()->getKey(),
-        ));
+        $this->getPage()->setVar(
+            array(
+                'CALENDAR_USER_ID' => $this->getUser()->getId(),
+                'CALENDAR_VIEW'    => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
+                'USER_TOKEN'       => $this->getUser()->getKey(),
+            )
+        );
 
         /* Render event types to choose from
 		 */
         $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
         if ($allTypes->count()) {
-            foreach($allTypes as $currentType) {
-                $this->getPage()->setVar(array(
-                    'EVENT_TYPE_ID' => $currentType->getId(),
-                    'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
-                ));
+            foreach ($allTypes as $currentType) {
+                $this->getPage()->setVar(
+                    array(
+                        'EVENT_TYPE_ID'   => $currentType->getId(),
+                        'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
+                    )
+                );
 
                 $this->getPage()->parse('event_type_block', 'event_type', true);
 
                 /* Event Task id
 				 */
                 if ($currentType->getType() == 'Task') {
-                    $this->getPage()->setVar(array(
-                        'TASK_TYPE_ID' => $currentType->getId(),
-                    ));
+                    $this->getPage()->setVar(
+                        array(
+                            'TASK_TYPE_ID' => $currentType->getId(),
+                        )
+                    );
                 }
             }
         } else {

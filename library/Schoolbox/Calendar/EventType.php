@@ -11,98 +11,106 @@
 namespace Schoolbox\Calendar;
 
 
-class EventType {
+class EventType
+{
 
-	/**
-	 * Event type id
-	 *
-	 * @var string
-	 */
-	private $id = '';
+    /**
+     * Event type id
+     *
+     * @var string
+     */
+    private $id = '';
 
-	/**
-	 * Event type name
-	 *
-	 * @var string
-	 */
-	private $type = '';
+    /**
+     * Event type name
+     *
+     * @var string
+     */
+    private $type = '';
 
-	/**
-	 * Colour of this event type
-	 *
-	 * @var string
-	 */
-	private $color = '';
+    /**
+     * Colour of this event type
+     *
+     * @var string
+     */
+    private $color = '';
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set color
-	 *
-	 * @param string $color
-	 * @return $this
-	 */
-	public function setColor($color) {
-		$this->color = $color;
+    /**
+     * Set color
+     *
+     * @param string $color
+     * @return $this
+     */
+    public function setColor($color)
+    {
+        $this->color = $color;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get color
-	 *
-	 * @return string
-	 */
-	public function getColor() {
-		return $this->color;
-	}
+    /**
+     * Get color
+     *
+     * @return string
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param string $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
+    /**
+     * Set id
+     *
+     * @param string $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return string
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Get id
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Set type
-	 *
-	 * @param string $type
-	 * @return $this
-	 */
-	public function setType($type) {
-		$this->type = $type;
+    /**
+     * Set type
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get type
-	 *
-	 * @return string
-	 */
-	public function getType() {
-		return $this->type;
-	}
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 }

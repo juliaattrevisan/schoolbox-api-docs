@@ -46,7 +46,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
         $this->getPage()->setVar(
             array(
-                'date_block' => '',
+                'date_block'          => '',
                 'has_no_events_block' => ''
             )
         );
@@ -86,7 +86,6 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         }
 
 
-
         $groupHandler = new Group();
         $category_list = $groupHandler->involvedInCategoryList($this->getUser()->getId());
 
@@ -96,8 +95,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         /* Render everything else out
          */
         // Load sources
-        $configs       = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-        $sourceList    = $configs->map(
+        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $sourceList = $configs->map(
             function ($record) {
                 /** @var Calendar_Api_Config_Record $record */
                 return array(
@@ -116,11 +115,10 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             $selected['campus'] = $_SESSION['calendarFilter']['campus'];
             $selected['event_type'] = $_SESSION['calendarFilter']['events'];
             $selected['source'] = $_SESSION['calendarFilter']['sources'];
-        }
-        else {
+        } else {
             // select all groups
             if (count($category_list)) {
-                foreach($category_list as $cat) {
+                foreach ($category_list as $cat) {
                     $selected['group'][] = $cat['id'];
                 }
             }
@@ -130,7 +128,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
             // select all types
             $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
-            foreach($typeList as $type) {
+            foreach ($typeList as $type) {
                 $selected['event_type'][] = $type->getId();
             }
 
@@ -183,8 +181,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             $selected['event_type'],
             TEMPLATE_content,
             array(
-                'type' => 'EVENT_TYPE_NAME',
-                'id' => 'EVENT_TYPE_ID',
+                'type'  => 'EVENT_TYPE_NAME',
+                'id'    => 'EVENT_TYPE_ID',
                 'color' => 'EVENT_TYPE_COLOUR'
             )
         );
