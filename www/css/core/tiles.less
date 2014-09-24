@@ -123,9 +123,14 @@ ul.tileList {
 }
 
 #tile-modify-form {
-  .title-position, .title-color {
+  .title-position/*, .title-color, .background-color*/ {
     label {
       display: inline;
+    }
+  }
+  .title-color, .background-color {
+    label {
+      min-width: 7em;
     }
   }
 }
