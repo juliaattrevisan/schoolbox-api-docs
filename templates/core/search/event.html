@@ -3,13 +3,14 @@
 <ul class="information-list">
 <!-- BEGIN event -->
 	<li>
-		<a href="/calendar/full/{EVENT_DATE}">
+		<a href="/calendar/full/{EVENT_DATE_RAW}">
         	<img class="thumbnail" height="64" width="64" src="images/icons/60x60/event.png" />
 			<h4>{EVENT_TITLE}</h4>
 		</a>
-		<p class="meta">{EVENT_DATE} {EVENT_TIME}</p>
-		<p class="meta">{EVENT_LOCATION}</p>
-		<p>{EVENT_TYPE}: {EVENT_DETAIL}</p>
+		<p class="meta">{EVENT_DATE} {EVENT_TIME} <br />
+            {EVENT_TYPE} <br />
+            {EVENT_LOCATION}</p>
+		<p>{EVENT_DETAIL}</p>
 	</li>
 <!-- END event -->
 </ul>

@@ -587,6 +587,7 @@ class Calendar extends DeprecatedModel {
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+                            AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -605,6 +606,7 @@ class Calendar extends DeprecatedModel {
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
 						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+						AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
 						";
 
         $events = $this->db->getAll($event_query);

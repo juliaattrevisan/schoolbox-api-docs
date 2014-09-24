@@ -662,23 +662,23 @@ if (!empty($result['event'])) {
     ));
 
     foreach ($result['event'] as $event) {
-        $date = new DateTime($event['date']);
-
+        $date = new Alaress_Date_Format($event['startDate'], 'Y-m-d');
         $event_time = '';
 
-        if (!empty($event['startTime'])) {
+        if (!empty($event['startTime']) && $event['startTime'] != '12:00AM') {
             $event_time .= $event['startTime'];
 
-            if (!empty($event['endTime'])) {
+            if (!empty($event['endTime']) && $event['startTime'] != '12:00AM') {
                 $event_time .= ' to ' . $event['endTime'];
             }
         }
 
         $page->setVar(array(
-            'EVENT_TITLE' => Scrub::html2text($event['note']),
+            'EVENT_TITLE' => Scrub::text($event['title']),
             'EVENT_TYPE' => Scrub::text($event['eventType']),
-            'EVENT_DETAIL' => Scrub::html2text($event['detail']),
-            'EVENT_DATE' => implode('-', array_reverse(explode('-', $event['startDate']))), // yep... -_-
+            'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']),150),
+            'EVENT_DATE' => $date->getDateOnly(),
+            'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
             'EVENT_LOCATION' => $event['location'],
             'EVENT_TIME' => $event_time
         ));
