@@ -248,7 +248,8 @@ class User extends DeprecatedModel
                 groups.name AS gname,
                 year,
                 local_email,
-                alt_email
+                alt_email,
+                synergy_id
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
             WHERE
