@@ -851,6 +851,7 @@ class Category extends DeprecatedModel {
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
       				  WHERE parent = ".$this->db->smartQuote($parentId)."
       				    AND name = ".$this->db->smartQuote($name)."
+      				    AND ca.deleted_at IS NULL
       				  GROUP BY ca.id
       				  LIMIT 1
       	";
