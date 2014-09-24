@@ -15,6 +15,99 @@ class Category extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
+    /**
+     * Filter method for nulling results that are deleted
+     *
+     * @param  array $result
+     * @return bool|array
+     */
+    protected function softDeleteFilter($result)
+    {
+        return $result['deleted_at'] ? false : $result;
+    }
+
+    /**
+     * Filter method for removing results from  that are deleted
+     *
+     * @param  array $resultSet
+     * @return bool|array
+     */
+    protected function softDeleteFilterAll($resultSet)
+    {
+        if (is_array($resultSet)) {
+            $resultSet = array_filter(
+                array_map(
+                    array($this, 'softDeleteFilter'),
+                    $resultSet
+                )
+            );
+            if (empty($resultSet)) {
+                $resultSet = false;
+            }
+        }
+        return $resultSet;
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getByID($id)
+    {
+        return $this->softDeleteFilter(parent::getByID($id));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getByField($field, $id)
+    {
+        return $this->softDeleteFilter(parent::getByField($field, $id));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getByArray($fieldList, $termOp = 'AND')
+    {
+        return $this->softDeleteFilterAll(parent::getByArray($fieldList, $termOp));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAllByField($field, $id, $orderBy = "", $orderDir = "")
+    {
+        return $this->softDeleteFilterAll(parent::getAllByField($field, $id, $orderBy, $orderDir));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAll($order = '')
+    {
+        return $this->softDeleteFilterAll(parent::getAll($order));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAllByFields($fields, $type = 'AND')
+    {
+        return $this->softDeleteFilterAll(parent::getAllByFields($fields, $type));
+    }
+
 	/**
 	 * Get a category by name
 	 *
