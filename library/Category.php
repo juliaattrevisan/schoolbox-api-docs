@@ -214,7 +214,7 @@ class Category extends DeprecatedModel {
     }
 
     function getParent($categoryID) {
-        $query = "SELECT parent FROM category WHERE id = $categoryID";
+        $query = "SELECT parent FROM category WHERE id = $categoryID AND deleted_at IS NULL";
         return $this->db->getOne($query);
     }
 
