@@ -802,6 +802,7 @@ class Category extends DeprecatedModel {
 						AND `userAccess`.uid = {$_SESSION['id']}
 					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 					WHERE (`perms`.cid OR `userAccess`.sid)
+					    AND category.deleted_at IS NULL
 						AND (
 							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
