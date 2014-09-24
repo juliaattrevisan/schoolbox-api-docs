@@ -57,7 +57,7 @@ SPARQL
             // Otherwise, use a new one.
             $area = new LearningArea\Model();
             $area
-//                ->setSource($this->getSource())
+                ->setSource($this->getSource())
                 ->setName($row->description->getValue());
             $collection->add($area);
         }
@@ -88,6 +88,7 @@ SPARQL
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
             $level = new LearningLevel\Model();
+            $level->setSource($this->getSource());
             $label = null;
             if (isset($row->label)) {
                 $label = $row->label->getValue();
