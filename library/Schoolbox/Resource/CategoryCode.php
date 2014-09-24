@@ -6,21 +6,23 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 
 namespace Schoolbox\Resource;
+
 use Schoolbox\ISoftDeletable;
 
-class CategoryCode implements ISoftDeletable{
-	/**
-	 * @var Category
-	 */
-	protected $category;
+class CategoryCode implements ISoftDeletable
+{
+    /**
+     * @var Category
+     */
+    protected $category;
 
-	/**
-	 * @var string
-	 */
-	protected $code;
+    /**
+     * @var string
+     */
+    protected $code;
 
     /**
      * @var \Alaress_Date_Format
@@ -28,36 +30,40 @@ class CategoryCode implements ISoftDeletable{
     protected $deletedAt;
 
     /**
-	 * @param  Category $category
-	 * @return $this
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
+     * @param  Category $category
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
-	/**
-	 * @return Category
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
+    /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
-	/**
-	 * @param  string $code
-	 * @return $this
-	 */
-	public function setCode($code) {
-		$this->code = $code;
-		return $this;
-	}
+    /**
+     * @param  string $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCode() {
-		return $this->code;
-	}
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
     /**
      * @param \Alaress_Date_Format $deletedAt
@@ -78,7 +84,8 @@ class CategoryCode implements ISoftDeletable{
     /**
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
     }
 

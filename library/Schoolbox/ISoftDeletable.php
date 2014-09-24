@@ -9,7 +9,8 @@
 
 namespace Schoolbox;
 
-interface ISoftDeletable {
+interface ISoftDeletable
+{
     /**
      * Is this object deleted?
      *
