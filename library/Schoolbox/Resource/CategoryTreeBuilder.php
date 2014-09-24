@@ -11,6 +11,7 @@ namespace Schoolbox\Resource;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Group as CategoryHandler;
+use TextFormatter;
 
 class CategoryTreeBuilder {
 
@@ -84,11 +85,19 @@ class CategoryTreeBuilder {
                     $type = 'course';
                 }
 
+                // Build the name of the category
+                $name = $category->getName();
+                $codeString = $category->getCodeString();
+                if ($codeString != '' && $codeString != $name) {
+                    $name .= ' ('.$codeString.')';
+                }
+                $name = TextFormatter::cutString($name, 32);
+
                 // Output something.
                 $output[] = array(
                     'id'       => $category->getId(),
                     'parent'   => $category->getParent()->getId() ?: '0',
-                    'text'     => $category->getName(),
+                    'text'     => $name,
                     'children' => count($children) > 0,
                     'type'     => $type,
                     'a_attr'   => array(
