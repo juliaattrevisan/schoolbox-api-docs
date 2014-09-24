@@ -42,7 +42,7 @@ class Category extends DeprecatedModel {
 		$query .= "
 			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 			WHERE (category.name LIKE \"%{$quotedName}%\"
-			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_as IS NULL";
+			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_at IS NULL";
 
         return $this->db->getAll($query);
     }
