@@ -141,7 +141,8 @@ class Category extends DeprecatedModel {
         $query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
 				  FROM category
 				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-				  WHERE category.id = '$category_id'";
+				  WHERE category.id = '$category_id'
+				  AND category.deleted_at IS NULL";
 
         return $this->db->getRow($query);
     }
