@@ -4563,6 +4563,20 @@ fieldset.edit-duration {
     background: @lgrey url(/images/core/icons/chat-up.png) no-repeat 50% 50%;
 }
 
+.evaluation-menu .edit-category{
+	background: @dark;
+	padding: 16px;
+}
+
+#subcategoryForm,
+#editCatForm{
+	input{
+		height: 28px;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+}
+
 .evaluation-options {
     background: @lgrey
 }
@@ -5302,17 +5316,6 @@ ul.multiple-choice-mark li {
 
 .submission-dropdown {
     .see-more-arrow();
-/*
-    display: block;
-    height: 17px;
-    width: 17px;
-    background: #909090;
-    color: @white;
-    text-align: center;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-*/
 }
 
 .sub-table-row td {
@@ -5324,7 +5327,6 @@ ul.multiple-choice-mark li {
     width: 400px;
     height: 200px;
     float: left;
-
     margin-bottom: 16px
 }
 
@@ -5332,9 +5334,7 @@ ul.multiple-choice-mark li {
     float: left;
     margin-left: 16px;
     border: 1px solid #e0e0e0;
-
     margin-bottom: 16px;
-
     -webkit-box-shadow: 1px 1px 2px #e0e0e0;
     -moz-box-shadow: 1px 1px 2px #e0e0e0;
     box-shadow: 1px 1px 2px #e0e0e0;
@@ -5350,15 +5350,13 @@ ul.multiple-choice-mark li {
 
 /* Question bank */
 .evaluation-content.question-bank .question {
-    border: 1px solid #e0e0e0;
+    border: 1px solid @lgrey;
     background: @dark;
-    margin-bottom: 0;
     padding: 0;
 }
 
 .evaluation-content.question-bank .question p {
     padding: 7px 16px;
-    background: @white;
 }
 
 .evaluation-content.question-bank h3 {
@@ -5373,43 +5371,50 @@ ul.multiple-choice-mark li {
     display: none;
     padding: 7px 16px;
     background: @white;
+    margin-top: -1px;
 }
 
 .evaluation-content.question-bank  .add-to-evaluation {
     margin-bottom: 16px;
 }
 
-.evaluation-content.question-bank  .add-to-evaluation .question-content {
-    background: @white;
-}
+/* Question Content */
 
-question-content
+.question-bank .question {
 
-.question-bank .question .question-checkbox {
-    float: left;
-    width: 5%
-}
-
-.question-bank .question .question-checkbox input[type=checkbox] {
-    display: block;
-    margin: 10px auto;
+	.question-checkbox{
+		float: left;
+    	width: 5%;
+    	input[type=checkbox] {
+			display: block;
+			margin: 10px auto;
+			height: inherit;
+		}
+	}
+	.btn{
+		border: 0;
+		float: right;
+		width: 2%;
+	}
 }
 
 .question-bank .question-content {
     float: left;
     display: block;
-    width: 95%;
-}
-
-.question-bank .question-content p {
-    margin: 0;
+    width: 75%;
+    p {
+    	margin: 0;
+	}
 }
 
 .question-bank .show-answers {
-    background: @dark /*url(/images/core/icons/chat-down.png) no-repeat 50% 50%*/;
+    background: darken(@dark,@darken-value / 4);
+    border: 1px solid @lgrey;
     display: block;
     text-align: center;
     padding: 2px 0;
+	.transition(background ease 0.5s);
+    &:hover{ background: darken(@dark,@darken-value / 3); }
 }
 
 ul.evaluation-category-select {
@@ -5425,20 +5430,13 @@ ul.evaluation-category-select {
     display: block;
     padding: 7px 16px;
     background-color:  @dark;
-    background-image: -webkit-gradient(linear, left top, left bottom, from( @dark), to( @dark));
-    background-image: -webkit-linear-gradient(top,  @dark,  @dark);
-    background-image: -moz-linear-gradient(top,  @dark,  @dark);
-    background-image: -ms-linear-gradient(top,  @dark,  @dark);
-    background-image: -o-linear-gradient(top,  @dark,  @dark);
-    background-image: linear-gradient(top,  @dark,  @dark);
-    filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr = ' @{dark}', EndColorStr = ' @{dark}')";
     text-shadow: 0px 1px 0px @white;
-
     border: 1px solid @std-grey;
     margin-bottom: 8px;
 }
 
-.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {
+.evaluation-content.question-bank .question.checked,
+.evaluation-category-select li a.selected {
     background: @dark;
     filter: none;
 }
@@ -5457,7 +5455,7 @@ ul.evaluation-category-select {
 }
 
 #categoryTree {
-    background: darken(@dark,@darken-value / 4);
+    background: @dark;
     padding: 16px;
 }
 
@@ -6909,9 +6907,6 @@ HOMEPAGE CUSTOMISE
         &:hover .icon{
             opacity: 0.75;
         }
-        //&:hover .plus{
-        //    opacity: 1;
-        //}
         .icon{
             background-image: url('/images/core/icons/component-icons.png');
             background-repeat: no-repeat;
