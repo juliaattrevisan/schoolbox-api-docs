@@ -38,17 +38,24 @@ class Controller extends Base
     }
 
     /**
-     * Controller action for loading the list of learning levels and areas for
-     * a given source (in request->params[id]).
+     * Controller action for loading the list of learning levels for a given
+     * source (in request->query[id]).
      */
     public function learningLevels()
     {
         $code = 200;
+        $data = array();
         try {
-            $source = $this->getSourceMapper()->findById($this->getRequest()->params['id']);
+            $source = $this->getSourceMapper()->findById($this->getRequest()->query['id']);
             // Stuff this into a factory and use that to build a list of levels
+            $factory = new Source\BrowserFactory();
+            $browser = $factory->build($source);
+            // Try to fetch levels and areas asynchronously
+            $data['levels'] = $browser->getLearningLevels();
         } catch (Mapper\Exception $e) {
             $code = 400;
+        } catch (\InvalidArgumentException $e) {
+            $code = 500;
         }
         $this->getResponse()->status->setCode($code);
         $this->getResponse()->content->set(
