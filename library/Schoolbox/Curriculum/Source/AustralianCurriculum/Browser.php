@@ -15,8 +15,9 @@ use EasyRdf_Sparql_Client;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\Curriculum\Source;
 
-class Browser
+class Browser extends Source\BrowserAbstract
 {
     /**
      * @var EasyRdf_Sparql_Client
@@ -24,9 +25,9 @@ class Browser
     protected $client;
 
     /**
-     * Constructor - creates this field with a preset SPARQL client.
+     * Post-construct hook - creates a SPARQL client for the Australian Curriculum.
      */
-    public function __construct()
+    public function setup()
     {
         $this->setClient(
             new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/sparql')
@@ -34,11 +35,7 @@ class Browser
     }
 
     /**
-     * Retrieves a collection of learning areas.
-     *
-     * Optionally, it may only return areas that apply to a learning level?
-     *
-     * @return Collection|LearningArea\Model[]
+     * {@inheritdoc}
      */
     public function getLearningAreas()
     {
@@ -68,11 +65,7 @@ SPARQL
     }
 
     /**
-     * Returns a collection of learning levels.
-     *
-     * Optionally, it may only return levels that apply to a learning area?
-     *
-     * @return Collection|LearningLevel\Model[]
+     * {@inheritdoc}
      */
     public function getLearningLevels()
     {
