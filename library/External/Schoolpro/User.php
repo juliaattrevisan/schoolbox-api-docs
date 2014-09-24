@@ -414,7 +414,7 @@ class External_Schoolpro_User implements External_UserInterface {
 		/* Find the last updated datetime
 		 */
 		if ($result['success'] && count($result['result'])) {
-			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
+			$photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
@@ -445,7 +445,7 @@ class External_Schoolpro_User implements External_UserInterface {
 
 					/* Purge all previously transformed copies
 					 */
-					$pattern = Config::get('stream_dir') . "/portrait/" . escapeshellcmd($externalUserId) . '-*.dat';
+					$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
 					foreach (glob($pattern) as $oldCacheFile) {
 						unlink($oldCacheFile);
