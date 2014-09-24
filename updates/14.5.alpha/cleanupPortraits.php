@@ -6,7 +6,7 @@ require_once __DIR__.'/../../include/Bootstrap.php';
 
 $affected = array('synergetic', 'schoolpro', 'maze');
 
-if(in_array($cfg->get('external_type'),$affected )) {
+if(in_array(Config::get('external_type'),$affected )) {
 
     /* Remove original portraits */
     $pattern = Config::get('portrait_dir') . '/*.jpg';
