@@ -15,8 +15,6 @@ use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use \External_UserInterface;
 use Schoolbox\Resource\Category;
-use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Resource\FileMapper;
 
 class CategoryMapper extends Mapper {
 
@@ -150,6 +148,7 @@ class CategoryMapper extends Mapper {
 
 		// iterate codes given; if any already exist, error 136
 		$codeList = $model->getCodes()->getColumnValues('code');
+
 
 		$collisions = CategoryCodeMapper::getInstance()->findByColumn('code', $codeList);
 
@@ -311,6 +310,7 @@ class CategoryMapper extends Mapper {
 
     /**
      * Finds a single category based on the category code passed in.
+     * Does not find codes that have been deleted
      *
      * @param  string $code
      * @throws \Schoolbox\Mapper\Exception if statement returned no category
@@ -318,7 +318,7 @@ class CategoryMapper extends Mapper {
      */
     public function findByCode($code) {
         $query = $this->getFindQuery();
-        $query .= 'WHERE cc.code=:code OR cc.code LIKE :codeLike';
+        $query .= 'WHERE c.deleted_at IS NULL AND cc.code=:code OR cc.code LIKE :codeLike';
         $statement = $this->database->prepare($query);
         $statement->execute(array(
             'code'     => $code,
@@ -505,6 +505,15 @@ class CategoryMapper extends Mapper {
 
         foreach ($allLinks as $currentLink) {
             $linkMapper->delete($currentLink);
+        }
+
+        /* Soft delete all category codes
+         */
+        $codeMapper = new CategoryCodeMapper();
+        $allCodes = $codeMapper->findForCategory($category->getId());
+
+        foreach($allCodes as $currentCode) {
+            $codeMapper->delete($currentCode);
         }
 
         /* Delete folder

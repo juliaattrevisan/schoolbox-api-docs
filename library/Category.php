@@ -42,7 +42,7 @@ class Category extends DeprecatedModel {
 		$query .= "
 			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 			WHERE (category.name LIKE \"%{$quotedName}%\"
-			OR categoryCode.code LIKE \"%{$quotedName}%\")";
+			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_as IS NULL";
 
         return $this->db->getAll($query);
     }
@@ -90,7 +90,7 @@ class Category extends DeprecatedModel {
             FROM category ca
             LEFT JOIN categoryCode co ON co.categoryID = ca.id
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
-            WHERE parent $cats
+            WHERE ca.deleted_at IS NULL AND parent $cats
             GROUP BY ca.id";
 
         $sortFields = array('name' => 'name', 'date' => 'id');
@@ -111,7 +111,7 @@ class Category extends DeprecatedModel {
       				  FROM category ca
       				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
-      				  WHERE parent = $categoryId
+      				  WHERE ca.deleted_at IS NULL AND parent = $categoryId
       				  GROUP BY ca.id
       	";
 
@@ -123,7 +123,7 @@ class Category extends DeprecatedModel {
     function hasChildren($categoryID) {
         $query = "SELECT c.id as children
 				  FROM category c
-				  WHERE parent = $categoryID
+				  WHERE c.deleted_at IS NULL AND parent = $categoryID
 				  LIMIT 1";
 
         return $this->db->getOne($query);
@@ -158,7 +158,7 @@ class Category extends DeprecatedModel {
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
                   LEFT JOIN homepage_config cf ON cf.cid = c.id
-                  WHERE (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)})
+                  WHERE c.deleted_at IS NULL AND (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)})
                   GROUP BY c.id";
 
         return $this->db->getRow($query);
@@ -372,7 +372,7 @@ class Category extends DeprecatedModel {
 
     function checkForChildren($id) {
         //check for child folders
-        $query = "SELECT id FROM category WHERE parent = '" . $id . "' LIMIT 1";
+        $query = "SELECT id FROM category WHERE deleted_at IS NULL AND parent = '" . $id . "' LIMIT 1";
         if ($this->db->getOne($query)) {
             return true;
         }
@@ -431,7 +431,7 @@ class Category extends DeprecatedModel {
             return false;
         }
 
-        $query = "SELECT * FROM categoryCode WHERE  ";
+        $query = "SELECT * FROM categoryCode WHERE deleted_at IS NULL ";
 
         /* When updating ignore the item your updating */
         if ($updateID) {

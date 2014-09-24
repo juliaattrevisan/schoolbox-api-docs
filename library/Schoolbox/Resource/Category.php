@@ -44,7 +44,7 @@ class Category implements ISoftDeletable {
     /**
      * Deleted at
      *
-     * @var
+     * @var \Alaress_Date_Format
      */
     protected $deletedAt;
 
@@ -232,7 +232,7 @@ class Category implements ISoftDeletable {
 	}
 
     /**
-     * @param mixed $deletedAt
+     * @param \Alaress_Date_Format $deletedAt
      */
     public function setDeletedAt($deletedAt)
     {
@@ -240,7 +240,7 @@ class Category implements ISoftDeletable {
     }
 
     /**
-     * @return mixed
+     * @return \Alaress_Date_Format
      */
     public function getDeletedAt()
     {

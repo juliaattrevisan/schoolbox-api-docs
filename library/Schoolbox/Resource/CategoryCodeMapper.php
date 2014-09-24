@@ -30,12 +30,19 @@ class CategoryCodeMapper extends Mapper {
 			'property'   => 'code',
 			'type'       => self::TYPE_STRING,
 		));
+        $this->hasMap(array(
+                'column'     => 'deleted_at',
+                'property'   => 'deletedAt',
+                'type'       => self::TYPE_STRING,
+        ));
 		$this->hasJoin('category', array(
 			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
 			'this_key'  => 'category',
 			'other_key' => 'id',
 		));
-	}
+
+        $this->hasSoftDeleteDateField('deleted_at');
+    }
 
 	/**
 	 * Retrieves category codes for a given category.

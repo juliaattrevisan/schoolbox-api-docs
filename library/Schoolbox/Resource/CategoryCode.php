@@ -9,9 +9,9 @@
  
 
 namespace Schoolbox\Resource;
+use Schoolbox\ISoftDeletable;
 
-
-class CategoryCode {
+class CategoryCode implements ISoftDeletable{
 	/**
 	 * @var Category
 	 */
@@ -22,7 +22,12 @@ class CategoryCode {
 	 */
 	protected $code;
 
-	/**
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $deletedAt;
+
+    /**
 	 * @param  Category $category
 	 * @return $this
 	 */
@@ -53,5 +58,28 @@ class CategoryCode {
 	public function getCode() {
 		return $this->code;
 	}
+
+    /**
+     * @param \Alaress_Date_Format $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+    }
 
 }
