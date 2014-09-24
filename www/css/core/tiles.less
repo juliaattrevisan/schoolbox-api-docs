@@ -32,12 +32,18 @@ ul.tileList {
     }
     &.add {
       // Add new tile link looks like a tile
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: #8fd16b;
+      &:hover {
+        background-color: #aeff83;
+      }
       .title {
         // its title is just a link in the middle of it
         text-align: center;
         vertical-align: middle;
       }
+    }
+    .btn {
+      margin: 8px 8px 0 0;
     }
     .title {
       // Title: revert spacing back to normal
@@ -89,7 +95,7 @@ ul.tileList {
     &.selected {
       // Selected: ensure weight is normal, and add light yellow background
       font-weight: normal;
-      background-color: #ffffcc;
+      background-color: #ffffb2;
     }
     .shape {
       // Shapes for tile shape selector
