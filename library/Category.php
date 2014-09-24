@@ -16,7 +16,7 @@ class Category extends DeprecatedModel {
     }
 
     /**
-     * Filter method for nulling results that are deleted
+     * Filter method for clearing results that are soft deleted
      *
      * @param  array $result
      * @return bool|array
@@ -27,7 +27,7 @@ class Category extends DeprecatedModel {
     }
 
     /**
-     * Filter method for removing results from  that are deleted
+     * Filter method for removing soft deleted results from a result set
      *
      * @param  array $resultSet
      * @return bool|array
