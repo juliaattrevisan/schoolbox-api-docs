@@ -60,10 +60,37 @@ class Controller extends Base
         $this->getResponse()->status->setCode($code);
         $this->getResponse()->content->set(
             array(
-                'type' => 'json',
-                'data' => array(
-                    'levels' => $this->getSourceMapper()->findAll(),
-                ),
+                'format' => 'json',
+                'data'   => $data,
+            )
+        );
+    }
+
+    /**
+     * Controller action for loading the list of learning areas for a given
+     * source (in request->query[id]).
+     */
+    public function learningAreas()
+    {
+        $code = 200;
+        $data = array();
+        try {
+            $source = $this->getSourceMapper()->findById($this->getRequest()->query['id']);
+            // Stuff this into a factory and use that to build a list of levels
+            $factory = new Source\BrowserFactory();
+            $browser = $factory->build($source);
+            // Try to fetch levels and areas asynchronously
+            $data['areas'] = $browser->getLearningAreas();
+        } catch (Mapper\Exception $e) {
+            $code = 400;
+        } catch (\InvalidArgumentException $e) {
+            $code = 500;
+        }
+        $this->getResponse()->status->setCode($code);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
             )
         );
     }
