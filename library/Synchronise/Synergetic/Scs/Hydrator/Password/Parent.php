@@ -17,12 +17,15 @@ class Synchronise_Synergetic_Scs_Hydrator_Password_Parent extends Synchronise_Ba
     public function hydrateOnCreate($externalUser, $newUser)
     {
         $encoding = 'UTF-8';
-        $newUser['password'] = sprintf(
+        $password = sprintf(
             '%s%s%s',
             mb_strtolower(mb_substr($newUser['firstname'], 0, 1, $encoding), $encoding),
             mb_strtolower(mb_substr($newUser['lastname'], 0, 1, $encoding), $encoding),
             $newUser['synergy_id']
         );
+        if ($password !== '') {
+            $newUser['password'] = $password;
+        }
         return $newUser;
     }
 }
