@@ -76,7 +76,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface {
 					$allDefinitions['end'][] = $currentDefinition['TimeTo'];
 					$allDefinitions['number'][] = $currentDefinition['PeriodNumber'];
 					$allDefinitions['dayNumber'][] = $currentDefinition['DayNumber'];
-					$allDefinitions['sequence'][] = null;
+					$allDefinitions['sequence'][] = 1;
 				}
 			}
 
@@ -331,6 +331,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface {
 				$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
 				$timetable[$period]['periodStart'] = $start;
 				$timetable[$period]['periodEnd'] = $end;
+				$timetable[$period]['periodSequence'] = 1;
 			}
 		}
 
