@@ -259,20 +259,27 @@ class CategoryMapper extends Mapper
         $category = null;
 
         foreach ($statement as $row) {
-            $category = $this->hydrate($row, 'c');
-            $code = $code_mapper->hydrate($row, 'cc');
+            $existingCat = $collection->filterBy('id', $row['c.id']);
+            if ($existingCat->count()) {
+                //Category already exists in collection
+                $code = $code_mapper->hydrate($row, 'cc');
+                if ($code->getCategory()->getId()) {
+                    $existingCat->first()->addCode($code);
+                }
+            } else {
+                $category = $this->hydrate($row, 'c');
+                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+                $category->setHomepage($homepageConfig);
 
-            if ($code->getCategory()->getId()) {
-                $category->addCode($code);
+                $group = $group_mapper->hydrate($row, 'ug');
+                $category->setGroup($group);
+
+                $code = $code_mapper->hydrate($row, 'cc');
+                if ($code->getCategory()->getId()) {
+                    $category->addCode($code);
+                }
+                $collection->add($category);
             }
-
-            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-            $category->setHomepage($homepageConfig);
-
-            $group = $group_mapper->hydrate($row, 'ug');
-            $category->setGroup($group);
-
-            $collection->add($category);
         }
 
         return $collection;

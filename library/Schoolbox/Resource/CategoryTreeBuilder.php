@@ -6,13 +6,16 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
-namespace Schoolbox\Resource;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Assessment\Course\TaskMapper;
-use Group as CategoryHandler;
 
-class CategoryTreeBuilder {
+namespace Schoolbox\Resource;
+
+use Group as CategoryHandler;
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use TextFormatter;
+
+class CategoryTreeBuilder
+{
 
     /**
      * @var CategoryMapper
@@ -34,7 +37,8 @@ class CategoryTreeBuilder {
      * @param TaskMapper      $taskMapper
      * @param CategoryHandler $handler
      */
-    public function __construct(CategoryMapper $mapper, TaskMapper $taskMapper, CategoryHandler $handler) {
+    public function __construct(CategoryMapper $mapper, TaskMapper $taskMapper, CategoryHandler $handler)
+    {
         $this->mapper     = $mapper;
         $this->handler    = $handler;
         $this->taskMapper = $taskMapper;
@@ -44,9 +48,11 @@ class CategoryTreeBuilder {
      * Builds a list of child nodes for $categoryId
      *
      * @param  mixed $categoryId
+     *
      * @return array
      */
-    public function buildChildNodes($categoryId) {
+    public function buildChildNodes($categoryId)
+    {
 
         $output = array();
 
@@ -62,12 +68,9 @@ class CategoryTreeBuilder {
                     'data-permission' => $this->getPermissionString($this->handler->getPermission(0)),
                 ),
             );
-        }
-        else {
-
+        } else {
             // Child nodes
             foreach ($this->mapper->findByParent($categoryId) as $category) {
-
                 // Get the permission this user has on this folder.
                 // No permission: don't show it at all!
                 $permission = $this->getPermissionString($this->handler->getPermission($category->getId()));
@@ -84,15 +87,23 @@ class CategoryTreeBuilder {
                     $type = 'course';
                 }
 
+                // Build the name of the category
+                $name       = $category->getName();
+                $codeString = $category->getCodeString();
+                if ($codeString != '' && $codeString != $name) {
+                    $name .= ' (' . $codeString . ')';
+                }
+                $name = TextFormatter::cutString($name, 32);
+
                 // Output something.
                 $output[] = array(
                     'id'       => $category->getId(),
                     'parent'   => $category->getParent()->getId() ?: '0',
-                    'text'     => $category->getName(),
+                    'text'     => $name,
                     'children' => count($children) > 0,
                     'type'     => $type,
                     'a_attr'   => array(
-                        'href' => '/homepage/'.$category->getId(),
+                        'href' => '/homepage/' . $category->getId(),
                     ),
                     'li_attr'  => array(
                         'data-permission' => $permission,
@@ -111,21 +122,22 @@ class CategoryTreeBuilder {
      * children, and repeats all the way up to the parent node.
      *
      * @param  mixed $categoryId
+     *
      * @return array
      */
-    public function buildPartialTree($categoryId) {
+    public function buildPartialTree($categoryId)
+    {
 
         // build a list of parentage
         $parentList[] = $parentId = $categoryId;
-        $i = 0;
+        $i            = 0;
         while ($parentId > 0) {
             if ($i++ > 100) {
                 break;
             }
             try {
                 $parentList[] = $parentId = $this->mapper->findById($parentId)->getParent()->getId();
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 break;
             }
         }
@@ -156,9 +168,11 @@ class CategoryTreeBuilder {
      * $this->handler->getPermission().
      *
      * @param  $code
+     *
      * @return string
      */
-    protected function getPermissionString($code) {
+    protected function getPermissionString($code)
+    {
         switch ($code) {
             case UserAccess::ACCESS_FULL:
                 return 'full';
@@ -174,5 +188,4 @@ class CategoryTreeBuilder {
         }
         return '';
     }
-
 }
