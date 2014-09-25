@@ -53,9 +53,9 @@ class External_Schoolbox_User implements External_UserInterface
             SELECT
                 parent.synergy_id AS StudentContactID,
                 parent.alt_email AS StudentContactEmail
-            FROM user
-            INNER JOIN user_relation ON user.id = user_relation.user_id
-            INNER JOIN user parent ON parent.id = user_relation.relation_id
+            FROM `user`
+            INNER JOIN user_relation ON user.id = user_relation.relation_id
+            INNER JOIN `user` parent ON parent.id = user_relation.user_id
             WHERE user.synergy_id IN ($id_list)
         "
         );
