@@ -165,6 +165,8 @@ abstract class Calendar_Layout_Full_Abstract
                 );
             }
         )->getAll();
+        // select all types
+        $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
             $selected['group'] = $_SESSION['calendarFilter']['groups'];
             $selected['campus'] = $_SESSION['calendarFilter']['campus'];
@@ -180,9 +182,6 @@ abstract class Calendar_Layout_Full_Abstract
 
             // select all campuses
             $selected['campus'] = $_SESSION['campus'];
-
-            // select all types
-            $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
             foreach ($typeList as $type) {
                 $selected['event_type'][] = $type->getId();
