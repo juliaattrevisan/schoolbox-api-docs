@@ -64,10 +64,17 @@ class LinkMapper extends Mapper {
 			'type'              => self::TYPE_DATETIME,
 			'updated_timestamp' => true,
 		));
+        $this->hasMap(array(
+            'column'     => 'deleted_at',
+            'property'   => 'deletedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 		$this->hasJoin('user', array(
              'mapper'    => '\\Schoolbox\\UserMapper',
              'this_key'  => 'owner',
              'other_key' => 'id',
 		));
+
+        $this->hasSoftDeleteDateField('deleted_at');
 	}
 }

@@ -15,6 +15,89 @@ class Category extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
+    /**
+     * Filter method for clearing results that are soft deleted
+     *
+     * @param  array $result
+     * @return bool|array
+     */
+    protected function softDeleteFilter($result)
+    {
+        return $result['deleted_at'] ? false : $result;
+    }
+
+    /**
+     * Filter method for removing soft deleted results from a result set
+     *
+     * @param  array $resultSet
+     * @return bool|array
+     */
+    protected function softDeleteFilterAll($resultSet)
+    {
+        if (is_array($resultSet)) {
+            $resultSet = array_filter(
+                array_map(
+                    array($this, 'softDeleteFilter'),
+                    $resultSet
+                )
+            );
+            if (empty($resultSet)) {
+                $resultSet = false;
+            }
+        }
+        return $resultSet;
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getByField($field, $id)
+    {
+        return $this->softDeleteFilter(parent::getByField($field, $id));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getByArray($fieldList, $termOp = 'AND')
+    {
+        return $this->softDeleteFilterAll(parent::getByArray($fieldList, $termOp));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAllByField($field, $id, $orderBy = "", $orderDir = "")
+    {
+        return $this->softDeleteFilterAll(parent::getAllByField($field, $id, $orderBy, $orderDir));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAll($order = '')
+    {
+        return $this->softDeleteFilterAll(parent::getAll($order));
+    }
+
+    /**
+     * Overridden to respect soft deleted rows
+     *
+     * {@inheritdoc}
+     */
+    public function getAllByFields($fields, $type = 'AND')
+    {
+        return $this->softDeleteFilterAll(parent::getAllByFields($fields, $type));
+    }
+
 	/**
 	 * Get a category by name
 	 *
@@ -42,7 +125,7 @@ class Category extends DeprecatedModel {
 		$query .= "
 			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 			WHERE (category.name LIKE \"%{$quotedName}%\"
-			OR categoryCode.code LIKE \"%{$quotedName}%\")";
+			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_at IS NULL";
 
         return $this->db->getAll($query);
     }
@@ -58,7 +141,8 @@ class Category extends DeprecatedModel {
         $query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
 				  FROM category
 				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-				  WHERE category.id = '$category_id'";
+				  WHERE category.id = '$category_id'
+				  AND category.deleted_at IS NULL";
 
         return $this->db->getRow($query);
     }
@@ -90,7 +174,7 @@ class Category extends DeprecatedModel {
             FROM category ca
             LEFT JOIN categoryCode co ON co.categoryID = ca.id
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
-            WHERE parent $cats
+            WHERE ca.deleted_at IS NULL AND parent $cats
             GROUP BY ca.id";
 
         $sortFields = array('name' => 'name', 'date' => 'id');
@@ -111,7 +195,7 @@ class Category extends DeprecatedModel {
       				  FROM category ca
       				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
-      				  WHERE parent = $categoryId
+      				  WHERE ca.deleted_at IS NULL AND parent = $categoryId
       				  GROUP BY ca.id
       	";
 
@@ -123,14 +207,14 @@ class Category extends DeprecatedModel {
     function hasChildren($categoryID) {
         $query = "SELECT c.id as children
 				  FROM category c
-				  WHERE parent = $categoryID
+				  WHERE c.deleted_at IS NULL AND parent = $categoryID
 				  LIMIT 1";
 
         return $this->db->getOne($query);
     }
 
     function getParent($categoryID) {
-        $query = "SELECT parent FROM category WHERE id = $categoryID";
+        $query = "SELECT parent FROM category WHERE id = $categoryID AND deleted_at IS NULL";
         return $this->db->getOne($query);
     }
 
@@ -143,7 +227,7 @@ class Category extends DeprecatedModel {
 				  LEFT JOIN user u on u.id = a.uid
 				  LEFT JOIN userGroups g ON g.cid = c.id
 				  LEFT JOIN homepage_config cf ON cf.cid = c.id
-				  WHERE c.id = '$categoryID'
+				  WHERE c.id = '$categoryID' AND c.deleted_at IS NULL
 				  GROUP BY c.id";
 
         return $this->db->getRow($query);
@@ -158,7 +242,7 @@ class Category extends DeprecatedModel {
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
                   LEFT JOIN homepage_config cf ON cf.cid = c.id
-                  WHERE (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)})
+                  WHERE c.deleted_at IS NULL AND (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)})
                   GROUP BY c.id";
 
         return $this->db->getRow($query);
@@ -204,6 +288,7 @@ class Category extends DeprecatedModel {
 				  WHERE category.id = '$categoryID'
 				  AND	category.id = homepage_log.cid
 				  AND   homepage_log.user = '$userID'
+				  AND   category.deleted_at IS NULL
 		";
         return $this->db->getOne($query);
     }
@@ -372,7 +457,7 @@ class Category extends DeprecatedModel {
 
     function checkForChildren($id) {
         //check for child folders
-        $query = "SELECT id FROM category WHERE parent = '" . $id . "' LIMIT 1";
+        $query = "SELECT id FROM category WHERE deleted_at IS NULL AND parent = '" . $id . "' LIMIT 1";
         if ($this->db->getOne($query)) {
             return true;
         }
@@ -431,7 +516,7 @@ class Category extends DeprecatedModel {
             return false;
         }
 
-        $query = "SELECT * FROM categoryCode WHERE  ";
+        $query = "SELECT * FROM categoryCode WHERE deleted_at IS NULL ";
 
         /* When updating ignore the item your updating */
         if ($updateID) {
@@ -717,6 +802,7 @@ class Category extends DeprecatedModel {
 						AND `userAccess`.uid = {$_SESSION['id']}
 					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 					WHERE (`perms`.cid OR `userAccess`.sid)
+					    AND category.deleted_at IS NULL
 						AND (
 							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
@@ -765,6 +851,7 @@ class Category extends DeprecatedModel {
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
       				  WHERE parent = ".$this->db->smartQuote($parentId)."
       				    AND name = ".$this->db->smartQuote($name)."
+      				    AND ca.deleted_at IS NULL
       				  GROUP BY ca.id
       				  LIMIT 1
       	";

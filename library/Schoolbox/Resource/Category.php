@@ -6,39 +6,48 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 
 namespace Schoolbox\Resource;
+
 use Schoolbox\Collection;
-use Schoolbox\External\Mapper;
 use Schoolbox\UserMapper;
+use Schoolbox\ISoftDeletable;
 
 
-class Category {
-	/**
-	 * @var int
-	 */
-	protected $id;
+class Category implements ISoftDeletable
+{
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var string
-	 */
-	protected $name;
+    /**
+     * @var string
+     */
+    protected $name;
 
-	/**
-	 * @var Category
-	 */
-	protected $parent;
+    /**
+     * @var Category
+     */
+    protected $parent;
 
     /**
      * @var \Schoolbox\Resource\HomepageConfig
      */
     protected $homepage;
 
-	/**
-	 * @var Collection
-	 */
-	protected $codes;
+    /**
+     * @var Collection
+     */
+    protected $codes;
+
+    /**
+     * Deleted at
+     *
+     * @var \Alaress_Date_Format
+     */
+    protected $deletedAt;
 
     /**
      *
@@ -46,125 +55,140 @@ class Category {
      */
     protected $group;
 
-	/** @var Collection */
-	protected $teacher_collection;
+    /** @var Collection */
+    protected $teacher_collection;
 
-	public function __construct() {
-		$this->setCodes(new Collection(array()));
-	}
+    public function __construct()
+    {
+        $this->setCodes(new Collection(array()));
+    }
 
     /**
      * Does this category have a homepage?
      *
      * @return bool
      */
-    public function hasHomepage() {
+    public function hasHomepage()
+    {
         return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate()->getId());
     }
 
-	/**
-	 * @param  Collection $codes
-	 * @return $this
-	 */
-	public function setCodes($codes) {
-		$this->codes = $codes;
-		return $this;
-	}
+    /**
+     * @param  Collection $codes
+     * @return $this
+     */
+    public function setCodes($codes)
+    {
+        $this->codes = $codes;
+        return $this;
+    }
 
-	/**
-	 * @return Collection|CategoryCode[]
-	 */
-	public function getCodes() {
-		return $this->codes;
-	}
+    /**
+     * @return Collection|CategoryCode[]
+     */
+    public function getCodes()
+    {
+        return $this->codes;
+    }
 
     /**
      * Gets your category codes in a , seperated string
      * @return string
      */
-    public function getCodeString() {
-		if (count($this->codes)) {
-			foreach($this->codes as $code) {
-				$codeSet[] = $code->getCode();
-			}
-			
-			return implode(',',$codeSet);
-		}
+    public function getCodeString()
+    {
+        if (count($this->codes)) {
+            foreach ($this->codes as $code) {
+                $codeSet[] = $code->getCode();
+            }
 
-		return '';
+            return implode(',', $codeSet);
+        }
+
+        return '';
     }
 
     /**
-	 * @param  CategoryCode $code
-	 * @return $this
-	 */
-	public function addCode($code) {
-		$this->getCodes()->add($code);
-		return $this;
-	}
+     * @param  CategoryCode $code
+     * @return $this
+     */
+    public function addCode($code)
+    {
+        $this->getCodes()->add($code);
+        return $this;
+    }
 
-	/**
-	 * @param  int $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param  int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  string $name
-	 * @return $this
-	 */
-	public function setName($name) {
-		$this->name = $name;
-		return $this;
-	}
+    /**
+     * @param  string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * @param  Category $parent
-	 * @return $this
-	 */
-	public function setParent($parent) {
-		$this->parent = $parent;
-		return $this;
-	}
+    /**
+     * @param  Category $parent
+     * @return $this
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
 
-	/**
-	 * @return Category
-	 */
-	public function getParent() {
-		return $this->parent;
-	}
+    /**
+     * @return Category
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
 
-	/**
-	 * @param \Schoolbox\Resource\HomepageConfig $homepage
-	 * @return $this
-	 */
-	public function setHomepage($homepage) {
-		$this->homepage = $homepage;
-		return $this;
-	}
-	/**
-	 * @return \Schoolbox\Resource\HomepageConfig
-	 */
-	public function getHomepage() {
-		return $this->homepage;
-	}
+    /**
+     * @param \Schoolbox\Resource\HomepageConfig $homepage
+     * @return $this
+     */
+    public function setHomepage($homepage)
+    {
+        $this->homepage = $homepage;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Resource\HomepageConfig
+     */
+    public function getHomepage()
+    {
+        return $this->homepage;
+    }
 
     /**
      * @param \Schoolbox\Resource\Group $group
@@ -184,48 +208,72 @@ class Category {
         return $this->group;
     }
 
-	/**
-	 * Returns the teacher collection
-	 *
-	 * @return Collection
-	 */
-	public function getTeachers() {
-		return $this->teacher_collection;
-	}
+    /**
+     * Returns the teacher collection
+     *
+     * @return Collection
+     */
+    public function getTeachers()
+    {
+        return $this->teacher_collection;
+    }
 
 
-	/**
-	 * Populates the teacher collection
-	 *
-	 * @param bool $includeSynergy
-	 */
-	public function loadTeachers($includeSynergy = true) {
-		// populate the teacher collection
+    /**
+     * Populates the teacher collection
+     *
+     * @param bool $includeSynergy
+     */
+    public function loadTeachers($includeSynergy = true)
+    {
+        // populate the teacher collection
 
-		$this->teacher_collection = new Collection();
+        $this->teacher_collection = new Collection();
 
-		if($includeSynergy) {
-			// TODO remove handler dependency
-			$DEPRECATED_EXTERNAL_CLASS = new \External_Class();
+        if ($includeSynergy) {
+            // TODO remove handler dependency
+            $DEPRECATED_EXTERNAL_CLASS = new \External_Class();
 
-			$codeCollection = $this->getCodes();
+            $codeCollection = $this->getCodes();
 
-			if($codeCollection->count()) {
-				$externalIdArray = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
+            if ($codeCollection->count()) {
+                $externalIdArray = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
 
-				foreach($externalIdArray as $extId) {
-					$this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
-				}
-			}
-		}
+                foreach ($externalIdArray as $extId) {
+                    $this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
+                }
+            }
+        }
 
-		// do we include staff included in this category internally as well? for now, no.
+        // do we include staff included in this category internally as well? for now, no.
 
-	}
+    }
 
-	//
-	// TODO implement group type, user access joins
+    /**
+     * @param \Alaress_Date_Format $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    //
+    // TODO implement group type, user access joins
 //	protected $user_access;
 
-
+    /**
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+    }
 }
