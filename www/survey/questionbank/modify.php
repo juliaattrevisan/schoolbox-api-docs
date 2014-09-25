@@ -24,6 +24,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     );
 
     $categoryHandler->update($newCategory);
+    $page->backToTheFuture(1);
 } else {
     error(126);
 }
