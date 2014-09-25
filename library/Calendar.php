@@ -521,7 +521,7 @@ class Calendar extends DeprecatedModel {
         return $stack;
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc') {
         $keyword = $this->db->quote($keyword);
 
         if (is_array($_SESSION['campus'])) {
@@ -552,6 +552,11 @@ class Calendar extends DeprecatedModel {
             if (count($groupList)) {
                 $groupQuery = "OR (access = '2' AND event_category.category_id IN (" . implode(',', $groupList) . "))";
             }
+        }
+
+        if($sort_by == 'diff') {
+            $sort_by = 'ABS( DATEDIFF( startDate, NOW() ) )';
+            $sort_dir = '';
         }
 
         $this->groupHandler->setService(CALENDAR_SERVICE);
@@ -587,6 +592,7 @@ class Calendar extends DeprecatedModel {
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+                            AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -605,6 +611,7 @@ class Calendar extends DeprecatedModel {
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
 						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+						AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
 						";
 
         $events = $this->db->getAll($event_query);
