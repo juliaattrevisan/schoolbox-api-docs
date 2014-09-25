@@ -24,6 +24,7 @@ class Synchronise_Synergetic_Scs_Strategy_Student extends Synchronise_Base_Strat
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Group_Student())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_House())
+            ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_ResidentialHouse())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear());
     }
