@@ -60,7 +60,8 @@ if (empty($check_id) || $groupHandler->getPermission($check_id) < WRITE_ACCESS) 
 
 if($action == 'delete') {
     $mapper->delete($mapper->findById($_GET['deleteBox']));
-    $page->localRedir("/submission/listSubmission/");
+    // BTFF this thing
+    $page->backToTheFuture(1);
 }
 else if($action == 'visibility') {
     /* This is used for an ajax update request of just the visibility */
