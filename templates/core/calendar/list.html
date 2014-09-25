@@ -4,10 +4,14 @@
 <script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
 <script type="text/javascript">
 	$(function() {
+
+		var exportForm = $('#calendar-export .filter-drop');
+
 		$('[data-filters="true"]').filterSelector({
-			filterContainer: '.filter-drop',
-			eventContainer: $('[data-eventlist="true"]')
-		});
+			filterContainer: '#calendar-list .filter-drop',
+			eventContainer: $('[data-eventlist="true"]'),
+			exportContainer: exportForm
+		})
 
 		/* date picker */
 		$j('#start_date, #finish_date').datepicker({
@@ -30,9 +34,8 @@
 
 		$('.btn.export').click(function(event) {
 			event.preventDefault();
-
-			$('.filter-drop').hide();
-			$('#calendar-export .filter-drop').toggle();
+			$('.filter-drop').not(exportForm).hide();
+			exportForm.toggle();
 		});
 
 //		exportControls.find(cal.options.filter.boxSelector).toggle()
@@ -123,7 +126,7 @@
 <div class="clearfix"></div>
 
 
-<div class='printEventList' data-eventlist="true">
+<div id="calendar-list" class='printEventList' data-eventlist="true">
 	<div class="calendar-controls">
 		<div class="link-case">
 			<div class="filter-drop clearfix">
