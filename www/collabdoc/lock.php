@@ -48,7 +48,7 @@ if ($authenticator->canCreate($pad->getHomepageId())) {
 	 */
 	$padMapper->save($pad);
 
-	$this->localRedir("/collabdoc/modify/{$pad->getId()}/{$this->arg[1]}");
+	$this->localRedir("/collabdoc/edit/{$pad->getId()}/{$this->arg[1]}");
 }
 else {
 	error(19);
