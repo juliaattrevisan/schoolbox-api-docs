@@ -332,6 +332,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface {
 				/* Port across some values
 				 */
 				$timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
+				$timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
 				$timetable[$period]['periodStart'] = $start;
 				$timetable[$period]['periodEnd'] = $end;
 				$timetable[$period]['periodSequence'] = 1;
