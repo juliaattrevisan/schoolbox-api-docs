@@ -20,6 +20,7 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
+            ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Parent())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
             ->addHydrator(
                 new Synchronise_Base_Hydrator_BasicMapping(
@@ -33,6 +34,7 @@ class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
+            ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Parent())
             ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
             ->addSpouseHydrator(
                 new Synchronise_Base_Hydrator_BasicMapping(
