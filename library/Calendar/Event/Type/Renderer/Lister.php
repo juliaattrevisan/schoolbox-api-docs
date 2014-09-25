@@ -14,13 +14,14 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     /**
      * Classes to be used as filter selectors
      *
-     * @param $currentEvent
+     * @param Calendar_Event_Type_Abstract $currentEvent
      * @return array|string
      */
     private function determineSelectors($currentEvent)
     {
         $selectors = array(
-            'type' . $currentEvent->getType()
+            'type' . $currentEvent->getType(),
+            'source' . $currentEvent->getConnectorId(),
         );
 
         /* Merge levels
