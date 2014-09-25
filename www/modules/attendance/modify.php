@@ -123,6 +123,7 @@ if ($class) {
 				'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
 				'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleDescription']),
                 'STUDENT_ATTENDANCESTRING'  => Scrub::text($currentStudent['TodaysAttendanceString']),
+                'STUDENT_NONATTENDREASON'   => Scrub::text($currentStudent['PossibleNonAttendReason']),
                 'STUDENT_ARRIVAL_TIME'  => isset($arrivalTime[3]) ? date('g:ia',strtotime($arrivalTime[0])) : '',
                 'STUDENT_DEPT_TIME'  => isset($deptTime[3]) ? date('g:ia',strtotime($deptTime[0])) : '',
                 'IS_ABSENT' => $currentStudent['AttendedFlag'] == 0 ? 'checked="checked"' : '',

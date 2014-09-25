@@ -131,6 +131,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
                        'spswkAttendances_ws', array(
                                array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4 ),
                                array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
+                               array('@CheckPossibleNonAttendFlag', 1, SQLINT4),
                                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
                            )
         );
