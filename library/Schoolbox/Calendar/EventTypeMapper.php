@@ -9,29 +9,38 @@
  */
 
 namespace Schoolbox\Calendar;
+
 use Schoolbox;
 
 
-class EventTypeMapper extends Schoolbox\External\Mapper {
+class EventTypeMapper extends Schoolbox\External\Mapper
+{
 
-	protected function mapping() {
-		$this->hasTable('luEventType');
-		$this->hasModel('\\Schoolbox\\Calendar\EventType');
-		$this->hasMap(array(
-			'column' => 'eventTypeID',
-			'property' => 'id',
-			'type' => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column' => 'eventType',
-			'property' => 'type',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'eventColour',
-			'property' => 'color',
-			'type' => self::TYPE_STRING,
-		));
-	}
+    protected function mapping()
+    {
+        $this->hasTable('luEventType');
+        $this->hasModel('\\Schoolbox\\Calendar\EventType');
+        $this->hasMap(
+            array(
+                'column'     => 'eventTypeID',
+                'property'   => 'id',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'eventType',
+                'property' => 'type',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'eventColour',
+                'property' => 'color',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+    }
 }

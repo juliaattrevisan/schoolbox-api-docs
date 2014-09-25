@@ -27,7 +27,11 @@
 
 				/* The element containing all the events
 				 */
-				eventContainer: null
+				eventContainer: null,
+
+				/* The element containing the export container
+				 */
+				exportContainer: null
 			}
 
 			var derived = {
@@ -45,6 +49,7 @@
 			$(config.element).click(function(event) {
 				event.preventDefault();
 
+				$(config.exportContainer).hide();
 				$(config.filterContainer).toggle();
 			});
 		}
