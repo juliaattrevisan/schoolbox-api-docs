@@ -6,28 +6,23 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 // ID provided, DueWork already exists
 $is_task = !empty($_POST['is_task']);
 if (is_numeric($_POST['id']) && ($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
-    $action = 'update';
+    $action          = 'update';
     $submissionBoxID = $_POST['id'];
-}
-// no ID, create a new DueWork
+} // no ID, create a new DueWork
 elseif (($is_task || $_POST['due_date']) && is_numeric($_POST['category'])) {
-    $action = 'create';
+    $action          = 'create';
     $submissionBoxID = 0;
-}
-// deletion flagged, delete existing DueWork
+} // deletion flagged, delete existing DueWork
 elseif (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
-    $action = 'delete';
+    $action          = 'delete';
     $submissionBoxID = $_GET['deleteBox'];
-}
-elseif (isset($_GET['id']) && isset($_GET['mark_visibility'])) {
-    $action = 'visibility';
+} elseif (isset($_GET['id']) && isset($_GET['mark_visibility'])) {
+    $action          = 'visibility';
     $submissionBoxID = $_GET['id'];
-}
-// data was POSTed, but nothing received: file upload size exceeded
+} // data was POSTed, but nothing received: file upload size exceeded
 elseif (upload_failed()) {
     error(10);
-}
-// unknown case, bug out
+} // unknown case, bug out
 else {
     error(2);
 }
@@ -44,7 +39,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper = new SubmissionBoxMapper();
 // localise important variables
-$submission = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : new SubmissionBox();
+$submission   = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : new SubmissionBox();
 $groupHandler = new Group();
 //
 // Auth: submission's category must be writable by this user.
@@ -57,14 +52,13 @@ if (empty($check_id) || $groupHandler->getPermission($check_id) < WRITE_ACCESS) 
 }
 
 
-
-if($action == 'delete') {
+if ($action == 'delete') {
     $mapper->delete($mapper->findById($_GET['deleteBox']));
-    $page->localRedir("/submission/listSubmission/");
-}
-else if($action == 'visibility') {
+    // BTFF this thing
+    $page->backToTheFuture(1);
+} elseif ($action == 'visibility') {
     /* This is used for an ajax update request of just the visibility */
-    try{
+    try {
         $subBox = $mapper->findById($submissionBoxID);
         $subBox->setMarkVisibility($_GET['mark_visibility']);
         $mapper->save($subBox);
@@ -77,16 +71,16 @@ else if($action == 'visibility') {
 
 // CREATE OR UPDATE
 
-$categoryID = $_POST['category'];
-$markTypeID = $_POST['marktype'];
+$categoryID  = $_POST['category'];
+$markTypeID  = $_POST['marktype'];
 $resultSetID = $_POST['resultset'];
 
 $acceptSubmissions = !empty($_POST['accept_submission']);
-$multiSubmissions = !empty($_POST['multi_submission']);
+$multiSubmissions  = !empty($_POST['multi_submission']);
 
-$descriptors = $_POST['des'];
-$values = $_POST['value'];
-$criteria = $_POST['crit'];
+$descriptors    = $_POST['des'];
+$values         = $_POST['value'];
+$criteria       = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
 //
@@ -115,11 +109,10 @@ if (!empty($_POST['fileId'])) {
 $dueDate = generateDate('due', '23:59:59');
 
 // if we're not accepting submissions. override the open date to now() and late date to due date
-if(!$acceptSubmissions) {
+if (!$acceptSubmissions) {
     $openDate = new Alaress_Date_Format(time(), 'U');
     $lateDate = $dueDate;
-}
-else {
+} else {
     $openDate = generateDate('open', '00:00:00');
     $lateDate = generateDate('late', '23:59:59');
 }
@@ -141,23 +134,21 @@ $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, de
 // if Total Mark selected, mark value must be specified
 if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
     error(2);
-}
-// if Rubric selected, generate the objects needed
-elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
+} // if Rubric selected, generate the objects needed
+elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rubricFactory = new DueWork_Rubric_Factory($criteria);
 
-    if($useDescriptors) {
+    if ($useDescriptors) {
         $specification = array();
-        foreach($descriptors as $critID => $desc) {
-            if($criteria[$critID]) {
-                foreach($desc as $k => $v) {
+        foreach ($descriptors as $critID => $desc) {
+            if ($criteria[$critID]) {
+                foreach ($desc as $k => $v) {
                     $specification[$critID][$k] = new DueWork_Rubric_Descriptor($v, $values[$critID][$k]);
                 }
             }
         }
         $rubric = $rubricFactory->buildRubric($specification, $submissionBoxID);
-    }
-    else {
+    } else {
         $rubric = $rubricFactory->buildRubric($resultSetID, $submissionBoxID);
     }
 
@@ -175,7 +166,7 @@ elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 
 // define submissionBox 'object': elements common to both scenarios
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
-$submission->setAcceptMultiple(!empty($_POST['multi_submission'])  ? true : false);
+$submission->setAcceptMultiple(!empty($_POST['multi_submission']) ? true : false);
 if (!$is_task) {
     $submission->setOpenDate($openDate);
     $submission->setDueDate($dueDate);
@@ -215,15 +206,13 @@ try {
             /** @var UnitInstance $unit */
             try {
                 $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($_POST['unit_id'], $categoryID);
-            }
-            catch (Schoolbox\Mapper\Exception $e) {
+            } catch (Schoolbox\Mapper\Exception $e) {
                 error(2);
             }
             $task_instance
                 ->setTitle($submission->getName())
                 ->setUnitInstance($unit)
-                ->setOwner($_SESSION['id'])
-            ;
+                ->setOwner($_SESSION['id']);
             Task\InstanceMapper::getInstance()->save($task_instance);
             $submission->setTaskInstance($task_instance);
         }
@@ -242,8 +231,7 @@ try {
             $task_instance->setSubmissionBox($submission);
             Task\InstanceMapper::getInstance()->save($task_instance);
         }
-    }
-    // update existing
+    } // update existing
     elseif ($action == 'update') {
         $mapper->save($submission);
         // Update task or task instance for this box
@@ -257,41 +245,53 @@ try {
             $task_instance->setTitle($_POST['name']);
             Task\InstanceMapper::getInstance()->save($task_instance);
         }
-    }
-    // something happened that shouldn't have
+    } // something happened that shouldn't have
     else {
         error(105);
     }
-}
-catch (Schoolbox\Resource\Exception $e) {
+} catch (Schoolbox\Resource\Exception $e) {
     if ($e->getCode() == Schoolbox\Resource\Exception::CODE_COPY_TO_STORAGE_FAILED) {
         error(105, 'The attached file could not be processed - try deleting it and re-attaching it.');
-    }
-    else {
+    } else {
         error(105);
     }
 }
 
 // persist rubric data
-if(isset($rubric)) {
+if (isset($rubric)) {
     $rubricHandler = new DueWork_Rubric_Handler();
-    $rubricHandler->persistRubric($rubric, isset($invalidateExistingMarks) ? $invalidateExistingMarks : false, $submissionBoxID);
+    $rubricHandler->persistRubric(
+        $rubric,
+        isset($invalidateExistingMarks) ? $invalidateExistingMarks : false,
+        $submissionBoxID
+    );
 }
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');
 
 /**
  * Uses POST variables to create dates
+ *
  * @param $field
  * @param $placeholder
+ *
  * @return Alaress_Date_Format
  */
-function generateDate($field, $placeholder) {
-    if(empty($_POST[$field . '_hour'])) {
-        $adf = new Alaress_Date_Format(sprintf("%s %s", $_POST[$field.'_date'], $placeholder), 'd/m/y');
-    }
-    else {
-        $adf = new Alaress_Date_Format(sprintf("%s %s:%s %s", $_POST[$field.'_date'], $_POST[$field.'_hour'], $_POST[$field.'_minute'], $_POST[$field.'_period']), 'd/m/y');
+function generateDate($field, $placeholder)
+{
+    if (empty($_POST[$field . '_hour'])) {
+        $adf = new Alaress_Date_Format(sprintf("%s %s", $_POST[$field . '_date'], $placeholder), 'd/m/y');
+    } else {
+        $adf = new Alaress_Date_Format(
+            sprintf(
+                "%s %s:%s %s",
+                $_POST[$field . '_date'],
+                $_POST[$field . '_hour'],
+                $_POST[$field . '_minute'],
+                $_POST[$field . '_period']
+            ),
+            'd/m/y'
+        );
     }
     return $adf;
 }
