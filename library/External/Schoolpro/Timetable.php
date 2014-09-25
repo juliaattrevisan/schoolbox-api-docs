@@ -132,7 +132,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface {
 	 * Get period number for a particular campus
 	 *
 	 * @param $campusId
-	 * @return bool
+	 * @return array
 	 */
 	public function getPeriodNumber($campusId) {
 		$campus = $this->getCampusMapper()->findById($campusId);
@@ -149,7 +149,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface {
 		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
 		if ($result['success'] && count($result['result'])) {
-			return $result['result'][0]['PeriodNumber'];
+			return array(
+				'PeriodNumber'    => $result['result'][0]['Identifier'],
+				'PeriodNumberSeq' => 1,
+			);
 		}
 
 		return false;
