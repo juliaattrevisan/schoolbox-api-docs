@@ -6,26 +6,15 @@
             var areaSelect  = form.find('select[name="learningArea"]');
             form.on('change', 'select[name="source"]', function() {
                 // Load the learning areas and levels for the selected source.
-                // Do it asynchronously (I would if I could, because these
-                // requests write to a locking session!)
+                // Do it asynchronously
                 if (this.value) {
-                    var levelRequest = $.get(
+                    $.get(
                         {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
                         {id: this.value},
                         $.noop,
                         'json'
-                    );
-                    var areaRequest = $.get(
-                        {{ routeLookup('curriculumImport.learningAreas')|json_encode|raw }},
-                        {id: this.value},
-                        $.noop,
-                        'json'
-                    );
-                    $.when(levelRequest, areaRequest)
-                        .done(function(levelResponse, areaResponse) {
-                            var levelData = levelResponse[0];
-                            var areaData  = areaResponse[0];
-
+                    )
+                        .done(function(data) {
                             // Remove the old levels, and add new ones
                             levelSelect
                                 .prop('disabled', false)
@@ -34,7 +23,7 @@
                                     return this.value;
                                 })
                                 .remove();
-                            levelData.levels.forEach(function(level) {
+                            data.levels.forEach(function(level) {
                                 $('<option />')
                                     .attr('label', level.name)
                                     .attr('value', level.name)
@@ -48,7 +37,7 @@
                                     return this.value;
                                 })
                                 .remove();
-                            areaData.areas.forEach(function(area) {
+                            data.areas.forEach(function(area) {
                                 $('<option />')
                                     .attr('label', area.name)
                                     .attr('value', area.name)

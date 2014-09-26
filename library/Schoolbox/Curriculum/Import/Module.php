@@ -26,7 +26,6 @@ class Module extends BaseModule
     {
         $router->addGet('curriculumImport.browse', $basePath . '/?');
         $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels');
-        $router->addGet('curriculumImport.learningAreas', $basePath . '/learningAreas');
 //        // Attach standard REST routes
 //        $router->attachResource('tile', $basePath);
 //        $router->attachResourcePostAlias('tile', $basePath);
