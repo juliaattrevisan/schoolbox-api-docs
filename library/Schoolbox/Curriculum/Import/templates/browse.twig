@@ -1,21 +1,77 @@
 <script type="text/javascript">
     (function($) {
         $(function() {
-            var form = $('form#curriculum-import-form');
+            var form        = $('form#curriculum-import-form');
+            var levelSelect = form.find('select[name="learningLevel"]');
+            var areaSelect  = form.find('select[name="learningArea"]');
             form.on('change', 'select[name="source"]', function() {
                 // Load the learning areas and levels for the selected source.
-                $.get(
-                    {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
-                    {id: this.value},
-                    $.noop,
-                    'json'
-                )
-                    .done(function(data) {
-                        console.log(data);
-                    })
-                    .fail(function() {
-                        // some error message
-                    })
+                // Do it asynchronously (I would if I could, because these
+                // requests write to a locking session!)
+                if (this.value) {
+                    var levelRequest = $.get(
+                        {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
+                        {id: this.value},
+                        $.noop,
+                        'json'
+                    );
+                    var areaRequest = $.get(
+                        {{ routeLookup('curriculumImport.learningAreas')|json_encode|raw }},
+                        {id: this.value},
+                        $.noop,
+                        'json'
+                    );
+                    $.when(levelRequest, areaRequest)
+                        .done(function(levelResponse, areaResponse) {
+                            var levelData = levelResponse[0];
+                            var areaData  = areaResponse[0];
+
+                            // Remove the old levels, and add new ones
+                            levelSelect
+                                .prop('disabled', false)
+                                .find('option')
+                                .filter(function() {
+                                    return this.value;
+                                })
+                                .remove();
+                            levelData.levels.forEach(function(level) {
+                                $('<option />')
+                                    .attr('label', level.name)
+                                    .attr('value', level.name)
+                                    .text(level.name)
+                                    .appendTo(levelSelect);
+                            });
+                            areaSelect
+                                .prop('disabled', false)
+                                .find('option')
+                                .filter(function() {
+                                    return this.value;
+                                })
+                                .remove();
+                            areaData.areas.forEach(function(area) {
+                                $('<option />')
+                                    .attr('label', area.name)
+                                    .attr('value', area.name)
+                                    .text(area.name)
+                                    .appendTo(areaSelect);
+                            });
+                        })
+                        .fail(function(jqXhr, textStatus, error) {
+                            // do something else
+                        });
+                } else {
+                    // Remove all filled in levels
+                    levelSelect
+                        .prop('disabled', true)
+                        .find('option')
+                        .filter(function() { return this.value; })
+                        .remove();
+                    areaSelect
+                        .prop('disabled', true)
+                        .find('option')
+                        .filter(function() { return this.value; })
+                        .remove();
+                }
             })
         })
     })(jQuery);
@@ -48,18 +104,22 @@
         </tr>
         <tr data-wizard-step="2">
             <td class="formLabelWidth">
-                <h4>Learning Area</h4>
-                <em>Choose a curriculum source to import your curriculum from.</em>
+                <h4>Learning Level</h4>
             </td>
             <td>
+                <select name="learningLevel" disabled>
+                    <option value="">-- select --</option>
+                </select>
             </td>
         </tr>
         <tr data-wizard-step="2">
             <td class="formLabelWidth">
-                <h4>Learning Level</h4>
-                <em>Choose a curriculum source to import your curriculum from.</em>
+                <h4>Learning Area</h4>
             </td>
             <td>
+                <select name="learningArea" disabled>
+                    <option value="">-- select --</option>
+                </select>
             </td>
         </tr>
         <tr data-wizard-step="3">
