@@ -64,6 +64,7 @@ SPARQL
                     ->setName($desc)
                     ->setCreatedAt($row->modified->getValue())
                     ->setModifiedAt($row->modified->getValue())
+                    ->setReference($row->doc->getUri())
                     ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
                 $models[$desc] = $area;
             }
@@ -112,7 +113,9 @@ SPARQL
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
             $level = new LearningLevel\Model();
-            $level->setSource($this->getSource());
+            $level
+                ->setSource($this->getSource())
+                ->setReference($row->level->getUri());
             $label = null;
             if (isset($row->label)) {
                 $label = $row->label->getValue();
