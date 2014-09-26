@@ -35,12 +35,13 @@
 <sql_create_table>CREATE TABLE `curriculum_learning_area` (
   `id` int(11) NOT NULL,
   `curriculum_source_id` int(11) NOT NULL,
-  `name` varchar(250) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `description` text NOT NULL,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `curriculum_source_id_2` (`curriculum_source_id`,`name`),
   KEY `curriculum_source_id` (`curriculum_source_id`),
   CONSTRAINT `curriculum_learning_area_ibfk_1` FOREIGN KEY (`curriculum_source_id`) REFERENCES `curriculum_source` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
@@ -53,12 +54,13 @@
 <sql_create_table>CREATE TABLE `curriculum_learning_level` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `curriculum_source_id` int(11) NOT NULL,
-  `name` varchar(250) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `description` text NOT NULL,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `curriculum_source_id_2` (`curriculum_source_id`,`name`),
   KEY `curriculum_source_id` (`curriculum_source_id`),
   CONSTRAINT `curriculum_year_level_ibfk_1` FOREIGN KEY (`curriculum_source_id`) REFERENCES `curriculum_source` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
@@ -70,14 +72,15 @@
 <height>174</height>
 <sql_create_table>CREATE TABLE `curriculum_source` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(250) NOT NULL,
-  `class` varchar(250) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `class` varchar(64) NOT NULL,
   `description` text NOT NULL,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4</sql_create_table>
 </table>
 <table name="curriculum_strand" view="colnames">
 <left>433</left>
