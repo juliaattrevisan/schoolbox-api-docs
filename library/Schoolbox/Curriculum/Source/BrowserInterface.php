@@ -28,4 +28,14 @@ interface BrowserInterface
      * @return Collection|LearningLevel\Model[]
      */
     public function getLearningLevels();
+
+    /**
+     * Returns a collection of outcomes for the given learning area and level.
+     *
+     * @param  LearningArea\Model  $area  The learning area to search
+     * @param  LearningLevel\Model $model The learning level to search
+     *
+     * @return Collection To be determined
+     */
+    public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $model);
 }

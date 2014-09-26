@@ -139,11 +139,9 @@ SPARQL
     }
 
     /**
-     * @param string $learningArea
-     *
-     * @return object
+     * {@inheritdoc}
      */
-    public function getStrands($learningArea)
+    public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $model)
     {
         // Given learning area and learning level:
 
@@ -173,10 +171,6 @@ SPARQL
         // Create a recursive tree of strands?
         $result = $this->getClient()->query($sparql);
         return $result;
-    }
-
-    public function getOutcomes()
-    {
     }
 
     /**
