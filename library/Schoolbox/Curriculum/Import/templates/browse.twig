@@ -81,7 +81,7 @@
             </td>
             <td>
                 <select name="source">
-                    <option value="">-- select --</option>
+                    <option value="">-- select a source --</option>
                     {% for item in sourceList %}
                         <option value="{{ item.id|e('html_attr') }}"
                                 label="{{ item.name|e('html_attr') }}"
@@ -89,26 +89,27 @@
                                 >{{ item.name }}</option>
                     {% endfor %}
                 </select>
+                <input type="submit"
+                       value="Use This Source"
+                       class="submit-btn-plain inline"
+                />
             </td>
         </tr>
         <tr data-wizard-step="2">
             <td class="formLabelWidth">
-                <h4>Learning Level</h4>
+                <h4>Curriculum</h4>
             </td>
             <td>
                 <select name="learningLevel" disabled>
-                    <option value="">-- select --</option>
+                    <option value="">-- select a level --</option>
                 </select>
-            </td>
-        </tr>
-        <tr data-wizard-step="2">
-            <td class="formLabelWidth">
-                <h4>Learning Area</h4>
-            </td>
-            <td>
                 <select name="learningArea" disabled>
-                    <option value="">-- select --</option>
+                    <option value="">-- select an area --</option>
                 </select>
+                <input type="submit"
+                       value="Search"
+                       class="submit-btn-plain inline"
+                />
             </td>
         </tr>
         <tr data-wizard-step="3">
