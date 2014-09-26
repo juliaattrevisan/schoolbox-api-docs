@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="latin1" collation="latin1_swedish_ci">schoolbox</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="curriculum_description" view="colnames">
+<left>719</left>
+<top>623</top>
+<width>228</width>
+<height>206</height>
+<sql_create_table>CREATE TABLE `curriculum_description` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `curriculum_description_parent_id` int(11) DEFAULT NULL,
+  `curriculum_strand_id` int(11) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  `code` varchar(64) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `curriculum_strand_id` (`curriculum_strand_id`),
+  KEY `curriculum_description_ibfk_2` (`curriculum_description_parent_id`),
+  CONSTRAINT `curriculum_description_ibfk_1` FOREIGN KEY (`curriculum_strand_id`) REFERENCES `curriculum_strand` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_description_ibfk_2` FOREIGN KEY (`curriculum_description_parent_id`) REFERENCES `curriculum_description` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+<table name="curriculum_learning_area" view="colnames">
+<left>245</left>
+<top>223</top>
+<width>160</width>
+<height>174</height>
+<sql_create_table>CREATE TABLE `curriculum_learning_area` (
+  `id` int(11) NOT NULL,
+  `curriculum_source_id` int(11) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `curriculum_source_id` (`curriculum_source_id`),
+  CONSTRAINT `curriculum_learning_area_ibfk_1` FOREIGN KEY (`curriculum_source_id`) REFERENCES `curriculum_source` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+<table name="curriculum_learning_level" view="colnames">
+<left>650</left>
+<top>224</top>
+<width>201</width>
+<height>174</height>
+<sql_create_table>CREATE TABLE `curriculum_learning_level` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `curriculum_source_id` int(11) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `curriculum_source_id` (`curriculum_source_id`),
+  CONSTRAINT `curriculum_year_level_ibfk_1` FOREIGN KEY (`curriculum_source_id`) REFERENCES `curriculum_source` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+<table name="curriculum_source" view="colnames">
+<left>71</left>
+<top>59</top>
+<width>112</width>
+<height>174</height>
+<sql_create_table>CREATE TABLE `curriculum_source` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) NOT NULL,
+  `class` varchar(250) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+<table name="curriculum_strand" view="colnames">
+<left>433</left>
+<top>524</top>
+<width>202</width>
+<height>206</height>
+<sql_create_table>CREATE TABLE `curriculum_strand` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `curriculum_strand_parent_id` int(11) DEFAULT NULL,
+  `curriculum_learning_level_id` int(11) DEFAULT NULL,
+  `curriculum_learning_area_id` int(11) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime NOT NULL,
+  `modified_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `curriculum_strand_ibfk_1` (`curriculum_learning_area_id`),
+  KEY `curriculum_strand_ibfk_2` (`curriculum_strand_parent_id`),
+  KEY `curriculum_strand_ibfk_3` (`curriculum_learning_level_id`),
+  CONSTRAINT `curriculum_strand_ibfk_1` FOREIGN KEY (`curriculum_learning_area_id`) REFERENCES `curriculum_learning_area` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_strand_ibfk_2` FOREIGN KEY (`curriculum_strand_parent_id`) REFERENCES `curriculum_strand` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_strand_ibfk_3` FOREIGN KEY (`curriculum_learning_level_id`) REFERENCES `curriculum_learning_level` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>
