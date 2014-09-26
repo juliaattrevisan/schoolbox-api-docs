@@ -41,6 +41,14 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $name;
 
     /**
+     * Reference used by the browser for fetching outcomes.
+     * Possibly a URI used in a RDF query.
+     *
+     * @var string
+     */
+    protected $reference;
+
+    /**
      * The PHP class name that this model points to
      *
      * @var string
@@ -211,6 +219,24 @@ class Model implements ISoftDeletable, JsonSerializable
     public function getSource()
     {
         return $this->source;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReference()
+    {
+        return $this->reference;
+    }
+
+    /**
+     * @param  string $reference
+     * @return $this
+     */
+    public function setReference($reference)
+    {
+        $this->reference = $reference;
+        return $this;
     }
 
     /**

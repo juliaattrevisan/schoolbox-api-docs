@@ -51,6 +51,13 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_STRING
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'reference',
+                'property' => 'reference',
+                'type'     => self::TYPE_STRING
+            )
+        );
 
         // Created/Modified/Deleted
         $this->hasMap(
