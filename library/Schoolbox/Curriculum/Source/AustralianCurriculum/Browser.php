@@ -45,22 +45,46 @@ class Browser extends Source\BrowserAbstract
 prefix asn: <http://purl.org/ASN/schema/core/>
 prefix dct: <http://purl.org/dc/terms/>
 SELECT * WHERE {
-    ?subject a asn:StandardDocument .
-    ?subject dct:description ?description .
-    ?subject dct:source ?source .
+    ?doc a asn:StandardDocument .
+    ?doc dct:description ?description .
+    ?doc dct:source ?source .
+    ?doc dct:modified ?modified .
+    ?doc dct:subject ?subject .
+    OPTIONAL { ?doc dct:abstract ?abstract } .
 }
 SPARQL
         ;
-        $collection = new Collection();
+        $models = array();
         foreach ($this->getClient()->query($sparql) as $row) {
+            $desc = $row->description->getValue();
+            if (!array_key_exists($desc, $models)) {
+                $area = new LearningArea\Model();
+                $area
+                    ->setSource($this->getSource())
+                    ->setName($desc)
+                    ->setCreatedAt($row->modified->getValue())
+                    ->setModifiedAt($row->modified->getValue())
+                    ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
+                $models[$desc] = $area;
+            }
             // Use an existing area if possible.
             // Otherwise, use a new one.
-            $area = new LearningArea\Model();
-            $area
-                ->setSource($this->getSource())
-                ->setName($row->description->getValue());
-            $collection->add($area);
+            // Build a description for this item, consisting of desc, abstracts
+            // and the subject.
+            $abstract   = $row->abstract->getValue();
+            $titleParts = explode('/', $abstract);
+            $title      = array_pop($titleParts);
+            $desc       = $area->getDescription();
+            $area->setDescription(
+                sprintf(
+                    "%s\n<a href=\"%s\">%s</a>",
+                    $desc,
+                    htmlspecialchars($abstract, ENT_QUOTES),
+                    htmlspecialchars($title, ENT_QUOTES)
+                )
+            );
         }
+        $collection = new Collection(array_values($models));
         return $collection;
     }
 
