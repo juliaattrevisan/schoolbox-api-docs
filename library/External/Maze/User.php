@@ -786,7 +786,12 @@ class External_Maze_User implements External_UserInterface {
 	 */
 	public function getPortrait($externalUserId) {
 		$userMapper = new \Schoolbox\UserMapper();
-		$user = $userMapper->findByColumn('synergy_id', $externalUserId);
+        try {
+		    $user = $userMapper->findByColumn('synergy_id', $externalUserId);
+        } catch (Exception_Schoolbox $e) {
+            /* User not found */
+            return false;
+        }
 
 		/* Students and staff store their pics in different places
 		 */
@@ -808,7 +813,7 @@ class External_Maze_User implements External_UserInterface {
 		}
 
 		if ($photo = $this->getDb()->getRow($query)) {
-			$photoPath = Config::get('portrait_dir') . '/' . escapeshellcmd($externalUserId) . '.jpg';
+			$photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
@@ -843,7 +848,7 @@ class External_Maze_User implements External_UserInterface {
 
 				/* Purge all previously transformed copies
 				 */
-				$pattern = Config::get('stream_dir') . "/portrait/" . escapeshellcmd($externalUserId) . '-*.dat';
+				$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
 				foreach (glob($pattern) as $oldCacheFile) {
 					unlink($oldCacheFile);
