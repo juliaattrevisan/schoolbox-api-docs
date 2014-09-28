@@ -68,7 +68,8 @@ class Synchronise_Synergetic_Seymour_Strategy_Student extends Synchronise_Synerg
 		 */
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
-        $newUser['residential_house_id'] = 0;
+        // Residential house - Seymour has only one
+        $newUser['residential_house_id'] = $currentUser['StudentBoarder'] === 'B' ? 1 : 0;
 
 		/* This person is not a superuser
 		 */
