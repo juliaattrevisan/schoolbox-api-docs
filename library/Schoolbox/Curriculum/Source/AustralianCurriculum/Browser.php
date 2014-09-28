@@ -147,6 +147,10 @@ SPARQL
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $model)
     {
         // Given learning area and learning level:
+        // http://vocabulary.curriculum.edu.au/schoolLevel/0
+        // http://rdf.australiancurriculum.edu.au/elements/2012/08/7f6bd186-fcdf-4e46-a727-9e4600a2a39b
+        $areaReference  = $area->getReference();
+        $modelReference = $model->getReference();
 
         // Get the learning area, then get all the strands that are part of it?
         // Get all strands of the given learning area
