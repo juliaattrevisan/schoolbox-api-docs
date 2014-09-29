@@ -1,5 +1,23 @@
 <script type="text/javascript">
     (function($) {
+
+        var makeTree = function(nodes, destination) {
+            nodes.forEach(function(node) {
+                var listItem = $('<li />')
+                    .data('reference', node.reference)
+                    .html(node.description);
+                if (node.code) {
+                    listItem.append(' ('+node.code+')');
+                }
+                if (node.children.length) {
+                    var subList = $('<ul />');
+                    makeTree(node.children, subList);
+                    listItem.append(subList);
+                }
+                destination.append(listItem);
+            })
+        };
+
         $(function() {
             var form        = $('form#curriculum-import-form');
             var levelSelect = form.find('select[name="learningLevel"]');
@@ -7,6 +25,7 @@
             form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
                 event.preventDefault();
                 var value = form.find('select[name="source"]').val();
+                form.find('input[data-role="wizard-step-2-submit"]').prop('disabled', true);
 
                 // Clear previous settings:
                 // remember, if anything changes in a previous wizard step,
@@ -67,10 +86,36 @@
                         .remove();
                 }
             });
+
+            form.on('click', 'input[data-role="wizard-step-2-submit"]', function(event) {
+                event.preventDefault();
+                var value = form.find('select[name="source"]').val();
+                $.get(
+                    {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }},
+                    {
+                        id:    form.find('select[name="source"]').val(),
+                        area:  form.find('select[name="learningArea"] :selected').data('area').reference,
+                        level: form.find('select[name="learningLevel"] :selected').data('level').reference
+                    },
+                    $.noop,
+                    'json'
+                )
+                    .done(function(data) {
+                        // Shove all of this into a tree
+                        makeTree(data.outcomes, form.find('#outcomes').empty())
+                    });
+            });
+
             form.on('change', 'select[name="source"]', function() {
                 form.find('input[data-role="wizard-step-1-submit"]').prop('disabled', !this.value);
-            })
-        })
+            });
+
+            form.on('change', 'select[name="learningArea"], select[name="learningLevel"]', function() {
+                var area  = form.find('select[name="learningArea"]').val();
+                var level = form.find('select[name="learningLevel"]').val();
+                form.find('input[data-role="wizard-step-2-submit"]').prop('disabled', !(area && level));
+            });
+        });
     })(jQuery);
 </script>
 
@@ -129,6 +174,7 @@
                 <h4>Outcomes</h4>
             </td>
             <td>
+                <ul id="outcomes"></ul>
             </td>
         </tr>
     </table>
