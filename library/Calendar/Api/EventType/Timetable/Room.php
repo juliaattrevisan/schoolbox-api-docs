@@ -91,8 +91,12 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 }
 
                 // Does this event overlap timespan $startTimestamp to $endTimestamp?
-                $classStart = strtotime($room['PeriodStart'], $currentTimestamp);
-                $classEnd   = strtotime($room['PeriodEnd'], $currentTimestamp);
+                $currentDay = date('Y-m-d', $currentTimestamp);
+                $classStart = date('H:i:s', strtotime($room['PeriodStart'], $currentTimestamp));
+                $classEnd   = date('H:i:s', strtotime($room['PeriodEnd'], $currentTimestamp));
+                $classStart = strtotime($currentDay . ' ' . $classStart);
+                $classEnd   = strtotime($currentDay . ' ' . $classEnd);
+
                 if ($classEnd < $startTimestamp) {
                     continue;
                 }
