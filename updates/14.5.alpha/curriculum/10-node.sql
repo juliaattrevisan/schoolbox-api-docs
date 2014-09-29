@@ -7,6 +7,7 @@ CREATE TABLE `curriculum_node` (
   `curriculum_learning_area_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `code` varchar(64) NOT NULL,
+  `order` tinyint NOT NULL,
   `description` text NOT NULL,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
