@@ -121,7 +121,9 @@ SPARQL
             $level
                 ->setSource($this->getSource())
                 ->setReference($row->level->getUri());
-            $label = null;
+            $label    = null;
+            $created  = null;
+            $modified = null;
             if (isset($row->label)) {
                 $label = $row->label->getValue();
             } else {
@@ -135,7 +137,21 @@ SPARQL
                         $label = "$labelElement";
                         break;
                     }
+                    foreach ($document->xpath('//dcterms:issued') as $createdElement) {
+                        $created = "$createdElement";
+                        break;
+                    }
+                    foreach ($document->xpath('//dcterms:modified') as $modifiedElement) {
+                        $modified = "$modifiedElement";
+                        break;
+                    }
                 }
+            }
+            if ($created) {
+                $level->setCreatedAt(new Alaress_Date_Format(new DateTime($created)));
+            }
+            if ($modified) {
+                $level->setModifiedAt(new Alaress_Date_Format(new DateTime($modified)));
             }
             // No label - don't add
             if (isset($label)) {
