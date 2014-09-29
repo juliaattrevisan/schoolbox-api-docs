@@ -376,6 +376,7 @@ class PortfolioWebDAV
                 $fileShares = array(
                     'Academic',
                     'BIT',
+                    'CommunityRelations',
                     'DramaAndDance',
                     'EdOutdoors',
                     'English',
@@ -384,6 +385,7 @@ class PortfolioWebDAV
                     'LOTE',
                     'Maths',
                     'Music',
+                    'PhotoStore',
                     'Science',
                     'Technology',
                     'VisualArts',
