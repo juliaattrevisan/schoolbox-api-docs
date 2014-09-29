@@ -78,8 +78,8 @@ class External_Tass_Timetable implements External_TimetableInterface
 
             $timetableDef['desc'][] = $period['prd_desc'];
             $timetableDef['start'][] = (int)$TimeFromMatches[1] . ':' . $TimeFromMatches[2] . strtolower(
-                    $TimeFromMatches[3]
-                );
+                $TimeFromMatches[3]
+            );
             $timetableDef['end'][] = (int)$TimeToMatches[1] . ':' . $TimeToMatches[2] . strtolower($TimeToMatches[3]);
             $timetableDef['number'][] = $period['prd_code'];
             $periodCount++;
@@ -105,46 +105,52 @@ class External_Tass_Timetable implements External_TimetableInterface
         //get day count
         if ($this->getDays($campus) == 5) {
             return date("w", $date);
-        } else if ($this->getDays($campus) == 7) {
+        } elseif ($this->getDays($campus) == 7) {
             return 0; //Not implemented
-        } else if ($this->getDays($campus) == 10) {
-
+        } elseif ($this->getDays($campus) == 10) {
             $startDate = $this->getLastDay($date, $campus);
 
-            if($this->tassDay[$startDate] > 5)
+            if ($this->tassDay[$startDate] > 5) {
                 $this->tassDay[$startDate] = $this->tassDay[$startDate] + 1;  //extra days for weekend
-
+            }
             $startDate = $startDate - ($this->tassDay[$startDate]*86400);
 
-            if(!$startDate) //Just assume the start of the year if we cannot find anything
-                $startDate = mktime(0,0,0,1,1,date('Y'));
+            if (!$startDate) {
+//Just assume the start of the year if we cannot find anything
+                $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
+            }
 
             //find number of days between both dates
             $difference = floor(($date - $startDate) / 86400);
             //find number of weeks between 2 dates
             $weeks = intval(($difference) / 7);
 
-            if(($weeks % 2) == 0) {
-                $day =  date('w',$date);
-                if($day < 1) //on sundays move it forward
+            if (($weeks % 2) == 0) {
+                $day =  date('w', $date);
+                if ($day < 1) {
+//on sundays move it forward
                     $day = 1;
-            }
-            else {
-                $day =  date('w',$date) + 5;
-                if($day < 6) //on sundays move it forward
+                }
+            } else {
+                $day =  date('w', $date) + 5;
+                if ($day < 6) {
+//on sundays move it forward
                     $day = 6;
+                }
 
             }
             return $day;
 
-        } else { //unknown day number
+        } else {
+//unknown day number
             return 0;
         }
     }
 
-    function getLastDay($date, $campus) {
+    function getLastDay($date, $campus)
+    {
 
-        $nowmssqldate = date('Y-m-d',$date).' 00:00:00';
+        $nowmssqldate = date('Y-m-d', $date).' 00:00:00';
 
         $query = "SELECT ttdate, day_code FROM ttcalendar
                     WHERE ttdate <= '$nowmssqldate'
@@ -234,7 +240,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         $timetabledef = $this->getTimetableDefinition($campus);
 
         if ($this->groupHandler->isStudent($userID)) {
-
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
                             JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
@@ -246,7 +251,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                             ORDER BY prd_code, day_code";
 
         } else {
-
             $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
@@ -277,7 +281,6 @@ class External_Tass_Timetable implements External_TimetableInterface
 
             //for each day
             for ($y = 1; $y <= $dayCount; $y++) {
-
                 if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber'] && $desc['day_code'] == $y) {
                     $timetable[$x]['day'][$y]['periodOn'] = 1;
                     $timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
@@ -342,7 +345,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $this->getDatabase()->getOne($query);
     }
 
-    public function getRoomTimetable($roomCode) {
+    public function getRoomTimetable($roomCode)
+    {
         $query = "
             SELECT
                 subtab.sub_desc AS Description,
