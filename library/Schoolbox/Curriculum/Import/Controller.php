@@ -10,6 +10,8 @@
 namespace Schoolbox\Curriculum\Import;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Curriculum\LearningArea;
+use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\Mapper;
 
@@ -53,6 +55,42 @@ class Controller extends Base
             // Try to fetch levels and areas asynchronously
             $data['levels'] = $browser->getLearningLevels();
             $data['areas']  = $browser->getLearningAreas();
+        } catch (Mapper\Exception $e) {
+            $code = 400;
+        } catch (\InvalidArgumentException $e) {
+            $code = 500;
+        }
+        $this->getResponse()->status->setCode($code);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
+            )
+        );
+    }
+
+    /**
+     * Controller action for loading the list of learning levels for a given
+     * source (in request->query[id]).
+     */
+    public function outcomes()
+    {
+        $code = 200;
+        $data = array();
+        try {
+            $source = $this->getSourceMapper()->findById($this->getRequest()->query['id']);
+
+            // Stuff this into a factory and use that to build a list of levels
+            $factory = new Source\BrowserFactory();
+            $browser = $factory->build($source);
+
+            $testArea  = new LearningArea\Model();
+            $testArea->setReference(
+                'http://rdf.australiancurriculum.edu.au/elements/2012/08/7f6bd186-fcdf-4e46-a727-9e4600a2a39b'
+            );
+            $testLevel = new LearningLevel\Model();
+            $testLevel->setReference('http://vocabulary.curriculum.edu.au/schoolLevel/0');
+            $data['outcomes'] = $browser->getOutcomes($testArea, $testLevel);
         } catch (Mapper\Exception $e) {
             $code = 400;
         } catch (\InvalidArgumentException $e) {
