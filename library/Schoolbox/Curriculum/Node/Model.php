@@ -374,6 +374,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'name'        => $this->getName(),
             'description' => $this->getDescription(),
             'reference'   => $this->getReference(),
+            'children'    => $this->getChildren(),
         );
     }
 }
