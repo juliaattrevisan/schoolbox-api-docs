@@ -14,6 +14,7 @@ namespace Schoolbox\Curriculum\Node;
 
 use Alaress_Date_Format;
 use JsonSerializable;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\ISoftDeletable;
@@ -33,6 +34,13 @@ class Model implements ISoftDeletable, JsonSerializable
      * @var Model
      */
     protected $parent;
+
+    /**
+     * This node's children (if it has any)
+     *
+     * @var Collection|Model[]
+     */
+    protected $children;
 
     /**
      * The learning level this node is associated with
@@ -302,6 +310,34 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setParent($parent)
     {
         $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * @param  Model $child
+     * @return $this
+     */
+    public function addChild($child)
+    {
+        $this->getChildren()->add($child);
+        return $this;
+    }
+
+    /**
+     * @return Collection|Model[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param  Collection|Model[] $children
+     * @return $this
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
         return $this;
     }
 
