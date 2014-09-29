@@ -1,9 +1,6 @@
 <?php
 /**
-<<<<<<< HEAD
  * AJAX folder browser used for quick breadcrumb based browsing of resources in SBFS
-=======
->>>>>>> f9e83bb... Update homepage resource browser usage [SB-4102]
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
