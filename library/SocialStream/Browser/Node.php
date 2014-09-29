@@ -32,11 +32,11 @@ class Node extends Browser\Node
     /**
      * Combine the categories and files into a single list
      */
-    protected function processNode()
+    protected function processNode($mimeFilter = null)
     {
         $output = array(
             'breadcrumbs' => $this->getBreadcrumbs(),
-            'records'     => array_merge($this->getCategories(), $this->getFiles()),
+            'records'     => array_merge($this->getCategories(), $this->getFiles($mimeFilter)),
         );
 
         $this->setResult($output);

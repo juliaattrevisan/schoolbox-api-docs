@@ -99,7 +99,7 @@ class Node
     /**
      * Combine the categories and files into a single list
      */
-    protected function processNode()
+    protected function processNode($mimeFilter = null)
     {
         $output = array(
             'breadcrumbs' => $this->getBreadcrumbs(),

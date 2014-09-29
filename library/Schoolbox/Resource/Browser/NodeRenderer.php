@@ -158,6 +158,8 @@ class NodeRenderer
             $currentRecord = $allRecords[$i];
             $this->renderCategory($currentRecord, $i);
         }
+
+        $this->getPage()->parse('use_folder_block', 'use_folder');
     }
 
 
