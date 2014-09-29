@@ -242,7 +242,12 @@ class External_Synergetic_User implements External_UserInterface
                     $emailList[$row['RelatedID']] = $row['Email'];
                     break;
                 case 'D': //Use default email address
-                    $emailList[$row['RelatedID']] = $row['DefaultEmail'];
+                    if(trim($row['DefaultEmail']) != '') {
+                        $defaultEmail = explode(';',$row['DefaultEmail']);
+                        foreach($defaultEmail as $key=>$email){
+                            $emailList[$row['RelatedID'].'-'.$key] = $email;
+                        }
+                    }
                     break;
                 default:
                     break;
