@@ -12,6 +12,8 @@
 namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 
 use Alaress_Curl_Url;
+use Alaress_Date_Format;
+use DateTime;
 use EasyRdf_Sparql_Client;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
@@ -60,12 +62,13 @@ SPARQL
         foreach ($this->getClient()->query($sparql) as $row) {
             $desc = $row->description->getValue();
             if (!array_key_exists($desc, $models)) {
+                $modified = new Alaress_Date_Format($row->modified->getValue());
                 $area = new LearningArea\Model();
                 $area
                     ->setSource($this->getSource())
                     ->setName($desc)
-                    ->setCreatedAt($row->modified->getValue())
-                    ->setModifiedAt($row->modified->getValue())
+                    ->setCreatedAt($modified)
+                    ->setModifiedAt($modified)
                     ->setReference($row->doc->getUri())
                     ->setDescription(sprintf('<h1>%s</h1>', htmlspecialchars($desc, ENT_QUOTES)));
                 $models[$desc] = $area;
@@ -181,7 +184,9 @@ SPARQL
             $node->setCode($jsonTree->asn_statementNotation->literal);
         }
         if ($jsonTree->dcterms_modified) {
-            $modified = new \DateTime($jsonTree->dcterms_modified->literal);
+            $modified = new Alaress_Date_Format(
+                new DateTime($jsonTree->dcterms_modified->literal)
+            );
             $node
                 ->setCreatedAt($modified)
                 ->setModifiedAt($modified);
