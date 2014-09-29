@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 
+use Alaress_Curl_Url;
 use EasyRdf_Sparql_Client;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
@@ -122,7 +123,7 @@ SPARQL
             } else {
                 // fetch the label in a separate request.
                 // TODO get the query working properly
-                $curl = new \Alaress_Curl_Url($row->level->getUri().'.rdf');
+                $curl = new Alaress_Curl_Url($row->level->getUri().'.rdf');
                 $curl->exec();
                 if (!count($curl->getErrors())) {
                     $document = simplexml_load_string($curl->getResult());
