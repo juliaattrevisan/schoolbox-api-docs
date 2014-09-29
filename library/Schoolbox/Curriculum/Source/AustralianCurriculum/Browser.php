@@ -16,6 +16,7 @@ use EasyRdf_Sparql_Client;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
 
 class Browser extends Source\BrowserAbstract
@@ -147,6 +148,7 @@ SPARQL
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
+        $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
         $curl->exec();
@@ -154,11 +156,34 @@ SPARQL
             $manifest = json_decode($curl->getResult());
             foreach ($manifest as $part) {
                 if ($part->dcterms_educationLevel->uri === $level->getReference()) {
-                    return $part->children;
+                    // This is the right year level within this learning area.
+                    // Build an outcome tree out of it.
+                    $collection->add($this->buildOutputTree($part));
                 }
             }
         }
-        return array();
+        return $collection;
+    }
+
+    /**
+     * @param  object $jsonTree
+     * @return Node\Model
+     */
+    protected function buildOutputTree($jsonTree)
+    {
+        $node = new Node\Model();
+        $node
+            ->setReference($jsonTree->id)
+            ->setDescription($jsonTree->text);
+        if ($jsonTree->asn_statementNotation) {
+            $node->setReference($jsonTree->asn_statementNotation);
+        }
+        if ($jsonTree->children) {
+            foreach ($jsonTree->children as $child) {
+                $node->addChild($this->buildOutputTree($child));
+            }
+        }
+        return $node;
     }
 
     /**
