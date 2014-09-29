@@ -1,4 +1,5 @@
 <?php
+
 /************************************************************
  *                                                           *
  *         Copyright (c) 2013 Alaress Pty Ltd                *
@@ -6,7 +7,6 @@
  *    This file provides access to TASS timetable info    *
  *                                                           *
  ************************************************************/
-
 class External_Tass_Timetable implements External_TimetableInterface
 {
 
@@ -56,14 +56,14 @@ class External_Tass_Timetable implements External_TimetableInterface
     function getTimetableDefinition($campus, $day = 0)
     {
 
-        $campusCode = $this->getCampusCode($campus);
+        $campusCode    = $this->getCampusCode($campus);
         $timetableCode = $this->getTimetableCode($campus);
 
         /* Fetch the longest day to use as our day template...  */
         if ($day == 0) {
-            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . " ' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
+            $query      = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . " ' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
             $longestDay = $this->getDatabase()->getRow($query);
-            $day = $longestDay['day_code'];
+            $day        = $longestDay['day_code'];
         }
 
         $query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
@@ -76,17 +76,17 @@ class External_Tass_Timetable implements External_TimetableInterface
             preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_end'], $TimeToMatches);
             preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_start'], $TimeFromMatches);
 
-            $timetableDef['desc'][] = $period['prd_desc'];
-            $timetableDef['start'][] = (int)$TimeFromMatches[1] . ':' . $TimeFromMatches[2] . strtolower(
-                $TimeFromMatches[3]
-            );
-            $timetableDef['end'][] = (int)$TimeToMatches[1] . ':' . $TimeToMatches[2] . strtolower($TimeToMatches[3]);
+            $timetableDef['desc'][]   = $period['prd_desc'];
+            $timetableDef['start'][]  = (int)$TimeFromMatches[1] . ':' . $TimeFromMatches[2]
+                . strtolower($TimeFromMatches[3]);
+            $timetableDef['end'][]    = (int)$TimeToMatches[1] . ':' . $TimeToMatches[2] .
+                strtolower($TimeToMatches[3]);
             $timetableDef['number'][] = $period['prd_code'];
             $periodCount++;
         }
 
         $timetableDef['periodCount'] = $longestDay['prd_num'];
-        $timetableDef['dayCount'] = $this->getDays($campus);
+        $timetableDef['dayCount']    = $this->getDays($campus);
         return $timetableDef;
 
     }
@@ -113,10 +113,10 @@ class External_Tass_Timetable implements External_TimetableInterface
             if ($this->tassDay[$startDate] > 5) {
                 $this->tassDay[$startDate] = $this->tassDay[$startDate] + 1;  //extra days for weekend
             }
-            $startDate = $startDate - ($this->tassDay[$startDate]*86400);
+            $startDate = $startDate - ($this->tassDay[$startDate] * 86400);
 
             if (!$startDate) {
-//Just assume the start of the year if we cannot find anything
+                //Just assume the start of the year if we cannot find anything
                 $startDate = mktime(0, 0, 0, 1, 1, date('Y'));
             }
 
@@ -126,15 +126,15 @@ class External_Tass_Timetable implements External_TimetableInterface
             $weeks = intval(($difference) / 7);
 
             if (($weeks % 2) == 0) {
-                $day =  date('w', $date);
+                $day = date('w', $date);
                 if ($day < 1) {
-//on sundays move it forward
+                    //on sundays move it forward
                     $day = 1;
                 }
             } else {
-                $day =  date('w', $date) + 5;
+                $day = date('w', $date) + 5;
                 if ($day < 6) {
-//on sundays move it forward
+                    //on sundays move it forward
                     $day = 6;
                 }
 
@@ -142,7 +142,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             return $day;
 
         } else {
-//unknown day number
+            //unknown day number
             return 0;
         }
     }
@@ -150,16 +150,16 @@ class External_Tass_Timetable implements External_TimetableInterface
     function getLastDay($date, $campus)
     {
 
-        $nowmssqldate = date('Y-m-d', $date).' 00:00:00';
+        $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
 
         $query = "SELECT ttdate, day_code FROM ttcalendar
                     WHERE ttdate <= '$nowmssqldate'
-                    AND cmpy_code = '".$this->getCampusCode($campus)."'
-                    AND tt_id = '".$this->getTimetableCode($campus)."'
+                    AND cmpy_code = '" . $this->getCampusCode($campus) . "'
+                    AND tt_id = '" . $this->getTimetableCode($campus) . "'
                     ORDER BY ttdate DESC";
 
-        $result= $this->getDatabase()->getRow($query);
-        $time = strtotime($result['ttdate']);
+        $result               = $this->getDatabase()->getRow($query);
+        $time                 = strtotime($result['ttdate']);
         $this->tassDay[$time] = $result['day_code'];
 
         return $time;
@@ -198,7 +198,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
 
         $periodCount = $timetabledef['periodCount'];
-        $dayCount = $timetabledef['dayCount'];
+        $dayCount    = $timetabledef['dayCount'];
 
         $result = $this->getDatabase()->query($query);
         //get first period
@@ -210,17 +210,18 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         //for each period
         for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
-            $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = 1;
 
             if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
                 $timetable[$x]['description'] = $desc['sub_desc'];
-                $timetable[$x]['code'] = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                $timetable[$x]['room'] = $desc['room_code'];
-                $desc = $this->getDatabase()->getNextArray();
+                $timetable[$x]['code']        =
+                    trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                $timetable[$x]['room']        = $desc['room_code'];
+                $desc                         = $this->getDatabase()->getNextArray();
 
                 //bad data in synergetic.. why..??
                 while ($desc['prd_code'] == $timetable[$x]['periodNumber'] && $desc != 0) {
@@ -261,8 +262,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
 
         $periodCount = $timetabledef['periodCount'];
-        $dayCount = $timetabledef['dayCount'];
-        $result = $this->getDatabase()->query($query);
+        $dayCount    = $timetabledef['dayCount'];
+        $result      = $this->getDatabase()->query($query);
 
         //get first period
         if ($result != 1) {
@@ -273,20 +274,24 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         //for each period
         for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
-            $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = 1;
 
             //for each day
             for ($y = 1; $y <= $dayCount; $y++) {
-                if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber'] && $desc['day_code'] == $y) {
-                    $timetable[$x]['day'][$y]['periodOn'] = 1;
+                if ($timetabledef['sequence'][$x] != 2
+                    && $desc['prd_code'] == $timetable[$x]['periodNumber']
+                    && $desc['day_code'] == $y
+                ) {
+                    $timetable[$x]['day'][$y]['periodOn']    = 1;
                     $timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
-                    $timetable[$x]['day'][$y]['code'] = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                    $timetable[$x]['day'][$y]['room'] = $desc['room_code'];
-                    $timetable[$x]['day'][$y]['staffCode'] = $desc['tch_code'];
+                    $timetable[$x]['day'][$y]['code']        =
+                        trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                    $timetable[$x]['day'][$y]['room']        = $desc['room_code'];
+                    $timetable[$x]['day'][$y]['staffCode']   = $desc['tch_code'];
 
                     $desc = $this->getDatabase()->getNextArray();
 
@@ -308,7 +313,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     function getDaySubjects($synergy_id, $daynum)
     {
         $query = "SELECT Timetable.Room, SubjectClasses.Description,
-                       	 Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
+                         Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
                          FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
                          WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
                          Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
@@ -316,7 +321,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                          AND Timetable.FileYear = SubjectClasses.FileYear AND
                          ((SubjectClasses.FileSemester=" . $_SESSION['FileSemester'] . ") AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
                          AND (Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynum'
-			  	ORDER BY Timetable.PeriodNumber";
+                ORDER BY Timetable.PeriodNumber";
 
         return $this->getDatabase()->getAll($query);
 
@@ -327,10 +332,10 @@ class External_Tass_Timetable implements External_TimetableInterface
         //give a subject code and day this function returns the period that it occurs in
 
         $query = "SELECT Timetable.PeriodNumber
-			FROM SynergyOne.dbo.Timetable Timetable
-			WHERE Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND Timetable.FileYear='" . $_SESSION['FileYear'] . "'
-			AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
-		";
+            FROM SynergyOne.dbo.Timetable Timetable
+            WHERE Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND Timetable.FileYear='" . $_SESSION['FileYear'] . "'
+            AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
+        ";
 
         return $this->getDatabase()->getOne($query);
 
@@ -340,8 +345,8 @@ class External_Tass_Timetable implements External_TimetableInterface
     {
 
         $query = "SELECT SubjectClasses.Description
-                       	FROM SynergyOne.dbo.SubjectClasses SubjectClasses
-                       	WHERE SubjectClasses.ClassCode = '$code'";
+                        FROM SynergyOne.dbo.SubjectClasses SubjectClasses
+                        WHERE SubjectClasses.ClassCode = '$code'";
         return $this->getDatabase()->getOne($query);
     }
 
@@ -390,9 +395,9 @@ class External_Tass_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             array(
-                ':semester' => "'".$this->database->quote($_SESSION['FileSemester'])."'",
-                ':year'     => "'".$this->database->quote($_SESSION['FileYear'])."'",
-                ':room'     => "'".$this->database->quote($roomCode)."'",
+                ':semester' => "'" . $this->database->quote($_SESSION['FileSemester']) . "'",
+                ':year'     => "'" . $this->database->quote($_SESSION['FileYear']) . "'",
+                ':room'     => "'" . $this->database->quote($roomCode) . "'",
             )
         );
         return $this->database->trimAll($this->database->getAll($query));
