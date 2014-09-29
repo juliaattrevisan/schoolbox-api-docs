@@ -391,7 +391,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 ':room'     => "'".$this->database->quote($roomCode)."'",
             )
         );
-        return $this->database->getAll($query);
+        return $this->database->trimAll($this->database->getAll($query));
     }
 
     private function setDatabase($database)
