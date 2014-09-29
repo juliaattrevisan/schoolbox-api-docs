@@ -85,11 +85,9 @@ class Controller extends Base
             $browser = $factory->build($source);
 
             $testArea  = new LearningArea\Model();
-            $testArea->setReference(
-                'http://rdf.australiancurriculum.edu.au/elements/2012/08/7f6bd186-fcdf-4e46-a727-9e4600a2a39b'
-            );
+            $testArea->setReference($this->getRequest()->query['area']);
             $testLevel = new LearningLevel\Model();
-            $testLevel->setReference('http://vocabulary.curriculum.edu.au/schoolLevel/0');
+            $testLevel->setReference($this->getRequest()->query['level']);
             $data['outcomes'] = $browser->getOutcomes($testArea, $testLevel);
         } catch (Mapper\Exception $e) {
             $code = 400;
