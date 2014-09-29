@@ -147,38 +147,18 @@ SPARQL
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
-        // Given learning area and learning level:
-        // http://vocabulary.curriculum.edu.au/schoolLevel/0
-        // http://rdf.australiancurriculum.edu.au/elements/2012/08/7f6bd186-fcdf-4e46-a727-9e4600a2a39b
-        $areaReference  = $area->getReference();
-        $modelReference = $model->getReference();
-
-        // Get the learning area, then get all the strands that are part of it?
-        // Get all strands of the given learning area
-        $sparql = <<<SPARQL
-prefix asn: <http://purl.org/ASN/schema/core/>
-prefix dct: <http://purl.org/dc/terms/>
-SELECT * WHERE {
-    {
-        ?subject asn:statementLabel "Strand"@en-au .
-        ?subject dct:description ?description .
-        ?subject dct:isPartOf ?part .
-        ?part    dct:description ?learningArea .
-    }
-    UNION {
-        ?subject asn:statementLabel "Year level strand"@en-au .
-        ?subject dct:description ?description .
-        ?subject dct:educationLevel ?level .
-        ?subject dct:isPartOf ?part .
-        ?part    dct:description ?learningArea .
-    }
-}
-ORDER BY ASC(?learningArea) ASC(?description)
-SPARQL
-        ;
-        // Create a recursive tree of strands?
-        $result = $this->getClient()->query($sparql);
-        return $result;
+        // Get everything out of the manifest instead of out of RDF queries.
+        $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
+        $curl->exec();
+        if (!count($curl->getErrors())) {
+            $manifest = json_decode($curl->getResult());
+            foreach ($manifest as $part) {
+                if ($part->dcterms_educationLevel->uri === $level->getReference()) {
+                    return $part->children;
+                }
+            }
+        }
+        return array();
     }
 
     /**
