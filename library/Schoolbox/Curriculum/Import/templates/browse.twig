@@ -27,6 +27,7 @@
                                 $('<option />')
                                     .attr('label', level.name)
                                     .attr('value', level.name)
+                                    .data('level', level)
                                     .text(level.name)
                                     .appendTo(levelSelect);
                             });
@@ -41,6 +42,7 @@
                                 $('<option />')
                                     .attr('label', area.name)
                                     .attr('value', area.name)
+                                    .data('area',  area)
                                     .text(area.name)
                                     .appendTo(areaSelect);
                             });
