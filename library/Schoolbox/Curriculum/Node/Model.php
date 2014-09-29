@@ -116,6 +116,16 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * @param  Alaress_Date_Format $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
      * @return Alaress_Date_Format
      */
     public function getCreatedAt()
