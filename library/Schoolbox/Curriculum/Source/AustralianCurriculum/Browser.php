@@ -172,11 +172,19 @@ SPARQL
     protected function buildOutputTree($jsonTree)
     {
         $node = new Node\Model();
+        // Name: maybe it doesn't have one at all.
+        // Use the code instead.
         $node
             ->setReference($jsonTree->id)
             ->setDescription($jsonTree->text);
         if ($jsonTree->asn_statementNotation) {
-            $node->setReference($jsonTree->asn_statementNotation);
+            $node->setCode($jsonTree->asn_statementNotation->literal);
+        }
+        if ($jsonTree->dcterms_modified) {
+            $modified = new \DateTime($jsonTree->dcterms_modified->literal);
+            $node
+                ->setCreatedAt($modified)
+                ->setModifiedAt($modified);
         }
         if ($jsonTree->children) {
             foreach ($jsonTree->children as $child) {
