@@ -108,6 +108,14 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $deletedAt;
 
     /**
+     * Constructor: build this element with a new, empty collection.
+     */
+    public function __construct()
+    {
+        $this->setChildren(new Collection());
+    }
+
+    /**
      * @return Alaress_Date_Format
      */
     public function getCreatedAt()
