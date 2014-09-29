@@ -4,13 +4,20 @@
             var form        = $('form#curriculum-import-form');
             var levelSelect = form.find('select[name="learningLevel"]');
             var areaSelect  = form.find('select[name="learningArea"]');
-            form.on('change', 'select[name="source"]', function() {
+            form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
+                event.preventDefault();
+                var value = form.find('select[name="source"]').val();
+
+                // Clear previous settings:
+                // remember, if anything changes in a previous wizard step,
+                // invalidate steps after it
+
                 // Load the learning areas and levels for the selected source.
                 // Do it asynchronously
-                if (this.value) {
+                if (value) {
                     $.get(
                         {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
-                        {id: this.value},
+                        {id: value},
                         $.noop,
                         'json'
                     )
@@ -19,9 +26,7 @@
                             levelSelect
                                 .prop('disabled', false)
                                 .find('option')
-                                .filter(function() {
-                                    return this.value;
-                                })
+                                .filter(function() { return this.value; })
                                 .remove();
                             data.levels.forEach(function(level) {
                                 $('<option />')
@@ -34,9 +39,7 @@
                             areaSelect
                                 .prop('disabled', false)
                                 .find('option')
-                                .filter(function() {
-                                    return this.value;
-                                })
+                                .filter(function() { return this.value; })
                                 .remove();
                             data.areas.forEach(function(area) {
                                 $('<option />')
@@ -63,6 +66,9 @@
                         .filter(function() { return this.value; })
                         .remove();
                 }
+            });
+            form.on('change', 'select[name="source"]', function() {
+                form.find('input[data-role="wizard-step-1-submit"]').prop('disabled', !this.value);
             })
         })
     })(jQuery);
@@ -94,6 +100,8 @@
                 <input type="submit"
                        value="Use This Source"
                        class="submit-btn-plain inline"
+                       data-role="wizard-step-1-submit"
+                       disabled
                 />
             </td>
         </tr>
@@ -111,6 +119,8 @@
                 <input type="submit"
                        value="Search"
                        class="submit-btn-plain inline"
+                       data-role="wizard-step-2-submit"
+                       disabled
                 />
             </td>
         </tr>
