@@ -145,7 +145,7 @@ SPARQL
     /**
      * {@inheritdoc}
      */
-    public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $model)
+    public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
         // Given learning area and learning level:
         // http://vocabulary.curriculum.edu.au/schoolLevel/0
