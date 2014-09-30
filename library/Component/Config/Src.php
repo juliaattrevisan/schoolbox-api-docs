@@ -33,12 +33,14 @@ class Component_Config_Src extends Component_Config_Abstract {
 			$page->setVar(array(
 				'COMPONENT_CONFIG_SRC_ID'   => '#',
 				'COMPONENT_CONFIG_SRC_NAME' => 'Local',
+                'COMPONENT_CONFIG_SRC_CID'  => '0'
 			));
 		}
 		else {
 			$page->setVar(array(
 	            'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $cat['id'],
 	            'COMPONENT_CONFIG_SRC_NAME' => $cat['name'],
+                'COMPONENT_CONFIG_SRC_CID'  => $cat['id']
 	        ));
 		}
     }

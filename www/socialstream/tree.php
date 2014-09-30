@@ -7,25 +7,27 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace SocialStream\Browser;
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$page = new \SitePage();
+$page = new SitePage();
 
 /* Get the stuff in this node
  */
 try {
-    $browser = new Node($_REQUEST['relationID'], $_REQUEST['mimeFilter']);
-    $nodeData = $browser->render();
+
+    if (isset($_REQUEST['nofiles'])) {
+        $browser  = new \Schoolbox\Resource\Browser\Node($_REQUEST['relationID'], $_REQUEST['mimeFilter']);
+        $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($page, $browser->render());
+    } else {
+        $browser  = new \SocialStream\Browser\Node($_REQUEST['relationID'], $_REQUEST['mimeFilter']);
+        $renderer = new \SocialStream\Browser\NodeRenderer($page, $browser->render());
+    }
 
     /* Render the stuff in this node
      */
-    $renderer = new NodeRenderer($page, $nodeData);
     $renderer->render();
 } catch (\Schoolbox\Resource\Exception $e) {
     $page->setAjax(true);
     $page->error(6);
 }
-
-

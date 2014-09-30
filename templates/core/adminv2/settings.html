@@ -3,8 +3,11 @@
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 <script type="text/javascript">
 	$j(function() {
+    var settings = $('#settings');
+
 		$.fn.alaressTiny({
 			mode: "specific_textareas",
 			editor_selector: "mceEditor"
@@ -24,39 +27,38 @@
 			});
 		});
 
-		$j('#settings').validate();
+		settings.validate();
 
 		// Homepage selector and its event
-		$j('#resource-browser').dialog({
-			width: 650,
-			autoOpen: false,
-			title: "Select a homepage",
-			modal: true,
-			resizable: false
-		});
-		$j(':button[data-interaction="homepage_selector"]').click(function(event) {
-			event.preventDefault();
-			$j('#resource-browser').load(
-				'/ajax/resourceBrowser',
-				{destination : ':input[name="'+$j(this).data('input_name')+'"]'},
-				function() { $j('#resource-browser').dialog('open'); }
-			);
-		});
+        settings.on('click', ':button[data-interaction="homepage_selector"]', function() {
 
-		/* Force submission of checkboxes regardless of whether they are ticked
-		 * or not.
-		 */
-		$j('input[type=checkbox]').change(function() {
-			var name = 'input[name=' + $j(this).attr('name') + ']';
+        $j('#resource-browser').socialstreamBrowser({
+            title: 'Choose a folder',
+            categoryId: 0,
+            url: '/socialstream/tree.php?nofiles=1',
+            submitCallback: function(url, filename) {
+                settings.find('input[name=course_homepage]').val(url);
+            }
+        });
+    });
 
-			if ($j(this).val() == 0) {
-				$j(name).val(1);
-			}
-			else {
-				$j(name).val(0);
-			}
-		});
-	});
+    settings.validate();
+
+    /* Force submission of checkboxes regardless of whether they are ticked
+     * or not.
+     */
+    $j('input[type=checkbox]').change(function() {
+        var name = 'input[name=' + $j(this).attr('name') + ']';
+
+        if ($j(this).val() == 0) {
+            $j(name).val(1);
+        }
+        else {
+            $j(name).val(0);
+        }
+    });
+
+  });
 </script>
 
 <!-- END custom_head -->

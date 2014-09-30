@@ -12,15 +12,7 @@
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
-
         var browser   = $('#resource-browser');
-        browser.dialog({
-            width: 650,
-            autoOpen: false,
-            title: "Select a homepage",
-            modal: true,
-            resizable: false
-        });
 
         var dialog = component.find('.file_uploader');
         dialog.ajaxUploadDialog({
@@ -31,28 +23,23 @@
         });
 
         // Browser options: now based on component
-        var component_id    = component.attr('id');
-        var browser_options = {
-            destination:     '#'+component_id+' input[name="homepage"]',
-            base:            settings.course_homepage,
-            start:           settings.course_homepage,
-            triggerChange:   true,
-            destinationText: '#'+component_id+' span[data-resource_text]'
-        }
+        var component_id = component.attr('id');
+        var destination  = '#'+component_id+' input[name="homepage"]';
 
-        // Event for displaying the homepage selector.
-        component.on(
-            'click.courseInstance',
-            'a[data-interaction="homepage_selector"]',
-            function(event) {
-                event.preventDefault();
-                browser.load(
-                    '/ajax/resourceBrowser',
-                    browser_options,
-                    function() { browser.dialog('open'); }
-                );
-            }
-        );
+        component.on('click.courseInstance', 'a[data-interaction=homepage_selector]', function (event) {
+            event.preventDefault();
+            browser.socialstreamBrowser({
+                title: 'Select a course',
+                categoryId: settings.course_homepage,
+                isolate: true,
+                url: '/socialstream/tree.php?nofiles=1',
+                submitCallback: function(url, filename) {
+                    $(destination)
+                        .val(url.match(/[0-9]+/)[0])
+                        .trigger('change.courseInstance');
+                }
+            });
+        });
 
         // Event for opening the import page - tied to change event of input
         // that gets changed by resource selector, instead of a button.
@@ -60,7 +47,7 @@
             'change.courseInstance',
             'input[name="homepage"]',
             function() {
-                var homepage_id = this.value.replace(/.*?(\d+$)/, '$1')
+                var homepage_id = this.value.replace(/.*?(\d+$)/, '$1');
                 // Strip trailing / off of the import base URL
                 var base_href   = settings.import_base_url.replace(/\/*$/, '');
                 window.location.href = base_href+'/'+homepage_id;
@@ -79,12 +66,12 @@
                 var task_list    = unit_element.find('.task-list');
                 if (is_collapsed) {
                     unit_element.removeClass('collapsed').addClass('expanded');
-                    task_list.slideDown('fast')
+                    task_list.slideDown('fast');
                     element.data('interaction-state', 'expanded');
                 }
                 else {
                     unit_element.removeClass('expanded').addClass('collapsed');
-                    task_list.slideUp('fast')
+                    task_list.slideUp('fast');
                     element.data('interaction-state', 'collapsed');
                 }
             }
@@ -267,7 +254,7 @@
             container.slideUp('fast', function() {
                 reloadTaskList(data);
             });
-        }
+        };
 
         // Reloads the task list, setting up drag/drop again too.
         var reloadTaskList = function(data) {
@@ -287,7 +274,7 @@
                 }
             });
             initTaskList();
-        }
+        };
 
         var initTaskList = function() {
             if (settings.readonly) {

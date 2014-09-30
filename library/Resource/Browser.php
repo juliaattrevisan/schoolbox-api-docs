@@ -7,6 +7,10 @@
  * @version     SVN: $Id$
  */
 
+/**
+ * Class Resource_Browser
+ * @deprecated
+ */
 class Resource_Browser {
 
     /**

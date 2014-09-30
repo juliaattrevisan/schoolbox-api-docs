@@ -12,8 +12,11 @@
  * @version     SVN: $Id$
  */
 
-if (socialstreamSession === undefined) {
-    var socialstreamSession = {categoryId : 0};
+try {
+    socialstreamSession.categoryId;
+} catch (e) {
+    // define scope
+    var socialstreamSession;
 }
 
 (function($j) {
@@ -53,6 +56,9 @@ if (socialstreamSession === undefined) {
 				 */
 				categoryId: 0,
 
+                /* Should this instance listen to the global rememberer */
+                isolate: false,
+
 				/* A callback method. The file you choze from the browser is passed
 				 * to this method to deal with in whatever manner you want
 				 */
@@ -75,6 +81,14 @@ if (socialstreamSession === undefined) {
 			 */
 			merged = $j.extend(defaults, options);
 			merged.categoryId = parseInt(merged.categoryId, 10);
+
+            if (!merged.isolate) {
+                try {
+                    socialstreamSession.categoryId;
+                } catch (e) {
+                    socialstreamSession = {categoryId : merged.categoryId};
+                }
+            }
 
 			return merged;
 		}
@@ -117,9 +131,11 @@ if (socialstreamSession === undefined) {
                 mimeFilter: config.mimeFilter
 			};
 
-			/* Remember where we left off and reopen from here
-			 */
-			socialstreamSession.categoryId = node;
+            if (!config.isolate) {
+                /* Remember where we left off and reopen from here
+                 */
+                socialstreamSession.categoryId = node;
+            }
 
 			/* Load data into the node container
 			 */
@@ -159,7 +175,7 @@ if (socialstreamSession === undefined) {
 						 */
 						config.submitCallback(url, name, meta);
 
-                        if (this.modal) {
+                        if (config.modal) {
                             $j(config.element).dialog('close');
                         }
 					});
@@ -200,7 +216,7 @@ if (socialstreamSession === undefined) {
 
         /* Open Pandora's Box
          */
-        loadNode(socialstreamSession.categoryId);
+        loadNode(config.isolate ? config.categoryId : socialstreamSession.categoryId);
 
-    }
+    };
 }(jQuery));
