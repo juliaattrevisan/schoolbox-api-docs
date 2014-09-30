@@ -6,6 +6,8 @@
 <script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 <script type="text/javascript">
 	$j(function() {
+    var settings = $('#settings');
+
 		$.fn.alaressTiny({
 			mode: "specific_textareas",
 			editor_selector: "mceEditor"
@@ -25,7 +27,7 @@
 			});
 		});
 
-		$j('#settings').validate();
+		settings.validate();
 
 		// Homepage selector and its event
         settings.on('click', ':button[data-interaction="homepage_selector"]', function() {
@@ -40,7 +42,7 @@
         });
     });
 
-    $j('#settings').validate();
+    settings.validate();
 
     /* Force submission of checkboxes regardless of whether they are ticked
      * or not.
