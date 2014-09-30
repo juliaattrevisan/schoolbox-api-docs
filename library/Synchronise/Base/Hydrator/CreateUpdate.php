@@ -46,7 +46,8 @@ class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrat
     protected function userExists($externalUser, $newUser)
     {
         $row = $this->userHandler->getBySynergyAndGroup(
-            $newUser['synergy_id'], $newUser['group_id']
+            $newUser['synergy_id'],
+            $newUser['group_id']
         );
         return !empty($row);
     }
