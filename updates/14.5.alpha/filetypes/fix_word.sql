@@ -1,0 +1,1 @@
+UPDATE allowedFileTypes SET inline = 'false' WHERE mime like 'application/msword';
