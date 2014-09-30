@@ -813,6 +813,8 @@ class External_Synergetic_User implements External_UserInterface
                 StudentOccupEmail,
                 vStudents.StudentYearLevel,
                 vStudents.StudentHouse,
+				vStudents.StudentBoarder,
+				vStudents.StudentBoardingHouse,
                 StudentCampus
             FROM SynergyOne.dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
