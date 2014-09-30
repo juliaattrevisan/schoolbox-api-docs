@@ -29,7 +29,7 @@
         component.on('click.courseInstance', 'a[data-interaction=homepage_selector]', function (event) {
             event.preventDefault();
             browser.socialstreamBrowser({
-                title: 'Select a homepage',
+                title: 'Select a course',
                 categoryId: settings.course_homepage,
                 url: '/socialstream/tree.php?nofiles=1',
                 submitCallback: function(url, filename) {
