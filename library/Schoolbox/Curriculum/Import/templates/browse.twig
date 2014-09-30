@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/jquery.wizardize.js"></script>
 <script type="text/javascript">
     (function($) {
 
@@ -20,6 +21,36 @@
 
         $(function() {
             var form        = $('form#curriculum-import-form');
+
+            form.wizardize({
+                startAtStep: 1,
+                // Steps should autoload using data-wizard-step
+                // Alternately tie to an accordion component
+                steps: [
+                    form.find('[data-wizard-step="1"]'),
+                    form.find('[data-wizard-step="2"]'),
+                    form.find('[data-wizard-step="3"]')
+                ]
+            })
+                .on('wizardize_gotoStep', function(event, wizardize) {
+                    console.log(wizardize);
+//                    switch (step) {
+//                        case 1:
+//                            break;
+//                        case 2:
+//                            break;
+//                        case 3:
+//                            break;
+//                    }
+                });
+
+            // Wizard: any inputs in steps above the current one are disabled
+
+            // Transition management:
+            // on ajax load, call form.wizardize('gotoStep', x)
+            // Events:
+            // form.on('wizardize_gotoStep', function(event, step) {});
+
             var levelSelect = form.find('select[name="learningLevel"]');
             var areaSelect  = form.find('select[name="learningArea"]');
             form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
