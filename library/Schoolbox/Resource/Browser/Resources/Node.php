@@ -11,14 +11,16 @@
  * @version     SVN: $Id$
  */
 
-namespace SocialStream\Browser;
+namespace Schoolbox\Resource\Browser\Resources;
 
 
 use Schoolbox\Collection;
-use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Resource\Browser;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\FileInterface;
+use Schoolbox\FolderInterface;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Browser\AbstractNode;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Exception;
 
 /**
  * Class Node
@@ -26,81 +28,90 @@ use Schoolbox\Resource\FileMapper;
  *
  * @package SocialStream\Browser
  */
-class Node extends Browser\Node
+class Node extends AbstractNode
 {
 
     /**
-     * Combine the categories and files into a single list
+     * @var \Group
      */
-    protected function processNode($mimeFilter = null)
-    {
-        $output = array(
-            'breadcrumbs' => $this->getBreadcrumbs(),
-            'records'     => array_merge($this->getCategories(), $this->getFiles($mimeFilter)),
-        );
+    protected $groupHandler;
 
-        $this->setResult($output);
+
+    /**
+     * @param int  $nodeId
+     * @param null $mimeFilter
+     * @throws \Schoolbox\Resource\Exception
+     */
+    public function __construct($nodeId, $mimeFilter = null)
+    {
+        parent::__construct($nodeId, $mimeFilter);
+
+        $this->setFolderMapper(new CategoryMapper());
+        $this->setGroupHandler(new \Group());
+
+        // Check we have permission to render node
+        if ($nodeId > 0 && !$this->hasPermission($nodeId, READ_ACCESS)) {
+            throw new Exception('Permission denied');
+        }
     }
 
 
     /**
-     * Get all the files for a particular category
-     *
-     * @param string $mimeFilter
-     * @return array
+     * @param \Group $groupHandler
+     * @return AbstractNode
      */
-    protected function getFiles($mimeFilter = null)
+    protected function setGroupHandler($groupHandler)
     {
-        $output = array();
+        $this->groupHandler = $groupHandler;
+        return $this;
+    }
 
-        $fileMapper = new FileMapper();
-        $mimetypeMapper = new MimetypeMapper();
 
-        //Double check perms, should not get here but just incase
-        if ($this->getGroupHandler()->getPermission($this->getNodeId()) < READ_ACCESS) {
-            return $output;
-        }
+    /**
+     * @return \Group
+     */
+    protected function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
 
+
+    /**
+     * Returns whether or not permission can be granted for the given node
+     *
+     * @param int $nodeId
+     * @param int $minimumLevel
+     * @return bool
+     */
+    protected function hasPermission($nodeId, $minimumLevel)
+    {
+        return $this->getGroupHandler()->getPermission($nodeId) >= $minimumLevel;
+    }
+
+
+    /**
+     * @param int $nodeId
+     * @return Collection|FolderInterface[]
+     */
+    protected function findFoldersForNode($nodeId)
+    {
+        return $this->getFolderMapper()->findByParent($this->getNodeId());
+    }
+
+
+    /**
+     * @param int $nodeId
+     * @return Collection|FileInterface[]
+     */
+    protected function findFilesForNode($nodeId)
+    {
         $options = array();
 
-        if ($mimeFilter) {
-            $options['mime'] = $mimeFilter;
+        if ($this->mimeFilter) {
+            $options['mime'] = $this->mimeFilter;
         }
 
-        /** @var Collection|File[] $allFiles */
-        $allFiles = $fileMapper->findByColumn('category', $this->getNodeId(), $options);
-
-        foreach ($allFiles as $currentFile) {
-
-            /* Use a generic default icon for unknown filetypes that
-              * could accumulate in the schoolbox
-              */
-            try {
-                $mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
-            } catch (\Exception $e) {
-                $mimetype = $mimetypeMapper->getUnknownMime();
-            }
-
-            /* If the mimetype table is empty, it'll spawn with a dunce object
-             * SB-3911
-             */
-            if (!is_numeric($mimetype->getFileTypeID())) {
-                $mimetype = $mimetypeMapper->getUnknownMime();
-            }
-
-            $record = array(
-                'type'   => 'file',
-                'fileId' => $currentFile->getId(),
-                'name'   => $currentFile->getDescription(),
-                'mime'   => $mimetype->getMime(),
-                'icon'   => $mimetype->getIconFile(),
-                'size'   => $currentFile->getFilesize(),
-            );
-
-            $output[] = $record;
-        }
-
-        return $output;
+        return $this->getFileMapper()->findByColumn('category', $this->getNodeId(), $options);
     }
 
 }
