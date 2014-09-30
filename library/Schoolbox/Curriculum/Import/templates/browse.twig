@@ -157,57 +157,49 @@
       method="post"
       name="form" class="clearfix"
 >
-    <table class="standardForm table" data-wizard>
-        <tr data-wizard-step="1">
-            <td class="formLabelWidth">
-                <h4>Source</h4>
-                <em>Select a source to import your curriculum from.</em>
-            </td>
-            <td>
-                <select name="source">
-                    <option value="">-- select a source --</option>
-                    {% for item in sourceList %}
-                        <option value="{{ item.id|e('html_attr') }}"
-                                label="{{ item.name|e('html_attr') }}"
-                                title="{{ item.description|e('html_attr') }}"
-                                >{{ item.name }}</option>
-                    {% endfor %}
-                </select>
-                <input type="submit"
-                       value="Use This Source"
-                       class="submit-btn-plain inline"
-                       data-role="wizard-step-1-submit"
-                       disabled
+    <h3>Select a source</h3>
+    <section data-wizard-step="1">
+        <em>Select a source to import your curriculum from.</em>
+        <select name="source">
+            <option value="">-- select a source --</option>
+            {% for item in sourceList %}
+                <option value="{{ item.id|e('html_attr') }}"
+                        label="{{ item.name|e('html_attr') }}"
+                        title="{{ item.description|e('html_attr') }}"
+                        >{{ item.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit"
+               value="Use This Source"
+               class="submit-btn-plain inline"
+               data-role="wizard-step-1-submit"
+               disabled
                 />
-            </td>
-        </tr>
-        <tr data-wizard-step="2">
-            <td class="formLabelWidth">
-                <h4>Curriculum</h4>
-                <em>Select a learning level and learning area to import outcomes from.</em>
-            </td>
-            <td>
-                <select name="learningLevel" disabled>
-                    <option value="">-- select a level --</option>
-                </select>
-                <select name="learningArea" disabled>
-                    <option value="">-- select an area --</option>
-                </select>
-                <input type="submit"
-                       value="Search"
-                       class="submit-btn-plain inline"
-                       data-role="wizard-step-2-submit"
-                       disabled
+    </section>
+    <h3>Select a curriculum</h3>
+    <section data-wizard-step="2">
+        <em>Select a learning level and learning area to import outcomes from.</em>
+        <select name="learningLevel" disabled>
+            <option value="">-- select a level --</option>
+        </select>
+        <select name="learningArea" disabled>
+            <option value="">-- select an area --</option>
+        </select>
+        <input type="submit"
+               value="Search"
+               class="submit-btn-plain inline"
+               data-role="wizard-step-2-submit"
+               disabled
                 />
-            </td>
-        </tr>
-        <tr data-wizard-step="3">
-            <td class="formLabelWidth">
-                <h4>Outcomes</h4>
-            </td>
-            <td>
-                <ul class="wysiwyg" id="outcomes"></ul>
-            </td>
-        </tr>
-    </table>
+    </section>
+    <h3>View outcomes</h3>
+    <section data-wizard-step="3">
+        <ul class="wysiwyg" id="outcomes"></ul>
+        <input type="submit"
+               value="Done"
+               class="submit-btn-plain inline"
+               data-role="wizard-step-3-submit"
+               disabled
+                />
+    </section>
 </form>
