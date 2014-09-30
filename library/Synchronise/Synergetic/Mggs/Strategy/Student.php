@@ -64,9 +64,12 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
 
-		/* Staff Group ID
+		/* Student Group ID
 		 */
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
+
+        //Boarding House, only one exists
+        $newUser['residential_house_id'] = $currentUser['StudentBoarder'] === 'B' ? 1 : 0;
 
 		/* This person is not a superuser
 		 */
