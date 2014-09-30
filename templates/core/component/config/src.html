@@ -9,8 +9,8 @@
 
       $j('#resource-browser').socialstreamBrowser({
         title: 'Choose a source',
-        categoryId: '{ID}',
-        url: '/socialstream/tree.php?nofiles=1&relationID={COMPONENT_CONFIG_SRC_CID}',
+        categoryId: '{COMPONENT_CONFIG_SRC_CID}',
+        url: '/socialstream/tree.php?nofiles=1',
         submitCallback: function(url, filename) {
 
           var src = $j('#src-{COMPONENT_HANDLE}');

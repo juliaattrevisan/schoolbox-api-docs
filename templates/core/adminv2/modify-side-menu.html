@@ -4,8 +4,6 @@
 <script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 <script type="text/javascript">
 
-    socialstreamSession = {};
-
     $j(function () {
 
         // setup tree structure
@@ -41,7 +39,7 @@
         $j('#resource-browser').socialstreamBrowser({
           title: 'Choose a folder',
           categoryId: 0,
-          url: '/socialstream/tree.php?nofiles=1',
+          url: '/socialstream/tree.php',
           submitCallback: function(url, filename) {
             $j('#url').val(url);
           }

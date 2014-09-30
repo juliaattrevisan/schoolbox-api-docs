@@ -12,8 +12,11 @@
  * @version     SVN: $Id$
  */
 
-if (socialstreamSession === undefined) {
-    var socialstreamSession = {categoryId : 0};
+try {
+    socialstreamSession.categoryId;
+} catch (e) {
+    // define scope
+    var socialstreamSession;
 }
 
 (function($j) {
@@ -75,6 +78,12 @@ if (socialstreamSession === undefined) {
 			 */
 			merged = $j.extend(defaults, options);
 			merged.categoryId = parseInt(merged.categoryId, 10);
+
+            try {
+                socialstreamSession.categoryId;
+            } catch (e) {
+                socialstreamSession = {categoryId : merged.categoryId};
+            }
 
 			return merged;
 		}
