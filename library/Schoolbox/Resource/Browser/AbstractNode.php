@@ -14,11 +14,14 @@
 namespace Schoolbox\Resource\Browser;
 
 
+use InvalidArgumentException;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Exception;
 
-class Node
+class AbstractNode implements NodeInterface
 {
+
+    const MAX_DEPTH = 100;
 
     /**
      * A node id, usually a primary key
@@ -33,6 +36,13 @@ class Node
      * @var array
      */
     protected $result = array();
+
+    /**
+     * Optional mime filter
+     *
+     * @var string
+     */
+    protected $mimeFilter = null;
 
     /**
      * An instance of a category mapper
@@ -53,25 +63,26 @@ class Node
      * $nodeId is the primary key of the category whose contents
      * you wish to present
      *
-     * @param int $nodeId
+     * @param int    $nodeId
      * @param string $mimeFilter
-     * @throws Exception
+     * @throws \Schoolbox\Resource\Exception
+     * @throws InvalidArgumentException
      */
     public function __construct($nodeId, $mimeFilter = null)
     {
-        if (is_numeric($nodeId)) {
-            $this->setNodeId($nodeId);
-            $this->setCategoryMapper(new CategoryMapper());
-            $this->setGroupHandler(new \Group());
-
-            // Check we have permission to render node
-            if ($nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
-                throw new Exception('Permission denied');
-            }
-
-
-            $this->processNode($mimeFilter);
+        if (!is_numeric($nodeId)) {
+            throw new InvalidArgumentException("Node ID must be numeric");
         }
+
+        // Check we have permission to render node
+        if ($nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
+            throw new Exception('Permission denied');
+        }
+
+        $this->setNodeId($nodeId);
+        $this->setMimeFilter($mimeFilter);
+        $this->setCategoryMapper(new CategoryMapper());
+        $this->setGroupHandler(new \Group());
     }
 
 
@@ -92,6 +103,7 @@ class Node
      */
     public function render()
     {
+        $this->processNode($this->getMimeFilter());
         return $this->getResult();
     }
 
@@ -129,7 +141,7 @@ class Node
                 'name'       => $category->getName(),
             );
 
-            for ($i = 0; ($category->getParent()->getId() > 0) && ($i < 100); $i++) {
+            for ($i = 0; ($category->getParent()->getId() > 0) && ($i < self::MAX_DEPTH); $i++) {
                 if ($this->getGroupHandler()->getPermission($category->getParent()->getId()) >= READ_ACCESS) {
                     $currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
 
@@ -245,7 +257,7 @@ class Node
 
     /**
      * @param \Group $groupHandler
-     * @return self
+     * @return AbstractNode
      */
     protected function setGroupHandler($groupHandler)
     {
@@ -261,6 +273,27 @@ class Node
     {
         return $this->groupHandler;
     }
+
+
+    /**
+     * @param string $mimeFilter
+     * @return AbstractNode
+     */
+    public function setMimeFilter($mimeFilter)
+    {
+        $this->mimeFilter = $mimeFilter;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getMimeFilter()
+    {
+        return $this->mimeFilter;
+    }
+
 
 
 }
