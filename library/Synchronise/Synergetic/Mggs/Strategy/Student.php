@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synchronise_Synergetic_Mggs_Strategy_Student
  *
@@ -12,97 +13,104 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergetic_Mggs_Strategy_Abstract {
-	protected $strategyTitle = "Update Schoolbox Student Details Synchronisation";
+class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergetic_Mggs_Strategy_Abstract
+{
+    protected $strategyTitle = "Update Schoolbox Student Details Synchronisation";
 
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose());
-	}
+    /**
+     * Setup
+     */
+    protected function setup()
+    {
+        $this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose());
+    }
 
-	/**
-	 * Get a list of users' Synergy IDs to sync
-	 *
-	 * @return void
-	 */
-	public function generateList() {
-		$this->collateList($this->getExternalUserHandler()->getStudentUserAccountInfo());
-	}
+    /**
+     * Get a list of users' Synergy IDs to sync
+     *
+     * @return void
+     */
+    public function generateList()
+    {
+        $this->collateList($this->getExternalUserHandler()->getStudentUserAccountInfo());
+    }
 
-	/**
-	 * Set up the new user's details
-	 *
-	 * @param  $currentUser
-	 * @return array
-	 */
-	public function setupUserDetails($currentUser) {
-		$newUser = array();
+    /**
+     * Set up the new user's details
+     *
+     * @param  $currentUser
+     * @return array
+     */
+    public function setupUserDetails($currentUser)
+    {
+        $newUser = array();
 
-		/* Login details
-		 * We don't know how the password is given to us
-		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+        /* Login details
+         * We don't know how the password is given to us
+         */
+        $newUser['username'] = $currentUser['NetworkLogin'];
 
-		/* User details
-		 */
-		$newUser['title'] = '';
-		$newUser['firstname'] = $currentUser['StudentPreferred'];
-		$newUser['lastname'] = $currentUser['StudentSurname'];
-		$newUser['alt_email'] = $currentUser['StudentOccupEmail'];
-		$newUser['synergy_id'] = $currentUser['StudentID'];
-		$newUser['local_email'] = 0;
-		$newUser['webmail'] = 1;
+        /* User details
+         */
+        $newUser['title'] = '';
+        $newUser['firstname'] = $currentUser['StudentPreferred'];
+        $newUser['lastname'] = $currentUser['StudentSurname'];
+        $newUser['alt_email'] = $currentUser['StudentOccupEmail'];
+        $newUser['synergy_id'] = $currentUser['StudentID'];
+        $newUser['local_email'] = 0;
+        $newUser['webmail'] = 1;
 
-		/* Year level
-		 */
-		$newUser['year'] = $this->getYear($currentUser['StudentYearLevel']);
+        /* Year level
+         */
+        $newUser['year'] = $this->getYear($currentUser['StudentYearLevel']);
 
-		/* Campus config: needs to map to a campus id
-		 */
-		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
+        /* Campus config: needs to map to a campus id
+         */
+        $newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
+        $newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
 
-		/* Student Group ID
-		 */
-		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
+        /* Student Group ID
+         */
+        $newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
         //Boarding House, only one exists
         $newUser['residential_house_id'] = $currentUser['StudentBoarder'] === 'B' ? 1 : 0;
 
-		/* This person is not a superuser
-		 */
-		//$newUser['su'] = false;
+        /* This person is not a superuser
+         */
+        //$newUser['su'] = false;
 
-		return $newUser;
-	}
-
-    protected function getYear($year) {
-        if($year == '40')
-            return '4yo Kinder';
-        else if($year == '30')
-            return '3yo Kinder';
-        else
-            return $year;
+        return $newUser;
     }
 
-	/**
-	 * If the users exist in Synergy but not in Schoolbox, create an account for
-	 * them
-	 *
-	 * @return void
-	 */
-	public function createIfExists() {
-		$this->getVerboseFilter()->intro();
+    protected function getYear($year)
+    {
+        if ($year == '40') {
+            return '4yo Kinder';
+        } else if ($year == '30') {
+            return '3yo Kinder';
+        } else {
+            return $year;
+        }
+    }
 
-		foreach($this->getList() as $currentUser) {
+    /**
+     * If the users exist in Synergy but not in Schoolbox, create an account for
+     * them
+     *
+     * @return void
+     */
+    public function createIfExists()
+    {
+        $this->getVerboseFilter()->intro();
 
-			/* Generate details about the new user
-			 */
-			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
-		}
+        foreach ($this->getList() as $currentUser) {
 
-		$this->getVerboseFilter()->summary();
-	}
+            /* Generate details about the new user
+             */
+            $this->executeCreateUpdate($this->setupUserDetails($currentUser));
+        }
+
+        $this->getVerboseFilter()->summary();
+    }
 }
