@@ -15,10 +15,13 @@ namespace Schoolbox\Resource\Browser;
 
 
 use InvalidArgumentException;
-use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Resource\Exception;
+use Schoolbox\Collection;
+use Schoolbox\File\MimetypeMapper;
+use Schoolbox\FileInterface;
+use Schoolbox\FolderInterface;
+use Schoolbox\Mapper;
 
-class AbstractNode implements NodeInterface
+abstract class AbstractNode implements NodeInterface
 {
 
     const MAX_DEPTH = 100;
@@ -45,16 +48,14 @@ class AbstractNode implements NodeInterface
     protected $mimeFilter = null;
 
     /**
-     * An instance of a category mapper
-     *
-     * @var CategoryMapper
+     * @var Mapper
      */
-    protected $categoryMapper = null;
+    protected $folderMapper = null;
 
     /**
-     * @var \Group
+     * @var Mapper
      */
-    protected $groupHandler;
+    protected $fileMapper = null;
 
 
     /**
@@ -74,15 +75,8 @@ class AbstractNode implements NodeInterface
             throw new InvalidArgumentException("Node ID must be numeric");
         }
 
-        // Check we have permission to render node
-        if ($nodeId > 0 && $this->getGroupHandler()->getPermission($nodeId) < READ_ACCESS) {
-            throw new Exception('Permission denied');
-        }
-
         $this->setNodeId($nodeId);
         $this->setMimeFilter($mimeFilter);
-        $this->setCategoryMapper(new CategoryMapper());
-        $this->setGroupHandler(new \Group());
     }
 
 
@@ -111,11 +105,11 @@ class AbstractNode implements NodeInterface
     /**
      * Combine the categories and files into a single list
      */
-    protected function processNode($mimeFilter = null)
+    protected function processNode()
     {
         $output = array(
             'breadcrumbs' => $this->getBreadcrumbs(),
-            'records'     => $this->getCategories(),
+            'records'     => array_merge($this->getFolders(), $this->getFiles()),
         );
 
         $this->setResult($output);
@@ -134,24 +128,26 @@ class AbstractNode implements NodeInterface
         /* Special case for root node
          */
         if ($this->getNodeId()) {
-            $category = $this->getCategoryMapper()->findById($this->getNodeId());
+            return $breadcrumbs;
+        }
 
-            $breadcrumbs[] = array(
-                'categoryId' => $category->getId(),
-                'name'       => $category->getName(),
-            );
+        $category = $this->getFolderMapper()->findById($this->getNodeId());
 
-            for ($i = 0; ($category->getParent()->getId() > 0) && ($i < self::MAX_DEPTH); $i++) {
-                if ($this->getGroupHandler()->getPermission($category->getParent()->getId()) >= READ_ACCESS) {
-                    $currentCategory = $this->getCategoryMapper()->findById($category->getParent()->getId());
+        $breadcrumbs[] = array(
+            'categoryId' => $category->getId(),
+            'name'       => $category->getName(),
+        );
 
-                    $breadcrumbs[] = array(
-                        'categoryId' => $currentCategory->getId(),
-                        'name'       => $currentCategory->getName(),
-                    );
+        for ($i = 0; ($category->getParent()->getId() > 0) && ($i < self::MAX_DEPTH); $i++) {
+            if ($this->hasPermission($category->getParent()->getId(), READ_ACCESS)) {
+                $currentCategory = $this->getFolderMapper()->findById($category->getParent()->getId());
 
-                    $category = $currentCategory;
-                }
+                $breadcrumbs[] = array(
+                    'categoryId' => $currentCategory->getId(),
+                    'name'       => $currentCategory->getName(),
+                );
+
+                $category = $currentCategory;
             }
         }
 
@@ -165,18 +161,18 @@ class AbstractNode implements NodeInterface
      *
      * @return array
      */
-    protected function getCategories()
+    protected function getFolders()
     {
         $output = array();
 
-        $allCategories = $this->getCategoryMapper()->findByParent($this->getNodeId());
+        $allFolders = $this->findFoldersForNode($this->getNodeId());
 
-        foreach ($allCategories as $currentCategory) {
-            if ($this->getGroupHandler()->getPermission($currentCategory->getId()) >= READ_ACCESS) {
+        foreach ($allFolders as $currentFolder) {
+            if ($this->hasPermission($currentFolder->getId(), READ_ACCESS)) {
                 $record = array(
                     'type'       => 'category',
-                    'categoryId' => $currentCategory->getId(),
-                    'name'       => $currentCategory->getName()
+                    'categoryId' => $currentFolder->getId(),
+                    'name'       => $currentFolder->getName()
                 );
 
                 $output[] = $record;
@@ -185,6 +181,59 @@ class AbstractNode implements NodeInterface
 
         return $output;
     }
+
+
+    /**
+     * Get all the files for a particular folder
+     *
+     * @return array
+     */
+    protected function getFiles()
+    {
+        $output = array();
+
+        $mimetypeMapper = new MimetypeMapper();
+
+        //Double check perms, should not get here but just incase
+        if (!$this->hasPermission($this->getNodeId(), READ_ACCESS)) {
+            return $output;
+        }
+
+        $allFiles = $this->findFilesForNode($this->getNodeId());
+
+        foreach ($allFiles as $currentFile) {
+
+            /* Use a generic default icon for unknown filetypes that
+              * could accumulate in the schoolbox
+              */
+            try {
+                $mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
+            } catch (\Exception $e) {
+                $mimetype = $mimetypeMapper->getUnknownMime();
+            }
+
+            /* If the mimetype table is empty, it'll spawn with a dunce object
+             * SB-3911
+             */
+            if (!is_numeric($mimetype->getFileTypeID())) {
+                $mimetype = $mimetypeMapper->getUnknownMime();
+            }
+
+            $record = array(
+                'type'   => 'file',
+                'fileId' => $currentFile->getId(),
+                'name'   => $currentFile->getDescription(),
+                'mime'   => $mimetype->getMime(),
+                'icon'   => $mimetype->getIconFile(),
+                'size'   => $currentFile->getFilesize(),
+            );
+
+            $output[] = $record;
+        }
+
+        return $output;
+    }
+
 
     /* Getters/Setters
      */
@@ -234,48 +283,6 @@ class AbstractNode implements NodeInterface
 
 
     /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    protected function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-
-    /**
-     * Get category mapper
-     *
-     * @return CategoryMapper
-     */
-    protected function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-
-    /**
-     * @param \Group $groupHandler
-     * @return AbstractNode
-     */
-    protected function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-        return $this;
-    }
-
-
-    /**
-     * @return \Group
-     */
-    protected function getGroupHandler()
-    {
-        return $this->groupHandler;
-    }
-
-
-    /**
      * @param string $mimeFilter
      * @return AbstractNode
      */
@@ -295,5 +302,66 @@ class AbstractNode implements NodeInterface
     }
 
 
+    /**
+     * @param Mapper $mapper
+     * @return self
+     */
+    protected function setFolderMapper($mapper)
+    {
+        $this->folderMapper = $mapper;
+    }
+
+
+    /**
+     * @return Mapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+
+    /**
+     * @param Mapper $mapper
+     * @return self
+     */
+    protected function setFileMapper($mapper)
+    {
+        $this->fileMapper = $mapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Mapper
+     */
+    protected function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+
+    /**
+     * Returns whether or not permission can be granted for the given node
+     *
+     * @param int $nodeId
+     * @param int $minimumLevel
+     * @return bool
+     */
+    protected abstract function hasPermission($nodeId, $minimumLevel);
+
+
+    /**
+     * @param int $nodeId
+     * @return Collection|FolderInterface[]
+     */
+    protected abstract function findFoldersForNode($nodeId);
+
+
+    /**
+     * @param int $nodeId
+     * @return Collection|FileInterface[]
+     */
+    protected abstract function findFilesForNode($nodeId);
 
 }
