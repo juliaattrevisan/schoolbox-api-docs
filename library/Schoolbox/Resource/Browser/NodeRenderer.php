@@ -156,10 +156,41 @@ class NodeRenderer
 
         for ($i = 0; $i < count($allRecords); $i++) {
             $currentRecord = $allRecords[$i];
-            $this->renderCategory($currentRecord, $i);
+
+            switch ($currentRecord['type']) {
+                case 'category':
+                    $this->renderFolder($currentRecord, $i);
+                    break;
+                case 'file':
+                    $this->renderFile($currentRecord, $i);
+                    break;
+                default:
+                    break;
+            }
         }
 
         $this->getPage()->parse('use_folder_block', 'use_folder');
+    }
+
+
+    /**
+     * Render a file record
+     *
+     * @param $currentRecord
+     * @param $i
+     */
+    protected function renderFile($currentRecord, $i)
+    {
+        $this->getPage()->setVar(array(
+            'NODE_FILE_ON_OFF' => $i % 2 ? '' : 'dark',
+            'NODE_FILE_ID'     => $currentRecord['fileId'],
+            'NODE_FILE_NAME'   => $currentRecord['name'],
+            'NODE_FILE_ICON'   => $currentRecord['icon'],
+            'NODE_MIME_TYPE'   => $currentRecord['mime'],
+            'NODE_FILE_SIZE'   => $currentRecord['size']
+        ));
+
+        $this->getPage()->parse('node_file_block', 'node_file', true);
     }
 
 
@@ -169,7 +200,7 @@ class NodeRenderer
      * @param $currentRecord
      * @param $i
      */
-    protected function renderCategory($currentRecord, $i)
+    protected function renderFolder($currentRecord, $i)
     {
         $this->getPage()->setVar(array(
             'NODE_CATEGORY_ON_OFF' => $i % 2 ? '' : 'dark',
