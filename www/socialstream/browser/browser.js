@@ -56,6 +56,9 @@ try {
 				 */
 				categoryId: 0,
 
+                /* Should this instance listen to the global rememberer */
+                isolate: false,
+
 				/* A callback method. The file you choze from the browser is passed
 				 * to this method to deal with in whatever manner you want
 				 */
@@ -79,10 +82,12 @@ try {
 			merged = $j.extend(defaults, options);
 			merged.categoryId = parseInt(merged.categoryId, 10);
 
-            try {
-                socialstreamSession.categoryId;
-            } catch (e) {
-                socialstreamSession = {categoryId : merged.categoryId};
+            if (!merged.isolate) {
+                try {
+                    socialstreamSession.categoryId;
+                } catch (e) {
+                    socialstreamSession = {categoryId : merged.categoryId};
+                }
             }
 
 			return merged;
@@ -126,9 +131,11 @@ try {
                 mimeFilter: config.mimeFilter
 			};
 
-			/* Remember where we left off and reopen from here
-			 */
-			socialstreamSession.categoryId = node;
+            if (!config.isolate) {
+                /* Remember where we left off and reopen from here
+                 */
+                socialstreamSession.categoryId = node;
+            }
 
 			/* Load data into the node container
 			 */
@@ -209,7 +216,7 @@ try {
 
         /* Open Pandora's Box
          */
-        loadNode(socialstreamSession.categoryId);
+        loadNode(config.isolate ? config.categoryId : socialstreamSession.categoryId);
 
     };
 }(jQuery));

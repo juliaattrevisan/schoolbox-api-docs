@@ -31,6 +31,7 @@
             browser.socialstreamBrowser({
                 title: 'Select a course',
                 categoryId: settings.course_homepage,
+                isolate: true,
                 url: '/socialstream/tree.php?nofiles=1',
                 submitCallback: function(url, filename) {
                     $(destination)
