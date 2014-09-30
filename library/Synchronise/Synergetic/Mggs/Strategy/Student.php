@@ -11,7 +11,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergetic_Mggs_Strategy_Abstract
 {
@@ -76,10 +75,6 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
         //Boarding House, only one exists
         $newUser['residential_house_id'] = $currentUser['StudentBoarder'] === 'B' ? 1 : 0;
 
-        /* This person is not a superuser
-         */
-        //$newUser['su'] = false;
-
         return $newUser;
     }
 
@@ -87,7 +82,7 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
     {
         if ($year == '40') {
             return '4yo Kinder';
-        } else if ($year == '30') {
+        } elseif ($year == '30') {
             return '3yo Kinder';
         } else {
             return $year;
