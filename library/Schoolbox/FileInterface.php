@@ -23,4 +23,28 @@ interface FileInterface {
      */
     public function getMime();
 
-} 
+    /**
+     * Returns the ID of the file
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * Returns the size on disk of the file
+     * @return int
+     */
+    public function getFilesize();
+
+    /**
+     * Returns the real filename of the file
+     * @return string
+     */
+    public function getFilename();
+
+    /**
+     * Returns the title (not filename) of the file
+     * @return string
+     */
+//    public function getDescription();
+
+}
