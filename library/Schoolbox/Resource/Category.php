@@ -11,11 +11,12 @@
 namespace Schoolbox\Resource;
 
 use Schoolbox\Collection;
+use Schoolbox\FolderInterface;
 use Schoolbox\UserMapper;
 use Schoolbox\ISoftDeletable;
 
 
-class Category implements ISoftDeletable
+class Category implements ISoftDeletable, FolderInterface
 {
     /**
      * @var int

@@ -9,7 +9,7 @@
 
 namespace Schoolbox;
 
-class MyFolder {
+class MyFolder implements FolderInterface {
 
     /**
      * @var int
