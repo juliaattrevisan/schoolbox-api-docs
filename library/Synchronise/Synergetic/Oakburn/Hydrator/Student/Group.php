@@ -23,6 +23,12 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Student_Group implements Synchroni
      * @return int
      */
     public function getGroupIDFromUser($externalUser) {
+
+        if(!($externalUser['StudentCampus'] == 'J' || $externalUser['StudentCampus'] == 'S')) {
+            //External students put them in the external group
+            return 21;
+        }
+
 		switch ($externalUser['StudentYearLevel']) {
 			case 0: return 8; break;
 			case 1: return 9; break;
@@ -41,6 +47,9 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Student_Group implements Synchroni
 			case 40: return 7; break;
 			default: break;
 		}
+
+
+
 
 		return 0;
     }

@@ -13,6 +13,9 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Parent_Username implements Synchro
      */
     public function hydrate($externalUser, $newUser) {
 
+        if(!isset($newUser['synergy_id'])) {
+            return false;
+        }
         $query = "SELECT Networklogin, initialPassword, WantMail FROM uvParentNetworkLogin WHERE ID = '".$newUser['synergy_id']."'";
         $userViewParent = MSSQL::getInstance()->getRow($query);
 
