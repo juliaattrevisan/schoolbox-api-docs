@@ -52,7 +52,7 @@ class Alaress_Twitter_Search
             $search .= "from:{$this->getUser()} ";
         }
 
-        $search = urlencode(trim($this->getKeywords()));
+        $search .= urlencode(trim($this->getKeywords()));
 
         return array('q' => $search);
     }
