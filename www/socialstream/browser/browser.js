@@ -50,7 +50,7 @@ try {
 
 				/* The url to load node contents from
 				 */
-				url: '/socialstream/tree.php',
+				url: '/ajax/resource/tree/browse',
 
 				/* The default category to open
 				 */
