@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0c5a6d8f22d63e1814e4b1e21a993845",
+    "hash": "96ef6b9820b8f4773cab663afd32bde8",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -1223,34 +1223,39 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "3.1.3",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-vobject.git",
-                "reference": "961546d71c332ab34ad1c5bba7f372c08b388dcf"
+                "reference": "2a5c49e706454d437a9e25bdb39583a18d470399"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/961546d71c332ab34ad1c5bba7f372c08b388dcf",
-                "reference": "961546d71c332ab34ad1c5bba7f372c08b388dcf",
+                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/2a5c49e706454d437a9e25bdb39583a18d470399",
+                "reference": "2a5c49e706454d437a9e25bdb39583a18d470399",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": ">=5.3.1"
             },
+            "require-dev": {
+                "phpunit/phpunit": "*",
+                "squizlabs/php_codesniffer": "*"
+            },
             "bin": [
-                "bin/vobject"
+                "bin/vobject",
+                "bin/generate_vcards"
             ],
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1.x-dev"
+                    "dev-master": "3.2.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Sabre\\VObject": "lib/"
+                "psr-4": {
+                    "Sabre\\VObject\\": "lib/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1261,18 +1266,20 @@
                 {
                     "name": "Evert Pot",
                     "email": "evert@rooftopsolutions.nl",
-                    "homepage": "http://www.rooftopsolutions.nl/",
+                    "homepage": "http://evertpot.com/",
                     "role": "Developer"
                 }
             ],
             "description": "The VObject library for PHP allows you to easily parse and manipulate iCalendar and vCard objects",
-            "homepage": "https://github.com/fruux/sabre-vobject",
+            "homepage": "http://sabre.io/vobject/",
             "keywords": [
                 "VObject",
                 "iCalendar",
+                "jCal",
+                "jCard",
                 "vCard"
             ],
-            "time": "2013-10-02 15:59:03"
+            "time": "2014-09-19 18:54:29"
         },
         {
             "name": "shareworks/xml-security",
@@ -3791,7 +3798,7 @@
         {
             "alias": "2.1",
             "alias_normalized": "2.1.0.0",
-            "version": "3.1.3.0",
+            "version": "3.3.2.0",
             "package": "sabre/vobject"
         },
         {
