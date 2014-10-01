@@ -92,11 +92,12 @@ abstract class AbstractNode implements NodeInterface
     /**
      * Render it out so phplib can do it
      *
+     * @param bool $noFiles
      * @return array
      */
-    public function render()
+    public function render($noFiles = false)
     {
-        $this->processNode();
+        $this->processNode($noFiles);
         return $this->getResult();
     }
 
@@ -104,11 +105,17 @@ abstract class AbstractNode implements NodeInterface
     /**
      * Combine the categories and files into a single list
      */
-    protected function processNode()
+    protected function processNode($noFiles)
     {
+        $records = $this->getFolders();
+
+        if(!$noFiles) {
+            $records = array_merge($records, $this->getFiles());
+        }
+
         $output = array(
             'breadcrumbs' => $this->getBreadcrumbs(),
-            'records'     => array_merge($this->getFolders(), $this->getFiles()),
+            'records'     => $records,
         );
 
         $this->setResult($output);

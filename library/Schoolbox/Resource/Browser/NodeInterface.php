@@ -37,8 +37,9 @@ interface NodeInterface {
     /**
      * Render it out so phplib can do it
      *
+     * @param bool $noFiles
      * @return array
      */
-    public function render();
+    public function render($noFiles = false);
 
 } 
