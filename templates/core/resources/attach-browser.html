@@ -20,23 +20,16 @@
   <script type="text/javascript">
     window.gpick = {
       picked: function (docs) {
-        console.log('docsez');
         var i;
         for(i = 0; i < docs.length; ++i) {
           var doc = docs[i];
-          console.log(doc.name, doc.iconUrl, doc.id);
           fiil();
 
         }
       },
-      cancel: function () {
-        console.log('cancellation');
-      },
-      needAuth: function () {
-        console.log('u mus autorizer ur accountz');
-      },
+      cancel: function () { /* noop */ },
+      needAuth: function () { /* noop */ },
       loaded: function () {
-        console.log('lockd n loaded');
         $('#attachment-browser')
             .find('li[data-source="external/google"]')
             .find('div.explorer')
@@ -55,7 +48,6 @@
         li.addClass('browsing').siblings().removeClass('browsing');
 
         if (!ab.data(src)) {
-          console.log('loading pane for '+src);
 
           // load this tab
           ab.data(src, {loaded: true});

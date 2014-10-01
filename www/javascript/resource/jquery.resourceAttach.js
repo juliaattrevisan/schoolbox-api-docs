@@ -298,7 +298,7 @@
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
-                hash: list[i].hash,
+                hash: list[i].hash
             };
 
             if (this.dropzone) {
