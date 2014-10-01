@@ -1,0 +1,23 @@
+<script type="application/javascript" src="/socialstream/browser/browser.js"></script>
+<script type="application/javascript">
+  $(function () {
+    $('#ab-{SOURCE_SLUG}').socialstreamBrowser({
+      url: '/ajax/resource/tree/{SOURCE_SLUG}',
+      modal: false,
+      mimeFilter: {MIME_FILTER},
+      submitCallback: function (url, filename, meta) {
+        var data = [{
+          title:    $(filename).text(),
+          mimeType: meta.mime,
+          filesize: meta.size,
+          hash:     '{SOURCE_SLUG}.' + url.split('?')[1]
+        }];
+        window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+      }
+    });
+  });
+</script>
+<div id="ab-{SOURCE_SLUG}" class="ab-pane"><!-- CONTENT AJAX-LOADED --></div>
+<div class="ctrl">
+  <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+</div>
