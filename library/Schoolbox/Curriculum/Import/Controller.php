@@ -40,6 +40,14 @@ class Controller extends Base
     }
 
     /**
+     * Controller action for creating a curriculum.
+     */
+    public function create()
+    {
+        // Refetch outcomes
+    }
+
+    /**
      * Controller action for loading the list of learning levels for a given
      * source (in request->query[id]).
      */

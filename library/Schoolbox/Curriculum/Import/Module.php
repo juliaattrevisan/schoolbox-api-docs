@@ -24,7 +24,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('curriculumImport.browse', $basePath . '/?');
+        $router->addGet('curriculumImport.browse', $basePath);
+        $router->addPost('curriculumImport.create', $basePath);
         $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels');
         $router->addGet('curriculumImport.outcomes', $basePath . '/outcomes');
 //        // Attach standard REST routes
