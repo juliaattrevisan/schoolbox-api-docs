@@ -52,7 +52,7 @@ class NodeRenderer
     /**
      * Render tree and excrete it
      */
-    public function render()
+    public function render($foldersSelectable = true)
     {
         // Setup the various blocks that need setting
         $this->setupBlocks();
@@ -67,7 +67,7 @@ class NodeRenderer
 
         /* Render all the records
          */
-        $this->renderContents();
+        $this->renderContents($foldersSelectable);
 
         /* Send it out
          */
@@ -148,7 +148,7 @@ class NodeRenderer
     /**
      * Render all the contents of the current node
      */
-    protected function renderContents()
+    protected function renderContents($foldersSelectable = true)
     {
         $nodeData = $this->getNodeData();
 
@@ -169,7 +169,10 @@ class NodeRenderer
             }
         }
 
-        $this->getPage()->parse('use_folder_block', 'use_folder');
+        // only render the 'use this folder' block if it's been asked for
+        if ($foldersSelectable) {
+            $this->getPage()->parse('use_folder_block', 'use_folder');
+        }
     }
 
 

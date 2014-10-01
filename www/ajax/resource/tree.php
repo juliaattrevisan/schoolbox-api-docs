@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Resource\Browser\Resources\Node;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -29,17 +31,27 @@ if (count($this->arg) != 1) {
 
 $source     = $this->arg[0];
 $resourceId = isset($_REQUEST['relationID']) ? $_REQUEST['relationID'] : 0;
-$mimeFilter = isset($_REQUEST['mimeFilter']) ? $_REQUEST['mimeFilter'] : null;
-$noFiles    = isset($_REQUEST['nofiles'])    ? !!$_REQUEST['nofiles']  : false;
+$useFolders = true;            // allow folder selection
+$mimeFilter = Node::ALL_FILES; // show all files by default
+
+if (isset($_REQUEST['mimeFilter'])) {
+    // might be *set* but blank, which means show no files
+    if ($_REQUEST['mimeFilter']) {
+        $mimeFilter = $_REQUEST['mimeFilter'];
+        $useFolders = false;
+    } else {
+        $mimeFilter = Node::NO_FILES;
+    }
+}
 
 try {
     $factory  = new \Schoolbox\Resource\Browser\NodeFactory();
     $browser  = $factory->build($source, $resourceId, $mimeFilter);
-    $nodeData = $browser->render($noFiles);
+    $nodeData = $browser->render();
 
     // Render the stuff in this node
     $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
-    $renderer->render();
+    $renderer->render($useFolders);
 
 } catch (\Schoolbox\Resource\Exception $e) {
     $this->error(6);

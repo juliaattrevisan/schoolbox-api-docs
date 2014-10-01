@@ -25,6 +25,10 @@ abstract class AbstractNode implements NodeInterface
 
     const MAX_DEPTH = 100;
 
+    const ALL_FILES = null;
+    const NO_FILES  = false;
+
+
     /**
      * A node id, usually a primary key
      *
@@ -92,12 +96,11 @@ abstract class AbstractNode implements NodeInterface
     /**
      * Render it out so phplib can do it
      *
-     * @param bool $noFiles
      * @return array
      */
-    public function render($noFiles = false)
+    public function render()
     {
-        $this->processNode($noFiles);
+        $this->processNode();
         return $this->getResult();
     }
 
@@ -105,13 +108,9 @@ abstract class AbstractNode implements NodeInterface
     /**
      * Combine the categories and files into a single list
      */
-    protected function processNode($noFiles)
+    protected function processNode()
     {
-        $records = $this->getFolders();
-
-        if(!$noFiles) {
-            $records = array_merge($records, $this->getFiles());
-        }
+        $records = array_merge($this->getFolders(), $this->getFiles());
 
         $output = array(
             'breadcrumbs' => $this->getBreadcrumbs(),
@@ -201,6 +200,11 @@ abstract class AbstractNode implements NodeInterface
     protected function getFiles()
     {
         $output = array();
+
+        if ($this->mimeFilter === self::NO_FILES) {
+            // no files if filter is explicitly false
+            return $output;
+        }
 
         $mimetypeMapper = new MimetypeMapper();
 

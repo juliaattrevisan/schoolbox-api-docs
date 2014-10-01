@@ -39,7 +39,7 @@
         $j('#resource-browser').socialstreamBrowser({
           title: 'Choose a folder',
           categoryId: 0,
-          url: '/socialstream/tree.php',
+          mimeFilter: false,
           submitCallback: function(url, filename) {
             $j('#url').val(url);
           }
