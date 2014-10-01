@@ -202,6 +202,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         $categoryId    = $category->getId();
         $effectorExtId = $effector->getExternalId();
 
+        // manuel hydration
+        if (!$category->getName()) {
+            $category = $this->categoryMapper->findById($categoryId);
+        }
+
         $bob = new Builder();
         $bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
             ->setHref("/homepage/$categoryId")
