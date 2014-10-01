@@ -4,6 +4,7 @@
     $('#ab-{SOURCE_SLUG}').socialstreamBrowser({
       url: '/ajax/resource/tree/{SOURCE_SLUG}',
       modal: false,
+      isolate: true,
       mimeFilter: {MIME_FILTER},
       submitCallback: function (url, filename, meta) {
         var data = [{
