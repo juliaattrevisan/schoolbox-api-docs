@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum\Import;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\Mapper;
 
@@ -45,6 +46,37 @@ class Controller extends Base
     public function create()
     {
         // Refetch outcomes
+        $post = $this->getRequest()->post;
+        $source = $this->getSourceMapper()->findById($post['id']);
+        // Stuff this into a factory and use that to build a list of levels
+        $factory = new Source\BrowserFactory();
+        $browser = $factory->build($source);
+
+
+//        $testArea = new LearningArea\Model();
+//        $testArea->setReference($post['area']);
+//        $testLevel = new LearningLevel\Model();
+//        $testLevel->setReference($post['level']);
+
+        // Save all areas and levels?
+        $areaMapper = LearningArea\Mapper::getInstance();
+        $areaMapper->save($areas = $browser->getLearningAreas());
+        $levelMapper = LearningLevel\Mapper::getInstance();
+        $levelMapper->save($levels = $browser->getLearningLevels());
+
+        $area  = $areaMapper->findOneByColumn('reference', $post['area']);
+        $level = $levelMapper->findOneByColumn('reference', $post['level']);
+
+        $outcomes = $browser->getOutcomes($area, $level);
+        foreach ($outcomes as $outcome) {
+            $outcome
+                ->setLearningLevel($level)
+                ->setLearningArea($area)
+                ->setName($post['name']);
+            Node\Mapper::getInstance()->saveTree($outcome);
+        }
+
+        // JSON something back to me
     }
 
     /**
