@@ -14,13 +14,11 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
-use Schoolbox\Collection;
-use Schoolbox\FileInterface;
-use Schoolbox\FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractNode;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Exception;
+use Schoolbox\Resource\FileMapper;
 
 /**
  * Class Node
@@ -46,7 +44,8 @@ class Node extends AbstractNode
     {
         parent::__construct($nodeId, $mimeFilter);
 
-        $this->setFolderMapper(new CategoryMapper());
+        $this->setFolderLocator(new CategoryMapper());
+        $this->setFileLocator(new FileMapper());
         $this->setGroupHandler(new \Group());
 
         // Check we have permission to render node
@@ -86,32 +85,6 @@ class Node extends AbstractNode
     protected function hasPermission($nodeId, $minimumLevel)
     {
         return $this->getGroupHandler()->getPermission($nodeId) >= $minimumLevel;
-    }
-
-
-    /**
-     * @param int $nodeId
-     * @return Collection|FolderInterface[]
-     */
-    protected function findFoldersForNode($nodeId)
-    {
-        return $this->getFolderMapper()->findByParent($this->getNodeId());
-    }
-
-
-    /**
-     * @param int $nodeId
-     * @return Collection|FileInterface[]
-     */
-    protected function findFilesForNode($nodeId)
-    {
-        $options = array();
-
-        if ($this->mimeFilter) {
-            $options['mime'] = $this->mimeFilter;
-        }
-
-        return $this->getFileMapper()->findByColumn('category', $this->getNodeId(), $options);
     }
 
 }

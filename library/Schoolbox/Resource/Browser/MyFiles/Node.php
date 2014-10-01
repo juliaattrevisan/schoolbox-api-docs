@@ -14,7 +14,6 @@
 namespace Schoolbox\Resource\Browser\MyFiles;
 
 
-use Schoolbox\FileInterface;
 use Schoolbox\Mapper;
 use Schoolbox\MyFileMapper;
 use Schoolbox\MyFolderMapper;
@@ -35,8 +34,8 @@ class Node extends AbstractNode
     public function __construct($nodeId, $mimeFilter = null)
     {
         parent::__construct($nodeId, $mimeFilter);
-        $this->setFolderMapper(new MyFolderMapper());
-        $this->setFileMapper(new MyFileMapper());
+        $this->setFolderLocator(new MyFolderMapper());
+        $this->setFileLocator(new MyFileMapper());
     }
 
 
@@ -50,32 +49,6 @@ class Node extends AbstractNode
     protected function hasPermission($nodeId, $minimumLevel)
     {
         return true;
-    }
-
-
-    /**
-     * @param int $nodeId
-     * @return mixed
-     */
-    protected function findFoldersForNode($nodeId)
-    {
-        return $this->getFolderMapper()->findByColumnList(array(
-            'parent' => $this->getNodeId(),
-            'owner'  => $_SESSION['id'] // TODO don't merge this
-        ));
-    }
-
-
-    /**
-     * @param int $nodeId
-     * @return FileInterface
-     */
-    protected function findFilesForNode($nodeId)
-    {
-        return $this->getFileMapper()->findByColumnList(array(
-            'parent' => $this->getNodeId(),
-            'owner'  => $_SESSION['id'] // TODO don't merge this
-        ));
     }
 
 }
