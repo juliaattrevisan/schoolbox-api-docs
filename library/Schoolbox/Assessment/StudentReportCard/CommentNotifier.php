@@ -16,18 +16,32 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 
 class CommentNotifier extends AbstractModuleNotifier {
 
 	const TRIGGER_COMMENTED = 'commented';
 
-	/**
+    /** @var CategoryMapper */
+    protected $categoryMapper;
+
+    public function loadDependencies($dependencies = null)
+    {
+        if (empty($dependencies['categoryMapper'])) {
+            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+        }
+        parent::loadDependencies($dependencies);
+    }
+
+
+    /**
 	 * @return string
 	 */
 	protected function getSlug() {
@@ -61,6 +75,26 @@ class CommentNotifier extends AbstractModuleNotifier {
 	}
 
 
+    /**
+     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     * @return self
+     */
+    public function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\Resource\CategoryMapper
+     */
+    public function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
+
+
 	/**
 	 * @param Comment $comment
 	 * @param User    $author
@@ -73,6 +107,10 @@ class CommentNotifier extends AbstractModuleNotifier {
 		// extract elements we'll be using
 		$student = $comment->getStudent();
 		$category = $comment->getCategory();
+
+        if (!$category->getName()) {
+            $category = $this->categoryMapper->findById($category->getId());
+        }
 
 		// perform magic
 		$DEPRECATED_EXTERNAL_USER = new \External_User();
