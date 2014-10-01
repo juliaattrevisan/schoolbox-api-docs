@@ -123,4 +123,21 @@ class Mapper extends BaseMapper
         );
         $this->hasSoftDeleteDateField('deleted_at');
     }
+
+    /**
+     * Saves an entire tree of nodes, recursively.
+     *
+     * @param Model $model
+     */
+    public function saveTree(Model $model)
+    {
+        $this->save($model);
+        foreach ($model->getChildren() as $child) {
+            $child
+                ->setLearningArea($model->getLearningArea())
+                ->setLearningLevel($model->getLearningLevel())
+                ->setParent($model->getId());
+            $this->saveTree($child);
+        }
+    }
 }
