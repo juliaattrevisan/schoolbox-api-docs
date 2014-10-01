@@ -9,8 +9,9 @@
 
 namespace Schoolbox;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\FolderLocatorInterface;
 
-class MyFolderMapper extends Mapper {
+class MyFolderMapper extends Mapper implements FolderLocatorInterface {
 
     protected function mapping () {
         $this->hasTable('myFolder');
@@ -46,6 +47,21 @@ class MyFolderMapper extends Mapper {
             'column'     => 'name',
             'property'   => 'name',
             'type'       => self::TYPE_STRING,
+        ));
+    }
+
+
+    /**
+     * Return the folders contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FolderInterface[]
+     */
+    public function findByParentId($nodeId)
+    {
+        return $this->findByColumnList(array(
+            'parent' => $nodeId,
+            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
         ));
     }
 }

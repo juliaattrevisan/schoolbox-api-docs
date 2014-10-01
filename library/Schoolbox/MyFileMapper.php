@@ -11,7 +11,7 @@ namespace Schoolbox;
 use Schoolbox;
 use Schoolbox\Mapper;
 
-class MyFileMapper extends Mapper {
+class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInterface {
 
 	protected function mapping () {
 		$this->hasTable('myFile');
@@ -158,4 +158,19 @@ class MyFileMapper extends Mapper {
 	private function getSaveLocation() {
 		return \Config::get('myfile_dir') . '/';
 	}
+
+
+    /**
+     * Return the files contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FileInterface[]
+     */
+    public function findByFolderId($nodeId)
+    {
+        return $this->findByColumnList(array(
+            'parent' => $nodeId,
+            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
+        ));
+    }
 }

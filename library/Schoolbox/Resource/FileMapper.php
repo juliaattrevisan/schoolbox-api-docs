@@ -12,13 +12,14 @@
  
 namespace Schoolbox\Resource;
 use Schoolbox;
+use Schoolbox\FileInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class FileMapper extends Mapper {
+class FileMapper extends Mapper implements FileLocatorInterface {
 
 	/**
 	 * @var \Schoolbox\StorageMapper
@@ -315,4 +316,17 @@ class FileMapper extends Mapper {
         return $parts;
     }
 
+
+    /**
+     * Return the files contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FileInterface[]
+     */
+    public function findByFolderId($nodeId)
+    {
+        return $this->findByColumnList(array(
+            'category' => $nodeId
+        ));
+    }
 }
