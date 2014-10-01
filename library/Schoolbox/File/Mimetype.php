@@ -278,4 +278,40 @@ class Mimetype {
 
         return false;
     }
+
+
+    /**
+     * Compares this mimetype against the given filter. Returns true if ANY are matched.
+     *
+     * @param string $mimeFilter in the format:
+     *                           "image/jpeg,image/png", "image/*" or "{star}/*"
+     * @return bool
+     */
+    public function matches($mimeFilter)
+    {
+        // if the filter can loosely evaluate to false, it's considered no filter therefore match
+        if (!($mimeFilter)) {
+            return true;
+        }
+
+        $xpl = explode(',', $mimeFilter);
+
+        foreach ($xpl as $filter) {
+
+            // easy comparison
+            if ($filter === '*/*') {
+                return true;
+            }
+
+            // harder comparison
+            $filter = str_replace('*','[^/]+', $filter);
+
+            if (preg_match("`^$filter$`", $this->getMime())) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
 }
