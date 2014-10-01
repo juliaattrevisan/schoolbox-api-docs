@@ -24,7 +24,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Student_Group implements Synchroni
      */
     public function getGroupIDFromUser($externalUser) {
 
-        if(!($externalUser['StudentCampus'] == 'J' || $externalUser['StudentCampus'] == 'S')) {
+        if(!(trim($externalUser['StudentCampus']) == 'J' || trim($externalUser['StudentCampus']) == 'S')) {
             //External students put them in the external group
             return 21;
         }

@@ -12,7 +12,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Campus implements Synchronis
      * Hydrates user's campus and default campus.
      */
     public function hydrate($externalUser, $newUser) {
-		switch($externalUser['StaffCampus']) {
+		switch(trim($externalUser['StaffCampus'])) {
 			case 'S': $campus = 1; break;
 			case 'J': $campus = 3; break;
 			default: $campus = 4; break;

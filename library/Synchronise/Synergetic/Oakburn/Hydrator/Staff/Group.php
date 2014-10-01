@@ -12,7 +12,7 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group implements Synchronise
      * {@inheritdoc}
      */
     public function hydrate($externalUser, $newUser) {
-		switch ($externalUser['StaffCategory']) {
+		switch (trim($externalUser['StaffCategory'])) {
 			case 'T': $group = 3; break;
 			case 'RT': $group = 3; break;
 			case 'A': $group = 2; break;
@@ -27,10 +27,10 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group implements Synchronise
 			/* Special campus conditional
 			 */
 			case 'AN':
-				if ($externalUser['StaffCampus'] == 'S') {
+				if (trim($externalUser['StaffCampus']) == 'S') {
 					$group = 2;
 				}
-				else if ($externalUser['StaffCampus'] == 'J') {
+				else if (trim($externalUser['StaffCampus']) == 'J') {
 					$group = 3;
 				}
 
