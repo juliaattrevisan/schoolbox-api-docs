@@ -1,7 +1,7 @@
 -- Learning area table
 -- An area of study (Maths, English, etc.)
 CREATE TABLE `curriculum_learning_area` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `curriculum_source_id` int(11) NOT NULL,
   `name` varchar(250) NOT NULL,
   `description` text NOT NULL,
