@@ -41,11 +41,13 @@
                 disabled: [1, 2]
             });
 
-            var levelSelect = form.find('select[name="learningLevel"]');
-            var areaSelect  = form.find('select[name="learningArea"]');
+            var sourceSelect = form.find('select[name="source"]');
+            var levelSelect  = form.find('select[name="learningLevel"]');
+            var areaSelect   = form.find('select[name="learningArea"]');
+            var nameInput    = form.find('input[name="curriculumName"]');
             form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
                 event.preventDefault();
-                var value = form.find('select[name="source"]').val();
+                var value = sourceSelect.val();
                 var tab   = $(event.target).closest('section');
                 tab.addClass('loading').find(':input').prop('disabled', true);
 
@@ -123,28 +125,36 @@
 
             form.on('click', 'input[data-role="wizard-step-2-submit"]', function(event) {
                 event.preventDefault();
-                var value = form.find('select[name="source"]').val();
-                var tab   = $(event.target).closest('section');
+                var tab = $(event.target).closest('section');
                 tab.addClass('loading').find(':input').prop('disabled', true);
                 $.get(
                     {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }},
                     {
-                        id:    form.find('select[name="source"]').val(),
-                        area:  form.find('select[name="learningArea"] :selected').data('area').reference,
-                        level: form.find('select[name="learningLevel"] :selected').data('level').reference
+                        id:    sourceSelect.val(),
+                        area:  areaSelect.find(':selected').data('area').reference,
+                        level: levelSelect.find(':selected').data('level').reference
                     },
                     $.noop,
                     'json'
                 )
                     .done(function(data) {
+                        // Create a default name
+                        nameInput.val(
+                            form.find('select[name="learningLevel"] :selected').text()
+                            + ' '
+                            + form.find('select[name="learningArea"] :selected').text()
+                        );
                         // Shove all of this into a tree
                         makeTree(data.outcomes, form.find('#outcomes').empty())
                         tab.next('section').addClass('loaded');
+                        form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', false);
                         form.tabs('enable', 2)
                             .tabs('option', 'active', 2);
+                        // Enable the submit button
                     })
                     .fail(function(jqXhr, textStatus, error) {
                         // do something else
+                        form.find('input[data-role="wizard-step-3-submit"]').prop('disabled', true);
                         form.tabs('disable', 2)
                             .tabs('option', 'active', 1);
                         tab.addClass('failed');
@@ -152,6 +162,36 @@
                     .always(function() {
                         tab.removeClass('loading').find(':input').prop('disabled', false);
                     });
+            });
+
+            form.on('click', 'input[data-role="wizard-step-3-submit"]', function(event) {
+                event.preventDefault();
+                // Save this box
+                // Craft a request, consisting of:
+                // Source
+                // Learning area and level (with or without an ID)
+                //  Use the reference instead?
+                // A map of outcomes
+                // (Allow editing after the fact)
+
+                formData = {
+                    id:     sourceSelect.val(),
+                    area:   areaSelect.find(':selected').data('area').reference,
+                    level:  levelSelect.find(':selected').data('level').reference,
+                    name:   nameInput.val()
+                }
+
+                var ajaxParams = {
+                    url: form.attr('action'),
+                    data: formData,
+                    dataType: 'json',
+                    type: 'post'
+                };
+                console.log(ajaxParams);
+//                $.ajax(ajaxParams)
+//                    .done(function() {
+//                        // do stuff
+//                    })
             });
 
             // Ensure that I can't submit without selecting a source
@@ -179,7 +219,7 @@
 <h1>Import Curriculum</h1>
 
 <form id="curriculum-import-form"
-      action="{{ saveAction }}"
+      action="{{ routeLookup('curriculumImport.create')|e('html_attr') }}"
       method="post"
       name="form" class="clearfix"
 >
@@ -222,6 +262,9 @@
                 />
     </section>
     <section id="step-3">
+        <h4>Name of curriculum</h4>
+        <input type="text" name="curriculumName" value="" />
+        <h4>Preview</h4>
         <ul class="wysiwyg" id="outcomes"></ul>
         <input type="submit"
                value="Done"
