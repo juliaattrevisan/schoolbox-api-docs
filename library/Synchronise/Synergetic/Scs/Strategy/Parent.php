@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synchronise_Synergetic_Scs_Strategy_Parent
  *
@@ -6,22 +7,44 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
-	
+class Synchronise_Synergetic_Scs_Strategy_Parent extends Synchronise_Base_Strategy_Parent
+{
     /**
      * Setup verbose output
      */
-    protected function setup() {
+    protected function setup()
+    {
+        $unset = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unset->setClearFields(array('webmail', 'eportfolio_enabled'));
         $this->verbose_filter = new Synchronise_Synergetic_Scs_Verbose();
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
+            ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Parent())
             ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
+            ->addHydrator(
+                new Synchronise_Base_Hydrator_BasicMapping(
+                    'StudentContactNetworkLogin',
+                    'username'
+                )
+            )
+            ->addHydrator(new Synchronise_Synergetic_Scs_Hydrator_Password_Parent())
+            ->addHydrator($unset)
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
+            ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Parent())
             ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Campus())
-            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
-        ;
+            ->addSpouseHydrator(
+                new Synchronise_Base_Hydrator_BasicMapping(
+                    'StudentContactSpouseNetworkLogin',
+                    'username'
+                )
+            )
+            ->addSpouseHydrator(new Synchronise_Synergetic_Scs_Hydrator_Password_Parent())
+            ->addSpouseHydrator($unset)
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear());
     }
 }
