@@ -1,4 +1,17 @@
-<script type="text/javascript" src="/javascript/jquery.wizardize.js"></script>
+<style type="text/css">
+    #curriculum-import-form .ui-tabs-panel {
+        transition: background-color 1s;
+    }
+    #curriculum-import-form .ui-tabs-panel.loading {
+        background-color: #77fffe;
+    }
+    #curriculum-import-form .ui-tabs-panel.loaded {
+        background-color: hotpink;
+    }
+    #curriculum-import-form .ui-tabs-panel.failed {
+        background-color: #ff3311;
+    }
+</style>
 <script type="text/javascript">
     (function($) {
 
@@ -21,47 +34,20 @@
 
         $(function() {
             var form = $('form#curriculum-import-form');
+
             // Tabs 1 and 2 get activated as you go through the wizard.
             form.tabs({
                 active: 0,
                 disabled: [1, 2]
             });
 
-//            form.wizardize({
-//                startAtStep: 1,
-//                // Steps should autoload using data-wizard-step
-//                // Alternately tie to an accordion component
-//                steps: [
-//                    form.find('[data-wizard-step="1"]'),
-//                    form.find('[data-wizard-step="2"]'),
-//                    form.find('[data-wizard-step="3"]')
-//                ]
-//            })
-//                .on('wizardize_gotoStep', function(event, wizardize) {
-//                    console.log(wizardize);
-////                    switch (step) {
-////                        case 1:
-////                            break;
-////                        case 2:
-////                            break;
-////                        case 3:
-////                            break;
-////                    }
-//                });
-
-            // Wizard: any inputs in steps above the current one are disabled
-
-            // Transition management:
-            // on ajax load, call form.wizardize('gotoStep', x)
-            // Events:
-            // form.on('wizardize_gotoStep', function(event, step) {});
-
             var levelSelect = form.find('select[name="learningLevel"]');
             var areaSelect  = form.find('select[name="learningArea"]');
             form.on('click', 'input[data-role="wizard-step-1-submit"]', function(event) {
                 event.preventDefault();
                 var value = form.find('select[name="source"]').val();
-                form.find('input[data-role="wizard-step-2-submit"]').prop('disabled', true);
+                var tab   = $(event.target).closest('section');
+                tab.addClass('loading').find(':input').prop('disabled', true);
 
                 // Clear previous settings:
                 // remember, if anything changes in a previous wizard step,
@@ -70,6 +56,7 @@
                 // Load the learning areas and levels for the selected source.
                 // Do it asynchronously
                 if (value) {
+                    // have some sort of ajax spinner or state change
                     $.get(
                         {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
                         {id: value},
@@ -104,14 +91,20 @@
                                     .text(area.name)
                                     .appendTo(areaSelect);
                             });
+                            tab.next('section').addClass('loaded');
                             form.tabs('enable', 1)
-                                .tabs('option', 'active', 1);
+                                .tabs('option', 'active', 1)
+                            // Animate next tab?
                         })
                         .fail(function(jqXhr, textStatus, error) {
                             // do something else
                             form.tabs('disable', 1)
                                 .tabs('disable', 2)
                                 .tabs('option', 'active', 0);
+                            tab.addClass('failed');
+                        })
+                        .always(function() {
+                            tab.removeClass('loading').find(':input').prop('disabled', false);
                         });
                 } else {
                     // Remove all filled in levels
@@ -131,6 +124,8 @@
             form.on('click', 'input[data-role="wizard-step-2-submit"]', function(event) {
                 event.preventDefault();
                 var value = form.find('select[name="source"]').val();
+                var tab   = $(event.target).closest('section');
+                tab.addClass('loading').find(':input').prop('disabled', true);
                 $.get(
                     {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }},
                     {
@@ -144,6 +139,7 @@
                     .done(function(data) {
                         // Shove all of this into a tree
                         makeTree(data.outcomes, form.find('#outcomes').empty())
+                        tab.next('section').addClass('loaded');
                         form.tabs('enable', 2)
                             .tabs('option', 'active', 2);
                     })
@@ -151,17 +147,30 @@
                         // do something else
                         form.tabs('disable', 2)
                             .tabs('option', 'active', 1);
+                        tab.addClass('failed');
+                    })
+                    .always(function() {
+                        tab.removeClass('loading').find(':input').prop('disabled', false);
                     });
             });
 
+            // Ensure that I can't submit without selecting a source
             form.on('change', 'select[name="source"]', function() {
                 form.find('input[data-role="wizard-step-1-submit"]').prop('disabled', !this.value);
             });
 
+            // Ensure that I can't submit without selecting a learning area and level
             form.on('change', 'select[name="learningArea"], select[name="learningLevel"]', function() {
                 var area  = form.find('select[name="learningArea"]').val();
                 var level = form.find('select[name="learningLevel"]').val();
                 form.find('input[data-role="wizard-step-2-submit"]').prop('disabled', !(area && level));
+            });
+
+            // Fade out the loaded class on the new tab
+            form.on('tabsactivate', function(event, ui) {
+                setTimeout(function() {
+                    ui.newPanel.removeClass('loaded');
+                }, 2000)
             });
         });
     })(jQuery);
