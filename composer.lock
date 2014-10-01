@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3ffe92d5e145ea3e49b4be40f7ec0031",
+    "hash": "96ef6b9820b8f4773cab663afd32bde8",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -1205,8 +1205,8 @@
             "authors": [
                 {
                     "name": "Evert Pot",
-                    "email": "me@evertpot.com",
-                    "homepage": "http://evertpot.com/",
+                    "email": "evert@rooftopsolutions.nl",
+                    "homepage": "http://www.rooftopsolutions.nl/",
                     "role": "Developer"
                 }
             ],
@@ -1223,16 +1223,16 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "3.3.1",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-vobject.git",
-                "reference": "ab7eb33fa799ba10e791f5f728bd168e2eba3f61"
+                "reference": "2a5c49e706454d437a9e25bdb39583a18d470399"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/ab7eb33fa799ba10e791f5f728bd168e2eba3f61",
-                "reference": "ab7eb33fa799ba10e791f5f728bd168e2eba3f61",
+                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/2a5c49e706454d437a9e25bdb39583a18d470399",
+                "reference": "2a5c49e706454d437a9e25bdb39583a18d470399",
                 "shasum": ""
             },
             "require": {
@@ -1279,7 +1279,7 @@
                 "jCard",
                 "vCard"
             ],
-            "time": "2014-08-18 19:30:06"
+            "time": "2014-09-19 18:54:29"
         },
         {
             "name": "shareworks/xml-security",
@@ -2447,7 +2447,7 @@
                 {
                     "name": "Anthon Pang",
                     "email": "apang@softwaredevelopment.ca",
-                    "role": "Fork Maintainer"
+                    "role": "developer"
                 }
             ],
             "description": "PHP WebDriver for Selenium 2",
@@ -3131,7 +3131,8 @@
                 },
                 {
                     "name": "Adam Harvey",
-                    "email": "aharvey@php.net"
+                    "email": "aharvey@php.net",
+                    "role": "Lead"
                 },
                 {
                     "name": "Bernhard Schussek",
@@ -3797,7 +3798,7 @@
         {
             "alias": "2.1",
             "alias_normalized": "2.1.0.0",
-            "version": "3.3.1.0",
+            "version": "3.3.2.0",
             "package": "sabre/vobject"
         },
         {
