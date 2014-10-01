@@ -846,7 +846,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface
 
         $folder->setId($data['id']);
         $folder->setParent($parent);
-        $folder->setName($data['description'] ?: $data['name'] ?: urldecode($data['path']));
+        $folder->setName(urldecode($data['description'] ?: $data['name'] ?: $data['path']));
 
         return $folder;
     }
