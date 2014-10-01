@@ -49,18 +49,11 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $reference;
 
     /**
-     * The PHP class name that this model points to
-     *
-     * @var string
-     */
-    protected $class;
-
-    /**
      * User-friendly description
      *
      * @var string
      */
-    protected $description;
+    protected $description = '';
 
     /**
      * @var Alaress_Date_Format
@@ -77,23 +70,6 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected $deletedAt;
 
-    /**
-     * @param  string $class
-     * @return $this
-     */
-    public function setClass($class)
-    {
-        $this->class = $class;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
 
     /**
      * @param  Alaress_Date_Format $createdAt

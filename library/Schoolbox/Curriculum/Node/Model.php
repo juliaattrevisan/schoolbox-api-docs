@@ -61,14 +61,14 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @var string
      */
-    protected $name;
+    protected $name = '';
 
     /**
      * Curriculum code (if this node has one)
      *
      * @var string
      */
-    protected $code;
+    protected $code = '';
 
     /**
      * Reference used by the browser for fetching outcomes.
@@ -83,14 +83,14 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @var string
      */
-    protected $description;
+    protected $description = '';
 
     /**
      * The order in the tree structure that this node exists
      *
      * @var int
      */
-    protected $order;
+    protected $order = 0;
 
     /**
      * @var Alaress_Date_Format

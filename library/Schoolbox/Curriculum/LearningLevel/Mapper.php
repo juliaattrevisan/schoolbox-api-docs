@@ -15,7 +15,7 @@ class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('curriculum_learning_area');
+        $this->hasTable('curriculum_learning_level');
         $this->hasModel('\\Schoolbox\\Curriculum\\LearningLevel\\Model');
         $this->hasMap(
             array(

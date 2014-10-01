@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum\Source;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\Curriculum\Node;
 
 interface BrowserInterface
 {
@@ -35,7 +36,7 @@ interface BrowserInterface
      * @param  LearningArea\Model  $area  The learning area to search
      * @param  LearningLevel\Model $level The learning level to search
      *
-     * @return Collection To be determined
+     * @return Collection|Node\Model[]
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level);
 }
