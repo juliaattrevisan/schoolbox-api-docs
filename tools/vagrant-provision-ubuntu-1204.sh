@@ -29,8 +29,9 @@ do
 	fi
 done < schoolboxdemo-latest-sha1-cached.txt;
 
-echo "$vag Restarting MySQL";
-service mysql restart > /dev/null 2>&1;
+echo "$vag Ensuring MySQL is running";
+#service mysql restart > /dev/null 2>&1;
+service mysql start > /dev/null 2>&1;
 
 echo "$vag Stopping Apache";
 service apache2 stop > /dev/null 2>&1;
@@ -126,9 +127,6 @@ cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 echo "$vag Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
-echo "$vag Installing Java for package build process";
-apt-get -y install openjdk-7-jre;
-
 echo "$vag Building CSS and JS";
 /vagrant/tools/pkg-build-css-js.sh;
 
@@ -144,7 +142,7 @@ echo "$vag Loading all demo data complete";
 
 echo "$vag Run Notifications binder";
 cd /vagrant/tools/mq;
-./binder.php;
+./binder.php &
 
 echo "$vag Install schoolbox-scheduled";
 cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
@@ -172,7 +170,7 @@ fi
 
 echo "$vag Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
-service mysql restart > /dev/null 2>&1;
+#service mysql restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 service schoolbox-scheduled restart > /dev/null 2>/dev/null &
