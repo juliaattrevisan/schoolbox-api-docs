@@ -747,6 +747,12 @@ class StudentReportCard
         $page->setBlock('subject_comments', 'comment', 'comment_block');
         $page->setBlock('subject_comments', 'create_comment', 'create_comment_block');
         $page->setBlock('comment', 'comment_modify', 'comment_modify_block');
+
+        if(!\Config::get('grade_comments_enable')) {
+            $page->setVar('subject_comments_block', '');
+            return;
+        }
+
         // sessionuser var
         $sessionUser  = UserMapper::getInstance()->findById($this->viewingUserId);
         $sessionRole  = $sessionUser->getRole()->getType();
@@ -850,7 +856,7 @@ class StudentReportCard
             }
         } // no comments in this conversation
         else {
-            $page->setVar('comment_block', '<tr><td colspan="4">No comments.</td></tr>');
+            $page->setVar('comment_block', '');
         }
         $page->parse('subject_comments_block', 'subject_comments');
     }
