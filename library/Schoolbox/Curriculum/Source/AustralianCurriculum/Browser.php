@@ -43,6 +43,9 @@ class Browser extends Source\BrowserAbstract
      */
     public function getLearningAreas()
     {
+        if (count($savedAreas = $this->getSavedLearningAreas())) {
+            return $savedAreas;
+        }
         // Fetch a list of all standard documents.
         // Then, group by available education levels?
         $sparql = <<<SPARQL
@@ -99,6 +102,9 @@ SPARQL
      */
     public function getLearningLevels()
     {
+        if (count($savedLevels = $this->getSavedLearningLevels())) {
+            return $savedLevels;
+        }
         // Fetch all unique learning levels from the curriculum here.
         // I'd like to fetch the label from the level document too, but I don't
         // know how.
