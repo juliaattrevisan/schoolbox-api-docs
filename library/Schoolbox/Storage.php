@@ -346,4 +346,16 @@ class Storage implements FileInterface {
         return $this->getMimetype()->isEnabled();
 	}
 
+
+    /**
+     * Returns the title (not filename) of the file
+     *
+     * @alias getUploadedBy
+     * @return string
+     */
+    public function getOwner()
+    {
+        return $this->getUploadedBy();
+    }
+
 }

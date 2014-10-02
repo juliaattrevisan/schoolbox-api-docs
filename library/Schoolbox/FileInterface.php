@@ -47,4 +47,9 @@ interface FileInterface {
      */
 //    public function getDescription();
 
+    /**
+     * @return User
+     */
+    public function getOwner();
+
 }
