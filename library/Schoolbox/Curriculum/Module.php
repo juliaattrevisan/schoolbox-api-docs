@@ -26,6 +26,8 @@ class Module extends BaseModule
     {
         $importModule = new Import\Module($injector);
         $importModule->init($basePath.'/import');
+        $sourceModule = new Source\Module($injector);
+        $sourceModule->init($basePath.'/source');
     }
 
     /**
@@ -33,7 +35,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('curriculum.browse', $basePath . '/?');
+        $router->addGet('curriculum.browse', $basePath . '/');
 //        // Attach standard REST routes
 //        $router->attachResource('tile', $basePath);
 //        $router->attachResourcePostAlias('tile', $basePath);
