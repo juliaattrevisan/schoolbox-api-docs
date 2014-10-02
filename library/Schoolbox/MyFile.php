@@ -296,6 +296,6 @@ class MyFile implements FileInterface {
      */
     public function getFileLocation()
     {
-        return $this->config_loader->get('myfile_dir') . $this->getId() . '.dat';
+        return $this->config_loader->get('myfile_dir') . '/' . $this->getId() . '.dat';
     }
 }
