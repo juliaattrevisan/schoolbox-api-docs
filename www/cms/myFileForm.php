@@ -26,42 +26,41 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
     if (is_numeric($_POST['fileID'])) {
         // check user owns file
+        /** @var MyFile $currentFile */
 		$currentFile = MyFileMapper::getInstance()->findById($_POST['fileID']);
 
-        if ($currentFile->getOwner() != $userId) {
+        if ($currentFile->getOwner()->getId() != $userId) {
             $page->error(47);
         }
-
-		$currentFile->setParent($_POST['parent']);
-		$currentFile->setOwner($_SESSION['user']->getId());
-		$currentFile->setDescription($_POST['description']);
-
-		MyFileMapper::getInstance()->save($currentFile);
-    }
-    else {
+    } else {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
 		/* TODO: this should be made consistent with File -_-
 		 */
-		$mimetype = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
+		$mime = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
 
-		$currentFile = new MyFile();
-		$currentFile->setParent($_POST['parent']);
-		$currentFile->setOwner($_SESSION['user']->getId());
-		$currentFile->setDescription($_POST['description']);
+        $currentFile = new MyFile();
 		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
 		$currentFile->setFilename($_FILES['file']['name']);
 		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-		$currentFile->setMime($mimetype->getMime());
-		$currentFile->setCreatedAt(new Datetime('now'));
-		$currentFile->setdeletedAt(0);
-
-		MyFileMapper::getInstance()->save($currentFile);
+		$currentFile->setMime($mime);
+		$currentFile->setCreatedAt(new Alaress_Date_Format(time(), 'U'));
+		$currentFile->setDeleted(false);
     }
 
-	/* If any checkboxes were selected, publish to eportfolio My Files components on various pages
-	 */
+    $parent = new \Schoolbox\MyFolder();
+    $parent->setId($_POST['parent']);
+
+    $currentFile->setParent($parent);
+    $currentFile->setOwner($_SESSION['user']);
+    $currentFile->setDescription($_POST['description']);
+
+    MyFileMapper::getInstance()->save($currentFile);
+
+
+    /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
+     */
 	if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
