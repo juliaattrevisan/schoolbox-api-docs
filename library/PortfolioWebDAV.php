@@ -1,4 +1,5 @@
 <?php
+use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\FileInterface;
 use Schoolbox\FolderInterface;
 use Schoolbox\Resource\FileLocatorInterface;
@@ -92,7 +93,7 @@ class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
     }
 }
 
-class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface
+class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
 
     /**
@@ -914,5 +915,29 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface
         return $folders;
     }
 
+
+    /**
+     * Retrieves the metadata for the given fileId
+     *
+     * @param int $fileId
+     * @return array
+     */
+    public function fetchMetaData($fileId)
+    {
+        return $this->getByID($fileId);
+    }
+
+
+    /**
+     * Attempts to retrieve remote source to local destination, returns the path of the saved file.
+     *
+     * @param int $fileId
+     * @throws OutOfBoundsException
+     * @return string
+     */
+    function fetchToFile($fileId)
+    {
+        return $this->getFile($fileId);
+    }
 }
 
