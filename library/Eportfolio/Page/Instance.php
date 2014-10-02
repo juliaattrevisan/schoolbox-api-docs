@@ -168,13 +168,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             foreach ($instanceCollection as $component) {
                 /** @var Component_Instance $component */
                 ++$i;
-                $class = '';
+                $class = str_replace('\\', '_', $component->getDefinition()->getClass());
 
                 if ($component->getDefinition()->getMultiple() == 'false') {
-                    $class = 'one-only ';
+                    $class .= ' one-only';
 
                     if ($component->getDefinition()->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
-                        $class .= 'disabled ';
+                        $class .= ' disabled';
                     }
                 }
 

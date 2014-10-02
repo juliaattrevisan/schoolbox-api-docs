@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
 <!-- BEGIN modify_layout -->
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
-<script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/tinycolor/tinycolor.js"></script>
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
@@ -139,265 +139,147 @@
 
 <div class='clearfix'></div>
 
-<h1>
-	<span>{HEADING}</span> - {PAGE_TITLE}
+<h1><span>{HEADING}</span> - {PAGE_TITLE}</h1>
+
+<ul class="homepage-controls clearfix">
     <!-- BEGIN edit_page -->
-    <a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a>
+    <li><a id="tab-delete" class="btn delete no-text" data-tab="tabs-5" title="Delete this page"><span></span></a></li>
+    <li><a id="tab-permissions" class="btn groups no-text" data-tab="tabs-4" title="Change Permissions"><span></span></a></li>
+    <li><a id="tab-update" class="btn modify no-text" data-tab="tabs-3" title="Edit the page title"><span></span></a></li>
+    <li><a id="tab-columns" class="btn homepage-columns no-text" data-tab="tabs-2" title="Edit columns"><span></span></a></li>
+    <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
     <!-- END edit_page -->
-</h1>
+</ul>
+
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
-	<ul class="clearfix">
-		<li><a href="#tabs-1">Components</a></li>
-		<li><a href='#tabs-2'>Page Settings</a></li>
-		<li><a href="#tabs-3">Colours</a></li>
-		<li><a href="#tabs-4">Permissions</a></li>
-	</ul>
-
 	<div id="tabs-1" class="customise-components">
-		<div id="tabs-sub">
-			<table border="0" cellpadding="0" cellspacing="0" class="table">
-				<colgroup>
-					<col width="128" />
-				</colgroup>
-				<tr>
-					<td valign="top">
-						<ul class="component-categories">
-							<!-- BEGIN eportfolio_component_tab -->
-							<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-							<!-- END eportfolio_component_tab -->
-						</ul>
-					</td>
-					<td>
-						<div class="components clearfix">
-							<!-- BEGIN eportfolio_component_page -->
-							<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-								<!-- BEGIN eportfolio_component -->
-								<div class="add-component {EPORTFOLIO_COMPONENT_CLASS} clearfix">
-									<h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
-									<p>{EPORTFOLIO_COMPONENT_DESCRIPTION}</p>
-									<span class="notification"><strong></strong>Added</span>
-									<a href="#" rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}" class="btn add"><span></span>Add</a>
-								</div>
-								<!-- END eportfolio_component -->
-							</div>
-							<!-- END eportfolio_component_page -->
-						</div>
-					</td>
-				</tr>
-			</table>
+		<div id="tabs-sub"> <!-- tabs-sub -->
+			<ul class="ui-tabs admin-nav">
+				<!-- BEGIN eportfolio_component_tab -->
+				<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+				<!-- END eportfolio_component_tab -->
+			</ul>
+			<div class="clearfix"></div>
+			<div class="components clearfix">
+				<!-- BEGIN eportfolio_component_page -->
+				<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+					<!-- BEGIN eportfolio_component -->
+					<div class="add-component clearfix">
+						<a href="#"
+						   rel="{EPORTFOLIO_COMPONENT_DEFINITION_ID} {EPORTFOLIO_COMPONENT_ID}"
+						   class="{EPORTFOLIO_COMPONENT_CLASS}"
+						   title="{EPORTFOLIO_COMPONENT_DESCRIPTION}"
+								>
+							<span class="icon"></span>
+							<span class="notification"><strong></strong>Added</span>
+							<h4>{EPORTFOLIO_COMPONENT_NAME}</strong></h4>
+						</a>
+					</div>
+					<!-- END eportfolio_component -->
+				</div>
+				<!-- END eportfolio_component_page -->
+			</div>
 		</div>
 	</div>
 	<!--/tabs-1-->
 
 	<div id="tabs-2" class="customise-components">
-		<div class="clearfix">
-			<form method='post' action='/eportfolio/configForm.php'>
+        <div class="column-colours">
+            <!-- These are selectable items - default to top selected only -->
+            <a href="#" id="top" class="columns left-right selected" data-column-selector data-interaction-state="selected">Top</a>
+            <a href="#" id="left" class="columns left-right" data-column-selector>Left</a>
+            <a href="#" id="right" class="columns left-right" data-column-selector>Right</a>
+            <!--
+            <a href="#" id="bottom" class="columns left-right" data-column-selector>Bottom</a>
+            -->
+        </div>
+        <div class="colours">
+            <div class="colours-split top-split">
+                <h3>Heading</h3>
+                <div class="colour clearfix">
+                    <input id="head_font" class="colorBox" name="colors[head_font]" type="text" data-colorpicker />
+                    <p>Text</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="head_bg" class="colorBox" name="colors[head_bg]" type="text" data-colorpicker />
+                    <p>Background</p>
+                </div>
+            </div>
+            <div class="colours-split">
+                <h3>Content</h3>
+                <div class="colour clearfix">
+                    <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
+                    <p>Primary Background</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="bg_secondary" class="colorBox" name="colors[bg_secondary]" type="text" data-colorpicker />
+                    <p>Secondary Background</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                    <p>Text</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="link" class="colorBox" name="colors[link]" type="text" data-colorpicker />
+                    <p>Link</p>
+                </div>
+                <div class="colour clearfix">
+                    <input id="hover" class="colorBox" name="colors[hover]" type="text" data-colorpicker />
+                    <p>Link Hover</p>
+                </div>
+            </div>
+            <div class="colours-buttons">
+                <form method="POST" action="" name="saveColours">
+                    <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save</button>
+                    <button class="submit-btn-plain" type="button" id="restore">Reset</button>
+                    <button class="submit-btn-plain" type="button" id="cancel">Cancel</button>
+                </form>
+                <div class="saved-colours">Saved colour set!</div>
+            </div>
+        </div>
+        <div style="clear:both;">
+            <form method="POST" action="" >
+                <p class="information-notification pad-it ">In order to adjust the
+                    widths of the left and right columns on the page, drag the slider
+                    below left and right. </p>
+                <div class="clearfix slide-guide">
+                    <h3>Column width slider</h3>
+                    <div class="slider-house">
+                        <div id="slider"></div>
+                    </div>
+                </div>
+                <div class="saved-layout">Saved layout</div>
+
+            </form>
+        </div>
+        <div class="clearfix"></div>
+	</div>
+
+    <div id="tabs-3" class="customise-components">
+        <div class="clearfix">
+            <form method='post' action='/eportfolio/configForm.php'>
                 <table class="standardForm table">
-					<tr>
-						<td class="formLabelWidth">
-							<h4>Page Title</h4>
-							<em>Specify a title for this page</em>
-						</td>
-						<td>
-							<p>
-								<input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-								<input type='hidden' name='user_id' value='{ID}' />
-								<input type='hidden' name='page_id' value='{PAGE_ID}' />
-								<input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
-							</p>
-						</td>
-					</tr>
+                    <tr>
+                        <td class="formLabelWidth">
+                            <h4>Page Title</h4>
+                            <em>Specify a title for this page</em>
+                        </td>
+                        <td>
+                            <p>
+                                <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                                <input type='hidden' name='user_id' value='{ID}' />
+                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                                <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
+                            </p>
+                        </td>
+                    </tr>
                 </table>
             </form>
+        </div>
+    </div>
 
-			<form method='post' action='/eportfolio/configForm.php'>
-				<table class="standardForm table">
-					<tr>
-						<td class="formLabelWidth">
-							<h4>Delete Page</h4>
-							<em>Remove this page from your ePortfolio</em>
-						</td>
-						<td>
-							<p>
-								<input type='hidden' name='page_id' value='{PAGE_ID}' />
-								<input type='hidden' name='deletePage' value='true' />
-								<input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
-							</p>
-						</td>
-					</tr>
-				</table>
-			</form>
-
-			<form method="post" action="">
-				<p class="information-notification pad-it">
-					In order to adjust the widths of the left and right columns on the page, drag the slider
-					below left and right.
-				</p>
-				<div class="clearfix slide-guide">
-					<h3>Column width slider</h3>
-					<div class="slider-house">
-						<div id="slider"></div>
-					</div>
-				</div>
-				<div class="saved-layout">Saved layout</div>
-			</form>
-		</div>
-	</div>
-
-	<div id="tabs-3" class="customise-components clearfix">
-		<div class="clearfix">
-			<div class="colours topColumn clearfix">
-				<h3>Top Column</h3>
-				<div class="colours-split top-split">
-					<h3>Heading</h3>
-					<div class="colour clearfix">
-						<div id="top_head_font" class="colorBox"></div>
-						<input name="colors[top_head_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="top_head_bg" class="colorBox"></div>
-						<input name="colors[top_head_bg]" type="hidden" />
-						<p>Background</p>
-					</div>
-				</div>
-				<div class="colours-split">
-					<h3>Content</h3>
-					<div class="colour clearfix">
-						<div id="top_bg_primary" class="colorBox"></div>
-						<input name="colors[top_bg_primary]" type="hidden" />
-						<p>Primary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="top_bg_secondary" class="colorBox"></div>
-						<input name="colors[top_bg_secondary]" type="hidden" />
-						<p>Secondary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="top_font" class="colorBox"></div>
-						<input name="colors[top_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="top_link" class="colorBox"></div>
-						<input name="colors[top_link]" type="hidden" />
-						<p>Link</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="top_hover" class="colorBox"></div>
-						<input name="colors[top_hover]" type="hidden" />
-						<p>Link Hover</p>
-					</div>
-				</div>
-			</div>
-			<div class="colours leftColumn">
-				<h3>Left Column</h3>
-				<div class="colours-split top-split">
-					<h3>Heading</h3>
-					<div class="colour clearfix">
-						<div id="left_head_font" class="colorBox  selected"></div>
-						<input name="colors[left_head_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="left_head_bg" class="colorBox"></div>
-						<input name="colors[left_head_bg]" type="hidden" />
-						<p>Background</p>
-					</div>
-				</div>
-				<div class="colours-split ">
-					<h3>Content</h3>
-					<div class="colour clearfix">
-						<div id="left_bg_primary" class="colorBox"></div>
-						<input name="colors[left_bg_primary]" type="hidden" />
-						<p>Primary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="left_bg_secondary" class="colorBox"></div>
-						<input name="colors[left_bg_secondary]" type="hidden" />
-						<p>Secondary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="left_font" class="colorBox"></div>
-						<input name="colors[left_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="left_link" class="colorBox"></div>
-						<input name="colors[left_link]" type="hidden" />
-						<p>Link</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="left_hover" class="colorBox"></div>
-						<input name="colors[left_hover]" type="hidden" />
-						<p>Link Hover</p>
-					</div>
-				</div>
-			</div>
-			<div class="colours clearfix">
-				<h3>Right Column</h3>
-				<div class="colours-split top-split">
-					<h3>Heading</h3>
-					<div class="colour clearfix">
-						<div id="right_head_font" class="colorBox"></div>
-						<input name="colors[right_head_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="right_head_bg" class="colorBox"></div>
-						<input name="colors[right_head_bg]" type="hidden" />
-						<p>Background</p>
-					</div>
-				</div>
-				<div class="colours-split">
-					<h3>Content</h3>
-					<div class="colour clearfix">
-						<div id="right_bg_primary" class="colorBox"></div>
-						<input name="colors[right_bg_primary]" type="hidden" />
-						<p>Primary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="right_bg_secondary" class="colorBox"></div>
-						<input name="colors[right_bg_secondary]" type="hidden" />
-						<p>Secondary Background</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="right_font" class="colorBox"></div>
-						<input name="colors[right_font]" type="hidden" />
-						<p>Text</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="right_link" class="colorBox"></div>
-						<input name="colors[right_link]" type="hidden" />
-						<p>Link</p>
-					</div>
-					<div class="colour clearfix">
-						<div id="right_hover" class="colorBox"></div>
-						<input name="colors[right_hover]" type="hidden" />
-						<p>Link Hover</p>
-					</div>
-				</div>
-			</div>
-
-			<div class="colours">
-				<div id="picker"></div>
-			</div>
-		</div>
-
-		<div class="colours-buttons clearfix">
-			<form method="POST" class="clearfix" action="" name="saveColours">
-				<button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
-				<button class="submit-btn-plain" type="button" id="leftRight" >Copy top colours &gt; left &amp; right</button>
-				<button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
-				<button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
-			</form>
-
-			<div class="saved-colours">Saved colour set!</div>
-		</div>
-	</div>
-
-	<div id="tabs-4" class="clearfix">
+	<div id="tabs-4" class="customise-components">
 		<div class="clearfix">
 			<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
 				<input type='hidden' name='page_id' value='{PAGE_ID}' />
@@ -444,7 +326,29 @@
 			</form>
 		</div>
 	</div>
-</div>
+
+    <div id="tabs-5" class="customise-components">
+        <div class="clearfix">
+            <form method='post' action='/eportfolio/configForm.php'>
+                <table class="standardForm table">
+                    <tr>
+                        <td class="formLabelWidth">
+                            <h4>Delete Page</h4>
+                            <em>Remove this page from your ePortfolio</em>
+                        </td>
+                        <td>
+                            <p>
+                                <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                                <input type='hidden' name='deletePage' value='true' />
+                                <input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+    </div>
 <!-- END customise_page -->
 
 <div class="homepage clearfix">
