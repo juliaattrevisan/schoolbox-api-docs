@@ -52,6 +52,13 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $reference;
 
     /**
+     * The order of this item in lists (higher number - later in list)
+     *
+     * @var int
+     */
+    protected $order = 0;
+
+    /**
      * The PHP class name that this model points to
      *
      * @var string
@@ -239,6 +246,25 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setReference($reference)
     {
         $this->reference = $reference;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param  int $order
+     *
+     * @return $this
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
         return $this;
     }
 

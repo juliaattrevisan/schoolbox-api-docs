@@ -58,6 +58,13 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_STRING
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'order',
+                'property' => 'order',
+                'type'     => self::TYPE_INTEGER
+            )
+        );
 
         // Created/Modified/Deleted
         $this->hasMap(
