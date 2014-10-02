@@ -62,7 +62,7 @@ class Controller extends Base
     public function create()
     {
         // Refetch outcomes
-        $post = $this->getRequest()->post;
+        $post   = $this->getRequest()->post;
         $source = $this->getSourceMapper()->findById($post['id']);
 
         // Stuff the source into a factory and use that to build list of levels
@@ -103,6 +103,8 @@ class Controller extends Base
         $this->getLevelMapper()->save($newLevels);
 
         // And save the outcomes
+        $code = 200;
+        $data = array();
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
             $outcomes = $browser->getOutcomes($thisArea, $thisLevel);
             foreach ($outcomes as $outcome) {
@@ -112,9 +114,20 @@ class Controller extends Base
                     ->setName($post['name']);
                 $this->getNodeMapper()->saveTree($outcome);
             }
+            $data['outcomes'] = $outcomes;
+        } else {
+            $code = 400;
+            $data['message'] = 'Area or level not found';
         }
 
         // JSON something back to me
+        $this->getResponse()->status->setCode($code);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
+            )
+        );
     }
 
     /**
