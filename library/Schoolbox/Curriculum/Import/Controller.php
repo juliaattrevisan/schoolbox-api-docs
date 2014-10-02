@@ -149,11 +149,24 @@ class Controller extends Base
             $factory = new Source\BrowserFactory();
             $browser = $factory->build($source);
 
-            $testArea  = new LearningArea\Model();
-            $testArea->setReference($this->getRequest()->query['area']);
-            $testLevel = new LearningLevel\Model();
-            $testLevel->setReference($this->getRequest()->query['level']);
-            $data['outcomes'] = $browser->getOutcomes($testArea, $testLevel);
+            // Try fetching an existing area and level.
+            // Otherwise, create a virtual one.
+            $areaRef  = $this->getRequest()->query['area'];
+            $levelRef = $this->getRequest()->query['level'];
+            try {
+                $area = LearningArea\Mapper::getInstance()->findOneByColumn('reference', $areaRef);
+            } catch (Mapper\Exception $e) {
+                $area = new LearningArea\Model();
+                $area->setReference($areaRef);
+            }
+            try {
+                $level = LearningLevel\Mapper::getInstance()->findOneByColumn('reference', $levelRef);
+            } catch (Mapper\Exception $e) {
+                $level = new LearningLevel\Model();
+                $level->setReference($levelRef);
+            }
+
+            $data['outcomes'] = $browser->getOutcomes($area, $level);
         } catch (Mapper\Exception $e) {
             $code = 400;
         } catch (\InvalidArgumentException $e) {
