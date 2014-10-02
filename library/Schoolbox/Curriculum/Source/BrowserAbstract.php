@@ -179,39 +179,20 @@ abstract class BrowserAbstract implements BrowserInterface
     public function getSavedOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
         /** @var Collection|Node\Model[] $flatList */
-        $flatList = $this->getNodeMapper()->findByColumnList(
-            array(
-                'curriculum_learning_level_id' => $level->getId(),
-                'curriculum_learning_area_id'  => $area->getId(),
-            ),
-            array(
-                'order' => array(
-                    'curriculum_node_parent_id' => 'asc',
-                    'order'                     => 'asc',
-                    'name'                      => 'asc',
+        return $this->getNodeMapper()->getCollectionAsTree(
+            $this->getNodeMapper()->findByColumnList(
+                array(
+                    'curriculum_learning_level_id' => $level->getId(),
+                    'curriculum_learning_area_id'  => $area->getId(),
                 ),
+                array(
+                    'order' => array(
+                        'curriculum_node_parent_id' => 'asc',
+                        'order'                     => 'asc',
+                        'name'                      => 'asc',
+                    ),
+                )
             )
         );
-        $treeList = new Collection();
-
-        // Process $flatList into a tree list.
-        // This can all be done in one pass, because objects are stored by
-        // reference - setting a node's children in $flatList sets its children
-        // in $treeList, regardless of where it is in the tree.
-        foreach ($flatList as $node) {
-            if (!($node->getParent()->getId())) {
-                $treeList->add($node);
-            }
-            $node->setChildren(
-                $flatList->filterByCallback(
-                    function ($childNode) use ($node) {
-                        /** @var Node\Model $childNode */
-                        return $childNode->getParent()->getId() == $node->getId();
-                    }
-                )
-            );
-        }
-        unset($flatList);
-        return $treeList;
     }
 }

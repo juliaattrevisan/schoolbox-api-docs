@@ -344,6 +344,44 @@ class Mapper implements Serializable
     }
 
     /**
+     * Processes $collection into a hierarchical structure.
+     *
+     * @param  Collection $collection  The flat structure
+     * @param  string     $parentField The name of the parent field. For most
+     *                                 hierarchical mappers, this is "parent'
+     * @param  string     $childField  The name of the children field.
+     * @return Collection
+     */
+    public function getCollectionAsTree($collection, $parentField = 'parent', $childField = 'children')
+    {
+        $treeList = new Collection();
+
+        // Process $collection into a tree list.
+        // This can all be done in one pass, because objects are stored by
+        // reference - setting children in $collection sets its children
+        // in $treeList, regardless of where it is in the tree.
+        $getId       = $this->getGetIdentifierMethodName();
+        $getParent   = $this->getGetMethodName($parentField);
+        $setChildren = $this->getSetMethodName($childField);
+        foreach ($collection as $node) {
+            $nodeId   = $node->$getId();
+            $parentId = $node->$getParent()->$getId();
+            if (!$parentId) {
+                $treeList->add($node);
+            }
+            $node->$setChildren(
+                $collection->filterByCallback(
+                    function ($childNode) use ($nodeId, $getParent, $getId) {
+                        return $childNode->$getParent()->$getId() == $nodeId;
+                    }
+                )
+            );
+        }
+        unset($flatList);
+        return $treeList;
+    }
+
+    /**
      * Gets name of get method for identifier column.
      *
      * @return string
