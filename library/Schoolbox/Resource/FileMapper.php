@@ -74,12 +74,13 @@ class FileMapper extends Mapper implements FileLocatorInterface {
 		$this->hasMap(array(
 			'column'     => 'hidden',
 			'property'   => 'hidden',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_BOOLEAN,
 		));
 		$this->hasMap(array(
 			'column'     => 'category',
 			'property'   => 'folder',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'category'
 		));
 		$this->hasMap(array(
 			'column'     => 'file_size',
@@ -134,6 +135,11 @@ class FileMapper extends Mapper implements FileLocatorInterface {
                 'other_key' => 'mime',
             ));
 
+        $this->hasJoin('category', array(
+            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'this_key'  => 'category',
+            'other_key' => 'id'
+        ));
 
         $this->registerCallback('preSave', array($this, 'preSave'));
         $this->registerCallback('postSave', array($this, 'postSave'));

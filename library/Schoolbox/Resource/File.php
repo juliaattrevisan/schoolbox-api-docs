@@ -38,7 +38,7 @@ class File implements ISoftDeletable, FileInterface {
 	protected $mimeType;
 
 	/**
-	 * @var int
+	 * @var User
 	 */
 	protected $owner;
 
@@ -63,12 +63,12 @@ class File implements ISoftDeletable, FileInterface {
 	protected $comment;
 
 	/**
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $hidden;
 
 	/**
-	 * @var string
+	 * @var Category
 	 */
 	protected $folder;
 
@@ -158,6 +158,10 @@ class File implements ISoftDeletable, FileInterface {
             return new Mimetype();
     }
 
+
+    /**
+     * @return string
+     */
     public function getMime() {
         return $this->getMimeType()->getMime();
     }
@@ -180,7 +184,7 @@ class File implements ISoftDeletable, FileInterface {
 	}
 
 	/**
-	 * @param  int $owner
+	 * @param User $owner
 	 * @return $this
 	 */
 	public function setOwner($owner) {
@@ -255,32 +259,56 @@ class File implements ISoftDeletable, FileInterface {
 		return $this->description;
 	}
 
-	public function setHidden($hidden) {
+
+    /**
+     * @param bool $hidden
+     */
+    public function setHidden($hidden) {
 		$this->hidden = $hidden;
 	}
 
-	public function getHidden() {
+
+    /**
+     * @return bool
+     */
+    public function getHidden() {
 		return $this->hidden;
 	}
 
-	public function setFolder($folder) {
+
+    /**
+     * @param Category $folder
+     */
+    public function setFolder($folder) {
 		$this->folder = $folder;
 	}
 
-	public function getFolder() {
+
+    /**
+     * @return Category
+     */
+    public function getFolder() {
 		return $this->folder;
 	}
 
-	public function setFilesize($filesize) {
+
+    /**
+     * @param int $filesize
+     */
+    public function setFilesize($filesize) {
 		$this->filesize = $filesize;
 	}
 
-	public function getFilesize() {
+
+    /**
+     * @return int
+     */
+    public function getFilesize() {
 		return $this->filesize;
 	}
 
 	/**
-	 * @param  boolean $deleted
+	 * @param bool $deleted
 	 *
 	 * @return $this
 	 */
@@ -290,13 +318,17 @@ class File implements ISoftDeletable, FileInterface {
 	}
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getDeleted() {
 		return $this->deleted;
 	}
 
-	public function isDeleted() {
+
+    /**
+     * @return bool
+     */
+    public function isDeleted() {
 		return $this->getDeleted();
 	}
 
@@ -311,7 +343,7 @@ class File implements ISoftDeletable, FileInterface {
 
     /**
      * This function only exists to move the uploaded file into the correct location on save
-     * @return mixed
+     * @return string
      */
     public function getTempFileLocation()
     {
