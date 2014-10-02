@@ -90,35 +90,6 @@ class File extends DeprecatedModel {
 
     }
 
-    public function migrateCategory ($sourceCategoryId, $destinationCategoryId) {
-        $fileList = $this->getAllByField('category', $sourceCategoryId);
-
-        if ( is_array($fileList) ) {
-            foreach ( $fileList as &$file ) {
-                $sourceFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
-
-                unset($file['id']);
-
-                $file['category'] = $destinationCategoryId;
-
-                $file['id'] = parent::create($file);
-                
-                if ( is_readable($sourceFilename) ) {
-
-                    $destinationFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
-
-                    if ( is_writable( dirname($destinationFilename)) ) {
-                        copy($sourceFilename, $destinationFilename);
-                    }
-                    else {
-                        $this->db->delete($this->_table, $this->_index, $file['id']);
-                    }
-
-                }
-            }
-        }
-    }
-
     function mergeLinks ($fileList, $linkList) {
         $fileList = is_array($fileList) ? $fileList : array();
         $linkList = is_array($linkList) ? $linkList : array();
