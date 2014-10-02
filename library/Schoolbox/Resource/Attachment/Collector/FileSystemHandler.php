@@ -37,7 +37,7 @@ class FileSystemHandler implements TypeHandlerInterface {
     public function __construct($prefix, $dir, FileLocatorInterface $locator, StorageMapper $storage)
     {
         $this->prefix  = $prefix . '.';
-        $this->dif     = $dir;
+        $this->dir     = $dir;
         $this->locator = $locator;
         $this->storage = $storage;
     }
@@ -59,7 +59,7 @@ class FileSystemHandler implements TypeHandlerInterface {
      */
     protected function extractFileId($name)
     {
-        return substr($name, strlen($this->prefix));
+        return substr($name, strlen($this->prefix) + 3);
     }
 
 
