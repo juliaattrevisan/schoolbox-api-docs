@@ -1,6 +1,7 @@
 <?php
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
+use Schoolbox\Calendar\Relation\CategoryMapper;
 use \Schoolbox\Resource\FileMapper;
 use \Schoolbox\Resource\File;
 
@@ -45,7 +46,7 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         /** @var File $currentFile */
 
 
-        if ( $groupHandler->getPermission($currentFile->getFolder()) < WRITE_ACCESS ) {
+        if ( $groupHandler->getPermission($currentFile->getFolder()->getId()) < WRITE_ACCESS ) {
             error(6);
         }
 
@@ -53,7 +54,7 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         $currentFile->setDescription($_POST['description']);
         $currentFile->setComment($_POST['comment']);
         $currentFile->setHidden($_POST['hidden']?true:false);
-        $currentFile->setModified(new DateTime('now'));
+        $currentFile->setModified(Alaress_Date_Format::now());
 
 
 
@@ -137,7 +138,7 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
                 }
 
                 $fileDest = clone $file;
-                $fileDest->setFolder($cat);
+                $fileDest->setFolder(CategoryMapper::getInstance()->createModel($cat));
                 $fileCollection->add($fileDest);
             }
 
@@ -154,7 +155,7 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
                 }
             }
 
-            $file->setFolder($_POST['category']);
+            $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['category']));
         }
 
         try {
@@ -210,15 +211,15 @@ elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
-        if ( $groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS ) {
+        if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
             $result = "Insufficient permssions";
         }
         else if ( $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS ) {
             $result = "Insufficient permssions";
         }
         else {
-            $file->setFolder($_POST['categoryID']);
-            $file->setModified(new DateTime('now'));
+            $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['categoryID']));
+            $file->setModified(Alaress_Date_Format::now());
 
             FileMapper::getInstance()->save($file);
             $result = "success";
@@ -237,7 +238,7 @@ elseif ( is_numeric($_GET['delete']) ) {
     try{
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
-        if ( $groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS ) {
+        if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
             error(6);
         }
 
@@ -266,7 +267,7 @@ elseif ( is_numeric($_GET['deleteList']) ) {
                 try{
                     $file = FileMapper::getInstance()->findById($fileID);
 
-                    if ( $groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS ) {
+                    if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
                         error(6);
                     }
 

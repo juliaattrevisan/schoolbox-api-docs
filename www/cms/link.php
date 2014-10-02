@@ -10,16 +10,20 @@ if(is_numeric($this->arg[0])) {
 	$linkHandler = new Link;
 
     try{
+        /** @var \Schoolbox\Resource\Link $link */
         $link = LinkMapper::getInstance()->findById($this->arg[0]);
-        $folder = CategoryMapper::getInstance()->findById($link->getFolder());
+        /** @var \Schoolbox\Resource\Category $folder */
+        $folder = CategoryMapper::getInstance()->findById($link->getFolder()->getId());
     }
     catch (Exception $e) {
         error(41);
     }
 
 	/* Check permissions to submit */
-	if($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS )
-		error(6);
+	if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS ) {
+        error(6);
+    }
+
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
 
@@ -32,14 +36,14 @@ if(is_numeric($this->arg[0])) {
 					'DESCRIPTION'		=> Scrub::text($link->getDescription()),
 					'COMMENT'			=> Scrub::text($link->getComment()),
 					'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
-					'CATEGORY_ID'		=> $link->getFolder(),
+					'CATEGORY_ID'		=> $link->getFolder()->getId(),
 					'HIDDEN_SELECTED'	=> $link->getHidden() > 0 ? 'checked="checked"' : '',
 					);
 	$this->setVar($output);
 
 
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-    try{
+    try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
     }
     catch (Exception $e) {
@@ -55,8 +59,9 @@ if(is_numeric($this->arg[0])) {
 
 
 	/* Check permissions to submit */
-	if($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS )
-		error(6);
+    if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS ) {
+        error(6);
+    }
 
 	$output = array('ACTION'			=> 'Post',
 					'LINK_ID'			=> '',

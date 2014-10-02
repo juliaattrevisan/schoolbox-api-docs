@@ -860,13 +860,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     {
         $file = new \Schoolbox\Resource\File();
 
+        $owner = new \Schoolbox\User();
+        $owner->setId($data['owner']);
+
+        $cat = new \Schoolbox\Resource\Category();
+        $cat->setId($data['parent']);
+
         $file->setId($data['id']);
-        $file->setFolder($data['parent']);
+        $file->setFolder($cat);
         $file->setTempFileLocation($data['path']);
         $file->setFilename($data['name']);
         $file->setDescription($data['description']);
         $file->setFilesize($data['file_size']);
-        $file->setOwner($data['owner']);
+        $file->setOwner($owner);
 
         return $file;
     }
