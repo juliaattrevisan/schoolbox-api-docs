@@ -18,5 +18,9 @@
     "jit-grunt": "~0.2.0",
     "shelljs": "~0.2.6"
   },
-  "license": "Commercial"
+  "license": "Commercial",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alaress/schoolbox.git"
+  }
 }
