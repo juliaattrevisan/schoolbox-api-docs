@@ -1763,18 +1763,27 @@ class Mapper implements Serializable
         return $this->getSoftDeleteSql($this->soft_delete_deleted_value, $alias);
     }
 
+
     /**
      * Creates a new instance of class with name passed in $this->hasModel().
      *
+     * @param int $idValue
      * @throws Mapper\Exception
      * @return object
      */
-    public function createModel()
+    public function createModel($idValue = null)
     {
         if (!$this->model) {
             throw new Exception("Cannot create nonexistent model");
         }
-        return new $this->model;
+
+        $model = new $this->model;
+
+        if ($idValue) {
+            $this->setModelProperty($model, $this->identifier['property'], $idValue);
+        }
+
+        return $model;
     }
 
     /**
