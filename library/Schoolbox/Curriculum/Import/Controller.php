@@ -10,6 +10,7 @@
 namespace Schoolbox\Curriculum\Import;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
@@ -48,32 +49,56 @@ class Controller extends Base
         // Refetch outcomes
         $post = $this->getRequest()->post;
         $source = $this->getSourceMapper()->findById($post['id']);
-        // Stuff this into a factory and use that to build a list of levels
+
+        // Stuff the source into a factory and use that to build list of levels
         $factory = new Source\BrowserFactory();
         $browser = $factory->build($source);
 
+        $thisArea  = null;
+        $thisLevel = null;
 
-//        $testArea = new LearningArea\Model();
-//        $testArea->setReference($post['area']);
-//        $testLevel = new LearningLevel\Model();
-//        $testLevel->setReference($post['level']);
+        // Save areas, if they're new
+        $areas    = $browser->getLearningAreas();
+        $newAreas = new Collection();
+        foreach ($areas as $i => $area) {
+            if ($area->getReference() === $post['area']) {
+                $thisArea = $area;
+            }
+            if (!$area->getId()) {
+                $area->setOrder($i);
+                $newAreas->add($area);
+            }
+        }
 
-        // Save all areas and levels?
+        // Save levels, if they're new
+        $levels    = $browser->getLearningLevels();
+        $newLevels = new Collection();
+        foreach ($levels as $i => $level) {
+            if ($level->getReference() === $post['level']) {
+                $thisLevel = $level;
+            }
+            if (!$level->getId()) {
+                $level->setOrder($i);
+                $newLevels->add($level);
+            }
+        }
+
+        // Save new areas and levels
         $areaMapper = LearningArea\Mapper::getInstance();
-        $areaMapper->save($areas = $browser->getLearningAreas());
+        $areaMapper->save($newAreas);
         $levelMapper = LearningLevel\Mapper::getInstance();
-        $levelMapper->save($levels = $browser->getLearningLevels());
+        $levelMapper->save($newLevels);
 
-        $area  = $areaMapper->findOneByColumn('reference', $post['area']);
-        $level = $levelMapper->findOneByColumn('reference', $post['level']);
-
-        $outcomes = $browser->getOutcomes($area, $level);
-        foreach ($outcomes as $outcome) {
-            $outcome
-                ->setLearningLevel($level)
-                ->setLearningArea($area)
-                ->setName($post['name']);
-            Node\Mapper::getInstance()->saveTree($outcome);
+        // And save the outcomes
+        if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
+            $outcomes = $browser->getOutcomes($thisArea, $thisLevel);
+            foreach ($outcomes as $outcome) {
+                $outcome
+                    ->setLearningLevel($thisLevel)
+                    ->setLearningArea($thisArea)
+                    ->setName($post['name']);
+                Node\Mapper::getInstance()->saveTree($outcome);
+            }
         }
 
         // JSON something back to me
