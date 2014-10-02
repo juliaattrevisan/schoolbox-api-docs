@@ -8,10 +8,8 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
-use Schoolbox\Mapper;
 
-class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInterface {
+class MyFileMapper extends Mapper implements Resource\FileLocatorInterface {
 
 	protected function mapping () {
 		$this->hasTable('myFile');
@@ -27,13 +25,15 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 		$this->hasMap(array(
 			'column'     => 'parent',
 			'property'   => 'parent',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'parent'
 		));
 
 		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'owner'
 		));
 
 		$this->hasMap(array(
@@ -60,17 +60,28 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 			'type'       => self::TYPE_INTEGER,
 		));
 
-		$this->hasMap(array(
-			'column'     => 'mime_type',
-			'property'   => 'mime',
-			'type'       => self::TYPE_STRING,
-		));
+        $hydrator = new Column\Model();
+        $hydrator->setIdentifierProperty('mime');
+
+        $this->hasMap(array(
+            'column'     => 'mime_type',
+            'property'   => 'mime',
+            'hydrator'   => $hydrator,
+            'join'       => 'allowedFileType',
+        ));
 
 		$this->hasMap(array(
 			'column'     => 'deleted',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_INTEGER,
+			'property'   => 'deleted',
+			'type'       => self::TYPE_BOOLEAN,
 		));
+
+
+        $this->hasJoin('parent', array(
+            'mapper'    => '\\Schoolbox\\MyFolderMapper',
+            'this_key'  => 'parent',
+            'other_key' => 'id'
+        ));
 
 		$this->hasJoin('allowedFileType', array(
 			'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
@@ -83,6 +94,8 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+
+        $this->hasSoftDeleteBooleanField('deleted');
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
@@ -107,7 +120,7 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 		$statement->bindParam(':userId', $userId, \PDO::PARAM_INT);
 		$statement->execute();
 
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		while ($row = $statement->fetch()) {
 			$collection->add($this->hydrate($row, 'mf'));
@@ -120,29 +133,29 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 	 * Save the file to the correct location
 	 * Setup video processing
 	 *
-	 * @param \Schoolbox\MyFile $file
+	 * @param MyFile $file
 	 * @param object $previous
 	 * @throws File\Exception
 	 */
-	protected function postSave(Schoolbox\MyFile $file, $previous = null) {
+	protected function postSave(MyFile $file, $previous = null) {
 
 		// copy file into location
 		if( is_readable($file->getTempFileLocation())) {
 			$filename = $file->getFileLocation();
 			@unlink($filename);
 
-			$mimetype = Schoolbox\File\MimetypeMapper::getInstance()->findOneByColumn('mime', $file->getMime());
+			$mimetype = File\MimetypeMapper::getInstance()->findOneByColumn('mime', $file->getMime());
 
 			if (!copy($file->getTempFileLocation(), $filename)) {
-				throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
+				throw new File\Exception('Cannot save file', File\Exception::CODE_CANNOT_WRITE);
 			}
 			// If video add to video processing queue */
 			if ($mimetype->isVideo()) {
-				$mapper = new Schoolbox\Video\QueueMapper();
-				$videoQ = new Schoolbox\Video\Queue();
+				$mapper = new Video\QueueMapper();
+				$videoQ = new Video\Queue();
 				$videoQ->setFileID($file->getId());
-				$videoQ->setStatus(Schoolbox\Video\QueueMapper::STATUS_PENDING);
-				$videoQ->setType(Schoolbox\Video\QueueMapper::FILE_TYPE_MYFILE);
+				$videoQ->setStatus(Video\QueueMapper::STATUS_PENDING);
+				$videoQ->setType(Video\QueueMapper::FILE_TYPE_MYFILE);
 
 				$mapper->save($videoQ);
 			}
@@ -156,7 +169,7 @@ class MyFileMapper extends Mapper implements Schoolbox\Resource\FileLocatorInter
 	 * @return string
 	 */
 	private function getSaveLocation() {
-		return \Config::get('myfile_dir') . '/';
+		return $this->getConfigLoader()->get('myfile_dir') . '/';
 	}
 
 

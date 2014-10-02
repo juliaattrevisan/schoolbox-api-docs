@@ -8,8 +8,9 @@
  */
 
 namespace Schoolbox;
-use Schoolbox\ConfigLoader;
-use Schoolbox\File\MimetypeMapper;
+
+use Alaress_Date_Format;
+use Schoolbox\File\Mimetype;
 
 class MyFile implements FileInterface {
 
@@ -19,60 +20,60 @@ class MyFile implements FileInterface {
 	protected $id;
 
 	/**
-	 * Parent?
+	 * Parent folder
 	 *
-	 * @var
+	 * @var MyFolder
 	 */
 	protected $parent;
 
 	/**
 	 * User id of the file owner
 	 *
-	 * @var
+	 * @var User
 	 */
 	protected $owner;
 
 	/**
 	 * The actual filename
 	 *
-	 * @var
+	 * @var string
 	 */
-	protected $realname;
+	protected $filename;
 
 	/**
 	 * The datetime the file was added
 	 *
-	 * @var
+	 * @var Alaress_Date_Format
 	 */
 	protected $created_at;
 
 	/**
 	 * A file description
 	 *
-	 * @var
+	 * @var string
 	 */
 	protected $description;
 
 	/**
 	 * The size of the file
 	 *
-	 * @var
+	 * @var int
 	 */
 	protected $filesize;
 
 	/**
 	 * The mime type
 	 *
-	 * @var string
+	 * @var Mimetype
 	 */
 	protected $mime;
 
 	/**
 	 * Whether this is softdeleted or not
 	 *
-	 * @var
+	 * @var bool
 	 */
-	protected $deleted_at;
+	protected $deleted;
 
 	/**
 	 * @var IConfigLoader
@@ -91,7 +92,7 @@ class MyFile implements FileInterface {
 	public function __construct() {
 		//
 		// Don't really want to load a mapper here, but meh.
-		$this->config_loader   = new ConfigLoader();
+		$this->config_loader = new Config\Loader();
 	}
 
 	/**
@@ -145,7 +146,7 @@ class MyFile implements FileInterface {
 	/**
 	 * Set mime object
 	 *
-	 * @param  string $mime
+	 * @param  MimeType $mime
 	 * @return $this
 	 */
 	public function setMime($mime) {
@@ -157,14 +158,14 @@ class MyFile implements FileInterface {
 	/**
 	 * Get mime object
 	 *
-	 * @return string
+	 * @return MimeType
 	 */
 	public function getMime() {
-		return $this->mime;
+		return $this->mime->getMime();
 	}
 
 	/**
-	 * @param  \Schoolbox\IConfigLoader $config_loader
+	 * @param  IConfigLoader $config_loader
 	 * @return $this
 	 */
 	public function setConfigLoader(IConfigLoader $config_loader) {
@@ -173,7 +174,7 @@ class MyFile implements FileInterface {
 	}
 
 	/**
-	 * @return \Schoolbox\IConfigLoader
+	 * @return IConfigLoader
 	 */
 	public function getConfigLoader() {
 		return $this->config_loader;
@@ -182,17 +183,18 @@ class MyFile implements FileInterface {
 	/**
 	 * Set parent id
 	 *
-	 * @param  $parent
+	 * @param MyFolder $parent
 	 */
 	public function setParent($parent) {
 		$this->parent = $parent;
 	}
 
-	/**
-	 * Get parent id
-	 *
-	 * @return
-	 */
+
+    /**
+     * Get parent id
+     *
+     * @return MyFolder
+     */
 	public function getParent() {
 		return $this->parent;
 	}
@@ -200,17 +202,18 @@ class MyFile implements FileInterface {
 	/**
 	 * Set owner id
 	 *
-	 * @param  $owner
+	 * @param User $owner
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
 	}
 
-	/**
-	 * Get owner id
-	 *
-	 * @return
-	 */
+
+    /**
+     * Get owner id
+     *
+     * @return User
+     */
 	public function getOwner() {
 		return $this->owner;
 	}
@@ -218,17 +221,18 @@ class MyFile implements FileInterface {
 	/**
 	 * Set created at
 	 *
-	 * @param  $created_at
+	 * @param Alaress_Date_Format $created_at
 	 */
 	public function setCreatedAt($created_at) {
 		$this->created_at = $created_at;
 	}
 
-	/**
-	 * Get created at
-	 *
-	 * @return
-	 */
+
+    /**
+     * Get created at
+     *
+     * @return Alaress_Date_Format
+     */
 	public function getCreatedAt() {
 		return $this->created_at;
 	}
@@ -236,42 +240,43 @@ class MyFile implements FileInterface {
 	/**
 	 * Set description
 	 *
-	 * @param  $description
+	 * @param string $description
 	 */
 	public function setDescription($description) {
 		$this->description = $description;
 	}
 
-	/**
-	 * Get description
-	 *
-	 * @return
-	 */
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
 	public function getDescription() {
 		return $this->description;
 	}
 
 	/**
-	 * Set deleted at
+	 * Set deleted
 	 *
-	 * @param  $deleted_at
+	 * @param bool $deleted
 	 */
-	public function setDeletedAt($deleted_at) {
-		$this->deleted_at = $deleted_at;
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
 	}
 
-	/**
-	 * Get deleted at
-	 *
-	 * @return
-	 */
-	public function getDeletedAt() {
-		return $this->deleted_at;
+    /**
+     * Get deleted
+     *
+     * @return bool
+     */
+	public function getDeleted() {
+		return $this->deleted;
 	}
 
 	/**
 	 * Use this function to set the location of the file when creating a new file record
-	 * @param mixed $tempFileLocation
+	 * @param string $tempFileLocation
 	 */
 	public function setTempFileLocation($tempFileLocation) {
 		$this->tempFileLocation = $tempFileLocation;
@@ -279,7 +284,7 @@ class MyFile implements FileInterface {
 
 	/**
 	 * This function only exists to move the uploaded file into the correct location on save
-	 * @return mixed
+	 * @return string
 	 */
 	public function getTempFileLocation() {
 		return $this->tempFileLocation;
@@ -291,6 +296,6 @@ class MyFile implements FileInterface {
      */
     public function getFileLocation()
     {
-        return \Config::get('myfile_dir') . $this->getId() . '.dat';
+        return $this->config_loader->get('myfile_dir') . $this->getId() . '.dat';
     }
 }
