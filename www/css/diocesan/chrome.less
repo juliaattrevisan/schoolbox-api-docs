@@ -47,7 +47,7 @@
 @banner-height:     			112px;
 
 // Modules
-@module-heading: 				#0c3e62;
+@module-heading: 				#585959;
 @module-background: 			@body-background;
 @admin-nav:                     @link;
 
@@ -99,9 +99,10 @@
 
 body{ font-family: Tahoma, Verdana, Arial, sans-serif; }
 
-h1, h2, h3, h4{ font-family: 'Brawler', serif; }
+h1, h1 span, h2, h3, h4{ font-family: 'Brawler', serif; font-weight: normal; }
 h1{ font-size: 22px; color: @link; }
 h2{ font-size: 17px; }
+.box h2 a{ color: @link; }
 
 #header{
 	background: @banner-background url('/images/diocesan/header-bg.png') top left no-repeat;
@@ -119,23 +120,51 @@ h2{ font-size: 17px; }
 	#tabs{
 		top: 40px;
 		position: relative;
+		z-index: 1;
 		li a:hover{
 			background: @tab-background;
+		}
+		.navthis a{
+			color: @module-heading;
+			font-weight: normal;
+			&:hover{
+				background: @navigation-hover-color;
+				text-decoration: underline;
+			}
 		}
 	}
 }
 
+#nav .first{ font-size: 22px; color: @link; }
 #nav h3,
 #nav h4{ font-size: 18px; font-weight: normal; }
 
 body.login{
+	background: @white;
+	#dio-img{
+		width: 778px;
+		position: fixed;
+		top: 100px;
+		right: 471px;
+	}
 	#container{
-		background: @white;
-		p{ color: @black; }
-		a{ color: @link; }
+		background: @tab-background;
+		position: fixed;
+		right: 123px;
+		top: 100px;
+		height: 372px;
+		.logo{
+			img {
+				margin: 17px 0 28px 0;
+			}
+		}
+		p{ color: @white; }
+		a{ color: @white; }
 		input{ background: @body-background; }
 		.submit-btn-plain{ background: @link url(/images/diocesan/chevron.png) 280px 11px no-repeat; }
 	}
+	#footer ul li{ color: @black }
+	#footer ul li a{ color: @black }
 }
 
 /*

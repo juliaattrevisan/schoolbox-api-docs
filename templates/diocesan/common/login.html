@@ -23,28 +23,33 @@ function init(){
 <script type="text/javascript">
     // Upgrade your browser
     window.location.href = "/upgrade.php";
-</script>
-<![endif]-->
+</script><![endif]-->
+
 </head>
 <body class="login">
-<div id="container" class=" login">
-	<div id="content" class="clearfix">
-        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo-login.png" alt="{SITE_NAME}" /></a>
-		<p class="error">{ERROR}</p>
-		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
-			<fieldset>
-                <!--[if lt IE 10]>Username:<![endif]-->
-				<input type="text" name="username" id="username" placeholder="Username" />
-			</fieldset>
-			<fieldset>
-                <!--[if lt IE 10]>Password:<![endif]-->
-				<input type="password" name="password" id="password" placeholder="Password" />
-			</fieldset>
-			<input type="hidden" name="page" value="{HIDDEN}" />
-			<input class="login submit-btn-plain" type="submit" name="Submit" value="Sign in" alt="Sign in" />
-		</form>
-		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
-	</div>
+<div id="fuckyou">
+    <div id="dio-img">
+        <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="">
+    </div>
+    <div id="container" class=" login">
+        <div id="content" class="clearfix">
+            <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/login-logo.png" alt="{SITE_NAME}" /></a>
+            <p class="error">{ERROR}</p>
+            <form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
+                <fieldset>
+                    <!--[if lt IE 10]>Username:<![endif]-->
+                    <input type="text" name="username" id="username" placeholder="Username" />
+                </fieldset>
+                <fieldset>
+                    <!--[if lt IE 10]>Password:<![endif]-->
+                    <input type="password" name="password" id="password" placeholder="Password" />
+                </fieldset>
+                <input type="hidden" name="page" value="{HIDDEN}" />
+                <input class="login submit-btn-plain" type="submit" name="Submit" value="Go" alt="Go" />
+            </form>
+            <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+        </div>
+    </div>
 </div>
 <div id="footer" class="login">
 	<ul>
@@ -57,9 +62,6 @@ function init(){
         <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
 		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
 	</ul>
-</div>
-<div id="login-bg">
-    <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="">
 </div>
 </body>
 </html>
