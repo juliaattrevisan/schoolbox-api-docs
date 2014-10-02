@@ -42,7 +42,8 @@ class StorageMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'uploaded_by',
 			'property'   => 'uploadedBy',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'user'
 		));
 		$this->hasMap(array(
 			'column'            => 'uploaded_on',
@@ -80,6 +81,12 @@ class StorageMapper extends Mapper {
                 'this_key'  => 'mime',
                 'other_key' => 'mime',
             ));
+
+        $this->hasJoin('user', array(
+            'mapper'    => '\\Schoolbox\\User',
+            'this_key'  => 'uploaded_by',
+            'other_key' => 'id'
+        ));
 
 		$this
 			->registerCallback('postSave', array($this, 'postSave'))
