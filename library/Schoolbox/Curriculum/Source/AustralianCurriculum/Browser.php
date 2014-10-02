@@ -173,6 +173,9 @@ SPARQL
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
+        if (count($savedOutcomes = $this->getSavedOutcomes($area, $level))) {
+            return $savedOutcomes;
+        }
         $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
