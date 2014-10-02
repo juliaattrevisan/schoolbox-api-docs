@@ -1,4 +1,5 @@
 <style type="text/css">
+    /** TODO change these Steve colors **/
     #curriculum-import-form .ui-tabs-panel {
         transition: background-color 1s;
     }
@@ -174,6 +175,9 @@
                 // A map of outcomes
                 // (Allow editing after the fact)
 
+                var tab = $(event.target).closest('section');
+                tab.addClass('loading').find(':input').prop('disabled', true);
+
                 formData = {
                     id:     sourceSelect.val(),
                     area:   areaSelect.find(':selected').data('area').reference,
@@ -181,17 +185,24 @@
                     name:   nameInput.val()
                 }
 
-                var ajaxParams = {
-                    url: form.attr('action'),
-                    data: formData,
+                $.ajax({
+                    url:       form.attr('action'),
+                    data:      formData,
                     dataType: 'json',
-                    type: 'post'
-                };
-                console.log(ajaxParams);
-                $.ajax(ajaxParams)
-//                    .done(function() {
-//                        // do stuff
-//                    })
+                    type:     'post'
+                })
+                    .done(function(data) {
+                        // Save succeeded, redirect somewhere
+                        tab.addClass('loaded');
+                        window.location.href = {{ routeLookup('curriculumSource.browse')|json_encode|raw }};
+                    })
+                    .fail(function(jqXhr, textStatus, error) {
+                        // do something else
+                        tab.addClass('failed');
+                    })
+                    .always(function() {
+                        tab.removeClass('loading').find(':input').prop('disabled', false);
+                    });
             });
 
             // Ensure that I can't submit without selecting a source
@@ -209,7 +220,7 @@
             // Fade out the loaded class on the new tab
             form.on('tabsactivate', function(event, ui) {
                 setTimeout(function() {
-                    ui.newPanel.removeClass('loaded');
+                    ui.newPanel.removeClass('loaded failed');
                 }, 2000)
             });
         });
