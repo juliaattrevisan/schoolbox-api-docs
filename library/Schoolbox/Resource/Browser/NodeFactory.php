@@ -16,9 +16,9 @@ use Schoolbox\Resource\Browser;
 class NodeFactory
 {
 
-    const CMS     = 'browse';
-    const MYFILES = 'myfile';
-    const WEBDAV  = 'webdav';
+    const SBFS   = 'browse';
+    const MYFILE = 'myfile';
+    const WEBDAV = 'webdav';
 
     /** @var callable[] */
     protected $loaders;
@@ -29,11 +29,11 @@ class NodeFactory
      */
     public function __construct()
     {
-        $this->add(self::CMS, function ($nodeId, $mimeFilter = null) {
+        $this->add(self::SBFS, function ($nodeId, $mimeFilter = null) {
             return new Browser\Resources\Node($nodeId, $mimeFilter);
         });
 
-        $this->add(self::MYFILES, function ($nodeId, $mimeFilter = null) {
+        $this->add(self::MYFILE, function ($nodeId, $mimeFilter = null) {
             return new Browser\MyFiles\Node($nodeId, $mimeFilter);
         });
 

@@ -17,8 +17,9 @@ class Collector
 
     const TYPE_STORAGE = 0x1;
     const TYPE_SBFS    = 0x2;
-    const TYPE_FOLIO   = 0x4;
-    const TYPE_ALL     = 0x7;
+    const TYPE_MYFILE  = 0x4;
+    const TYPE_WEBDAV  = 0x8;
+    const TYPE_ALL     = 0xF;
 
     /** @var array */
     protected $source;
