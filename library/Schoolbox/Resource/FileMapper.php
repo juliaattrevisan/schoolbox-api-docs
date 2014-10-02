@@ -140,11 +140,12 @@ class FileMapper extends Mapper implements FileLocatorInterface {
 
 	}
 
+
     /**
      * Retreives a schoolbox file system file with a mime type object
      *
-     * @throws Exception if no instance of model is found
-     * @param  int  $identifierValue
+     * @param int $id
+     * @throws \Schoolbox\Mapper\Exception
      * @return \Schoolbox\Resource\File
      */
     public function findById($id) {
