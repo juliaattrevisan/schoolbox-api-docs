@@ -46,13 +46,13 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'inline',
 			'property'   => 'inline',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_BOOL_ENUM,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'enable',
 			'property'   => 'enable',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_BOOL_ENUM,
 		));
 
         $this->hasMap(array(
