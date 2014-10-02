@@ -200,7 +200,13 @@
                 </label>
             </form>
 			<h2>Online Editor</h2>
-            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Edit Online</a>
+            <!-- BEGIN action_resubmit_online_create -->
+            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Create a new document</a>
+            <!-- END action_resubmit_online_create -->
+            <!-- BEGIN action_resubmit_online_update -->
+            <p>You have a saved draft.</p>
+            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Continue editing your draft</a>
+            <!-- END action_resubmit_online_update -->
             <!-- END action_resubmit -->
             <!-- END recent_submission -->
             <!-- BEGIN action_submit -->
@@ -220,7 +226,13 @@
                 </label>
             </form>
 			<h2>Online Editor</h2>
+            <!-- BEGIN action_submit_online_create -->
             <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Create document</a>
+            <!-- END action_submit_online_create -->
+            <!-- BEGIN action_submit_online_update -->
+            <p>You have a saved draft.</p>
+            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Continue editing your draft</a>
+            <!-- END action_submit_online_update -->
             <!-- END action_submit -->
 
         </div>
