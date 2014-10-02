@@ -141,7 +141,10 @@ abstract class BrowserAbstract implements BrowserInterface
             'curriculum_source_id',
             $this->getSource()->getId(),
             array(
-                'order' => array('name' => 'asc',),
+                'order' => array(
+                    'order' => 'asc',
+                    'name'  => 'asc',
+                ),
             )
         );
     }
@@ -157,7 +160,10 @@ abstract class BrowserAbstract implements BrowserInterface
             'curriculum_source_id',
             $this->getSource()->getId(),
             array(
-                'order' => array('name' => 'asc',),
+                'order' => array(
+                    'order' => 'asc',
+                    'name'  => 'asc',
+                ),
             )
         );
     }
