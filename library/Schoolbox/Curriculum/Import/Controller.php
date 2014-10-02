@@ -25,6 +25,21 @@ class Controller extends Base
     protected $sourceMapper;
 
     /**
+     * @var LearningArea\Mapper
+     */
+    protected $areaMapper;
+
+    /**
+     * @var LearningLevel\Mapper
+     */
+    protected $levelMapper;
+
+    /**
+     * @var Node\Mapper
+     */
+    protected $nodeMapper;
+
+    /**
      * Controller action for viewing the import page.
      */
     public function browse()
@@ -84,10 +99,8 @@ class Controller extends Base
         }
 
         // Save new areas and levels
-        $areaMapper = LearningArea\Mapper::getInstance();
-        $areaMapper->save($newAreas);
-        $levelMapper = LearningLevel\Mapper::getInstance();
-        $levelMapper->save($newLevels);
+        $this->getAreaMapper()->save($newAreas);
+        $this->getLevelMapper()->save($newLevels);
 
         // And save the outcomes
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
@@ -97,7 +110,7 @@ class Controller extends Base
                     ->setLearningLevel($thisLevel)
                     ->setLearningArea($thisArea)
                     ->setName($post['name']);
-                Node\Mapper::getInstance()->saveTree($outcome);
+                $this->getNodeMapper()->saveTree($outcome);
             }
         }
 
@@ -154,13 +167,13 @@ class Controller extends Base
             $areaRef  = $this->getRequest()->query['area'];
             $levelRef = $this->getRequest()->query['level'];
             try {
-                $area = LearningArea\Mapper::getInstance()->findOneByColumn('reference', $areaRef);
+                $area = $this->getAreaMapper()->findOneByColumn('reference', $areaRef);
             } catch (Mapper\Exception $e) {
                 $area = new LearningArea\Model();
                 $area->setReference($areaRef);
             }
             try {
-                $level = LearningLevel\Mapper::getInstance()->findOneByColumn('reference', $levelRef);
+                $level = $this->getLevelMapper()->findOneByColumn('reference', $levelRef);
             } catch (Mapper\Exception $e) {
                 $level = new LearningLevel\Model();
                 $level->setReference($levelRef);
@@ -182,7 +195,7 @@ class Controller extends Base
     }
 
     /**
-     * @param  \Schoolbox\Curriculum\Source\Mapper $sourceMapper
+     * @param  Source\Mapper $sourceMapper
      * @return $this
      */
     public function setSourceMapper($sourceMapper)
@@ -192,10 +205,64 @@ class Controller extends Base
     }
 
     /**
-     * @return \Schoolbox\Curriculum\Source\Mapper
+     * @return Source\Mapper
      */
     public function getSourceMapper()
     {
         return $this->sourceMapper;
+    }
+
+    /**
+     * @return LearningArea\Mapper
+     */
+    public function getAreaMapper()
+    {
+        return $this->areaMapper;
+    }
+
+    /**
+     * @param  LearningArea\Mapper $areaMapper
+     * @return $this
+     */
+    public function setAreaMapper($areaMapper)
+    {
+        $this->areaMapper = $areaMapper;
+        return $this;
+    }
+
+    /**
+     * @return LearningLevel\Mapper
+     */
+    public function getLevelMapper()
+    {
+        return $this->levelMapper;
+    }
+
+    /**
+     * @param  LearningLevel\Mapper $levelMapper
+     * @return $this
+     */
+    public function setLevelMapper($levelMapper)
+    {
+        $this->levelMapper = $levelMapper;
+        return $this;
+    }
+
+    /**
+     * @return Node\Mapper
+     */
+    public function getNodeMapper()
+    {
+        return $this->nodeMapper;
+    }
+
+    /**
+     * @param  Node\Mapper $nodeMapper
+     * @return $this
+     */
+    public function setNodeMapper($nodeMapper)
+    {
+        $this->nodeMapper = $nodeMapper;
+        return $this;
     }
 }
