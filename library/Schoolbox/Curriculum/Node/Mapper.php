@@ -132,11 +132,13 @@ class Mapper extends BaseMapper
     public function saveTree(Model $model)
     {
         $this->save($model);
+        $i = 0;
         foreach ($model->getChildren() as $child) {
             $child
                 ->setLearningArea($model->getLearningArea())
                 ->setLearningLevel($model->getLearningLevel())
-                ->setParent($model->getId());
+                ->setParent($model->getId())
+                ->setOrder($i++);
             $this->saveTree($child);
         }
     }
