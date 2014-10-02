@@ -169,14 +169,14 @@ abstract class BrowserAbstract implements BrowserInterface
     }
 
     /**
-     * Retrieves pre-saved node graph for the given area and level.
+     * Retrieves pre-saved outcome node graph for the given area and level.
      *
      * @param LearningArea\Model  $area
      * @param LearningLevel\Model $level
      *
      * @return Collection|Node\Model[]
      */
-    public function getSavedNodes(LearningArea\Model $area, LearningLevel\Model $level)
+    public function getSavedOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
         // Need some further post-processing to get this as a node tree
         return $this->getNodeMapper()->findByColumnList(
@@ -187,6 +187,7 @@ abstract class BrowserAbstract implements BrowserInterface
             array(
                 'order' => array(
                     'curriculum_node_parent_id' => 'asc',
+                    'order'                     => 'asc',
                     'name'                      => 'asc',
                 ),
             )
