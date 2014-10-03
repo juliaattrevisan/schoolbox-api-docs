@@ -95,20 +95,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         /* Render everything else out
          */
         // Load sources
-        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-        $sourceList = $configs->map(
-            function ($record) {
-                /** @var Calendar_Api_Config_Record $record */
-                return array(
-                    'id'   => $record->getId(),
-                    'name' => sprintf(
-                        "%s: %s",
-                        $record->getConnectorClass(),
-                        $record->getEventType()
-                    )
-                );
-            }
-        )->getAll();
+        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
         // select all types
         $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
