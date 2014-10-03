@@ -10,60 +10,63 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
+class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
+{
 
-	/**
-	 * Mapping rules
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('calendar_connector');
-		$this->hasModel('Calendar_Api_Config_Record');
+    /**
+    * Mapping rules
+    *
+    * @return Bool|void
+    */
+    protected function mapping()
+    {
+        $this->hasTable('calendar_connector');
+        $this->hasModel('Calendar_Api_Config_Record');
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'event_type',
-			'property'   => 'eventType',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'event_type',
+            'property'   => 'eventType',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'connector_class',
-			'property'   => 'connectorClass',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'connector_class',
+            'property'   => 'connectorClass',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'config',
-			'property'   => 'config',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'config',
+            'property'   => 'config',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'status',
-			'property'   => 'status',
-			'type'       => self::TYPE_INTEGER,
-		));
-	}
+        $this->hasMap(array(
+            'column'     => 'status',
+            'property'   => 'status',
+            'type'       => self::TYPE_INTEGER,
+        ));
+    }
 
-	/**
-	 * Return a set of config records being used
-	 *
-	 * Un-uniqueified because this was ramming all vCal sources into the same
-	 * connector, and they should be unique (for filtering by source).
-	 *
-	 * @return \Schoolbox\Collection
-	 */
-	public function getAllConfigRecords() {
-		return $this->findByColumn('status', 1);
-	}
+    /**
+    * Return a set of config records being used
+    *
+    * Un-uniqueified because this was ramming all vCal sources into the same
+    * connector, and they should be unique (for filtering by source).
+    *
+    * @return \Schoolbox\Collection
+    */
+    public function getAllConfigRecords()
+    {
+        return $this->findByColumn('status', 1);
+    }
 
     /**
      * Retrieves a list of sources for the calendar.
@@ -112,161 +115,170 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
         return array_values($sourceList);
     }
 
-	/**
-	 * Return a set of decoded config objects for the specified event_type and connector_class
-	 *
-	 * @param $currentEventType
-	 * @param $currentConnector
-	 * @return array
-	 */
-	public function getAllConfigs($currentEventType, $currentConnector) {
-		$configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
-			'event_type' => $currentEventType,
-			'connector_class' => $currentConnector,
-			'status' => 1
-		));
+    /**
+    * Return a set of decoded config objects for the specified event_type and connector_class
+    *
+    * @param $currentEventType
+    * @param $currentConnector
+    * @return array
+    */
+    public function getAllConfigs($currentEventType, $currentConnector)
+    {
+        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
+            'event_type' => $currentEventType,
+            'connector_class' => $currentConnector,
+            'status' => 1
+        ));
 
-		$allConfigs = array();
+        $allConfigs = array();
 
-		foreach ($configs as $currentConfig) {
-			/* @var $currentConfig Calendar_Api_Config_Record */
-			$config = $currentConfig->decodeConfig();
-			$config->setId($currentConfig->getId());
+        foreach ($configs as $currentConfig) {
+            /* @var $currentConfig Calendar_Api_Config_Record */
+            $config = $currentConfig->decodeConfig();
+            $config->setId($currentConfig->getId());
 
-			$allConfigs[] = $config;
-		}
+            $allConfigs[] = $config;
+        }
 
-		return $allConfigs;
-	}
+        return $allConfigs;
+    }
 
-	/**
-	 * Deactivate all configs (used when updating)
-	 */
-	public function deactivateAll() {
-		$statement = $this->database->prepare("
+    /**
+    * Deactivate all configs (used when updating)
+    */
+    public function deactivateAll()
+    {
+        $statement = $this->database->prepare(
+            "
 			UPDATE `{$this->table}`
 			SET status = 0
-		");
+		"
+        );
 
-		$statement->execute();
+        $statement->execute();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Activate a particular connector
-	 *
-	 * @param $eventType
-	 * @param $connectorClass
-	 *
-	 * @return \Calendar_Api_Config_Mapper
-	 */
-	public function activate($eventType, $connectorClass) {
-		$statement = $this->database->prepare("
+    /**
+    * Activate a particular connector
+    *
+    * @param $eventType
+    * @param $connectorClass
+    *
+    * @return \Calendar_Api_Config_Mapper
+    */
+    public function activate($eventType, $connectorClass)
+    {
+        $statement = $this->database->prepare(
+            "
 			UPDATE `{$this->table}`
 			SET status = 1
 			WHERE event_type = :eventType
 			AND connector_class = :connectorClass
-		");
+		"
+        );
 
-		$statement->bindParam(':eventType', $eventType);
-		$statement->bindParam(':connectorClass', $connectorClass);
+        $statement->bindParam(':eventType', $eventType);
+        $statement->bindParam(':connectorClass', $connectorClass);
 
-		$statement->execute();
+        $statement->execute();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Generate a tree of EventType/Connector pairs
-	 *
-	 * @return array
-	 */
-	public function generateApiHierarchy() {
+    /**
+    * Generate a tree of EventType/Connector pairs
+    *
+    * @return array
+    */
+    public function generateApiHierarchy()
+    {
 
-		/* Figger out which Event Types are around, and which Connectors
+        /* Figger out which Event Types are around, and which Connectors
 		 * are available for each Event Type.
 		 */
-		$path = '../library/Calendar/Api/EventType';
+        $path = '../library/Calendar/Api/EventType';
 
-		$allApi = array();
+        $allApi = array();
 
-		/* Just get the dir names (these correspond to event types)
+        /* Just get the dir names (these correspond to event types)
 		 */
-		foreach(array_filter(glob("$path/*"), 'is_dir') as $dirname) {
-			$eventTypeFilename = basename($dirname);
+        foreach (array_filter(glob("$path/*"), 'is_dir') as $dirname) {
+            $eventTypeFilename = basename($dirname);
 
-			/* Path to connectors
+            /* Path to connectors
 			 */
-			$subpath = "$path/$eventTypeFilename";
+            $subpath = "$path/$eventTypeFilename";
 
-			foreach(array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
-				$connectorClassFilename = basename($subdirname);
+            foreach (array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
+                $connectorClassFilename = basename($subdirname);
 
-				/* Augment that array
+                /* Augment that array
 				 */
-				$allApi[$eventTypeFilename][] = $connectorClassFilename;
-			}
-		}
+                $allApi[$eventTypeFilename][] = $connectorClassFilename;
+            }
+        }
 
-		return $allApi;
-	}
+        return $allApi;
+    }
 
-	/**
-	 * Some generic test values used to populate the calendar_connector table
-	 * while developing the admin ui
-	 */
-	public function setupDefaults() {
-		$start = 85;
+    /**
+    * Some generic test values used to populate the calendar_connector table
+    * while developing the admin ui
+    */
+    public function setupDefaults()
+    {
+        $start = 85;
 
-		$config = new Calendar_Api_Config_Connector_Vcal();
-		$config->setId($start);
-		$config->setEventType('Event');
-		$config->setConnectorClass('Vcal');
-		$config->setUrl('http://www.google.com');
+        $config = new Calendar_Api_Config_Connector_Vcal();
+        $config->setId($start);
+        $config->setEventType('Event');
+        $config->setConnectorClass('Vcal');
+        $config->setUrl('http://www.google.com');
 
-		$configRecord = new Calendar_Api_Config_Record();
-		$configRecord->setEventType('Event');
-		$configRecord->setConnectorClass('Vcal');
-		$configRecord->updateConfig($config);
+        $configRecord = new Calendar_Api_Config_Record();
+        $configRecord->setEventType('Event');
+        $configRecord->setConnectorClass('Vcal');
+        $configRecord->updateConfig($config);
 
-		$this->save(array($configRecord));
+        $this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Connector_Vcal();
-		$config->setId($start++);
-		$config->setEventType('Event');
-		$config->setConnectorClass('Vcal');
-		$config->setUrl('http://www.gruber.org');
+        $config = new Calendar_Api_Config_Connector_Vcal();
+        $config->setId($start++);
+        $config->setEventType('Event');
+        $config->setConnectorClass('Vcal');
+        $config->setUrl('http://www.gruber.org');
 
-		$configRecord = new Calendar_Api_Config_Record();
-		$configRecord->setEventType('Event');
-		$configRecord->setConnectorClass('Vcal');
-		$configRecord->updateConfig($config);
+        $configRecord = new Calendar_Api_Config_Record();
+        $configRecord->setEventType('Event');
+        $configRecord->setConnectorClass('Vcal');
+        $configRecord->updateConfig($config);
 
-		$this->save(array($configRecord));
+        $this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Connector_Schoolbox();
-		$config->setId($start++);
-		$config->setEventType('Submission');
-		$config->setConnectorClass('Schoolbox');
+        $config = new Calendar_Api_Config_Connector_Schoolbox();
+        $config->setId($start++);
+        $config->setEventType('Submission');
+        $config->setConnectorClass('Schoolbox');
 
-		$configRecord = new Calendar_Api_Config_Record();
-		$configRecord->setEventType('Submission');
-		$configRecord->setConnectorClass('Schoolbox');
-		$configRecord->updateConfig($config);
+        $configRecord = new Calendar_Api_Config_Record();
+        $configRecord->setEventType('Submission');
+        $configRecord->setConnectorClass('Schoolbox');
+        $configRecord->updateConfig($config);
 
-		$this->save(array($configRecord));
+        $this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Connector_Sharepoint();
-		$config->setId($start++);
-		$config->setEventType('StudentBirthday');
-		$config->setConnectorClass('Sharepoint');
+        $config = new Calendar_Api_Config_Connector_Sharepoint();
+        $config->setId($start++);
+        $config->setEventType('StudentBirthday');
+        $config->setConnectorClass('Sharepoint');
 
-		$configRecord = new Calendar_Api_Config_Record();
-		$configRecord->setEventType('StudentBirthday');
-		$configRecord->setConnectorClass('Sharepoint');
-		$configRecord->updateConfig($config);
+        $configRecord = new Calendar_Api_Config_Record();
+        $configRecord->setEventType('StudentBirthday');
+        $configRecord->setConnectorClass('Sharepoint');
+        $configRecord->updateConfig($config);
 
-		$this->save(array($configRecord));
-	}
+        $this->save(array($configRecord));
+    }
 }
