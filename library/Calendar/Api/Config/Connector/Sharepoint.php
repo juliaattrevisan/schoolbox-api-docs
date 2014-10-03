@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Config_Connector_Sharepoint
  *
@@ -19,29 +20,33 @@ class Calendar_Api_Config_Connector_Sharepoint extends Calendar_Api_Config_Conne
     }
 
     /**
-    * Render configs into admin screen
-    *
-    * @param $page
-    * @return mixed|void
-    */
+     * Render configs into admin screen
+     *
+     * @param $page
+     *
+     * @return mixed|void
+     */
     public function render($page)
     {
-        $page->setVar(array(
-            'CONNECTOR_ID' => $this->getId(),
-            'CONNECTOR_LABEL' => $this->getLabel(),
-            'CONNECTOR_CLASS' => $this->getConnectorClass(),
-        ));
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+            )
+        );
 
         $page->setVar('has_multiple_options_block', '');
     }
 
     /**
-    * Check if current user has permissions to see this event
-    *
-    * @param $userCampus
-    * @param $userGroup
-    * @return bool
-    */
+     * Check if current user has permissions to see this event
+     *
+     * @param $userCampus
+     * @param $userGroup
+     *
+     * @return bool
+     */
     public function hasPermissions($userCampus, $userGroup)
     {
         return true;
