@@ -1,7 +1,6 @@
 <?php
 
 /* Update the options for each connector
- * Currently, only Vcal has options which can be modified
  */
 if (is_array($_POST['record']) && count($_POST['record'])) {
     foreach ($_POST['record'] as $id => $attribs) {
@@ -37,6 +36,7 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
         }
      /* Update and save config
 		 */
+        $config->setLabel($attribs['label']);
         $configRecord->updateConfig($config);
         Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
     }
