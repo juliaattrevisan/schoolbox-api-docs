@@ -63,9 +63,11 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
         if (!$allConfigs->count()) {
             $className = 'Calendar_Api_Config_Connector_' . Scrub::text($bits[1]);
             if (class_exists($className)) {
+                /** @var Calendar_Api_Config_Connector_Abstract $config */
                 $config = new $className();
                 $config->setEventType(Scrub::text($bits[0]));
                 $config->setConnectorClass(Scrub::text($bits[1]));
+                $config->setLabel($config->getDefaultLabel());
                 $configRecord = new Calendar_Api_Config_Record();
                 $configRecord->setEventType(Scrub::text($bits[0]));
                 $configRecord->setConnectorClass(Scrub::text($bits[1]));
