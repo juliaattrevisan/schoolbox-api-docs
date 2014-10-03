@@ -161,6 +161,31 @@ abstract class Calendar_Layout_Full_Abstract
                 );
             }
         )->getAll();
+
+        // Multiple sources can have identical names - join their IDs together.
+        $sourceList = array_reduce(
+            $sourceList,
+            function($carry, $item) {
+                $id   = $item['id'];
+                $name = $item['name'];
+                if (!array_key_exists($name, $carry)) {
+                    $carry[$name] = $item;
+                    $carry[$name]['id'] = array();
+                }
+                $carry[$name]['id'][] = $id;
+                return $carry;
+            },
+            array()
+        );
+        $sourceList = array_map(
+            function($v) {
+                $v['id'] = implode(',', $v['id']);
+                return $v;
+            },
+            $sourceList
+        );
+        $sourceList = array_values($sourceList);
+
         // select all types
         $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
