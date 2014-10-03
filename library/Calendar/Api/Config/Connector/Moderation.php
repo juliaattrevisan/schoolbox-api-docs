@@ -8,7 +8,8 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Connector_Abstract {
+class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Connector_Abstract
+{
 
     /**
      * {@inheritdoc}
@@ -24,7 +25,8 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
      * @param  SitePage $page
      * @return void
      */
-    public function render($page) {
+    public function render($page)
+    {
         $page->setVar(array(
             'CONNECTOR_ID'    => $this->getId(),
             'CONNECTOR_LABEL' => $this->getLabel(),
@@ -40,7 +42,8 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
      * @param  $userGroup
      * @return bool
      */
-    public function hasPermissions($userCampus, $userGroup) {
+    public function hasPermissions($userCampus, $userGroup)
+    {
         return true;
     }
 }
