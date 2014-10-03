@@ -10,10 +10,10 @@
 abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Config_Connector_Interface
 {
     /**
-	 * Primary key
-	 *
-	 * @var int
-	 */
+    * Primary key
+    *
+    * @var int
+    */
     protected $id = -1;
 
     /**
@@ -24,38 +24,38 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     protected $label = '';
 
     /**
-	 * The kind of event this configuration is for
-	 * e.g. 'Event', 'Submission'
-	 *
-	 * Public because of Mapper
-	 *
-	 * @var string
-	 */
+    * The kind of event this configuration is for
+    * e.g. 'Event', 'Submission'
+    *
+    * Public because of Mapper
+    *
+    * @var string
+    */
     protected $eventType = '';
 
     /**
-	 * Class name of the API which will use this config
-	 * e.g. 'Schoolbox', 'Sharepoint'
-	 *
-	 * Public because of Mapper
-	 *
-	 * @var string
-	 */
+    * Class name of the API which will use this config
+    * e.g. 'Schoolbox', 'Sharepoint'
+    *
+    * Public because of Mapper
+    *
+    * @var string
+    */
     protected $connectorClass = '';
 
     /**
-	 * Corresponds to the luEventType table
-	 *
-	 * @var string
-	 */
+    * Corresponds to the luEventType table
+    *
+    * @var string
+    */
     protected $luEventType = '1';
 
     /**
-	 * Whether or not the current user can view these events
-	 * Setting this to False prevents event accumulation
-	 *
-	 * @var bool
-	 */
+    * Whether or not the current user can view these events
+    * Setting this to False prevents event accumulation
+    *
+    * @var bool
+    */
     protected $hasPermissions = false;
 
     /**
@@ -66,12 +66,12 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     abstract public function getDefaultLabel();
 
     /**
-	 * Render event type lookup selector with the currently chosen
-	 * value preselected
-	 *
-	 * @param $page
-	 * @param $preselected
-	 */
+    * Render event type lookup selector with the currently chosen
+    * value preselected
+    *
+    * @param $page
+    * @param $preselected
+    */
     protected function renderEventType($page, $preselected)
     {
         $eventHandler = new Calendar();
@@ -79,7 +79,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
         $allLookupEventTypes = $eventHandler->getTypeList();
 
         if (is_array($allLookupEventTypes) && count($allLookupEventTypes)) {
-            foreach($allLookupEventTypes as $currentLookupEventType) {
+            foreach ($allLookupEventTypes as $currentLookupEventType) {
                 if ($currentLookupEventType['eventTypeID'] == $preselected) {
                     $selected = 'selected="selected"';
                 } else {
@@ -101,93 +101,93 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
 
     /**
-	 * Find out if the current user's settings of $userCampus and $userGroup
-	 * are in the selections for this config
-	 *
-	 * @param $userCampus
-	 * @param $userGroup
-	 * @return bool
-	 */
+    * Find out if the current user's settings of $userCampus and $userGroup
+    * are in the selections for this config
+    *
+    * @param $userCampus
+    * @param $userGroup
+    * @return bool
+    */
 
 
     /* Getters/Setters
 	 */
 
     /**
-	 * Set event type
-	 *
-	 * @param string $eventType
-	 */
+    * Set event type
+    *
+    * @param string $eventType
+    */
     public function setEventType($eventType)
     {
         $this->eventType = $eventType;
     }
 
     /**
-	 * Get event type
-	 *
-	 * @return string
-	 */
+    * Get event type
+    *
+    * @return string
+    */
     public function getEventType()
     {
         return $this->eventType;
     }
 
     /**
-	 * Set connector class
-	 *
-	 * @param string $connectorClass
-	 */
+    * Set connector class
+    *
+    * @param string $connectorClass
+    */
     public function setConnectorClass($connectorClass)
     {
         $this->connectorClass = $connectorClass;
     }
 
     /**
-	 * Get connector class
-	 *
-	 * @return string
-	 */
+    * Get connector class
+    *
+    * @return string
+    */
     public function getConnectorClass()
     {
         return $this->connectorClass;
     }
 
     /**
-	 * Set id
-	 *
-	 * @param int $id
-	 */
+    * Set id
+    *
+    * @param int $id
+    */
     public function setId($id)
     {
         $this->id = $id;
     }
 
     /**
-	 * Get id
-	 *
-	 * @return int
-	 */
+    * Get id
+    *
+    * @return int
+    */
     public function getId()
     {
         return $this->id;
     }
 
     /**
-	 * Set luEventType
-	 *
-	 * @param string $luEventType
-	 */
+    * Set luEventType
+    *
+    * @param string $luEventType
+    */
     public function setLuEventType($luEventType)
     {
         $this->luEventType = $luEventType;
     }
 
     /**
-	 * Get luEventType
-	 *
-	 * @return string
-	 */
+    * Get luEventType
+    *
+    * @return string
+    */
     public function getLuEventType()
     {
         return $this->luEventType;
