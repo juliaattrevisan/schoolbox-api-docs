@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Config_Connector_Vcal
  *
@@ -19,40 +20,43 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     }
 
     /**
-    * A url to a vcal stream
-    *
-    * @var string
-    */
+     * A url to a vcal stream
+     *
+     * @var string
+     */
     private $url = '';
 
     /**
-    * Campus visibility for this stream
-    *
-    * @var array
-    */
+     * Campus visibility for this stream
+     *
+     * @var array
+     */
     private $campus = array();
 
     /**
-    * Group visibility for this stream
-    *
-    * @var array
-    */
+     * Group visibility for this stream
+     *
+     * @var array
+     */
     private $groups = array();
 
     /**
-    * Render configs into admin screen
-    *
-    * @param $page
-    * @return mixed|void
-    */
+     * Render configs into admin screen
+     *
+     * @param $page
+     *
+     * @return mixed|void
+     */
     public function render($page)
     {
-        $page->setVar(array(
-            'CONNECTOR_ID' => $this->getId(),
-            'CONNECTOR_LABEL' => $this->getLabel(),
-            'CONNECTOR_CLASS' => $this->getConnectorClass(),
-            'URL' => $this->getUrl()
-        ));
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+                'URL'             => $this->getUrl()
+            )
+        );
 
         $page->parse('has_multiple_options_block', 'has_multiple_options');
 
@@ -74,12 +78,13 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     }
 
     /**
-    * Check if current user has permissions to see this event
-    *
-    * @param $userCampus
-    * @param $userGroup
-    * @return bool
-    */
+     * Check if current user has permissions to see this event
+     *
+     * @param $userCampus
+     * @param $userGroup
+     *
+     * @return bool
+     */
     public function hasPermissions($userCampus, $userGroup)
     {
         if ((count(array_intersect($userCampus, $this->getCampus()))) && in_array($userGroup, $this->getGroups())) {
@@ -93,60 +98,60 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 	 */
 
     /**
-    * Set url
-    *
-    * @param string $url
-    */
+     * Set url
+     *
+     * @param string $url
+     */
     public function setUrl($url)
     {
         $this->url = $url;
     }
 
     /**
-    * Get url
-    *
-    * @return string
-    */
+     * Get url
+     *
+     * @return string
+     */
     public function getUrl()
     {
         return $this->url;
     }
 
     /**
-    * Set campus
-    *
-    * @param array $campus
-    */
+     * Set campus
+     *
+     * @param array $campus
+     */
     public function setCampus($campus)
     {
         $this->campus = $campus;
     }
 
     /**
-    * Get campus
-    *
-    * @return array
-    */
+     * Get campus
+     *
+     * @return array
+     */
     public function getCampus()
     {
         return $this->campus;
     }
 
     /**
-    * Set groups
-    *
-    * @param array $groups
-    */
+     * Set groups
+     *
+     * @param array $groups
+     */
     public function setGroups($groups)
     {
         $this->groups = $groups;
     }
 
     /**
-    * Get groups
-    *
-    * @return array
-    */
+     * Get groups
+     *
+     * @return array
+     */
     public function getGroups()
     {
         return $this->groups;
