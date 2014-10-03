@@ -1,7 +1,12 @@
 <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
 
-<!-- No special rendering required -->
+<fieldset class='calendarOptions'>
+    <fieldset>
+        <h3>Label</h3>
+        <p><input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' /></p>
+    </fieldset>
+</fieldset>
 
 <!-- BEGIN campus_list -->
 <!-- empty because PHPLib sucks -->
