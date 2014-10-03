@@ -26,6 +26,7 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
 	public function render($page) {
 		$page->setVar(array(
 			'CONNECTOR_ID' => $this->getId(),
+            'CONNECTOR_LABEL' => $this->getLabel(),
 			'CONNECTOR_CLASS' => $this->getConnectorClass(),
 		));
 

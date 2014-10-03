@@ -32,6 +32,7 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
         $page->setVar(
             array(
                 'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
                 'CONNECTOR_CLASS' => $this->getConnectorClass(),
             )
         );
