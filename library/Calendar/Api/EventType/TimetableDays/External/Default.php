@@ -105,6 +105,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                 $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                 $event->setType($eventType);
                 $event->setColour($eventColor);
+                $event->setConnectorId($this->getConnectorId());
                 $stack->add($event);
             }
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
