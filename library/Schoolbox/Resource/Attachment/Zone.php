@@ -33,6 +33,12 @@ class Zone {
     /** @var array */
     protected $text;
 
+    /** @var string */
+    protected $mimeFilter;
+
+    /** @var StorageMapper */
+    protected $mapper;
+
     /**
      * @param string $zoneId
      * @param StorageMapper $mapper
@@ -48,6 +54,7 @@ class Zone {
         );
         $this->mapper   = $mapper ?: StorageMapper::getInstance();
 
+        $this->mimeFilter  = '';
         $this->attachments = array();
     }
 
@@ -105,6 +112,24 @@ class Zone {
 
 
     /**
+     * @param string $filter
+     */
+    public function setMimeFilter($filter)
+    {
+        $this->mimeFilter = $filter;
+    }
+
+
+    /**
+     * Clear the mime filter
+     */
+    public function clearMimeFilter()
+    {
+        $this->mimeFilter = null;
+    }
+
+
+    /**
      * @param \SitePage $page
      * @param string $varname
      */
@@ -112,6 +137,15 @@ class Zone {
     {
         $page->setFile(self::TPL, 'resources/attachzone.html');
         $page->setBlock(self::TPL, 'attachment_list', 'attachment_list_block');
+
+        // wrap in quotes
+        $filter = "'$this->mimeFilter'";
+
+        if ($this->mimeFilter == null) {
+            $filter = 'null';
+        } elseif ($this->mimeFilter == false) {
+            $filter = 'false';
+        }
 
         $page->setVar(array(
             'AZ_ID'         => $this->id,
@@ -121,6 +155,7 @@ class Zone {
             'AZ_ATTACH_PROMPT'     => $this->text['attachPrompt'],
             'AZ_ATTACHMENTS_LABEL' => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
             'AZ_MODAL_TITLE'       => $this->text['modalTitle'],
+            'AZ_MIME_FILTER'       => $filter,
 
             'attachment_list_block' => '',
         ));
