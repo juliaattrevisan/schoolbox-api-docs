@@ -61,19 +61,19 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         $page->parse('has_multiple_options_block', 'has_multiple_options');
 
         /* Render event type options
-		 */
+         */
         $this->renderEventType($page, $this->getLuEventType());
 
         /* Permissions for this connector
-		 */
+         */
         $calendarHandler = new Calendar();
 
         /* Campus permissions
-		 */
+         */
         $page->checkList('campus_list', $calendarHandler->getCampusList(), $this->getCampus(), 'configFragment');
 
         /* Group permissions
-		 */
+         */
         $page->checkList('group_list', $calendarHandler->getGroupList(), $this->getGroups());
     }
 
@@ -95,7 +95,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * Set url
