@@ -1,9 +1,5 @@
 <?php
-use Schoolbox\Resource\Attachment\Collector\Collector;
-use Schoolbox\Resource\Attachment\Collector\SbfsHandler;
-use Schoolbox\Resource\Attachment\Collector\StorageHandler;
-use Schoolbox\Resource\FileMapper;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
@@ -103,20 +99,13 @@ if ($_POST['heading']) {
 		$article->setModifiedDate(new Alaress_Date_Format(time(), 'U'));
 	}
 
-    if (count($_POST['attachment'])) {
-
-        $smap = StorageMapper::getInstance();
-        $fmap = FileMapper::getInstance();
-        $conf = new \Schoolbox\Config\Loader();
-
-        $collector = new Collector($_POST['attachment'], array(
-            Collector::TYPE_STORAGE => new StorageHandler($smap),
-            Collector::TYPE_SBFS    => new SbfsHandler($fmap, $smap, $conf)
-        ));
-
+    if (count($_POST['attachment']) && is_array($_POST['attachment'])) {
         try {
+            $collectorFactory = new CollectorFactory();
+            $collector = $collectorFactory->build($_POST['attachment']);
             $article->setImage($collector->getFirst());
         } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
         }
     }
     // retained case for browsers that require fallback
