@@ -65,6 +65,53 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper {
 		return $this->findByColumn('status', 1);
 	}
 
+    /**
+     * Retrieves a list of sources for the calendar.
+     *
+     * @return array
+     *   name: a name for this source
+     *   id:   a comma-separated list of source IDs
+     */
+    public function getSourceListForCalendar()
+    {
+        $configs = $this->getAllConfigRecords();
+        $sourceList = $configs->map(
+            function ($record) {
+                /** @var Calendar_Api_Config_Record $record */
+                return array(
+                    'id'   => $record->getId(),
+                    'name' => $record->decodeConfig()->getLabel()
+                );
+            }
+        )->getAll();
+
+        // Multiple sources can have identical names - join their IDs together.
+        $sourceList = array_reduce(
+            $sourceList,
+            function($carry, $item) {
+                $id   = $item['id'];
+                $name = $item['name'];
+                if (!array_key_exists($name, $carry)) {
+                    $carry[$name] = $item;
+                    $carry[$name]['id'] = array();
+                }
+                $carry[$name]['id'][] = $id;
+                return $carry;
+            },
+            array()
+        );
+
+        // Join the IDs for each source together.
+        $sourceList = array_map(
+            function($v) {
+                $v['id'] = implode(',', $v['id']);
+                return $v;
+            },
+            $sourceList
+        );
+        return array_values($sourceList);
+    }
+
 	/**
 	 * Return a set of decoded config objects for the specified event_type and connector_class
 	 *
