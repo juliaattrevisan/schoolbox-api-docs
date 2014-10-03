@@ -83,7 +83,7 @@ class StorageMapper extends Mapper {
             ));
 
         $this->hasJoin('user', array(
-            'mapper'    => '\\Schoolbox\\User',
+            'mapper'    => '\\Schoolbox\\UserMapper',
             'this_key'  => 'uploaded_by',
             'other_key' => 'id'
         ));
