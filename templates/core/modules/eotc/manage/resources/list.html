@@ -65,6 +65,9 @@ $(function() {
 			<th>
 				End
 			</th>
+			<th>
+				Action
+			</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -81,6 +84,11 @@ $(function() {
 			</td>
 			<td>
 				{RESOURCEBOOKING_END}
+			</td>
+			<td>
+				<span class="actions one-button">
+					<a href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="btn no-text delete" alt="Remove Booking" title="Remove Booking"><span></span></a>
+				</span>
 			</td>
 		</tr>
 		<!-- END resourcebooking -->
