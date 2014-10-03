@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config connector for resource booking.
  *
@@ -23,15 +24,18 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
      * Render configs into admin screen
      *
      * @param  SitePage $page
+     *
      * @return void
      */
     public function render($page)
     {
-        $page->setVar(array(
-            'CONNECTOR_ID'    => $this->getId(),
-            'CONNECTOR_LABEL' => $this->getLabel(),
-            'CONNECTOR_CLASS' => $this->getConnectorClass(),
-        ));
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+            )
+        );
         $page->setVar('has_multiple_options_block', '');
     }
 
@@ -40,6 +44,7 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
      *
      * @param  $userCampus
      * @param  $userGroup
+     *
      * @return bool
      */
     public function hasPermissions($userCampus, $userGroup)
