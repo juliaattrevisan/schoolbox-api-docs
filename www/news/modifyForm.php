@@ -104,8 +104,8 @@ if ($_POST['heading']) {
             $collectorFactory = new CollectorFactory();
             $collector = $collectorFactory->build($_POST['attachment']);
             $article->setImage($collector->getFirst());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+        } catch (\Schoolbox\Resource\Exception $e) {
+            error(41); // no any device exists
         }
     }
     // retained case for browsers that require fallback

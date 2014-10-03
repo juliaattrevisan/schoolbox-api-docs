@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
-
+use Schoolbox\Resource;
 use Schoolbox\Resource\FileLocatorInterface;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
@@ -65,8 +65,9 @@ class FileSystemHandler implements TypeHandlerInterface {
 
     /**
      * TODO for now, we are simply copying resources from SBFS to Storage. Upgrade by intelligently linking through to storage
-     * 
+     *
      * @param string $id
+     * @throws \Schoolbox\Resource\Exception
      * @return Storage
      */
     public function fetch($id)
@@ -78,7 +79,11 @@ class FileSystemHandler implements TypeHandlerInterface {
         $location = sprintf($pattern, $file->getId());
         $owner    = $file->getOwner()->getId();
 
-        return $this->storage->upload($filename, $location, $owner);
+        try {
+            return $this->storage->upload($filename, $location, $owner);
+        } catch (\PDOException $e) {
+            throw new Resource\Exception("Could not copy file", Resource\Exception::CODE_COPY_TO_STORAGE_FAILED, $e);
+        }
     }
 
 }
