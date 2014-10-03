@@ -17,6 +17,13 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     protected $id = -1;
 
     /**
+     * The label for this connector. Used in the calendar source filter.
+     *
+     * @var string
+     */
+    protected $label = '';
+
+    /**
 	 * The kind of event this configuration is for
 	 * e.g. 'Event', 'Submission'
 	 *
@@ -50,6 +57,13 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 	 * @var bool
 	 */
     protected $hasPermissions = false;
+
+    /**
+     * Gets a sensible default label for this connector.
+     *
+     * @return string
+     */
+    abstract public function getDefaultLabel();
 
     /**
 	 * Render event type lookup selector with the currently chosen
@@ -177,5 +191,23 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     public function getLuEventType()
     {
         return $this->luEventType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param  string $label
+     * @return $this
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+        return $this;
     }
 }

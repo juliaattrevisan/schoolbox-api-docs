@@ -11,6 +11,16 @@
 class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connector_Abstract
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        // Will depend on value of $this->eventType if more external connectors
+        // beyond Timetable get added.
+        return 'Timetable';
+    }
+
+    /**
      * Render configs into admin screen. Currently, the only setting is the
      * event type.
      *

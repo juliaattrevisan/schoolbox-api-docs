@@ -9,6 +9,14 @@
  */
 class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_Abstract {
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'Events';
+    }
+
 	/**
 	 * A url to a vcal stream
 	 *

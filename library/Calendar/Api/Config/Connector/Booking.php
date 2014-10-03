@@ -11,6 +11,14 @@
 class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connector_Abstract {
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'Resource Booking';
+    }
+
+    /**
      * Render configs into admin screen
      *
      * @param  SitePage $page

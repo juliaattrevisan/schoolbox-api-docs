@@ -9,6 +9,14 @@
  */
 class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_Abstract {
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'EOTC';
+    }
+
 	/**
 	 * Render configs into admin screen
 	 *

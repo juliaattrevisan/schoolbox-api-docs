@@ -9,6 +9,14 @@
  */
 class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connector_Abstract {
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'Events';
+    }
+
 	/**
 	 * Render configs into admin screen
 	 *
