@@ -44,6 +44,10 @@ if ($authenticator->isEOTCAdministrator($_SESSION['user']) || $canPromote) {
 	$statusMapper = new \EOTC\EventStatusMapper();
 	$status = $statusMapper->findById($_POST['statusId']);
 
+	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
+		error(165);
+	}
+
 	$event->getMetadata()->setStatus($status);
 	$event->getMetadata()->setComment($_POST['comment']);
 
