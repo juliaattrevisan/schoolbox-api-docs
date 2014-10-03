@@ -16,7 +16,6 @@
                 var input = $(this);
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time);
-                    form.valid();
                 })
             }
         });
@@ -31,13 +30,12 @@
         }
         form.on('click.courseImport', 'input[data-interaction="enable"]', function() {
             enableUnitClickEvent($(this));
-            form.valid();
         });
         form.find('input[data-interaction="enable"]').each(function() {
             enableUnitClickEvent($(this));
         })
 
-        // Form validation: Run the validation on any blur event on a field
+        // Form validation: Run the validation on submit only
         form.validate({
             errorPlacement: function(error, element) {
                 error.insertAfter(element.parent('td').find('.ui-datepicker-trigger'));
