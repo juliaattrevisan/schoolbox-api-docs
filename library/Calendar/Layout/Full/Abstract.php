@@ -157,11 +157,7 @@ abstract class Calendar_Layout_Full_Abstract
                 /** @var Calendar_Api_Config_Record $record */
                 return array(
                     'id'   => $record->getId(),
-                    'name' => sprintf(
-                        "%s: %s",
-                        $record->getConnectorClass(),
-                        $record->getEventType()
-                    )
+                    'name' => $record->decodeConfig()->getLabel()
                 );
             }
         )->getAll();
