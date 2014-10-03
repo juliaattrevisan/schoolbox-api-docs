@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Config_Mapper
  *
@@ -14,55 +15,65 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
 {
 
     /**
-    * Mapping rules
-    *
-    * @return Bool|void
-    */
+     * Mapping rules
+     *
+     * @return Bool|void
+     */
     protected function mapping()
     {
         $this->hasTable('calendar_connector');
         $this->hasModel('Calendar_Api_Config_Record');
 
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
+        $this->hasMap(
+            array(
+                'column'     => 'id',
+                'property'   => 'id',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true
+            )
+        );
 
-        $this->hasMap(array(
-            'column'     => 'event_type',
-            'property'   => 'eventType',
-            'type'       => self::TYPE_STRING,
-        ));
+        $this->hasMap(
+            array(
+                'column'   => 'event_type',
+                'property' => 'eventType',
+                'type'     => self::TYPE_STRING,
+            )
+        );
 
-        $this->hasMap(array(
-            'column'     => 'connector_class',
-            'property'   => 'connectorClass',
-            'type'       => self::TYPE_STRING,
-        ));
+        $this->hasMap(
+            array(
+                'column'   => 'connector_class',
+                'property' => 'connectorClass',
+                'type'     => self::TYPE_STRING,
+            )
+        );
 
-        $this->hasMap(array(
-            'column'     => 'config',
-            'property'   => 'config',
-            'type'       => self::TYPE_STRING,
-        ));
+        $this->hasMap(
+            array(
+                'column'   => 'config',
+                'property' => 'config',
+                'type'     => self::TYPE_STRING,
+            )
+        );
 
-        $this->hasMap(array(
-            'column'     => 'status',
-            'property'   => 'status',
-            'type'       => self::TYPE_INTEGER,
-        ));
+        $this->hasMap(
+            array(
+                'column'   => 'status',
+                'property' => 'status',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
     }
 
     /**
-    * Return a set of config records being used
-    *
-    * Un-uniqueified because this was ramming all vCal sources into the same
-    * connector, and they should be unique (for filtering by source).
-    *
-    * @return \Schoolbox\Collection
-    */
+     * Return a set of config records being used
+     *
+     * Un-uniqueified because this was ramming all vCal sources into the same
+     * connector, and they should be unique (for filtering by source).
+     *
+     * @return \Schoolbox\Collection
+     */
     public function getAllConfigRecords()
     {
         return $this->findByColumn('status', 1);
@@ -77,7 +88,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      */
     public function getSourceListForCalendar()
     {
-        $configs = $this->getAllConfigRecords();
+        $configs    = $this->getAllConfigRecords();
         $sourceList = $configs->map(
             function ($record) {
                 /** @var Calendar_Api_Config_Record $record */
@@ -91,11 +102,11 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
         // Multiple sources can have identical names - join their IDs together.
         $sourceList = array_reduce(
             $sourceList,
-            function($carry, $item) {
+            function ($carry, $item) {
                 $id   = $item['id'];
                 $name = $item['name'];
                 if (!array_key_exists($name, $carry)) {
-                    $carry[$name] = $item;
+                    $carry[$name]       = $item;
                     $carry[$name]['id'] = array();
                 }
                 $carry[$name]['id'][] = $id;
@@ -106,7 +117,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
 
         // Join the IDs for each source together.
         $sourceList = array_map(
-            function($v) {
+            function ($v) {
                 $v['id'] = implode(',', $v['id']);
                 return $v;
             },
@@ -116,19 +127,22 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-    * Return a set of decoded config objects for the specified event_type and connector_class
-    *
-    * @param $currentEventType
-    * @param $currentConnector
-    * @return array
-    */
+     * Return a set of decoded config objects for the specified event_type and connector_class
+     *
+     * @param $currentEventType
+     * @param $currentConnector
+     *
+     * @return array
+     */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
-        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
-            'event_type' => $currentEventType,
-            'connector_class' => $currentConnector,
-            'status' => 1
-        ));
+        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(
+            array(
+                'event_type'      => $currentEventType,
+                'connector_class' => $currentConnector,
+                'status'          => 1
+            )
+        );
 
         $allConfigs = array();
 
@@ -144,15 +158,15 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-    * Deactivate all configs (used when updating)
-    */
+     * Deactivate all configs (used when updating)
+     */
     public function deactivateAll()
     {
         $statement = $this->database->prepare(
             "
-			UPDATE `{$this->table}`
-			SET status = 0
-		"
+            UPDATE `{$this->table}`
+            SET status = 0
+        "
         );
 
         $statement->execute();
@@ -161,22 +175,22 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-    * Activate a particular connector
-    *
-    * @param $eventType
-    * @param $connectorClass
-    *
-    * @return \Calendar_Api_Config_Mapper
-    */
+     * Activate a particular connector
+     *
+     * @param $eventType
+     * @param $connectorClass
+     *
+     * @return \Calendar_Api_Config_Mapper
+     */
     public function activate($eventType, $connectorClass)
     {
         $statement = $this->database->prepare(
             "
-			UPDATE `{$this->table}`
-			SET status = 1
-			WHERE event_type = :eventType
-			AND connector_class = :connectorClass
-		"
+            UPDATE `{$this->table}`
+            SET status = 1
+            WHERE event_type = :eventType
+            AND connector_class = :connectorClass
+        "
         );
 
         $statement->bindParam(':eventType', $eventType);
@@ -188,34 +202,34 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-    * Generate a tree of EventType/Connector pairs
-    *
-    * @return array
-    */
+     * Generate a tree of EventType/Connector pairs
+     *
+     * @return array
+     */
     public function generateApiHierarchy()
     {
 
         /* Figger out which Event Types are around, and which Connectors
-		 * are available for each Event Type.
-		 */
+         * are available for each Event Type.
+         */
         $path = '../library/Calendar/Api/EventType';
 
         $allApi = array();
 
         /* Just get the dir names (these correspond to event types)
-		 */
+         */
         foreach (array_filter(glob("$path/*"), 'is_dir') as $dirname) {
             $eventTypeFilename = basename($dirname);
 
             /* Path to connectors
-			 */
+             */
             $subpath = "$path/$eventTypeFilename";
 
             foreach (array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
                 $connectorClassFilename = basename($subdirname);
 
                 /* Augment that array
-				 */
+                 */
                 $allApi[$eventTypeFilename][] = $connectorClassFilename;
             }
         }
@@ -224,9 +238,9 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-    * Some generic test values used to populate the calendar_connector table
-    * while developing the admin ui
-    */
+     * Some generic test values used to populate the calendar_connector table
+     * while developing the admin ui
+     */
     public function setupDefaults()
     {
         $start = 85;
