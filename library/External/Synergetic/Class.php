@@ -136,6 +136,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $this->database = $database;
     }
 
+    /**
+     * @return MSSQL
+     */
     private function getDatabase()
     {
         return $this->database;
@@ -162,17 +165,26 @@ class External_Synergetic_Class implements External_ClassInterface
 	 * @param $filetype
 	 * @return mixed
 	 */
-	public function findSubjectsWithFiletype($filetype) {
+	public function findSubjectsWithFiletype($filetype, $campusCode) {
 		$query = "
 			SELECT ClassCode
 			FROM SynergyOne.dbo.StudentClasses
-			WHERE FileType = '{$filetype}'
-			AND FileYear = '{$_SESSION['FileYear']}'
-			AND FileSemester = '{$_SESSION['FileSemester']}'
+			WHERE FileType = :type
+			AND FileYear = :year
+			AND FileSemester = :semester
+			-- AND ClassCampus IN :campusList
 			GROUP BY ClassCode
 			ORDER BY ClassCode
 		";
-
+        $query = strtr(
+            $query,
+            array(
+                ':type'     => "'".$this->getDatabase()->quote($filetype)."'",
+                ':year'     => "'".$this->getDatabase()->quote($_SESSION['FileYear'])."'",
+                ':semester' => "'".$this->getDatabase()->quote($_SESSION['FileSemester'])."'",
+//                ':campus'   => "'".$this->getDatabase()->quote($campusCode)."'",
+            )
+        );
 		return $this->getDatabase()->getAll($query);
 	}
 }
