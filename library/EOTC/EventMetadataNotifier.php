@@ -357,6 +357,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier {
 					}
 				}
 
+				// Tell everyone in the activity log that this event got cancelled
+				foreach ($relEvent->getMetadata()->getActivityLog() as $log) {
+					/** @var \EOTC\ActivityLog\Log $log */
+					$envelope->targetToUser($log->getActioner()->getId(), $bob->build());
+				}
+
 				// in any case, the teacher in charge and applicant will be informed
 				$bob->setHref($hrefOwn);
 				foreach($ownerIds as $id) {
