@@ -289,12 +289,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.statuschanged")
             ->setSeverity(Logger::WARNING)
-            ->setParams(
-                array(
-                    'moderator' => new UserParam($effector),
-                    'event'     => new Param($relEventNote)
-                )
-            );
+            ->setParam('moderator', new UserParam($effector));
 
         $hrefMod = "/modules/eotc/status/modify/$relEventId";
         $hrefOwn = "/modules/eotc/manage/modify.php?eventID=$relEventId";
@@ -309,7 +304,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             case EventStatusMapper::STATUS_INPRINCIPLE:
                 $bob->setTitle(":moderator has approved :event in principle")
-                    ->setHref($hrefOwn);
+                    ->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
 
                 // tell applicant and TiC
                 foreach ($ownerIds as $userId) {
@@ -319,17 +315,20 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             case EventStatusMapper::STATUS_DETAILSCOMPLETED:
                 $bob->setTitle(":moderator has completed details for :event")
-                    ->setHref($hrefMod);
+                    ->setHref($hrefMod)
+                    ->setParam('event', new Param($relEventNote, $hrefMod));
                 break;
 
             case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
                 $bob->setTitle(":moderator has made :event ready for final approval")
-                    ->setHref($hrefMod);
+                    ->setHref($hrefMod)
+                    ->setParam('event', new Param($relEventNote, $hrefMod));
                 break;
 
             case EventStatusMapper::STATUS_APPROVED:
                 $bob->setTitle(":moderator has given final approval for :event")
-                    ->setHref($hrefOwn);
+                    ->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
 
                 // tell applicant, TiC...
                 foreach ($ownerIds as $userId) {
@@ -337,7 +336,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 }
 
                 // ...relevant staff...
-                $bob->setHref($hrefReg);
+                $bob->setHref($hrefReg)
+                    ->setParam('event', new Param($relEventNote, $hrefReg));
                 foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
@@ -350,14 +350,16 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 // in this case, tell. freaking. everybody.
                 if ($oldStatus == EventStatusMapper::STATUS_APPROVED) {
                     // tell relevant staff
-                    $bob->setHref($hrefReg);
+                    $bob->setHref($hrefReg)
+                        ->setParam('event', new Param($relEventNote, $hrefReg));
                     foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                         $envelope->targetToUser($userId, $bob->build());
                     }
 
                     // if RAMS, inform RAMS Approval Moderator(s)
                     if ($eventMetadata->getRamsRequired()) {
-                        $bob->setHref($hrefMod);
+                        $bob->setHref($hrefMod)
+                            ->setParam('event', new Param($relEventNote, $hrefMod));
 
                         $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
 
@@ -374,7 +376,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 }
                 // in any case, the teacher in charge and applicant will be informed.
                 // This includes Attendance Officer and Operations Officer.
-                $bob->setHref($hrefOwn);
+                $bob->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
                 foreach ($ownerIds as $id) {
                     $envelope->targetToUser($id, $bob->build());
                 }
@@ -386,7 +389,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $moderatorIds = $this->getInterestedUsers($relEvent, $newStatus);
 
         // inform them
-        $bob->setHref($hrefMod);
+        $bob->setHref($hrefMod)
+            ->setParam('event', new Param($relEventNote, $hrefMod));
         foreach ($moderatorIds as $modId) {
             $envelope->targetToUser($modId, $bob->build());
         }
