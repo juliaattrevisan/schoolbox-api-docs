@@ -206,7 +206,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // prep msg data
         $bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId");
-        $bob->setHref("/modules/eotc/status/modify/$relEventId");
+        $href = "/modules/eotc/status/modify/$relEventId";
 
         // change was made by applicant or TiC: inform moderators
         if ($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
@@ -214,15 +214,16 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         } // change was made by moderator (right?): inform applicant and TiC
         else {
             $inform = array($teacherInChargeId, $applicantId);
-            $bob->setHref("/modules/eotc/manage/modify.php?eventID=$relEventId");
+            $href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
         }
 
-        $bob->setParams(
-            array(
-                'user' => new UserParam($effector),
-                'note' => new Param($relEventNote)
+        $bob->setHref($href)
+            ->setParams(
+                array(
+                    'user' => new UserParam($effector),
+                    'note' => new Param($relEventNote, $href)
+                )
             )
-        )
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.updated")
