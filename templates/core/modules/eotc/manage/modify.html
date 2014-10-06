@@ -236,21 +236,19 @@
 						<input type="hidden" name="ramsRequired" value="0" />
                     <label><input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />RAMS Required?</label>
 
-						<ul class="listing">
+						<ul>
 							<!-- BEGIN rams_list -->
-							<li>
-								<span class="actions">
-									<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
-								</span>
-								<h4>
-									<img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />
-									{EVENT_RAMS_FILE}
-								</h4>
-								<input type="checkbox"
-									id="deleteRamsFile-{EVENT_RAMS_HASH}"
-									name="deleteRamsFile[{EVENT_RAMS_HASH}]"
-									value="1" />
-								<label for="deleteRamsFile-{EVENT_RAMS_HASH}">Delete?</label>
+							<li class="clearfix">
+								<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
+								<label class="float-right">
+									<input type="checkbox"
+										   id="deleteRamsFile-{EVENT_RAMS_HASH}"
+										   name="deleteRamsFile[{EVENT_RAMS_HASH}]"
+										   value="1" />
+									Delete?
+								</label>
+								<img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />
+								{EVENT_RAMS_FILE}
 							</li>
 							<!-- END rams_list -->
 						</ul>
