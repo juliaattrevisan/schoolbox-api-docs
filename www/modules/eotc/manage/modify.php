@@ -374,6 +374,10 @@ else if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$page->setVar(array(
 		'can_promote_in_principle_block' => ''
 	));
+
+	/* There's no RAMS rammed in yet either
+	 */
+	$page->setVar('rams_list_block', '');
 }
 /* Nobody else should be here
  */
