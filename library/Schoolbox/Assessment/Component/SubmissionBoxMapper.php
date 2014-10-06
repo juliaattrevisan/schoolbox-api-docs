@@ -315,8 +315,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
 			foreach ($statement as $row) {
 				$box_file     = $box_file_mapper->hydrate($row, 'sm');
-				$storage_file = $file_mapper->hydrate($row, 'f');
-				$storage_file->setMime($mime_mapper->hydrate($row, 'm'));
+				/** @var Schoolbox\Storage $storage_file */
+                $storage_file = $file_mapper->hydrate($row, 'f');
+				$storage_file->setMimetype($mime_mapper->hydrate($row, 'm'));
 				$box_file->setFile($storage_file);
 				$submission_box->addFileLink($box_file);
 
