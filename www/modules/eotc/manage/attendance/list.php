@@ -15,8 +15,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 	try {
 		$event = $eventMapper->findById($this->arg[0]);
-	}
-	catch (\Exception $e) {
+    } catch (\Exception $e) {
 		error(160);
 	}
 
@@ -26,16 +25,16 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 	$this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 
-	$eventCampusCodes = array();
-	foreach ($event->getCampusCollection() as $campus) {
-		$eventCampusCodes[] = $campus->getExtTimetableCode();
-	}
-	$this->setVar(array(
-		'EVENT_ID' => $event->getId(),
-		'EVENT_NAME' => $event->getTitle(),
-		'EVENT_CAMPUS_CODES' => json_encode($eventCampusCodes),
-		'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
-	));
+    $eventCampusCodes = array();
+    foreach ($event->getCampusCollection() as $campus) {
+        $eventCampusCodes[] = $campus->getExtTimetableCode();
+    }
+    $this->setVar(array(
+        'EVENT_ID' => $event->getId(),
+        'EVENT_NAME' => $event->getTitle(),
+        'EVENT_CAMPUS_CODES' => json_encode($eventCampusCodes),
+        'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
+    ));
 
 	$externalHandler = new \External_Synergetic_Class();
 	$allFiletypes = $externalHandler->findFiletypes();
@@ -66,13 +65,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			$this->parse('student_attendee_block', 'student_attendee', true);
 		}
-	}
-	else {
+    } else {
 		$this->setVar(array(
 			'student_attendee_block' => ''
 		));
 	}
-}
-else {
+} else {
 	error(19);
 }
