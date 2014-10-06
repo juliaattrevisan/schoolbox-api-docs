@@ -56,7 +56,7 @@ class CollectorFactory {
         $dav     = PortfolioWebDAV::factory();
         $conf    = new Loader();
 
-        $storer  = $mapper ?: $this->storage;
+        $storer  = $mapper ?: $storage;
 
         $this->add(NodeFactory::STORE, function () use ($storage, $storer) {
             return new StorageHandler($storage, $storer);
