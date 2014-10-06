@@ -172,20 +172,28 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 * the checkbox setting declares that one must exist
 			 */
 			if ($event->getMetadata()->getRamsRequired()) {
-
-				/* A RAMS file was uploaded; replace all existing ones
-				 */
-				if (strlen($_FILES['ramsFile']['name'])) {
-
-					/* Empty old RAMS objects and put the new one in
-					 */
-					$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload($_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
-
-					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
-					$event->getMetadata()->getRamsFiles()->add($ramsFile);
+				// Delete files that are checked, preserve ones that aren't
+				$ramsFiles = new \Schoolbox\Collection();
+				foreach ($event->getMetadata()->getRamsFiles() as $existingFile) {
+					if (empty($_POST['deleteRamsFile'][$existingFile->getHash()])) {
+						$ramsFiles->add($existingFile);
+					}
 				}
-				/* Otherwise just keep the current RAMS file
-				 */
+				if (!empty($_FILES['ramsFile'])) {
+					// Upload new files
+					// php wy u do fials liek dis
+					foreach ($_FILES['ramsFile']['name'] as $i => $fileName) {
+						if ($_FILES['ramsFile']['error'][$i] === UPLOAD_ERR_OK) {
+							$newFile = \Schoolbox\StorageMapper::getInstance()->upload(
+								$fileName,
+								$_FILES['ramsFile']['tmp_name'][$i],
+								$author->getId()
+							);
+							$ramsFiles->add($newFile);
+						}
+					}
+				}
+				$event->getMetadata()->setRamsFiles($ramsFiles);
 			}
 			/* RAMS file not needed - remove all existing ones
 			 */

@@ -218,7 +218,15 @@
 								<span class="actions">
 									<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
 								</span>
-								<h4><img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}</h4>
+								<h4>
+									<img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />
+									{EVENT_RAMS_FILE}
+								</h4>
+								<input type="checkbox"
+									id="deleteRamsFile-{EVENT_RAMS_HASH}"
+									name="deleteRamsFile[{EVENT_RAMS_HASH}]"
+									value="1" />
+								<label for="deleteRamsFile-{EVENT_RAMS_HASH}">Delete?</label>
 							</li>
 							<!-- END rams_list -->
 						</ul>
