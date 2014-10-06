@@ -8,14 +8,17 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
+use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
+use Schoolbox\File\Exception as FileException;
+use Schoolbox\FileInterface;
 
-class SubmissionMapper extends Schoolbox\Mapper {
+class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface {
 
 	protected function mapping () {
 		$this->hasTable('student_submission');
@@ -346,5 +349,40 @@ class SubmissionMapper extends Schoolbox\Mapper {
         }
         return $return;
     }
+
+
+    /**
+     * Convenience method for creating and saving a file via this mapper.
+     *
+     * @param string $filename     the file's name.
+     * @param string $tempLocation the location of the file to save.
+     * @param int    $userId       the user to associate with the file.
+     * @throws FileException       if the upload was not allowed.
+     * @return FileInterface
+     */
+    public function upload($filename, $tempLocation, $userId)
+    {
+        $submission = new Submission();
+
+        $submission
+            ->setFilename($filename)
+            ->setTempLocation($tempLocation)
+            ->setSubmitted(Alaress_Date_Format::now())
+            ->loadMimetypeFromFilename()
+            ->setFilesize($submission->getFilesizeFromPath());
+
+        if (!$submission->getMimetype()->isEnabled()) {
+            throw new FileException('Invalid mime type', FileException::CODE_MIMETYPE_NOT_FOUND);
+        }
+
+        if ($submission->getMimetype()->getMaxFileSize() < $submission->getFilesize()) {
+            throw new FileException('File too large', FileException::CODE_FILE_TOO_LARGE);
+        }
+
+        // TODO the record really SHOULD be saved here; but we don't have access to the box ID...
+
+        return $submission;
+    }
+
 }
 
