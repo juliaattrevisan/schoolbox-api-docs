@@ -36,6 +36,9 @@ class Zone {
     /** @var string */
     protected $mimeFilter;
 
+    /** @var bool */
+    protected $multi;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -47,6 +50,7 @@ class Zone {
     {
         $this->id       = $zoneId;
         $this->size     = 32;
+        $this->multi    = false;
         $this->text     = array(
             'attachPrompt'     => 'Attach files',
             'attachmentsLabel' => 'Attachments',
@@ -130,6 +134,15 @@ class Zone {
 
 
     /**
+     * @param bool $multi
+     */
+    public function setMulti($multi)
+    {
+        $this->multi = $multi;
+    }
+
+
+    /**
      * @param \SitePage $page
      * @param string $varname
      */
@@ -156,6 +169,7 @@ class Zone {
             'AZ_ATTACHMENTS_LABEL' => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
             'AZ_MODAL_TITLE'       => $this->text['modalTitle'],
             'AZ_MIME_FILTER'       => $filter,
+            'AZ_MULTI'             => $this->multi ? 'true' : 'false',
 
             'attachment_list_block' => '',
         ));
