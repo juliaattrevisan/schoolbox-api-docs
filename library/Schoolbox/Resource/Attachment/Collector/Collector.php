@@ -30,7 +30,7 @@ class Collector
 
 
     /**
-     * @param array $source
+     * @param array $source - in the form $source[$type][$i] = $id
      * @param TypeHandlerInterface[] $handlers
      */
     public function __construct($source, $handlers)
@@ -47,9 +47,14 @@ class Collector
      */
     public function getFirst($filter = self::TYPE_ALL)
     {
-        foreach (array_keys($this->source) as $index) {
-            if ($result = $this->get($index, $filter)) {
-                return $result;
+        foreach ($this->source as $type => $ids) {
+            if (!$type & $filter) {
+                continue;
+            }
+            foreach ($ids as $id) {
+                if($result = $this->get($type, $id)) {
+                    return $result;
+                }
             }
         }
         throw new ResourceException("Could not find a matching resource");
@@ -64,9 +69,14 @@ class Collector
     {
         $result = array();
 
-        foreach (array_keys($this->source) as $index) {
-            if ($r = $this->get($index, $filter)) {
-                $result[] = $r;
+        foreach ($this->source as $type => $ids) {
+            if(!$type & $filter) {
+                continue;
+            }
+            foreach ($ids as $id) {
+                if($r = $this->get($type, $id)) {
+                    $result[] = $r;
+                }
             }
         }
 
@@ -75,34 +85,18 @@ class Collector
 
 
     /**
-     * @param int $i
-     * @param int $filter
+     * @param int $type
+     * @param string $id
      * @return FileInterface
      */
-    protected function get($i, $filter = self::TYPE_ALL)
+    protected function get($type, $id)
     {
-        $type = $this->detectType($this->source[$i]);
 
-        if (empty($this->handlers[$type]) || !($type & $filter)) {
+        if (empty($this->handlers[$type])) {
             return null;
         }
 
-        return $this->handlers[$type]->fetch($this->source[$i]);
-    }
-
-
-    /**
-     * @param string $id
-     * @return int
-     */
-    public function detectType($id)
-    {
-        foreach ($this->handlers as $type => $handler) {
-            if ($handler->matches($id)) {
-                return (int)$type;
-            }
-        }
-        return 0;
+        return $this->handlers[$type]->fetch($id);
     }
 
 } 

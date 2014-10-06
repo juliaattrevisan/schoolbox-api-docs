@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
+use InvalidArgumentException;
 use PortfolioWebDAV;
 use Schoolbox\Config\Loader;
 use Schoolbox\MyFileMapper;
@@ -38,6 +39,8 @@ class CollectorFactory {
     /** @var Loader */
     protected $conf;
 
+    /** @var callable[] */
+    protected $loaders;
 
     /**
      * The mapper passed in here defines the model that will be returned by self->build()->get*();
@@ -47,13 +50,55 @@ class CollectorFactory {
      */
     public function __construct(StorageMapperInterface $mapper = null)
     {
-        $this->storage = StorageMapper::getInstance();
-        $this->file    = FileMapper::getInstance();
-        $this->myFile  = MyFileMapper::getInstance();
-        $this->dav     = PortfolioWebDAV::factory();
-        $this->conf    = new Loader();
+        $storage = StorageMapper::getInstance();
+        $file    = FileMapper::getInstance();
+        $myFile  = MyFileMapper::getInstance();
+        $dav     = PortfolioWebDAV::factory();
+        $conf    = new Loader();
 
-        $this->storer  = $mapper ?: $this->storage;
+        $storer  = $mapper ?: $this->storage;
+
+        $this->add(NodeFactory::STORE, function () use ($storage, $storer) {
+            return new StorageHandler($storage, $storer);
+        });
+
+        $this->add(NodeFactory::SBFS, function () use ($conf, $file, $storer) {
+            return new FileSystemHandler(NodeFactory::SBFS, $conf->get('file_dir'), $file, $storer);
+        });
+
+        $this->add(NodeFactory::MYFILE, function () use ($conf, $myFile, $storer) {
+            return new FileSystemHandler(NodeFactory::MYFILE, $conf->get('myfile_dir'), $myFile, $storer);
+        });
+
+        $this->add(NodeFactory::WEBDAV, function () use ($dav, $storer) {
+            return new ExternalFileSystemHandler(NodeFactory::WEBDAV, $dav, $dav, $storer); // yup. totally passed it in twice
+        });
+    }
+
+
+    /**
+     * @param string $type
+     * @param callable $lazyload
+     */
+    protected function add($type, $lazyload) {
+        if (is_callable($lazyload)) {
+            $this->loaders[$type] = $lazyload;
+        }
+    }
+
+
+    /**
+     * @param string $type
+     * @throws InvalidArgumentException
+     * @return TypeHandlerInterface
+     */
+    protected function get($type)
+    {
+        if(empty($this->loaders[$type])) {
+            throw new InvalidArgumentException("Loader for '$type' not defined.");
+        }
+
+        return call_user_func($this->loaders[$type]);
     }
 
 
@@ -65,12 +110,36 @@ class CollectorFactory {
      */
     public function build(array $attachments)
     {
-        return new Collector($attachments, array(
-            Collector::TYPE_STORAGE => new StorageHandler($this->storage, $this->storer),
-            Collector::TYPE_SBFS    => new FileSystemHandler(NodeFactory::SBFS, $this->conf->get('file_dir'), $this->file, $this->storer),
-            Collector::TYPE_MYFILE  => new FileSystemHandler(NodeFactory::MYFILE, $this->conf->get('myfile_dir'), $this->myFile, $this->storer),
-            Collector::TYPE_WEBDAV  => new ExternalFileSystemHandler(NodeFactory::WEBDAV, $this->dav, $this->dav, $this->storer) // yup. totally passed it in twice
-        ));
+        $handlers = array();
+
+        $map = array(
+            NodeFactory::STORE  => Collector::TYPE_STORAGE,
+            NodeFactory::SBFS   => Collector::TYPE_SBFS,
+            NodeFactory::MYFILE => Collector::TYPE_MYFILE,
+            NodeFactory::WEBDAV => Collector::TYPE_WEBDAV
+        );
+
+        $indexedAttachments = array();
+
+        // detect which handlers we are going to need and lazy them in
+        foreach ($attachments as $attachment) {
+            $xpl = explode(':', $attachment, 2);
+
+            // check valid count
+            if(count($xpl) != 2) {
+                continue;
+            }
+
+            $mapped = $map[$xpl[0]];
+
+            if(empty($handlers[$xpl[0]])) {
+                $handlers[$mapped] = $this->get($xpl[0]);
+            }
+
+            $indexedAttachments[$mapped][] = $xpl[1];
+        }
+
+        return new Collector($indexedAttachments, $handlers);
     }
 
 }
