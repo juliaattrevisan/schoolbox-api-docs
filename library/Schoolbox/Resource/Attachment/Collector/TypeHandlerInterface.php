@@ -16,13 +16,6 @@ interface TypeHandlerInterface {
 
     /**
      * @param string $id
-     * @return bool
-     */
-    public function matches($id);
-
-
-    /**
-     * @param string $id
      * @return FileInterface
      */
     public function fetch($id);

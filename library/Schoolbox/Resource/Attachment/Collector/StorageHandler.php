@@ -32,15 +32,6 @@ class StorageHandler implements TypeHandlerInterface {
         $this->storer = $storer;
     }
 
-    /**
-     * @param string $id
-     * @return bool
-     */
-    public function matches($id)
-    {
-        return preg_match('`^[0-9a-f]{40}$`i', $id);
-    }
-
 
     /**
      * @param string $id

@@ -44,7 +44,7 @@ class ExternalFileSystemHandler extends FileSystemHandler {
      */
     public function fetch($id)
     {
-        $file = $this->locator->findById($this->extractFileId($id));
+        $file = $this->locator->findById($id);
 
         if (!$file instanceof FileInterface) {
             throw new Resource\Exception("Invalid type: resource is folder, not file", Resource\Exception::CODE_UNKNOWN);

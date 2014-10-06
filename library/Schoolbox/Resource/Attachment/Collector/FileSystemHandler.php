@@ -44,26 +44,6 @@ class FileSystemHandler implements TypeHandlerInterface {
 
 
     /**
-     * @param string $id
-     * @return bool
-     */
-    public function matches($id)
-    {
-        return strpos($id, $this->prefix) === 0;
-    }
-
-
-    /**
-     * @param string $name
-     * @return string
-     */
-    protected function extractFileId($name)
-    {
-        return substr($name, strlen($this->prefix) + 3);
-    }
-
-
-    /**
      * TODO for now, we are simply copying resources from SBFS to Storage. Upgrade by intelligently linking through to storage
      *
      * @param string $id
@@ -72,7 +52,7 @@ class FileSystemHandler implements TypeHandlerInterface {
      */
     public function fetch($id)
     {
-        $file = $this->locator->findById($this->extractFileId($id));
+        $file = $this->locator->findById($id);
 
         $pattern  = $this->dir . '/%d.dat';
         $filename = $file->getFilename();
