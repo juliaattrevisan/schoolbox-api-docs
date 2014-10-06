@@ -33,17 +33,17 @@ class External_Synergetic_Class implements External_ClassInterface
      * @param $classCode
      * @return mixed
      */
-    public function getClass($classCode) {
+    public function getClass($classCode)
+    {
 
-        if(strpos($classCode, '/') !== FALSE ) {
-            $codeArray = explode('/',$classCode);
+        if (strpos($classCode, '/') !== false) {
+            $codeArray = explode('/', $classCode);
             $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) ";
-        }
-        else {
+        } else {
             $classQuery .= "ClassCode = '$classCode'";
         }
 
-		$query = "
+        $query = "
 			SELECT *
 			FROM SynergyOne.dbo.SubjectClasses
 			WHERE $classQuery
@@ -51,26 +51,24 @@ class External_Synergetic_Class implements External_ClassInterface
 			AND FileSemester='" . $_SESSION['FileSemester'] . "'
 		";
 
-		return $this->getDatabase()->getRow($query);
-	}
+        return $this->getDatabase()->getRow($query);
+    }
 
     public function getStudents($subCode)
     {
-	    if(!$subCode) {
-		    /* Dont bother if you got no code */
-		    return false;
-	    }
+        if (!$subCode) {
+         /* Dont bother if you got no code */
+            return false;
+        }
 
         $classQuery = '(';
 
-	    $subCodeArray = explode(',', $subCode);
+        $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
-
-            if(strpos($code, '/') !== FALSE ) {
-                $codeArray = explode('/',$code);
+            if (strpos($code, '/') !== false) {
+                $codeArray = explode('/', $code);
                 $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
-            }
-            else {
+            } else {
                 $classQuery .= "ClassCode = '$code' OR ";
             }
         }
@@ -104,12 +102,10 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery = '(';
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
-
-            if(strpos($code, '/') !== FALSE ) {
-                $codeArray = explode('/',$code);
+            if (strpos($code, '/') !== false) {
+                $codeArray = explode('/', $code);
                 $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
-            }
-            else {
+            } else {
                 $classQuery .= "ClassCode = '$code' OR ";
             }
         }
@@ -144,37 +140,38 @@ class External_Synergetic_Class implements External_ClassInterface
         return $this->database;
     }
 
-	/**
-	 * Get all the filetypes in Synergetic
-	 *
-	 * @return mixed
-	 */
-	public function findFiletypes() {
-		$query = "
+    /**
+    * Get all the filetypes in Synergetic
+    *
+    * @return mixed
+    */
+    public function findFiletypes()
+    {
+        $query = "
 			SELECT *
 			FROM SynergyOne.dbo.luFileType
 			WHERE Code != ''
 		";
+        return $this->getDatabase()->getAll($query);
+    }
 
-		return $this->getDatabase()->getAll($query);
-	}
-
-	/**
-	 * Get all the subjects with a particular filetype
-	 *
-	 * @param string $filetype
-	 * @param array $timetableCode
-	 * @return mixed
-	 */
-	public function findSubjectsWithFiletype($filetype, $timetableCode) {
-		$database = $this->getDatabase();
-		$params = array(
-			':type'     => "'".$database->quote($filetype)."'",
-			':year'     => "'".$database->quote($_SESSION['FileYear'])."'",
-			':semester' => "'".$database->quote($_SESSION['FileSemester'])."'",
-		);
-		if (empty($timetableCode)) {
-			$query = "
+    /**
+    * Get all the subjects with a particular filetype
+    *
+    * @param string $filetype
+    * @param array $timetableCode
+    * @return mixed
+    */
+    public function findSubjectsWithFiletype($filetype, $timetableCode)
+    {
+        $database = $this->getDatabase();
+        $params = array(
+         ':type'     => "'".$database->quote($filetype)."'",
+         ':year'     => "'".$database->quote($_SESSION['FileYear'])."'",
+         ':semester' => "'".$database->quote($_SESSION['FileSemester'])."'",
+        );
+        if (empty($timetableCode)) {
+            $query = "
 				SELECT ClassCode
 				FROM SynergyOne.dbo.StudentClasses
 				WHERE FileType = :type
@@ -183,8 +180,8 @@ class External_Synergetic_Class implements External_ClassInterface
 				GROUP BY ClassCode
 				ORDER BY ClassCode
 			";
-		} else {
-			$query = "
+        } else {
+            $query = "
 				SELECT sc.ClassCode
 				FROM SynergyOne.dbo.StudentClasses sc
 				INNER JOIN SynergyOne.dbo.Timetable t on sc.ClassCampus = t.ClassCampus
@@ -195,17 +192,17 @@ class External_Synergetic_Class implements External_ClassInterface
 				GROUP BY sc.ClassCode
 				ORDER BY sc.ClassCode
 			";
-			$params[':campusList'] = implode(
-				',',
-				array_map(
-					function($code) use($database) {
-						return "'".$database->quote($code)."'";
-					},
-					$timetableCode
-				)
-			);
-		}
-		$query = strtr($query, $params);
-		return $this->getDatabase()->getAll($query);
-	}
+            $params[':campusList'] = implode(
+                ',',
+                array_map(
+                    function($code) use ($database) {
+                    return "'".$database->quote($code)."'";
+                    },
+                    $timetableCode
+                )
+            );
+        }
+        $query = strtr($query, $params);
+        return $this->getDatabase()->getAll($query);
+    }
 }
