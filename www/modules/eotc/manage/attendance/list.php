@@ -26,14 +26,14 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 	$this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 
-	$eventCampusIds = array();
+	$eventCampusCodes = array();
 	foreach ($event->getCampusCollection() as $campus) {
-		$eventCampusIds[] = $campus->getId();
+		$eventCampusCodes[] = $campus->getExtTimetableCode();
 	}
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getTitle(),
-		'EVENT_CAMPUS_IDS' => json_encode($eventCampusIds),
+		'EVENT_CAMPUS_CODES' => json_encode($eventCampusCodes),
 		'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
 	));
 
