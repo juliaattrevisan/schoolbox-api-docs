@@ -387,7 +387,7 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
      * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
      *                           any access level.
      *
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\Collection|Category[]
      */
     public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ)
     {

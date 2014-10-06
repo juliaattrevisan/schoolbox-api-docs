@@ -348,10 +348,10 @@ class Storage implements FileInterface {
 
 
     /**
-     * Returns the title (not filename) of the file
+     * Returns the owner/uploader of the file
      *
      * @alias getUploadedBy
-     * @return string
+     * @return User
      */
     public function getOwner()
     {

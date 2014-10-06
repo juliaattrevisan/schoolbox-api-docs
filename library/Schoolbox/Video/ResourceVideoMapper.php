@@ -213,7 +213,13 @@ class ResourceVideoMapper extends Mapper {
 		return $videoList;
 	}
 
-	public function findByFileId($id) {
+
+    /**
+     * @param $id
+     * @return ResourceVideo
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findByFileId($id) {
 		$fileMapper = new \Schoolbox\Resource\FileMapper;
 
 		$statement = $this->database->prepare( "
@@ -241,7 +247,7 @@ class ResourceVideoMapper extends Mapper {
 	 * Find a video in the MyFile table
 	 *
 	 * @param $id
-	 * @return null|object
+	 * @return ResourceVideo
 	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	public function findByMyFileId($id) {
@@ -335,7 +341,7 @@ class ResourceVideoMapper extends Mapper {
 	 * Gets a video for a submission, regardless of the video's processing status
 	 *
 	 * @param $id
-	 * @return null|object
+	 * @return ResourceVideo
 	 * @throws \Schoolbox\Mapper\Exception
 	 */
 	public function findBySubmissionId($id) {
