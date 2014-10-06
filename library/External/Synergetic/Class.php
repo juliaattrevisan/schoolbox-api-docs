@@ -162,29 +162,50 @@ class External_Synergetic_Class implements External_ClassInterface
 	/**
 	 * Get all the subjects with a particular filetype
 	 *
-	 * @param $filetype
+	 * @param string $filetype
+	 * @param array $timetableCode
 	 * @return mixed
 	 */
-	public function findSubjectsWithFiletype($filetype, $campusCode) {
-		$query = "
-			SELECT ClassCode
-			FROM SynergyOne.dbo.StudentClasses
-			WHERE FileType = :type
-			AND FileYear = :year
-			AND FileSemester = :semester
-			-- AND ClassCampus IN :campusList
-			GROUP BY ClassCode
-			ORDER BY ClassCode
-		";
-        $query = strtr(
-            $query,
-            array(
-                ':type'     => "'".$this->getDatabase()->quote($filetype)."'",
-                ':year'     => "'".$this->getDatabase()->quote($_SESSION['FileYear'])."'",
-                ':semester' => "'".$this->getDatabase()->quote($_SESSION['FileSemester'])."'",
-//                ':campus'   => "'".$this->getDatabase()->quote($campusCode)."'",
-            )
-        );
+	public function findSubjectsWithFiletype($filetype, $timetableCode) {
+		$database = $this->getDatabase();
+		$params = array(
+			':type'     => "'".$database->quote($filetype)."'",
+			':year'     => "'".$database->quote($_SESSION['FileYear'])."'",
+			':semester' => "'".$database->quote($_SESSION['FileSemester'])."'",
+		);
+		if (empty($timetableCode)) {
+			$query = "
+				SELECT ClassCode
+				FROM SynergyOne.dbo.StudentClasses
+				WHERE FileType = :type
+				AND FileYear = :year
+				AND FileSemester = :semester
+				GROUP BY ClassCode
+				ORDER BY ClassCode
+			";
+		} else {
+			$query = "
+				SELECT sc.ClassCode
+				FROM SynergyOne.dbo.StudentClasses sc
+				INNER JOIN SynergyOne.dbo.Timetable t on sc.ClassCampus = t.ClassCampus
+				WHERE sc.FileType = :type
+				AND sc.FileYear = :year
+				AND sc.FileSemester = :semester
+				AND t.TimetableGroup IN (:campusList)
+				GROUP BY sc.ClassCode
+				ORDER BY sc.ClassCode
+			";
+			$params[':campusList'] = implode(
+				',',
+				array_map(
+					function($code) use($database) {
+						return "'".$database->quote($code)."'";
+					},
+					$timetableCode
+				)
+			);
+		}
+		$query = strtr($query, $params);
 		return $this->getDatabase()->getAll($query);
 	}
 }
