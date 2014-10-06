@@ -11,10 +11,9 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
-use Schoolbox\Resource\Exception;
-use \External_User;
 
 class SubmissionMapper extends Schoolbox\Mapper {
 
@@ -299,6 +298,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Port of SubmissionStudent handler's securityCheck() method.
 	 *
+     * @deprecated this method belongs in SubmissionBoxMapper
 	 * @throws Schoolbox\Resource\Exception
 	 *
 	 * @param Submission $submission
@@ -307,66 +307,10 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	 */
 	public function checkUploadability(Submission $submission) {
 
-		//
-		// Are online submissions accepted?
-		$submission_box = $submission->getSubmissionBox();
-		if (!$submission_box->getAcceptOnline()) {
-			throw new Exception(
-				'This submission box does not accept online submission.',
-				Exception::CODE_NO_ONLINE_SUBMISSION
-			);
-		}
+        /** @var SubmissionBoxMapper $boxMapper */
+        $boxMapper = $this->getJoinMapper('submission_box');
 
-		//
-		// Does a (non-draft) submission already exist for this student?
-		$box_id          = $submission->getSubmissionBox()->getId();
-		$user_id         = $submission->getOwner()->getId();
-		$count_statement = $this->database->prepare(
-			"SELECT id FROM {$this->getTable()} WHERE box_id=? AND owner=? AND draft IS FALSE"
-		);
-		$count_statement->execute(array($box_id, $user_id));
-		$submitted = ($count_statement->rowCount() > 0);
-		if ($submitted && !$submission_box->getAcceptMultiple()) {
-			throw new Exception(
-				'This submission box does not accept multiple submissions.',
-				Exception::CODE_NO_MULTIPLE_SUBMISSION
-			);
-		}
-
-		//
-		// Is the submission late (after overdue time)?
-		$now = new \DateTime('now');
-		if ($submission_box->getLateDate()->getUnixTimestamp() < $now->getTimestamp()) {
-			throw new Exception(
-				'This submission box no longer accepts submissions.',
-				Exception::CODE_SUBMISSION_CLOSED
-			);
-		}
-
-		//
-		// Is the student involved in this group?
-		// (Need much better checking than this, this abuses session variables)
-		$cat_mapper = $this->getJoinMapper('submission_box')->getJoinMapper('category');
-		$cat_mapper->setExternalUser(new External_User());
-		$categories = array();
-		foreach ($cat_mapper->findForUser($submission->getOwner(), true) as $cat) {
-			$categories[] = $cat->getId();
-		}
-		if (!in_array($submission_box->getCategory()->getId(), $categories)) {
-			//
-			// 403 forbidden error
-			throw new Exception('Access denied', Exception::CODE_ACCESS_DENIED);
-		}
-
-		//
-		// Is the submission early (before open time)?
-		if ($submission_box->getOpenDate()->getUnixTimestamp() > $now->getTimestamp()) {
-			throw new Exception(
-				'This submission box does not accept submissions yet.',
-				Exception::CODE_SUBMISSION_NOT_YET_OPEN
-			);
-		}
-		return true;
+        $boxMapper->checkUploadability($submission->getSubmissionBox(), $submission->getOwner());
 	}
 
     /**

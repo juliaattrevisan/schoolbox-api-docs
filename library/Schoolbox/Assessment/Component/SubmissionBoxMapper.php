@@ -953,4 +953,73 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 		return $c;
 	}
 
+    /**
+     * Port of SubmissionStudent handler's securityCheck() method.
+     *
+     * @throws Schoolbox\Resource\Exception
+     *
+     * @param SubmissionBox $box
+     * @param User          $user
+     *
+     * @return bool
+     */
+    public function checkUploadability(SubmissionBox $box, User $user)
+    {
+        // Are online submissions accepted?
+        if (!$box->getAcceptOnline()) {
+            throw new Schoolbox\Resource\Exception(
+                'This submission box does not accept online submission.',
+                Schoolbox\Resource\Exception::CODE_NO_ONLINE_SUBMISSION
+            );
+        }
+
+        // Does a (non-draft) submission already exist for this student?
+        $boxId  = $box->getId();
+        $userId = $user->getId();
+        $stmt   = $this->database->prepare(
+            "SELECT id FROM `student_submission` WHERE box_id=? AND owner=? AND draft IS FALSE"
+        );
+        $stmt->execute(array($boxId, $userId));
+        $submitted = ($stmt->rowCount() > 0);
+        if ($submitted && !$box->getAcceptMultiple()) {
+            throw new Schoolbox\Resource\Exception(
+                'This submission box does not accept multiple submissions.',
+                Schoolbox\Resource\Exception::CODE_NO_MULTIPLE_SUBMISSION
+            );
+        }
+
+        // Is the submission late (after overdue time)?
+        $now = new \DateTime('now');
+        if ($box->getLateDate()->getUnixTimestamp() < $now->getTimestamp()) {
+            throw new Schoolbox\Resource\Exception(
+                'This submission box no longer accepts submissions.',
+                Schoolbox\Resource\Exception::CODE_SUBMISSION_CLOSED
+            );
+        }
+
+        // Is the student involved in this group?
+        // (Need much better checking than this, this abuses session variables)
+
+        /** @var Schoolbox\Resource\CategoryMapper $catMap */
+        $catMap = $this->getJoinMapper('category');
+        $catMap->setExternalUser(new \External_User());
+        $categories = array();
+        foreach ($catMap->findForUser($user, true) as $cat) {
+            $categories[] = $cat->getId();
+        }
+        if (!in_array($box->getCategory()->getId(), $categories)) {
+            // 403 forbidden error
+            throw new Schoolbox\Resource\Exception('Access denied', Schoolbox\Resource\Exception::CODE_ACCESS_DENIED);
+        }
+
+        // Is the submission early (before open time)?
+        if ($box->getOpenDate()->getUnixTimestamp() > $now->getTimestamp()) {
+            throw new Schoolbox\Resource\Exception(
+                'This submission box does not accept submissions yet.',
+                Schoolbox\Resource\Exception::CODE_SUBMISSION_NOT_YET_OPEN
+            );
+        }
+        return true;
+    }
+
 }
