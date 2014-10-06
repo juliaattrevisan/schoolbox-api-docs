@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\File\Mimetype;
 use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -54,7 +55,7 @@ class Submission implements FileInterface {
 	protected $late;
 
 	/**
-	 * @var AllowedFile
+	 * @var Mimetype
 	 */
 	protected $mimetype;
 
@@ -127,11 +128,11 @@ class Submission implements FileInterface {
 	 * @return bool|int
 	 */
 	public function getFilesizeFromPath() {
-		if (($location = $this->getFileLocation()) !== false) {
-			if (file_exists($location)) {
-				return filesize($location);
-			}
-		}
+        // try for file location first, or if not yet "saved", try the temp location
+        $location = $this->getFileLocation() ?: $this->getTempLocation();
+        if ($location !== false && file_exists($location)) {
+            return filesize($location);
+        }
 		return false;
 	}
 
@@ -253,7 +254,7 @@ class Submission implements FileInterface {
 	}
 
 	/**
-	 * @param \Schoolbox\File\Mimetype $mimetype
+	 * @param Mimetype $mimetype
 	 *
 	 * @return $this
 	 */
@@ -263,8 +264,7 @@ class Submission implements FileInterface {
 	}
 
 	/**
-     * This should be hydrated with the mime object
-     * @return \Schoolbox\File\Mimetype
+     * @return Mimetype
 	 */
 	public function getMimetype() {
 		return $this->mimetype;
