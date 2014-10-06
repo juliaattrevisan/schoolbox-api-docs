@@ -1,3 +1,14 @@
+/**
+ * Sets up a class code selector on the given element.
+ *
+ * The element this plugin is applied to provides a class code category.
+ *
+ * Parameters:
+ * * url: the URL to which the JSON call is made.
+ * * output: the select element to which class codes are output
+ * * campus: if provided, the class codes returned are restricted to this list.
+ *           Provided as a list of timetable codes.
+ */
 (function($) {
 	$.fn.externalClassCodes = function(options) {
 		options = options || {}
