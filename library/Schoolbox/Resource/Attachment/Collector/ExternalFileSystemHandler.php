@@ -13,9 +13,8 @@ namespace Schoolbox\Resource\Attachment\Collector;
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\FileInterface;
 use Schoolbox\Resource\FileLocatorInterface;
-use Schoolbox\Storage;
 use Schoolbox\Resource;
-use Schoolbox\StorageMapper;
+use Schoolbox\StorageMapperInterface;
 
 class ExternalFileSystemHandler extends FileSystemHandler {
 
@@ -24,12 +23,12 @@ class ExternalFileSystemHandler extends FileSystemHandler {
 
 
     /**
-     * @param string               $prefix
-     * @param FetcherInterface     $fetcher
-     * @param FileLocatorInterface $locator
-     * @param StorageMapper        $storage
+     * @param string                 $prefix
+     * @param FetcherInterface       $fetcher
+     * @param FileLocatorInterface   $locator
+     * @param StorageMapperInterface $storage
      */
-    public function __construct($prefix, FetcherInterface $fetcher, FileLocatorInterface $locator, StorageMapper $storage)
+    public function __construct($prefix, FetcherInterface $fetcher, FileLocatorInterface $locator, StorageMapperInterface $storage)
     {
         parent::__construct($prefix, null, $locator, $storage);
         $this->fetcher = $fetcher;
@@ -41,7 +40,7 @@ class ExternalFileSystemHandler extends FileSystemHandler {
      *
      * @param string $id
      * @throws Resource\Exception
-     * @return Storage
+     * @return FileInterface
      */
     public function fetch($id)
     {

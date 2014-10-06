@@ -9,10 +9,10 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
+use Schoolbox\FileInterface;
 use Schoolbox\Resource;
 use Schoolbox\Resource\FileLocatorInterface;
-use Schoolbox\Storage;
-use Schoolbox\StorageMapper;
+use Schoolbox\StorageMapperInterface;
 
 class FileSystemHandler implements TypeHandlerInterface {
 
@@ -22,19 +22,19 @@ class FileSystemHandler implements TypeHandlerInterface {
     /** @var FileLocatorInterface */
     protected $locator;
 
-    /** @var StorageMapper */
+    /** @var StorageMapperInterface */
     protected $storage;
 
     /** @var string */
     protected $dir;
 
     /**
-     * @param string               $prefix
-     * @param string               $dir
-     * @param FileLocatorInterface $locator
-     * @param StorageMapper        $storage
+     * @param string                 $prefix
+     * @param string                 $dir
+     * @param FileLocatorInterface   $locator
+     * @param StorageMapperInterface $storage
      */
-    public function __construct($prefix, $dir, FileLocatorInterface $locator, StorageMapper $storage)
+    public function __construct($prefix, $dir, FileLocatorInterface $locator, StorageMapperInterface $storage)
     {
         $this->prefix  = $prefix . '.';
         $this->dir     = $dir;
@@ -68,7 +68,7 @@ class FileSystemHandler implements TypeHandlerInterface {
      *
      * @param string $id
      * @throws \Schoolbox\Resource\Exception
-     * @return Storage
+     * @return FileInterface
      */
     public function fetch($id)
     {
