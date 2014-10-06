@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment;
 
 
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
 
@@ -199,7 +200,7 @@ class Zone {
 
             $page->setVar(array(
                 'AZ_FILE_NAME'    => $file->getFilename(),
-                'AZ_FILE_HASH'    => $file->getHash(),
+                'AZ_FILE_HASH'    => NodeFactory::STORE . ':' . $file->getHash(),
                 'AZ_FILE_PREVIEW' => $href,
             ));
 
