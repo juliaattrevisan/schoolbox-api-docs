@@ -30,6 +30,7 @@ $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
 $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
 $this->setBlock(TEMPLATE_content, 'event_student', 'event_student_block');
 $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
+$this->setBlock('has_rams', 'rams_list', 'rams_list_block');
 $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
 $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_log_block');
 $this->setBlock(TEMPLATE_content, 'has_change_event_status', 'has_change_event_status_block');
@@ -74,7 +75,8 @@ else {
 /* RAMS file requirement
  */
 $this->setVar(array(
-	'has_rams_block' => ''
+	'has_rams_block' => '',
+	'rams_list_block' => '',
 ));
 
 if ($event->getMetadata()->getRamsRequired()) {
@@ -82,19 +84,20 @@ if ($event->getMetadata()->getRamsRequired()) {
 	/* Sometimes event/file relations get recorded with a storage_id of 0
 	 * so we need to check whether one actually legitimately saved properly
 	 */
-	if ($event->getMetadata()->getRamsFiles()->first() && $event->getMetadata()->getRamsFiles()->first()->getId()) {
+	foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
 		$mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-		$mimetype = $mimetypeMapper->getByFilename($event->getMetadata()->getRamsFiles()->first()->getFilename());
+		$mimetype = $mimetypeMapper->getByFilename($ramsFile->getFilename());
 
 		$this->setVar(array(
-			'EVENT_RAMS_FILE' => $event->getMetadata()->getRamsFiles()->first()->getFilename(),
-			'EVENT_RAMS_FILESIZE' => $event->getMetadata()->getRamsFiles()->first()->getFilesize(),
+			'EVENT_RAMS_FILE' => $ramsFile->getFilename(),
+			'EVENT_RAMS_FILESIZE' => $ramsFile->getFilesize(),
 			'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
-			'EVENT_RAMS_HASH' => $event->getMetadata()->getRamsFiles()->first()->getHash(),
+			'EVENT_RAMS_HASH' => $ramsFile->getHash(),
 		));
 
-		$this->parse('has_rams_block', 'has_rams');
+		$this->parse('rams_list_block', 'rams_list', true);
 	}
+	$this->parse('has_rams_block', 'has_rams');
 }
 
 /* Teacher In Charge
