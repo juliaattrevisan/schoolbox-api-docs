@@ -170,9 +170,9 @@ class Zone {
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
 
-        if ($this->mimeFilter == null) {
+        if ($this->mimeFilter === null) {
             $filter = 'null';
-        } elseif ($this->mimeFilter == false) {
+        } elseif ($this->mimeFilter === false) {
             $filter = 'false';
         }
 
