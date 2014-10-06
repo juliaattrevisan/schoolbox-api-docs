@@ -16,6 +16,7 @@ use Schoolbox\Resource\Browser;
 class NodeFactory
 {
 
+    const STORE  = 'store';
     const SBFS   = 'browse';
     const MYFILE = 'myfile';
     const WEBDAV = 'webdav';

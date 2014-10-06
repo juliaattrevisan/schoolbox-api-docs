@@ -11,7 +11,7 @@
           title:    $(filename).text(),
           mimeType: meta.mime,
           filesize: meta.size,
-          hash:     '{SOURCE_SLUG}.' + url.split('?')[1]
+          hash:     '{SOURCE_SLUG}:' + url.split('?id=')[1]
         }];
         window.top.postMessage(JSON.stringify({ data: data }), location.origin);
       }
