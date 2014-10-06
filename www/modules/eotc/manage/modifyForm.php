@@ -179,7 +179,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 					/* Empty old RAMS objects and put the new one in
 					 */
-					$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload(\Cfg::get('storage_dir') . '/' . $_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
+					$ramsFile = \Schoolbox\StorageMapper::getInstance()->upload($_FILES['ramsFile']['name'], $_FILES['ramsFile']['tmp_name'], $author->getId());
 
 					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 					$event->getMetadata()->getRamsFiles()->add($ramsFile);
