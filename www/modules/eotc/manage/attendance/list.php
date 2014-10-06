@@ -11,65 +11,73 @@
 $authenticator = new \EOTC\Authenticator();
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+    $eventMapper = new \EOTC\EventMapper();
 
-	try {
-		$event = $eventMapper->findById($this->arg[0]);
+    try {
+        $event = $eventMapper->findById($this->arg[0]);
     } catch (\Exception $e) {
-		error(160);
-	}
+        error(160);
+    }
 
-	$groupHandler = new Group();
+    $groupHandler = new Group();
 
-	$this->setFile(TEMPLATE_content, 'modules/eotc/manage/attendance/list.html');
-	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
-	$this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
+    $this->setFile(TEMPLATE_content, 'modules/eotc/manage/attendance/list.html');
+    $this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
+    $this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 
     $eventCampusCodes = array();
     foreach ($event->getCampusCollection() as $campus) {
         $eventCampusCodes[] = $campus->getExtTimetableCode();
     }
-    $this->setVar(array(
-        'EVENT_ID' => $event->getId(),
-        'EVENT_NAME' => $event->getTitle(),
-        'EVENT_CAMPUS_CODES' => json_encode($eventCampusCodes),
-        'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
-    ));
+    $this->setVar(
+        array(
+            'EVENT_ID'               => $event->getId(),
+            'EVENT_NAME'             => $event->getTitle(),
+            'EVENT_CAMPUS_CODES'     => json_encode($eventCampusCodes),
+            'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
+        )
+    );
 
-	$externalHandler = new \External_Synergetic_Class();
-	$allFiletypes = $externalHandler->findFiletypes();
+    $externalHandler = new \External_Synergetic_Class();
+    $allFiletypes    = $externalHandler->findFiletypes();
 
-	if (is_array($allFiletypes) && count($allFiletypes)) {
-		foreach($allFiletypes as $currentFiletype) {
-			$this->setVar(array(
-				'FILETYPE_ID' => $currentFiletype['Code'],
-				'FILETYPE_NAME' => $currentFiletype['Description']
-			));
+    if (is_array($allFiletypes) && count($allFiletypes)) {
+        foreach ($allFiletypes as $currentFiletype) {
+            $this->setVar(
+                array(
+                    'FILETYPE_ID'   => $currentFiletype['Code'],
+                    'FILETYPE_NAME' => $currentFiletype['Description']
+                )
+            );
 
-			$this->parse('filetype_block', 'filetype', true);
-		}
-	}
+            $this->parse('filetype_block', 'filetype', true);
+        }
+    }
 
-	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = new \Schoolbox\RoleMapper();
+    if ($event->getMetadata()->getStudentAttendees()->count()) {
+        $roleMapper = new \Schoolbox\RoleMapper();
 
-		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
-			$role = $roleMapper->findById($currentStudent->getRole()->getId());
+        foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
+            $role = $roleMapper->findById($currentStudent->getRole()->getId());
 
-			$this->setVar(array(
-				'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
-				'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
-				'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
-				'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
-			));
+            $this->setVar(
+                array(
+                    'STUDENT_ATTENDEE_ID'        => $currentStudent->getId(),
+                    'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
+                    'STUDENT_ATTENDEE_LASTNAME'  => $currentStudent->getLastname(),
+                    'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
+                )
+            );
 
-			$this->parse('student_attendee_block', 'student_attendee', true);
-		}
+            $this->parse('student_attendee_block', 'student_attendee', true);
+        }
     } else {
-		$this->setVar(array(
-			'student_attendee_block' => ''
-		));
-	}
+        $this->setVar(
+            array(
+                'student_attendee_block' => ''
+            )
+        );
+    }
 } else {
-	error(19);
+    error(19);
 }
