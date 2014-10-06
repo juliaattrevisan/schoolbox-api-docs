@@ -10,7 +10,8 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\Storage;
+use Schoolbox\FileInterface;
+use Schoolbox\Resource\Exception as ResourceException;
 
 class Collector
 {
@@ -41,7 +42,8 @@ class Collector
 
     /**
      * @param int $filter
-     * @return Storage
+     * @throws ResourceException
+     * @return FileInterface
      */
     public function getFirst($filter = self::TYPE_ALL)
     {
@@ -50,21 +52,22 @@ class Collector
                 return $result;
             }
         }
-
-        return null;
+        throw new ResourceException("Could not find a matching resource");
     }
 
 
     /**
      * @param int $filter
-     * @return Storage[]
+     * @return FileInterface[]
      */
     public function getAll($filter = self::TYPE_ALL)
     {
         $result = array();
 
         foreach (array_keys($this->source) as $index) {
-            $result[] = $this->get($index, $filter);
+            if ($r = $this->get($index, $filter)) {
+                $result[] = $r;
+            }
         }
 
         return $result;
@@ -74,7 +77,7 @@ class Collector
     /**
      * @param int $i
      * @param int $filter
-     * @return Storage
+     * @return FileInterface
      */
     protected function get($i, $filter = self::TYPE_ALL)
     {
