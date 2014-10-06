@@ -212,7 +212,16 @@
 						<input type="hidden" name="ramsRequired" value="0" />
                     <label><input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />RAMS Required?</label>
 
-                        {EVENT_RAMS_FILE}
+						<ul class="listing">
+							<!-- BEGIN rams_list -->
+							<li>
+								<span class="actions">
+									<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
+								</span>
+								<h4><img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}</h4>
+							</li>
+							<!-- END rams_list -->
+						</ul>
 
 						<div data-ramsfile="true">
 							<input type="file" name="ramsFile[]" />
