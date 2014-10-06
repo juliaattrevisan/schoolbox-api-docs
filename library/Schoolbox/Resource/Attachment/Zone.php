@@ -65,6 +65,7 @@ class Zone {
 
     /**
      * @param array $hashlist
+     * @return self
      */
     public function attachFiles(array $hashlist)
     {
@@ -76,69 +77,84 @@ class Zone {
                 // TODO maybe look elsewhere?
             }
         }
+        return $this;
     }
 
 
     /**
      * @param int $px
+     * @return self
      */
     public function setThumbnailSize($px)
     {
         $this->size = $px;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setAttachPrompt($text)
     {
         $this->text['attachPrompt'] = $text;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setAttachmentsLabel($text)
     {
         $this->text['attachmentsLabel'] = $text;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setModalTitle($text)
     {
         $this->text['modalTitle'] = $text;
+        return $this;
     }
 
 
     /**
      * @param string $filter
+     * @return self
      */
     public function setMimeFilter($filter)
     {
         $this->mimeFilter = $filter;
+        return $this;
     }
 
 
     /**
      * Clear the mime filter
+     * @return self
      */
     public function clearMimeFilter()
     {
         $this->mimeFilter = null;
+        return $this;
     }
 
 
     /**
      * @param bool $multi
+     * @return self
      */
     public function setMulti($multi)
     {
         $this->multi = $multi;
+        return $this;
     }
 
 
