@@ -24,7 +24,8 @@
 			var defaults = {
 				element: element,
 				url: '/modules/eotc/manage/attendance/courseCodes',
-				output: null
+				output: null,
+				campus: []
 			}
 
 			var derived = {
@@ -50,7 +51,7 @@
 		 * @param id
 		 */
 		function retrieveData(id) {
-			$.post(config.url, {id: id}, function(responseText) {
+			$.post(config.url, {id: id, campus: config.campus}, function(responseText) {
 				var data = $.parseJSON(responseText);
 
 				var allOptions = '';
