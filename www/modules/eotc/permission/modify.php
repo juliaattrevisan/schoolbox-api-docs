@@ -15,6 +15,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'modules/eotc/permission/modify.html');
 $this->setBlock(TEMPLATE_content, 'campus', 'campus_block');
 $this->setBlock(TEMPLATE_content, 'status', 'status_block');
+$this->setBlock(TEMPLATE_content, 'subscription', 'subscription_block');
 $this->setBlock(TEMPLATE_content, 'permission', 'permission_block');
 
 $this->setVar(array(
@@ -85,11 +86,10 @@ foreach ($allPermissions as $currentPermission) {
 }
 
 $statusMapper = new \EOTC\EventStatusMapper();
-$allStatuses = $statusMapper->findPermissionStatuses();
 
 /* Ignore Rejected and Approved
  */
-foreach ($allStatuses as $currentStatus) {
+foreach ($statusMapper->findPermissionStatuses() as $currentStatus) {
 	if (in_array($currentStatus->getId(), $statusIds)) {
 		$selected = 'checked="checked"';
 	}
@@ -104,6 +104,26 @@ foreach ($allStatuses as $currentStatus) {
 	));
 
 	$this->parse('status_block', 'status', true);
+}
+
+// Subscriptions: do not ignore rejected and approved
+foreach ($statusMapper->findAll() as $currentStatus) {
+    if (in_array($currentStatus->getId(), $statusIds)) {
+        $selected = 'checked="checked"';
+    }
+    else {
+        $selected = '';
+    }
+
+    $this->setVar(
+        array(
+            'STATUS_ID' => $currentStatus->getId(),
+            'STATUS_NAME' => $currentStatus->getName(),
+            'STATUS_SELECTED' => $selected
+        )
+    );
+
+    $this->parse('subscription_block', 'subscription', true);
 }
 
 /* Render everything else

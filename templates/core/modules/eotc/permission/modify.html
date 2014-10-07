@@ -33,7 +33,7 @@
 	});
 </script>
 
-<h1>Manage EOTC Permissions</h1>
+<h1>Manage EOTC Users</h1>
 
 <h2>Add User</h2>
 <form id='assign-permissions' action="/modules/eotc/permission/modifyForm.php" method="post">
@@ -51,7 +51,7 @@
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Campus</h4>
-					The campuses to which permissions apply.
+					The campuses to which these settings apply.
 				</td>
 				<td>
 					<!-- BEGIN campus -->
@@ -70,20 +70,26 @@
 					<em>The user will be able to perform actions on events which have the selected statuses.</em>
 				</td>
 				<td>
-                    <table>
-                        <tr>
-                            <th>&nbsp;</th>
-                            <th>Can Edit</th>
-                            <th>Is Notified</th>
-                        </tr>
-                        <!-- BEGIN status -->
-                        <tr>
-                            <th>{STATUS_NAME}</th>
-                            <td><input class="statusCheckbox" name='status[]' type="checkbox" value="{STATUS_ID}_allow" {STATUS_ALLOW_SELECTED} /></td>
-                            <td><input class="statusCheckbox" name='status[]' type="checkbox" value="{STATUS_ID}_notify" {STATUS_NOTIFY_SELECTED} /></td>
-                        </tr>
-                        <!-- END status -->
-                    </table>
+					<!-- BEGIN status -->
+					<label>
+						<input name='status[{STATUS_ID}][allowed]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
+						{STATUS_NAME}
+					</label>
+					<!-- END status -->
+				</td>
+			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Subscriptions</h4>
+					<em>The user will receive messages when an event is set to this status.</em>
+				</td>
+				<td>
+					<!-- BEGIN subscription -->
+					<label>
+						<input name='status[{STATUS_ID}][subscribed]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
+						{STATUS_NAME}
+					</label>
+					<!-- END subscription -->
 				</td>
 			</tr>
 		</tbody>
