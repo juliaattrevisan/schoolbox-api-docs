@@ -33,7 +33,7 @@
 	});
 </script>
 
-<h1>Manage EOTC Users</h1>
+<h1>Manage EOTC Admins</h1>
 
 <h2>Add User</h2>
 <form id='assign-permissions' action="/modules/eotc/permission/modifyForm.php" method="post">
@@ -107,6 +107,7 @@
 		<col width="200" />
 		<col width="200" />
 		<col width="200" />
+		<col width="200" />
 		<col width="100" />
 	</colgroup>
 	<thead>
@@ -122,6 +123,9 @@
 			</th>
 			<th>
 				Status
+			</th>
+			<th>
+				Subscriptions
 			</th>
 			<th>
 				Remove
@@ -142,6 +146,9 @@
 			</td>
 			<td>
 				{PERMISSION_STATUS_NAMES}
+			</td>
+			<td>
+				{PERMISSION_STATUS_SUBSCRIPTIONS}
 			</td>
 			<td>
 				<a data-confirm='true' href="/modules/eotc/permission/delete/{PERMISSION_USER_ID}">Remove</a>

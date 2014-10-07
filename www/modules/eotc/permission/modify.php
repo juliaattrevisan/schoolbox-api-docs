@@ -42,11 +42,13 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	$allPermissions = $eventPermissionMapper->findByUser($user);
+	$allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
 }
 /* Create new permissions for someone
  */
 else {
 	$allPermissions = new \Schoolbox\Collection();
+	$allSubscriptions = new \Schoolbox\Collection();
 }
 
 /* Accumulate all the campus names and remove dupes
@@ -107,23 +109,27 @@ foreach ($statusMapper->findPermissionStatuses() as $currentStatus) {
 }
 
 // Subscriptions: do not ignore rejected and approved
+$statusIds = array();
+foreach ($allSubscriptions as $currentSubscription) {
+	$statusIds[] = $currentSubscription->getStatusId()->getId();
+}
 foreach ($statusMapper->findAll() as $currentStatus) {
-    if (in_array($currentStatus->getId(), $statusIds)) {
-        $selected = 'checked="checked"';
-    }
-    else {
-        $selected = '';
-    }
+	if (in_array($currentStatus->getId(), $statusIds)) {
+		$selected = 'checked="checked"';
+	}
+	else {
+		$selected = '';
+	}
 
-    $this->setVar(
-        array(
-            'STATUS_ID' => $currentStatus->getId(),
-            'STATUS_NAME' => $currentStatus->getName(),
-            'STATUS_SELECTED' => $selected
-        )
-    );
+	$this->setVar(
+		array(
+			'STATUS_ID' => $currentStatus->getId(),
+			'STATUS_NAME' => $currentStatus->getName(),
+			'STATUS_SELECTED' => $selected
+		)
+	);
 
-    $this->parse('subscription_block', 'subscription', true);
+	$this->parse('subscription_block', 'subscription', true);
 }
 
 /* Render everything else
@@ -134,6 +140,7 @@ foreach ($allUserIds as $currentUserId) {
 	$user = $userMapper->findById($currentUserId);
 
 	$allPermissions = $eventPermissionMapper->findByUser($user);
+	$allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
 
 	/* Accumulate all the campus names and remove dupes
 	 */
@@ -148,19 +155,21 @@ foreach ($allUserIds as $currentUserId) {
 	/* Accumulate all the status names and remove dupes
 	 */
 	$statusNames = array();
-
 	foreach ($allPermissions as $currentPermission) {
 		$statusNames[$currentPermission->getStatusId()->getName()] = '';
 	}
-
-	$allStatuses = implode(', ', array_keys($statusNames));
+	$statusSubscriptionNames = array();
+	foreach ($allSubscriptions as $currentSubscription) {
+		$statusSubscriptionNames[$currentSubscription->getStatusId()->getName()] = '';
+	}
 
 	$this->setVar(array(
 		'PERMISSION_USER_ID' => $user->getId(),
 		'PERMISSION_USER_FIRSTNAME' => $user->getFirstname(),
 		'PERMISSION_USER_LASTNAME' => $user->getLastname(),
 		'PERMISSION_CAMPUS_NAMES' => $allCampuses,
-		'PERMISSION_STATUS_NAMES' => $allStatuses,
+		'PERMISSION_STATUS_NAMES' => implode(', ', array_keys($statusNames)),
+		'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
 	));
 
 	$this->parse('permission_block', 'permission', true);
