@@ -10,46 +10,49 @@
 
 namespace EOTC;
 
+use Alaress_Date_Format;
+use Schoolbox\User;
+use Schoolbox\Campus;
 
 class EventPermission {
 
 	/**
 	 * Identifier
 	 *
-	 * @var null
+	 * @var int
 	 */
 	private $id = null;
 
 	/**
-	 * An instance of \Schoolbox\User
+	 * The user to whom this permissions/subscriptions applies
 	 *
 	 * @var int
 	 */
 	private $userId = -1;
 
 	/**
-	 * An instance of \Schoolbox\Campus
+	 * The campus to which this permissions/subscriptions applies
 	 *
-	 * @var int
+	 * @var Campus
 	 */
 	private $campusId = -1;
 
 	/**
-	 * An instance of EventStatus
+	 * The status to which this permissions/subscriptions applies
 	 *
 	 * @var int
 	 */
 	private $statusId = -1;
 
     /**
-     * Is this user allowed to edit EOTC events in this status?
+     * Is this user allowed to edit EOTC events in this status for this campus?
      *
      * @var bool
      */
     protected $allowed = false;
 
     /**
-     * Is this user subscribed to receive messgaes for EOTC events when they
+     * Is this user subscribed to receive messages for EOTC events when they
      * are switched to this status?
      *
      * @var bool
@@ -57,23 +60,23 @@ class EventPermission {
     protected $subscribed = false;
 
 	/**
-	 * An instance of \Alaress_Date_Format
+	 * When was this created?
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
-	 * An instance of \Alaress_Date_Format
+	 * When was this updated
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
-	 * An instance of \Alaress_Date_Format
+	 * When was this deleted?
 	 *
-	 * @var null
+	 * @var Alaress_Date_Format
 	 */
 	private $deletedAt = null;
 
@@ -89,7 +92,7 @@ class EventPermission {
 	/**
 	 * Set campus id
 	 *
-	 * @param int $campusId
+	 * @param Campus $campusId
 	 */
 	public function setCampusId($campusId) {
 		$this->campusId = $campusId;
@@ -98,7 +101,7 @@ class EventPermission {
 	/**
 	 * Get campus id
 	 *
-	 * @return int
+	 * @return Campus
 	 */
 	public function getCampusId() {
 		return $this->campusId;
@@ -107,7 +110,7 @@ class EventPermission {
 	/**
 	 * Set id
 	 *
-	 * @param null $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -116,7 +119,7 @@ class EventPermission {
 	/**
 	 * Get id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -161,7 +164,7 @@ class EventPermission {
 	/**
 	 * Set created at
 	 *
-	 * @param null $createdAt
+	 * @param Alaress_Date_Format $createdAt
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
@@ -170,7 +173,7 @@ class EventPermission {
 	/**
 	 * Get created at
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->createdAt;
@@ -179,7 +182,7 @@ class EventPermission {
 	/**
 	 * Set deleted at
 	 *
-	 * @param null $deletedAt
+	 * @param Alaress_Date_Format $deletedAt
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
@@ -188,7 +191,7 @@ class EventPermission {
 	/**
 	 * Get deleted at
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;
@@ -197,7 +200,7 @@ class EventPermission {
 	/**
 	 * Set updated at
 	 *
-	 * @param null $updatedAt
+	 * @param Alaress_Date_Format $updatedAt
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
@@ -206,7 +209,7 @@ class EventPermission {
 	/**
 	 * Get updated at
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
