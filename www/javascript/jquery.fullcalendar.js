@@ -252,6 +252,7 @@ function Calendar(id, bubbleId, opts) {
             var calendarControls = $j(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
+                // Each filter array can contain a comma-separated list of IDs
                 var k = 0
                 flist[i] = [filterArray[i], {}]
 
@@ -259,8 +260,17 @@ function Calendar(id, bubbleId, opts) {
                     var n = $j(this).attr('value')
                     // show related entries
                     if(this.checked) {
-                        flist[i][1][k++] = n
-                        selected_classes.push(n);
+
+                        var base = n.match(/^\D+/);
+                        if (base.length) {
+                            flist[i][1][k++] = n
+                            var ids = n.match(/\d+/g);
+                            if (ids) {
+                                ids.forEach(function(id) {
+                                    selected_classes.push(base + id);
+                                });
+                            }
+                        }
                     }
                 })
             }

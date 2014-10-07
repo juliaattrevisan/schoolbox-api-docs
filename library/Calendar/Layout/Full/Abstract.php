@@ -151,20 +151,8 @@ abstract class Calendar_Layout_Full_Abstract
     protected function setupMovementButtons()
     {
         // Load sources
-        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-        $sourceList = $configs->map(
-            function ($record) {
-                /** @var Calendar_Api_Config_Record $record */
-                return array(
-                    'id'   => $record->getId(),
-                    'name' => sprintf(
-                        "%s: %s",
-                        $record->getConnectorClass(),
-                        $record->getEventType()
-                    )
-                );
-            }
-        )->getAll();
+        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
+
         // select all types
         $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {

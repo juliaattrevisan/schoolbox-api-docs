@@ -86,36 +86,23 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         }
 
 
-        $groupHandler = new Group();
+        $groupHandler  = new Group();
         $category_list = $groupHandler->involvedInCategoryList($this->getUser()->getId());
 
         $calendarHandler = new Calendar();
-        $campus_list = $calendarHandler->getFilterCampusList($this->getUser()->getId());
+        $campus_list     = $calendarHandler->getFilterCampusList($this->getUser()->getId());
 
         /* Render everything else out
          */
         // Load sources
-        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-        $sourceList = $configs->map(
-            function ($record) {
-                /** @var Calendar_Api_Config_Record $record */
-                return array(
-                    'id'   => $record->getId(),
-                    'name' => sprintf(
-                        "%s: %s",
-                        $record->getConnectorClass(),
-                        $record->getEventType()
-                    )
-                );
-            }
-        )->getAll();
+        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
         // select all types
         $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group'] = $_SESSION['calendarFilter']['groups'];
-            $selected['campus'] = $_SESSION['calendarFilter']['campus'];
+            $selected['group']      = $_SESSION['calendarFilter']['groups'];
+            $selected['campus']     = $_SESSION['calendarFilter']['campus'];
             $selected['event_type'] = $_SESSION['calendarFilter']['events'];
-            $selected['source'] = $_SESSION['calendarFilter']['sources'];
+            $selected['source']     = $_SESSION['calendarFilter']['sources'];
         } else {
             // select all groups
             if (count($category_list)) {

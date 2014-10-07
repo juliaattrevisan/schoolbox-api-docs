@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Config_Connector_Vcal
  *
@@ -7,130 +8,152 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_Abstract {
+class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_Abstract
+{
 
-	/**
-	 * A url to a vcal stream
-	 *
-	 * @var string
-	 */
-	private $url = '';
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'Events';
+    }
 
-	/**
-	 * Campus visibility for this stream
-	 *
-	 * @var array
-	 */
-	private $campus = array();
+    /**
+     * A url to a vcal stream
+     *
+     * @var string
+     */
+    private $url = '';
 
-	/**
-	 * Group visibility for this stream
-	 *
-	 * @var array
-	 */
-	private $groups = array();
+    /**
+     * Campus visibility for this stream
+     *
+     * @var array
+     */
+    private $campus = array();
 
-	/**
-	 * Render configs into admin screen
-	 *
-	 * @param $page
-	 * @return mixed|void
-	 */
-	public function render($page) {
-		$page->setVar(array(
-			'CONNECTOR_ID' => $this->getId(),
-			'CONNECTOR_CLASS' => $this->getConnectorClass(),
-			'URL' => $this->getUrl()
-		));
+    /**
+     * Group visibility for this stream
+     *
+     * @var array
+     */
+    private $groups = array();
 
-		$page->parse('has_multiple_options_block', 'has_multiple_options');
+    /**
+     * Render configs into admin screen
+     *
+     * @param $page
+     *
+     * @return mixed|void
+     */
+    public function render($page)
+    {
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+                'URL'             => $this->getUrl()
+            )
+        );
 
-		/* Render event type options
-		 */
-		$this->renderEventType($page, $this->getLuEventType());
+        $page->parse('has_multiple_options_block', 'has_multiple_options');
 
-		/* Permissions for this connector
-		 */
-		$calendarHandler = new Calendar();
+        /* Render event type options
+         */
+        $this->renderEventType($page, $this->getLuEventType());
 
-		/* Campus permissions
-		 */
-		$page->checkList('campus_list', $calendarHandler->getCampusList(), $this->getCampus(), 'configFragment');
+        /* Permissions for this connector
+         */
+        $calendarHandler = new Calendar();
 
-		/* Group permissions
-		 */
-		$page->checkList('group_list', $calendarHandler->getGroupList(), $this->getGroups());
-	}
+        /* Campus permissions
+         */
+        $page->checkList('campus_list', $calendarHandler->getCampusList(), $this->getCampus(), 'configFragment');
 
-	/**
-	 * Check if current user has permissions to see this event
-	 *
-	 * @param $userCampus
-	 * @param $userGroup
-	 * @return bool
-	 */
-	public function hasPermissions($userCampus, $userGroup) {
-		if ((count(array_intersect($userCampus, $this->getCampus()))) && in_array($userGroup, $this->getGroups())) {
-			return true;
-		}
+        /* Group permissions
+         */
+        $page->checkList('group_list', $calendarHandler->getGroupList(), $this->getGroups());
+    }
 
-		return false;
-	}
+    /**
+     * Check if current user has permissions to see this event
+     *
+     * @param $userCampus
+     * @param $userGroup
+     *
+     * @return bool
+     */
+    public function hasPermissions($userCampus, $userGroup)
+    {
+        if ((count(array_intersect($userCampus, $this->getCampus()))) && in_array($userGroup, $this->getGroups())) {
+            return true;
+        }
 
-	/* Getters/Setters
-	 */
+        return false;
+    }
 
-	/**
-	 * Set url
-	 *
-	 * @param string $url
-	 */
-	public function setUrl($url) {
-		$this->url = $url;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	public function getUrl() {
-		return $this->url;
-	}
+    /**
+     * Set url
+     *
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
 
-	/**
-	 * Set campus
-	 *
-	 * @param array $campus
-	 */
-	public function setCampus($campus) {
-		$this->campus = $campus;
-	}
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
-	/**
-	 * Get campus
-	 *
-	 * @return array
-	 */
-	public function getCampus() {
-		return $this->campus;
-	}
+    /**
+     * Set campus
+     *
+     * @param array $campus
+     */
+    public function setCampus($campus)
+    {
+        $this->campus = $campus;
+    }
 
-	/**
-	 * Set groups
-	 *
-	 * @param array $groups
-	 */
-	public function setGroups($groups) {
-		$this->groups = $groups;
-	}
+    /**
+     * Get campus
+     *
+     * @return array
+     */
+    public function getCampus()
+    {
+        return $this->campus;
+    }
 
-	/**
-	 * Get groups
-	 *
-	 * @return array
-	 */
-	public function getGroups() {
-		return $this->groups;
-	}
+    /**
+     * Set groups
+     *
+     * @param array $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    /**
+     * Get groups
+     *
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
 }

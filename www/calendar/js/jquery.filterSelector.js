@@ -73,14 +73,16 @@
 			$.each($(config.filterContainer).find('.applyFilters'), function(index, element) {
 				$(element).click(function(event) {
 					var attribute = $(this).val();
-
-					if ($(this).is(':checked')) {
-						$(config.eventContainer).find('.'+attribute).show();
-					}
-					else {
-						$(config.eventContainer).find('.'+attribute).hide();
-					}
-
+                    var checked   = $(this).is(':checked');
+                    var base      = attribute.match(/^\D+/);
+                    if (base.length) {
+                        var ids = attribute.match(/\d+/g);
+                        if (ids) {
+                            ids.forEach(function(id) {
+                                $(config.eventContainer).find('.' + base + id).toggle(checked);
+                            });
+                        }
+                    }
 					toggleHeaders();
 				});
 			});

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Config_Connector_Schoolbox
  *
@@ -7,31 +8,46 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_Abstract {
+class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_Abstract
+{
 
-	/**
-	 * Render configs into admin screen
-	 *
-	 * @param $page
-	 * @return mixed|void
-	 */
-	public function render($page) {
-		$page->setVar(array(
-			'CONNECTOR_ID' => $this->getId(),
-			'CONNECTOR_CLASS' => $this->getConnectorClass(),
-		));
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'EOTC';
+    }
 
-		$page->setVar('has_multiple_options_block', '');
-	}
+    /**
+     * Render configs into admin screen
+     *
+     * @param $page
+     *
+     * @return mixed|void
+     */
+    public function render($page)
+    {
+        $page->setVar(
+            array(
+                'CONNECTOR_ID'    => $this->getId(),
+                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+            )
+        );
+        $page->setVar('has_multiple_options_block', '');
+    }
 
-	/**
-	 * Check if current user has permissions to see this event
-	 *
-	 * @param $userCampus
-	 * @param $userGroup
-	 * @return bool
-	 */
-	public function hasPermissions($userCampus, $userGroup) {
-		return true;
-	}
+    /**
+     * Check if current user has permissions to see this event
+     *
+     * @param $userCampus
+     * @param $userGroup
+     *
+     * @return bool
+     */
+    public function hasPermissions($userCampus, $userGroup)
+    {
+        return true;
+    }
 }
