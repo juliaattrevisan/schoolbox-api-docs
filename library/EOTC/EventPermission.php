@@ -41,6 +41,21 @@ class EventPermission {
 	 */
 	private $statusId = -1;
 
+    /**
+     * Is this user allowed to edit EOTC events in this status?
+     *
+     * @var bool
+     */
+    protected $allowed = false;
+
+    /**
+     * Is this user subscribed to receive messgaes for EOTC events when they
+     * are switched to this status?
+     *
+     * @var bool
+     */
+    protected $subscribed = false;
+
 	/**
 	 * An instance of \Alaress_Date_Format
 	 *
@@ -196,4 +211,42 @@ class EventPermission {
 	public function getUpdatedAt() {
 		return $this->updatedAt;
 	}
+
+    /**
+     * @return boolean
+     */
+    public function getAllowed()
+    {
+        return $this->allowed;
+    }
+
+    /**
+     * @param  boolean $allowed
+     *
+     * @return $this
+     */
+    public function setAllowed($allowed)
+    {
+        $this->allowed = $allowed;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getSubscribed()
+    {
+        return $this->subscribed;
+    }
+
+    /**
+     * @param  boolean $subscribed
+     *
+     * @return $this
+     */
+    public function setSubscribed($subscribed)
+    {
+        $this->subscribed = $subscribed;
+        return $this;
+    }
 }

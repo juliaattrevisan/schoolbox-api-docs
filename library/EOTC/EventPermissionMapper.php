@@ -42,6 +42,16 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'property' => 'statusId',
 			'type' => self::TYPE_INTEGER,
 		));
+        $this->hasMap(array(
+            'column' => 'is_allowed',
+            'property' => 'allowed',
+            'type' => self::TYPE_BOOLEAN,
+        ));
+        $this->hasMap(array(
+            'column' => 'is_subscribed',
+            'property' => 'subscribed',
+            'type' => self::TYPE_BOOLEAN,
+        ));
 		$this->hasMap(array(
 			'column'   => 'created_at',
 			'property' => 'createdAt',
