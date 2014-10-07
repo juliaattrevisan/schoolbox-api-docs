@@ -18,439 +18,479 @@ use Schoolbox\Resource\Category;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
-class OnlineAssessment implements ISoftDeletable {
+class OnlineAssessment implements ISoftDeletable
+{
 
-	const AVAILABILITY_ASSESS = 'assess';
-	const AVAILABILITY_SURVEY = 'survey';
+    const AVAILABILITY_ASSESS = 'assess';
+    const AVAILABILITY_SURVEY = 'survey';
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+    * @var int
+    */
+    protected $id;
 
-	/**
-	 * @var Category
-	 */
-	protected $category;
+    /**
+    * @var Category
+    */
+    protected $category;
 
-	/**
-	 * @var User
-	 */
-	protected $user;
+    /**
+    * @var User
+    */
+    protected $user;
 
-	/**
-	 * Not strictly required, because it's always WorkType::TYPE_ONLINE_ASSESSMENT.
-	 *
-	 * @var WorkType
-	 */
-	protected $work_type;
+    /**
+    * Not strictly required, because it's always WorkType::TYPE_ONLINE_ASSESSMENT.
+    *
+    * @var WorkType
+    */
+    protected $work_type;
 
-	/**
-	 * @var string
-	 */
-	protected $title;
+    /**
+    * @var string
+    */
+    protected $title;
 
-	/**
-	 * @var Task
-	 */
-	protected $task;
+    /**
+    * @var Task
+    */
+    protected $task;
 
-	/**
-	 * @var Task\Instance
-	 */
-	protected $task_instance;
+    /**
+    * @var Task\Instance
+    */
+    protected $task_instance;
 
-	/**
-	 * @var string
-	 */
-	protected $description;
+    /**
+    * @var string
+    */
+    protected $description;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	protected $start;
+    /**
+    * @var Alaress_Date_Format
+    */
+    protected $start;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	protected $finish;
+    /**
+    * @var Alaress_Date_Format
+    */
+    protected $finish;
 
-	/**
-	 * @var int
-	 */
-	protected $duration;
+    /**
+    * @var int
+    */
+    protected $duration;
 
-	/**
-	 * @var int
-	 */
-	protected $max_attempts;
+    /**
+    * @var int
+    */
+    protected $max_attempts;
 
-	/**
-	 * @var int
-	 */
-	protected $weight = 0;
+    /**
+    * @var int
+    */
+    protected $weight = 0;
 
-	/**
-	 * @var string
-	 */
-	protected $availability = self::AVAILABILITY_ASSESS;
+    /**
+    * @var string
+    */
+    protected $availability = self::AVAILABILITY_ASSESS;
 
-	/**
-	 * @var bool
-	 */
-	protected $anonymous_result;
+    /**
+    * @var bool
+    */
+    protected $anonymous_result;
 
-	/**
-	 * @var bool
-	 */
-	protected $notify_author;
+    /**
+    * @var bool
+    */
+    protected $notify_author;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	protected $created;
+    /**
+    * @var Alaress_Date_Format
+    */
+    protected $created;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	protected $deleted;
+    /**
+    * @var Alaress_Date_Format
+    */
+    protected $deleted;
 
     /**
      * @var int
      */
     protected $mark_visibility = 0;
 
-	/**
-	 * Get index of gradient
-	 *
-	 * @return int
-	 */
-	public function getGradientIndex() {
-		$urgency = intval(($this->getFinish()->getUnixTimestamp() - time()) / 86400);
+    /**
+    * Get index of gradient
+    *
+    * @return int
+    */
+    public function getGradientIndex()
+    {
+        $urgency = intval(($this->getFinish()->getUnixTimestamp() - time()) / 86400);
 
-		return max(0, min(10, $urgency));
-	}
+        return max(0, min(10, $urgency));
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * @param  boolean $anonymous_result
-	 *
-	 * @return $this
-	 */
-	public function setAnonymousResult($anonymous_result) {
-		$this->anonymous_result = $anonymous_result;
-		return $this;
-	}
+    /**
+    * @param  boolean $anonymous_result
+    *
+    * @return $this
+    */
+    public function setAnonymousResult($anonymous_result)
+    {
+        $this->anonymous_result = $anonymous_result;
+        return $this;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function getAnonymousResult() {
-		return $this->anonymous_result;
-	}
+    /**
+    * @return boolean
+    */
+    public function getAnonymousResult()
+    {
+        return $this->anonymous_result;
+    }
 
-	/**
-	 * @param  string $availability
-	 *
-	 * @return $this
-	 */
-	public function setAvailability($availability) {
-		$this->availability = $availability;
-		return $this;
-	}
+    /**
+    * @param  string $availability
+    *
+    * @return $this
+    */
+    public function setAvailability($availability)
+    {
+        $this->availability = $availability;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getAvailability() {
-		return $this->availability;
-	}
+    /**
+    * @return string
+    */
+    public function getAvailability()
+    {
+        return $this->availability;
+    }
 
-	/**
-	 * @param  \Schoolbox\Resource\Category $category
-	 *
-	 * @return $this
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
+    /**
+    * @param  \Schoolbox\Resource\Category $category
+    *
+    * @return $this
+    */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
-	/**
-	 * @param  \Schoolbox\Assessment\Course\Task $task
-	 * @return $this
-	 */
-	public function setTask($task) {
-		$this->task = $task;
-		return $this;
-	}
+    /**
+    * @param  \Schoolbox\Assessment\Course\Task $task
+    * @return $this
+    */
+    public function setTask($task)
+    {
+        $this->task = $task;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\Assessment\Course\Task
-	 */
-	public function getTask() {
-		return $this->task;
-	}
+    /**
+    * @return \Schoolbox\Assessment\Course\Task
+    */
+    public function getTask()
+    {
+        return $this->task;
+    }
 
-	/**
-	 * @param  Task\Instance $task_instance
-	 * @return $this
-	 */
-	public function setTaskInstance($task_instance) {
-		$this->task_instance = $task_instance;
-		return $this;
-	}
+    /**
+    * @param  Task\Instance $task_instance
+    * @return $this
+    */
+    public function setTaskInstance($task_instance)
+    {
+        $this->task_instance = $task_instance;
+        return $this;
+    }
 
-	/**
-	 * @return Task\Instance
-	 */
-	public function getTaskInstance() {
-		return $this->task_instance;
-	}
+    /**
+    * @return Task\Instance
+    */
+    public function getTaskInstance()
+    {
+        return $this->task_instance;
+    }
 
-	/**
-	 * @return \Schoolbox\Resource\Category
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
+    /**
+    * @return \Schoolbox\Resource\Category
+    */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $created
-	 *
-	 * @return $this
-	 */
-	public function setCreated($created) {
-		$this->created = $created;
-		return $this;
-	}
+    /**
+    * @param  \Alaress_Date_Format $created
+    *
+    * @return $this
+    */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreated() {
-		return $this->created;
-	}
+    /**
+    * @return \Alaress_Date_Format
+    */
+    public function getCreated()
+    {
+        return $this->created;
+    }
 
-	/**
-	 * @param  string $description
-	 *
-	 * @return $this
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-		return $this;
-	}
+    /**
+    * @param  string $description
+    *
+    * @return $this
+    */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getDescription() {
-		return $this->description;
-	}
+    /**
+    * @return string
+    */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 
-	/**
-	 * @param  int $duration
-	 *
-	 * @return $this
-	 */
-	public function setDuration($duration) {
-		$this->duration = $duration;
-		return $this;
-	}
+    /**
+    * @param  int $duration
+    *
+    * @return $this
+    */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getDuration() {
-		return $this->duration;
-	}
+    /**
+    * @return int
+    */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $finish
-	 *
-	 * @return $this
-	 */
-	public function setFinish($finish) {
-		$this->finish = $finish;
-		return $this;
-	}
+    /**
+    * @param  \Alaress_Date_Format $finish
+    *
+    * @return $this
+    */
+    public function setFinish($finish)
+    {
+        $this->finish = $finish;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getFinish() {
-		return $this->finish;
-	}
+    /**
+    * @return \Alaress_Date_Format
+    */
+    public function getFinish()
+    {
+        return $this->finish;
+    }
 
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+    * @param  int $id
+    *
+    * @return $this
+    */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+    * @return int
+    */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  int $max_attempts
-	 *
-	 * @return $this
-	 */
-	public function setMaxAttempts($max_attempts) {
-		$this->max_attempts = $max_attempts;
-		return $this;
-	}
+    /**
+    * @param  int $max_attempts
+    *
+    * @return $this
+    */
+    public function setMaxAttempts($max_attempts)
+    {
+        $this->max_attempts = $max_attempts;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getMaxAttempts() {
-		return $this->max_attempts;
-	}
+    /**
+    * @return int
+    */
+    public function getMaxAttempts()
+    {
+        return $this->max_attempts;
+    }
 
-	/**
-	 * @param  boolean $notify_author
-	 *
-	 * @return $this
-	 */
-	public function setNotifyAuthor($notify_author) {
-		$this->notify_author = $notify_author;
-		return $this;
-	}
+    /**
+    * @param  boolean $notify_author
+    *
+    * @return $this
+    */
+    public function setNotifyAuthor($notify_author)
+    {
+        $this->notify_author = $notify_author;
+        return $this;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function getNotifyAuthor() {
-		return $this->notify_author;
-	}
+    /**
+    * @return boolean
+    */
+    public function getNotifyAuthor()
+    {
+        return $this->notify_author;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $start
-	 *
-	 * @return $this
-	 */
-	public function setStart($start) {
-		$this->start = $start;
-		return $this;
-	}
+    /**
+    * @param  \Alaress_Date_Format $start
+    *
+    * @return $this
+    */
+    public function setStart($start)
+    {
+        $this->start = $start;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getStart() {
-		return $this->start;
-	}
+    /**
+    * @return \Alaress_Date_Format
+    */
+    public function getStart()
+    {
+        return $this->start;
+    }
 
-	/**
-	 * @param  string $title
-	 *
-	 * @return $this
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-		return $this;
-	}
+    /**
+    * @param  string $title
+    *
+    * @return $this
+    */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
+    /**
+    * @return string
+    */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
-	/**
-	 * @param  \Schoolbox\User $user
-	 *
-	 * @return $this
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-		return $this;
-	}
+    /**
+    * @param  \Schoolbox\User $user
+    *
+    * @return $this
+    */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+    * @return \Schoolbox\User
+    */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * @param  \Schoolbox\Assessment\Component\SubmissionBox\WorkType $work_type
-	 *
-	 * @return $this
-	 */
-	public function setWorkType($work_type) {
-		$this->work_type = $work_type;
-		return $this;
-	}
+    /**
+    * @param  \Schoolbox\Assessment\Component\SubmissionBox\WorkType $work_type
+    *
+    * @return $this
+    */
+    public function setWorkType($work_type)
+    {
+        $this->work_type = $work_type;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox\WorkType
-	 */
-	public function getWorkType() {
-		return $this->work_type;
-	}
+    /**
+    * @return \Schoolbox\Assessment\Component\SubmissionBox\WorkType
+    */
+    public function getWorkType()
+    {
+        return $this->work_type;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $deleted
-	 * @return $this
-	 */
-	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
-		return $this;
-	}
+    /**
+    * @param  \Alaress_Date_Format $deleted
+    * @return $this
+    */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDeleted() {
-		return $this->deleted;
-	}
+    /**
+    * @return \Alaress_Date_Format
+    */
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
 
-	/**
-	 * Is this deleted? (added so there's a consistent method for determining if
-	 * a model is deleted)
-	 *
-	 * @return bool
-	 */
-	public function isDeleted() {
-		return ($this->getDeleted() instanceof \Alaress_Date_Format);
-	}
+    /**
+    * Is this deleted? (added so there's a consistent method for determining if
+    * a model is deleted)
+    *
+    * @return bool
+    */
+    public function isDeleted()
+    {
+        return ($this->getDeleted() instanceof \Alaress_Date_Format);
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getWeight() {
-		return $this->weight;
-	}
+    /**
+    * @return int
+    */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
 
-	/**
-	 * @param  int   $weight
-	 * @return $this
-	 */
-	public function setWeight($weight) {
-		$this->weight = $weight;
-		return $this;
-	}
+    /**
+    * @param  int   $weight
+    * @return $this
+    */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
+        return $this;
+    }
 
     /**
      * @param  int $mark_visibility
      * @return $this
      */
-    public function setMarkVisibility($mark_visibility) {
+    public function setMarkVisibility($mark_visibility)
+    {
         $this->mark_visibility = $mark_visibility;
         return $this;
     }
@@ -458,7 +498,8 @@ class OnlineAssessment implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getMarkVisibility() {
+    public function getMarkVisibility()
+    {
         return $this->mark_visibility;
     }
 }
