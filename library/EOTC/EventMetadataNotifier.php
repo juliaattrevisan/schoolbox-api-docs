@@ -180,7 +180,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $effectorExtId     = $effector->getExternalId();
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
-        $moderatorIds  = $this->getModerators(
+        $moderatorIds  = $this->getInterestedUsers(
             $relEvent,
             $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
         );
@@ -312,7 +312,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     // if RAMS, inform RAMS Approval Moderator(s)
                     if ($eventMetadata->getRamsRequired()) {
                         $bob->setHref($hrefMod);
-                        $ramsModIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
+                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
                         foreach ($ramsModIds as $userId) {
                             $envelope->targetToUser($userId, $bob->build());
                         }
@@ -332,7 +332,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 break;
         }
         // get list of moderators relevant to the current status
-        $moderatorIds = $this->getModerators($relEvent, $newStatus);
+        $moderatorIds = $this->getInterestedUsers($relEvent, $newStatus);
         // inform them
         $bob->setHref($hrefMod);
         foreach ($moderatorIds as $modId) {
@@ -355,7 +355,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      *
      * @return array
      */
-    protected function getModerators($event, $targetStatus)
+    protected function getInterestedUsers($event, $targetStatus)
     {
         $campusIds = array();
         // coerce "campuses" out of their "collection"
