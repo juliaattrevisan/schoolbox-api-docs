@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 $(function() {
     $.fn.alaressTiny({
@@ -127,14 +128,9 @@ function verify()
     <tr>
       <td><h4>Attachments:</h4>
 	 </td>
-	 <td> <input id="attachment" type="file" name="file[]" />
-        <div id="files_list"></div>
-        <script type="text/javascript">
-						<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
-						var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), 5 );
-						<!-- Pass in the file element -->
-						multi_selector.addElement( document.getElementById( 'attachment' ) );
-						</script></td>
+	 <td>
+        {ATTACH_ZONE}
+     </td>
     </tr>
     <tr>
       <td></td>

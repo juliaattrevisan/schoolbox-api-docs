@@ -35,6 +35,15 @@ if (Cfg::get('mail_enable') == 1) {
         'BCC'     => json_encode($bccList),
     );
 
+    $zone = new \Schoolbox\Resource\Attachment\Zone('email-attachments');
+    $zone->setMulti(true)
+        ->setThumbnailSize(64)
+        ->setModalTitle('Select files')
+        ->setMimeFilter('*/*')
+        ->setAttachPrompt('Click or drag to add attachments');
+
+    $zone->renderIntoSitePage($page, 'ATTACH_ZONE');
+
     $page->setVar($output);
     $page->outputPage();
 } else {
