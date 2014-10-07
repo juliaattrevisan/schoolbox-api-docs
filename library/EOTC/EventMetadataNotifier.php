@@ -115,16 +115,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Event $relEvent */
         $relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         // inform approved in principle moderator(s)
-        /** @var Collection|int[] $moderatorCollection */
-        $moderatorCollection = new Collection(
-            EventPermissionMapper::getInstance()->findByColumnList(
-                array(
-                    'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-                    'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
-                        $eventMetadata->getStatus()->getId() :
-                        $eventMetadata->getStatus()
-                )
-            )->getColumnValues('userId')
+        /** @var Collection|EventPermission[] $permissionCollection */
+        $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
+            array(
+                'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
+                'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
+                    $eventMetadata->getStatus()->getId() :
+                    $eventMetadata->getStatus()
+            )
         );
         $bob->setTitle(":applicant submitted new EOTC, :event")
             ->setParams(
@@ -139,8 +137,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.{$relEvent->getId()}.submitted");
         $instance = $bob->build();
-        foreach ($moderatorCollection as $mod) {
-            $envelope->targetToUser($mod, $instance);
+        foreach ($permissionCollection as $permission) {
+            if ($permission->getSubscribed() || $permission->getAllowed()) {
+                $envelope->targetToUser($permission->getUserId(), $instance);
+            }
         }
         return $envelope;
     }
