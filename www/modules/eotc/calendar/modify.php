@@ -14,7 +14,6 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $page = new SitePage();
 
 $page->setFile(TEMPLATE_content, 'modules/eotc/modify.html');
-$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 
@@ -97,8 +96,6 @@ if (is_numeric($_GET['eventID'])) {
 		$page->parse('recurring_reminder_block', 'recurring_reminder');
 		$page->setVar('recurring_dates_block', '');
 	}
-
-	$page->parse('delete_button_block', 'delete_button');
 }
 /* Create new event
  */
@@ -150,7 +147,6 @@ else {
 	 */
 	$page->setVar(array(
 		'recurring_reminder_block' => '',
-		'delete_button_block' => ''
 	));
 
 	$page->parse('recurring_dates_block', 'recurring_dates');

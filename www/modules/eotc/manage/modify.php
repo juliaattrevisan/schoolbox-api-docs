@@ -14,7 +14,6 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
-$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 $page->setBlock(TEMPLATE_content, 'has_activity_log', 'has_activity_log_block');
@@ -226,8 +225,6 @@ if (is_numeric($_GET['eventID'])) {
 			$page->parse('has_activity_log_block', 'has_activity_log');
 		}
 
-		$page->parse('delete_button_block', 'delete_button');
-
 		/* Cannot add students until an event is created
 		 */
 		$page->parse('can_add_students_block', 'can_add_students');
@@ -336,7 +333,6 @@ else if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	 */
 	$page->setVar(array(
 		'recurring_reminder_block' => '',
-		'delete_button_block' => ''
 	));
 
 	$page->parse('recurring_dates_block', 'recurring_dates');

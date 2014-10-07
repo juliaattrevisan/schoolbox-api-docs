@@ -267,10 +267,6 @@
 			$(key).click(function() {
 				$('#action').val(config.functionLabel);
 			});
-
-			$('#bDelete').click(function() {
-				$('#action').val('Delete');
-			});
 		}
 
 		/**
@@ -394,56 +390,11 @@
 								}
 							});
 						}
-						else if (act == 'Delete') {
-							$('.bulk-update').css('display', 'none');
-							$('.bulk-delete').css('display', 'inline');
-							$("#dialog-bulk").dialog({
-								resizable: false,
-								height: 140,
-								width: 400,
-								modal: true,
-								draggable: false,
-								buttons: {
-									"Only this event": function() {
-										$('#efficacy').val('self');
-										form.submit();
-									},
-									"All events in the series": function() {
-										$('#efficacy').val('series');
-										form.submit();
-									}
-								},
-								close: function() {
-									return false;
-								}
-							});
-						}
 					}
 					// single event
 					else {
 						if (act == 'Update') {
 							form.submit();
-						}
-						else if (act == 'Delete') {
-							$("#dialog-delete").dialog({
-								resizable: false,
-								width: 400,
-								height: 140,
-								modal: true,
-								draggable: false,
-								buttons: {
-									"Yes": function() {
-										form.submit();
-									},
-									"No": function() {
-										$(this).dialog('close');
-										return false;
-									}
-								},
-								close: function() {
-									return false;
-								}
-							});
 						}
 						else {
 							// add
