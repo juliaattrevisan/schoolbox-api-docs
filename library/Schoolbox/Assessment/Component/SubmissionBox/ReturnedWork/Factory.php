@@ -11,6 +11,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -21,14 +22,14 @@ class Factory
     /**
      * A schoolbox user
      *
-     * @var null
+     * @var User
      */
     private $user = null;
 
     /**
      * An instance of Submission
      *
-     * @var null
+     * @var SubmissionBox
      */
     private $submissionBox = null;
 
@@ -53,16 +54,16 @@ class Factory
     private $rubric = array();
 
     /**
-     * A $_FILES array element
+     * A $_POST['attachment'][] array element
      *
-     * @var null
+     * @var array
      */
-    private $file = array();
+    private $attachments = array();
 
     /**
      * An instance of ReturnedWorkMapper
      *
-     * @var null
+     * @var ReturnedWorkMapper
      */
     private $returnedWorkMapper = null;
 
@@ -105,17 +106,17 @@ class Factory
      * @param $mark
      * @param $comment
      * @param $rubric
-     * @param $file
+     * @param $attachments
      * @param $uuid
      */
-    public function __construct(User $user, SubmissionBox $submissionBox, $mark, $comment, $rubric, $file, $uuid)
+    public function __construct(User $user, SubmissionBox $submissionBox, $mark, $comment, $rubric, $attachments, $uuid)
     {
         $this->setUser($user);
         $this->setSubmissionBox($submissionBox);
         $this->setMark($mark);
         $this->setComment($comment);
         $this->setRubric($rubric);
-        $this->setFile($file);
+        $this->setAttachments($attachments);
         $this->setUuid($uuid);
 
         /* Internally used instances
@@ -172,7 +173,7 @@ class Factory
 
         /* If there was a file upload, attach it
          */
-        $returnedWork = $this->addFile($returnedWork);
+        $this->addFile($returnedWork);
 
         /* Ram it home
          */
@@ -223,7 +224,7 @@ class Factory
         /* If you can't find an existing record, spawn a new one
          */
         try {
-            /** @var ReturnedWork $returned_work */
+            /** @var ReturnedWork $returnedWork */
             $returnedWork = $this->getReturnedWorkMapper()->findOneByColumnList(
                 array(
                     'owner' => $this->getUser()->getId(),
@@ -333,29 +334,34 @@ class Factory
     /**
      * Add an optional file
      *
-     * @param $returnedWork
-     * @return mixed
+     * @param ReturnedWork $returnedWork
      */
     private function addFile($returnedWork)
     {
-        $file = $this->getFile();
+        $factory = new CollectorFactory(ReturnedWorkMapper::getInstance());
 
-        if (is_array($file) && strlen($file['name'])) {
-            $allowedFileHandler = new \AllowedFile();
-            $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($file));
-
-            /* Save filesize in db
-             */
-            $returnedWork->setFilesize($file['size']);
-            $returnedWork->setMimeType($file['type']);
+        /**
+         * So Collector->getFirst() returns a ReturnedWork...but we've already got one...
+         *
+         * Since the one that was passed in will contain all the data we want, we'll copy
+         * the data from the one we just built into it. This isn't how Collectors were
+         * intended to work, but...it will do for now.
+         *
+         * @var ReturnedWork $return
+         */
+        try {
+            $return = $factory->build($this->getAttachments())->getFirst();
 
             $returnedWork
-                ->setFilename($file['name'])
-                ->setTempLocation($file['tmp_name'])
+                ->setFilesize($return->getFilesize())
+                ->setMimetype($return->getMimetype())
+                ->setFilename($return->getFilename())
+                ->setTempLocation($return->getTempLocation())
                 ->loadFilesizeFromTempLocation();
-        }
 
-        return $returnedWork;
+        } catch (\Schoolbox\Resource\Exception $e) {
+            // noop
+        }
     }
 
     /* Getters/Setters
@@ -442,23 +448,23 @@ class Factory
     }
 
     /**
-     * Set file
+     * Set attachments
      *
-     * @param null $file
+     * @param array $attachments
      */
-    private function setFile($file)
+    private function setAttachments($attachments = array())
     {
-        $this->file = $file;
+        $this->attachments = $attachments;
     }
 
     /**
-     * Get file
+     * Get attachments
      *
-     * @return null
+     * @return array
      */
-    private function getFile()
+    private function getAttachments()
     {
-        return $this->file;
+        return $this->attachments;
     }
 
     /**

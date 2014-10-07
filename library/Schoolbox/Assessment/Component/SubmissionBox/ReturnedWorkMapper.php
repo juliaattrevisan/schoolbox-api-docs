@@ -12,9 +12,11 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\FileInterface;
 
-class ReturnedWorkMapper extends Schoolbox\Mapper
+class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface
 {
 
     protected function mapping()
@@ -236,6 +238,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function getStudentMarks($category_id, $student_id, $extra_params = array())
     {
+        /** @var SubmissionBoxMapper $submission_box_mapper */
         $submission_box_mapper = $this->getJoinMapper('submission_box');
 
         //
@@ -462,4 +465,37 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
             }
         }
     }
+
+
+    /**
+     * Convenience method for creating and saving a file via this mapper.
+     *
+     * @param string $filename     the file's name.
+     * @param string $tempLocation the location of the file to save.
+     * @param int    $userId       the user to associate with the file.
+     * @throws \Schoolbox\File\Exception       if the upload was not allowed.
+     * @return FileInterface
+     */
+    public function upload($filename, $tempLocation, $userId)
+    {
+        $return = new ReturnedWork();
+
+        $return
+            ->setTempLocation($tempLocation)
+            ->setFilename($filename)
+            ->setMimetype(\Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename))
+            ->setOwner($this->getJoinMapper('owner')->findById($userId))
+            ->loadFilesizeFromTempLocation();
+
+        /**
+         * TODO
+         * So, returnedwork should not actually *have* filedata on it: it should be referenced
+         * from a join table. This method by all rights should save the returnedwork, but can't
+         * because there is data lacking, so we just return it as is, expecting the calling
+         * class to fill in the blanks then save the data (which ReturnedWork\Factory will)
+         */
+
+        return $return;
+    }
+
 }

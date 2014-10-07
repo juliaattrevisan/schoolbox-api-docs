@@ -14,6 +14,7 @@ use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\File\MimetypeMapper;
+use Schoolbox\Resource\Attachment\Zone;
 use \Schoolbox\Resource\CategoryCodeMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
@@ -163,6 +164,17 @@ $navigationElements = array(
 $navigationDirect = json_encode($navigationElements);
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
+
+$zone = new Zone('inline-return');
+
+$zone->setMulti(false)
+    ->setMimeFilter('*/*')
+    ->setThumbnailSize(32)
+    ->setAttachPrompt('Click or drag to attach a file to return to the student')
+    ->setModalTitle('Select file')
+    ->setAttachmentsLabel('');
+
+$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 /* Render injectable views
  */

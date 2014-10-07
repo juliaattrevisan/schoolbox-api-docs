@@ -36,9 +36,9 @@ $rubric = $_POST['rubric'];
  */
 $comment = $_POST['comment'];
 
-/* Optional file upload
+/* Optional file attachment
  */
-$file = $_FILES['file'];
+$attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
 /* Crocodoc uuid, to view return independently of submission
  */
@@ -54,7 +54,7 @@ $redirect = $_POST['redirect'];
 
 /* Process the return's comments, marks, rubrics and uploads
  */
-$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $file, $crocodoc);
+$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $attachments, $crocodoc);
 $returnedWork = $returnedWorkFactory->start();
 
 /* Go to St. Albans when finished

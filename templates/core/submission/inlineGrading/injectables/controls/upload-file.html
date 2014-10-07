@@ -17,22 +17,5 @@
 	<div class="clearfix"></div>
 </div>
 <!-- END returned_work -->
-<div class='pad-it'>
-	<p>Select and upload a file to return to the student.</p>
-	<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-	<script type="text/javascript">
-		$(function() {
-			$j('.prettify').prettyFileInput({
-				inputHolderClass:'file-input not-static',
-				additionalButtonClasses: 'no-marg float-left',
-				buttonActiveClass:'tick',
-				defaultText:'<span></span>Choose File',
-				defaultFileSelectedText:'<span></span>File selected'
-			});
-		});
-	</script>
-
-	<input type="file" name="file" class="prettify"/>
-
-	<div class="clearfix"></div>
-</div>
+{ATTACH_ZONE}
+<div class="clearfix pad-it"></div>
