@@ -1,5 +1,6 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$j('#staff-suggest').selectizeSelector({
@@ -14,7 +15,7 @@
 
 		$('#assign-permissions').validate({
 			rules: {
-				'status[]': 'required',
+//				'status[]': 'required',
 				'campus[]': 'required'
 			},
 			submitHandler: function(form) {
@@ -69,12 +70,20 @@
 					<em>The user will be able to perform actions on events which have the selected statuses.</em>
 				</td>
 				<td>
-					<!-- BEGIN status -->
-					<label>
-						<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
-						{STATUS_NAME}
-					</label>
-					<!-- END status -->
+                    <table>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Can Edit</th>
+                            <th>Is Notified</th>
+                        </tr>
+                        <!-- BEGIN status -->
+                        <tr>
+                            <th>{STATUS_NAME}</th>
+                            <td><input class="statusCheckbox" name='status[]' type="checkbox" value="{STATUS_ID}_allow" {STATUS_ALLOW_SELECTED} /></td>
+                            <td><input class="statusCheckbox" name='status[]' type="checkbox" value="{STATUS_ID}_notify" {STATUS_NOTIFY_SELECTED} /></td>
+                        </tr>
+                        <!-- END status -->
+                    </table>
 				</td>
 			</tr>
 		</tbody>
