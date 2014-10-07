@@ -10,10 +10,9 @@
 namespace Schoolbox;
 use Schoolbox;
 use Schoolbox\Mapper;
-use Schoolbox\Storage;
 use Schoolbox\File\MimetypeMapper;
 
-class StorageMapper extends Mapper {
+class StorageMapper extends Mapper implements StorageMapperInterface {
 	protected function mapping () {
 		$this->hasTable('storage');
 		$this->hasModel('\\Schoolbox\\Storage');
@@ -42,7 +41,8 @@ class StorageMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'uploaded_by',
 			'property'   => 'uploadedBy',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'user'
 		));
 		$this->hasMap(array(
 			'column'            => 'uploaded_on',
@@ -80,6 +80,12 @@ class StorageMapper extends Mapper {
                 'this_key'  => 'mime',
                 'other_key' => 'mime',
             ));
+
+        $this->hasJoin('user', array(
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'uploaded_by',
+            'other_key' => 'id'
+        ));
 
 		$this
 			->registerCallback('postSave', array($this, 'postSave'))
@@ -126,7 +132,7 @@ class StorageMapper extends Mapper {
 			throw new File\Exception('Invalid mime type', File\Exception::CODE_MIMETYPE_NOT_FOUND);
 		}
 		$file->setTempLocation($temp_location);
-		$file->setUploadedBy($user_id);
+		$file->setUploadedBy(UserMapper::getInstance()->createModel($user_id));
 		$file->loadHashFromTempLocation();
 		$file->loadFilesizeFromTempLocation();
 

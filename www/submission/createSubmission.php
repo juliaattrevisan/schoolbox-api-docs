@@ -4,9 +4,6 @@
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 
-$this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
-$this->setBlock('browse_row', 'existing_file', 'existing_file_block');
-
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 
 // Instead of all this block BS I'll create a sub-template
@@ -29,15 +26,13 @@ $this->setVar('CLASS_CRITERIA', '');
 
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 $mapper      = new SubmissionBoxMapper();
@@ -46,6 +41,15 @@ $mark_mapper = new SubmissionBox\MarkTypeMapper();
 
 $groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();
+
+$zone = new Zone('duework-attachment');
+$zone
+    ->setMimeFilter('*/*')
+    ->setMulti(true)
+    ->setModalTitle('Select files')
+    ->setAttachPrompt('Click or drag to attach files')
+    ->setAttachmentsLabel('')
+    ->setThumbnailSize(64);
 
 //
 // Should work types include or not include online assessments?
@@ -85,6 +89,16 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 	/* Allow deletion of the submission box from modify screen
 	 */
 	$this->parse('delete_button_block', 'delete_button');
+
+    // collate attachments
+    $boxFileMapper = SubmissionBox\FileMapper::getInstance();
+    $files = $boxFileMapper->findByColumn('box_id', $submission_id);
+
+    /** @var \Schoolbox\Collection|\Schoolbox\Storage[] $storages */
+    $storages = \Schoolbox\StorageMapper::getInstance()->findByColumn('storage_id', $files->getColumnValues('fileId'));
+
+    $zone->attachFiles($storages->getColumnValues('hash'));
+
 }
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setVar(array(
@@ -173,41 +187,35 @@ $this->setVar(array(
     'existing_file_block'             => '',
     'existing_marks_warning_block'    => '',
     'duework_timespan_block'          => '',
-    'browse_block'                    => '',
     'marktype_block'                  => '',
 ));
 
 // Set file inputs
-$file_links = $submission->getFileLinks();
-if ($file_links->count() > 0) {
-    foreach ($file_links as $file_link) {
-        /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
-        $file = $file_link->getFile();
-        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-        $this->setVar('CURRENT_FILE_ID',   $file->getId());
-        $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
-        $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
-        $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
-        $this->parse('existing_file_block','existing_file', true);
-    }
-}
-elseif ($submission->getLegacyFileId()) {
-    $fileHandler = new File;
-    $file = $fileHandler->getByID($submission->getLegacyFileId());
-    $this->setVar('CURRENT_FILE_NAME', $file['realname']);
-    $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
-    $this->setVar('CURRENT_FILE_ID',   'old');
-    $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
-    $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
-    $this->parse('existing_file_block','existing_file');
-}
+//$file_links = $submission->getFileLinks();
+//if ($file_links->count() > 0) {
+//    foreach ($file_links as $file_link) {
+//        /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
+//        $file = $file_link->getFile();
+//        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+//        $this->setVar('CURRENT_FILE_ID',   $file->getId());
+//        $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
+//        $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
+//        $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
+//        $this->parse('existing_file_block','existing_file', true);
+//    }
+//}
+//elseif ($submission->getLegacyFileId()) {
+//    $fileHandler = new File;
+//    $file = $fileHandler->getByID($submission->getLegacyFileId());
+//    $this->setVar('CURRENT_FILE_NAME', $file['realname']);
+//    $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
+//    $this->setVar('CURRENT_FILE_ID',   'old');
+//    $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
+//    $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
+//    $this->parse('existing_file_block','existing_file');
+//}
 
-// File browser:
-// A new submission box can be created from a file, if it is then don't show the
-// browser.
-if (!$has_file_preset) {
-    $this->parse('browse_block', 'browse_row');
-}
+$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 // Output submission work_type drop down.
 $work_type = $submission->getWorkType()->getId();

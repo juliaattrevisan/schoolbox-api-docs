@@ -20,60 +20,60 @@ class Mimetype {
 	/**
 	 * Allowed File id
 	 *
-	 * @var
+	 * @var int
 	 */
-	private $fileTypeID;
+	protected $fileTypeID;
 
 	/**
 	 * Description for this mime type
 	 *
-	 * @var
+	 * @var string
 	 */
-	private $description;
+	protected $description;
 
 	/**
 	 * Mime type
 	 *
-	 * @var
+	 * @var string
 	 */
-	private $mime;
+	protected $mime;
 
 	/**
 	 * Filename representing this mime type
 	 *
-	 * @var
+	 * @var string
 	 */
-	private $iconFile;
+	protected $iconFile;
 
 	/**
 	 * String true/false depending on whether the filetype can be opened
 	 * inline within the browser
 	 *
-	 * @var
+	 * @var bool
 	 */
-	private $inline;
+	protected $inline;
 
 	/**
 	 * String true/false depending on whether this allowed filetype is enabled
 	 * (that is, allowed to be uploaded)
 	 *
-	 * @var
+	 * @var bool
 	 */
-	private $enable;
+	protected $enable;
 
     /**
      * Max file size allowed for mime
      *
      * @var int
      */
-    private $maxFileSize;
+    protected $maxFileSize;
 
     /**
 	 * Get icon class by deriving it from the iconFile
 	 *
 	 * This previously abused the \Url class, but now it's all self-contained here and independent.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getClass() {
 		return preg_replace('/[^a-zA-Z]/', '', substr(strtolower($this->getIconFile()), 0, strrpos($this->getIconFile(), ".")));
@@ -85,7 +85,7 @@ class Mimetype {
 	/**
 	 * Set description
 	 *
-	 * @param $description
+	 * @param string $description
 	 */
 	public function setDescription($description) {
 		$this->description = $description;
@@ -94,7 +94,7 @@ class Mimetype {
 	/**
 	 * Get description
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getDescription() {
 		return $this->description;
@@ -103,7 +103,7 @@ class Mimetype {
 	/**
 	 * Set enable
 	 *
-	 * @param $enable
+	 * @param bool $enable
 	 * @return void
 	 */
 	public function setEnable($enable) {
@@ -113,7 +113,7 @@ class Mimetype {
 	/**
 	 * Get enable
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
 	public function getEnable() {
 		return $this->enable;
@@ -122,7 +122,7 @@ class Mimetype {
 	/**
 	 * Set file type id
 	 *
-	 * @param $fileTypeID
+	 * @param int $fileTypeID
 	 * @return void
 	 */
 	public function setFileTypeID($fileTypeID) {
@@ -132,7 +132,7 @@ class Mimetype {
 	/**
 	 * Get file type id
 	 *
-	 * @return mixed
+	 * @return int
 	 */
 	public function getFileTypeID() {
 		return $this->fileTypeID;
@@ -141,7 +141,7 @@ class Mimetype {
 	/**
 	 * Alias method
 	 *
-	 * @param $id
+	 * @param int $id
 	 * @return void
 	 */
 	public function setId($id) {
@@ -151,7 +151,7 @@ class Mimetype {
 	/**
 	 * Alias method
 	 *
-	 * @return mixed
+	 * @return int
 	 */
 	public function getId() {
 		return $this->getFileTypeID();
@@ -160,7 +160,7 @@ class Mimetype {
 	/**
 	 * Set icon file
 	 *
-	 * @param $iconFile
+	 * @param string $iconFile
 	 */
 	public function setIconFile($iconFile) {
 		$this->iconFile = $iconFile;
@@ -169,7 +169,7 @@ class Mimetype {
 	/**
 	 * Get icon file
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getIconFile() {
 		return $this->iconFile;
@@ -178,7 +178,7 @@ class Mimetype {
 	/**
 	 * Set inline
 	 *
-	 * @param $inline
+	 * @param bool $inline
 	 */
 	public function setInline($inline) {
 		$this->inline = $inline;
@@ -187,7 +187,7 @@ class Mimetype {
 	/**
 	 * Get inline
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
 	public function getInline() {
 		return $this->inline;
@@ -196,7 +196,7 @@ class Mimetype {
 	/**
 	 * Set mime type
 	 *
-	 * @param $mime
+	 * @param string $mime
 	 */
 	public function setMime($mime) {
 		$this->mime = $mime;
@@ -205,7 +205,7 @@ class Mimetype {
 	/**
 	 * Get mime type
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getMime() {
 		return $this->mime;
@@ -215,7 +215,7 @@ class Mimetype {
     /**
      * Set max file size for mime type
      *
-     * @param $maxFileSize
+     * @param int $maxFileSize
      * @return $this
      */
     public function setMaxFileSize($maxFileSize) {
@@ -226,7 +226,7 @@ class Mimetype {
     /**
      * Get the max file size allowed for this particular mime type
      *
-     * @return mixed
+     * @return int
      */
     public function getMaxFileSize()  {
         return ($this->maxFileSize > 0) ? $this->maxFileSize : Config::get('max_file_size');
@@ -237,7 +237,7 @@ class Mimetype {
      * @return bool
      */
     public function isEnabled() {
-        return $this->getEnable() ===  'true';
+        return $this->getEnable();
     }
 
     /**
@@ -274,6 +274,42 @@ class Mimetype {
     public function isImage() {
         if (preg_match('#^image/#', $this->getMime())) {
             return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Compares this mimetype against the given filter. Returns true if ANY are matched.
+     *
+     * @param string $mimeFilter in the format:
+     *                           "image/jpeg,image/png", "image/*" or "{star}/*"
+     * @return bool
+     */
+    public function matches($mimeFilter)
+    {
+        // if the filter can loosely evaluate to false, it's considered no filter therefore match
+        if (!($mimeFilter)) {
+            return true;
+        }
+
+        $xpl = explode(',', $mimeFilter);
+
+        foreach ($xpl as $filter) {
+
+            // easy comparison
+            if ($filter === '*/*') {
+                return true;
+            }
+
+            // harder comparison
+            $filter = str_replace('*','[^/]+', $filter);
+
+            if (preg_match("`^$filter$`", $this->getMime())) {
+                return true;
+            }
+
         }
 
         return false;

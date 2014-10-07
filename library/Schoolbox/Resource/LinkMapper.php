@@ -24,7 +24,8 @@ class LinkMapper extends Mapper {
         $this->hasMap(array(
             'column'     => 'category',
             'property'   => 'folder',
-            'type'       => self::TYPE_INTEGER,
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'category'
         ));
         $this->hasMap(array(
             'column'     => 'owner',
@@ -74,6 +75,11 @@ class LinkMapper extends Mapper {
              'this_key'  => 'owner',
              'other_key' => 'id',
 		));
+        $this->hasJoin('category', array(
+            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'this_key'  => 'category',
+            'other_key' => 'id'
+        ));
 
         $this->hasSoftDeleteDateField('deleted_at');
 	}

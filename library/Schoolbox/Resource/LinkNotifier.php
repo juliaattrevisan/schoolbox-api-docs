@@ -41,7 +41,7 @@ class LinkNotifier extends ResourceNotifier {
 	 * @return Envelope
 	 */
 	public function notifyCreated($roletype, $link, $effector, $diff = null) {
-		$category = CategoryMapper::getInstance()->findById($link->getFolder());
+		$category = CategoryMapper::getInstance()->findById($link->getFolder()->getId());
 
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
@@ -58,7 +58,7 @@ class LinkNotifier extends ResourceNotifier {
 	 * @return Envelope
 	 */
 	public function notifyDeleted($roletype, $link, $effector, $diff = null) {
-		$category = CategoryMapper::getInstance()->findById($link->getFolder());
+		$category = CategoryMapper::getInstance()->findById($link->getFolder()->getId());
 		// abstract this so far it doesn't even make sense any more
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
@@ -82,7 +82,7 @@ class LinkNotifier extends ResourceNotifier {
 	 * @return Category
 	 */
 	protected function getResourceCategory($resource) {
-		return $this->categoryMapper->findById($resource->getFolder());
+		return $this->categoryMapper->findById($resource->getFolder()->getId());
 	}
 
 

@@ -12,13 +12,14 @@
  
 namespace Schoolbox\Resource;
 use Schoolbox;
+use Schoolbox\FileInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class FileMapper extends Mapper {
+class FileMapper extends Mapper implements FileLocatorInterface {
 
 	/**
 	 * @var \Schoolbox\StorageMapper
@@ -73,12 +74,13 @@ class FileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'hidden',
 			'property'   => 'hidden',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_BOOLEAN,
 		));
 		$this->hasMap(array(
 			'column'     => 'category',
 			'property'   => 'folder',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'category'
 		));
 		$this->hasMap(array(
 			'column'     => 'file_size',
@@ -133,17 +135,23 @@ class FileMapper extends Mapper {
                 'other_key' => 'mime',
             ));
 
+        $this->hasJoin('category', array(
+            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'this_key'  => 'category',
+            'other_key' => 'id'
+        ));
 
         $this->registerCallback('preSave', array($this, 'preSave'));
         $this->registerCallback('postSave', array($this, 'postSave'));
 
 	}
 
+
     /**
      * Retreives a schoolbox file system file with a mime type object
      *
-     * @throws Exception if no instance of model is found
-     * @param  int  $identifierValue
+     * @param int $id
+     * @throws \Schoolbox\Mapper\Exception
      * @return \Schoolbox\Resource\File
      */
     public function findById($id) {
@@ -315,4 +323,17 @@ class FileMapper extends Mapper {
         return $parts;
     }
 
+
+    /**
+     * Return the files contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FileInterface[]
+     */
+    public function findByFolderId($nodeId)
+    {
+        return $this->findByColumnList(array(
+            'category' => $nodeId
+        ));
+    }
 }

@@ -50,7 +50,7 @@ try {
 
 				/* The url to load node contents from
 				 */
-				url: '/socialstream/tree.php',
+				url: '/ajax/resource/tree/browse',
 
 				/* The default category to open
 				 */
@@ -126,10 +126,16 @@ try {
 
 			/* The thing you clicked on
 			 */
-			var args = {
-				relationID: node,
-                mimeFilter: config.mimeFilter
-			};
+			var args = { relationID: node };
+
+            if (config.mimeFilter === false) {
+                // if the filter is explicitly false, exclude all files
+                args.mimeFilter = '';
+            }
+            else if (config.mimeFilter) {
+                // if a filter is set, include it
+                args.mimeFilter = config.mimeFilter;
+            }
 
             if (!config.isolate) {
                 /* Remember where we left off and reopen from here

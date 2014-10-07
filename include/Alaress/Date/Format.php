@@ -20,6 +20,24 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 */
 	protected $strategy;
 
+
+    /**
+     * Returns an instance of self at the current time.
+     * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
+     *
+     * @return static
+     */
+    public static function now()
+    {
+        if (isset($_SERVER['REQUEST_TIME'])) {
+            $time = $_SERVER['REQUEST_TIME'];
+        } else {
+            $time = time();
+        }
+
+        return new static($time, 'U');
+    }
+
 	/**
 	 * Set up datetime data for processing. Choose your strategy here!
 	 * Choose your locale as well; this would probably come from the Config

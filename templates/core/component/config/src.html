@@ -10,7 +10,7 @@
       $j('#resource-browser').socialstreamBrowser({
         title: 'Choose a source',
         categoryId: '{COMPONENT_CONFIG_SRC_CID}',
-        url: '/socialstream/tree.php?nofiles=1',
+        mimeFilter: false,
         submitCallback: function(url, filename) {
 
           var src = $j('#src-{COMPONENT_HANDLE}');

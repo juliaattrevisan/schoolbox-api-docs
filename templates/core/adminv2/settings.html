@@ -34,8 +34,8 @@
 
         $j('#resource-browser').socialstreamBrowser({
             title: 'Choose a folder',
+            mimeFilter: false,
             categoryId: 0,
-            url: '/socialstream/tree.php?nofiles=1',
             submitCallback: function(url, filename) {
                 settings.find('input[name=course_homepage]').val(url);
             }

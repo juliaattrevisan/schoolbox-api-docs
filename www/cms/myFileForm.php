@@ -26,42 +26,41 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
     if (is_numeric($_POST['fileID'])) {
         // check user owns file
+        /** @var MyFile $currentFile */
 		$currentFile = MyFileMapper::getInstance()->findById($_POST['fileID']);
 
-        if ($currentFile->getOwner() != $userId) {
+        if ($currentFile->getOwner()->getId() != $userId) {
             $page->error(47);
         }
-
-		$currentFile->setParent($_POST['parent']);
-		$currentFile->setOwner($_SESSION['user']->getId());
-		$currentFile->setDescription($_POST['description']);
-
-		MyFileMapper::getInstance()->save($currentFile);
-    }
-    else {
+    } else {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
 		/* TODO: this should be made consistent with File -_-
 		 */
-		$mimetype = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
+		$mime = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
 
-		$currentFile = new MyFile();
-		$currentFile->setParent($_POST['parent']);
-		$currentFile->setOwner($_SESSION['user']->getId());
-		$currentFile->setDescription($_POST['description']);
+        $currentFile = new MyFile();
 		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
 		$currentFile->setFilename($_FILES['file']['name']);
 		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-		$currentFile->setMime($mimetype->getMime());
-		$currentFile->setCreatedAt(new Datetime('now'));
-		$currentFile->setdeletedAt(0);
-
-		MyFileMapper::getInstance()->save($currentFile);
+		$currentFile->setMime($mime);
+		$currentFile->setCreatedAt(new Alaress_Date_Format(time(), 'U'));
+		$currentFile->setDeleted(false);
     }
 
-	/* If any checkboxes were selected, publish to eportfolio My Files components on various pages
-	 */
+    $parent = new \Schoolbox\MyFolder();
+    $parent->setId($_POST['parent']);
+
+    $currentFile->setParent($parent);
+    $currentFile->setOwner($_SESSION['user']);
+    $currentFile->setDescription($_POST['description']);
+
+    MyFileMapper::getInstance()->save($currentFile);
+
+
+    /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
+     */
 	if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
@@ -92,11 +91,12 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 }
 // delete a single file
 elseif (is_numeric($_GET['delete'])) {
-	$e = deleteMyFile($fileHandler, $_GET['delete']);
-	if(is_numeric($e)) {
-		error($e);
-	}
-    SitePage::localRedir('/cms/portfolio/' . $e['parent']);
+    try {
+        $parent = deleteMyFile($_GET['delete']);
+    } catch (Schoolbox\Resource\Exception $e) {
+        error($e->getCode());
+    }
+    SitePage::localRedir("/cms/portfolio/$parent");
 }
 // delete multiple files
 elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
@@ -105,19 +105,17 @@ elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
 	$parent = 0;
 	if(is_array($fileList) && count($fileList)) {
 		foreach($fileList as $file) {
-			$e = deleteMyFile($fileHandler, $file);
-			if(is_numeric($e)) {
-				$errorList[] = $e;
-			}
-			else {
-				// it's fine for this to be overwritten each iteration
-				$parent = $e['parent'];
+            try {
+                // it's fine for this to be overwritten each iteration
+                $parent = deleteMyFile($file);
+            } catch (Schoolbox\Resource\Exception $e) {
+                $errorList[] = $e->getCode();
 			}
 		}
 		if(count($errorList)) {
 			error($errorList[0]);
 		}
-		SitePage::localRedir('/cms/portfolio/' . $parent);
+        SitePage::localRedir("/cms/portfolio/$parent");
 	}
 	else {
 		error(2);
@@ -127,31 +125,42 @@ elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
 else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
-    if (!$file = $fileHandler->getByID($_POST['move'])) {
-        echo "Failed";
-    }
+    try {
+        /** @var MyFile $file */
+        $file = MyFileMapper::getInstance()->findById($_POST['move']);
 
-    if ($file['owner'] != $_SESSION['id']) {
-        echo "Insufficient permssions";
+        if ($file->getOwner()->getId() != $_SESSION['id']) {
+            die('Insufficient permissions');
+        }
+        $file->getParent()->setId($_POST['categoryID']);
+        MyFileMapper::getInstance()->save($file);
+    } catch (Schoolbox\Resource\Exception $e) {
+        die('Failed');
     }
-
-    $fileHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
 }
 
 
 /**
- * @param MyFile $fileHandler
  * @param int $fileId
- * @return int errorCode | array file
+ * @throws Schoolbox\Resource\Exception
+ * @return int
  */
-function deleteMyFile($fileHandler, $fileId) {
-	if (!$file = $fileHandler->getByID($fileId)) {
-		return 41; // file does not exist
-	}
-	if ($file['owner'] != $_SESSION['id']) {
-		return 48; // don't have permission
-	}
-	return $fileHandler->delete($fileId)
-		? $file
-		: 2; // not enough info submitted (should theoretically never happen based on above checks)
+function deleteMyFile($fileId) {
+    try {
+        /** @var MyFile $file */
+        $file      = MyFileMapper::getInstance()->findById($fileId);
+        $ownerId   = $file->getOwner()->getId();
+        $sessionId = $_SESSION['user']->getId();
+        $isSuper   = $_SESSION['user']->isSuperuser();
+
+        if ($ownerId == $sessionId || $isSuper) {
+            if (MyFileMapper::getInstance()->delete($file)) {
+                return $file->getParent()->getId();
+            }
+            throw new Schoolbox\Resource\Exception("Error", 2); // fail to delete
+        }
+        throw new Schoolbox\Resource\Exception("Error", 48); // permissions insufficient
+    } catch(Schoolbox\Mapper\Exception $e) {
+        throw new Schoolbox\Resource\Exception("Error", 41); // no any device exists
+    }
 }

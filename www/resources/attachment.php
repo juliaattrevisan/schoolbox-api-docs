@@ -31,10 +31,10 @@ $factory = new \Schoolbox\Resource\Attachment\Factory(array(
     'internal' => array(
         'upload' => "$base\\Internal\\UploadController",
         'browse' => "$base\\Internal\\BrowseController",
-        'myfile' => "$base\\Internal\\MyFileController",
+        'myfile' => "$base\\Internal\\MyfileController",
     ),
     'external' => array(
-        'webdav' => "$base\\External\\WebDavController",
+        'webdav' => "$base\\External\\WebdavController",
         'google' => "$base\\External\\GoogleController",
     )
 ));

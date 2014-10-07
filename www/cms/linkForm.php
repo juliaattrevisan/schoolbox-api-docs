@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Schoolbox\Resource\CategoryMapper;
 use \Schoolbox\Resource\LinkMapper;
 use \Schoolbox\Resource\Link;
 
@@ -22,9 +23,10 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
    		/* Modify existing link
    		 */
         try{
+            /** @var Link $link */
             $link = LinkMapper::getInstance()->findById($_POST['linkID']);
 
-            if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
           			error(6);
             }
         }
@@ -36,10 +38,11 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['hidden']?true:false);
-        $link->setModified(new DateTime('now'));
+        $link->setModified(Alaress_Date_Format::now());
 
     }
     else {
+        /** @var Link $link */
         $link = LinkMapper::getInstance()->createModel();
         $link->setOwner($_SESSION['id']);
 
@@ -59,7 +62,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
                 }
 
                 $linkDest = clone $link;
-                $linkDest->setFolder($cat);
+                $linkDest->setFolder(CategoryMapper::getInstance()->createModel($cat));
                 $linkCollection->add($linkDest);
             }
             $link=$linkCollection;
@@ -69,7 +72,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
                 error(6);
             }
 
-            $link->setFolder($_POST['category']);
+            $link->setFolder(CategoryMapper::getInstance()->createModel($_POST['category']));
         }
     }
 
@@ -85,15 +88,15 @@ else {
         try{
             $link = LinkMapper::getInstance()->findById($_POST['move']);
 
-            if ($groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             }
             else if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             }
             else {
-                $link->setFolder($_POST['categoryID']);
-                $link->setModified(new DateTime('now'));
+                $link->setFolder(\Schoolbox\Calendar\Relation\CategoryMapper::getInstance()->createModel($_POST['categoryID']));
+                $link->setModified(Alaress_Date_Format::now());
                 LinkMapper::getInstance()->save($link);
                 $result = "success";
             }
@@ -111,7 +114,7 @@ else {
         try{
             $link = LinkMapper::getInstance()->findById($_GET['delete']);
 
-            if ( $groupHandler->getPermission($link->getFolder()) < WRITE_ACCESS ) {
+            if ( $groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS ) {
                 error(6);
             }
 

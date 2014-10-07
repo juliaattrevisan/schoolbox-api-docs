@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Resource\Browser\NodeFactory;
+
 /**
  * Asynchronous upload of a brownhole file.
  *
@@ -38,7 +40,7 @@ elseif (is_readable($_FILES['upload']['tmp_name'])) {
         $result['success'] = true;
         $result['message'] = 'OK';
         $result['error']   = 200;
-        $result['hash']    = $imageResource->getHash();
+        $result['hash']    = NodeFactory::STORE . ':' . $imageResource->getHash();
     }
     catch (Exception $ex) {
     }

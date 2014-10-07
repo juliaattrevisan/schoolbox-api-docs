@@ -12,13 +12,13 @@ if(is_numeric($this->arg[0])) {
 	/* Modify existing file */
     try{
         $file = FileMapper::getInstance()->findById($this->arg[0]);
-        $folder = CategoryMapper::getInstance()->findById($file->getFolder());
+        $folder = CategoryMapper::getInstance()->findById($file->getFolder()->getId());
     }
     catch (Exception $e) {
 		error(41);
 	}
 
-	if ($groupHandler->getPermission($file->getFolder()) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
 		error(6);
 	}
 
@@ -39,7 +39,7 @@ if(is_numeric($this->arg[0])) {
 		'COMMENT' => Scrub::text($file->getComment()),
 		'HIDDEN_SELECTED' => $file->getHidden() > 0 ? 'checked="checked"' : '',
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-		'CATEGORY_ID' => $file->getFolder(),
+		'CATEGORY_ID' => $file->getFolder()->getId(),
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'DUE_DAY' => '',
 		'DUE_MONTH' => '',

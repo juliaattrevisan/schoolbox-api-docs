@@ -33,7 +33,7 @@ class Storage implements FileInterface {
 	protected $filesize;
 
 	/**
-	 * @var int
+	 * @var User
 	 */
 	protected $uploaded_by;
 
@@ -171,7 +171,7 @@ class Storage implements FileInterface {
 	}
 
 	/**
-	 * @param  int $uploaded_by
+	 * @param User $uploaded_by
 	 * @return $this
 	 */
 	public function setUploadedBy($uploaded_by) {
@@ -180,7 +180,7 @@ class Storage implements FileInterface {
 	}
 
 	/**
-	 * @return int
+	 * @return User
 	 */
 	public function getUploadedBy() {
 		return $this->uploaded_by;
@@ -345,5 +345,17 @@ class Storage implements FileInterface {
 	public function isUploadAllowed() {
         return $this->getMimetype()->isEnabled();
 	}
+
+
+    /**
+     * Returns the owner/uploader of the file
+     *
+     * @alias getUploadedBy
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->getUploadedBy();
+    }
 
 }

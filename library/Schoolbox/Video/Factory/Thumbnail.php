@@ -20,8 +20,8 @@ class Thumbnail extends Base {
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($video) {
-		if ($this->getGroupHandler()->getPermission($video->getFile()->getFolder()) < READ_ACCESS) {
-			SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+		if ($this->getGroupHandler()->getPermission($video->getFile()->getFolder()->getId()) < READ_ACCESS) {
+			\SitePage::redirectToBrokenImageOfSize(64, 64, 403);
 		}
 	}
 }

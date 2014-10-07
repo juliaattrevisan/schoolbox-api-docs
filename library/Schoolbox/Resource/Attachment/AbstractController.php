@@ -22,7 +22,7 @@ abstract class AbstractController implements ControllerInterface {
     protected $mimeFilter;
 
     /** @var string */
-    protected $template;
+    protected $slug;
 
 
     /**
@@ -38,7 +38,8 @@ abstract class AbstractController implements ControllerInterface {
 
         $this->multi      = $multi;
         $this->mimeFilter = $mimeFilter;
-        $this->template   = strtolower(str_replace('\\','/',$matches[1]));
+        $this->slug       = strtolower(str_replace('\\','/',$matches[1]));
+        $this->template   = $this->slug;
     }
 
 
@@ -56,7 +57,7 @@ abstract class AbstractController implements ControllerInterface {
      */
     public function getSlug()
     {
-        return $this->template;
+        return $this->slug;
     }
 
 

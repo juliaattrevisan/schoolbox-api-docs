@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment;
 
 
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
 
@@ -33,6 +34,15 @@ class Zone {
     /** @var array */
     protected $text;
 
+    /** @var string */
+    protected $mimeFilter;
+
+    /** @var bool */
+    protected $multi;
+
+    /** @var StorageMapper */
+    protected $mapper;
+
     /**
      * @param string $zoneId
      * @param StorageMapper $mapper
@@ -41,6 +51,7 @@ class Zone {
     {
         $this->id       = $zoneId;
         $this->size     = 32;
+        $this->multi    = false;
         $this->text     = array(
             'attachPrompt'     => 'Attach files',
             'attachmentsLabel' => 'Attachments',
@@ -48,12 +59,14 @@ class Zone {
         );
         $this->mapper   = $mapper ?: StorageMapper::getInstance();
 
+        $this->mimeFilter  = '';
         $this->attachments = array();
     }
 
 
     /**
      * @param array $hashlist
+     * @return self
      */
     public function attachFiles(array $hashlist)
     {
@@ -65,42 +78,84 @@ class Zone {
                 // TODO maybe look elsewhere?
             }
         }
+        return $this;
     }
 
 
     /**
      * @param int $px
+     * @return self
      */
     public function setThumbnailSize($px)
     {
         $this->size = $px;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setAttachPrompt($text)
     {
         $this->text['attachPrompt'] = $text;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setAttachmentsLabel($text)
     {
         $this->text['attachmentsLabel'] = $text;
+        return $this;
     }
 
 
     /**
      * @param string $text
+     * @return self
      */
     public function setModalTitle($text)
     {
         $this->text['modalTitle'] = $text;
+        return $this;
+    }
+
+
+    /**
+     * @param string $filter
+     * @return self
+     */
+    public function setMimeFilter($filter)
+    {
+        $this->mimeFilter = $filter;
+        return $this;
+    }
+
+
+    /**
+     * Clear the mime filter
+     * @return self
+     */
+    public function clearMimeFilter()
+    {
+        $this->mimeFilter = null;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $multi
+     * @return self
+     */
+    public function setMulti($multi)
+    {
+        $this->multi = $multi;
+        return $this;
     }
 
 
@@ -113,6 +168,15 @@ class Zone {
         $page->setFile(self::TPL, 'resources/attachzone.html');
         $page->setBlock(self::TPL, 'attachment_list', 'attachment_list_block');
 
+        // wrap in quotes
+        $filter = "'$this->mimeFilter'";
+
+        if ($this->mimeFilter === null) {
+            $filter = 'null';
+        } elseif ($this->mimeFilter === false) {
+            $filter = 'false';
+        }
+
         $page->setVar(array(
             'AZ_ID'         => $this->id,
             'AZ_ID_CAMEL'   => $this->delim2camel($this->id),
@@ -121,6 +185,8 @@ class Zone {
             'AZ_ATTACH_PROMPT'     => $this->text['attachPrompt'],
             'AZ_ATTACHMENTS_LABEL' => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
             'AZ_MODAL_TITLE'       => $this->text['modalTitle'],
+            'AZ_MIME_FILTER'       => $filter,
+            'AZ_MULTI'             => $this->multi ? 'true' : 'false',
 
             'attachment_list_block' => '',
         ));
@@ -134,7 +200,7 @@ class Zone {
 
             $page->setVar(array(
                 'AZ_FILE_NAME'    => $file->getFilename(),
-                'AZ_FILE_HASH'    => $file->getHash(),
+                'AZ_FILE_HASH'    => NodeFactory::STORE . ':' . $file->getHash(),
                 'AZ_FILE_PREVIEW' => $href,
             ));
 

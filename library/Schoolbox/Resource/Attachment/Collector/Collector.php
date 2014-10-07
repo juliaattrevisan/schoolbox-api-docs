@@ -10,15 +10,17 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\Storage;
+use Schoolbox\FileInterface;
+use Schoolbox\Resource\Exception as ResourceException;
 
 class Collector
 {
 
     const TYPE_STORAGE = 0x1;
     const TYPE_SBFS    = 0x2;
-    const TYPE_FOLIO   = 0x4;
-    const TYPE_ALL     = 0x7;
+    const TYPE_MYFILE  = 0x4;
+    const TYPE_WEBDAV  = 0x8;
+    const TYPE_ALL     = 0xF;
 
     /** @var array */
     protected $source;
@@ -28,7 +30,7 @@ class Collector
 
 
     /**
-     * @param array $source
+     * @param array $source - in the form $source[$type][$i] = $id
      * @param TypeHandlerInterface[] $handlers
      */
     public function __construct($source, $handlers)
@@ -40,30 +42,42 @@ class Collector
 
     /**
      * @param int $filter
-     * @return Storage
+     * @throws ResourceException
+     * @return FileInterface
      */
     public function getFirst($filter = self::TYPE_ALL)
     {
-        foreach (array_keys($this->source) as $index) {
-            if ($result = $this->get($index, $filter)) {
-                return $result;
+        foreach ($this->source as $type => $ids) {
+            if (!$type & $filter) {
+                continue;
+            }
+            foreach ($ids as $id) {
+                if($result = $this->get($type, $id)) {
+                    return $result;
+                }
             }
         }
-
-        return null;
+        throw new ResourceException("Could not find a matching resource");
     }
 
 
     /**
      * @param int $filter
-     * @return Storage[]
+     * @return FileInterface[]
      */
     public function getAll($filter = self::TYPE_ALL)
     {
         $result = array();
 
-        foreach (array_keys($this->source) as $index) {
-            $result[] = $this->get($index, $filter);
+        foreach ($this->source as $type => $ids) {
+            if(!$type & $filter) {
+                continue;
+            }
+            foreach ($ids as $id) {
+                if($r = $this->get($type, $id)) {
+                    $result[] = $r;
+                }
+            }
         }
 
         return $result;
@@ -71,34 +85,18 @@ class Collector
 
 
     /**
-     * @param int $i
-     * @param int $filter
-     * @return Storage
+     * @param int $type
+     * @param string $id
+     * @return FileInterface
      */
-    protected function get($i, $filter = self::TYPE_ALL)
+    protected function get($type, $id)
     {
-        $type = $this->detectType($this->source[$i]);
 
-        if (empty($this->handlers[$type]) || !($type & $filter)) {
+        if (empty($this->handlers[$type])) {
             return null;
         }
 
-        return $this->handlers[$type]->fetch($this->source[$i]);
-    }
-
-
-    /**
-     * @param string $id
-     * @return int
-     */
-    public function detectType($id)
-    {
-        foreach ($this->handlers as $type => $handler) {
-            if ($handler->matches($id)) {
-                return (int)$type;
-            }
-        }
-        return 0;
+        return $this->handlers[$type]->fetch($id);
     }
 
 } 

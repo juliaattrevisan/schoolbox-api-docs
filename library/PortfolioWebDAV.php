@@ -1,4 +1,10 @@
 <?php
+use Alaress\File\Remote\FetcherInterface;
+use Schoolbox\FileInterface;
+use Schoolbox\FolderInterface;
+use Schoolbox\Resource\FileLocatorInterface;
+use Schoolbox\Resource\FolderLocatorInterface;
+
 class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
 {
 
@@ -87,7 +93,7 @@ class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
     }
 }
 
-class PortfolioWebDAV
+class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
 
     /**
@@ -807,5 +813,137 @@ class PortfolioWebDAV
         return $_SESSION['portfolioIdPathMap'][$index];
     }
 
+    /**
+     * Return the resource (file *OR* folder) with the given ID
+     *
+     * @param int $nodeId
+     * @throws InvalidArgumentException
+     * @return FileInterface|FolderInterface
+     */
+    public function findById($nodeId)
+    {
+        $data = $this->getByID($nodeId);
+
+        switch ($data['type']) {
+            case 'dir':
+                return $this->parseFolder($data);
+            case 'file':
+                return $this->parseFile($data);
+        }
+
+        throw new InvalidArgumentException("Unable to parse DAV data");
+    }
+
+    /**
+     * @param array $data
+     * @return FolderInterface
+     */
+    protected function parseFolder($data)
+    {
+        $folder = new \Schoolbox\Resource\Category();
+
+        $parent = new \Schoolbox\Resource\Category();
+        $parent->setId($data['parent']);
+
+        $folder->setId($data['id']);
+        $folder->setParent($parent);
+        $folder->setName(urldecode($data['description'] ?: $data['name'] ?: $data['path']));
+
+        return $folder;
+    }
+
+    /**
+     * @param array $data
+     * @return FileInterface
+     */
+    protected function parseFile($data)
+    {
+        $file = new \Schoolbox\Resource\File();
+
+        $owner = new \Schoolbox\User();
+        $owner->setId($data['owner']);
+
+        $cat = new \Schoolbox\Resource\Category();
+        $cat->setId($data['parent']);
+
+        $file->setId($data['id']);
+        $file->setFolder($cat);
+        $file->setTempFileLocation($data['path']);
+        $file->setFilename($data['name']);
+        $file->setDescription($data['description']);
+        $file->setFilesize($data['file_size']);
+        $file->setOwner($owner);
+
+        return $file;
+    }
+
+    /**
+     * Return the files contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FileInterface[]
+     */
+    public function findByFolderId($nodeId)
+    {
+        $files = array();
+        $data  = $this->getAllInFolder($nodeId);
+
+        if (!is_array($data)) {
+            return $files;
+        }
+
+        foreach ($data as $node) {
+            $files[] = $this->parseFile($node);
+        }
+
+        return $files;
+    }
+
+    /**
+     * Return the folders contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return FolderInterface[]
+     */
+    public function findByParentId($nodeId)
+    {
+        $folders = array();
+        $data    = $this->getFolderList($nodeId);
+
+        if (!is_array($data)) {
+            return $folders;
+        }
+
+        foreach ($data as $node) {
+            $folders[] = $this->parseFolder($node);
+        }
+
+        return $folders;
+    }
+
+
+    /**
+     * Retrieves the metadata for the given fileId
+     *
+     * @param int $fileId
+     * @return array
+     */
+    public function fetchMetaData($fileId)
+    {
+        return $this->getByID($fileId);
+    }
+
+
+    /**
+     * Attempts to retrieve remote source to local destination, returns the path of the saved file.
+     *
+     * @param int $fileId
+     * @throws OutOfBoundsException
+     * @return string
+     */
+    function fetchToFile($fileId)
+    {
+        return $this->getFile($fileId);
+    }
 }
 

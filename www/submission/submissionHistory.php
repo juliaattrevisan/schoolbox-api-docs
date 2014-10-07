@@ -290,6 +290,14 @@ unset($html2text, $policy);
 
 $usersList = array();
 
+$zone = new \Schoolbox\Resource\Attachment\Zone('submission-file');
+$zone->setAttachPrompt('Click or drag here to attach your submission')
+     ->setAttachmentsLabel('')
+     ->setMulti(true)
+     ->setMimeFilter('*/*')
+     ->setModalTitle('Select file');
+
+$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 $recent_submission = null;
 $recent_return = null;

@@ -10,39 +10,48 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\Storage;
+use Schoolbox\FileInterface;
 use Schoolbox\StorageMapper;
+use Schoolbox\StorageMapperInterface;
 
 class StorageHandler implements TypeHandlerInterface {
 
     /** @var StorageMapper */
     protected $mapper;
 
+    /** @var StorageMapperInterface */
+    protected $storer;
+
     /**
-     * @param StorageMapper $mapper
+     * @param StorageMapper          $mapper
+     * @param StorageMapperInterface $storer
      */
-    public function __construct(StorageMapper $mapper)
+    public function __construct(StorageMapper $mapper, StorageMapperInterface $storer)
     {
         $this->mapper = $mapper;
-    }
-
-    /**
-     * @param string $id
-     * @return bool
-     */
-    public function matches($id)
-    {
-        return preg_match('`^[0-9a-f]{40}$`i', $id);
+        $this->storer = $storer;
     }
 
 
     /**
      * @param string $id
-     * @return Storage
+     * @return FileInterface
      */
     public function fetch($id)
     {
-        return $this->mapper->findByHash($id);
+        $sourcefile = $this->mapper->findByHash($id);
+
+        // don't try to put storage in storage
+        if ($this->storer instanceof StorageMapper) {
+            return $sourcefile;
+        }
+
+        // transfer from storage to wherever this storer wants to put it
+        return $this->storer->upload(
+            $sourcefile->getFilename(),
+            $sourcefile->getFileLocation(),
+            $sourcefile->getOwner()->getId()
+        );
     }
 
 }

@@ -36,6 +36,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $mapper = new SubmissionBoxMapper();
 // localise important variables
@@ -83,20 +84,32 @@ $values         = $_POST['value'];
 $criteria       = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
-//
-// Attach any files that were passed (they will have been saved in fileForm)
-if (!empty($_POST['file_ids']) && is_array($_POST['file_ids'])) {
-    foreach ($_POST['file_ids'] as $file_id) {
-        if (!empty($file_id)) {
-            $submission->getFileLinks()->addFromFileId($file_id);
-        }
+
+// clean the manymany file relation
+SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
+
+if (isset($_POST['attachment'])) {
+
+//    var_dump($_POST['attachment']);
+
+    $factory = new CollectorFactory();
+    /** @var \Schoolbox\Storage[] $storages */
+    $storages = $factory->build($_POST['attachment'])->getAll();
+
+    $files = new \Schoolbox\Collection();
+
+    // iterate and link up
+    foreach ($storages as $storage) {
+        $file = new SubmissionBox\File();
+        $file->setFile($storage);
+        $file->setFileId($storage->getId());
+        $file->setSubmissionBoxId($submissionBoxID);
+        $files->add($file);
     }
-}
-//
-// Legacy file ID (if passed through createSubmission/new/{catId}/{fileId})
-// submission's save method stores this as a storage file anyway.
-if (!empty($_POST['fileId'])) {
-    $submission->setLegacyFileId($_POST['fileId']);
+
+    $affected = SubmissionBox\FileMapper::getInstance()->save($files);
+
+    $submission->setFileLinks(new SubmissionBox\FileCollection());
 }
 
 

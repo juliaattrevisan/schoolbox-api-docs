@@ -24,7 +24,7 @@ class Link implements ISoftDeletable {
 	protected $owner;
 
     /**
-     * @var int
+     * @var Category
      */
     protected $folder;
 
@@ -96,7 +96,7 @@ class Link implements ISoftDeletable {
 	}
 
     /**
-     * @param int $folder
+     * @param Category $folder
      */
     public function setFolder($folder)
     {
@@ -104,7 +104,7 @@ class Link implements ISoftDeletable {
     }
 
     /**
-     * @return int
+     * @return Category
      */
     public function getFolder()
     {

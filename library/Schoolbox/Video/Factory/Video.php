@@ -11,16 +11,18 @@
 namespace Schoolbox\Video\Factory;
 
 
+use Schoolbox\Video\ResourceVideo;
+
 class Video extends Base {
 
 	/**
 	 * Check perms
 	 *
-	 * @param $video
+	 * @param ResourceVideo $video
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($video) {
-		if ($this->getGroupHandler()->getPermission($video->getFile()->getFolder()) < READ_ACCESS) {
+		if ($this->getGroupHandler()->getPermission($video->getFile()->getFolder()->getId()) < READ_ACCESS) {
 			throw new \Exception('You do not have permission to view this video.');
 		}
 	}

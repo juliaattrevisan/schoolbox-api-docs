@@ -32,7 +32,7 @@
                 title: 'Select a course',
                 categoryId: settings.course_homepage,
                 isolate: true,
-                url: '/socialstream/tree.php?nofiles=1',
+                mimeFilter: false,
                 submitCallback: function(url, filename) {
                     $(destination)
                         .val(url.match(/[0-9]+/)[0])

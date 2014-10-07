@@ -79,7 +79,7 @@
             paramName: opt.paramName,
             clickable: false,
             maxFiles: opt.multi ? null : 1,
-            acceptedFiles: opt.allowedFiles,
+            acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
             dictDefaultMessage: opt.dictDefaultMessage,
@@ -298,7 +298,7 @@
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
-                hash: list[i].hash,
+                hash: list[i].hash
             };
 
             if (this.dropzone) {

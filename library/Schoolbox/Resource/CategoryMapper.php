@@ -12,13 +12,14 @@
 namespace Schoolbox\Resource;
 
 use Schoolbox\Collection;
+use Schoolbox\FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use \External_UserInterface;
 use Schoolbox\Resource\Category;
 
-class CategoryMapper extends Mapper
+class CategoryMapper extends Mapper implements FolderLocatorInterface
 {
 
     /**
@@ -386,7 +387,7 @@ class CategoryMapper extends Mapper
      * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
      *                           any access level.
      *
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\Collection|Category[]
      */
     public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ)
     {
@@ -574,5 +575,18 @@ class CategoryMapper extends Mapper
          * configs, components, groups etc. untouched
          */
         $this->delete($category);
+    }
+
+
+    /**
+     * Return the folders contained within the folder with the given ID
+     *
+     * @see findByParent()
+     * @param int $nodeId
+     * @return FolderInterface[]
+     */
+    public function findByParentId($nodeId)
+    {
+        return $this->findByParent($nodeId);
     }
 }

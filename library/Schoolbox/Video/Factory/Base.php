@@ -13,6 +13,7 @@
 namespace Schoolbox\Video\Factory;
 
 use \Schoolbox\Video\QueueMapper;
+use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 
 abstract class Base {
@@ -53,7 +54,7 @@ abstract class Base {
 	/**
 	 * Spawn a video object
 	 *
-	 * @return null|object|ResourceVideo
+	 * @return ResourceVideo
 	 * @throws \Exception
 	 */
 	public function produce() {
@@ -75,9 +76,9 @@ abstract class Base {
 			case QueueMapper::FILE_TYPE_MYFILE:
 				$video = $videoMapper->findByMyFileId($this->getId());
 				return $video;
-
-			default: break;
 		}
+
+        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
 	}
 
 	/**
@@ -100,7 +101,7 @@ abstract class Base {
 	/**
 	 * Get group handler
 	 *
-	 * @return null
+	 * @return \Group
 	 */
 	protected function getGroupHandler() {
 		return $this->groupHandler;
