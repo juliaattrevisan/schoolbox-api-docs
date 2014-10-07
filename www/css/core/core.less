@@ -11864,7 +11864,6 @@ textarea.event-detail {
 		background-image: url("/images/core/files/paperclip-32.png");
 		background-position: 8px;
 		background-size: 22px;
-		line-height: 40px;
 		padding-left: 40px;
 	}
 	.actions .btn {
@@ -11892,7 +11891,6 @@ textarea.event-detail {
 		background-image: url("/images/core/files/paperclip-64.png");
 		background-size: 48px;
 		background-position: 10px;
-		line-height: 72px;
 		padding-left: 72px;
 	}
 	.actions .btn {
@@ -11912,6 +11910,9 @@ textarea.event-detail {
 			background-image: none;
 			color: #000;
 			padding-left: 0;
+			span {
+				padding: 0;
+			}
 		}
 	}
 	&.dz-unsupported {
@@ -11935,6 +11936,7 @@ textarea.event-detail {
 	}
 
 	.dzone {
+		position: relative;
 		overflow: hidden;
 		border: dashed 1px #ccc;
 		background-color: rgba(240, 240, 240, 0.5);
@@ -11943,12 +11945,30 @@ textarea.event-detail {
 		box-sizing: border-box;
 		color: #777;
 		text-shadow: 0 1px 0 #fff;
+		line-height: 1.1em;
+		width: 100%;
 		.transition(
 			background-color 150ms ease-out,
 			border-color 150ms ease-out,
 			color 150ms ease-out,
 			height 150ms ease-out 150ms
 		);
+		&:hover {
+			cursor: pointer;
+			span {
+				text-decoration: underline;
+			}
+		}
+		span {
+			display: inline-block;
+			vertical-align: middle;
+			padding: 4px;
+			position: absolute;
+			top: 50%;
+			.transform(
+				translateY(-50%)
+			);
+		}
 	}
 	.dz-success img[data-dz-thumbnail] {
 		background: none;
