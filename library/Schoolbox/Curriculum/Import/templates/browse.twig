@@ -12,26 +12,40 @@
     #curriculum-import-form .ui-tabs-panel.failed {
         background-color: #ff3311;
     }
+    #curriculum-import-form #outcomes .code {
+        color: #770000;
+        font-weight: bolder;
+    }
 </style>
+<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
+<!-- Template for the tree -->
+{% verbatim %}
+<script id="node-template" type="text/x-dot-template">
+    <li>
+        {{?it.code }}
+        <span class="code">{{!it.code }}</span>
+        {{?}}
+        {{=it.description }}
+    </li>
+</script>
+{% endverbatim %}
 <script type="text/javascript">
     (function($) {
+        var template         = doT.template($j('script#node-template').html().trim())
         var learningLevelUrl = {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }};
         var outcomeUrl       = {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }};
         var browseUrl        = {{ routeLookup('curriculumSource.browse')|json_encode|raw }};
 
         var makeTree = function(nodes, destination) {
             nodes.forEach(function(node) {
-                var listItem = $('<li />')
-                    .data('reference', node.reference)
-                    .html(node.description);
-                if (node.code) {
-                    listItem.append(' ('+node.code+')');
-                }
+                var subList = [];
                 if (node.children.length) {
-                    var subList = $('<ul />');
+                    subList = $('<ul />');
                     makeTree(node.children, subList);
-                    listItem.append(subList);
                 }
+                var listItem = $(template(node))
+                    .data('reference', node.reference)
+                    .append(subList);
                 destination.append(listItem);
             })
         };
