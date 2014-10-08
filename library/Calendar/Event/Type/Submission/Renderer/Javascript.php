@@ -9,17 +9,18 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract
+{
 
-	/**
-	 * Visitor
-	 *
-	 * @param $currentEvent
-	 */
-	public function visit($currentEvent) {
-		if ($this->isVisible($currentEvent)) {
-
-			/* Future events are visible to superusers, event owners, group members with write access
+    /**
+    * Visitor
+    *
+    * @param $currentEvent
+    */
+    public function visit($currentEvent)
+    {
+        if ($this->isVisible($currentEvent)) {
+/* Future events are visible to superusers, event owners, group members with write access
 			 */
 //			if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
 //				$cssClass = 'translucent';
@@ -28,119 +29,118 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 //				$cssClass = '';
 //			}
 
-			/* Modify link. Should be templated...
+            /* Modify link. Should be templated...
 			 */
-			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
-				$editable = true;
-			}
-			else {
-				$editable = false;
-			}
+            if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
+                $editable = true;
+            } else {
+                $editable = false;
+            }
 
-			/* Show a homepage if appropriate
+            /* Show a homepage if appropriate
 			 */
-			if ($currentEvent->getCategoryId() > 0) {
-				$categoryId = $currentEvent->getCategoryId();
-				$categoryName = $currentEvent->getCategoryName();
-			}
-			else {
-				$categoryId = '';
-				$categoryName = '';
-			}
+            if ($currentEvent->getCategoryId() > 0) {
+                $categoryId = $currentEvent->getCategoryId();
+                $categoryName = $currentEvent->getCategoryName();
+            } else {
+                $categoryId = '';
+                $categoryName = '';
+            }
 
-			/* Event attendance
+            /* Event attendance
 			 */
-			$hasIcon = false;
-			$hasStatus = false;
-			$hasAttendanceRequestButton = false;
-			$hasListButton = false;
+            $hasIcon = false;
+            $hasStatus = false;
+            $hasAttendanceRequestButton = false;
+            $hasListButton = false;
 
-			/* Congeal all that stuff
+            /* Congeal all that stuff
 			 */
-			$start   = $currentEvent->getStartTime()->getDatabaseDate();
-			$all_day = $currentEvent->getAllDay();
-			if (!$all_day) {
-				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-			}
+            $start   = $currentEvent->getStartTime()->getDatabaseDate();
+            $all_day = $currentEvent->getAllDay();
+            if (!$all_day) {
+                $start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+            }
 
-			// Set classes
-			$classes = array(
-				'group' . $categoryId,
-				'type' . $currentEvent->getType(),
-			);
-			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
-				$classes[] = 'source' . $connectorId;
-			}
+            // Set classes
+            $classes = array(
+                'group' . $categoryId,
+                'type' . $currentEvent->getType(),
+            );
+            if (($connectorId = $currentEvent->getConnectorId()) > 0) {
+                $classes[] = 'source' . $connectorId;
+            }
 
-			$event = array(
-				'title' => $currentEvent->getTitle(),
-				'start' => "$start",
-				'end' => "",
+            $event = array(
+                'title' => $currentEvent->getTitle(),
+                'start' => "$start",
+                'end' => "",
 
-				/* Whether you can edit this event or not
+                /* Whether you can edit this event or not
 				 */
-				'editable' => $editable,
+                'editable' => $editable,
 
-				/* Whether it's an all-day event or not
+                /* Whether it's an all-day event or not
 				 * If allDay is true, then you can't resize it
 				 *
 				 * Schoolbox usage would be that all events are not
 				 * allDay events
 				 */
-				'allDay' => $all_day,
+                'allDay' => $all_day,
 
-				/* Colour of the event
+                /* Colour of the event
 				 */
-				'color' => $currentEvent->getColour(),
+                'color' => $currentEvent->getColour(),
 
-				'className' => $classes,
+                'className' => $classes,
 
-				/* Extra data that the Event Object doesn't directly support
+                /* Extra data that the Event Object doesn't directly support
 				 */
-				'data' => array(
-					'meta' => array(
-						'eventId' => $currentEvent->getEventId(),
-						'time' => $currentEvent->getTime(),
-						'detail' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
-						'location' => $currentEvent->getLocation(),
-						'eventType' => 'type' . $currentEvent->getType(),
-						'type' => $currentEvent->getEventType(),
-						'author' => $currentEvent->getAuthorName(),
-						'authorId' => $currentEvent->getAuthorId(),
-						'level' => $currentEvent->getDerivedEventLevel(),
-						'completed' => $currentEvent->getCompleted(),
-					),
-					'links' => array(
-						'category' => array(
-							'id' => $categoryId,
-							'name' => $categoryName,
-						)
-					),
-					'styles' => array(
-						'visible' => $this->isVisible($currentEvent),
-					),
-					'attendance' => array(
-						'icon' => $hasIcon,
-						'status' => $hasStatus,
-						'requestButton' => $hasAttendanceRequestButton,
-						'listButton' => $hasListButton,
-					)
-				)
-			);
+                'data' => array(
+                    'meta' => array(
+                        'eventId' => $currentEvent->getEventId(),
+                        'time' => $currentEvent->getTime(),
+                        'detail' => Scrub::html($currentEvent->getSubmissionBoxDetail()),
+                        'location' => $currentEvent->getLocation(),
+                        'eventType' => 'type' . $currentEvent->getType(),
+                        'type' => $currentEvent->getEventType(),
+                        'author' => $currentEvent->getAuthorName(),
+                        'authorId' => $currentEvent->getAuthorId(),
+                        'level' => $currentEvent->getDerivedEventLevel(),
+                        'completed' => $currentEvent->getCompleted(),
+                    ),
+                    'links' => array(
+                        'category' => array(
+                            'id' => $categoryId,
+                            'name' => $categoryName,
+                        )
+                    ),
+                    'styles' => array(
+                        'visible' => $this->isVisible($currentEvent),
+                    ),
+                    'attendance' => array(
+                        'icon' => $hasIcon,
+                        'status' => $hasStatus,
+                        'requestButton' => $hasAttendanceRequestButton,
+                        'listButton' => $hasListButton,
+                    )
+                )
+            );
 
-			echo json_encode($event);
-			echo ",";
-		}
-	}
+            echo json_encode($event);
+            echo ",";
+        }
+    }
 
-	/**
-	 * Submission events are always visible
-	 *
-	 * @param $currentEvent
-	 *
-	 * @return bool
-	 */
-	protected function isVisible($currentEvent) {
-		return true;
-	}
+    /**
+    * Submission events are always visible
+    *
+    * @param $currentEvent
+    *
+    * @return bool
+    */
+    protected function isVisible($currentEvent)
+    {
+        return true;
+    }
 }
