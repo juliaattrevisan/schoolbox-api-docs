@@ -1014,7 +1014,7 @@ class Calendar extends DeprecatedModel
     {
         // set the filters into the session
         foreach ($filters as $filter) {
-            $_SESSION['calendarFilter'][$filter[0]] = preg_replace('/[^0-9]/', '', $filter[1]);
+            $_SESSION['calendarFilter'][$filter[0]] = preg_replace('/^[^0-9]+/', '', $filter[1]);
         }
 
         // update the user table to hold onto the view that they last used
