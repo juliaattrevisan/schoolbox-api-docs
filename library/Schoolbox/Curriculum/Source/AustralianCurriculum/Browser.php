@@ -200,15 +200,20 @@ SPARQL
     protected function buildOutputTree($jsonTree)
     {
         $node = new Node\Model();
-        // Name: maybe it doesn't have one at all.
-        // Use the code instead.
+        // Name: use the title if it's there, otherwise just use the statement
+        // label (which does a decent job defining the purpose of this node)
+        if ($jsonTree->dcterms_title && $jsonTree->dcterms_title->literal) {
+            $node->setName($jsonTree->dcterms_title->literal);
+        } elseif ($jsonTree->asn_statementLabel && $jsonTree->asn_statementLabel->literal) {
+            $node->setName($jsonTree->asn_statementLabel->literal);
+        }
         $node
             ->setReference($jsonTree->id)
             ->setDescription($jsonTree->text);
-        if ($jsonTree->asn_statementNotation) {
+        if ($jsonTree->asn_statementNotation && $jsonTree->asn_statementNotation->literal) {
             $node->setCode($jsonTree->asn_statementNotation->literal);
         }
-        if ($jsonTree->dcterms_modified) {
+        if ($jsonTree->dcterms_modified && $jsonTree->dcterms_modified->literal) {
             $modified = new Alaress_Date_Format(
                 new DateTime($jsonTree->dcterms_modified->literal)
             );
