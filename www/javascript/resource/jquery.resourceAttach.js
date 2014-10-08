@@ -6,6 +6,23 @@
  * @version     SVN: $Id$
  */
 ;
+// It's dangerous to go alone. Take this.
+// IE9+ polyfill: https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent
+(function () {
+    if (typeof window.CustomEvent == 'undefined') {
+        function CustomEvent ( event, params ) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent( 'CustomEvent' );
+            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            return evt;
+        }
+
+        CustomEvent.prototype = window.Event.prototype;
+
+        window.CustomEvent = CustomEvent;
+    }
+})();
+
 (function ($, Dropzone, window, document, undefined) {
 
     var pluginName = 'resourceAttach',
@@ -36,6 +53,7 @@
             dictDefaultMessage: null,
             previewsContainerSelector: 'ul.az-list',
             thumbnailSize: 64,
+            tplOverride: null,
 
             // pass through to various implementations
             allowedFiles: null,
@@ -52,7 +70,7 @@
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
         this.modal   = null;
-        this.tpl     = $(this.element).find('[data-template]').detach();
+        this.tpl     = this.options.tplOverride || $(this.element).find('[data-template]').detach();
 
         self  = this;
         opt   = self.options;
@@ -83,7 +101,7 @@
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
             dictDefaultMessage: opt.dictDefaultMessage,
-            previewsContainer: opt.previewsContainerSelector,
+            previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
 
             fallback: function () {
@@ -356,6 +374,7 @@
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src','/ajax/mime/' + file.type);
         }
+        elem.addClass('dz-success');
     };
 
 
@@ -368,5 +387,18 @@
             }
         });
     };
+
+
+    $.fn[pluginName + 'Clone'] = function (source) {
+        return this.each(function () {
+            if (source.data('plugin_' + pluginName)) {
+                // grab the options from the existing source and push them into a new instance
+                var ra = source.data('plugin_' + pluginName);
+                var options = ra.options;
+                options.tplOverride = ra.tpl.clone();
+                $(this)[pluginName](options);
+            }
+        });
+    }
 
 }(jQuery, Dropzone, window, document));
