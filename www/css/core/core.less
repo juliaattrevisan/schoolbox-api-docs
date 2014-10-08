@@ -2809,12 +2809,12 @@ input.timeField {
 }
 
 .submit-btn-plain {
-    line-height: 23px;
+    line-height: 24px;
     float: left;
     padding: 0 13px 0 13px;
     text-align: center;
     margin-bottom: 16px;
-    height: 23px;
+    height: 24px;
     outline: none;
 
 	background: @submit-btn;
@@ -10719,6 +10719,27 @@ ul.activity-list li,
 
 /* Socialstream */
 .addPostForm {
+	padding-bottom: 8px;
+	.submit-btn-plain {
+		margin: 8px 12px 8px 0;
+	}
+	.post-attachment {
+		margin: 0 124px 0 80px;
+		&.url {
+			margin-top: 10px;
+			> li {
+				height: 1.7em;
+				line-height: 1.6em;
+				padding: 10px 16px 10px 0 !important; // override that stupid !important 20 lines down
+			}
+		}
+	}
+	.alt-src {
+		position: absolute;
+		top: 4px;
+		line-height: 32px;
+		right: 0;
+	}
 
 }
 
@@ -10728,6 +10749,9 @@ ul.activity-list li,
 		margin: 0;
 		background: @dark;
 		border-bottom: 1px solid @border-color;
+		&.addPostForm li {
+			background: transparent;
+		}
 		p {
 			margin: 0 16px;
 			clear: both;
@@ -10739,7 +10763,8 @@ ul.activity-list li,
 		label {
 			padding-right: 0;
 			input, .socialstream-selected-file {
-				width: 75%;
+				font-size: 1em;
+				width: 100%;
 				float: right;
 				.ellipsis;
 			}
@@ -11804,9 +11829,10 @@ textarea.event-detail {
 }
 
 // attach-zone
-.az-list {
+ul.az-list {
 	position: relative;
 	> li {
+		clear: none;
 		padding: 4px 12px 4px 4px;
 		background-color: rgba(128, 128, 128, 0);
 		.transition(
@@ -11829,6 +11855,7 @@ textarea.event-detail {
 		}
 		.actions {
 			float: right;
+			margin: 0;
 		}
 	}
 	img {
@@ -11836,6 +11863,7 @@ textarea.event-detail {
 	}
 	p {
 		margin-bottom: 0;
+		clear: none;
 	}
 	.filename {
 		overflow-x: hidden;
@@ -11866,8 +11894,11 @@ textarea.event-detail {
 		background-size: 22px;
 		padding-left: 40px;
 	}
+	.dz-upload {
+		height: 40px;
+	}
 	.actions .btn {
-		margin-top: 4px;
+		margin: 4px 4px 0 0;
 	}
 }
 
@@ -11893,8 +11924,11 @@ textarea.event-detail {
 		background-position: 10px;
 		padding-left: 72px;
 	}
+	.dz-upload {
+		height: 72px;
+	}
 	.actions .btn {
-		margin-top: 20px;
+		margin: 20px 8px 0 0;
 	}
 }
 
@@ -11933,8 +11967,12 @@ textarea.event-detail {
 
 	img[data-dz-thumbnail] {
 		background: url('/images/resources/ajax.gif') no-repeat 50%;
+		.transition(opacity 800ms ease-in);
 	}
-
+	ul.az-list > li {
+		padding: 4px !important; /* srsly? I have to do this? */
+		position: relative;
+	}
 	.dzone {
 		position: relative;
 		overflow: hidden;
@@ -11970,9 +12008,39 @@ textarea.event-detail {
 			);
 		}
 	}
-	.dz-success img[data-dz-thumbnail] {
-		background: none;
+	.dz-error {
+		img[data-dz-thumbnail] {
+			opacity: 0;
+		}
+		.dz-upload {
+			background-color: rgba(255, 120, 120, 0.1);
+		}
 	}
+	.dz-success {
+		img[data-dz-thumbnail] {
+			background: none;
+		}
+		.dz-upload {
+			background-color: rgba(0, 102, 176, 0);
+		}
+		.filename {
+			opacity: 1;
+		}
+	}
+	.dz-progress {
+		margin: 0;
+	}
+	.dz-upload {
+		background-color: rgba(0, 102, 176, 0.03);
+		top: 0;
+		left: 0;
+	}
+	.filename {
+		opacity: 0.4;
+		.transition(opacity 800ms ease-out);
+	}
+
+
 }
 
 .message-list {
