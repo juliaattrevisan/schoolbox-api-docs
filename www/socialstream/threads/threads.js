@@ -159,8 +159,17 @@
 				clone.find('input[name=rootId]').val(rootId);
 				clone.find('input[name=url]').val('');
 
+                var dzone = clone.find('div.dzone');
+                dzone.attr('id', dzone.attr('id') + parentId);
+
+                var azone = clone.find('div.attachzone');
+                azone.attr('id', azone.attr('id') + parentId);
+
+                azone.removeClass('dz-max-files-reached').find('ul.az-list').html('');
+
 				/* Show specific ones
 				 */
+                azone.resourceAttachClone(config.defaultForm.find('div.attachzone'));
 				initAttachmentSelectors(clone);
 
 				/* Unhide it
@@ -318,33 +327,26 @@
 
 			/* Url attachment options
 			 */
-			form.find('.socialstream-attachment-url').click(function() {
-				form.find('input[name=socialstreamAttachment]').val('url');
+            form.on('click', 'a.sstream-attachment', function() {
+                var type = $(this).attr('data-value');
 
-				form.find('input[name=url]').val('').prop('readonly', false).closest('li').show();
-				form.find('input[name=file]').closest('li').hide();
-				form.find('.socialstream-selected-file').html('').closest('li').hide();
+                form.find('input[name=type]').val(type);
 
-			});
+                // show only the one we want
+                var attachers = form.find('div.post-attachment');
+                attachers.hide().filter('.'+type).show();
 
-			/* Upload attachment options
-			 */
-			form.find('.socialstream-attachment-upload').click(function() {
-				form.find('input[name=socialstreamAttachment]').val('upload');
+                form.find('input[name=url]').val('').prop('readonly', type == 'attach');
 
-				form.find('input[name=url]').val('').closest('li').hide();
-				form.find('input[name=file]').closest('li').show();
-				form.find('.socialstream-selected-file').html('').closest('li').hide();
-			});
+                if (type == 'url') {
+                    // tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
+                    // not jQuery.detach() - it can't trigger dropzone's event listener
+                    form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
+                        var event = new CustomEvent('click');
+                        this.dispatchEvent(event);
+                    });
+                }
 
-			/* Resource attachment options
-			 */
-			form.find('.socialstream-attachment-resource').click(function() {
-				form.find('input[name=socialstreamAttachment]').val('resource');
-
-				form.find('input[name=url]').val('').prop('readonly', true).closest('li').show();
-				form.find('input[name=file]').closest('li').hide();
-				form.find('.socialstream-selected-file').html('').closest('li').show();
 			});
 
 			return form;
