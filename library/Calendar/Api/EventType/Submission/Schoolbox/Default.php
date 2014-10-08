@@ -32,6 +32,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$stack = new Calendar_Event_Collection();
+		$eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
 
 		//
 		// Use the mapper classes to get events for this day.
@@ -59,7 +60,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 			}
 			$event->setCategoryCodes($category_codes);
 
-			$event->setColour($this->calendarHandler->displayColour(4));
+			$event->setType($eventType);
+			$event->setColour($this->calendarHandler->displayColour($eventType));
 			$event->setStartTime($activity->getDate());
 			$event->setEndTime($activity->getDate());
 
