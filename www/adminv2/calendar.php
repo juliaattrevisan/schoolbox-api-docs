@@ -64,8 +64,7 @@ $typeList = array(
 
 if (is_array($typeList)) {
     foreach ($typeList as $type) {
-
-        /* Navigation stuff
+/* Navigation stuff
  		 */
         $this->setVar(array(
             'SETTING_TAB_NAME' => $type['type'],
@@ -84,17 +83,15 @@ if (is_array($typeList)) {
 		 */
         if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
             $this->parse('import_block', 'import');
-        }
-        /* Subscribe page
+        } /* Subscribe page
 	 	 */
-        else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+        elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
             $allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
 
             /* All calendar subscription options go here
 			 */
-            foreach($allApi as $currentEventType => $allConnectors) {
-
-                /* Render titles etc
+            foreach ($allApi as $currentEventType => $allConnectors) {
+/* Render titles etc
 				 * Put a space between CamelCase names so they become Camel Case
 				 */
                 $this->setVar(array(
@@ -104,9 +101,8 @@ if (is_array($typeList)) {
 
                 /* Inject individual templates just like before -_-
 				 */
-                foreach($allConnectors as $currentConnector) {
-
-                    /* Render titles etc
+                foreach ($allConnectors as $currentConnector) {
+/* Render titles etc
 					 *
 					 * Some kind of rendering issue exists where I can't combine it with the other
 					 * setVar() further down. It leads to the wrong connector name being used.
@@ -120,7 +116,7 @@ if (is_array($typeList)) {
                     $allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
 
                     if (count($allConfigs)) {
-                        foreach($allConfigs as $currentConfig) {
+                        foreach ($allConfigs as $currentConfig) {
                             $this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
                             $this->setBlock('configFragment', 'event_type_list', 'event_type_list_block');
                             $this->setBlock('event_type_list', 'luEventType', 'luEventType_block');
@@ -176,12 +172,10 @@ if (is_array($typeList)) {
             }
 
             $this->parse('subscribe_block', 'subscribe');
-        }
-        /* Cleanup page
+        } /* Cleanup page
 		 */
-        else if (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
-
-            /* If both dates specified, find events between those two dates inclusive
+        elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+/* If both dates specified, find events between those two dates inclusive
 			 */
             if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
                 $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
@@ -195,7 +189,7 @@ if (is_array($typeList)) {
                 $eventMapper = new \Schoolbox\Calendar\EventMapper();
                 $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
-                foreach($allEvents as $currentEvent) {
+                foreach ($allEvents as $currentEvent) {
                     $this->setVar(array(
                         'CLEANUP_EVENT_ID' => $currentEvent['event']->getId(),
                         'CLEANUP_EVENT_TITLE' => $currentEvent['event']->getTitle(),
