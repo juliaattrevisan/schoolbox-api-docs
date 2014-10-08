@@ -2,6 +2,7 @@
 	<link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
 	<script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
 	<script type='text/javascript' src='/socialstream/threads/threads.js'></script>
+    <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 
 	<script type='text/javascript'>
 		/* Use flag to prevent double loading :(
@@ -38,38 +39,34 @@
 			<input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
 			<input type='hidden' name='parentId' value='0' />
 			<input type='hidden' name='rootId' value='0' />
-			<input type='hidden' name='socialstreamAttachment' value=''>
 
 			<ul class="socialstream-form">
 				<li>
 					<textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
 				</li>
 			</ul>
-			<ul class="socialstream-form">
-				<li>
-					<label>Link:
-						<input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
-					</label>
-				</li>
+            <div class="clearfix dz-wrap">
+                <p>
+                    <input class='submit-btn-plain' type='submit' value='Post' />
+                </p>
 
-				<li>
-					<label>File:
-						<input type='file' class='upload' name='file' value='' />
-					</label>
-				</li>
+                <div class="post-attachment attach">
+                    {ATTACH_ZONE}
+                    <p class="alt-src">
+                        or <a class='btn links sstream-attachment' data-value='url'><span></span>Link</a>
+                    </p>
+                </div>
 
-				<li>
-					<label>Resource:
-						<span class='socialstream-selected-file'>TS</span>
-					</label>
-				</li>
-			</ul>
-			<p class="clearfix">
-				<a class='btn folder socialstream-attachment-resource socialstream-browser-button' data-value='resource'><span></span>Browse Resources</a>
-				<a class='btn up-arrow socialstream-attachment-upload' data-value='upload'><span></span>Upload</a>
-				<a class='btn links socialstream-attachment-url' data-value='url'><span></span>Link</a>
-				<input class='submit-btn-plain' type='submit' value='Post' />
-			</p>
+                <div class="post-attachment url" style="display:none;">
+                    <label>
+                        <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                    </label>
+                    <p class="alt-src">
+                        or <a class='btn attach sstream-attachment' data-value='attach'><span></span>Attach</a>
+                    </p>
+                </div>
+
+            </div>
 		</form>
 		<!-- END socialstream_has_newpost -->
 	</div>

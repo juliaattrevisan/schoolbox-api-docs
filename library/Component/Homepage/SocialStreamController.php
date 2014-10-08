@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Resource\Attachment\Zone;
+
 /**
  * Component_Eportfolio_List
  *
@@ -85,6 +87,16 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 					'FORM_CLASS' => 'hide'
 				));
 			}
+
+            $zone = new Zone('sstream-attachment');
+            $zone->setMimeFilter(null)
+                 ->setAttachPrompt('Click or drag a file to share')
+                 ->setAttachmentsLabel('')
+                 ->setModalTitle('Select a file or folder')
+                 ->setMulti(false)
+                 ->setThumbnailSize(32);
+
+            $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
 
 			$this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
 		}
