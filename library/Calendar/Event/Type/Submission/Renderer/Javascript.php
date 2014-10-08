@@ -64,7 +64,10 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 			}
 
 			// Set classes
-			$classes = array('group' . $categoryId,);
+			$classes = array(
+				'group' . $categoryId,
+				'type' . $currentEvent->getType(),
+			);
 			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
 				$classes[] = 'source' . $connectorId;
 			}
