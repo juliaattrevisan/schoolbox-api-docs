@@ -1,22 +1,23 @@
 <?php
+
 /**
  * Calendar_Api_EventType_Submission_Schoolbox_Default
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     private $calendarHandler = null;
 
     /**
-    * Constructor
-    *
-    * @param \Schoolbox\User $user
-    * @param $config
-    */
+     * Constructor
+     *
+     * @param \Schoolbox\User $user
+     * @param                 $config
+     */
     public function __construct(\Schoolbox\User $user, $config)
     {
         $this->setCalendarHandler(new Calendar());
@@ -24,17 +25,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     }
 
     /**
-    * Get day events from this data source
-    *
-    * @param $startTimestamp
-    * @param $endTimestamp
-    * @internal param $currentDay
-    *
-    * @return Calendar_Event_Collection
-    */
+     * Get day events from this data source
+     *
+     * @param $startTimestamp
+     * @param $endTimestamp
+     *
+     * @internal param $currentDay
+     * @return Calendar_Event_Collection
+     */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack = new Calendar_Event_Collection();
+        $stack     = new Calendar_Event_Collection();
         $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
 
         //
@@ -103,39 +104,40 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     }
 
     /**
-    * Find a particular event from this source
-    *
-    * @param $eventId
-    * @return Calendar_Event_Collection
-    */
+     * Find a particular event from this source
+     *
+     * @param $eventId
+     *
+     * @return Calendar_Event_Collection
+     */
     public function getEvent($eventId)
     {
         $collection = new Calendar_Event_Collection();
 
         /* Fill in your query result set here and populate $collection
-		 */
+         */
 
         return $collection;
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
-    * Set calendar handler
-    *
-    * @param $calendarHandler
-    */
+     * Set calendar handler
+     *
+     * @param $calendarHandler
+     */
     public function setCalendarHandler($calendarHandler)
     {
         $this->calendarHandler = $calendarHandler;
     }
 
     /**
-    * Get calendar handler
-    *
-    * @return null
-    */
+     * Get calendar handler
+     *
+     * @return null
+     */
     public function getCalendarHandler()
     {
         return $this->calendarHandler;
