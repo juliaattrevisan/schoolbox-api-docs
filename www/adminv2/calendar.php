@@ -122,7 +122,8 @@ if (is_array($typeList)) {
                     if (count($allConfigs)) {
                         foreach($allConfigs as $currentConfig) {
                             $this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
-                            $this->setBlock('configFragment', 'luEventType', 'luEventType_block');
+                            $this->setBlock('configFragment', 'event_type_list', 'event_type_list_block');
+                            $this->setBlock('event_type_list', 'luEventType', 'luEventType_block');
                             $this->setBlock('configFragment', 'campus_list', 'campus_list_block');
                             $this->setBlock('configFragment', 'group_list', 'group_list_block');
 
@@ -139,6 +140,7 @@ if (is_array($typeList)) {
                             $this->setVar('luEventType_block', '');
                             $this->setVar('campus_list_block', '');
                             $this->setVar('group_list_block', '');
+                            $this->setVar('event_type_list_block', '');
                         }
 
                         /* Whether this connector displays at Ticked or not
