@@ -15,6 +15,9 @@
 </style>
 <script type="text/javascript">
     (function($) {
+        var learningLevelUrl = {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }};
+        var outcomeUrl       = {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }};
+        var browseUrl        = {{ routeLookup('curriculumSource.browse')|json_encode|raw }};
 
         var makeTree = function(nodes, destination) {
             nodes.forEach(function(node) {
@@ -61,7 +64,7 @@
                 if (value) {
                     // have some sort of ajax spinner or state change
                     $.get(
-                        {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }},
+                        learningLevelUrl,
                         {id: value},
                         $.noop,
                         'json'
@@ -129,7 +132,7 @@
                 var tab = $(event.target).closest('section');
                 tab.addClass('loading').find(':input').prop('disabled', true);
                 $.get(
-                    {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }},
+                    outcomeUrl,
                     {
                         id:    sourceSelect.val(),
                         area:  areaSelect.find(':selected').data('area').reference,
@@ -194,7 +197,7 @@
                     .done(function(data) {
                         // Save succeeded, redirect somewhere
                         tab.addClass('loaded');
-                        window.location.href = {{ routeLookup('curriculumSource.browse')|json_encode|raw }};
+                        window.location.href = browseUrl;
                     })
                     .fail(function(jqXhr, textStatus, error) {
                         // do something else
