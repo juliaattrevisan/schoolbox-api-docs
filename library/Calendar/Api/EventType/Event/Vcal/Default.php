@@ -129,7 +129,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
 		$collection = new Calendar_Event_Collection();
 
-		$currentConfig = Calendar_Api_Config_Mapper::getInstance()->findById($this->getConnectorId());
+		$currentConfig = $this->loadConnectorConfiguration();
 		$group_handler = new Group();
 		$is_superuser  = $group_handler->isSuperuser();
 

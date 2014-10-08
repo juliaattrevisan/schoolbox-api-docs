@@ -59,13 +59,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
         // Figure out event type
         try {
             /** @var Calendar_Api_Config_Record $config */
-            $config        = $this->getConfigMapper()->findOneByColumnList(
-                array(
-                    'event_type'      => 'TimetableDays',
-                    'connector_class' => 'External',
-                    'status'          => 1,
-                )
-            );
+            $config        = $this->loadConnectorConfiguration();
             $decodedConfig = $config->decodeConfig();
             $eventType     = $decodedConfig->getLuEventType();
         } catch (\Schoolbox\Mapper\Exception $e) {
