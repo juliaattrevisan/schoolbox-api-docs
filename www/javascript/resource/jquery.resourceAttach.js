@@ -195,7 +195,8 @@
                 explorer.attr('data-text', message.text);
             } else if (message.data) {
                 explorer.removeAttr('data-text');
-                self.attach(message.data);
+                var elems = self.attach(message.data);
+                $(elems).each(function() { this.addClass('dz-success') });
             }
         });
 
@@ -307,7 +308,7 @@
 
 
     ResourceAttach.prototype.attach = function (list) {
-        var i, data, self = this;
+        var i, data, elems = [], self = this;
 
         this.close();
 
@@ -321,6 +322,7 @@
 
             if (this.dropzone) {
                 this.dropzone.addFile(data);
+                elems.push($(data.previewElement));
             }
             else {
                 data.previewElement = $(this.tpl.html());
@@ -334,9 +336,12 @@
                 data.previewElement.find('[data-dz-remove]').on('click', function () {
                     self.detach(this);
                 });
+
+                elems.push(data.previewElement);
             }
         }
 
+        return elems;
     };
 
 
@@ -374,7 +379,6 @@
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src','/ajax/mime/' + file.type);
         }
-        elem.addClass('dz-success');
     };
 
 
