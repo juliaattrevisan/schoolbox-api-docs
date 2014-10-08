@@ -14,8 +14,10 @@
 namespace SocialStream\Post\Factory;
 
 
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Storage;
 use SocialStream\UrlDetection;
 
 class Creational extends AbstractFactory {
@@ -46,11 +48,9 @@ class Creational extends AbstractFactory {
 	/**
 	 * Constructor
 	 *
-	 * @param $type
 	 * @param $url
 	 */
-	public function __construct($type, $url) {
-		$this->setType($type);
+	public function __construct($url) {
 		$this->setUrl(trim($url));
 		$this->setUrlDetection(new UrlDetection($url));
 	}
@@ -65,11 +65,26 @@ class Creational extends AbstractFactory {
 	 */
 	public function produce($data) {
 
+        // if data contains an attachment
+        if (is_array($data['attachment'])) {
+            $factory = new CollectorFactory();
+            try {
+                // posts (should) only have one attachment
+                $storage = $factory->build($data['attachment'])->getFirst();
+                $this->parseStorageMetadata($storage, $data);
+            } catch (\Schoolbox\Resource\Exception $e) {
+                // this means the user 'attached' a file that failed upload, but submitted the form anyway
+                // default back to plaintext
+                $this->setProduct($this->constructDefault());
+                $this->populate($data);
+            }
+        }
+
 		/* Treat local urls differently as they should bypass the caching
 		 * stuff entirely - this applies to the Resource browser mainly,
 		 * but also when people input a local url manually
 		 */
-		if ($this->getUrlDetection()->isLocalUrl()) {
+		elseif ($this->getUrlDetection()->isLocalUrl()) {
 
 			/* When a Resource url is provided
 			 */
@@ -113,14 +128,7 @@ class Creational extends AbstractFactory {
 
 			try {
 				$resource = \Schoolbox\StorageMapper::getInstance()->upload($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
-
-				$uploadedFile = $this->constructFromUpload($resource);
-				$this->populate($data);
-
-				/* Spawn additional stuff
-				 */
-				$this->spawnMetadataFromUpload($uploadedFile);
-				$this->spawnThumbnailFromUpload($uploadedFile);
+                $this->parseStorageMetadata($resource, $data);
 			}
 			catch (\Exception $ex) {
 			}
@@ -168,6 +176,22 @@ class Creational extends AbstractFactory {
 		}
 		return $this->getProduct();
 	}
+
+
+    /**
+     * @param Storage $storage
+     * @param array   $data
+     */
+    protected function parseStorageMetadata(Storage $storage, array $data)
+    {
+        $uploadedFile = $this->constructFromUpload($storage);
+        $this->populate($data);
+
+        /* Spawn additional stuff
+         */
+        $this->spawnMetadataFromUpload($uploadedFile);
+        $this->spawnThumbnailFromUpload($uploadedFile);
+    }
 
 	/**
 	 * Construct a post from a link by doing url analysis

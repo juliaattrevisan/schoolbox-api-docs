@@ -20,8 +20,6 @@ $currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
-	$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
 	/* Softdelete the post and the entire thread
 	 */
 	$postMapper = new PostMapper();
@@ -64,13 +62,13 @@ else {
 	/* Compile some misc data
 	 */
 	$data = array_merge($_POST, array(
-		'ownerId' => $_SESSION['id'],
-		'requestTime' => new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'),
+		'ownerId'     => $_SESSION['id'],
+		'requestTime' => \Alaress_Date_Format::now(),
 	));
 
 	/* Create new SocialStream Post
 	 */
-	$factory = new Post\Factory\Creational($_POST['socialstreamAttachment'], $_POST['url']);
+	$factory = new Post\Factory\Creational($_POST['url']);
 	$newPost = $factory->produce($data);
 
 	/* Set up authentication
