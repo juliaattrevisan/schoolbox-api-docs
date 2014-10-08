@@ -42,7 +42,7 @@ try {
 		 * @returns {*}
 		 */
 		function init(options, element) {
-			var merged, defaults = {
+			var i, merged, defaults = {
 
 				/* The title of the browser
 				 */
@@ -80,7 +80,11 @@ try {
 			/* Type casting
 			 */
 			merged = $j.extend(defaults, options);
-			merged.categoryId = parseInt(merged.categoryId, 10);
+			if(isNaN(i = parseInt(merged.categoryId, 10))) {
+                merged.categoryId = 0;
+            } else {
+                merged.categoryId = i;
+            }
 
             if (!merged.isolate) {
                 try {
