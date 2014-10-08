@@ -155,6 +155,31 @@ class Authenticator {
 		return false;
 	}
 
+	/**
+	 * Gets whether the requested status change is allowed.
+	 *
+	 * Currently, the only barred change is that events may not be approved if
+	 * there are no students in the event.
+	 *
+	 * @param Event       $event
+	 * @param EventStatus $newStatus
+	 *
+	 * @return bool
+	 */
+	public function isStatusChangeAllowed(Event $event, EventStatus $newStatus)
+	{
+		$oldStatusId = $event->getMetadata()->getStatus()->getId();
+		$newStatusId = $newStatus->getId();
+		if ($oldStatusId != $newStatusId) {
+			if ($newStatusId == EventStatusMapper::STATUS_APPROVED) {
+				if (count($event->getMetadata()->getStudentAttendees()) === 0) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	/* Getters/Setters
 	 */
 
