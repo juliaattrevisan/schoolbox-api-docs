@@ -9,10 +9,14 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
         $config       = $configRecord->decodeConfig();
         /* Process multiple Vcals
          */
-        if ($config instanceof Calendar_Api_Config_Connector_Vcal) {
+        if (isset($attribs['luEventType'])) {
             /* Add eventType option
+             * For now, assume any config can have an event type.
+             * It's ignored for configs for which this is not set anyway.
              */
             $config->setLuEventType($attribs['luEventType']);
+        }
+        if ($config instanceof Calendar_Api_Config_Connector_Vcal) {
             /* Add urls
              */
             $config->setUrl($attribs['url']);
@@ -30,9 +34,6 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
             } else {
                 $config->setGroups(array());
             }
-        } elseif ($config instanceof Calendar_Api_Config_Connector_External) {
-            // External connector: only set event type
-            $config->setLuEventType($attribs['luEventType']);
         }
         /* Update and save config
          */
