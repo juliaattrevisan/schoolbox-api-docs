@@ -73,4 +73,16 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     {
         return $this->user;
     }
+
+    /**
+     * Helper method for loading this event type's calendar connector config.
+     *
+     * @return Calendar_Api_Config_Record
+     */
+    public function loadConnectorConfiguration()
+    {
+        return Calendar_Api_Config_Mapper::getInstance()->findById(
+            $this->getConnectorId()
+        );
+    }
 }
