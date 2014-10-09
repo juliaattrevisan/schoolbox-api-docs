@@ -103,17 +103,21 @@ class Controller extends Base
         $this->getLevelMapper()->save($newLevels);
 
         // And save the outcomes
+        // (Save a root node, and save everything as a child of that.)
         $code = 200;
         $data = array();
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
-            $outcomes = $browser->getOutcomes($thisArea, $thisLevel);
-            foreach ($outcomes as $outcome) {
-                $outcome
-                    ->setLearningLevel($thisLevel)
-                    ->setLearningArea($thisArea)
-                    ->setName($post['name']);
-                $this->getNodeMapper()->saveTree($outcome);
-            }
+            /** @var Node\Model $rootNode */
+            $rootNode = $this->getNodeMapper()->createModel();
+            $rootNode
+                ->setLearningLevel($thisLevel)
+                ->setLearningArea($thisArea)
+                ->setName($post['name'])
+                ->setReference('')
+                ->setChildren($browser->getOutcomes($thisArea, $thisLevel));
+            $this->getNodeMapper()->saveTree($rootNode);
+            $outcomes = new Collection();
+            $outcomes->add($rootNode);
             $data['outcomes'] = $outcomes;
         } else {
             $code = 400;
