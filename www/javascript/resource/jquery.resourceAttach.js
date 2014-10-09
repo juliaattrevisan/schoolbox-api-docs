@@ -65,7 +65,7 @@
 
 
     function ResourceAttach(element, options) {
-        var self, opt, azone;
+        var self, opt, azone, prompt;
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
@@ -90,6 +90,7 @@
             e.preventDefault();
         });
 
+        prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
 
         // wrap ourselves around an instance of dropzone
         azone.dropzone({
@@ -100,12 +101,12 @@
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
-            dictDefaultMessage: opt.dictDefaultMessage,
+            dictDefaultMessage: prompt,
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
 
             fallback: function () {
-                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="btn up-arrow float-left"><span></span>Attach</a>',
+                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="btn attach float-left"><span></span>' + opt.dictDefaultMessage + '</a>',
                     btn = $(mk);
 
                 // mimic dropzone behaviour
@@ -113,10 +114,12 @@
 
                 $(opt.dropzoneSelector).addClass('clearfix').append(btn);
                 opt.trigger = opt.fallbackButtonSelector;
+
+                self.fallbackFiles = [];
             },
 
             init: function () {
-                var content = $('<span/>').html(opt.dictDefaultMessage);
+                var content = $('<span/>').html(prompt);
                 $(opt.dropzoneSelector).append(content);
 
                 // *goes crosseyed*
@@ -214,24 +217,28 @@
                     hash: hash
                 };
 
-            if(self.dropzone) {
+            if (self.dropzone) {
                 self.dropzone.files.push(file);
 
                 dbtn.one('click', function (e) {
                     self.dropzone.removeFile(file);
                 });
-            }
-            else {
+            } else {
+                self.fallbackFiles.push(file);
+
                 dbtn.one('click', function (e) {
+                    var ff = self.fallbackFiles;
+                    ff.splice(ff.indexOf(file), 1);
                     self.detach(file);
                 });
             }
-
-
         });
 
-        if(this.dropzone) {
+        if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
+        }
+        else {
+            this.fallbackMaxFilesReached();
         }
 
         // prepare the dialog in the background
@@ -334,10 +341,16 @@
                     .append(data.previewElement);
 
                 data.previewElement.find('[data-dz-remove]').on('click', function () {
+                    var ff = self.fallbackFiles;
+                    ff.splice(ff.indexOf(data), 1);
                     self.detach(this);
                 });
 
                 elems.push(data.previewElement);
+
+                this.fallbackFiles.push(data);
+
+                this.fallbackMaxFilesReached();
             }
         }
 
@@ -352,6 +365,8 @@
 
         if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
+        } else {
+            this.fallbackMaxFilesReached();
         }
 
         setTimeout(function () {
@@ -378,6 +393,19 @@
         }
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src','/ajax/mime/' + file.type);
+        }
+    };
+
+
+    ResourceAttach.prototype.fallbackMaxFilesReached = function () {
+        // if we accept multi, there's no limit to check
+        if (this.options.multi) {
+            return;
+        }
+        if (this.fallbackFiles.length) {
+            $(this.element).addClass('dz-max-files-reached');
+        } else {
+            $(this.element).removeClass('dz-max-files-reached');
         }
     };
 
