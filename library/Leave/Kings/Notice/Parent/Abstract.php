@@ -24,10 +24,21 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		 */
 		$this->setExternalUser(new External_User());
 
-		$housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouse());
+                // hmarray(house id) = housemaster id
+                $hmarray['5'] = '1568';
+                $hmarray['6'] = '1574';
+                $hmarray['7'] = '1629';
+                $hmarray['9'] = '1568';
+                $hmarray['11'] = '1575';
+                $hmarray['13'] = '1568';
+                $hmarray['14'] = '1632';
+                $hmarray['20'] = '1570';
+
+		// $housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouse());
 
 		$userHandler = new User();
-		$housemaster = $userHandler->getByUsername($housemasterInitials);
+		// $housemaster = $userHandler->getByUsername($housemasterInitials);
+		$housemaster = $userHandler->getByID($hmarray[$this->getRequest()->getUser()->getResidentialHouse()]);
 
 		$housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
 		$housemasterEmail = $housemaster['alt_email'];
