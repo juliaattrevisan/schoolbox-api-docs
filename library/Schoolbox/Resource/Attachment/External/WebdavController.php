@@ -14,6 +14,18 @@ use Schoolbox\Resource\Attachment\NavigatorController;
 
 class WebdavController extends NavigatorController implements ExternalInterface {
 
+
+    /**
+     * @param bool $multi
+     * @param string $mimeFilter
+     */
+    public function __construct($multi, $mimeFilter = null)
+    {
+        // disallow null: cast to '*/*'
+        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter);
+    }
+
+
     /**
      * @return string
      */
