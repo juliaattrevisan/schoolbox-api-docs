@@ -194,37 +194,75 @@ SPARQL
     }
 
     /**
+     * Creates this node and its children from the JSON object.
+     *
      * @param  object $jsonTree
      * @return Node\Model
      */
     protected function buildOutputTree($jsonTree)
     {
-        $node = new Node\Model();
-        // Name: use the title if it's there, otherwise just use the statement
-        // label (which does a decent job defining the purpose of this node)
-        if ($jsonTree->dcterms_title && $jsonTree->dcterms_title->literal) {
-            $node->setName($jsonTree->dcterms_title->literal);
-        } elseif ($jsonTree->asn_statementLabel && $jsonTree->asn_statementLabel->literal) {
-            $node->setName($jsonTree->asn_statementLabel->literal);
-        }
-        $node
-            ->setReference($jsonTree->id)
-            ->setDescription($jsonTree->text);
-        if ($jsonTree->asn_statementNotation && $jsonTree->asn_statementNotation->literal) {
-            $node->setCode($jsonTree->asn_statementNotation->literal);
-        }
-        if ($jsonTree->dcterms_modified && $jsonTree->dcterms_modified->literal) {
-            $modified = new Alaress_Date_Format(
-                new DateTime($jsonTree->dcterms_modified->literal)
-            );
-            $node
-                ->setCreatedAt($modified)
-                ->setModifiedAt($modified);
-        }
+        $node = $this->buildSingleNode($jsonTree);
         if ($jsonTree->children) {
             foreach ($jsonTree->children as $child) {
                 $node->addChild($this->buildOutputTree($child));
             }
+        }
+        return $node;
+    }
+
+    /**
+     * Creates a single node from the given JSON object.
+     *
+     * @param  object $json
+     * @return Node\Model
+     */
+    protected function buildSingleNode($json)
+    {
+        $node = new Node\Model();
+        $node->setReference($json->id);
+
+        // Figure out what the name and description should be.
+        $statementLabel = '';
+        if ($json->asn_statementLabel && $json->asn_statementLabel->literal) {
+            $statementLabel = $json->asn_statementLabel->literal;
+        }
+        switch ($statementLabel) {
+            case 'Achievement standard':
+                // has no title field, and its text is unsuitable as a name.
+                // Let's just call it an achievement standard.
+                $node
+                    ->setName($statementLabel)
+                    ->setDescription($json->text);
+                break;
+            default:
+                // Try basing name off the title, and desc off the text.
+                // If that fails, set the name as the text and an empty desc.
+                if ($json->dcterms_title && $json->dcterms_title->literal) {
+                    $node
+                        ->setName($json->dcterms_title->literal)
+                        ->setDescription($json->text);
+                } else {
+                    $node
+                        ->setName($json->text)
+                        ->setDescription('');
+                }
+                break;
+        }
+
+        // There shouldn't be HTML in the name.
+        $node->setName(strip_tags($node->getName()));
+
+        // Set the timetable code if there is one
+        if ($json->asn_statementNotation && $json->asn_statementNotation->literal) {
+            $node->setCode($json->asn_statementNotation->literal);
+        }
+        if ($json->dcterms_modified && $json->dcterms_modified->literal) {
+            $modified = new Alaress_Date_Format(
+                new DateTime($json->dcterms_modified->literal)
+            );
+            $node
+                ->setCreatedAt($modified)
+                ->setModifiedAt($modified);
         }
         return $node;
     }
