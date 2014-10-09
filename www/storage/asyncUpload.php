@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\StorageMapper;
 
 /**
  * Asynchronous upload of a brownhole file.
@@ -11,6 +12,8 @@ use Schoolbox\Resource\Browser\NodeFactory;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
+$returnMeta = false;
+
 // Force session usage due to flash uploader
 // http://www.uploadify.com/documentation/uploadify/using-sessions-with-uploadify/
 if (isset($_POST[session_name()])) {
@@ -20,6 +23,10 @@ if (isset($_POST[session_name()])) {
 if (isset($_GET[session_name()])) {
     session_id($_GET[session_name()]);
     session_start();
+}
+if (isset($_POST['fallback']) && isset($_COOKIE[session_name()])) {
+    session_start();
+    $returnMeta = true;
 }
 
 $result = array(
@@ -31,20 +38,92 @@ $result = array(
 if (!$_SESSION['id']) {
     $result['message'] = 'Unauthorized';
     $result['error']   = 403;
-}
-elseif (is_readable($_FILES['upload']['tmp_name'])) {
-    try {
-        $imageResource = Schoolbox\StorageMapper::getInstance()->upload(
-            $_FILES['upload']['name'], $_FILES['upload']['tmp_name'], $_SESSION['id']
-        );
-        $result['success'] = true;
-        $result['message'] = 'OK';
-        $result['error']   = 200;
-        $result['hash']    = NodeFactory::STORE . ':' . $imageResource->getHash();
-    }
-    catch (Exception $ex) {
+
+} elseif (isset($_FILES['upload'])) {
+    $meta = $_FILES['upload'];
+
+    if (is_array($meta['name'])) {
+        $hashes = array();
+        $metas = array();
+        for ($i = 0; $i < count($meta['name']); ++$i) {
+            try {
+                $result = attemptStorage(getFileAtIndex($meta, $i), $returnMeta);
+                $hashes[] = $result['hash'];
+                if ($returnMeta) {
+                    $metas[] = $result['meta'];
+                }
+
+            } catch (Exception $e) {
+                $hashes[] = 'exception:'.$e->getMessage();
+                if ($returnMeta) {
+                    $metas[] = array();
+                }
+            }
+        }
+        $result['hash'] = $hashes;
+        if ($returnMeta) {
+            $result['meta'] = $metas;
+        }
+
+    } else {
+        try {
+            $result = attemptStorage($meta, $returnMeta);
+        } catch (Exception $e) {
+            $result['hash'] = 'exception:'.$e->getMessage();
+            if ($returnMeta) {
+                $result['meta'] = array();
+            }
+        }
     }
 }
 
 header(':', true, $result['error']);
 die(json_encode($result));
+
+
+/**
+ * @param array $meta
+ * @param int $i
+ * @return array
+ */
+function getFileAtIndex($meta, $i)
+{
+    $rtn = array();
+    foreach(array_keys($meta) as $field) {
+        $rtn[$field] = $meta[$field][$i];
+    }
+    return $rtn;
+}
+
+
+/**
+ * @param array $fileData
+ * @param bool $returnMeta
+ * @throws Schoolbox\File\Exception
+ * @return array
+ */
+function attemptStorage($fileData, $returnMeta)
+{
+    if (!is_readable($fileData['tmp_name'])) {
+        throw new Schoolbox\File\Exception("Filedata not readable");
+    }
+
+    $storage = StorageMapper::getInstance()->upload($fileData['name'], $fileData['tmp_name'], $_SESSION['id']);
+
+    $result = array(
+        'success' => true,
+        'error'   => 200,
+        'message' => 'OK',
+        'hash'    => NodeFactory::STORE . ':' . $storage->getHash(),
+    );
+
+    if ($returnMeta) {
+        $result['meta'] = array(
+            'name' => $storage->getFilename(),
+            'type' => $storage->getMime(),
+            'size' => $storage->getFilesize()
+        );
+    }
+
+    return $result;
+}
