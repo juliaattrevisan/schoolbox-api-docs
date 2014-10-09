@@ -72,7 +72,7 @@
 
                         var len = ff.find(fi).length;
 
-                        if (!maxFiles || len >= maxFiles) {
+                        if (!maxFiles || len < maxFiles) {
                             var newInput = $('<input class="prettify" type="file" name="upload[]" />');
                             ff.children('p').append(newInput);
                             newInput.prettyFileInput(cf);
@@ -112,7 +112,7 @@
                             console.log(data);
 
                         } catch (e) {
-                            console.warn('unparseable response');
+                            // noop
                         }
 
                     });
