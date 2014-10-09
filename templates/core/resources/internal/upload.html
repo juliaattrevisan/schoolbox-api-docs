@@ -100,12 +100,15 @@
                             uploads = JSON.parse(str);
 
                             for (i = 0; i < uploads.hash.length; ++i) {
-                                data.push({
-                                    title: uploads.meta[i].name,
-                                    mimeType: uploads.meta[i].type,
-                                    filesize: uploads.meta[i].size,
-                                    hash: uploads.hash[i]
-                                });
+                                // don't include upload failures
+                                if (uploads.hash[i].split(':')[0] != 'exception') {
+                                    data.push({
+                                        title: uploads.meta[i].name,
+                                        mimeType: uploads.meta[i].type,
+                                        filesize: uploads.meta[i].size,
+                                        hash: uploads.hash[i]
+                                    });
+                                }
                             }
 
                             window.top.postMessage(JSON.stringify({ data: data }), location.origin);
