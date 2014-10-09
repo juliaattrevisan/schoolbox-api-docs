@@ -1,3 +1,14 @@
+/**
+ * Sets up a class code selector on the given element.
+ *
+ * The element this plugin is applied to provides a class code category.
+ *
+ * Parameters:
+ * * url: the URL to which the JSON call is made.
+ * * output: the select element to which class codes are output
+ * * campus: if provided, the class codes returned are restricted to this list.
+ *           Provided as a list of timetable codes.
+ */
 (function($) {
 	$.fn.externalClassCodes = function(options) {
 		options = options || {}
@@ -24,7 +35,8 @@
 			var defaults = {
 				element: element,
 				url: '/modules/eotc/manage/attendance/courseCodes',
-				output: null
+				output: null,
+				campus: []
 			}
 
 			var derived = {
@@ -50,7 +62,7 @@
 		 * @param id
 		 */
 		function retrieveData(id) {
-			$.post(config.url, {id: id}, function(responseText) {
+			$.post(config.url, {id: id, campus: config.campus}, function(responseText) {
 				var data = $.parseJSON(responseText);
 
 				var allOptions = '';
