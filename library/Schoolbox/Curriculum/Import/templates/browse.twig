@@ -41,7 +41,7 @@
         var template         = doT.template($j('script#node-template').html().trim())
         var learningLevelUrl = {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }};
         var outcomeUrl       = {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }};
-        var browseUrl        = {{ routeLookup('curriculumSource.browse')|json_encode|raw }};
+        var browseUrl        = {{ routeLookup('curriculum.browse')|json_encode|raw }};
 
         var makeTree = function(nodes, destination) {
             nodes.forEach(function(node) {
