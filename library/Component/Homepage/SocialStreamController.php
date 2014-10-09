@@ -90,7 +90,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
             $zone = new Zone('sstream-attachment');
             $zone->setMimeFilter(null)
-                 ->setAttachPrompt('Click or drag a file to share')
+                 ->setAttachPrompt('Share a file')
                  ->setAttachmentsLabel('')
                  ->setModalTitle('Select a file or folder')
                  ->setMulti(false)

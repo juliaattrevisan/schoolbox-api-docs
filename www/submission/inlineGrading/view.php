@@ -170,7 +170,7 @@ $zone = new Zone('inline-return');
 $zone->setMulti(false)
     ->setMimeFilter('*/*')
     ->setThumbnailSize(32)
-    ->setAttachPrompt('Click or drag to attach a file to return to the student')
+    ->setAttachPrompt('Attach file to return')
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
 

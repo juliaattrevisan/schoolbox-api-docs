@@ -40,7 +40,7 @@ if (Cfg::get('mail_enable') == 1) {
         ->setThumbnailSize(64)
         ->setModalTitle('Select files')
         ->setMimeFilter('*/*')
-        ->setAttachPrompt('Click or drag to add attachments');
+        ->setAttachPrompt('Attach files');
 
     $zone->renderIntoSitePage($page, 'ATTACH_ZONE');
 
