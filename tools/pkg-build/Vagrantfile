@@ -1,9 +1,14 @@
-Vagrant::Config.run do |config|
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
-  config.vm.box = "ubuntu-12.04"
-  config.vm.box_url = "http://vagrant.alaress-dev.com.au/ubuntu-12.04.box"
-  
-  config.vm.network :bridged
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "ubuntu-1204-gold"
+  config.vm.box_url = "http://vagrant.alaress-dev.com.au/ubuntu-1204-gold.box"
+
   config.vm.host_name = "ubuntubuild-schoolbox"
 
   config.vm.provision :puppet do |puppet|
