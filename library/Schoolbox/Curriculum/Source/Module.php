@@ -58,7 +58,7 @@ class Module extends BaseModule
             'controller:curriculumSource',
             $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Controller')
         );
-        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setMapper']
+        $injector->setters['Schoolbox\\Curriculum\\Source\\Controller']['setMapper']
             = $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Mapper');
     }
 }
