@@ -1,0 +1,24 @@
+{##
+ # Implemented as macro instead of as recursive template for performance.
+ # The include statement creates a file lookup each time it's called.
+ #}
+{% macro output(nodeList) %}
+    {% import _self as nodeTemplate %}
+    <ul>
+        {% for node in nodeList %}
+            <li>
+                {% if node.code %}
+                    ({{ node.code }})
+                {% endif %}
+                <a href="{{ routeLookup('curriculum.read', {id: node.id}) }}">{{ node.name }}</a>
+
+                {% if node.children %}
+                    {{ nodeTemplate.output(node.children) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% import _self as nodeTemplate %}
+{{ nodeTemplate.output(nodeList) }}
