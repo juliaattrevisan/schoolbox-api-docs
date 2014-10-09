@@ -26,8 +26,13 @@ try {
     $root = __DIR__ . "/../images/mime";
     $base = "$root/{$size}x{$size}";
 
-    $filenames[] = "$root/128x128/mime.png";
-    $filenames[] = "$base/mime.png";
+    // special case -_-
+    if ($this->arg == array('folder')) {
+        $filenames[] = __DIR__ . "/../images/icons/128x128/folder.png";
+    } else {
+        $filenames[] = "$root/128x128/mime.png";
+        $filenames[] = "$base/mime.png";
+    }
 
     if(count($this->arg) != 2) {
         throw new Schoolbox\Mapper\Exception("No mime specified");
@@ -72,3 +77,4 @@ foreach(array_reverse($filenames) as $filename) {
     fpassthru($fp);
     exit;
 }
+error(41);
