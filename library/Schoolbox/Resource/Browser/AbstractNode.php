@@ -181,7 +181,8 @@ abstract class AbstractNode implements NodeInterface
                 $record = array(
                     'type'       => 'category',
                     'categoryId' => $currentFolder->getId(),
-                    'name'       => $currentFolder->getName()
+                    'name'       => $currentFolder->getName(),
+                    'folderType' => $currentFolder->getFolderType(),
                 );
 
                 $output[] = $record;

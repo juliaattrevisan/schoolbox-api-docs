@@ -209,6 +209,7 @@ class NodeRenderer
             'NODE_CATEGORY_ON_OFF' => $i % 2 ? '' : 'dark',
             'NODE_CATEGORY_ID'     => $currentRecord['categoryId'],
             'NODE_CATEGORY_NAME'   => $currentRecord['name'],
+            'NODE_CATEGORY_TYPE'   => $currentRecord['folderType'],
         ));
 
         $this->getPage()->parse('node_category_block', 'node_category', true);
