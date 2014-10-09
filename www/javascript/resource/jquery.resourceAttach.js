@@ -25,9 +25,11 @@
 
 (function ($, Dropzone, window, document, undefined) {
 
-    var pluginName = 'resourceAttach',
-        noop = function () {},
-        defaults = {
+    var pluginName     = 'resourceAttach',
+        singletonModal = null,
+        noop           = function () {},
+        listening      = false,
+        defaults       = {
 
             // our options
             trigger: null,
@@ -65,16 +67,16 @@
 
 
     function ResourceAttach(element, options) {
-        var self, opt, azone, prompt;
+        var self, opt, azone, dzone, prompt;
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
-        this.modal   = null;
         this.tpl     = this.options.tplOverride || $(this.element).find('[data-template]').detach();
 
         self  = this;
         opt   = self.options;
         azone = $(this.element);
+        dzone = azone.find(opt.dropzoneSelector).html('');
 
         if (opt.title == null) {
             opt.title = 'Select file' + (opt.multi ? 's' : '') + ' to attach';
@@ -112,15 +114,14 @@
                 // mimic dropzone behaviour
                 azone.addClass('dz-unsupported');
 
-                $(opt.dropzoneSelector).addClass('clearfix').append(btn);
+                dzone.addClass('clearfix').append(btn);
                 opt.trigger = opt.fallbackButtonSelector;
 
                 self.fallbackFiles = [];
             },
 
             init: function () {
-                var content = $('<span/>').html(prompt);
-                $(opt.dropzoneSelector).append(content);
+                dzone.append($('<span/>').html(prompt));
 
                 // *goes crosseyed*
                 self.dropzone = this;
@@ -183,25 +184,29 @@
         });
 
         // for iframe communication
-        $(window).on('message', { self: this }, function (e) {
-            var message,
-                self     = e.data.self,
-                explorer = self.modal.find('li.browsing').find('div.explorer');
+        if(!listening) {
+            $(window).on('message', function (e) {
+                var message,
+                    modal    = singletonModal,
+                    self     = modal.data('rtn'),
+                    explorer = modal.find('li.browsing').find('div.explorer');
 
-            try {
-                message = JSON.parse(e.originalEvent.data);
-            } catch (err) {
-                message = e.originalEvent.data;
-            }
+                try {
+                    message = JSON.parse(e.originalEvent.data);
+                } catch (err) {
+                    message = e.originalEvent.data;
+                }
 
-            if (message.text) {
-                explorer.attr('data-text', message.text);
-            } else if (message.data) {
-                explorer.removeAttr('data-text');
-                var elems = self.attach(message.data);
-                $(elems).each(function() { this.addClass('dz-success') });
-            }
-        });
+                if (message.text) {
+                    explorer.attr('data-text', message.text);
+                } else if (message.data) {
+                    explorer.removeAttr('data-text');
+                    var elems = self.attach(message.data);
+                    $(elems).each(function() { this.addClass('dz-success') });
+                }
+            });
+            listening = true;
+        }
 
         // check for existing attachments and push them into the dropzone's list
         azone.find(opt.previewsContainerSelector).find(opt.attachmentTag).each(function() {
@@ -254,9 +259,10 @@
         // if my modal already exists, destroy it
         this.destroy();
 
-        this.modal = $('<div/>');
+        singletonModal = $('<div/>');
+        singletonModal.data('rtn', this);
 
-        body.append(this.modal);
+        body.append(singletonModal);
 
         qString = 'multi=' + (this.options.multi ? '1' : '0');
 
@@ -264,11 +270,11 @@
            qString += '&mime=' + this.options.allowedFiles;
         }
 
-        this.modal.load(this.options.source, qString, function () {
+        singletonModal.load(this.options.source, qString, function () {
             // anything you need to do upon completion of loading
         });
 
-        this.modal.dialog({
+        singletonModal.dialog({
             width:     this.options.width,
             height:    this.options.height,
             title:     this.options.title,
@@ -280,36 +286,40 @@
             }
         });
 
-        this.modal.on('click', '.cancel[role=button]', function (e) {
+        singletonModal.on('click', '.cancel[role=button]', function (e) {
             window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
         });
 
         $(this.element).on('click', this.options.trigger, function (e) {
+            e.preventDefault();
             self.open();
         });
     };
 
 
     ResourceAttach.prototype.open = function () {
-        if (this.modal == null) {
+        if (singletonModal == null) {
             this.build();
+        } else {
+            // ensure the return points to the right element
+            singletonModal.data('rtn', this);
         }
 
-        this.modal.dialog('open');
+        singletonModal.dialog('open');
     };
 
 
     ResourceAttach.prototype.close = function () {
-        this.modal.dialog('close');
+        singletonModal.dialog('close');
     };
 
 
     ResourceAttach.prototype.destroy = function () {
-        if (this.modal) {
-            this.modal.dialog('close');
-            this.modal.dialog('destroy');
-            this.modal.detach();
-            this.modal = null;
+        if (singletonModal) {
+            singletonModal.dialog('close');
+            singletonModal.dialog('destroy');
+            singletonModal.detach();
+            singletonModal = null;
         }
     };
 
