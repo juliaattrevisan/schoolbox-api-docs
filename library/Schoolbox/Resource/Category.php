@@ -266,6 +266,17 @@ class Category implements ISoftDeletable, FolderInterface
         return $this->deletedAt;
     }
 
+    /**
+     * "home" if this is a homepage, "folder" otherwise.
+     *
+     * {@inheritdoc}
+     */
+    public function getFolderType()
+    {
+        // I'd also like to say this is a course
+        return $this->hasHomepage() ? 'home' : 'folder';
+    }
+
     //
     // TODO implement group type, user access joins
 //	protected $user_access;
