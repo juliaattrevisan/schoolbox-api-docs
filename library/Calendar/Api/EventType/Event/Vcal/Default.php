@@ -1,324 +1,332 @@
 <?php
+
 /**
  * Calendar_Api_EventType_Event_Vcal_Default
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
+{
 
-	/**
-	 * A list of luEventType records. You can assign a "colour scheme" to Vcal events
-	 * using the luEventType table.
-	 *
-	 * @var array
-	 */
-	private $allLuEventTypes = array();
+    /**
+     * A list of luEventType records. You can assign a "colour scheme" to Vcal events
+     * using the luEventType table.
+     *
+     * @var array
+     */
+    private $allLuEventTypes = array();
 
-	/**
-	 * Constructor
-	 *
-	 * @param \Schoolbox\User $user
-	 * @param $config
-	 */
-	public function __construct(\Schoolbox\User $user, $config) {
-		$this->setUser($user);
+    /**
+     * Constructor
+     *
+     * @param \Schoolbox\User $user
+     * @param                 $config
+     */
+    public function __construct(\Schoolbox\User $user, $config)
+    {
+        $this->setUser($user);
 
-		$eventHandler = new Calendar();
+        $eventHandler = new Calendar();
 
-		$this->setAllLuEventTypes($eventHandler->getTypeList());
-	}
+        $this->setAllLuEventTypes($eventHandler->getTypeList());
+    }
 
-	/**
-	 * Associate a colour scheme with this event stream
-	 *
-	 * @param $id
-	 * @return array
-	 */
-	private function findLuEventType($id) {
-		foreach($this->getAllLuEventTypes() as $currentLuEventType) {
-			if ($currentLuEventType['eventTypeID'] == $id) {
-				return $currentLuEventType;
-			}
-		}
+    /**
+     * Associate a colour scheme with this event stream
+     *
+     * @param $id
+     *
+     * @return array
+     */
+    private function findLuEventType($id)
+    {
+        foreach ($this->getAllLuEventTypes() as $currentLuEventType) {
+            if ($currentLuEventType['eventTypeID'] == $id) {
+                return $currentLuEventType;
+            }
+        }
 
-		return array();
-	}
+        return array();
+    }
 
-	/**
-	 * Get day events from this data source
-	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
-	 *
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		return $this->getFilteredEventCollection(
-			function($currentEvent) use($startTimestamp, $endTimestamp) {
-				/** @var Sabre\VObject\Component\VEvent $currentEvent */
-				$allDay              = !$currentEvent->DTSTART->hasTime();
-				$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
+    /**
+     * Get day events from this data source
+     *
+     * @param $startTimestamp
+     * @param $endTimestamp
+     *
+     * @internal param $currentDay
+     * @return Calendar_Event_Collection
+     */
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
+        return $this->getFilteredEventCollection(
+            function ($currentEvent) use ($startTimestamp, $endTimestamp) {
+                /** @var Sabre\VObject\Component\VEvent $currentEvent */
+                $allDay              = !$currentEvent->DTSTART->hasTime();
+                $eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
 
-				// Event has no DTEND (anniversaries and reminders might not
-				// have one)
-				// Set it to same as DTSTART, I guess.
-				$eventEnd = "{$currentEvent->DTEND}";
-				if (strlen($eventEnd) > 0) {
-					$eventEndTimestamp = strtotime("{$currentEvent->DTEND}");
-					// According to VCAL standard: end of all day event
-					// is 12am next day
-					if ($allDay) {
-						$eventEndTimestamp -= 1;
-					}
-				}
-				else {
-					$eventEndTimestamp = $eventStartTimestamp;
-				}
+                // Event has no DTEND (anniversaries and reminders might not
+                // have one)
+                // Set it to same as DTSTART, I guess.
+                $eventEnd = "{$currentEvent->DTEND}";
+                if (strlen($eventEnd) > 0) {
+                    $eventEndTimestamp = strtotime("{$currentEvent->DTEND}");
+                    // According to VCAL standard: end of all day event
+                    // is 12am next day
+                    if ($allDay) {
+                        $eventEndTimestamp -= 1;
+                    }
+                } else {
+                    $eventEndTimestamp = $eventStartTimestamp;
+                }
 
-				/* Only get events that overlap the range specified
-				 * Event's end time is before start time of span: ignore
-				 * Event's start time is before end time of span: ignore
-				 */
-				return (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp));
-			},
-			$startTimestamp, $endTimestamp
-		);
-	}
+                /* Only get events that overlap the range specified
+                 * Event's end time is before start time of span: ignore
+                 * Event's start time is before end time of span: ignore
+                 */
+                return (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp));
+            },
+            $startTimestamp,
+            $endTimestamp
+        );
+    }
 
-	/**
-	 * Find a particular event from this source
-	 *
-	 * Do everything the same as usual, but only stack up one event (if you find it) and
-	 * return that instead of a collection of everything
-	 *
-	 * @param  int $eventId
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvent($eventId) {
-		return $this->getFilteredEventCollection(
-			function($currentEvent) use($eventId) {
-				/** @var Sabre\VObject\Component\VEvent $currentEvent */
-				return $eventId == "{$currentEvent->UID}";
-			},
-			null, null, 1
-		);
-	}
+    /**
+     * Find a particular event from this source
+     * Do everything the same as usual, but only stack up one event (if you find it) and
+     * return that instead of a collection of everything
+     *
+     * @param  int $eventId
+     *
+     * @return Calendar_Event_Collection
+     */
+    public function getEvent($eventId)
+    {
+        return $this->getFilteredEventCollection(
+            function ($currentEvent) use ($eventId) {
+                /** @var Sabre\VObject\Component\VEvent $currentEvent */
+                return $eventId == "{$currentEvent->UID}";
+            },
+            null,
+            null,
+            1
+        );
+    }
 
-	/**
-	 * Retrieves collection of events which match a filter function.
-	 *
-	 * @param  callable $filterFunction   Callback which accepts following parameters:
-	 *                                    Sabre\VObject\Component\VEvent: event to add
-	 *                                    Calendar_Api_Config_Connector_Vcal: event retriever's configuration
-	 *                                    Returns true if this event is accepted
-	 * @param  int      $startTimestamp   If set, only events after this are returned
-	 * @param  int      $endTimestamp     If set, only events before this are returned
-	 * @param  int      $limit            If set, only this many events are returned
-	 * @return Calendar_Event_Collection
-	 */
-	protected function getFilteredEventCollection(
-		$filterFunction,
-		$startTimestamp = null,
-		$endTimestamp = null,
-		$limit = null
-	) {
+    /**
+     * Retrieves collection of events which match a filter function.
+     *
+     * @param  callable $filterFunction   Callback which accepts following parameters:
+     *                                    Sabre\VObject\Component\VEvent: event to add
+     *                                    Calendar_Api_Config_Connector_Vcal: event retriever's configuration
+     *                                    Returns true if this event is accepted
+     * @param  int      $startTimestamp   If set, only events after this are returned
+     * @param  int      $endTimestamp     If set, only events before this are returned
+     * @param  int      $limit            If set, only this many events are returned
+     *
+     * @return Calendar_Event_Collection
+     */
+    protected function getFilteredEventCollection(
+        $filterFunction,
+        $startTimestamp = null,
+        $endTimestamp = null,
+        $limit = null
+    ) {
 
-		$collection = new Calendar_Event_Collection();
+        $collection = new Calendar_Event_Collection();
 
-		$currentConfig = Calendar_Api_Config_Mapper::getInstance()->findById($this->getConnectorId());
-		$group_handler = new Group();
-		$is_superuser  = $group_handler->isSuperuser();
+        $currentConfig = $this->loadConnectorConfiguration();
+        $group_handler = new Group();
+        $is_superuser  = $group_handler->isSuperuser();
 
-		$decodedConfig = $currentConfig->decodeConfig();
+        $decodedConfig = $currentConfig->decodeConfig();
 
-		/* Check permissions - if you can view these events according to the Permissions
-		 * settings then accumulate the events. Otherwise ignore them.
-		 * (Superusers can view all events, so skip permissions on those)
-		 */
-		if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
-
-			/* Load calendar from locker cache
-			 * Cache step 1: cache load of VCAL file from URL
-			 */
-			$cache = new Calendar_Api_Cache();
-			$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
-			/* Parse it all
-			 */
-			try {
-				// Cache step 2: Expand VCAL into event collection.
-				// The expanded events depend on the start and end time, not
-				// just the VCAL file.
-				$serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
-					'vcal.'.$decodedConfig->getUrl(),
-					function($params) {
-						list($source, $startTimestamp, $endTimestamp) = $params;
+        /* Check permissions - if you can view these events according to the Permissions
+         * settings then accumulate the events. Otherwise ignore them.
+         * (Superusers can view all events, so skip permissions on those)
+         */
+        if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
+            /* Load calendar from locker cache
+             * Cache step 1: cache load of VCAL file from URL
+             */
+            $cache  = new Calendar_Api_Cache();
+            $source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+            /* Parse it all
+             */
+            try {
+                // Cache step 2: Expand VCAL into event collection.
+                // The expanded events depend on the start and end time, not
+                // just the VCAL file.
+                $serializedEvents = Alaress\Redis::getInstance()->cacheFunctionCall(
+                    'vcal.' . $decodedConfig->getUrl(),
+                    function ($params) {
+                        list($source, $startTimestamp, $endTimestamp) = $params;
                         // You provided UTF-16? Proceed to UTF-8
-                        if(preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
+                        if (preg_match('/^(\x{FF}\x{FE})|(\x{FE}\x{FF})/', $source)) {
                             $source = mb_convert_encoding($source, 'UTF-8', 'UTF-16');
-                        }
-                        else {
+                        } else {
                             // Just remove UTF8 BOM if it exists
                             $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
                         }
 
-						$allEvents = Sabre\VObject\Reader::read(
-							$source, Sabre\VObject\Reader::OPTION_FORGIVING
-						);
-						if ($startTimestamp && $endTimestamp) {
-							$allEvents->expand(
-								new DateTime('@'.$startTimestamp),
-								new DateTime('@'.$endTimestamp)
-							);
-						}
-						return serialize($allEvents);
-					},
-					array($source, $startTimestamp, $endTimestamp),
-					$cache->getCachedTime()
-				);
-				$allEvents = unserialize($serializedEvents);
-			}
-			catch(Exception $e) {
+                        $allEvents = Sabre\VObject\Reader::read(
+                            $source,
+                            Sabre\VObject\Reader::OPTION_FORGIVING
+                        );
+                        if ($startTimestamp && $endTimestamp) {
+                            $allEvents->expand(
+                                new DateTime('@' . $startTimestamp),
+                                new DateTime('@' . $endTimestamp)
+                            );
+                        }
+                        return serialize($allEvents);
+                    },
+                    array($source, $startTimestamp, $endTimestamp),
+                    $cache->getCachedTime()
+                );
+                $allEvents        = unserialize($serializedEvents);
+            } catch (Exception $e) {
+                /* Some google calendars don't follow sabre's expected format?
+                echo $decodedConfig->getUrl();
+                echo $e->getMessage();
+                 */
+            }
 
-				/* Some google calendars don't follow sabre's expected format?
-				echo $decodedConfig->getUrl();
-				echo $e->getMessage();
-				 */
-			}
+            if ($allEvents !== null) {
+                foreach ($allEvents->children as $currentEvent) {
+                    /*
+                     * $currentEvent \Sabre\VObject\Component\VEvent
+                     */
 
-			if ($allEvents !== null) {
-				foreach($allEvents->children as $currentEvent) {
+                    /* gloop returns a whole bunch of stuff all mixed up
+                     *
+                     * We only want to deal with Sabre\VObject\Component\VEvent objects
+                     * as they seem to be the calendar items themselves
+                     */
+                    if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
+                        $isAdded = true;
+                        if (is_callable($filterFunction)) {
+                            $isAdded = $filterFunction($currentEvent, $decodedConfig);
+                        }
+                        if ($isAdded) {
+                            $collection->add(
+                                $this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
+                            );
+                        }
+                        if (isset($limit) && $collection->getCount() >= $limit) {
+                            return $collection;
+                        }
+                    }
+                }
+            }
+        }
+        return $collection;
+    }
 
-					/*
-					 * $currentEvent \Sabre\VObject\Component\VEvent
-					 */
+    /**
+     * Generic method for creating a calendar event from a VEvent object
+     *
+     * @param \Sabre\VObject\Component\VEvent    $currentEvent
+     * @param Calendar_Api_Config_Connector_Vcal $decodedConfig
+     *
+     * @return Calendar_Event_Type_Day
+     */
+    protected function buildCalendarEventFromVevent(
+        Sabre\VObject\Component\VEvent $currentEvent,
+        Calendar_Api_Config_Connector_Vcal $decodedConfig
+    ) {
 
-					/* gloop returns a whole bunch of stuff all mixed up
-					 *
-					 * We only want to deal with Sabre\VObject\Component\VEvent objects
-					 * as they seem to be the calendar items themselves
-					 */
-					if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
-						$isAdded = true;
-						if (is_callable($filterFunction)) {
-							$isAdded = $filterFunction($currentEvent, $decodedConfig);
-						}
-						if ($isAdded) {
-							$collection->add(
-								$this->buildCalendarEventFromVevent($currentEvent, $decodedConfig)
-							);
-						}
-						if (isset($limit) && $collection->getCount() >= $limit) {
-							return $collection;
-						}
-					}
-				}
-			}
-		}
-		return $collection;
-	}
+        $allDay              = !$currentEvent->DTSTART->hasTime();
+        $eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
+        $eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
 
-	/**
-	 * Generic method for creating a calendar event from a VEvent object
-	 *
-	 * @param \Sabre\VObject\Component\VEvent    $currentEvent
-	 * @param Calendar_Api_Config_Connector_Vcal $decodedConfig
-	 *
-	 * @return Calendar_Event_Type_Day
-	 */
-	protected function buildCalendarEventFromVevent(
-		Sabre\VObject\Component\VEvent $currentEvent,
-		Calendar_Api_Config_Connector_Vcal $decodedConfig
-	) {
+        // According to VCAL standard: end of all day event is 12am next day
+        if ($allDay) {
+            $eventEndTimestamp -= 1;
+        }
 
-		$allDay              = !$currentEvent->DTSTART->hasTime();
-		$eventStartTimestamp = strtotime("{$currentEvent->DTSTART}");
-		$eventEndTimestamp   = strtotime("{$currentEvent->DTEND}");
+        // Get category list for this event.
+        // If this event has a category which matches
+        // any event type, then apply that event type's
+        // color instead of the configured one.
+        $categoryList = explode(';', "{$currentEvent->CATEGORIES}");
+        $categoryList = array_map('trim', $categoryList);
+        $categoryList = array_map('strtoupper', $categoryList);
+        $categoryList = array_filter($categoryList, 'strlen');
+        $metaDetails  = null;
+        foreach ($categoryList as $categoryName) {
+            foreach ($this->getAllLuEventTypes() as $eventType) {
+                if (strtoupper($eventType['eventType']) === $categoryName) {
+                    $metaDetails = $eventType;
+                    break;
+                }
+            }
+            if (!empty($metaDetails)) {
+                break;
+            }
+        }
+        if (empty($metaDetails)) {
+            $metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+        }
 
-		// According to VCAL standard: end of all day event is 12am next day
-		if ($allDay) {
-			$eventEndTimestamp -= 1;
-		}
+        $event = new Calendar_Event_Type_Day();
 
-		// Get category list for this event.
-		// If this event has a category which matches
-		// any event type, then apply that event type's
-		// color instead of the configured one.
-		$categoryList = explode(';', "{$currentEvent->CATEGORIES}");
-		$categoryList = array_map('trim',       $categoryList);
-		$categoryList = array_map('strtoupper', $categoryList);
-		$categoryList = array_filter($categoryList, 'strlen');
-		$metaDetails   = null;
-		foreach ($categoryList as $categoryName) {
-			foreach ($this->getAllLuEventTypes() as $eventType) {
-				if (strtoupper($eventType['eventType']) === $categoryName) {
-					$metaDetails = $eventType;
-					break;
-				}
-			}
-			if (!empty($metaDetails)) {
-				break;
-			}
-		}
-		if (empty($metaDetails)) {
-			$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
-		}
+        $event->setAuthorName('');
+        $event->setAuthorId(-1);
+        $event->setEventId("{$currentEvent->UID}");
 
-		$event = new Calendar_Event_Type_Day();
+        $event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+        $event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
-		$event->setAuthorName('');
-		$event->setAuthorId(-1);
-		$event->setEventId("{$currentEvent->UID}");
+        $event->setType($metaDetails['eventTypeID']);
+        $event->setTitle("{$currentEvent->SUMMARY}");
+        $event->setAccess('');
+        $event->setEventType($metaDetails['eventType']);
+        $event->setColour($metaDetails['eventColour']);
+        $event->setCampusList(implode(',', $decodedConfig->getCampus()));
+        $event->setDetail(nl2br("{$currentEvent->DESCRIPTION}"));
+        $event->setLocation("{$currentEvent->LOCATION}");
+        $event->setPublishDate('');
+        $event->setAllday($allDay);
 
-		$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-		$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+        $event->setIsEditable(false);
 
-		$event->setType($metaDetails['eventTypeID']);
-		$event->setTitle("{$currentEvent->SUMMARY}");
-		$event->setAccess('');
-		$event->setEventType($metaDetails['eventType']);
-		$event->setColour($metaDetails['eventColour']);
-		$event->setCampusList(implode(',', $decodedConfig->getCampus()));
-		$event->setDetail(nl2br("{$currentEvent->DESCRIPTION}"));
-		$event->setLocation("{$currentEvent->LOCATION}");
-		$event->setPublishDate('');
-		$event->setAllday($allDay);
+        $event->setAttendance(0);
+        $event->setCompleted(0);
 
-		$event->setIsEditable(false);
+        /* Give the calendar_connector id so this event knows where it came from
+         * This allows you to create an event detail screen in Mobile
+         * (and also filter by event source on main calendar)
+         */
+        $event->setConnectorId($this->getConnectorId());
 
-		$event->setAttendance(0);
-		$event->setCompleted(0);
+        return $event;
+    }
 
-		/* Give the calendar_connector id so this event knows where it came from
-		 * This allows you to create an event detail screen in Mobile
-		 * (and also filter by event source on main calendar)
-		 */
-		$event->setConnectorId($this->getConnectorId());
+    /* Getters/Setters
+     */
 
-		return $event;
-	}
+    /**
+     * Set allLuEventTypes
+     *
+     * @param array $allLuEventTypes
+     */
+    private function setAllLuEventTypes($allLuEventTypes)
+    {
+        $this->allLuEventTypes = $allLuEventTypes;
+    }
 
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set allLuEventTypes
-	 *
-	 * @param array $allLuEventTypes
-	 */
-	private function setAllLuEventTypes($allLuEventTypes) {
-		$this->allLuEventTypes = $allLuEventTypes;
-	}
-
-	/**
-	 * Get allLuEventTypes
-	 *
-	 * @return array
-	 */
-	private function getAllLuEventTypes() {
-		return $this->allLuEventTypes;
-	}
+    /**
+     * Get allLuEventTypes
+     *
+     * @return array
+     */
+    private function getAllLuEventTypes()
+    {
+        return $this->allLuEventTypes;
+    }
 }

@@ -1,136 +1,145 @@
 <?php
+
 /**
  * Calendar_Api_EventType_Submission_Schoolbox_Default
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
-	private $calendarHandler = null;
+class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
+{
+    private $calendarHandler = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param \Schoolbox\User $user
-	 * @param $config
-	 */
-	public function __construct(\Schoolbox\User $user, $config) {
-		$this->setCalendarHandler(new Calendar());
-		$this->setUser($user);
-	}
+    /**
+     * Constructor
+     *
+     * @param \Schoolbox\User $user
+     * @param                 $config
+     */
+    public function __construct(\Schoolbox\User $user, $config)
+    {
+        $this->setCalendarHandler(new Calendar());
+        $this->setUser($user);
+    }
 
-	/**
-	 * Get day events from this data source
-	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
-	 *
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$stack = new Calendar_Event_Collection();
+    /**
+     * Get day events from this data source
+     *
+     * @param $startTimestamp
+     * @param $endTimestamp
+     *
+     * @internal param $currentDay
+     * @return Calendar_Event_Collection
+     */
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
+        $stack     = new Calendar_Event_Collection();
+        $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
 
-		//
-		// Use the mapper classes to get events for this day.
-		// Also, need the categories to filter on.
-		// Don't like using session here but other event types use them, so meh.
-		$cat_mapper = new Schoolbox\Resource\CategoryMapper();
-		$cat_mapper->setExternalUser(new External_User());
-		$category_id_list = array();
-		foreach ($cat_mapper->findForUser($this->getUser()) as $category) {
-			$category_id_list[] = $category->getId();
-		}
+        //
+        // Use the mapper classes to get events for this day.
+        // Also, need the categories to filter on.
+        // Don't like using session here but other event types use them, so meh.
+        $cat_mapper = new Schoolbox\Resource\CategoryMapper();
+        $cat_mapper->setExternalUser(new External_User());
+        $category_id_list = array();
+        foreach ($cat_mapper->findForUser($this->getUser()) as $category) {
+            $category_id_list[] = $category->getId();
+        }
 
-		$box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
-		$assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
-		$activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
-		$activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
-		foreach ($activities as $activity) {
-			$event = new Calendar_Event_Type_Submission();
-			$event->setCategoryId($activity->getCategory()->getId());
-			$event->setCategoryName($activity->getCategory()->getName());
+        $box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
+        $assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+        $activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
+        $activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
+        foreach ($activities as $activity) {
+            $event = new Calendar_Event_Type_Submission();
+            $event->setCategoryId($activity->getCategory()->getId());
+            $event->setCategoryName($activity->getCategory()->getName());
 
-			$category_codes = array();
-			foreach ($activity->getCategory()->getCodes() as $code) {
-				$category_codes[] = $code->getCode();
-			}
-			$event->setCategoryCodes($category_codes);
+            $category_codes = array();
+            foreach ($activity->getCategory()->getCodes() as $code) {
+                $category_codes[] = $code->getCode();
+            }
+            $event->setCategoryCodes($category_codes);
 
-			$event->setColour($this->calendarHandler->displayColour(4));
-			$event->setStartTime($activity->getDate());
-			$event->setEndTime($activity->getDate());
+            $event->setType($eventType);
+            $event->setColour($this->calendarHandler->displayColour($eventType));
+            $event->setStartTime($activity->getDate());
+            $event->setEndTime($activity->getDate());
 
-			//
-			// Will only be all day if the event's date is one second before
-			// midnight.
-			$event->setAllDay($activity->getDate()->getUsingFormat('H:i:s') === '23:59:59');
+            //
+            // Will only be all day if the event's date is one second before
+            // midnight.
+            $event->setAllDay($activity->getDate()->getUsingFormat('H:i:s') === '23:59:59');
 
-			//
-			// Populate differently based on whether an assessment or submission
-			if ($activity->isAssessment()) {
-				$assessment = $activity->getAssessment();
-				$owner      = $assessment->getUser();
-				$event->setIsAssessment(true);
-				$event->setSubmissionBoxId($assessment->getId());
-				$event->setSubmissionBoxName($assessment->getTitle());
-				$event->setSubmissionBoxDetail($assessment->getDescription());
-				$event->setPublishDate($assessment->getStart());
-			}
-			else {
-				$submission_box = $activity->getSubmissionBox();
-				$owner          = $submission_box->getOwner();
-				$event->setIsAssessment(false);
-				$event->setSubmissionBoxId($submission_box->getId());
-				$event->setSubmissionBoxName($submission_box->getName());
-				$event->setSubmissionBoxDetail($submission_box->getDescription());
-				$event->setPublishDate($submission_box->getOpenDate());
-			}
+            //
+            // Populate differently based on whether an assessment or submission
+            if ($activity->isAssessment()) {
+                $assessment = $activity->getAssessment();
+                $owner      = $assessment->getUser();
+                $event->setIsAssessment(true);
+                $event->setSubmissionBoxId($assessment->getId());
+                $event->setSubmissionBoxName($assessment->getTitle());
+                $event->setSubmissionBoxDetail($assessment->getDescription());
+                $event->setPublishDate($assessment->getStart());
+            } else {
+                $submission_box = $activity->getSubmissionBox();
+                $owner          = $submission_box->getOwner();
+                $event->setIsAssessment(false);
+                $event->setSubmissionBoxId($submission_box->getId());
+                $event->setSubmissionBoxName($submission_box->getName());
+                $event->setSubmissionBoxDetail($submission_box->getDescription());
+                $event->setPublishDate($submission_box->getOpenDate());
+            }
 
-			$event->setAuthorId($owner->getId());
-			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
-			$event->setConnectorId($this->getConnectorId());
+            $event->setAuthorId($owner->getId());
+            $event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
+            $event->setConnectorId($this->getConnectorId());
 
-			$stack->add($event);
-		}
-		return $stack;
-	}
+            $stack->add($event);
+        }
+        return $stack;
+    }
 
-	/**
-	 * Find a particular event from this source
-	 *
-	 * @param $eventId
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvent($eventId) {
-		$collection = new Calendar_Event_Collection();
+    /**
+     * Find a particular event from this source
+     *
+     * @param $eventId
+     *
+     * @return Calendar_Event_Collection
+     */
+    public function getEvent($eventId)
+    {
+        $collection = new Calendar_Event_Collection();
 
-		/* Fill in your query result set here and populate $collection
-		 */
+        /* Fill in your query result set here and populate $collection
+         */
 
-		return $collection;
-	}
+        return $collection;
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set calendar handler
-	 *
-	 * @param $calendarHandler
-	 */
-	public function setCalendarHandler($calendarHandler) {
-		$this->calendarHandler = $calendarHandler;
-	}
+    /**
+     * Set calendar handler
+     *
+     * @param $calendarHandler
+     */
+    public function setCalendarHandler($calendarHandler)
+    {
+        $this->calendarHandler = $calendarHandler;
+    }
 
-	/**
-	 * Get calendar handler
-	 *
-	 * @return null
-	 */
-	public function getCalendarHandler() {
-		return $this->calendarHandler;
-	}
+    /**
+     * Get calendar handler
+     *
+     * @return null
+     */
+    public function getCalendarHandler()
+    {
+        return $this->calendarHandler;
+    }
 }

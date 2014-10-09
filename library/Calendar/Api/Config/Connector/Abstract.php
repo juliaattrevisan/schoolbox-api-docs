@@ -97,6 +97,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
                 $page->parse('luEventType_block', 'luEventType', true);
             }
+            $page->parse('event_type_list_block', 'event_type_list');
         } else {
             $page->setVar('luEventType_block', '');
         }

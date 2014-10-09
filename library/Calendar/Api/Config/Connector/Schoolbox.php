@@ -37,6 +37,11 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
         );
 
         $page->setVar('has_multiple_options_block', '');
+
+        // Should be only for submission events.
+        if ($this->getEventType() === 'Submission') {
+            $this->renderEventType($page, $this->getLuEventType());
+        }
     }
 
     /**
