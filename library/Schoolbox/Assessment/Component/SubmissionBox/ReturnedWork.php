@@ -11,12 +11,13 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\File\Mimetype;
+use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
-use Schoolbox\ConfigLoader;
 
-class ReturnedWork implements ISoftDeletable
+class ReturnedWork implements ISoftDeletable, FileInterface
 {
 
     /**
@@ -60,7 +61,7 @@ class ReturnedWork implements ISoftDeletable
     protected $filename;
 
     /**
-     * @var string
+     * @var Mimetype
      */
     protected $mimetype;
 
@@ -397,7 +398,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @param  string $mimetype
+     * @param  Mimetype $mimetype
      *
      * @return $this
      */
@@ -408,7 +409,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return Mimetype
      */
     public function getMimetype()
     {
@@ -522,4 +523,16 @@ class ReturnedWork implements ISoftDeletable
     {
         return $this->uuid;
     }
+
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getMimetype()->getMime();
+    }
+
 }

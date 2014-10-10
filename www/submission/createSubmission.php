@@ -47,7 +47,7 @@ $zone
     ->setMimeFilter('*/*')
     ->setMulti(true)
     ->setModalTitle('Select files')
-    ->setAttachPrompt('Click or drag to attach files')
+    ->setAttachPrompt('Attach files')
     ->setAttachmentsLabel('')
     ->setThumbnailSize(64);
 

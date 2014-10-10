@@ -16,6 +16,17 @@ class MyfileController extends NavigatorController implements InternalInterface 
 
 
     /**
+     * @param bool $multi
+     * @param string $mimeFilter
+     */
+    public function __construct($multi, $mimeFilter = null)
+    {
+        // disallow null: cast to '*/*'
+        parent::__construct($multi, is_null($mimeFilter) ? '*/*' : $mimeFilter);
+    }
+
+
+    /**
      * @return string
      */
     public function getLabel()
@@ -32,4 +43,4 @@ class MyfileController extends NavigatorController implements InternalInterface 
         return self::RENDER_INLINE;
     }
 
-} 
+}

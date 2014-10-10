@@ -1,0 +1,8 @@
+<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<iframe id="fallup" name="fallup" style="width:0;height:0;border:none;"></iframe>
+<form id="fileform" action="/storage/asyncUpload.php" method="post" enctype="multipart/form-data" target="fallup">
+    <input type="hidden" name="fallback" value="1">
+    <p>
+        <input type="file" name="upload[]" class="prettify" />
+    </p>
+</form>

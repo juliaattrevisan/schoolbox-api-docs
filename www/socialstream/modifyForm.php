@@ -10,6 +10,8 @@
 
 namespace SocialStream;
 
+use Schoolbox\Resource\Browser\NodeFactory;
+
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
@@ -20,8 +22,6 @@ $currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
-	$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
 	/* Softdelete the post and the entire thread
 	 */
 	$postMapper = new PostMapper();
@@ -64,13 +64,28 @@ else {
 	/* Compile some misc data
 	 */
 	$data = array_merge($_POST, array(
-		'ownerId' => $_SESSION['id'],
-		'requestTime' => new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'),
+		'ownerId'     => $_SESSION['id'],
+		'requestTime' => \Alaress_Date_Format::now(),
 	));
+
+    $url = '';
+
+    if (!empty($_POST['url'])) {
+        // give precedence to URL
+        $url = $_POST['url'];
+
+    } else {
+        // if the attachment points to a folder, use that for the URL
+        $str = NodeFactory::SBFS . '.folder:';
+        if (strpos($data['attachment'][0], $str) === 0) {
+            $url = '/homepage/' . substr($data['attachment'][0], strlen($str));
+            unset($data['attachment']);
+        }
+    }
 
 	/* Create new SocialStream Post
 	 */
-	$factory = new Post\Factory\Creational($_POST['socialstreamAttachment'], $_POST['url']);
+	$factory = new Post\Factory\Creational($url);
 	$newPost = $factory->produce($data);
 
 	/* Set up authentication

@@ -77,16 +77,18 @@
         this._defaults = defaults;
         this._name = plugin;
         this._wrap = $(this.options.wrap);
-        this._previewsContainer = $(this.options.previewContainer);
+        this._previewsContainer = $(this.options.previewsContainer);
         this._dragging = [];
         this._tt = null;
 
         // only allow global window listeners once
         if(!$.data(window, 'listening_'+plugin)) {
 
+            //noinspection FunctionWithInconsistentReturnsJS
             window.onbeforeunload = function() {
-                // check if there are outstanding uploads
-                return pending <= 0 ? null : self.options.navWarning;
+                if (pending > 0) {
+                    return self.options.navWarning;
+                }
             };
 
             // detect dragstart

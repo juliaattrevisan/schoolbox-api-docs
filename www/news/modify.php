@@ -17,7 +17,7 @@ $this->setTab('news');
 
 $zone = new \Schoolbox\Resource\Attachment\Zone('news-feature');
 $zone->setThumbnailSize(64);
-$zone->setAttachPrompt('Click or drag here to attach a feature image');
+$zone->setAttachPrompt('Attach feature image');
 $zone->setAttachmentsLabel('');
 $zone->setMimeFilter('image/*');
 $zone->setModalTitle('Select feature image');

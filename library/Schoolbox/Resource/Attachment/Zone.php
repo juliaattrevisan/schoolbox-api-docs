@@ -94,6 +94,9 @@ class Zone {
 
 
     /**
+     * The text to appear either in the attachzone or the fallback button.
+     * If dropzone activates, note that 'Click or drag here to ' will be prepended to lcfirst($text).
+     *
      * @param string $text
      * @return self
      */

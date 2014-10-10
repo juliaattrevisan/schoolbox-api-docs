@@ -6,11 +6,35 @@
  * @version     SVN: $Id$
  */
 ;
+// It's dangerous to go alone. Take this.
+// IE9+ polyfill: https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent
+(function () {
+    if (typeof window.CustomEvent == 'undefined') {
+        function CustomEvent ( event, params ) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent( 'CustomEvent' );
+            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            return evt;
+        }
+
+        CustomEvent.prototype = window.Event.prototype;
+
+        window.CustomEvent = CustomEvent;
+    }
+})();
+
+// get a fix on your IE9 origin
+if(typeof window.location.origin == 'undefined') {
+    window.location.origin = window.location.protocol + '//' + window.location.hostname;
+}
+
 (function ($, Dropzone, window, document, undefined) {
 
-    var pluginName = 'resourceAttach',
-        noop = function () {},
-        defaults = {
+    var pluginName     = 'resourceAttach',
+        singletonModal = null,
+        noop           = function () {},
+        listening      = false,
+        defaults       = {
 
             // our options
             trigger: null,
@@ -36,6 +60,7 @@
             dictDefaultMessage: null,
             previewsContainerSelector: 'ul.az-list',
             thumbnailSize: 64,
+            tplOverride: null,
 
             // pass through to various implementations
             allowedFiles: null,
@@ -47,16 +72,16 @@
 
 
     function ResourceAttach(element, options) {
-        var self, opt, azone;
+        var self, opt, azone, dzone, prompt;
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
-        this.modal   = null;
-        this.tpl     = $(this.element).find('[data-template]').detach();
+        this.tpl     = this.options.tplOverride || $(this.element).find('[data-template]').detach();
 
         self  = this;
         opt   = self.options;
         azone = $(this.element);
+        dzone = azone.find(opt.dropzoneSelector).html('');
 
         if (opt.title == null) {
             opt.title = 'Select file' + (opt.multi ? 's' : '') + ' to attach';
@@ -72,6 +97,7 @@
             e.preventDefault();
         });
 
+        prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
 
         // wrap ourselves around an instance of dropzone
         azone.dropzone({
@@ -82,24 +108,25 @@
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
-            dictDefaultMessage: opt.dictDefaultMessage,
-            previewsContainer: opt.previewsContainerSelector,
+            dictDefaultMessage: prompt,
+            previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
 
             fallback: function () {
-                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="btn up-arrow float-left"><span></span>Attach</a>',
+                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="btn attach float-left"><span></span>' + opt.dictDefaultMessage + '</a>',
                     btn = $(mk);
 
                 // mimic dropzone behaviour
                 azone.addClass('dz-unsupported');
 
-                $(opt.dropzoneSelector).addClass('clearfix').append(btn);
+                dzone.addClass('clearfix').append(btn);
                 opt.trigger = opt.fallbackButtonSelector;
+
+                self.fallbackFiles = [];
             },
 
             init: function () {
-                var content = $('<span/>').html(opt.dictDefaultMessage);
-                $(opt.dropzoneSelector).append(content);
+                dzone.append($('<span/>').html(prompt));
 
                 // *goes crosseyed*
                 self.dropzone = this;
@@ -162,24 +189,29 @@
         });
 
         // for iframe communication
-        $(window).on('message', { self: this }, function (e) {
-            var message,
-                self     = e.data.self,
-                explorer = self.modal.find('li.browsing').find('div.explorer');
+        if(!listening) {
+            $(window).on('message', function (e) {
+                var message,
+                    modal    = singletonModal,
+                    self     = modal.data('rtn'),
+                    explorer = modal.find('li.browsing').find('div.explorer');
 
-            try {
-                message = JSON.parse(e.originalEvent.data);
-            } catch (err) {
-                message = e.originalEvent.data;
-            }
+                try {
+                    message = JSON.parse(e.originalEvent.data);
+                } catch (err) {
+                    message = e.originalEvent.data;
+                }
 
-            if (message.text) {
-                explorer.attr('data-text', message.text);
-            } else if (message.data) {
-                explorer.removeAttr('data-text');
-                self.attach(message.data);
-            }
-        });
+                if (message.text) {
+                    explorer.attr('data-text', message.text);
+                } else if (message.data) {
+                    explorer.removeAttr('data-text');
+                    var elems = self.attach(message.data);
+                    $(elems).each(function() { this.addClass('dz-success') });
+                }
+            });
+            listening = true;
+        }
 
         // check for existing attachments and push them into the dropzone's list
         azone.find(opt.previewsContainerSelector).find(opt.attachmentTag).each(function() {
@@ -195,24 +227,28 @@
                     hash: hash
                 };
 
-            if(self.dropzone) {
+            if (self.dropzone) {
                 self.dropzone.files.push(file);
 
                 dbtn.one('click', function (e) {
                     self.dropzone.removeFile(file);
                 });
-            }
-            else {
+            } else {
+                self.fallbackFiles.push(file);
+
                 dbtn.one('click', function (e) {
+                    var ff = self.fallbackFiles;
+                    ff.splice(ff.indexOf(file), 1);
                     self.detach(file);
                 });
             }
-
-
         });
 
-        if(this.dropzone) {
+        if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
+        }
+        else {
+            this.fallbackMaxFilesReached();
         }
 
         // prepare the dialog in the background
@@ -228,9 +264,10 @@
         // if my modal already exists, destroy it
         this.destroy();
 
-        this.modal = $('<div/>');
+        singletonModal = $('<div/>');
+        singletonModal.data('rtn', this);
 
-        body.append(this.modal);
+        body.append(singletonModal);
 
         qString = 'multi=' + (this.options.multi ? '1' : '0');
 
@@ -238,11 +275,11 @@
            qString += '&mime=' + this.options.allowedFiles;
         }
 
-        this.modal.load(this.options.source, qString, function () {
+        singletonModal.load(this.options.source, qString, function () {
             // anything you need to do upon completion of loading
         });
 
-        this.modal.dialog({
+        singletonModal.dialog({
             width:     this.options.width,
             height:    this.options.height,
             title:     this.options.title,
@@ -254,42 +291,46 @@
             }
         });
 
-        this.modal.on('click', '.cancel[role=button]', function (e) {
+        singletonModal.on('click', '.cancel[role=button]', function (e) {
             window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
         });
 
         $(this.element).on('click', this.options.trigger, function (e) {
+            e.preventDefault();
             self.open();
         });
     };
 
 
     ResourceAttach.prototype.open = function () {
-        if (this.modal == null) {
+        if (singletonModal == null) {
             this.build();
+        } else {
+            // ensure the return points to the right element
+            singletonModal.data('rtn', this);
         }
 
-        this.modal.dialog('open');
+        singletonModal.dialog('open');
     };
 
 
     ResourceAttach.prototype.close = function () {
-        this.modal.dialog('close');
+        singletonModal.dialog('close');
     };
 
 
     ResourceAttach.prototype.destroy = function () {
-        if (this.modal) {
-            this.modal.dialog('close');
-            this.modal.dialog('destroy');
-            this.modal.detach();
-            this.modal = null;
+        if (singletonModal) {
+            singletonModal.dialog('close');
+            singletonModal.dialog('destroy');
+            singletonModal.detach();
+            singletonModal = null;
         }
     };
 
 
     ResourceAttach.prototype.attach = function (list) {
-        var i, data, self = this;
+        var i, data, elems = [], self = this;
 
         this.close();
 
@@ -303,6 +344,7 @@
 
             if (this.dropzone) {
                 this.dropzone.addFile(data);
+                elems.push($(data.previewElement));
             }
             else {
                 data.previewElement = $(this.tpl.html());
@@ -314,11 +356,20 @@
                     .append(data.previewElement);
 
                 data.previewElement.find('[data-dz-remove]').on('click', function () {
+                    var ff = self.fallbackFiles;
+                    ff.splice(ff.indexOf(data), 1);
                     self.detach(this);
                 });
+
+                elems.push(data.previewElement);
+
+                this.fallbackFiles.push(data);
+
+                this.fallbackMaxFilesReached();
             }
         }
 
+        return elems;
     };
 
 
@@ -329,6 +380,8 @@
 
         if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
+        } else {
+            this.fallbackMaxFilesReached();
         }
 
         setTimeout(function () {
@@ -359,6 +412,19 @@
     };
 
 
+    ResourceAttach.prototype.fallbackMaxFilesReached = function () {
+        // if we accept multi, there's no limit to check
+        if (this.options.multi) {
+            return;
+        }
+        if (this.fallbackFiles.length) {
+            $(this.element).addClass('dz-max-files-reached');
+        } else {
+            $(this.element).removeClass('dz-max-files-reached');
+        }
+    };
+
+
     $.fn[pluginName] = function (options) {
         return this.each(function () {
             var ra;
@@ -368,5 +434,18 @@
             }
         });
     };
+
+
+    $.fn[pluginName + 'Clone'] = function (source) {
+        return this.each(function () {
+            if (source.data('plugin_' + pluginName)) {
+                // grab the options from the existing source and push them into a new instance
+                var ra = source.data('plugin_' + pluginName);
+                var options = ra.options;
+                options.tplOverride = ra.tpl.clone();
+                $(this)[pluginName](options);
+            }
+        });
+    }
 
 }(jQuery, Dropzone, window, document));

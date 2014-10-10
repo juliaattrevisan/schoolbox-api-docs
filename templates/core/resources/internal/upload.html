@@ -6,29 +6,117 @@
             abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
             abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
-            abUploadCancelBtn = abUploadControls.children('a.cancel');
+            abUploadCancelBtn = abUploadControls.children('a.cancel'),
+            maxFiles           = {MAX_FILES};
 
         abUploadForm.dropzone({
             paramName: 'upload',
             dictDefaultMessage: 'Click or drag here to upload',
             dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
-            maxFiles: {MAX_FILES},
+            maxFiles: maxFiles,
             autoProcessQueue: false,
             addRemoveLinks: true,
             acceptedFiles: {ACCEPTED_FILES},
 
             fallback: function () {
-                // TODO this fallback needs to be an iframe'd form
-                $(this.element)
-                    .append($('<div/>').addClass('dz-fallback')
-                        .append($('<p/>').text(this.options.dictFallbackText)
-                            .append($('<input type="file" name="upload" />'))
-                        )
-                    );
 
-                abUploadSubmitBtn.one('click', function () {
-                    $.post(abUploadForm.attr('action'), abUploadForm.serialize())
+                // pull in the manual upload fallback
+                abUpload.load('/ajax/resource/internal/upload-fallback.html', function () {
+                    var ff = $('#fileform'),
+                        fr = $('#fallup'),
+                        lb = 'label.file-input',
+                        fi = 'input.prettify[type=file]',
+                        cf = {
+                            additionalButtonClasses: 'up-arrow no-marg float-left',
+                            buttonActiveClass: 'tick',
+                            defaultText: '<span></span>Select file',
+                            defaultFileSelectedText: '<span></span>File selected'
+                        };
+
+                    ff.find(fi).prettyFileInput(cf);
+
+                    abUploadSubmitBtn.one('click', function () {
+                        // cleanup any empty inputs
+                        ff.find(fi).filter(function () {
+                            return !$(this).val();
+                        }).closest(lb).detach();
+
+                        ff.submit();
+                    });
+
+                    ff.on('submit', function (e) {
+                        abUploadSubmitBtn.attr('disabled', 'disabled').html('Uploading');
+                    });
+
+                    ff.on('change', fi, function (e) {
+
+                        // cleanup any empty inputs
+                        ff.find(fi).filter(function () {
+                            return !$(this).val();
+                        }).closest(lb).detach();
+
+                        var len = ff.find(fi).length;
+
+                        if (!maxFiles || len < maxFiles) {
+                            var newInput = $('<input class="prettify" type="file" name="upload[]" />');
+                            ff.children('p').append(newInput);
+                            newInput.prettyFileInput(cf);
+                        }
+
+                        if (len) {
+                            abUploadSubmitBtn
+                                .html('Upload (' + len + ')')
+                                .removeAttr('disabled');
+                        } else {
+                            abUploadSubmitBtn
+                                .html('Upload')
+                                .attr('disabled', 'disabled');
+                        }
+
+
+                    });
+
+                    fr.load(function () {
+                        var uploads, i,
+                            data = [],
+                            str  = fr.contents().find('body').text();
+
+                        try {
+                            uploads = JSON.parse(str);
+
+                            for (i = 0; i < uploads.hash.length; ++i) {
+                                // don't include upload failures
+                                if (uploads.hash[i].split(':')[0] != 'exception') {
+                                    data.push({
+                                        title: uploads.meta[i].name,
+                                        mimeType: uploads.meta[i].type,
+                                        filesize: uploads.meta[i].size,
+                                        hash: uploads.hash[i]
+                                    });
+                                }
+                            }
+
+                            window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+
+                        } catch (e) {
+                            // noop
+                        }
+
+                    });
                 });
+
+
+//                // TODO this fallback needs to be an iframe'd form
+//                $(this.element)
+//                    .append($('<div/>').addClass('dz-fallback')
+//                        .append($('<p/>').text(this.options.dictFallbackText)
+//                            .append($('<input type="file" name="upload" />'))
+//                        )
+//                    );
+//
+//                abUploadSubmitBtn.one('click', function () {
+//                    $.post(abUploadForm.attr('action'), abUploadForm.serialize())
+//                });
             },
 
             init: function () {

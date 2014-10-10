@@ -20,9 +20,15 @@ class UploadController extends AbstractController implements InternalInterface {
      */
     protected function pparse(SitePage $page)
     {
+        if (is_null($this->mimeFilter) || $this->mimeFilter == '*/*') {
+            $mime = 'null';
+        } else {
+            $mime = "'{$this->mimeFilter}'";
+        }
+
         $page->setVar(array(
             'MAX_FILES'      => $this->multi ? 'null' : '1',
-            'ACCEPTED_FILES' => is_null($this->mimeFilter) ? 'null' : "'{$this->mimeFilter}'"
+            'ACCEPTED_FILES' => $mime
         ));
     }
 

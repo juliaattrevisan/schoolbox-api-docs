@@ -7,12 +7,27 @@
       isolate: true,
       mimeFilter: {MIME_FILTER},
       submitCallback: function (url, filename, meta) {
-        var data = [{
+        var i, hash, data;
+
+        i = url.match(/\/(?:homepage\/([0-9]+))?$/);
+
+        if (i) {
+            hash = '{SOURCE_SLUG}.folder:' + (i[1] || 0);
+            meta = {
+                mime: 'folder',
+                size: 0
+            }
+        } else {
+            hash = '{SOURCE_SLUG}:' + url.split('?id=')[1];
+        }
+
+        data = [{
           title:    $(filename).text(),
           mimeType: meta.mime,
           filesize: meta.size,
-          hash:     '{SOURCE_SLUG}:' + url.split('?id=')[1]
+          hash:     hash
         }];
+
         window.top.postMessage(JSON.stringify({ data: data }), location.origin);
       }
     });

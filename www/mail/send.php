@@ -1,4 +1,8 @@
 <?php
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Storage;
+use Schoolbox\StorageMapper;
+
 /************************************************************
 *                                                           *
 *         Copyright (c) 2013 Alaress Pty Ltd                *
@@ -10,7 +14,7 @@ require_once __DIR__."/../../include/Bootstrap.php";
 
 $page = new SitePage();
 
-function sendMail($to, $cc, $bcc, $subject, $message)
+function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
 {
     $mail = new Swift_Message();
 
@@ -102,17 +106,16 @@ function sendMail($to, $cc, $bcc, $subject, $message)
     $mail->setBody($converter->get_text(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
-    if (is_array($_FILES)) {
-        foreach ($_FILES["file"]["error"] as $key => $error) {
-            if ($error == UPLOAD_ERR_OK && filesize($_FILES['file']['tmp_name'][$key]) < Cfg::get('max_file_size')) {
-                $attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
-                $attach->setFilename($_FILES['file']['name'][$key]);
-                $attach->setContentType($_FILES['file']['type'][$key]);
-                $mail->attach($attach);
-            }
-        }
-    }
+    $factory = new CollectorFactory(StorageMapper::getInstance());
+    /** @var Storage[] $files */
+    $files = $factory->build($attachments)->getAll();
 
+    foreach ($files as $storage) {
+        $attach = Swift_Attachment::fromPath($storage->getFileLocation());
+        $attach->setFilename($storage->getFilename());
+        $attach->setContentType($storage->getMime());
+        $mail->attach($attach);
+    }
 
     try {
         Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
@@ -126,7 +129,9 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 //if form has been submitted
 if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 {
-    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message']);
+    $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
+
+    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments);
 
     //output code to send the browser to where it came from
     $back = -2;
