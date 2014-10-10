@@ -1,7 +1,7 @@
 <?php
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
-use Schoolbox\Calendar\Relation\CategoryMapper;
+use \Schoolbox\Resource\CategoryMapper;
 use \Schoolbox\Resource\FileMapper;
 use \Schoolbox\Resource\File;
 
