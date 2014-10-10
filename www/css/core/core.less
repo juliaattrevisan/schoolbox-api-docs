@@ -2623,7 +2623,6 @@ input, select, textarea {
     -webkit-transition: border-color 0.2s linear;
     transition: border-color 0.2s linear;
     &:disabled{
-        background-color: @dark;
         color: @mgrey;
     }
 }
@@ -2633,6 +2632,9 @@ input:not([type="button"]):not([type="file"]):not([type="submit"]):not([type="im
 select,
 textarea {
     background-color: @white;
+    &:disabled {
+        background-color: @dark;
+    }
 }
 
 .formLabelWidth {
