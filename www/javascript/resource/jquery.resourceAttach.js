@@ -23,6 +23,11 @@
     }
 })();
 
+// get a fix on your IE9 origin
+if(typeof window.location.origin == 'undefined') {
+    window.location.origin = window.location.protocol + '//' + window.location.hostname;
+}
+
 (function ($, Dropzone, window, document, undefined) {
 
     var pluginName     = 'resourceAttach',

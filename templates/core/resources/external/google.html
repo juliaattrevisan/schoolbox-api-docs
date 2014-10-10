@@ -39,6 +39,11 @@
   <script type="text/javascript" src="/javascript/google/apiloader.js"></script>
   <script type="text/javascript">
 
+      // get a fix on your IE9 origin
+      if(typeof window.location.origin == 'undefined') {
+          window.location.origin = window.location.protocol + '//' + window.location.hostname;
+      }
+
       if (window.top && window.top.postMessage) {
           window.top.postMessage(JSON.stringify({text: 'Connecting to your Google Drive...'}), location.origin);
       }
