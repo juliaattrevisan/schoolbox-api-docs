@@ -249,9 +249,16 @@ class User extends DeprecatedModel
                 year,
                 local_email,
                 alt_email,
-                synergy_id
+                synergy_id,
+                luCampus.id as campusId,
+                luCampus.name as campusName
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
+            LEFT JOIN userCampus defaultCampus
+              ON user.id = defaultCampus.uid
+              AND defaultCampus.defaultCampus IS TRUE
+            LEFT JOIN luCampus
+              ON defaultCampus.campus = luCampus.id
             WHERE
         ";
         if ($keyword != "") {
