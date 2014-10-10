@@ -66,6 +66,24 @@
 		});
 	});
 </script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Finagle timepicker settings so you get an hour and minute picker
+        $('input[data-timepicker="hour"]').timepicker({
+            timeFormat: "h",
+            minTime: '01:00am',
+            maxTime: '12:59pm',
+            step: 60
+        });
+        $('input[data-timepicker="minute"]').timepicker({
+            timeFormat: "i",
+            step: 5,
+            minTime: '12:00am',
+            maxTime: '12:59am'
+        });
+    });
+</script>
 <h1>
 	<span>{FUNCTION} Event</span>
 	<a class="customise" href="#">
@@ -103,8 +121,8 @@
 				<td>
 					<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
 					<span class="timeInputs">
-						<input name="startHour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
-						<input name="startMinute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+						<input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
+						<input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
 						<select name="startPeriod">
 							<option value="am" {EVENT_START_AM}>AM</option>
 							<option value="pm" {EVENT_START_PM}>PM</option>
@@ -115,8 +133,8 @@
 
 					<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
 					<span class="timeInputs">
-						<input name="endHour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
-						<input name="endMinute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+						<input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
+						<input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
 
 						<select name="endPeriod">
 							<option value="am" {EVENT_END_AM}>AM</option>
