@@ -88,7 +88,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 $person .= $user['gname'];
 
                 if ($user['synergy_id']) {
-                    $person .= ", ({$user['synergy_id']})";
+                    $person .= " ({$user['synergy_id']})";
                 }
 
                 $return[] = array(
