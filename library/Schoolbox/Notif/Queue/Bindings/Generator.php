@@ -250,7 +250,9 @@ class Generator implements GeneratorInterface
                     ));
                     // parent bindings
                     // *.notify.parent.{childId}.#
-                    $bindings['parent'] = $childCollection->getColumnValues('id');
+                    foreach ($childCollection->getColumnValues('id') as $id) {
+                        $bindings['parent'][] = "$id.#";
+                    }
                 }
             }
         }
