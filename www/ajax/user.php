@@ -13,6 +13,7 @@ $keyword      = $_GET['query'];
 $groupID      = $_GET['groupID'];
 $roleTypeID   = $_GET['roleTypeID'];
 $boardersOnly = !empty($_GET['boardersOnly']);
+$showCampus   = !empty($_GET['showCampus']);
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     && (strlen($groupID) || strlen($roleTypeID))
@@ -78,6 +79,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
 
                 if ($user['year']) {
                     $person .= "Year {$user['year']}, ";
+                }
+
+                if ($showCampus) {
+                    $person .= ', '.$user['campusName'];
                 }
 
                 $person .= $user['gname'];
