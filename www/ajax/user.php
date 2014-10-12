@@ -82,7 +82,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 }
 
                 if ($showCampus) {
-                    $person .= ', '.$user['campusName'];
+                    $person .= ' '.$user['campusName'].' ';
                 }
 
                 $person .= $user['gname'];
