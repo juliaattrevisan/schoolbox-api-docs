@@ -12,7 +12,7 @@ class Plagscan_Gateway
 {
 
     const API_VERSION = '2.0';
-    const API_URL     = 'https://www.plagscan.com/api/';
+    const API_URL     = 'https://api.plagscan.com/';
 
     const METHOD_SUBMIT   = 'Submit';
     const METHOD_RETRIEVE = 'Retrieve';
