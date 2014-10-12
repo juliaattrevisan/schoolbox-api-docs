@@ -9,7 +9,6 @@
 			mode: 'textareas',
 			editor_deselector: "selfPromotionalComment"
 		});
-
 		$j('#staff-suggest').selectizeSelector({
 			ajax: {
 				url:      '/ajax/user.php',
@@ -60,6 +59,31 @@
 				});
 			}
 		});
+		// Hack multiple file uploads into browsers which don't support them
+		// Modern browsers will be none the wiser.
+		if (!('multiple' in $('<input type="file">')[0])) {
+			$('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
+				var container     = $(this).closest('[data-ramsfile]');
+				var allContainers = $('#eventForm [data-ramsfile]').not(container);
+				if (this.value.length > 0) {
+					// clone me
+					// Hide remove button from new one, show it in old.
+					var newContainer = container.clone();
+					container.find('a[data-action="delete"]').show();
+					newContainer.find('a[data-action="delete"]').hide();
+					container.after(newContainer);
+				} else {
+					// delete me (unless I'm the only one)
+					if (allContainers.length) {
+						container.remove();
+					}
+				}
+			});
+			$('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
+				event.preventDefault();
+				$(this).closest('[data-ramsfile]').remove();
+			});
+		}
 
 		$('#eventForm').eventModify({
 			functionLabel: "{FUNCTION}"
@@ -230,10 +254,26 @@
 						<input type="hidden" name="ramsRequired" value="0" />
                     <label><input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />RAMS Required?</label>
 
-                        {EVENT_RAMS_FILE}
+						<ul>
+							<!-- BEGIN rams_list -->
+							<li class="clearfix">
+								<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
+								<label class="float-right">
+									<input type="checkbox"
+										   id="deleteRamsFile-{EVENT_RAMS_HASH}"
+										   name="deleteRamsFile[{EVENT_RAMS_HASH}]"
+										   value="1" />
+									Delete?
+								</label>
+								<img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />
+								{EVENT_RAMS_FILE}
+							</li>
+							<!-- END rams_list -->
+						</ul>
 
 						<div data-ramsfile="true">
-							<input type="file" name="ramsFile" />
+							<input type="file" name="ramsFile[]" multiple />
+							<a href="#" data-action="delete" class="hide">Remove</a>
 						</div>
 
 				</td>
@@ -416,3 +456,7 @@
 	
 	<a href="/modules/eotc/myReview" class="btn go-to"><span></span>Back to My EOTC Events</a>
 </form>
+
+
+
+
