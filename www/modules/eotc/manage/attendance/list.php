@@ -41,25 +41,37 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $externalHandler = new \External_Synergetic_Class();
     $allFiletypes    = $externalHandler->findFiletypes();
 
+    // Lame hardcoded filetype lameness. LAAAAAME [SB-5494]
+    $hardcodedFiletypes = array(
+        'A' => 'Academic',
+        'C' => 'Cultural',
+        'L' => 'Leadership',
+        'M' => 'Music',
+        'R' => 'Service',
+        'S' => 'Sports',
+        'V' => 'Awards',
+        'Z' => 'Miscellaneous',
+    );
+
+    $this->setVar('filetype_block', '');
     if (is_array($allFiletypes) && count($allFiletypes)) {
         foreach ($allFiletypes as $currentFiletype) {
-            $this->setVar(
-                array(
-                    'FILETYPE_ID'   => $currentFiletype['Code'],
-                    'FILETYPE_NAME' => $currentFiletype['Description']
-                )
-            );
-
-            $this->parse('filetype_block', 'filetype', true);
+            if (array_key_exists($currentFiletype['Code'], $hardcodedFiletypes)) {
+                $this->setVar(
+                    array(
+                        'FILETYPE_ID'   => $currentFiletype['Code'],
+                        'FILETYPE_NAME' => $currentFiletype['Description']
+                    )
+                );
+                $this->parse('filetype_block', 'filetype', true);
+            }
         }
     }
 
     if ($event->getMetadata()->getStudentAttendees()->count()) {
         $roleMapper = new \Schoolbox\RoleMapper();
-
         foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
             $role = $roleMapper->findById($currentStudent->getRole()->getId());
-
             $this->setVar(
                 array(
                     'STUDENT_ATTENDEE_ID'        => $currentStudent->getId(),
@@ -68,7 +80,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                     'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
                 )
             );
-
             $this->parse('student_attendee_block', 'student_attendee', true);
         }
     } else {
