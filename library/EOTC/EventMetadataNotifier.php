@@ -343,12 +343,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
 
     /**
-	 * Returns an array of user IDs that have mod privilege or are subscribed
-	 * for the given event/status combination.
-	 *
-	 * This includes the Attendance Officer and Operations Officer - it's
-	 * assumed that these users will be subscribed to Approved and Cancelled
-	 * events.
+     * Returns an array of user IDs that have mod privilege or are subscribed
+     * for the given event/status combination.
+     * This includes the Attendance Officer and Operations Officer - it's
+     * assumed that these users will be subscribed to Approved and Cancelled
+     * events.
      *
      * @param Event     $event        the event in question
      * @param int|array $targetStatus can be an array of statuses
@@ -364,13 +363,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             $campusIds[] = $unknown instanceof Campus ? $unknown->getId() : (int)$unknown;
         }
         $permissions = EventPermissionMapper::getInstance()->findByColumnList(
-                array(
-                    'campus_id' => $campusIds,
-                    'status_id' => $targetStatus,
-                )
-            )->getColumnValues('userId')
+            array(
+                'campus_id' => $campusIds,
+                'status_id' => $targetStatus,
+            )
         );
-        $userIds      = array();
+        $userIds     = array();
         foreach ($permissions as $permission) {
             /** @var EventPermission $permission */
             // the field is called userId, yet it MIGHT contain userIds OR User objects...
