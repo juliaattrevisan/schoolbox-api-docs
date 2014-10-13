@@ -62,8 +62,12 @@ $(document).ready(function() {
             month: calendarDate.getMonth(),
             year:  calendarDate.getFullYear(),
             columnFormat: {
-                month: 'ddd',
-                '':    'ddd d/M'
+                month:      'ddd',
+                week:       'ddd d/M',
+                agendaWeek: 'ddd d/M',
+                day:        'ddd d/M',
+                agendaDay:  'ddd d/M',
+                '':         'ddd d/M'
             },
             defaultView: calendarView,
             timeFormat: { month: 'h(:mm)tt' },
