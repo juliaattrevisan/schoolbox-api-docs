@@ -63,7 +63,7 @@ if(is_numeric($this->arg[0])) {
         error(6);
     }
 
-	$output = array('ACTION'			=> 'Post',
+	$output = array('ACTION'			=> 'Add',
 					'LINK_ID'			=> '',
 					'URL'				=> '',
 					'DESCRIPTION'		=> '',
