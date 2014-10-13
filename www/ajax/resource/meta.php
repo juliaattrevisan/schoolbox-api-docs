@@ -16,14 +16,14 @@ use Schoolbox\Resource\FileMapper;
 new SitePage();
 
 // disallow SitePage context, this is an ajax script
-if(isset($this)) {
-	SitePage::localRedir('/ajax/resource/meta.php');
-	exit;
+if (isset($this)) {
+    SitePage::localRedir('/ajax/resource/meta.php');
+    exit;
 }
 
 // check 1: folder specified and sane
-if(!(isset($_POST['folderId']) && is_numeric($_POST['folderId']))) {
-	sendError('No folder ID specified');
+if (!(isset($_POST['folderId']) && is_numeric($_POST['folderId']))) {
+    sendError('No folder ID specified');
 }
 
 $folderId = $_POST['folderId'];
@@ -31,39 +31,35 @@ $folderId = $_POST['folderId'];
 // check 2: user logged in an has at minimum read access
 $groupHandler = new Group();
 $access = $groupHandler->getPermission($folderId);
-if($access < READ_ACCESS) {
-	sendError('User does not have access to this folder');
+if ($access < READ_ACCESS) {
+    sendError('User does not have access to this folder');
 }
 
 // check 3: if no files specified, return folder
-if(!isset($_POST['files'])) {
-	$response = getFolderMeta($folderId);
-	die(json_encode($response));
+if (!isset($_POST['files'])) {
+    $response = getFolderMeta($folderId);
+    die(json_encode($response));
 }
 
 // check 4: files correctly specified
-if(!is_array($_POST['files'])) {
-	sendError('Invalid file ID(s) specified');
+if (!is_array($_POST['files'])) {
+    sendError('Invalid file ID(s) specified');
 }
 
 
 // check 5: single or multi?
-if(count($_POST['files']['file']) + count($_POST['files']['link']) == 1) {
-	if(isset($_POST['files']['file'])) {
-		$response = getSingleFileMeta($folderId, $_POST['files']['file'][0]);
-	}
-	else {
-		$response = getSingleLinkMeta($folderId, $_POST['files']['link'][0]);
-	}
-}
-else {
-	$response = getMultiFileMeta($folderId);
+if (count($_POST['files']['file']) + count($_POST['files']['link']) == 1) {
+    if (isset($_POST['files']['file'])) {
+        $response = getSingleFileMeta($folderId, $_POST['files']['file'][0]);
+    } else {
+        $response = getSingleLinkMeta($folderId, $_POST['files']['link'][0]);
+    }
+} else {
+    $response = getMultiFileMeta($folderId);
 }
 
 header('Content-Type: application/json');
 die(json_encode($response));
-
-
 
 
 /**
@@ -71,10 +67,11 @@ die(json_encode($response));
  *
  * @param $errString
  */
-function sendError($errString) {
-	header('HTTP/1.1 400 Bad Request');
-	header('Content-Type: application/json');
-	die(json_encode(array('error', $errString)));
+function sendError($errString)
+{
+    header('HTTP/1.1 400 Bad Request');
+    header('Content-Type: application/json');
+    die(json_encode(array('error', $errString)));
 }
 
 
@@ -84,145 +81,139 @@ function sendError($errString) {
  * @param $folderId
  * @return array
  */
-function getFolderMeta($folderId) {
+function getFolderMeta($folderId)
+{
 
-	// handler setup
-	$catHandler = new Category();
-	$groupHandler = new Group();
+    // handler setup
+    $catHandler = new Category();
+    $groupHandler = new Group();
 
     $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
-	try {
+    try {
 
-		/* Only throw error exception if a folderId is specified
-		 * and it can't be found; $folderId 0 is used to add a
-		 * folder to the root node
-		 */
-		if ($folderId) {
-			$cat = $categoryMapper->findById($folderId);
-		}
-	}
-	catch (Schoolbox\Mapper\Exception $e) {
-		sendError('No folder with specified ID exists');
-		exit;
-	}
-
-
-	// if it's the root node, return add-folder functions if admin
-	if($folderId == 0) {
-		$actions = $groupHandler->isSuperuser() ? array('folder') : array();
-
-		$folder = array(
-			'name' => 'Resources',
-			'id' => 0,
-			'template' => '',
-			'type' => '',
-			'joinable' => 0,
-			'permissions' => array(),
-			'actions' => $actions,
-		);
-		return $folder;
-	}
-
-	// determine the name of the template, if the folder has a homepage
+        /* Only throw error exception if a folderId is specified
+         * and it can't be found; $folderId 0 is used to add a
+         * folder to the root node
+         */
+        if ($folderId) {
+            $cat = $categoryMapper->findById($folderId);
+        }
+    } catch (Schoolbox\Mapper\Exception $e) {
+        sendError('No folder with specified ID exists');
+        exit;
+    }
 
 
+    // if it's the root node, return add-folder functions if admin
+    if ($folderId == 0) {
+        $actions = $groupHandler->isSuperuser() ? array('folder') : array();
 
-	// determine the group type (open, restricted, moderated)
-    if($cat->getGroup()->isPrivate()) {
+        $folder = array(
+            'name'        => 'Resources',
+            'id'          => 0,
+            'template'    => '',
+            'type'        => '',
+            'joinable'    => 0,
+            'permissions' => array(),
+            'actions'     => $actions,
+        );
+        return $folder;
+    }
+
+    // determine the name of the template, if the folder has a homepage
+
+
+    // determine the group type (open, restricted, moderated)
+    if ($cat->getGroup()->isPrivate()) {
         $type = 'Restricted';
-    }
-    else if($cat->getGroup()->isModerated()) {
+    } elseif ($cat->getGroup()->isModerated()) {
         $type = 'Moderated';
-    }
-    else if($cat->getGroup()->isFree()) {
+    } elseif ($cat->getGroup()->isFree()) {
         $type = 'Open';
-    }
-    else {
+    } else {
         $type = '';
     }
 
 
-	// joinable: is the logged in user not already a member?
-	$accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
+    // joinable: is the logged in user not already a member?
+    $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
-	$joinable = 0; // either don't have access, or are already a member
-	if ($accessType == DENY_ACCESS) {
-		if (!is_null($accessType)) {
-			$joinable = 2; // pending approval
-		}
-		elseif ($groupHandler->canSubscribe($folderId)) {
-			$joinable = 1; // can join
-		}
-	}
+    $joinable = 0; // either don't have access, or are already a member
+    if ($accessType == DENY_ACCESS) {
+        if (!is_null($accessType)) {
+            $joinable = 2; // pending approval
+        } elseif ($groupHandler->canSubscribe($folderId)) {
+            $joinable = 1; // can join
+        }
+    }
 
-	// permissions: must have write access to see it
-	$userAccess = $groupHandler->getPermission($folderId);
-	if($userAccess >= WRITE_ACCESS) {
-		$permissions = array();
-		$permsList = $catHandler->getGroupPerms($folderId);
-		if(is_array($permsList)) {
-			$j = 0;
+    // permissions: must have write access to see it
+    $userAccess = $groupHandler->getPermission($folderId);
+    if ($userAccess >= WRITE_ACCESS) {
+        $permissions = array();
+        $permsList = $catHandler->getGroupPerms($folderId);
+        if (is_array($permsList)) {
+            $j = 0;
 
-			foreach($permsList as $group) {
-				$groupAccess = (int)$group['type'];
-				if($groupAccess > 0) {
-					$permissions[] = array(
-						'group' => $group['name'],
-						'access' => $groupAccess,
-						'on_off' => ++$j % 2 ? '' : 'dark',
-					);
-				}
-			}
-		}
-	}
-	else {
-		$permissions = array();
-	}
+            foreach ($permsList as $group) {
+                $groupAccess = (int)$group['type'];
+                if ($groupAccess > 0) {
+                    $permissions[] = array(
+                        'group'  => $group['name'],
+                        'access' => $groupAccess,
+                        'on_off' => ++$j % 2 ? '' : 'dark',
+                    );
+                }
+            }
+        }
+    } else {
+        $permissions = array();
+    }
 
-	// actions: if write, some; if full, all.
-	$actions = array();
-	switch($userAccess) {
-		case FULL_ACCESS:
-			$actions[] = 'multi';
-			if ($groupHandler->isSuperuser()) {
-				$actions[] = 'zip';
-			}
-			// no break
-		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download', 'multi'));
-			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
-			
-			/* Allow teachers to upload a zip file
-			 */
-			if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
-				$actions[] = 'zip';
-			}
+    // actions: if write, some; if full, all.
+    $actions = array();
+    switch ($userAccess) {
+        case FULL_ACCESS:
+            $actions[] = 'multi';
+            if ($groupHandler->isSuperuser()) {
+                $actions[] = 'zip';
+            }
+        // no break
+        case WRITE_ACCESS:
+            $actions = array_merge($actions, array('file', 'link', 'folder', 'modify', 'download', 'multi'));
+            $actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 
-			
-			// no break
-		case READ_ACCESS:
-		default:
-			// no actions available
-			break;
-	}
+            /* Allow teachers to upload a zip file
+             */
+            if ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload')) {
+                $actions[] = 'zip';
+            }
 
 
-	if($cat->hasHomepage()) {
-		$actions[] = 'homepage';
-	}
+        // no break
+        case READ_ACCESS:
+        default:
+            // no actions available
+            break;
+    }
 
-	$folder = array(
-		'name' => $cat->getName(),
-		'id' => $cat->getId(),
-		'template' =>  $cat->hasHomepage(),
-		'type' => $type,
-		'joinable' => $joinable,
-		'permissions' => $permissions,
-		'actions' => $actions,
-	);
 
-	return $folder;
+    if ($cat->hasHomepage()) {
+        $actions[] = 'homepage';
+    }
+
+    $folder = array(
+        'name'        => $cat->getName(),
+        'id'          => $cat->getId(),
+        'template'    => $cat->hasHomepage(),
+        'type'        => $type,
+        'joinable'    => $joinable,
+        'permissions' => $permissions,
+        'actions'     => $actions,
+    );
+
+    return $folder;
 
 }
 
@@ -234,58 +225,58 @@ function getFolderMeta($folderId) {
  * @param $fileId
  * @return array
  */
-function getSingleFileMeta($folderId, $fileId) {
+function getSingleFileMeta($folderId, $fileId)
+{
 
-	$groupHandler = new Group();
+    $groupHandler = new Group();
 
-	$fmap = new FileMapper();
-	$file = $fmap->findById($fileId);
+    $fmap = new FileMapper();
+    $file = $fmap->findById($fileId);
     try {
-	    $owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
+        $owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $owner = UserMapper::getInstance()->getUnknownUser();
     }
-    catch (Schoolbox\Mapper\Exception $e) {
-        $owner =  UserMapper::getInstance()->getUnknownUser();
+
+
+    if (!$file) {
+        sendError('No file with the specified ID exists');
     }
 
+    $userAccess = $groupHandler->getPermission($folderId);
 
-	if(!$file) {
-		sendError('No file with the specified ID exists');
-	}
+    // write access provides actions
+    $actions = array();
+    switch ($userAccess) {
+        case FULL_ACCESS:
+        case WRITE_ACCESS:
+            $actions = array_merge($actions, array('modify', 'delete'));
+        // no break
+        case READ_ACCESS:
+            $actions = array_merge($actions, array('open', 'download', 'properties'));
+        // no break
+        default:
+            // no actions available
+            break;
+    }
 
-	$userAccess = $groupHandler->getPermission($folderId);
+    $modified = new Alaress_Date_Relative($file->getModified());
 
-	// write access provides actions
-	$actions = array();
-	switch($userAccess) {
-		case FULL_ACCESS:
-		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('modify', 'delete'));
-			// no break
-		case READ_ACCESS:
-			$actions = array_merge($actions, array('open', 'download', 'properties'));
-			// no break
-		default:
-			// no actions available
-			break;
-	}
+    $file = array(
+        'kind'        => 'file',
+        'id'          => $file->getId(),
+        'name'        => $file->getDescription(),
+        'mime'        => $file->getMimeType()->getIconFile(), //TODO: mime type data should be part of resource object
+        'filesize'    => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+        'hidden'      => $file->getHidden() ? 1 : 0,
+        'description' => $file->getComment(),
+        'posted_by'   => $owner->formatName(),
+        'posted_date' => $file->getSubmitted()->getDateOnly(),
+        'modified'    => $modified->getRelativeTime(),
+        'actions'     => $actions
+    );
 
-	$modified = new Alaress_Date_Relative($file->getModified());
-
-	$file = array(
-		'kind' => 'file',
-		'id' => $file->getId(),
-		'name' => $file->getDescription(),
-		'mime' => $file->getMimeType()->getIconFile(), //TODO: mime type data should be part of resource object
-		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
-		'hidden' => $file->getHidden() ? 1 : 0,
-		'description' => $file->getComment(),
-		'posted_by' => $owner->formatName(),
-		'posted_date' => $file->getSubmitted()->getDateOnly(),
-		'modified' => $modified->getRelativeTime(),
-		'actions' => $actions
-	);
-
-	return $file;
+    return $file;
 }
 
 /**
@@ -293,47 +284,48 @@ function getSingleFileMeta($folderId, $fileId) {
  * @param $linkId
  * @return array
  */
-function getSingleLinkMeta($folderId, $linkId) {
-	$groupHandler = new Group();
-	$linkHandler = new Link();
-	$userHandler = new User();
+function getSingleLinkMeta($folderId, $linkId)
+{
+    $groupHandler = new Group();
+    $linkHandler = new Link();
+    $userHandler = new User();
 
-	$link = $linkHandler->getByID($linkId);
+    $link = $linkHandler->getByID($linkId);
 
-	if(!$link || $link['deleted'] == 1) {
-		sendError('No link with the specified ID exists');
-	}
+    if (!$link || $link['deleted'] == 1) {
+        sendError('No link with the specified ID exists');
+    }
 
-	$userAccess = $groupHandler->getPermission($folderId);
-	$adf = new Alaress_Date_Format($link['submitted'], 'U');
+    $userAccess = $groupHandler->getPermission($folderId);
+    $adf = new Alaress_Date_Format($link['submitted'], 'U');
 
-	// actions based on access
-	$actions = array();
-	switch($userAccess) {
-		case FULL_ACCESS:
-		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('modify', 'delete'));
-		// no break
-		case READ_ACCESS:
-			$actions = array_merge($actions, array('open', 'properties'));
-		// no break
-		default:
-			// no actions available
-			break;
-	}
+    // actions based on access
+    $actions = array();
+    switch ($userAccess) {
+        case FULL_ACCESS:
+        case WRITE_ACCESS:
+            $actions = array_merge($actions, array('modify', 'delete'));
+        // no break
+        case READ_ACCESS:
+            $actions = array_merge($actions, array('open', 'properties'));
+        // no break
+        default:
+            // no actions available
+            break;
+    }
 
-	$file = array(
-		'kind' => 'link',
-		'id' => $link['id'],
-		'name' => $link['description'],
-		'hidden' => $link['hidden'],
-		'description' => $link['comment'],
-		'posted_by' => $userHandler->formatName($userHandler->getByID($link['owner'])),
-		'posted_date' => $adf->getDateOnly(),
-		'actions' => $actions
-	);
+    $file = array(
+        'kind'        => 'link',
+        'id'          => $link['id'],
+        'name'        => $link['description'],
+        'hidden'      => $link['hidden'],
+        'description' => $link['comment'],
+        'posted_by'   => $userHandler->formatName($userHandler->getByID($link['owner'])),
+        'posted_date' => $adf->getDateOnly(),
+        'actions'     => $actions
+    );
 
-	return $file;
+    return $file;
 }
 
 
@@ -344,20 +336,20 @@ function getSingleLinkMeta($folderId, $linkId) {
  * @param $folderId
  * @return array
  */
-function getMultiFileMeta($folderId) {
+function getMultiFileMeta($folderId)
+{
 
-	// if has write permission, grant delete access
-	$groupHandler = new Group();
-	$access = $groupHandler->getPermission($folderId);
+    // if has write permission, grant delete access
+    $groupHandler = new Group();
+    $access = $groupHandler->getPermission($folderId);
 
-	if($access <= READ_ACCESS) {
-		return array(
-			'actions' => array()
-		);
-	}
-	else {
-		return array(
-			'actions' => array('delete')
-		);
-	}
+    if ($access <= READ_ACCESS) {
+        return array(
+            'actions' => array()
+        );
+    } else {
+        return array(
+            'actions' => array('delete')
+        );
+    }
 }
