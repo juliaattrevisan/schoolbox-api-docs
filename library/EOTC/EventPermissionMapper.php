@@ -42,6 +42,16 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			'property' => 'statusId',
 			'type' => self::TYPE_INTEGER,
 		));
+        $this->hasMap(array(
+            'column' => 'is_allowed',
+            'property' => 'allowed',
+            'type' => self::TYPE_BOOLEAN,
+        ));
+        $this->hasMap(array(
+            'column' => 'is_subscribed',
+            'property' => 'subscribed',
+            'type' => self::TYPE_BOOLEAN,
+        ));
 		$this->hasMap(array(
 			'column'   => 'created_at',
 			'property' => 'createdAt',
@@ -121,42 +131,75 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 	 * Find all the permissions for a particular user
 	 *
 	 * @param \Schoolbox\User
-	 * @return \Schoolbox\Collection
+	 * @return \Schoolbox\Collection|EventPermission[]
 	 */
 	public function findByUser(\Schoolbox\User $user) {
-		$campus_mapper = $this->getJoinMapper('campus');
-		$status_mapper = $this->getJoinMapper('status');
-
 		$query = "
 			SELECT
 				{$this->getColumnString('p')},
-				{$campus_mapper->getColumnString('c')},
-				{$status_mapper->getColumnString('s')}
+				{$this->getJoinColumnString('campus', 'c')},
+				{$this->getJoinColumnString('status', 's')}
 			FROM `{$this->table}` p
 			LEFT JOIN {$this->getJoinSql('campus', 'p', 'c')}
 			LEFT JOIN {$this->getJoinSql('status', 'p', 's')}
 			WHERE p.user_id = :userId
+			AND p.is_allowed IS TRUE
 			ORDER BY p.campus_id, p.status_id
 		";
 
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(":userId", $user->getId());
 		$statement->execute();
-
-		$allPermissions = new \Schoolbox\Collection();
-
-		foreach($statement as $row) {
-			$permissionItem = $this->hydrate($row, 'p');
-
-			$campusItem = $campus_mapper->hydrate($row, 'c');
-			$permissionItem->setCampusId($campusItem);
-
-			$statusItem = $status_mapper->hydrate($row, 's');
-			$permissionItem->setStatusId($statusItem);
-
-			$allPermissions->add($permissionItem);
-		}
-
-		return $allPermissions;
+		return $this->hydrateWithCampusAndStatus($statement);
 	}
+
+    /**
+     * Find all the subscriptions for a particular user.
+     *
+     * @param \Schoolbox\User $user
+     * @return \Schoolbox\Collection|EventPermission[]
+     */
+    public function findSubscriptionsByUser(\Schoolbox\User $user) {
+        $query = "
+			SELECT
+				{$this->getColumnString('p')},
+				{$this->getJoinColumnString('campus', 'c')},
+				{$this->getJoinColumnString('status', 's')}
+			FROM `{$this->table}` p
+			LEFT JOIN {$this->getJoinSql('campus', 'p', 'c')}
+			LEFT JOIN {$this->getJoinSql('status', 'p', 's')}
+			WHERE p.user_id = :userId
+			AND p.is_subscribed IS TRUE
+			ORDER BY p.campus_id, p.status_id
+		";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(":userId", $user->getId());
+        $statement->execute();
+        return $this->hydrateWithCampusAndStatus($statement);
+    }
+
+    /**
+     * Helper for hydrating a statement into a list of EventPermission objects,
+     * with attached campus and status.
+     *
+     * @param \Traversable $statement
+     * @return \Schoolbox\Collection|EventPermission[]
+     */
+    protected function hydrateWithCampusAndStatus($statement)
+    {
+        $allPermissions = new \Schoolbox\Collection();
+        foreach ($statement as $row) {
+            $permissionItem = $this->hydrate($row, 'p');
+
+            $campusItem = $this->hydrateJoin($row, 'campus', 'c');
+            $permissionItem->setCampusId($campusItem);
+
+            $statusItem = $this->hydrateJoin($row, 'status', 's');
+            $permissionItem->setStatusId($statusItem);
+
+            $allPermissions->add($permissionItem);
+        }
+        return $allPermissions;
+    }
 }

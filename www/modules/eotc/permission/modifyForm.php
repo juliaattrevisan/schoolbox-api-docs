@@ -36,11 +36,13 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
 		/* Apply the same perms for each campus
 		 */
 		if (is_array($_POST['status']) && count($_POST['status'])) {
-			foreach ($_POST['status'] as $currentStatus) {
+			foreach ($_POST['status'] as $currentStatus => $settings) {
 				$permission = new \EOTC\EventPermission();
 				$permission->setUserId($user->getId());
 				$permission->setCampusId($currentCampus);
 				$permission->setStatusId($currentStatus);
+				$permission->setAllowed($settings['allowed']);
+				$permission->setSubscribed($settings['subscribed']);
 				$permission->setCreatedAt($_SERVER['REQUEST_TIME']);
 				$permission->setUpdatedAt($_SERVER['REQUEST_TIME']);
 

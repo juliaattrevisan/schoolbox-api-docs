@@ -1,5 +1,6 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$j('#staff-suggest').selectizeSelector({
@@ -14,7 +15,7 @@
 
 		$('#assign-permissions').validate({
 			rules: {
-				'status[]': 'required',
+//				'status[]': 'required',
 				'campus[]': 'required'
 			},
 			submitHandler: function(form) {
@@ -32,7 +33,7 @@
 	});
 </script>
 
-<h1>Manage EOTC Permissions</h1>
+<h1>Manage EOTC Admins</h1>
 
 <h2>Add User</h2>
 <form id='assign-permissions' action="/modules/eotc/permission/modifyForm.php" method="post">
@@ -41,7 +42,7 @@
 		<tr>
 			<td class="formLabelWidth">
 				<h4>User</h4>
-				The user to whom you are giving permissions.
+				<em>The user to whom these settings apply.</em>
 			</td>
 			<td>
 				<select id="staff-suggest" name="staff" placeholder="Search Staff"></select>
@@ -50,7 +51,7 @@
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Campus</h4>
-					The campuses to which permissions apply.
+					<em>The campuses to which these settings apply.</em>
 				</td>
 				<td>
 					<!-- BEGIN campus -->
@@ -71,16 +72,31 @@
 				<td>
 					<!-- BEGIN status -->
 					<label>
-						<input name='status[]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
+						<input name='status[{STATUS_ID}][allowed]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
 						{STATUS_NAME}
 					</label>
 					<!-- END status -->
 				</td>
 			</tr>
+			<tr>
+				<td class="formLabelWidth">
+					<h4>Subscriptions</h4>
+					<em>The user will receive messages when an event is set to this status.
+						(Attendance Officers and Operations Officers should be subscribed to Approved and Cancelled events.)</em>
+				</td>
+				<td>
+					<!-- BEGIN subscription -->
+					<label>
+						<input name='status[{STATUS_ID}][subscribed]' type="checkbox" value="{STATUS_ID}" {STATUS_SELECTED} />
+						{STATUS_NAME}
+					</label>
+					<!-- END subscription -->
+				</td>
+			</tr>
 		</tbody>
 	</table>
 
-	<input type="submit" class='submit-btn-plain' value="Assign Permissions" />
+	<input type="submit" class='submit-btn-plain' value="Assign" />
 </form>
 
 <div class="clearfix"></div>
@@ -88,6 +104,7 @@
 <h2>Current EOTC Admins</h2>
 <table class="standardForm">
 	<colgroup>
+		<col width="200" />
 		<col width="200" />
 		<col width="200" />
 		<col width="200" />
@@ -109,6 +126,9 @@
 				Status
 			</th>
 			<th>
+				Subscriptions
+			</th>
+			<th>
 				Remove
 			</th>
 		</tr>
@@ -127,6 +147,9 @@
 			</td>
 			<td>
 				{PERMISSION_STATUS_NAMES}
+			</td>
+			<td>
+				{PERMISSION_STATUS_SUBSCRIPTIONS}
 			</td>
 			<td>
 				<a data-confirm='true' href="/modules/eotc/permission/delete/{PERMISSION_USER_ID}">Remove</a>

@@ -115,16 +115,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Event $relEvent */
         $relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         // inform approved in principle moderator(s)
-        /** @var Collection|int[] $moderatorCollection */
-        $moderatorCollection = new Collection(
-            EventPermissionMapper::getInstance()->findByColumnList(
-                array(
-                    'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-                    'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
-                        $eventMetadata->getStatus()->getId() :
-                        $eventMetadata->getStatus()
-                )
-            )->getColumnValues('userId')
+        /** @var Collection|EventPermission[] $permissionCollection */
+        $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
+            array(
+                'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
+                'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
+                    $eventMetadata->getStatus()->getId() :
+                    $eventMetadata->getStatus()
+            )
         );
         $bob->setTitle(":applicant submitted new EOTC, :event")
             ->setParams(
@@ -139,8 +137,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.{$relEvent->getId()}.submitted");
         $instance = $bob->build();
-        foreach ($moderatorCollection as $mod) {
-            $envelope->targetToUser($mod, $instance);
+        foreach ($permissionCollection as $permission) {
+            if ($permission->getSubscribed() || $permission->getAllowed()) {
+                $envelope->targetToUser($permission->getUserId(), $instance);
+            }
         }
         return $envelope;
     }
@@ -180,7 +180,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $effectorExtId     = $effector->getExternalId();
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
-        $moderatorIds  = $this->getModerators(
+        $moderatorIds  = $this->getInterestedUsers(
             $relEvent,
             $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
         );
@@ -299,8 +299,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
-                // ...Attendance Officer and Operations Officer
-                // TODO who are the AO and OO? Don't know where they're defined...
                 break;
             case EventStatusMapper::STATUS_REJECTED:
                 $bob->setTitle(":moderator has cancelled :event");
@@ -311,14 +309,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                         $envelope->targetToUser($userId, $bob->build());
                     }
-                    // include Attendance Officer and Operations Officer
-                    // TODO who are the AO and OO? Don't know where they're defined...
-                    // if Resources booked, inform Resource Moderator(s)
-                    // TODO who are the AO and OO? Don't know where they're defined...
                     // if RAMS, inform RAMS Approval Moderator(s)
                     if ($eventMetadata->getRamsRequired()) {
                         $bob->setHref($hrefMod);
-                        $ramsModIds = $this->getModerators($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
+                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
                         foreach ($ramsModIds as $userId) {
                             $envelope->targetToUser($userId, $bob->build());
                         }
@@ -329,7 +323,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     /** @var \EOTC\ActivityLog\Log $log */
                     $envelope->targetToUser($log->getActioner()->getId(), $bob->build());
                 }
-                // in any case, the teacher in charge and applicant will be informed
+                // in any case, the teacher in charge and applicant will be informed.
+                // This includes Attendance Officer and Operations Officer.
                 $bob->setHref($hrefOwn);
                 foreach ($ownerIds as $id) {
                     $envelope->targetToUser($id, $bob->build());
@@ -337,7 +332,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 break;
         }
         // get list of moderators relevant to the current status
-        $moderatorIds = $this->getModerators($relEvent, $newStatus);
+        $moderatorIds = $this->getInterestedUsers($relEvent, $newStatus);
         // inform them
         $bob->setHref($hrefMod);
         foreach ($moderatorIds as $modId) {
@@ -348,14 +343,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
 
     /**
-     * Returns an array of user IDs that have mod privilege for the given event/status combination
+     * Returns an array of user IDs that have mod privilege or are subscribed
+     * for the given event/status combination.
+     * This includes the Attendance Officer and Operations Officer - it's
+     * assumed that these users will be subscribed to Approved and Cancelled
+     * events.
      *
      * @param Event     $event        the event in question
      * @param int|array $targetStatus can be an array of statuses
      *
      * @return array
      */
-    protected function getModerators($event, $targetStatus)
+    protected function getInterestedUsers($event, $targetStatus)
     {
         $campusIds = array();
         // coerce "campuses" out of their "collection"
@@ -363,18 +362,20 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         foreach ($event->getCampusCollection()->getAll() as $unknown) {
             $campusIds[] = $unknown instanceof Campus ? $unknown->getId() : (int)$unknown;
         }
-        // the field is called userId, yet it MIGHT contain userIds OR User objects...
-        $userUnknowns = new Collection(
-            EventPermissionMapper::getInstance()->findByColumnList(
-                array(
-                    'campus_id' => $campusIds,
-                    'status_id' => $targetStatus
-                )
-            )->getColumnValues('userId')
+        $permissions = EventPermissionMapper::getInstance()->findByColumnList(
+            array(
+                'campus_id' => $campusIds,
+                'status_id' => $targetStatus,
+            )
         );
-        $userIds      = array();
-        foreach ($userUnknowns as $unknown) {
-            $userIds[] = $unknown instanceof User ? $unknown->getId() : (int)$unknown;
+        $userIds     = array();
+        foreach ($permissions as $permission) {
+            /** @var EventPermission $permission */
+            // the field is called userId, yet it MIGHT contain userIds OR User objects...
+            if ($permission->getSubscribed() || $permission->getAllowed()) {
+                $unknown   = $permission->getUserId();
+                $userIds[] = $unknown instanceof User ? $unknown->getId() : (int)$unknown;
+            }
         }
         return array_unique($userIds);
     }
