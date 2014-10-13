@@ -617,28 +617,4 @@ class Homepage {
 
         $this->db->delete('homepage_config', 'cid', $categoryId);
     }
-
-    public function migrateHomepageConfiguration ($sourceCategoryId, $destinationCategoryId) {
-        /* Copy config from source to destination */
-        if ( $config = $this->getConfig($sourceCategoryId) ) {
-            $config['cid'] = $destinationCategoryId;
-
-            $this->setConfig($config, $destinationCategoryId);
-        }
-
-        /* Copy components from source to destination */
-        $componentList = $this->getSimpleComponentList($sourceCategoryId);
-
-        if ( is_array($componentList) ) {
-            foreach ( $componentList as &$component ) {
-                unset($component['homepageComponentLocationID'], $component['config']);
-
-                $component['cid'] = $destinationCategoryId;
-            }
-        }
-
-        $this->deleteComponentPositions($destinationCategoryId);
-
-        $this->setComponentList($componentList, $destinationCategoryId);
-    }
 }

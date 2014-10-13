@@ -56,21 +56,6 @@ class Link extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    public function migrateCategory($sourceCategoryId, $destinationCategoryId)
-    {
-        $linkList = $this->getAllByField('category', $sourceCategoryId);
-
-        if (is_array($linkList)) {
-            foreach ($linkList as &$link) {
-                unset($link['id']);
-
-                $link['category'] = $destinationCategoryId;
-
-                $link['id'] = parent::create($link);
-            }
-        }
-    }
-
     function appendHTTP($url)
     {
         if (strncasecmp($url, "http://", 7) && strncasecmp($url, "https://", 8) && strncasecmp($url, "ftp://", 6))

@@ -41,20 +41,6 @@ class TextBox extends DeprecatedModel {
         $this->db->query($query);
     }
 
-    public function migrateCategory($sourceCategoryId, $destinationCategoryId) {
-        $textBoxList = $this->getAllByField('categoryID', $sourceCategoryId);
-
-        if (is_array($textBoxList)) {
-            foreach ($textBoxList as &$textBox) {
-                unset($textBox['textBoxID']);
-
-                $textBox['categoryID'] = $destinationCategoryId;
-
-                $textBox['textBoxID'] = parent::create($textBox);
-            }
-        }
-    }
-
     /**
      * Search the user table for particular user(s)
      *
