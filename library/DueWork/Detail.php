@@ -138,7 +138,7 @@ class DueWork_Detail {
         // setup blocks, etc
         $page->setTab('submission');
         $page->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
-        $page->setTitle('Submission Box');
+        $page->setTitle( Scrub::text($this->dueWork['categoryName']).': '.Scrub::text($this->dueWork['name']));
 
         $page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
         $page->setBlock('student_row', 'submission_row', 'submission_row_block');

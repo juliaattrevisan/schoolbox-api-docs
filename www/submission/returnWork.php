@@ -6,7 +6,6 @@ $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block'
 $this->setBlock(TEMPLATE_content, 'mark_type_letter', 'mark_type_letter_block');
 $this->setBlock(TEMPLATE_content, 'mark_type_raw', 'mark_type_raw_block');
 $this->setBlock(TEMPLATE_content, 'mark_type_free', 'mark_type_free_block');
-$this->setTitle('Return Student Work');
 $this->setTab('submission');
 
 if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
@@ -21,12 +20,21 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 	$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 	$submissionBox = $submissionBoxMapper->findById($this->arg[0]);
 
-	$this->setVar(array(
+    $this->setTitle('Grading '.\Scrub::text($submissionBox->getCategory()->getName()).' for '.\Scrub::text($submissionBox->getName()));
+
+
+    $this->setVar(array(
 		'CATEGORY'  => \Scrub::text($submissionBox->getCategory()->getName()),
 		'ASSNAME' => \Scrub::text($submissionBox->getName()),
 		'BOX_ID' => $submissionBox->getId(),
-		'NAME' => $user->formatName(),
+        'CAT_ID' => $submissionBox->getCategory()->getId(),
+        'DUEWORK_YEAR'          => date('Y', strtotime($submissionBox->getDueDate())),
+        'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
+        'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
+        'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
+		'NAME' => Scrub::text($user->formatName()),
 		'SYN_ID' => $user->getExternalId(),
+        'ROLE'  => Scrub::text($user->getRole()->getName()),
 		'UID' => $user->getId(),
 		'REDIRECT' => "/submission/viewSubmission/{$submissionBox->getId()}",
 	));

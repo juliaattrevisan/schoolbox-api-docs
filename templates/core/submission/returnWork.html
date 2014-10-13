@@ -21,7 +21,16 @@
 </script>
 <!-- END custom_head -->
 
-<h1>Mark Rubric</h1>
+<h1>Grading {ASSNAME} for {NAME}</h1>
+<p class="sub-heading">{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
+<div class="listing">
+    <ul class="breadcrumb">
+        <li><a href="/submission/listSubmission" >Submissions</a></li>
+        <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CAT_ID}" >{CATEGORY}</a></li>
+        <li><a href="/submission/viewSubmission/{BOX_ID}">{ASSNAME}</a></li>
+        <li class="last"><a href="/search/user/{UID}">{NAME}</a></li>
+    </ul>
+</div>
 <form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
     <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
     <input name="uid" type="hidden" id="uid" value="{UID}" />
@@ -31,7 +40,7 @@
         <tr>
             <td class="formLabelWidth"><h4>Student</h4>
 			<td>
-                <img class="student-img" alt="{NAME}" src="/portrait?userId={SYN_ID}&size=square32" /><strong>{NAME}</strong><br />{CATEGORY} - {ASSNAME}
+                <img class="student-img" alt="{NAME}" src="/portrait?userId={SYN_ID}&size=square32" /><strong>{NAME}</strong><br />{ROLE}
             </td>
         </tr>
         <tr>
