@@ -5,110 +5,109 @@ $groupHandler = new Group;
 use \Schoolbox\Resource\LinkMapper;
 use \Schoolbox\Resource\CategoryMapper;
 
-if(is_numeric($this->arg[0])) {
+if (is_numeric($this->arg[0])) {
 
-	$linkHandler = new Link;
+    $linkHandler = new Link;
 
-    try{
+    try {
         /** @var \Schoolbox\Resource\Link $link */
         $link = LinkMapper::getInstance()->findById($this->arg[0]);
         /** @var \Schoolbox\Resource\Category $folder */
         $folder = CategoryMapper::getInstance()->findById($link->getFolder()->getId());
-    }
-    catch (Exception $e) {
+
+        /* Check permissions to submit */
+        if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+            error(6);
+        }
+
+    } catch (Exception $e) {
         error(41);
     }
 
-	/* Check permissions to submit */
-	if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS ) {
-        error(6);
-    }
+    $this->setFile(TEMPLATE_content, 'cms/modify-link.html');
+
+    $this->setTitle('Modify Link');
+    $this->setTab('resources');
+
+    $output = array(
+        'ACTION'          => 'Modify',
+        'LINK_ID'         => $link->getId(),
+        'URL'             => $link->getUrl(),
+        'DESCRIPTION'     => Scrub::text($link->getDescription()),
+        'COMMENT'         => Scrub::text($link->getComment()),
+        'CATEGORY_NAME'   => Scrub::text($folder->getName()),
+        'CATEGORY_ID'     => $link->getFolder()->getId(),
+        'HIDDEN_SELECTED' => $link->getHidden() > 0 ? 'checked="checked"' : '',
+    );
+    $this->setVar($output);
 
 
-	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
-
-	$this->setTitle('Modify Link');
-	$this->setTab('resources');
-
-	$output = array('ACTION'			=> 'Modify',
-					'LINK_ID'			=> $link->getId(),
-					'URL'				=> $link->getUrl(),
-					'DESCRIPTION'		=> Scrub::text($link->getDescription()),
-					'COMMENT'			=> Scrub::text($link->getComment()),
-					'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
-					'CATEGORY_ID'		=> $link->getFolder()->getId(),
-					'HIDDEN_SELECTED'	=> $link->getHidden() > 0 ? 'checked="checked"' : '',
-					);
-	$this->setVar($output);
-
-
-} else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
-    }
-    catch (Exception $e) {
-		error(13);
-	}
 
-	/* Add new link to system */
-	$this->setFile(TEMPLATE_content, 'cms/modify-link.html');
-	$this->setTitle('Add Link');
-	$this->setTab('resources');
-    $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
-    $this->setVar('delete_button_block','');
+        /* Check permissions to submit */
+        if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
+            error(6);
+        }
 
-
-	/* Check permissions to submit */
-    if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS ) {
-        error(6);
+    } catch (Exception $e) {
+        error(13);
     }
 
-	$output = array('ACTION'			=> 'Add',
-					'LINK_ID'			=> '',
-					'URL'				=> '',
-					'DESCRIPTION'		=> '',
-					'COMMENT'			=> '',
-					'HIDDEN_SELECTED'	=> '',
-					'CATEGORY_NAME'		=> Scrub::text($folder->getName()),
-					'CATEGORY_ID'		=> $folder->getId(),
-					);
-	$this->setVar($output);
+    /* Add new link to system */
+    $this->setFile(TEMPLATE_content, 'cms/modify-link.html');
+    $this->setTitle('Add Link');
+    $this->setTab('resources');
+    $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+    $this->setVar('delete_button_block', '');
 
-}
-else if($this->arg[0] == 'multicat') {
-	/* Upload a link to multiple categories */
+    $output = array(
+        'ACTION'          => 'Add',
+        'LINK_ID'         => '',
+        'URL'             => '',
+        'DESCRIPTION'     => '',
+        'COMMENT'         => '',
+        'HIDDEN_SELECTED' => '',
+        'CATEGORY_NAME'   => Scrub::text($folder->getName()),
+        'CATEGORY_ID'     => $folder->getId(),
+    );
+    $this->setVar($output);
 
-	$this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
-	$this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
+} else if ($this->arg[0] == 'multicat') {
+    /* Upload a link to multiple categories */
 
-	$this->setTitle('Upload a Link to Multiple Locations');
-	$this->setTab('resources');
+    $this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');
+    $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 
-	$groupHandler = new Group;
-	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    $this->setTitle('Upload a Link to Multiple Locations');
+    $this->setTab('resources');
 
-	if(is_array($categoryList) && count($categoryList)) {
-		foreach($categoryList as $category) {
-			$name = $category['name'];
+    $groupHandler = new Group;
+    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 
-			/* Optionally append the categoryCode if one exists
-			 */
-			if (strlen(trim($category['code']))) {
-				$name .= ' (' . $category['code'] . ')';
-			}
+    if (is_array($categoryList) && count($categoryList)) {
+        foreach ($categoryList as $category) {
+            $name = $category['name'];
 
-			$this->setVar(array(
-				'CATEGORY_NAME'	=> Scrub::text($name),
-				'CATEGORY_ID' => $category['id'],
-			));
+            /* Optionally append the categoryCode if one exists
+             */
+            if (strlen(trim($category['code']))) {
+                $name .= ' (' . $category['code'] . ')';
+            }
 
-			$this->parse('category_list_block', 'category_list', true);
-		}
-	}
-    else {
+            $this->setVar(
+                array(
+                    'CATEGORY_NAME' => Scrub::text($name),
+                    'CATEGORY_ID'   => $category['id'],
+                )
+            );
+
+            $this->parse('category_list_block', 'category_list', true);
+        }
+    } else {
         error(154);
     }
-}
-else {
-	error(2);
+} else {
+    error(2);
 }
