@@ -10,6 +10,7 @@
 
 namespace EOTC;
 
+
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
@@ -59,17 +60,21 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+
             // what KIND of update has occurred?
             $diff = $bundle->getEvent()->getDiff();
+
             // no diff - nothing to handle
             if (empty($diff)) {
                 return;
             }
+
             // status has been updated:
             if (isset($diff['status'])) {
                 $bundle->attach(self::TRIGGER_STATUSCHANGED, self::IMMEDIATELY);
                 return;
             }
+
             // process the other kinds of updates
             $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
         }
@@ -106,14 +111,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         $bob      = new Builder();
+
         // retrieve the event that this metadata object is connected to
         $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
         // no event? no messages
         if (!$eventCollection->count()) {
             return $envelope;
         }
+
         /** @var Event $relEvent */
         $relEvent = EventMapper::getInstance()->findById($eventCollection->first()->getId());
+
         // inform approved in principle moderator(s)
         /** @var Collection|EventPermission[] $permissionCollection */
         $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
@@ -124,24 +133,29 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     $eventMetadata->getStatus()
             )
         );
+
+        $href = "/modules/eotc/status/modify/".$relEvent->getId();
         $bob->setTitle(":applicant submitted new EOTC, :event")
             ->setParams(
                 array(
                     'applicant' => new UserParam($applicant, ParameterInterface::STACKING_REPLACE),
-                    'event'     => new Param($relEvent->getTitle())
+                    'event'     => new Param($relEvent->getTitle(), $href)
                 )
             )
-            ->setIcon("/portrait.php?size=square32&userId=" . $applicant->getExternalId())
-            ->setHref("/modules/eotc/status/modify/" . $relEvent->getId())
+            ->setIcon("/portrait.php?size=square32&userId=".$applicant->getExternalId())
+            ->setHref($href)
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.{$relEvent->getId()}.submitted");
+
         $instance = $bob->build();
+
         foreach ($permissionCollection as $permission) {
             if ($permission->getSubscribed() || $permission->getAllowed()) {
                 $envelope->targetToUser($permission->getUserId(), $instance);
             }
         }
+
         return $envelope;
     }
 
@@ -161,16 +175,20 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         $bob      = new Builder();
+
         // retrieve the event that this metadata object is connected to
         $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
         // no event? no messages
         if (!$eventCollection->count()) {
             return $envelope;
         }
+
         /** @var Event $relEvent */
         $relEvent     = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId   = $relEvent->getId();
-        $relEventNote = $relEvent->getTitle();
+        $relEventNote = $relEvent->getNote();
+
         // pray that these are actually User objects
         $teacherInCharge   = $relEvent->getTeacherInCharge();
         $teacherInChargeId = $teacherInCharge->getId();
@@ -178,33 +196,39 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $applicantId       = $applicant->getId();
         $effectorId        = $effector->getId();
         $effectorExtId     = $effector->getExternalId();
+
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
         $moderatorIds  = $this->getInterestedUsers(
             $relEvent,
             $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
         );
+
         // prep msg data
         $bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId");
-        $bob->setHref("/modules/eotc/status/modify/$relEventId");
+        $href = "/modules/eotc/status/modify/$relEventId";
+
         // change was made by applicant or TiC: inform moderators
         if ($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
             $inform = $moderatorIds;
         } // change was made by moderator (right?): inform applicant and TiC
         else {
             $inform = array($teacherInChargeId, $applicantId);
-            $bob->setHref("/modules/eotc/manage/modify.php?eventID=$relEventId");
+            $href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
         }
-        $bob->setParams(
-            array(
-                'user' => new UserParam($effector),
-                'note' => new Param($relEventNote)
+
+        $bob->setHref($href)
+            ->setParams(
+                array(
+                    'user' => new UserParam($effector),
+                    'note' => new Param($relEventNote, $href)
+                )
             )
-        )
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.updated")
             ->setMeta($diff);
+
         if (isset($diff['comment'])) {
             $bob->setTitle(":user commented on the EOTC event :note")
                 ->setByline($effector->formatName('{firstname}') . " wrote")
@@ -212,11 +236,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         } else {
             $bob->setTitle(":user updated the EOTC event :note");
         }
+
         $instance = $bob->build();
+
         // iterate those who should be informed and bind a message for them
         foreach ($inform as $id) {
             $envelope->targetToUser($id, $instance);
         }
+
         return $envelope;
     }
 
@@ -236,88 +263,112 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         list($newStatus, $oldStatus) = $diff['status'];
+
         $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
         // no event? no messages
         if (!$eventCollection->count()) {
             return $envelope;
         }
+
         /** @var Event $relEvent */
         $relEvent     = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId   = $relEvent->getId();
-        $relEventNote = $relEvent->getTitle();
+        $relEventNote = $relEvent->getNote();
         // pray that these are actually User objects
         $teacherInCharge   = $relEvent->getTeacherInCharge();
         $teacherInChargeId = $teacherInCharge->getId();
         $applicant         = $relEvent->getAuthor();
         $applicantId       = $applicant->getId();
         $effectorExtId     = $effector->getExternalId();
+
+
         // setup initial condition of the builder
         $bob = new Builder();
         $bob->setIcon("/portrait.php?size=square32&userId=$effectorExtId")
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.statuschanged")
             ->setSeverity(Logger::WARNING)
-            ->setParams(
-                array(
-                    'moderator' => new UserParam($effector),
-                    'event'     => new Param($relEventNote)
-                )
-            );
+            ->setParam('moderator', new UserParam($effector));
+
         $hrefMod = "/modules/eotc/status/modify/$relEventId";
         $hrefOwn = "/modules/eotc/manage/modify.php?eventID=$relEventId";
         $hrefReg = "/calendar/full/" . $relEvent->getStartDateTime()->getUsingFormat('d-m-Y');
+
         /** @var EventMetadataMapper $mapper */
         $mapper   = $this->mapper;
         $ownerIds = array($teacherInChargeId, $applicantId);
+
         // what we do is entirely contingent on what the new status is
         switch ($newStatus) {
+
             case EventStatusMapper::STATUS_INPRINCIPLE:
                 $bob->setTitle(":moderator has approved :event in principle")
-                    ->setHref($hrefOwn);
+                    ->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
+
                 // tell applicant and TiC
                 foreach ($ownerIds as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
                 break;
+
             case EventStatusMapper::STATUS_DETAILSCOMPLETED:
                 $bob->setTitle(":moderator has completed details for :event")
-                    ->setHref($hrefMod);
+                    ->setHref($hrefMod)
+                    ->setParam('event', new Param($relEventNote, $hrefMod));
                 break;
+
             case EventStatusMapper::STATUS_READYFORFINALAPPROVAL:
                 $bob->setTitle(":moderator has made :event ready for final approval")
-                    ->setHref($hrefMod);
+                    ->setHref($hrefMod)
+                    ->setParam('event', new Param($relEventNote, $hrefMod));
                 break;
+
             case EventStatusMapper::STATUS_APPROVED:
                 $bob->setTitle(":moderator has given final approval for :event")
-                    ->setHref($hrefOwn);
+                    ->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
+
                 // tell applicant, TiC...
                 foreach ($ownerIds as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
+
                 // ...relevant staff...
-                $bob->setHref($hrefReg);
+                $bob->setHref($hrefReg)
+                    ->setParam('event', new Param($relEventNote, $hrefReg));
                 foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                     $envelope->targetToUser($userId, $bob->build());
                 }
+
                 break;
+
             case EventStatusMapper::STATUS_REJECTED:
                 $bob->setTitle(":moderator has cancelled :event");
+
                 // in this case, tell. freaking. everybody.
                 if ($oldStatus == EventStatusMapper::STATUS_APPROVED) {
                     // tell relevant staff
-                    $bob->setHref($hrefReg);
+                    $bob->setHref($hrefReg)
+                        ->setParam('event', new Param($relEventNote, $hrefReg));
                     foreach ($mapper->findStaffAttendees($eventMetadata->getId())->getColumnValues('id') as $userId) {
                         $envelope->targetToUser($userId, $bob->build());
                     }
+
                     // if RAMS, inform RAMS Approval Moderator(s)
                     if ($eventMetadata->getRamsRequired()) {
-                        $bob->setHref($hrefMod);
+                        $bob->setHref($hrefMod)
+                            ->setParam('event', new Param($relEventNote, $hrefMod));
+
                         $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
+
                         foreach ($ramsModIds as $userId) {
                             $envelope->targetToUser($userId, $bob->build());
                         }
                     }
                 }
+
                 // Tell everyone in the activity log that this event got cancelled
                 foreach ($relEvent->getMetadata()->getActivityLog() as $log) {
                     /** @var \EOTC\ActivityLog\Log $log */
@@ -325,19 +376,25 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                 }
                 // in any case, the teacher in charge and applicant will be informed.
                 // This includes Attendance Officer and Operations Officer.
-                $bob->setHref($hrefOwn);
+                $bob->setHref($hrefOwn)
+                    ->setParam('event', new Param($relEventNote, $hrefOwn));
                 foreach ($ownerIds as $id) {
                     $envelope->targetToUser($id, $bob->build());
                 }
                 break;
+
         }
+
         // get list of moderators relevant to the current status
         $moderatorIds = $this->getInterestedUsers($relEvent, $newStatus);
+
         // inform them
-        $bob->setHref($hrefMod);
+        $bob->setHref($hrefMod)
+            ->setParam('event', new Param($relEventNote, $hrefMod));
         foreach ($moderatorIds as $modId) {
             $envelope->targetToUser($modId, $bob->build());
         }
+
         return $envelope;
     }
 
@@ -362,6 +419,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         foreach ($event->getCampusCollection()->getAll() as $unknown) {
             $campusIds[] = $unknown instanceof Campus ? $unknown->getId() : (int)$unknown;
         }
+
         $permissions = EventPermissionMapper::getInstance()->findByColumnList(
             array(
                 'campus_id' => $campusIds,
@@ -379,4 +437,5 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         }
         return array_unique($userIds);
     }
+
 }
