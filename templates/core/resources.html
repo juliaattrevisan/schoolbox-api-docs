@@ -146,6 +146,10 @@ $(function() {
         window.open("/cms/file/new/" + id, "_self")
         return true
       },
+      f_link : function(id) {
+        window.open("/cms/link/new/" + id, "_self")
+        return true
+      },
       f_zip : function(id) {
         window.open('/cms/zipFile/' + id, '_self')
         return true
@@ -282,6 +286,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
             <a class="btn download rdownload" data-action="download"><span></span>Download</a>
             <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
             <a class="btn create rfile" data-action="file"><span></span>Post File</a>
+            <a class="btn create rlink" data-action="link"><span></span>Add Link</a>
             <a class="btn up-arrow rmulti" data-action="multi"><span></span>Upload Multiple Files</a>
             <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
           </div>

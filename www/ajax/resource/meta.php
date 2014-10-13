@@ -190,7 +190,7 @@ function getFolderMeta($folderId) {
 			}
 			// no break
 		case WRITE_ACCESS:
-			$actions = array_merge($actions, array('file', 'folder', 'modify', 'download', 'multi'));
+			$actions = array_merge($actions, array('file', 'link', 'folder', 'modify', 'download', 'multi'));
 			$actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 			
 			/* Allow teachers to upload a zip file
