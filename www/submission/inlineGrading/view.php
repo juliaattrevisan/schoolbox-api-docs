@@ -1,11 +1,10 @@
 <?php
 /**
- * ${NAME}
+ * View and grade students submissions
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 
@@ -191,6 +190,9 @@ $dueWorkDetail = new DueWork_Detail($submissionBoxId);
 $dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 
+$this->setTitle('Grading '.Scrub::text($submissionBox->getName()).' for '.Scrub::text($user->getFullName()));
+
+
 /* Rubric's Cube
  */
 $rubricsRenderer = new Vertical($this, $submissionBox, $user);
@@ -210,11 +212,11 @@ else {
 $this->setVar(array(
 	'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
 	'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
-	'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
+	'INLINE_GRADING_SUBMISSION_BOX_NAME' => Scrub::text($submissionBox->getName()),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID' => $currentAugmented['currentStudent']->getId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT' => $navigationDirect,
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS' => $navigationItems,
-	'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
+	'INLINE_GRADING_STUDENT_FULL_NAME' => Scrub::text($user->getFullName()),
 	'INLINE_GRADING_STUDENT_ID' => $user->getId(),
 	'INLINE_GRADING_SUBMISSION_NAVIGATION_NEXT_URL' => $nextUrl
 ));
