@@ -2622,10 +2622,18 @@ label {
 input, select, textarea {
     -webkit-transition: border-color 0.2s linear;
     transition: border-color 0.2s linear;
-    background-color: @white;
     &:disabled{
-        background-color: @dark;
         color: @mgrey;
+    }
+}
+
+// All inputs that don't have buttons: make them white
+input:not([type="button"]):not([type="file"]):not([type="submit"]):not([type="image"]):not([type="reset"]),
+select,
+textarea {
+    background-color: @white;
+    &:disabled {
+        background-color: @dark;
     }
 }
 
