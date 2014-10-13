@@ -899,6 +899,20 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
+
+        /* Restrict staff categories to provided list */
+        $staffCategory = explode(',',\Config::get('synergetic_staff_dir_restrict'));
+        $scWhere = '';
+        if(is_array($staffCategory) && $staffCategory[0] != '') {
+            $db = $this->getDatabase();
+            $staffCategoryString = implode(',', array_map(function ($var) use ($db) {
+                        return "'".$db->quote($var)."'";
+                    }
+                    , $staffCategory));
+            $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
+        }
+
+
         $query = "
             SELECT
                 vStaff.StaffID,
@@ -919,13 +933,14 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN SynergyOne.dbo.luDepartment Department ON vStaff.StaffDepartment = Department.Code
             WHERE vStaff.ActiveFlag = 1
             AND StaffCategoryDescription != 'Staff on leave'
-            AND StaffCategory NOT IN ('SC')
+            $scWhere
             AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
             OR    JobPositions.StaffJobPositionStartDate IS NULL )
             AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
             OR    JobPositions.StaffJobPositionEndDate IS NULL )
             ORDER BY StaffSurname
         ";
+
         return $this->getDatabase()->getAll($query);
     }
 
