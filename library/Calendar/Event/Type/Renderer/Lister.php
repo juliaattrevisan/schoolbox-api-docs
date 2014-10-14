@@ -82,6 +82,8 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                 'EVENT_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
                 'event_has_category_block' => '',
                 'event_buttons_block' => '',
+                'event_attendance_status_block' => '',
+                'event_attendance_request_block' => '',
             )
         );
         if ($currentEvent->getCategoryId() > 0) {
@@ -104,15 +106,68 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             );
         }
 
-        $this->getPage()->parse('event_block', 'event', true);
+        // Crude approximation of fullcalendar's butonyes
+
+        // Modify butonye
+        if ($currentEvent instanceof Calendar_Event_Type_Day && $currentEvent->getIsEditable()) {
+            // Only Schoolbox events are modifiable through this interface.
+            // Anyway, events should be able to supply their own edit URI.
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'Modify',
+                    'EVENT_BUTTON_TYPE' => 'modify',
+                    'EVENT_BUTTON_HREF' => '/calendar/modify.php?eventID=' . $currentEvent->getEventId(),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
+        // Go to homepage butonye
+        if ($currentEvent->getCategoryId() > 0) {
+            // Only Schoolbox events are modifiable through this interface.
+            // Anyway, events should be able to supply their own edit URI.
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'Go to homepage',
+                    'EVENT_BUTTON_TYPE' => '',
+                    'EVENT_BUTTON_HREF' => '/homepage/' . $currentEvent->getCategoryId(),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
+        // Attendance butonye - needs access to calendar and group handlers
+//        if ($currentEvent->canAttend()) {
+//            if ($attendance = $page->getCalendar()->getAttendanceByEventAndUser(
+//                $currentEvent->getEventId(),
+//                $_SESSION['id']
+//            )) {
+//                /* Attendance Status
+//                 */
+//                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Pending');
+//                } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Approved');
+//                } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Rejected');
+//                } else {
+//                    $page->setVar('ATTENDANCE_STATUS', '');
+//                }
+//            } elseif ($page->getGroup()->isStaff($_SESSION['id'])) {
+//                $page->parse('event_attendance_status_block', 'event_attendance_status');
+//            }
+//            $page->parse('event_attendance_status_block', 'event_attendance_status');
+//        }
+
+        $page->parse('event_block', 'event', true);
 
         /* Clear children after parsing out the parent
          */
-        $this->getPage()->setVar(
+        $page->setVar(
             array(
                 'event_allday_block' => '',
                 'event_timed_block' => ''
             )
         );
     }
-} 
+}
