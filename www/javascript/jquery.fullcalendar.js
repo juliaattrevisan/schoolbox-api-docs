@@ -378,8 +378,8 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
     /* Button for list view
      */
-    var headerRight = this.dom.find('td.fc-header-right');
-    var baseButton  = headerRight.children('.fc-button').first();
+    var headerRight = this.dom.find('.fc-toolbar .fc-right');
+    var baseButton  = headerRight.find('.fc-button').first();
     headerRight.prepend(
         baseButton.clone()
             .html('list')
@@ -390,8 +390,6 @@ Calendar.prototype.init = function() {
 
     if(this.options.filter.enabled) {
         // mash the filters in (if they're enabled)
-        var headerRight = this.dom.find('td.fc-header-right');
-        var baseButton  = headerRight.children('.fc-button').first();
         if (this.options.filter.btnSelector) {
             headerRight.prepend(
                 baseButton.clone()
@@ -412,9 +410,9 @@ Calendar.prototype.init = function() {
         }
     }
     // and now make all the buttons on the header look the way they're meant to
-    var header = this.dom.children('.fc-header')
+    var header = this.dom.find('.fc-toolbar')
     header.addClass('calendar-controls')
-    header.find('span.fc-button').each(function() {
+    header.find('.fc-button').each(function() {
         var self = $j(this)
         var text = self.html()
         self.addClass('filter-change '+text).html('<span></span>'+text)
