@@ -20,12 +20,14 @@ use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
+    public function initRoutes(Router $router, $basePath)
+    {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
         $router->addGet('resourceBooking.book', $basePath.'/bookItem/{id}');
@@ -41,16 +43,17 @@ class Module extends BaseModule {
                ->addValues(array('format' => '.json'));
 
         // Approving or rejecting a single booking
-        $router->add('resourceBooking.approve',    $basePath.'/{id}/approve');
-        $router->add('resourceBooking.reject',     $basePath.'/{id}/reject');
+        $router->add('resourceBooking.approve', $basePath.'/{id}/approve');
+        $router->add('resourceBooking.reject', $basePath.'/{id}/reject');
         $router->add('resourceBooking.setPending', $basePath.'/{id}/setPending');
-        $router->add('resourceBooking.cancel',     $basePath.'/{id}/cancel');
+        $router->add('resourceBooking.cancel', $basePath.'/{id}/cancel');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         // Add the booking item to params, if ID is in the route.
         $matcher->add(
             '/^resourceBooking\.(?:edit|update|approve|reject|setPending|cancel)/',
@@ -74,7 +77,8 @@ class Module extends BaseModule {
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
         // Base management rule:
         // Any superuser or user with moderate access to resource booking
         // Resource management rule:
@@ -100,27 +104,28 @@ class Module extends BaseModule {
         $canBookRule->setMapper(ItemMapper::getInstance());
         $bookingCreateRule = new Rule\Any($baseManageRule, $canBookRule);
 
-        // Cancel rule:
+        // Cancel/edit rule:
         // booking can be cancelled by a moderator, or the owner of the booking.
         $isOwnerRule = new Auth\UserOwnsBooking();
         $isOwnerRule->setMapper(Mapper::getInstance());
-        $bookingCancelRule = new Rule\Any($baseManageRule, $isOwnerRule);
+        $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $authorizer
-            ->addRule('/^resourceBooking(?:$|\.)/',                  new Rule\IsLoggedIn())
+            ->addRule('/^resourceBooking(?:$|\.)/', new Rule\IsLoggedIn())
             ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
             ->addRule(
-                '/^resourceBooking\.(?:approve|reject|setPending|edit|update:post)$/',
+                '/^resourceBooking\.(?:approve|reject|setPending)$/',
                 $baseManageRule
             )
-            ->addRule('/^resourceBooking\.cancel$/', $bookingCancelRule)
+            ->addRule('/^resourceBooking\.(?:cancel|edit|update:post)$/', $bookingEditRule)
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
         $loader = new Twig_Loader_Filesystem(array());
         $loader->addPath(__DIR__.'/templates', 'resourceBooking');
         $templateLoader->addLoader($loader);
@@ -129,7 +134,8 @@ class Module extends BaseModule {
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
+    public function initControllers(ContainerInterface $injector)
+    {
         $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventMapper']
             = $injector->lazyNew('Schoolbox\\Calendar\\EventMapper');
         $injector->params['Schoolbox\\Calendar\\EventRecurrenceMapper'] = array(
@@ -148,5 +154,4 @@ class Module extends BaseModule {
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')
         );
     }
-
 }
