@@ -239,19 +239,30 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+
+        // Please forgive me, I added a subquery for getting if a category
+        // contains tasks
         $query = "
-			SELECT
-				{$this->getColumnString('c')},
-				{$code_mapper->getColumnString('cc')},
-				{$homepageConfig_mapper->getColumnString('hp')},
-				{$group_mapper->getColumnString('ug')}
-			FROM {$this->getTable()} c
-			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
-			LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-			WHERE c.deleted_at IS NULL AND c.parent=?
-			ORDER BY c.name
-		";
+            SELECT
+                {$this->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')},
+                {$homepageConfig_mapper->getColumnString('hp')},
+                {$group_mapper->getColumnString('ug')},
+                (
+                    SELECT COUNT(*) FROM `task` `t`
+                    WHERE `t`.`category_id` IN (
+                        SELECT `subc`.`id`
+                        FROM {$this->getTable()} `subc`
+                        WHERE `subc`.`parent` = `c`.`id`
+                    )
+                ) AS `c.taskCount`
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
+            WHERE c.deleted_at IS NULL AND c.parent=?
+            ORDER BY c.name
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
@@ -269,6 +280,9 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
                 }
             } else {
                 $category = $this->hydrate($row, 'c');
+                if (isset($row['c.taskCount'])) {
+                    $category->setTaskCount($row['c.taskCount']);
+                }
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
                 $category->setHomepage($homepageConfig);
 
@@ -304,7 +318,15 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
                 {$this->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')}
+                {$group_mapper->getColumnString('ug')},
+                (
+                    SELECT COUNT(*) FROM `task` `t`
+                    WHERE `t`.`category_id` IN (
+                        SELECT `subc`.`id`
+                        FROM {$this->getTable()} `subc`
+                        WHERE `subc`.`parent` = `c`.`id`
+                    )
+                ) AS `c.taskCount`
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
@@ -328,6 +350,9 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         foreach ($statement as $row) {
             if (!$category instanceof $this->model) {
                 $category = $this->hydrate($row, 'c');
+                if (isset($row['c.taskCount'])) {
+                    $category->setTaskCount($row['c.taskCount']);
+                }
             }
             $code = $code_mapper->hydrate($row, 'cc');
             if ($code->getCategory()->getId()) {

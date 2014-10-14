@@ -95,4 +95,11 @@ class MyFolder implements FolderInterface {
         return $this->parent;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getFolderType()
+    {
+        return 'folder';
+    }
 }

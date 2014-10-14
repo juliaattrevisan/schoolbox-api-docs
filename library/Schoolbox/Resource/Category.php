@@ -51,6 +51,14 @@ class Category implements ISoftDeletable, FolderInterface
     protected $deletedAt;
 
     /**
+     * Unmapped field - this contains the number of tasks that are in this
+     * category's children.
+     *
+     * @var int
+     */
+    protected $taskCount;
+
+    /**
      *
      * @var \Schoolbox\Resource\Group
      */
@@ -264,6 +272,39 @@ class Category implements ISoftDeletable, FolderInterface
     public function getDeletedAt()
     {
         return $this->deletedAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTaskCount()
+    {
+        return $this->taskCount;
+    }
+
+    /**
+     * @param  int $taskCount
+     *
+     * @return $this
+     */
+    public function setTaskCount($taskCount)
+    {
+        $this->taskCount = $taskCount;
+        return $this;
+    }
+
+    /**
+     * "home" if this is a homepage, "folder" otherwise.
+     *
+     * {@inheritdoc}
+     */
+    public function getFolderType()
+    {
+        // I'd also like to say this is a course
+        if ($this->getTaskCount() > 0) {
+            return 'course';
+        }
+        return $this->hasHomepage() ? 'home' : 'folder';
     }
 
     //

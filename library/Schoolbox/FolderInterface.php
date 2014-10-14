@@ -29,4 +29,10 @@ interface FolderInterface {
      */
     public function getParent();
 
-} 
+    /**
+     * A folder type. This will probably map to a class name.
+     *
+     * @return string
+     */
+    public function getFolderType();
+}
