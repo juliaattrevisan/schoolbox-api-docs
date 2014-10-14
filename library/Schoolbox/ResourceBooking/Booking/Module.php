@@ -100,20 +100,20 @@ class Module extends BaseModule {
         $canBookRule->setMapper(ItemMapper::getInstance());
         $bookingCreateRule = new Rule\Any($baseManageRule, $canBookRule);
 
-        // Cancel rule:
+        // Cancel/edit rule:
         // booking can be cancelled by a moderator, or the owner of the booking.
         $isOwnerRule = new Auth\UserOwnsBooking();
         $isOwnerRule->setMapper(Mapper::getInstance());
-        $bookingCancelRule = new Rule\Any($baseManageRule, $isOwnerRule);
+        $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $authorizer
             ->addRule('/^resourceBooking(?:$|\.)/',                  new Rule\IsLoggedIn())
             ->addRule('/^resourceBooking\.(?:book|createBooking)$/', $bookingCreateRule)
             ->addRule(
-                '/^resourceBooking\.(?:approve|reject|setPending|edit|update:post)$/',
+                '/^resourceBooking\.(?:approve|reject|setPending)$/',
                 $baseManageRule
             )
-            ->addRule('/^resourceBooking\.cancel$/', $bookingCancelRule)
+            ->addRule('/^resourceBooking\.(?:cancel|edit|update:post)$/', $bookingEditRule)
         ;
     }
 
