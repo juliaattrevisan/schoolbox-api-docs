@@ -41,7 +41,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
                 $answer['sequence']++;
             }
 
-            $answer['answer'] = $this->encode($answer['answer']);
+            $answer['answer'] = serialize($answer['answer']);
 
             // only important on an update but we want to make sure we dont delete anything if there is no answers
             $this->db->delete($this->_table, 'question_id', $question_id);
