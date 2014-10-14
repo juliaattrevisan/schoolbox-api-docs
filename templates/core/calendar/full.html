@@ -76,6 +76,10 @@
                  * @param view
                  */
                 eventRender: function(calEvent, jsEvent, view) {
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
 
                     //
                     // Would you believe the way this SHOULD work (return false)
@@ -94,42 +98,40 @@
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
 
-                    if (calEvent.data) {
-                        if (calEvent.data.attendance.icon.toString() == 'true') {
-                            if((content = jsEvent.find('.fc-event-content')).length == 1) {
-                                content.append(span)
-                            }
-                            else {
-                                inner.append(span)
-                            }
+                    if (calEvent.data.attendance.icon.toString() == 'true') {
+                        if((content = jsEvent.find('.fc-event-content')).length == 1) {
+                            content.append(span)
                         }
-
-                        // If this event is a task, alter the state of the checkbox accordingly
-                        if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
-                            inner.prepend(
-                                    $('<input type="checkbox" name="completed" />')
-                                            .attr('id', 't'+ calEvent.data.meta.eventId)
-                            )
-                            if (calEvent.data.meta.completed == '1') {
-                                title.addClass('strike')
-                                inner.find(':checkbox').prop('checked', true)
-                            }
+                        else {
+                            inner.append(span)
                         }
+                    }
 
-                        $j(jsEvent).addClass(calEvent.data.styles.visible);
+                    // If this event is a task, alter the state of the checkbox accordingly
+                    if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                        inner.prepend(
+                                $('<input type="checkbox" name="completed" />')
+                                        .attr('id', 't'+ calEvent.data.meta.eventId)
+                        )
+                        if (calEvent.data.meta.completed == '1') {
+                            title.addClass('strike')
+                            inner.find(':checkbox').prop('checked', true)
+                        }
+                    }
 
-                        // Add booking styles
-                        if (calEvent.data.booking) {
-                            jsEvent.addClass('booking');
-                            if (calEvent.data.booking.status.isRejected) {
-                                jsEvent.addClass('rejected');
-                            }
-                            if (calEvent.data.booking.status.isApproved) {
-                                jsEvent.addClass('approved');
-                            }
-                            if (calEvent.data.booking.status.isPending) {
-                                jsEvent.addClass('pending');
-                            }
+                    $j(jsEvent).addClass(calEvent.data.styles.visible);
+
+                    // Add booking styles
+                    if (calEvent.data.booking) {
+                        jsEvent.addClass('booking');
+                        if (calEvent.data.booking.status.isRejected) {
+                            jsEvent.addClass('rejected');
+                        }
+                        if (calEvent.data.booking.status.isApproved) {
+                            jsEvent.addClass('approved');
+                        }
+                        if (calEvent.data.booking.status.isPending) {
+                            jsEvent.addClass('pending');
                         }
                     }
                 },
