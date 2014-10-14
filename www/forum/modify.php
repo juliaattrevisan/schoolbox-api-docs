@@ -153,10 +153,12 @@ if (is_numeric($this->arg[0])) {
 
         try{
             $quote = PostMapper::getInstance()->findById($quotePostID);
-            $output = array(
-                'QUOTE_USER' => $quote->getOwner()->formatName($user),
-                'QUOTE_BODY' => Scrub::html($quote->getBody()),
-            );
+            if (!$output['BODY']) {
+                $output['BODY'] =
+                    '<blockquote class="mceNonEditable">'.Scrub::html($quote->getBody()).
+                    '<cite>'.$quote->getOwner()->formatName($user).'</cite>'.
+                    '</blockquote><p></p>';
+            }
 
             $this->setVar($output);
             $this->parse('quote_block', 'quote', true);

@@ -37,3 +37,31 @@ pre {
     word-break: break-all;
     word-wrap: break-word;
 }
+blockquote {
+    background: #DEDEDE;
+    border-left: 10px solid #797979;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+}
+blockquote p {
+    display: inline;
+}
+blockquote cite {
+    color: #797979;
+    font-style: italic;
+    display: block;
+    margin-left: 28px;
+    border: none;
+}
+blockquote cite:before {
+    content: "\2014 \2009";
+}
+blockquote:before {
+    color: #797979;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+}
