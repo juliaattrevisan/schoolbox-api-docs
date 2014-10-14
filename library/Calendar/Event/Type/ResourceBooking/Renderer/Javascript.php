@@ -102,7 +102,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         );
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Cancel',
+                'label' => 'Delete',
                 'class' => 'delete booking-cancel',
                 'href'  => $cancelUrl,
             );
