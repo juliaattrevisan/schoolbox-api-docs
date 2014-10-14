@@ -31,15 +31,15 @@ if (isset($_POST['resize']) && $_POST['resize']) {
     /* Otherwise you are moving an event on the Month view, which makes
      * the new datetime transfer as a difference value -_-
      */
-    $dayDelta    = $_POST['dayDelta'];
+//    $dayDelta    = $_POST['dayDelta'];
     $minuteDelta = $_POST['minuteDelta'];
 
     $startTime = new Alaress_Date_Format(strtotime($event['startDate'] . ' ' . $event['startTime']), 'U');
-    $startTime->addDays($dayDelta);
+//    $startTime->addDays($dayDelta);
     $startTime->addMinutes($minuteDelta);
 
     $endTime = new Alaress_Date_Format(strtotime($event['endDate'] . ' ' . $event['endTime']), 'U');
-    $endTime->addDays($dayDelta);
+//    $endTime->addDays($dayDelta);
     $endTime->addMinutes($minuteDelta);
 }
 

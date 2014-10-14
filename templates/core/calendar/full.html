@@ -162,8 +162,8 @@
                 eventDrop: function(event, delta, revertFunc) {
                     var data = {
                         eventId: event.data.meta.eventId,
-                        dayDelta: Math.floor(delta.asDays()),
-                        minuteDelta: delta.minutes() + delta.hours() * 60,
+//                        dayDelta: Math.floor(delta.asDays()),
+                        minuteDelta: delta.asMinutes(),
                         allDay: !event.start.hasTime()
                     };
 
