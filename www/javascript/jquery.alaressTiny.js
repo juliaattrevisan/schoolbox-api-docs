@@ -26,7 +26,7 @@
 			var standard = {
 				theme: "advanced",
 				skin: "cirkuit",
-				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker,noneditable",
 				browser_spellcheck: true,
 				content_css: "/css/core/tiny.css",
 				accessibility_warnings: false,
