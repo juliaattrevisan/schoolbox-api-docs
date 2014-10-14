@@ -103,12 +103,12 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
-                    // Fullcalendar
-                    'www/javascript/components/fullcalendar/fullcalendar.js',
                     // Magnific Popup (lightbox)
                     'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
                     // Moment
-                    'www/javascript/components/momentjs/moment.js',
+                    'www/javascript/components/moment/moment.js',
+                    // Fullcalendar
+                    'www/javascript/components/fullcalendar/dist/fullcalendar.min.js',
                     // Dropzone
                     'www/javascript/components/dropzone/downloads/dropzone.js',
                     // Notifier
