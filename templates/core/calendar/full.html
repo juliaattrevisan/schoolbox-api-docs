@@ -181,31 +181,18 @@
                 /**
                  * When you click on a day to add a new event
                  * @param date
-                 * @param allDay
                  * @param jsEvent
                  * @param view
                  */
-                dayClick: function(date, allDay, jsEvent, view) {
-
-                    // Date formatting
-                    var weekday = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
-
-                    var month = [ "January", "February", "March", "April", "May", "June", "July", "August",
-                                  "September", "October", "November", "December" ]
-
-                    var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
-
-					/* yyyy-mm-dd format only, not timestampede
-					 */
-					var elems = [
-						('0' + date.getDate()).toString().slice(-2),
-						('0' + (date.getMonth()+1)).toString().slice(-2),
-						date.getFullYear()
-					].join('-');
-
-                    var eventData = {
-                        date: elems,
-                        displayDate: displayDate
+                dayClick: function(date, jsEvent, view) {
+                    var allDay = !date.hasTime();
+                    var eventData = { allDay: allDay ? 1 : 0 };
+                    if (allDay) {
+                        eventData.date        = date.format('YYYY-MM-DD');
+                        eventData.displayDate = date.format('ddd, Mo MMMM')
+                    } else {
+                        eventData.date        = date.format('YYYY-MM-DD HH:mm');
+                        eventData.displayDate = date.format('ddd, Mo MMMM, h(:mm)a')
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
@@ -488,6 +475,7 @@
                     <li><a href="#" id="showCreateTaskForm">Task</a></li>
                 </ul>
 				<input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="allDay" type="hidden" value="" />
                 <input name="date" type="hidden" value="" />
                 <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label>Event Title<input name="note" type="text" value="" /></label>
@@ -508,6 +496,7 @@
                 </ul>
 				<input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
                 <input name="date" type="hidden" value="" />
+                <input name="allDay" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
                 <label>Task<input name="note" type="text" value="" /></label>
                 <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
