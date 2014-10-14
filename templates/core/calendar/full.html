@@ -156,17 +156,15 @@
                 /**
                  * When you finish dragging an event to its new home
                  * @param event
-                 * @param dayDelta
-                 * @param minuteDelta
-                 * @param allDay
+                 * @param delta
                  * @param revertFunc
                  */
-                eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+                eventDrop: function(event, delta, revertFunc) {
                     var data = {
                         eventId: event.data.meta.eventId,
-                        dayDelta: dayDelta,
-                        minuteDelta: minuteDelta,
-                        allDay: allDay
+                        dayDelta: Math.floor(delta.asDays()),
+                        minuteDelta: delta.minutes() + delta.hours() * 60,
+                        allDay: !event.start.hasTime()
                     };
 
                     /* TODO: Event re-render
