@@ -278,13 +278,13 @@
                 },
 
                 // Stream location
-                events: function(start, end, callback) {
+                events: function(start, end, timezone, callback) {
                     $j.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
                         data: {
-                            start: Math.round(start.getTime()/1000),
-                            end:   Math.round(end.getTime()/1000),
+                            start: Math.round(start.unix()),
+                            end:   Math.round(end.unix()),
 							userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
