@@ -1,7 +1,7 @@
 <?php
+
 /**
  * Evaluation_Answer_Match
- *
  * Handler for Matching Pairs questions.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -13,10 +13,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 {
 
     /**
-    * Javascript class to use when creating UI
-    *
-    * @var string
-    */
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
     protected $plugin = 'evaluationMatchingPairs';
 
     protected $correctClass = 'matchCorrect';
@@ -28,13 +28,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @param  $object
      * @param  $question_id
+     *
      * @return bool|int
      */
     public function create($object, $question_id)
     {
-        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+        $answer                = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
-        $answer['sequence'] = 1;
+        $answer['sequence']    = 1;
 
         if (isset($object['allAnswers']) && $object['allAnswers'] != '') {
             foreach (json_decode($object['allAnswers']) as $currentAnswer) {
@@ -61,6 +62,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * Updates an existing Answer.
      *
      * @param  $object
+     *
      * @return void
      */
     public function update($object)
@@ -73,8 +75,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
+     * @param        $page
      * @param string $question_id
+     *
      * @return void
      */
     public function modify($page, $question_id = '')
@@ -82,18 +85,22 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
-            $page->setVar(array(
-                'ANSWER_ID' => $answerGroup['answer_id']
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $answerGroup['answer_id']
+                )
+            );
 
             if ($answerGroup) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
                 foreach ($allAnswers as $currentAnswer) {
-                    $page->setVar(array(
-                        'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    ));
+                    $page->setVar(
+                        array(
+                            'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
+                            'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
+                        )
+                    );
 
                     $page->parse('answerOption_block', 'answerOption', true);
                 }
@@ -104,22 +111,25 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     }
 
     /**
-    * Render answers in the QuestionBank
-    *
-    * @param  $page
-    * @param string $answerGroup
-    * @return void
-    */
+     * Render answers in the QuestionBank
+     *
+     * @param        $page
+     * @param string $answerGroup
+     *
+     * @return void
+     */
     public function modifyInQuestionBank($page, $answerGroup)
     {
         if (strlen($answerGroup)) {
             $allAnswers = unserialize($answerGroup);
 
             foreach ($allAnswers as $currentAnswer) {
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                    'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
+                    )
+                );
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
@@ -129,11 +139,12 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     }
 
     /**
-    * Serialize for db storage (we shouldn't be using serialize anymore)
-    *
-    * @param $data
-    * @return string
-    */
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param $data
+     *
+     * @return string
+     */
     public function encodeForQuestionBank($data)
     {
         return serialize(json_decode($data));
@@ -142,19 +153,19 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
-     *
      * TODO: If a response for the current user and attempt already exists,
      * prefill it.
      *
      * @param  $page
      * @param  $question_id
+     *
      * @return void
      */
     public function prepareResponse($page, $question_id)
     {
 
         /* Optional configuration hook
-		 */
+         */
         $this->configureResponse($page, $question_id);
 
         $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
@@ -165,17 +176,17 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
         $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
 
-        $left = array();
+        $left  = array();
         $right = array();
 
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
             $answerCount = 0;
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers  = unserialize($answerGroup['answer']);
 
             foreach ($allAnswers as $currentAnswer) {
-                $left[] = $currentAnswer->answerLeft;
+                $left[]  = $currentAnswer->answerLeft;
                 $right[] = $currentAnswer->answerRight;
 
                 $answerCount++;
@@ -195,10 +206,12 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             }
 
             for ($i = 0; $i < $answerCount; $i++) {
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($left[$i]),
-                    'ANSWER_RIGHT_VALUE' => Scrub::text($right[$i]),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'  => Scrub::text($left[$i]),
+                        'ANSWER_RIGHT_VALUE' => Scrub::text($right[$i]),
+                    )
+                );
 
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
@@ -207,11 +220,13 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 
         /* Parse question number, so you can have multiple sortable instances
          */
-        $page->setVar(array(
-            'MATCHPAIRS_QUESTION_ID' => $question_id,
-            'QUESTION_ID' => $question_id,
-            'QUESTION_PLUGIN' => $this->plugin,
-        ));
+        $page->setVar(
+            array(
+                'MATCHPAIRS_QUESTION_ID' => $question_id,
+                'QUESTION_ID'            => $question_id,
+                'QUESTION_PLUGIN'        => $this->plugin,
+            )
+        );
     }
 
     /**
@@ -219,6 +234,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      * method for polymorphic algorithm
      *
      * @param  $page
+     *
      * @return void
      */
     public function cleanupParse($page)
@@ -248,6 +264,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @param  $page
      * @param  $question_id
+     *
      * @return void
      */
     public function exportMoodleAnswer($page, $question_id)
@@ -262,10 +279,12 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
 
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                    'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
+                    )
+                );
 
                 $page->parse('answerCorrect_block', 'answerCorrect', true);
             }
@@ -279,25 +298,26 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @param  $xmlObj
      * @param  $question_id
+     *
      * @return bool|int
      */
     public function importMoodleAnswer($xmlObj, $question_id)
     {
         foreach ($xmlObj->subquestion as $currentAnswer) {
-/* Set up data object in accordance with $this->create();
-             */
+            /* Set up data object in accordance with $this->create();
+                         */
 
-            $answer['answerLeft'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
-            $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->answer), ENT_IGNORE|ENT_QUOTES);
+            $answer['answerLeft']  = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
+            $answer['answerRight'] = html_entity_decode(trim((string)$currentAnswer->answer), ENT_IGNORE | ENT_QUOTES);
 
             $allAnswers[] = $answer;
         }
 
         $object = array(
-            'answer_id' => '',
+            'answer_id'   => '',
             'question_id' => $question_id,
-            'sequence' => 1,
-            'allAnswers' => json_encode($allAnswers),
+            'sequence'    => 1,
+            'allAnswers'  => json_encode($allAnswers),
         );
 
         return $this->create($object, $question_id);
@@ -308,6 +328,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @param  $attempt_id
      * @param  $question_id
+     *
      * @return mixed
      */
     public function exportResponseToCSV($attempt_id, $question_id)
@@ -340,6 +361,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
      *
      * @param  $question_id
      * @param  $value
+     *
      * @return string
      */
     public function getAnswerText($question_id, $value)
@@ -360,9 +382,9 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     /**
      * Get the response for a particular question
      *
-     *
      * @param  $attempt_id
      * @param  $question_id
+     *
      * @return mixed
      */
     public function exportResponseToArray($attempt_id, $question_id)
@@ -375,13 +397,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     }
 
     /**
-    * Show the response someone submitted and also show the correct answer.
-    * Provide an option for the teacher to review the mark and adjust.
-    *
-    * @param  $page
-    * @param  $question_id
-    * @return void
-    */
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param  $page
+     * @param  $question_id
+     *
+     * @return void
+     */
     public function reviewResponse($page, $question_id)
     {
         $right = array();
@@ -393,8 +416,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         }
 
         /* Define special blocks to handle this special answerOptions scenario,
-		   * because we have three columns to parse per iteration.
-		   */
+           * because we have three columns to parse per iteration.
+           */
         $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
         $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
         $page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
@@ -403,12 +426,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 
         $page->setVar('answerOptionCorrectResponse_block', '');
         if ($answerGroup) {
-            $page->setVar(array(
-                'ANSWER_ID' => $answerGroup['answer_id'],
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-                'REVIEWED_MARKS' => $existing['mark'],
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID'        => $answerGroup['answer_id'],
+                    'RESPONSE_ID'      => $existing['response_id'],
+                    'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                    'REVIEWED_MARKS'   => $existing['mark'],
+                )
+            );
 
             $allAnswers = unserialize($answerGroup['answer']);
 
@@ -421,12 +446,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                     $correct = $this->getIncorrectClass();
                 }
 
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                    'ANSWER_RIGHT_VALUE' => $right[$i],
-                    'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    'CORRECT' => $correct,
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'             => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE'            => $right[$i],
+                        'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+                        'CORRECT'                       => $correct,
+                    )
+                );
 
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
@@ -436,13 +463,13 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     }
 
     /**
-    * Show the response someone submitted and also show the correct answer.
-    * Provide an option for the teacher to review the mark and adjust.
-    *
-    * @param $page
-    * @param $attemptId
-    * @param $currentQuestion
-    */
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param $page
+     * @param $attemptId
+     * @param $currentQuestion
+     */
     public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
     {
         $right = array();
@@ -454,8 +481,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         }
 
         /* Define special blocks to handle this special answerOptions scenario,
-		   * because we have three columns to parse per iteration.
-		   */
+           * because we have three columns to parse per iteration.
+           */
         $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
         $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
         $page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
@@ -463,15 +490,17 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
         if ($answerGroup) {
-            $page->setVar(array(
-                'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-                'USER_FIRSTNAME' => $currentQuestion['firstname'],
-                'USER_LASTNAME' => $currentQuestion['lastname'],
-                'ANSWER_ID' => $answerGroup['answer_id'],
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-                'REVIEWED_MARKS' => $existing['mark'],
-            ));
+            $page->setVar(
+                array(
+                    'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+                    'USER_FIRSTNAME'   => $currentQuestion['firstname'],
+                    'USER_LASTNAME'    => $currentQuestion['lastname'],
+                    'ANSWER_ID'        => $answerGroup['answer_id'],
+                    'RESPONSE_ID'      => $existing['response_id'],
+                    'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                    'REVIEWED_MARKS'   => $existing['mark'],
+                )
+            );
 
             $allAnswers = unserialize($answerGroup['answer']);
 
@@ -484,12 +513,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                     $correct = $this->getIncorrectClass();
                 }
 
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                    'ANSWER_RIGHT_VALUE' => $right[$i],
-                    'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    'CORRECT' => $correct,
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'             => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE'            => $right[$i],
+                        'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+                        'CORRECT'                       => $correct,
+                    )
+                );
 
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
@@ -499,19 +530,20 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
     }
 
     /**
-    * The answer for a question during horizontal marking, so it appears at the
-    * top under the question itself, and not repeated for each attempt
-    *
-    * @param $page
-    * @param $currentQuestion
-    * @return void
-    */
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param $page
+     * @param $currentQuestion
+     *
+     * @return void
+     */
     public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
     {
 
         /* Define special blocks to handle this special answerOptions scenario,
-		 * because we have three columns to parse per iteration.
-		 */
+         * because we have three columns to parse per iteration.
+         */
         $page->setBlock('answerFormFragmentTop', 'answerOptionTopLeft', 'answerOptionTopLeft_block');
         $page->setBlock('answerFormFragmentTop', 'answerOptionTopRight', 'answerOptionTopRight_block');
         $page->setBlock('answerFormFragmentTop', 'answerOptionTopCorrectResponse', 'answerOptionTopCorrectResponse_block');
@@ -524,12 +556,14 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
 
-                $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
-                    'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
-                    'CORRECT' => $this->getCorrectClass(),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_LEFT_VALUE'             => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE'            => Scrub::text($currentAnswer->answerRight),
+                        'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
+                        'CORRECT'                       => $this->getCorrectClass(),
+                    )
+                );
 
                 $page->parse('answerOptionTopLeft_block', 'answerOptionTopLeft', true);
                 $page->parse('answerOptionTopRight_block', 'answerOptionTopRight', true);
