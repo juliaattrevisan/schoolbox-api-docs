@@ -62,7 +62,7 @@ $j(function() {
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.
      */
-    $j(document).on('click', 'ul.js_happening li', function() {
+    $j(document).on('click', 'ul.js_happening li', function(event) {
         var currentObject = $(this);
         var bubble = $j('.cal-bubble');
         bubble.find('.bottom, .bottom strong').removeAttr("style");
@@ -76,9 +76,15 @@ $j(function() {
             + bubble.find('.top').outerHeight()
             + bubble.find('.bottom').outerHeight()
 
-        // right edge lines up with right edge of currentObject
+        // right edge lines up with where you clicked, or right edge of currentObject
         // bottom edge lines up with top edge of currentObject, hide pointer if it's at top of screen
-        var left = Math.max(0, position.left + currentObject.outerWidth() - bubble.outerWidth());
+        var left = Math.max(
+            0,
+            Math.min(
+                event.pageX,
+                position.left + currentObject.outerWidth()
+            ) - bubble.outerWidth()
+        );
         var top  = Math.max(0, position.top  - annoyingHeight);
         if (top === 0) {
             bubble.find('.bottom').hide();
