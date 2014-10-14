@@ -18,12 +18,6 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
-/* Javascript returns date as milliseconds from 1/1/1970
- * When creating via the js calendar ui, assume single-day events so
- * startDate and endDate are the same.
- */
-$dateObj = new Alaress_Date_Format($_POST['date'], 'd-m-y');
-
 $groupHandler = new Group();
 
 $user = $_SESSION['user'];
@@ -50,14 +44,26 @@ $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	->setRoleCollection(new Collection())
 	->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']))
 	->setTitle($_POST['note'])
-	->setStartDateTime($dateObj)
-	->setEndDateTime($dateObj)
-	->setAllDay(true)
 	->setLocation($_POST['location'])
 	->setAttendance($_POST['attendance'])
 	->setDetail($_POST['detail'])
 	->setPublishDateTime(null)
 	->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
+if ($_POST['allDay']) {
+    $dateObj = new Alaress_Date_Format($_POST['date'], 'Y-m-d');
+    $event
+        ->setStartDateTime($dateObj)
+        ->setEndDateTime($dateObj)
+        ->setAllDay(true);
+} else {
+    $startDate = new Alaress_Date_Format($_POST['date'], 'Y-m-d H:i');
+    $endDate   = new Alaress_Date_Format($_POST['date'], 'Y-m-d H:i');
+    $endDate->addHours(1);
+    $event
+        ->setStartDateTime($startDate)
+        ->setEndDateTime($endDate)
+        ->setAllDay(false);
+}
 
 $affectedIds = EventMapper::getInstance()->save($event);
 
