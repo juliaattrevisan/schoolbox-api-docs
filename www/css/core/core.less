@@ -6814,8 +6814,7 @@ HOMEPAGE CUSTOMISE
             background-color: @dark;
             //display: block;
             max-height: 1000px;
-            -webkit-transition: all 1s cubic-bezier(.10, .10, .25, .90);
-            -moz-transition: all 1s cubic-bezier(.10, .10, .25, .90);
+            .transition(all 500ms cubic-bezier(.0, .45, .45, .1));
         }
     }
 }
@@ -7398,21 +7397,34 @@ th.avatar, td.avatar {
     padding: 16px;
 }
 
-.post-content blockquote {
-    background: lighten(@highlight-color,@lighten-value);
-    padding: 8px;
-    margin-bottom: 16px;
-    margin-left: 16px;
-}
-
-.post-content blockquote p {
-    margin: 0;
-}
-
-.post-content cite {
-    font-style: normal;
-    margin: 0 0 4px 16px;
-    display: block;
+.post-content {
+  blockquote {
+    background: @lgrey;
+    border-left: 10px solid @dgrey;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+    p {
+      display: inline;
+    }
+    cite {
+      color: @dgrey;
+      font-style: italic;
+      display: block;
+      margin-left: 28px;
+    }
+    cite:before {
+      content: "\2014 \2009";
+    }
+  }
+  blockquote:before {
+    color: @dgrey;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+  }
 }
 
 .post-left {
