@@ -14,7 +14,8 @@ use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\ResourceBooking\Booking;
 
-class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract
+{
 
     /**
      * @var Router
@@ -30,7 +31,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      * Setup: injects global router into this object, so it can use it to look
      * up URLs relating to actions on an event.
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->router     = $this->getPage()->getDi()->get('router');
         $this->authorizer = $this->getPage()->getDi()->get('authorizer');
     }
@@ -40,7 +42,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      *
      * @param Calendar_Event_Type_ResourceBooking $currentEvent
      */
-    public function visit($currentEvent) {
+    public function visit($currentEvent)
+    {
 //        // Future events are visible to superusers, event owners, group members with write access
 //        if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
 //            $cssClass = 'translucent';
@@ -102,7 +105,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         );
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Cancel',
+                'label' => 'Delete',
                 'class' => 'delete booking-cancel',
                 'href'  => $cancelUrl,
             );
@@ -146,8 +149,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         $detail = $currentEvent->getDetail();
         if (strlen($title) === 0) {
             $title = 'Booking: '.$currentEvent->getBooking()->getResource()->getName();
-        }
-        else {
+        } else {
             $detail = sprintf(
                 "(Booking for: %s)<br />%s",
                 $currentEvent->getBooking()->getResource()->getName(),
@@ -222,26 +224,6 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         echo ",";
     }
 
-//    /**
-//     * If the Publish Date hasn't been reached yet, only show the events to Superusers
-//     * in a different way so they can still edit/click them. Otherwise, they don't appear
-//     * at all for everyone else
-//     *
-//     * @param $currentEvent
-//     *
-//     * @return bool
-//     */
-//    private function isVisible($currentEvent) {
-//        $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-//        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
-//
-//        if ($isFutureEvent && !($isVisibleToUser)) {
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
     /**
      * Helper function - gets whether access to a route is allowed.
      *
@@ -250,7 +232,8 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
      *
      * @return bool|string False if not authorized, a URL if it is.
      */
-    public function getRouteIfAuthorized($name, array $params = array()) {
+    public function getRouteIfAuthorized($name, array $params = array())
+    {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $_SESSION['user'])) {
             return $this->router->generate($name, $params);
         }
