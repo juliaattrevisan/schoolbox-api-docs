@@ -32,8 +32,7 @@ $(document).ready(function() {
     }
 
     // Dialog for use when clicking an item that is in a series
-    var updateSeriesDialog = $('#dialog-bulk-update')
-    updateSeriesDialog.dialog({
+    var dialogOptions = {
         autoOpen:false,
         resizable:false,
         height:180,
@@ -43,7 +42,9 @@ $(document).ready(function() {
         close: function () {
             return false;
         }
-    })
+    };
+    var updateSeriesDialog = $('#dialog-bulk-update').dialog(dialogOptions);
+    var deleteDialog = $('#dialog-delete').dialog(dialogOptions);
 
     var c = new Calendar('calendar', 'calendar-bubble', {
         filter: {
@@ -217,8 +218,22 @@ $(document).ready(function() {
                         }
                     }])
                     .dialog('open')
-            }
-            else {
+            } else if ($(this).hasClass('booking-cancel')) {
+                deleteDialog
+                    .dialog('option', 'buttons', [{
+                        text: "Yes",
+                        click: function() {
+                            deleteDialog.dialog('close')
+                            callback({})
+                        }
+                    }, {
+                        text: "No",
+                        click: function() {
+                            deleteDialog.dialog('close')
+                        }
+                    }])
+                    .dialog('open')
+            } else {
                 c.bubble.hide()
                 callback()
             }
@@ -372,4 +387,9 @@ $(document).ready(function() {
 {# Dialog for changing bookings in series #}
 <div id="dialog-bulk-update" title="This booking is part of a series">
     Would you like to <span class="action-text"></span> only this booking, or all in the series?
+</div>
+
+{# Dialog for deleting bookings #}
+<div id="dialog-delete" title="Confirm deletion">
+    Are you sure you want to delete this booking?
 </div>
