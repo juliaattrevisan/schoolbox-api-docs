@@ -79,7 +79,7 @@ function Calendar(id, bubbleId, opts) {
 
                 // setup data to be displayed
                 var data = $j.extend(true, {}, calEvent.data.meta)
-                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mma'
+                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
@@ -840,7 +840,7 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    return datetime.format('ddd, dS MMM')
+    return datetime.format('ddd, Do MMM')
     //return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
