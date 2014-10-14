@@ -167,7 +167,10 @@ function Calendar(id, bubbleId, opts) {
             dateFormat: 'dd-mm-yy',
             onSelect: function(dateText, inst) {
                 // Use fullcalendar to load events instead of redirecting to a new page.
-                self.dom.fullCalendar('gotoDate', inst.currentYear, inst.currentMonth, inst.currentDay)
+                self.dom.fullCalendar(
+                    'gotoDate',
+                    moment().year(inst.currentYear).month(inst.currentMonth).date(inst.currentDay)
+                )
             },
             beforeShow: function() {
                 // Make sure the stupid datepicker shows above everything else
@@ -434,7 +437,7 @@ Calendar.prototype.init = function() {
     });
 
     // mash in the datepicker
-    var headerCenter = this.dom.find('td.fc-header-center')
+    var headerCenter = header.find('.fc-center')
     headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
 
     // Event creation form listeners
