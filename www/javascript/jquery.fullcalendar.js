@@ -88,10 +88,10 @@ function Calendar(id, bubbleId, opts) {
                 else {
                     data.note = calEvent.title
                 }
-                data.date = $.fullCalendar.formatDate(calEvent.start, format)
+                data.date = calEvent.start.format(format)
                 if (calEvent.end != null) {
                     data.date += " – "
-                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                    data.date += calEvent.end.format(format)
                 }
 
                 // Links to Modify Screen
@@ -840,7 +840,8 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
+    return datetime.format('ddd, dS MMM')
+    //return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
 /**
@@ -849,5 +850,6 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
+    return datetime.format('h:mma')
+    //return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }
