@@ -262,7 +262,7 @@ function Calendar(id, bubbleId, opts) {
                     if(this.checked) {
 
                         var base = n.match(/^\D+/);
-                        if (base.length) {
+                        if (base) {
                             flist[i][1][k++] = n
                             var ids = n.match(/\d+/g);
                             if (ids) {
