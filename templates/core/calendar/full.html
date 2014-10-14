@@ -139,18 +139,15 @@
                 /**
                  * When you finish resizing an event, update it
                  * Note the difference between eventResize() and eventResizeStop()
-                 * @param calEvent
-                 * @param jsEvent
-                 * @param ui
-                 * @param view
+                 * @param event
+                 * @param delta
                  */
-                eventResize: function(calEvent, jsEvent, ui, view) {
-                    var event_end = (calEvent.end == null) ? calEvent.start : calEvent.end;
+                eventResize: function(event, delta) {
                     var data = {
-                        eventId: calEvent.data.meta.eventId,
+                        eventId: event.data.meta.eventId,
                         resize: true,
-                        start: calendarDate(calEvent.start),
-                        end: calendarDate(event_end)
+                        start: event.start.format(),
+                        end: event.end.add(delta).format()
                     };
 
                     c.cupdate(data);
