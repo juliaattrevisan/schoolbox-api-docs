@@ -20,6 +20,7 @@ use RuntimeException;
 
 class Subscription {
 
+    const STOMP_QUEUE_PREFIX = '/amq/queue/';
 
 	/** @var AMQPResponseHandlerInterface */
 	public $handler;
@@ -44,8 +45,8 @@ class Subscription {
 
 
     /**
-     * @param                              $userId
-     * @param                              $destination
+     * @param int                          $userId
+     * @param string                       $destination
      * @param Client                       $client
      * @param AMQPResponseHandlerInterface $handler
      * @param LoggerInterface              $log
@@ -59,7 +60,7 @@ class Subscription {
         $this->log = $log;
 		$self = $this;
 
-		$this->destination = "/amq/queue/$destination";
+		$this->destination = $destination;
 
 		// subscribe to the user's unread queue and push these immediately to the Pipe Manager
 		$this->id = $this->client->subscribeWithAck($this->destination, 'client-individual',
