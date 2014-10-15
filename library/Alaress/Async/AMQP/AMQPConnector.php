@@ -308,6 +308,32 @@ abstract class AMQPConnector implements AMQPInterface {
 	}
 
 
+    /**
+     * Delete the given queue
+     *
+     * @param string $queueName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteQueue($queueName, $channelId = null)
+    {
+        $this->getChannel($channelId)->queue_delete($queueName);
+        return $this;
+    }
+
+
+    /**
+     * @param string $exchangeName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteExchange($exchangeName, $channelId = null)
+    {
+        $this->getChannel($channelId)->exchange_delete($exchangeName);
+        return $this;
+    }
+
+
 	/**
 	 * Returns the name of the primary exchange of this connection.
 	 *

@@ -200,7 +200,33 @@ class MockAMQPConnector implements AMQPInterface {
 	}
 
 
-	/**
+    /**
+     * Delete the given queue
+     *
+     * @param string $queueName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteQueue($queueName, $channelId = null)
+    {
+        return $this;
+    }
+
+
+    /**
+     * Delete the given exchange
+     *
+     * @param string $exchangeName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteExchange($exchangeName, $channelId = null)
+    {
+        return $this;
+    }
+
+
+    /**
 	 * @return AMQPExchange
 	 */
 	public function getPrimaryExchange() {
