@@ -22,14 +22,7 @@ class Controller extends Base
     public function browse()
     {
         // Fetch all the nodes at once, and parse into a jstree like status
-        $tree = array(
-            array(
-                'id'     => 0,
-                'parent' => '#',
-                'text'   => 'Curricula',
-                'type'   => 'root',
-            )
-        );
+        $tree = array();
         foreach ($this->getNodeMapper()->findAll() as $node) {
             /** @var Node\Model $node */
             $nodeId = intval($node->getId());
@@ -40,7 +33,7 @@ class Controller extends Base
             }
             $tree[] = array(
                 'id'     => $nodeId,
-                'parent' => intval($node->getParent()->getId()),
+                'parent' => intval($node->getParent()->getId()) ?: '#',
                 'text'   => $name,
                 'a_attr' => array(
                     'href' => $this->getRouter()->generate(
