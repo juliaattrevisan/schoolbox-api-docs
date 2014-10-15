@@ -24,15 +24,20 @@ class RedisQueue implements QueueInterface
     /** @var string */
     protected $name;
 
+    /** @var int */
+    protected $ttl;
+
 
     /**
      * @param ClientInterface $redis
-     * @param string $name
+     * @param string          $name
+     * @param int             $ttl
      */
-    public function __construct(ClientInterface $redis, $name)
+    public function __construct(ClientInterface $redis, $name, $ttl = self::TTL)
     {
         $this->redis = $redis;
         $this->name  = $name;
+        $this->ttl   = $ttl;
     }
 
 
@@ -78,17 +83,14 @@ class RedisQueue implements QueueInterface
      */
     public function contains(Instance $instance)
     {
-        $index = $this->index();
-        $hash  = $this->getFullHash($instance);
-        $queue = "$index:$this->name";
-        $id    = "$index:$hash";
+        $id = $this->getRedisMsgKey($instance);
 
         $exists = !!$this->exec('EXISTS', $id);
-        $listed = !!$this->exec('SISMEMBER', $queue, $id);
+        $listed = !!$this->exec('SISMEMBER', $this->getRedisSetKey(), $id);
 
         // a little housekeeping: if the 'queue' contains the reference, but the msg has expired, drop the reference
         if ($listed && !$exists) {
-            $this->exec('SREM', $queue, $id);
+            $this->exec('SREM', $this->getRedisSetKey(), $id);
         }
 
         return $exists && $listed;
@@ -103,12 +105,12 @@ class RedisQueue implements QueueInterface
     public function drain()
     {
         // delete the list, which is a user's reference to the messages. they will be expired automatically (and other users may still be attached)
-        $this->exec("DEL", $this->index() . ':' . $this->name);
+        $this->exec("DEL", $this->getRedisSetKey());
     }
 
 
     /**
-     * Push a message instance into this queue
+     * Push a message instance into this 'queue'
      * Note: this isn't an interfaced method; AMQP doesn't support this concept
      *
      * @param Instance $instance
@@ -116,16 +118,15 @@ class RedisQueue implements QueueInterface
      */
     public function push(Instance $instance)
     {
-        $id    = $this->getFullHash($instance);
-        $index = $this->index();
+        $id    = $this->getRedisMsgKey($instance);
         $data  = gzcompress("$instance", 9);
 
         // insert the msg body into storage, with expiry automatically set
-        $this->exec("SET", "$index:$id", $data);
-        $this->exec("EXPIRE", "$index:$id", self::TTL);
+        $this->exec("SET", $id, $data);
+        $this->exec("EXPIRE", $id, $this->ttl);
 
         // insert the msg reference into this 'queue'
-        $this->exec("SADD", "$index:$this->name", "$index:$id");
+        $this->exec("SADD", $this->getRedisSetKey(), $id);
     }
 
 
@@ -155,9 +156,9 @@ class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    protected function index()
+    protected function getInstanceHash()
     {
-        return "msgs:" . INSTANCE_ID;
+        return "msg:" . INSTANCE_ID;
     }
 
 
@@ -166,17 +167,29 @@ class RedisQueue implements QueueInterface
      */
     protected function fetchIdList()
     {
-        return $this->exec("SMEMBERS", $this->index() . ':' . $this->name) ? : array();
+        return $this->exec("SMEMBERS", $this->getRedisSetKey()) ? : array();
     }
 
 
     /**
+     * The key in Redis for the given Instance, in the form 'msg:vagrantx:m:hash'
+     *
      * @param Instance $instance
      * @return string
      */
-    protected function getFullHash(Instance $instance)
+    protected function getRedisMsgKey(Instance $instance)
     {
-        return 'm:' . $instance->getBaseHash() . ':' . $instance->getParamHash();
+        return $this->getInstanceHash() . ':m:' . $instance->getBaseHash() . ':' . $instance->getParamHash();
     }
 
+
+    /**
+     * The key for the Redis SET that holds this queue's data, in the form 'msg:vagrantx:q:name'
+     *
+     * @return string
+     */
+    protected function getRedisSetKey()
+    {
+        return $this->getInstanceHash() . ':q:' . $this->getName();
+    }
 }

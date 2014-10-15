@@ -30,18 +30,19 @@ class AMQPQueue implements QueueInterface
 
 
     /**
-     * @param AMQPInterface $connector
-     * @param string        $name
-     * @param string        $routingKey
+     * @param AMQPInterface $connector   the connector to use for AMQP transactions
+     * @param string        $name        the unique name to be used for this queue in AMQP
+     * @param string        $routingKey  the routing key used to bind this queue to its parent exchange
      * @throws AMQPRuntimeException
      */
     public function __construct(AMQPInterface $connector, $name, $routingKey)
     {
+        $this->rkey = $routingKey;
+        $this->name = INSTANCE_ID . '.u.' . $name;
+
         // ensure it exists
         $this->conn = $connector;
-        $this->name = $name;
         $this->conn->declareQueue($this->name);
-        $this->rkey = $routingKey;
     }
 
 
