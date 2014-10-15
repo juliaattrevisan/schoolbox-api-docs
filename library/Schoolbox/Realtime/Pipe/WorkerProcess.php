@@ -19,8 +19,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Role;
@@ -100,10 +99,11 @@ class WorkerProcess extends AbstractProcess
         $decorator = new Decorator();
 
         // get ALL messages in this queue
-        $queue = $this->uqf->buildUserQueue($userId, -1, false);
+        $queue = $this->uqf->buildForUser($userId);
 
         // make messages pretty
-        $queue->fetchNotificationsIntoBundle(UserQueue::Q_LISTED, $decorator, true);
+        $queue->fetchNotificationsIntoBundle($decorator, true);
+
         // wrap in an array to preserve keys
         return array($decorator->renderAsSocketArray(false, $count));
     }

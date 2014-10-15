@@ -12,17 +12,14 @@ namespace Schoolbox\Realtime\Rerouter;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Queue\RedisQueue;
+use Alaress\Async\UserQueue\UserQueue;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Notif\Message\External\TargetedConverter;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\Builder\Plan\FullPlan;
-use Schoolbox\Notif\Queue\Builder\RedisBuilder;
-use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\Filter\FilterException;
 use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
@@ -43,57 +40,54 @@ class QueueSorter implements FilterInterface {
 	/** @var Notif */
 	protected $notif;
 
-    /** @var RedisBuilder */
-    protected $redisBuilder;
+    /** @var QueueFactory */
+    protected $qFactory;
 
 
-	/**
-	 * @param FilterInterface[]      $filters
-	 * @param LoggerInterface        $log
-	 * @param Notif                  $notif
-     * @param RedisBuilder           $redisBuilder
-	 * @param RoutePermissionMapper  $permMapper
-	 * @throws \InvalidArgumentException
-	 */
-	public function __construct($filters, $log, $notif, $redisBuilder, $permMapper) {
-		$this->filters = array();
+    /**
+     * @param FilterInterface[]     $filters
+     * @param LoggerInterface       $log
+     * @param Notif                 $notif
+     * @param QueueFactory          $qFactory
+     * @param RoutePermissionMapper $permMapper
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(
+        array $filters,
+        LoggerInterface $log,
+        Notif $notif,
+        QueueFactory $qFactory,
+        RoutePermissionMapper $permMapper
+    ) {
+        $this->filters = array();
 
-		foreach($filters as $filter) {
-			if($filter instanceof FilterInterface) {
-				$this->filters[] = $filter;
-			}
-		}
+        foreach ($filters as $filter) {
+            if ($filter instanceof FilterInterface) {
+                $this->filters[] = $filter;
+            }
+        }
 
-		if(!count($this->filters)) {
-			throw new InvalidArgumentException("At least one valid filter must be specified");
-		}
+        if (!count($this->filters)) {
+            throw new InvalidArgumentException("At least one valid filter must be specified");
+        }
 
-		$this->log          = $log;
-		$this->permMapper   = $permMapper;
-		$this->notif        = $notif;
-        $this->redisBuilder = $redisBuilder;
-	}
+        $this->log        = $log;
+        $this->permMapper = $permMapper;
+        $this->notif      = $notif;
+        $this->qFactory   = $qFactory;
+    }
 
 
-	/**
+    /**
 	 * @param User $user
 	 * @param Frame $frame
 	 * @throws InvalidArgumentException
 	 * @return bool
 	 */
-	public function process($user, $frame) {
+	public function process(User $user, Frame $frame) {
 		// anything echoed in this method is caught in an output buffer and piped to the log
 		$formatted = json_decode($frame->body, true);
-
-		try {
-			$instance = Instance::jsonUnserialize($formatted['message']);
-		}
-		catch(InvalidArgumentException $e) {
-
-			// TODO once TargetedMessage has been fully deprecated, this catch can be removed
-			$conv = new TargetedConverter();
-			$instance = $conv->convert($formatted['message']);
-		}
+        $instance  = Instance::jsonUnserialize($formatted['message']);
 
 		try {
 			$this->validate($instance, $formatted, $user);
@@ -110,7 +104,7 @@ class QueueSorter implements FilterInterface {
 				// instant + email
 				case Logger::WARNING:
 				case Logger::ERROR:
-					$method = 'instant';
+                    $method = UserQueue::Q_LISTED;
 					break;
 
 				// total suppression
@@ -123,12 +117,14 @@ class QueueSorter implements FilterInterface {
 			}
 
             // put the instance in redis: it will always end up being stored in one queue or the other
-            $qLabel = $method == UserQueue::Q_DIGEST ? UserQueue::Q_DIGEST : UserQueue::Q_LISTED;
-            $redisQ = $this->redisBuilder->createQueue($qLabel, $user);
+            $q = $this->qFactory->setKind($method)->buildForUser($user->getId());
 
-            $redisQ->push($instance);
+            if ($q instanceof RedisQueue) {
+                $q->push($instance);
+            }
 
-			$newTopic = "$method.user.{$user->getId()}";
+            // cast 'listed' to 'instant'
+			$newTopic = ($method == UserQueue::Q_LISTED ? 'instant' : $method) . ".user.{$user->getId()}";
 
 			$this->log->info("Rerouting message to '$newTopic' at level $newLevel");
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
@@ -150,13 +146,13 @@ class QueueSorter implements FilterInterface {
 
 
 	/**
-	 * Returns true if this message is considered valid, or false if it should be dismissed
+	 * Iterates the installed filters, any of which will throw an exception if the message fails its validation
 	 *
 	 * @param Instance $message
 	 * @param array    $formatted
 	 * @param User     $user
 	 * @throws FilterException
-	 * @return bool
+	 * @return void
 	 */
 	public function validate($message, $formatted, $user) {
 		foreach($this->filters as $filter) {
@@ -171,7 +167,7 @@ class QueueSorter implements FilterInterface {
 	 * @param string $channel
 	 * @return int
 	 */
-	protected function getReroutedLevel($user, $channel) {
+	protected function getReroutedLevel(User $user, $channel) {
 		$levels = $this->permMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
 
 		if(!count($levels)) {

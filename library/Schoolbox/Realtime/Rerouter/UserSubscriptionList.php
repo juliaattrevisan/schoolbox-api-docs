@@ -12,23 +12,22 @@ namespace Schoolbox\Realtime\Rerouter;
 
 use Alaress\Async\Stomp\SubscriptionList;
 use Schoolbox\Collection;
-use Schoolbox\Notif\Queue\Builder\BuilderInterface;
-use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class UserSubscriptionList extends SubscriptionList {
 
-    /** @var BuilderInterface */
-    protected $builder;
+    /** @var QueueFactory */
+    protected $qf;
 
 
     /**
-     * @param BuilderInterface $builder
+     * @param QueueFactory $qf
      */
-    public function __construct(BuilderInterface $builder)
+    public function __construct(QueueFactory $qf)
     {
-        $this->builder = $builder;
+        $this->qf = $qf;
     }
 
 
@@ -38,7 +37,7 @@ class UserSubscriptionList extends SubscriptionList {
      */
     public function createQueueName($userId)
     {
-        return $this->builder->createQueueName(UserQueue::Q_TOSORT, $userId);
+        return $this->qf->buildForUser($userId)->getName();
     }
 
 	/**
@@ -52,7 +51,7 @@ class UserSubscriptionList extends SubscriptionList {
 		}
 
 		/** @var Collection|User[] $users */
-		$users   = $source->findAll();
+		$users = $source->findAll();
 
 		foreach($users as $user) {
             $user = $source->findById($user->getId()); // TODO srsly. this has to change.

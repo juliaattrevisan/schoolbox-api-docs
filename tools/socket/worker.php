@@ -43,12 +43,13 @@ $kernel->run(
            $client = $redis->getClientInstance();
            $amqp   = \Schoolbox\Notif\MQ\Connector::getInstance();
 
-           // setup the plan
-           $plan   = new \Schoolbox\Notif\Queue\Builder\Plan\FullPlan($amqp, $client);
-           $uqf    = new \Schoolbox\Notif\Queue\UserQueueFactory($plan);
+           $qf = new \Schoolbox\Notif\UserQueue\UserQueueFactory();
+           $qf->setAMQP($amqp)
+              ->setRedis($client)
+              ->setKind(\Schoolbox\Notif\UserQueue\UserQueueFactory::UQ_INSTANT);
 
            // create a new worker; we don't need to store the instance, it'll be held within the loop
-           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $uqf);
+           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $qf);
        }
 );
 
