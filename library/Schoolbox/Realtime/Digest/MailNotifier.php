@@ -17,9 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Queue\Builder\Plan;
-use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -74,8 +72,10 @@ class MailNotifier implements Serializable {
     {
         // lazyload
         if (empty($this->uqf)) {
-            $r = new Redis();
-            $this->uqf = new UserQueueFactory(new Plan\DigestPlan($r->getClientInstance()));
+            $this->uqf = new UserQueueFactory();
+            $this->uqf
+                 ->setRedis(Redis::getClientInstance())
+                 ->setKind(UserQueueFactory::UQ_DIGEST);
         }
         return $this->uqf;
     }
@@ -103,11 +103,11 @@ class MailNotifier implements Serializable {
 
             $decorator = new Decorator();
             $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-            $uq        = $this->getUserQueueFactory()->buildUserQueue($user, 0);
+            $uq        = $this->getUserQueueFactory()->buildForUser($user->getId());
 
             $this->log()->info("Digesting {$user->getUsername()}");
 
-            $uq->fetchNotificationsIntoBundle(UserQueue::Q_DIGEST, $decorator, true);
+            $uq->fetchNotificationsIntoBundle($decorator, true);
 
 			if(!$decorator->count()) {
 				// this user has nothing to digest
@@ -126,7 +126,7 @@ class MailNotifier implements Serializable {
             // if email sent successfully, ACK, otherwise NACK
 			if($sent) {
 				$this->log()->notice("Mail sent successfully, dropping messages from queue");
-                $uq->drain(UserQueue::Q_DIGEST);
+                $uq->drain();
 				++$result;
 			}
 			else {
