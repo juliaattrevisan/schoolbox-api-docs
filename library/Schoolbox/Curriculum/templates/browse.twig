@@ -40,18 +40,47 @@
                     jstree.instance.open_node(jstree.node.id);
                 })
                 .on('ready.jstree', function(event, jstree) {
+                    // Is there a hash? If so, open all nodes below that hash.
+                    // (but maybe not curriculum codes)
                     var match = window.location.hash.match(/^#(.*)/);
                     if (match) {
                         jstree.instance.select_node(match[1]);
                         jstree.instance.open_all(match[1]);
                     }
                 })
-            // Open whatever node is in the anchor if any
+
+            // resizer - stolen from three panel
+            var resizePanels = function() {
+                $('#category-window, #detail-window').height(
+                    $(window).height() - $('#header').height() - $('#footer').height() - 50
+                );
+            };
+            resizePanels();
+            $(window).resize(resizePanels);
         })
     })(jQuery);
 </script>
 
 <h1>Curriculum Browser</h1>
 
-<div id="browser">
+<div class="template2">
+    <div class="left">
+        <div id="category-window">
+            <div class="loading"></div>
+            <table id="category-head" class="table">
+                <thead>
+                    <tr>
+                        <th>Curricula</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="scroller">
+                <div id="browser"></div>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div id="detail-window">
+        </div>
+    </div>
 </div>
