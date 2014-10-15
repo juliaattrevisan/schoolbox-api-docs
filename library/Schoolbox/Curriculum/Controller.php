@@ -43,17 +43,13 @@ class Controller extends Base
             );
         }
 
-        $nodeList = $this->getNodeMapper()->getCollectionAsTree(
-            $this->getNodeMapper()->findAll()
-        );
         // Load parent nodes and all of their subnodes, and dump them in a tree
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Curriculum',
                 'template' => '@curriculum/browse.twig',
                 'data'     => array(
-                    'tree'     => $tree,
-                    'itemList' => $nodeList,
+                    'tree' => $tree,
                 ),
             )
         );
