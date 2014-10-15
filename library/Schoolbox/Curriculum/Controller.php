@@ -21,6 +21,28 @@ class Controller extends Base
 
     public function browse()
     {
+        // Fetch all the nodes at once, and parse into a jstree like status
+        $tree = array(
+            array(
+                'id'     => 0,
+                'parent' => '#',
+                'text'   => 'Curricula',
+                'type'   => 'root',
+            )
+        );
+        foreach ($this->getNodeMapper()->findAll() as $node) {
+            /** @var Node\Model $node */
+            $tree[] = array(
+                'id'     => intval($node->getId()),
+                'parent' => intval($node->getParent()->getId()),
+                'text'   => $node->getName(),
+                'a_attr' => array(
+                    'href' => '#',
+                ),
+                'type'   => 'folder',
+            );
+        }
+
         $nodeList = $this->getNodeMapper()->getCollectionAsTree(
             $this->getNodeMapper()->findAll()
         );
@@ -30,6 +52,7 @@ class Controller extends Base
                 'title'    => 'Curriculum',
                 'template' => '@curriculum/browse.twig',
                 'data'     => array(
+                    'tree'     => $tree,
                     'itemList' => $nodeList,
                 ),
             )
