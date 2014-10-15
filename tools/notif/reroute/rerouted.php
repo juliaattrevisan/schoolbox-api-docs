@@ -1,7 +1,9 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Async\AMQP\Bunny\BunnyControl;
 use Alaress\Async\Stomp\Subscriber;
+use Alaress\Async\UserQueue\UserQueue;
 use Alaress\Redis;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
@@ -9,10 +11,9 @@ use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
-use Schoolbox\Notif\Queue\Builder\AMQPBuilder;
-use Schoolbox\Notif\Queue\Builder\Plan\FullPlan;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Rerouter\Rerouter;
 use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
 use Schoolbox\Realtime\Rerouter\UserSubscriptionList;
@@ -95,15 +96,19 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
             $redisf = new Redis();
             $redisc = $redisf->getClientInstance();
 
+            $qf1 = new QueueFactory();
+            $qf1->setRedis($redisc)->setAMQP($amqp)->setKind(UserQueue::Q_TOSORT);
+            // yeah we need two independent instances of this
+            $qf2 = clone $qf1;
+
             // setup dependencies
-            $binder     = new UserQueueBinder();
-            $plan       = new FullPlan($amqp, $redisc, $binder);
-            $uqf        = new UserQueueFactory($plan);
-            $subscriber = new Subscriber($client, new UserSubscriptionList($plan->getBuilder(AMQPBuilder::STORE)));
+            $binder     = new UserQueueBinder($amqp, new BunnyControl(), $qf1, new Generator());
+            $subscriber = new Subscriber($client, new UserSubscriptionList($qf2));
             $strat      = new RerouterDispatchStrategy($opts['flags']);
+            $bunnyCtrl  = new BunnyControl();
 
             // throw all the above into the class we wanted in the first place
-            $rerouter   = new Rerouter($loop, $strat, $subscriber, $uqf, $log, $client, $amqp, $binder);
+            $rerouter   = new Rerouter($loop, $strat, $subscriber, $log, $client, $binder, $bunnyCtrl);
 
             if ($opts['bind']) {
                 $rerouter->onHangup();

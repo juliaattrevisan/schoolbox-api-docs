@@ -10,11 +10,10 @@
 namespace Schoolbox\Realtime\Rerouter;
 
 
-use Alaress\Async\AMQP\AMQPInterface;
-use Alaress\Async\AMQP\Bunny\BunnyControl;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\SignalEmitter;
 use Alaress\Async\Stomp\Subscriber;
+use Alaress\Async\UserQueue\UserQueue;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -28,9 +27,7 @@ use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
-use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -52,12 +49,6 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 	/** @var DispatcherInterface */
 	protected $dispatcher;
 
-	/** @var UserQueueFactory */
-	protected $uqf;
-
-    /** @var AMQPInterface */
-    protected $amqp;
-
     /** @var ControlInterface */
     protected $bunny;
 
@@ -75,10 +66,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param Subscriber                $subscriber
-     * @param UserQueueFactory          $uqf
      * @param LoggerInterface           $log
      * @param Client                    $stomp
-     * @param AMQPInterface             $amqpConn
      * @param UserQueueBinder           $binder
      * @param ControlInterface          $rabbitControl
      */
@@ -86,25 +75,19 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         Subscriber $subscriber,
-        UserQueueFactory $uqf,
         LoggerInterface $log,
         Client $stomp,
-        AMQPInterface $amqpConn = null,
-        UserQueueBinder $binder = null,
-        ControlInterface $rabbitControl = null
+        UserQueueBinder $binder,
+        ControlInterface $rabbitControl
     ) {
 		parent::__construct($loop);
 
 		$this->loop       = $loop;
 		$this->running    = false;
 		$this->subscriber = $subscriber;
-        $this->uqf        = $uqf;
 		$this->log        = $log;
-
-		// cast optional param
-        $this->amqp       = $amqpConn ? : Connector::getInstance();
-        $this->bunny      = $rabbitControl ? : new BunnyControl();
-        $this->binder     = $binder ? : new UserQueueBinder();
+        $this->bunny      = $rabbitControl;
+        $this->binder     = $binder;
 
         // TODO transpose these NEWs and getInstances into a factory
         $this->userMapper      = UserMapper::getInstance();
@@ -331,22 +314,10 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
      */
     public function rebindUser(User $user)
     {
-        $binder = $this->binder;
-
         // pause the current subscription
         $this->unsubscribeUser($user->getId());
 
-        // remove the current user's bindings
-        $removed = $binder->destroyUserBindings($this->amqp, $this->bunny, $user->getId());
-
-        // build the queue, which will generate and attach the bindings we require
-        $this->uqf->buildUserQueue($user, 0);
-
-        // resume the current subscription
-        $this->subscribeUser($user->getId());
-
-        // the binder inside UQF is the same object as $this->binder, so we can extract and count its current set of bindings
-        $added = count($binder->getBindings());
+        list($removed, $added) = $this->binder->setUser($user)->performBind(array(UserQueue::Q_TOSORT, UserQueue::Q_UNREAD));
 
         $this->log->debug(sprintf("BIND %4s %4d  %s", "-{$removed}", "+{$added}", $user->getUsername()));
     }

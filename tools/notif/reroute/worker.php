@@ -5,9 +5,8 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\Builder\Plan\ReroutePlan;
-use Schoolbox\Notif\Queue\Builder\RedisBuilder;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\Queue\QueueFactory;
+use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
 use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
@@ -52,7 +51,13 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
     $redis  = new \Alaress\Redis();
     $client = $redis->getClientInstance();
-    $uqf    = new UserQueueFactory(new ReroutePlan($redis->getClientInstance()));
+
+    $uqf = new UserQueueFactory();
+    $uqf->setKind(UserQueueFactory::UQ_REROUTE)
+        ->setRedis($client);
+
+    $qf = new QueueFactory();
+    $qf->setRedis($client);
 
 	$rerouteFilters = array(
 		new Filter\AlreadyReroutedFilter(),
@@ -63,7 +68,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
 		new Filter\DuplicateFilter($uqf)
 	);
 
-    $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), new RedisBuilder($client), RoutePermissionMapper::getInstance());
+    $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), $qf, RoutePermissionMapper::getInstance());
 
     // use the reroute strat
     $strat = new RerouterDispatchStrategy();
