@@ -32,12 +32,16 @@ class Controller extends Base
         );
         foreach ($this->getNodeMapper()->findAll() as $node) {
             /** @var Node\Model $node */
+            $nodeId = intval($node->getId());
             $tree[] = array(
-                'id'     => intval($node->getId()),
+                'id'     => $nodeId,
                 'parent' => intval($node->getParent()->getId()),
                 'text'   => $node->getName(),
                 'a_attr' => array(
-                    'href' => '#',
+                    'href' => $this->getRouter()->generate(
+                        'curriculum.read',
+                        array('id' => $nodeId, 'format' => '')
+                    ),
                 ),
                 'type'   => 'folder',
             );
