@@ -33,10 +33,15 @@ class Controller extends Base
         foreach ($this->getNodeMapper()->findAll() as $node) {
             /** @var Node\Model $node */
             $nodeId = intval($node->getId());
+            $name   = $node->getName();
+            $isCode = strlen($node->getCode()) > 0;
+            if ($isCode) {
+                $name = sprintf('[%s] %s', $node->getCode(), $name);
+            }
             $tree[] = array(
                 'id'     => $nodeId,
                 'parent' => intval($node->getParent()->getId()),
-                'text'   => $node->getName(),
+                'text'   => $name,
                 'a_attr' => array(
                     'href' => $this->getRouter()->generate(
                         'curriculum.read',
@@ -47,7 +52,7 @@ class Controller extends Base
                         array('id' => $nodeId, 'format' => '')
                     ),
                 ),
-                'type'   => 'folder',
+                'type'   => ($isCode ? 'code' : 'folder'),
             );
         }
 
