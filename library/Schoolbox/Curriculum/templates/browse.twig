@@ -3,9 +3,17 @@
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="application/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="application/javascript">
     (function($) {
         $(function() {
+            $.fn.alaressTiny({
+                mode: 'none'
+            });
+            var template  = doT.template($('script#node-template').html().trim());
+            var formPanel = $('#detail-window');
             $('#browser').jstree({
                 core: {
                     animation: 50,
@@ -48,6 +56,26 @@
                         jstree.instance.open_all(match[1]);
                     }
                 })
+                .on('select_node.jstree', function(event, jstree) {
+                    // Load this node in the node browser
+                    // read URL comes from the node I just clicked
+                    formPanel
+                        .addClass('loading')
+                        .find(':input').prop('disabled', true);
+                    $.getJSON(jstree.node.a_attr.href+'.json')
+                        .done(function(data) {
+                            tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
+                            var templateData = data.item;
+                            templateData.updateUri = jstree.node.a_attr['data-updateuri'];
+                            formPanel
+                                .empty()
+                                .append(template(templateData));
+                            tinyMCE.execCommand('mceAddControl', true, 'node-description');
+                        })
+                        .always(function() {
+                            formPanel.removeClass('loading');
+                        });
+                })
 
             // resizer - stolen from three panel
             var resizePanels = function() {
@@ -57,11 +85,51 @@
             };
             resizePanels();
             $(window).resize(resizePanels);
+
+            // Node save form submission
+            formPanel.on('submit', '#node-form', function(event) {
+                event.preventDefault();
+                // Do it via AJAX instead
+                $.ajax({
+                    method:   this.method,
+                    data:     $(this).serialize(),
+                    dataType: 'json',
+                    url:      this.action
+                })
+                    .done(function(data) {
+                        // Update jsTree with what I just saved
+                    })
+            })
+
+            // Node addition
         })
     })(jQuery);
 </script>
 
-<h1>Curriculum Browser</h1>
+<!-- Template for the display of a curriculum node -->
+{% verbatim %}
+<script id="node-template" type="text/x-dot-template">
+    <form id="node-form" method="post" action="{{! it.form }}">
+        <dl>
+            <dt>Name</dt>
+            <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Code</dt>
+            <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Reference</dt>
+            <dd><input type="text" name="reference" value="{{! it.reference }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Description</dt>
+            <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
+        </dl>
+        <input type="submit" class="submit-btn-plain" value="Save Changes" />
+    </form>
+</script>
+{% endverbatim %}
 
 <div class="template2">
     <div class="left">
