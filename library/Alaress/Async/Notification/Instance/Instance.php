@@ -177,8 +177,8 @@ class Instance implements JsonSerializable {
 	public function jsonSerialize() {
 		return array(
 			'title'     => array(
-				'text'        => $this->messageString,
-				'params'      => $this->params
+				'text'      => $this->messageString,
+				'params'    => $this->params
 			),
 			'namespace' => $this->namespace,
 			'time'      => $this->time,

@@ -199,8 +199,7 @@ class Generator implements GeneratorInterface
             )
         );
 
-        $roleType = $user->getRole()
-                         ->getType();
+        $roleType = $user->getRole()->getType();
 
         // superuser bindings
         if ($user->isSuperuser()) {
@@ -260,8 +259,7 @@ class Generator implements GeneratorInterface
         // role bindings
         // *.notify.role.{id}.#
         $bindings['role'] = array(
-            $user->getRole()
-                 ->getId() . ".#"
+            $user->getRole()->getId() . ".#"
         );
 
         // role-type bindings
@@ -280,14 +278,13 @@ class Generator implements GeneratorInterface
                            ->getColumnValues('id');
 
             /** @var UserAccess $access */
-            $accessList = $this->getUserAccessMapper()
-                               ->findByColumnList(
-                               array(
-                                   'uid'     => $user->getId(),
-                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                   'sid'     => $catIds
-                               )
-                );
+            $accessList = $this->getUserAccessMapper()->findByColumnList(
+                array(
+                    'uid'     => $user->getId(),
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
+                    'sid'     => $catIds
+                )
+            );
         } catch (Mapper\Exception $e) {
             $accessList = new Collection();
         }
