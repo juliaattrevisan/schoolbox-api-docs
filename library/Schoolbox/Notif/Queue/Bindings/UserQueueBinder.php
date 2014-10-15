@@ -16,6 +16,8 @@ use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
 use OutOfBoundsException;
 use RuntimeException;
+use Schoolbox\Notif\Queue\QueueFactory;
+use Schoolbox\User;
 
 class UserQueueBinder
 {
@@ -29,12 +31,50 @@ class UserQueueBinder
     /** @var array */
     protected $existingBindings = null;
 
+    /** @var AMQPInterface */
+    protected $amqp;
+
+    /** @var ControlInterface */
+    protected $rabbitCtrl;
+
+    /** @var QueueFactory */
+    protected $queueFactory;
+
+    /** @var Generator */
+    protected $generator;
+
+
+    /**
+     * @param AMQPInterface    $amqp
+     * @param ControlInterface $rabbitCtrl
+     * @param QueueFactory     $qFactory
+     * @param Generator        $gen
+     */
+    public function __construct(AMQPInterface $amqp, ControlInterface $rabbitCtrl, QueueFactory $qFactory, Generator $gen)
+    {
+        $this->amqp         = $amqp;
+        $this->rabbitCtrl   = $rabbitCtrl;
+        $this->queueFactory = $qFactory;
+        $this->generator    = $gen;
+    }
+
+
+    /**
+     * @param User $user
+     * @return self
+     */
+    public function setUser(User $user)
+    {
+        $this->setBindings($this->generator->generateBindingsForUser($user));
+        return $this;
+    }
+
 
     /**
      * @param array $bindings
      * @return self
      */
-    public function setBindings(array $bindings)
+    protected function setBindings(array $bindings)
     {
         $this->bindings = array();
 
@@ -65,41 +105,41 @@ class UserQueueBinder
      */
     public function getBindings()
     {
+        $this->validate();
         return $this->bindings;
     }
 
 
     /**
-     * @param AMQPInterface    $conn
-     * @param AMQPExchange     $exchange
-     * @param AMQPQueue[]      $queues
+     * Binds to AMQP. Returns the number of bindings created.
+     *
+     * @param AMQPExchange  $exchange
+     * @param AMQPQueue[]   $queues
      * @throws OutOfBoundsException
-     * @return self
+     * @return int
      */
-    public function bindToAMQP(AMQPInterface $conn, AMQPExchange $exchange, array $queues)
+    public function bindToAMQP(AMQPExchange $exchange, array $queues)
     {
-        if (empty($this->bindings) || !$this->userId) {
-            throw new OutOfBoundsException("Must have valid bindings");
-        }
+        $this->validate();
 
         $exchangeName = $exchange->getName();
 
         // exchange things
-        $conn->declareExchange($exchange);
+        $this->amqp->declareExchange($exchange);
 
         foreach ($this->bindings as $key) {
-            $conn->bindExchange($exchangeName, $key);
+            $this->amqp->bindExchange($exchangeName, $key);
         }
 
         // queue things
         foreach ($queues as $q) {
             $queueName = $q->getName();
             $routeKey  = $q->getRoutingKey();
-            $conn->declareQueue($queueName);
-            $conn->bindQueue($queueName, $routeKey, $exchangeName);
+            $this->amqp->declareQueue($queueName);
+            $this->amqp->bindQueue($queueName, $routeKey, $exchangeName);
         }
 
-        return $this;
+        return count($this->bindings);
     }
 
 
@@ -107,28 +147,26 @@ class UserQueueBinder
      * Destroy all routing bindings for the given user.
      * Returns the number of bindings deleted, or -1 on error.
      *
-     * @param AMQPInterface    $conn
-     * @param ControlInterface $rabbitController
-     * @param int              $userId
      * @return int
      */
-    public function destroyUserBindings(AMQPInterface $conn, ControlInterface $rabbitController, $userId)
+    public function destroyUserBindings()
     {
+        $this->validate();
 
         if (!$this->existingBindings) {
-            $this->cacheExistingBindings($conn, $rabbitController);
+            $this->cacheExistingBindings($this->amqp, $this->rabbitCtrl);
         }
 
-        if (!isset($this->existingBindings[$userId])) {
+        if (!isset($this->existingBindings[$this->userId])) {
             return 0;
         }
 
         $count = 0;
 
-        $userExchange = $conn->getSecondaryExchange($userId);
+        $userExchange = $this->amqp->getSecondaryExchange($this->userId);
 
-        foreach ($this->existingBindings[$userId] as $routingKey) {
-            $conn->unbindExchange($userExchange->getName(), $routingKey);
+        foreach ($this->existingBindings[$this->userId] as $routingKey) {
+            $this->amqp->unbindExchange($userExchange->getName(), $routingKey);
             ++$count;
         }
 
@@ -140,16 +178,14 @@ class UserQueueBinder
     /**
      * Retrieve all existing bindings from RabbitMQ and cache into an array, indexed by username
      *
-     * @param AMQPInterface    $conn
-     * @param ControlInterface $bunny
      * @return int
      */
-    protected function cacheExistingBindings(AMQPInterface $conn, ControlInterface $bunny)
+    protected function cacheExistingBindings()
     {
         $this->existingBindings = array();
 
         try {
-            $bindings = $bunny->listBindings(array('destination_name', 'routing_key'));
+            $bindings = $this->rabbitCtrl->listBindings(array('destination_name', 'routing_key'));
         } catch (RuntimeException $e) {
             return -1;
         }
@@ -159,8 +195,7 @@ class UserQueueBinder
         }
 
         $count  = 0;
-        $prefix = $conn->getSecondaryExchange('')
-                       ->getName();
+        $prefix = $this->amqp->getSecondaryExchange('')->getName();
 
         foreach ($bindings as $binding) {
             // only parse line if this is a user exchange
@@ -186,5 +221,47 @@ class UserQueueBinder
     {
         $this->existingBindings = null;
     }
+
+
+    /**
+     * @param array $kinds
+     * @return array
+     */
+    public function performBind($kinds)
+    {
+        $this->validate();
+
+        $queues = array();
+
+        foreach ($kinds as $k) {
+            $queues[] = $this->queueFactory->setKind($k)->buildForUser($this->userId);
+        }
+
+        // remove the current user's bindings
+        $removed = $this->destroyUserBindings();
+
+        // AMQP-specific things we need
+        $exchange = $this->amqp->getSecondaryExchange($this->userId);
+
+
+        // generate and attach the bindings we require
+        $added = $this->bindToAMQP($exchange, $queues);
+
+        return array($removed, $added);
+    }
+
+
+    /**
+     * Verify that a valid user has been imported
+     *
+     * @throws OutOfBoundsException
+     */
+    protected function validate()
+    {
+        if (empty($this->bindings) || !$this->userId) {
+            throw new OutOfBoundsException("A user with bindings has not been specified");
+        }
+    }
+
 
 }

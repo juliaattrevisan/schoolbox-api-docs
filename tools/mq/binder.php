@@ -1,16 +1,16 @@
 #!/usr/bin/php
 <?php
 use Alaress\Async\AMQP\Bunny\BunnyControl;
+use Alaress\Async\UserQueue\UserQueue;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\MQ\Test\MockAMQPConnector;
 use Schoolbox\Notif\MQ\Test\MockBunnyControl;
+use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
-use Schoolbox\Notif\Queue\Builder\AMQPBuilder;
-use Schoolbox\Notif\Queue\Builder\Plan\BinderPlan;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Rerouter\UserSubscriptionList;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -76,10 +76,13 @@ EOL;
     $uMap = UserMapper::getInstance();
 
     // setup new object dependencies
-    $binder   = new UserQueueBinder();
-    $plan     = new BinderPlan($conn, $binder);
-    $subList  = new UserSubscriptionList($plan->getBuilder(AMQPBuilder::STORE));
-    $qFactory = new UserQueueFactory($plan);
+    $qf = new QueueFactory();
+    $qf->setAMQP($conn)
+       ->setKind(UserQueue::Q_TOSORT);
+
+    $generator = new Generator();
+    $binder    = new UserQueueBinder($conn, $ctrl, $qf, $generator);
+    $subList   = new UserSubscriptionList($qf);
 
     // import data from database
     $log->debug("Importing user data");
@@ -91,21 +94,18 @@ EOL;
     $countLen  = strlen("$userCount");
     $pattern   = "BIND [%{$countLen}d/%{$countLen}d]  %4s/%4s: %s";
 
-    $log->debug("Iterating users to bind");
+    $log->debug("Preparing to bind $userCount users");
 
     // and go.
     foreach ($subList->getAllQueueNames() as $i => $queue) {
         /** @var User $user */
         $user = $subList->getQueueData($queue);
 
-        // remove the current user's bindings
-        $removed = $binder->destroyUserBindings($conn, $ctrl, $user->getId());
+        $kinds = array(UserQueue::Q_TOSORT, UserQueue::Q_UNREAD);
 
-        // build the queue, which will generate and attach the bindings we require
-        $qFactory->buildUserQueue($user, 0);
-
-        // count the number of bindings that were generated inside the binder
-        $added = count($binder->getBindings());
+        list($removed, $added) = $binder
+            ->setUser($user)
+            ->performBind($kinds);
 
         // advise progress
         $log->notice(sprintf($pattern, $i, $userCount, "-$removed", "+$added", $user->getUsername()));
