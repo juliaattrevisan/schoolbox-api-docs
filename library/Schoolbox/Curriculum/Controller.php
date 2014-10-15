@@ -42,6 +42,10 @@ class Controller extends Base
                         'curriculum.read',
                         array('id' => $nodeId, 'format' => '')
                     ),
+                    'data-edituri' => $this->getRouter()->generate(
+                        'curriculum.edit',
+                        array('id' => $nodeId, 'format' => '')
+                    ),
                 ),
                 'type'   => 'folder',
             );
