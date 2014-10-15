@@ -2,7 +2,6 @@
     $(function () {
 
         var abUpload          = $('#ab-upload'),
-            abUploadExplorer  = abUpload.closest('.explorer'),
             abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
             abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
@@ -17,6 +16,11 @@
             autoProcessQueue: false,
             addRemoveLinks: true,
             acceptedFiles: {ACCEPTED_FILES},
+
+            accept: function (file, done) {
+                done();
+                checkState.call(this);
+            },
 
             fallback: function () {
 
@@ -104,19 +108,6 @@
 
                     });
                 });
-
-
-//                // TODO this fallback needs to be an iframe'd form
-//                $(this.element)
-//                    .append($('<div/>').addClass('dz-fallback')
-//                        .append($('<p/>').text(this.options.dictFallbackText)
-//                            .append($('<input type="file" name="upload" />'))
-//                        )
-//                    );
-//
-//                abUploadSubmitBtn.one('click', function () {
-//                    $.post(abUploadForm.attr('action'), abUploadForm.serialize())
-//                });
             },
 
             init: function () {
@@ -129,7 +120,6 @@
                 this.on('addedfile', function (file) {
                     var img = $(file.previewElement).find('img[data-dz-thumbnail]');
                     img.attr('src', '/ajax/mime/' + file.type);
-                    checkState.call(this);
                 });
 
                 this.on('removedfile', function (file) {
