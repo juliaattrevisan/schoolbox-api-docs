@@ -87,10 +87,10 @@ elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) ||
         catch (Exception $e) {
             // Output errors
             if($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-                error(11, "Your file, '{$file->getFilename()}'");
+                error(11, "Your file '{$currentFile->getFilename()}' is not a valid filetype");
             }
             else if($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
-                error(10, 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.');
+                error(10, 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($currentFile->getMimetype()->getMaxFileSize()).'.');
             }
             else {
                 error(9, $e->getMessage());
