@@ -84,6 +84,8 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                 'event_buttons_block' => '',
                 'event_attendance_status_block' => '',
                 'event_attendance_request_block' => '',
+                'event_timed_block' => '',
+                'event_allday_block' => '',
             )
         );
         if ($currentEvent->getCategoryId() > 0) {
@@ -91,19 +93,11 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         }
 
         if ($currentEvent->getAllday()) {
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d'));
             $page->parse('event_allday_block', 'event_allday');
-            $page->setVar(
-                array(
-                    'event_timed_block' => ''
-                )
-            );
         } else {
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d H:i:s'));
             $page->parse('event_timed_block', 'event_timed');
-            $page->setVar(
-                array(
-                    'event_allday_block' => '',
-                )
-            );
         }
 
         // Crude approximation of fullcalendar's butonyes
