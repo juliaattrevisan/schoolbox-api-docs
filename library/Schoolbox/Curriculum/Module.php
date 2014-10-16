@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Loader_Chain;
@@ -44,6 +45,27 @@ class Module extends BaseModule
 //        // but have separate add tile paths
 //        $router->addGet('tile.add', $basePath.'/add/{componentId}');
 //        $router->addPost('tile.create', $basePath.'/add/{componentId}');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // Add the item to params, if ID is in the route.
+        // TODO DI this
+        $nodeMapper = new Node\Mapper();
+        $matcher->add(
+            '/^curriculum\\./',
+            function ($params) use ($nodeMapper) {
+                if (array_key_exists('id', $params)) {
+                    return array(
+                        'item' => $nodeMapper->findById($params['id']),
+                    );
+                }
+                return array();
+            }
+        );
     }
 
     /**
