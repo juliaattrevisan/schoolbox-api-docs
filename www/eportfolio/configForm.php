@@ -88,18 +88,24 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		}
 		/* POST new component to page and output render of component
 		 */
-		else if (is_numeric($_POST['add'])) {
-			$newComp = new Component_Instance();
-			$newComp
-				->setDefinitionId($_POST['add'])
-				->setIdentifier($_POST['page_id'])
-				->setModule('eportfolio')
-				->setSequence(0)
-				->setPosition('left');
+		else if (is_numeric($_POST['add']) || is_numeric($_POST['reload'])) {
+			if (is_numeric($_POST['add'])) {
 
-			$ids = $componentInstanceMapper->save($newComp);
+                $newComp = new Component_Instance();
+                $newComp
+                    ->setDefinitionId($_POST['add'])
+                    ->setIdentifier($_POST['page_id'])
+                    ->setModule('eportfolio')
+                    ->setSequence(0)
+                    ->setPosition('left');
 
-			$instanceID = $ids[0];
+                $ids = $componentInstanceMapper->save($newComp);
+
+                $instanceID = $ids[0];
+            }
+            else {
+                $instanceID = $_POST['reload'];
+            }
 
 			$componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
 
@@ -233,6 +239,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			if(isset($config['filter'])) {
 				// retrieve the instance so we know how to insert this data
 				$cclass = $instance->getDefinition()->getClass();
+                /** @var \Component_ControllerAbstract $controller */
 				$controller = new $cclass($instance, new \Schoolbox\User(), $page);
 				$controller->execute();
 				$fields = $controller->getFilterFields();

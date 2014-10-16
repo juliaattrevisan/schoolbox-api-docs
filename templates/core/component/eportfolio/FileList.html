@@ -38,7 +38,10 @@
                 tplWrap: '<li class="dz-preview" />',
                 refreshUrl: '/eportfolio/configForm.php',
                 refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                refreshData: {
+                    page_id: '{PAGE_ID}',
+                    reload: '{COMPONENT_INSTANCE_ID}'
+                },
                 sending: function (file, xhr, formData) {
                     formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
                     formData.append('parent', 0);
