@@ -65,7 +65,7 @@ class MyFileMapper extends Mapper implements Resource\FileLocatorInterface {
 
         $this->hasMap(array(
             'column'     => 'mime_type',
-            'property'   => 'mime',
+            'property'   => 'mimetype',
             'hydrator'   => $hydrator,
             'join'       => 'allowedFileType',
         ));

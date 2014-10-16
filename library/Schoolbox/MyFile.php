@@ -149,16 +149,25 @@ class MyFile implements FileInterface {
 	 * @param  MimeType $mime
 	 * @return $this
 	 */
-	public function setMime($mime) {
+	public function setMimetype($mime) {
 		$this->mime = $mime;
 
 		return $this;
 	}
 
+    /**
+     * Get mime object
+     * @return Mimetype
+     */
+    public function getMimetype()
+    {
+        return $this->mime;
+    }
+
 	/**
-	 * Get mime object
+	 * Get mime string
 	 *
-	 * @return MimeType
+	 * @return string
 	 */
 	public function getMime() {
 		return $this->mime->getMime();
