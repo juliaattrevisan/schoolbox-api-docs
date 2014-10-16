@@ -4,17 +4,27 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 use \Schoolbox\MyFileMapper;
 use \Schoolbox\MyFile;
 
+$ajax = isset($_GET['ajax']) && $_GET['ajax'];
+
+if($ajax) {
+    header("Content-Type: application/json");
+}
+
 $page = new SitePage();
+$page->setAjax($ajax);
 
 $userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
 
 // PERMISSION: have to be session user or staff
 $groupHandler = new Group();
 if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
-	error(47);
+	if ($ajax) {
+        header(':', true, 400);
+        die(json_encode('You do not have write permission to this ePortfolio.'));
+    } else {
+        error(47);
+    }
 }
-
-//$fileHandler = new MyFile($userId);
 
 // Upload a new file
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
@@ -30,7 +40,13 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 		$currentFile = MyFileMapper::getInstance()->findById($_POST['fileID']);
 
         if ($currentFile->getOwner()->getId() != $userId) {
-            $page->error(47);
+            if ($ajax) {
+                header(':', true, 400);
+                die(json_encode('You do not have write permission to this ePortfolio.'));
+            } else {
+                error(47);
+            }
+
         }
     } else {
         $allowedFileHandler = new AllowedFile;
@@ -44,7 +60,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
 		$currentFile->setFilename($_FILES['file']['name']);
 		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-		$currentFile->setMime($mime);
+		$currentFile->setMimetype($mime);
 		$currentFile->setCreatedAt(new Alaress_Date_Format(time(), 'U'));
 		$currentFile->setDeleted(false);
     }
@@ -56,37 +72,68 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
     $currentFile->setOwner($_SESSION['user']);
     $currentFile->setDescription($_POST['description']);
 
-    MyFileMapper::getInstance()->save($currentFile);
+    try {
+        $affectedIds = MyFileMapper::getInstance()->save($currentFile);
 
+        /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
+         */
+        if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
+            $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-    /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
-     */
-	if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
-		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            foreach($_POST['published'] as $ownerId => $pageIds) {
+                if (is_array($pageIds) && count($pageIds)) {
+                    foreach($pageIds as $currentPageId => $unused) {
+                        $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
+                        if ($authenticator->canModify()) {
+                            $publishedFile = new \Component\Eportfolio\FileList();
+                            $publishedFile->setPageId($currentPageId);
+                            $publishedFile->setFileId($currentFile->getId());
+                            $publishedFile->setCreatedAt($now);
+                            $publishedFile->setUpdatedAt($now);
 
-		foreach($_POST['published'] as $ownerId => $pageIds) {
-			if (is_array($pageIds) && count($pageIds)) {
-				foreach($pageIds as $currentPageId => $unused) {
-					$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
-					if ($authenticator->canModify()) {
-						$publishedFile = new \Component\Eportfolio\FileList();
-						$publishedFile->setPageId($currentPageId);
-						$publishedFile->setFileId($currentFile->getId());
-						$publishedFile->setCreatedAt($now);
-						$publishedFile->setUpdatedAt($now);
+                            \Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
+                        }
+                    }
+                }
+            }
+        }
 
-						\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
-					}
-				}
-			}
-		}
-	}
+        if (isset($_POST['return'])) {
+            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
 
-    if ( isset( $_POST['return'] ) ) {
-        SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
-    }
-    else {
-        $page->backToTheFuture(2);
+        } elseif($ajax) {
+            header(':', true, 201);
+            die(json_encode(array('id' => $affectedIds[0])));
+
+        } else {
+            $page->backToTheFuture(2);
+        }
+    } catch (\Schoolbox\File\Exception $e) {
+
+        // Output errors
+        if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
+            $code = 11;
+            $msg  = "Your file, '{$currentFile->getFilename()}' is not a valid filetype";
+
+        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
+            $code = 10;
+            $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($currentFile->getMimetype()->getMaxFileSize()).'.';
+
+        } else {
+            $code = 9;
+            $msg  = $e->getMessage();
+        }
+
+        if ($ajax) {
+            header(':', true, 400);
+            die(json_encode(array('code' => $code, 'error' => $msg)));
+
+        } else {
+            error($code, $msg);
+        }
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        header('Content-Type: text/html');
+        die($e);
     }
 }
 // delete a single file
