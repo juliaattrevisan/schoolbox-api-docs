@@ -63,7 +63,7 @@ class Controller extends Base
                     'curriculum.read',
                     array('id' => $nodeId, 'format' => '')
                 ),
-                'data-updateuri' => $this->getRouter()->generate(
+                'data-saveuri' => $this->getRouter()->generate(
                     'curriculum.update:post',
                     array('id' => $nodeId)
                 ),

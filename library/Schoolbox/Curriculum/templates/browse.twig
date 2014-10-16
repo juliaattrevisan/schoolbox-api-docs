@@ -9,10 +9,24 @@
 <script type="application/javascript">
     (function($) {
         $(function() {
+            // Setup Tiny now, for later addition
             $.fn.alaressTiny({
                 mode: 'none'
             });
+
+            // Method for building the form
+            // Tears down and sets up TinyMCE dynamically too
+            var buildForm = function(action, data) {
+                tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
+                data.action = action;
+                formPanel
+                    .empty()
+                    .append(template(data));
+                tinyMCE.execCommand('mceAddControl', true, 'node-description');
+            };
+
             var template  = doT.template($('script#node-template').html().trim());
+            var treePanel = $('#category-window');
             var formPanel = $('#detail-window');
             var tree      = $('#browser').jstree({
                 core: {
@@ -64,13 +78,7 @@
                         .find(':input').prop('disabled', true);
                     $.getJSON(jstree.node.a_attr.href+'.json')
                         .done(function(data) {
-                            tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
-                            var templateData = data.item;
-                            templateData.action = jstree.node.a_attr['data-updateuri'];
-                            formPanel
-                                .empty()
-                                .append(template(templateData));
-                            tinyMCE.execCommand('mceAddControl', true, 'node-description');
+                            buildForm(jstree.node.a_attr['data-saveuri'], data.item);
                         })
                         .always(function() {
                             formPanel.removeClass('loading');
@@ -93,7 +101,6 @@
                 // Do it via AJAX instead
                 var form     = $(this);
                 var formData = form.serializeArray();
-                // Need to add TinyMCE box value into formData
                 formPanel
                     .addClass('loading')
                     .find(':input').prop('disabled', true);
@@ -104,8 +111,14 @@
                     url:      this.action
                 })
                     .done(function(data) {
+                        // Is this a newly created node? If so, add it in.
                         // jsTree has no comprehensive updateNode, so update what I can.
-                        $.jstree.reference('#browser').rename_node(data.item.id, data.tree.text);
+                        var jstree = $.jstree.reference('#browser');
+                        if (jstree.get_node(data.item.id)) {
+                            jstree.rename_node(data.item.id, data.tree.text);
+                        } else {
+                            jstree.create_node(data.tree.parent, data.tree);
+                        }
                     })
                     .always(function() {
                         formPanel.removeClass('loading')
@@ -114,18 +127,33 @@
             })
 
             // Node addition
+            treePanel.on('click', '#create-node-button', function(event) {
+                event.preventDefault();
+                buildForm($(this).data('saveuri'), {});
+            })
         })
     })(jQuery);
 </script>
+<style type="text/css">
+    #category-window .jstree-node {
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    #category-window .jstree-anchor {
+        display: inline;
+    }
+</style>
 
 <!-- Template for the display of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
     <form id="node-form" method="post" action="{{! it.action }}">
+        <input type="hidden" name="parent" value="{{! it.parent }}"
         <dl>
             <dt>Name</dt>
             <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
         </dl>
+        <!-- Only show learning level for new curriculum base nodes -->
         <dl>
             <dt>Code</dt>
             <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
@@ -150,7 +178,14 @@
             <table id="category-head" class="table">
                 <thead>
                     <tr>
-                        <th>Curricula</th>
+                        <th>
+                            Curricula
+                            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+                               id="create-node-button"
+                               class="submit-btn-plain float-right inline-block"
+                               data-saveuri="{{ routeLookup('curriculum.create')|escape('html_attr') }}"
+                            >Create New Curriculum</a>
+                        </th>
                     </tr>
                 </thead>
             </table>
