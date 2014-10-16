@@ -38,7 +38,7 @@
 {% endverbatim %}
 <script type="text/javascript">
     (function($) {
-        var template         = doT.template($j('script#node-template').html().trim())
+        var template         = doT.template($('script#node-template').html().trim())
         var learningLevelUrl = {{ routeLookup('curriculumImport.learningLevels')|json_encode|raw }};
         var outcomeUrl       = {{ routeLookup('curriculumImport.outcomes')|json_encode|raw }};
         var browseUrl        = {{ routeLookup('curriculum.browse')|json_encode|raw }};
