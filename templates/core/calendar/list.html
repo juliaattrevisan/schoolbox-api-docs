@@ -207,14 +207,14 @@
 	<h2>{EVENT_DATE}</h2>
 	<ul class="js_happening">
 		<!-- BEGIN event -->
-		<li class="{EVENT_SELECTORS}" style="background-color:{EVENT_COLOUR}">
-			<p class=" {EVENT_CLASS}">
+		<li class="event {EVENT_SELECTORS}" style="background-color:{EVENT_COLOUR}">
+			<p class="{EVENT_CLASS}">
 				<!-- BEGIN event_allday -->
-				<span class="duration">All Day</span>
+				<time class="duration" datetime="{EVENT_TIMESTAMP}">All Day</time>
 				<!-- END event_allday -->
 
 				<!-- BEGIN event_timed -->
-				<span class="duration">{EVENT_START}&ndash;{EVENT_END}</span>
+				<time class="duration" datetime="{EVENT_TIMESTAMP}">{EVENT_START}&ndash;{EVENT_END}</time>
 				<!-- END event_timed -->
 
 				{EVENT_TITLE}
