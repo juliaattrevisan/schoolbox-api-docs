@@ -43,6 +43,11 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         $this->getPage()->setBlock('date', 'event', 'event_block');
         $this->getPage()->setBlock('event', 'event_allday', 'event_allday_block');
         $this->getPage()->setBlock('event', 'event_timed', 'event_timed_block');
+        // More blocks for attendance and that
+        $this->getPage()->setBlock('event', 'event_has_category', 'event_has_category_block');
+        $this->getPage()->setBlock('event', 'event_buttons', 'event_buttons_block');
+        $this->getPage()->setBlock('event', 'event_attendance_status', 'event_attendance_status_block');
+        $this->getPage()->setBlock('event', 'event_attendance_request', 'event_attendance_request_block');
 
         $this->getPage()->setVar(
             array(

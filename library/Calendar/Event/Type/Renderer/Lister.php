@@ -56,50 +56,112 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
      */
     public function visit($currentEvent)
     {
+        $page = $this->getPage();
         if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
         } else {
             $cssClass = '';
         }
 
-        $this->getPage()->setVar(
+        $page->setVar(
             array(
+                'EVENT_ID' => $currentEvent->getEventId(),
                 'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
                 'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
                 'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
                 'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
                 'EVENT_CLASS' => $cssClass,
                 'EVENT_COLOUR' => $currentEvent->getColour(),
+                'EVENT_DETAIL' => Scrub::html($currentEvent->getDetail()),
+                'EVENT_TYPE' => Scrub::text($currentEvent->getEventType()),
+                'EVENT_AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
+                'EVENT_AUTHOR_ID' => $currentEvent->getAuthorId(),
+                'EVENT_FULL_TIME' => $currentEvent->getFullDate(),
+                'EVENT_LOCATION' => Scrub::text($currentEvent->getLocation()),
+                'EVENT_CATEGORY_ID' => $currentEvent->getCategoryId(),
+                'EVENT_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
+                'event_has_category_block' => '',
+                'event_buttons_block' => '',
+                'event_attendance_status_block' => '',
+                'event_attendance_request_block' => '',
+                'event_timed_block' => '',
+                'event_allday_block' => '',
             )
         );
-
-        if ($currentEvent->getAllday()) {
-            $this->getPage()->parse('event_allday_block', 'event_allday');
-
-            $this->getPage()->setVar(
-                array(
-                    'event_timed_block' => ''
-                )
-            );
-        } else {
-            $this->getPage()->parse('event_timed_block', 'event_timed');
-
-            $this->getPage()->setVar(
-                array(
-                    'event_allday_block' => '',
-                )
-            );
+        if ($currentEvent->getCategoryId() > 0) {
+            $page->parse('event_has_category_block', 'event_has_category');
         }
 
-        $this->getPage()->parse('event_block', 'event', true);
+        if ($currentEvent->getAllday()) {
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d'));
+            $page->parse('event_allday_block', 'event_allday');
+        } else {
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d H:i:s'));
+            $page->parse('event_timed_block', 'event_timed');
+        }
+
+        // Crude approximation of fullcalendar's butonyes
+
+        // Modify butonye
+        if ($currentEvent instanceof Calendar_Event_Type_Day && $currentEvent->getIsEditable()) {
+            // Only Schoolbox events are modifiable through this interface.
+            // Anyway, events should be able to supply their own edit URI.
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'Modify',
+                    'EVENT_BUTTON_TYPE' => 'modify',
+                    'EVENT_BUTTON_HREF' => '/calendar/modify.php?eventID=' . $currentEvent->getEventId(),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
+        // Go to homepage butonye
+        if ($currentEvent->getCategoryId() > 0) {
+            // Only Schoolbox events are modifiable through this interface.
+            // Anyway, events should be able to supply their own edit URI.
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'Go to homepage',
+                    'EVENT_BUTTON_TYPE' => '',
+                    'EVENT_BUTTON_HREF' => '/homepage/' . $currentEvent->getCategoryId(),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
+        // Attendance butonye - needs access to calendar and group handlers
+//        if ($currentEvent->canAttend()) {
+//            if ($attendance = $page->getCalendar()->getAttendanceByEventAndUser(
+//                $currentEvent->getEventId(),
+//                $_SESSION['id']
+//            )) {
+//                /* Attendance Status
+//                 */
+//                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Pending');
+//                } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Approved');
+//                } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+//                    $page->setVar('ATTENDANCE_STATUS', 'Rejected');
+//                } else {
+//                    $page->setVar('ATTENDANCE_STATUS', '');
+//                }
+//            } elseif ($page->getGroup()->isStaff($_SESSION['id'])) {
+//                $page->parse('event_attendance_status_block', 'event_attendance_status');
+//            }
+//            $page->parse('event_attendance_status_block', 'event_attendance_status');
+//        }
+
+        $page->parse('event_block', 'event', true);
 
         /* Clear children after parsing out the parent
          */
-        $this->getPage()->setVar(
+        $page->setVar(
             array(
                 'event_allday_block' => '',
                 'event_timed_block' => ''
             )
         );
     }
-} 
+}
