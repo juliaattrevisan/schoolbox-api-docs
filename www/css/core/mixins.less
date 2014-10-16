@@ -52,10 +52,11 @@
     background: -ms-linear-gradient(top, @startColor, @endColor);
     background: -o-linear-gradient(top, @startColor, @endColor);
 }
-.transform (...) {
-	@transform: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+.transform (@transform) {
 	-webkit-transform: @transform;
+	-moz-transform: @transform;
 	-ms-transform: @transform;
+	-o-transform: @transform;
 	transform: @transform;
 }
 .transform-origin (@transform-origin) {
