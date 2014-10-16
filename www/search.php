@@ -190,39 +190,16 @@ if (!empty($result['user'])) {
     ));
 
     foreach ($result['user'] as $user) {
-        // Format email address
-        $emailObj = new Email();
-        $address = $emailObj->formatEmailFromArray($user);
-
-        if ($address) {
-            if (Cfg::get('site_location') == 'wenona') {
-                $email = "<a href=\"{$_SESSION['mailhandle']}$address\">Send Email</a>";
-            } else {
-                $email = "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>";
-            }
-        } else {
-            $email = '';
-        }
-
         /* If a parent is performing the search, remove the email address
            */
         $groupHandler = new Group();
         $userHandler = new User();
 
-        if ($groupHandler->isParent()) {
-            unset($email);
-        }
-
-        /* If restrict_parent_emails and not a staff member, remove the email address */
-        if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent($user['id']) && !$groupHandler->isStaff()) {
-            unset($email);
-        }
 
         $page->setVar(array(
             'USER_SEARCH_ID' => $user['id'],
             'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
             'USER_SEARCH_NAME' => $userHandler->formatName($user),
-            'USER_SEARCH_EMAIL' => $email,
             'USER_SEARCH_COUNT' => $count['user'],
             'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
             'USER_SEARCH_CAMPUS' => Scrub::text(
