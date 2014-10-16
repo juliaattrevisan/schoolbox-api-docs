@@ -2,11 +2,67 @@
     <h2>{IMAGE_TITLE}</h2>
     {CONFIGURATION}
 
-    <div class="text" style="text-align:{IMAGE_ALIGN};">
-		<img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
-	</div>
+    <div class="dz-wrap">
+        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="image">
+            <div class="text dz-preview dz-file-preview" style="text-align:{IMAGE_ALIGN};">
+                <span class="dz-details">
+                  <img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" style="top:50%;left:50%;" />
+                  <img data-dz-thumbnail border="0" style="position:static;height:{COMPONENT_CONFIG_PIXEL};opacity:0.5">
+                </span>
+                <div class="dz-progress"><span class="dz-upload" style="position:absolute;top:0;left:0;height:100%;"></span></div>
+            </div>
+        </form>
+        <div class="dz-container">
+            <div class="text" style="text-align:{IMAGE_ALIGN};">
+                <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
+            </div>
+        </div>
+    </div>
 
 	<!-- BEGIN modify_button -->
     <p class="interact"><a href="/cms/myFile/new/{ID}/0" class="btn up-arrow"><span></span>Post Image</a></p>
+    <script type="text/javascript">
+        $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+            wrapClass: 'dragging',
+            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .dz-container',
+            createImageThumbnails: true,
+            thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
+            thumbnailWidth: null,
+            refreshUrl: '/eportfolio/configForm.php',
+            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+            refreshData: {
+                page_id: '{PAGE_ID}',
+                reload: '{COMPONENT_INSTANCE_ID}'
+            },
+            tplWrap: '<li class="dz-preview" />',
+            addedfile: function (file) {
+            },
+            sending: function (file, xhr, formData) {
+                $(file.previewElement)
+                    .closest('.dz-container')
+                    .find('div.text:not(.dz-preview)').remove();
+
+                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                formData.append('parent', 0);
+                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+            },
+            error: function(file) {
+                $(file.previewElement)
+                    .closest('.dz-container')
+                    .find('.dz-preview').remove();
+            },
+            success: function (file, response) {
+                var frm = $('#'+this.element.id.replace('dropzone','component')+' > .settings > form');
+
+                frm.find('select[name=eportfolioImage]').remove();
+                frm.append($('<input/>').attr('name', 'eportfolioImage').val(response.id));
+                $.ajax({
+                    type: frm.attr('method'),
+                    url: frm.attr('action'),
+                    data: frm.serialize()
+                });
+            }
+        });
+    </script>
 	<!-- END modify_button -->
 </div>
