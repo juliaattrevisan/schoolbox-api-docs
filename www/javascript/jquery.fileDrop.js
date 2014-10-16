@@ -67,7 +67,9 @@
     function FileDrop(element, options) {
 
         // sigh
-        var self = this;
+        var self         = this,
+            acceptedMime = null,
+            dataAccepts;
 
         // setup standard vars
         this.element = element;
@@ -77,7 +79,6 @@
         this._defaults = defaults;
         this._name = plugin;
         this._wrap = $(this.options.wrap);
-        this._previewsContainer = $(this.options.previewsContainer);
         this._dragging = [];
         this._tt = null;
 
@@ -109,6 +110,15 @@
         // add THIS detect to the window listener
         $(window).on('dragenter dragend drop dragleave mouseenter', null, this, this.detect);
 
+        if (this.options.acceptedFiles) {
+            acceptedMime = this.options.acceptedFiles;
+        } else {
+            dataAccepts = $(this.element).attr('data-accepts');
+            if (dataAccepts) {
+                acceptedMime = dataAccepts + '/*';
+            }
+        }
+
         $(this.element).dropzone({
             clickable: this.options.clickable,
             previewsContainer: this.options.previewsContainer,
@@ -116,7 +126,7 @@
             thumbnailWidth: this.options.thumbnailWidth,
             thumbnailHeight: this.options.thumbnailHeight,
             parallelUploads: this.options.parallelUploads,
-            acceptedFiles: this.options.acceptedFiles,
+            acceptedFiles: acceptedMime,
             fallback: this.options.fallback,
             forceFallback: this.options.forceFallback,
 
@@ -126,6 +136,8 @@
 
             // expose dropzone methods
             init: function() {
+                self.checkState();
+
                 this.on('sending',        function() { self.options.sending.apply(this, arguments) });
                 this.on('uploadprogress', function() { self.options.uploadprogress.apply(this, arguments); });
                 this.on('success',        function() { self.options.success.apply(this, arguments); });
@@ -137,6 +149,7 @@
                         window.clearTimeout(self._tt);
                     }
                     self.options.addedfile.apply(this, [file]);
+                    self.checkState();
                 });
 
                 this.on('complete', function(file) {
@@ -160,8 +173,18 @@
                 });
             }
         });
-
     }
+
+    FileDrop.prototype.checkState = function () {
+        var containerEmpty = !$(this.options.previewsContainer).children().length,
+            e = $(this.options.refreshSelector);
+
+        if (containerEmpty && this.options.dictDefaultMessage) {
+            e.addClass('dragging');
+        } else {
+            e.removeClass('dragging');
+        }
+    };
 
     FileDrop.prototype.detect = function (event) {
         event.preventDefault();
@@ -216,21 +239,7 @@
         }
 
         self._dragging = dragging;
-
-//        var accepts;
-//
-//        if (accepts = $(self.element).attr('data-accepts') || '') {
-//            accepts = accepts.split(' ');
-//        } else {
-//            accepts = (self.options.acceptedFiles || '').split(',');
-//        }
-//
-//        for (i = 0; i < accepts.length; ++i) {
-//            accepts[i] = 'mime-' + accepts[i].match(/[^//]+/);
-//        }
-
-
-    }
+    };
 
     FileDrop.prototype.createTemplate = function(tpl) {
         var e = $(this.element);
@@ -258,7 +267,7 @@
         }
 
         return outerHTML(t[0]);
-    }
+    };
 
     /**
      * FileDrop can only be applied to forms, and only once per form
@@ -276,7 +285,7 @@
                 $.data(this, 'plugin_' + plugin, new FileDrop(this, options));
             }
         });
-    }
+    };
 
     /**
      * Internal helper function
