@@ -184,17 +184,15 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
     $page->setBlock('user', 'user_calendar', 'user_calendar_block');
 
+    $groupHandler = new Group();
+    $userHandler = new User();
+
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
         'USER_COUNT' => $count['user'],
     ));
 
     foreach ($result['user'] as $user) {
-        /* If a parent is performing the search, remove the email address
-           */
-        $groupHandler = new Group();
-        $userHandler = new User();
-
 
         $page->setVar(array(
             'USER_SEARCH_ID' => $user['id'],
