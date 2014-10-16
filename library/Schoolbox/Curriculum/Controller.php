@@ -25,28 +25,7 @@ class Controller extends Base
         $tree = array();
         foreach ($this->getNodeMapper()->findAll() as $node) {
             /** @var Node\Model $node */
-            $nodeId = intval($node->getId());
-            $name   = $node->getName();
-            $isCode = strlen($node->getCode()) > 0;
-            if ($isCode) {
-                $name = sprintf('[%s] %s', $node->getCode(), $name);
-            }
-            $tree[] = array(
-                'id'     => $nodeId,
-                'parent' => intval($node->getParent()->getId()) ?: '#',
-                'text'   => $name,
-                'a_attr' => array(
-                    'href' => $this->getRouter()->generate(
-                        'curriculum.read',
-                        array('id' => $nodeId, 'format' => '')
-                    ),
-                    'data-updateuri' => $this->getRouter()->generate(
-                        'curriculum.update:post',
-                        array('id' => $nodeId)
-                    ),
-                ),
-                'type'   => ($isCode ? 'code' : 'folder'),
-            );
+            $tree[] = $this->getAsJsTree($node);
         }
 
         // Load parent nodes and all of their subnodes, and dump them in a tree
@@ -58,6 +37,38 @@ class Controller extends Base
                     'tree' => $tree,
                 ),
             )
+        );
+    }
+
+    /**
+     * Helper method for fetching a node as a JsTree entry.
+     *
+     * @param  Node\Model $node
+     * @return array
+     */
+    protected function getAsJsTree(Node\Model $node)
+    {
+        $nodeId = intval($node->getId());
+        $name   = $node->getName();
+        $isCode = strlen($node->getCode()) > 0;
+        if ($isCode) {
+            $name = sprintf('[%s] %s', $node->getCode(), $name);
+        }
+        return array(
+            'id'     => $nodeId,
+            'parent' => intval($node->getParent()->getId()) ?: '#',
+            'text'   => $name,
+            'a_attr' => array(
+                'href' => $this->getRouter()->generate(
+                    'curriculum.read',
+                    array('id' => $nodeId, 'format' => '')
+                ),
+                'data-updateuri' => $this->getRouter()->generate(
+                    'curriculum.update:post',
+                    array('id' => $nodeId)
+                ),
+            ),
+            'type'   => ($isCode ? 'code' : 'folder'),
         );
     }
 
