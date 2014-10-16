@@ -34,7 +34,7 @@
     $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
       wrapClass: 'dragging',
       previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
-//      acceptedFiles: 'audio/*',
+      dictDefaultMessage: 'You can drag audio files into this space.',
       refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
       refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
       tplWrap: '<li class="dz-preview" />',

@@ -12183,13 +12183,16 @@ ul.az-list {
 
 	z-index: 2;
 	opacity: 0.7;
-	border-color: #888;
+	border-color: #bbb;
 	background-color: #fff;
 
 	&.dz-drag-hover {
 		z-index: 2;
 		border-color: #383;
 		background-color: #F0FFFA;
+		.dz-default span {
+			color: #383;
+		}
 	}
 
 	+ .dz-container {
@@ -12223,7 +12226,7 @@ ul.az-list {
 	}
 
 	// generic selector
-	.dropzone:not([data-accepts]) {
+	.dropzone { // :not([data-accepts])
 		.dropzone-active();
 	}
 	&.debug {
@@ -12239,7 +12242,8 @@ ul.az-list {
 	.transition(
 //		opacity          150ms ease-out,
 		background-color 150ms ease-out,
-		border-color     150ms ease-out
+		border-color     150ms ease-out,
+		color            150ms ease-out
 	);
 	z-index: -1;
 	position: absolute;
@@ -12249,7 +12253,7 @@ ul.az-list {
 	height: 100%;
 	background-color: transparent;
 	box-sizing: border-box;
-	border: dashed 2px transparent;
+	border: dashed 1px transparent;
 	opacity: 0.01;
 }
 .dz-details img {
@@ -12296,6 +12300,18 @@ ul.az-list {
 }
 .dz-wrap {
 	position: relative;
+}
+.dz-default span {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	color: #888;
+	text-align: center;
+	font-weight: bold;
+	.transform(
+		translateY(-50%)
+	);
 }
 
 
