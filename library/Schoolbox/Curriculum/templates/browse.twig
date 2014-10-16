@@ -104,13 +104,8 @@
                     url:      this.action
                 })
                     .done(function(data) {
-                        // Update jsTree with what I just saved
-                        var nodeName = '';
-                        if (data.item.code.length) {
-                            nodeName = '['+data.item.code+'] ';
-                        }
-                        nodeName += data.item.name;
-                        $.jstree.reference('#browser').rename_node(data.item.id, nodeName);
+                        // jsTree has no comprehensive updateNode, so update what I can.
+                        $.jstree.reference('#browser').rename_node(data.item.id, data.tree.text);
                     })
                     .always(function() {
                         formPanel.removeClass('loading')

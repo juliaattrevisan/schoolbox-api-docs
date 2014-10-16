@@ -129,6 +129,7 @@ class Controller extends Base
                     'format' => 'json',
                     'data'   => array(
                         'item' => $item,
+                        'tree' => $this->getAsJsTree($item),
                     ),
                 )
             );
