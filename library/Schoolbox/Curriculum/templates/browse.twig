@@ -14,7 +14,7 @@
             });
             var template  = doT.template($('script#node-template').html().trim());
             var formPanel = $('#detail-window');
-            $('#browser').jstree({
+            var tree      = $('#browser').jstree({
                 core: {
                     animation: 50,
                     data: {{ tree|json_encode|raw }},
@@ -66,7 +66,7 @@
                         .done(function(data) {
                             tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                             var templateData = data.item;
-                            templateData.updateUri = jstree.node.a_attr['data-updateuri'];
+                            templateData.action = jstree.node.a_attr['data-updateuri'];
                             formPanel
                                 .empty()
                                 .append(template(templateData));
@@ -89,16 +89,33 @@
             // Node save form submission
             formPanel.on('submit', '#node-form', function(event) {
                 event.preventDefault();
+
                 // Do it via AJAX instead
+                var form     = $(this);
+                var formData = form.serializeArray();
+                // Need to add TinyMCE box value into formData
+                formPanel
+                    .addClass('loading')
+                    .find(':input').prop('disabled', true);
                 $.ajax({
-                    method:   this.method,
-                    data:     $(this).serialize(),
+                    type:     this.method,
+                    data:     formData,
                     dataType: 'json',
                     url:      this.action
                 })
                     .done(function(data) {
                         // Update jsTree with what I just saved
+                        var nodeName = '';
+                        if (data.item.code.length) {
+                            nodeName = '['+data.item.code+'] ';
+                        }
+                        nodeName += data.item.name;
+                        $.jstree.reference('#browser').rename_node(data.item.id, nodeName);
                     })
+                    .always(function() {
+                        formPanel.removeClass('loading')
+                            .find(':input').prop('disabled', false);
+                    });
             })
 
             // Node addition
@@ -109,7 +126,7 @@
 <!-- Template for the display of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <form id="node-form" method="post" action="{{! it.form }}">
+    <form id="node-form" method="post" action="{{! it.action }}">
         <dl>
             <dt>Name</dt>
             <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
