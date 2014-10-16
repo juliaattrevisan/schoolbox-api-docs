@@ -68,7 +68,10 @@ class Controller extends Base
                     array('id' => $nodeId)
                 ),
             ),
-            'type'   => ($isCode ? 'code' : 'folder'),
+            'li_attr' => array(
+                'title' => $name,
+            ),
+            'type'    => ($isCode ? 'code' : 'folder'),
         );
     }
 
