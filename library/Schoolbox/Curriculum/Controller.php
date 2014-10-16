@@ -61,19 +61,73 @@ class Controller extends Base
         );
     }
 
-    public function read($id)
+    /**
+     * Reads a node and outputs it.
+     *
+     * @param Node\Model $item
+     */
+    public function read(Node\Model $item)
     {
-        $node = $this->getNodeMapper()->findById($id);
-        // Load parent nodes and all of their subnodes, and dump them in a tree
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Curriculum',
                 'template' => '@curriculum/read.twig',
                 'data'     => array(
-                    'item' => $node,
+                    'item' => $item,
                 ),
             )
         );
+    }
+
+    /**
+     * Saves a form input.
+     *
+     * @param Node\Model $item
+     */
+    public function update(Node\Model $item)
+    {
+        $post = $this->getRequest()->post;
+        $code = 200;
+
+        // Perform necessary validations, if any.
+        if (isset($post['name'])) {
+            $item->setName($post['name']);
+        }
+        if (isset($post['code'])) {
+            $item->setCode($post['code']);
+        }
+        if (isset($post['reference'])) {
+            $item->setReference($post['reference']);
+        }
+        if (isset($post['description'])) {
+            $item->setDescription($post['description']);
+        }
+
+        // Save the item
+        if (!$this->getNodeMapper()->save($item)) {
+            // Something went wrong, but I know not what
+            $code = 500;
+        }
+
+        // Send something back
+        // Consider outputting jsTree node data as well
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item' => $item,
+                    ),
+                )
+            );
+        } else {
+            // Redirect back to the the last page?
+            // Or elsewhere, should validation have failed
+            $this->getResponse()->redirect->afterPost(
+                $this->getSession()->getHistory()
+            );
+        }
     }
 
     /**
