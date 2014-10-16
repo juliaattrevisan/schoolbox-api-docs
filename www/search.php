@@ -197,7 +197,7 @@ if (!empty($result['user'])) {
         $page->setVar(array(
             'USER_SEARCH_ID' => $user['id'],
             'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
-            'USER_SEARCH_NAME' => $userHandler->formatName($user),
+            'USER_SEARCH_NAME' => Scrub::text($userHandler->formatName($user)),
             'USER_SEARCH_COUNT' => $count['user'],
             'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
             'USER_SEARCH_CAMPUS' => Scrub::text(
