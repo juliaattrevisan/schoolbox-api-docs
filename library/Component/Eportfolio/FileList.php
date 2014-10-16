@@ -14,40 +14,40 @@ class FileList extends ListItem {
 	/**
 	 * Id of a published file
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $fileId;
 
 	/**
 	 * The page to which a file is published
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $pageId;
 
 	/**
 	 * A Schoolbox\MyFile instance
 	 *
-	 * @var
+	 * @var \Schoolbox\MyFile
 	 */
 	private $file;
 
 	/**
 	 * When the File List item was created
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $created_at;
 
 	/**
 	 * When the File List item was updated
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $updated_at;
 
 	/**
 	 * When the File List item was softdeleted
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $deleted_at;
 
@@ -55,45 +55,9 @@ class FileList extends ListItem {
 	 */
 
 	/**
-	 * Set list item id
-	 *
-	 * @param  $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-	/**
-	 * Get list item id
-	 *
-	 * @return
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * Set component instance id
-	 *
-	 * @param  $component_instance_id
-	 */
-	public function setComponentInstanceId($component_instance_id) {
-		$this->component_instance_id = $component_instance_id;
-	}
-
-	/**
-	 * Get component instance id
-	 *
-	 * @return
-	 */
-	public function getComponentInstanceId() {
-		return $this->component_instance_id;
-	}
-
-	/**
 	 * Set file id
 	 *
-	 * @param  $fileId
+	 * @param int $fileId
 	 */
 	public function setFileId($fileId) {
 		$this->fileId = $fileId;
@@ -102,7 +66,7 @@ class FileList extends ListItem {
 	/**
 	 * Get file id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getFileId() {
 		return $this->fileId;
@@ -111,7 +75,7 @@ class FileList extends ListItem {
 	/**
 	 * Set created at
 	 *
-	 * @param  $created_at
+	 * @param \Alaress_Date_Format $created_at
 	 */
 	public function setCreatedAt($created_at) {
 		$this->created_at = $created_at;
@@ -120,7 +84,7 @@ class FileList extends ListItem {
 	/**
 	 * Get created at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->created_at;
@@ -129,7 +93,7 @@ class FileList extends ListItem {
 	/**
 	 * Set deleted at
 	 *
-	 * @param  $deleted_at
+	 * @param \Alaress_Date_Format $deleted_at
 	 */
 	public function setDeletedAt($deleted_at) {
 		$this->deleted_at = $deleted_at;
@@ -138,7 +102,7 @@ class FileList extends ListItem {
 	/**
 	 * Get deleted at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
 		return $this->deleted_at;
@@ -147,7 +111,7 @@ class FileList extends ListItem {
 	/**
 	 * Set updated at
 	 *
-	 * @param  $updated_at
+	 * @param \Alaress_Date_Format $updated_at
 	 */
 	public function setUpdatedAt($updated_at) {
 		$this->updated_at = $updated_at;
@@ -156,7 +120,7 @@ class FileList extends ListItem {
 	/**
 	 * Get updated at
 	 *
-	 * @return
+	 * @return \Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
@@ -165,7 +129,7 @@ class FileList extends ListItem {
 	/**
 	 * Set file
 	 *
-	 * @param  $file
+	 * @param \Schoolbox\MyFile $file
 	 */
 	public function setFile($file) {
 		$this->file = $file;
@@ -174,7 +138,7 @@ class FileList extends ListItem {
 	/**
 	 * Get file
 	 *
-	 * @return
+	 * @return \Schoolbox\MyFile
 	 */
 	public function getFile() {
 		return $this->file;
@@ -183,7 +147,7 @@ class FileList extends ListItem {
 	/**
 	 * Set page id
 	 *
-	 * @param  $pageId
+	 * @param int $pageId
 	 */
 	public function setPageId($pageId) {
 		$this->pageId = $pageId;
@@ -192,7 +156,7 @@ class FileList extends ListItem {
 	/**
 	 * Get page id
 	 *
-	 * @return
+	 * @return int
 	 */
 	public function getPageId() {
 		return $this->pageId;

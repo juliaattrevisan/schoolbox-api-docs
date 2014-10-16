@@ -11,7 +11,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 	/**
 	 * A mapper instance, for polymorphism
 	 *
-	 * @var null
+	 * @var \Schoolbox\Mapper
 	 */
 	protected $mapperClass = null;
 
@@ -99,14 +99,14 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 	 */
 
 	/**
-	 * @param null $mapperClass
+	 * @param \Schoolbox\Mapper $mapperClass
 	 */
 	protected function setMapperClass($mapperClass) {
 		$this->mapperClass = $mapperClass;
 	}
 
 	/**
-	 * @return null
+	 * @return \Schoolbox\Mapper
 	 */
 	protected function getMapperClass() {
 		return $this->mapperClass;

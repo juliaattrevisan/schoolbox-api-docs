@@ -12,7 +12,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 	/**
 	 * A mapper instance, for polymorphism
 	 *
-	 * @var null
+	 * @var \Component\Eportfolio\FileListMapper
 	 */
 	protected $mapperClass = null;
 
@@ -27,8 +27,6 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		$mapper = new \Component\Eportfolio\FileListMapper();
 
 		$this->setMapperClass($mapper);
-
-		return true;
 	}
 
 	/**
@@ -55,9 +53,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			'list_item_block' => ''
 		));
 
-		/* Gather everything
-		 */
-		$allItems = $this->getMapperClass()->findForPage($this->instance->getIdentifier());
+		$allItems = $this->mapperClass->findForPage($this->instance->getIdentifier());
 
 		/* Show edit buttons
 		 */
@@ -77,7 +73,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 					'FILE_ITEM_ID' => $currentItem->getFileId(),
 					'FILE_ITEM_TITLE' => Scrub::text($currentItem->getFile()->getDescription()),
 					'FILE_ITEM_FILENAME' => Scrub::text($currentItem->getFile()->getFilename()),
-					'FILE_ITEM_MIMETYPE' => $currentItem->getFile()->getMime()->getClass(),
+					'FILE_ITEM_MIMETYPE' => $currentItem->getFile()->getMimetype()->getClass(),
 					'FILE_ITEM_CREATED_AT' => $currentItem->getCreatedAt()->getShort(),
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
 					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getFilesize()),
