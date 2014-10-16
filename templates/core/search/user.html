@@ -13,25 +13,31 @@
 		<h4>{USER_SEARCH_NAME}</h4>
 		</a>
 		<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
-		{USER_SEARCH_EMAIL}
-		<!-- BEGIN user_calendar -->
-		<a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="btn calendar"><span></span>Calendar</a>
-		<!-- END user_calendar -->
-		<!-- BEGIN boarder_leave -->
-		<a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn bed"><span></span>Boarder Leave History</a>
-		<!-- END boarder_leave -->
-		<!-- BEGIN eportfolio -->
-		<a href="/eportfolio/{USER_SEARCH_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
-		<!-- END eportfolio -->
-        <!-- BEGIN grades_button -->
-        <a href="/submission/allWork/{USER_SEARCH_ID}" class="btn tick"><span></span>Grades</a>
-        <!-- END grades_button -->
-		<!-- BEGIN due_work -->
-		<a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="btn due-work"><span></span>Due Work</a>
-		<!-- END due_work -->
-		<!-- BEGIN timetable -->
-		<a href="/timetable/{USER_SEARCH_ID}" class="btn time-table"><span></span>Timetable</a>
-		<!-- END timetable -->
+		<span class="buttons">
+			<!-- BEGIN boarder_leave -->
+			<a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn bed"><span></span>Boarding Leave</a>
+			<!-- END boarder_leave -->
+
+			<!-- BEGIN timetable -->
+			<a href="/timetable/{USER_SEARCH_ID}" class="btn time-table"><span></span>Timetable</a>
+			<!-- END timetable -->
+
+			<!-- BEGIN user_calendar -->
+			<a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="btn calendar"><span></span>Calendar</a>
+			<!-- END user_calendar -->
+
+			<!-- BEGIN eportfolio -->
+			<a href="/eportfolio/{USER_SEARCH_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
+			<!-- END eportfolio -->
+
+	        <!-- BEGIN grades_button -->
+	        <a href="/submission/allWork/{USER_SEARCH_ID}" class="btn tick"><span></span>Grades</a>
+	        <!-- END grades_button -->
+
+			<!-- BEGIN due_work -->
+			<a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="btn due-work"><span></span>Due Work</a>
+			<!-- END due_work -->
+		</span>
 	</li>
 <!-- END user -->
 </ul>
