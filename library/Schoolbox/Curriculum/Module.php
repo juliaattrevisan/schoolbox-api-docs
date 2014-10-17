@@ -99,5 +99,9 @@ class Module extends BaseModule
         );
         $injector->setters['Schoolbox\\Curriculum\\Controller']['setNodeMapper']
             = $injector->lazyNew('Schoolbox\\Curriculum\\Node\\Mapper');
+        $injector->setters['Schoolbox\\Curriculum\\Controller']['setAreaMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningArea\\Mapper');
+        $injector->setters['Schoolbox\\Curriculum\\Controller']['setLevelMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
     }
 }

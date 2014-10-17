@@ -11,6 +11,8 @@ namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Curriculum\LearningArea;
+use Schoolbox\Curriculum\LearningLevel;
 
 class Controller extends Base
 {
@@ -18,6 +20,16 @@ class Controller extends Base
      * @var Node\Mapper
      */
     protected $nodeMapper;
+
+    /**
+     * @var LearningArea\Mapper
+     */
+    protected $areaMapper;
+
+    /**
+     * @var LearningLevel\Mapper
+     */
+    protected $levelMapper;
 
     public function browse()
     {
@@ -94,7 +106,69 @@ class Controller extends Base
     }
 
     /**
-     * Saves a form input.
+     * Creates a new node
+     */
+    public function create()
+    {
+        $item = $this->getNodeMapper()->createModel();
+
+        // Default learning area and level, or a preselected one?
+
+        $post = $this->getRequest()->post;
+        $code = 200;
+
+        // Perform necessary validations, if any.
+        $item
+            ->setName($post['name'])
+            ->setCode($post['code'])
+            ->setReference($post['reference'])
+            ->setDescription($post['description']);
+
+        // set this node's area and level to its parents,
+        // if it has parent.
+        // (Do this in preSave?)
+        if ($post['parent']) {
+            $parent = $this->getNodeMapper()->findById($post['parent']);
+            $item
+                ->setParent($parent)
+                ->setLearningArea($parent->getLearningArea())
+                ->setLearningLevel($parent->getLearningLevel());
+        } else {
+            $item
+                ->setParent($this->getNodeMapper()->createModel())
+                ->setLearningArea($this->getAreaMapper()->findById($post['learningArea']))
+                ->setLearningLevel($this->getLevelMapper()->findById($post['learningLevel']));
+        }
+
+        // Save the item
+        if (!$this->getNodeMapper()->save($item)) {
+            // Something went wrong, but I know not what
+            $code = 500;
+        }
+
+        // Send something back
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item' => $item,
+                        'tree' => $this->getAsJsTree($item),
+                    ),
+                )
+            );
+        } else {
+            // Redirect back to the the last page?
+            // Or elsewhere, should validation have failed
+            $this->getResponse()->redirect->afterPost(
+                $this->getSession()->getHistory()
+            );
+        }
+    }
+
+    /**
+     * Saves a curriculum.
      *
      * @param Node\Model $item
      */
@@ -117,6 +191,8 @@ class Controller extends Base
             $item->setDescription($post['description']);
         }
 
+        // Parent: check this node isn't its own ancestor
+
         // Save the item
         if (!$this->getNodeMapper()->save($item)) {
             // Something went wrong, but I know not what
@@ -124,7 +200,6 @@ class Controller extends Base
         }
 
         // Send something back
-        // Consider outputting jsTree node data as well
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
@@ -160,6 +235,42 @@ class Controller extends Base
     public function setNodeMapper($nodeMapper)
     {
         $this->nodeMapper = $nodeMapper;
+        return $this;
+    }
+
+    /**
+     * @return LearningArea\Mapper
+     */
+    public function getAreaMapper()
+    {
+        return $this->areaMapper;
+    }
+
+    /**
+     * @param  LearningArea\Mapper $areaMapper
+     * @return $this
+     */
+    public function setAreaMapper($areaMapper)
+    {
+        $this->areaMapper = $areaMapper;
+        return $this;
+    }
+
+    /**
+     * @return LearningLevel\Mapper
+     */
+    public function getLevelMapper()
+    {
+        return $this->levelMapper;
+    }
+
+    /**
+     * @param  LearningLevel\Mapper $levelMapper
+     * @return $this
+     */
+    public function setLevelMapper($levelMapper)
+    {
+        $this->levelMapper = $levelMapper;
         return $this;
     }
 }
