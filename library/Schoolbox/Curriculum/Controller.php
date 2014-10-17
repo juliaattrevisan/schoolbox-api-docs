@@ -31,6 +31,9 @@ class Controller extends Base
      */
     protected $levelMapper;
 
+    /**
+     * Controller action for browsing the list of curricula.
+     */
     public function browse()
     {
         // Fetch all the nodes at once, and parse into a jstree like status
@@ -46,10 +49,39 @@ class Controller extends Base
                 'title'    => 'Curriculum',
                 'template' => '@curriculum/browse.twig',
                 'data'     => array(
-                    'tree' => $tree,
+                    'tree'   => $tree,
+                    'areas'  => $this->getAsGroupedList($this->getAreaMapper()->findAllWithSource()),
+                    'levels' => $this->getAsGroupedList($this->getLevelMapper()->findAllWithSource()),
                 ),
             )
         );
+    }
+
+    /**
+     * Gets a list of LearningArea\Model or LearningLevel\Model objects as a
+     * list, grouped by source.
+     *
+     * @param  LearningArea\Model[]|LearningLevel\Model[] $list
+     * @return array
+     */
+    protected function getAsGroupedList($list)
+    {
+        $returnList = array();
+        foreach ($list as $item) {
+            $sourceId = $item->getSource()->getId();
+            if (!array_key_exists($sourceId, $returnList)) {
+                $returnList[$sourceId] = array(
+                    'id'   => $sourceId,
+                    'name' => $item->getSource()->getName(),
+                    'list' => array(),
+                );
+            }
+            $returnList[$sourceId]['list'][] = array(
+                'id'    => $item->getId(),
+                'name'  => $item->getName(),
+            );
+        }
+        return array_values($returnList);
     }
 
     /**
