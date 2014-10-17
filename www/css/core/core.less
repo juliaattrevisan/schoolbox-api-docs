@@ -450,11 +450,8 @@ table.ruler {
 		background: @dark;
 	}
 
-	tr:nth-child(even) td{ background: @dark; }
+	tr:nth-child(odd) td{ background: @dark; }
 	tr:hover td{background: lighten(@highlight-color,@lighten-value); }
-}
-
-table.ruler-fix.tablesorter .tablesorter {
 }
 
 /*--------------------------------------------------------------
@@ -3438,9 +3435,6 @@ ADMIN BODY
         margin-bottom: 8px;
         position: relative;
         min-height: 1px;
-        .dark td {
-            background: @dark;
-        }
     }
     .split-container {
         width: 50%;
@@ -3643,8 +3637,9 @@ ADMIN BODY
 
 .row-holder {
     width: 100%;
-    background: @dark;
     position: relative;
+    &:nth-child(odd){ background: @dark; }
+    &:hover{ background-color: lighten(@highlight-color,@lighten-value); }
 }
 
 .row .enabled, .row .description, .row .mime, .row .extensions, .row .inline, .row .max_size {
