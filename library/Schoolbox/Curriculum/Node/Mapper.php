@@ -122,6 +122,7 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerCallback('postSoftDelete', array($this, 'deleteChildren'));
     }
 
     /**
@@ -141,5 +142,24 @@ class Mapper extends BaseMapper
                 ->setOrder($i++);
             $this->saveTree($child);
         }
+    }
+
+    /**
+     * Soft-deletes all child nodes of the given node.
+     *
+     * @param Model $model
+     */
+    public function deleteChildren(Model $model)
+    {
+        // Soft-delete all children (recursively)
+        $this->delete(
+            $this->findByColumn(
+                'curriculum_node_parent_id',
+                $model->getId(),
+                array(
+                    'deleted' => true,
+                )
+            )
+        );
     }
 }
