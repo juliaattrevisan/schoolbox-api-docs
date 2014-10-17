@@ -117,6 +117,8 @@
                             jstree.rename_node(data.item.id, data.tree.text);
                         } else {
                             jstree.create_node(data.tree.parent, data.tree);
+                            jstree.deselect_all(true);
+                            jstree.select_node(data.tree.id);
                         }
                     })
                     .always(function() {
