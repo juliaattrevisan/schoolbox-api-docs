@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Curriculum\LearningArea;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -91,5 +92,33 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
+    }
+
+    /**
+     * Gets all learning areas, along with their source.
+     *
+     * @return Collection|Model[]
+     */
+    public function findAllWithSource()
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('a')},
+                {$this->getJoinColumnString('source', 's')}
+            FROM `{$this->getTable()}` `a`
+            INNER JOIN {$this->getJoinSql('source', 'a', 's')}
+            WHERE `a`.`deleted_at` IS NULL
+            ORDER BY `s`.`name` ASC, `a`.`order` ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+        return $this->hydrateList(
+            $statement,
+            'a',
+            function ($mapper, $model, $row) {
+                $model->setSource($mapper->hydrateJoin($row, 'source', 's'));
+                return $model;
+            }
+        );
     }
 }
