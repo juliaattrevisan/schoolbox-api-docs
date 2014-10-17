@@ -47,6 +47,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
+        $this->setBlock($templateHandle, 'image', 'image_block');
 
 		/* Load a file, if one exists - otherwise clear phplibs
 		 */
@@ -58,12 +59,10 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 				'PREVIEW_IMAGE_URL' => "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel",
 				'PREVIEW_IMAGE_DESC' => Scrub::text($file->getDescription())
 			));
+            $this->parse('image_block', 'image');
 		}
 		catch (\Exception $e) {
-			$this->setVar(array(
-				'PREVIEW_IMAGE_URL' => '',
-				'PREVIEW_IMAGE_DESC' => ''
-			));
+			$this->setVar('image_block', '');
 		}
 
 		/* Alignment

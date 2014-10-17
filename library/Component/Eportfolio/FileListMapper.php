@@ -9,6 +9,7 @@
  */
 namespace Component\Eportfolio;
 use Schoolbox;
+use Schoolbox\Collection;
 
 class FileListMapper extends Schoolbox\Mapper {
 
@@ -148,7 +149,7 @@ class FileListMapper extends Schoolbox\Mapper {
 	 * Find all the published files that belong to a particular page
 	 *
 	 * @param $pageId
-	 * @return Schoolbox\Collection
+	 * @return Collection|FileList[]
 	 */
 	public function findForPage($pageId) {
 		$file_mapper = $this->getJoinMapper('files');
@@ -172,17 +173,21 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement->execute();
 
-		$collection = new \Schoolbox\Collection();
+		$collection = new Collection();
 
 		foreach ($statement as $row) {
+            /** @var FileList $fileListItem */
 			$fileListItem = $this->hydrate($row, 'fl');
 
+            /** @var Schoolbox\MyFile $file */
 			$file = $file_mapper->hydrate($row, 'f');
+
+            /** @var Schoolbox\File\Mimetype $mime */
 			$mime = $mime_mapper->hydrate($row, 'af');
 
 			/* Put mime type instance into file instance
 			 */
-			$file->setMime($mime);
+			$file->setMimetype($mime);
 
 			/* Put file instance into file list item instance
 			 */

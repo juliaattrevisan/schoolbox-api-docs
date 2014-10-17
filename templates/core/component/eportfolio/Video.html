@@ -1,65 +1,89 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
-	<script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
-	<h2>{COMPONENT_NAME}</h2>
-	{CONFIGURATION}
+    <link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
+    <script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
 
-	<!-- BEGIN default_video -->
-	<div class="videoWrapper">
-		<video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
-			controls
-			preload="none"
-			poster="/cms/videoThumb.php?type=myfile&id={DEFAULT_VIDEO_ID}&size=poster"
-			height="400"
-			width="100%"
-		>
-			<source src="/cms/sendVideo.php?type=myfile&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
-		</video>
-		<script>
-			var videoElement = $("#schoolbox_video{COMPONENT_INSTANCE_ID}").mediaelementplayer();
-			var video        = videoElement.data('mediaelementplayer');
-		</script>
-	</div>
-	<!-- END default_video -->
+    <div class="dz-wrap">
+        <!-- BEGIN default_video -->
+        <div class="videoWrapper">
+            <video id="schoolbox_video{COMPONENT_INSTANCE_ID}"
+                   controls
+                   preload="none"
+                   poster="/cms/videoThumb.php?type=myfile&id={DEFAULT_VIDEO_ID}&size=poster"
+                   height="400"
+                   width="100%"
+                >
+                <source src="/cms/sendVideo.php?type=myfile&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
+            </video>
+            <script>
+                var videoElement = $("#schoolbox_video{COMPONENT_INSTANCE_ID}").mediaelementplayer();
+                var video = videoElement.data('mediaelementplayer');
+            </script>
+        </div>
+        <!-- END default_video -->
+        <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/myFileForm.php?ajax=1" method="post" data-accepts="video"></form>
+        <ul class="information-list dz-container">
+            <!-- BEGIN video_list -->
+            <li class="{ON_OFF}">
+                <a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
+                    <img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}"/>
+                    <h4>{VIDEO_LIST_TITLE}</h4>
+                </a>
+                <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                <p>{VIDEO_LIST_COMMENT}</p>
+            </li>
+            <!-- END video_list -->
+            <!-- BEGIN video_pending_list -->
+            <li class="{ON_OFF}">
+                <img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}"/>
+                <h4>{VIDEO_LIST_TITLE}</h4>
+                <p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                <p>{VIDEO_LIST_COMMENT}</p>
+            </li>
+            <!-- END video_pending_list -->
+        </ul>
+    </div>
 
-	<ul class="information-list">
-		<!-- BEGIN video_list -->
-		<li class="{ON_OFF}">
-			<a class="video-link" href="#" rel="{VIDEO_LIST_ID}">
-				<img class="thumbnail" width="64" height="64" src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
-				<h4>{VIDEO_LIST_TITLE}</h4>
-			</a>
-			<p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-			<p>{VIDEO_LIST_COMMENT}</p>
-		</li>
-		<!-- END video_list -->
-		<!-- BEGIN video_pending_list -->
-		<li class="{ON_OFF}">
-			<img class="thumbnail" width="64" height="64" src="{VIDEO_LIST_STATUSIMG}" title="Currently transcoding {VIDEO_LIST_TITLE}" />
-			<h4>{VIDEO_LIST_TITLE}</h4>
-			<p class="meta">Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
-			<p>{VIDEO_LIST_COMMENT}</p>
-		</li>
-		<!-- END video_pending_list -->
-	</ul>
+    <script type="text/javascript">
+        $j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function (event) {
+            event.preventDefault();
+            var $target = "/cms/sendVideo.php?type=myfile&id=" + $j(this).attr("rel");
+            var $poster = "/cms/videoThumb.php?type=myfile&id=" + $j(this).attr("rel") + "&size=poster";
+            // setting video plugin's poster doesn't work as expected,
+            // so set the video's poster directly
+            videoElement.attr('poster', $poster);
+            video.pause();
+            video.setSrc($target);
+            video.setPoster($poster);
+        });
+    </script>
 
-	<script type="text/javascript">
-		$j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
-			event.preventDefault();
-			var $target = "/cms/sendVideo.php?type=myfile&id="+$j(this).attr("rel");
-			var $poster = "/cms/videoThumb.php?type=myfile&id="+$j(this).attr("rel")+"&size=poster";
-			// setting video plugin's poster doesn't work as expected,
-			// so set the video's poster directly
-			videoElement.attr('poster', $poster);
-			video.pause();
-			video.setSrc($target);
-			video.setPoster($poster);
-		});
-	</script>
-
-	<!-- BEGIN submit_video -->
-	<p class="interact">
-		<a href="/cms/myFile/new/{ID}" class="btn up-arrow"><span></span>Post Video</a>
-	</p>
-	<!-- END submit_video -->
+    <!-- BEGIN submit_video -->
+    <p class="interact">
+        <a href="/cms/myFile/new/{ID}" class="btn up-arrow"><span></span>Post Video</a>
+    </p>
+    <script type="text/javascript">
+        $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+            wrapClass: 'dragging',
+            previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+            tplWrap: '<li class="dz-preview" />',
+            dictDefaultMessage: 'You can drag videos into this space',
+            refreshUrl: '/eportfolio/configForm.php',
+            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+            refreshData: {
+                page_id: '{PAGE_ID}',
+                reload: '{COMPONENT_INSTANCE_ID}'
+            },
+            sending: function (file, xhr, formData) {
+                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                formData.append('parent', 0);
+                formData.append('published[{ID}][{PAGE_ID}]', 'value_ignored');
+            },
+            complete: function (file) {
+                $(file.previewElement).find('img').remove();
+            }
+        });
+    </script>
+    <!-- END submit_video -->
 </div>
