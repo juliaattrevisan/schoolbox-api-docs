@@ -13,9 +13,11 @@
             </div>
         </form>
         <div class="dz-container">
+            <!-- BEGIN image -->
             <div class="text" style="text-align:{IMAGE_ALIGN};">
                 <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" />
             </div>
+            <!-- END image -->
         </div>
     </div>
 
@@ -28,6 +30,7 @@
             createImageThumbnails: true,
             thumbnailHeight: {COMPONENT_CONFIG_PIXEL},
             thumbnailWidth: null,
+            dictDefaultMessage: 'You can drag images into this space',
             refreshUrl: '/eportfolio/configForm.php',
             refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
             refreshData: {
