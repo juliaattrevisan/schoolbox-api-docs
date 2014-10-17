@@ -15,9 +15,13 @@
 
             // Method for building the form
             // Tears down and sets up TinyMCE dynamically too
+            var areas  = {{ areas|json_encode|raw }};
+            var levels = {{ levels|json_encode|raw }};
             var buildForm = function(action, data) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                 data.action = action;
+                data.areas  = areas;
+                data.levels = levels;
                 formPanel
                     .empty()
                     .append(template(data));
@@ -149,12 +153,42 @@
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
     <form id="node-form" method="post" action="{{! it.action }}">
-        <input type="hidden" name="parent" value="{{! it.parent }}"
+        <input type="hidden" name="parent" value="{{! it.parent }}" />
+        <!--
+        Only show curriculum selection for new base nodes
+        Also consider making these selectors selectized so I can add dynamically
+        -->
+        {{? !it.id }}
+        <dl>
+            <dt>Curriculum</dt>
+            <dd>
+                <select name="learningLevel">
+                    <option value="">-- select a level --</option>
+                    {{~ it.levels :levelGroup }}
+                    <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
+                        {{~ levelGroup.list :level }}
+                        <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                </select>
+                <select name="learningArea">
+                    <option value="">-- select an area --</option>
+                    {{~ it.areas :areaGroup }}
+                    <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
+                        {{~ areaGroup.list :area }}
+                        <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                </select>
+            </dd>
+        </dl>
+        {{?}}
         <dl>
             <dt>Name</dt>
             <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
         </dl>
-        <!-- Only show learning level for new curriculum base nodes -->
         <dl>
             <dt>Code</dt>
             <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
@@ -167,7 +201,17 @@
             <dt>Description</dt>
             <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
         </dl>
-        <input type="submit" class="submit-btn-plain" value="Save Changes" />
+        {{? it.id }}
+            <input type="submit" class="submit-btn-plain" value="Save Changes" />
+        {{?}}
+        {{? !it.id }}
+            {{? it.parent }}
+                <input type="submit" class="submit-btn-plain" value="Create Subsection" />
+            {{?}}
+            {{? !it.parent }}
+                <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
+            {{?}}
+        {{?}}
     </form>
 </script>
 {% endverbatim %}
