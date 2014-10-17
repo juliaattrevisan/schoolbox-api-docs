@@ -355,7 +355,7 @@ class PostMapper extends Schoolbox\Mapper
     /**
      * Spawn a subclass of SocialStream_Post_Abstract
      *
-     * @param $row
+     * @param array $row
      * @return SocialStream_Post_Abstract
      */
     public function createModel($row)
@@ -380,7 +380,7 @@ class PostMapper extends Schoolbox\Mapper
      * @param Array    $row
      * @param String   $alias
      * @param callable $callback
-     * @return Model
+     * @return SocialStream_Post_Abstract
      */
     public function hydrate($row, $alias = '', $callback = null)
     {
@@ -431,7 +431,7 @@ class PostMapper extends Schoolbox\Mapper
         $collection = new Collection();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $collection->add($this->createModel($r));
+            $collection->add($this->hydrate($r, 'p'));
         }
 
         return $collection;

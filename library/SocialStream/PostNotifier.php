@@ -10,12 +10,15 @@
 namespace SocialStream;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
@@ -26,7 +29,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
 use Scrub;
 use SocialStream_Post_Abstract;
-use TextFormatter;
 
 class PostNotifier extends AbstractModuleNotifier {
 
@@ -114,53 +116,62 @@ class PostNotifier extends AbstractModuleNotifier {
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function notifyPosted($roleType, $post, $author, $diff = null) {
-		$msgr = new Messenger();
+        $envelope = new Envelope();
+        $bob = new Builder();
 
 		/** @var Category $cat */
 		$cat = $this->catMapper->findById($post->getHomepageId());
 
 		if($post instanceof \SocialStream_Post_Url) {
-			$text = ':author posted a link in :cat: ":stub"';
+			$text = ':author posted a link in :cat';
 		}
 		elseif($post instanceof \SocialStream_Post_Video) {
-			$text = ':author posted a video in :cat: ":stub"';
+			$text = ':author posted a video in :cat';
 		}
 		elseif($post instanceof \SocialStream_Post_Image) {
-			$text = ':author posted a video in :cat: ":stub"';
+			$text = ':author posted an image in :cat';
 		}
 		// string
 		else {
-			$text = ':author posted in :cat: ":stub"';
+			$text = ':author posted in :cat';
 		}
 
 		$href = '/homepage/'.$cat->getId();
 
-		$msg = new Message($text, $this->getPostIcon($post, $author), $href);
+        $bob->setTitle($text)
+            ->setParams(array(
+                'author' => new UserParam($author),
+                'cat'    => new CategoryParam($cat)
+            ))
+            ->setIcon($this->getPostIcon($post, $author))
+            ->setHref($href)
+            ->addTopic("sstream.{$post->getPostId()}.posted")
+            ->setSeverity(Logger::NOTICE)
+            ->setBody(Scrub::html2text($post->getBody()))
+            ->setNamespace($this->getSlug())
+            ->addFilter('roletype', $roleType);
 
-		$msgr->broadcastToCategory($cat->getId(), $msg, "sstream.{$post->getPostId()}.posted", Logger::NOTICE, array(
-			'author' => array($author->formatName(), '/search/user/'.$author->getId()),
-			'cat'    => array($cat->getName(), $href),
-			'stub'   => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 48)
-		), array(
-			'roletype' => $roleType
-		));
+        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
 
-		return $msgr;
+		return $envelope;
 	}
 
 
 	/**
-	 * @param string $roleType
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
-	protected function notifyReplied($roleType, $post, $author, $diff = null) {
-		$msgr = new Messenger();
+	protected function notifyReplied($post, $author, $diff = null) {
+
+        /** @var PostMapper $mapper */
+        $mapper   = $this->mapper;
+        $envelope = new Envelope();
+        $bob      = new Builder();
 
 		/** @var Category $cat */
 		$cat = $this->catMapper->findById($post->getHomepageId());
@@ -177,32 +188,38 @@ class PostNotifier extends AbstractModuleNotifier {
 		}
 
 		/** @var Collection|SocialStream_Post_Abstract[] $siblings */
-		$siblings = $this->mapper->findChildren($post);
+		$siblings = $mapper->findChildren($parent);
 
+        // so, this MIGHT return objects, or MIGHT return ids.
 		$siblingAuthorsOrIds = $siblings->getColumnValues('ownerId') ?: array();
 
 		$href = '/homepage/'.$cat->getId();
 		$icon = $this->getPostIcon($post, $author);
 
-		$parentMsg = new Message(':author replied to your post in :cat: ":stub"', $icon, $href);
-		$siblingMsg = new Message(':author also replied to a post in :cat: ":stub"', $icon, $href);
+        // base config
+        $bob->setHref($href)
+            ->setIcon($icon)
+            ->addTopic("sstream.{$post->getPostId()}.replied")
+            ->setSeverity(Logger::NOTICE)
+            ->setNamespace($this->getSlug())
+            ->setBody(Scrub::html2text($post->getBody()))
+            ->setParams(array(
+                'author' => new UserParam($author),
+                'cat'    => new CategoryParam($cat)
+            ));
 
-		$msgr->targetToUser($parentAuthorId, $parentMsg, "sstream.{$post->getPostId()}.replied", Logger::NOTICE, array(
-			'author' => array($author->formatName(), '/search/user/'.$author->getId()),
-			'cat'    => array($cat->getName(), $href),
-			'stub'   => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 48)
-		));
+        // parent post config
+        $envelope->targetToUser($parentAuthorId, $bob->setTitle(':author replied to your post in :cat')->build());
 
-		foreach($siblingAuthorsOrIds as $siblingOrId) {
-			$siblingId = $siblingOrId instanceof User ? $siblingOrId->getId() : $siblingOrId;
-			$msgr->targetToUser($siblingId, $siblingMsg, "sstream.{$post->getPostId()}.replied", Logger::NOTICE, array(
-				'author' => array($author->formatName(), '/search/user/'.$author->getId()),
-				'cat'    => array($cat->getName(), $href),
-				'stub'   => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 48)
-			));
-		}
+        // sibling post config
+        $bob->setTitle(':author also replied to a post in :cat');
 
-		return $msgr;
+        foreach ($siblingAuthorsOrIds as $siblingOrId) {
+            $siblingId = $siblingOrId instanceof User ? $siblingOrId->getId() : $siblingOrId;
+            $envelope->targetToUser($siblingId, $bob->build());
+        }
+
+        return $envelope;
 	}
 
 
@@ -210,7 +227,7 @@ class PostNotifier extends AbstractModuleNotifier {
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentPosted($post, $author, $diff = null) {
 		return $this->notifyPosted(Role::STUDENT, $post, $author, $diff);
@@ -221,10 +238,10 @@ class PostNotifier extends AbstractModuleNotifier {
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentReplied($post, $author, $diff = null) {
-		return $this->notifyReplied(Role::STUDENT, $post, $author, $diff);
+		return $this->notifyReplied($post, $author, $diff);
 	}
 
 
@@ -232,7 +249,7 @@ class PostNotifier extends AbstractModuleNotifier {
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffPosted($post, $author, $diff = null) {
 		return $this->notifyPosted(Role::STAFF, $post, $author, $diff);
@@ -243,10 +260,10 @@ class PostNotifier extends AbstractModuleNotifier {
 	 * @param SocialStream_Post_Abstract $post
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffReplied($post, $author, $diff = null) {
-		return $this->notifyReplied(Role::STAFF, $post, $author, $diff);
+		return $this->notifyReplied($post, $author, $diff);
 	}
 
 } 
