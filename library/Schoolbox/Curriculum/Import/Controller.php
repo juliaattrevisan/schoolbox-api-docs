@@ -45,12 +45,13 @@ class Controller extends Base
     public function browse()
     {
         // A list of source objects
+        // Only show ones with an import class, though.
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Curriculum Import',
                 'template' => '@curriculumImport/browse.twig',
                 'data'     => array(
-                    'sourceList' => $this->getSourceMapper()->findAll(),
+                    'sourceList' => $this->getSourceMapper()->findImportable(),
                 ),
             )
         );

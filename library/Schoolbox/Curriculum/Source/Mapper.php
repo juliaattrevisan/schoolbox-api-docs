@@ -73,4 +73,21 @@ class Mapper extends BaseMapper
         );
         $this->hasSoftDeleteDateField('deleted_at');
     }
+
+    /**
+     * Retrieves only importable items
+     *
+     * @return object
+     */
+    public function findImportable()
+    {
+        $query = "
+            SELECT {$this->getColumnString('s')}
+            FROM `{$this->getTable()}` `s`
+            WHERE `s`.`class` != ''
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+        return $this->hydrateList($statement, 's');
+    }
 }
