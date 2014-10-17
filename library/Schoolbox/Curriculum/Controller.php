@@ -111,6 +111,10 @@ class Controller extends Base
                     'curriculum.update:post',
                     array('id' => $nodeId)
                 ),
+                'data-deleteuri' => $this->getRouter()->generate(
+                    'curriculum.delete:post',
+                    array('id' => $nodeId)
+                ),
             ),
             'li_attr' => array(
                 'title' => $name,
@@ -227,6 +231,40 @@ class Controller extends Base
 
         // Save the item
         if (!$this->getNodeMapper()->save($item)) {
+            // Something went wrong, but I know not what
+            $code = 500;
+        }
+
+        // Send something back
+        if ($this->getRequest()->isXhr()) {
+            $this->getResponse()->status->setCode($code);
+            $this->getResponse()->content->set(
+                array(
+                    'format' => 'json',
+                    'data'   => array(
+                        'item' => $item,
+                        'tree' => $this->getAsJsTree($item),
+                    ),
+                )
+            );
+        } else {
+            // Redirect back to the the last page?
+            // Or elsewhere, should validation have failed
+            $this->getResponse()->redirect->afterPost(
+                $this->getSession()->getHistory()
+            );
+        }
+    }
+
+    /**
+     * Delete action
+     *
+     * @param Node\Model $item
+     */
+    public function delete(Node\Model $item)
+    {
+        $code = 200;
+        if (!$this->getNodeMapper()->delete($item)) {
             // Something went wrong, but I know not what
             $code = 500;
         }

@@ -13,17 +13,18 @@
                 mode: 'none'
             });
 
-            // Method for building the form
-            // Tears down and sets up TinyMCE dynamically too
+            // Twig-generated JS
             var areas     = {{ areas|json_encode|raw }};
             var levels    = {{ levels|json_encode|raw }};
             var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
 
-            var buildForm = function(action, data) {
+            // Method for building the form
+            // Tears down and sets up TinyMCE dynamically too
+            var buildForm = function(actions, data) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
-                data.action = action;
-                data.areas  = areas;
-                data.levels = levels;
+                data.actions = actions;
+                data.areas   = areas;
+                data.levels  = levels;
                 formPanel
                     .empty()
                     .append(template(data));
@@ -83,12 +84,20 @@
                         .find(':input').prop('disabled', true);
                     $.getJSON(jstree.node.a_attr.href+'.json')
                         .done(function(data) {
-                            buildForm(jstree.node.a_attr['data-saveuri'], data.item);
+                            buildForm(
+                                {
+                                    save:   jstree.node.a_attr['data-saveuri'],
+                                    delete: jstree.node.a_attr['data-deleteuri']
+                                },
+                                data.item
+                            );
                         })
                         .always(function() {
                             formPanel.removeClass('loading');
                         });
                 })
+
+            var jstree = $.jstree.reference('#browser');
 
             // resizer - stolen from three panel
             var resizePanels = function() {
@@ -118,7 +127,6 @@
                     .done(function(data) {
                         // Is this a newly created node? If so, add it in.
                         // jsTree has no comprehensive updateNode, so update what I can.
-                        var jstree = $.jstree.reference('#browser');
                         if (jstree.get_node(data.item.id)) {
                             jstree.rename_node(data.item.id, data.tree.text);
                         } else {
@@ -131,19 +139,49 @@
                         formPanel.removeClass('loading')
                             .find(':input').prop('disabled', false);
                     });
+            });
+
+            // IE9 doesn't support form attribute on inputs.
+            // Add a click delete button polyfill.
+            if (!('form' in $('<input>')[0])) {
+                formPanel.on('click', '#delete-button', function(event) {
+                    event.preventDefault();
+                    formPanel.find('#node-delete-form').submit();
+                });
+            }
+
+            // Delete node form
+            formPanel.on('submit', '#node-delete-form', function(event) {
+                event.preventDefault();
+                formPanel
+                    .addClass('loading')
+                    .find(':input').prop('disabled', true);
+                $.ajax({
+                    type:     this.method,
+                    dataType: 'json',
+                    url:      this.action
+                })
+                    .done(function(data) {
+                        jstree.delete_node(data.item.id);
+                        jstree.select_node(data.tree.parent);
+                    })
+                    .always(function() {
+                        formPanel.removeClass('loading')
+                            .find(':input').prop('disabled', false);
+                    });
             })
 
             // Create new curriculum
             treePanel.on('click', '#create-curriculum-button', function(event) {
                 event.preventDefault();
-                buildForm(createUri, {});
+                buildForm({ save: createUri }, {});
             });
 
             // Add child to existing curriculum
             formPanel.on('click', '#create-child-button', function(event) {
                 event.preventDefault();
                 var form = $(this).closest('form');
-                buildForm(createUri, { parent: form.data('nodeid') });
+                buildForm({ save: createUri }, { parent: form.data('nodeid') });
             });
         })
     })(jQuery);
@@ -161,7 +199,7 @@
 <!-- Template for the display of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <form id="node-form" method="post" action="{{! it.action }}" data-nodeid="{{! it.id }}">
+    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
         <!--
         Only show curriculum selection for new base nodes
@@ -222,7 +260,18 @@
                 <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
             {{?}}
         {{?}}
+        {{? it.actions.delete }}
+            <input type="submit"
+                   class="submit-btn-plain"
+                   value="Delete"
+                   id="delete-button"
+                   form="node-delete-form"
+            />
+        {{?}}
     </form>
+    {{? it.actions.delete }}
+    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
+    {{?}}
 </script>
 {% endverbatim %}
 
