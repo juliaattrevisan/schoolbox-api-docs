@@ -15,8 +15,10 @@
 
             // Method for building the form
             // Tears down and sets up TinyMCE dynamically too
-            var areas  = {{ areas|json_encode|raw }};
-            var levels = {{ levels|json_encode|raw }};
+            var areas     = {{ areas|json_encode|raw }};
+            var levels    = {{ levels|json_encode|raw }};
+            var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
+
             var buildForm = function(action, data) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                 data.action = action;
@@ -131,11 +133,18 @@
                     });
             })
 
-            // Node addition
-            treePanel.on('click', '#create-node-button', function(event) {
+            // Create new curriculum
+            treePanel.on('click', '#create-curriculum-button', function(event) {
                 event.preventDefault();
-                buildForm($(this).data('saveuri'), {});
-            })
+                buildForm(createUri, {});
+            });
+
+            // Add child to existing curriculum
+            formPanel.on('click', '#create-child-button', function(event) {
+                event.preventDefault();
+                var form = $(this).closest('form');
+                buildForm(createUri, { parent: form.data('nodeid') });
+            });
         })
     })(jQuery);
 </script>
@@ -152,13 +161,13 @@
 <!-- Template for the display of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <form id="node-form" method="post" action="{{! it.action }}">
+    <form id="node-form" method="post" action="{{! it.action }}" data-nodeid="{{! it.id }}">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
         <!--
         Only show curriculum selection for new base nodes
         Also consider making these selectors selectized so I can add dynamically
         -->
-        {{? !it.id }}
+        {{? !it.id && !it.parent }}
         <dl>
             <dt>Curriculum</dt>
             <dd>
@@ -203,6 +212,7 @@
         </dl>
         {{? it.id }}
             <input type="submit" class="submit-btn-plain" value="Save Changes" />
+            <input type="submit" class="submit-btn-plain" value="Add Child" id="create-child-button" />
         {{?}}
         {{? !it.id }}
             {{? it.parent }}
@@ -226,9 +236,8 @@
                         <th>
                             Curricula
                             <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
-                               id="create-node-button"
+                               id="create-curriculum-button"
                                class="submit-btn-plain float-right inline-block"
-                               data-saveuri="{{ routeLookup('curriculum.create')|escape('html_attr') }}"
                             >Create New Curriculum</a>
                             <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
                                class="submit-btn-plain float-right inline-block"
