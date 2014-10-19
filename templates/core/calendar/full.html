@@ -142,12 +142,12 @@
                  * @param event
                  * @param delta
                  */
-                eventResize: function(event, delta) {
+                eventResize: function(event) {
                     var data = {
                         eventId: event.data.meta.eventId,
                         resize: true,
                         start: event.start.format(),
-                        end: event.end.add(delta).format()
+                        end: event.end.format()
                     };
 
                     c.cupdate(data);
