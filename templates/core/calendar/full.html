@@ -55,9 +55,7 @@
                 ajax: '/calendar/ajax/filter'
             },
             fullCalendar: {
-                date: '{SELECTED_DAY}',
-                month: '{SELECTED_MONTH}',
-                year: '{SELECTED_YEAR}',
+                defaultDate: moment('{SELECTED_DATE}'),
                 columnFormat: {
                     month:      'ddd',
                     week:       'ddd D/M',
