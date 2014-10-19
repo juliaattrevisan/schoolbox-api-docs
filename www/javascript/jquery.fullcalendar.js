@@ -426,15 +426,9 @@ Calendar.prototype.init = function() {
     /* Special case for list view, it's the only button with an anchor
      */
 	var userId = this.options.userId;
-	var selectedDate = [
-		this.options.fullCalendar.date,
-		parseInt(this.options.fullCalendar.month)+1,
-		this.options.fullCalendar.year
-	].join('-');
-
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + selectedDate + '/' + userId;
+        window.location.href = '/calendar/list/' + this.options.fullCalendar.defaultDate + '/' + userId;
     });
 
     // mash in the datepicker
@@ -483,15 +477,6 @@ Calendar.prototype.init = function() {
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $j('#datepicker').datepicker(c.options.datepicker);
-    $j('#datepicker').datepicker(
-        'setDate',
-        $j.datepicker.parseDate(
-            "dd-mm-yy",
-            c.options.fullCalendar.date + '-'
-            + (parseInt(c.options.fullCalendar.month) + 1)
-            + '-' + c.options.fullCalendar.year
-        )
-    )
 
     return this
 }
