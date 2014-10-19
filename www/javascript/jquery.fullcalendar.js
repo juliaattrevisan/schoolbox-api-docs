@@ -68,6 +68,7 @@ function Calendar(id, bubbleId, opts) {
             date: null,
             month: null,
             year: null,
+            eventLimit: true,
 
             /**
              * Generic action for when an event is clicked
