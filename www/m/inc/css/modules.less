@@ -82,15 +82,14 @@
 /* =============================================================================
    Login
    ========================================================================== */
-#loading {
-    .login-background(@login-color, lighten(@login-color, @login-lighten));
+#loading                    { background: @login-color;
     #switch                 { position: absolute; bottom: 10px; margin: 0 auto; width: 100%; text-align: center;
                               font-size: @dp4; opacity: 0.5; text-shadow: none;
     }
 }
 
 #login_frm                  { margin-top: @dp6;
-    input                   { border: none; .login-input(10%); padding: @dp12 @dp6;
+    input                   { border: none; .login-input(100%); padding: @dp4; height: 40px;
         &:focus             { .login-input(20%); outline: none; }
         &::-webkit-input-placeholder { .threshold(@login-color); }
         &:-moz-placeholder { .threshold(@login-color); }

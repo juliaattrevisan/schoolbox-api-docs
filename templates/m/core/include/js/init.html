@@ -65,9 +65,8 @@ function init() {
             $('#loading').append('<form id="login_frm"><ul>' +
                     '<li><input type="text" id="username" name="username" placeholder="Username" value="" /></li>' +
                     '<li><input type="password" id="password" name="password" placeholder="Password" value="" /></li>' +
-                    '<li><input type="submit" id="login" name="login" value="Login" /></li>' +
+                    '<li><input type="submit" id="login" name="login" value="Log in &rsaquo;" /></li>' +
                     '</ul></form>');
-            $('#loading').css('min-height', $('#login_frm').offset().top + $('#login_frm').height() + 96);
 
             $('#loading').on('submit', '#login_frm', function(e) {
 
