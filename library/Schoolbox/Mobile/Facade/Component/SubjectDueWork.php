@@ -39,6 +39,10 @@ class SubjectDueWork extends Generic {
 		if (!(\Cfg::get('restrict_parent_duework_access') && $user->getRole()->isParent())) {
 			if (count($upcoming) && is_array($upcoming)) {
 				foreach($upcoming as &$item) {
+                    // Don't show if not staff and not published yet
+                    if (!$user->getRole()->isStaff() && $item['open_date'] > $now) {
+                        continue;
+                    }
 					$invalid = false;
 
 					if($item['kind'] == 0) {
