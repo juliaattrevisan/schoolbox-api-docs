@@ -597,9 +597,9 @@ class SitePage extends Page
 
                 case 'cedars':
                     if ($this->groupHandler->isStaff()) {
-                        $location = 'https://mail.cedars.nsw.edu.au/owa';
+                        $location = 'https://login.microsoftonline.com';
                     } elseif ($this->groupHandler->isStudent()) {
-                        $location = 'https://portal.microsoftonline.com';
+                        $location = 'https://login.microsoftonline.com';
                     }
 
                     break;
