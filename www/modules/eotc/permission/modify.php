@@ -149,6 +149,9 @@ foreach ($allUserIds as $currentUserId) {
 	foreach ($allPermissions as $currentPermission) {
 		$campusNames[$currentPermission->getCampusId()->getName()] = '';
 	}
+    foreach ($allSubscriptions as $currentPermission) {
+        $campusNames[$currentPermission->getCampusId()->getName()] = '';
+    }
 
 	$allCampuses = implode(', ', array_keys($campusNames));
 
