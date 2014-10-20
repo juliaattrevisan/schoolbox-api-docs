@@ -1345,7 +1345,10 @@ class Submission extends DeprecatedModel
         $this_year = date('Y');
         $q0        = "
             SELECT
-              '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
+              '0' kind, sb.id, sb.name `title`, ft.name `type`,
+              UNIX_TIMESTAMP(sb.open_date) AS `open_date`,
+              UNIX_TIMESTAMP(sb.date) AS `date`,
+              UNIX_TIMESTAMP(sb.late_date) AS late_date,
               c.`name` subj_name, c.id subj_id, sb.accept_submission submittable, sb.multi_submission multi_submit, COUNT(ss.id) submit_count
             FROM submission_box sb
             LEFT JOIN lu_submission_type ft ON ft.id = sb.type
@@ -1361,7 +1364,10 @@ class Submission extends DeprecatedModel
 
         $q1 = "
             SELECT
-              '1' kind, a.assess_id id, a.title, ft.name `type`, a.finish `date`, UNIX_TIMESTAMP(a.finish) AS `date`,
+              '1' kind, a.assess_id id, a.title, ft.name `type`,
+              UNIX_TIMESTAMP(a.start) AS `open_date`,
+              UNIX_TIMESTAMP(a.finish) AS `date`,
+              UNIX_TIMESTAMP(a.finish) AS `late_date`,
               c.`name` subj_name, c.id subj_id, a.max_attempts, COUNT(aa.attempt_id) attempt_count
             FROM assess a
             LEFT JOIN lu_submission_type ft ON ft.id = a.`type`
