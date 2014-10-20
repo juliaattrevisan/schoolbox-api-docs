@@ -1041,10 +1041,7 @@ class SitePage extends Page
                     $this->localRedir('/login/');
                 }
             } else {
-                $error = isset($_GET['page'])
-                    ? 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.'
-                    : 'To begin a new session please login with your username and password.';
-                $this->setVar('ERROR', $error);
+                $this->setVar('ERROR', '');
             }
         }
 
