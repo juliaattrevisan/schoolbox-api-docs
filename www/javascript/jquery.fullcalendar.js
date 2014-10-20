@@ -418,8 +418,11 @@ Calendar.prototype.init = function() {
     header.addClass('calendar-controls')
     header.find('.fc-button').each(function() {
         var self = $j(this)
-        var text = self.html()
-        self.addClass('filter-change '+text).html('<span></span>'+text)
+        self.addClass('filter-change');
+    })
+    header.find('.fc-right .fc-button').each(function() {
+        var self = $j(this)
+        self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
     })
 
 
