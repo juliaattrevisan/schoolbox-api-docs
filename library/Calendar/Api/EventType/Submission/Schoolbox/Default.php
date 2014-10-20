@@ -35,8 +35,13 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack     = new Calendar_Event_Collection();
-        $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
+        $stack = new Calendar_Event_Collection();
+        // Configuration may not have been set, take this into account.
+        try {
+            $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
+        } catch (Schoolbox\Mapper\Exception $e) {
+            $eventType = 1;
+        }
 
         //
         // Use the mapper classes to get events for this day.
