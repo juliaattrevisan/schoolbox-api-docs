@@ -1028,6 +1028,9 @@ class SitePage extends Page
             $this->setVar('HIDDEN', '');
         }
 
+        // Shove GET params (samlAuth and page at least) into the form
+        $getParams = array_intersect_key($_GET, array('page' => true, 'samlAuth' => true));
+        $this->setVar('GET_PARAMS', htmlspecialchars(http_build_query($getParams), ENT_QUOTES));
         if ($error) {
             $this->setVar('ERROR', $error);
         } else {
