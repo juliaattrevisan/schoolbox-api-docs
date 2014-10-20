@@ -32,9 +32,9 @@ ul.tileList {
     }
     &.add {
       // Add new tile link looks like a tile
-      background-color: #8fd16b;
+      background-color: @tiles-add-background;
       &:hover {
-        background-color: #aeff83;
+        background-color: @tiles-add-background-hover;
       }
       .title {
         // its title is just a link in the middle of it
@@ -101,7 +101,7 @@ ul.tileList {
     &.selected {
       // Selected: ensure weight is normal, and add light yellow background
       font-weight: normal;
-      background-color: #ffffb2;
+      background-color: @tiles-selected-background;
     }
     .shape {
       // Shapes for tile shape selector
