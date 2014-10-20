@@ -1041,7 +1041,13 @@ class SitePage extends Page
                     $this->localRedir('/login/');
                 }
             } else {
-                $this->setVar('ERROR', '');
+                if (!($_GET['page'] == '/login/' || $_GET['page'] == '/login')) {
+                    $error =
+                        'You are currently not logged in. ' .
+                        'Your session has either expired or you are beginning a new session. ' .
+                        'Please log in below to continue browsing the portal.';
+                }
+                $this->setVar('ERROR', $error);
             }
         }
 
