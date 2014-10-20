@@ -90,14 +90,14 @@ $useDescriptors = $resultSetID == 0;
  * Also set the time to the start or end of the day if all_day is set
  */
 
-$dueDate = generateDate('due', '23:59:59');
+$openDate = generateDate('open', '00:00:00');
+$dueDate  = generateDate('due', '23:59:59');
 
-// if we're not accepting submissions. override the open date to now() and late date to due date
+// if we're not accepting submissions. override the late date to due date
+// Open date: the date on which the event shows on student's calendars
 if (!$acceptSubmissions) {
-    $openDate = new Alaress_Date_Format(time(), 'U');
     $lateDate = $dueDate;
 } else {
-    $openDate = generateDate('open', '00:00:00');
     $lateDate = generateDate('late', '23:59:59');
 }
 
