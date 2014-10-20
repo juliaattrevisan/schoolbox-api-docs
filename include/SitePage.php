@@ -1041,10 +1041,11 @@ class SitePage extends Page
                     $this->localRedir('/login/');
                 }
             } else {
-                if (!($_GET['page'] == '/login/' || $_GET['page'] == '/login')) {
+                // If there's a lasttime in the session and we're here, the
+                // session must have timed out
+                if (isset($_SESSION['lasttime'])) {
                     $error =
-                        'You are currently not logged in. ' .
-                        'Your session has either expired or you are beginning a new session. ' .
+                        'Your session has expired. ' .
                         'Please log in below to continue browsing the portal.';
                 }
                 $this->setVar('ERROR', $error);
