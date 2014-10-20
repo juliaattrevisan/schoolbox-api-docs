@@ -30,7 +30,7 @@ function init(){
 	<div id="content" class="clearfix">
         <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/schol.png" alt="{SITE_NAME}" /></a>
 		<p class="error">{ERROR}</p>
-		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php">
+		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php?{GET_PARAMS}">
 			<fieldset>
                 <!--[if lt IE 10]>Login Name:<![endif]-->
 				<input type="text" name="username" id="username" placeholder="Login Name" />
