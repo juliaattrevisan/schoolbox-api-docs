@@ -10,649 +10,691 @@
 
 namespace SocialStream;
 
-class Threads {
+class Threads
+{
 
-	/**
-	 * A schoolbox collection of SocialStream_Post instances
-	 *
-	 * @var null
-	 */
-	private $allPosts = null;
+    /**
+     * A schoolbox collection of SocialStream_Post instances
+     *
+     * @var null
+     */
+    private $allPosts = null;
 
-	/**
-	 * Resultant tree structure
-	 *
-	 * @var null
-	 */
-	private $tree = null;
+    /**
+     * Resultant tree structure
+     *
+     * @var null
+     */
+    private $tree = null;
 
-	/**
-	 * The homepage which you are currently on
-	 * This is derived from the component instance's identifier value
-	 *
-	 * @var int
-	 */
-	private $homepageId = 0;
+    /**
+     * The homepage which you are currently on
+     * This is derived from the component instance's identifier value
+     *
+     * @var int
+     */
+    private $homepageId = 0;
 
-	/**
-	 * Only fetch N posts newer than $dateThreshold
-	 *
-	 * @var int
-	 */
-	private $start = 0;
+    /**
+     * Only fetch N posts newer than $dateThreshold
+     *
+     * @var int
+     */
+    private $start = 0;
 
-	/**
-	 * Only fetch posts newer than this date
-	 *
-	 * @var string
-	 */
-	private $offset = 0;
+    /**
+     * Only fetch posts newer than this date
+     *
+     * @var string
+     */
+    private $offset = 0;
 
-	/**
-	 * The component instance
-	 *
-	 * @var null
-	 */
-	private $instance = null;
+    /**
+     * The component instance
+     *
+     * @var null
+     */
+    private $instance = null;
 
-	/**
-	 * The output html structure
-	 *
-	 * @var string
-	 */
-	private $ajaxHtml = '';
+    /**
+     * The output html structure
+     *
+     * @var string
+     */
+    private $ajaxHtml = '';
 
-	/**
-	 * Constructor
-	 *
-	 * @param $instance
-	 * @param $homepageId
-	 * @param $start
-	 * @param $offset
-	 */
-	public function __construct($instance, $homepageId, $start, $offset) {
-		$this->setInstance($instance);
-		$this->setHomepageId($homepageId);
-		$this->setStart($start);
-		$this->setOffset($offset);
+    /**
+     * Constructor
+     *
+     * @param $instance
+     * @param $homepageId
+     * @param $start
+     * @param $offset
+     */
+    public function __construct($instance, $homepageId, $start, $offset)
+    {
+        $this->setInstance($instance);
+        $this->setHomepageId($homepageId);
+        $this->setStart($start);
+        $this->setOffset($offset);
 
-		$this->init();
-		$this->growTree();
-	}
+        $this->init();
+        $this->growTree();
+    }
 
-	/**
-	 * Initialise data set before growing tree
-	 */
-	private function init() {
+    /**
+     * Initialise data set before growing tree
+     */
+    private function init()
+    {
 
-		/* Get all the posts that should appear
-		 */
-		$allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getStart(), $this->getOffset());
+        /* Get all the posts that should appear
+         */
+        $allPosts = \SocialStream\PostMapper::getInstance()->findLatestForHomepage($this->getHomepageId(), $this->getStart(), $this->getOffset());
 
-		$ids = array();
+        $ids = array();
 
-		foreach($allPosts as $currentPost) {
-			$ids[] = $currentPost->getPostId();
-		}
+        foreach ($allPosts as $currentPost) {
+            $ids[] = $currentPost->getPostId();
+        }
 
-		if (count($ids)) {
-			/* Get each posts' hierarchy
-			 */
-			$tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
+        if (count($ids)) {
+            /* Get each posts' hierarchy
+             */
+            $tree = \SocialStream\PostMapper::getInstance()->findHierarchy($ids);
 
-			/* And merge it all together
-			 */
-			$tree->merge($allPosts);
-		}
-		else {
-			$tree = new \Schoolbox\Collection();
-		}
+            /* And merge it all together
+             */
+            $tree->merge($allPosts);
+        } else {
+            $tree = new \Schoolbox\Collection();
+        }
 
-		/* Save it for later!
-		 */
-		$this->setAllPosts($tree);
-	}
+        /* Save it for later!
+         */
+        $this->setAllPosts($tree);
+    }
 
-	/**
-	 * Grow a tree
-	 *
-	 * @return array
-	 */
-	private function growTree() {
-		$structure = array();
-		$remove = array();
+    /**
+     * Grow a tree
+     *
+     * @return array
+     */
+    private function growTree()
+    {
+        $structure = array();
+        $remove    = array();
 
-		/* Move everything into an array to start with
-		 */
-		foreach($this->getAllPosts() as $currentPost) {
-			$structure[] = $currentPost;
-		}
+        /* Move everything into an array to start with
+         */
+        foreach ($this->getAllPosts() as $currentPost) {
+            $structure[] = $currentPost;
+        }
 
-		/* Push posts into their respective parents
-		 */
-		foreach($structure as $currentPost) {
+        /* Push posts into their respective parents
+         */
+        foreach ($structure as $currentPost) {
+            /* Only worry about moving deeper posts
+                         */
+            if ($currentPost->getParentId()) {
+                $destination = $this->findNode($structure, $currentPost->getParentId());
 
-			/* Only worry about moving deeper posts
-			 */
-			if ($currentPost->getParentId()) {
-				$destination = $this->findNode($structure, $currentPost->getParentId());
+                /* Only try to add it if a destination is found
+                 * (This should get around orphaned posts)
+                 */
+                if ($destination) {
+                    $destination->getChildren()->add($currentPost);
+                }
 
-				/* Only try to add it if a destination is found
-				 * (This should get around orphaned posts)
-				 */
-				if ($destination) {
-					$destination->getChildren()->add($currentPost);
-				}
+                /* Remember which ones we can remove from the root level
+                 */
+                $remove[] = $currentPost->getPostId();
+            }
+        }
 
-				/* Remember which ones we can remove from the root level
-				 */
-				$remove[] = $currentPost->getPostId();
-			}
-		}
+        /* Nullify posts which have been moved elsewhere
+         */
+        for ($i = 0; $i < count($structure); $i++) {
+            if (in_array($structure[$i]->getPostId(), $remove)) {
+                $structure[$i] = null;
+            }
+        }
 
-		/* Nullify posts which have been moved elsewhere
-		 */
-		for ($i = 0; $i < count($structure); $i++) {
-			if (in_array($structure[$i]->getPostId(), $remove)) {
-				$structure[$i] = null;
-			}
-		}
+        /* Remove posts which were nullified
+         */
+        $tree = array_values(array_filter($structure));
 
-		/* Remove posts which were nullified
-		 */
-		$tree = array_values(array_filter($structure));
+        /* Transform it back into a collection, because we normally don't
+         * remove elements from iterator classes
+         */
+        $collection = new \Schoolbox\Collection();
 
-		/* Transform it back into a collection, because we normally don't
-		 * remove elements from iterator classes
-		 */
-		$collection = new \Schoolbox\Collection();
+        foreach ($tree as $node) {
+            $collection->add($node);
+        }
 
-		foreach($tree as $node) {
-			$collection->add($node);
-		}
+        /* Save that one for later!
+         */
+        $this->setTree($collection);
 
-		/* Save that one for later!
-		 */
-		$this->setTree($collection);
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Find a node in a tree
+     *
+     * @param $tree
+     * @param $id
+     *
+     * @return mixed
+     */
+    private function findNode($tree, $id)
+    {
+        foreach ($tree as $leaf) {
+            if ($leaf->getPostId() == $id) {
+                return $leaf;
+            }
+        }
+    }
 
-	/**
-	 * Find a node in a tree
-	 *
-	 * @param $tree
-	 * @param $id
-	 * @return mixed
-	 */
-	private function findNode($tree, $id) {
-		foreach($tree as $leaf) {
-			if ($leaf->getPostId() == $id) {
-				return $leaf;
-			}
-		}
-	}
+    /**
+     * Generate ajax html
+     */
+    public function generate()
+    {
+        $page = new \SitePage();
 
-	/**
-	 * Generate ajax html
-	 */
-	public function generate() {
-		$page = new \SitePage();
+        /* Determine whether you have access to the input form
+         */
+        $newPost       = new \SocialStream_Post_String();
+        $currentUser   = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+        $authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
-		/* Determine whether you have access to the input form
-		 */
-		$newPost = new \SocialStream_Post_String();
-		$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-		$authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
+        /* Simply hide the comment icon if you can't view it
+         */
+        if ($authenticator->canComment()) {
+            $canComment = true;
+        } else {
+            $canComment = false;
+        }
 
-		/* Simply hide the comment icon if you can't view it
-		 */
-		if ($authenticator->canComment()) {
-			$canComment = true;
-		}
-		else {
-			$canComment = false;
-		}
+        /* Set up blocks and stuff
+         */
+        $page->setFile('socialstream_thread', '/component/homepage/socialstream/thread.html');
+        $page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
+        $page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+        $page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
 
-		/* Set up blocks and stuff
-		 */
-		$page->setFile('socialstream_thread', '/component/homepage/socialstream/thread.html');
-		$page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
-		$page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
-		$page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
-
-		/* Thumbnail stuff
-		 */
-		$page->setBlock('socialstream_post', 'socialstream_post_has_attachment', 'socialstream_post_has_attachment_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video', 'socialstream_post_has_video_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video_pending', 'socialstream_post_has_video_pending_block');
-		$page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_metadata', 'socialstream_post_has_metadata_block');
+        /* Thumbnail stuff
+         */
+        $page->setBlock('socialstream_post', 'socialstream_post_has_attachment', 'socialstream_post_has_attachment_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video', 'socialstream_post_has_video_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video_pending', 'socialstream_post_has_video_pending_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_metadata', 'socialstream_post_has_metadata_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_image', 'socialstream_post_has_image_block');
         $page->setBlock('socialstream_post', 'socialstream_post_has_add', 'socialstream_post_has_add_block');
-		$page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
+        $page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
 
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_attachment', 'socialstream_comment_has_attachment_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_block');
-		$page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
+        $page->setBlock('socialstream_comment', 'socialstream_comment_has_attachment', 'socialstream_comment_has_attachment_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_image', 'socialstream_comment_has_image_block');
         $page->setBlock('socialstream_comment', 'socialstream_comment_has_add', 'socialstream_comment_has_add_block');
-		$page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
+        $page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
 
-		$page->setBlock('socialstream_reply', 'socialstream_reply_has_attachment', 'socialstream_reply_has_attachment_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video', 'socialstream_reply_has_video_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video_pending', 'socialstream_reply_has_video_pending_block');
-		$page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
+        $page->setBlock('socialstream_reply', 'socialstream_reply_has_attachment', 'socialstream_reply_has_attachment_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video', 'socialstream_reply_has_video_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video_pending', 'socialstream_reply_has_video_pending_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_image', 'socialstream_reply_has_image_block');
         $page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
 
-		$page->setVar(array(
-			'socialstream_post_block' => '',
-			'socialstream_comment_block' => '',
-			'socialstream_reply_block' => '',
+        $page->setVar(
+            array(
+                'socialstream_post_block'                      => '',
+                'socialstream_comment_block'                   => '',
+                'socialstream_reply_block'                     => '',
+                'socialstream_post_has_attachment_block'       => '',
+                'socialstream_post_has_icon_block'             => '',
+                'socialstream_post_has_image_block'            => '',
+                'socialstream_post_has_thumbnail_block'        => '',
+                'socialstream_post_has_player_block'           => '',
+                'socialstream_post_has_video_block'            => '',
+                'socialstream_post_has_video_pending_block'    => '',
+                'socialstream_post_has_metadata_block'         => '',
+                'socialstream_post_has_delete_block'           => '',
+                'socialstream_comment_has_attachment_block'    => '',
+                'socialstream_comment_has_icon_block'          => '',
+                'socialstream_comment_has_image_block'         => '',
+                'socialstream_comment_has_thumbnail_block'     => '',
+                'socialstream_comment_has_player_block'        => '',
+                'socialstream_comment_has_video_block'         => '',
+                'socialstream_comment_has_video_pending_block' => '',
+                'socialstream_comment_has_metadata_block'      => '',
+                'socialstream_comment_has_delete_block'        => '',
+                'socialstream_reply_has_attachment_block'      => '',
+                'socialstream_reply_has_icon_block'            => '',
+                'socialstream_reply_has_image_block'           => '',
+                'socialstream_reply_has_thumbnail_block'       => '',
+                'socialstream_reply_has_player_block'          => '',
+                'socialstream_reply_has_video_block'           => '',
+                'socialstream_reply_has_video_pending_block'   => '',
+                'socialstream_reply_has_metadata_block'        => '',
+                'socialstream_reply_has_delete_block'          => '',
+            )
+        );
 
-			'socialstream_post_has_attachment_block' => '',
-			'socialstream_post_has_icon_block' => '',
-            'socialstream_post_has_image_block' => '',
-			'socialstream_post_has_thumbnail_block' => '',
-			'socialstream_post_has_player_block' => '',
-			'socialstream_post_has_video_block' => '',
-			'socialstream_post_has_video_pending_block' => '',
-			'socialstream_post_has_metadata_block' => '',
-			'socialstream_post_has_delete_block' => '',
+        /* Traverse everything
+         */
+        $i = 0;
 
-			'socialstream_comment_has_attachment_block' => '',
-			'socialstream_comment_has_icon_block' => '',
-            'socialstream_comment_has_image_block' => '',
-			'socialstream_comment_has_thumbnail_block' => '',
-			'socialstream_comment_has_player_block' => '',
-			'socialstream_comment_has_video_block' => '',
-			'socialstream_comment_has_video_pending_block' => '',
-			'socialstream_comment_has_metadata_block' => '',
-			'socialstream_comment_has_delete_block' => '',
+        foreach ($this->getTree() as $currentPost) {
+            $rel = new \Alaress_Date_Relative($currentPost->getCreatedAt());
+            $page->setVar(
+                array(
+                    'COMPONENT_INSTANCE_ID'              => $this->getInstance()->getId(),
+                    'SOCIALSTREAM_POST_POST_ID'          => \Scrub::text($currentPost->getPostId()),
+                    'SOCIALSTREAM_POST_BODY'             => nl2br(\Scrub::text($currentPost->getBody())),
+                    'SOCIALSTREAM_POST_CREATED_AT'       => $rel->getRelativeTime(),
+                    'SOCIALSTREAM_POST_USER_ID'          => \Scrub::text($currentPost->getOwnerId()->getId()),
+                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
+                    'SOCIALSTREAM_POST_USER_FULLNAME'    => \Scrub::text($currentPost->getOwnerId()->getFullname()),
+                    'SOCIALSTREAM_POST_TIMESTAMP'        => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
+                    'ON_OFF'                             => $i % 2 ? 'dark' : '',
+                )
+            );
 
-			'socialstream_reply_has_attachment_block' => '',
-			'socialstream_reply_has_icon_block' => '',
-            'socialstream_reply_has_image_block' => '',
-            'socialstream_reply_has_thumbnail_block' => '',
-			'socialstream_reply_has_player_block' => '',
-			'socialstream_reply_has_video_block' => '',
-			'socialstream_reply_has_video_pending_block' => '',
-			'socialstream_reply_has_metadata_block' => '',
-			'socialstream_reply_has_delete_block' => '',
-		));
+            /* Ability to add posts
+             */
+            if ($canComment) {
+                $page->parse('socialstream_post_has_add_block', 'socialstream_post_has_add');
+            } else {
+                $page->setVar(
+                    array(
+                        'socialstream_post_has_add_block' => '',
+                    )
+                );
+            }
 
-		/* Traverse everything
-		 */
-		$i = 0;
+            /* Ability to delete posts
+             */
+            $authenticator->setNewPost($currentPost);
 
-		foreach($this->getTree() as $currentPost) {
-			$rel = new \Alaress_Date_Relative($currentPost->getCreatedAt());
-			$page->setVar(array(
-				'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
-				'SOCIALSTREAM_POST_POST_ID' => \Scrub::text($currentPost->getPostId()),
-				'SOCIALSTREAM_POST_BODY' => \Scrub::text($currentPost->getBody()),
-				'SOCIALSTREAM_POST_CREATED_AT' => $rel->getRelativeTime(),
-				'SOCIALSTREAM_POST_USER_ID' => \Scrub::text($currentPost->getOwnerId()->getId()),
-				'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => \Scrub::text($currentPost->getOwnerId()->getExternalId()),
-				'SOCIALSTREAM_POST_USER_FULLNAME' => \Scrub::text($currentPost->getOwnerId()->getFullname()),
-				'SOCIALSTREAM_POST_TIMESTAMP' => \Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
-				'ON_OFF' => $i%2 ? 'dark' : '',
-			));
+            if ($authenticator->canDelete()) {
+                $page->parse('socialstream_post_has_delete_block', 'socialstream_post_has_delete');
+            } else {
+                $page->setVar(
+                    array(
+                        'socialstream_post_has_delete_block' => '',
+                    )
+                );
+            }
 
-			/* Ability to add posts
-			 */
-			if ($canComment) {
-				$page->parse('socialstream_post_has_add_block', 'socialstream_post_has_add');
-			}
-			else {
-				$page->setVar(array(
-					'socialstream_post_has_add_block' => '',
-				));
-			}
+            /* Thumbnails
+             */
+            $page->setVar(
+                array(
+                    'socialstream_post_has_attachment_block'    => '',
+                    'socialstream_post_has_icon_block'          => '',
+                    'socialstream_post_has_image_block'         => '',
+                    'socialstream_post_has_thumbnail_block'     => '',
+                    'socialstream_post_has_player_block'        => '',
+                    'socialstream_post_has_video_block'         => '',
+                    'socialstream_post_has_video_pending_block' => '',
+                    'socialstream_post_has_metadata_block'      => '',
+                )
+            );
 
-			/* Ability to delete posts
-			 */
-			$authenticator->setNewPost($currentPost);
+            $hasAttachment = $currentPost->renderThumbnail('post', $page);
 
-			if ($authenticator->canDelete()) {
-				$page->parse('socialstream_post_has_delete_block', 'socialstream_post_has_delete');
-			}
-			else {
-				$page->setVar(array(
-					'socialstream_post_has_delete_block' => '',
-				));
-			}
+            if ($hasAttachment) {
+                $page->parse('socialstream_post_has_attachment_block', 'socialstream_post_has_attachment');
+            }
 
-			/* Thumbnails
-			 */
-			$page->setVar(array(
-				'socialstream_post_has_attachment_block' => '',
-				'socialstream_post_has_icon_block' => '',
-                'socialstream_post_has_image_block' => '',
-				'socialstream_post_has_thumbnail_block' => '',
-				'socialstream_post_has_player_block' => '',
-				'socialstream_post_has_video_block' => '',
-				'socialstream_post_has_video_pending_block' => '',
-				'socialstream_post_has_metadata_block' => '',
-			));
+            /* Descendents
+             */
+            foreach ($currentPost->getChildren() as $currentComment) {
+                $rel = new \Alaress_Date_Relative($currentComment->getCreatedAt());
+                $page->setVar(
+                    array(
+                        'COMPONENT_INSTANCE_ID'                 => $this->getInstance()->getId(),
+                        'SOCIALSTREAM_COMMENT_POST_ID'          => \Scrub::text($currentComment->getPostId()),
+                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(\Scrub::text($currentComment->getBody())),
+                        'SOCIALSTREAM_COMMENT_CREATED_AT'       => $rel->getRelativeTime(),
+                        'SOCIALSTREAM_COMMENT_USER_ID'          => \Scrub::text($currentComment->getOwnerId()->getId()),
+                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
+                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => \Scrub::text($currentComment->getOwnerId()->getFullname()),
+                    )
+                );
 
-			$hasAttachment = $currentPost->renderThumbnail('post', $page);
+                /* Ability to add posts
+                 */
+                if ($canComment) {
+                    $page->parse('socialstream_comment_has_add_block', 'socialstream_comment_has_add');
+                } else {
+                    $page->setVar(
+                        array(
+                            'socialstream_comment_has_add_block' => '',
+                        )
+                    );
+                }
 
-			if ($hasAttachment) {
-				$page->parse('socialstream_post_has_attachment_block', 'socialstream_post_has_attachment');
-			}
+                /* Ability to delete posts
+                 */
+                $authenticator->setNewPost($currentComment);
 
-			/* Descendents
-			 */
-			foreach($currentPost->getChildren() as $currentComment) {
-				$rel = new \Alaress_Date_Relative($currentComment->getCreatedAt());
-				$page->setVar(array(
-					'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
-					'SOCIALSTREAM_COMMENT_POST_ID' => \Scrub::text($currentComment->getPostId()),
-					'SOCIALSTREAM_COMMENT_BODY' => \Scrub::text($currentComment->getBody()),
-					'SOCIALSTREAM_COMMENT_CREATED_AT' => $rel->getRelativeTime(),
-					'SOCIALSTREAM_COMMENT_USER_ID' => \Scrub::text($currentComment->getOwnerId()->getId()),
-					'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => \Scrub::text($currentComment->getOwnerId()->getExternalId()),
-					'SOCIALSTREAM_COMMENT_USER_FULLNAME' => \Scrub::text($currentComment->getOwnerId()->getFullname()),
-				));
+                if ($authenticator->canDelete()) {
+                    $page->parse('socialstream_comment_has_delete_block', 'socialstream_comment_has_delete');
+                } else {
+                    $page->setVar(
+                        array(
+                            'socialstream_comment_has_delete_block' => '',
+                        )
+                    );
+                }
 
-				/* Ability to add posts
-				 */
-				if ($canComment) {
-					$page->parse('socialstream_comment_has_add_block', 'socialstream_comment_has_add');
-				}
-				else {
-					$page->setVar(array(
-						'socialstream_comment_has_add_block' => '',
-					));
-				}
+                /* Thumbnails
+                 */
+                $page->setVar(
+                    array(
+                        'socialstream_comment_has_attachment_block'    => '',
+                        'socialstream_comment_has_icon_block'          => '',
+                        'socialstream_comment_has_image_block'         => '',
+                        'socialstream_comment_has_thumbnail_block'     => '',
+                        'socialstream_comment_has_player_block'        => '',
+                        'socialstream_comment_has_video_block'         => '',
+                        'socialstream_comment_has_video_pending_block' => '',
+                        'socialstream_comment_has_metadata_block'      => '',
+                    )
+                );
 
-				/* Ability to delete posts
-				 */
-				$authenticator->setNewPost($currentComment);
+                $hasAttachment = $currentComment->renderThumbnail('comment', $page);
 
-				if ($authenticator->canDelete()) {
-					$page->parse('socialstream_comment_has_delete_block', 'socialstream_comment_has_delete');
-				}
-				else {
-					$page->setVar(array(
-						'socialstream_comment_has_delete_block' => '',
-					));
-				}
+                if ($hasAttachment) {
+                    $page->parse('socialstream_comment_has_attachment_block', 'socialstream_comment_has_attachment');
+                }
 
-				/* Thumbnails
-				 */
-				$page->setVar(array(
-					'socialstream_comment_has_attachment_block' => '',
-					'socialstream_comment_has_icon_block' => '',
-                    'socialstream_comment_has_image_block' => '',
-                    'socialstream_comment_has_thumbnail_block' => '',
-					'socialstream_comment_has_player_block' => '',
-					'socialstream_comment_has_video_block' => '',
-					'socialstream_comment_has_video_pending_block' => '',
-					'socialstream_comment_has_metadata_block' => '',
-				));
+                /* Descendents
+                 */
+                foreach ($currentComment->getChildren() as $currentReply) {
+                    $rel = new \Alaress_Date_Relative($currentReply->getCreatedAt());
+                    $page->setVar(
+                        array(
+                            'COMPONENT_INSTANCE_ID'               => $this->getInstance()->getId(),
+                            'SOCIALSTREAM_REPLY_POST_ID'          => \Scrub::text($currentReply->getPostId()),
+                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(\Scrub::text($currentReply->getBody())),
+                            'SOCIALSTREAM_REPLY_CREATED_AT'       => $rel->getRelativeTime(),
+                            'SOCIALSTREAM_REPLY_USER_ID'          => \Scrub::text($currentReply->getOwnerId()->getId()),
+                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
+                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => \Scrub::text($currentReply->getOwnerId()->getFullname()),
+                        )
+                    );
 
-				$hasAttachment = $currentComment->renderThumbnail('comment', $page);
+                    /* Ability to delete posts
+                     */
+                    $authenticator->setNewPost($currentReply);
 
-				if ($hasAttachment) {
-					$page->parse('socialstream_comment_has_attachment_block', 'socialstream_comment_has_attachment');
-				}
+                    if ($authenticator->canDelete()) {
+                        $page->parse('socialstream_reply_has_delete_block', 'socialstream_reply_has_delete');
+                    } else {
+                        $page->setVar(
+                            array(
+                                'socialstream_reply_has_delete_block' => '',
+                            )
+                        );
+                    }
 
-				/* Descendents
-				 */
-				foreach($currentComment->getChildren() as $currentReply) {
-					$rel = new \Alaress_Date_Relative($currentReply->getCreatedAt());
-					$page->setVar(array(
-						'COMPONENT_INSTANCE_ID' => $this->getInstance()->getId(),
-						'SOCIALSTREAM_REPLY_POST_ID' => \Scrub::text($currentReply->getPostId()),
-						'SOCIALSTREAM_REPLY_BODY' => \Scrub::text($currentReply->getBody()),
-						'SOCIALSTREAM_REPLY_CREATED_AT' => $rel->getRelativeTime(),
-						'SOCIALSTREAM_REPLY_USER_ID' => \Scrub::text($currentReply->getOwnerId()->getId()),
-						'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => \Scrub::text($currentReply->getOwnerId()->getExternalId()),
-						'SOCIALSTREAM_REPLY_USER_FULLNAME' => \Scrub::text($currentReply->getOwnerId()->getFullname()),
-					));
+                    /* Thumbnails
+                     */
+                    $page->setVar(
+                        array(
+                            'socialstream_reply_has_attachment_block'    => '',
+                            'socialstream_reply_has_icon_block'          => '',
+                            'socialstream_reply_has_image_block'         => '',
+                            'socialstream_reply_has_thumbnail_block'     => '',
+                            'socialstream_reply_has_player_block'        => '',
+                            'socialstream_reply_has_video_block'         => '',
+                            'socialstream_reply_has_video_pending_block' => '',
+                            'socialstream_reply_has_metadata_block'      => '',
+                        )
+                    );
 
-					/* Ability to delete posts
-					 */
-					$authenticator->setNewPost($currentReply);
+                    $hasAttachment = $currentReply->renderThumbnail('reply', $page);
 
-					if ($authenticator->canDelete()) {
-						$page->parse('socialstream_reply_has_delete_block', 'socialstream_reply_has_delete');
-					}
-					else {
-						$page->setVar(array(
-							'socialstream_reply_has_delete_block' => '',
-						));
-					}
+                    if ($hasAttachment) {
+                        $page->parse('socialstream_reply_has_attachment_block', 'socialstream_reply_has_attachment');
+                    }
 
-					/* Thumbnails
-					 */
-					$page->setVar(array(
-						'socialstream_reply_has_attachment_block' => '',
-						'socialstream_reply_has_icon_block' => '',
-                        'socialstream_reply_has_image_block' => '',
-                        'socialstream_reply_has_thumbnail_block' => '',
-						'socialstream_reply_has_player_block' => '',
-						'socialstream_reply_has_video_block' => '',
-						'socialstream_reply_has_video_pending_block' => '',
-						'socialstream_reply_has_metadata_block' => '',
-					));
+                    /* Clear children after parsing out the parent
+                     */
+                    $page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
-					$hasAttachment = $currentReply->renderThumbnail('reply', $page);
+                    $page->setVar(
+                        array(
+                            'socialstream_reply_has_attachment_block'    => '',
+                            'socialstream_reply_has_icon_block'          => '',
+                            'socialstream_reply_has_thumbnail_block'     => '',
+                            'socialstream_reply_has_image_block'         => '',
+                            'socialstream_reply_has_player_block'        => '',
+                            'socialstream_reply_has_video_block'         => '',
+                            'socialstream_reply_has_video_pending_block' => '',
+                            'socialstream_reply_has_metadata_block'      => '',
+                            'socialstream_reply_has_add_block'           => '',
+                            'socialstream_reply_has_delete_block'        => '',
+                        )
+                    );
+                }
 
-					if ($hasAttachment) {
-						$page->parse('socialstream_reply_has_attachment_block', 'socialstream_reply_has_attachment');
-					}
+                /* Clear children after parsing out the parent
+                 */
+                $page->parse('socialstream_comment_block', 'socialstream_comment', true);
 
-					/* Clear children after parsing out the parent
-					 */
-					$page->parse('socialstream_reply_block', 'socialstream_reply', true);
+                $page->setVar(
+                    array(
+                        'socialstream_comment_has_attachment_block'    => '',
+                        'socialstream_comment_has_icon_block'          => '',
+                        'socialstream_comment_has_image_block'         => '',
+                        'socialstream_comment_has_thumbnail_block'     => '',
+                        'socialstream_comment_has_player_block'        => '',
+                        'socialstream_comment_has_video_block'         => '',
+                        'socialstream_comment_has_video_pending_block' => '',
+                        'socialstream_comment_has_metadata_block'      => '',
+                        'socialstream_comment_has_add_block'           => '',
+                        'socialstream_comment_has_delete_block'        => '',
+                        'socialstream_reply_block'                     => '',
+                    )
+                );
+            }
 
-					$page->setVar(array(
-						'socialstream_reply_has_attachment_block' => '',
-						'socialstream_reply_has_icon_block' => '',
-						'socialstream_reply_has_thumbnail_block' => '',
-                        'socialstream_reply_has_image_block' => '',
-						'socialstream_reply_has_player_block' => '',
-						'socialstream_reply_has_video_block' => '',
-						'socialstream_reply_has_video_pending_block' => '',
-						'socialstream_reply_has_metadata_block' => '',
-						'socialstream_reply_has_add_block' => '',
-						'socialstream_reply_has_delete_block' => '',
-					));
-				}
+            /* Clear children after parsing out the parent
+             */
+            $page->parse('socialstream_post_block', 'socialstream_post', true);
 
-				/* Clear children after parsing out the parent
-				 */
-				$page->parse('socialstream_comment_block', 'socialstream_comment', true);
+            $page->setVar(
+                array(
+                    'socialstream_post_has_attachment_block'    => '',
+                    'socialstream_post_has_icon_block'          => '',
+                    'socialstream_post_has_image_block'         => '',
+                    'socialstream_post_has_thumbnail_block'     => '',
+                    'socialstream_post_has_player_block'        => '',
+                    'socialstream_post_has_video_block'         => '',
+                    'socialstream_post_has_video_pending_block' => '',
+                    'socialstream_post_has_metadata_block'      => '',
+                    'socialstream_post_has_add_block'           => '',
+                    'socialstream_post_has_delete_block'        => '',
+                    'socialstream_comment_block'                => '',
+                    'socialstream_reply_block'                  => '',
+                )
+            );
 
-				$page->setVar(array(
-					'socialstream_comment_has_attachment_block' => '',
-					'socialstream_comment_has_icon_block' => '',
-                    'socialstream_comment_has_image_block' => '',
-					'socialstream_comment_has_thumbnail_block' => '',
-					'socialstream_comment_has_player_block' => '',
-					'socialstream_comment_has_video_block' => '',
-					'socialstream_comment_has_video_pending_block' => '',
-					'socialstream_comment_has_metadata_block' => '',
-					'socialstream_comment_has_add_block' => '',
-					'socialstream_comment_has_delete_block' => '',
-					'socialstream_reply_block' => '',
-				));
-			}
+            /* Alternating colours -_-
+             */
+            $i++;
+        }
 
-			/* Clear children after parsing out the parent
-			 */
-			$page->parse('socialstream_post_block', 'socialstream_post', true);
+        /* Save output for later!
+         */
+        $this->setAjaxHtml($page->template->_varVals['socialstream_post_block']);
 
-			$page->setVar(array(
-				'socialstream_post_has_attachment_block' => '',
-				'socialstream_post_has_icon_block' => '',
-                'socialstream_post_has_image_block' => '',
-				'socialstream_post_has_thumbnail_block' => '',
-				'socialstream_post_has_player_block' => '',
-				'socialstream_post_has_video_block' => '',
-				'socialstream_post_has_video_pending_block' => '',
-				'socialstream_post_has_metadata_block' => '',
-				'socialstream_post_has_add_block' => '',
-				'socialstream_post_has_delete_block' => '',
-				'socialstream_comment_block' => '',
-				'socialstream_reply_block' => '',
-			));
+        /* Chain it
+         */
+        return $this;
+    }
 
-			/* Alternating colours -_-
-			 */
-			$i++;
-		}
+    /**
+     * Render out a bunch of html containing each SocialStream Post
+     */
+    public function render()
+    {
+        return $this->getAjaxHtml();
+    }
 
-		/* Save output for later!
-		 */
-		$this->setAjaxHtml($page->template->_varVals['socialstream_post_block']);
+    /* Getters/Setters
+     */
 
-		/* Chain it
-		 */
-		return $this;
-	}
+    /**
+     * @param null $allPosts
+     */
+    private function setAllPosts($allPosts)
+    {
+        $this->allPosts = $allPosts;
+    }
 
-	/**
-	 * Render out a bunch of html containing each SocialStream Post
-	 */
-	public function render() {
-		return $this->getAjaxHtml();
-	}
+    /**
+     * @return null
+     */
+    private function getAllPosts()
+    {
+        return $this->allPosts;
+    }
 
-	/* Getters/Setters
-	 */
+    /**
+     * Set tree
+     *
+     * @param null $tree
+     */
+    private function setTree($tree)
+    {
+        $this->tree = $tree;
+    }
 
-	/**
-	 * @param null $allPosts
-	 */
-	private function setAllPosts($allPosts) {
-		$this->allPosts = $allPosts;
-	}
+    /**
+     * Get tree
+     *
+     * @return null
+     */
+    private function getTree()
+    {
+        return $this->tree;
+    }
 
-	/**
-	 * @return null
-	 */
-	private function getAllPosts() {
-		return $this->allPosts;
-	}
+    /**
+     * Set homepage id
+     *
+     * @param $homepageId
+     */
+    private function setHomepageId($homepageId)
+    {
+        $this->homepageId = $homepageId;
+    }
 
-	/**
-	 * Set tree
-	 *
-	 * @param null $tree
-	 */
-	private function setTree($tree) {
-		$this->tree = $tree;
-	}
+    /**
+     * Get homepage id
+     *
+     * @return int
+     */
+    private function getHomepageId()
+    {
+        return $this->homepageId;
+    }
 
-	/**
-	 * Get tree
-	 *
-	 * @return null
-	 */
-	private function getTree() {
-		return $this->tree;
-	}
+    /**
+     * Set instance
+     *
+     * @param null $instance
+     */
+    private function setInstance($instance)
+    {
+        $this->instance = $instance;
+    }
 
-	/**
-	 * Set homepage id
-	 *
-	 * @param $homepageId
-	 */
-	private function setHomepageId($homepageId) {
-		$this->homepageId = $homepageId;
-	}
+    /**
+     * Get instance
+     *
+     * @return null
+     */
+    private function getInstance()
+    {
+        return $this->instance;
+    }
 
-	/**
-	 * Get homepage id
-	 *
-	 * @return int
-	 */
-	private function getHomepageId() {
-		return $this->homepageId;
-	}
-	/**
-	 * Set instance
-	 *
-	 * @param null $instance
-	 */
-	private function setInstance($instance) {
-		$this->instance = $instance;
-	}
+    /**
+     * Set ajax html
+     *
+     * @param string $ajaxHtml
+     */
+    private function setAjaxHtml($ajaxHtml)
+    {
+        $this->ajaxHtml = $ajaxHtml;
+    }
 
-	/**
-	 * Get instance
-	 *
-	 * @return null
-	 */
-	private function getInstance() {
-		return $this->instance;
-	}
+    /**
+     * Get ajax html
+     *
+     * @return string
+     */
+    private function getAjaxHtml()
+    {
+        return $this->ajaxHtml;
+    }
 
-	/**
-	 * Set ajax html
-	 *
-	 * @param string $ajaxHtml
-	 */
-	private function setAjaxHtml($ajaxHtml) {
-		$this->ajaxHtml = $ajaxHtml;
-	}
+    /**
+     * Set start
+     *
+     * @param int $start
+     */
+    public function setStart($start)
+    {
+        $this->start = $start;
+    }
 
-	/**
-	 * Get ajax html
-	 *
-	 * @return string
-	 */
-	private function getAjaxHtml() {
-		return $this->ajaxHtml;
-	}
+    /**
+     * Get start
+     *
+     * @return int
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
 
-	/**
-	 * Set start
-	 *
-	 * @param int $start
-	 */
-	public function setStart($start) {
-		$this->start = $start;
-	}
+    /**
+     * Set offset
+     *
+     * @param string $offset
+     */
+    private function setOffset($offset)
+    {
+        $this->offset = $offset;
+    }
 
-	/**
-	 * Get start
-	 *
-	 * @return int
-	 */
-	public function getStart() {
-		return $this->start;
-	}
-
-	/**
-	 * Set offset
-	 *
-	 * @param string $offset
-	 */
-	private function setOffset($offset) {
-		$this->offset = $offset;
-	}
-
-	/**
-	 * Get offset
-	 *
-	 * @return string
-	 */
-	private function getOffset() {
-		return $this->offset;
-	}
+    /**
+     * Get offset
+     *
+     * @return string
+     */
+    private function getOffset()
+    {
+        return $this->offset;
+    }
 }
