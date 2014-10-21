@@ -81,7 +81,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
         }
 
-        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
+        if ($this->permission < READ_ACCESS) {
             return false;
         }
 
