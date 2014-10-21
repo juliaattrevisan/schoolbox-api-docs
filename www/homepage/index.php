@@ -76,6 +76,11 @@ if (($permission = $g->getPermission($category->getId())) < READ_ACCESS) {
     error(14);
 }
 
+// If I'm a write level user, I can downgrade myself to read access
+if ($permission > READ_ACCESS && $_GET['readonly']) {
+    $permission = READ_ACCESS;
+}
+
 // setup the homepage handler
 $homepageHandler = new Homepage($category->getId());
 
