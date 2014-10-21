@@ -15,7 +15,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     public function setup(array $context, array $config) {
         parent::setup($context, $config);
         $g = new Group();
-        $this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['id']);
+        $this->permission = $g->getPermission($context['id']);
 
 
         $args = $this->sitepage->arg;
