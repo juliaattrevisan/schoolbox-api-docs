@@ -25,6 +25,15 @@ abstract class Component_FactoryAbstract {
      */
     protected $dependencyList;
 
+    /**
+     * The maximum permission given to components built with this factory.
+     *
+     * Used for building read-only views of component lists.
+     *
+     * @var int
+     */
+    protected $maximumPermission = FULL_ACCESS;
+
 	/**
 	 * Constructor
 	 *
@@ -155,4 +164,21 @@ abstract class Component_FactoryAbstract {
         return $dependencyList;
     }
 
+    /**
+     * @return int
+     */
+    public function getMaximumPermission()
+    {
+        return $this->maximumPermission;
+    }
+
+    /**
+     * @param  int   $maximumPermission
+     * @return $this
+     */
+    public function setMaximumPermission($maximumPermission)
+    {
+        $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
 }
