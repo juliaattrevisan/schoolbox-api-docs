@@ -114,13 +114,13 @@ class QueueSorter implements FilterInterface {
 
 			$newTopic = "$method.user.{$user->getId()}";
 
-			$this->log->info("Rerouting message to '$newTopic' at level $newLevel");
+			$this->log->info(sprintf('SEND %s:%s -> %s @ %s', $instance->getBaseHash(), $instance->getParamHash(), $newTopic, $newLevel));
 			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
 
 			return true;
 		}
 		catch(FilterException $e) {
-			$this->log->notice("Message dropped: ".$e->getMessage());
+			$this->log->notice(sprintf('DROP %s:%s -> %s: %s', $instance->getBaseHash(), $instance->getParamHash(), $user->getId(), $e->getMessage()));
 			return true;
 		}
 		catch(Exception $e) {
