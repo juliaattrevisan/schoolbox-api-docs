@@ -1067,8 +1067,8 @@ Notifications
     font-size: 13px;
     line-height: 18px;
     padding: 6px;
-    width: @search-width - 12px;
-    height: 20px;
+    width: @search-width;
+    height: 32px;
     border: 0;
     background: saturate(lighten(@banner-background,25%),-70%);
     background: rgba(255,255,255,0.2);
@@ -2401,6 +2401,10 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
 	script + span {
 		display: inline;
 	}
+    input,
+	select{
+    	margin: 6px 0;
+    }
 }
 
 .box {
@@ -2450,12 +2454,6 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
             position: relative;
             top: 2px;
         }
-        input[type=text] {
-            border: solid 1px @std-grey;
-            padding: 2px;
-            width: 99%;
-        }
-
         form div {
             .row {
 				display: block;
@@ -2595,8 +2593,10 @@ label {
     margin-bottom: 4px;
     display: block;
     input[type=text] {
+    	box-sizing: border-box;
         width: 100%;
         margin: 0;
+        padding: 6px;
     }
 
     &.error {
@@ -2629,6 +2629,8 @@ input:not([type="button"]):not([type="file"]):not([type="submit"]):not([type="im
 select,
 textarea {
     background-color: @white;
+    box-sizing: border-box;
+    padding: 6px;
     &:disabled {
         background-color: @dark;
     }
@@ -2688,6 +2690,10 @@ fieldset {
     .acceptCheck {
         top: 0;
     }
+}
+
+.ui-datepicker-trigger{
+	margin: 0 6px;
 }
 
 dl.errors {
@@ -3599,15 +3605,6 @@ ADMIN BODY
     background-clip: padding-box;
 }
 
-.level table {
-	td, th {
-		padding: 0 8px 0 0;
-//		&.colours-buttons {
-//			padding: 16px;
-//		}
-	}
-}
-
 .sortable {
     padding: 16px;
     margin: 0;
@@ -3768,9 +3765,10 @@ ADMIN BODY
 		}
 		input[type=text],
 		input[type=password] {
+			box-sizing: border-box;
 			width: 100%;
 			margin: 8px 0;
-			padding: 2px 0
+			padding: 6px;
 		}
 		input.datepicker {
 			width: 75%;
@@ -4302,7 +4300,6 @@ HOMEPAGE TEMPLATES
     .component input[type=text] {
         width: 215px;
         border: solid 1px @std-grey;
-        padding: 2px;
     }
     form {
         padding-bottom: 16px;
@@ -9966,9 +9963,6 @@ div.colours p {
             clear: both;
         }
     }
-    #report-result .table td {
-        padding: 2px 0;
-    }
 }
 
 /* search */
@@ -10061,7 +10055,6 @@ div.colours p {
     }
     input {
         border: solid 1px @std-grey;
-        padding: 2px;
         width: 250px;
         margin-left: 10px;
     }
@@ -10954,9 +10947,8 @@ ul.activity-list li,
 
       input {
         border: 0;
-        width: 90%;
-        height: 26px;
-        padding: 7px 5%;
+        width: 100%;
+        height: 40px;
       }
 
       .submit-btn-plain{
