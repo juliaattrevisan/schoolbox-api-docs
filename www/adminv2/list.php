@@ -79,11 +79,6 @@ $tableList = array(
         'index' => 'newsTopicID'
     ),
     array(
-        'name' => 'submission_grade',
-        'title' => 'Submission Grades',
-        'index' => 'grade_id'
-    ),
-    array(
         'name' => 'lu_submission_type',
         'title' => 'Submission Types',
         'index' => 'id'

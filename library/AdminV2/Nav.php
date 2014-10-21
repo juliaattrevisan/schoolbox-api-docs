@@ -19,6 +19,7 @@ class AdminV2_Nav {
         'setting' => 'Settings',
         'calendar' => 'Calendar',
         'folder' => 'Folder',
+        'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
 	    'messages' => 'Messages',
         'list' => 'Lists',
