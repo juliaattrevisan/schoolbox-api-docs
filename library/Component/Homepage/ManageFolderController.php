@@ -99,7 +99,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 
 		/* Only write-access people can view statistics
 		 */
-        if($this->groupHandler->isSuperuser() || $this->permission >= WRITE_ACCESS) {
+        if($this->permission >= WRITE_ACCESS) {
             $this->parse('view_stats_block','view_stats');
         }
         else {

@@ -64,7 +64,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $this->parseConfig();
 
-	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+	    if($this->permission < READ_ACCESS) {
 		    return false;
 	    }
 

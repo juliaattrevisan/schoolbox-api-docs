@@ -103,8 +103,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        $group_handler = new Group();
-        if ($group_handler->getPermission($this->source_category_id) < READ_ACCESS) {
+        if ($this->permission < READ_ACCESS) {
             return false;
         }
 

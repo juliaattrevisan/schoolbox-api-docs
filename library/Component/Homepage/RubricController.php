@@ -54,7 +54,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         }
 
         // Permission denied if user doesn't have write access to category
-        if ($this->group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS) {
+        if ($this->permission < WRITE_ACCESS) {
             return false;
         }
 

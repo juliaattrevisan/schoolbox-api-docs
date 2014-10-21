@@ -62,7 +62,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
         $this->parseConfig();
 
-	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+	    if($this->permission < READ_ACCESS) {
 		    return false;
 	    }
 
@@ -93,7 +93,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setVar('news_block', '');
         $this->setVar('submit_news_block', '');
 
-        $newsPermission = $this->groupHandler->getPermission($this->source['id']);
+        $newsPermission = $this->permission;
 
         switch ($newsPermission) {
 
