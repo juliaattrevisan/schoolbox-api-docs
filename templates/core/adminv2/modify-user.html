@@ -325,7 +325,7 @@ $j(function() {
                     </select>
                 </label>
 
-				<table cellpadding="0" width="50%" class="float-left table">
+				<table class="table ruler">
 					<colgroup>
 						<col width="33%" />
 						<col width="33%" />
@@ -420,7 +420,7 @@ $j(function() {
 <div class="level clearfix">
 	<h3>Groups</h3>
 	<h3>Manage</h3>
-	<table class="table">
+	<table class="table ruler">
 		<colgroup>
 			<col width="10%" />
 			<col width="50%" />
@@ -478,7 +478,7 @@ $j(function() {
 <div class="level clearfix">
 	<h3 id="permissions">Permissions</h3>
 	<h3>Manage</h3>
-	<table class="table" id="permissions-list">
+	<table class="table ruler" id="permissions-list">
 		<colgroup>
 			<col width="10%" />
 			<col width="20%" />
@@ -611,14 +611,12 @@ $j(function() {
 							<col width="10%" />
 							<col width="20%" />
 							<col width="70%" />
-
 						</colgroup>
 						<tr>
 							<th>Service</th>
 							<th>Campus</th>
 							<th>Access</th>
 						</tr>
-						
 						<tr>
 						<td>
 						<label>
@@ -668,12 +666,14 @@ $j(function() {
         <div class="split">
             <h3>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h3>
             <table class="ruler table">
-				<tbody>
+                <thead>
 					<tr>
 						<th>Date</th>
 						<th>IP</th>
 						<th>Result</th>
 					</tr>
+                </thead>
+                <tbody>
 					<!-- BEGIN login_log -->
 					<tr>
 						<td>{LOGIN_DATE}</td>
@@ -689,11 +689,13 @@ $j(function() {
 		<div class="split last">
 			<h3>Activity <a class="btn in-heading-absolute" href="/adminv2/reports/activity/user={USERNAME}"><span></span>See All</a></h3>
 			<table class="ruler table">
-				<tbody>
+				<thead>
 					<tr>
 						<th>Date</th>
 						<th>Action</th>
 					</tr>
+                </thead>
+                <tbody>
 					<!-- BEGIN action_log -->
 					<tr>
 						<td nowrap="nowrap">{ACTION_DATE}</td>
