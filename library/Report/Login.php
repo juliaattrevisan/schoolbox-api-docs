@@ -268,8 +268,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'IP'        => $log['ip']
                 ));
 
-                $page->setVar('DARK', ++$j % 2 ? 'dark' : '');
-
                 $page->parse('activity_block', 'activity', true);
             }
 

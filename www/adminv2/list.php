@@ -276,8 +276,6 @@ if ($table) {
 
         $rowOne = 'true';
 
-        $this->setVar('ROW_COLOR', ++$j % 2 == 1 ? 'dark' : '');
-
         $this->parse('table_row_block', 'table_row', true);
         $this->setVar('table_cell_block', '');
     }

@@ -190,8 +190,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
                 else
                     $page->parse('modify_block', 'modify');
 
-                $page->setVar('DARK', ++$j%2?'dark':'');
-
                 $page->parse('user_block', 'user', true);
             }
 

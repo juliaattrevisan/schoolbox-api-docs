@@ -287,8 +287,6 @@ OR ml.name        LIKE :keyword
                     'IP'        => $log['ip']
                 ));
 
-                $page->setVar('DARK', ++$j%2?'dark':'');
-
                 $page->parse('activity_block', 'activity', true);
             }
 
