@@ -59,31 +59,29 @@
 				});
 			}
 		});
-		// Hack multiple file uploads into browsers which don't support them
-		// Modern browsers will be none the wiser.
-		if (!('multiple' in $('<input type="file">')[0])) {
-			$('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
-				var container     = $(this).closest('[data-ramsfile]');
-				var allContainers = $('#eventForm [data-ramsfile]').not(container);
-				if (this.value.length > 0) {
-					// clone me
-					// Hide remove button from new one, show it in old.
-					var newContainer = container.clone();
-					container.find('a[data-action="delete"]').show();
-					newContainer.find('a[data-action="delete"]').hide();
-					container.after(newContainer);
-				} else {
-					// delete me (unless I'm the only one)
-					if (allContainers.length) {
-						container.remove();
-					}
+		// My polyfill for multiple file uploads is actually more usable than
+		// HTML5 multifile uploads.
+		$('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
+			var container     = $(this).closest('[data-ramsfile]');
+			var allContainers = $('#eventForm [data-ramsfile]').not(container);
+			if (this.value.length > 0) {
+				// clone me
+				// Hide remove button from new one, show it in old.
+				var newContainer = container.clone();
+				container.find('a[data-action="delete"]').show();
+				newContainer.find('a[data-action="delete"]').hide();
+				container.after(newContainer);
+			} else {
+				// delete me (unless I'm the only one)
+				if (allContainers.length) {
+					container.remove();
 				}
-			});
-			$('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
-				event.preventDefault();
-				$(this).closest('[data-ramsfile]').remove();
-			});
-		}
+			}
+		});
+		$('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
+			event.preventDefault();
+			$(this).closest('[data-ramsfile]').remove();
+		});
 
 		$('#eventForm').eventModify({
 			functionLabel: "{FUNCTION}"
