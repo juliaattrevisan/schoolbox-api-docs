@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Grade\Group;
 
+use Schoolbox\Collection;
+use Schoolbox\Assessment\Component\SubmissionBox\Grade\Model as GradeModel;
+
 class Model
 {
     /**
@@ -24,6 +27,21 @@ class Model
      * @var string
      */
     protected $name;
+
+    /**
+     * Collection of grade levels that belong to this group
+     *
+     * @var Collection|GradeModel[]
+     */
+    protected $gradeLevels;
+
+    /**
+     * Constructor - sets up grade level collection.
+     */
+    public function __construct()
+    {
+        $this->setGradeLevels(new Collection());
+    }
 
     /**
      * @return int
@@ -59,5 +77,32 @@ class Model
     {
         $this->name = $name;
         return $this;
+    }
+
+    /**
+     * @return GradeModel[]|Collection
+     */
+    public function getGradeLevels()
+    {
+        return $this->gradeLevels;
+    }
+
+    /**
+     * @param  GradeModel[]|Collection $gradeLevels
+     * @return $this
+     */
+    public function setGradeLevels($gradeLevels)
+    {
+        $this->gradeLevels = $gradeLevels;
+        return $this;
+    }
+
+    /**
+     * @param  GradeModel $level
+     * @return $this
+     */
+    public function addGradeLevel(GradeModel $level)
+    {
+        $this->getGradeLevels()->add($level);
     }
 }
