@@ -273,13 +273,23 @@ $categoryContext = array(   'id'   => $category->getID(),
 );
 
 //Setup control buttons
-$manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
+$manageFolderController = new Component_Homepage_ManageFolderController(
+    new Component_Instance(),
+    $_SESSION['user'],
+    $this
+);
+$manageFolderController->setMaximumPermission($permission);
 $manageFolderController->setup($categoryContext, array());
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
 //Setup class list buttons
-$manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
+$manageClassController = new Component_Homepage_ManageClassController(
+    new Component_Instance(),
+    $_SESSION['user'],
+    $this
+);
+$manageClassController->setMaximumPermission($permission);
 $manageClassController->setup($categoryContext, array());
 $manageClassController->execute();
 if($manageClassController->renderTemplate('manage_class')){
