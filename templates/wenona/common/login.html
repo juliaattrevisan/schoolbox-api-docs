@@ -83,7 +83,7 @@ p#login-footer{
 <body onload="document.getElementById('login').username.focus();">
     <div>
     <div id="front-login" >
-        <form name="login" id="login" method="post" action="/loginForm.php">
+        <form name="login" id="login" method="post" action="/loginForm.php?{GET_PARAMS}">
 		<h1>Portal Login</h1>
         <p>{ERROR}</p>
             <table class="table">
