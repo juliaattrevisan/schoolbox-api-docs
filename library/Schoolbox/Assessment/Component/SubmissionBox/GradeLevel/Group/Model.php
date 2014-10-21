@@ -7,10 +7,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Grade\Group;
+namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Component\SubmissionBox\Grade\Model as GradeModel;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
 
 class Model
 {
@@ -31,7 +31,7 @@ class Model
     /**
      * Collection of grade levels that belong to this group
      *
-     * @var Collection|GradeModel[]
+     * @var Collection|GradeLevelModel[]
      */
     protected $gradeLevels;
 
@@ -80,7 +80,7 @@ class Model
     }
 
     /**
-     * @return GradeModel[]|Collection
+     * @return GradeLevelModel[]|Collection
      */
     public function getGradeLevels()
     {
@@ -88,7 +88,7 @@ class Model
     }
 
     /**
-     * @param  GradeModel[]|Collection $gradeLevels
+     * @param  GradeLevelModel[]|Collection $gradeLevels
      * @return $this
      */
     public function setGradeLevels($gradeLevels)
@@ -98,10 +98,10 @@ class Model
     }
 
     /**
-     * @param  GradeModel $level
+     * @param  GradeLevelModel $level
      * @return $this
      */
-    public function addGradeLevel(GradeModel $level)
+    public function addGradeLevel(GradeLevelModel $level)
     {
         $this->getGradeLevels()->add($level);
     }

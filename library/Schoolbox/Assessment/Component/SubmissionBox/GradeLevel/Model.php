@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Grade;
+namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
 class Model
 {

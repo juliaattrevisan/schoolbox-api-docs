@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Grade\Group;
+namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -19,7 +19,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('submission_grade_group');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Grade\\Group\\Model');
+        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',

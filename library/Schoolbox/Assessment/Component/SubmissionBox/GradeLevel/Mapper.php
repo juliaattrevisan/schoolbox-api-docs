@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Grade;
+namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -19,7 +19,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('submission_grade');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Grade\\Model');
+        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Model');
         $this->hasMap(
             array(
                 'column'     => 'grade_id',
@@ -35,7 +35,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'group',
                 'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Grade\\Group\\Mapper',
+                    'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Mapper',
                     'other_key' => 'id',
                 )
             )
