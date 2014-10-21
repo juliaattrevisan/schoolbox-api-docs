@@ -108,9 +108,7 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-if (!empty($_GET['readonly'])) {
-    $componentFactory->setMaximumPermission(READ_ACCESS);
-}
+$componentFactory->setMaximumPermission($permission);
 $componentCollection = $componentFactory->buildComponentList($category->getId());
 
 // User has elevated priviliges: can write to page
