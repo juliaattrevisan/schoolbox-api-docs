@@ -1,0 +1,62 @@
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents clearfix">
+    <h2>Submission Grades and Groupings</h2>
+    <div class="level clearfix">
+        <form id="gradesForm" method="POST" action="/adminv2/gradesForm.php">
+            <div class="half listing">
+                <ul>
+                    <li>Edit the grades and groupings for grades here. These options will be available to use on all submissions.</li>
+                    <li>Note that once grades or groupings have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                        that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
+                    <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
+                </ul>
+            </div>
+            <div class="half last">
+                <ul id="grades">
+                    <!-- BEGIN submission_grade_group -->
+                    <li>
+                        <input type="hidden"
+                               name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
+                               value="{SUBMISSION_GRADE_GROUP_ID}"
+                        />
+                        <input type="text"
+                               name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
+                               value="{SUBMISSION_GRADE_GROUP_NAME}"
+                               placeholder="Grouping Name"
+                        />
+                        <ul>
+                            <!-- BEGIN submission_grade -->
+                            <li>
+                                <input type="hidden"
+                                       name="grade[{SUBMISSION_GRADE_ID}][id]"
+                                       value="{SUBMISSION_GRADE_ID}"
+                                />
+                                <input type="hidden"
+                                       name="grade[{SUBMISSION_GRADE_ID}][group_id]"
+                                       value="{SUBMISSION_GRADE_GROUP_ID}"
+                                />
+                                <input type="text"
+                                       name="grade[{SUBMISSION_GRADE_ID}][lower_bound]"
+                                       value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                       placeholder="Lower Bound"
+                                />
+                                <input type="text"
+                                       name="grade[{SUBMISSION_GRADE_ID}][caption]"
+                                       value="{SUBMISSION_GRADE_CAPTION}"
+                                       placeholder="Caption"
+                                />
+                            </li>
+                            <!-- END submission_grade -->
+                        </ul>
+                    </li>
+                    <!-- END submission_grade_group -->
+                </ul>
+            </div>
+        </form>
+    </div>
+</div>
