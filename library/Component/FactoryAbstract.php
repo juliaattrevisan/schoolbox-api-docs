@@ -91,6 +91,7 @@ abstract class Component_FactoryAbstract {
             $controllerReflection = new ReflectionClass($class);
 
             $controller = $controllerReflection->newInstanceArgs($argumentList);
+            $controller->setMaximumPermission($this->getMaximumPermission());
 
             return $controller;
         }
