@@ -10,50 +10,61 @@
             var groupTemplate = doT.template($('script#submission-grade-group-template').html().trim());
             var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
 
-            // Lamery with messing with rows
-            // Blur the last grouping name field:
-            // Create a new one, if it's not empty
-            var form     = $('form#gradesForm');
+            var form = $('form#gradesForm');
+
+            /**
+             * Adds a new grade to the given group.
+             * @param gradeGroup
+             */
+            var addGrade = function(gradeGroup) {
+                // Get the grade ID out of the container
+                var groupId = gradeGroup.data('groupid');
+                gradeGroup.find('.gradeList').append(
+                    gradeTemplate({
+                        id: 'new-'+String(newGradeId++),
+                        group: {
+                            id: groupId
+                        }
+                    })
+                );
+            };
+
+            /**
+             * Adds a new grade group, and a new grade entry to that group.
+             */
             var addGroup = function() {
                 var newGroup  = $(groupTemplate({
-                    id: 'new-'+String(newGroupId)
+                    id: 'new-'+String(newGroupId++)
                 }));
-                var newGrade  = $(gradeTemplate({
-                    id: 'new-'+String(newGradeId),
-                    group: {
-                        id: 'new-'+String(newGroupId)
-                    }
-                }));
-                newGradeId++;
-                newGroupId++;
-                newGroup.find('.gradeList').append(newGrade);
+                addGrade(newGroup);
                 form.find('#gradeGroupList').append(newGroup);
             };
-            var addGrade = function(container) {
-                container.find('.gradeList');
-            };
+
+            // Add a new grade entry to each group, and a new empty group.
+            form.find('.gradeGroup').each(function() {
+                addGrade($(this));
+            });
             addGroup();
 
+            // If you blur the last grouping name field:
+            // Create a new one, if it's not empty.
             form.on('blur', 'input[name$="[name]"]:last', function(event) {
                 if (this.value.length > 0) {
-                    // Clone out a new grouping
-//                    var input = groupTemplate({
-//                        id: 'new-'+String(newGradeId++),
-//                        group: {}
-//                    });
+                    addGroup();
                 }
             });
+
+            // If you blur the last grade field in a group:
+            // Create a new one, if it's not empty.
             form.on('blur', 'input[name$="[caption]"]', function(event) {
-                // Only trigger this event if it's the last caption for this group
                 if (this.value.length > 0) {
-                    // Clone out a new grouping
                     var element     = $(this);
-                    var lastCaption = element.closest('.gradeList')
+                    var group       = element.closest('.gradeGroup');
+                    var lastCaption = group
                         .find('input[name$="[caption]"]')
                         .filter(':last');
                     if (element.is(lastCaption)) {
-                        // Clone a new grade
-                        console.log('3');
+                        addGrade(group);
                     }
                 }
             });
