@@ -1213,50 +1213,110 @@ Notifications
 /*--------------------------------------------------------------
  BOXES/COMPONENT LAYOUT ^_^
 --------------------------------------------------------------*/
+.homepage {
+	.ui-sortable-helper {
+		.shadow-14();
+		.transition(
+			box-shadow 120ms ease-out 70ms
+		);
+	}
+	.add-component.pending {
+		border: dashed 1px #ccc;
+		background: #f7f7f7;
+		width: 100%;
+		text-align: center;
+		h4 {
+			background: url('/images/resources/ajax.gif') no-repeat 0 50%;
+			height: 16px;
+			width: auto;
+			margin: 0 auto 16px;
+			position: absolute;
+			padding-left: 24px;
+			left: 50%;
+			.transform(
+				translateX(-50%)
+			);
+		}
+		strong {
+			display: none;
+		}
+		.icon {
+			left: 50%;
+			.transform(
+				translateX(-50%)
+			);
+		}
+	}
+	.placeholder {
+		display: none;
+	}
+}
+
+.homepage .column {
+	position: relative;
+}
 .marker, .empty-column {
     border: 1px dashed @positive-color;
-    height: 150px;
-    margin: 16px;
+    min-height: 48px;
+    margin: 0 0 16px 0;
+	box-sizing: border-box;
     display: block;
-    z-index: 2;
-    text-align: center;
-    font-size: 18px;
-    color: darken(@positive-color,@darken-value);
-    font-weight: bold;
-    line-height: 150px;
-    text-shadow: 0 1px 1px @white;
+    z-index: auto;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     .gradient(lighten(@positive-color,@lighten-value * 2),lighten(@positive-color,@lighten-value));
 }
+.marker, .empty-column .placeholder {
+	text-align: center;
+	font-size: 16px;
+	color: darken(@positive-color,@darken-value);
+	font-weight: bold;
+	line-height: 24px;
+	text-shadow: 0 1px 1px @white;
+	position: relative;
+}
+
+.marker span, .empty-column .placeholder {
+	position: absolute;
+	top: 50%;
+	width: 94%;
+	left: 0;
+	transform: translateY(-50%);
+	padding: 3%;
+}
+
 
 .empty-column {
-    display: none;
-    min-height: 50px;
+	display: block;
+    min-height: 48px;
     height: auto;
-    line-height: 50px;
+    line-height: 48px;
     background: none;
     color: @std-grey;
-    margin: 16px 0;
     border-color: @std-grey;
     filter: none;
     position: relative;
-    .box {
-        padding: 0 16px;
-    }
     p {
         text-align: center;
         padding: 0px 16px;
-        font-size: 18px;
+        font-size: 16px;
         color: @std-grey !important;
         font-weight: bold;
         text-shadow: 0 1px 1px @white;
         margin: 0;
-        line-height: 50px;
-
+        line-height: 48px;
     }
-
+	.marker {
+		border-width: 0px;
+		margin-bottom: 0;
+	}
+	p.placeholder {
+		display: block;
+		.transition(
+			height 90ms ease
+		);
+	}
 }
 
 .box {
@@ -1268,6 +1328,9 @@ Notifications
     .text {
         padding: 8px 16px;
     }
+	h2:not(.permanent) {
+		cursor: move;
+	}
     h3 {
         font-weight: bold;
         padding: 7px 0;
@@ -6797,6 +6860,7 @@ HOMEPAGE CUSTOMISE
         transition: all 500ms ease;
         max-height: 0px;
         &.open{
+			margin-bottom: 16px;
             border: 1px solid @std-grey;
             padding: 15px;
             background-color: @dark;
@@ -6856,19 +6920,26 @@ HOMEPAGE CUSTOMISE
 }
 
 .add-component {
-    border-right: 1px solid @lgrey;
+    border: solid 1px transparent;
+	background-color: rgba(255, 255, 255, 0);
+    border-right-color: @lgrey;
     position: relative;
     float: left;
     zoom: 1;
     width: 135px;
     height: 135px;
     margin: 0 0 15px 0;
-    .transition(opacity 0.5s);
+    .transition(
+		opacity 500ms,
+		border-color 90ms ease-out 500ms,
+		background-color 200ms ease-out 500ms
+	);
 
     a{
         display: block;
         height: 100%;
         width: 100%;
+		cursor: move;
         &:hover{ text-decoration: none; }
         &:hover .icon{
             opacity: 0.75;
@@ -6966,7 +7037,14 @@ HOMEPAGE CUSTOMISE
             background: rgba(222,222,222,0.1);
             text-indent: -90000px;
         }
+		a {
+			cursor: default;
+		}
     }
+	&.insert-new {
+		border-color: @lgrey;
+		background-color: rgba(255, 255, 255, 1);
+	}
 }
 
 .add-component p {
@@ -8760,9 +8838,18 @@ tr span.leave-pending {
     display: none;
 }
 
-.homepage .active {
-    background: @lgrey;
+.homepage {
+	.edit:hover em {
+		display: block;
+	}
+	.active {
+		background: @lgrey;
+		em {
+			display: block;
+		}
+	}
 }
+
 
 .add-component.undeveloped .btn {
     display: none;
