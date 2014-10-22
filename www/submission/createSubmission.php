@@ -5,7 +5,6 @@ $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
-$this->setBlock(TEMPLATE_content, 'gradegroup', 'gradegroup_block');
 
 // Instead of all this block BS I'll create a sub-template
 $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
@@ -19,6 +18,8 @@ $this->setBlock('marktype', 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
+$this->setBlock('marktype', 'gradegroup_explanation', 'gradegroup_explanation_block');
+$this->setBlock('gradegroup_explanation', 'gradegroup_explanation_level', 'gradegroup_explanation_level_block');
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
 
@@ -60,7 +61,7 @@ $zone
 // They do for pre-existing items, they don't for new items.
 $work_types  = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
 $mark_types  = $mark_mapper->getAll();
-$gradeGroups = $groupMapper->findAll();
+$gradeGroups = $groupMapper->findAllWithGradeLevels();
 
 $title            = '';
 $heading          = '';
@@ -241,6 +242,26 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         )
     );
     // Maybe output the marks for each grade group?
+    $this->setVar('gradegroup_explanation_block', '');
+    foreach ($gradeGroups as $group) {
+        $this->setVar(
+            array(
+                'gradegroup_explanation_level_block' => '',
+                'GRADEGROUP_NAME'                    => $group->getName(),
+            )
+        );
+        foreach ($group->getGradeLevels() as $level) {
+            $this->setVar(
+                array(
+                    'GRADEGROUP_LEVEL_LOWER_BOUND' => $level->getLowerBound(),
+                    'GRADEGROUP_LEVEL_CAPTION'     => $level->getCaption(),
+                )
+            );
+            $this->parse('gradegroup_explanation_level_block', 'gradegroup_explanation_level', true);
+        }
+        $this->parse('gradegroup_explanation_block', 'gradegroup_explanation', true);
+    }
+
 
     // if the rubric creation fails it will throw an exception, in which case just output the empty sets
     // Default values for criteria

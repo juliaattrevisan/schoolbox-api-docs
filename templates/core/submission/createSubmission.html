@@ -483,6 +483,19 @@
                 <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
                 <!-- END gradegroup_drop -->
             </select>
+
+            <dl>
+                <!-- BEGIN gradegroup_explanation -->
+                <dt>{GRADEGROUP_NAME}</dt>
+                <dd>
+                    <ul>
+                        <!-- BEGIN gradegroup_explanation_level -->
+                        <li>{GRADEGROUP_LEVEL_LOWER_BOUND}+: {GRADEGROUP_LEVEL_CAPTION}</li>
+                        <!-- END gradegroup_explanation_level -->
+                    </ul>
+                </dd>
+                <!-- END gradegroup_explanation -->
+            </dl>
         </td>
     </tr>
     <tr id="marktype-total" class="marks-hide dark">
