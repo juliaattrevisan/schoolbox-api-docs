@@ -53,8 +53,14 @@ class Session
 
         $ip = Session::getIP();
 
-        /* if user is found and session is started create our user record */
+        if($remember == true) {
+            session_set_cookie_params(5184000);
+        }
+        else {
+            session_set_cookie_params(0);
+        }
 
+        /* if user is found and session is started create our user record */
         if (is_array($user) && session_start()) {
 
 
