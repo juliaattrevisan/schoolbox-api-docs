@@ -63,7 +63,7 @@
 
 <!-- Template for grade groups -->
 <script type="x-dot-template" id="submission-grade-group-template">
-    <li class="new gradeGroup">
+    <li class="new gradeGroup" data-groupid="{{! it.id }}">
         <input type="hidden"
                name="group[{{! it.id }}][id]"
                value="{{! it.id }}"
@@ -92,7 +92,7 @@
 
 <!-- Template for grades -->
 <script type="x-dot-template" id="submission-grade-template">
-    <tr class="new grade">
+    <tr class="new grade" data-gradeid="{{! it.id }}">
         <td>
             <input type="hidden"
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][id]"
@@ -136,7 +136,7 @@
             <div class="half last">
                 <ul id="gradeGroupList">
                     <!-- BEGIN submission_grade_group -->
-                    <li class="gradeGroup">
+                    <li class="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
                         <input type="hidden"
                                name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
                                value="{SUBMISSION_GRADE_GROUP_ID}"
@@ -155,7 +155,7 @@
                             </thead>
                             <tbody class="gradeList">
                             <!-- BEGIN submission_grade -->
-                            <tr class="grade">
+                            <tr class="grade" data-gradeid="{SUBMISSION_GRADE_ID}">
                                 <td>
                                     <input type="text"
                                            name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
@@ -172,80 +172,10 @@
                                 </td>
                             </tr>
                             <!-- END submission_grade -->
-                            <!--
-                                New submission grade input - no ID
-                                use a JS template instead?
-                                Alternately use a JS template to render the
-                                whole thing instead of PHPLibbery
-                                Let's just say -ve numbers are new items
-                            -->
-                            <!--
-                            <tr class="new grade">
-                                <td>
-                                    <input type="text"
-                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][new-1][lower_bound]"
-                                           value=""
-                                           placeholder="Lower Bound"
-                                            />
-                                </td>
-                                <td>
-                                    <input type="text"
-                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][new-1][caption]"
-                                           value=""
-                                           placeholder="Caption"
-                                            />
-                                </td>
-                            </tr>
-                            -->
                             </tbody>
                         </table>
                     </li>
                     <!-- END submission_grade_group -->
-                    <!--
-                        New submission grade group input - no ID
-                        use a JS template instead?
-                        Alternately use a JS template to render the
-                        whole thing instead of PHPLibbery?
-                    -->
-                    <!--
-                    <li class="new gradeGroup">
-                        <input type="text"
-                               name="group[new-1][name]"
-                               value=""
-                               placeholder="Grouping Name"
-                        />
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Lower Bound</th>
-                                <th>Caption</th>
-                            </tr>
-                            </thead>
-                            <tbody class="gradeList">
-                            <tr class="new grade">
-                                <td>
-                                    <input type="hidden"
-                                           name="group[new-1][grade][new-1][id]"
-                                           value=""
-                                            />
-                                    <input type="text"
-                                           name="group[new-1][grade][new-1][lower_bound]"
-                                           value=""
-                                           placeholder="Lower Bound"
-                                            />
-                                </td>
-                                <td>
-                                    <input type="text"
-                                           name="group[new-1][grade][new-1][caption]"
-                                           value=""
-                                           placeholder="Caption"
-                                            />
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </li>
-                    -->
                 </ul>
             </div>
         </form>
