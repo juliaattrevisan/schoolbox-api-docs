@@ -36,26 +36,26 @@ class Marksheet_Letter extends Marksheet_Abstract {
     }
 
     public function outputUI(SitePage $page, $mark) {
-        $subHandler = new Submission();
-
         $page->setVar('grade_drop_block', '');
 
-        $grades = $subHandler->getLetterGrades();
-
-        $dem = DueWork_ErrorMapper::getInstance();
-        $errs = $dem->listDisplayValues();
-        foreach($errs as $e) {
-            $grades[] = array(
-                'grade_id' => $e,
-                'lower_bound' => -1,
-                'caption' => $e,
-            );
-        }
-
-        $page->dropdown('grade_drop', $grades, $mark['grade_selected'], 'mark_type_letter', array(
-            'grade_id' => 'GRADE_VALUE',
-            'caption'  => 'GRADE_TEXT',
-        ));
+        // Only allow letter grades for the selected submission box
+        // TODO allow the submission to be passed in here
+        $factory = new Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\ListFactory();
+        $submission = new \Schoolbox\Assessment\Component\SubmissionBox();
+        $submission->getMarkType()->setId(
+            \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_LETTER
+        );
+        $grades = $factory->buildGradeList($submission);
+        $page->dropdown(
+            'grade_drop',
+            $grades,
+            $mark['grade_selected'],
+            'mark_type_letter',
+            array(
+                'id'      => 'GRADE_VALUE',
+                'caption' => 'GRADE_TEXT',
+            )
+        );
         $page->setVar('COMMENT', Scrub::text($mark['comment']));
     }
 
