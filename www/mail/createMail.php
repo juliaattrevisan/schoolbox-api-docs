@@ -20,8 +20,12 @@ if (Cfg::get('mail_enable') == 1) {
     foreach (Mailer::parseAddressString($_REQUEST['replyto']) as $email => $name) {
         $replytoList[] = Mailer::buildAddress($email, $name);
     }
-    foreach (Mailer::parseAddressString($_REQUEST['bcc']) as $email => $name) {
-        $bccList[] = Mailer::buildAddress($email, $name);
+    if($_REQUEST['bcc']) {
+        foreach (Mailer::parseAddressString($_REQUEST['bcc']) as $email => $name) {
+            $bccList[] = Mailer::buildAddress($email, $name);
+        }
+    } else {
+        $bccList[] = Mailer::buildAddress($_SESSION['user']->getEmail(), $_SESSION['user']->getFullName());
     }
 
     $page->setFile(TEMPLATE_content, 'mail/send.html');
