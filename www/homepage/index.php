@@ -91,7 +91,7 @@ $catHandler->logPageView($category->getId());
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
-$this->setTitle($category->getName());
+$this->setTitle(Scrub::text($category->getName()));
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -285,21 +285,24 @@ else {
 
 $this->parse('page_controls_block','page_controls');
 
-if($category->getCodes()->count() > 4) {
-    //Get first 4 codes
-    $subCodes = $category->getCodes()->slice(0, 4);
-    foreach($subCodes as $subCode) {
-        $subCodeString[] = $subCode->getCode();
+$codeString = '';
+if($_SESSION['user']->getRole()->isStaff()) {
+    if($category->getCodes()->count() > 4) {
+        //Get first 4 codes
+        $subCodes = $category->getCodes()->slice(0, 4);
+        foreach($subCodes as $subCode) {
+            $subCodeString[] = $subCode->getCode();
+        }
+        $codeString = Scrub::text(implode(',',$subCodeString).'....');
+    } else {
+        $codeString = Scrub::text($category->getCodeString());
     }
-    $codeString = Scrub::text(implode(',',$subCodeString).'....');
-} else {
-    $codeString = Scrub::text($category->getCodeString());
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING' => Scrub::text($category->getName()) . ($category->getCodes()->count() ? ' (' . $codeString . ')' : ''),
+    'HEADING' => Scrub::text($category->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
     'CODE' => urlencode(urlencode($category->getCodeString())),
     'ID' => $category->getId(),
     'USER_TOKEN' => $_SESSION['key'],
