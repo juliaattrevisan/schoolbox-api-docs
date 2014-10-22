@@ -1,3 +1,120 @@
+<!-- BEGIN custom_head -->
+<script type="application/javascript" src="/javascript/components/doT/doT.min.js"></script>
+<script type="application/javascript">
+    (function($){
+        $(function(){
+
+            var newGroupId = 1;
+            var newGradeId = 1;
+
+            var groupTemplate = doT.template($('script#submission-grade-group-template').html().trim());
+            var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
+
+            // Lamery with messing with rows
+            // Blur the last grouping name field:
+            // Create a new one, if it's not empty
+            var form     = $('form#gradesForm');
+            var addGroup = function() {
+                var newGroup  = $(groupTemplate({
+                    id: 'new-'+String(newGroupId)
+                }));
+                var newGrade  = $(gradeTemplate({
+                    id: 'new-'+String(newGradeId),
+                    group: {
+                        id: 'new-'+String(newGroupId)
+                    }
+                }));
+                newGradeId++;
+                newGroupId++;
+                newGroup.find('.gradeList').append(newGrade);
+                form.find('#gradeGroupList').append(newGroup);
+            };
+            var addGrade = function(container) {
+                container.find('.gradeList');
+            };
+            addGroup();
+
+            form.on('blur', 'input[name$="[name]"]:last', function(event) {
+                if (this.value.length > 0) {
+                    // Clone out a new grouping
+//                    var input = groupTemplate({
+//                        id: 'new-'+String(newGradeId++),
+//                        group: {}
+//                    });
+                }
+            });
+            form.on('blur', 'input[name$="[caption]"]', function(event) {
+                // Only trigger this event if it's the last caption for this group
+                if (this.value.length > 0) {
+                    // Clone out a new grouping
+                    var element     = $(this);
+                    var lastCaption = element.closest('.gradeList')
+                        .find('input[name$="[caption]"]')
+                        .filter(':last');
+                    if (element.is(lastCaption)) {
+                        // Clone a new grade
+                        console.log('3');
+                    }
+                }
+            });
+        });
+    })(jQuery);
+</script>
+
+<!-- Template for grade groups -->
+<script type="x-dot-template" id="submission-grade-group-template">
+    <li class="new gradeGroup">
+        <input type="hidden"
+               name="group[{{! it.id }}][id]"
+               value="{{! it.id }}"
+        />
+        <input type="text"
+               name="group[{{! it.id }}][name]"
+               value="{{! it.name }}"
+               placeholder="Grouping Name"
+        />
+        <table>
+            <thead>
+                <tr>
+                    <th>Lower Bound</th>
+                    <th>Caption</th>
+                </tr>
+            </thead>
+            <tbody class="gradeList">
+                <!-- include templates for all grades, and add another for blanks -->
+                {{~ it.gradeLevels :level }}
+                    {{= it.gradeTemplate(level) }}
+                {{~}}
+            </tbody>
+        </table>
+    </li>
+</script>
+
+<!-- Template for grades -->
+<script type="x-dot-template" id="submission-grade-template">
+    <tr class="new grade">
+        <td>
+            <input type="hidden"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][id]"
+                   value="{{! it.id }}"
+            />
+            <input type="text"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][lower_bound]"
+                   value="{{! it.lowerBound }}"
+                   placeholder="Lower Bound"
+            />
+        </td>
+        <td>
+            <input type="text"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][caption]"
+                   value="{{! it.caption }}"
+                   placeholder="Caption"
+            />
+        </td>
+    </tr>
+</script>
+<!-- END custom_head -->
+
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
     <!-- BEGIN admin_nav_item -->
@@ -17,9 +134,9 @@
                 </ul>
             </div>
             <div class="half last">
-                <ul id="grades">
+                <ul id="gradeGroupList">
                     <!-- BEGIN submission_grade_group -->
-                    <li>
+                    <li class="gradeGroup">
                         <input type="hidden"
                                name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
                                value="{SUBMISSION_GRADE_GROUP_ID}"
@@ -29,32 +146,106 @@
                                value="{SUBMISSION_GRADE_GROUP_NAME}"
                                placeholder="Grouping Name"
                         />
-                        <ul>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Lower Bound</th>
+                                <th>Caption</th>
+                            </tr>
+                            </thead>
+                            <tbody class="gradeList">
                             <!-- BEGIN submission_grade -->
-                            <li>
-                                <input type="hidden"
-                                       name="grade[{SUBMISSION_GRADE_ID}][id]"
-                                       value="{SUBMISSION_GRADE_ID}"
-                                />
-                                <input type="hidden"
-                                       name="grade[{SUBMISSION_GRADE_ID}][group_id]"
-                                       value="{SUBMISSION_GRADE_GROUP_ID}"
-                                />
-                                <input type="text"
-                                       name="grade[{SUBMISSION_GRADE_ID}][lower_bound]"
-                                       value="{SUBMISSION_GRADE_LOWER_BOUND}"
-                                       placeholder="Lower Bound"
-                                />
-                                <input type="text"
-                                       name="grade[{SUBMISSION_GRADE_ID}][caption]"
-                                       value="{SUBMISSION_GRADE_CAPTION}"
-                                       placeholder="Caption"
-                                />
-                            </li>
+                            <tr class="grade">
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
+                                           value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                           placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
+                                           value="{SUBMISSION_GRADE_CAPTION}"
+                                           placeholder="Caption"
+                                            />
+                                </td>
+                            </tr>
                             <!-- END submission_grade -->
-                        </ul>
+                            <!--
+                                New submission grade input - no ID
+                                use a JS template instead?
+                                Alternately use a JS template to render the
+                                whole thing instead of PHPLibbery
+                                Let's just say -ve numbers are new items
+                            -->
+                            <!--
+                            <tr class="new grade">
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][new-1][lower_bound]"
+                                           value=""
+                                           placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][new-1][caption]"
+                                           value=""
+                                           placeholder="Caption"
+                                            />
+                                </td>
+                            </tr>
+                            -->
+                            </tbody>
+                        </table>
                     </li>
                     <!-- END submission_grade_group -->
+                    <!--
+                        New submission grade group input - no ID
+                        use a JS template instead?
+                        Alternately use a JS template to render the
+                        whole thing instead of PHPLibbery?
+                    -->
+                    <!--
+                    <li class="new gradeGroup">
+                        <input type="text"
+                               name="group[new-1][name]"
+                               value=""
+                               placeholder="Grouping Name"
+                        />
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Lower Bound</th>
+                                <th>Caption</th>
+                            </tr>
+                            </thead>
+                            <tbody class="gradeList">
+                            <tr class="new grade">
+                                <td>
+                                    <input type="hidden"
+                                           name="group[new-1][grade][new-1][id]"
+                                           value=""
+                                            />
+                                    <input type="text"
+                                           name="group[new-1][grade][new-1][lower_bound]"
+                                           value=""
+                                           placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[new-1][grade][new-1][caption]"
+                                           value=""
+                                           placeholder="Caption"
+                                            />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    -->
                 </ul>
             </div>
         </form>
