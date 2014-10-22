@@ -150,6 +150,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'mark_type',
 		));
+        $this->hasMap(
+            array(
+                'column'   => 'submission_grade_group_id',
+                'property' => 'gradeGroup',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'gradeGroup',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Mapper',
+                    'other_key' => 'id',
+                ),
+            )
+        );
 		$this->hasMap(array(
 			'column'     => 'max_mark',
 			'property'   => 'maxMark',

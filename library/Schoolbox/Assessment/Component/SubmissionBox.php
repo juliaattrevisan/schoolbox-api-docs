@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\User;
 
@@ -41,6 +42,11 @@ class SubmissionBox implements ISoftDeletable
      * @var WorkType
      */
     protected $work_type;
+
+    /**
+     * @var GradeLevel\Group\Model
+     */
+    protected $gradeGroup;
 
     /**
      * @var string
@@ -668,5 +674,23 @@ class SubmissionBox implements ISoftDeletable
     public function getSkipUnsubmitted()
     {
         return $this->skipUnsubmitted;
+    }
+
+    /**
+     * @return GradeLevel\Group\Model
+     */
+    public function getGradeGroup()
+    {
+        return $this->gradeGroup;
+    }
+
+    /**
+     * @param  GradeLevel\Group\Model $gradeGroup
+     * @return $this
+     */
+    public function setGradeGroup($gradeGroup)
+    {
+        $this->gradeGroup = $gradeGroup;
+        return $this;
     }
 }
