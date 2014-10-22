@@ -89,11 +89,17 @@ class Session extends BaseSession {
      */
     public function isAuthSessionAlive() {
         $authSession   = $this->getSegment(null);
-        $lastTime      = $authSession->get('lasttime');
-        $sessionLength = $this->getConfig()->get('session_length');
 
-        // Session timed out: don't get the user.
-        return (!($lastTime + $sessionLength < $this->getRequestTime()));
+        if($authSession->get('remember')) {
+            return true;
+        }
+        else {
+            $lastTime      = $authSession->get('lasttime');
+            $sessionLength = $this->getConfig()->get('session_length');
+
+            // Session timed out: don't get the user.
+            return (!($lastTime + $sessionLength < $this->getRequestTime()));
+        }
     }
 
     /**
