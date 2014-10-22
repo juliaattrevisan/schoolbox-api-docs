@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 
@@ -59,7 +60,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString('g')},
                 {$this->getJoinColumnString('levels', 'l')}
             FROM `{$this->getTable()}` `g`
-            INNER JOIN {$this->getJoinSql('levels', 'g', 'l')}
+            LEFT JOIN {$this->getJoinSql('levels', 'g', 'l')}
             ORDER BY `g`.`id` ASC, `l`.`lower_bound` ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
@@ -74,7 +75,10 @@ class Mapper extends BaseMapper
             if (!array_key_exists($id, $groups)) {
                 $groups[$id] = $item;
             }
-            $groups[$id]->addGradeLevel($this->hydrateJoin($row, 'levels', 'l'));
+            $level = $this->hydrateJoin($row, 'levels', 'l');
+            if ($level instanceof GradeModel && $level->getId()) {
+                $groups[$id]->addGradeLevel($level);
+            }
         }
         return new Collection(array_values($groups));
     }
