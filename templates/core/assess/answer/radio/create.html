@@ -1,3 +1,4 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -51,7 +52,8 @@ $j(document).ready(function() {
 				type_id: theForm.find('select[name=type_id]').val(),
 				question: tinyMCE.get('question').getContent(),
 				marks: theForm.find('input[name=marks]').val(),
-				allAnswers: JSON.stringify(answerCollection)
+				allAnswers: JSON.stringify(answerCollection),
+				configuration: JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 			};
 
 			/* Submit via POST and redirect to question creation screen upon done
@@ -149,11 +151,19 @@ $j(document).ready(function() {
 	
     /* Add a new answer option
      */
-    $j(document).on('click', '#makeNewAnswer', function() {
-		var thing = $j('.hidden-clone li:first-child').clone();
-		$j('ul#answerCollection').append(thing);
-		refreshList();
-		
+    $j(document).on('click', '.makeNewAnswer', function(e) {
+		e.preventDefault();
+
+		var maxItems = 702;
+
+		/* Obey limit
+		 */
+		if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
+            var thing = $j('.hidden-clone li:first-child').clone();
+            $j('ul#answerCollection').append(thing);
+            refreshList();
+		}
+
 		return false;
     });
 	
@@ -167,20 +177,16 @@ $j(document).ready(function() {
     });	
 	
 	$j(document).on('click', '.answerCorrect', function() {
-		refreshList();
 		$j(this).parent().parent().toggleClass("highlight");
 	});
 	
 	function refreshList() {
-		
-		var alphabetStart = 65;
+		var i = 1;
 
-		$j('li.inputs > .list-item').each(function() {	
-			var $this = $j(this);
-			$this.children('span').html('&#' + alphabetStart + ';)');
-			var convert = String.fromCharCode(alphabetStart);
-			$this.children('input').val(convert);
-			alphabetStart++;
+		$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+			$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
+			$(element).children('input').val(i);
+			i++;
 		});
 		
 		var pos = $j('#answerCollection').height();
@@ -196,22 +202,22 @@ $j(document).ready(function() {
 });
 </script>
 
-<label>Answer
+<label>Answer</label>
     <div class="answer-collection">
         <ul id="answerCollection" >
 			<li class="inputs clearfix">
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
-				<label class="check-it"><input name="answer[]" class="answerCorrect" checkbox="checkbox" type="checkbox" value="" /></label>
+				<div class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></div>
+				<label class="check-it"><input name="answer[]" class="answerCorrect" type="radio" value="" /></label>
 				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>		
         </ul>
 		
-		<label for="answerDescription[]" generated="true" id="listItems" class="error">Please fill out all answers</label>
-		<label for="answer[]" generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
+	<label generated="true" id="listItems" class="error">Please fill out all answers</label>
+	<label generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
 		
 		<p class="clearfix">
-        <a class="add-answer btn add float-left" id="makeNewAnswer" href="#"><span></span>Add answer option</a>
+		<a class="add-answer btn add float-left makeNewAnswer" href="#"><span></span>Add answer option</a>
 		</p>
     </div>
 	
@@ -219,11 +225,10 @@ $j(document).ready(function() {
         <ul>
 			<li class="inputs clearfix">
 				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
-				<label class="check-it"><input name="answer[]" class="answerCorrect " checkbox="checkbox" type="checkbox" value="" /></label>
+				<label class="check-it"><input name="answer[]" class="answerCorrect " type="radio" value="" /></label>
 				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
 				<div class="delete"></div>
 			</li>		
         </ul>
-        <a class="add-answer" id="makeNewAnswer">Add answer option</a>
+	<a class="add-answer makeNewAnswer">Add answer option</a>
     </div>
-</label>

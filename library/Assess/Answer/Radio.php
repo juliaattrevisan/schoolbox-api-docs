@@ -2,77 +2,13 @@
 /**
  * Assess_Answer_Radio
  *
- * Handler for Multiple Choice questions.
+ * Handler for Multiple Choice questions with only a single answer.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Radio extends Evaluation_Answer_Radio {
-
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Assess_Response());
-	}
-
-	/**
-     * Automatically marks a response. Customised to be applicable to the way in
-     * which the response is actually stored.
-	 *
-	 * @param  $currentResponse
-	 * @return void
-	 */
-    public function mark($currentResponse) {
-        $response = unserialize($currentResponse['response']);
-        $answer = unserialize($currentResponse['answer']);
-
-        /* Find out how much each correct answer is worth
-         *
-         * i: the actual number of correct responses for the question
-         * numCorrect: the number of correct responses submitted
-         */
-        $i = 0;
-        $numCorrect = 0;
-
-		if (is_array($answer)) {
-			foreach($answer as $currentAnswer) {
-				if ($currentAnswer->correct) {
-
-					/* If the user responded with a correct answer, accumulate
-					 */
-					if (is_array($response) && in_array($currentAnswer->value, $response)) {
-						$numCorrect++;
-					}
-
-					$i++;
-				}
-			}
-		}
-
-        /* If the student selects exactly the correct responses then give them
-         * the marks, otherwise penalise them. The teacher can review and
-         * adjust the mark accordingly
-         */
-        if ($numCorrect == count($response)) {
-            if ($i) {
-                $marksPerAnswer = $currentResponse['marks']/$i;
-                $total = $marksPerAnswer * $numCorrect;
-            }
-        }
-        else {
-            $total = 0;
-        }
-
-        /* Total marks for this question
-         */
-        $marks = array(
-            'response_id' => $currentResponse['response_id'],
-            'mark' => $total,
-        );
-
-        $this->getResponseHandler()->update($marks);
-    }
+class Assess_Answer_Radio extends Assess_Answer_Multi {
+    protected $plugin = 'evaluationRadio';
 }
