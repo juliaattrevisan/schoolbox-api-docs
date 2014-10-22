@@ -41,7 +41,7 @@ class Session
         return $ip;
     }
 
-    public function create($username)
+    public function create($username, $remember=false)
     {
         $userHandler = new User;
         $groupHandler = new Group;
@@ -62,6 +62,7 @@ class Session
             $_SESSION['title'] = $user['title'];
             $_SESSION['firstname'] = $user['firstname'];
             $_SESSION['lastname'] = $user['lastname'];
+            $_SESSION['remember'] = $remember;
             $_SESSION['id'] = $user['uid'];
             $_SESSION['sid'] = $user['synergy_id'];
             $_SESSION['gid'] = $user['group_id'];
