@@ -43,7 +43,7 @@
 
         opt = this.options;
 
-        $(this.element).spectrum({
+        $(this.element).find(this.options.inputSelector).spectrum({
             showPalette: false,
             showSelectionPalette: false,
             showButtons: false,
@@ -57,6 +57,9 @@
             change: function (colorObject) { mspec.onColorChange(this, colorObject) },
             move: function (colorObject) { mspec.onColorChange(this, colorObject) }
         });
+
+        // setup colour selectors
+        this.loadColorpickerColors();
 
         // attach listeners
 
@@ -103,12 +106,10 @@
                 }
 
                 var data = {
-                    colors: pickers
+                    colors: mspec.options.colours.pickers
                 };
 
-                // TODO use this value
-                // data[setupCustomise.key] = setupCustomise.id;
-
+                data = $.extend({}, data, mspec.masonry.options.context);
 
                 $.post(opt.url, data, opt.complete);
             });
@@ -306,10 +307,29 @@
     };
 
 
+    /**
+     *
+     * @param {Masonry} masonry
+     * @returns {$}
+     */
     $.fn[pluginName] = function (masonry) {
+        var args = arguments;
         return this.each(function () {
+            var mspec;
+
             if (!$.data(this, 'plugin_' + pluginName)) {
                 $.data(this, 'plugin_' + pluginName, new MasonrySpectrum(this, masonry));
+            } else if (typeof masonry == 'string') {
+                mspec = $.data(this, 'plugin_' + pluginName);
+
+                switch (masonry) {
+                    case 'resetColours':
+                        mspec.resetColours(args[1], mspec.options.colours.pickers);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         });
     }
