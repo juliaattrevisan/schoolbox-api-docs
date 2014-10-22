@@ -5,6 +5,7 @@ $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+$this->setBlock(TEMPLATE_content, 'gradegroup', 'gradegroup_block');
 
 // Instead of all this block BS I'll create a sub-template
 $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
@@ -40,6 +41,7 @@ use Schoolbox\Resource\CategoryMapper;
 $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
+$groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
 
 $groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();
@@ -56,8 +58,9 @@ $zone
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
-$mark_types = $mark_mapper->getAll();
+$work_types  = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
+$mark_types  = $mark_mapper->getAll();
+$gradeGroups = $groupMapper->findAll();
 
 $title            = '';
 $heading          = '';
@@ -189,31 +192,6 @@ $this->setVar(
     )
 );
 
-// Set file inputs
-//$file_links = $submission->getFileLinks();
-//if ($file_links->count() > 0) {
-//    foreach ($file_links as $file_link) {
-//        /** @var Schoolbox\Assessment\Component\SubmissionBox\File $file_link */
-//        $file = $file_link->getFile();
-//        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-//        $this->setVar('CURRENT_FILE_ID',   $file->getId());
-//        $this->setVar('CURRENT_FILE_ICON', $file->getMimetype()->getIconFile());
-//        $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
-//        $this->setVar('CURRENT_FILE_URL',  '/storage/fetch.php?'.http_build_query(array('hash' => $file->getHash(), 'save' => 1)));
-//        $this->parse('existing_file_block','existing_file', true);
-//    }
-//}
-//elseif ($submission->getLegacyFileId()) {
-//    $fileHandler = new File;
-//    $file = $fileHandler->getByID($submission->getLegacyFileId());
-//    $this->setVar('CURRENT_FILE_NAME', $file['realname']);
-//    $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
-//    $this->setVar('CURRENT_FILE_ID',   'old');
-//    $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
-//    $this->setVar('CURRENT_FILE_URL',  '/send.php?'.http_build_query(array('id' => $submission->getLegacyFileId(), 'save' => 1)));
-//    $this->parse('existing_file_block','existing_file');
-//}
-
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 // Output submission work_type drop down.
@@ -250,6 +228,19 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             'slug' => 'MARKTYPE_SLUG'
         )
     );
+
+    // and the group types
+    $this->dropdown(
+        'gradegroup_drop',
+        $gradeGroups,
+        $submission->getGradeGroup()->getId(),
+        'marktype',
+        array(
+            'name' => 'GRADEGROUP_TEXT',
+            'id'   => 'GRADEGROUP_VALUE',
+        )
+    );
+    // Maybe output the marks for each grade group?
 
     // if the rubric creation fails it will throw an exception, in which case just output the empty sets
     // Default values for criteria
@@ -327,6 +318,7 @@ $output = array(
     'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked' : '',
     'TOTAL_MARK'        => $submission->getMaxMark(),
     'SUBMISSION_WEIGHT' => $submission->getWeight(),
+
     'OPEN_DATE'         => $open_date->getUsingFormat('d/m/Y'),
     'OPEN_HOUR'         => $open_hour,
     'OPEN_MIN'          => $open_min,
@@ -490,6 +482,7 @@ function outputCriteria(
         }
         $page->parse('crit_group_block', 'crit_group', true);
     }
+
     if (!$hasCritGroup) {
         $page->parse('no_crit_group_block', 'no_crit_group');
     }
@@ -497,3 +490,4 @@ function outputCriteria(
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
 }
+
