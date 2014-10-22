@@ -14,3 +14,9 @@ ALTER TABLE `submission_grade`
   ADD COLUMN `submission_grade_group_id` INT NOT NULL AFTER `grade_id`,
   ADD INDEX (`submission_grade_group_id`);
 UPDATE `submission_grade` SET `submission_grade_group_id` = @standardId;
+
+-- and submission boxes.
+ALTER TABLE `submission_box`
+  ADD COLUMN `submission_grade_group_id` INT NULL DEFAULT NULL AFTER `mark_type`,
+  ADD INDEX (`submission_grade_group_id`);
+UPDATE `submission_box` SET `submission_grade_group_id` = @standardId WHERE `mark_type` = 2;
