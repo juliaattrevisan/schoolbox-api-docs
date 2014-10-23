@@ -27,6 +27,7 @@ $user = $_SESSION['user'];
  */
 if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($_POST['userId']) || ($user->getId() == $_POST['userId'])) {
 	$ownerId = $_POST['userId'];
+	$owner   = UserMapper::getInstance()->createModel()->setId($ownerId);
 }
 /* You're not supposed to be able to create events under other circumstances
  */
@@ -37,7 +38,7 @@ else {
 
 $event = new Event();
 
-$event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
+$event->setOwner($owner)
 	->setAuthor($user)
 	->setAccess(Event::ACCESS_PERSONAL)
 	->setCampusCollection(new Collection())
@@ -76,58 +77,17 @@ $personalRelation->setUserId($ownerId);
 $personalRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
 $personalRelationMapper->save($personalRelation);
 
+// Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {
-	$json = array(
-		'title' => $event->getTitle(),
-		'start' => $event->getStartDateTime()->getUnixTimestamp(),
-
-		/* Whether you can edit this event or not
-		 */
-		'editable' => true,
-
-		/* Whether it's an all-day event or not
-		 * If allDay is true, then you can't resize it
-		 */
-		'allDay' => $event->getAllDay(),
-
-		/* Colour of the event
-		 */
-		'color' => '#aaaaaa',
-
-		/* Extra data that the Event Object doesn't directly support
-		 */
-		'data' => array(
-			'meta' => array(
-				'eventId'       => $affectedIds[0],
-				'detail'        => $event->getDetail(),
-				'location'      => $event->getLocation(),
-				'eventType'     => '',
-				'eventTypeId'   => $event->getType()->getId(),
-				'type'          => $event->getType()->getId(),
-				'author'        => '',
-				'authorId'      => $event->getOwner()->getId(),
-				'level'         => '',
-				'completed'     => $event->getCompleted(),
-			),
-			'links' => array(
-				'category'  => array(
-					'id'    => '',
-					'name'  => '',
-				)
-			),
-			'styles' => array(
-				'visible' => '',
-			),
-			'attendance'        => array(
-				'icon'          => false,
-				'status'        => false,
-				'requestButton' => false,
-				'listButton'    => false,
-			)
-		)
-	);
-
-	echo json_encode($json);
+    ob_start();
+    $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
+    $renderer  = new Calendar_Event_Type_Day_Renderer_Javascript(new SitePage());
+    foreach ($connector->getEvent($event->getId()) as $calendarEvent) {
+        $renderer->visit($calendarEvent);
+    }
+    // Panel-beat Steve's calendar JSON into shape
+    $jsonList  = json_decode('['.ob_get_clean().'{}]');
+    $jsonEvent = $jsonList[0];
+    echo json_encode($jsonEvent);
 }
-
 exit(1);
