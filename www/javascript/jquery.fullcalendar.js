@@ -409,7 +409,7 @@ Calendar.prototype.init = function() {
     headerRight.prepend(
         baseButton.clone()
             .html('list')
-            .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+            .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
             .addClass(' fc-corner-left no-icon')
             .attr('id','fc-button-list')
     );
@@ -420,7 +420,7 @@ Calendar.prototype.init = function() {
             headerRight.prepend(
                 baseButton.clone()
                     .html('filters')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
+                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
                     .attr('id','fc-button-filter')
             );
@@ -429,7 +429,7 @@ Calendar.prototype.init = function() {
             headerRight.append(
                 baseButton.clone()
                     .html('export')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
+                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
                     .attr('id','fc-button-export')
             );
