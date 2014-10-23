@@ -184,10 +184,10 @@
                     var allDay = !date.hasTime();
                     var eventData = { allDay: allDay ? 1 : 0 };
                     if (allDay) {
-                        eventData.date        = date.format('YYYY-MM-DD');
+                        eventData.date        = date.format('DD-MM-YYYY');
                         eventData.displayDate = date.format('ddd, Do MMMM')
                     } else {
-                        eventData.date        = date.format('YYYY-MM-DD HH:mm');
+                        eventData.date        = date.format('DD-MM-YYYY HH:mm');
                         eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
 
