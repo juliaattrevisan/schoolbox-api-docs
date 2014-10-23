@@ -304,9 +304,8 @@
 
         // click 'Edit Event' and push data through to main form page
         $j('#edit-full').click(function(e) {
-            var getstring = $j(this).closest('form').serialize()
-            var l = window.location
-            window.location = l.protocol + '//' + l.hostname + '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
+            var getstring = $j(this).closest('form').serialize();
+            window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
         })
 
         // hide bubbles if any header buttons are clicked
