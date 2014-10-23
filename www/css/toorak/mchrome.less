@@ -46,6 +46,8 @@
 @background:        #f1f0eb;
 @login-color:       #f1f0eb;
 @login-lighten:     20%;
+@input-bg:      #fff;       // Login input background
+@submit-bg:     @link-color;      // Submit btn background
 
 // OPTIONAL
 // any definitions in variables.less can be overridden by re-specifying here
@@ -54,40 +56,3 @@
 // Includes
 // =============================================================================
 @import "../../m/inc/css/chrome.less";
-
-#loading {
-  background: #0068a2;
-  background-image: -webkit-radial-gradient(center top, ellipse cover, #ffffff 0%, #d1ccbd 60%);
-  background-image: -ms-linear-gradient(top, #ffffff 0%, #d1ccbd 100%);
-  background-image: -o-radial-gradient(center top, ellipse cover, #ffffff 0%, #d1ccbd 60%);
-  background-image: linear-gradient(top, #ffffff 0%, #d1ccbd 100%);
-}
-
-#login_frm input {
-  border: none;
-  background: rgba(255, 255, 255, 1.0);
-  color: #006272;
-  padding: 4px 8px;
-}
-
-#login_frm #login {
-  border: none;
-  background: rgba(0, 38, 100, 1.0);
-  color: #ffffff;
-  padding: 4px 8px;
-}
-
-#login_frm input:focus {
-  background: rgba(255, 255, 255, 1.0);
-  color: #006272;
-  outline: none;
-}
-#login_frm input::-webkit-input-placeholder {
-  color: #006272;
-}
-#login_frm input:-moz-placeholder {
-  color: #006272;
-}
-#login_frm input:-ms-input-placeholder {
-  color: #006272;
-}

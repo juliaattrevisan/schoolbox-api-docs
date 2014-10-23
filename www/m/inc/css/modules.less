@@ -83,20 +83,21 @@
    Login
    ========================================================================== */
 #loading                    { background: @login-color;
-    #switch                 { position: absolute; bottom: 10px; margin: 0 auto; width: 100%; text-align: center;
-                              font-size: @dp4; opacity: 0.5; text-shadow: none;
+    #switch                 { position: absolute; bottom: 10px; color: @submit-bg; margin: 0 auto; width: 100%; text-align: center;
+                              font-size: @dp4; text-shadow: none;
     }
 }
 
-#login_frm                  { margin-top: @dp6;
-    input                   { border: none; .login-input(100%); padding: @dp4; height: 40px;
-        &:focus             { .login-input(20%); outline: none; }
-        &::-webkit-input-placeholder { .threshold(@login-color); }
-        &:-moz-placeholder { .threshold(@login-color); }
-        &:-ms-input-placeholder { .threshold(@login-color); }
+#login_frm                  { margin-top: @dp6; position: relative;
+    input                   { background: @input-bg; border: none; box-sizing: border-box; padding: @dp4; height: 48px;
+                            font-size: 18px; text-align: center; width: 100%; -webkit-appearance: none; border-radius: 0;
+        &:focus             { background: darken(@input-bg, 5%); outline: none; }
+        &::-webkit-input-placeholder { color: darken(@input-bg, 50%); }
+        &:-moz-placeholder { color: darken(@input-bg, 50%); }
+        &:-ms-input-placeholder { color: darken(@input-bg, 50%); }
         // no opera support available :(
     }
-    input[type="submit"]    { padding: 0 @dp4; }
+    input[type="submit"]    { background: @submit-bg; padding: @dp4; color: #fff; }
     li                      { border-bottom: none; }
 }
 
