@@ -82,10 +82,10 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 			$event->setAuthorId($currentEvent['uid']);
 			$event->setEventId($currentEvent['id']);
-			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'])));
-			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'])));
+			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['startDate'] . ' ' . $currentEvent['startTime'])));
+			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['endDate'] . ' ' . $currentEvent['endTime'])));
 			$event->setType($currentEvent['type']);
-			$event->setTitle($currentEvent['note']);
+			$event->setTitle($currentEvent['title']);
 			$event->setAccess($currentEvent['access']);
 			$event->setEventType($currentEvent['eventType']);
 			$event->setColour($currentEvent['eventColour']);
@@ -93,7 +93,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 			$event->setDetail($currentEvent['detail']);
 			$event->setLocation($currentEvent['location']);
 			$event->setPublishDate($currentEvent['publish_date']);
-			$event->setAllday($currentEvent['allday']);
+			$event->setAllday(!empty($currentEvent['allday']));
 
 			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
 				$event->setIsEditable(true);
