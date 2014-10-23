@@ -100,9 +100,20 @@ function Calendar(id, bubbleId, opts) {
                         end = calEvent.end.format(format);
                     }
                 }
+
                 if (end && start != end) {
-                    data.date = start + " – " + end;
+                    // Start and end aren't the same - stitch them together.
+                    if (!calEvent.allDay
+                        && calEvent.start.format('YYYYMMDD') === calEvent.end.format('YYYYMMDD')
+                    ) {
+                        // Between two times on the same day - show the timespan but only one date
+                        data.date = start + " – " + calEvent.end.format('h:mma');
+                    } else {
+                        // Between two different days - show the whole timespan
+                        data.date = start + " – " + end;
+                    }
                 } else {
+                    // Start and end are the same - just show the start
                     data.date = start;
                 }
 
