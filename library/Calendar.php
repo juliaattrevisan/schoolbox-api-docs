@@ -658,8 +658,11 @@ class Calendar extends DeprecatedModel
      * Get all events occurring across the specified date span.
      *
      * @param \Schoolbox\User $user
-     * @param int             $startTimestamp
-     * @param int             $endTimestamp
+     * @param int             $startTimestamp If not null, filter out events that end on
+     *                                        or before this time
+     *                                        (end times are exclusive in calendars)
+     * @param int             $endTimestamp   If not null, filter out events that start
+     *                                        after this time
      * @param array           $filter A filter to put on the list of results.
      *                                * campus: if set, event set is restricted to
      *                                events in this campus.
@@ -667,6 +670,7 @@ class Calendar extends DeprecatedModel
      *                                events for this group.
      *                                * personal: if set, only personal events for
      *                                current user are set.
+     *                                * id: if set, only this event ID will be retrieved.
      *                                If empty, all events for user are retrieved.
      *
      * @return Calendar_Event_Collection
@@ -758,10 +762,29 @@ class Calendar extends DeprecatedModel
             $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
         }
 
+        if ($filter['id']) {
+            $filter_query[] = 'event.id = ' . intval($filter['id']);
+        }
+
         $filter_query = implode(' AND ', $filter_query);
 
         if (strlen($filter_query) > 0) {
             $filter_query = " AND ($filter_query)";
+        }
+
+        // Build the date query
+        $dateQuery = '';
+        $dateQueryParts = array();
+        if (isset($startTimestamp)) {
+            // Start timestamp: don't get events which end before or on that time
+            $dateQueryParts[] = sprintf("DATE(endDate) < DATE(FROM_UNIXTIME('%d'))", $startTimestamp);
+        }
+        if (isset($endTimestamp)) {
+            // End timestamp: don't get events which start after that time
+            $dateQueryParts[] = sprintf("DATE(startDate) >= DATE(FROM_UNIXTIME('%d'))", $endTimestamp);
+        }
+        if (!empty($dateQueryParts)) {
+            $dateQuery = "AND (NOT (".implode(' OR ', $dateQueryParts).'))';
         }
 
         // get single events for the day
@@ -793,13 +816,7 @@ class Calendar extends DeprecatedModel
 					$groupQuery
 					OR (access = " . self::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
 				)
-				AND (
-					NOT (
-						DATE(endDate) < DATE(FROM_UNIXTIME('{$startTimestamp}'))
-						OR
-						DATE(startDate) >= DATE(FROM_UNIXTIME('{$endTimestamp}'))
-					)
-				)
+				$dateQuery
 				$filter_query
 			GROUP BY id
 			ORDER BY

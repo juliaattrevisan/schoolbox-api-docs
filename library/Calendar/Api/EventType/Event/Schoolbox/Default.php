@@ -60,62 +60,28 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * @return Calendar_Event_Collection
 	 */
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-		return $this->getCalendarHandler()->getDayEvents($this->getUser(), $startTimestamp, $endTimestamp);
+		return $this->getCalendarHandler()->getDayEvents(
+			$this->getUser(),
+			$startTimestamp,
+			$endTimestamp
+		);
 	}
 
 	/**
 	 * Find a particular event from this source
+	 * This implementation of getEvent is actually used
+	 * (by /www/calendar/ajax/create.php, to display a new event)
 	 *
 	 * @param $eventId
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
-		$collection = new Calendar_Event_Collection();
-
-		$currentEvent = $this->getCalendarHandler()->getByID($eventId);
-
-		/* If an event was found, compose and stack a new event object
-		 */
-		if (is_array($currentEvent)) {
-			$event = new Calendar_Event_Type_Day();
-
-			$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
-			$event->setAuthorId($currentEvent['uid']);
-			$event->setEventId($currentEvent['id']);
-			$event->setStartTime(new Alaress_Date_Format(new DateTime($currentEvent['startDate'] . ' ' . $currentEvent['startTime'])));
-			$event->setEndTime(new Alaress_Date_Format(new DateTime($currentEvent['endDate'] . ' ' . $currentEvent['endTime'])));
-			$event->setType($currentEvent['type']);
-			$event->setTitle($currentEvent['title']);
-			$event->setAccess($currentEvent['access']);
-			$event->setEventType($currentEvent['eventType']);
-			$event->setColour($currentEvent['eventColour']);
-			$event->setCampusList($currentEvent['campusList']);
-			$event->setDetail($currentEvent['detail']);
-			$event->setLocation($currentEvent['location']);
-			$event->setPublishDate($currentEvent['publish_date']);
-			$event->setAllday(!empty($currentEvent['allday']));
-
-			if ($this->getCalendarHandler()->getPerm($currentEvent) > 1) {
-				$event->setIsEditable(true);
-			}
-			else {
-				$event->setIsEditable(false);
-			}
-
-			if ($currentEvent['access'] == 2) {
-				$mapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
-				$allRelations = $mapper->findByColumn('event_id', $eventId);
-
-				$event->setCategoryCollection($allRelations);
-			}
-
-			$event->setAttendance($currentEvent['attendance']);
-			$event->setCompleted($currentEvent['completed']);
-
-			$collection->add($event);
-		}
-
-		return $collection;
+		return $this->getCalendarHandler()->getDayEvents(
+			$this->getUser(),
+			null,
+			null,
+			array('id' => $eventId)
+		);
 	}
 
 	/* Getters/Setters
