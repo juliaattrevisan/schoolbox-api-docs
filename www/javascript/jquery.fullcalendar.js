@@ -450,10 +450,9 @@ Calendar.prototype.init = function() {
 
     /* Special case for list view, it's the only button with an anchor
      */
-	var userId = this.options.userId;
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + this.options.fullCalendar.defaultDate + '/' + userId;
+        window.location.href = '/calendar/list/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY') + '/' + c.options.userId;
     });
 
     // mash in the datepicker
