@@ -9,7 +9,8 @@ $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 // Instead of all this block BS I'll create a sub-template
 $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
 $this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
-$this->setBlock('rubricTpl', 'criterion', 'criterion_block');
+$this->setBlock('rubricTpl', 'crit_group', 'crit_group_block');
+$this->setBlock('crit_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
 
 $this->setBlock('marktype', 'resultset', 'resultset_block');
@@ -133,7 +134,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     if ($is_unit) {
         $unit_id = $matches[1];
 
-        /** @var UnitInstance $unit */
+        /** @var \Schoolbox\Assessment\Course\UnitInstance $unit */
         try {
             $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($unit_id, $category_id);
         }
@@ -386,6 +387,15 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
 }
 
 
+/**
+ * @param SitePage $page
+ * @param          $catID
+ * @param          $checkedIDs
+ * @param SubmissionBox\Rubric\Descriptor[] $descriptors
+ * @param int      $descriptorCount
+ * @param bool     $is_course
+ * @param bool     $is_for_task
+ */
 function outputCriteria(
     SitePage $page,
     $catID,
@@ -399,6 +409,7 @@ function outputCriteria(
     // Output this all as part of a single template, and inject into the block.
 
     // get rubric details
+    /** @var \Schoolbox\Collection|Criterion[] $criterionCollection */
     $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
                                           array(
                                               'parent_id'   => $catID,
@@ -423,14 +434,25 @@ function outputCriteria(
         $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
     }
 
-    $page->setVar('criterion_block', '');
+    $page->setVar(array(
+        'crit_group_block' => '',
+        'criterion_block' => ''
+    ));
+
+    $currentGrouping = $criterionCollection->first()->getGrouping();
+
     foreach ($criterionCollection as $criterion) {
-        /* @var $criterion Criterion */
+        if ($criterion->getGrouping() != $currentGrouping) {
+            $page->parse('crit_group_block', 'crit_group', true);
+            $page->setVar('criterion_block', '');
+        }
+
         $page->setVar('crit_input_block', '');
         $page->setVar(array(
             'CRIT_ID'      => $criterion->getId(),
             'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
-            'CRIT_LABEL'   => Scrub::text($criterion->getGrouping()) . ' - ' . Scrub::text($criterion->getName()),
+            'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
+            'CRIT_NAME'    => Scrub::text($criterion->getName()),
             'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
         ));
 
@@ -452,7 +474,10 @@ function outputCriteria(
             }
         }
         $page->parse('criterion_block','criterion', true);
+
+        $currentGrouping = $criterion->getGrouping();
     }
+    $page->parse('crit_group_block', 'crit_group', true);
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
 }
