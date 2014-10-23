@@ -187,10 +187,10 @@
                     var eventData = { allDay: allDay ? 1 : 0 };
                     if (allDay) {
                         eventData.date        = date.format('YYYY-MM-DD');
-                        eventData.displayDate = date.format('ddd, Mo MMMM')
+                        eventData.displayDate = date.format('ddd, Do MMMM')
                     } else {
                         eventData.date        = date.format('YYYY-MM-DD HH:mm');
-                        eventData.displayDate = date.format('ddd, Mo MMMM, h(:mm)a')
+                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
