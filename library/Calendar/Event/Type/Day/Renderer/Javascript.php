@@ -132,7 +132,12 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			if (!$all_day) {
 				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
 				$end   .= ' ' . $currentEvent->getEndTime()->getDatabaseTime();
-			}
+			} else {
+                // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
+                // Doesn't really matter for timed events, but all day events
+                // get truncated by one day.
+                $end = $currentEvent->getEndTime()->addDays(1)->getDatabaseDate();
+            }
 
 			//
 			// Add campus list to list of classes
