@@ -80,31 +80,14 @@ $personalRelationMapper->save($personalRelation);
 // Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {
     ob_start();
-    // No matter what I do to get the just posted event, it will be a crime
-    // against humanity.
-    // The only difference is where it happens.
     $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
     $renderer  = new Calendar_Event_Type_Day_Renderer_Javascript(new SitePage());
-    $events    = $connector->getEvents(
-        intval($event->getStartDateTime()->getUnixTimestamp()),
-        intval($event->getEndDateTime()->addDays(1)->getUnixTimestamp())
-    );
-    foreach ($events as $calendarEvent) {
+    foreach ($connector->getEvent($event->getId()) as $calendarEvent) {
         $renderer->visit($calendarEvent);
     }
     // Panel-beat Steve's calendar JSON into shape
-    foreach (json_decode('['.ob_get_clean().'{}]') as $item) {
-        if (property_exists($item, 'data')) {
-            if (property_exists($item->data, 'meta')) {
-                if (property_exists($item->data->meta, 'eventId')) {
-                    if ($item->data->meta->eventId == $event->getId()) {
-                        echo json_encode($item);
-                        exit;
-                    }
-                }
-            }
-        }
-    }
-    echo '{}';
+    $jsonList  = json_decode('['.ob_get_clean().'{}]');
+    $jsonEvent = $jsonList[0];
+    echo json_encode($jsonEvent);
 }
 exit(1);
