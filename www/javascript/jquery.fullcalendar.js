@@ -80,7 +80,6 @@ function Calendar(id, bubbleId, opts) {
 
                 // setup data to be displayed
                 var data = $j.extend(true, {}, calEvent.data.meta)
-                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
@@ -89,10 +88,22 @@ function Calendar(id, bubbleId, opts) {
                 else {
                     data.note = calEvent.title
                 }
-                data.date = calEvent.start.format(format)
+
+                // Format the date of this event
+                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
+                var start = calEvent.start.format(format);
+                var end   = null;
                 if (calEvent.end != null) {
-                    data.date += " – "
-                    data.date += calEvent.end.format(format)
+                    if (calEvent.allDay) {
+                        end = moment(calEvent.end).subtract(1, 'd').format(format);
+                    } else {
+                        end = calEvent.end.format(format);
+                    }
+                }
+                if (end && start != end) {
+                    data.date = start + " – " + end;
+                } else {
+                    data.date = start;
                 }
 
                 // Links to Modify Screen
