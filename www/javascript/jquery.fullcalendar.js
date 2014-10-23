@@ -469,10 +469,7 @@ Calendar.prototype.init = function() {
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
-                            var responseData = new Function('return ' + responseText)
-                            var newEvent = responseData()
-
-                            c.dom.fullCalendar('renderEvent', newEvent)
+                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
                         }
                     })
                     c.clearForms()
@@ -486,10 +483,7 @@ Calendar.prototype.init = function() {
 
                     c.cupdate(data, function(responseText) {
                         if (responseText.length) {
-                            var responseData = new Function('return ' + responseText)
-                            var newEvent = responseData()
-
-                            c.dom.fullCalendar('renderEvent', newEvent)
+                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
                         }
                     })
                     c.bubble.hide()
