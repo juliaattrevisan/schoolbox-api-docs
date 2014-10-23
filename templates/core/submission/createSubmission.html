@@ -52,7 +52,7 @@
 
         var marktype = {
             total:$j('#marktype-total'),
-            rubric:$j('#marktype-rubric')
+            rubric:$j('tr.marktype-rubric')
         };
 
         var rubric = {
@@ -247,20 +247,20 @@
         $j('#descriptor-count').change(function () {
             var target = $j('#descriptor-count option:selected').first().val();
 
-            $j('#rubric-criteria ul').each(function () {
+            $j('#rubric-criteria tr').each(function () {
                 var i,
-                        inputCount = $j(this).find('li').length,
+                        inputCount = $j(this).find('td').length,
                         diff = target - inputCount;
 
                 if (diff < 0) {
                     for (i = 0; i < 0 - diff; ++i) {
                         // remove trailing li's
-                        $j(this).find('li:last-child').detach();
+                        $j(this).find('td:last-child').detach();
                     }
                 }
                 else if (diff > 0) {
                     var insertList = '',
-                            last = $j(this).children('li').last(),
+                            last = $j(this).children('td').last(),
                             newItem;
 
                     for (i = 0; i < diff; ++i) {
@@ -276,10 +276,35 @@
             });
         });
 
-        $j('#rubric-criteria ul').sortable({
-            placeholder:'sortable-placeholder',
-            forcePlaceholderSize: true
+        var rc                 = $('#rubric-criteria'),
+            critSelector       = 'div.crit',
+            inputSelector      = 'textarea, input[type=text]',
+            descriptorSelector = '.desc',
+            editingClass       = 'editing',
+            placeholderText    = 'Enter descriptor';
+
+
+        rc.on('click', inputSelector, function () {
+            var input = $(this);
+
+            rc.find(critSelector + ', ' + descriptorSelector)
+                .removeClass(editingClass)
+                .find(inputSelector)
+                .attr('readonly', 'readonly')
+                .removeAttr('placeholder');
+
+            input
+                .closest(critSelector)
+                .addClass(editingClass);
+
+            input
+                .closest(descriptorSelector)
+                .addClass(editingClass)
+                .find(inputSelector)
+                .removeAttr('readonly')
+                .attr('placeholder', placeholderText);
         });
+
 
         function showHideMarktype(timeout) {
             var v = $j('#marktype option:selected').first().data('slug');
@@ -300,14 +325,14 @@
         }
 
         function descriptor(action, element, timeout) {
-            $j(element).find(':input:not(:checkbox)').parent('li').each(function () {
+            $j(element).find(':input:not(:checkbox)').parent('td').each(function () {
                 if (action == 'show') {
-                    $j(this).slideDown(timeout);
-                    $j(element).addClass('highlight');
+                    $j(this).show();
+                    $j(element).addClass('highlight').find(inputSelector).first().trigger('click');
                 }
                 else if (action == 'hide') {
                     $j(element).removeClass('highlight');
-                    $j(this).slideUp(timeout);
+                    $j(this).hide();
                 }
             });
         }
@@ -458,7 +483,7 @@
             </label>
         </td>
     </tr>
-    <tr id="marktype-rubric" class="marks-hide dark">
+    <tr id="marktype-rubric" class="noline marks-hide dark marktype-rubric">
         <td>
             <h4>Rubric</h4>
             <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
@@ -477,7 +502,6 @@
             <!-- END existing_marks_warning -->
         </td>
         <td id="rubric">
-
             <div id="rubric-results">
                 <em>Result set</em>
                 <!-- BEGIN resultset -->
@@ -507,12 +531,13 @@
             </div>
             <div class="clearfix"></div>
 
-            <div id="rubric-criteria">
-                <em>Criteria being assessed</em>
-
+        </td>
+    </tr>
+    <tr class="marks-hide dark marktype-rubric">
+        <td colspan="2">
+            <div id="rubric-criteria" class="rubrics">
                 {COURSE_CRITERIA}
                 {CLASS_CRITERIA}
-
                 <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
                 <input type="text" style="visibility: hidden; height: 0" name="criteria" />
             </div>
