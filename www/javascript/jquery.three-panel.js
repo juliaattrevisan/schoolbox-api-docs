@@ -91,8 +91,18 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 var pending_element = threePanel.folderDetail.find('.pending');
                 var join_element    = threePanel.folderDetail.find('.join-btn');
                 var leave_element    = threePanel.folderDetail.find('.leave-btn');
-                var manage_element    = threePanel.folderDetail.find('.mange-btn');
+                var manage_element    = threePanel.folderDetail.find('.manage-btn');
                 switch(meta.joinable) {
+                    case 0: // not joinable
+                        join_element.hide().parent().data('id','')
+                        leave_element.hide().parent().data('id','')
+                        pending_element.hide()
+                        break
+                    case 1: // joinable
+                        join_element.show().parent().data('id', meta.id)
+                        pending_element.hide()
+                        leave_element.hide()
+                        break
                     case 3: //already member
                         pending_element.hide()
                         join_element.hide()
@@ -102,16 +112,6 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                         join_element.hide().parent().data('id','')
                         leave_element.show().parent().data('id',meta.id)
                         pending_element.show()
-                        break
-                    case 0: // not joinable
-                        join_element.hide().parent().data('id','')
-                        leave_element.hide().parent().data('id','')
-                        pending_element.hide()
-                        break
-                    case 1: // joinable
-                        join_element.show().parent().data('id', meta.id)
-                        pending_element.hide()
-                        leave_element.hide().parent().data('id','')
                         break
                 }
                 //Hide manage button if not admin

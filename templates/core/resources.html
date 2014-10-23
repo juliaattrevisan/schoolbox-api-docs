@@ -157,6 +157,9 @@ $(function() {
       f_homepage : function(id) {
         window.open('/homepage/' + id, '_self')
       },
+        f_manage : function(id) {
+            window.open('/group/modify/' + id, '_self')
+        },
       f_join : function(id) {
         var target = threePanel.folderDetail.find('a.join-btn')
         // do this one via ajax
@@ -170,6 +173,19 @@ $(function() {
               }
             })
       },
+        f_leave : function(id) {
+            var target = threePanel.folderDetail.find('a.leave-btn')
+            // do this one via ajax
+            $.get('/group/joinForm.php', {leave : id, ajax : 1})
+                    .done(function(data) {
+                        if(typeof(data.status) !== 'undefined') {
+                            target.hide()
+                            if(data.status == 'left') {
+                                target.siblings('.pending').hide()
+                            }
+                        }
+                    })
+        },
       f_multi : function(id) {
         window.open('/cms/file/multi/' + id, '_self')
       }
@@ -295,12 +311,12 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); }
                  <td><p><strong>Access Type:</strong></td><td><span class="rfolder type">{FOLDER_TYPE}</span></td>
                  </tr>
                  </table>
-                <p class="pending">Membership pending approval</p>
-                <a class="btn groups" data-action="manage"><span></span>Manage Group</a>
+                <p class="pending">Membership pending</p>
+                <a class="btn groups manage-btn" data-action="manage"><span></span>Manage Group</a>
                 <a data-action="join" class="rfolder join-btn btn add">
                     <span></span>Join Group
                 </a>
-                <a data-action="leave" class="rfolder join-btn btn go-back">
+                <a data-action="leave" class="rfolder leave-btn btn go-back">
                     <span></span>Leave Group
                 </a>
           </div>
