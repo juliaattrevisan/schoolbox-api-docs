@@ -23,6 +23,7 @@ if (!filter_var($remoteUrl, FILTER_VALIDATE_URL)) {
 $secret = Config::get('remote_secret');
 $time = time();
 $externalUserId = $_SESSION['sid'];
+$username = urlencode($_SESSION['username']);
 
 $key = sha1($secret . $time . $externalUserId);
 
@@ -35,7 +36,7 @@ if (strpos($remoteUrl, '?') === false) {
     $glue = '&';
 }
 
-$remoteUrl = $remoteUrl . $glue . "key=$key&time=$time&id=$externalUserId";
+$remoteUrl = $remoteUrl . $glue . "key=$key&time=$time&id=$externalUserId&user=$username";
 
 $this->setVar(array(
     'REMOTE_URL' => addslashes($remoteUrl),
