@@ -50,14 +50,14 @@ $event->setOwner(UserMapper::getInstance()->createModel()->setId($ownerId))
 	->setPublishDateTime(null)
 	->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 if ($_POST['allDay']) {
-    $dateObj = new Alaress_Date_Format($_POST['date'], 'Y-m-d');
+    $dateObj = new Alaress_Date_Format($_POST['date'], 'd-m-Y');
     $event
         ->setStartDateTime($dateObj)
         ->setEndDateTime($dateObj)
         ->setAllDay(true);
 } else {
-    $startDate = new Alaress_Date_Format($_POST['date'], 'Y-m-d H:i');
-    $endDate   = new Alaress_Date_Format($_POST['date'], 'Y-m-d H:i');
+    $startDate = new Alaress_Date_Format($_POST['date'], 'd-m-Y H:i');
+    $endDate   = new Alaress_Date_Format($_POST['date'], 'd-m-Y H:i');
     $endDate->addHours(1);
     $event
         ->setStartDateTime($startDate)
