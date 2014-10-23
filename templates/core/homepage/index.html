@@ -160,77 +160,78 @@
                 <a href="#" class="btn homepage-overflow no-text"><span></span></a>
                 <ul class="status-buttons">
                     <li class="status-header">Folder Actions</li>
-                        <!-- BEGIN stats_data -->
+                    <!-- BEGIN stats_data -->
                     <li>
                         <a href="/cms/category/{ID}" class="status-option">
                             <span class="btn modify"><span></span></span>
                             <span class="status-label">Modify Folder</span>
                         </a>
                     </li>
-                        <!-- END stats_data -->
-                        <!-- BEGIN manage_page -->
+                    <!-- END stats_data -->
+                    <!-- BEGIN manage_page -->
                     <li>
                         <a href="/group/modify/{ID}" class="status-option">
                             <span class="btn groups"><span></span></span>
                             <span class="status-label">Manage Group</span>
                         </a>
                     </li>
-                        <!-- END manage_page -->
-                        <!-- BEGIN addmylinks -->
+                    <!-- END manage_page -->
+                    <!-- BEGIN addmylinks -->
                     <li>
                         <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="status-option">
                             <span class="btn add"><span></span></span>
                             <span class="status-label">Add to My Links</span>
                         </a>
                     </li>
-                        <!-- END addmylinks -->
-                        <!-- BEGIN view_stats -->
+                    <!-- END addmylinks -->
+                    <!-- BEGIN view_stats -->
                     <li>
                         <a href="/statistics/homepage/{ID}" class="status-option">
                             <span class="btn line-graph"><span></span></span>
                             <span class="status-label">View Statistics</span>
                         </a>
                     </li>
-                        <!-- END view_stats -->
+                    <!-- END view_stats -->
                     <li>
                         <a href="/resources/{ID}" class="status-option">
                             <span class="btn folder"><span></span></span>
                             <span class="status-label">Browse Resources</span>
                         </a>
                     </li>
-                        <!-- BEGIN subscribedModerated -->
+                    <!-- BEGIN subscribedModerated -->
                     <li>
                         <a href="/group/joinForm.php?leave={ID}&return=true" class="status-option">
                             <span class="btn delete"><span></span></span>
                             <span class="status-label">Awaiting approval</span>
                         </a>
                     </li>
-                        <!-- END subscribedModerated -->
-                        <!-- BEGIN subscribed -->
+                    <!-- END subscribedModerated -->
+                    <!-- BEGIN subscribed -->
                     <li>
                         <a href="/group/joinForm.php?leave={ID}" class="status-option">
                             <span class="btn delete"><span></span></span>
                             <span class="status-label">Leave Group</span>
                         </a>
                     </li>
-                        <!-- END subscribed -->
-                        <!-- BEGIN unsubscribed -->
+                    <!-- END subscribed -->
+                    <!-- BEGIN unsubscribed -->
                     <li>
                         <a href="/group/joinForm.php?join={ID}&return=true" class="status-option">
                             <span class="btn add"><span></span></span>
                             <span class="status-label">Join Group</span>
                         </a>
                     </li>
-                        <!-- END unsubscribed -->
+                    <!-- END unsubscribed -->
                     <!-- BEGIN manage_class -->
                     <li class="status-header">Class Actions</li>
-                        <!-- BEGIN class_list -->
-                    <li>
-                        <a href="/subject/classList/{CODE}" class="status-option">
-                            <span class="btn report"><span></span></span>
-                            <span class="status-label">Class List</span>
-                        </a>
-                    </li>
+                    <!-- BEGIN student_grades -->
+                    <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades" class="status-option">
+                        <span class="btn tick"><span></span></span>
+                        <span class="status-label">View Grades</span>
+                    </a>
+                    <!-- END student_grades -->
+                    <!-- BEGIN class_list -->
+                    <a href="/subject/classList/{CODE}" class="status-option"><span class="btn report"><span></span></span><span class="status-label">Class List</span></a>
                     <!-- END class_list -->
                     <!-- BEGIN class_mark -->
                     <li>
