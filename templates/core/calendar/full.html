@@ -79,11 +79,9 @@
                         return false;
                     }
 
-                    //
-                    // Would you believe the way this SHOULD work (return false)
-                    // doesn't work, and hiding the event does?
+                    // Don't render me if I'm marked as do not render
                     if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        jsEvent.replaceWith('').hide();
+                        return false;
                     }
 
                     var inner = jsEvent.find('.fc-event-inner')
