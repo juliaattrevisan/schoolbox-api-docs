@@ -614,4 +614,6 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     {
         return $this->findByParent($nodeId);
     }
+
+
 }
