@@ -44,9 +44,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
         $this->setBlock($templateHandle, "student_grades", "student_grades_block");
 
-        /* Output student grades link to students */
 
-        if($this->permission == READ_ACCESS) {
+
+        // Determine the year and semester for the grades link
+        $this->setVar(
+            array(
+                'WORK_YEAR'     => date('Y'),
+                'WORK_SEMESTER' => DueWork_All::getSemester()
+            )
+        );
+
+        /* Output student grades link to students of this class */
+        if($this->permission == READ_ACCESS && (
+            $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id')) ||
+            $this->groupHandler->involvedInSubject($this->getContext('code')))) {
             $this->parse('student_grades_block', 'student_grades');
         }
         else {
