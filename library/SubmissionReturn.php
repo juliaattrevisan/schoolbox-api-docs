@@ -151,17 +151,21 @@ class SubmissionReturn extends DeprecatedModel
             LIMIT 1
         "
         );
-        $gradeResult = $this->db->getRow(
-            "
-                        SELECT g.*, r.returned, r.mark, r.comment
-                        FROM submission_return r, submission_grade g
-                        WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+        $gradeResult = $this->db->getRow("
+            SELECT
+              g.*,
+              r.returned,
+              r.mark,
+              r.comment
+            FROM submission_grade g
+            INNER JOIN submission_return r ON g.lower_bound <= r.norm_mark
+            INNER JOIN submission_box b ON r.box_id = b.id
+            WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
-            AND g.lower_bound <= r.norm_mark
+            AND g.submission_grade_group_id = b.submission_grade_group_id
             ORDER BY returned DESC, lower_bound DESC
             LIMIT 1
-        "
-        );
+        ");
 
         // Do both error and grade result exist? Use most recent of the two.
         if (!empty($errorResult) && !empty($gradeResult)) {
