@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class DueWork_Detail {
+class DueWork_Detail
+{
 
     const ACCEPT_NONE = 0;
     const ACCEPT_SINGLE = 1;
@@ -37,7 +38,8 @@ class DueWork_Detail {
     protected $sitepageData;
 
 
-    public function __construct($id) {
+    public function __construct($id)
+    {
         $this->userHandler = new User();
         $this->submissionHandler = new Submission();
         $this->submissionStudentHandler = new SubmissionStudent();
@@ -56,11 +58,13 @@ class DueWork_Detail {
      *
      * @return array
      */
-    public function getSitepageData() {
+    public function getSitepageData()
+    {
         return $this->sitepageData;
     }
 
-    public function processStudents(\Schoolbox\Collection $students) {
+    public function processStudents(\Schoolbox\Collection $students)
+    {
         if (!count($students)) {
             return;
         }
@@ -70,8 +74,8 @@ class DueWork_Detail {
 
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
-				$insertion['user']['instance'] = $user;
-				$submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
+                $insertion['user']['instance'] = $user;
+                $submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
 
                 // an empty array is preferred to false
                 if (!$submissions) {
@@ -115,7 +119,7 @@ class DueWork_Detail {
 
             } // does not accept submissions
             else {
-				$insertion['user']['instance'] = $user;
+                $insertion['user']['instance'] = $user;
                 $insertion['user']['status'] = '';
                 $insertion['user']['class'] = '';
             }
@@ -134,7 +138,8 @@ class DueWork_Detail {
     /**
      * @param SitePage $page
      */
-    public function renderDetails(SitePage $page) {
+    public function renderDetails(SitePage $page)
+    {
 
         $allowedHandler = new AllowedFile();
         $fileTypeHandler = new FileType('');
@@ -154,16 +159,15 @@ class DueWork_Detail {
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
         $page->setBlock('submission_row', 'plag_deleted', 'plag_deleted_block');
 
-	    $page->setVar('plag_deleted_block', '');
+        $page->setVar('plag_deleted_block', '');
 
         $closeADF = $this->getDueDate();
         $formatDateOnly = 'l, jS F Y';
         $formatDateTime = $formatDateOnly . ' g:ia';
 
-        if($closeADF->getUsingFormat('Hi') == '2359') {
+        if ($closeADF->getUsingFormat('Hi') == '2359') {
             $closeString = $closeADF->getUsingFormat($formatDateOnly);
-        }
-        else {
+        } else {
             $closeString = $closeADF->getUsingFormat($formatDateTime);
         }
 
@@ -188,10 +192,10 @@ class DueWork_Detail {
 
 
         if (!$data = $this->sitepageData) {
-            $page->setVar('student_row_block',  'This subject has no students in it.');
-			$page->setVar('download_btn_block', '');
-			$page->setVar('modify_btn_block',   '');
-			$page->setVar('DUEWORK_ARCHIVED',   '');
+            $page->setVar('student_row_block', 'This subject has no students in it.');
+            $page->setVar('download_btn_block', '');
+            $page->setVar('modify_btn_block', '');
+            $page->setVar('DUEWORK_ARCHIVED', '');
             return;
         }
 
@@ -221,11 +225,9 @@ class DueWork_Detail {
             // (without the previous student's rows)
             $page->setVar('submission_row_block', '');
             if (count($record['submissions'])) {
-
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'y-m-d j:i:s');
 
                 foreach ($record['submissions'] as $submission) {
-
                     $submitTime = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
 
                     if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp(
@@ -236,20 +238,18 @@ class DueWork_Detail {
                         $afterMark = '';
                     }
 
-					if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
-						$class = self::CLASS_LATE;
-						$submissionTimeDescription = 'Submitted Late';
-					}
-					else {
-						$class = '';
-						$submissionTimeDescription = 'Submitted On Time';
-					}
+                    if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
+                        $class = self::CLASS_LATE;
+                        $submissionTimeDescription = 'Submitted Late';
+                    } else {
+                        $class = '';
+                        $submissionTimeDescription = 'Submitted On Time';
+                    }
 
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
                     if ($submission['is_online_submission']) {
                         $mime = 'text/html';
-                    }
-                    else {
+                    } else {
                         $filename = $submission['realname'];
                         $mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
                     }
@@ -275,7 +275,7 @@ class DueWork_Detail {
                             'SUBMISSION_TIME' => $submission['date'],
                             'SUBMISSION_FILENAME' => $submission['realname'],
                             'SUBMISSION_CLASS' => $class,
-							'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
+                            'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
                             'SUBMISSION_AFTER_MARK' => $afterMark,
                             'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
                             'SUBMISSION_PLAG_CLASS' => $plagClass,
@@ -290,42 +290,31 @@ class DueWork_Detail {
 
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
-
-	                    // if it's deleted (pre- or post-completion) treat it as such
-	                    if(!is_null($submission['plag_deleted'])) {
-		                    $page->setVar('plag_enabled_block', '');
-
-							// do we have a number we can output for a score?
-		                    if($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
-			                    $page->parse('plag_deleted_block', 'plag_deleted');
-		                    }
-
-		                    // no value returned, hide it
-		                    else {
-			                    $page->setVar('plag_deleted_block', '');
-		                    }
-	                    }
-
-	                    // not deleted? ok, is it completed?
-	                    elseif($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
-	                        $page->parse('plag_enabled_block', 'plag_enabled');
-                        }
-
-                        // not complete? is this even a plagiarism document?
-                        elseif(!$submission['plag_doc_id']) {
+// if it's deleted (pre- or post-completion) treat it as such
+                        if (!is_null($submission['plag_deleted'])) {
                             $page->setVar('plag_enabled_block', '');
-                        }
 
-                        // it's a plag doc, but is being checked and still pending, so tell the user
+                            // do we have a number we can output for a score?
+                            if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+                                $page->parse('plag_deleted_block', 'plag_deleted');
+                            }                             // no value returned, hide it
+                            else {
+                                $page->setVar('plag_deleted_block', '');
+                            }
+                        } // not deleted? ok, is it completed?
+                        elseif ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+                            $page->parse('plag_enabled_block', 'plag_enabled');
+                        } // not complete? is this even a plagiarism document?
+                        elseif (!$submission['plag_doc_id']) {
+                            $page->setVar('plag_enabled_block', '');
+                        } // it's a plag doc, but is being checked and still pending, so tell the user
                         else {
                             $page->setVar(
                                 'plag_enabled_block',
                                 '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
                             );
                         }
-                    }
-
-                    // plagscan disabled, clear the indicator
+                    } // plagscan disabled, clear the indicator
                     else {
                         $page->setVar('plag_enabled_block', '');
                     }
@@ -369,7 +358,8 @@ class DueWork_Detail {
      * @param $htmlFormID
      * @param $markArray
      */
-    public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray) {
+    public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray)
+    {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
         $page->setVar('UFID', $htmlFormID);
@@ -394,7 +384,8 @@ class DueWork_Detail {
     /**
      * @return bool
      */
-    public function isArchived() {
+    public function isArchived()
+    {
         return $this->getDueDate()->getUsingFormat('Y') < date('Y');
     }
 
@@ -402,7 +393,8 @@ class DueWork_Detail {
     /**
      * @return bool
      */
-    public function isReadOnly() {
+    public function isReadOnly()
+    {
         // a markable work is read-only if the user IS NOT a super-user, AND it has been archived
         return !$this->groupHandler->isSuperuser() && $this->isArchived();
     }
@@ -411,7 +403,8 @@ class DueWork_Detail {
     /**
      * @return int
      */
-    public function getSubmissionType() {
+    public function getSubmissionType()
+    {
         if ($this->dueWork['multi_submission']) {
             return self::ACCEPT_MULTI;
         } elseif ($this->dueWork['accept_submission']) {
@@ -425,7 +418,8 @@ class DueWork_Detail {
     /**
      * @return Alaress_Date_Format
      */
-    public function getDueDate() {
+    public function getDueDate()
+    {
         return new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
     }
 }
