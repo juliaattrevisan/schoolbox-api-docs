@@ -1,6 +1,6 @@
 <!-- BEGIN custom_header -->
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
@@ -59,23 +59,21 @@ $(document).ready(function() {
         fullCalendar: {
             firstHour: 9,
             allDaySlot: false,
-            date:  calendarDate.getDate(),
-            month: calendarDate.getMonth(),
-            year:  calendarDate.getFullYear(),
+            defaultDate: calendarDate,
             columnFormat: {
                 month:      'ddd',
-                week:       'ddd d/M',
-                agendaWeek: 'ddd d/M',
-                day:        'ddd d/M',
-                agendaDay:  'ddd d/M',
-                '':         'ddd d/M'
+                week:       'ddd D/M',
+                agendaWeek: 'ddd D/M',
+                day:        'ddd D/M',
+                agendaDay:  'ddd D/M',
+                '':         'ddd D/M'
             },
             defaultView: calendarView,
-            timeFormat: { month: 'h(:mm)tt' },
-            events: function(start, end, callback) {
+            timeFormat: { month: 'h(:mm)a' },
+            events: function(start, end, timezone, callback) {
                 var data = [
-                    {name: 'start', value: Math.round(start.getTime()/1000)},
-                    {name: 'end',   value: Math.round(end.getTime()/1000)},
+                    {name: 'start', value: start.unix()},
+                    {name: 'end',   value: end.unix()}
                 ];
                 $.ajax({
                     data:     data.concat($('#calendar-controls').find('form').serializeArray()),
@@ -102,38 +100,15 @@ $(document).ready(function() {
              * Event rendering: put the event's start and end time into data
              */
             eventRender: function(event, element) {
-                // formatDate has no timezone support, and ISO 8601 outputs
-                // a Z as timezone always. Fail!
-                var getTimeWithTimezone = function(date) {
-                    var offset = date.getTimezoneOffset()
-                    var sign   = '';
-                    if (offset === 0) {
-                        return 'Z'
-                    }
-                    if (offset < 0) {
-                        // < 0 actually means +xxxx
-                        sign   = '+'
-                        offset = offset * -1
-                    }
-                    else {
-                        sign = '-'
-                    }
-                    var hours = String(Math.floor(offset / 60))
-                    if (hours.length === 1) {
-                        hours = '0' + hours;
-                    }
-                    var minutes = String(offset % 60)
-                    if (minutes.length === 1) {
-                        minutes = '0' + minutes;
-                    }
-                    return $.fullCalendar.formatDate(date, "yyyy-MM-dd'T'HH:mm:ss") + sign + hours + ':' + minutes
+                if (!event.data) {
+                    return false;
                 }
                 // Set data as attributes, that way selectors can query them
                 // End of event might not be defined if it's the same as
                 // start, too.
                 element.attr({
-                    'data-start':  getTimeWithTimezone(event.start),
-                    'data-end':    getTimeWithTimezone(event.end || event.start),
+                    'data-start':  event.start.format(),
+                    'data-end':    (event.end || event.start).format(),
                     'data-allday': event.allDay ? 1 : 0
                 })
 
@@ -157,18 +132,21 @@ $(document).ready(function() {
              * Event that is triggered when clicking on a calendar day or time.
              *
              * @param date
-             * @param allDay
              * @param jsEvent
+             * @param view
              */
-            dayClick: function(date, allDay, jsEvent) {
+            dayClick: function(date, jsEvent, view) {
                 // Bookings may not be made in the past.
-                var dateFormat = allDay ? 'ddd d MMMM' : 'h(:mm)tt, ddd d MMMM';
-                var eventData  = {
-                    startDate:   $.fullCalendar.formatDate(date, 'yyyy-MM-dd'),
-                    displayDate: $.fullCalendar.formatDate(date, dateFormat)
-                }
-                if (!allDay) {
-                    eventData.startTime = $.fullCalendar.formatDate(date, 'HH:mm')
+                var allDay = !date.hasTime();
+                var eventData = {
+                    allDay:    allDay ? 1 : 0,
+                    startDate: date.format('YYYY-MM-DD')
+                };
+                if (allDay) {
+                    eventData.displayDate = date.format('ddd, Do MMMM')
+                } else {
+                    eventData.startTime   = date.format('HH:mm');
+                    eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                 }
                 c.bubble.display('create', eventData, jsEvent, this)
             },
