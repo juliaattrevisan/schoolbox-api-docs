@@ -1,6 +1,9 @@
 <?php
 use Monolog\Logger;
-use Schoolbox\Role;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 
 /**
@@ -15,6 +18,32 @@ use Schoolbox\User;
 
 /* DATA RETRIEVAL AND PARSING */
 
+/** @var User $user */
+$user = $_SESSION['user'];
+
+/** @var \Schoolbox\Collection|\Schoolbox\Resource\Category[] $cats */
+$cats       = CategoryMapper::getInstance()
+                            ->findByColumn('id', $user->getAccessList()
+                            ->getColumnValues('serviceIdentifier'));
+
+$catIds     = $cats->getColumnValues('id');
+$service    = UserAccess::SERVICE_HOMEPAGE;
+$search     = array(
+    'user_id'        => array(0, $user->getId()),
+    'msg_route_key'  => "service.$service.([0-9]+)",
+    'outgoing_level' => 0
+);
+
+$unfollowed = RerouteOverrideMapper::getInstance()->findByColumnList($search)->map(
+    function ($override) {
+        /** @var RerouteOverride $override */
+        $matches = $override->getRouteKey();
+        return is_array($matches) ? $matches[1] : null;
+    },
+    false
+)->getAll();
+
+
 $stmt = Database::getInstance()->prepare("
 	SELECT  ns.slug, ns.label, src.key, src.description, perm.min_level, perm.max_level,
 			perm.default_level, reroute.outgoing_level
@@ -27,8 +56,6 @@ $stmt = Database::getInstance()->prepare("
 	ORDER BY min_level < max_level DESC, `key` ASC
 ");
 
-/** @var User $user */
-$user = $_SESSION['user'];
 
 $stmt->execute(array(
 	'user_id' => $user->getId(),
@@ -52,11 +79,29 @@ $methods = array(
 
 $this->setFile(TEMPLATE_content, 'settings/messages.html');
 
+$this->setBlock(TEMPLATE_content, 'follow', 'follow_block');
 $this->setBlock(TEMPLATE_content, 'digestible', 'digestible_block');
 $this->setBlock(TEMPLATE_content, 'digestible_col', 'digestible_col_block');
 $this->setBlock(TEMPLATE_content, 'namespace', 'namespace_block');
 $this->setBlock('namespace', 'route', 'route_block');
 $this->setBlock('route', 'box', 'box_block');
+
+
+// following
+foreach ($cats as $cat) {
+
+    $forced = false;
+
+    $this->setVar(array(
+        'CATEGORY_NAME'               => $cat->getName(),
+        'CATEGORY_ID'                 => $cat->getId(),
+        'CATEGORY_FOLLOWING_FORCE'    => $forced ? '1' : '0',
+        'CATEGORY_FOLLOWING_CHECKED'  => in_array($cat->getId(), $unfollowed) ? '' : 'checked="checked"',
+        'CATEGORY_FOLLOWING_DISABLED' => $forced ? 'disabled="disabled"' : ''
+    ));
+    $this->parse('follow_block', 'follow', true);
+}
+
 
 // digest
 $digestFreq = $user->getRole()->getDigestSchedule();
@@ -87,7 +132,9 @@ try {
 	}
 	else {
 		$fq = 'on ' . implode(', ', array_intersect_key($test, $days));
-		$fq = substr_replace($fq, ' &amp;', strrpos($fq, ','), 1);
+        if (($pos = strrpos($fq, ',')) !== false) {
+            $fq = substr_replace($fq, ' &amp;', $pos, 1);
+        }
 	}
 
 	$fq .= sprintf(' at %s', date('g:ia', strtotime(
