@@ -64,7 +64,7 @@ class ListFactory
             $collection->merge(
                 $this->gradeLevelMapper->findByColumn(
                     'submission_grade_group_id',
-                    1,
+                    $box->getGradeGroup()->getId(),
                     array(
                         'order' => array(
                             'lower_bound' => 'asc',
