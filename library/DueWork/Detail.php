@@ -78,6 +78,7 @@ class DueWork_Detail {
                     $insertion['submissions'] = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class'] = self::CLASS_UNSUBMITTED;
+                    $insertion['user']['time'] = new Alaress_Date_Format(0);
                     $submissions = array();
                 } // only use the first if this is a single-submit box
                 else {
@@ -91,11 +92,14 @@ class DueWork_Detail {
                         } else {
                             $insertion['user']['status'] = self::SUBMITTED;
                         }
+
                     }
 
                     // determine whether to give the ontime or late class
                     $submitTime = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
                     $dueTime = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+                    $insertion['user']['time'] = $submitTime;
+
 
                     if ($dueTime->getUnixTimestamp() < $submitTime->getUnixTimestamp()) {
                         $insertion['user']['status'] .= self::LATE;
@@ -202,6 +206,7 @@ class DueWork_Detail {
                     'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
                     'OWNER_STATUS' => $record['user']['status'],
                     'OWNER_CLASS' => $record['user']['class'],
+                    'OWNER_TIME'  => $record['user']['time']->getUnixTimestamp() ? $record['user']['time']->getShort():'',
                     'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
                 )
             );
