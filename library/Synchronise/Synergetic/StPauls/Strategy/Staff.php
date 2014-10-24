@@ -14,6 +14,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
     const ADMIN_GROUP_ID = 1;
     const TEACH_GROUP_ID = 2;
+    const GUEST_GROUP_ID = 7;
 	const STAFF_DEFAULT_CAMPUS = 1;
 
 	/**
@@ -112,9 +113,17 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 
     //Converts Synergetic StaffCategoryType to admin or teacher group
     protected function getGroupIDFromCategory($category) {
-        if($category == 'TEACHER')
+
+        $teachers = array('TEACHER','HEAD','CASH','CASJ','CASB');
+        $admin = array('CAB','SUPP','PRIN','COUN','CHAP');
+
+        if(in_array($category,$teachers)) {
             return self::TEACH_GROUP_ID;
-        else
+        }
+        elseif(in_array($category,$admin)){
             return self::ADMIN_GROUP_ID;
+        }
+        else
+            return self::GUEST_GROUP_ID;
     }
 }
