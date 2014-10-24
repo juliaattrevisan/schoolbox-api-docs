@@ -186,16 +186,19 @@ class SubmissionReturn extends DeprecatedModel
 
     /**
      * @param float $mark
+     * @param int $gradeGroupId The grade group to fetch from
      *
      * @return array|bool
      */
-    function getLetterGradeByValue($mark)
+    function getLetterGradeByValue($mark, $gradeGroupId = 1)
     {
-        $query = "SELECT * FROM submission_grade
-                  WHERE lower_bound <= $mark
-                  ORDER BY lower_bound DESC
-                  LIMIT 0, 1";
-
+        $query = "
+            SELECT * FROM submission_grade
+            WHERE lower_bound <= '{$this->db->quote($mark)}'
+            AND submission_grade_group_id = '{$this->db->quote($gradeGroupId)}'
+            ORDER BY lower_bound DESC
+            LIMIT 0, 1
+        ";
         return $this->db->getRow($query);
     }
 
