@@ -6,9 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Marksheet_Letter extends Marksheet_Abstract {
+class Marksheet_Letter extends Marksheet_Abstract
+{
 
-    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
+    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(
             'norm_mark' => $grade['lower_bound'],
@@ -16,7 +18,8 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    {
         $return = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
 
@@ -27,15 +30,17 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
-        if($rawMark === null) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
+    {
+        if ($rawMark === null) {
             $rawMark = -1;
         }
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
         return $grade['caption'];
     }
 
-    public function outputUI(SitePage $page, $mark) {
+    public function outputUI(SitePage $page, $mark)
+    {
         $page->setVar('grade_drop_block', '');
 
         // Only allow letter grades for the selected submission box
@@ -66,5 +71,4 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
         $page->setVar('COMMENT', Scrub::text($mark['comment']));
     }
-
 }
