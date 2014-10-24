@@ -417,6 +417,12 @@
             );
         });
 
+        // Grade group selector
+        $('select#gradegroup').on('change', function() {
+            $('.gradegroup_explanation').hide();
+            $('#gradegroup_explanation-'+this.value).show();
+        }).change();
+
 		$j('#deleteBox').click(function() {
 			if (confirm('Are you sure you want to delete this submission box?')) {
 				window.location = '/submission/submissionForm.php?deleteBox={ID}';
@@ -493,18 +499,13 @@
                 <!-- END gradegroup_drop -->
             </select>
 
-            <dl>
-                <!-- BEGIN gradegroup_explanation -->
-                <dt>{GRADEGROUP_NAME}</dt>
-                <dd>
-                    <ul>
-                        <!-- BEGIN gradegroup_explanation_level -->
-                        <li>{GRADEGROUP_LEVEL_LOWER_BOUND}+: {GRADEGROUP_LEVEL_CAPTION}</li>
-                        <!-- END gradegroup_explanation_level -->
-                    </ul>
-                </dd>
-                <!-- END gradegroup_explanation -->
-            </dl>
+            <!-- BEGIN gradegroup_explanation -->
+            <ul class="gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
+                <!-- BEGIN gradegroup_explanation_level -->
+                <li>{GRADEGROUP_LEVEL_LOWER_BOUND}+: {GRADEGROUP_LEVEL_CAPTION}</li>
+                <!-- END gradegroup_explanation_level -->
+            </ul>
+            <!-- END gradegroup_explanation -->
         </td>
     </tr>
     <tr id="marktype-total" class="marks-hide dark">

@@ -247,6 +247,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->setVar(
             array(
                 'gradegroup_explanation_level_block' => '',
+                'GRADEGROUP_ID'                      => $group->getId(),
                 'GRADEGROUP_NAME'                    => $group->getName(),
             )
         );
