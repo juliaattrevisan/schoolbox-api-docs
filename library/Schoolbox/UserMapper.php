@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use Schoolbox;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class UserMapper extends Mapper
 {
@@ -240,10 +241,10 @@ class UserMapper extends Mapper
                 $user = $this->hydrate($row, 'u');
                 $user->setSuperUser($row['u.superuser'] == 1);
                 $user->setRole($roleMapper->hydrate($row, 'g'));
-                $user->setAccessList(
-                    $this->getJoinMapper('userAccess')
-                        ->findByColumn('uid', $user->getId())
-                );
+
+                /** @var UserAccessMapper $uaMapper */
+                $uaMapper = $this->getJoinMapper('userAccess');
+                $user->setAccessList($uaMapper->findAllForUser($user));
             }
 
             $campus = $campusMapper->hydrate($row, 'c');
