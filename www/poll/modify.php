@@ -57,7 +57,7 @@ if (is_numeric($this->arg[0])) {
     $this->setTitle('Create Poll');
 
     $output = array(
-        'ACTION' => 'Add',
+        'ACTION' => 'Create',
         'POLL_ID' => '',
         'CATEGORY_ID' => $this->arg[1],
         'COMPONENT_HOMEPAGE_ID' => Scrub::text($this->arg[2]),
