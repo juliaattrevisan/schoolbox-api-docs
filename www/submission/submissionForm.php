@@ -89,7 +89,6 @@ $useDescriptors = $resultSetID == 0;
 SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
 
 if (isset($_POST['attachment'])) {
-
 //    var_dump($_POST['attachment']);
 
     $factory = new CollectorFactory();
