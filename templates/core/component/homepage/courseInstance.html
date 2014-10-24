@@ -119,6 +119,14 @@
                     <li class="unit-task interact {UNIT_BACKGROUND} {UNIT_TASK_COMPLETE_CLASS}" data-unit_task_id="{UNIT_TASK_ID}">
 
 						<span class="actions">
+                            <!-- BEGIN unit_task_quiz_results -->
+                            <a href="/assess/results/{UNIT_QUIZ_ID}" class="btn statistics no-text" title="View Results"><span></span></a>
+                            <!-- END unit_task_quiz_results -->
+
+                            <!-- BEGIN unit_task_duework_results -->
+                            <a href="/submission/viewSubmission/{UNIT_DUEWORK_ID}" class="btn tick no-text" title="View Results"><span></span></a>
+                            <!-- END unit_task_duework_results -->
+
 							<!-- BEGIN unit_task_delete -->
                             <a href="#" class="btn delete no-text" title="Delete this task" data-interaction="open_delete_task_form"><span></span></a>
                             <!-- END unit_task_delete -->

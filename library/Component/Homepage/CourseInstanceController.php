@@ -157,6 +157,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit',             'unit_task',            'unit_task_block');
         $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
         $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
+        $this->setBlock('unit_task',        'unit_task_quiz_results',    'unit_task_quiz_results_block');
+        $this->setBlock('unit_task',        'unit_task_duework_results', 'unit_task_duework_results_block');
         $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
         $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
         $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
@@ -408,6 +410,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_task_modify_block'      => '',
                 'unit_task_delete_form_block' => '',
                 'unit_task_modify_form_block' => '',
+                'unit_task_quiz_results_block'    => '',
+                'unit_task_duework_results_block' => '',
             )
         );
 
@@ -449,6 +453,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
 
                 $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
+            } elseif ($task->getType() == Task::TYPE_DUE_WORK) {
+                $this->setVar('UNIT_DUEWORK_ID', Scrub::text($task->getSubmissionBox()->getId()));
+                $this->parse('unit_task_duework_results_block', 'unit_task_duework_results');
+            } elseif ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
+                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
+                $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
         }
         $this->parse('unit_task_block', 'unit_task', true);
