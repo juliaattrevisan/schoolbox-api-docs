@@ -29,16 +29,4 @@ class Marksheet_Factory {
             return new Marksheet_Free($markType);
         }
     }
-
-    public static function buildByID($id) {
-        // if there's a problem, default to free for legacy
-        if(!is_numeric($id)) {
-            return Marksheet_Factory::build('percent');
-        }
-        $subHandler = new Submission();
-        $marktype = $subHandler->getMarkTypeByID($id);
-
-        return Marksheet_Factory::build($marktype['slug']);
-    }
-
 }
