@@ -43,6 +43,14 @@ class Model
     protected $caption;
 
     /**
+     * Constructor - puts an empty group object in.
+     */
+    public function __construct()
+    {
+        $this->setGroup(new Group\Model());
+    }
+
+    /**
      * @return string
      */
     public function getCaption()
