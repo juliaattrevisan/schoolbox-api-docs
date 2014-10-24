@@ -206,7 +206,9 @@ class DueWork_Detail {
                     'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
                     'OWNER_STATUS' => $record['user']['status'],
                     'OWNER_CLASS' => $record['user']['class'],
-                    'OWNER_TIME'  => $record['user']['time']->getUnixTimestamp() ? $record['user']['time']->getShort():'',
+                    'OWNER_TIME'  => $record['user']['time'] instanceof Alaress_Date_Format
+                        ? $record['user']['time']->getShort()
+                        : '',
                     'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
                 )
             );
