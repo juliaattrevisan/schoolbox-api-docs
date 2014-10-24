@@ -46,7 +46,8 @@ function Calendar(id, bubbleId, opts) {
             checkboxSelector: '.applyFilters',
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
-            listSelector: '.filter-list'
+            listSelector: '.filter-list',
+            listViewButton: true
         },
         fullCalendar: {
             contentHeight: $j(window).height() - this.dom.offset().top - 60,
@@ -406,13 +407,15 @@ Calendar.prototype.init = function() {
      */
     var headerRight = this.dom.find('.fc-toolbar .fc-right');
     var baseButton  = headerRight.find('.fc-button').first();
-    headerRight.prepend(
-        baseButton.clone()
-            .html('list')
-            .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
-            .addClass(' fc-corner-left no-icon')
-            .attr('id','fc-button-list')
-    );
+    if (this.options.filter.listViewButton) {
+        headerRight.prepend(
+            baseButton.clone()
+                .html('list')
+                .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
+                .addClass(' fc-corner-left no-icon')
+                .attr('id','fc-button-list')
+        );
+    }
 
     if(this.options.filter.enabled) {
         // mash the filters in (if they're enabled)
