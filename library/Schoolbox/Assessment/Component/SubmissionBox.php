@@ -163,6 +163,7 @@ class SubmissionBox implements ISoftDeletable
         $this->setCategory(new Category());
         $this->setWorkType(new WorkType());
         $this->setMarkType(new MarkType());
+        $this->setGradeGroup(new GradeLevel\Group\Model());
     }
 
     /**
