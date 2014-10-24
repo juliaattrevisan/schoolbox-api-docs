@@ -127,8 +127,7 @@ $allTableNames = array();
 
 // construct the sidebar
 foreach ($tableList as $table) {
-
-    // if the table in question does not exist in the target database, don't try to display it (empty table is a different story)
+// if the table in question does not exist in the target database, don't try to display it (empty table is a different story)
     $gHandle = new GenericTable($table['name'], $table['index']);
     if (!$gHandle->tableExists()) {
         continue;
@@ -180,7 +179,7 @@ if (isset($selectedTable['fields'])) {
 if ($table) {
     foreach ($table as $row) {
         foreach ($row as $keys => $data) {
-            $this->setVar('TABLE_DATA',   Scrub::text($data));
+            $this->setVar('TABLE_DATA', Scrub::text($data));
             $this->setVar('TABLE_COLUMN', $keys);
 
             $currentColumn = $selectedTable['fields'][$keys];
@@ -202,12 +201,11 @@ if ($table) {
             }
 
             if (!$rowOne) {
-
-                if ((isset($currentColumn['caption']))) {
+if ((isset($currentColumn['caption']))) {
                     $this->setVar('TABLE_HEAD', $currentColumn['caption']);
-                } else {
-                    $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
-                }
+} else {
+                        $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
+                    }
 
 
                 $this->parse('table_heading_block', 'table_heading', true);
@@ -235,8 +233,7 @@ if ($table) {
                                 $this->parse('newSelect_option_block', 'newSelect_option', true);
                             }
                             $this->parse('newSelect_block', 'newSelect', true);
-                        }
-                        // generically, just go with a text input
+                        } // generically, just go with a text input
                         else {
                             $this->setVar('TYPE', 'text');
                             $this->setVar('READONLY', '');
@@ -275,9 +272,7 @@ if ($table) {
         $this->setVar('table_cell_block', '');
     }
 } // else table contains no data. still display headers
-else {
-
-    foreach ($tableDefinition as $col) {
+else {foreach ($tableDefinition as $col) {
         $key = $col['Field'];
         if ((isset($selectedTable['fields'][$key]['caption']))) {
             $this->setVar('TABLE_HEAD', $selectedTable['fields'][$key]['caption']);
@@ -317,7 +312,7 @@ else {
             }
         }
 
-    }
+}
 
     $this->setVar('table_row_block', '');
 }
