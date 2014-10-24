@@ -1,30 +1,23 @@
+<script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-		
    	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 
 	 }).validate({
-
 		submitHandler: function() {
-   		    var theForm = $j('#createQuestionForm');
+				var theForm = $j('#createQuestionForm'),
+					answerCollection = new Array(),
+					content = tinyMCE.activeEditor.getContent(); // get the content
 
-        	/* Form preprocessing
-             */
-			var answerCollection = new Array();
-			
-			var content = tinyMCE.activeEditor.getContent(); // get the content
    			$j('#question').val(content); // put it in the textarea
 			
-			/* Collate possible answers and their correctness status
-			 */
+
 			$j.each($j('#answerCollection').find('li'), function(index, element) {
-				var elem = $j(element);
-	
-				var description = elem.find('.answerDescription').val();
-				var code = elem.find('.answerCode').val();
-	
+					var elem = $j(element),
+						description = elem.find('.answerDescription').val(),
+						code = elem.find('.answerCode').val();
+
 				/* Ignore empty answers that weren't removed
 				 */
 				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
@@ -35,10 +28,7 @@ $j(document).ready(function() {
 					});
 				}
 			});
-				
-			/* Collate the usual fields containing ids.
-			 * Collate the checkboxes too but append all the possibilities as well!
-			 */
+
 			if (typeof questionBank == "undefined") {
 				var data = {
 					section_id: theForm.find('input[name=section_id]').val(),
@@ -47,11 +37,10 @@ $j(document).ready(function() {
 					type_id: theForm.find('input[name=type_id]').val(),
 					question: tinyMCE.get('question').getContent(),
 					marks: theForm.find('input[name=marks]').val(),
-					allAnswers: JSON.stringify(answerCollection)
+					allAnswers:JSON.stringify(answerCollection),
+					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 				};
 
-				/* Submit via POST and redirect to question creation screen upon done
-				 */
 				$j.post(theForm.attr('action'), data, function(responseText) {
 					window.location = '/assess/question/modify/' + data.question_id;
 				});
@@ -65,11 +54,10 @@ $j(document).ready(function() {
 					type_id: theForm.find('input[name=type_id]').val(),
 					question: tinyMCE.get('question').getContent(),
 					marks: theForm.find('input[name=marks]').val(),
-					allAnswers: JSON.stringify(answerCollection)
+					allAnswers:JSON.stringify(answerCollection),
+					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 				};
 
-				/* Submit via POST and redirect to question creation screen upon done
-				 */
 				$j.post(theForm.attr('action'), data, function(responseText) {
 					window.location = questionBank.url;
 				});
@@ -91,8 +79,7 @@ $j(document).ready(function() {
 			'answerDescription[]': {
 				emptyInputs: true
 			},
-			/* Removed mandatory correct answer
-			 */
+
 			'answer[]':{
 				nothingChecked:true	
 			}
@@ -124,7 +111,7 @@ $j(document).ready(function() {
             var elem = $j(element);
 
             var description = elem.find('.answerDescription').val();
-            var code = elem.find('.answerCode').val();
+            var code = elem.find('.answerCode').attr('value');
 
             /* Ignore empty answers that weren't removed
              */
@@ -170,41 +157,50 @@ $j(document).ready(function() {
 	
     /* Add a new answer option
      */
-    $j(document).on('click', '#makeNewAnswer', function() {
+        $j(document).on('click', '.makeNewAnswer', function(e) {
+			e.preventDefault();
+
+			var maxItems = 702;
+
+			/* Obey limit
+			 */
+			if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);		
 		refreshList();
-		return false;
-    });
-	
-	$j('.answerCorrect').each(function(){
-		if ($j(this).is(':checked')) {
-			$j(this).parent().parent().addClass("highlight");
 		}
-	});
 	
-	$j(document).on('click', '.answerCorrect', function() {
-		$j(this).parent().parent().toggleClass("highlight");
+            return false;
 	});
 	
 	/* Remove an answer option
 	 */
-	$j(document).on('click', '.delete', function(){
-		if (($j('.inputs').length) !== 1) {
+		$j(document).on('click', 'div.delete', function(e) {
+			if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
-			refreshList()
+				refreshList();
 		}	
+
+			return false;
     });
 	
-	function refreshList() {
-		var alphabetStart = 65;
+        $j('.answerCorrect').each(function (e) {
+            if ($j(this).is(':checked')) {
+                $j(this).closest('li').addClass("highlight");
+            }
+        });
 
-		$j('li.inputs > .list-item').each(function() {	
-			var $this = $j(this);
-			$this.children('span').html('&#' + alphabetStart + ';)');
-			var convert = String.fromCharCode(alphabetStart);
-			$this.children('input').val(convert);
-			alphabetStart++;
+        $j('.check-it').click(function (e) {
+            $j(this).closest('li').toggleClass("highlight");
+        });
+
+	function refreshList() {
+			var i = 1;
+
+			$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+				$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
+				$(element).children('input').val(i);
+				i++;
 		});
 		
 		var pos = $j('ul#answerCollection').height();
@@ -218,50 +214,51 @@ $j(document).ready(function() {
 		});
 	}
 
-	refreshList()
-	
+        refreshList();
 });
 </script>
 		
-    <label>Answer
+<label>Answers</label>
 	<div class="answer-collection">
 		<ul id="answerCollection" >
 		 <!-- BEGIN answerOption -->
 			<li class="inputs clearfix">
-				<label class="list-item">
+                <div class="list-item">
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="{ANSWER_VALUE}" />
-					
-					<span>{ANSWER_VALUE})</span>
-				</label>
-				<label class="check-it"><input name="answer[]" {ANSWER_CHECKED} class="answerCorrect" type="checkbox" /></label>
-				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="{ANSWER_DESCRIPTION}" /></label>
+                    <span>{ANSWER_VALUE})</span>
+                </div>
+                <label class="check-it"><input name="answer[]" class="answerCorrect" type="radio" {ANSWER_CHECKED} /></label>
+                <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box"
+                                                   type="text" value="{ANSWER_DESCRIPTION}"/></label>
+
 				<div class="delete"></div>
 			</li>	
 			 <!-- END answerOption -->	
 		</ul>
 		
-		<label for="answerDescription[]" generated="true" class="error" id="listItems">Please fill out all answers</label>
-		<label for="answer[]" generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
+        <label generated="true" class="error" id="listItems">Please fill out all answers</label>
+        <label generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
 		
 		<p class="clearfix">
-			<a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a>
+            <a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
 		</p>
 	</div>
 	
 	<div class="hide hidden-clone">
 		<ul>
 			<li class="inputs clearfix">
-				<label class="list-item">
+                <div class="list-item">
 					<input name="answerCode[]" class="answerCode text-box" type="hidden" value="" />
 					<span>{ANSWER_VALUE})</span>
-				</label>
-				<label class="check-it"><input name="answer[]" class="answerCorrect"  type="checkbox" /></label>
-				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
+                </div>
+                <label class="check-it"><input name="answer[]" class="answerCorrect" type="radio"/></label>
+                <label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box"
+                                                   type="text" value=""/></label>
+
 				<div class="delete"></div>
 			</li>	
 		</ul>
 		<p class="clearfix">
-			<a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a>
+            <a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
 		</p>
 	</div>
-</label>

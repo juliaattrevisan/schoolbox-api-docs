@@ -1,0 +1,1 @@
+UPDATE `assess_luQuestionType` SET `availability` = 'all' WHERE `filename` = 'radio';

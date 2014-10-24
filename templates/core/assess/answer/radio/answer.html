@@ -1,6 +1,16 @@
-<!-- BEGIN answerOption -->
-<label class="checkboxes">
-	{ANSWER_VALUE})
-	<input name="answer" class="answerCorrect checkbox" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/><span>{ANSWER_DESCRIPTION}</span>
-</label>
-<!-- END answerOption -->
+<script type='text/javascript'>
+    $j(function() {
+        $j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+            id: {QUESTION_ID}
+        });
+    });
+</script>
+<span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+<fieldset class="radio-buttons">
+    <!-- BEGIN answerOption -->
+    <label>
+        {ANSWER_VALUE_FACADE})
+        <input name="answer" class="answerCorrect checkbox" type="radio" value="{ANSWER_VALUE}" {ANSWER_CHECKED}/><span>{ANSWER_DESCRIPTION}</span>
+    </label>
+    <!-- END answerOption -->
+</fieldset>
