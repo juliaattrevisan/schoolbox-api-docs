@@ -62,12 +62,11 @@ class ListFactory
 
             // Options for this grade group
             $collection->merge(
-                $this->gradeLevelMapper->findByColumn(
-                    'submission_grade_group_id',
-                    $box->getGradeGroup()->getId(),
+                $this->gradeLevelMapper->findAll(
                     array(
                         'order' => array(
-                            'lower_bound' => 'asc',
+                            'submission_grade_group_id' => 'asc',
+                            'lower_bound'               => 'asc',
                         ),
                     )
                 )

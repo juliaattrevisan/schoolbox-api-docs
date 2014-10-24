@@ -45,7 +45,14 @@ class Marksheet_Letter extends Marksheet_Abstract {
         $submission->getMarkType()->setId(
             \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_LETTER
         );
-        $grades = $factory->buildGradeList($submission);
+        $grades = array();
+        foreach ($factory->buildGradeList($submission) as $grade) {
+            $grades[] = array(
+                'id'      => $grade->getId(),
+                'caption' => $grade->getCaption(),
+                'group'   => $grade->getGroup()->getId(),
+            );
+        }
         $page->dropdown(
             'grade_drop',
             $grades,
@@ -54,6 +61,7 @@ class Marksheet_Letter extends Marksheet_Abstract {
             array(
                 'id'      => 'GRADE_VALUE',
                 'caption' => 'GRADE_TEXT',
+                'group'   => 'GRADE_GROUP_ID',
             )
         );
         $page->setVar('COMMENT', Scrub::text($mark['comment']));
