@@ -14,6 +14,11 @@ use Schoolbox\User;
 
 class RerouteOverride {
 
+    const DEFAULT_UNFOLLOW = 0;
+    const DEFAULT_FOLLOW   = 1;
+    const FORCE_FOLLOW     = 2;
+
+
 	/** @var User */
 	protected $user;
 
