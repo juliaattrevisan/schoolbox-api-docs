@@ -1,0 +1,2 @@
+ALTER TABLE `userGroups`
+  ADD COLUMN `force_follow` TINYINT(1) UNSIGNED DEFAULT 0  NOT NULL AFTER `type`;

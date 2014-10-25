@@ -27,5 +27,10 @@ class GroupMapper extends Mapper {
                 'property'   => 'type',
                 'type'       => self::TYPE_INTEGER,
             ));
+        $this->hasMap(array(
+            'column'   => 'force_follow',
+            'property' => 'forceFollow',
+            'type'     => self::TYPE_BOOLEAN
+        ));
     }
 }
