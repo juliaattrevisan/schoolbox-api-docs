@@ -56,7 +56,7 @@ $unfollow = array_values(array_diff($involvements, $follow));
  * @return string
  */
 function castToRoutingKey($v) {
-    return 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$v.#";
+    return 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$v";
 }
 
 // delete any overrides for homepages the user is RE-following

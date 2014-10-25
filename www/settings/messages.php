@@ -24,24 +24,33 @@ $user = $_SESSION['user'];
 /** @var \Schoolbox\Collection|\Schoolbox\Resource\Category[] $cats */
 $cats       = CategoryMapper::getInstance()
                             ->findByColumn('id', $user->getAccessList()
-                            ->getColumnValues('serviceIdentifier'));
+                            ->getColumnValues('serviceIdentifier'))
+                            ->sortBy('name', 'asc');
 
 $catIds     = $cats->getColumnValues('id');
 $service    = UserAccess::SERVICE_HOMEPAGE;
 $search     = array(
-    'user_id'        => array(0, $user->getId()),
     'msg_route_key'  => "service.$service.([0-9]+)",
     'outgoing_level' => 0
 );
 
-$unfollowed = RerouteOverrideMapper::getInstance()->findByColumnList($search)->map(
-    function ($override) {
-        /** @var RerouteOverride $override */
-        $matches = $override->getRouteKey();
-        return is_array($matches) ? $matches[1] : null;
-    },
-    false
-)->getAll();
+$muted = array(
+    'unfollow' => $user->getId(),
+    'disabled' => 0
+);
+
+foreach ($muted as $k => $id) {
+    $search['user_id'] = $id;
+
+    $muted[$k] = RerouteOverrideMapper::getInstance()->findByColumnList($search)->map(
+        function ($override) {
+            /** @var RerouteOverride $override */
+            $matches = $override->getRouteKey();
+            return is_array($matches) ? $matches[1] : null;
+        },
+        false
+    )->getAll();
+}
 
 
 $stmt = Database::getInstance()->prepare("
@@ -77,6 +86,7 @@ $methods = array(
 
 /* DISPLAY CONTENT */
 
+$this->setTitle('Message Settings');
 $this->setFile(TEMPLATE_content, 'settings/messages.html');
 
 $this->setBlock(TEMPLATE_content, 'follow', 'follow_block');
@@ -92,11 +102,20 @@ foreach ($cats as $cat) {
 
     $forced = false;
 
+    // forced hydration
+    $cat = CategoryMapper::getInstance()->findById($cat->getId());
+
+    if ($grp = $cat->getGroup()) {
+        $forced = $grp->getForceFollow() || in_array($cat->getId(), $muted['disabled']);
+    }
+
+    $follow = !(in_array($cat->getId(), $muted['unfollow']) || in_array($cat->getId(), $muted['disabled']));
+
     $this->setVar(array(
         'CATEGORY_NAME'               => $cat->getName(),
         'CATEGORY_ID'                 => $cat->getId(),
         'CATEGORY_FOLLOWING_FORCE'    => $forced ? '1' : '0',
-        'CATEGORY_FOLLOWING_CHECKED'  => in_array($cat->getId(), $unfollowed) ? '' : 'checked="checked"',
+        'CATEGORY_FOLLOWING_CHECKED'  => $follow ? 'checked="checked"'   : '' ,
         'CATEGORY_FOLLOWING_DISABLED' => $forced ? 'disabled="disabled"' : ''
     ));
     $this->parse('follow_block', 'follow', true);

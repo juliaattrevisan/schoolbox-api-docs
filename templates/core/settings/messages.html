@@ -1,8 +1,25 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
-  .standardForm tr.advanced {
-    display: table-row;
-  }
+    .standardForm tr.advanced {
+        display: table-row;
+    }
+
+    tr.ns th:not(:first-child) {
+        text-align: center;
+    }
+
+    #msg-settings td label {
+        text-align: center;
+    }
+
+    #msg-settings input[disabled]:not([checked]) {
+        opacity: 0.7;
+    }
+
+    table.ruler tr th {
+        background-color: #f0f0f0;
+    }
+
 </style>
 <script type="text/javascript">
 $j(document).ready(function() {
@@ -59,7 +76,7 @@ $j(document).ready(function() {
     Messages sent via Instant and Email will appear in your internal messages list, as well as be immediately emailed to you.
   </li>
 </ul>
-<table class="standardForm table">
+<table id="msg-settings" class="ruler table">
   <!-- BEGIN namespace -->
   <tr class="ns">
     <th>Receive {NAMESPACE_LABEL} messages when&hellip;</th>
