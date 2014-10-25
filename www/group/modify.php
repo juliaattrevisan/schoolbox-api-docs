@@ -1,11 +1,20 @@
 <?php
 
 
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
 $this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
+$this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_block');
+
+$this->setBlock(TEMPLATE_content, 'msg_enabled', 'msg_enabled_block');
+$this->setBlock('msg_enabled', 'default_follow', 'default_follow_block');
+
+$this->setBlock(TEMPLATE_content, 'msg_enabled_followth', 'msg_enabled_followth_block');
 
 $this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
 
@@ -19,6 +28,8 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 $categoryHandler = new Category;
 
 if (is_numeric($this->arg[0])) {
+    $messagingEnabled = ConfigMapper::getInstance()->get('messaging_enabled');
+
 	$userHandler = new User();
 
 	$category = $categoryHandler->getByID($this->arg[0]);
@@ -29,8 +40,10 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setVar(
 		array(
-			'groupOwner_block'     => '',
-			'groupUnmanaged_block' => '',
+			'groupOwner_block'           => '',
+			'groupUnmanaged_block'       => '',
+            'msg_enabled_followth_block' => '',
+            'msg_enabled_block'          => ''
 		)
 	);
 
@@ -43,6 +56,34 @@ if (is_numeric($this->arg[0])) {
 					);
 
 	$this->setVar($output);
+
+    $this->setVar('default_follow_block', '');
+
+    $search = array(
+        'user_id'        => 0,
+        'msg_route_key'  => "service.1.{$category['id']}",
+        'outgoing_level' => 0
+    );
+
+    // if result returned, it means group is muted
+    $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()->findByColumnList($search)->count();
+
+    $output = array(
+        'MSG_ENABLED_CHECKED'      => '',
+        'MSG_FORCE_FOLLOW_CHECKED' => ''
+    );
+
+    if ($groupMessagesEnabled) {
+        $output['MSG_ENABLED_CHECKED'] = 'checked="checked"';
+
+        if ($category['force_follow']) {
+            $output['MSG_FORCE_FOLLOW_CHECKED'] = 'checked="checked"';
+        }
+    }
+
+    $this->setVar($output);
+
+
 	if ($category['owner']) {
 		$this->setVar(
 			array(
@@ -56,6 +97,11 @@ if (is_numeric($this->arg[0])) {
 		$this->parse('groupUnmanaged_block', 'groupUnmanaged');
 	}
 
+    if ($messagingEnabled) {
+        $this->parse('msg_enabled_block', 'msg_enabled');
+        $this->parse('msg_enabled_followth_block', 'msg_enabled_followth');
+    }
+
 	$memberList   = $groupHandler->getMemberList($category['id']);
 	//
 	// Keep list of everyone to email
@@ -68,19 +114,36 @@ if (is_numeric($this->arg[0])) {
 			if ($member['uid'] != $_SESSION['id']) {
 				$all_emails[] = $email_object->formatEmailFromArray($member);
 			}
+
+            $search = array(
+                'user_id'        => array(0, $member['uid']),
+                'msg_route_key'  => "service.1.{$category['id']}",
+                'outgoing_level' => 0
+            );
+
+            $following = !RerouteOverrideMapper::getInstance()->findByColumnList($search)->count();
+
 			$output = array('USER_NAME'		=> $userHandler->formatName($member),
 							'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
 							'USER_ID'		=> $member['uid'],
-							'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : ''
+							'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : '',
+                            'USER_FOLLOWING' => $following ? 'Yes' : 'No'
 							);
 
 			$this->setVar($output);
 
 
-			$this->setVar('make_owner_block', '');
+			$this->setVar(array(
+                'make_owner_block'             => '',
+                'msg_enabled_userfollow_block' => ''
+            ));
+
 			if ($groupHandler->allowOwner($member['uid']))
 				$this->parse('make_owner_block', 'make_owner');
 
+            if ($messagingEnabled) {
+                $this->parse('msg_enabled_userfollow_block', 'msg_enabled_userfollow');
+            }
 
 			$this->parse('member_block', 'member', true);
 		}

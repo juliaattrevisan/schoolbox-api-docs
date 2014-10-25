@@ -1,4 +1,43 @@
 <!-- BEGIN custom_head -->
+    <style type="text/css">
+        form.ajax {
+            position: relative;
+            min-height: 100%;
+        }
+        form.ajax label {
+            transition: opacity 200ms ease-out;
+        }
+        form.ajaxing {
+            padding-bottom: 32px;
+        }
+        form.ajaxing label {
+            opacity: 0.5;
+        }
+        form.ajax:after {
+            display: block;
+            content: " ";
+            padding: 0 8px;
+            height: 0;
+            border: solid 1px transparent;
+            opacity: 0;
+            transition: opacity 200ms ease-out;
+        }
+        form.ajax.ajaxing:after {
+            height: auto;
+            content: "Saving...";
+            padding: 7px 0;
+            background: #ffe;
+            border-color: #eed;
+            opacity: 1;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+        .ajax fieldset {
+            margin-left: 32px;
+        }
+    </style>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
@@ -10,25 +49,16 @@ $j(document).ready(function() {
 		super: '{MAKEADMIN_SUPER}'
 	});
 
-    $j('.greenCheck').change(function() {
-        if ($j(this).prop('checked')) {
-            var data = {
+    $('#members').on('change', '.greenCheck', function() {
+        var input = $(this),
+            data  = {
                 categoryID: '{CATEGORY_ID}',
-                userID: $j(this).attr('rel'),
-                write: 2
-            }
-        }
-        else {
-            var data = {
-                categoryID: '{CATEGORY_ID}',
-                userID: $j(this).attr('rel'),
-                write: 1
-            }
-        }
+                userID: input.attr('rel'),
+                write: input.prop('checked') ? 2 : 1
+            };
 
-        $j.get('/group/modifyForm.php', data);
-
-    }).change();
+        $.get('/group/modifyForm.php', data);
+    });
 
     var addUserSelector = $j('#addUser');
     var addUserButton   = addUserSelector.closest('form').find(':submit');
@@ -50,13 +80,51 @@ $j(document).ready(function() {
             if ($(this).data('selectize').items.length === 0) {
                 addUserButton.prop('disabled', true).addClass('disabled');
             }
-        })
+        });
 
-	$j('#type_form input').each(function () {
-		$j(this).click(function () {
-			$j.get('/group/modifyForm.php', {categoryID: '{CATEGORY_ID}', type: $j(this).val()});
-		});
-	});
+    $('form.ajax').on('change', 'input', function (event) {
+
+        var input = $(this),
+            dataAttr, ajaxingClass, form, method, action, data;
+
+        updateFieldset(input, 120);
+
+//        if (this.type == 'radio') {
+            dataAttr     = 'wasdisabled';
+            ajaxingClass = 'ajaxing';
+            form         = event.delegateTarget;
+            method       = form.method || 'POST';
+            action       = form.action || '/';
+            data         = $(form).serialize();
+
+            $(form).addClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
+                $(this).data(dataAttr, !!this.disabled).attr('disabled', 'disabled');
+//                console.log('in', this, $(this).data(dataAttr));
+            });
+
+            $.ajax({
+                type: method,
+                url: action,
+                data: data,
+                complete: function () {
+                    $(form).removeClass(ajaxingClass).find('input:not([type=hidden])').each(function () {
+                        var input = $(this);
+//                        console.log('out', this, input.data(dataAttr));
+                        if(!input.data(dataAttr)) {
+                            input.removeAttr('disabled');
+                        }
+                        input.data(dataAttr, undefined);
+                    });
+                }
+            });
+//        }
+
+    });
+
+    // tell all input to hide their fieldsets if appropriate
+    $('input[data-fieldset]').each(function () {
+        updateFieldset($(this), 0);
+    });
 
 
 	$j('input.checkAll').each(function () {
@@ -72,6 +140,23 @@ $j(document).ready(function() {
 		if (confirm('Delete all selected users?'))
 			$j('#deleteForm').submit();
 	});
+
+    /**
+     * @param {jQuery} input
+     * @param {Integer} transitionSpeed
+     */
+    function updateFieldset(input, transitionSpeed)
+    {
+        if (input.data('fieldset')) {
+            fieldset = $('#' + input.data('fieldset'));
+
+            if (input.is(':checked')) {
+                fieldset.fadeIn(transitionSpeed).find('input').removeAttr('disabled');
+            } else {
+                fieldset.fadeOut(transitionSpeed).find('input').attr('disabled', 'disabled');
+            }
+        }
+    }
 });
 </script>
 <!-- END custom_head -->
@@ -108,27 +193,68 @@ $j(document).ready(function() {
 			<td valign="top"><h4>Access Type</h4>
 				<em>Restricted groups are private. Moderated allows users to join, but only access once approved.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
 				</td>
-				<td><form action="" method="post" id="type_form">
-					<input name="type" type="radio" value="1" {GROUP_TYPE_1} />
-					Restricted <br />
-					<input name="type" type="radio" value="2" {GROUP_TYPE_2} />
-					Moderated<br />
-					<input name="type" type="radio" value="3" {GROUP_TYPE_3} />
-					Free
-				</form></td>
+				<td>
+                    <form class="ajax" action="/group/modifyForm.php" method="post" id="type_form">
+                        <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                        <label>
+                            <input name="type" type="radio" value="1" {GROUP_TYPE_1} /> Restricted
+                        </label>
+                        <label>
+                            <input name="type" type="radio" value="2" {GROUP_TYPE_2} /> Moderated
+                        </label>
+                        <label>
+                            <input name="type" type="radio" value="3" {GROUP_TYPE_3} /> Free
+                        </label>
+				    </form>
+                </td>
 		</tr>
+        <!-- BEGIN msg_enabled -->
+        <tr>
+            <td>
+                <h4>Messages</h4>
+                <em>
+                    Whether or not messages are enabled for this group.
+                    If 'force follow' is disabled, users can still opt in or out of receiving messages.
+                </em>
+            </td>
+            <td>
+                <form class="ajax" action="/group/modifyForm.php" method="post" id="follow_form">
+                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}">
+                    <input type="hidden" name="msg[enabled]" value="0" />
+                    <label>
+                        <input data-fieldset="ffollow" type="checkbox" name="msg[enabled]" value="1" {MSG_ENABLED_CHECKED} /> Messages enabled
+                    </label>
+                    <fieldset id="ffollow">
+                        <input name="msg[force_follow]" type="hidden" value="0" />
+                        <label>
+                            <input name="msg[force_follow]" type="checkbox" value="1" {MSG_FORCE_FOLLOW_CHECKED} /> Force Follow
+                        </label>
+                    </fieldset>
+
+                    <!-- BEGIN default_follow -->
+                    <label>
+                        <input name="follow" type="radio" value="{FOLLOW_VALUE}" {FOLLOW_SELECTED} /> {FOLLOW_LABEL}
+                    </label>
+                    <!-- END default_follow -->
+                </form>
+            </td>
+        </tr>
+        <!-- END msg_enabled -->
 		<tr>
 			<td valign="top"><h4>Members</h4>
 				<em>You can give write access to any member of the group, this will enable them to post resources and moderate the forum.  Only one user may be the group admin and it cannot be a student.  Making another user the group admin will relinquish your control over the group.</em>
 				</td>
 				<td>
 				<form action="/group/modifyForm.php" method="post" id="deleteForm">
-					<table class="table">
+					<table id="members" class="table ruler">
 						<tr>
 							<th style="width: 20px; text-align: center;"><input type="checkbox" class="checkAll" id="delCheck" /></th>
 							<th>Name</th>
 							<th style="text-align: center;">Write</th>
 							<th style="text-align: center;">Delete</th>
+                            <!-- BEGIN msg_enabled_followth -->
+							<th style="text-align: center;">Following</th>
+                            <!-- END msg_enabled_followth -->
 							<th style="text-align: center; white-space: nowrap;">Make Admin </th>
 						</tr>
 						<!-- BEGIN member -->
@@ -137,9 +263,14 @@ $j(document).ready(function() {
 							<td style="white-space: nowrap;"><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
 							<td style="text-align: center;"><input class="greenCheck" type="checkbox" rel="{USER_ID}" {GROUP_CHECKED} /></td>
 							<td style="text-align: center;"><a href="/group/modifyForm.php?delete={USER_ID}&categoryID={CATEGORY_ID}" onclick="return confirm('Remove {USER_JAVA}?');">Delete</a></td>
-							<td style="text-align: center; white-space: nowrap;"><!-- BEGIN make_owner -->
+                            <!-- BEGIN msg_enabled_userfollow -->
+                            <td style="text-align: center;">{USER_FOLLOWING}</td>
+                            <!-- END msg_enabled_userfollow -->
+							<td style="text-align: center; white-space: nowrap;">
+                                <!-- BEGIN make_owner -->
 								<a href='#' class='makeAdmin' data-userid='{USER_ID}' data-categoryid='{CATEGORY_ID}' data-username="{USER_JAVA}">Make Admin</a>
-								<!-- END make_owner --></td>
+								<!-- END make_owner -->
+                            </td>
 						</tr>
 						<!-- END member -->
 					</table>

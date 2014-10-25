@@ -1,6 +1,9 @@
 <?php
 use Schoolbox\Collection;
+use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -17,6 +20,7 @@ $ua->setService(UserAccess::SERVICE_HOMEPAGE);
 
 $catMapper = CategoryMapper::getInstance();
 $userMapper = UserMapper::getInstance();
+$groupMapper = GroupMapper::getInstance();
 
 if(!is_numeric($_REQUEST['categoryID'])) {
 	error(2);
@@ -27,9 +31,57 @@ if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
 	error(19);
 }
 
-/* Change group type */
-if(is_numeric($_GET['type'])) {
-	$groupHandler->setType($_GET['categoryID'], $_GET['type']);
+if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
+    try {
+        /** @var \Schoolbox\Resource\Group $group */
+        $group = GroupMapper::getInstance()->findOneByColumn('cid', $_REQUEST['categoryID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        header(':', true, 404);
+        exit;
+    }
+
+    if (isset($_POST['type'])) {
+        $group->setType($_POST['type']);
+    }
+
+    if (isset($_POST['msg'])) {
+
+        $oMapper = RerouteOverrideMapper::getInstance();
+
+        // prime the global suppressor!
+        $override = new RerouteOverride();
+        $override->setUser($userMapper->createModel()->setId(0)); // ID 0 = global
+        $override->setRouteKey('service.1.' . $group->getCategory());
+        $override->setOutgoingLevel(0);
+
+        if ($_POST['msg']['enabled']) {
+            $force  = !!$_POST['msg']['force_follow'];
+            $search = $oMapper->dehydrate($override);
+
+            // set force-follow based on what we got
+            $group->setForceFollow($force);
+
+            // remove individual mutes as well
+            if ($force) {
+                unset($search['user_id']);
+            }
+
+            // remove the global suppressor
+            $oMapper->deleteByColumnList($search);
+        }
+        else {
+            // insert the global suppressor
+            $oMapper->save($override);
+
+            // force follow being active when the group is muted makes no sense
+            $group->setForceFollow(false);
+        }
+    }
+
+    $groupMapper->save($group);
+//    header(':', true, $_POST['debug'] ? 200 : 204);
+    header(':', true, 204);
+    exit;
 }
 
 /* Change write permission */
