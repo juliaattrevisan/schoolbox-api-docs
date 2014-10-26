@@ -1019,6 +1019,7 @@ class SitePage extends Page
     {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
+        $this->setBlock(TEMPLATE_body, 'remember_me', 'remember_me_block');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
         if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
             $this->setVar('HIDDEN', htmlspecialchars($page, ENT_QUOTES));
@@ -1026,6 +1027,13 @@ class SitePage extends Page
             $this->setVar('HIDDEN', htmlspecialchars($_GET['page'], ENT_QUOTES));
         } else {
             $this->setVar('HIDDEN', '');
+        }
+
+        if(\Config::get('session_remember')) {
+            $this->parse('remember_me_block','remember_me');
+        }
+        else {
+            $this->setVar('remember_me_block','');
         }
 
         // Shove GET params (samlAuth and page at least) into the form

@@ -10,6 +10,13 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
     $authenticated = false;
     $message       = null;
 
+    if(isset($_POST['rememberme']) && $_POST['rememberme'] == 1){
+        $remember = true;
+    }
+    else {
+        $remember = false;
+    }
+
     //first check for brute force attempt
     if ($sessionHandler->checkBruteForce()) {
         $message =
@@ -23,7 +30,7 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
         try {
             $authenticated =
                 $sessionHandler->authenticate($_POST['username'], $_POST['password'])
-                && $sessionHandler->create($_POST['username']);
+                && $sessionHandler->create($_POST['username'], $remember);
         }
         catch (Exception_Schoolbox_NotFound $e) {
             $message = 'The username or password you typed is incorrect, please try again.';

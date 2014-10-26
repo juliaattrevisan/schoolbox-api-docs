@@ -543,10 +543,6 @@ Notifications
   margin: 8px;
   border: 0;
   height: 32px;
-  ::-webkit-input-placeholder { color: @search-color; }
-  :-moz-placeholder { color: @search-color; } /* Firefox 18- */
-  ::-moz-placeholder { color: @search-color; } /* Firefox 19+ */
-  :-ms-input-placeholder { color: @search-color; }
   fieldset {
     width: 100%;
   }
@@ -562,6 +558,7 @@ Notifications
   border: 0;
   background: rgba(255,255,255,0.3);
   font-family: Arial, Helvetica, sans-serif;
+  .placeholder(@search-color);
 }
 
 #search-button {
@@ -1053,10 +1050,7 @@ Notifications
     margin: 8px 0;
     border: 0;
     height: 32px;
-    ::-webkit-input-placeholder { color: @search-color; }
-    :-moz-placeholder { color: @search-color; } /* Firefox 18- */
-    ::-moz-placeholder { color: @search-color; } /* Firefox 19+ */
-    :-ms-input-placeholder { color: @search-color; }
+    .placeholder(@search-color);
     fieldset {
       width: 100%;
     }
@@ -7585,28 +7579,6 @@ p.forgotten {
   margin: 10px 0;
 }
 
-#loginForm {
-  margin: 0 0 20px 0;
-
-  label {
-    display: block;
-    float: left;
-    font-weight: bold;
-    line-height: 22px;
-    width: 110px;
-  }
-
-  fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0 0 16px 0;
-  }
-
-  input[type="text"],
-  input[type="password"] {
-    width: 150px;
-  }
-}
 
 /* MERGING WIKI VERSIONS */
 .highlightedMessage {
@@ -11005,17 +10977,11 @@ ul.activity-list li,
 
     #loginForm {
       margin: 0 0 20px 0;
-      ::-webkit-input-placeholder { color: @black; font-size: 13px; }
-      :-moz-placeholder { color: @black; font-size: 13px; } /* Firefox 18- */
-      ::-moz-placeholder { color: @black; font-size: 13px; } /* Firefox 19+ */
-      :-ms-input-placeholder { color: @black; font-size: 13px; }
 
       label {
-        display: block;
         float: left;
         font-weight: bold;
-        line-height: 22px;
-        width: 110px;
+        padding-top:  8px;
       }
 
       fieldset {
@@ -11025,7 +10991,9 @@ ul.activity-list li,
         text-align: left;
       }
 
-      input {
+      input[type=text],
+      input[type=password],
+      input[type=submit] {
         border: 0;
         width: 100%;
         height: 40px;

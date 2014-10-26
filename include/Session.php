@@ -41,7 +41,7 @@ class Session
         return $ip;
     }
 
-    public function create($username)
+    public function create($username, $remember=false)
     {
         $userHandler = new User;
         $groupHandler = new Group;
@@ -53,8 +53,14 @@ class Session
 
         $ip = Session::getIP();
 
-        /* if user is found and session is started create our user record */
+        if($remember == true) {
+            session_set_cookie_params(5184000);
+        }
+        else {
+            session_set_cookie_params(0);
+        }
 
+        /* if user is found and session is started create our user record */
         if (is_array($user) && session_start()) {
 
 
@@ -62,6 +68,7 @@ class Session
             $_SESSION['title'] = $user['title'];
             $_SESSION['firstname'] = $user['firstname'];
             $_SESSION['lastname'] = $user['lastname'];
+            $_SESSION['remember'] = $remember;
             $_SESSION['id'] = $user['uid'];
             $_SESSION['sid'] = $user['synergy_id'];
             $_SESSION['gid'] = $user['group_id'];
