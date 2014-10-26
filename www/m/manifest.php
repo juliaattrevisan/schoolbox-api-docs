@@ -34,8 +34,7 @@ $includes = array(
     '/templates/m/core/include/js/qtap.html',
     '/templates/m/core/include/js/render.html',
     '/templates/m/core/include/js/variables.html',
-    "/templates/$location/m/hercules.html",
-    "/templates/$location/m/loading.html",
+    "/templates/$location/m/hercules.html"
 );
 foreach($includes as $file){
     $actual_file = __DIR__.'/../..'.$file;
