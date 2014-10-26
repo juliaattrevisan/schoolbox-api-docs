@@ -435,49 +435,53 @@ function outputCriteria(
     }
 
     $page->setVar(array(
-        'crit_group_block' => '',
+        'crit_group_block' => 'No criteria available',
         'criterion_block' => ''
     ));
 
-    $currentGrouping = $criterionCollection->first()->getGrouping();
+    if ($criterionCollection->count()) {
+        $currentGrouping = $criterionCollection->first()->getGrouping();
 
-    foreach ($criterionCollection as $criterion) {
-        if ($criterion->getGrouping() != $currentGrouping) {
-            $page->parse('crit_group_block', 'crit_group', true);
-            $page->setVar('criterion_block', '');
-        }
-
-        $page->setVar('crit_input_block', '');
-        $page->setVar(array(
-            'CRIT_ID'      => $criterion->getId(),
-            'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
-            'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
-            'CRIT_NAME'    => Scrub::text($criterion->getName()),
-            'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
-        ));
-
-        if (is_array($descriptors[$criterion->getId()])) {
-            foreach ($descriptors[$criterion->getId()] as $descriptor) {
-                $page->setVar(array(
-                    'CRIT_INPUT_VALUE' => $descriptor->getDescription(),
-                    'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
-                ));
-                $page->parse('crit_input_block','crit_input', true);
+        foreach ($criterionCollection as $criterion) {
+            if ($criterion->getGrouping() != $currentGrouping) {
+                $page->parse('crit_group_block', 'crit_group', true);
+                $page->setVar('criterion_block', '');
             }
-        }
-        // disply blank inputs, they weren't used
-        else {
-            for ($i = 0; $i < $descriptorCount; ++$i) {
-                $page->setVar('CRIT_INPUT_VALUE', '');
-                $page->setVar('CRIT_INPUT_WEIGHT', $i);
-                $page->parse('crit_input_block','crit_input', true);
-            }
-        }
-        $page->parse('criterion_block','criterion', true);
 
-        $currentGrouping = $criterion->getGrouping();
+            $page->setVar('crit_input_block', '');
+            $page->setVar(array(
+                'CRIT_ID'      => $criterion->getId(),
+                'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
+                'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
+                'CRIT_NAME'    => Scrub::text($criterion->getName()),
+                'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
+            ));
+
+            if (is_array($descriptors[$criterion->getId()])) {
+                foreach ($descriptors[$criterion->getId()] as $descriptor) {
+                    $page->setVar(array(
+                        'CRIT_INPUT_VALUE' => $descriptor->getDescription(),
+                        'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
+                    ));
+                    $page->parse('crit_input_block','crit_input', true);
+                }
+            }
+            // disply blank inputs, they weren't used
+            else {
+                for ($i = 0; $i < $descriptorCount; ++$i) {
+                    $page->setVar('CRIT_INPUT_VALUE', '');
+                    $page->setVar('CRIT_INPUT_WEIGHT', $i);
+                    $page->parse('crit_input_block','crit_input', true);
+                }
+            }
+            $page->parse('criterion_block','criterion', true);
+
+            $currentGrouping = $criterion->getGrouping();
+        }
+        $page->parse('crit_group_block', 'crit_group', true);
     }
-    $page->parse('crit_group_block', 'crit_group', true);
+
+
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
 }
