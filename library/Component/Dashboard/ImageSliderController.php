@@ -48,6 +48,8 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 	    if($this->source === false) {
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
+
+        $this->sortFields = array('name', 'date');
     }
 
     /**
@@ -104,7 +106,11 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->catHandler->getImages($this->source['id'], 0, true);
+        $allFiles = $this->fileHandler->getAllInCategory($this->source['id'], array(
+                'filter' => array('image'),
+                'sort'  => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+            ));
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
