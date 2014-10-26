@@ -1,70 +1,66 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
-/*
-  tr {
-    line-height: 24px;
-  }
-  tr.ns td {
-    text-align: center;
+    .standardForm tr.advanced {
+        display: table-row;
+    }
 
-  }
-  td {
-    position: relative;
-    padding: 0 16px;
-  }
-  td input {
-    position: relative;
-    top: 4px;
-  }
-  td label {
-    width: 100%;
-    text-align: center;
-    line-height: 16px;
-  }
-*/
-  .standardForm tr.advanced {
-    display: table-row;
-  }
+    tr.ns th:not(:first-child) {
+        text-align: center;
+    }
+
+    #msg-settings td label {
+        text-align: center;
+    }
+
+    #msg-settings input[disabled]:not([checked]) {
+        opacity: 0.7;
+    }
+
+    table.ruler tr th {
+        background-color: #f0f0f0;
+    }
+
 </style>
 <script type="text/javascript">
 $j(document).ready(function() {
-/*
-    $j('#frm').on('change', 'input', function(e) {
-        var self = $j(this);
-        var row = self.closest('tr');
-
-        if(this.checked) {
-            if(this.value == 'digest') {
-                row.find('input[value=email]').removeAttr('checked');
-                row.find('input[value=instant]').removeAttr('checked');
-            }
-            if(this.value == 'instant') {
-                row.find('input[value=digest]').removeAttr('checked');
-            }
-            if(this.value == 'email') {
-                row.find('input[value=instant]').attr('checked', 'checked').trigger('change');
-            }
-        }
-        else if(this.value == 'instant') {
-            row.find('input[value=email]').removeAttr('checked');
-        }
-    });
- */
-
     $j('#submit-btn').on('click', function() {
         this.disabled = 'disabled';
         this.value = 'Saving...';
         $j(this).closest('form').submit();
         return true;
     });
-
 });
 </script>
 <!-- END custom_head -->
 <h1>Message Settings</h1>
+<h2>Homepages</h2>
+<p>If you unfollow a homepage, you will receive <em>no</em> notifications that come from it.</p>
+<form method="POST" action="/settings/messagesForm.php">
+<table class="ruler table">
+    <thead>
+        <tr>
+            <th scope="col">Homepage</th>
+            <th scope="col">Following</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN follow -->
+        <tr>
+            <td>
+                <label for="follow-{CATEGORY_ID}">{CATEGORY_NAME}</label>
+            </td>
+            <td>
+                <input type="hidden" name="follow[{CATEGORY_ID}]" value="{CATEGORY_FOLLOWING_FORCE}">
+                <input id="follow-{CATEGORY_ID}" type="checkbox" name="follow[{CATEGORY_ID}]" value="1" {CATEGORY_FOLLOWING_CHECKED} {CATEGORY_FOLLOWING_DISABLED} />
+            </td>
+        </tr>
+        <!-- END follow -->
+    </tbody>
+</table>
+<h2>Settings</h2>
 <p>
-  This page allows you to customise the settings for when and how you receive messages. Options that are unavailable
-  have been disabled by your system administrator.
+  You can customise the settings for when and how you receive messages.
+  Options that are unavailable have been disabled by your system administrator.
 </p>
 <ul class="pad-it">
   <!-- BEGIN digestible -->
@@ -80,8 +76,7 @@ $j(document).ready(function() {
     Messages sent via Instant and Email will appear in your internal messages list, as well as be immediately emailed to you.
   </li>
 </ul>
-<form method="POST" action="/settings/messagesForm.php">
-<table class="standardForm table">
+<table id="msg-settings" class="ruler table">
   <!-- BEGIN namespace -->
   <tr class="ns">
     <th>Receive {NAMESPACE_LABEL} messages when&hellip;</th>

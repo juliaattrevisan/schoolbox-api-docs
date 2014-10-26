@@ -14,6 +14,7 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -63,6 +64,64 @@ class UserAccessMapper extends Mapper {
 		));
 
 	}
+
+
+    /**
+     * Returns all the UserAccess associated with the given user
+     *
+     * @param User $user
+     * @param bool $includeSynergy
+     * @return Collection|UserAccess[]
+     */
+    public function findAllForUser(User $user, $includeSynergy = true)
+    {
+        $access = new Collection();
+
+        // start with the userAccess table
+        $internal = $this->findByColumn('uid', $user->getId())->map(function ($ua) use ($user) {
+            /** @var UserAccess $ua */
+            // don't needlessly hold stub replicas of the user in memory
+            return $ua->setUser($user);
+        });
+
+        $access->mergeUnique($internal);
+
+        // we can bug out early if no external sources need to be considered
+        if (!$includeSynergy) {
+            return $access;
+        }
+
+        // TODO get rid of this
+        $_DEPRECATED_EXTERNAL_USER_HANDLER = new \External_User();
+
+        // but first, MAGIC!
+        $_DEPRECATED_EXTERNAL_USER_HANDLER->getCurrentSemester();
+
+        $extSubjs = $_DEPRECATED_EXTERNAL_USER_HANDLER->getSubjectList($user->getExternalId(), $user->getId());
+
+        $external = new Collection();
+
+        foreach ($extSubjs as $extSubj) {
+            try {
+                $catId = CategoryMapper::getInstance()->findByCode($extSubj['code'])->getId();
+
+                $ua = new UserAccess();
+                $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                   ->setServiceIdentifier($catId)
+                   ->setAccessLevel(UserAccess::ACCESS_READ)
+                   ->setUser($user);
+
+                $external->add($ua);
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+        }
+
+        $access->mergeUnique($external);
+
+        return $access;
+    }
 
 
 	/**

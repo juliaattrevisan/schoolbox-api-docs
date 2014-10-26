@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Message;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 
 class RerouteOverrideMapper extends Mapper {
 
@@ -34,7 +35,6 @@ class RerouteOverrideMapper extends Mapper {
 			'property'   => 'routeKey',
 			'type'       => self::TYPE_STRING,
 			'identifier' => true,
-			'join'       => 'source'
 		));
 		$this->hasMap(array(
 			'column'     => 'outgoing_level',
@@ -63,12 +63,52 @@ class RerouteOverrideMapper extends Mapper {
 		$coll = $this->findByColumn('user_id', array(0, $userId));
 		$regex = '`'. str_replace('*','[^\.]', $route) . '`';
 
-		$coll->filterByCallback(function($override) use ($regex) {
+		return $coll->filterByCallback(function($override) use ($regex) {
 			/** @var RerouteOverride $override */
 			return preg_match($regex, $override->getRouteKey());
 		});
 
-		return $coll;
 	}
+
+
+    /**
+     * Override to allow for regex pattern searching on the route key.
+     * If no capture groups are specified, the result is identical to if this override did not exist
+     * If capture groups are specified, each RerouteOverride::routeKey will be an array of the preg_matches
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return Collection|RerouteOverride[]
+     */
+    public function findByColumnList($columnList, $options = array())
+    {
+        // if not searching on this field, just return the parent result
+        if (empty($columnList['msg_route_key'])) {
+            return parent::findByColumnList($columnList, $options);
+        }
+
+        // don't SQL-filter the route key, we'll do it manually here
+        $routeKey = $columnList['msg_route_key'];
+        unset ($columnList['msg_route_key']);
+
+        $results = parent::findByColumnList($columnList, $options);
+
+        $regex = "`$routeKey`";
+
+        return $results->map(function ($override) use ($regex) {
+            /** @var RerouteOverride $override */
+
+            if (preg_match($regex, $override->getRouteKey(), $matches)) {
+                // more than 1 result means return regex
+                if (count($matches) > 1) {
+                    $override->setRouteKey($matches);
+                }
+
+                return $override;
+            }
+
+            return null;
+        }, false);
+    }
 
 } 

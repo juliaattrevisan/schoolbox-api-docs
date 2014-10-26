@@ -436,15 +436,20 @@ class Collection implements ICollection, JsonSerializable {
 
 	/**
 	 * Applies a callabale to all items in this collection, and returns a new
-	 * collection with the result.
+     * collection with the result. If $includeNull == false, iterations that
+     * return explicitly null will be omitted from the final result
 	 *
 	 * @param  callback   $callback
+     * @param  bool       $includeNull
 	 * @return Collection
 	 */
-	public function map($callback) {
+	public function map($callback, $includeNull = true) {
 		$return = new Collection();
 		foreach ($this as $key => $item) {
-			$return->offsetSet($key, call_user_func($callback, $item));
+            $result = call_user_func($callback, $item);
+            if ($includeNull || !is_null($result)) {
+                $return->offsetSet($key, $result);
+            }
 		}
 		return $return;
 	}

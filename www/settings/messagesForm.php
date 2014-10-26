@@ -1,4 +1,10 @@
 <?php
+use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\CategoryMapper;
+
 /**
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,6 +32,55 @@ $user = $_SESSION['user'];
 
 $userId = $user->getId();
 $roleId = $user->getRole()->getId();
+
+if (isset($_POST['follow'])) {
+    $follow = $_POST['follow'];
+    unset($_POST['follow']);
+} else {
+    $follow = array();
+}
+
+$involvements = $user->getAccessList()->getColumnValues('serviceIdentifier');
+
+$follow = array_keys(array_filter($follow));
+
+asort($follow);
+asort($involvements);
+
+$unfollow = array_values(array_diff($involvements, $follow));
+
+/**
+ * Wrap an int into a routing-key string
+ *
+ * @param int $v
+ * @return string
+ */
+function castToRoutingKey($v) {
+    return 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$v";
+}
+
+// delete any overrides for homepages the user is RE-following
+RerouteOverrideMapper::getInstance()->deleteByColumnList(array(
+    'user_id'        => $userId,
+    'msg_route_key'  => array_map('castToRoutingKey', $follow),
+    'outgoing_level' => 0
+));
+
+// insert new entries for homepages the user is UN-following
+$overrides = new Collection();
+
+foreach ($unfollow as $id) {
+    $override = new RerouteOverride();
+
+    $override->setUser($user);
+    $override->setRouteKey(castToRoutingKey($id));
+    $override->setOutgoingLevel(0);
+
+    $overrides->add($override);
+}
+
+RerouteOverrideMapper::getInstance()->save($overrides);
+
 
 $selectstmt = Database::getInstance()->prepare("
 	SELECT 	:userId `user_id`, src.id `msg_source_id`,

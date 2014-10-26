@@ -30,6 +30,9 @@ class Group {
      */
     protected $category;
 
+    /** @var bool */
+    protected $forceFollow;
+
     /**
      * Test if group is private
      *
@@ -100,6 +103,27 @@ class Group {
     {
         return $this->category;
     }
+
+
+    /**
+     * @param boolean $forceFollow
+     * @return self
+     */
+    public function setForceFollow($forceFollow)
+    {
+        $this->forceFollow = $forceFollow;
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function getForceFollow()
+    {
+        return $this->forceFollow;
+    }
+
 
 
 }
