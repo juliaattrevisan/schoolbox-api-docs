@@ -1,6 +1,26 @@
 <!-- BEGIN custom_head -->
+<script type='text/javascript' src='/socialstream/browser/browser.js'></script>
 <script language="JavaScript" type="text/javascript">
+
+
     $j(document).ready(function () {
+
+        /*
+         * Modal for URL homepage selection
+         * */
+
+        $j('#urlForm').on('click', '.open-modal', function() {
+
+            $j('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $j('#url').val(url);
+                }
+            });
+        });
+
         $j('#deleteLink').click(function () {
             if (confirm('Are you sure you want to delete this link?')) {
                 window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
@@ -35,7 +55,11 @@
         <tr>
             <td class="formLabelWidth"><h4>URL</h4>
                 <em>The internet address for the website, eg. http://www.google.com</em></td>
-            <td><label><input class="required" type="text" name="url" size="40" maxlength="250" value="{URL}"/></label>
+            <td><label><input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
+                <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
+                </p>
+
+                <div id="resource-browser" class="hide">
             </td>
         </tr>
         <td><h4>Description</h4>
@@ -48,7 +72,8 @@
                 <em>The link will be located in this folder. You can <a href="/cms/link/multicat/">upload a link to
                     multiple locations</a> here.</em>
             </td>
-            <td><input name="category" value="{CATEGORY_ID}" type="hidden"/><strong>{CATEGORY_NAME}</strong></td>
+            <td><input name="category" value="{CATEGORY_ID}" type="hidden"/><strong>{CATEGORY_NAME}</strong></div>
+            </td>
         </tr>
         <tr>
             <td><h4>Hidden</h4>
