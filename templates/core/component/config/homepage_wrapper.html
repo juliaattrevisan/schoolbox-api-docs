@@ -1,36 +1,36 @@
 <!-- BEGIN settings_link -->
-<a class="edit" href="#">
-  <em>Settings</em>
-  <span>&#9660;</span>
+<a class="edit" href="#" data-target="settings">
+    <em>Settings</em>
+    <span>&#9660;</span>
 </a>
 <!-- END settings_link -->
-<a class="close-delete" href="#">
-  <span>&times;</span>
+<a class="close-delete" href="#" data-target="delete-it">
+    <span>&times;</span>
 </a>
 <!-- BEGIN settings_panel -->
 <div class="editPanel settings hide">
-  <form action="/homepage/configForm.php" method="GET">
-    <input type="hidden" name="cid" value="{ID}" />
-    <input type="hidden" name="type" value="config" />
-    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-    <!-- BEGIN config_element -->
-    <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}><span>{CONFIG_ELEMENT_LABEL}: </span>{CONFIG_ELEMENT_CONTENT}</div>
-    <!-- END config_element -->
-    <input type="submit" value="Update" class="submit-btn update" />
-  </form>
+    <form action="/homepage/configForm.php" method="GET">
+        <input type="hidden" name="cid" value="{ID}" />
+        <input type="hidden" name="type" value="config" />
+        <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
+        <!-- BEGIN config_element -->
+        <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}><span>{CONFIG_ELEMENT_LABEL}: </span>{CONFIG_ELEMENT_CONTENT}</div>
+<!-- END config_element -->
+<input type="submit" value="Update" class="submit-btn update" />
+</form>
 </div>
 <!-- END settings_panel -->
 <div class="editPanel delete-it hide clearfix">
-  <p>Are you sure you want to remove this component?</p>
-  <form action="#" method="post">
-    <input type="hidden" name="cid" value="{ID}" />
-    <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
-    <input type="hidden" name="component" value="{COMPONENT_DEFINITION_ID}" />
-    <a href="#" class="delete-accept btn delete">
-        <span></span>Yes
-    </a>
-    <a href="#" class="delete-reject btn cross">
-        <span></span>No
-    </a>
-  </form>
+    <p>Are you sure you want to remove this component?</p>
+    <form action="#" method="post">
+        <input type="hidden" name="cid" value="{ID}" />
+        <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
+        <input type="hidden" class="defn-id" name="component" value="{COMPONENT_DEFINITION_ID}" />
+        <a href="#" class="delete-accept btn delete" data-remove="1">
+            <span></span>Yes
+        </a>
+        <a href="#" class="delete-reject btn cross" data-remove="0">
+            <span></span>No
+        </a>
+    </form>
 </div>
