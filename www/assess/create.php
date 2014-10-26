@@ -179,7 +179,7 @@ else {
         'ASSESS_CATEGORY_ID' => $category_id,
         'ASSESS_UNIT_ID'     => $unit_id,
         'ASSESS_TITLE'       => '',
-        'ASSESS_WEIGHT'      => 100,
+        'ASSESS_WEIGHT'      => 0,
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
