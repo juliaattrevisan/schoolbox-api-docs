@@ -2,19 +2,28 @@
 <em>{LABEL}:</em>
 <!-- END rubric_type_label -->
 
-<!-- BEGIN criterion -->
-<div class="crit">
-    <input type="hidden" value="0" name="{CRIT_SLUG}"/>
-    <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
-    <label for="c-{CRIT_ID}">{CRIT_LABEL}</label>
-    <ul class="descs">
-        <!-- BEGIN crit_input -->
-        <li style="display:none;">
-            <textarea name="des[{CRIT_ID}][]">{CRIT_INPUT_VALUE}</textarea>
-            <input size="3" name="value[{CRIT_ID}][]" value="{CRIT_INPUT_WEIGHT}" /> Pts
-        </li>
-        <!-- END crit_input -->
-    </ul>
+<!-- BEGIN crit_group -->
+<div class="crit-group">
+    <h5>{CRIT_GROUP}</h5>
+    <!-- BEGIN criterion -->
+    <div class="crit">
+        <input type="hidden" value="0" name="{CRIT_SLUG}"/>
+        <input id="c-{CRIT_ID}" type="checkbox" value="1" name="{CRIT_SLUG}"{CRIT_CHECKED} />
+        <label for="c-{CRIT_ID}">{CRIT_NAME}</label>
+        <table class="descs">
+            <tr>
+                <!-- BEGIN crit_input -->
+                <td class="desc" style="display:none;">
+                    <textarea name="des[{CRIT_ID}][]" readonly="readonly">{CRIT_INPUT_VALUE}</textarea>
+                    <label class="crit-pts">
+                        <input type="text" size="3" name="value[{CRIT_ID}][]" value="{CRIT_INPUT_WEIGHT}" readonly="readonly" />
+                    </label>
+                </td>
+                <!-- END crit_input -->
+            </tr>
+        </table>
+    </div>
+    <!-- END criterion -->
 </div>
-<!-- END criterion -->
+<!-- END crit_group -->
 <p class="pad-it"><a href="/submission/rubricCriteria/{RUBRIC_CAT_ID}">{MANAGE_CRITERIA_LABEL}</a></p>

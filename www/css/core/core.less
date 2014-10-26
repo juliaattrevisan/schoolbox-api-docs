@@ -8888,15 +8888,15 @@ h4 a.hidden {
 }
 
 #rubric-criteria {
-    textarea {
-        width: 340px;
-        margin-right: 5px;
-        height: 5em;
-    }
-    span input {
-        display: block;
-        margin-left: 30px;
-    }
+//    textarea {
+//        width: 340px;
+//        margin-right: 5px;
+//        height: 5em;
+//    }
+//    span input {
+//        display: block;
+//        margin-left: 30px;
+//    }
 }
 
 .rubric .warning span,
@@ -9633,6 +9633,141 @@ img.mimetype {
         padding-bottom: 5px;
         margin-bottom: 4px;
     }
+}
+.rubrics .crit-group {
+	&:last-of-type {
+		border-bottom-width: 1px;
+	}
+	h5 {
+		font-weight: bold;
+		margin: 8px 0;
+	}
+}
+.rubrics .crit {
+	width: 100%;
+	background-color: #e0e0e0;
+	border: solid 1px #999;
+	position: relative;
+	margin: 0 0 0 0;
+	&.highlight {
+		background-color: #e5eff7;
+		border-color: #000;
+		border-radius: 0;
+		padding: 0;
+		&.editing {
+			background-color: #FFFFb2;
+		}
+	}
+	&.editing {
+		.crit-pts {
+			display: block;
+		}
+		.desc {
+			width: 24px;
+			&.editing {
+				.crit-pts:after {
+					display: block;
+					content: "points";
+					position: absolute;
+					top: 0;
+					line-height: 28px;
+					left: 56px;
+				}
+			}
+			> textarea {
+				height: 150px;
+				border: none;
+				border-bottom: solid 1px #000;
+			}
+		}
+	}
+	&:hover {
+		background-color: #ffffe5;
+	}
+	> label {
+		display: block;
+		margin: 0 0 0 24px;
+		padding: 4px 0;
+	}
+	> input {
+		padding: 0;
+		display: inline;
+		position: absolute;
+		&[type=checkbox] {
+			top: 3px;
+		}
+	}
+
+	input[readonly] {
+		text-align: right;
+		padding: 6px 0 !important;
+	}
+
+	.crit-pts {
+		position: relative;
+		display: none;
+		margin: 0;
+		padding: 0 4px 4px 4px;
+		border-top: solid 1px transparent;
+		input {
+			width: 100%;
+			text-align: center;
+			padding: 0;
+			font-size: 12px;
+		}
+	}
+
+	.desc {
+		&.editing {
+			background-color: #F5F5F5;
+			.crit-pts input {
+				width: 48px;
+				text-align: left;
+			}
+		}
+		&:not(:last-child) {
+			border-right: solid 1px #000;
+		}
+		&:hover {
+			background: #fff;
+		}
+		> textarea {
+			width: 100%;
+			height: 60px;
+			min-width: 150px;
+			margin: 0;
+			resize: none;
+			.transition(
+				min-width 60ms ease,
+				height 60ms ease
+			);
+			&[readonly] {
+				min-width: 0;
+				overflow: hidden;
+				padding: 2px !important;
+			}
+		}
+		*:hover {
+			cursor: pointer;
+		}
+	}
+
+	/* overcome the stratospheric specificity on inputs */
+	textarea[readonly], input[readonly] {
+		border-color: transparent !important;
+		background: transparent !important;
+		box-shadow: none !important;
+	}
+}
+
+table.descs {
+	border-top: solid 1px #000;
+	border-collapse: collapse;
+	tr, td {
+		padding: 0;
+		margin: 0;
+		border: 0;
+	}
 }
 
 .descs span {
@@ -10747,6 +10882,12 @@ table img { max-width: none; }
 
 .standardForm td {
 	border-bottom: 1px solid @border-color;
+}
+.standardForm tr.noline {
+	border-bottom: none;
+	> td {
+		border-bottom: none;
+	}
 }
 
 .calendar .table .dark,
