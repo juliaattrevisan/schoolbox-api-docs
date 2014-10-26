@@ -35,6 +35,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'audio_list', 'audio_list_block');
+        $this->setBlock($templateHandle, 'audio_pending_list', 'audio_pending_list_block');
+        $this->setVar(
+            array(
+                'audio_list_block'         => '',
+                'audio_pending_list_block' => '',
+            )
+        );
 
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
@@ -78,17 +85,29 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                 );
 
                 $this->setVar($output);
-                $this->parse('audio_list_block', 'audio_list', true);
+                if ($file->getStatus() == "completed") {
+                    $this->parse('audio_list_block', 'audio_list', true);
+                } elseif ($this->permission >= WRITE_ACCESS) {
+                    $this->setVar(
+                        array(
+                            'AUDIO_LIST_STATUS'    => $file->getStatus(),
+                            'AUDIO_LIST_STATUSIMG' => $file->getStatusImage(),
+                        )
+                    );
+                    $this->parse('audio_pending_list_block', 'audio_pending_list', true);
+                }
             }
-        } else
+        } else {
             $this->setVar('audio_list_block', '');
+        }
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
-        if ($this->permission < WRITE_ACCESS)
+        if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
-        else
+        } else {
             $this->parse("submit_file_block", "submit_file");
+        }
 
 
 
