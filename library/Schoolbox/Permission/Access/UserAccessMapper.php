@@ -71,7 +71,7 @@ class UserAccessMapper extends Mapper {
 	 * @return Collection|User[]
 	 */
 	public function findStaffInCategory($category, $includeSynergy = true) {
-		return $this->findUsersInCategory($category, Role::STAFF, $includeSynergy);
+		return $this->findUsersInCategory($category, Role::STAFF, UserAccess::ACCESS_READ, $includeSynergy);
 	}
 
 
@@ -81,26 +81,30 @@ class UserAccessMapper extends Mapper {
 	 * @return Collection|User[]
 	 */
 	public function findStudentsInCategory($category, $includeSynergy = true) {
-		return $this->findUsersInCategory($category, Role::STUDENT, $includeSynergy);
+		return $this->findUsersInCategory($category, Role::STUDENT, UserAccess::ACCESS_READ, $includeSynergy);
 	}
 
+    /**
+     * Returns a list of users who are members of a group
+     *
+     * @param Category $category
+     * @return Collection|User[]
+     */
+    public function findAdminsInCategory($category) {
+        //TODO role type should be optional
+        return $this->findUsersInCategory($category, Role::STAFF, $accessType = UserAccess::ACCESS_FULL, false);
+    }
 
-	/**
+
+    /**
 	 * @param Category $category
 	 * @param string $roleType
+     * @param int $accessType
 	 * @param bool $includeSynergy
 	 * @return Collection|User[]
 	 */
-	public function findUsersInCategory($category, $roleType, $includeSynergy = true) {
+	public function findUsersInCategory($category, $roleType, $accessType = UserAccess::ACCESS_READ, $includeSynergy = true) {
 		// union 3 sources: userAccess, and if synergy, external class and external user
-
-		// TODO get rid of these
-		$_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-		$_DEPRECATED_EXTERNAL_USER_HANDLER = new \External_User();
-		$_DEPRECATED_USER_HANDLER = new \User();
-
-		// but first, MAGIC!
-		$_DEPRECATED_EXTERNAL_USER_HANDLER->getCurrentSemester();
 
 		// acquire users from internal access definition
 		$stmt = $this->database->prepare("
@@ -119,10 +123,9 @@ class UserAccessMapper extends Mapper {
 		$stmt->execute(array(
 			'service'   => UserAccess::SERVICE_HOMEPAGE,
 			'serviceId' => $category->getId(),
-			'minAccess' => UserAccess::ACCESS_READ,
+			'minAccess' => $accessType,
 			'roleType'  => $roleType
 		));
-
 		$userCollection = $this->createCollection();
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -136,6 +139,9 @@ class UserAccessMapper extends Mapper {
 			// no synergy? ok, we're done here
 			return $userCollection;
 		}
+
+        // TODO get rid of these
+        $_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
 
 		// including synergy: intersect the existing collection with synergy-based collections
 
@@ -151,16 +157,10 @@ class UserAccessMapper extends Mapper {
 				$classListArray = array();
 		}
 
-		$memberArray = $_DEPRECATED_USER_HANDLER->getAllInCategory($category->getId()) ?: array();
-
 		$synergyIdArray = array();
 
 		// index by synid
 		foreach($classListArray as $array) {
-			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
-		}
-
-		foreach($memberArray as $array) {
 			$synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
 		}
 
@@ -173,5 +173,7 @@ class UserAccessMapper extends Mapper {
 		$extUserCollection->mergeUnique($userCollection, 'id');
 		return $extUserCollection;
 	}
+
+
 
 } 

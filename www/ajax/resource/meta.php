@@ -11,6 +11,7 @@
 require_once('../../../include/Bootstrap.php');
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\FileMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 // kickstart a session
 new SitePage();
@@ -135,18 +136,31 @@ function getFolderMeta($folderId)
         $type = '';
     }
 
+    if($type) {
+        // joinable: is the logged in user not already a member?
+        $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
-    // joinable: is the logged in user not already a member?
-    $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
+        $joinable = 0; // either don't have access, or are already a member
+        if ($accessType == DENY_ACCESS) {
+            if (!is_null($accessType)) {
+                $joinable = 2; // pending approval
+            } elseif ($groupHandler->canSubscribe($folderId)) {
+                $joinable = 1; // can join
+            }
+        }
+        else if($accessType >= READ_ACCESS) {
+            $joinable = 3; //member of group
+        }
 
-    $joinable = 0; // either don't have access, or are already a member
-    if ($accessType == DENY_ACCESS) {
-        if (!is_null($accessType)) {
-            $joinable = 2; // pending approval
-        } elseif ($groupHandler->canSubscribe($folderId)) {
-            $joinable = 1; // can join
+        $members = UserAccessMapper::getInstance()->findAdminsInCategory($cat);
+        if(count($members) > 0) {
+            $admin = $members->first(); //only every 1 admin
+        }
+        else {
+            $admin = UserMapper::getInstance()->getUnknownUser();
         }
     }
+
 
     // permissions: must have write access to see it
     $userAccess = $groupHandler->getPermission($folderId);
@@ -210,8 +224,13 @@ function getFolderMeta($folderId)
         'type'        => $type,
         'joinable'    => $joinable,
         'permissions' => $permissions,
-        'actions'     => $actions,
+        'actions'     => $actions
     );
+
+    if($type) {
+        $folder['admins'] = array('externalID'=>$admin->getExternalId(), 'name'=>$admin->getFullName());
+        $folder['manage'] = $_SESSION['id'] == $admin->getId() || $_SESSION['user']->isSuperuser() ? true : false;
+    }
 
     return $folder;
 

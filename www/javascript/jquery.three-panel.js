@@ -84,27 +84,46 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             threePanel.folderDetail.find('img').attr('src', mime).attr('alt', meta.name)
 
             if(meta.type) {
-                threePanel.folderDetail.find('p.type').show()
+                threePanel.folderDetail.find('div.group').show()
+                threePanel.folderDetail.find('span.admin').text(meta.admins.name)
+                threePanel.folderDetail.find('img.admin').attr('src', '/portrait.php?userId='+meta.admins.externalID+'&size=square32')
                 threePanel.folderDetail.find('span.type').text(meta.type + ' Group')
                 var pending_element = threePanel.folderDetail.find('.pending');
                 var join_element    = threePanel.folderDetail.find('.join-btn');
+                var leave_element    = threePanel.folderDetail.find('.leave-btn');
+                var manage_element    = threePanel.folderDetail.find('.manage-btn');
                 switch(meta.joinable) {
-                    case 2: // pending approval
-                        join_element.hide().parent().data('id','')
-                        pending_element.show()
-                        break
                     case 0: // not joinable
                         join_element.hide().parent().data('id','')
+                        leave_element.hide().parent().data('id','')
                         pending_element.hide()
                         break
                     case 1: // joinable
                         join_element.show().parent().data('id', meta.id)
                         pending_element.hide()
+                        leave_element.hide()
                         break
+                    case 3: //already member
+                        pending_element.hide()
+                        join_element.hide()
+                        leave_element.show().parent().data('id',meta.id)
+                        break
+                    case 2: // pending approval
+                        join_element.hide().parent().data('id','')
+                        leave_element.show().parent().data('id',meta.id)
+                        pending_element.show()
+                        break
+                }
+                //Hide manage button if not admin
+                if(meta.manage) {
+                    manage_element.parent().data('id',meta.id)
+                }
+                else {
+                    manage_element.hide()
                 }
             }
             else {
-                threePanel.folderDetail.find('p.type').hide()
+                threePanel.folderDetail.find('div.group').hide()
             }
 
             // create the list of permission to display
