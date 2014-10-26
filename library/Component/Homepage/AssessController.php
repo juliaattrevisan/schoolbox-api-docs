@@ -257,12 +257,13 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     }
 
                     /* Modified this check so that only the owner or a superuser can get
-                   	 * these links which allow you to modify the assessment
-                  	 */
+                     * these links which allow you to modify the assessment
+                     */
+                    $this->setVar('teacherLink_block', '');
                     if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission($currentAssess['category_id']) >= WRITE_ACCESS) {
-                        $this->parse('teacherLink_block', 'teacherLink');
-                    } else {
-                        $this->setVar('teacherLink_block', '');
+                        if ($this->getMaximumPermission() >= WRITE_ACCESS) {
+                            $this->parse('teacherLink_block', 'teacherLink');
+                        }
                     }
 
                     $this->parse('assess_block', 'assess', true);

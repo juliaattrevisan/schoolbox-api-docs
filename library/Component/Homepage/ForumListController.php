@@ -66,7 +66,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+        if($this->permission < READ_ACCESS) {
             return false;
         }
 

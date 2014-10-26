@@ -72,8 +72,15 @@ if (!($category instanceof \Schoolbox\Resource\Category) || $category->isDeleted
 
 // confirm that the user has permission to view this page
 $g = new Group();
-if (($permission = $g->getPermission($category->getId())) < READ_ACCESS) {
+if (($actualPermission = $g->getPermission($category->getId())) < READ_ACCESS) {
     error(14);
+}
+
+// If I'm a write level user, I can downgrade myself to read access
+if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
+    $virtualPermission = READ_ACCESS;
+} else {
+    $virtualPermission = $actualPermission;
 }
 
 // setup the homepage handler
@@ -97,16 +104,30 @@ $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'page_controls', 'page_controls_block');
 $this->setBlock('page_controls', 'manage_class', 'manage_class_block');
+$this->setBlock(TEMPLATE_content, 'readonly_switch_on', 'readonly_switch_on_block');
+$this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_block');
 
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$componentFactory->setMaximumPermission($virtualPermission);
 $componentCollection = $componentFactory->buildComponentList($category->getId());
 
+// Decide which of parent/student view butonyes to show, if either
+$this->setVar('readonly_switch_on_block', '');
+$this->setVar('readonly_switch_off_block', '');
+if ($actualPermission >= WRITE_ACCESS) {
+    if ($_GET['readonly']) {
+        $this->parse('readonly_switch_off_block', 'readonly_switch_off');
+    } else {
+        $this->parse('readonly_switch_on_block', 'readonly_switch_on');
+    }
+}
+
 // User has elevated priviliges: can write to page
-if ($permission >= WRITE_ACCESS) {
+if ($virtualPermission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
@@ -267,13 +288,23 @@ $categoryContext = array(   'id'   => $category->getID(),
 );
 
 //Setup control buttons
-$manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $_SESSION['user'], $this);
+$manageFolderController = new Component_Homepage_ManageFolderController(
+    new Component_Instance(),
+    $_SESSION['user'],
+    $this
+);
+$manageFolderController->setMaximumPermission($virtualPermission);
 $manageFolderController->setup($categoryContext, array());
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
 //Setup class list buttons
-$manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $_SESSION['user'], $this);
+$manageClassController = new Component_Homepage_ManageClassController(
+    new Component_Instance(),
+    $_SESSION['user'],
+    $this
+);
+$manageClassController->setMaximumPermission($virtualPermission);
 $manageClassController->setup($categoryContext, array());
 $manageClassController->execute();
 if($manageClassController->renderTemplate('manage_class')){

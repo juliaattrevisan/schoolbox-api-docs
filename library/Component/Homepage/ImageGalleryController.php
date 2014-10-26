@@ -56,7 +56,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         }
         $this->parseConfig();
 
-	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+	    if($this->permission < READ_ACCESS) {
 		    return false;
 	    }
 

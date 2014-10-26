@@ -77,7 +77,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         }
 
         // Permission denied if user doesn't have write access to category
-        if ($this->group_handler->getPermission($this->getContext('id')) < WRITE_ACCESS) {
+        if ($this->permission < WRITE_ACCESS) {
             return false;
         }
 

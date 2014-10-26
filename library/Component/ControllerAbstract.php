@@ -42,6 +42,15 @@ abstract class Component_ControllerAbstract {
     protected $permission = 0;
 
     /**
+     * The maximum permission allowed for this component.
+     *
+     * Set to READ_ACCESS to force a read-only view of this component.
+     *
+     * @var int
+     */
+    protected $maximumPermission = FULL_ACCESS;
+
+    /**
      * @var array
      */
     protected $sortFields = null;
@@ -426,4 +435,21 @@ abstract class Component_ControllerAbstract {
         return $this->instance;
     }
 
+    /**
+     * @return int
+     */
+    public function getMaximumPermission()
+    {
+        return $this->maximumPermission;
+    }
+
+    /**
+     * @param  int   $maximumPermission
+     * @return $this
+     */
+    public function setMaximumPermission($maximumPermission)
+    {
+        $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
 }

@@ -111,7 +111,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                     /* Anyone with write access can approve attendance
                      */
-                    if ($groupHandler->getPermission($this->getContext('id')) >= WRITE_ACCESS) {
+                    if ($this->permission >= WRITE_ACCESS) {
                         $this->parse('attendance_list_button_block', 'attendance_list_button');
                     }
 

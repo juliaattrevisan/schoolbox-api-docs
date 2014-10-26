@@ -57,7 +57,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         }
         $this->parseConfig();
 
-	    if($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+	    if($this->permission < READ_ACCESS) {
 		    return false;
 	    }
 
@@ -75,7 +75,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $flag = 0;
             $j = 0;
             foreach ($folderList as $folder) {
-                if($this->groupHandler->getPermission($folder['id']) > DENY_ACCESS)
+                if($this->permission > DENY_ACCESS)
                 {
                     //set name
                     $output = array('FOLDER_ID'		=> $folder['id'],

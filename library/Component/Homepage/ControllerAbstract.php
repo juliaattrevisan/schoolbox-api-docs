@@ -11,7 +11,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     public function setup(array $context, array $config) {
         parent::setup($context, $config);
         $g = new Group();
-        $this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['id']);
+        // Managing permissions for alternate sources:
+        // alt-source permission overrides homepage perm.
+        if (!empty($config['src']['value'])) {
+            $sourceId = $config['src']['value'];
+        } else {
+            $sourceId = $context['id'];
+        }
+        $this->permission = min($g->getPermission($sourceId), $this->getMaximumPermission());
         $this->sitepage->setVar('ID', $context['id']);
     }
 

@@ -54,7 +54,7 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             'CHAT_USER_ID'      => $_SESSION['id'],
 	        'CHAT_USER_EXT_ID'  => $_SESSION['sid'],
             'CHAT_USER_NAME'    => Scrub::text($userHandler->formatName($_SESSION)),
-            'CHAT_USER_PERM'    => $group->getPermission($this->getContext('id')),
+            'CHAT_USER_PERM'    => $this->permission,
             'CHAT_STATE'        => $this->getConfig('state'),
         ));
 
