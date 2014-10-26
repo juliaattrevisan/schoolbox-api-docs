@@ -56,9 +56,10 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 			$hasListButton = false;
 
 			/* Congeal all that stuff
+ 			 * Compensate for FullCalendar/vCal having exclusive end times
 			 */
-			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			$start = $currentEvent->getStartTime()->getDatabaseDate();
+			$end = $currentEvent->getEndTime()->addDays(1)->getDatabaseDate();
 
 			$event = array(
 				'title' => $currentEvent->getTitle(),

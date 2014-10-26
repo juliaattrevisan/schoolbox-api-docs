@@ -46,7 +46,8 @@ function Calendar(id, bubbleId, opts) {
             checkboxSelector: '.applyFilters',
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
-            listSelector: '.filter-list'
+            listSelector: '.filter-list',
+            listViewButton: true
         },
         fullCalendar: {
             contentHeight: $j(window).height() - this.dom.offset().top - 60,
@@ -68,6 +69,7 @@ function Calendar(id, bubbleId, opts) {
             date: null,
             month: null,
             year: null,
+            eventLimit: true,
 
             /**
              * Generic action for when an event is clicked
@@ -79,7 +81,6 @@ function Calendar(id, bubbleId, opts) {
 
                 // setup data to be displayed
                 var data = $j.extend(true, {}, calEvent.data.meta)
-                var format = calEvent.allDay ? 'ddd dS MMM' : 'ddd dS MMM, h:mmtt'
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
@@ -88,10 +89,33 @@ function Calendar(id, bubbleId, opts) {
                 else {
                     data.note = calEvent.title
                 }
-                data.date = $.fullCalendar.formatDate(calEvent.start, format)
+
+                // Format the date of this event
+                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
+                var start = calEvent.start.format(format);
+                var end   = null;
                 if (calEvent.end != null) {
-                    data.date += " – "
-                    data.date += $.fullCalendar.formatDate(calEvent.end, format)
+                    if (calEvent.allDay) {
+                        end = moment(calEvent.end).subtract(1, 'd').format(format);
+                    } else {
+                        end = calEvent.end.format(format);
+                    }
+                }
+
+                if (end && start != end) {
+                    // Start and end aren't the same - stitch them together.
+                    if (!calEvent.allDay
+                        && calEvent.start.format('YYYYMMDD') === calEvent.end.format('YYYYMMDD')
+                    ) {
+                        // Between two times on the same day - show the timespan but only one date
+                        data.date = start + " – " + calEvent.end.format('h:mma');
+                    } else {
+                        // Between two different days - show the whole timespan
+                        data.date = start + " – " + end;
+                    }
+                } else {
+                    // Start and end are the same - just show the start
+                    data.date = start;
                 }
 
                 // Links to Modify Screen
@@ -167,7 +191,10 @@ function Calendar(id, bubbleId, opts) {
             dateFormat: 'dd-mm-yy',
             onSelect: function(dateText, inst) {
                 // Use fullcalendar to load events instead of redirecting to a new page.
-                self.dom.fullCalendar('gotoDate', inst.currentYear, inst.currentMonth, inst.currentDay)
+                self.dom.fullCalendar(
+                    'gotoDate',
+                    moment().year(inst.currentYear).month(inst.currentMonth).date(inst.currentDay)
+                )
             },
             beforeShow: function() {
                 // Make sure the stupid datepicker shows above everything else
@@ -378,25 +405,25 @@ Calendar.prototype.init = function() {
     this.dom.fullCalendar(this.options.fullCalendar)
     /* Button for list view
      */
-    var headerRight = this.dom.find('td.fc-header-right');
-    var baseButton  = headerRight.children('.fc-button').first();
-    headerRight.prepend(
-        baseButton.clone()
-            .html('list')
-            .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-            .addClass(' fc-corner-left no-icon')
-            .attr('id','fc-button-list')
-    );
+    var headerRight = this.dom.find('.fc-toolbar .fc-right');
+    var baseButton  = headerRight.find('.fc-button').first();
+    if (this.options.filter.listViewButton) {
+        headerRight.prepend(
+            baseButton.clone()
+                .html('list')
+                .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
+                .addClass(' fc-corner-left no-icon')
+                .attr('id','fc-button-list')
+        );
+    }
 
     if(this.options.filter.enabled) {
         // mash the filters in (if they're enabled)
-        var headerRight = this.dom.find('td.fc-header-right');
-        var baseButton  = headerRight.children('.fc-button').first();
         if (this.options.filter.btnSelector) {
             headerRight.prepend(
                 baseButton.clone()
                     .html('filters')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
+                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn')
                     .attr('id','fc-button-filter')
             );
@@ -405,38 +432,34 @@ Calendar.prototype.init = function() {
             headerRight.append(
                 baseButton.clone()
                     .html('export')
-                    .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active no-icon')
+                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
                     .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
                     .attr('id','fc-button-export')
             );
         }
     }
     // and now make all the buttons on the header look the way they're meant to
-    var header = this.dom.children('.fc-header')
+    var header = this.dom.find('.fc-toolbar')
     header.addClass('calendar-controls')
-    header.find('span.fc-button').each(function() {
+    header.find('.fc-button').each(function() {
         var self = $j(this)
-        var text = self.html()
-        self.addClass('filter-change '+text).html('<span></span>'+text)
+        self.addClass('filter-change');
+    })
+    header.find('.fc-right .fc-button').each(function() {
+        var self = $j(this)
+        self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
     })
 
 
     /* Special case for list view, it's the only button with an anchor
      */
-	var userId = this.options.userId;
-	var selectedDate = [
-		this.options.fullCalendar.date,
-		parseInt(this.options.fullCalendar.month)+1,
-		this.options.fullCalendar.year
-	].join('-');
-
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + selectedDate + '/' + userId;
+        window.location.href = '/calendar/list/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY') + '/' + c.options.userId;
     });
 
     // mash in the datepicker
-    var headerCenter = this.dom.find('td.fc-header-center')
+    var headerCenter = header.find('.fc-center')
     headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
 
     // Event creation form listeners
@@ -449,10 +472,7 @@ Calendar.prototype.init = function() {
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
-                            var responseData = new Function('return ' + responseText)
-                            var newEvent = responseData()
-
-                            c.dom.fullCalendar('renderEvent', newEvent)
+                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
                         }
                     })
                     c.clearForms()
@@ -466,10 +486,7 @@ Calendar.prototype.init = function() {
 
                     c.cupdate(data, function(responseText) {
                         if (responseText.length) {
-                            var responseData = new Function('return ' + responseText)
-                            var newEvent = responseData()
-
-                            c.dom.fullCalendar('renderEvent', newEvent)
+                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
                         }
                     })
                     c.bubble.hide()
@@ -481,15 +498,6 @@ Calendar.prototype.init = function() {
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $j('#datepicker').datepicker(c.options.datepicker);
-    $j('#datepicker').datepicker(
-        'setDate',
-        $j.datepicker.parseDate(
-            "dd-mm-yy",
-            c.options.fullCalendar.date + '-'
-            + (parseInt(c.options.fullCalendar.month) + 1)
-            + '-' + c.options.fullCalendar.year
-        )
-    )
 
     return this
 }
@@ -568,7 +576,7 @@ Calendar.prototype.suppressOne = function() {
  * @param callback
  */
 Calendar.prototype.ccreate = function(data, callback) {
-    this.post(this.options.crud.c, data, callback)
+    this.post(this.options.crud.c, data, callback, false)
 }
 
 /**
@@ -577,7 +585,7 @@ Calendar.prototype.ccreate = function(data, callback) {
  * @param callback
  */
 Calendar.prototype.cread = function(data, callback) {
-    this.post(this.options.crud.r, data, callback)
+    this.post(this.options.crud.r, data, callback, false)
 }
 
 /**
@@ -586,7 +594,7 @@ Calendar.prototype.cread = function(data, callback) {
  * @param callback
  */
 Calendar.prototype.cupdate = function(data, callback) {
-    this.post(this.options.crud.u, data, callback)
+    this.post(this.options.crud.u, data, callback, false)
 }
 
 /**
@@ -595,7 +603,7 @@ Calendar.prototype.cupdate = function(data, callback) {
  * @param callback
  */
 Calendar.prototype.cdelete = function(data, callback) {
-    this.post(this.options.crud.d, data, callback)
+    this.post(this.options.crud.d, data, callback, false)
 }
 
 
@@ -840,7 +848,8 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
+    return datetime.format('ddd, Do MMM')
+    //return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
 /**
@@ -849,5 +858,6 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
+    return datetime.format('h:mma')
+    //return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }

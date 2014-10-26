@@ -67,6 +67,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                 'SELECTED_DAY'   => $selectedDay,
                 'SELECTED_MONTH' => $selectedMonth - 1,
                 'SELECTED_YEAR'  => $selectedYear,
+                'SELECTED_DATE'  => date('Y-m-d', $selectedDate),
             )
         );
     }

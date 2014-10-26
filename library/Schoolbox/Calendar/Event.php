@@ -242,14 +242,31 @@ class Event {
 	 */
 
 	/**
-	 * Derive start and end dates
+	 * Derive start and end dates from a date.
+	 *
+	 * @param string $date A string in either "d-m-Y" or "d-m-Y H:i" format.
 	 *
 	 * @param $date
 	 */
 	public function setupDates($date) {
-		list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $date);
-
-		$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+		if (preg_match(
+			'/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
+			$date,
+			$matches
+		)) {
+			$year   = $matches['y'];
+			$month  = $matches['m'];
+			$day    = $matches['d'];
+			$hour   = $matches['h'];
+			$minute = $matches['i'];
+			$this->setAllDay(false);
+		} else {
+			list($day, $month, $year) = explode("-", $date);
+			$hour   = 0;
+			$minute = 0;
+			$this->setAllDay(true);
+		}
+		$selectedDate = @mktime($hour, $minute, 0, $month, $day, $year);
 
 		if ($selectedDate <= 0) {
 			$selectedDate = time();

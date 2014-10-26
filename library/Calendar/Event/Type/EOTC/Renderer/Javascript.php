@@ -41,16 +41,19 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 
 			/* Congeal all that stuff
 			 */
-			$start = $currentEvent->getStartTime()->getDatabase();
-			$end = $currentEvent->getEndTime()->getDatabase();
 
 			/* All-day settings
 			 */
 			if ($currentEvent->getAllDay()) {
+ 				// Compensate for FullCalendar/vCal having exclusive end times
 				$allDay = true;
+				$start  = $currentEvent->getStartTime()->getDatabaseDate();
+				$end    = $currentEvent->getEndTime()->addDays(1)->getDatabaseDate();
 			}
 			else {
 				$allDay = false;
+				$start  = $currentEvent->getStartTime()->getDatabase();
+				$end    = $currentEvent->getEndTime()->getDatabase();
 			}
 
 			//

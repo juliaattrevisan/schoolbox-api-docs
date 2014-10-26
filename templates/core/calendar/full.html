@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.css" />
-<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
@@ -55,19 +55,17 @@
                 ajax: '/calendar/ajax/filter'
             },
             fullCalendar: {
-                date: '{SELECTED_DAY}',
-                month: '{SELECTED_MONTH}',
-                year: '{SELECTED_YEAR}',
+                defaultDate: moment('{SELECTED_DATE}'),
                 columnFormat: {
                     month:      'ddd',
-                    week:       'ddd d/M',
-                    agendaWeek: 'ddd d/M',
-                    day:        'ddd d/M',
-                    agendaDay:  'ddd d/M',
-                    '':         'ddd d/M'
+                    week:       'ddd D/M',
+                    agendaWeek: 'ddd D/M',
+                    day:        'ddd D/M',
+                    agendaDay:  'ddd D/M',
+                    '':         'ddd D/M'
                 },
                 defaultView: anchor || '{CALENDAR_VIEW}',
-                timeFormat: { month: 'h(:mm)tt' },
+                timeFormat: { month: 'h(:mm)a' },
 
                 /**
                  * When an event is drawn on the calendar
@@ -76,12 +74,14 @@
                  * @param view
                  */
                 eventRender: function(calEvent, jsEvent, view) {
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
 
-                    //
-                    // Would you believe the way this SHOULD work (return false)
-                    // doesn't work, and hiding the event does?
+                    // Don't render me if I'm marked as do not render
                     if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        jsEvent.replaceWith('').hide();
+                        return false;
                     }
 
                     var inner = jsEvent.find('.fc-event-inner')
@@ -106,8 +106,8 @@
                     // If this event is a task, alter the state of the checkbox accordingly
                     if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
                         inner.prepend(
-                            $('<input type="checkbox" name="completed" />')
-                                .attr('id', 't'+ calEvent.data.meta.eventId)
+                                $('<input type="checkbox" name="completed" />')
+                                        .attr('id', 't'+ calEvent.data.meta.eventId)
                         )
                         if (calEvent.data.meta.completed == '1') {
                             title.addClass('strike')
@@ -115,7 +115,7 @@
                         }
                     }
 
-					$j(jsEvent).addClass(calEvent.data.styles.visible);
+                    $j(jsEvent).addClass(calEvent.data.styles.visible);
 
                     // Add booking styles
                     if (calEvent.data.booking) {
@@ -135,18 +135,15 @@
                 /**
                  * When you finish resizing an event, update it
                  * Note the difference between eventResize() and eventResizeStop()
-                 * @param calEvent
-                 * @param jsEvent
-                 * @param ui
-                 * @param view
+                 * @param event
+                 * @param delta
                  */
-                eventResize: function(calEvent, jsEvent, ui, view) {
-                    var event_end = (calEvent.end == null) ? calEvent.start : calEvent.end;
+                eventResize: function(event) {
                     var data = {
-                        eventId: calEvent.data.meta.eventId,
+                        eventId: event.data.meta.eventId,
                         resize: true,
-                        start: calendarDate(calEvent.start),
-                        end: calendarDate(event_end)
+                        start: event.start.format(),
+                        end: event.end.format()
                     };
 
                     c.cupdate(data);
@@ -155,17 +152,15 @@
                 /**
                  * When you finish dragging an event to its new home
                  * @param event
-                 * @param dayDelta
-                 * @param minuteDelta
-                 * @param allDay
+                 * @param delta
                  * @param revertFunc
                  */
-                eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+                eventDrop: function(event, delta, revertFunc) {
                     var data = {
                         eventId: event.data.meta.eventId,
-                        dayDelta: dayDelta,
-                        minuteDelta: minuteDelta,
-                        allDay: allDay
+//                        dayDelta: Math.floor(delta.asDays()),
+                        minuteDelta: delta.asMinutes(),
+                        allDay: !event.start.hasTime()
                     };
 
                     /* TODO: Event re-render
@@ -182,31 +177,18 @@
                 /**
                  * When you click on a day to add a new event
                  * @param date
-                 * @param allDay
                  * @param jsEvent
                  * @param view
                  */
-                dayClick: function(date, allDay, jsEvent, view) {
-
-                    // Date formatting
-                    var weekday = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
-
-                    var month = [ "January", "February", "March", "April", "May", "June", "July", "August",
-                                  "September", "October", "November", "December" ]
-
-                    var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
-
-					/* yyyy-mm-dd format only, not timestampede
-					 */
-					var elems = [
-						('0' + date.getDate()).toString().slice(-2),
-						('0' + (date.getMonth()+1)).toString().slice(-2),
-						date.getFullYear()
-					].join('-');
-
-                    var eventData = {
-                        date: elems,
-                        displayDate: displayDate
+                dayClick: function(date, jsEvent, view) {
+                    var allDay = !date.hasTime();
+                    var eventData = { allDay: allDay ? 1 : 0 };
+                    if (allDay) {
+                        eventData.date        = date.format('DD-MM-YYYY');
+                        eventData.displayDate = date.format('ddd, Do MMMM')
+                    } else {
+                        eventData.date        = date.format('DD-MM-YYYY HH:mm');
+                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
@@ -260,7 +242,7 @@
                         // update datepicker
                         var d = c.dom.fullCalendar('getDate')
 
-                        $j('#datepicker').datepicker('setDate', d)
+                        $j('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
                     }
                 },
 
@@ -276,13 +258,13 @@
                 },
 
                 // Stream location
-                events: function(start, end, callback) {
+                events: function(start, end, timezone, callback) {
                     $j.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
                         data: {
-                            start: Math.round(start.getTime()/1000),
-                            end:   Math.round(end.getTime()/1000),
+                            start: Math.round(start.unix()),
+                            end:   Math.round(end.unix()),
 							userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
@@ -322,9 +304,8 @@
 
         // click 'Edit Event' and push data through to main form page
         $j('#edit-full').click(function(e) {
-            var getstring = $j(this).closest('form').serialize()
-            var l = window.location
-            window.location = l.protocol + '//' + l.hostname + '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
+            var getstring = $j(this).closest('form').serialize();
+            window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
         })
 
         // hide bubbles if any header buttons are clicked
@@ -489,6 +470,7 @@
                     <li><a href="#" id="showCreateTaskForm">Task</a></li>
                 </ul>
 				<input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="allDay" type="hidden" value="" />
                 <input name="date" type="hidden" value="" />
                 <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label>Event Title<input name="note" type="text" value="" /></label>
@@ -509,6 +491,7 @@
                 </ul>
 				<input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
                 <input name="date" type="hidden" value="" />
+                <input name="allDay" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
                 <label>Task<input name="note" type="text" value="" /></label>
                 <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
