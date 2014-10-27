@@ -26,9 +26,10 @@
         // Cheat's responsive text size:
         // Constrain font size based on width of tile
         $(function() {
-            $('.tile .title').cheatsResize();
+            var tileList = $('#tileList-{{ layout.id }}');
+            tileList.find('.tile .title').cheatsResize();
             $(window).resize(function() {
-                $('.tile .title').cheatsResize();
+                tileList.find('.tile .title').cheatsResize();
             });
         });
     })(jQuery);
