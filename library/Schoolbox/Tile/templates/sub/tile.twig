@@ -48,6 +48,8 @@
 
     {% if tile.link %}
     <a href="{{ tile.link|e('html_attr') }}" class="tile-link"></a>
+    {% else %}
+    <span class="tile-link"></span>
     {% endif %}
 
     {% if editable and tile.id %}
