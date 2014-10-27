@@ -34,7 +34,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return false;
         }
 
-        if($this->permission < WRITE_ACCESS || $this->getContext('code') == '') {
+        if( $this->getContext('code') == '') {
             return false;
         }
 
@@ -42,20 +42,44 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         $this->setBlock($templateHandle, "class_list", "class_list_block");
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
+        $this->setBlock($templateHandle, "student_grades", "student_grades_block");
 
-        if(Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext('code') == '') {
-            $this->setVar("class_list_block", "");
+
+
+        // Determine the year and semester for the grades link
+        $this->setVar(
+            array(
+                'WORK_YEAR'     => date('Y'),
+                'WORK_SEMESTER' => DueWork_All::getSemester()
+            )
+        );
+
+        /* Output student grades link to students of this class */
+        if($this->permission == READ_ACCESS && (
+            $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id')) ||
+            $this->groupHandler->involvedInSubject($this->getContext('code')))) {
+            $this->parse('student_grades_block', 'student_grades');
         }
         else {
-            $this->parse("class_list_block", "class_list");
+            $this->setVar('student_grades_block', '');
+        }
+
+
+        if(Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext('code') == '') {
+            $this->setVar('class_list_block', '');
+        }
+        else {
+            $this->parse('class_list_block', 'class_list');
         }
 
         if ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
-            $this->parse("class_mark_block", "class_mark");
+            $this->parse('class_mark_block', 'class_mark');
         }
         else {
-            $this->setVar("class_mark_block", "");
+            $this->setVar('class_mark_block', '');
         }
+
+
 
         return true; // everything went according to plan
     }
