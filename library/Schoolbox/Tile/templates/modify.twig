@@ -22,7 +22,20 @@
             showAlpha: true,
             showInitial: true,
             showInput: true,
-            preferredFormat: "rgb"
+            preferredFormat: "rgb",
+            allowEmpty: true
+        }).each(function() {
+            // when I select a color on a transparent element,
+            // what I really mean is I want to select an opaque color.
+            // Setting the color to an opaque equivalent, then clearing it,
+            // preserves the alpha channel for when I next select a color.
+            var element = $(this);
+            var color   = element.spectrum('get');
+            if (color.getAlpha() == 0) {
+                color.setAlpha(1);
+                element.spectrum('set', color);
+                element.spectrum('set', null);
+            }
         });
 
         // Yes, this is a global variable, it's needed for the
