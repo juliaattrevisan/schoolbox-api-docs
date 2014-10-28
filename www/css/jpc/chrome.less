@@ -132,8 +132,8 @@ body.login{
           color: #5b5b5b;
           font-size: 17px;
           font-weight: bold;
-          width: 92%;
-          height: 27px;
+          width: 100%;
+          height: 47px;
           margin: 0 0 1px 0;
           padding: 10px 4%;
           -webkit-appearance: none;
@@ -197,37 +197,18 @@ body.login{
 
 #nav h4 { padding: 0 0 0 14px; color: #222478 }
 
-/* ---- Mobile (landscape fix for login) ---- */
- @media screen
- and (max-device-width: 1024px) {
-     body.login{
-         #container #content{
-             top: 20px;
-             .error, .forgotten{
-                 margin: 10px 0;
-             }
-             #login-logo img{
-                 width: 100%;
-                 height: auto;
-             }
-         }
-         #footer{
-             left: auto;
-             right: 0;
-         }
-     }
- }
+/* ---- Mobile ---- */
 
-  @media screen
-  and (max-device-width: 600px) {
+  @media screen and (max-width: 800px) {
       body.login{
           #container #content{
-              .error, .forgotten{
-                  display: none;
-              }
+              width: 100%;
+              box-sizing: border-box;
+              top: 15px;
+              #login-logo{ margin-bottom: 15px; }
+              .error, .forgotten{ display: none; }
           }
-          #footer{
-              display: none;
-          }
+          #login-bg,
+          #footer{ display: none; }
       }
   }
