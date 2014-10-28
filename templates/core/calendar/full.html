@@ -10,6 +10,30 @@
     // provide page-wide access to the calendar object so the callbacks can actually use it
     var c;
 
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
     // once the DOM has loaded, punch a fancy calendar into it
     $j(document).ready(function() {
         // Allow checking of anchor for view to display
@@ -137,16 +161,16 @@
                  * Note the difference between eventResize() and eventResizeStop()
                  * @param event
                  * @param delta
+                 * @param revertFunc
                  */
-                eventResize: function(event) {
+                eventResize: function(event, delta, revertFunc) {
                     var data = {
                         eventId: event.data.meta.eventId,
                         resize: true,
                         start: event.start.format(),
                         end: event.end.format()
                     };
-
-                    c.cupdate(data);
+                    updateWrapper(event, data, revertFunc);
                 },
 
                 /**
@@ -158,20 +182,10 @@
                 eventDrop: function(event, delta, revertFunc) {
                     var data = {
                         eventId: event.data.meta.eventId,
-//                        dayDelta: Math.floor(delta.asDays()),
                         minuteDelta: delta.asMinutes(),
                         allDay: !event.start.hasTime()
                     };
-
-                    /* TODO: Event re-render
-                     *
-                     * If an event's length exceeds the threshold of the current day
-                     * (e.g. a five-hour event got dragged to 11pm) the back-end changes
-                     * its end date to be 23:59:59 of the current day. However this
-                     * doesn't update the DOM until you reload the page. I haven't found
-                     * a re-render method for individual events.
-                     */
-                    c.cupdate(data);
+                    updateWrapper(event, data, revertFunc);
                 },
 
                 /**
