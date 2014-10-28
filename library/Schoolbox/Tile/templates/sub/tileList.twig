@@ -20,16 +20,17 @@
     {% endif %}
 }
 </style>
-<script type="text/javascript" src="/javascript/jquery.cheatsResize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tileResize.js"></script>
 <script type="text/javascript">
     (function($) {
         // Cheat's responsive text size:
         // Constrain font size based on width of tile
         $(function() {
-            $('.tile .title').cheatsResize();
-            $(window).resize(function() {
-                $('.tile .title').cheatsResize();
-            });
+            var resizeTitles = function() {
+                $('#tileList-{{ layout.id }}').find('.tile').tileResize();
+            };
+            resizeTitles();
+            $(window).resize(resizeTitles);
         });
     })(jQuery);
 </script>
