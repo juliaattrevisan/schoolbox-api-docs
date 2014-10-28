@@ -9,6 +9,8 @@
  */
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
+use Schoolbox\UserMapper;
+
 $calendarHandler = new Calendar();
 $page            = new SitePage();
 
@@ -70,7 +72,7 @@ if ($updatedEvent['allday']) {
 if (isset($_POST['note']) && isset($_POST['detail'])) {
     /* For tasks
      */
-    $updatedEvent['note']      = $_POST['note'];
+    $updatedEvent['title']     = $_POST['note'];
     $updatedEvent['detail']    = $_POST['detail'];
     $updatedEvent['completed'] = $_POST['completed'];
 } elseif (isset($_POST['completed'])) {
@@ -84,51 +86,18 @@ if (isset($_POST['note']) && isset($_POST['detail'])) {
     $updatedEvent['campusList'] = $calendarHandler->getEventCampus($event['id']);
 }
 
+// Get event back out of the connector, so I know the rendering is consistent
+$owner = UserMapper::getInstance()->createModel()->setId($event['owner']);
 if ($eventId = $calendarHandler->update($updatedEvent)) {
-    $event = $calendarHandler->getByID($eventId);
-
-    $json = array(
-        'title'    => $event['title'],
-        'start'    => strtotime($event['startDate'] . ' ' . $event['startTime']),
-        /* Whether you can edit this event or not
-         */
-        'editable' => true,
-        'allDay'   => $updatedEvent['allday'],
-        /* Colour of the event
-         */
-        'color'    => '#aaaaaa',
-        /* Extra data that the Event Object doesn't directly support
-         */
-        'data'     => array(
-            'meta'       => array(
-                'eventId'     => $eventId,
-                'detail'      => $event['detail'],
-                'location'    => $event['location'],
-                'eventType'   => '',
-                'eventTypeId' => $event['type'],
-                'type'        => $event['type'],
-                'author'      => '',
-                'authorId'    => $event['owner'],
-                'level'       => '',
-                'completed'   => $event['completed'],
-            ),
-            'links'      => array(
-                'category' => array(
-                    'id'   => '',
-                    'name' => '',
-                )
-            ),
-            'styles'     => array(
-                'visible' => '',
-            ),
-            'attendance' => array(
-                'icon'          => false,
-                'status'        => false,
-                'requestButton' => false,
-                'listButton'    => false,
-            )
-        )
-    );
-    echo json_encode($json);
+    ob_start();
+    $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
+    $renderer  = new Calendar_Event_Type_Day_Renderer_Javascript(new SitePage());
+    foreach ($connector->getEvent($eventId) as $calendarEvent) {
+        $renderer->visit($calendarEvent);
+    }
+    // Panel-beat Steve's calendar JSON into shape
+    $jsonList  = json_decode('['.ob_get_clean().'{}]');
+    $jsonEvent = $jsonList[0];
+    echo json_encode($jsonEvent);
 }
 exit(1);

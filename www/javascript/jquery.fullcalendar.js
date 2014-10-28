@@ -503,9 +503,24 @@ Calendar.prototype.init = function() {
                     event.preventDefault();
                     var data = $j(this).serialize()
 
+                    var matchEvents = function(eventId) {
+                        return function(event) {
+                            try {
+                                return event.data.meta.eventId == eventId;
+                            } catch (e) {
+                                return false;
+                            }
+                        }
+                    };
+
                     c.cupdate(data, function(responseText) {
                         if (responseText.length) {
-                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
+                            // Update the event (well, remove and replace)
+                            // instead of adding a new one.
+                            var newEvent = JSON.parse(responseText);
+                            var eventId  = newEvent.data.meta.eventId;
+                            c.dom.fullCalendar('removeEvents', matchEvents(eventId));
+                            c.dom.fullCalendar('renderEvent', newEvent);
                         }
                     })
                     c.bubble.hide()
