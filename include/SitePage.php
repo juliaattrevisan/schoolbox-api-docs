@@ -489,6 +489,13 @@ class SitePage extends Page
         $output = str_replace("%MESSAGE%", $message, $error['message']);
 
         header(':', true, $code);
+
+        // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
+        if ($this->ajax) {
+            header('Content-Type: application/json');
+            die(json_encode($output));
+        }
+
         $this->setVar(TEMPLATE_content, '');
 
         $this->setFile(TEMPLATE_content, 'common/error.html');
