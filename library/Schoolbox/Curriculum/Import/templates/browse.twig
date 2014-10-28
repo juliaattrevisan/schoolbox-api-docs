@@ -1,31 +1,8 @@
-<style type="text/css">
-    /** TODO change these Steve colors **/
-    #curriculum-import-form .ui-tabs-panel {
-        transition: background-color 1s;
-    }
-    #curriculum-import-form .ui-tabs-panel.loading {
-        background-color: #77fffe;
-    }
-    #curriculum-import-form .ui-tabs-panel.loaded {
-        background-color: hotpink;
-    }
-    #curriculum-import-form .ui-tabs-panel.failed {
-        background-color: #ff3311;
-    }
-    #curriculum-import-form #outcomes .name {
-        color: #007700;
-        font-weight: bolder;
-    }
-    #curriculum-import-form #outcomes .code {
-        color: #770000;
-        font-weight: bolder;
-    }
-</style>
 <script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
 <!-- Template for the tree -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
-    <li>
+    <li class="curriculum-node">
         {{?it.name }}
         <span class="name">{{!it.name }}</span>
         {{?}}
@@ -254,9 +231,10 @@
 <h1>Import Curriculum</h1>
 
 <form id="curriculum-import-form"
+      class="clearfix curriculum-import-widget"
       action="{{ routeLookup('curriculumImport.create')|e('html_attr') }}"
       method="post"
-      name="form" class="clearfix"
+      name="form"
 >
     <ul>
         <li><a href="#step-1">Source</a></li>
@@ -301,7 +279,7 @@
         <input type="text" name="curriculumName" value="" />
         <h4>Preview</h4>
 
-        <ul class="wysiwyg" id="outcomes"></ul>
+        <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
         After saving the curriculum, you may customise individual steps.
         <input type="submit"
                value="Save Curriculum"

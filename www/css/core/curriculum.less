@@ -1,0 +1,36 @@
+@charset "utf-8";
+
+/**
+ * Styles that relate to the curriculum mapping feature.
+ */
+
+/** TODO change these Steve colors **/
+.curriculum-import-widget {
+  // This style should be generic to all tabs.
+  // There should be a generic ajax-loading style too
+  .ui-tabs-panel {
+    transition: background-color 1s;
+    &.loading {
+      background-color: #77fffe;
+    }
+    &.loaded {
+      background-color: hotpink;
+    }
+    &.failed {
+      background-color: #ff3311;
+    }
+  }
+}
+/**
+ * Curriculum nodes: these should be generic too
+ */
+.curriculum-node {
+  .name {
+    color: #007700;
+    font-weight: bolder;
+  }
+  .code {
+    color: #770000;
+    font-weight: bolder;
+  }
+}
