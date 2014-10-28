@@ -287,7 +287,7 @@
             c.getForm('createTask').show()
 
             // copy details from event to task
-            cp('event', 'task', ['date', 'displayDate', 'note'])
+            cp('event', 'task', ['date', 'displayDate', 'note', 'allDay'])
 
         });
 
@@ -298,7 +298,7 @@
             c.getForm('createTask').hide()
 
             // copy details from event to task
-            cp('task', 'event', ['date', 'displayDate', 'note'])
+            cp('task', 'event', ['date', 'displayDate', 'note', 'allDay'])
 
         })
 
