@@ -2,8 +2,15 @@
  * FullCalendar CSS customisations
  */
 
-.fc-event {
-	color: #000;
+.fc-event,
+.fc-event:hover {
+    color: #000;
+}
+.fc-event:hover {
+    text-decoration: underline;
+}
+.fc-event.loading {
+    opacity: 0.5;
 }
 
 .fc-agenda-slots td div {
