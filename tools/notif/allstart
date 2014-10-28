@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./allstop
+
+service schoolbox-scheduled start;
+service schoolbox-rerouted  start;
+service schoolbox-socketd   start;
+service schoolbox-digestd   start;

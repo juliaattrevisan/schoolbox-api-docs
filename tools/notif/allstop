@@ -1,0 +1,6 @@
+#!/bin/bash
+
+service schoolbox-scheduled stop;
+service schoolbox-rerouted  stop;
+service schoolbox-socketd   stop;
+service schoolbox-digestd   stop;
