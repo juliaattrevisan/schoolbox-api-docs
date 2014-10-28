@@ -468,11 +468,30 @@ Calendar.prototype.init = function() {
             if(k.slice(0, 6) == 'create') {
                 this.submit(function(event) {
                     event.preventDefault();
-                    var data = $j(this).serialize()
+                    var form = $(this);
+                    var data = form.serialize()
+
+                    // Create and render a placeholder event
+                    var placeholderEvent = {
+                        allDay: Number(form.find('input[name="allDay"]').val()) ? true : false,
+                        title: form.find('input[name="note"]').val(),
+                        className: ['loading'],
+                        id: 'placeholder'
+                    };
+                    if (placeholderEvent.allDay) {
+                        placeholderEvent.start = moment(form.find('input[name="date"]').val(), "DD-MM-YYYY");
+                        placeholderEvent.end   = moment(placeholderEvent.start).add(1, 'd');
+                    } else {
+                        placeholderEvent.start = moment(form.find('input[name="date"]').val(), "DD-MM-YYYY HH:mm");
+                        placeholderEvent.end   = moment(placeholderEvent.start).add(1, 'h');
+                    }
+                    c.dom.fullCalendar('renderEvent', placeholderEvent);
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
-                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true)
+                            // Remove the placeholder and render the actual event
+                            c.dom.fullCalendar('removeEvents', 'placeholder');
+                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
                         }
                     })
                     c.clearForms()

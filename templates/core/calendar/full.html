@@ -98,6 +98,11 @@
                  * @param view
                  */
                 eventRender: function(calEvent, jsEvent, view) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
                     // Ignore the phantom event that the API puts there
                     if (!calEvent.data) {
                         return false;
