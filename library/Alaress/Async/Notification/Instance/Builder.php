@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Html2Text\Html2Text;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
@@ -110,11 +111,14 @@ class Builder {
 
 
 	/**
+     * Set body, converting to plaintext as you go (we can't support markup in the body)
+     *
 	 * @param string $body
 	 * @return self
 	 */
 	public function setBody($body) {
-		return $this->putMeta('body', $body);
+        $plain = new Html2Text($body);
+        return $this->putMeta('body', $plain->get_text());
 	}
 
 
