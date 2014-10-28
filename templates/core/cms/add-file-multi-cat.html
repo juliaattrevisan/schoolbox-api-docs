@@ -1,17 +1,10 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 
-$j(function() {
+$(function() {
 
-	$j('input[type=file].prettify').prettyFileInput({
-		additionalButtonClasses: 'no-marg float-left',
-		buttonActiveClass: 'tick',
-		defaultText: '<span></span>Choose file',
-		defaultFileSelectedText: '<span></span>File selected'
-	});
-
-	$j('#fileForm').validate({
+	$('#fileForm').validate({
 		rules: {
 			'category[]': {
 				required: true,
@@ -30,17 +23,17 @@ $j(function() {
 		}
 	});
 
-	$j(':checkbox').each(function() {
-		if ($j(this).is(':checked')) {
-			$j(this).parent().addClass('active-checkbox');
+	$(':checkbox').each(function() {
+		if ($(this).is(':checked')) {
+			$(this).parent().addClass('active-checkbox');
 		}
 	});
 
-	$j(':checkbox').click(function() {
-		if ($j(this).parent().hasClass('active-checkbox')) {
-			$j(this).parent().removeClass('active-checkbox')
+	$(':checkbox').click(function() {
+		if ($(this).parent().hasClass('active-checkbox')) {
+			$(this).parent().removeClass('active-checkbox')
 		} else {
-			$j(this).parent().addClass('active-checkbox');
+			$(this).parent().addClass('active-checkbox');
 		}
 	});
 
@@ -49,7 +42,7 @@ $j(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>Upload a File to Multiple Locations</h1>
+<h1>Post File to Multiple Locations</h1>
 <form method="post" enctype="multipart/form-data" id="fileForm" class="clearfix" action="/cms/fileForm.php">
 	<table class="standardForm table">
      <colgroup>
@@ -66,44 +59,22 @@ $j(function() {
 				</label>
 			</td>
 		</tr>
-		<!-- BEGIN browse -->
 		<tr>
 			<td class="formLabelWidth">
 				<h4>File</h4>
-				<em>Browse your local disk for a file or upload from your 'my files'.</em>
+				<em>Select a file to post.</em>
 			</td>
 			<td>
-				<strong>Upload from your computer</strong>
-
-				<div class="clearfix">
-					<input type="file" name="file"  id="browse" class="prettify" />
-					<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
-				</div>
-
-                <!-- BEGIN show_my_files -->
-                <br />
-                <strong>Copy from My Files</strong><br />
-                <select name='myfile' id="myfile">
-                    <option value=''></option>
-                    <!-- BEGIN optgroup -->
-                    <optgroup label="&gt; {MYFOLDER_NAME}"  style="padding-left: {MYFOLDER_LEFT}px;">
-                        <!-- BEGIN my_files -->
-                        <option value="{MYFILE_ID}" style="padding-left: 14px;">{MYFILE_NAME}</option>
-                        <!-- END my_files -->
-                    </optgroup>
-                    <!-- END optgroup -->
-                </select>
-                <!-- END show_my_files -->
+                {ATTACH_ZONE}
 			</td>
 		</tr>
-		<!-- END browse -->
 		<tr>
 			<td>
 				<h4>Description</h4>
 				<em>Any further details you wish to make about the file, useful for enhancing search results</em>
 			</td>
 			<td>
-				<textarea name="comment" cols="40" rows="4"></textarea>
+				<textarea name="comment" cols="40" rows="4" style="width:100%"></textarea>
 			</td>
 		</tr>
 		<tr>

@@ -1,6 +1,7 @@
 <?php
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use \Schoolbox\Resource\CategoryMapper;
 use \Schoolbox\Resource\FileMapper;
 use \Schoolbox\Resource\File;
@@ -24,187 +25,118 @@ if($ajax) {
 
 $page = new SitePage();
 $page->setAjax($ajax);
+
 $fileHandler = new File();
 $groupHandler = new Group();
 
-/* Upload single file to blackhole storage */
-if ( is_string($_POST['description']) && ( !isset($_POST['category']) ) ) {
-
-}
 
 /* Upload single file */
-elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
+if (is_string($_POST['description']) && isset($_POST['category'])) {
 
-    if ( is_numeric($_POST['fileID']) ) {
+    // get a file object or die
+    try {
+        // if we're editing an existing file, ensure the file exists
+        if (is_numeric($_POST['fileID'])) {
+            $file = FileMapper::getInstance()->findById($_POST['fileID']);
 
-        /* Modify existing file */
+        } else {
+            $file = FileMapper::getInstance()->createModel();
 
-        /* Double check permission on file
-           */
+        }
 
-        $currentFile = FileMapper::getInstance()->findById($_POST['fileID']);
-        /** @var File $currentFile */
+        // if file was ajax-uploaded
+        if (isset($_POST['attachment'])) {
+            $factory = new CollectorFactory(FileMapper::getInstance());
+            /** @var File $result */
+            $result  = $factory->build($_POST['attachment'])->getFirst();
 
+            if ($file->getId()) {
+                $result->setId($file->getId());
+            }
 
-        if ( $groupHandler->getPermission($currentFile->getFolder()->getId()) < WRITE_ACCESS ) {
+            // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
+            $file = $result;
+        }
+
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit; // shut UP, storm.
+    }
+
+    // if file was synchronously uploaded
+    if ( $_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+        $file->setTempFileLocation($_FILES['file']['tmp_name']);
+        $file->setFilename($_FILES['file']['name']);
+        $file->setFilesize(filesize($_FILES['file']['tmp_name']));
+    }
+
+    // set attributes
+    $file->setOwner($_SESSION['id']);
+    $file->setDescription($_POST['description']);
+    $file->setComment($_POST['comment']);
+    $file->setHidden($_POST['hidden'] ? true : false);
+    $file->setModified(Alaress_Date_Format::now());
+
+    // this is the collection we'll be saving
+    $collection = new \Schoolbox\Collection();
+
+    // we can iterate, even if we're only iterating one
+    $destinations = is_array($_POST['category']) ? $_POST['category'] : array($_POST['category']);
+
+    foreach ($destinations as $cat) {
+        if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
             error(6);
         }
 
+        $clone = clone $file;
+        $clone->setFolder(CategoryMapper::getInstance()->createModel()->setId($cat));
 
-        $currentFile->setDescription($_POST['description']);
-        $currentFile->setComment($_POST['comment']);
-        $currentFile->setHidden($_POST['hidden']?true:false);
-        $currentFile->setModified(Alaress_Date_Format::now());
+        $collection->add($clone);
+    }
 
+    try {
+        $affectedIds = FileMapper::getInstance()->save($collection);
 
-
-        if ( is_numeric($_POST['myfile']) ) {
-            /* Make this appear as a file upload */
-            $myFileHandler = new MyFile();
-
-            if ( !$privFile = $myFileHandler->getByID($_POST['myfile']) ) {
-                error(41);
-            }
-
-            $currentFile->setTempFileLocation(Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat');
-            $currentFile->setFilename($privFile['realname']);
-            $currentFile->setFilesize($privFile['filesize']);
-
-        }
-        else if ( $_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            /* Submitted file with form, run security checks */
-
-            $currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
-            $currentFile->setFilename($_FILES['file']['name']);
-            $currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-
+        /* For some reason this is necessary for upload indication to reach completed status */
+        if ($_POST['uploadifydie'] == true) {
+            exit(true);
         }
 
-        try {
-            FileMapper::getInstance()->save($currentFile);
+        if (isset($_POST['return'])) {
+            SitePage::localRedir($_POST['return']);
+
+        } elseif ($ajax) {
+            header(':', true, 201);
+            die(json_encode(array('id' => $affectedIds[0])));
+
+        } else {
             $page->backToTheFuture(2);
         }
-        catch (Exception $e) {
-            // Output errors
-            if($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-                error(11, "Your file '{$currentFile->getFilename()}' is not a valid filetype");
-            }
-            else if($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
-                error(10, 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($currentFile->getMimetype()->getMaxFileSize()).'.');
-            }
-            else {
-                error(9, $e->getMessage());
-            }
-        }
-    }
-    else {
-        $file = FileMapper::getInstance()->createModel();
-        /** @var File $file */
 
-        $file->setOwner($_SESSION['id']);
-        $file->setDescription($_POST['description']);
-        $file->setComment($_POST['comment']);
-        $file->setHidden($_POST['hidden']?true:false);
+    } catch (Exception $e) {
+        // Output errors
+        if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
+            $code = 11;
+            $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
 
+        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
+            $code = 10;
+            $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.';
 
-        if ( is_numeric($_POST['myfile']) ) {
-            /* Make this appear as a file upload */
-            $myFileHandler = new MyFile();
-
-            if ( !$privFile = $myFileHandler->getByID($_POST['myfile']) ) {
-                error(41);
-            }
-
-            $file->setTempFileLocation(Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat');
-            $file->setFilename($privFile['realname']);
-            $file->setFilesize($privFile['filesize']);
-        }
-        elseif ( $_FILES['file']['name'] ) {
-            $file->setTempFileLocation($_FILES['file']['tmp_name']);
-            $file->setFilename($_FILES['file']['name']);
-            $file->setFilesize(filesize($_FILES['file']['tmp_name']));
+        } else {
+            $code = 9;
+            $msg  = $e->getMessage();
         }
 
-        /* Add to multiple locations */
-        if ( is_array($_POST['category']) ) {
-
-            $fileCollection = FileMapper::getInstance()->createCollection();
-            /** @var Schoolbox\Collection $fileCollection */
-
-            foreach ( $_POST['category'] as $cat ) {
-
-                if ( $groupHandler->getPermission($cat) < WRITE_ACCESS ) {
-                    error(6);
-                }
-
-                $fileDest = clone $file;
-                $fileDest->setFolder(CategoryMapper::getInstance()->createModel($cat));
-                $fileCollection->add($fileDest);
-            }
-
-            $file = $fileCollection;
-        }
-        else {
-            /* Added to a single folder */
-            if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
-                if($ajax) {
-                    header(':', true, 400);
-                    die(json_encode('You do not have write permission to this category.'));
-                } else {
-                    error(6);
-                }
-            }
-
-            $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['category']));
-        }
-
-        try {
-            $affectedIds = FileMapper::getInstance()->save($file);
-
-            /* For some reason this is necessary for upload indication to reach completed status */
-            if ( $_POST['uploadifydie'] == true ) {
-                exit( true );
-            }
-
-            if ( isset( $_POST['return'] ) ) {
-                SitePage::localRedir($_POST['return']);
-            }
-            elseif($ajax) {
-                header(':', true, 201);
-                die(json_encode(array('id' => $affectedIds[0])));
-            }
-            else {
-                $page->backToTheFuture(2);
-            }
-
-        }
-        catch (Exception $e) {
-            // Output errors
-            if($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-                $code = 11;
-                $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
-            }
-            else if($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
-                $code = 10;
-                $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.';
-            }
-            else {
-                $code = 9;
-                $msg  = $e->getMessage();
-            }
-
-            if($ajax) {
-                header(':', true, 400);
-                die(json_encode(array('code' => $code, 'error' => $msg)));
-            }
-            else {
-                error($code, $msg);
-            }
-
-
+        if ($ajax) {
+            header(':', true, 400);
+            die(json_encode(array('code' => $code, 'error' => $msg)));
+        } else {
+            error($code, $msg);
         }
     }
 }
+
 /* Move file from one category to another */
 elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
 

@@ -1,21 +1,30 @@
 <?php
 
+use Schoolbox\Resource\Attachment\GenericZone;
 use \Schoolbox\Resource\FileMapper;
 use \Schoolbox\Resource\CategoryMapper;
 
 
 $groupHandler = new Group;
 
+$zone = new GenericZone('cms', FileMapper::getInstance());
+$zone->setAttachmentsLabel('')
+     ->setAttachPrompt('Post file')
+     ->setMimeFilter('*/*')
+     ->setMulti(false)
+     ->setThumbnailSize(64)
+     ->setModalTitle('Select file');
 
 if(is_numeric($this->arg[0])) {
 
 	/* Modify existing file */
-    try{
-        $file = FileMapper::getInstance()->findById($this->arg[0]);
+    try {
+        $file   = FileMapper::getInstance()->findById($this->arg[0]);
         $folder = CategoryMapper::getInstance()->findById($file->getFolder()->getId());
     }
     catch (Exception $e) {
 		error(41);
+        exit; // shut up, storm!
 	}
 
 	if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
@@ -23,17 +32,17 @@ if(is_numeric($this->arg[0])) {
 	}
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
-	//$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
-	$this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
-	$this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
-	$this->setBlock('optgroup', 'my_files', 'my_files_block');
+    $this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
+    $this->setVar('browse_block', 'The original file posted.');
 
 	$this->setTitle('Modify File');
 	$this->setTab('resources');
 
-	//$this->setVar('browse_block', '');
+	$zone->attachFiles(array($file->getId()));
+
 	$output = array(
 		'ACTION' => 'Modify',
+        'ACTION_DESC' => 'replace the existing file',
 		'FILE_ID' => $file->getId(),
 		'DESCRIPTION' => Scrub::text($file->getDescription()),
 		'COMMENT' => Scrub::text($file->getComment()),
@@ -47,17 +56,13 @@ if(is_numeric($this->arg[0])) {
 	);
 
 	$this->setVar($output);
-
-    outputMyFileSelector($this);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	/* Add new file to system */
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
-	$this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
-	$this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
-	$this->setBlock('optgroup', 'my_files', 'my_files_block');
     $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
     $this->setVar('delete_button_block','');
 
@@ -77,6 +82,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$output = array(
 		'ACTION' => 'Post',
+        'ACTION_DESC' => 'upload',
 		'FILE_ID' => '',
 		'DESCRIPTION' => '',
 		'COMMENT' => '',
@@ -89,16 +95,17 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'DUE_YEAR' => is_numeric($this->arg[4]) ? $this->arg[4] : '',
     );
 
-	$this->setVar($output);
+    $this->setVar($output);
 
-    outputMyFileSelector($this);
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
 
 	$this->setFile(TEMPLATE_content, 'cms/add-multi-file.html');
 
-	$this->setTitle('Upload Multiple Files');
+	$this->setTitle('Add Multiple Files');
 	$this->setTab('resources');
 
     try{
@@ -141,9 +148,6 @@ else if($this->arg[0] == 'multicat') {
 	/* Upload a file to multiple categories */
 
 	$this->setFile(TEMPLATE_content, 'cms/add-file-multi-cat.html');
-    $this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
-    $this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
-    $this->setBlock('optgroup', 'my_files', 'my_files_block');
     $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 	$this->setBlock(TEMPLATE_content, 'no_categories', 'no_categories_block');
 
@@ -157,7 +161,8 @@ else if($this->arg[0] == 'multicat') {
 
 	$this->setVar($output);
 
-	$groupHandler = new Group;
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
 	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], TRUE, WRITE_ACCESS);
 
 	if (is_array($categoryList) && count($categoryList)) {
@@ -178,70 +183,7 @@ else if($this->arg[0] == 'multicat') {
 		error(154);
 	}
 
-    outputMyFileSelector($this);
 }
 else {
 	error(2);
-}
-
-/**
- * Stupid output method for stupid file selector.
- *
- * Factored out of duplicate code for add/edit file.
- *
- * @param Sitepage $sitepage The Sitepage to spam blocks into
- */
-function outputMyFileSelector($sitepage) {
-    $myFolderHandler = new MyFolder;
-    $myFileHandler   = new MyFile;
-
-    /* Check for files in the root
-    */
-    $fileList = $myFileHandler->getAllInFolder(0);
-
-    if (is_array($fileList)) {
-        $sitepage->setVar(
-                 array(
-                     'MYFOLDER_NAME' => 'Top'
-                 )
-        );
-
-        foreach ($fileList as $file) {
-            $output = array(
-                'MYFILE_ID'   => $file['id'],
-                'MYFILE_NAME' => $file['description'],
-            );
-
-            $sitepage->setVar($output);
-            $sitepage->parse('my_files_block', 'my_files', true);
-        }
-    }
-    $sitepage->parse('optgroup_block', 'optgroup', true);
-    $sitepage->setVar('my_files_block', '');
-
-    $folderTree = $myFolderHandler->getFolderTree();
-    if (is_array($folderTree)) {
-        foreach ($folderTree as $folder) {
-            $output = array(
-                'MYFOLDER_NAME' => trim($folder['name']),
-                'MYFOLDER_LEFT' => number_format($folder['depth'] * 14, 0),
-            );
-            $sitepage->setVar($output);
-            $fileList = $myFileHandler->getAllInFolder($folder['id']);
-            if (is_array($fileList)) {
-                foreach ($fileList as $fileOut) {
-                    $output = array(
-                        'MYFILE_ID'   => $fileOut['id'],
-                        'MYFILE_NAME' => $fileOut['description'],
-                    );
-                    $sitepage->setVar($output);
-                    $sitepage->parse('my_files_block', 'my_files', true);
-                }
-            }
-            $sitepage->parse('optgroup_block', 'optgroup', true);
-            $sitepage->setVar('my_files_block', '');
-        }
-    }
-
-    $sitepage->parse('show_my_files_block', 'show_my_files');
 }
