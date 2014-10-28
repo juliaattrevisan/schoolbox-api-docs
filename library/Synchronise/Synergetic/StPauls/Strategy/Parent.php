@@ -11,134 +11,125 @@
  * @version     SVN: $Id$
  */
 class Synchronise_Synergetic_StPauls_Strategy_Parent extends Synchronise_Synergetic_StPauls_Strategy_Abstract {
-	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
+    protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setVerboseFilter(new Synchronise_Synergetic_StPauls_Verbose_Parent());
-	}
 
-	/**
-	 * Get a list of users' Synergy IDs to sync
-	 *
-	 * @return void
-	 */
-	public function generateList() {
-		$this->collateList($this->getUserHandler()->getByGroup($this->getGroupHandler()->getParentGroupTypeIds(), true));
-	}
+    /**
+     * Setup
+     */
+    protected function setup() {
+        $this->setVerboseFilter(new Synchronise_Synergetic_StPauls_Verbose_Parent());
+    }
 
-	/**
-	 * If the users exist in Synergy but not in Schoolbox, create an account for
-	 * them
-	 *
-	 * @return void
-	 */
-	public function createIfExists() {
-		$this->getVerboseFilter()->intro();
+    /**
+     * Get a list of users' Synergy IDs to sync
+     *
+     * @return void
+     */
+    public function generateList() {
+        $this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
+    }
 
-		foreach($this->getList() as $currentUser) {
+    /**
+     * Set up the new user's details
+     *
+     * @param  $currentUser
+     * @return array
+     */
+    public function setupUserDetails($currentUser) {
+        $newUser = array();
 
-			/* Generate details about the new user
-			 */
-			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
-		}
+        $parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactID']);
 
-		$this->getVerboseFilter()->summary();
-	}
+        // User details
+        $newUser['username']   = $currentUser['StudentContactID'];
+        $newUser['synergy_id'] = $currentUser['StudentContactID'];
+        $newUser['title']      = $currentUser['StudentContactTitle'];
+        $newUser['firstname']  = $currentUser['StudentContactPreferred'];
+        $newUser['lastname']   = $currentUser['StudentContactSurname'];
+        $newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
 
-	/**
-	 * Set up the new user's details
-	 *
-	 * @param  $currentUser
-	 * @return array
-	 */
-	public function setupUserDetails($currentUser) {
-		return $currentUser;
-	}
+        // get campuses of attached children
+        $newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $newUser['group_id']      = self::PARENT_GROUP_ID;
+        $newUser['su']            = false;
 
-	/**
-	 * Identical algorithm used to create/update a user
-	 *
-	 * @param $currentUser
-	 */
-	public function executeCreateUpdate($currentUser) {
-		$currentSynergyId = $currentUser['synergy_id'];
+        return $newUser;
+    }
 
-		$currentParent = $this->getExternalUserHandler()->getParentSync($currentSynergyId);
+    /**
+     * Set up the new user's spouse's details
+     *
+     * @param $currentUser
+     * @return array
+     */
+    public function setupSpouseDetails($currentUser) {
+        $newUser = array();
 
-		/* If the parent could be found, try updating him in Synergetic
-		 */
-		//if ($currentParent) {
+        $parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactSpouseID']);
 
-			/* The drop down in synergetic's Phone and Occupation tabs indicates
-			 * which email the person prefers to use.
-			 */
-			if ($currentParent['DefaultEmailCode'] == 'O') {
-				$preferredEmail = $currentParent['OccupEmail'];
-			}
-			else {
-				$preferredEmail = $currentParent['Email'];
-			}
+        // User details
+        $newUser['username']   = $currentUser['StudentContactSpouseID'];
+        $newUser['synergy_id'] = $currentUser['StudentContactSpouseID'];
+        $newUser['title']      = $currentUser['StudentContactSpouseTitle'];
+        $newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
+        $newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
+        $newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
 
-			/* Update Portal with Synergetic data if there is something
-			 * different contained in Synergetic db
-			 */
-			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
+        // get campuses of kids
+        $newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
+        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $newUser['group_id']      = self::PARENT_GROUP_ID;
+        $newUser['su']            = false;
 
-			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
+        return $newUser;
+    }
 
-				$updatedUser['id'] = $user['uid'];
-				$updatedUser['username'] = $user['username'];
-				$updatedUser['title'] = trim($currentParent['Title']);
-				$updatedUser['firstname'] = trim($currentParent['Preferred']);
-				$updatedUser['lastname'] = trim($currentParent['Surname']);
 
-				$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-				$updatedUser['defaultCampus'] = $updatedUser['campus'][0];
-				$updatedUser['password'] = 'password';
+    /**
+     * If the users exist in Synergy but not in Schoolbox, create an account for
+     * them
+     *
+     * @return void
+     */
+    public function createIfExists() {
+        $this->getVerboseFilter()->intro();
 
-				/* Clear email address in Portal if the user is not meant to be
-				 * publicly listed
-				 */
-				if ($this->isPubliclyListed($currentParent)) {
-					$updatedUser['alt_email'] = trim($preferredEmail);
-				}
-				else {
-					$updatedUser['alt_email'] = '';
-				}
+        //
+        // Pass 1: get a unique list of users
+        $parents = array();
+        foreach ($this->getList() as $currentUser) {
+            //
+            // Get user and their spouse.
+            $users = array(
+                $this->setupUserDetails($currentUser),
+                $this->setupSpouseDetails($currentUser),
+            );
+            foreach ($users as $newUser) {
+                //
+                // Add each user to the list of unique users, merging the campus
+                // list into the new one.
+                $user_id = $newUser['synergy_id'];
+                if (!isset($parents[$user_id])) {
+                    $parents[$user_id] = $newUser;
+                }
+                //
+                // Overwrite default campus
+                $parents[$user_id]['defaultCampus'] = $newUser['campus'];
+                $parents[$user_id]['campus'] = array_unique(array_merge(
+                        $parents[$user_id]['campus'],
+                        $newUser['campus']
+                    ));
+            }
+        }
 
-				/* Actually perform db update
-				 */
-				if ($this->getPerformUpdate() === true) {
-					$this->getUserHandler()->update($updatedUser);
-					$this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					$this->getVerboseFilter()->incrementUpdated();
-				}
-				else {
-					$this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					$this->getVerboseFilter()->incrementUpdated();
-				}
-			}
-			else {
-				$this->getVerboseFilter()->skip($user, $currentSynergyId);
-				$this->getVerboseFilter()->incrementSkipped();
-			}
-		//}
-	}
+        //
+        // Pass 2: insert/update into list of users
+        foreach ($parents as $parent) {
+            $this->executeCreateUpdate($parent);
+        }
 
-	/**
-	 * Determine whether the $currentParent is supposed to be listed publicly
-	 *
-	 * @param  $currentParent
-	 * @return bool
-	 */
-	private function isPubliclyListed($currentParent) {
-		if ($currentParent['DirectoryIncludeFlag'] == 0) {
-			return false;
-		}
-
-		return true;
-	}
+        $this->getVerboseFilter()->summary();
+    }
 }
