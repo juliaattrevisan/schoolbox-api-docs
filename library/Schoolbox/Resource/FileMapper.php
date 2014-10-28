@@ -19,7 +19,7 @@ use Schoolbox\StorageMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-class FileMapper extends Mapper implements FileLocatorInterface {
+class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\StorageMapperInterface {
 
 	/**
 	 * @var \Schoolbox\StorageMapper
@@ -235,7 +235,6 @@ class FileMapper extends Mapper implements FileLocatorInterface {
     /**
      * Checks file can be saved and it passes all the required checks
      * @param File $file
-     * @param null $previous
      * @throws \Schoolbox\File\Exception
      */
     protected function preSave(File $file) {
@@ -265,7 +264,7 @@ class FileMapper extends Mapper implements FileLocatorInterface {
      * Setup video processing
      *
      * @param File $file
-     * @param object $previous
+     * @param File $previous
      * @throws \Schoolbox\File\Exception
      */
     protected function postSave(File $file, $previous = null) {
@@ -336,4 +335,33 @@ class FileMapper extends Mapper implements FileLocatorInterface {
             'category' => $nodeId
         ));
     }
+
+
+    /**
+     * Convenience method for creating and saving a file via this mapper.
+     *
+     * @param string $filename     the file's name.
+     * @param string $tempLocation the location of the file to save.
+     * @param int    $userId       the user to associate with the file.
+     * @throws \Schoolbox\File\Exception if the upload was not allowed.
+     * @return FileInterface
+     */
+    public function upload($filename, $tempLocation, $userId)
+    {
+        // check it's not already in SBFS
+        if (preg_match('`^' . $this->getSaveLocation() . '([0-9]+)`', $tempLocation, $matches)) {
+            return $this->findById($matches[1]);
+        }
+
+        /** @var File $file */
+        $file = $this->createModel();
+        $file->setTempFileLocation($tempLocation);
+        $file->setOwner($this->getJoinMapper('user')->createModel()->setId($userId));
+        $file->setFilename($filename);
+        $file->setFilesize(filesize($tempLocation));
+
+        // TODO either rename this method entirely, or find a way to pass enough data thru to persist this object
+        return $file;
+    }
+
 }
