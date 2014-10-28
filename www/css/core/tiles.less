@@ -32,12 +32,18 @@ ul.tileList {
     }
     &.add {
       // Add new tile link looks like a tile
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: @tiles-add-background;
+      &:hover {
+        background-color: @tiles-add-background-hover;
+      }
       .title {
         // its title is just a link in the middle of it
         text-align: center;
         vertical-align: middle;
       }
+    }
+    .btn {
+      margin: 8px 8px 0 0;
     }
     .title {
       // Title: revert spacing back to normal
@@ -51,6 +57,12 @@ ul.tileList {
       box-sizing: border-box;
       &.position-top {
         top: 0;
+      }
+      &.position-middle {
+        // Yes, this works in IE9!
+        top: 50%;
+        left: 50%;
+        .transform(translateX(-50%) translateY(-50%));
       }
       &.position-bottom {
         bottom: 0;
@@ -89,7 +101,7 @@ ul.tileList {
     &.selected {
       // Selected: ensure weight is normal, and add light yellow background
       font-weight: normal;
-      background-color: #ffffcc;
+      background-color: @tiles-selected-background;
     }
     .shape {
       // Shapes for tile shape selector
@@ -117,9 +129,14 @@ ul.tileList {
 }
 
 #tile-modify-form {
-  .title-position, .title-color {
+  .title-position/*, .title-color, .background-color*/ {
     label {
       display: inline;
+    }
+  }
+  .title-color, .background-color {
+    label {
+      min-width: 7em;
     }
   }
 }
