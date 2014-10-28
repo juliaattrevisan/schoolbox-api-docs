@@ -25,6 +25,7 @@ use Schoolbox\Realtime\Rerouter\Filter\FilterException;
 use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Swift_RfcComplianceException;
 
 class QueueSorter implements FilterInterface {
 
@@ -137,6 +138,9 @@ class QueueSorter implements FilterInterface {
 			$this->log->notice("Message dropped: ".$e->getMessage());
 			return true;
 		}
+        catch(Swift_RfcComplianceException $e) {
+            $this->log->warning($e->getMessage());
+        }
 		catch(Exception $e) {
 			$this->log->error(get_class($e) . " occurred during rerouting: " . $e->getMessage(), array($e));
 		}
