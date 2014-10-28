@@ -68,7 +68,7 @@ class RedisQueue implements QueueInterface
 
         foreach ($result as $data) {
             // attempt to unserialize the message
-            $instances[] = Instance::jsonUnserialize(gzuncompress($data));
+            $instances[] = $this->inflate($data);
         }
 
         return $instances;
@@ -119,7 +119,7 @@ class RedisQueue implements QueueInterface
     public function push(Instance $instance)
     {
         $id    = $this->getRedisMsgKey($instance);
-        $data  = gzcompress("$instance", 9);
+        $data  = $this->deflate($instance);
 
         // insert the msg body into storage, with expiry automatically set
         $this->exec("SET", $id, $data);
@@ -191,5 +191,30 @@ class RedisQueue implements QueueInterface
     protected function getRedisSetKey()
     {
         return $this->getInstanceHash() . ':q:' . $this->getName();
+    }
+
+    /**
+     * Prepare an instance for storage.
+     * Inverse of inflate()
+     *
+     * @param Instance $instance
+     * @return string
+     */
+    protected function deflate(Instance $instance)
+    {
+        return gzcompress("$instance", 9);
+    }
+
+
+    /**
+     * Revert an instance from its stored form.
+     * Inverse of deflate()
+     *
+     * @param string $data
+     * @return Instance
+     */
+    protected function inflate($data)
+    {
+        return Instance::jsonUnserialize(gzuncompress($data));
     }
 }
