@@ -22,6 +22,9 @@ use OutOfBoundsException;
  */
 class Builder {
 
+    /** @var bool */
+    protected $validate;
+
 	/** @var array */
 	protected $context;
 
@@ -55,8 +58,11 @@ class Builder {
 
 	/**
 	 * Basic construction
+     *
+     * @param bool $validate optionally build without validation (debug only), if validation fails exception thrown
 	 */
-	public function __construct() {
+	public function __construct($validate = true) {
+        $this->validate = $validate;
 		$this->clear();
 	}
 
@@ -245,15 +251,14 @@ class Builder {
 	/**
 	 * Builds an instance from the construction given
 	 *
-	 * @param bool $validate - optionally build without validation (debug only), if validation fails exception thrown
 	 * @throws OutOfBoundsException
 	 * @throws InvalidArgumentException
 	 * @return Instance
 	 */
-	public function build($validate = true) {
+	public function build() {
 		// check things are right
 
-		if($validate) {
+		if($this->validate) {
 			// mandatory strings
 			$check = array('title', 'icon', 'namespace', 'href');
 
