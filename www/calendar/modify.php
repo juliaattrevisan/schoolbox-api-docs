@@ -129,6 +129,9 @@ else {
 	 */
 	$event = new \Schoolbox\Calendar\Event();
 	$event->setupDates($_GET['date']);
+	if (!$event->getAllDay()) {
+		$event->getEndDateTime()->addHours(1);
+	}
 
 	$defaultTypeId = '';
 	$defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
