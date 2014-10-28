@@ -1,0 +1,66 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Attachment;
+
+
+use Schoolbox\FileInterface;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Browser\NodeFactory;
+
+class GenericZone extends Zone {
+
+    /** @var string */
+    protected $prefix;
+
+
+    /**
+     * @param string $zoneId
+     * @param Mapper $mapper - one that maps a FileInterface model
+     * @param string $prefix - the "hash" prefix, used for determining a file's source
+     */
+    public function __construct($zoneId, $mapper, $prefix = NodeFactory::SBFS)
+    {
+        parent::__construct($zoneId, $mapper);
+        $this->prefix = $prefix;
+    }
+
+
+    /**
+     * This will obviously return the type of whatever mapper you passed in.
+     * Since the returned object will shortly be passed into deriveSitePageVars(), it's
+     * worthwhile using a Mapper than returns FileInterfaces.
+     *
+     * @param string $id
+     * @return FileInterface
+     */
+    protected function findFile($id)
+    {
+        return $this->mapper->findById($id);
+    }
+
+
+    /**
+     * Returns some PHPlibs, based on the File given
+     *
+     * @param FileInterface $file
+     * @return array
+     */
+    protected function deriveSitePageVars($file)
+    {
+        return array(
+            'AZ_FILE_NAME'    => $file->getFilename(),
+            'AZ_FILE_HASH'    => $this->prefix . ':' . $file->getId(),
+            'AZ_FILE_PREVIEW' => '/ajax/mime/' . $file->getMime()
+        );
+    }
+
+
+
+} 

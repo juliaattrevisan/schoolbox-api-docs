@@ -11,10 +11,20 @@ namespace Schoolbox\Resource\Attachment;
 
 
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Storage;
 use Schoolbox\StorageMapper;
+use UnexpectedValueException;
 
+/**
+ * Class Zone
+ *
+ * Used specifically for use with Storage.
+ * If you need a less-specific FileInterface implementation, use GenericZone.
+ *
+ * @package Schoolbox\Resource\Attachment
+ */
 class Zone {
 
     const TPL = 'azTpl';
@@ -40,12 +50,17 @@ class Zone {
     /** @var bool */
     protected $multi;
 
+    /** @var bool */
+    protected $readOnly;
+
     /** @var StorageMapper */
     protected $mapper;
 
+
     /**
      * @param string $zoneId
-     * @param StorageMapper $mapper
+     * @param Mapper $mapper
+     * @throws UnexpectedValueException
      */
     public function __construct($zoneId, $mapper = null)
     {
@@ -57,10 +72,11 @@ class Zone {
             'attachmentsLabel' => 'Attachments',
             'modalTitle'       => 'Select files',
         );
-        $this->mapper   = $mapper ?: StorageMapper::getInstance();
 
+        $this->mapper      = $mapper ?: StorageMapper::getInstance();
         $this->mimeFilter  = '';
         $this->attachments = array();
+        $this->readOnly    = false;
     }
 
 
@@ -72,13 +88,22 @@ class Zone {
     {
         foreach ($hashlist as $hash) {
             try {
-                $this->attachments[$hash] = $this->mapper->findByHash($hash);
+                $this->attachments[$hash] = $this->findFile($hash);
             } catch (Exception $e) {
                 // file given doesn't exist in Storage
-                // TODO maybe look elsewhere?
             }
         }
         return $this;
+    }
+
+
+    /**
+     * @param string $hash
+     * @return Storage
+     */
+    protected function findFile($hash)
+    {
+        return $this->mapper->findByHash($hash);
     }
 
 
@@ -163,13 +188,31 @@ class Zone {
 
 
     /**
+     * @param bool $readOnly
+     * @return $this
+     */
+    public function setReadOnly($readOnly) {
+        $this->readOnly = $readOnly;
+        return $this;
+    }
+
+
+    /**
      * @param \SitePage $page
      * @param string $varname
      */
     public function renderIntoSitePage(\SitePage $page, $varname)
     {
         $page->setFile(self::TPL, 'resources/attachzone.html');
+        $page->setBlock(self::TPL, 'can_drop', 'can_drop_block');
         $page->setBlock(self::TPL, 'attachment_list', 'attachment_list_block');
+        $page->setBlock('attachment_list', 'attachment_editable', 'attachment_editable_block');
+
+        if ($this->readOnly) {
+            $page->setVar('can_drop_block', '');
+        } else {
+            $page->parse('can_drop_block', 'can_drop');
+        }
 
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
@@ -195,22 +238,40 @@ class Zone {
         ));
 
         foreach ($this->attachments as $file) {
+            $page->setVar('attachment_editable_block', '');
+            $page->setVar($this->deriveSitePageVars($file));
 
-            // if it's an image, render it out, otherwise use its mime thumbnail
-            $href = $file->getMimetype()->isImage()
-                ? "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}"
-                : '/ajax/mime/' . $file->getMimetype()->getMime();
+            if (!$this->readOnly) {
+                $page->parse('attachment_editable_block', 'attachment_editable', false);
+            }
 
-            $page->setVar(array(
-                'AZ_FILE_NAME'    => $file->getFilename(),
-                'AZ_FILE_HASH'    => NodeFactory::STORE . ':' . $file->getHash(),
-                'AZ_FILE_PREVIEW' => $href,
-            ));
 
             $page->parse('attachment_list_block', 'attachment_list', true);
         }
 
         $page->parse($varname, self::TPL);
+    }
+
+
+    /**
+     * Returns some PHPlibs, based on the File given
+     *
+     * @param Storage $file
+     * @return array
+     */
+    protected function deriveSitePageVars($file)
+    {
+        // if it's an image, render it out, otherwise use its mime thumbnail
+        $href = $file->getMimetype()->isImage()
+            ? "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}"
+            : '/ajax/mime/' . $file->getMimetype()->getMime();
+
+        return array(
+            'AZ_FILE_NAME'    => $file->getFilename(),
+            'AZ_FILE_HASH'    => NodeFactory::STORE . ':' . $file->getHash(),
+            'AZ_FILE_PREVIEW' => $href,
+        );
+
     }
 
 
