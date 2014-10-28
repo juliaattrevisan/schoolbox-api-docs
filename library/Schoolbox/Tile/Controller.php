@@ -256,12 +256,12 @@ class Controller extends Base
     {
         $item
             ->setTitleText($post['title_text'])
-            ->setTitleColor($post['title_color'])
-            ->setTitleBackgroundColor($post['title_background_color'])
+            ->setTitleColor($post['title_color'] ?: '00000000')
+            ->setTitleBackgroundColor($post['title_background_color'] ?: '00000000')
             ->setTitlePosition($post['title_position'])
             ->setLink($post['link'])
-            ->setBackgroundColor($post['background_color'])
-            ->setHoverColor($post['hover_color']);
+            ->setBackgroundColor($post['background_color'] ?: '00000000')
+            ->setHoverColor($post['hover_color'] ?: '00000000');
 
         // Upload a file if there was one
         if (($upload = $files['background_image']) && empty($upload['error'])) {
