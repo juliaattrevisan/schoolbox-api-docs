@@ -84,8 +84,8 @@
                         return false;
                     }
 
-                    var inner = jsEvent.find('.fc-event-inner')
-                    var title = jsEvent.find('.fc-event-title')
+                    var inner = jsEvent.find('.fc-content')
+                    var title = jsEvent.find('.fc-title')
 
                     // newer fullCalendar implementations escape event title -
                     // we've already done this, so reset the title.
@@ -232,7 +232,7 @@
                             var self = $j(this)
 
                             if(self.prop('checked')) {
-                                self.siblings('.fc-event-title').addClass('strike')
+                                self.siblings('.fc-title').addClass('strike')
                             }
                         })
 
@@ -423,7 +423,7 @@
         c.dom.on('change', 'input[type=checkbox]', function(e) {
 
             var self = $j(this)
-            var ttl = self.siblings('.fc-event-title')
+            var ttl = self.siblings('.fc-title')
             if(self.prop('checked')) {
                 ttl.addClass('strike')
             }
