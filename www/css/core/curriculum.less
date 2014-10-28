@@ -9,15 +9,15 @@
   // This style should be generic to all tabs.
   // There should be a generic ajax-loading style too
   .ui-tabs-panel {
-    transition: background-color 1s;
+    transition: background 1s;
     &.loading {
-      background-color: #77fffe;
+      background-color: @highlight-color;
     }
     &.loaded {
-      background-color: hotpink;
+      background-color: @positive-color;
     }
     &.failed {
-      background-color: #ff3311;
+      background-color: @negative-color;
     }
   }
 }
