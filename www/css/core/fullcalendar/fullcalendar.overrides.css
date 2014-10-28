@@ -9,6 +9,9 @@
 .fc-event:hover {
     text-decoration: underline;
 }
+.fc-event.loading {
+    opacity: 0.5;
+}
 
 .fc-agenda-slots td div {
 	height: 31px;
