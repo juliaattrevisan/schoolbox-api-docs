@@ -3,11 +3,11 @@
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
     <li class="curriculum-node">
+        {{?it.code }}
+        <span class="code">[{{!it.code }}]</span>
+        {{?}}
         {{?it.name }}
         <span class="name">{{!it.name }}</span>
-        {{?}}
-        {{?it.code }}
-        <span class="code">{{!it.code }}</span>
         {{?}}
         {{=it.description }}
     </li>
