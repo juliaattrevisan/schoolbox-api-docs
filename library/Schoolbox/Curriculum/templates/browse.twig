@@ -119,7 +119,7 @@
 
             // resizer - stolen from three panel
             var resizePanels = function() {
-                $().add(formPanel).add(treePanel).height(
+                $().add(formPanel).add(treePanel).outerHeight(
                     $(window).height() - $('#header').height() - $('#footer').height() - 50
                 );
             };
