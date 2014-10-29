@@ -15,6 +15,7 @@ use Alaress_Curl_Url;
 use Alaress_Date_Format;
 use DateTime;
 use EasyRdf_Sparql_Client;
+use Html2Text\Html2Text;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
@@ -29,6 +30,11 @@ class Browser extends Source\BrowserAbstract
     protected $client;
 
     /**
+     * @var Html2Text
+     */
+    protected $htmlConverter;
+
+    /**
      * Post-construct hook - creates a SPARQL client for the Australian Curriculum.
      */
     public function setup()
@@ -36,6 +42,7 @@ class Browser extends Source\BrowserAbstract
         $this->setClient(
             new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/sparql')
         );
+        $this->setHtmlConverter(new Html2Text());
     }
 
     /**
@@ -249,8 +256,9 @@ SPARQL
                 break;
         }
 
-        // There shouldn't be HTML in the name.
-        $node->setName(strip_tags($node->getName()));
+        // Convert the name from HTML to text
+        $this->getHtmlConverter()->set_html($node->getName());
+        $node->setName($this->getHtmlConverter()->get_text());
 
         // Set the timetable code if there is one
         if ($json->asn_statementNotation && $json->asn_statementNotation->literal) {
@@ -283,5 +291,23 @@ SPARQL
     public function getClient()
     {
         return $this->client;
+    }
+
+    /**
+     * @return Html2Text
+     */
+    public function getHtmlConverter()
+    {
+        return $this->htmlConverter;
+    }
+
+    /**
+     * @param  Html2Text $htmlConverter
+     * @return $this
+     */
+    public function setHtmlConverter($htmlConverter)
+    {
+        $this->htmlConverter = $htmlConverter;
+        return $this;
     }
 }
