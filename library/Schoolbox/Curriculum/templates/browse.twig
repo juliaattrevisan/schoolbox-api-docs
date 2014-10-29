@@ -209,6 +209,7 @@
         Also consider making these selectors selectized so I can add dynamically
         -->
         {{? !it.id && !it.parent }}
+        <h1>Create New Curriculum</h1>
         <dl>
             <dt>Curriculum</dt>
             <dd>
@@ -235,6 +236,14 @@
             </dd>
         </dl>
         {{?}}
+
+        {{? it.id }}
+        <h1>Edit Curriculum Subsection</h1>
+        {{?}}
+        {{? !it.id && it.parent }}
+        <h1>Create New Curriculum Subsection</h1>
+        {{?}}
+
         <dl>
             <dt>Name</dt>
             <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
@@ -253,15 +262,13 @@
         </dl>
         {{? it.id }}
             <input type="submit" class="submit-btn-plain" value="Save Changes" />
-            <input type="submit" class="submit-btn-plain" value="Add Child" id="create-child-button" />
+            <input type="submit" class="submit-btn-plain" value="Add New Subsection" id="create-child-button" />
         {{?}}
-        {{? !it.id }}
-            {{? it.parent }}
-                <input type="submit" class="submit-btn-plain" value="Create Subsection" />
-            {{?}}
-            {{? !it.parent }}
-                <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
-            {{?}}
+        {{? !it.id && it.parent }}
+            <input type="submit" class="submit-btn-plain" value="Create Subsection" />
+        {{?}}
+        {{? !it.id && !it.parent }}
+            <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
         {{?}}
         {{? it.actions.delete }}
             <input type="submit"
