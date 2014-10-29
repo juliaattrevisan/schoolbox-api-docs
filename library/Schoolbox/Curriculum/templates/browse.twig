@@ -104,8 +104,14 @@
                                 data.item
                             );
                         })
+                        .fail(function(jqXhr, textStatus, error) {
+                            formPanel.addClass('failed');
+                        })
                         .always(function() {
                             formPanel.removeClass('loading');
+                            setTimeout(function() {
+                                formPanel.removeClass('loaded failed');
+                            }, 2000)
                         });
                 })
 
@@ -139,6 +145,7 @@
                     .done(function(data) {
                         // Is this a newly created node? If so, add it in.
                         // jsTree has no comprehensive updateNode, so update what I can.
+                        formPanel.addClass('loaded');
                         if (jstree.get_node(data.item.id)) {
                             jstree.rename_node(data.item.id, data.tree.text);
                         } else {
@@ -147,9 +154,15 @@
                             jstree.select_node(data.tree.id);
                         }
                     })
+                    .fail(function(jqXhr, textStatus, error) {
+                        formPanel.addClass('failed');
+                    })
                     .always(function() {
                         formPanel.removeClass('loading')
                             .find(':input').prop('disabled', false);
+                        setTimeout(function() {
+                            formPanel.removeClass('loaded failed');
+                        }, 2000)
                     });
             });
 
@@ -174,8 +187,12 @@
                     url:      this.action
                 })
                     .done(function(data) {
+                        formPanel.addClass('loaded');
                         jstree.delete_node(data.item.id);
                         jstree.select_node(data.tree.parent);
+                    })
+                    .fail(function(jqXhr, textStatus, error) {
+                        formPanel.addClass('failed');
                     })
                     .always(function() {
                         formPanel.removeClass('loading')
