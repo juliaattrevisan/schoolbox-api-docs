@@ -500,11 +500,16 @@
             </select>
 
             <!-- BEGIN gradegroup_explanation -->
-            <ul class="gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
+            <table class="table gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
+                <tbody>
                 <!-- BEGIN gradegroup_explanation_level -->
-                <li>{GRADEGROUP_LEVEL_LOWER_BOUND}+: {GRADEGROUP_LEVEL_CAPTION}</li>
+                <tr>
+                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
+                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
                 <!-- END gradegroup_explanation_level -->
-            </ul>
+                </tr>
+                </tbody>
+            </table>
             <!-- END gradegroup_explanation -->
         </td>
     </tr>
