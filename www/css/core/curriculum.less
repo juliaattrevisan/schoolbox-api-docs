@@ -4,7 +4,7 @@
  * Styles that relate to the curriculum mapping feature.
  */
 
-/** TODO change these Steve colors **/
+// The curriculum importer
 .curriculum-import-widget {
   // This style should be generic to all tabs.
   // There should be a generic ajax-loading style too
@@ -25,10 +25,25 @@
  * Curriculum nodes: these should be generic too
  */
 .curriculum-node {
-  .name {
-    font-weight: bolder;
+  font-weight: bolder;
+//  .name {
+//    font-weight: bolder;
+//  }
+//  .code {
+//    font-weight: bolder;
+//  }
+}
+
+/**
+ * Curriculum browser
+ */
+.curriculum-browser {
+  // These should be generic styles for all jstrees
+  .jstree-node {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .code {
-    font-weight: bolder;
+  .jstree-anchor {
+    display: inline;
   }
 }
