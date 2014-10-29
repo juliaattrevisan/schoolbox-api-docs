@@ -18,6 +18,17 @@
             var levels    = {{ levels|json_encode|raw }};
             var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
 
+            // add classes to tree, because jstree doesn't allow me to define
+            // a base style for trees
+            var tree = {{ tree|json_encode|raw }}.map(function(row) {
+                try {
+                    row.li_attr.class += ' curriculum-node';
+                } catch (e) {
+                    row.li_attr.class = 'curriculum-node';
+                }
+                return row;
+            });
+
             // Method for building the form
             // Tears down and sets up TinyMCE dynamically too
             var buildForm = function(actions, data) {
@@ -37,7 +48,7 @@
             var tree      = $('#browser').jstree({
                 core: {
                     animation: 50,
-                    data: {{ tree|json_encode|raw }},
+                    data: tree,
                     force_text: true,
                     multiple: false,
                     check_callback: true,
@@ -65,6 +76,7 @@
                 }
             })
                 .on('select_node.jstree', function(event, jstree) {
+                    // Open a node when you select it
                     jstree.instance.open_node(jstree.node.id);
                 })
                 .on('ready.jstree', function(event, jstree) {
