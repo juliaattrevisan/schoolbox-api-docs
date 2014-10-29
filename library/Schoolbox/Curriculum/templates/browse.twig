@@ -43,9 +43,9 @@
             };
 
             var template  = doT.template($('script#node-template').html().trim());
-            var treePanel = $('#category-window');
-            var formPanel = $('#detail-window');
-            var tree      = $('#browser').jstree({
+            var treePanel = $('.curriculum-selector');
+            var formPanel = $('.curriculum-editor');
+            var tree      = $('.curriculum-tree').jstree({
                 core: {
                     animation: 50,
                     data: tree,
@@ -109,11 +109,11 @@
                         });
                 })
 
-            var jstree = $.jstree.reference('#browser');
+            var jstree = $.jstree.reference('.curriculum-tree');
 
             // resizer - stolen from three panel
             var resizePanels = function() {
-                $('#category-window, #detail-window').height(
+                $().add(formPanel).add(treePanel).height(
                     $(window).height() - $('#header').height() - $('#footer').height() - 50
                 );
             };
@@ -280,8 +280,7 @@
 
 <div class="template2 curriculum-browser">
     <div class="left">
-        <div id="category-window">
-            <div class="loading"></div>
+        <div class="pane curriculum-selector">
             <table id="category-head" class="table">
                 <thead>
                     <tr>
@@ -299,12 +298,12 @@
                 </thead>
             </table>
             <div class="scroller">
-                <div id="browser"></div>
+                <div class="curriculum-tree"></div>
             </div>
         </div>
     </div>
     <div class="right">
-        <div id="detail-window">
+        <div class="pane curriculum-editor">
         </div>
     </div>
 </div>
