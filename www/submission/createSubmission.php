@@ -76,21 +76,20 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $title            = 'Modify Due Work';
     $heading          = 'Modify';
 
-	try {
-		$submission = $mapper->findById($submission_id);
-	}
-	catch (\Exception $e) {
-		error(17);
-	}
+    try {
+        $submission = $mapper->findById($submission_id);
+    } catch (\Exception $e) {
+        error(17);
+    }
 
     $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
     $task_id          = $submission->getTask()->getId();
     $is_task          = (bool)$task_id;
     $task_instance_id = $submission->getTaskInstance()->getId();
 
-	/* Allow deletion of the submission box from modify screen
+    /* Allow deletion of the submission box from modify screen
 	 */
-	$this->parse('delete_button_block', 'delete_button');
+    $this->parse('delete_button_block', 'delete_button');
 
     // collate attachments
     $boxFileMapper = SubmissionBox\FileMapper::getInstance();
@@ -101,11 +100,10 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     $zone->attachFiles($storages->getColumnValues('hash'));
 
-}
-elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-	$this->setVar(array(
-		'delete_button_block' => ''
-	));
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+    $this->setVar(array(
+        'delete_button_block' => ''
+    ));
 
     // IF NEW
     // Args:
@@ -138,8 +136,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         /** @var \Schoolbox\Assessment\Course\UnitInstance $unit */
         try {
             $unit = UnitInstanceMapper::getInstance()->findByIdAndCategoryId($unit_id, $category_id);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             error(2);
         }
 
@@ -173,8 +170,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     if (!empty($this->arg[3])) {
         $submission->setWorkType(SubmissionBox\WorkTypeMapper::getInstance()->findById($this->arg[3]));
     }
-}
-else {
+} else {
     error(2);
 }
 
@@ -235,8 +231,7 @@ $widgets->outputVisibilityDropdown($this, $submission->getMarkVisibility());
 $mark_type = $submission->getMarkType()->getId();
 if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
     $this->setVar('marktype_block', '');
-}
-else {
+} else {
     $this->dropdown('marktype_drop', $mark_types, $mark_type, 'marktype', array(
         'name' => 'MARKTYPE_TEXT',
         'id'   => 'MARKTYPE_VALUE',
@@ -262,8 +257,8 @@ else {
             $results     = $rubric->getResults();
             $resultCount = $rubric->getResultCount();
         }
+    } catch (Exception $e) {
     }
-    catch (Exception $e) {}
     outputResultSets($this, $resultSetID, $resultCount);
     outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
     if ($is_task) {
@@ -287,8 +282,7 @@ $late_date = $submission->getLateDate();
 if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
     $open_hour = '';
     $open_min  = '';
-}
-else {
+} else {
     $open_hour = $open_date->getUsingFormat('g');
     $open_min  = $open_date->getUsingFormat('i');
 }
@@ -296,8 +290,7 @@ else {
 if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
     $due_hour = '';
     $due_min  = '';
-}
-else {
+} else {
     $due_hour = $due_date->getUsingFormat('g');
     $due_min  = $due_date->getUsingFormat('i');
 }
@@ -305,8 +298,7 @@ else {
 if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
     $late_hour = '';
     $late_min  = '';
-}
-else {
+} else {
     $late_hour = $late_date->getUsingFormat('g');
     $late_min  = $late_date->getUsingFormat('i');
 }
@@ -354,16 +346,17 @@ $this->setVar($output);
 
 
 
-function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2) {
+function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2)
+{
     $rubricHandler = new DueWork_Rubric_Handler();
     $rs = $rubricHandler->getResultSets();
 
     $page->setVar('resultset_block', '');
 
-    if(count($rs)) {
-        foreach($rs as $i => $set) {
+    if (count($rs)) {
+        foreach ($rs as $i => $set) {
             $page->setVar('result_block', '');
-            foreach($set as $item) {
+            foreach ($set as $item) {
                 $page->setVar(array(
                     'RS_ID'           => $i,
                     'RS_RESULT_LABEL' => $item,
@@ -412,11 +405,11 @@ function outputCriteria(
     // get rubric details
     /** @var \Schoolbox\Collection|Criterion[] $criterionCollection */
     $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
-                                          array(
+        array(
                                               'parent_id'   => $catID,
                                               'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
                                           ),
-                                              array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+        array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
     );
 
     $page->setVar(
@@ -430,8 +423,7 @@ function outputCriteria(
     $page->setVar('rubric_type_label_block', '');
     if ($is_for_task) {
         $page->parse('rubric_type_label_block', 'rubric_type_label');
-    }
-    else {
+    } else {
         $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
     }
 
@@ -467,18 +459,17 @@ function outputCriteria(
                         'CRIT_INPUT_VALUE' => $descriptor->getDescription(),
                         'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
                     ));
-                    $page->parse('crit_input_block','crit_input', true);
+                    $page->parse('crit_input_block', 'crit_input', true);
                 }
-            }
-            // disply blank inputs, they weren't used
+            } // disply blank inputs, they weren't used
             else {
                 for ($i = 0; $i < $descriptorCount; ++$i) {
                     $page->setVar('CRIT_INPUT_VALUE', '');
                     $page->setVar('CRIT_INPUT_WEIGHT', $i);
-                    $page->parse('crit_input_block','crit_input', true);
+                    $page->parse('crit_input_block', 'crit_input', true);
                 }
             }
-            $page->parse('criterion_block','criterion', true);
+            $page->parse('criterion_block', 'criterion', true);
 
             $currentGrouping = $criterion->getGrouping();
         }
@@ -491,4 +482,3 @@ function outputCriteria(
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
 }
-
