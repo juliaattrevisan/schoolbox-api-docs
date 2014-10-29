@@ -284,7 +284,7 @@
             placeholderText    = 'Enter descriptor';
 
 
-        rc.on('click', inputSelector, function () {
+        rc.on('focus', inputSelector, function () {
             var input = $(this);
 
             rc.find(critSelector + ', ' + descriptorSelector)
