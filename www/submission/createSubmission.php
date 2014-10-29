@@ -9,6 +9,7 @@ $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 // Instead of all this block BS I'll create a sub-template
 $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
 $this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
+$this->setBlock('rubricTpl', 'no_crit_group', 'no_crit_group_block');
 $this->setBlock('rubricTpl', 'crit_group', 'crit_group_block');
 $this->setBlock('crit_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
@@ -435,15 +436,18 @@ function outputCriteria(
     }
 
     $page->setVar(array(
-        'crit_group_block' => 'No criteria available',
+        'no_crit_group_block' => '',
+        'crit_group_block' => '',
         'criterion_block' => ''
     ));
 
+    $hasCritGroup = false;
     if ($criterionCollection->count()) {
         $currentGrouping = $criterionCollection->first()->getGrouping();
 
         foreach ($criterionCollection as $criterion) {
             if ($criterion->getGrouping() != $currentGrouping) {
+                $hasCritGroup = true;
                 $page->parse('crit_group_block', 'crit_group', true);
                 $page->setVar('criterion_block', '');
             }
@@ -480,7 +484,9 @@ function outputCriteria(
         }
         $page->parse('crit_group_block', 'crit_group', true);
     }
-
+    if (!$hasCritGroup) {
+        $page->parse('no_crit_group_block', 'no_crit_group');
+    }
 
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
