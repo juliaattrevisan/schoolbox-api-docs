@@ -246,33 +246,6 @@ a{
     -moz-border-radius: 7px 0px 0px 0px;
 	padding: 15px;
 }
-#content {
-	padding: 0;
-	float: left;
-	width: 100%;
-}
-#infoPanel {
-	float: right;
-	margin: 14px 0;
-}
-#infoPanel li {
-	float: left;
-	color: #fff;
-	font-size: 12px;
-	margin-left: 10px;
-	padding-left: 11px;
-	background: url(/images/mggs/header-div.gif) no-repeat 0 50%;
-}
-#infoPanel li.first {
-	background: 0;
-    color: #3f3f3f;
-    margin-top: 5px;
-}
-#infoPanel a {
-	color: #002e52;
-    text-decoration: underline;
-}
-
 #nav {
 	width: 161px;
 	margin: 15px 0 0 15px;
@@ -290,23 +263,6 @@ a{
 	font-size:12px;
 	height:29px;
 }
-
-#infoPanel li a#logout{
-    background: url(/images/mggs/logout.png) top left no-repeat;
-    display: block;
-    width: 56px;
-    height: 19px;
-    font-weight: bold;
-    padding-top: 5px;
-    text-align: center;
-    text-decoration: none;
-}
-
-#infoPanel li a#logout:hover{
-    background: url(/images/mggs/logout.png) bottom left no-repeat;
-    text-decoration: underline;
-}
-
 #header #search-button{
     background: url("/images/core/icons/search.png") no-repeat 50% 50%;
     border: 0;
@@ -315,27 +271,16 @@ a{
     height: 30px;
     width: 30px;
 }
-#search-button{
-	width:auto; border:0 none; height:auto;	
-}
-
 #search{background:none; height:auto;}
 #search-field{
     background:#fff;
     border: 1px solid #ccdceb;
-    height:auto;
     border:none;
     color: #003a6c;
-    line-height:12px;
-    width:227px;
-    font-size:12px;
-    height:32px;
-    line-height:22px;
-    margin-left:35px;
     border: 1px solid #e3e3e3;
     font-weight:bold;
-    -webkit-box-shadow: inset 0px 0px 5px 2px #e3eaed;
-    box-shadow: inset 0px 0px 5px 2px #e3eaed;
+    -webkit-box-shadow: inset 0px 0px 5px 2px #e8eef0;
+    box-shadow: inset 0px 0px 5px 2px #e8eef0;
 }
 
 #nav ul {	
@@ -451,17 +396,17 @@ li p.interact {
 	clear: right;
 }
 
-#tabs {
+#header #tabs {
 	bottom: 0;
 	right: 16px;
+    z-index: 1;
 }
-#tabs li {
+#header #tabs li {
 	float: right;
 	position: relative;
-	z-index: 5;
     margin-right: 0;
 }
-#tabs li a  {
+#header #tabs li a  {
 	background: 0;
     color: #fff;
     border: 0;
@@ -473,7 +418,7 @@ li p.interact {
 	font-size:12px;
 	line-height:31px;
 }
-#tabs li a span {
+#header #tabs li a span {
     background: url(/images/mggs/nav-bg.png) 0px 0px repeat;
     border-right: 1px solid #003a6c;
     border-left: 1px solid #1088d9;
@@ -482,21 +427,21 @@ li p.interact {
 	float: left;
     padding: 0 12px;
 }
-#tabs li a span:hover {
+#header #tabs li a span:hover {
     background: url(/images/mggs/nav-bg.png) 0px -30px repeat;
 }
-#tabs li a span.first {
+#header #tabs li a span.first {
     background: url(/images/mggs/nav-bg.png) 0px -60px repeat;
     border-left: none;
 }
-#tabs li a span.first:hover {
+#header #tabs li a span.first:hover {
     background: url(/images/mggs/nav-bg.png) 0px -90px repeat;
 }
-#tabs li a span.last {
+#header #tabs li a span.last {
     background: url(/images/mggs/nav-bg.png) 0px -120px repeat;
     border-right: none;
 }
-#tabs li a span.last:hover {
+#header #tabs li a span.last:hover {
     background: url(/images/mggs/nav-bg.png) 0px -150px repeat;
 }
 #header #tabs li.navthis a {
@@ -517,7 +462,7 @@ li p.interact {
 #header #tabs li.navthis {
 	z-index: 10;
 }
-#tabs li a:hover  {
+#header #tabs li a:hover  {
 	background: 0;
 	color: #fff;
 }
@@ -603,60 +548,6 @@ ul.js_happening li:nth-child(odd){
 .calendar-controls .filter-change.week span{ background-image: url(/images/mggs/calendar-week.png) !important; }
 .calendar-controls .filter-change.month span{ background: url(/images/mggs/calendar-click.png) no-repeat; background-position: 0px 0px !important;}*/
 
-
-
-/*****************************************
-	LOGIN
-*****************************************/
-#loginForm label {
-    width: 105px;
-}
-
-.mggs-login #container {
-	margin: 0;
-	padding: 0;
-	background:#fff;
-}
-.mggs-login #content {
-	background: url(/images/mggs/login-bg.png) no-repeat;
-	height: 437px;
-}
-#evi {
-	margin: 127px 0 0 360px;
-	width: 287px;
-}
-#evi h1 {
-	font-size: 20px;
-	border: 0;
-	margin: 0 0 0.5em 0;
-}
-#evi form {
-	border-top: 1px dashed #d8d8d8;
-	padding-top: 20px;
-	margin-top: 30px;
-}
-#evi #loginForm fieldset input {
- 	width: 170px;
-}
-#evi .login {
-	float: right;
-}
-#evi .forgotten {
-	float: left;
-	font-size: 11px;
-	line-height: 25px;
-	margin: 0;
-}
-p.important {
-	color: #f00;
-}
-.admin-contents h2{margin-bottom:8px;}
-.admin-contents h2 span a{color:#000;}
-
-
-.cal-bubble .middle{border-color:#245398}
-.cal-bubble .bottom{border-right-color:#245398}
-.cal-bubble .middle .close{background:#245398; color:#fff;}
 /*************************
 
 Library
