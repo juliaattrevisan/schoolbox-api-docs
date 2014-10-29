@@ -1,5 +1,19 @@
 @charset "utf-8";
 
+// Here's a basic mixin for loading/loaded/failed
+.ajax-loading() {
+  transition: background 1s;
+  &.loading {
+    background-color: @highlight-color;
+  }
+  &.loaded {
+    background-color: @positive-color;
+  }
+  &.failed {
+    background-color: @negative-color;
+  }
+}
+
 /**
  * Styles that relate to the curriculum mapping feature.
  */
@@ -9,16 +23,7 @@
   // This style should be generic to all tabs.
   // There should be a generic ajax-loading style too
   .ui-tabs-panel {
-    transition: background 1s;
-    &.loading {
-      background-color: @highlight-color;
-    }
-    &.loaded {
-      background-color: @positive-color;
-    }
-    &.failed {
-      background-color: @negative-color;
-    }
+    .ajax-loading();
   }
 }
 /**
@@ -62,4 +67,5 @@
  */
 .curriculum-editor {
   padding: 12px;
+  .ajax-loading();
 }
