@@ -156,6 +156,25 @@ if(is_array($optionList)) {
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
+                case 'selectLookup':
+                    $this->setVar('setting_select_block', '');
+                    // options: expected to contain mapper
+                    $lookupOptions  = unserialize($option['options']);
+                    $mapper         = call_user_func(array($lookupOptions['mapper'], 'getInstance'));
+                    $getKeyMethod   = $lookupOptions['getKeyMethod']   ?: 'getId';
+                    $getValueMethod = $lookupOptions['getValueMethod'] ?: 'getName';
+                    $findMethod     = $lookupOptions['findMethod']     ?: 'findAll';
+                    foreach (call_user_func(array($mapper, $findMethod)) as $opt) {
+                        $key   = $opt->$getKeyMethod();
+                        $value = $opt->$getValueMethod();
+                        $this->setVar('SELECT_VALUE', $key);
+                        $this->setVar('SELECT_OPTION', $value);
+                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $key ? 'selected="selected"' : '');
+                        $this->parse('setting_select_block', 'setting_select', true);
+                    }
+                    $this->parse('setting_type_input_block', 'setting_type_select', true);
+                    break;
+
                 case 'checkbox':
                     $this->parse('setting_type_input_block', 'setting_type_checkbox', true);
                     break;
