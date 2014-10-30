@@ -35,6 +35,7 @@
             li.removeClass('new-item');
             li.find('code').removeClass('prompt');
             li.parent('ul').append(newli);
+            newli.find(':input:visible:first').focus();
         });
         $j(document).on('click', '#add-set', function(e) {
             e.preventDefault();
