@@ -52,7 +52,8 @@ class SessionValidator {
             throw new SessionException("No sessionID provided on which to search.");
         }
 
-        $redisResponse = $this->checkRedis($sessionId, 2);
+        $redisCommand  = $this->redis->createCommand('get', array(PipeManager::REDIS_SESSION_PREFIX . $sessionId));
+        $redisResponse = $this->redis->executeCommand($redisCommand);
 
         if (!$redisResponse) {
             throw new SessionException("No session found for given session key.");
@@ -79,31 +80,4 @@ class SessionValidator {
         }
     }
 
-
-    /**
-     * Recursively attempt to solicit a response from Redis, which may have gone to sleep
-     *
-     * @param string $sessionId
-     * @param int $retries
-     * @return mixed
-     * @throws CommunicationException
-     */
-    protected function checkRedis($sessionId, $retries = 0) {
-        try {
-            $redisCommand  = $this->redis->createCommand('get', array(PipeManager::REDIS_SESSION_PREFIX . $sessionId));
-            return $this->redis->executeCommand($redisCommand);
-        }
-        catch(CommunicationException $e) {
-            // redis timed out, this attempt should have reawoken it
-
-            if($retries <= 0) {
-                // if we've run out of retries, rethrow the exception
-                throw $e;
-            }
-
-            // recurse
-            return $this->checkRedis($sessionId, $retries - 1);
-        }
-
-    }
 } 
