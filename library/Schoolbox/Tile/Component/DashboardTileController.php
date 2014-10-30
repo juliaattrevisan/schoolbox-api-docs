@@ -42,16 +42,14 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
-     * @param GroupHandler       $group
      */
     public function __construct(
         Component_Instance $instance,
         User $user,
-        SitePage $sitepage,
-        GroupHandler $group
+        SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->groupHandler = $group;
+        $this->groupHandler = new GroupHandler();
         $this->delegate = new TileControllerDelegate();
     }
 
