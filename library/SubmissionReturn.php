@@ -190,12 +190,16 @@ class SubmissionReturn extends DeprecatedModel
 
     /**
      * @param float $mark
-     * @param int $gradeGroupId The grade group to fetch from
+     * @param int $gradeGroupId The grade group to fetch from.
+     *                          defaults to config default_grade_group.
      *
      * @return array|bool
      */
-    function getLetterGradeByValue($mark, $gradeGroupId = 1)
+    function getLetterGradeByValue($mark, $gradeGroupId = null)
     {
+        if (!isset($gradeGroupId)) {
+            $gradeGroupId = Config::get('default_grade_group');
+        }
         $query = "
             SELECT * FROM submission_grade
             WHERE lower_bound <= '{$this->db->quote($mark)}'
@@ -312,11 +316,11 @@ class SubmissionReturn extends DeprecatedModel
      *
      * @param float $percentage
      * @param int   $gradeGroupId The grade group to fetch from.
-     *                            If not provided, defaults to group 1.
+     *                            Defaults to config default_grade_group
      *
      * @return string
      */
-    function percent2letter($percentage, $gradeGroupId = 1)
+    function percent2letter($percentage, $gradeGroupId = null)
     {
         $letterArray = $this->getLetterGradeByValue($percentage, $gradeGroupId);
         return $this->shortenGrade($letterArray['caption']);
