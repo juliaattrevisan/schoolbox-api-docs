@@ -35,8 +35,19 @@ class Marksheet_Letter extends Marksheet_Abstract
         if ($rawMark === null) {
             $rawMark = -1;
         }
-        $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
-        return $grade['caption'];
+        // use extra_params if they were set, what a mess
+        $params = $this->getExtraParams();
+        if (!empty($params['gradeGroup'])) {
+            $result = array();
+            foreach ($params['gradeGroup'] as $gradeGroup) {
+                $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark, $gradeGroup);
+                $result[] = $grade['caption'];
+            }
+            return implode(' / ', $result);
+        } else {
+            $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
+            return $grade['caption'];
+        }
     }
 
     public function outputUI(SitePage $page, $mark)
