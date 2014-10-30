@@ -18,26 +18,27 @@
              */
             var addGrade = function(gradeGroup) {
                 // Get the grade ID out of the container
-                var groupId = gradeGroup.data('groupid');
-                gradeGroup.find('.gradeList').append(
-                    gradeTemplate({
-                        id: 'new-'+String(newGradeId++),
-                        group: {
-                            id: groupId
-                        }
-                    })
-                );
+                var groupId  = gradeGroup.data('groupid');
+                var newGrade = $(gradeTemplate({
+                    id: 'new-'+String(newGradeId++),
+                    group: {
+                        id: groupId
+                    }
+                }));
+                gradeGroup.find('.gradeList').append(newGrade);
+                return newGrade;
             };
 
             /**
              * Adds a new grade group, and a new grade entry to that group.
              */
             var addGroup = function() {
-                var newGroup  = $(groupTemplate({
+                var newGroup = $(groupTemplate({
                     id: 'new-'+String(newGroupId++)
                 }));
                 addGrade(newGroup);
                 form.find('#gradeGroupList').append(newGroup);
+                return newGroup;
             };
 
             // Add a new grade entry to each group, and a new empty group.
@@ -64,7 +65,8 @@
                         .find('input[name$="[caption]"]')
                         .filter(':last');
                     if (element.is(lastCaption)) {
-                        addGrade(group);
+                        // Focus on the newly created element
+                        addGrade(group).find(':input:visible:first').focus();
                     }
                 }
             });
