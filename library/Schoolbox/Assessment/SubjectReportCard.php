@@ -175,7 +175,7 @@ class SubjectReportCard {
 			}
 			if (empty($gradeGroups)) {
 				// No grade groups: just show whatever the standard is.
-				$gradeGroups[] = 1;
+				$gradeGroups[] = \Config::get('default_grade_group');
 			}
 			$gradeGroups = array_unique($gradeGroups);
 			sort($gradeGroups);
