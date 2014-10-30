@@ -10,6 +10,7 @@
 namespace Alaress\Mail;
 
 
+use Alaress\Exception\IO\IOException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -23,6 +24,9 @@ use Swift_SwiftException;
 use Swift_Transport;
 
 abstract class AbstractMailer implements IMailer {
+
+    const MAX_RETRIES   = 4;
+    const RETRY_TIMEOUT = 1;
 
 	/**
 	 * Instance of mail transporter.
@@ -168,12 +172,13 @@ abstract class AbstractMailer implements IMailer {
 	protected abstract function composePlain();
 
 
-	/**
-	 * Attempts to send the email constructed by this class. Returns mailing success or failure.
-	 *
-	 * @param string $to
-	 * @return bool
-	 */
+    /**
+     * Attempts to send the email constructed by this class. Returns mailing success or failure.
+     *
+     * @param string $to
+     * @throws Swift_SwiftException
+     * @return bool
+     */
 	public function send ($to = "") {
 
 		if ( !empty( $to ) ) {
@@ -187,17 +192,44 @@ abstract class AbstractMailer implements IMailer {
 			$this->email->getHeaders()->addTextHeader($name, $value);
 		}
 
-		// create transport and send email
-		try {
-			$mailer = Swift_Mailer::newInstance(self::getSwiftTransport());
-			$this->configureSwiftMailer($mailer);
-			$mailer->send($this->email);
-		}
-		catch (Swift_SwiftException $ex) {
-			return false;
-		}
-		return true;
+        try {
+            return $this->trySend(self::MAX_RETRIES);
+        } catch (IOException $e) {
+            return $this->trySend();
+        } catch (Swift_SwiftException $e) {
+            throw new Swift_SwiftException("Failed to send email", $e->getCode(), $e);
+        }
 	}
+
+
+    /**
+     * @param int  $retries
+     * @param bool $reinitialise
+     * @throws \Exception
+     * @return bool
+     */
+    private function trySend($retries = 0, $reinitialise = false)
+    {
+        // create transport and send email
+        try {
+            $mailer = Swift_Mailer::newInstance(self::getSwiftTransport($reinitialise));
+            $this->configureSwiftMailer($mailer);
+
+            $mailer->send($this->email);
+        }
+        catch (\Exception $e) {
+            // this means "mail server went away"
+            if ($retries <= 0) {
+                throw $e;
+            }
+
+            sleep(self::RETRY_TIMEOUT);
+
+            return $this->trySend($retries - 1, true);
+        }
+
+        return true;
+    }
 
 
 	/**
