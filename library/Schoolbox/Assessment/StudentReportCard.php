@@ -389,15 +389,19 @@ class StudentReportCard
             $trendDir = '';
         }
         $returnHandler = new \SubmissionReturn();
+
+        // Try to get all grade groups out of the subject data.
+        $gradeAverageLabel = array();
+        foreach ($gradeAvg['groups'] as $gradeGroup) {
+            $gradeAverageLabel[] = $returnHandler->percent2letter($gradeAvg['grade'], $gradeGroup);
+        }
         $page->setVar(
             array(
                 'SUBJ_GRADEIENT'   => (isset($gradeAvg['grade']) ? (int)($gradeAvg['grade'] / 10) : ''),
-                'SUBJ_GRADE_AVG'   => $returnHandler->percent2letter($gradeAvg['grade']),
-                'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0 ? sprintf(
-                        "%0.1f%% %s",
-                        $gradeAvg['trend'],
-                        $trendDir
-                    ) : ''
+                'SUBJ_GRADE_AVG'   => implode(' / ', $gradeAverageLabel),
+                'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0
+                    ? sprintf("%0.1f%% %s", $gradeAvg['trend'], $trendDir)
+                    : ''
             )
         );
         $page->parse('grade_average_block', 'grade_average');
