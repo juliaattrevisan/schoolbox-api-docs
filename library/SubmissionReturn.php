@@ -314,13 +314,14 @@ class SubmissionReturn extends DeprecatedModel
      *  - 'Credit' becomes 'CR'
      *  - 'High Distinction' becomes 'HD'
      *
-     * @param float $percentage
-     * @param array $gradeGroupIds The grade groups to turn to a letter grade.
-     *                             Defaults to config default_grade_group
+     * @param float  $percentage
+     * @param array  $gradeGroupIds The grade groups to turn to a letter grade.
+     *                              Defaults to config default_grade_group
+     * @param string $separator
      *
      * @return string
      */
-    function percent2letter($percentage, $gradeGroupIds = array())
+    function percent2letter($percentage, $gradeGroupIds = array(), $separator = ' / ')
     {
         $letterArrays = array();
         if (empty($gradeGroupIds)) {
@@ -334,7 +335,7 @@ class SubmissionReturn extends DeprecatedModel
         foreach ($letterArrays as $letterArray) {
             $results[] = $this->shortenGrade($letterArray['caption']);
         }
-        return implode(' / ', $results);
+        return implode($separator, $results);
     }
 
     /**
