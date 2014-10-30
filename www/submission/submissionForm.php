@@ -89,7 +89,6 @@ $useDescriptors = $resultSetID == 0;
 SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
 
 if (isset($_POST['attachment'])) {
-
 //    var_dump($_POST['attachment']);
 
     $factory = new CollectorFactory();
@@ -189,6 +188,7 @@ $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
 $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
+$submission->getGradeGroup()->setId($_POST['gradegroup']);
 $submission->setRubricResultSet($resultSetID ?: 0);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);

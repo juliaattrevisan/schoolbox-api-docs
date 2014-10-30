@@ -87,6 +87,8 @@ class Marksheet {
 	protected $statisticDataSet = array();
 	/** @var array */
 	protected $displayOrder = array();
+    /** @var array */
+    protected $gradeGroups = array();
 	/** @var Collection */
 	protected $errorList;
 
@@ -244,8 +246,12 @@ class Marksheet {
 					}
 				}
 
+				$extraParams = array();
 				if($object instanceof SubmissionBox) {
 					$maxMark = $object->getMaxMark();
+                    if ($object->getMarkType()->getId() == SubmissionBox\MarkType::TYPE_LETTER) {
+                        $extraParams['gradeGroup'][] = $this->gradeGroups[] = $object->getGradeGroup()->getId();
+                    }
 				}
 				elseif($object instanceof OnlineAssessment) {
 					$maxMark = 100;
@@ -255,7 +261,7 @@ class Marksheet {
 					$classAvg = null;
 				}
 				else {
-					$classAvg = $this->marktypeFactoryHandler->build($mtSlug)->convertRawMark(
+					$classAvg = $this->marktypeFactoryHandler->build($mtSlug, $extraParams)->convertRawMark(
 						$stats['mean'], $maxMark, true, false
 					);
 				}
@@ -616,7 +622,8 @@ class Marksheet {
 			}
 			else {
 				$gradient = (int)($row['avg'] / 10);
-				$average = \Marksheet_Factory::build('letter')->convertRawMark($row['avg'], null, true, false);
+				$average = \Marksheet_Factory::build('letter', array('gradeGroup' => $this->gradeGroups))
+					->convertRawMark($row['avg'], null, true, false);
 			}
 
 

@@ -389,15 +389,14 @@ class StudentReportCard
             $trendDir = '';
         }
         $returnHandler = new \SubmissionReturn();
+
         $page->setVar(
             array(
                 'SUBJ_GRADEIENT'   => (isset($gradeAvg['grade']) ? (int)($gradeAvg['grade'] / 10) : ''),
-                'SUBJ_GRADE_AVG'   => $returnHandler->percent2letter($gradeAvg['grade']),
-                'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0 ? sprintf(
-                        "%0.1f%% %s",
-                        $gradeAvg['trend'],
-                        $trendDir
-                    ) : ''
+                'SUBJ_GRADE_AVG'   => $returnHandler->percent2letter($gradeAvg['grade'], $gradeAvg['groups']),
+                'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0
+                    ? sprintf("%0.1f%% %s", $gradeAvg['trend'], $trendDir)
+                    : ''
             )
         );
         $page->parse('grade_average_block', 'grade_average');
@@ -995,9 +994,10 @@ class StudentReportCard
             if ($gradeAvg == -1) {
                 $page->setVar('subject_grade_block', '');
             } else {
+                // All letters together?
                 $page->setVar(
                     array(
-                        'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg),
+                        'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg, $grade['groups']),
                         'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
                     )
                 );

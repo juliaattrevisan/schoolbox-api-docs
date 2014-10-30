@@ -16,13 +16,21 @@ abstract class Marksheet_Abstract {
     protected $subHandler;
     protected $subReturnHandler;
 
-    public function __construct($mark_type) {
+    /**
+     * Assorted extra params that this marksheet could use.
+     *
+     * @var array
+     */
+    protected $extraParams;
+
+    public function __construct($mark_type, $extraParams) {
         $this->id = $mark_type['mark_type_id'];
         $this->setName($mark_type['hr_name']);
         $this->setSlug($mark_type['slug']);
         $this->setComment($mark_type['comment']);
         $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
+        $this->setExtraParams($extraParams);
     }
 
     /* Getters ans setters */
@@ -75,6 +83,24 @@ abstract class Marksheet_Abstract {
      */
     public function getSubmissionReturnHandler() {
         return $this->subReturnHandler;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtraParams()
+    {
+        return $this->extraParams;
+    }
+
+    /**
+     * @param  array $extraParams
+     * @return $this
+     */
+    public function setExtraParams($extraParams)
+    {
+        $this->extraParams = $extraParams;
+        return $this;
     }
 
     /**

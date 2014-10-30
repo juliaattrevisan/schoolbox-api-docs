@@ -6,9 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Marksheet_Letter extends Marksheet_Abstract {
+class Marksheet_Letter extends Marksheet_Abstract
+{
 
-    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
+    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(
             'norm_mark' => $grade['lower_bound'],
@@ -16,7 +18,8 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    {
         $return = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
 
@@ -27,36 +30,56 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
-        if($rawMark === null) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
+    {
+        if ($rawMark === null) {
             $rawMark = -1;
         }
-        $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
-        return $grade['caption'];
+        // use extra_params if they were set, what a mess
+        $params = $this->getExtraParams();
+        if (!empty($params['gradeGroup'])) {
+            $result = array();
+            foreach ($params['gradeGroup'] as $gradeGroup) {
+                $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark, $gradeGroup);
+                $result[] = $grade['caption'];
+            }
+            return implode(' / ', $result);
+        } else {
+            $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
+            return $grade['caption'];
+        }
     }
 
-    public function outputUI(SitePage $page, $mark) {
-        $subHandler = new Submission();
-
+    public function outputUI(SitePage $page, $mark)
+    {
         $page->setVar('grade_drop_block', '');
 
-        $grades = $subHandler->getLetterGrades();
-
-        $dem = DueWork_ErrorMapper::getInstance();
-        $errs = $dem->listDisplayValues();
-        foreach($errs as $e) {
+        // Only allow letter grades for the selected submission box
+        // TODO allow the submission to be passed in here
+        $factory = new Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\ListFactory();
+        $submission = new \Schoolbox\Assessment\Component\SubmissionBox();
+        $submission->getMarkType()->setId(
+            \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_LETTER
+        );
+        $grades = array();
+        foreach ($factory->buildGradeList($submission) as $grade) {
             $grades[] = array(
-                'grade_id' => $e,
-                'lower_bound' => -1,
-                'caption' => $e,
+                'id'      => $grade->getId(),
+                'caption' => $grade->getCaption(),
+                'group'   => $grade->getGroup()->getId(),
             );
         }
-
-        $page->dropdown('grade_drop', $grades, $mark['grade_selected'], 'mark_type_letter', array(
-            'grade_id' => 'GRADE_VALUE',
-            'caption'  => 'GRADE_TEXT',
-        ));
+        $page->dropdown(
+            'grade_drop',
+            $grades,
+            $mark['grade_selected'],
+            'mark_type_letter',
+            array(
+                'id'      => 'GRADE_VALUE',
+                'caption' => 'GRADE_TEXT',
+                'group'   => 'GRADE_GROUP_ID',
+            )
+        );
         $page->setVar('COMMENT', Scrub::text($mark['comment']));
     }
-
 }

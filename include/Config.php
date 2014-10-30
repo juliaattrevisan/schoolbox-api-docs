@@ -16,6 +16,7 @@ class Config extends DeprecatedModel {
     const FIELD_SELECTKEY = 7;
     const FIELD_HTML      = 8;
     const FIELD_RESOURCE  = 9;
+    const FIELD_SELECTLOOKUP = 10;
 
     const TYPE_SITE         = 1;
     const TYPE_SECURITY     = 2;

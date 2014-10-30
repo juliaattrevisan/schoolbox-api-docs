@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class AdminV2_Nav {
+class AdminV2_Nav
+{
 
     private $nav = array(
         'home' => 'Home',
@@ -14,22 +15,24 @@ class AdminV2_Nav {
         'side-menu' => 'Side Menu',
         'dashboard' => 'Dashboard',
         'homepage' => 'Homepages',
-		'eportfolio' => 'ePortfolios',
+        'eportfolio' => 'ePortfolios',
         'allowed-file' => 'Allowed Files',
         'setting' => 'Settings',
         'calendar' => 'Calendar',
         'folder' => 'Folder',
+        'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
-	    'messages' => 'Messages',
+        'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
-		'usage' => 'Usage',
-	    'rollover' => 'Rollover',
+        'usage' => 'Usage',
+        'rollover' => 'Rollover',
     );
 
-    public function parse(SitePage $page, $currentPage = 'home') {
+    public function parse(SitePage $page, $currentPage = 'home')
+    {
         $page->setBlock(TEMPLATE_content, 'admin_nav_item', 'admin_nav_item_block');
-        foreach($this->nav as $href => $label) {
+        foreach ($this->nav as $href => $label) {
             $page->setVar(array(
                 'ADMNAV_HREF' => $href,
                 'ADMNAV_CURRENT' => $currentPage == $href ? 'current' : '',

@@ -4,9 +4,9 @@
     <span>&nbsp;%</span>
     <!-- END mark_type_percent -->
     <!-- BEGIN mark_type_letter -->
-    <select id="mark" class="mark-input" name="mark[{OWNER_ID}]">
+    <select data-marktype="letter" id="mark" class="mark-input" name="mark[{OWNER_ID}]">
         <!-- BEGIN grade_drop -->
-        <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+        <option data-groupId="{GRADE_GROUP_ID}" value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
         <!-- END grade_drop -->
     </select>
     <!-- END mark_type_letter -->

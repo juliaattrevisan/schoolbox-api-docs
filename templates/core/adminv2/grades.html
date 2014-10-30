@@ -1,0 +1,198 @@
+<!-- BEGIN custom_head -->
+<script type="application/javascript" src="/javascript/components/doT/doT.min.js"></script>
+<script type="application/javascript">
+    (function($){
+        $(function(){
+
+            var newGroupId = 1;
+            var newGradeId = 1;
+
+            var groupTemplate = doT.template($('script#submission-grade-group-template').html().trim());
+            var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
+
+            var form = $('form#gradesForm');
+
+            /**
+             * Adds a new grade to the given group.
+             * @param gradeGroup
+             */
+            var addGrade = function(gradeGroup) {
+                // Get the grade ID out of the container
+                var groupId  = gradeGroup.data('groupid');
+                var newGrade = $(gradeTemplate({
+                    id: 'new-'+String(newGradeId++),
+                    group: {
+                        id: groupId
+                    }
+                }));
+                gradeGroup.find('.gradeList').append(newGrade);
+                return newGrade;
+            };
+
+            /**
+             * Adds a new grade group, and a new grade entry to that group.
+             */
+            var addGroup = function() {
+                var newGroup = $(groupTemplate({
+                    id: 'new-'+String(newGroupId++)
+                }));
+                addGrade(newGroup);
+                form.find('#gradeGroupList').append(newGroup);
+                return newGroup;
+            };
+
+            // Add a new grade entry to each group, and a new empty group.
+            form.find('.gradeGroup').each(function() {
+                addGrade($(this));
+            });
+            addGroup();
+
+            // If you blur the last grouping name field:
+            // Create a new one, if it's not empty.
+            form.on('blur', 'input[name$="[name]"]:last', function(event) {
+                if (this.value.length > 0) {
+                    addGroup();
+                }
+            });
+
+            // If you blur the last grade field in a group:
+            // Create a new one, if it's not empty.
+            form.on('blur', 'input[name$="[caption]"]', function(event) {
+                if (this.value.length > 0) {
+                    var element     = $(this);
+                    var group       = element.closest('.gradeGroup');
+                    var lastCaption = group
+                        .find('input[name$="[caption]"]')
+                        .filter(':last');
+                    if (element.is(lastCaption)) {
+                        // Focus on the newly created element
+                        addGrade(group).find(':input:visible:first').focus();
+                    }
+                }
+            });
+        });
+    })(jQuery);
+</script>
+
+<!-- Template for grade groups -->
+<script type="x-dot-template" id="submission-grade-group-template">
+    <li class="new gradeGroup" data-groupid="{{! it.id }}">
+        <input type="hidden"
+               name="group[{{! it.id }}][id]"
+               value="{{! it.id }}"
+        />
+        <input type="text"
+               name="group[{{! it.id }}][name]"
+               value="{{! it.name }}"
+               placeholder="Grouping Name"
+        />
+        <table>
+            <thead>
+                <tr>
+                    <th>Lower Bound</th>
+                    <th>Caption</th>
+                </tr>
+            </thead>
+            <tbody class="gradeList">
+                <!-- include templates for all grades, and add another for blanks -->
+                {{~ it.gradeLevels :level }}
+                    {{= it.gradeTemplate(level) }}
+                {{~}}
+            </tbody>
+        </table>
+    </li>
+</script>
+
+<!-- Template for grades -->
+<script type="x-dot-template" id="submission-grade-template">
+    <tr class="new grade" data-gradeid="{{! it.id }}">
+        <td>
+            <input type="hidden"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][id]"
+                   value="{{! it.id }}"
+            />
+            <input type="text"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][lower_bound]"
+                   value="{{! it.lowerBound }}"
+                   placeholder="Lower Bound"
+            />
+        </td>
+        <td>
+            <input type="text"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][caption]"
+                   value="{{! it.caption }}"
+                   placeholder="Caption"
+            />
+        </td>
+    </tr>
+</script>
+<!-- END custom_head -->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents clearfix">
+    <h2>Submission Grades and Groupings</h2>
+    <div class="level clearfix">
+        <form id="gradesForm" method="POST" action="/adminv2/gradesForm.php">
+            <div class="half listing">
+                <ul>
+                    <li>Edit the grades and groupings for grades here. These options will be available to use on all submissions.</li>
+                    <li>Note that once grades or groupings have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                        that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
+                    <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
+                </ul>
+            </div>
+            <div class="half last">
+                <ul id="gradeGroupList">
+                    <!-- BEGIN submission_grade_group -->
+                    <li class="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
+                        <input type="hidden"
+                               name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
+                               value="{SUBMISSION_GRADE_GROUP_ID}"
+                        />
+                        <input type="text"
+                               name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
+                               value="{SUBMISSION_GRADE_GROUP_NAME}"
+                               placeholder="Grouping Name"
+                        />
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Lower Bound</th>
+                                <th>Caption</th>
+                            </tr>
+                            </thead>
+                            <tbody class="gradeList">
+                            <!-- BEGIN submission_grade -->
+                            <tr class="grade" data-gradeid="{SUBMISSION_GRADE_ID}">
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
+                                           value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                           placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
+                                           value="{SUBMISSION_GRADE_CAPTION}"
+                                           placeholder="Caption"
+                                            />
+                                </td>
+                            </tr>
+                            <!-- END submission_grade -->
+                            </tbody>
+                        </table>
+                    </li>
+                    <!-- END submission_grade_group -->
+                </ul>
+            </div>
+            <input type="submit" class="submit-btn-plain" value="Save changes" />
+            <span class="hide" id="err-expl">Ensure all pre-existing results are not blank.</span>
+        </form>
+    </div>
+</div>

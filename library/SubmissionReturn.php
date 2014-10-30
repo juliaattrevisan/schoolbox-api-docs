@@ -151,17 +151,21 @@ class SubmissionReturn extends DeprecatedModel
             LIMIT 1
         "
         );
-        $gradeResult = $this->db->getRow(
-            "
-                        SELECT g.*, r.returned, r.mark, r.comment
-                        FROM submission_return r, submission_grade g
-                        WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+        $gradeResult = $this->db->getRow("
+            SELECT
+              g.*,
+              r.returned,
+              r.mark,
+              r.comment
+            FROM submission_grade g
+            INNER JOIN submission_return r ON g.lower_bound <= r.norm_mark
+            INNER JOIN submission_box b ON r.box_id = b.id
+            WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
-            AND g.lower_bound <= r.norm_mark
+            AND g.submission_grade_group_id = b.submission_grade_group_id
             ORDER BY returned DESC, lower_bound DESC
             LIMIT 1
-        "
-        );
+        ");
 
         // Do both error and grade result exist? Use most recent of the two.
         if (!empty($errorResult) && !empty($gradeResult)) {
@@ -186,16 +190,23 @@ class SubmissionReturn extends DeprecatedModel
 
     /**
      * @param float $mark
+     * @param int $gradeGroupId The grade group to fetch from.
+     *                          defaults to config default_grade_group.
      *
      * @return array|bool
      */
-    function getLetterGradeByValue($mark)
+    function getLetterGradeByValue($mark, $gradeGroupId = null)
     {
-        $query = "SELECT * FROM submission_grade
-                  WHERE lower_bound <= $mark
-                  ORDER BY lower_bound DESC
-                  LIMIT 0, 1";
-
+        if (!isset($gradeGroupId)) {
+            $gradeGroupId = Config::get('default_grade_group');
+        }
+        $query = "
+            SELECT * FROM submission_grade
+            WHERE lower_bound <= '{$this->db->quote($mark)}'
+            AND submission_grade_group_id = '{$this->db->quote($gradeGroupId)}'
+            ORDER BY lower_bound DESC
+            LIMIT 0, 1
+        ";
         return $this->db->getRow($query);
     }
 
@@ -303,14 +314,28 @@ class SubmissionReturn extends DeprecatedModel
      *  - 'Credit' becomes 'CR'
      *  - 'High Distinction' becomes 'HD'
      *
-     * @param float $percentage
+     * @param float  $percentage
+     * @param array  $gradeGroupIds The grade groups to turn to a letter grade.
+     *                              Defaults to config default_grade_group
+     * @param string $separator
      *
      * @return string
      */
-    function percent2letter($percentage)
+    function percent2letter($percentage, $gradeGroupIds = array(), $separator = ' / ')
     {
-        $letterArray = $this->getLetterGradeByValue($percentage);
-        return $this->shortenGrade($letterArray['caption']);
+        $letterArrays = array();
+        if (empty($gradeGroupIds)) {
+            $letterArrays[] = $this->getLetterGradeByValue($percentage);
+        }
+        foreach ($gradeGroupIds as $gradeGroupId) {
+            $letterArrays[] = $this->getLetterGradeByValue($percentage, $gradeGroupId);
+        }
+
+        $results = array();
+        foreach ($letterArrays as $letterArray) {
+            $results[] = $this->shortenGrade($letterArray['caption']);
+        }
+        return implode($separator, $results);
     }
 
     /**
