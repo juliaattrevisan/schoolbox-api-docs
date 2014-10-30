@@ -512,4 +512,3 @@ function outputCriteria(
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
     $page->parse($handle, 'rubricTpl', true);
 }
-
