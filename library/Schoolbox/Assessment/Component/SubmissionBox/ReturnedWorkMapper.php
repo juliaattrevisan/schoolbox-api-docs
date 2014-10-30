@@ -274,9 +274,16 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
         }
         $filters = implode(' AND ', $filters);
 
-
+        // Get submission grade group, but only for letter grade submissions
         $query = "
-			SELECT sb.id AS box_id, sr.mark, sr.norm_mark, sr.returned, sb.weight
+			SELECT
+				sb.id AS box_id,
+				sr.mark,
+				sr.norm_mark,
+				sr.returned,
+				sb.weight,
+				sb.mark_type,
+				sb.submission_grade_group_id
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
@@ -294,10 +301,12 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
             $pretty_mark = $row['mark'];
             if (!array_key_exists($box_id, $marks)) {
                 $marks[$box_id] = array(
-                    'mark' => $mark,
-                    'pretty_mark' => $pretty_mark,
-                    'date' => $row['returned'],
-                    'weight' => $row['weight'],
+                    'mark'                      => $mark,
+                    'pretty_mark'               => $pretty_mark,
+                    'date'                      => $row['returned'],
+                    'weight'                    => $row['weight'],
+                    'mark_type'                 => $row['mark_type'],
+                    'submission_grade_group_id' => $row['submission_grade_group_id'],
                 );
             }
         }
