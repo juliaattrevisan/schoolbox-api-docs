@@ -315,15 +315,26 @@ class SubmissionReturn extends DeprecatedModel
      *  - 'High Distinction' becomes 'HD'
      *
      * @param float $percentage
-     * @param int   $gradeGroupId The grade group to fetch from.
-     *                            Defaults to config default_grade_group
+     * @param array $gradeGroupIds The grade groups to turn to a letter grade.
+     *                             Defaults to config default_grade_group
      *
      * @return string
      */
-    function percent2letter($percentage, $gradeGroupId = null)
+    function percent2letter($percentage, $gradeGroupIds = array())
     {
-        $letterArray = $this->getLetterGradeByValue($percentage, $gradeGroupId);
-        return $this->shortenGrade($letterArray['caption']);
+        $letterArrays = array();
+        if (empty($gradeGroupIds)) {
+            $letterArrays[] = $this->getLetterGradeByValue($percentage);
+        }
+        foreach ($gradeGroupIds as $gradeGroupId) {
+            $letterArrays[] = $this->getLetterGradeByValue($percentage, $gradeGroupId);
+        }
+
+        $results = array();
+        foreach ($letterArrays as $letterArray) {
+            $results[] = $this->shortenGrade($letterArray['caption']);
+        }
+        return implode(' / ', $results);
     }
 
     /**
