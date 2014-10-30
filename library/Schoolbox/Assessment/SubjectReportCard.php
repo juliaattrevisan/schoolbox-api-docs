@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
@@ -165,6 +166,20 @@ class SubjectReportCard {
 			);
 			usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
 
+			// Load grade groups
+			$gradeGroups = array();
+			foreach ($studentGrades as $grade) {
+				if ($grade['mark_type'] == MarkType::TYPE_LETTER) {
+					$gradeGroups[] = $grade['submission_grade_group_id'];
+				}
+			}
+			if (empty($gradeGroups)) {
+				// No grade groups: just show whatever the standard is.
+				$gradeGroups[] = 1;
+			}
+			$gradeGroups = array_unique($gradeGroups);
+			sort($gradeGroups);
+
 			$gradeAvg = $this->calculateAverageFromStudentGrades($studentGrades);
 			$trendAmt = null;
 
@@ -180,8 +195,9 @@ class SubjectReportCard {
 			}
 
 			$this->_gradeAverage = array(
-				'grade' => $gradeAvg,
-				'trend' => $trendAmt
+				'grade'  => $gradeAvg,
+				'trend'  => $trendAmt,
+				'groups' => $gradeGroups,
 			);
 		}
 
