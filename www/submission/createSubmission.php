@@ -127,7 +127,11 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
-        ->setMarkVisibility(Config::get('submission_access'));
+        ->setMarkVisibility(Config::get('submission_access'))
+    ;
+    $gradeGroup = new SubmissionBox\GradeLevel\Group\Model();
+    $gradeGroup->setId(Config::get('default_grade_group'));
+    $submission->setGradeGroup($gradeGroup);
 
     // Is this a task?
     $is_task = ($this->arg[2] === 'task');
