@@ -244,8 +244,10 @@ class Marksheet {
 					}
 				}
 
+				$extraParams = array();
 				if($object instanceof SubmissionBox) {
 					$maxMark = $object->getMaxMark();
+					$extraParams['gradeGroup'][] = $object->getGradeGroup()->getId();
 				}
 				elseif($object instanceof OnlineAssessment) {
 					$maxMark = 100;
@@ -255,7 +257,7 @@ class Marksheet {
 					$classAvg = null;
 				}
 				else {
-					$classAvg = $this->marktypeFactoryHandler->build($mtSlug)->convertRawMark(
+					$classAvg = $this->marktypeFactoryHandler->build($mtSlug, $extraParams)->convertRawMark(
 						$stats['mean'], $maxMark, true, false
 					);
 				}
