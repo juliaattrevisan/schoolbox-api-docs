@@ -311,12 +311,14 @@ class SubmissionReturn extends DeprecatedModel
      *  - 'High Distinction' becomes 'HD'
      *
      * @param float $percentage
+     * @param int   $gradeGroupId The grade group to fetch from.
+     *                            If not provided, defaults to group 1.
      *
      * @return string
      */
-    function percent2letter($percentage)
+    function percent2letter($percentage, $gradeGroupId = 1)
     {
-        $letterArray = $this->getLetterGradeByValue($percentage);
+        $letterArray = $this->getLetterGradeByValue($percentage, $gradeGroupId);
         return $this->shortenGrade($letterArray['caption']);
     }
 
