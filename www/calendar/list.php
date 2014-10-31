@@ -49,6 +49,12 @@ $this->setVar(
     )
 );
 
-$calendar = new Calendar_Event_Collection_Lister($api, $start->getUnixTimestamp(), $finish->getUnixTimestamp(), $this, $user);
+// Extend finish by one day for search
+$calendar = new Calendar_Event_Collection_Lister(
+    $api,
+    $start->getUnixTimestamp(),
+    $finish->addDays(1)->getUnixTimestamp(),
+    $this,
+    $user
+);
 $calendar->renderAll();
-
