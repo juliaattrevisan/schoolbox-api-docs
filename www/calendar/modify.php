@@ -35,12 +35,12 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     /* Default values
-	 */
+     */
     $defaultTypeId      = $event->getType()->getId();
     $defaultAccessLevel = $event->getAccess();
 
     /* Preselected campuses
-	 */
+     */
     $selectedCampuses = array();
     $allCampuses      = $event->getCampusCollection();
 
@@ -49,7 +49,7 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     /* Preselected roles
-	 */
+     */
     $selectedRoles = array();
     $allRoles      = $event->getRoleCollection();
 
@@ -58,8 +58,8 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     /* Only provide publish date if one was provided and if it
-	 * wasn't useless somehow
-	 */
+     * wasn't useless somehow
+     */
     if ($event->getPublishDateTime() && strlen($event->getPublishDateTime()->getDatabase())) {
         $publishDate = $event->getPublishDateTime()->getLocalShort();
     } else {
@@ -67,8 +67,8 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     /* Miscellaneous setvarring
-	 * Hide advanced options by default
-	 */
+     * Hide advanced options by default
+     */
     $page->setVar(
         array(
             'FUNCTION'       => 'Update',
@@ -89,22 +89,35 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_DATE'     => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
-            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
+                ? 'selected="selected"'
+                : '',
+            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
+                ? 'selected="selected"'
+                : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
-            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
+                ? 'selected="selected"'
+                : '',
+            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
+                ? 'selected="selected"'
+                : '',
             'EVENT_PUBLISH_DATE'   => $publishDate,
             'EVENT_LOCATION'       => $event->getLocation(),
             'EVENT_DETAIL'         => $event->getDetail(),
-            'EVENT_REDIRECT'       => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+            'EVENT_REDIRECT'       => $event->setupRedirect(
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['sid'],
+                $_GET['userId']
+            ),
         )
     );
 
     /* Recurrence
-	 */
+     */
     // Is there a recurrence? If so don't show the repeat selector.
     if ($event->getSeriesId() == null) {
         $page->setVar('recurring_reminder_block', '');
@@ -119,11 +132,11 @@ if (is_numeric($_GET['eventID'])) {
         $page->parse('recurring_reminder_block', 'recurring_reminder');
         $page->setVar('recurring_dates_block', '');
     }
-} /* Create new event
- */
-else {
+} else {
+    /* Create new event
+     */
     /* Set up default dates
-         */
+     */
     $event = new \Schoolbox\Calendar\Event();
     $event->setupDates($_GET['date']);
     if (!$event->getAllDay()) {
@@ -134,16 +147,16 @@ else {
     $defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
 
     /* Preselected campus
-	 */
+     */
     $selectedCampuses = array($_SESSION['campus'][0]);
 
     /* Preselected roles
-	 */
+     */
     $selectedRoles = array();
 
     /* Miscellaneous setvarring
-	 * Hide advanced options by default
-	 */
+     * Hide advanced options by default
+     */
     $page->setVar(
         array(
             'FUNCTION'       => 'Add',
@@ -164,22 +177,35 @@ else {
             'EVENT_START_DATE'     => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
-            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
+                ? 'selected="selected"'
+                : '',
+            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
+                ? 'selected="selected"'
+                : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
-            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
-            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
+                ? 'selected="selected"'
+                : '',
+            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
+                ? 'selected="selected"'
+                : '',
             'EVENT_PUBLISH_DATE'   => '',
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
-            'EVENT_REDIRECT'       => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
+            'EVENT_REDIRECT'       => $event->setupRedirect(
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['sid'],
+                $_GET['userId']
+            ),
         )
     );
 
     /* Recurrence
-	 */
+     */
     $page->setVar(
         array(
             'recurring_reminder_block' => '',
@@ -196,7 +222,11 @@ $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
 $allEventTypes           = $calendarEventTypeMapper->findAll();
 
 $page->dropDown(
-    'type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
+    'type_drop',
+    $allEventTypes,
+    $defaultTypeId,
+    TEMPLATE_content,
+    array(
         'id'   => 'EVENT_EVENTTYPE_ID',
         'type' => 'EVENT_EVENTTYPE_NAME'
     )
@@ -214,8 +244,8 @@ foreach ($groupList as $currentUserGroup) {
     $fromHomepage      = (($_GET['level'] == 2) && ($_GET['sid'] == $currentUserGroup['id']));
 
     /* If you have already chosen these categories, or if it's specified
-	 * from a homepage via Group Calendar > Add Event
-	 */
+     * from a homepage via Group Calendar > Add Event
+     */
     if ($alreadyInCategory || $fromHomepage) {
         $selected = 'checked="checked"';
     } else {
@@ -247,7 +277,11 @@ $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
  * Requires both $groupList and $campusList for optional values
  */
 $page->dropDown(
-    'event_level_drop', new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList), $defaultAccessLevel, TEMPLATE_content, array(
+    'event_level_drop',
+    new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList),
+    $defaultAccessLevel,
+    TEMPLATE_content,
+    array(
         'id'   => 'EVENT_EVENTLEVEL_ID',
         'name' => 'EVENT_EVENTLEVEL_NAME',
     )
@@ -266,7 +300,11 @@ if ($campusList->count()) {
     }
 
     $page->checkList(
-        'event_campus_list', $allCampuses, $selectedCampuses, TEMPLATE_content, array(
+        'event_campus_list',
+        $allCampuses,
+        $selectedCampuses,
+        TEMPLATE_content,
+        array(
             'id'   => 'EVENT_CAMPUS_ID',
             'name' => 'EVENT_CAMPUS_NAME',
         )
@@ -295,7 +333,11 @@ foreach ($roleList as $current) {
 }
 
 $page->checkList(
-    'event_role_list', $allRoles, $selectedRoles, TEMPLATE_content, array(
+    'event_role_list',
+    $allRoles,
+    $selectedRoles,
+    TEMPLATE_content,
+    array(
         'id'   => 'EVENT_ROLE_ID',
         'name' => 'EVENT_ROLE_NAME'
     )
