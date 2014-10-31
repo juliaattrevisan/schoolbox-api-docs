@@ -86,6 +86,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
                 $lastDate = $currentDate;
             }
+            // Parze out blox after last event
+            $this->getPage()->parse('date_block', 'date', true);
         } else {
             $this->getPage()->parse('has_no_events_block', 'has_no_events');
         }
