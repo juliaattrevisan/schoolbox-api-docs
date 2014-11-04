@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Trigger\Compressed;
 
 
+use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
@@ -37,7 +38,11 @@ class CompressedTriggerBundle extends TriggerBundle {
 		$triggers = array();
 
 		foreach($this->triggers as $t) {
-			$triggers[] = new CompressedTrigger($t, $this->level);
+            if ($t instanceof CancelTrigger) {
+                $triggers[] = $t;
+            } else {
+                $triggers[] = new CompressedTrigger($t, $this->level);
+            }
 		}
 
 		return $triggers;
