@@ -158,6 +158,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
         $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
         $this->setBlock('unit_task',        'unit_task_quiz_results',    'unit_task_quiz_results_block');
+        $this->setBlock('unit_task',        'unit_task_quiz_attempts',   'unit_task_quiz_attempts_block');
         $this->setBlock('unit_task',        'unit_task_duework_results', 'unit_task_duework_results_block');
         $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
         $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
@@ -411,6 +412,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_task_delete_form_block' => '',
                 'unit_task_modify_form_block' => '',
                 'unit_task_quiz_results_block'    => '',
+                'unit_task_quiz_attempts_block'   => '',
                 'unit_task_duework_results_block' => '',
             )
         );
@@ -424,6 +426,13 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             }
             if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
                 $this->parse('unit_task_start_block', 'unit_task_start');
+            }
+            if ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
+                $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
+                // Am I a student that has previous attempts? Show that block if I do.
+                if ($complete_count > 0) {
+                    $this->parse('unit_task_quiz_attempts_block', 'unit_task_quiz_attempts');
+                }
             }
         } else {
             $this->parse('unit_task_count_block', 'unit_task_count');
