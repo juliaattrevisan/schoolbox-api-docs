@@ -11,6 +11,7 @@ namespace Alaress\Scheduler\Stomp;
 
 
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use OutOfBoundsException;
 use React\Stomp\AckResolver;
 use RuntimeException;
 use SplObjectStorage;
@@ -19,6 +20,9 @@ class ResolutionManager {
 
 	/** @var SplObjectStorage|AckResolver[] */
 	protected $resolvers;
+
+    /** @var AckResolver[] */
+    protected $resolversIndexedByTriggerHash = array();
 
 	/**
 	 * Instantiate members
@@ -39,41 +43,56 @@ class ResolutionManager {
 		$data = $this->getData($resolver);
 		$data->attach($trigger);
 		$this->setData($resolver, $data);
+        $this->resolversIndexedByTriggerHash[$trigger->getHash()] = $resolver;
 	}
 
-	/**
-	 * If the final trigger of a resolver is detached, the resolver will be ACK'd and unset
-	 * Returns the resultant trigger count for the resolver to which it was attached (or -1 otherwise)
-	 *
-	 * @param TriggerInterface $trigger
-	 * @return int
-	 */
+
+    /**
+     * If the final trigger of a resolver is detached, the resolver will be ACK'd and unset
+     * Returns the resultant trigger count for the resolver to which it was attached (or -1 otherwise)
+     *
+     * @param TriggerInterface $trigger
+     * @throws \OutOfBoundsException
+     * @return int
+     */
 	public function detachTrigger($trigger) {
-		// iterate the currently-stored resolvers looking for this trigger
-		foreach($this->resolvers as $resolver) {
-			/** @var SplObjectStorage|TriggerInterface[] $triggers */
-			$triggers = $this->resolvers->offsetGet($resolver);
+		// see if this trigger is referenced
+        if (!array_key_exists($trigger->getHash(), $this->resolversIndexedByTriggerHash)) {
+            throw new OutOfBoundsException("Given trigger is not attached to any resolver");
+        }
 
-			if($triggers->contains($trigger)) {
-				$triggers->detach($trigger);
-				$this->setData($resolver, $triggers);
+        // we know this trigger existed once, but its resolver has already been acknowledged
+        if (is_null($this->resolversIndexedByTriggerHash[$trigger->getHash()])) {
+            throw new OutOfBoundsException("Resolver for this trigger has already been acknowledged");
+        }
 
-				if($this->getTriggerCount($resolver) === 0) {
-					// detach this first, so we're not dependent on whether it resolves or not
-					$this->resolvers->detach($resolver);
+        $resolver = $this->resolversIndexedByTriggerHash[$trigger->getHash()];
 
-					try {
-						$resolver->ack();
-					}
-					catch(RuntimeException $e) {
-						// noop: this message has already been acknowledged, so we can safely drop it
-					}
-				}
+        /** @var SplObjectStorage|TriggerInterface[] $triggers */
+        $triggers = $this->resolvers->offsetGet($resolver);
 
-				return $this->getTriggerCount($resolver);
-			}
-		}
-		return -1;
+        if(!$triggers->contains($trigger)) {
+            throw new OutOfBoundsException("Given trigger is not attached to the expected resolver");
+        }
+
+        $this->resolversIndexedByTriggerHash[$trigger->getHash()] = null;
+
+        $triggers->detach($trigger);
+        $this->setData($resolver, $triggers);
+
+        if($this->getTriggerCount($resolver) === 0) {
+            // detach this first, so we're not dependent on whether it resolves or not
+            $this->resolvers->detach($resolver);
+
+            try {
+                $resolver->ack();
+            }
+            catch(RuntimeException $e) {
+                // noop: this message has already been acknowledged, so we can safely drop it
+            }
+        }
+
+        return $this->getTriggerCount($resolver);
 	}
 
 	/**

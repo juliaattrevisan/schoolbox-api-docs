@@ -12,7 +12,6 @@ namespace Alaress\Scheduler;
 
 use Alaress\Async\SignalEmitter;
 use Alaress\Scheduler\Trigger\CancelTrigger;
-use Alaress\Scheduler\Trigger\RecurringTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
@@ -145,9 +144,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
             );
         }
         if (count($trigger->getCallbacks()) == 0) {
-            $class = get_class($event->getObject());
-            $label = $trigger->getLabel();
-            $this->log->warning("Trigger for '$class::$label' has no callbacks");
+            $this->log->warning("Trigger for '{$trigger->getIdString()}' has no callbacks");
         }
     }
 
@@ -163,6 +160,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
+            $this->log->debug("Cannot schedule CancelTrigger");
             return false;
         }
 
@@ -170,7 +168,6 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $this->unschedule($trigger);
 
         $model = $trigger->getEvent()->getObject();
-        $class = get_class($model);
         $label = $trigger->getLabel();
 
         /** @var TimerInterface $timer */
@@ -178,7 +175,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
-        $this->log->info("Scheduling trigger '$class::$label'", array('char' => '+'));
+        $this->log->info("Scheduling trigger '{$trigger->getIdString()}'", array('char' => '+'));
 
         return true;
     }
@@ -192,16 +189,12 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     protected function unschedule($trigger)
     {
-        if ($trigger instanceof RecurringTrigger) {
-
-        }
         $model = $trigger->getEvent()->getObject();
-        $class = get_class($model);
         $label = $trigger->getLabel();
 
         if ($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
-            $this->log->info("Unscheduling trigger '$class::$label'", array('char' => '-'));
+            $this->log->info("Unscheduling trigger '{$trigger->getIdString()}'", array('char' => '-'));
             $this->loop->cancelTimer($timer);
             return true;
         }

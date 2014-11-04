@@ -17,6 +17,7 @@ use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -134,7 +135,7 @@ class Scheduler extends StompScheduler
 
             // only a few Models actually have schedule strategies, failure is ok
             // each module strategy knows how to deal with its own events
-            $this->log->info("Building trigger factory for " . get_class($event->getObject()));
+            $this->log->debug("Building trigger factory for " . get_class($event->getObject()));
             $triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
 
             // retrieve, populate, and schedule this bundle of triggers
@@ -157,7 +158,7 @@ class Scheduler extends StompScheduler
             // this message is can't be parsed, so we ACK it to make it go away
         } catch(ScheduleException $e) {
             // we're happy to ignore this, it just means no scheduling strategy exists for this Model
-            $this->log->info('Schedule Exception: ' . $e->getMessage(), array('char' => '?'));
+            $this->log->debug('Schedule Exception: ' . $e->getMessage());
         } catch(CompressionException $e) {
             // this message is unparseable, so we'll eventually ACK it to make it go away
             $this->log->critical('Compression Exception: ' . $e->getMessage(), array($e));
@@ -212,6 +213,10 @@ class Scheduler extends StompScheduler
         $c = count($triggers);
         if ($c == 0) {
             $this->log->info("No triggers to schedule");
+            if ($resolver instanceof AckResolver) {
+                $resolver->ack();
+                $this->log->debug("Resolver acknowledged");
+            }
             return;
         }
         $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
@@ -227,12 +232,42 @@ class Scheduler extends StompScheduler
      */
     public function scheduleNotification($trigger, $resolver = null)
     {
-        parent::scheduleNotification($trigger);
         if ($resolver instanceof AckResolver) {
             $this->attachResolverTrigger($resolver, $trigger);
         } else {
             $this->log->warning("No resolver supplied for attaching trigger");
         }
+
+        parent::scheduleNotification($trigger);
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     */
+    public function dispatchTrigger($trigger)
+    {
+        if (count($trigger->getCallbacks()) == 0) {
+            $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
+            $this->detachTrigger($trigger);
+        } else {
+            parent::dispatchTrigger($trigger);
+        }
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    protected function unschedule($trigger)
+    {
+        // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
+        if (parent::unschedule($trigger)) {
+            $this->detachTrigger($trigger);
+            return true;
+        }
+        return false;
     }
 
 
@@ -341,6 +376,7 @@ class Scheduler extends StompScheduler
     protected function attachResolverTrigger($ackResolver, $trigger)
     {
         $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
+        $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver");
     }
 
 
@@ -350,35 +386,29 @@ class Scheduler extends StompScheduler
      */
     protected function detachTrigger($trigger)
     {
-        $count = $this->resolvers->detachTrigger($trigger);
+        try {
+            $count = $this->resolvers->detachTrigger($trigger);
 
-        switch ($count) {
-            case -1:
-                $msg = "resolver now empty; detached";
-                break;
-            case 0:
-                $msg = "resolver now empty, but not detached...?";
-                break;
-            default:
-                $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
-                break;
+            switch ($count) {
+                case -1:
+                    $msg = "resolver now empty; acknowledged";
+                    break;
+                case 0:
+                    $msg = "resolver now empty, but not acknowledged...?";
+                    break;
+                default:
+                    $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
+                    break;
+            }
+
+            $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg");
+            return $count;
+
+        } catch (OutOfBoundsException $e) {
+            $this->log->debug("Trigger '{$trigger->getIdString()}' not detached: " . $e->getMessage());
         }
 
-        $this->log->debug("Detaching trigger: $msg");
-
-        return $count;
-    }
-
-
-    /**
-     * TODO put this method on the Trigger itself
-     *
-     * @param TriggerInterface $trigger
-     * @return string
-     */
-    protected function generateTriggerIdString($trigger)
-    {
-        return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
+        return -1;
     }
 
 }
