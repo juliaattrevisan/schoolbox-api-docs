@@ -52,4 +52,19 @@ interface TriggerInterface {
      */
     public function getEvent();
 
+
+    /**
+     * Return a representation of self in the form "objectClass:label"
+     *
+     * @return string
+     */
+    public function getIdString();
+
+
+    /**
+     * Return a hash representation of self
+     *
+     * @return string
+     */
+    public function getHash();
 } 
