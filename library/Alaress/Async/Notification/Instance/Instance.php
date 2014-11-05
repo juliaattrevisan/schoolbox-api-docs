@@ -157,6 +157,8 @@ class Instance implements JsonSerializable {
 		$this->topics        = (array)$topics;
 		$this->context       = (array)$context ?: array();
 
+        $this->meta          = array();
+
         // cap the amount of data that can be stored in meta
         $meta = (array)$meta ?: array();
 
