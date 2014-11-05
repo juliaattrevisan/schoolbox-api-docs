@@ -518,7 +518,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 
-//        $personalMapper = $this->getJoinMapper('personal');
+        $personalMapper = $this->getJoinMapper('personal');
         $categoryMapper = $this->getJoinMapper('category');
 
 		$query = "
@@ -556,7 +556,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
             /* Find the groups
              */
-//            $event->setUserCollection($personalMapper->findAllForEvents($event));
+            $event->setUserCollection($personalMapper->findAllForEvent($event));
             $event->setCategoryCollection($categoryMapper->findAllForEvent($event));
 
 			$augmented = array(

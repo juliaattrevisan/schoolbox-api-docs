@@ -11,6 +11,7 @@
 namespace Schoolbox\Calendar\Relation;
 
 use Schoolbox;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
@@ -35,6 +36,11 @@ class PersonalMapper extends Schoolbox\External\Mapper {
 			'property' => 'userId',
 			'type' => self::TYPE_INTEGER,
 		));
+        $this->hasJoin('personal', array(
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'user_id',
+                'other_key' => 'id',
+            ));
 	}
 
 	/**
@@ -51,4 +57,33 @@ class PersonalMapper extends Schoolbox\External\Mapper {
 		$statement->bindValue(':identifierValue', $event->getId());
 		$statement->execute();
 	}
+
+    /**
+     * Find all the users belonging to an event
+     *
+     * @param Schoolbox\Calendar\Event $event
+     * @return Collection
+     */
+    public function findAllForEvent(Schoolbox\Calendar\Event $event) {
+        $personalMapper = $this->getJoinMapper('personal');
+
+        $query = "
+            SELECT {$personalMapper->getColumnString('u')}
+            FROM `{$this->table}` eu
+            LEFT JOIN {$this->getJoinSql('personal', 'eu', 'u')}
+            WHERE eu.event_id = :eventId
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindValue(':eventId', $event->getId());
+        $statement->execute();
+
+        $allUsers = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $allUsers->add($personalMapper->hydrate($row, 'u'));
+        }
+
+        return $allUsers;
+    }
 }
