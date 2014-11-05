@@ -102,4 +102,26 @@ class CompressedTrigger implements InstantTriggerInterface {
 		return $this->extractTrigger()->getEvent();
 	}
 
+
+    /**
+     * Return a representation of self in the form "objectClass:label"
+     *
+     * @return string
+     */
+    public function getIdString()
+    {
+        return sprintf("%s:%s", get_class($this->getEvent()->getObject()), $this->getLabel());
+    }
+
+
+    /**
+     * Return a hash representation of self
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        return spl_object_hash($this);
+    }
+
 } 

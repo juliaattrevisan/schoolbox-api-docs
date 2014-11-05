@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\Rerouter\Filter;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Schoolbox\Notif\Queue\UserQueueFactory;
+use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\User;
 
 class DuplicateFilter implements FilterInterface {
@@ -38,7 +38,7 @@ class DuplicateFilter implements FilterInterface {
 	 * @return bool
 	 */
 	public function validate($message, $formatted, $user) {
-		if($this->uqf->userHasSeen($user->getId(), $message)) {
+		if($this->uqf->buildForUser($user->getId())->contains($message)) {
 			throw new FilterException("User has already seen this message");
 		}
 		return true;

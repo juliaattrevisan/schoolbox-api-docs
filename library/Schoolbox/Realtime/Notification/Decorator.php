@@ -35,13 +35,15 @@ class Decorator extends NotificationBundle {
 	}
 
 
-	/**
-	 * @return array
-	 */
-	protected function toArray() {
+    /**
+     * @param int $limit
+     * @param int $dir
+     * @return array
+     */
+	protected function toArray($limit = 0, $dir = SORT_DESC) {
 		$array = array();
 
-		foreach($this->getAll() as $notification) {
+		foreach($this->getNotifications($limit, $dir) as $notification) {
 			$hash = $notification->getId();
 
 			$array[$hash] = array(
@@ -65,14 +67,15 @@ class Decorator extends NotificationBundle {
 	 * Render the stored array of notification instances as a Twig context array (for sending via email)
 	 *
 	 * @param array $coreContext    the base context of the template to be rendered, if any
+     * @param int   $limit          the max number of notifications to return. The default is 'all'
 	 * @param int   $sortDirection  the direction in which to sort the messages, by timestamp
 	 * @return array                a context Twig can parse
 	 */
-	public function renderAsTwigContext($coreContext = array(), $sortDirection = SORT_DESC) {
+	public function renderAsTwigContext($coreContext = array(), $limit = 0, $sortDirection = SORT_DESC) {
 		$array = $this->toArray();
 		$fqdn = isset($coreContext['config']['fqdn']) ? 'http://'.$coreContext['config']['fqdn'] : '';
 
-		foreach($this->notifications as $n) {
+		foreach($this->getNotifications($limit, $sortDirection) as $n) {
 			// compile the title
 			$array[$n->getId()]['title'] = $this->renderTitleAsHtml($n, $fqdn);
 			$array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
@@ -143,16 +146,18 @@ class Decorator extends NotificationBundle {
 	}
 
 
-	/**
-	 * SitePage is dead. Long live SitePage.
-	 *
-	 * @deprecated
-	 * @return array
-	 */
-	public function renderAsSitePageArray() {
+    /**
+     * SitePage is dead. Long live SitePage.
+     *
+     * @deprecated
+     * @param int $limit
+     * @param int $dir
+     * @return array
+     */
+	public function renderAsSitePageArray($limit = 0, $dir = SORT_DESC) {
 		$context = $this->toArray();
 
-		foreach($this->notifications as $n) {
+		foreach($this->getNotifications($limit, $dir) as $n) {
 			// compile the title
 			$context[$n->getId()]['title'] = $this->renderTitleAsHtml($n);
 
@@ -170,12 +175,14 @@ class Decorator extends NotificationBundle {
 	 * Render the stored array of notification instances as an array that can be sent down a websocket
 	 *
 	 * @param bool $asUnread - by default, the message will be marked as coming from the 'read' context
+     * @param int  $limit    - the maximum number of notifications to be returned, default is 'all'
+     * @param int  $dir      - by default, sorting order is reverse chronological
 	 * @return array
 	 */
-	public function renderAsSocketArray($asUnread = false) {
+	public function renderAsSocketArray($asUnread = false, $limit = 0, $dir = SORT_DESC) {
 		$result = array();
 
-		foreach($this->getAll() as $notification) {
+		foreach($this->getNotifications($limit, $dir) as $notification) {
 			$id = $notification->getId();
 			$result[$id] = array(
 				'id'        => $id,

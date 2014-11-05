@@ -127,6 +127,8 @@ class Dispatcher implements DispatcherInterface
             $this->detach();
         }
 
+        $rate = (int)$rate;
+
         // if there's a timer, use it, otherwise create it
         if (!($this->timer instanceof TimerInterface)) {
             $this->log->debug("Creating timer to fire at {$rate}ms intervals");

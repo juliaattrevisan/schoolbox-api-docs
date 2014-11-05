@@ -1,12 +1,16 @@
 #!/usr/bin/hhvm
 <?php
 
+use Alaress\Async\UserQueue\UserQueue;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Aura\Di;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Queue\Builder\Plan;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\SessionValidator;
 
@@ -92,9 +96,15 @@ $kernel->run(
 
            $client->connect(2)
                   ->then(
-                  function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts) {
+                  function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts, $redis) {
 
-                      $pipeManager = new PipeManager($loop, $sessionValidator, $client, $log, $poolStrat);
+                      $mqConn = Connector::getInstance();
+
+                      $queueFactory = new QueueFactory();
+                      $queueFactory->setAMQP($mqConn);
+                      $queueFactory->setKind(UserQueue::Q_UNREAD);
+
+                      $pipeManager  = new PipeManager($loop, $sessionValidator, $client, $queueFactory, $log, $poolStrat);
 
                       $wss = new Ratchet\WebSocket\WsServer($pipeManager);
                       $wss->disableVersion(0);

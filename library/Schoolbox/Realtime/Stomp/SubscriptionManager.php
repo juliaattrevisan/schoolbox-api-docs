@@ -17,13 +17,12 @@ use React\Stomp\Exception\ConnectionException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\UserQueue;
-use Schoolbox\Realtime\Pipe\PipeManager;
-use Schoolbox\Realtime\Pipe\SelfResponder;
+use Schoolbox\Notif\Queue\QueueFactory;
+use UnexpectedValueException;
 
 class SubscriptionManager {
 
-	/** @var PipeManager */
+	/** @var AMQPResponseHandlerInterface */
 	protected $handler;
 
 	/** @var Client */
@@ -38,47 +37,49 @@ class SubscriptionManager {
     /** @var LoggerInterface */
     protected $log;
 
-	/**
-     * @param Client $stompClient
-	 * @param AMQPResponseHandlerInterface $handler
-     * @param LoggerInterface $log
-	 */
-	public function __construct(Client $stompClient, AMQPResponseHandlerInterface $handler, LoggerInterface $log) {
-		// this factory requires its own loop to work
-		$this->subscriptions = array();
-		$this->handler = $handler;
-		$this->stompClient = $stompClient;
-		$this->conf = ConfigMapper::getInstance();
-        $this->log = $log;
-	}
+    /** @var QueueFactory */
+    protected $qf;
+
+
+    /**
+     * @param Client                       $stompClient
+     * @param AMQPResponseHandlerInterface $handler
+     * @param LoggerInterface              $log
+     * @param QueueFactory                 $qf
+     * @param IConfigLoader                $conf
+     * @throws UnexpectedValueException
+     */
+    public function __construct(
+        Client $stompClient,
+        AMQPResponseHandlerInterface $handler,
+        LoggerInterface $log,
+        QueueFactory $qf,
+        IConfigLoader $conf = null
+    ) {
+        $this->subscriptions = array();
+        $this->handler       = $handler;
+        $this->stompClient   = $stompClient;
+        $this->conf          = $conf ? : ConfigMapper::getInstance();
+        $this->log           = $log;
+        $this->qf            = $qf;
+    }
+
 
 	/**
-	 * Add a subscription for the given user. If a pipe is provided, it will be notified upon success.
+	 * Add a subscription for the given user.
 	 *
 	 * @param int $userId
-	 * @param SelfResponder $responder
 	 * @return bool
 	 */
-	public function subscribe($userId, $responder = null) {
+	public function subscribe($userId) {
 		if($this->userHasSubscription($userId)) {
 			$this->log->info("User $userId is already subscribed");
-
-			// notify the pipe if it was supplied
-			if($responder instanceof SelfResponder) {
-				$responder->notifyPipe(json_encode(array('subscribe' => true)));
-			}
-
-			return false;
+			return true;
 		}
 
 		try {
-            // this closure is executed when a stomp client connection is established
-            $this->putSubscription(new Subscription($this->stompClient, $userId, $this->handler, $this->log));
-            // if a responder is provided, use it as a callback for success
-            if($responder instanceof SelfResponder) {
-                $responder->notifyPipe(json_encode(array('subscribe' => true)));
-            }
-
+            $queueName = $this->userSubscriptionDestination($userId);
+			$this->putSubscription(new Subscription($userId, $queueName, $this->stompClient, $this->handler, $this->log));
 			return true;
 		}
 		// the rabbit is probably offline
@@ -166,7 +167,9 @@ class SubscriptionManager {
 	 * @return string
 	 */
 	protected function userSubscriptionDestination($userId) {
-		return sprintf("/amq/queue/".UserQueue::QUEUE_UNREAD_MESSAGES, INSTANCE_ID, $userId);
+        // this whole "build an object just to get its name" might seem like overkill, but part of that
+        // instantiation is to ensure that the AMQP queue actually *exists*, which makes it all worth it.
+        return Subscription::STOMP_QUEUE_PREFIX . $this->qf->buildForUser($userId)->getName();
 	}
 
 	/**

@@ -10,17 +10,15 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Lumberjack\Logger;
-use InvalidArgumentException;
+use Alaress\Redis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
-use Schoolbox\Notif\Message\External\TargetedConverter;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Queue\UserQueue;
+use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -35,13 +33,15 @@ class MailNotifier implements Serializable {
 	/** @var LoggerInterface */
 	protected $log;
 
+    /** @var UserQueueFactory */
+    protected $uqf;
+
 	/**
 	 * @param IConfigLoader   $configLoader
 	 * @param LoggerInterface $log
 	 */
     public function __construct($configLoader = null, $log = null) {
         $this->conf = $configLoader ?: ConfigMapper::getInstance();
-	    $this->setLogger($log ?: new Logger(null));
     }
 
 
@@ -53,6 +53,35 @@ class MailNotifier implements Serializable {
 	}
 
 
+    /**
+     * @return LoggerInterface
+     */
+    public function log()
+    {
+        // lazyload
+        if (empty($this->log)) {
+            $this->log = new Logger(null);
+        }
+        return $this->log;
+    }
+
+
+    /**
+     * @return UserQueueFactory
+     */
+    public function getUserQueueFactory()
+    {
+        // lazyload
+        if (empty($this->uqf)) {
+            $this->uqf = new UserQueueFactory();
+            $this->uqf
+                 ->setRedis(Redis::getClientInstance())
+                 ->setKind(UserQueueFactory::UQ_DIGEST);
+        }
+        return $this->uqf;
+    }
+
+
 	/**
 	 * This method is executed by a worker using the 'digest' command
 	 *
@@ -61,77 +90,74 @@ class MailNotifier implements Serializable {
 	 */
 	public function processDigest($role) {
 
-		// setup
-		$conn = Connector::getInstance();
-
 		// get a list of users
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
 
-		$this->log->info("Preparing to digest {$role->getName()}: {$users->count()} users");
+		$this->log()->info("Preparing to digest {$role->getName()}: {$users->count()} users");
 
-		$result = 0;
-
-		$decorator = new Decorator();
-		$dir = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
+        $result = 0;
+		$dir    = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
+        $core   = new CoreContext($this->conf);
 
 		// iterate and digest
 		foreach($users as $user) {
-			$email = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
-			$this->log->info("Digesting {$user->getUsername()}");
-			$q = UserQueue::getUserDigestQueueName($user->getId());
-			$acks = array();
 
-			// collate list of messages
-			while($m = $conn->readFromQueue($q)) {
-				$acks[] = $m;
-				try {
-					if($formatted = json_decode($m->body, true)) {
-						try {
-							$inst = Instance::jsonUnserialize($formatted['message']);
-						}
-						catch(InvalidArgumentException $e) {
-							$conv = new TargetedConverter();
-							$inst = $conv->convert($formatted['message']);
-						}
-						$decorator->appendInstance($inst);
-					}
-				}
-				catch(InvalidArgumentException $e) {
-					// meh. just ignore this message then
-					$this->log->error("Unparseable message instance detected");
-				}
-			}
+            $decorator = new Decorator();
+            $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
+            $uq        = $this->getUserQueueFactory()->buildForUser($user->getId());
 
-			if(!count($acks)) {
+            $email->setCoreContext($core->getContext());
+
+            $this->log()->info("Digesting {$user->getUsername()}");
+
+            $uq->fetchNotificationsIntoBundle($decorator, true);
+
+			if(!$decorator->count()) {
 				// this user has nothing to digest
-				$this->log->notice("{$user->getUsername()} has nothing to digest");
+				$this->log()->notice("{$user->getUsername()} has nothing to digest");
+                unset($uq, $decorator, $email, $user);
 				continue;
 			}
 
-			$context = $decorator->renderAsTwigContext($email->getCoreContext(), $dir);
-			$this->log->debug(sprintf('Collated %s instances into %s notifications to digest', count($acks), count($decorator->getAll())));
+			$context = $decorator->renderAsTwigContext($core->getContext(), 0, $dir);
 
-			// explicitly an rfc822 email spec, so it sets, not adds
-			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
+            try {
+                // explicitly an rfc822 email spec, so it sets, not adds
+                $email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
 
-			// away she goes
-			$sent = $email->send();
+                // away she goes
+                $sent = $email->send();
 
-            // if email sent successfully, ACK, otherwise NACK
-			if($sent) {
-				$this->log->notice("Mail sent successfully");
-				$conn->acceptMessages($acks);
-				++$result;
-			}
-			else {
-				$this->log->warning("Failed to email, rejecting messages");
-				$conn->rejectMessages($acks);
-			}
+                // if email sent successfully, ACK, otherwise NACK
+                if($sent) {
+                    $this->log()->notice("Mail sent successfully, dropping messages from queue");
+                    $uq->drain();
+                    ++$result;
+                }
+                else {
+                    $this->log()->warning("Failed to email");
+                }
+
+                unset($uq, $decorator, $email, $user);
+
+            } catch (\Swift_SwiftException $e) {
+                $this->log()->warning(get_class($e) . ': ' . $e->getMessage(), array($e));
+            } catch (\Twig_Error_Runtime $e) {
+                $this->log()->error(get_class($e) . ': ' . $e->getMessage(), array($e));
+                if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
+                    // this means the template couldn't render the mail because of bad data, so we have to flush it :/
+                    $uq->drain();
+                    $this->log()->warning('Message content cannot be rendered; data lost');
+                }
+            }
+
 		}
 
+        unset($users);
+
 		// return the number of emails successfully sent
-		$this->log->info("Finished digesting {$role->getName()}: $result emails sent");
+		$this->log()->info("Finished digesting {$role->getName()}: $result emails sent");
 		return $result;
 	}
 

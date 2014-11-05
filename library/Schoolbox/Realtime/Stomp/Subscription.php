@@ -17,10 +17,10 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
-use Schoolbox\Notif\Queue\UserQueue;
 
 class Subscription {
 
+    const STOMP_QUEUE_PREFIX = '/amq/queue/';
 
 	/** @var AMQPResponseHandlerInterface */
 	public $handler;
@@ -43,14 +43,16 @@ class Subscription {
     /** @var LoggerInterface */
     protected $log;
 
-	/**
-	 * @param Client $client
-	 * @param int $userId
-	 * @param AMQPResponseHandlerInterface $handler
-     * @param LoggerInterface $log
-	 */
-	public function __construct($client, $userId, $handler, $log) {
 
+    /**
+     * @param int                          $userId
+     * @param string                       $destination
+     * @param Client                       $client
+     * @param AMQPResponseHandlerInterface $handler
+     * @param LoggerInterface              $log
+     */
+    public function __construct($userId, $destination, Client $client, AMQPResponseHandlerInterface $handler, LoggerInterface $log)
+    {
 		$this->messages = array();
 		$this->client = $client;
 		$this->handler = $handler;
@@ -58,7 +60,7 @@ class Subscription {
         $this->log = $log;
 		$self = $this;
 
-		$this->destination = "/amq/queue/".UserQueue::getUserUnreadQueueName($userId);
+		$this->destination = $destination;
 
 		// subscribe to the user's unread queue and push these immediately to the Pipe Manager
 		$this->id = $this->client->subscribeWithAck($this->destination, 'client-individual',
@@ -171,10 +173,6 @@ class Subscription {
 					$stompMessage->ack();
 					$success[$msgId] = true;
 				}
-//				else {
-//					$this->pipeManager->v("Attempting NACK of $msgId");
-//					$stompMessage->nack();
-//				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd

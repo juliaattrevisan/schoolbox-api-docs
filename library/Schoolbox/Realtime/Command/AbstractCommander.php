@@ -35,11 +35,4 @@ abstract class AbstractCommander implements CommanderInterface {
 		$n->warning($message);
 	}
 
-	/**
-	 * Call through to scheduler to statically bind queues
-	 *
-	 * @return void
-	 */
-	protected abstract function bindQueues();
-
 }

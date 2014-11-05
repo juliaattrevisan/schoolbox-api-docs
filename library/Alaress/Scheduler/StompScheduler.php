@@ -26,9 +26,6 @@ abstract class StompScheduler extends AbstractScheduler {
 	/** @var string */
     protected $scheduleQueue;
 
-	/** @var string */
-	protected $commandQueue;
-
 	/** @var array */
 	protected $subscriptions;
 
@@ -40,19 +37,17 @@ abstract class StompScheduler extends AbstractScheduler {
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param string $scheduleQueue
-     * @param string $commandQueue
      * @param LoggerInterface $log
      */
-    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $commandQueue, $log) {
+    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $log) {
         parent::__construct($loop, $dispatchStrategy, $log);
         $this->method = DefaultDispatchStrategy::TASK_PUBLISH;
         $this->scheduleQueue = $scheduleQueue;
-		$this->commandQueue = $commandQueue;
 
         try {
             // defer to implementing classes
             $this->stomp = $this->getStompConnection();
-	        $this->stomp->connect()->then(array($this, 'onConnect'));
+            $this->stomp->connect()->then(array($this, 'onConnect'));
         }
         catch(ConnectionException $e) {
             // if the connection bugged out...
@@ -70,7 +65,6 @@ abstract class StompScheduler extends AbstractScheduler {
     public function onConnect() {
         $this->log->info("Connected to STOMP", array('char' => '+'));
 	    $this->subscribeAck($this->scheduleQueue, array($this, 'onMessage'));
-	    $this->subscribe($this->commandQueue, array($this, 'onCommand'));
 	    $this->stomp->on('error', array($this, 'onException'));
     }
 
@@ -156,12 +150,6 @@ abstract class StompScheduler extends AbstractScheduler {
      * @return void
      */
     public abstract function onMessage($frame, $resolver);
-
-	/**
-	 * @param Frame $frame
-	 * @return void
-	 */
-	public abstract function onCommand($frame);
 
     /**
      * @param Exception $e

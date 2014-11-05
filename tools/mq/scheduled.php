@@ -63,9 +63,16 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	 * @var array $opts
 	 */
 
+    // make sure our endpoint exists
+    $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
+    $q   = INSTANCE_ID . '.sb.sched';
+
+    $mqc->declareQueue($q)
+        ->bindQueue($q, '*.' . Notif::TOPIC_APPLICATION);
+
 	try {
 		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper(), $opts['flags']);
-		$sched = new Scheduler($loop, $strat, $log);
+		$sched = new Scheduler($loop, $strat, $log, $q);
 
 		// read STDIN in the stream loop so we can communicate with it in dev mode
 		$stdin = new \React\Stream\Stream(STDIN, $loop);

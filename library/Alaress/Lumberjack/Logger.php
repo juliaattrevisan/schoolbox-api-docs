@@ -246,7 +246,11 @@ class Logger implements LoggerInterface {
             }
         }
 
-        $this->log->log($level, $message, $context);
+        try {
+            $this->log->log($level, $message, $context);
+        } catch (\LogicException $e) {
+            // output stream has already been closed :/
+        }
     }
 
 }

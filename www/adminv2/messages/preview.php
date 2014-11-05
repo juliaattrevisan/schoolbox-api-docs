@@ -29,7 +29,7 @@ if(empty($this->arg[0])) {
 	$this->localRedir('/adminv2/messages/preview/digest');
 }
 
-$bob = new \Alaress\Async\Notification\Instance\Builder();
+$bob = new \Alaress\Async\Notification\Instance\Builder(false);
 $decorator = new \Schoolbox\Realtime\Notification\Decorator();
 
 switch($this->arg[0]) {
@@ -54,7 +54,7 @@ switch($this->arg[0]) {
 			->setByline('Due 24th April, 2014')
 			->setHref('#')
 			->setIcon('/images/icon.php?size=32&icon=work')
-			->build(false)
+			->build()
 		);
 		break;
 
@@ -76,7 +76,7 @@ switch($this->arg[0]) {
 				->setByline('Due 24th April, 2014')
 				->setHref('#')
 				->setIcon('/images/icon.php?size=32&icon=work')
-				->build(false)
+				->build()
 		);
 
 		$due = date('D, jS M', strtotime('tomorrow'));
@@ -92,7 +92,7 @@ switch($this->arg[0]) {
 				->setBody('')
 				->setByline("Due $due")
 				->setIcon('/images/icon.php?size=32&icon=work')
-				->build(false)
+				->build()
 		);
 
 		$decorator->appendInstance($bob
@@ -102,7 +102,7 @@ switch($this->arg[0]) {
 					'name'   => new Param("Star-cross'd Lovers: "),
 					'subj'   => new Param('Yr 10 English Literature'),
 				))
-			->build(false)
+			->build()
 		);
 
 		$decorator->appendInstance($bob->clear()
@@ -115,7 +115,7 @@ switch($this->arg[0]) {
 			->setTimestamp(strtotime('yesterday'))
 			->setNamespace(NSMapper::NS_DUEWORK)
 			->setHref('#')
-			->build(false)
+			->build()
 		);
 
 		$articles = \Schoolbox\News\ArticleMapper::getInstance()->findAll(array('limit' => 3, 'order' => array(
@@ -147,7 +147,7 @@ switch($this->arg[0]) {
 				->setByline("By {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
 				->setTimestamp($article->getPostDate()->getUnixTimestamp())
 				->setNamespace(NSMapper::NS_NEWS)
-				->build(false)
+				->build()
 			);
 		}
 
@@ -175,7 +175,7 @@ switch($this->arg[0]) {
 				$bob->setParam('user', new Param($name, '', Param::STACKING_APPEND))
 					->setTimestamp($time++)
 					->setBody(sprintf('%s wrote: "%s"', substr($name, 0, strpos($name, ' ')), $comment))
-					->build(false)
+					->build()
 			);
 		}
 
@@ -188,7 +188,7 @@ switch($this->arg[0]) {
 				))
 			->setNamespace(NSMapper::NS_WIKI)
 			->setHref('#')
-			->build(false)
+			->build()
 		);
 
 		break;
@@ -196,7 +196,7 @@ switch($this->arg[0]) {
 
 $direction = ConfigMapper::getInstance()->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
 
-$email->setContext($decorator->renderAsTwigContext($cctx, $direction));
+$email->setContext($decorator->renderAsTwigContext($cctx, 0, $direction));
 
 if(isset($this->arg[1]) && $this->arg[1] == 'context') {
 	header('Content-Type: text/plain');

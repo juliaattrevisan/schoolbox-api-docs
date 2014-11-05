@@ -237,7 +237,12 @@ class ArticleMapper extends Mapper implements Searchable {
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 			if(empty($mainModel)) {
-				$mainModel = $this->hydrate($r, 't0');
+				/** @var Article $mainModel */
+                $mainModel = $this->hydrate($r, 't0');
+                // set blank collections
+                $mainModel->setRoles(new Collection());
+                $mainModel->setCampuses(new Collection());
+                $mainModel->setUsers(new Collection());
 			}
 
 			foreach($joinMappers as $alias => $mapper) {

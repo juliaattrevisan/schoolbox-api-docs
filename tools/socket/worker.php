@@ -38,8 +38,18 @@ $kernel->run(
            // we open stream(3) as our data output stream
            $writer = new \Alaress\WorkerCrew\Worker\PipeWriter($strat, $log, fopen("php://fd/3", 'w'));
 
+           // grab external connector instances
+           $redis  = new \Alaress\Redis();
+           $client = $redis->getClientInstance();
+           $amqp   = \Schoolbox\Notif\MQ\Connector::getInstance();
+
+           $qf = new \Schoolbox\Notif\UserQueue\UserQueueFactory();
+           $qf->setAMQP($amqp)
+              ->setRedis($client)
+              ->setKind(\Schoolbox\Notif\UserQueue\UserQueueFactory::UQ_INSTANT);
+
            // create a new worker; we don't need to store the instance, it'll be held within the loop
-           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat);
+           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $qf);
        }
 );
 

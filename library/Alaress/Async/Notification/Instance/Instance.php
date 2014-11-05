@@ -13,9 +13,11 @@ namespace Alaress\Async\Notification\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Json;
+use Html2Text\Html2Text;
 use InvalidArgumentException;
 use JsonSerializable;
 use OutOfBoundsException;
+use TextFormatter;
 
 /**
  * Basically a really big container of specific things that get put together in a special way
@@ -26,6 +28,8 @@ use OutOfBoundsException;
  * @package Alaress\Async\Notification
  */
 class Instance implements JsonSerializable {
+
+    const MAX_FIELD_SIZE = 512;
 
 	/**
 	 * The :tokenised string that forms the base template of the message
@@ -151,9 +155,25 @@ class Instance implements JsonSerializable {
 
 		$this->params        = (array)$params;
 		$this->topics        = (array)$topics;
-		$this->meta          = (array)$meta ?: array();
 		$this->context       = (array)$context ?: array();
-	}
+
+        $this->meta          = array();
+
+        // cap the amount of data that can be stored in meta
+        $meta = (array)$meta ?: array();
+
+        foreach ($meta as $key => $value) {
+            // check if it's out of bounds
+            if (strlen($value) > self::MAX_FIELD_SIZE) {
+                // convert to plaintext first as a precaution
+                $plain = new Html2Text($value);
+                $value = TextFormatter::cutSentence($plain->get_text(), self::MAX_FIELD_SIZE);
+            }
+
+            $this->meta[$key] = $value;
+        }
+
+    }
 
 
 	/**
@@ -177,8 +197,8 @@ class Instance implements JsonSerializable {
 	public function jsonSerialize() {
 		return array(
 			'title'     => array(
-				'text'        => $this->messageString,
-				'params'      => $this->params
+				'text'      => $this->messageString,
+				'params'    => $this->params
 			),
 			'namespace' => $this->namespace,
 			'time'      => $this->time,

@@ -51,7 +51,26 @@ $kernel->run(function($di, $loop, $log, $opts) {
 	 */
 
 	try {
-		new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $log);
+
+        // make sure our endpoint exists
+        $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
+        $q   = INSTANCE_ID . DigestScheduler::QUEUE_COMMAND;
+
+        $mqc->declareQueue($q)
+            ->bindQueue($q, '*.' . Notif::TOPIC_CMD_DIGEST);
+
+        $conf = new \Schoolbox\Config\Loader();
+
+        $stompFactory = new \React\Stomp\Factory($loop);
+        $client = $stompFactory->createClient(array(
+            'host'      => $conf->get('amqp_host'),
+            'port'      => $conf->get('amqp_stomp_port'),
+            'vhost'     => '/',
+            'login'     => $conf->get('amqp_user'),
+            'passcode'  => $conf->get('amqp_pass'),
+        ));
+
+        new DigestScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $conf);
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.");

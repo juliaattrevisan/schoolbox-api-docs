@@ -9,6 +9,7 @@
 
 namespace Alaress;
 
+use Alaress\Redis\AutoRefreshClient;
 use Predis;
 
 class Redis
@@ -59,7 +60,7 @@ class Redis
      */
     public function connect($parameters = null, $options = null)
     {
-        $this->setClient(new Predis\Client($parameters, $options));
+        $this->setClient(new AutoRefreshClient($parameters, $options));
         return $this;
     }
 

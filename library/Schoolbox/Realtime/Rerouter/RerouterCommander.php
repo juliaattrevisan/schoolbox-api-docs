@@ -7,32 +7,22 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Realtime\Schedule;
+namespace Schoolbox\Realtime\Rerouter;
 
 
-use Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\UserQueueFactory;
 use Schoolbox\Realtime\Command\AbstractCommander;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
-class SchedulerCommander extends AbstractCommander {
+class RerouterCommander extends AbstractCommander {
 
 	const CMD_RELOAD        = 'reload';
 	const CMD_SUBSCRIBE     = 'subscribe.';   // note the trailing dot
 	const CMD_UNSUBSCRIBE   = 'unsubscribe.'; // note the trailing dot
 	const CMD_BIND          = 'bind.';        // note the trailing dot
 
-
-	/**
-	 * Call through to scheduler to statically bind queues
-	 *
-	 * @return void
-	 */
-	protected function bindQueues() {
-		Scheduler::bindQueues();
-	}
+    /** @var Mapper */
+    protected $mapper;
 
 
 	/**
@@ -75,16 +65,18 @@ class SchedulerCommander extends AbstractCommander {
 	}
 
 
-	/**
-	 * General construction
-	 */
-	public function __construct() {
-		parent::__construct(Notif::TOPIC_CMD_SCHED);
-	}
+    /**
+     * @param Mapper $userMapper
+     */
+    public function __construct(Mapper $userMapper)
+    {
+        parent::__construct(Notif::TOPIC_CMD_SCHED);
+        $this->mapper = $userMapper;
+    }
 
 
-	/**
-	 * @param Scheduler $scheduler
+    /**
+	 * @param Rerouter $rerouter
 	 * @param string $command - one of:
 	 *  - refresh all subscriptions                 (hooked from binder.all)
 	 *  - add a subscription for a specific user    (hooked from `user.created` event)
@@ -93,7 +85,7 @@ class SchedulerCommander extends AbstractCommander {
 	 *  - run binder for a specific user            (hooked from [User|Role]AccessNotifier)
 	 * @return bool
 	 */
-	public function exec($scheduler, $command) {
+	public function exec($rerouter, $command) {
 		$cmds = array(
 			self::CMD_RELOAD                    => array($this, 'reload'),
 			self::CMD_SUBSCRIBE.'([0-9]+)'      => array($this, 'subscribeUser'),
@@ -105,14 +97,14 @@ class SchedulerCommander extends AbstractCommander {
 		foreach($cmds as $regex => $callback) {
 			if(preg_match("`^$regex$`", $command, $matches)) {
 				if(isset($matches[1])) {
-					return call_user_func($callback, $scheduler, $matches[1]);
+					return call_user_func($callback, $rerouter, (int)$matches[1]);
 				}
 				else {
-					return call_user_func($callback, $scheduler);
+					return call_user_func($callback, $rerouter);
 				}
 			}
 		}
-		$scheduler->log->critical("Unrecognised command: $command");
+		$rerouter->log->critical("Unrecognised command: $command");
 		return false;
 	}
 
@@ -120,12 +112,12 @@ class SchedulerCommander extends AbstractCommander {
 	/**
 	 * Refresh all subscriptions (hooked from binder.all)
 	 *
-	 * @param Scheduler $scheduler
+	 * @param Rerouter $rerouter
 	 * @return bool
 	 */
-	protected function reload($scheduler) {
-		$scheduler->log->info("Reloading all subscriptions");
-		$scheduler->reload();
+	protected function reload($rerouter) {
+		$rerouter->onPause();
+		$rerouter->onResume();
 		return true;
 	}
 
@@ -133,67 +125,49 @@ class SchedulerCommander extends AbstractCommander {
 	/**
 	 * Add a subscription for a specific user (hooked from `user.created` event)
 	 *
-	 * @param Scheduler $scheduler
+	 * @param Rerouter $rerouter
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function subscribeUser($scheduler, $id) {
-		$scheduler->log->info("Subscribing user $id");
-		return $scheduler->subscribeUser($id);
+	protected function subscribeUser($rerouter, $id) {
+		$rerouter->log->info("Subscribing user $id");
+		return $rerouter->subscribeUser($id);
 	}
 
 
 	/**
 	 * Remove a subscription for a specific user (hooked from `user.deleted` event)
 	 *
-	 * @param Scheduler $scheduler
+	 * @param Rerouter $rerouter
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function unsubscribeUser($scheduler, $id) {
-		$scheduler->log->info("Unsubscribing user $id");
-		return $scheduler->unsubscribeUser($id);
+	protected function unsubscribeUser($rerouter, $id) {
+		$rerouter->log->info("Unsubscribing user $id");
+		return $rerouter->unsubscribeUser($id);
 	}
 
 
 	/**
 	 * Run binder for a specific user (hooked from [User|Role]AccessNotifier)
 	 *
-	 * @param Scheduler $scheduler
+	 * @param Rerouter $rerouter
 	 * @param int $id
 	 * @return bool
 	 */
-	protected function bindUser($scheduler, $id) {
-		$scheduler->log->info("Resetting bindings for user $id");
-		try {
-			$uqf = new UserQueueFactory();
-			$uqf->destroyUserBindings($id);
-			$uqf->bindUserQueue($id);
-			return true;
-		}
-		catch(Exception $e) {
-			// catch any and all exceptions
-			$scheduler->log->critical(get_class($e) . ": ".$e->getMessage());
-			return false;
-		}
+	protected function bindUser($rerouter, $id) {
+        $rerouter->rebindUser($this->mapper->findById($id));
 	}
 
 
 	/**
 	 * Run binder for all users (hooked from sync script)
 	 *
-	 * @param Scheduler $scheduler
+	 * @param Rerouter $rerouter
 	 * @return bool
 	 */
-	protected function bindAll($scheduler) {
-		$scheduler->log->info("Resetting bindings for all users");
-		$result = true;
-		foreach(UserMapper::getInstance()->findAll() as $user) {
-			/** @var User $user */
-			$result = $result && $this->bindUser($scheduler, $user->getId());
-		}
-		$this->adviseReload();
-		return $result;
+	protected function bindAll($rerouter) {
+        $rerouter->onHangup();
 	}
 
 }

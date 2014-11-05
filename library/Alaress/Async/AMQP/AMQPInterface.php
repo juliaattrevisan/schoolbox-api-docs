@@ -24,7 +24,7 @@ interface AMQPInterface {
 	/**
 	 * Declare an exchange
 	 *
-	 * @param $exchange
+	 * @param AMQPExchange $exchange
 	 * @param string $channelId
 	 * @return self
 	 */
@@ -151,7 +151,27 @@ interface AMQPInterface {
 	public function publish($message, $routingKey, $channelId = null);
 
 
-	/**
+    /**
+     * Delete the given queue
+     *
+     * @param string $queueName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteQueue($queueName, $channelId = null);
+
+
+    /**
+     * Delete the given exchange
+     *
+     * @param string $exchangeName
+     * @param string $channelId
+     * @return self
+     */
+    public function deleteExchange($exchangeName, $channelId = null);
+
+
+    /**
 	 * @return AMQPExchange
 	 */
 	public function getPrimaryExchange();

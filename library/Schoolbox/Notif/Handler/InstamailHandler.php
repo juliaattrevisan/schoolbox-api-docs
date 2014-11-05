@@ -14,11 +14,13 @@ use Monolog\Handler\MailHandler;
 use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Swift_RfcComplianceException;
 
 
 /**
@@ -48,16 +50,16 @@ class InstamailHandler extends MailHandler {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
+        $this->core = new CoreContext($this->conf);
 	}
 
 
     /**
      * @param string $content
-     * @param array $records
+     * @param array  $records
+     * @throws Swift_RfcComplianceException
      */
     protected function send($content, array $records) {
-	    $this->email = new TwigEmail('instantmail.twig');
-	    $decorator = new Decorator();
 
 	    if(count($records) != 1) {
 		    // handle multirecord message - TODO pretty sure this never happens
@@ -74,7 +76,16 @@ class InstamailHandler extends MailHandler {
 		try {
 			$user = $this->userMapper->findById($matches[1]);
 
-			if(isset($records[0]['context']['user'])) {
+            if (!$user->getEmail()) {
+                throw new Swift_RfcComplianceException("Empty address '{$user->getEmail()}' for user {$user->getId()}");
+            }
+
+            $this->email = new TwigEmail('instantmail.twig');
+            $this->email->setCoreContext($this->core->getContext());
+
+            $decorator = new Decorator();
+
+            if(isset($records[0]['context']['user'])) {
 				/** @var User $sender */
 				$sender = $this->userMapper->findById($records[0]['context']['user']);
 				$this->email->setFrom($sender->getEmail(), $sender->formatName());
@@ -83,7 +94,7 @@ class InstamailHandler extends MailHandler {
 			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));
 
 			// there should only be one notification
-			$n = reset($decorator->getAll());
+			$n = reset($decorator->getNotifications());
 
 			$this->email->setSubject($decorator->renderTitleAsPlaintext($n));
 

@@ -1,4 +1,8 @@
 <?php
+use Alaress\Redis;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\UserQueue\InstantUserQueue;
+use Schoolbox\Realtime\Notification\Decorator;
 
 /**
  * 
@@ -26,14 +30,12 @@ $this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
+$amqp  = Connector::getInstance();
+$queue = new InstantUserQueue(Redis::getClientInstance(), $amqp, $_SESSION['id']);
 
-$qf = new \Schoolbox\Notif\Queue\UserQueueFactory();
-$q = $qf->bindUserQueue($_SESSION['user']);
-
-// load the 20 most recent notifications into a decorator
-$decorator = new \Schoolbox\Realtime\Notification\Decorator();
-$decorator->appendNotifications($q->getNotifications(20, true, true));
-
+// load the data into your hat, and pull out a rabbit
+$decorator = new Decorator();
+$queue->fetchNotificationsIntoBundle($decorator);
 $notifications = $decorator->renderAsSitePageArray();
 
 $msgsByDay = array();

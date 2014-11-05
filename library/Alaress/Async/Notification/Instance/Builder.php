@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Html2Text\Html2Text;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
@@ -21,6 +22,9 @@ use OutOfBoundsException;
  * @package Alaress\Async\Notification
  */
 class Builder {
+
+    /** @var bool */
+    protected $validate;
 
 	/** @var array */
 	protected $context;
@@ -55,8 +59,11 @@ class Builder {
 
 	/**
 	 * Basic construction
+     *
+     * @param bool $validate optionally build without validation (debug only), if validation fails exception thrown
 	 */
-	public function __construct() {
+	public function __construct($validate = true) {
+        $this->validate = $validate;
 		$this->clear();
 	}
 
@@ -104,11 +111,14 @@ class Builder {
 
 
 	/**
+     * Set body, converting to plaintext as you go (we can't support markup in the body)
+     *
 	 * @param string $body
 	 * @return self
 	 */
 	public function setBody($body) {
-		return $this->putMeta('body', $body);
+        $plain = new Html2Text($body);
+        return $this->putMeta('body', $plain->get_text());
 	}
 
 
@@ -245,15 +255,14 @@ class Builder {
 	/**
 	 * Builds an instance from the construction given
 	 *
-	 * @param bool $validate - optionally build without validation (debug only), if validation fails exception thrown
 	 * @throws OutOfBoundsException
 	 * @throws InvalidArgumentException
 	 * @return Instance
 	 */
-	public function build($validate = true) {
+	public function build() {
 		// check things are right
 
-		if($validate) {
+		if($this->validate) {
 			// mandatory strings
 			$check = array('title', 'icon', 'namespace', 'href');
 

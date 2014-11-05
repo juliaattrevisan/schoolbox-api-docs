@@ -25,6 +25,7 @@ use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Client;
+use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
@@ -71,22 +72,31 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
     /** @var TimerInterface[] */
     protected $userTimeouts = array();
 
-	/**
-	 * @param LoopInterface $reactLoop
-	 * @param SessionValidator $sessionValidator
-	 * @param LoggerInterface $log
-     * @param Client $stompClient
-	 * @param DispatchStrategyInterface $strat
-	 */
-	public function __construct($reactLoop, $sessionValidator, $stompClient, $log, $strat = null) {
-		$this->pipes = new PipeCollection($sessionValidator, $log);
-		$this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log);
-		$this->reactLoop = $reactLoop;
-		$this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
-		$this->log = $log;
 
-		$this->log->debug('Instantiated PipeManager');
-	}
+    /**
+     * @param LoopInterface             $reactLoop
+     * @param SessionValidator          $sessionValidator
+     * @param Client                    $stompClient
+     * @param QueueFactory              $qf
+     * @param LoggerInterface           $log
+     * @param DispatchStrategyInterface $strat
+     */
+    public function __construct(
+        LoopInterface $reactLoop,
+        SessionValidator $sessionValidator,
+        Client $stompClient,
+        QueueFactory $qf,
+        LoggerInterface $log,
+        DispatchStrategyInterface $strat = null
+    ) {
+        $this->pipes               = new PipeCollection($sessionValidator, $log);
+        $this->reactLoop           = $reactLoop;
+        $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->log                 = $log;
+        $this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log, $qf);
+
+        $this->log->debug('Instantiated PipeManager');
+    }
 
 
 	/**
@@ -130,7 +140,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * @throws \Exception
 	 */
 	public function onClose(ConnectionInterface $conn) {
-		// explicitly close the descriptor to the temporary-file associated with the request that initiated this conn
+        /** @noinspection PhpUndefinedFieldInspection - explicitly close the descriptor to the temporary-file associated with the request that initiated this conn */
 		$conn->WebSocket->request->getBody()->close();
 		$this->pipes->unregisterPipe(Pipe::getSocketKeyForConnection($conn));
 	}
@@ -145,7 +155,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * @throws \Exception
 	 */
 	public function onError(ConnectionInterface $conn, \Exception $e) {
-		$this->log->critical(sprintf('Exception! %s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()));
+		$this->log->critical(sprintf('%s: "%s" - %s:%s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()));
 
 		// process exception needs to be rethrown
 		if($e instanceof ProcessException) {
@@ -330,9 +340,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			// deal with this yourself
 			case 'subscribe':
 				try {
-					if(!$this->subscriptionManager->subscribe($userId, new SelfResponder($this, $pipe))) {
-						// initiate a push to the client if subscribing failed (ie. they already got one)
-						$this->subscriptionManager->getUserSubscription($userId)->push();
+					if ($this->subscriptionManager->subscribe($userId)) {
+                        $this->sendToPipe($pipe, array('subscribe' => true));
+                        $this->subscriptionManager->getUserSubscription($userId)->push();
 					}
 				}
 				catch(SubscriptionException $e) {
@@ -346,6 +356,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				$data = $data[0];
 				$this->sendToPipe($pipe, array($command => $data));
 				break;
+
 			case 'push':
 				$this->sendToUser($userId, array($command => $data));
                 $release = false;

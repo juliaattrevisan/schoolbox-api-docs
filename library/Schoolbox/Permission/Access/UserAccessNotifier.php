@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Schedule\SchedulerCommander;
+use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
@@ -24,6 +24,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class UserAccessNotifier extends AbstractModuleNotifier {
 
@@ -258,8 +259,8 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 *
 	 * @param UserAccess $userAccess
 	 */
-	protected function adviseSchedulerCommander($userAccess) {
-		$cmdr = new SchedulerCommander();
+	protected function adviseRerouterCommander($userAccess) {
+		$cmdr = new RerouterCommander(UserMapper::getInstance());
 		$cmdr->adviseBindUser($userAccess->getUser()->getId());
 	}
 
@@ -272,7 +273,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @param array $diff
 	 */
 	public function notifySystemJoined($userAccess, $user, $diff = null) {
-		$this->adviseSchedulerCommander($userAccess);
+		$this->adviseRerouterCommander($userAccess);
 	}
 
 	/**
@@ -284,7 +285,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @param array $diff
 	 */
 	public function notifySystemLeft($userAccess, $user, $diff = null) {
-		$this->adviseSchedulerCommander($userAccess);
+		$this->adviseRerouterCommander($userAccess);
 	}
 
 	/**
@@ -296,7 +297,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @param array $diff
 	 */
 	public function notifySystemApproved($userAccess, $user, $diff = null) {
-		$this->adviseSchedulerCommander($userAccess);
+		$this->adviseRerouterCommander($userAccess);
 	}
 
 	/**
@@ -308,7 +309,7 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 	 * @param array $diff
 	 */
 	public function notifySystemRejected($userAccess, $user, $diff = null) {
-		$this->adviseSchedulerCommander($userAccess);
+		$this->adviseRerouterCommander($userAccess);
 	}
 
 }

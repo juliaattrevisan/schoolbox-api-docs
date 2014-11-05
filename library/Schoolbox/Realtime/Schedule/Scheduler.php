@@ -12,12 +12,12 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
-use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
+use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -33,7 +33,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
-use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
@@ -46,33 +45,12 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerFactory;
  *
  * @package Schoolbox\Realtime\Schedule
  */
-class Scheduler extends StompScheduler implements CommandableInterface
+class Scheduler extends StompScheduler
 {
 
     const MODULE_NS      = 'Schoolbox\\Realtime\\Schedule\\Module\\';
-    const QUEUE_SCHEDULE = '.sb.sched';
-    const QUEUE_COMMAND  = '.sb.cmd.sched';
 
     const COMPRESSION_LEVEL = 9;
-
-
-    /**
-     * Binds the queues that the Scheduler requires
-     */
-    public static function bindQueues()
-    {
-        // make sure our endpoints exist
-        $mqc    = Connector::getInstance();
-        $queues = array(
-            INSTANCE_ID . self::QUEUE_SCHEDULE => '*.' . Notif::TOPIC_APPLICATION,
-            INSTANCE_ID . self::QUEUE_COMMAND  => '*.' . Notif::TOPIC_CMD_SCHED
-        );
-
-        foreach ($queues as $q => $route) {
-            $mqc->declareQueue($q)
-                ->bindQueue($q, $route);
-        }
-    }
 
 
     /** @var Notif */
@@ -86,19 +64,18 @@ class Scheduler extends StompScheduler implements CommandableInterface
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
+     * @param string                    $scheduleQueue - don't forget to declare this in rabbit!
      * @param IConfigLoader             $conf
      */
-    public function __construct($loop, $dispatchStrategy, $log, $conf = null)
+    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf = null)
     {
         // cast optional param
         $this->conf  = $conf ? : ConfigMapper::getInstance();
         $this->notif = new Notif();
 
         // run construction
-        parent::__construct($loop, $dispatchStrategy, INSTANCE_ID . self::QUEUE_SCHEDULE, INSTANCE_ID . self::QUEUE_COMMAND, $log);
+        parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log);
         $this->resolvers = new ResolutionManager();
-
-        self::bindQueues();
 
         // register signal listeners
         $this->on(SIGHUP, array($this, 'onHangup'));
@@ -151,18 +128,18 @@ class Scheduler extends StompScheduler implements CommandableInterface
      */
     public function onMessage($frame, $resolver)
     {
-        $this->log->info('Received message from ' . INSTANCE_ID . self::QUEUE_SCHEDULE, array('char' => '>'));
+        $this->log->info("Received event from $this->scheduleQueue", array('char' => '>'));
         try {
             $formatted = CompressedFormatter::uncompress($frame->body);
             $event     = unserialize($formatted['message']);
 
             // only a few Models actually have schedule strategies, failure is ok
             // each module strategy knows how to deal with its own events
-            $this->log->info("Building trigger factory for " . get_class($event->getObject()));
+            $this->log->debug("Building trigger factory for " . get_class($event->getObject()));
             $triggerFactory = new TriggerFactory($this->getModule($event), $event, self::COMPRESSION_LEVEL);
 
             // retrieve, populate, and schedule this bundle of triggers
-            $this->log->info("Retrieving triggers");
+            $this->log->debug("Retrieving triggers");
             $triggers = $triggerFactory->buildTriggers($event->getAction())->getTriggers();
             $this->scheduleNotifications($triggers, $resolver);
             $triggerFactory->cleanup($triggers);
@@ -181,36 +158,13 @@ class Scheduler extends StompScheduler implements CommandableInterface
             // this message is can't be parsed, so we ACK it to make it go away
         } catch(ScheduleException $e) {
             // we're happy to ignore this, it just means no scheduling strategy exists for this Model
-            $this->log->info('Schedule Exception: ' . $e->getMessage(), array('char' => '?'));
+            $this->log->debug('Schedule Exception: ' . $e->getMessage());
         } catch(CompressionException $e) {
             // this message is unparseable, so we'll eventually ACK it to make it go away
             $this->log->critical('Compression Exception: ' . $e->getMessage(), array($e));
         }
 
         $resolver->ack();
-    }
-
-
-    /**
-     * Callback executed when a command is received from RabbitMQ on the command queue
-     *
-     * @param Frame $frame
-     */
-    public function onCommand($frame)
-    {
-        $this->log->info('Received command from ' . INSTANCE_ID . self::QUEUE_COMMAND, array('char' => '>'));
-        $cmdr = new SchedulerCommander();
-        try {
-            $body   = CompressedFormatter::uncompress($frame->body);
-            $result = $cmdr->exec($this, $body['message']);
-            if ($result) {
-                $this->log->debug("Command executed successfully");
-                return;
-            }
-        } catch(CompressionException $e) {
-            // noop
-        }
-        $this->log->error("Command failed to execute");
     }
 
 
@@ -259,6 +213,10 @@ class Scheduler extends StompScheduler implements CommandableInterface
         $c = count($triggers);
         if ($c == 0) {
             $this->log->info("No triggers to schedule");
+            if ($resolver instanceof AckResolver) {
+                $resolver->ack();
+                $this->log->debug("Resolver acknowledged");
+            }
             return;
         }
         $this->log->info(sprintf('Scheduling %s trigger%s', $c, $c == 1 ? '' : 's'));
@@ -274,12 +232,42 @@ class Scheduler extends StompScheduler implements CommandableInterface
      */
     public function scheduleNotification($trigger, $resolver = null)
     {
-        parent::scheduleNotification($trigger);
         if ($resolver instanceof AckResolver) {
             $this->attachResolverTrigger($resolver, $trigger);
         } else {
             $this->log->warning("No resolver supplied for attaching trigger");
         }
+
+        parent::scheduleNotification($trigger);
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     */
+    public function dispatchTrigger($trigger)
+    {
+        if (count($trigger->getCallbacks()) == 0) {
+            $this->log->warning("Trigger '{$trigger->getIdString()}' has no callbacks");
+            $this->detachTrigger($trigger);
+        } else {
+            parent::dispatchTrigger($trigger);
+        }
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return bool
+     */
+    protected function unschedule($trigger)
+    {
+        // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
+        if (parent::unschedule($trigger)) {
+            $this->detachTrigger($trigger);
+            return true;
+        }
+        return false;
     }
 
 
@@ -324,14 +312,9 @@ class Scheduler extends StompScheduler implements CommandableInterface
 
         $postman = new Postman($this->notif, $this->log);
 
-        $count = $postman->deliver(
-                         $bundle,
-                             array(
-                                 'user' => $trigger->getEvent()
-                                                   ->getEffector()
-                                                   ->getId()
-                             )
-        );
+        $count = $postman->deliver($bundle, array(
+            'user' => $trigger->getEvent()->getEffector()->getId()
+        ));
 
         if (is_null($count)) {
             $this->log->debug("No messages to broadcast");
@@ -363,11 +346,8 @@ class Scheduler extends StompScheduler implements CommandableInterface
         $pregClass  = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
 
         // first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
-        if ($event->getMapper() instanceof Mapper && $event->getMapper()
-                                                           ->getModuleNotifier()
-        ) {
-            $classname = $event->getMapper()
-                               ->getModuleNotifier();
+        if ($event->getMapper() instanceof Mapper && $event->getMapper()->getModuleNotifier()) {
+            $classname = $event->getMapper()->getModuleNotifier();
         } // next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
         elseif (class_exists($modelClass . 'Notifier')) {
             $classname = $modelClass . 'Notifier';
@@ -396,6 +376,7 @@ class Scheduler extends StompScheduler implements CommandableInterface
     protected function attachResolverTrigger($ackResolver, $trigger)
     {
         $this->resolvers->attachTriggerToResolver($ackResolver, $trigger);
+        $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver");
     }
 
 
@@ -405,33 +386,29 @@ class Scheduler extends StompScheduler implements CommandableInterface
      */
     protected function detachTrigger($trigger)
     {
-        $count = $this->resolvers->detachTrigger($trigger);
+        try {
+            $count = $this->resolvers->detachTrigger($trigger);
 
-        switch ($count) {
-            case -1:
-                $msg = "resolver now empty; detached";
-                break;
-            case 0:
-                $msg = "resolver now empty, but not detached...?";
-                break;
-            default:
-                $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
-                break;
+            switch ($count) {
+                case -1:
+                    $msg = "resolver now empty; acknowledged";
+                    break;
+                case 0:
+                    $msg = "resolver now empty, but not acknowledged...?";
+                    break;
+                default:
+                    $msg = "resolver still contains $count trigger" . ($count == 1 ? '' : 's');
+                    break;
+            }
+
+            $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg");
+            return $count;
+
+        } catch (OutOfBoundsException $e) {
+            $this->log->debug("Trigger '{$trigger->getIdString()}' not detached: " . $e->getMessage());
         }
 
-        $this->log->debug("Detaching trigger: $msg");
-
-        return $count;
-    }
-
-
-    /**
-     * @param TriggerInterface $trigger
-     * @return string
-     */
-    protected function generateTriggerIdString($trigger)
-    {
-        return sprintf("%s:%s", get_class($trigger->getEvent()->getObject()), $trigger->getLabel());
+        return -1;
     }
 
 }
