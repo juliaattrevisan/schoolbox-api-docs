@@ -518,6 +518,9 @@ class EventMapper extends Schoolbox\External\Mapper {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 
+//        $personalMapper = $this->getJoinMapper('personal');
+        $categoryMapper = $this->getJoinMapper('category');
+
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
@@ -551,6 +554,11 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$event->setAuthor($author);
 			$event->setType($eventType);
 
+            /* Find the groups
+             */
+//            $event->setUserCollection($personalMapper->findAllForEvents($event));
+            $event->setCategoryCollection($categoryMapper->findAllForEvent($event));
+
 			$augmented = array(
 				'event' => $event,
 				'auxiliary' => array(
@@ -560,7 +568,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 			$allEvents->add($augmented);
 		}
-
+        new \Alaress_Probe($allEvents);
 		return $allEvents;
 	}
 }
