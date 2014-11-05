@@ -171,12 +171,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 /** @var Component_Instance $component */
                 ++$i;
                 $class = str_replace('\\', '_', $component->getDefinition()->getClass());
+                $multipleClass = '';
 
                 if ($component->getDefinition()->getMultiple() == 'false') {
-                    $class .= ' one-only';
+                    $multipleClass .= ' one-only';
 
                     if ($component->getDefinition()->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
-                        $class .= ' disabled';
+                        $multipleClass .= ' disabled';
                     }
                 }
 
@@ -222,6 +223,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     'EPORTFOLIO_COMPONENT_COUNT' => $component->getInstanceCount(),
                     'EPORTFOLIO_COMPONENT_CLASS' => $class,
                     'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->getIdentifier(),
+                    'EPORTFOLIO_COMPONENT_MULTIPLE_STATE' => $multipleClass,
                 ));
 
                 $this_category = $component->getDefinition()->getComponentCategory();
