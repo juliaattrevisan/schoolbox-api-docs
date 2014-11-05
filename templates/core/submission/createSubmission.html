@@ -31,10 +31,11 @@
 		});
 
         // setup datepickers
-        var openDate = $j('#open_date');
-        var dueDate  = $j('#due_date');
-        var lateDate = $j('#late_date');
-        openDate.add(dueDate).add(lateDate).datepicker({
+        var publishDate = $j('#publish_date');
+        var openDate    = $j('#open_date');
+        var dueDate     = $j('#due_date');
+        var lateDate    = $j('#late_date');
+        openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
@@ -619,10 +620,26 @@
 
     <!-- BEGIN duework_timespan -->
     <tr class="dark">
+        <td class="formLabelWidth"><h4>Publish Date</h4>
+            <em>This due work will not show on your student's calendar until this date.
+                To publish at the start of the day, leave the time fields blank.</em>
+        </td>
+        <td>
+            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20"/>
+            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
+            <span>:</span>
+            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
+            <select name="publish_period" class="short">
+                <option value="am">AM</option>
+                <option value="pm"
+                {PUBLISH_PM}>PM</option>
+            </select>
+        </td>
+    </tr>
+    <tr class="dark accept-hide">
         <td class="formLabelWidth"><h4>Open Date</h4>
             <em>The date from when the due work will be available for submission.
                 To allow submissions from the start of the day, leave the time fields blank.</em>
-            <em>This due work will not show on your student's calendar until this date.</em>
         </td>
         <td>
             <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20"/>

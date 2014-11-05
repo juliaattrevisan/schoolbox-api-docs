@@ -122,6 +122,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $category    = CategoryMapper::getInstance()->findById($category_id);
     $submission
         ->setCategory($category)
+        ->setPublishDate(new Alaress_Date_Format(new DateTime('00:00:00')))
         ->setOpenDate(new Alaress_Date_Format(new DateTime('00:00:00')))
         ->setDueDate(new Alaress_Date_Format(new DateTime('+1 day 23:59:59')))
         ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
@@ -306,9 +307,18 @@ if (!$is_task) {
 }
 
 // Set date values
-$open_date = $submission->getOpenDate();
-$due_date  = $submission->getDueDate();
-$late_date = $submission->getLateDate();
+$publish_date = $submission->getPublishDate();
+$open_date    = $submission->getOpenDate();
+$due_date     = $submission->getDueDate();
+$late_date    = $submission->getLateDate();
+
+$publish_hour = '';
+$publish_min  = '';
+if ($publish_date->getUsingFormat('H:i:s') != '00:00:00') {
+    $publish_hour = $publish_date->getUsingFormat('g');
+    $publish_min  = $publish_date->getUsingFormat('i');
+}
+
 if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
     $open_hour = '';
     $open_min  = '';
@@ -349,6 +359,10 @@ $output = array(
     'OPEN_HOUR'         => $open_hour,
     'OPEN_MIN'          => $open_min,
     'OPEN_PM'           => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+    'PUBLISH_DATE'      => $publish_date->getUsingFormat('d/m/Y'),
+    'PUBLISH_HOUR'      => $publish_hour,
+    'PUBLISH_MIN'       => $publish_min,
+    'PUBLISH_PM'        => $publish_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
     'DUE_DATE'          => $due_date->getUsingFormat('d/m/Y'),
     'DUE_HOUR'          => $due_hour,
     'DUE_MIN'           => $due_min,

@@ -90,8 +90,9 @@ $useDescriptors = $resultSetID == 0;
  * Also set the time to the start or end of the day if all_day is set
  */
 
-$openDate = generateDate('open', '00:00:00');
-$dueDate  = generateDate('due', '23:59:59');
+$publishDate = generateDate('publish', '00:00:00');
+$openDate    = generateDate('open', '00:00:00');
+$dueDate     = generateDate('due', '23:59:59');
 
 // if we're not accepting submissions. override the late date to due date
 // Open date: the date on which the event shows on student's calendars
@@ -103,7 +104,7 @@ if (!$acceptSubmissions) {
 
 // If not a task: check if any of the dates failed to parse
 if (!$is_task) {
-    if (!($openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
+    if (!($publishDate->isValid() && $openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
         error(15);
     }
 
@@ -152,6 +153,7 @@ elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
 $submission->setAcceptMultiple(!empty($_POST['multi_submission']) ? true : false);
 if (!$is_task) {
+    $submission->setPublishDate($openDate);
     $submission->setOpenDate($openDate);
     $submission->setDueDate($dueDate);
     $submission->setLateDate($lateDate);
