@@ -561,8 +561,6 @@ class EventMapper extends Schoolbox\External\Mapper {
             $allEvents->add($event);
 		}
 
-        new \Alaress_Probe($allEvents);
-
 		return $allEvents;
 	}
 }
