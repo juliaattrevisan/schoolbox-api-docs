@@ -89,6 +89,14 @@ class SubmissionBox implements ISoftDeletable
     protected $owner;
 
     /**
+     * If this isn't null, the submission box won't be shown on student's
+     * calendars until this date.
+     *
+     * @var \Alaress_Date_Format
+     */
+    protected $publish_date;
+
+    /**
      * @var \Alaress_Date_Format
      */
     protected $open_date;
@@ -692,6 +700,24 @@ class SubmissionBox implements ISoftDeletable
     public function setGradeGroup($gradeGroup)
     {
         $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getPublishDate()
+    {
+        return $this->publish_date;
+    }
+
+    /**
+     * @param  \Alaress_Date_Format $publish_date
+     * @return $this
+     */
+    public function setPublishDate($publish_date)
+    {
+        $this->publish_date = $publish_date;
         return $this;
     }
 }

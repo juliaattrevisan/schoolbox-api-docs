@@ -112,6 +112,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'type'       => self::TYPE_MODEL,
             'join'       => 'task_instance',
         ));
+        $this->hasMap(
+            array(
+                'column'   => 'publish_date',
+                'property' => 'publishDate',
+                'type'     => self::TYPE_DATETIME,
+            )
+        );
         $this->hasMap(array(
             'column'     => 'open_date',
             'property'   => 'openDate',
