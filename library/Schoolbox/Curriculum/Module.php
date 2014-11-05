@@ -27,8 +27,6 @@ class Module extends BaseModule
     {
         $importModule = new Import\Module($injector);
         $importModule->init($basePath.'/import');
-        $sourceModule = new Source\Module($injector);
-        $sourceModule->init($basePath.'/source');
     }
 
     /**
