@@ -37,10 +37,10 @@ class PersonalMapper extends Schoolbox\External\Mapper {
 			'type' => self::TYPE_INTEGER,
 		));
         $this->hasJoin('personal', array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'user_id',
-                'other_key' => 'id',
-            ));
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'user_id',
+            'other_key' => 'id',
+        ));
 	}
 
 	/**

@@ -520,18 +520,16 @@ class EventMapper extends Schoolbox\External\Mapper {
 
         $personalMapper = $this->getJoinMapper('personal');
         $categoryMapper = $this->getJoinMapper('category');
+        $campusMapper = $this->getJoinMapper('campus');
 
 		$query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
-				{$eventTypeMapper->getColumnString('t')},
-				GROUP_CONCAT(DISTINCT luCampus.name ORDER BY luCampus.name ASC SEPARATOR ', ') AS aux_event_campuses
+				{$eventTypeMapper->getColumnString('t')}
 			FROM `{$this->table}` e
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			LEFT JOIN event_campus ON e.id = event_campus.event_id
-			LEFT JOIN luCampus ON event_campus.campus_id = luCampus.id
 			WHERE startDate >= :startDate
 			AND endDate <= :endDate
 			GROUP BY e.id
@@ -554,21 +552,17 @@ class EventMapper extends Schoolbox\External\Mapper {
 			$event->setAuthor($author);
 			$event->setType($eventType);
 
-            /* Find the groups
+            /* Find the auxiliary info
              */
             $event->setUserCollection($personalMapper->findAllForEvent($event));
             $event->setCategoryCollection($categoryMapper->findAllForEvent($event));
+            $event->setCampusCollection($campusMapper->findAllForEvent($event));
 
-			$augmented = array(
-				'event' => $event,
-				'auxiliary' => array(
-					'campuses' => $row['aux_event_campuses'],
-				)
-			);
-
-			$allEvents->add($augmented);
+            $allEvents->add($event);
 		}
+
         new \Alaress_Probe($allEvents);
+
 		return $allEvents;
 	}
 }
