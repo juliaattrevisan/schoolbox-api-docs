@@ -10,7 +10,6 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use Alaress\Scheduler\CommandableInterface;
 use Alaress\Scheduler\CronScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -18,13 +17,10 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
-use React\Stomp\Factory;
 use React\Stomp\Protocol\Frame;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
-use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
