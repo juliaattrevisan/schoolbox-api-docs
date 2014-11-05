@@ -1,0 +1,76 @@
+<?php
+/**
+ * Definition for the curriculum import submodule.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Curriculum\Import;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
+
+class Module extends BaseModule
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $router->addGet('curriculumImport.browse', $basePath);
+        $router->addPost('curriculumImport.create', $basePath);
+        $router->addGet('curriculumImport.learningLevels', $basePath . '/learningLevels');
+        $router->addGet('curriculumImport.outcomes', $basePath . '/outcomes');
+//        // Attach standard REST routes
+//        $router->attachResource('tile', $basePath);
+//        $router->attachResourcePostAlias('tile', $basePath);
+//        // but have separate add tile paths
+//        $router->addGet('tile.add', $basePath.'/add/{componentId}');
+//        $router->addPost('tile.create', $basePath.'/add/{componentId}');
+    }
+
+    /**
+     * For now, curricula are only editable by superusers.
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $authorizer->addRule('/^curriculumImport\\..*/', new Rule\IsLoggedIn());
+        $authorizer->addRule('/^curriculumImport\\..*/', new Rule\IsSuperuser());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $loader = new Twig_Loader_Filesystem(array());
+        $loader->addPath(__DIR__ . '/templates', 'curriculumImport');
+        $templateLoader->addLoader($loader);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set(
+            'controller:curriculumImport',
+            $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
+        );
+        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Mapper');
+        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setAreaMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningArea\\Mapper');
+        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setLevelMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
+        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setNodeMapper']
+            = $injector->lazyNew('Schoolbox\\Curriculum\\Node\\Mapper');
+    }
+}

@@ -1,0 +1,72 @@
+@charset "utf-8";
+
+// Here's a basic mixin for loading/loaded/failed
+.ajax-loading() {
+  .transition(background 1s);
+  &.loading {
+    background-color: @highlight-color;
+  }
+  &.loaded {
+    background-color: @positive-color;
+  }
+  &.failed {
+    background-color: @negative-color;
+  }
+}
+
+/**
+ * Styles that relate to the curriculum mapping feature.
+ */
+
+// The curriculum importer
+.curriculum-import-widget {
+  // This style should be generic to all tabs.
+  // There should be a generic ajax-loading style too
+  .ui-tabs-panel {
+    .ajax-loading();
+  }
+}
+/**
+ * Curriculum nodes: these should be generic too
+ */
+.curriculum-node {
+  font-weight: bolder;
+//  .name {
+//    font-weight: bolder;
+//  }
+//  .code {
+//    font-weight: bolder;
+//  }
+}
+
+/**
+ * Curriculum browser
+ */
+.curriculum-browser {
+  // These should be generic styles for all jstrees
+  .jstree-node {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .jstree-anchor {
+    display: inline;
+  }
+
+  // Two-panel layout
+  .pane {
+    margin: 0;
+    border: 1px solid @std-grey;
+    position: relative;
+    overflow: auto;
+    text-align: left;
+    box-sizing: border-box;
+  }
+}
+
+/**
+ * Editor within the curriculum browser
+ */
+.curriculum-editor {
+  padding: 12px;
+  .ajax-loading();
+}

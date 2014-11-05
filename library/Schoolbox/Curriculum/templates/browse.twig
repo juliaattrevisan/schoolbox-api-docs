@@ -1,0 +1,333 @@
+<!-- Template for browsing curricula -->
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="application/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="application/javascript">
+    (function($) {
+        $(function() {
+            // Setup Tiny now, for later addition
+            $.fn.alaressTiny({
+                mode: 'none'
+            });
+
+            // Twig-generated JS
+            var areas     = {{ areas|json_encode|raw }};
+            var levels    = {{ levels|json_encode|raw }};
+            var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
+
+            // add classes to tree, because jstree doesn't allow me to define
+            // a base style for trees
+            var tree = {{ tree|json_encode|raw }}.map(function(row) {
+                try {
+                    row.li_attr.class += ' curriculum-node';
+                } catch (e) {
+                    row.li_attr.class = 'curriculum-node';
+                }
+                return row;
+            });
+
+            // Method for building the form
+            // Tears down and sets up TinyMCE dynamically too
+            var buildForm = function(actions, data) {
+                tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
+                data.actions = actions;
+                data.areas   = areas;
+                data.levels  = levels;
+                formPanel
+                    .empty()
+                    .append(template(data));
+                tinyMCE.execCommand('mceAddControl', true, 'node-description');
+            };
+
+            var template  = doT.template($('script#node-template').html().trim());
+            var treePanel = $('.curriculum-selector');
+            var formPanel = $('.curriculum-editor');
+            var tree      = $('.curriculum-tree').jstree({
+                core: {
+                    animation: 50,
+                    data: tree,
+                    force_text: true,
+                    multiple: false,
+                    check_callback: true,
+                    themes: {
+                        variant: "resourcetree",
+                        dots: true,
+                        icons: true,
+                        responsive: false
+                    }
+                },
+                plugins: ['sort', 'types'],
+                types: {
+                    root: {
+                        icon: '/images/tree/server.gif'
+                    },
+                    'default': {
+                        icon: '/images/icons/22x22/folder.png'
+                    },
+                    folder: {
+                        icon: '/images/icons/22x22/folder.png'
+                    },
+                    code: {
+                        icon: '/images/famicons/star.png'
+                    }
+                }
+            })
+                .on('select_node.jstree', function(event, jstree) {
+                    // Open a node when you select it
+                    jstree.instance.open_node(jstree.node.id);
+                })
+                .on('ready.jstree', function(event, jstree) {
+                    // Is there a hash? If so, open all nodes below that hash.
+                    // (but maybe not curriculum codes)
+                    var match = window.location.hash.match(/^#(.*)/);
+                    if (match) {
+                        jstree.instance.select_node(match[1]);
+                        jstree.instance.open_all(match[1]);
+                    }
+                })
+                .on('select_node.jstree', function(event, jstree) {
+                    // Load this node in the node browser
+                    // read URL comes from the node I just clicked
+                    formPanel
+                        .addClass('loading')
+                        .find(':input').prop('disabled', true);
+                    $.getJSON(jstree.node.a_attr.href+'.json')
+                        .done(function(data) {
+                            buildForm(
+                                {
+                                    save:   jstree.node.a_attr['data-saveuri'],
+                                    delete: jstree.node.a_attr['data-deleteuri']
+                                },
+                                data.item
+                            );
+                        })
+                        .fail(function(jqXhr, textStatus, error) {
+                            formPanel.addClass('failed');
+                        })
+                        .always(function() {
+                            formPanel.removeClass('loading');
+                            setTimeout(function() {
+                                formPanel.removeClass('loaded failed');
+                            }, 2000)
+                        });
+                })
+
+            var jstree = $.jstree.reference('.curriculum-tree');
+
+            // resizer - stolen from three panel
+            var resizePanels = function() {
+                $().add(formPanel).add(treePanel).outerHeight(
+                    $(window).height() - $('#header').height() - $('#footer').height() - 50
+                );
+            };
+            resizePanels();
+            $(window).resize(resizePanels);
+
+            // Node save form submission
+            formPanel.on('submit', '#node-form', function(event) {
+                event.preventDefault();
+
+                // Do it via AJAX instead
+                var form     = $(this);
+                var formData = form.serializeArray();
+                formPanel
+                    .addClass('loading')
+                    .find(':input').prop('disabled', true);
+                $.ajax({
+                    type:     this.method,
+                    data:     formData,
+                    dataType: 'json',
+                    url:      this.action
+                })
+                    .done(function(data) {
+                        // Is this a newly created node? If so, add it in.
+                        // jsTree has no comprehensive updateNode, so update what I can.
+                        formPanel.addClass('loaded');
+                        if (jstree.get_node(data.item.id)) {
+                            jstree.rename_node(data.item.id, data.tree.text);
+                        } else {
+                            jstree.create_node(data.tree.parent, data.tree);
+                            jstree.deselect_all(true);
+                            jstree.select_node(data.tree.id);
+                        }
+                    })
+                    .fail(function(jqXhr, textStatus, error) {
+                        formPanel.addClass('failed');
+                    })
+                    .always(function() {
+                        formPanel.removeClass('loading')
+                            .find(':input').prop('disabled', false);
+                        setTimeout(function() {
+                            formPanel.removeClass('loaded failed');
+                        }, 2000)
+                    });
+            });
+
+            // IE9 doesn't support form attribute on inputs.
+            // Add a click delete button polyfill.
+            if (!('form' in $('<input>')[0])) {
+                formPanel.on('click', '#delete-button', function(event) {
+                    event.preventDefault();
+                    formPanel.find('#node-delete-form').submit();
+                });
+            }
+
+            // Delete node form
+            formPanel.on('submit', '#node-delete-form', function(event) {
+                event.preventDefault();
+                formPanel
+                    .addClass('loading')
+                    .find(':input').prop('disabled', true);
+                $.ajax({
+                    type:     this.method,
+                    dataType: 'json',
+                    url:      this.action
+                })
+                    .done(function(data) {
+                        formPanel.addClass('loaded');
+                        jstree.delete_node(data.item.id);
+                        jstree.select_node(data.tree.parent);
+                    })
+                    .fail(function(jqXhr, textStatus, error) {
+                        formPanel.addClass('failed');
+                    })
+                    .always(function() {
+                        formPanel.removeClass('loading')
+                            .find(':input').prop('disabled', false);
+                    });
+            })
+
+            // Create new curriculum
+            treePanel.on('click', '#create-curriculum-button', function(event) {
+                event.preventDefault();
+                buildForm({ save: createUri }, {});
+            });
+
+            // Add child to existing curriculum
+            formPanel.on('click', '#create-child-button', function(event) {
+                event.preventDefault();
+                var form = $(this).closest('form');
+                buildForm({ save: createUri }, { parent: form.data('nodeid') });
+            });
+        })
+    })(jQuery);
+</script>
+
+<!-- Template for the display of a curriculum node -->
+{% verbatim %}
+<script id="node-template" type="text/x-dot-template">
+    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
+        <input type="hidden" name="parent" value="{{! it.parent }}" />
+        <!--
+        Only show curriculum selection for new base nodes
+        Also consider making these selectors selectized so I can add dynamically
+        -->
+        {{? !it.id && !it.parent }}
+        <h1>Create New Curriculum</h1>
+        <dl>
+            <dt>Curriculum</dt>
+            <dd>
+                <select name="learningLevel">
+                    <option value="">-- select a level --</option>
+                    {{~ it.levels :levelGroup }}
+                    <optgroup label="{{! levelGroup.name || 'Uncategorized' }}">
+                        {{~ levelGroup.list :level }}
+                        <option value="{{! level.id }}" label="{{! level.name }}">{{! level.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                </select>
+                <select name="learningArea">
+                    <option value="">-- select an area --</option>
+                    {{~ it.areas :areaGroup }}
+                    <optgroup label="{{! areaGroup.name || 'Uncategorized' }}">
+                        {{~ areaGroup.list :area }}
+                        <option value="{{! area.id }}" label="{{! area.name }}">{{! area.name }}</option>
+                        {{~ }}
+                    </optgroup>
+                    {{~}}
+                </select>
+            </dd>
+        </dl>
+        {{?}}
+
+        {{? it.id }}
+        <h1>Edit Curriculum Subsection</h1>
+        {{?}}
+        {{? !it.id && it.parent }}
+        <h1>Create New Curriculum Subsection</h1>
+        {{?}}
+
+        <dl>
+            <dt>Name</dt>
+            <dd><input type="text" name="name" value="{{! it.name }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Code</dt>
+            <dd><input type="text" name="code" value="{{! it.code }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Reference</dt>
+            <dd><input type="text" name="reference" value="{{! it.reference }}" /></dd>
+        </dl>
+        <dl>
+            <dt>Description</dt>
+            <dd><textarea id="node-description" name="description">{{! it.description }}</textarea>
+        </dl>
+        {{? it.id }}
+            <input type="submit" class="submit-btn-plain" value="Save Changes" />
+            <input type="submit" class="submit-btn-plain" value="Add New Subsection" id="create-child-button" />
+        {{?}}
+        {{? !it.id && it.parent }}
+            <input type="submit" class="submit-btn-plain" value="Create Subsection" />
+        {{?}}
+        {{? !it.id && !it.parent }}
+            <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
+        {{?}}
+        {{? it.actions.delete }}
+            <input type="submit"
+                   class="submit-btn-plain"
+                   value="Delete"
+                   id="delete-button"
+                   form="node-delete-form"
+            />
+        {{?}}
+    </form>
+    {{? it.actions.delete }}
+    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
+    {{?}}
+</script>
+{% endverbatim %}
+
+<div class="template2 curriculum-browser">
+    <div class="left">
+        <div class="pane curriculum-selector">
+            <table id="category-head" class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Curricula
+                            <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
+                               id="create-curriculum-button"
+                               class="submit-btn-plain float-right inline-block"
+                            >Create New Curriculum</a>
+                            <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
+                               class="submit-btn-plain float-right inline-block"
+                            >Import Curriculum</a>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="scroller">
+                <div class="curriculum-tree"></div>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div class="pane curriculum-editor">
+        </div>
+    </div>
+</div>
