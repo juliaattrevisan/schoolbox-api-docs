@@ -56,7 +56,7 @@
 					<li class='viewCommentThread' id='comment_{COMMENT_ID}'>
 						<!-- BEGIN has_delete_comment_form -->
 						<span class="actions">
-							<a class="delete-comment btn delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={COMMENT_AUTHOR_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment"><span></span></a>
+							<a class="delete-comment btn delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={COMMENT_AUTHOR_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this comment?');"><span></span></a>
 						</span>
 						<!-- END has_delete_comment_form -->
 
@@ -84,7 +84,7 @@
 				</form>
 
 				<p class='interact'>
-					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show Comments</a>
+					<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}' data-numcomments="{COMMENT_TOTAL}"><span></span>Show Comments ({COMMENT_TOTAL})</a>
 					<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
 				</p>
 
