@@ -16,6 +16,7 @@ use Alaress\Async\UserQueue\UserQueue;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Logger;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\Notif;
@@ -83,6 +84,7 @@ class QueueSorter implements FilterInterface {
 	 * @param User $user
 	 * @param Frame $frame
 	 * @throws InvalidArgumentException
+     * @throws PDOException
 	 * @return bool
 	 */
 	public function process(User $user, Frame $frame) {
@@ -140,6 +142,10 @@ class QueueSorter implements FilterInterface {
 		}
         catch(Swift_RfcComplianceException $e) {
             $this->log->warning($e->getMessage());
+        }
+        catch(PDOException $e) {
+            // this needs to be escalated
+            throw $e;
         }
 		catch(Exception $e) {
 			$this->log->error(get_class($e) . " occurred during rerouting: " . $e->getMessage(), array($e));

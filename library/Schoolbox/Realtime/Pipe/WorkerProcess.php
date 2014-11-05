@@ -16,6 +16,8 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
 use InvalidArgumentException;
+use PDOException;
+use Predis\PredisException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
@@ -91,6 +93,7 @@ class WorkerProcess extends AbstractProcess
      *
      * @param $userId
      * @param $count
+     * @throws PDOException
      * @return array
      */
     protected function fetch($userId, $count)
@@ -101,11 +104,17 @@ class WorkerProcess extends AbstractProcess
         // get ALL messages in this queue
         $queue = $this->uqf->buildForUser($userId);
 
-        // make messages pretty
-        $queue->fetchNotificationsIntoBundle($decorator, true);
+        try {
+            // make messages pretty
+            $queue->fetchNotificationsIntoBundle($decorator, true);
 
-        // wrap in an array to preserve keys
-        return array($decorator->renderAsSocketArray(false, $count));
+            // wrap in an array to preserve keys
+            return array($decorator->renderAsSocketArray(false, $count));
+
+        } catch (PredisException $e) {
+            // Redis has gone away -_-;
+            throw new PDOException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
 
