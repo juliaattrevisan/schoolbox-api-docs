@@ -221,6 +221,9 @@ if (is_array($typeList)) {
                 $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
                 foreach ($allEvents as $currentEvent) {
+
+                    /* Auxiliary collections
+                     */
                     $allUsers = array();
 
                     foreach ($currentEvent->getUserCollection() as $currentUser) {
@@ -239,6 +242,15 @@ if (is_array($typeList)) {
                         $allCampuses[] = $currentCampus->getName();
                     }
 
+                    /* Special selection modifiers
+                     */
+                    if (count($allUsers)) {
+                        $modifier = 'personal';
+                    }
+                    else if (count($allCategories)) {
+                        $modifier = 'group';
+                    }
+
                     $this->setVar(
                         array(
                             'CLEANUP_EVENT_ID' => $currentEvent->getId(),
@@ -251,6 +263,7 @@ if (is_array($typeList)) {
                             'CLEANUP_EVENT_USERS' => implode('<br />', $allUsers),
                             'CLEANUP_EVENT_CATEGORIES' => implode('<br />', $allCategories),
                             'CLEANUP_EVENT_CAMPUSES' => implode('<br />', $allCampuses),
+                            'CLEANUP_EVENT_MODIFIER' => $modifier,
                         )
                     );
 
