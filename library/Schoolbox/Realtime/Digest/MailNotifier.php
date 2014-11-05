@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -97,6 +98,7 @@ class MailNotifier implements Serializable {
 
         $result = 0;
 		$dir    = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
+        $core   = new CoreContext($this->conf);
 
 		// iterate and digest
 		foreach($users as $user) {
@@ -105,6 +107,8 @@ class MailNotifier implements Serializable {
             $email     = new TwigEmail('digestmail.twig', $this->conf->get('digest_subject'));
             $uq        = $this->getUserQueueFactory()->buildForUser($user->getId());
 
+            $email->setCoreContext($core->getContext());
+
             $this->log()->info("Digesting {$user->getUsername()}");
 
             $uq->fetchNotificationsIntoBundle($decorator, true);
@@ -112,28 +116,42 @@ class MailNotifier implements Serializable {
 			if(!$decorator->count()) {
 				// this user has nothing to digest
 				$this->log()->notice("{$user->getUsername()} has nothing to digest");
+                unset($uq, $decorator, $email, $user);
 				continue;
 			}
 
-			$context = $decorator->renderAsTwigContext($email->getCoreContext(), 0, $dir);
+			$context = $decorator->renderAsTwigContext($core->getContext(), 0, $dir);
 
-			// explicitly an rfc822 email spec, so it sets, not adds
-			$email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
+            try {
+                // explicitly an rfc822 email spec, so it sets, not adds
+                $email->setContext($context)->setTo(sprintf("%s <%s>", $user->formatName(), $user->getEmail()));
 
-			// away she goes
-			$sent = $email->send();
+                // away she goes
+                $sent = $email->send();
 
-            // if email sent successfully, ACK, otherwise NACK
-			if($sent) {
-				$this->log()->notice("Mail sent successfully, dropping messages from queue");
-                $uq->drain();
-				++$result;
-			}
-			else {
-				$this->log()->warning("Failed to email");
-			}
+                // if email sent successfully, ACK, otherwise NACK
+                if($sent) {
+                    $this->log()->notice("Mail sent successfully, dropping messages from queue");
+                    $uq->drain();
+                    ++$result;
+                }
+                else {
+                    $this->log()->warning("Failed to email");
+                }
 
-            unset($uq, $decorator, $email, $user);
+                unset($uq, $decorator, $email, $user);
+
+            } catch (\Swift_SwiftException $e) {
+                $this->log()->warning(get_class($e) . ': ' . $e->getMessage(), array($e));
+            } catch (\Twig_Error_Runtime $e) {
+                $this->log()->error(get_class($e) . ': ' . $e->getMessage(), array($e));
+                if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
+                    // this means the template couldn't render the mail because of bad data, so we have to flush it :/
+                    $uq->drain();
+                    $this->log()->warning('Message content cannot be rendered; data lost');
+                }
+            }
+
 		}
 
         unset($users);

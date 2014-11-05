@@ -14,6 +14,7 @@ use Monolog\Handler\MailHandler;
 use Monolog\Logger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -49,6 +50,7 @@ class InstamailHandler extends MailHandler {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
+        $this->core = new CoreContext($this->conf);
 	}
 
 
@@ -79,6 +81,8 @@ class InstamailHandler extends MailHandler {
             }
 
             $this->email = new TwigEmail('instantmail.twig');
+            $this->email->setCoreContext($this->core->getContext());
+
             $decorator = new Decorator();
 
             if(isset($records[0]['context']['user'])) {
