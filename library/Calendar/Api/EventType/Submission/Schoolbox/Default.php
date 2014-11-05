@@ -96,7 +96,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 $event->setSubmissionBoxId($submission_box->getId());
                 $event->setSubmissionBoxName($submission_box->getName());
                 $event->setSubmissionBoxDetail($submission_box->getDescription());
-                $event->setPublishDate($submission_box->getOpenDate());
+                $event->setPublishDate($submission_box->getPublishDate());
             }
 
             $event->setAuthorId($owner->getId());
