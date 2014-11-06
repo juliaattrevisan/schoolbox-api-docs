@@ -14,41 +14,50 @@ use Schoolbox;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
-class RoleMapper extends Schoolbox\External\Mapper {
+class RoleMapper extends Schoolbox\External\Mapper
+{
 
-	/**
-	 * Mapping
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('event_group');
-		$this->hasModel('\\Schoolbox\\Calendar\\Relation\\Role');
+    /**
+     * Mapping
+     *
+     * @return Bool|void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('event_group');
+        $this->hasModel('\\Schoolbox\\Calendar\\Relation\\Role');
 
-		$this->hasMap(array(
-			'column' => 'event_id',
-			'property' => 'eventId',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'group_id',
-			'property' => 'roleId',
-			'type' => self::TYPE_INTEGER,
-		));
-	}
+        $this->hasMap(
+            array(
+                'column' => 'event_id',
+                'property' => 'eventId',
+                'type' => self::TYPE_INTEGER,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column' => 'group_id',
+                'property' => 'roleId',
+                'type' => self::TYPE_INTEGER,
+            )
+        );
+    }
 
-	/**
-	 * Purge existing sid assignations
-	 *
-	 * @param Schoolbox\Calendar\Event $event
-	 */
-	public function cleanse(Schoolbox\Calendar\Event $event) {
-		$statement = $this->database->prepare("
+    /**
+     * Purge existing sid assignations
+     *
+     * @param Schoolbox\Calendar\Event $event
+     */
+    public function cleanse(Schoolbox\Calendar\Event $event)
+    {
+        $statement = $this->database->prepare(
+            "
 			DELETE FROM `{$this->table}`
 			WHERE `event_id` = :identifierValue
-		");
+		"
+        );
 
-		$statement->bindValue(':identifierValue', $event->getId());
-		$statement->execute();
-	}
+        $statement->bindValue(':identifierValue', $event->getId());
+        $statement->execute();
+    }
 }

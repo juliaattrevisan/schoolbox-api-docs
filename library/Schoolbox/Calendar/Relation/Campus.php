@@ -11,64 +11,70 @@
  */
 namespace Schoolbox\Calendar\Relation;
 
-class Campus {
+class Campus
+{
 
-	/**
-	 * eventId to which this sid belongs
-	 *
-	 * @var null
-	 */
-	private $eventId = null;
+    /**
+     * eventId to which this sid belongs
+     *
+     * @var null
+     */
+    private $eventId = null;
 
-	/**
-	 * Sid value
-	 *
-	 * @var null
-	 */
-	private $campusId = null;
+    /**
+     * Sid value
+     *
+     * @var null
+     */
+    private $campusId = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set event id
-	 *
-	 * @param null $eventId
-	 */
-	public function setEventId($eventId) {
-		$this->eventId = $eventId;
-	}
+    /**
+     * Set event id
+     *
+     * @param null $eventId
+     */
+    public function setEventId($eventId)
+    {
+        $this->eventId = $eventId;
+    }
 
-	/**
-	 * Get event id
-	 *
-	 * @return null
-	 */
-	public function getEventId() {
-		return $this->eventId;
-	}
+    /**
+     * Get event id
+     *
+     * @return null
+     */
+    public function getEventId()
+    {
+        return $this->eventId;
+    }
 
-	/**
-	 * Set campus id
-	 *
-	 * @param null $campusId
-	 */
-	public function setCampusId($campusId) {
-		$this->campusId = $campusId;
-	}
+    /**
+     * Set campus id
+     *
+     * @param null $campusId
+     */
+    public function setCampusId($campusId)
+    {
+        $this->campusId = $campusId;
+    }
 
-	/**
-	 * Get campus id
-	 *
-	 * @return null
-	 */
-	public function getCampusId() {
-		return $this->campusId;
-	}
+    /**
+     * Get campus id
+     *
+     * @return null
+     */
+    public function getCampusId()
+    {
+        return $this->campusId;
+    }
 }
