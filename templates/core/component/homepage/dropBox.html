@@ -1,7 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
-    $j(function() {
+    $(function() {
+
         $j('input[type=file].pretty-file-input').prettyFileInput({
             additionalButtonClasses: 'no-marg float-left',
             buttonActiveClass: 'tick',
@@ -26,18 +28,12 @@
             <!-- END drop_success -->
             <fieldset class="drop-left">
                 <h3>Description</h3>
-                <label><input name="description" class="required" type="text" /></label>
+                <label>
+                    <input name="description" class="required" type="text" />
+                </label>
                 <input type="hidden" name="category" value="{ID}" />
             </fieldset>
-
-
-
-            <fieldset class="drop-right">
-                <h3>File</h3>
-                <input name="file" type="file" class="pretty-file-input"/>
-            </fieldset>
-
-
+            <fieldset class="drop-right">{ATTACH_ZONE}</fieldset>
             <fieldset class="submit">
                 <input type="submit" value="Upload" class="drop-submit submit-btn-plain"/>
             </fieldset>
@@ -50,8 +46,9 @@
                 <span class="actions">
                     <a class="btn delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"><span></span></a>
                 </span>
-
-                <h4><a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a></h4>
+                <h4>
+                    <a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a>
+                </h4>
                 <p class="meta">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
             </li>
             <!-- END drop_file -->
