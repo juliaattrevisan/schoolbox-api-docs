@@ -3,7 +3,7 @@
 class SubmissionStudent extends DeprecatedModel
 {
 
-    function SubmissionStudent ()
+    function SubmissionStudent()
     {
 
         $this->_table = "student_submission";
@@ -14,8 +14,8 @@ class SubmissionStudent extends DeprecatedModel
 
     function getByID($id)
     {
-        $query = "SELECT s.*, u.lastname, u.firstname FROM `".$this->_table."` s, user u
-				  WHERE s.owner = u.id AND s.".$this->_index." = $id";
+        $query = "SELECT s.*, u.lastname, u.firstname FROM `" . $this->_table . "` s, user u
+                  WHERE s.owner = u.id AND s." . $this->_index . " = $id";
         return $this->db->getRow($query);
     }
 
@@ -40,22 +40,23 @@ class SubmissionStudent extends DeprecatedModel
      * Gets list of al students who have submitted to this submission box ID.
      *
      * @param  int $boxId
+     *
      * @return array
      */
     public function getStudentListByBoxId($boxId)
     {
-        $studentList = array();
+        $studentList    = array();
         $allSubmissions = $this->getByBoxID($boxId);
         if (is_array($allSubmissions) && count($allSubmissions)) {
             foreach ($allSubmissions as $submission) {
                 $studentList[] = array(
-                    'title' => $submission['title'],
-                    'firstname' => $submission['firstname'],
-                    'lastname' => $submission['lastname'],
-                    'uid' => $submission['uid'],
+                    'title'      => $submission['title'],
+                    'firstname'  => $submission['firstname'],
+                    'lastname'   => $submission['lastname'],
+                    'uid'        => $submission['uid'],
                     'synergy_id' => $submission['synergy_id'],
-                    'type' => $submission['type'],
-                    'group_id' => $submission['group_id'],
+                    'type'       => $submission['type'],
+                    'group_id'   => $submission['group_id'],
                 );
             }
         }
@@ -90,56 +91,57 @@ class SubmissionStudent extends DeprecatedModel
         return $this->db->getAll($query);
 
     }
-/*
-    function getBySynergyID($subBoxID, $synergyID) {
-        $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
-                         local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
-                         DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
-                         pd.score
-                  FROM (student_submission, user)
-                  LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
-                  WHERE synergy_id = '$synergyID'
-                  AND owner = user.id
-                  AND box_id = '$subBoxID'
-                  ORDER BY lastname, firstname, datestamp DESC ";
-        return $this->db->getAll($query);
-    }
 
-    function getByUserID($subBoxID, $userID) {
-        $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
-                         local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
-                         DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
-                         pd.score
-                  FROM (student_submission, user)
-                  LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
-                  WHERE owner = '$userID'
-                  AND owner = user.id
-                  AND box_id = '$subBoxID'
-                  ORDER BY lastname, firstname, datestamp DESC ";
-        return $this->db->getAll($query);
-    }
+    /*
+        function getBySynergyID($subBoxID, $synergyID) {
+            $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
+                             local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
+                             DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
+                             pd.score
+                      FROM (student_submission, user)
+                      LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
+                      WHERE synergy_id = '$synergyID'
+                      AND owner = user.id
+                      AND box_id = '$subBoxID'
+                      ORDER BY lastname, firstname, datestamp DESC ";
+            return $this->db->getAll($query);
+        }
 
-    function getByBoxID($subBoxID) {
-         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
-                          local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
-                          DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
-                          pd.score
-                   FROM (student_submission, user)
-                   LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
-                   WHERE owner = user.id
-                   AND box_id = '$subBoxID'
-                   ORDER BY lastname, firstname";
-         return $this->db->getAll($query);
-    }
-*/
+        function getByUserID($subBoxID, $userID) {
+            $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
+                             local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
+                             DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
+                             pd.score
+                      FROM (student_submission, user)
+                      LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
+                      WHERE owner = '$userID'
+                      AND owner = user.id
+                      AND box_id = '$subBoxID'
+                      ORDER BY lastname, firstname, datestamp DESC ";
+            return $this->db->getAll($query);
+        }
+
+        function getByBoxID($subBoxID) {
+             $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
+                              local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
+                              DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
+                              pd.score
+                       FROM (student_submission, user)
+                       LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
+                       WHERE owner = user.id
+                       AND box_id = '$subBoxID'
+                       ORDER BY lastname, firstname";
+             return $this->db->getAll($query);
+        }
+    */
     function checkSubmitted($box_id, $userID)
     {
         $query = "SELECT s.id FROM student_submission s
-				  WHERE s.box_id = '$box_id' AND s.owner = '".$userID."'";
+                  WHERE s.box_id = '$box_id' AND s.owner = '" . $userID . "'";
         return is_array($this->db->getRow($query));
     }
 
-    function getStatus ($user_id, $submission_box_id)
+    function getStatus($user_id, $submission_box_id)
     {
         $query = "SELECT sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, sr.returned, sr.mark
                   FROM submission_box sb
@@ -161,16 +163,16 @@ class SubmissionStudent extends DeprecatedModel
         }
 
         if (!empty($submission['returned']) && empty($submission['submitted'])) {
-            $submission['status'] = 1;
+            $submission['status']        = 1;
             $submission['relevant_date'] = $submission['date'];
         } elseif (!empty($submission['returned'])) {
-            $submission['status'] = 3;
+            $submission['status']        = 3;
             $submission['relevant_date'] = $submission['returned'];
         } elseif (!empty($submission['submitted'])) {
-            $submission['status'] = 2;
+            $submission['status']        = 2;
             $submission['relevant_date'] = $submission['submitted'];
         } else {
-            $submission['status'] = 1;
+            $submission['status']        = 1;
             $submission['relevant_date'] = $submission['date'];
         }
 
@@ -182,7 +184,7 @@ class SubmissionStudent extends DeprecatedModel
         //check if already submitted
         if ($this->checkSubmitted($box_id, $_SESSION['id'])) {
             $subHandler = new Submission();
-            $subbox = $subHandler->getByID($box_id);
+            $subbox     = $subHandler->getByID($box_id);
 
             if (!$subbox['multi_submission']) {
                 error(27);
@@ -190,13 +192,13 @@ class SubmissionStudent extends DeprecatedModel
         }
 
         //check if submitted assignment is late
-        $query = "SELECT
+        $query  = "SELECT
                       UNIX_TIMESTAMP(date) AS overdue, UNIX_TIMESTAMP(open_date) AS open, code, category.id
                   FROM
                       submission_box, category
-		          WHERE
-		              submission_box.id = '$box_id'
-		              AND submission_box.category = category.id";
+                  WHERE
+                      submission_box.id = '$box_id'
+                      AND submission_box.category = category.id";
         $result = $this->db->getRow($query);
         if (!is_array($result)) {
             error(17);
@@ -227,20 +229,20 @@ class SubmissionStudent extends DeprecatedModel
     {
         $late = $this->securityCheck($boxID);
 
-        $studentSub = array (
+        $studentSub = array(
             'owner'     => $_SESSION['id'],
             'realname'  => $file['name'],
             'submitted' => 'NOW()',
             'box_id'    => $boxID,
             'late'      => $late,
         );
-        
+
         $this->db->insert($this->_table, $studentSub);
         $fileId = $this->db->insertID();
 
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
-        
+
         move_uploaded_file($file['tmp_name'], Cfg::get('submission_dir') . "/" . $newFileName);
 
         return $fileId;
