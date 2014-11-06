@@ -48,6 +48,7 @@
                 })
             }
         });
+        publishDate.syncDates({endDate: openDate});
         openDate.syncDates({endDate: dueDate});
         dueDate.syncDates({endDate: lateDate});
 
@@ -130,7 +131,14 @@
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
         var submission_form = $j('#createSubmissionForm');
         var publish_date_valid = { dateValid: true };
-        var open_date_valid = { dateValid: true };
+        var open_date_valid = {
+            dateValid: true,
+            dateNotBefore: {
+                message: 'Please enter a date that is not before the publish date.',
+                param:   'publish',
+                depends: isAcceptSubmit
+            }
+        };
         var due_date_valid  = {
             dateValid: true,
             dateNotBefore: {
@@ -178,6 +186,10 @@
                 late_period: late_date_valid
             },
             messages: {
+                open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_period: {dateNotBefore: open_date_valid.dateNotBefore.message},
                 due_date:    {dateNotBefore: due_date_valid.dateNotBefore.message},
                 due_hour:    {dateNotBefore: due_date_valid.dateNotBefore.message},
                 due_minute:  {dateNotBefore: due_date_valid.dateNotBefore.message},
