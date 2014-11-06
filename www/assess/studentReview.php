@@ -107,7 +107,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID' => $assess['category_id'],
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
 
 ));
 

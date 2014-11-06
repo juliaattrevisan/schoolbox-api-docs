@@ -1,6 +1,14 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+
 <script type="text/javascript">
 $j(function() {
+	$.fn.alaressTiny({
+		mode: 'exact',
+		elements: 'description',
+		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
+	});
 
 	$j('.checkbox').click(function() {	
 		if ($j('.hide-questions').is(":visible")) {
