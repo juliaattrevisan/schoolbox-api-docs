@@ -129,6 +129,7 @@
 
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
         var submission_form = $j('#createSubmissionForm');
+        var publish_date_valid = { dateValid: true };
         var open_date_valid = { dateValid: true };
         var due_date_valid  = {
             dateValid: true,
@@ -159,6 +160,10 @@
                     markTypeRubricCriteriaExists: true,
                     markTypeRubricCriteriaCheck: true
                 },
+                publish_date:   publish_date_valid,
+                publish_hour:   publish_date_valid,
+                publish_minute: publish_date_valid,
+                publish_period: publish_date_valid,
                 open_date:   open_date_valid,
                 open_hour:   open_date_valid,
                 open_minute: open_date_valid,
