@@ -1346,6 +1346,7 @@ class Submission extends DeprecatedModel
         $q0        = "
             SELECT
               '0' kind, sb.id, sb.name `title`, ft.name `type`,
+              UNIX_TIMESTAMP(sb.publish_date) AS `publish_date`,
               UNIX_TIMESTAMP(sb.open_date) AS `open_date`,
               UNIX_TIMESTAMP(sb.date) AS `date`,
               UNIX_TIMESTAMP(sb.late_date) AS late_date,
@@ -1365,6 +1366,7 @@ class Submission extends DeprecatedModel
         $q1 = "
             SELECT
               '1' kind, a.assess_id id, a.title, ft.name `type`,
+              UNIX_TIMESTAMP(a.start) AS `publish_date`,
               UNIX_TIMESTAMP(a.start) AS `open_date`,
               UNIX_TIMESTAMP(a.finish) AS `date`,
               UNIX_TIMESTAMP(a.finish) AS `late_date`,

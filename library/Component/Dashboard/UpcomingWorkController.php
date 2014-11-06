@@ -113,7 +113,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             unset($output);
             // find out if we're actually showing this item
             // Skip if I'm not a staff member and this isn't yet open
-            if (!$isStaff && $item['open_date'] > $now) {
+            if (!$isStaff && $item['publish_date'] > $now) {
                 continue;
             }
             if ($item['kind'] == 0) {
