@@ -1286,7 +1286,7 @@ class Submission extends DeprecatedModel {
             FROM submission_box sb
             LEFT JOIN lu_submission_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
-            LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
+            LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.draft IS FALSE
             WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year
             AND sb.deleted IS FALSE
