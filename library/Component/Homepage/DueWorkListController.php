@@ -96,7 +96,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
         $submission_counts = array();
-        if ($this->groupHandler->isStudent()) {
+        $isStudent         = $this->groupHandler->isStudent();
+        if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');
             $submission_counts = SubmissionBox\SubmissionMapper::getInstance()->findCountsForSubmissionBoxes(
                 $box_id_list,
@@ -110,6 +111,11 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             // unless it's a task.
             $isTask = $submission->getTask()->getId();
             if (!$isTask && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
+                continue;
+            }
+
+            // Don't show students unpublished work
+            if ($isStudent && $submission->getPublishDate()->getDateTimeObject() > $time->getDateTimeObject()) {
                 continue;
             }
 
