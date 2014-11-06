@@ -248,15 +248,15 @@ if (is_array($typeList)) {
                     $allCampuses[] = $currentCampus->getName();
                 }
 
-                /* Special selection modifiers
+                /* Special selection modifiers for javascript control
                  */
-                if (count($allUsers)) {
+                if ($currentEvent->isPersonalLevel()) {
                     $modifier = 'personal';
                 }
-                else if (count($allCategories)) {
+                else if ($currentEvent->isGroupLevel()) {
                     $modifier = 'group';
                 }
-                else {
+                else if ($currentEvent->isCampusLevel()) {
                     $modifier = 'school';
                 }
 
