@@ -125,16 +125,4 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
             echo ",";
         }
     }
-
-    /**
-     * Submission events are always visible
-     *
-     * @param $currentEvent
-     *
-     * @return bool
-     */
-    protected function isVisible($currentEvent)
-    {
-        return true;
-    }
 }
