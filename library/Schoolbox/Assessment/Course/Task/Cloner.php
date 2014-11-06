@@ -189,7 +189,10 @@ class Cloner
             if ($box_id) {
                 /** @var SubmissionBox $box */
                 $box = SubmissionBoxMapper::getInstance()->findById($box_id);
-                $box->setOpenDate($this->getOpenTimeFromTask());
+                $box
+                    ->setPublishDate($this->getOpenTimeFromTask())
+                    ->setOpenDate($this->getOpenTimeFromTask())
+                ;
                 SubmissionBoxMapper::getInstance()->save($box);
             }
         } catch (Exception $e) {
