@@ -19,8 +19,7 @@ $j(function() {
 		$j('.hide-questions').toggle();
 	});
 	
-	
-	jQuery.validator.addMethod("combo", function(value, element) 
+	jQuery.validator.addMethod("combo", function(value, element)
 		{
 		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
 		{
@@ -42,7 +41,6 @@ $j(function() {
 				combo: true
 			}
 		},
-		
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
