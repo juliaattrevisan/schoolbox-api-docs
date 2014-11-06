@@ -271,6 +271,11 @@ class Sidebar {
         $j = 0;
 
         foreach($upcoming as &$item) {
+            // Skip work that isn't published yet.
+            // Assume that whoever's viewing this is a student.
+            if ($item['publish_date'] > $now) {
+                continue;
+            }
             $invalid = false;
 
             if($item['kind'] == 0) {
