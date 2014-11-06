@@ -9,9 +9,11 @@ define('RETURNED_WORK_TYPE', 3);
 define('OVERDUE_WORK_TYPE', 4);
 define('RECENT_WORK_LIMIT', 12);
 
-class Submission extends DeprecatedModel {
+class Submission extends DeprecatedModel
+{
 
-    function Submission() {
+    function Submission()
+    {
 
         $this->_table = "submission_box";
         $this->_index = "id";
@@ -25,7 +27,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $categoryID
      * @return <type>
      */
-    function countSubmissionBoxes($categoryID) {
+    function countSubmissionBoxes($categoryID)
+    {
         $query = "SELECT COUNT(category) FROM " . $this->_table . " WHERE category = '$categoryID'";
 
         return $this->db->getOne($query);
@@ -37,7 +40,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $categoryID
      * @return <type>
      */
-    function getSubmissionsForSubject($categoryID) {
+    function getSubmissionsForSubject($categoryID)
+    {
         $query = "SELECT
                       submission_box.category, submission_box.name, submission_box.description,
                       student_submission.owner, realname
@@ -55,7 +59,8 @@ class Submission extends DeprecatedModel {
      * @param $boxID
      * @return array|bool
      */
-    function getByID($boxID) {
+    function getByID($boxID)
+    {
         return $this->getByField('s.id', $boxID);
     }
 
@@ -63,7 +68,8 @@ class Submission extends DeprecatedModel {
      * @param $boxID
      * @return array|bool
      */
-    function getByName($boxName) {
+    function getByName($boxName)
+    {
         return $this->getByField('s.name', $boxName);
     }
 
@@ -72,7 +78,8 @@ class Submission extends DeprecatedModel {
      * @param string|array $value
      * @return array|bool
      */
-    function getByField($field, $value) {
+    function getByField($field, $value)
+    {
 
         // "securitae"
         $field = $this->db->quote($field);
@@ -83,8 +90,7 @@ class Submission extends DeprecatedModel {
             }
             unset($v);
             $conditional = 'IN (' . implode(',', $value) . ')';
-        }
-        else {
+        } else {
             $conditional = "= '".$this->db->quote($value)."'";
         }
 
@@ -148,7 +154,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $categoryList
      * @return <type>
      */
-    function getByDate($date, $userID, $categoryList) {
+    function getByDate($date, $userID, $categoryList)
+    {
         $query = "(SELECT
                     FALSE as is_assessment,
                     s.id, s.category, s.type, s.owner, s.open_date, s.date, s.late_date, s.fid, s.accept_submission,
@@ -205,7 +212,8 @@ class Submission extends DeprecatedModel {
         return $result;
     }
 
-    function getUpcoming($userID, $categoryList) {
+    function getUpcoming($userID, $categoryList)
+    {
         $query = "SELECT s.*, UNIX_TIMESTAMP(s.date) date, ft.name as type, file.realname, file.id file_id, a.inline, c.name categoryName
 				  FROM ( submission_box s, category c )
 				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = '$userID'
@@ -228,7 +236,8 @@ class Submission extends DeprecatedModel {
      *
      * @return array|bool
      */
-    public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0) {
+    public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0)
+    {
 
         if (!$categoryIDList) {
             return array();
@@ -297,7 +306,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $limit
      * @return <type>
      */
-    function getRecentWork($userID, $categoryIDList, $type) {
+    function getRecentWork($userID, $categoryIDList, $type)
+    {
         $query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -396,7 +406,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $limit
      * @return <type>
      */
-    function getSubmissionHistory($userID, $boxID) {
+    function getSubmissionHistory($userID, $boxID)
+    {
         $query = "(SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -442,7 +453,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getAllForCategory($categoryID, $config = false, $distinct = false, $userID = -1) {
+    function getAllForCategory($categoryID, $config = false, $distinct = false, $userID = -1)
+    {
         if ($userID == -1) {
             $userID = $_SESSION['id'];
         }
@@ -474,11 +486,12 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getAllForUserCategory($categoryID, $userID = 0, $year = 0, $semester = 0) {
+    function getAllForUserCategory($categoryID, $userID = 0, $year = 0, $semester = 0)
+    {
         $dateCondA = '';
         $dateCondB = '';
-	    $ownerCondA = '';
-	    $ownerCondB = '';
+        $ownerCondA = '';
+        $ownerCondB = '';
 
         if ($year) {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
@@ -488,10 +501,10 @@ class Submission extends DeprecatedModel {
             $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
             $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
-	    if ($userID) {
-		    $ownerCondA = "AND sb.owner = '$userID'";
-		    $ownerCondB = "AND assess.user_id = '$userID'";
-	    }
+        if ($userID) {
+            $ownerCondA = "AND sb.owner = '$userID'";
+            $ownerCondB = "AND assess.user_id = '$userID'";
+        }
 
         $q[] = "
             SELECT
@@ -544,9 +557,9 @@ class Submission extends DeprecatedModel {
         ";
 
         $r = array();
-        foreach($q as $k => $query) {
+        foreach ($q as $k => $query) {
             $r[$k] = $this->db->getAll($query);
-            if(!is_array($r[$k])) {
+            if (!is_array($r[$k])) {
                 $r[$k] = array();
             }
         }
@@ -559,7 +572,8 @@ class Submission extends DeprecatedModel {
     }
 
 
-    function getHomework($categoryID, $config = false, $type = 3) {
+    function getHomework($categoryID, $config = false, $type = 3)
+    {
 
         $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
@@ -588,7 +602,8 @@ class Submission extends DeprecatedModel {
      * @param  $userID
      * @return array|bool
      */
-    public function getAllForUser($userID, $year = 0, $semester = 0) {
+    public function getAllForUser($userID, $year = 0, $semester = 0)
+    {
         $dateConditionA = '';
         $dateConditionB = '';
 
@@ -639,18 +654,19 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-	/**
-	 * This function is similar to getAllForUsers, but returns aggregated results.
-	 * Written for welcome component Most Recent Submissions
-	 *
-	 * @param $userID
-	 * @return array|bool
-	 */
-    public function getTotalSubmissionsByOwner($userID) {
+    /**
+    * This function is similar to getAllForUsers, but returns aggregated results.
+    * Written for welcome component Most Recent Submissions
+    *
+    * @param $userID
+    * @return array|bool
+    */
+    public function getTotalSubmissionsByOwner($userID)
+    {
 
-		/* Six month display threshold for Most Recent Submission
+        /* Six month display threshold for Most Recent Submission
 		 */
-		$threshold = 6;
+        $threshold = 6;
 
         $query = "(SELECT *, COUNT(id) AS `count` FROM (
                         SELECT  sb.id,
@@ -700,7 +716,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getBoxCount($box_id) {
+    function getBoxCount($box_id)
+    {
         $query = "SELECT COUNT(DISTINCT(owner)) FROM student_submission WHERE box_id = '" . $box_id . "'";
         $count['total'] = $this->db->getOne($query);
         $query = "SELECT COUNT(DISTINCT(owner)) FROM submission_return WHERE box_id = '$box_id'";
@@ -708,7 +725,8 @@ class Submission extends DeprecatedModel {
         return $count;
     }
 
-    function getTypes() {
+    function getTypes()
+    {
         $query = "SELECT * FROM lu_submission_type";
         return $this->db->getAll($query);
     }
@@ -717,7 +735,8 @@ class Submission extends DeprecatedModel {
      * Get the custom letter grades from the database
      * @return array
      */
-    function getLetterGrades() {
+    function getLetterGrades()
+    {
         // in addition to the db, give 'none' option.
         $default = array(
             array(
@@ -731,13 +750,15 @@ class Submission extends DeprecatedModel {
         return array_merge($default, $this->db->getAll($query));
     }
 
-    function getLetterGradeByID($id) {
+    function getLetterGradeByID($id)
+    {
         $query = "SELECT * FROM submission_grade WHERE grade_id = '$id'";
         return $this->db->getRow($query);
     }
 
 
-    function getMarkTypes($includeDisabled = false) {
+    function getMarkTypes($includeDisabled = false)
+    {
         $query = "SELECT *
                   FROM submission_mark_type";
 
@@ -749,7 +770,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getMarkTypeByID($id) {
+    function getMarkTypeByID($id)
+    {
         $query = "SELECT *
                   FROM submission_mark_type
                   WHERE mark_type_id = '$id'";
@@ -757,7 +779,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getMarkTypeBySlug($slug) {
+    function getMarkTypeBySlug($slug)
+    {
         $query = "SELECT *
                   FROM submission_mark_type
                   WHERE slug = '$slug'";
@@ -765,7 +788,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getSubmissionBoxMarkType($box_id) {
+    function getSubmissionBoxMarkType($box_id)
+    {
         $query = "SELECT slug
                   FROM submission_box s
                   LEFT JOIN submission_mark_type mt ON s.mark_type = mt.mark_type_id
@@ -773,7 +797,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getSubmissionBoxMarkTypeByName($box_name) {
+    function getSubmissionBoxMarkTypeByName($box_name)
+    {
         $query = "SELECT slug
                   FROM submission_box s
                   LEFT JOIN submission_mark_type mt ON s.mark_type = mt.mark_type_id
@@ -789,7 +814,8 @@ class Submission extends DeprecatedModel {
      * @param <type> $vals
      * @return <type>
      */
-    function getTypesExcept($vals) {
+    function getTypesExcept($vals)
+    {
         $query = "SELECT * FROM lu_submission_type";
 
         if (is_array($vals) && count($vals)) {
@@ -799,24 +825,25 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getActivityLog($userID, $limit = 5, $categoryList) {
+    function getActivityLog($userID, $limit = 5, $categoryList)
+    {
         $implodedCategoryList = implode(',', $categoryList);
 
         $query = " ( SELECT open_date activity_date, s.type, f.name typeName,s.id box_id, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, lu_submission_type f
 					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (" . implode(
-            ',', $categoryList
-        ) . ") )
+    ',', $categoryList
+) . ") )
 					UNION
 				    ( SELECT `date`, u.type, l.name typeName, u.id box_id, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, lu_submission_type l )
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
 					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (" . implode(
-            ',', $categoryList
-        ) . ") )
+        ',', $categoryList
+) . ") )
 					UNION
 					( SELECT `late_date`, t.type, i.name typeName, t.id box_id, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, lu_submission_type i
 					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (" . implode(
-            ',', $categoryList
-        ) . ") )
+    ',', $categoryList
+) . ") )
 					UNION
 					( SELECT g.`submitted` activity_date, m.type, g.realname typeName, m.id box_id, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
 					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )
@@ -861,7 +888,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function logPageView($page, $box_id = 0) {
+    function logPageView($page, $box_id = 0)
+    {
         //Page 1=due work page, 2 = returned work page (deprecated), 3 = submission page
 
 
@@ -882,19 +910,23 @@ class Submission extends DeprecatedModel {
         $this->db->query($query);
     }
 
-    function getAssignments($categoryID, $config = false) {
+    function getAssignments($categoryID, $config = false)
+    {
         return $this->getHomework($categoryID, $config, 2);
     }
 
-    function delete($id, $clean = false) {
+    function delete($id, $clean = false)
+    {
         return $this->update(array('id' => $id, 'deleted' => 1));
     }
 
-    function homepageClean($cid) {
+    function homepageClean($cid)
+    {
         return $this->db->update($this->_table, 'category', array('category' => $cid, 'deleted' => 1));
     }
 
-    function getBoxOwner($box_id) {
+    function getBoxOwner($box_id)
+    {
         $query = "SELECT owner
                  FROM submission_box
                  WHERE id = $box_id";
@@ -902,7 +934,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getAllForBox($box_id) {
+    function getAllForBox($box_id)
+    {
         $query = "SELECT multi_submission FROM submission_box WHERE id = $box_id";
         $multi = $this->db->getOne($query);
 
@@ -934,7 +967,8 @@ class Submission extends DeprecatedModel {
      * @param $typeId
      * @return array|bool
      */
-    public function getType($typeId) {
+    public function getType($typeId)
+    {
         $query = "
 			SELECT name
 			FROM lu_submission_type
@@ -944,7 +978,8 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    public function getSubmissionReminderList($status) {
+    public function getSubmissionReminderList($status)
+    {
 
         //
         // Don't get users, just submission boxes.
@@ -1052,8 +1087,7 @@ class Submission extends DeprecatedModel {
                     unset($student);
                 }
                 $members = $students[$subject_code];
-            }
-            else {
+            } else {
                 if (!array_key_exists($subject_id, $group_members)) {
                     $group_members[$subject_id] = $groupHandler->getMemberList($subject_id);
                     //
@@ -1100,7 +1134,7 @@ class Submission extends DeprecatedModel {
                 // If not, then add them to the list of students who have to.
                 $student_submissions = array();
                 if (is_array($submissions)) {
-                    $student_submissions = array_filter($submissions, function($sub) use($member_id) {
+                    $student_submissions = array_filter($submissions, function($sub) use ($member_id) {
                         return $sub['uid'] == $member_id;
                     });
                 }
@@ -1130,7 +1164,8 @@ class Submission extends DeprecatedModel {
         });
     }
 
-    public function getAllYearsByUser($userID = 0) {
+    public function getAllYearsByUser($userID = 0)
+    {
         if (!$userID) {
             $userID = $_SESSION['id'];
         }
@@ -1160,7 +1195,8 @@ class Submission extends DeprecatedModel {
      * @param $includeSubjectList
      * @param int $accessType
      */
-    function submittedToCategoryList($userID, $year, $semester) {
+    function submittedToCategoryList($userID, $year, $semester)
+    {
         $semesterTest = DueWork_All::getSemesterLogic($semester);
 
         $sql = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
@@ -1190,7 +1226,8 @@ class Submission extends DeprecatedModel {
      * @param $object
      * @return bool|int
      */
-    function create($object) {
+    function create($object)
+    {
         // extract notification array
         $notifs = $object['notifications'];
         unset($object['notifications']);
@@ -1217,7 +1254,8 @@ class Submission extends DeprecatedModel {
      * @param $object
      * @return bool
      */
-    function update($object) {
+    function update($object)
+    {
         // extract notification array
         $id = $object[$this->_index];
         $notifs = $object['notifications'];
@@ -1244,7 +1282,8 @@ class Submission extends DeprecatedModel {
      * @param $studentID
      * @return array
      */
-    function getAllUpcomingWorkAndAssessments($studentID) {
+    function getAllUpcomingWorkAndAssessments($studentID)
+    {
         $groupHandler = new Group();
 
         // start by getting the membership for the student in question
@@ -1267,14 +1306,13 @@ class Submission extends DeprecatedModel {
      * @param $cats
      * @return array
      */
-    function getUpcomingWorkAndAssessmentsByCategory($studentID, $cats) {
+    function getUpcomingWorkAndAssessmentsByCategory($studentID, $cats)
+    {
         if (is_array($cats) && count($cats)) {
             $conditional = 'IN (' . implode(',', $cats) . ')';
-        }
-        elseif(is_numeric($cats)) {
+        } elseif (is_numeric($cats)) {
             $conditional = '= ' . (int)$cats;
-        }
-        else {
+        } else {
             $conditional = '= 0';
         }
 
@@ -1331,7 +1369,8 @@ class Submission extends DeprecatedModel {
 
     }
 
-    function cmpDates($a, $b) {
+    function cmpDates($a, $b)
+    {
         if ($a['date'] < $b['date']) {
             return -1;
         } elseif ($a['date'] > $b['date']) {
@@ -1340,14 +1379,15 @@ class Submission extends DeprecatedModel {
         return 0;
     }
 
-	/**
-	 * Retrieves all students that are able to submit to this submission box, or
-	 * who have submitted to it already.
-	 *
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox $box
-	 * @return array
-	 */
-	public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box) {
+    /**
+    * Retrieves all students that are able to submit to this submission box, or
+    * who have submitted to it already.
+    *
+    * @param \Schoolbox\Assessment\Component\SubmissionBox $box
+    * @return array
+    */
+    public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
+    {
         $studentList = array();
 
         if ($box->getCategory()->getCodeString() && Cfg::get('external_enable')) {
@@ -1384,36 +1424,34 @@ class Submission extends DeprecatedModel {
         usort($studentList, function($a, $b) {
             $last = strcmp($a['lastname'], $b['lastname']);
             if ($last == 0) {
-                return strcmp($a['firstname'],$b['firstname']);
+                return strcmp($a['firstname'], $b['firstname']);
             }
             return $last;
         });
 
-		/* Convert those to standardised user objects
+        /* Convert those to standardised user objects
 		 */
-		$userMapper = new \Schoolbox\UserMapper();
+        $userMapper = new \Schoolbox\UserMapper();
 
-		$allStudents = new \Schoolbox\Collection();
+        $allStudents = new \Schoolbox\Collection();
 
-		/* External sources won't provide a uid value, so find a user by
+        /* External sources won't provide a uid value, so find a user by
 		 * using the external id instead
 		 */
-		foreach($studentList as $currentStudent) {
-			try {
-				if (isset($currentStudent['uid'])) {
-					$user = $userMapper->findById($currentStudent['uid']);
-				}
-				else {
-					$user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
-				}
+        foreach ($studentList as $currentStudent) {
+            try {
+                if (isset($currentStudent['uid'])) {
+                    $user = $userMapper->findById($currentStudent['uid']);
+                } else {
+                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+                }
 
-				$allStudents->add($user);
-			}
-			/* Ignore unfound users
+                $allStudents->add($user);
+            } /* Ignore unfound users
 			 */
-			catch (\Exception $e) {
-			}
-		}
+            catch (\Exception $e) {
+            }
+        }
 
         return $allStudents;
     }
