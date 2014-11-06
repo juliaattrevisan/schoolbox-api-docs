@@ -101,6 +101,11 @@ class UserAccessMapper extends Mapper {
 
         $external = new Collection();
 
+        // in case this is false, stop here
+        if (!$extSubjs) {
+            return $access;
+        }
+
         foreach ($extSubjs as $extSubj) {
             try {
                 $catId = CategoryMapper::getInstance()->findByCode($extSubj['code'])->getId();
