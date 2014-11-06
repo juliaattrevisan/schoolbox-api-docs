@@ -136,6 +136,7 @@ class Cloner
                 ->setTaskInstance($this->task_instance)
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
+                ->setPublishDate($this->getOpenTimeFromTask())
                 ->setOpenDate($this->getOpenTimeFromTask())
                 ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
                 ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
