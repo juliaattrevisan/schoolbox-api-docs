@@ -210,8 +210,7 @@ if (is_array($typeList)) {
             if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
                 $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
                 $to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
-            }
-            else {
+            } else {
                 $from = new \Alaress_Date_Format(strtotime('-1 month'), 'U');
                 $to = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
             }
@@ -252,12 +251,14 @@ if (is_array($typeList)) {
                  */
                 if ($currentEvent->isPersonalLevel()) {
                     $modifier = 'personal';
-                }
-                else if ($currentEvent->isGroupLevel()) {
-                    $modifier = 'group';
-                }
-                else if ($currentEvent->isCampusLevel()) {
-                    $modifier = 'school';
+                } else {
+                    if ($currentEvent->isGroupLevel()) {
+                        $modifier = 'group';
+                    } else {
+                        if ($currentEvent->isCampusLevel()) {
+                            $modifier = 'school';
+                        }
+                    }
                 }
 
                 $this->setVar(
