@@ -763,6 +763,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // Get list of valid categories for the given user.
         $params      = array();
         $where_parts = array(
+            'sb.open_date <= NOW()',
             'sb.late_date > NOW()',
             'sb.accept_submission IS TRUE',
             'sb.deleted IS FALSE',
