@@ -1,8 +1,10 @@
 <?php
 
-class SubmissionStudent extends DeprecatedModel {
+class SubmissionStudent extends DeprecatedModel
+{
 
-    function SubmissionStudent () {
+    function SubmissionStudent ()
+    {
 
         $this->_table = "student_submission";
         $this->_index = "id";
@@ -10,23 +12,27 @@ class SubmissionStudent extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
-	function getByID($id) {
-		$query = "SELECT s.*, u.lastname, u.firstname FROM `".$this->_table."` s, user u
-				  WHERE s.owner = u.id AND s.".$this->_index." = $id";	
-		return $this->db->getRow($query);
-	}
+    function getByID($id)
+    {
+        $query = "SELECT s.*, u.lastname, u.firstname FROM `".$this->_table."` s, user u
+				  WHERE s.owner = u.id AND s.".$this->_index." = $id";
+        return $this->db->getRow($query);
+    }
 
     // 3 CONVENIENCE WRAPPER METHODS FOR RETRIEVING WITH CERTAIN CONDITIONS
 
-    function getBySynergyID($subBoxID, $synergyID) {
+    function getBySynergyID($subBoxID, $synergyID)
+    {
         return $this->getByCondition($subBoxID, array('synergy_id' => $synergyID, 'draft' => false));
     }
 
-    function getByUserID($subBoxID, $userID) {
+    function getByUserID($subBoxID, $userID)
+    {
         return $this->getByCondition($subBoxID, array('`owner`' => $userID, 'draft' => false));
     }
 
-    function getByBoxID($subBoxID) {
+    function getByBoxID($subBoxID)
+    {
         return $this->getByCondition($subBoxID, array());
     }
 
@@ -36,7 +42,8 @@ class SubmissionStudent extends DeprecatedModel {
      * @param  int $boxId
      * @return array
      */
-    public function getStudentListByBoxId($boxId) {
+    public function getStudentListByBoxId($boxId)
+    {
         $studentList = array();
         $allSubmissions = $this->getByBoxID($boxId);
         if (is_array($allSubmissions) && count($allSubmissions)) {
@@ -55,16 +62,16 @@ class SubmissionStudent extends DeprecatedModel {
         return $studentList;
     }
 
-    protected function getByCondition($subBoxID, array $conditions) {
+    protected function getByCondition($subBoxID, array $conditions)
+    {
 
         $where = array();
-        if(count($conditions)) {
-            foreach($conditions as $k => $v) {
+        if (count($conditions)) {
+            foreach ($conditions as $k => $v) {
                 $where[] = "$k = '$v'";
             }
             $conditional = implode(' AND ', $where);
-        }
-        else {
+        } else {
             $conditional = '1=1';
         }
 
@@ -125,13 +132,15 @@ class SubmissionStudent extends DeprecatedModel {
          return $this->db->getAll($query);
     }
 */
-	function checkSubmitted($box_id, $userID) {
-		$query = "SELECT s.id FROM student_submission s
+    function checkSubmitted($box_id, $userID)
+    {
+        $query = "SELECT s.id FROM student_submission s
 				  WHERE s.box_id = '$box_id' AND s.owner = '".$userID."'";
-		return is_array($this->db->getRow($query));
-	}
+        return is_array($this->db->getRow($query));
+    }
 
-    function getStatus ($user_id, $submission_box_id) {
+    function getStatus ($user_id, $submission_box_id)
+    {
         $query = "SELECT sb.open_date, sb.date, sb.late_date, sb.created, ss.submitted, sr.returned, sr.mark
                   FROM submission_box sb
                   LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = $user_id
@@ -140,7 +149,7 @@ class SubmissionStudent extends DeprecatedModel {
                   AND sb.deleted = 0
                   AND sb.task_id IS NULL";
 
-		$submission = $this->db->getRow($query);
+        $submission = $this->db->getRow($query);
 
         /* Convert date fields and set status */
         $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
@@ -168,15 +177,16 @@ class SubmissionStudent extends DeprecatedModel {
         return $submission;
     }
 
-    function securityCheck($box_id) {
+    function securityCheck($box_id)
+    {
         //check if already submitted
-        if($this->checkSubmitted($box_id, $_SESSION['id'])) {
-
+        if ($this->checkSubmitted($box_id, $_SESSION['id'])) {
             $subHandler = new Submission();
             $subbox = $subHandler->getByID($box_id);
 
-            if(!$subbox['multi_submission'])
+            if (!$subbox['multi_submission']) {
                 error(27);
+            }
         }
 
         //check if submitted assignment is late
@@ -188,28 +198,33 @@ class SubmissionStudent extends DeprecatedModel {
 		              submission_box.id = '$box_id'
 		              AND submission_box.category = category.id";
         $result = $this->db->getRow($query);
-        if(!is_array($result))
+        if (!is_array($result)) {
             error(17);
+        }
 
         //check if they are involved in subject (dont allow anyone to submit to box) use involved in
         $groupHandler = new Group;
-        if(!$groupHandler->involvedInSubject($result['id']) && !$groupHandler->involvedInGroup($_SESSION['id'], $result['id']))
+        if (!$groupHandler->involvedInSubject($result['id']) && !$groupHandler->involvedInGroup($_SESSION['id'], $result['id'])) {
             error(24);
+        }
 
         $now = date("U");
 
         //check if its early
-        if($result['open'] > $now)
+        if ($result['open'] > $now) {
             error(36);
+        }
 
         //check if it is late
-        if($result['overdue'] < $now)
+        if ($result['overdue'] < $now) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
-    function create($boxID, $file) {
+    function create($boxID, $file)
+    {
         $late = $this->securityCheck($boxID);
 
         $studentSub = array (
@@ -219,30 +234,29 @@ class SubmissionStudent extends DeprecatedModel {
             'box_id'    => $boxID,
             'late'      => $late,
         );
-		
+        
         $this->db->insert($this->_table, $studentSub);
-		$fileId = $this->db->insertID();
+        $fileId = $this->db->insertID();
 
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
-		
+        
         move_uploaded_file($file['tmp_name'], Cfg::get('submission_dir') . "/" . $newFileName);
 
         return $fileId;
     }
 
-    function delete($id, $clean = true) {
+    function delete($id, $clean = true)
+    {
         //delete a student submission to a box so they can resubmit
 
-        if($clean) {
+        if ($clean) {
             //delete from database
             parent::delete($id);
             $filename = Cfg::get('submission_dir') . "/" . $id . ".dat";
             @unlink($filename);
-        }
-        else {
+        } else {
             parent::update(array('deleted' => 'true', 'id' => $id));
         }
     }
 }
-?>
