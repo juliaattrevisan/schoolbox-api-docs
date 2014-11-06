@@ -24,7 +24,7 @@ if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
 $conf    = $this->getDi()->get('config');
 $headers = apache_request_headers();
 $proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher($conf->get('storage_dir') . '/grive', $proxy->curl_init(), $headers['Authorization']); // TODO change /grive to sysTempDir
+$grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curl_init(), $headers['Authorization']);
 $mapper  = StorageMapper::getInstance();
 $files   = array();
 
