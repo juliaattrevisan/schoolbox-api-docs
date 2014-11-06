@@ -21,6 +21,7 @@ if(is_numeric($_GET['id'])) {
     if ($group->getPermission($submissionBox['category']) >= WRITE_ACCESS) {
         $submissionList = $subBoxHandler->getAllForBox($box_id);
 
+        set_time_limit(300);
         $zip = new SubmissionZipFolder($zipName, $submissionList);
         $zip->sendZip();
     }
