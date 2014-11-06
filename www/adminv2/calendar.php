@@ -256,6 +256,9 @@ if (is_array($typeList)) {
                 else if (count($allCategories)) {
                     $modifier = 'group';
                 }
+                else {
+                    $modifier = 'school';
+                }
 
                 $this->setVar(
                     array(
