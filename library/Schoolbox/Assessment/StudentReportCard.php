@@ -562,6 +562,16 @@ class StudentReportCard
                 );
                 $existingShowcasedItem = null;
                 if ($object instanceof SubmissionBox) {
+                    // Don't output to students if it's not published yet?
+                    if ($object->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+                        if (!(
+                            $user->isSuperuser()
+                            || $user->getRole()->isStaff()
+                            || $user->getId() == $object->getOwner()->getId()
+                        )) {
+                            continue;
+                        }
+                    }
                     $rowData = $this->outputDueWorkRow($object, $marks);
                     $page->setVar($rowData);
                     /* Hide related buttons if eportfolio is not enabled
@@ -608,6 +618,7 @@ class StudentReportCard
                         $page->setVar('action_publish_block', '');
                     }
                 } elseif ($object instanceof OnlineAssessment) {
+                    // Quizzes that aren't open shouldn't show here either?
                     $rowData = $this->outputOnlineAssessRow($object, $marks);
                     $page->setVar($rowData);
                     // OA's cannot be published at the moment, refactor DueWork publish code if they become publishable
