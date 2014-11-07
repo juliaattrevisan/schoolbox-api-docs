@@ -48,6 +48,14 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 unset($_SESSION['dropSuccess']);
             }
 
+            $zone = new \Schoolbox\Resource\Attachment\Zone('dropzbox');
+            $zone->setMulti(false)
+                ->setThumbnailSize(64)
+                ->setAttachPrompt('Add a file')
+                ->setModalTitle('Select file')
+                ->setAttachmentsLabel('')
+                ->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+
             $this->parse('drop_student_block', 'drop_student');
             $this->setVar('drop_staff_block', '');
         }
