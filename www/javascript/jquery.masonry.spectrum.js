@@ -94,7 +94,9 @@
                 mspec.resetColours(mspec.masonry.columns, colourSet);
 
                 // copy values from defaults into pickers and reload
-                opt.colours.pickers = colourSet;
+                $.each(colourSet, function(key, value) {
+                    opt.colours.pickers[key] = value;
+                });
                 mspec.loadColorpickerColors();
             })
             .on('click', this.options.saveBtnSelector, function (event) {
