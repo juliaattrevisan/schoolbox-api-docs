@@ -1,6 +1,7 @@
 <?php
 use Monolog\Logger;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\CategoryMapper;
@@ -21,9 +22,12 @@ use Schoolbox\User;
 /** @var User $user */
 $user = $_SESSION['user'];
 
+// as much as we'd like get this as cached in session, we can't include subjects here
+$accesses   = UserAccessMapper::getInstance()->findAllForUser($user, false);
+
 /** @var \Schoolbox\Collection|\Schoolbox\Resource\Category[] $cats */
 $cats       = CategoryMapper::getInstance()
-                            ->findByColumn('id', $user->getAccessList()
+                            ->findByColumn('id', $accesses
                             ->getColumnValues('serviceIdentifier'))
                             ->sortBy('name', 'asc');
 
