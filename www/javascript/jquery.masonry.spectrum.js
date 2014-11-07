@@ -296,7 +296,7 @@
 
                 switch (masonry) {
                     case 'resetColours':
-                        mspec.resetColours(args[1], mspec.options.colours.pickers);
+                        mspec.resetColours(args[1], mspec.options.colours.original);
                         break;
 
                     default:
