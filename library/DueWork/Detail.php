@@ -256,6 +256,7 @@ class DueWork_Detail
                     $icon = $fileTypeHandler->getIconFile($mime);
 
                     $plagClass = self::CLASS_PLAG_0;
+
                     if (is_numeric($submission['score'])) {
                         if ($submission['score'] >= 60) {
                             $plagClass = self::CLASS_PLAG_60;
@@ -290,14 +291,14 @@ class DueWork_Detail
 
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
-// if it's deleted (pre- or post-completion) treat it as such
-                        if (!is_null($submission['plag_deleted'])) {
+                        // if it's deleted (pre- or post-completion) treat it as such
+                        if ($submission['plag_deleted'] || $submission['plag_status'] == Plagscan_Document::STATUS_UNSCANNABLE) {
                             $page->setVar('plag_enabled_block', '');
 
                             // do we have a number we can output for a score?
                             if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
                                 $page->parse('plag_deleted_block', 'plag_deleted');
-                            }                             // no value returned, hide it
+                            } // no value returned, hide it
                             else {
                                 $page->setVar('plag_deleted_block', '');
                             }
