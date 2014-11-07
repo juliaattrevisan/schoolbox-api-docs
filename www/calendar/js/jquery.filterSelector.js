@@ -71,7 +71,7 @@
 		 */
 		function applyCheckboxToggle() {
 			$.each($(config.filterContainer).find('.applyFilters'), function(index, element) {
-				$(element).click(function(event) {
+				$(element).change(function(event) {
 					var attribute = $(this).val();
                     var checked   = $(this).is(':checked');
                     var base      = attribute.match(/^\D+/);
