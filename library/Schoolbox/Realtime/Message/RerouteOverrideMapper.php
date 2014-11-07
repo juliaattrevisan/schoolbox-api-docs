@@ -111,4 +111,52 @@ class RerouteOverrideMapper extends Mapper {
         }, false);
     }
 
+    /**
+     * Have message for this route key been muted?
+     *
+     * @param string $routeKey
+     * @param int    $userId   If supplied, the user to check.
+     *
+     * @return string
+     */
+    public function isRouteMuted($routeKey, $userId = null)
+    {
+        $userIds = array(0);
+        if (isset($userId)) {
+            $userIds[] = $userId;
+        }
+        // Check all permutations of route key:
+        // exact match
+        // starts with
+        // in middle of route
+        // ends with
+        // Keep in mind that . is used as a sub-route separator.
+        $query = "
+            SELECT COUNT(*)
+            FROM {$this->getTable()}
+            WHERE (
+                  `msg_route_key` = :routeKey
+                  OR
+                  `msg_route_key` LIKE :startKey
+                  OR
+                  `msg_route_key` LIKE :middleKey
+                  OR
+                  `msg_route_key` LIKE :endKey
+            )
+            AND `user_id` IN {$this->getArrayPlaceholders($userIds, 'user')}
+            AND `outgoing_level` = 0
+        ";
+        $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
+        $params    = array(
+            'routeKey'  => $routeKey,
+            'startKey'  => $quotedKey.'.*',
+            'middleKey' => '*.'.$quotedKey.'.*',
+            'endKey'    => '*.'.$quotedKey,
+        );
+        $params = array_merge($params, $this->getArrayParameters($userIds, 'user'));
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        return $statement->fetchColumn();
+    }
+
 } 
