@@ -14,6 +14,8 @@ use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\StorageMapper;
 
 class Controller extends Base
@@ -127,14 +129,16 @@ class Controller extends Base
      */
     public function add(Component_Instance $component)
     {
+        $model = $this->getMapper()->createModel();
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Add Tile',
                 'template' => '@tile/modify.twig',
                 'data'     => array(
-                    'item'      => $this->getMapper()->createModel(),
+                    'item'      => $model,
                     'layout'    => $this->getLayoutFromComponent($component),
                     'component' => $component,
+                    'attachzone' => $this->getAttachZoneData($model)
                 ),
             )
         );
@@ -152,8 +156,7 @@ class Controller extends Base
         $item = $this->getMapper()->createModel();
         $this->updateItemWithFormValues(
             $item,
-            $this->getRequest()->post,
-            $this->getRequest()->files
+            $this->getRequest()->post
         );
 
         // updateItemWithFormValues() doesn't set the layout item - set it here.
@@ -187,6 +190,7 @@ class Controller extends Base
                 'data'     => array(
                     'item'      => $item,
                     'component' => $component,
+                    'attachzone' => $this->getAttachZoneData($item)
                 ),
             )
         );
@@ -202,8 +206,7 @@ class Controller extends Base
     {
         $this->updateItemWithFormValues(
             $item,
-            $this->getRequest()->post,
-            $this->getRequest()->files
+            $this->getRequest()->post
         );
 
         $this->getMapper()->save($item);
@@ -245,14 +248,36 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * @param Model $model
+     * @return array
+     */
+    protected function getAttachZoneData(Model $model) {
+        $zone = new Zone('tile');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select Image')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Set background image')
+            ->setMimeFilter('image/*')
+            ->setReadOnly(false)
+            ->setMulti(false);
+
+        if ($model->getBackgroundImage()) {
+            $zone->attachFiles(array($model->getBackgroundImage()->getHash()));
+        }
+
+        return $zone->getTwigContext();
+    }
+
     /**
      * Updates an item with values passed from the form.
      *
      * @param Model        $item  The tile to update
      * @param \ArrayObject $post  An array-like object that abstracts $_POST
-     * @param \ArrayObject $files An array-like object that abstracts $_FILES
      */
-    protected function updateItemWithFormValues(Model $item, $post, $files)
+    protected function updateItemWithFormValues(Model $item, $post)
     {
         $item
             ->setTitleText($post['title_text'])
@@ -263,16 +288,15 @@ class Controller extends Base
             ->setBackgroundColor($post['background_color'] ?: '00000000')
             ->setHoverColor($post['hover_color'] ?: '00000000');
 
-        // Upload a file if there was one
-        if (($upload = $files['background_image']) && empty($upload['error'])) {
-            $image = $this->getStorageMapper()->upload(
-                $upload['name'],
-                $upload['tmp_name'],
-                $this->getUser()->getId()
-            );
+        if (is_array($post['attachment'])) {
+            $factory = new CollectorFactory();
+            /** @var \Schoolbox\Storage $image */
+            $image = $factory->build($post['attachment'])->getFirst();
             $item->setBackgroundImage($image);
+
         } else {
-            $item->setBackgroundImage($post['background_image'] ?: null);
+            $item->setBackgroundImage(null);
+
         }
     }
 

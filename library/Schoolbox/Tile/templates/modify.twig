@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type='text/javascript' src='/socialstream/browser/browser.js'></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -158,18 +159,7 @@
                     </dd>
                     <dt>Image</dt>
                     <dd class="background-upload">
-                        {# really basic upload, etc #}
-                        {# Extract into a sub-template #}
-                        {% if item.backgroundImage.hash %}
-                            <input type="hidden"
-                                   name="background_image"
-                                   value="{{ item.backgroundImage.id|e('html_attr') }}" />
-                            <img src="/storage/image.php?size=constrain200&amp;hash={{ item.backgroundImage.hash|e('url') }}" />
-                            <label><input type="checkbox" name="background_image" value="" /> Delete Image</label>
-                            <input type="file" name="background_image" class="prettify">
-                        {% else %}
-                            <input type="file" name="background_image" class="prettify">
-                        {% endif %}
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </dd>
                 </dl>
             </td>
