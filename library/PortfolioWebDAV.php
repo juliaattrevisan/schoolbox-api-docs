@@ -475,6 +475,12 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             $paths = array('/');
         }
 
+        if (empty($settings)) {
+            // the next invocation would actually cause a fatal error if $settings is undefined anyway,
+            // so this is no worse (but is now catchable)
+            throw new DomainException("WebDAV is not configured");
+        }
+
         $client = new Sabre_DAV_Client_Extended($settings);
 
         return new self($client, $paths);
