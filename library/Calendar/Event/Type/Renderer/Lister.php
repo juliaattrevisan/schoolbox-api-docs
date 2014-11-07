@@ -57,7 +57,10 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     public function visit($currentEvent)
     {
         $page = $this->getPage();
-        if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+
+        /* EOTC Events don't use a publishDate
+         */
+        if (($currentEvent->getPublishDate() instanceof \Alaress_Date_Format) && $currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
         } else {
             $cssClass = '';
