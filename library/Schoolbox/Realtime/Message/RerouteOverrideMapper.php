@@ -76,6 +76,8 @@ class RerouteOverrideMapper extends Mapper {
      * If no capture groups are specified, the result is identical to if this override did not exist
      * If capture groups are specified, each RerouteOverride::routeKey will be an array of the preg_matches
      *
+     * TODO deprecate this unique implementation, as its only use case is now covered by isRouteMuted?
+     *
      * @param array $columnList
      * @param array $options
      * @return Collection|RerouteOverride[]
