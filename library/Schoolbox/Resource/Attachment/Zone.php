@@ -197,6 +197,45 @@ class Zone {
     }
 
 
+    public function getTwigContext() {
+
+        // wrap in quotes
+        $filter = "'$this->mimeFilter'";
+
+        if ($this->mimeFilter === null) {
+            $filter = 'null';
+        } elseif ($this->mimeFilter === false) {
+            $filter = 'false';
+        }
+
+
+        $context = array(
+            'title'    => $this->text['modalTitle'],
+            'id'       => $this->id,
+            'camelId'  => $this->delim2camel($this->id),
+            'label'    => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
+            'prompt'   => $this->text['attachPrompt'],
+            'mime'     => $filter,
+            'readonly' => $this->readOnly,
+            'multi'    => $this->multi,
+            'size'     => $this->size
+        );
+
+        foreach ($this->attachments as $storage) {
+
+            $vars = $this->deriveSitePageVars($storage);
+
+            $context['attachments'][] = array(
+                'name'    => $vars['AZ_FILE_NAME'],
+                'hash'    => $vars['AZ_FILE_HASH'],
+                'preview' => $vars['AZ_FILE_PREVIEW']
+            );
+        }
+
+        return $context;
+    }
+
+
     /**
      * @param \SitePage $page
      * @param string $varname
