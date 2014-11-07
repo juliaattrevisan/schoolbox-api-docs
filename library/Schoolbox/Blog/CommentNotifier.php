@@ -131,7 +131,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		$blog         = $this->blogMapper->findById($comment->getBlog()->getId());
 		$blogName     = $blog->getHeading();
 
-		$categoryId   = $comment->getBlog()->getCategory()->getId();
+		$categoryId   = $blog->getCategory()->getId();
 		$category     = CategoryMapper::getInstance()->findById($categoryId);
 
 		$bob = new Builder();
