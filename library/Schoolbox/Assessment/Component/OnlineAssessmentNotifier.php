@@ -229,6 +229,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	public function notifyStaffClosed($quiz, $owner, $diff = null) {
 		$msgr = new Messenger();
 
+		$quiz = $this->fullyHydrateQuiz($quiz);
 		$totalUnattempted = $this->getStudentsUnattemptedList($quiz)->count();
 
 		// everyone submitted! woohoo!
