@@ -198,35 +198,7 @@
     MasonrySpectrum.prototype.resetColours = function (columns, colours) {
         //noinspection AssignmentToFunctionParameterJS
         colours = colours || this.options.colours.defaults;
-
-        columns.each(function () {
-            var col = $(this),
-                position = col.data('position'),
-                map = {
-                    'h2': {
-                        'color': colours[position+'_head_font'],
-                        'background-color': colours[position+'_head_bg']
-                    },
-                    'p, h3, .listing p.small': {
-                        'color': colours[position+'_font']
-                    },
-                    'a, .listing p.small a': {
-                        'color': colours[position+'_link']
-                    },
-                    '.text, .listing': {
-                        'background': colours[position+'_bg_primary']
-                    },
-                    '.dark': {
-                        'background':  colours[position+'_bg_secondary']
-                    }
-                };
-
-            $.each(map, function (selectors, css) {
-                col.find(selectors).css(css);
-            });
-
-        });
-
+        $.each(colours, this.updateColor);
         return false;
     };
 
