@@ -36,7 +36,6 @@
 				selector: element.find('[data-' + options.key + '="true"]'),
 				checkboxes: element.find('input[name="' + options.checkboxName + '"]')
 			}
-			console.log(derived);
 			var merged = $.extend(defaults, derived, options);
 
 			return merged;
