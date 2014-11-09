@@ -5,8 +5,6 @@ use \Schoolbox\Resource\CategoryMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
 
-
-
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
@@ -19,33 +17,31 @@ $this->setVar('title_block', '');
 $this->setVar('quote_block', '');
 
 if (is_numeric($this->arg[0])) {
-
-	/* Category exists
+/* Category exists
 	 */
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         error(2);
     }
 
 
-	/* Forum exists
+    /* Forum exists
 	 */
-	if (!$forumHandler->hasForum($folder->getId())) {
-		SitePage::localRedir('/homepage/' . $folder->getId());
-	}
+    if (!$forumHandler->hasForum($folder->getId())) {
+        SitePage::localRedir('/homepage/' . $folder->getId());
+    }
 
-	/* Check permissions
+    /* Check permissions
 	 */
-	if ($groupHandler->getPermission($folder->getId()) < READ_ACCESS) {
-		error(19);
-	}
-	if ($groupHandler->hasChildAccessOnly($folder->getId())) {
-		error(19);
-	}
+    if ($groupHandler->getPermission($folder->getId()) < READ_ACCESS) {
+        error(19);
+    }
+    if ($groupHandler->hasChildAccessOnly($folder->getId())) {
+        error(19);
+    }
 
-	$this->setTitle(Scrub::text($folder->getName() . ' Forum'));
+    $this->setTitle(Scrub::text($folder->getName() . ' Forum'));
 
     $output = array(
         'THREAD_ID' => '',
@@ -56,37 +52,35 @@ if (is_numeric($this->arg[0])) {
         'BODY' => '',
     );
 
-	/* Edit post
+    /* Edit post
 	 */
-	if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
-
-        try{
+    if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
+try {
             $post = PostMapper::getInstance()->findById($this->arg[2]);
             $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
-        }
-        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        }
+            }
         catch (Exception $e) {
             error(2);
         }
 
-		/* Check user owns post
+        /* Check user owns post
 		 */
-		if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
-			error(19);
-		}
+        if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+            error(19);
+        }
 
-		/* check locked
+        /* check locked
 		 */
-		if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
-			error(19);
-		}
+        if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+            error(19);
+        }
 
-		if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
+        if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
             $output['THREAD_TITLE'] = $thread->getTitle();
-			$this->parse('title_block', 'title');
-		}
+            $this->parse('title_block', 'title');
+        }
 
         $output['ACTION'] = 'Modify';
         $output['THREAD_POST'] = 'Post';
@@ -96,26 +90,22 @@ if (is_numeric($this->arg[0])) {
 
 
             $this->parse('thread_link_block', 'thread_link');
-	}
-	/* Add new reply
+    } /* Add new reply
 	 */
-	else if (is_numeric($this->arg[1])) {
-
-        try {
+    elseif (is_numeric($this->arg[1])) {try {
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
-        }
-        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        }
+    }
         catch (Exception $e) {
             error(2);
         }
 
-		/* Check locked
+        /* Check locked
 		 */
-		if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
-			error(19);
-		}
+        if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+            error(19);
+        }
 
 
         $output['ACTION'] = 'Post';
@@ -125,34 +115,30 @@ if (is_numeric($this->arg[0])) {
 
 
 
-		$this->parse('thread_link_block', 'thread_link');
-	}
-	else {
-
+        $this->parse('thread_link_block', 'thread_link');
+    } else {
         $output['ACTION'] = 'Post';
         $output['THREAD_POST'] =  'Thread';
 
-		$this->parse('title_block', 'title');
-		$this->setVar('thread_link_block', '');
-	}
+        $this->parse('title_block', 'title');
+        $this->setVar('thread_link_block', '');
+    }
 
 
-	$this->setVar($output);
+    $this->setVar($output);
 
-	/* output quote
+    /* output quote
 	 */
-	$this->setVar('quote_block', '');
+    $this->setVar('quote_block', '');
 
-	$quotePostID = $this->arg[3];
+    $quotePostID = $this->arg[3];
 
-	if (!is_numeric($quotePostID) && $this->arg[1]) {
+    if (!is_numeric($quotePostID) && $this->arg[1]) {
         //Gets the oldest post to use as a thread reply
         $quotePostID = $thread->getFirstPost()->getPostID();
-	}
+    }
 
-	if (is_numeric($quotePostID) && $quotePostID > 0) {
-
-        try{
+    if (is_numeric($quotePostID) && $quotePostID > 0) {        try {
             $quote = PostMapper::getInstance()->findById($quotePostID);
             if (!$output['BODY']) {
                 $output['BODY'] =
@@ -163,11 +149,9 @@ if (is_numeric($this->arg[0])) {
 
             $this->setVar($output);
             $this->parse('quote_block', 'quote', true);
-
-        }
-        catch (Exception $e) { }
-	}
-}
-else {
-	error(2);
+    } catch (Exception $e) {
+    }
+    }
+} else {
+    error(2);
 }
