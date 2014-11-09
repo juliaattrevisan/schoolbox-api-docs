@@ -94,7 +94,9 @@
                 mspec.resetColours(mspec.masonry.columns, colourSet);
 
                 // copy values from defaults into pickers and reload
-                opt.colours.pickers = colourSet;
+                $.each(colourSet, function(key, value) {
+                    opt.colours.pickers[key] = value;
+                });
                 mspec.loadColorpickerColors();
             })
             .on('click', this.options.saveBtnSelector, function (event) {
@@ -198,35 +200,7 @@
     MasonrySpectrum.prototype.resetColours = function (columns, colours) {
         //noinspection AssignmentToFunctionParameterJS
         colours = colours || this.options.colours.defaults;
-
-        columns.each(function () {
-            var col = $(this),
-                position = col.data('position'),
-                map = {
-                    'h2': {
-                        'color': colours[position+'_head_font'],
-                        'background-color': colours[position+'_head_bg']
-                    },
-                    'p, h3, .listing p.small': {
-                        'color': colours[position+'_font']
-                    },
-                    'a, .listing p.small a': {
-                        'color': colours[position+'_link']
-                    },
-                    '.text, .listing': {
-                        'background': colours[position+'_bg_primary']
-                    },
-                    '.dark': {
-                        'background':  colours[position+'_bg_secondary']
-                    }
-                };
-
-            $.each(map, function (selectors, css) {
-                col.find(selectors).css(css);
-            });
-
-        });
-
+        $.each(colours, this.updateColor);
         return false;
     };
 
@@ -324,7 +298,7 @@
 
                 switch (masonry) {
                     case 'resetColours':
-                        mspec.resetColours(args[1], mspec.options.colours.pickers);
+                        mspec.resetColours(args[1], mspec.options.colours.original);
                         break;
 
                     default:
