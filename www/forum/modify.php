@@ -18,7 +18,7 @@ $this->setVar('quote_block', '');
 
 if (is_numeric($this->arg[0])) {
     /* Category exists
-         */
+     */
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
@@ -27,13 +27,13 @@ if (is_numeric($this->arg[0])) {
 
 
     /* Forum exists
-	 */
+     */
     if (!$forumHandler->hasForum($folder->getId())) {
         SitePage::localRedir('/homepage/' . $folder->getId());
     }
 
     /* Check permissions
-	 */
+     */
     if ($groupHandler->getPermission($folder->getId()) < READ_ACCESS) {
         error(19);
     }
@@ -53,7 +53,7 @@ if (is_numeric($this->arg[0])) {
     );
 
     /* Edit post
-	 */
+     */
     if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         try {
             $post   = PostMapper::getInstance()->findById($this->arg[2]);
@@ -65,13 +65,15 @@ if (is_numeric($this->arg[0])) {
         }
 
         /* Check user owns post
-		 */
-        if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
+         */
+        if ($post->getOwner()->getId() != $_SESSION['id']
+            && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS
+        ) {
             error(19);
         }
 
         /* check locked
-		 */
+         */
         if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
             error(19);
         }
@@ -89,9 +91,9 @@ if (is_numeric($this->arg[0])) {
 
 
         $this->parse('thread_link_block', 'thread_link');
-    } /* Add new reply
-	 */
-    elseif (is_numeric($this->arg[1])) {
+    } elseif (is_numeric($this->arg[1])) {
+        /* Add new reply
+         */
         try {
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
@@ -101,7 +103,7 @@ if (is_numeric($this->arg[0])) {
         }
 
         /* Check locked
-		 */
+         */
         if ($thread->isLocked() && $groupHandler->getPermission($folder->getId()) < FULL_ACCESS) {
             error(19);
         }
@@ -126,7 +128,7 @@ if (is_numeric($this->arg[0])) {
     $this->setVar($output);
 
     /* output quote
-	 */
+     */
     $this->setVar('quote_block', '');
 
     $quotePostID = $this->arg[3];
