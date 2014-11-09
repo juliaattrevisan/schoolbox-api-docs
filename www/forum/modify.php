@@ -84,6 +84,7 @@ if (is_numeric($this->arg[0])) {
 		}
 
 		if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
+            $output['THREAD_TITLE'] = $thread->getTitle();
 			$this->parse('title_block', 'title');
 		}
 
