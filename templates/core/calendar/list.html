@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
-<script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
 	$(function() {
 
@@ -55,14 +55,37 @@
 			});
 		});
 
-		$('.checkboxes')
-			.greenerize({ applyClasses: false })
-			.on(
-				'greenerizeChange',
-				function(event, selectAll, checkboxes) {
-					checkboxes.first().change();
-				}
-			)
+		$('.filter-cat.sources').selectAll({
+			key: 'selectallsources',
+			checkboxName: 'source',
+			change: function() {
+				$('input[name=source]').change();
+			}
+		});
+
+		$('.filter-cat.groups').selectAll({
+			key: 'selectallgroups',
+			checkboxName: 'group',
+			change: function() {
+				$('input[name=group]').change();
+			}
+		});
+
+		$('.filter-cat.campus').selectAll({
+			key: 'selectallcampuses',
+			checkboxName: 'campus',
+			change: function() {
+				$('input[name=campus]').change();
+			}
+		});
+
+		$('.filter-cat.events').selectAll({
+			key: 'selectalleventtypes',
+			checkboxName: 'events',
+			change: function() {
+				$('input[name=events]').change();
+			}
+		});
 	});
 </script>
 
@@ -125,7 +148,6 @@
 </div>
 <div class="clearfix"></div>
 
-
 <div id="calendar-list" class='printEventList' data-eventlist="true">
 	<div class="calendar-controls">
 		<div class="link-case">
@@ -134,7 +156,7 @@
 					<form class="clearfix">
 						<div class="filter-cat sources clearfix checkboxes"><span class="filter-title">Sources</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox" checked/>Select all
+								<input data-selectallsources='true' type="checkbox" class="checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_source -->
 							<label title="{SOURCE_NAME}">
@@ -145,7 +167,7 @@
 						</div>
 						<div class="filter-cat groups clearfix checkboxes"><span class="filter-title">Groups</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox" checked/>Select all
+								<input data-selectallgroups='true' type="checkbox" class="checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_group -->
 							<label title="{GROUP_NAME}">
@@ -156,7 +178,7 @@
 						</div>
 						<div class="filter-cat campus checkboxes"><span class="filter-title">Campus</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox" checked/>Select all
+								<input data-selectallcampuses='true' type="checkbox" class="checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_campus -->
 							<label title="{CAMPUS_NAME}">
@@ -167,7 +189,7 @@
 						</div>
 						<div class="filter-cat events checkboxes last"><span class="filter-title">Event</span>
 							<label>
-								<input type="checkbox" class="select_all checkbox" checked/>Select all
+								<input data-selectalleventtypes='true' type="checkbox" class=" checkbox" checked/>Select all
 							</label>
 							<!-- BEGIN filter_event_type -->
 							<label title="{EVENT_TYPE_NAME}">
