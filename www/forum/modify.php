@@ -1,9 +1,9 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-use \Schoolbox\Resource\CategoryMapper;
-use \Schoolbox\Forum\PostMapper;
-use \Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Forum\PostMapper;
+use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Resource\CategoryMapper;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -17,8 +17,8 @@ $this->setVar('title_block', '');
 $this->setVar('quote_block', '');
 
 if (is_numeric($this->arg[0])) {
-/* Category exists
-	 */
+    /* Category exists
+         */
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
@@ -44,24 +44,23 @@ if (is_numeric($this->arg[0])) {
     $this->setTitle(Scrub::text($folder->getName() . ' Forum'));
 
     $output = array(
-        'THREAD_ID' => '',
+        'THREAD_ID'    => '',
         'THREAD_TITLE' => '',
-        'POST_ID' => '',
-        'CATEGORY_ID' => $folder->getId(),
-        'CATEGORY' => Scrub::text($folder->getName()),
-        'BODY' => '',
+        'POST_ID'      => '',
+        'CATEGORY_ID'  => $folder->getId(),
+        'CATEGORY'     => Scrub::text($folder->getName()),
+        'BODY'         => '',
     );
 
     /* Edit post
 	 */
     if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
-try {
-            $post = PostMapper::getInstance()->findById($this->arg[2]);
+        try {
+            $post   = PostMapper::getInstance()->findById($this->arg[2]);
             $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
-} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-            }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             error(2);
         }
 
@@ -82,22 +81,22 @@ try {
             $this->parse('title_block', 'title');
         }
 
-        $output['ACTION'] = 'Modify';
+        $output['ACTION']      = 'Modify';
         $output['THREAD_POST'] = 'Post';
-        $output['THREAD_ID'] = $thread->getThreadId();
-        $output['POST_ID'] = $post->getPostId();
-        $output['BODY'] = Scrub::text($post->getBody());
+        $output['THREAD_ID']   = $thread->getThreadId();
+        $output['POST_ID']     = $post->getPostId();
+        $output['BODY']        = Scrub::text($post->getBody());
 
 
-            $this->parse('thread_link_block', 'thread_link');
+        $this->parse('thread_link_block', 'thread_link');
     } /* Add new reply
 	 */
-    elseif (is_numeric($this->arg[1])) {try {
+    elseif (is_numeric($this->arg[1])) {
+        try {
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
-    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-    }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             error(2);
         }
 
@@ -108,17 +107,16 @@ try {
         }
 
 
-        $output['ACTION'] = 'Post';
-        $output['THREAD_POST'] ='Reply';
-        $output['THREAD_ID'] = $thread->getThreadId();
+        $output['ACTION']       = 'Post';
+        $output['THREAD_POST']  = 'Reply';
+        $output['THREAD_ID']    = $thread->getThreadId();
         $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
-
 
 
         $this->parse('thread_link_block', 'thread_link');
     } else {
-        $output['ACTION'] = 'Post';
-        $output['THREAD_POST'] =  'Thread';
+        $output['ACTION']      = 'Post';
+        $output['THREAD_POST'] = 'Thread';
 
         $this->parse('title_block', 'title');
         $this->setVar('thread_link_block', '');
@@ -138,19 +136,20 @@ try {
         $quotePostID = $thread->getFirstPost()->getPostID();
     }
 
-    if (is_numeric($quotePostID) && $quotePostID > 0) {        try {
+    if (is_numeric($quotePostID) && $quotePostID > 0) {
+        try {
             $quote = PostMapper::getInstance()->findById($quotePostID);
             if (!$output['BODY']) {
                 $output['BODY'] =
-                    '<blockquote class="mceNonEditable">'.Scrub::html($quote->getBody()).
-                    '<cite>'.$quote->getOwner()->formatName($user).'</cite>'.
+                    '<blockquote class="mceNonEditable">' . Scrub::html($quote->getBody()) .
+                    '<cite>' . $quote->getOwner()->formatName($user) . '</cite>' .
                     '</blockquote><p></p>';
             }
 
             $this->setVar($output);
             $this->parse('quote_block', 'quote', true);
-    } catch (Exception $e) {
-    }
+        } catch (Exception $e) {
+        }
     }
 } else {
     error(2);
