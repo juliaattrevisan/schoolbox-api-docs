@@ -61,12 +61,25 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
     foreach ($allAttempts as $currentAttempt) {
         $i++;
+        $isFinished = false;
+        $canReview = false;
+
+        $firstSection = $sectionHandler->getFirst($this->arg[0]);
+
+        $this->setVar(array(
+            'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
+            'ATTEMPT_ASSESS_ID' => $this->arg[0],
+            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+        ));
 
         $startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 
         /* For attempts that are still in progress
          */
-        if (($currentAttempt['finish'] != '0000-00-00 00:00:00') && strlen($currentAttempt['finish'])) {
+        $isFinished = ($currentAttempt['finish'] != '0000-00-00 00:00:00') && strlen($currentAttempt['finish']);
+
+        if ($isFinished) {
 
 			/* Calculate time taken in hrs
 			 */
@@ -95,48 +108,26 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			else if ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent() || $groupHandler->isParentOfChild($this->arg[1]))) {
 				$canReview = true;
 			}
-
-			if ($canReview) {
-				$this->setVar(array(
-					'attempt_resume_block' => ''
-				));
-
-				$this->parse('attempt_review_block', 'attempt_review');
-			}
-			else {
-				$this->setVar(array(
-					'attempt_review_block' => ''
-				));
-			}
-        }
-		else {
-            $finishDateValue = 'Unfinished';
-
-			/* Parse resume link
-			 */
-			$this->setVar(array(
-				'attempt_review_block' => ''
-			));
-
-			$this->parse('attempt_resume_block', 'attempt_resume');
         }
 
-        $firstSection = $sectionHandler->getFirst($this->arg[0]);
+        /* Misc details
+         */
+
 
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
 
-		if ($currentAttempt['reviewed_at'] != null) {
-			$reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
-			$reviewed = $reviewedAt->getShort();
+        if ($currentAttempt['reviewed_at'] != null) {
+            $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d h:i:s');
+            $reviewed = $reviewedAt->getShort();
 
-			if ($available && $canReview) {
-				$marks = round($currentAttempt['totalMarks']).'/'.round($available);
-			}
-			else {
-				$marks = 'N/A';
-			}
-		}
-		else {
+            if ($available && $canReview) {
+                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+            }
+            else {
+                $marks = 'N/A';
+            }
+        }
+        else {
             $numMarkedQuestions = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
             $numUnmarkedQuestions = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
             $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($currentAttempt['attempt_id']);
@@ -146,20 +137,44 @@ if (is_array($allAttempts) && count($allAttempts)) {
             if($canReview) {
                 $marks = round($currentAttempt['totalMarks']).'/'.round($available);
             }
-		}
+        }
 
         $this->setVar(array(
-            'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
             'ATTEMPT_START' => $startDate->getShort(),
             'ATTEMPT_FINISH' => $finishDateValue,
-            'ATTEMPT_ASSESS_ID' => $this->arg[0],
-            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
-            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-			'ATTEMPT_REVIEWED_AT' => $reviewed,
-			'ATTEMPT_MARKS' => $marks,
-			'ATTEMPT_TIME_TAKEN' => $timeTaken,
+            'ATTEMPT_REVIEWED_AT' => $reviewed,
+            'ATTEMPT_MARKS' => $marks,
+            'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ON_OFF' => $i % 2 ? 'dark' : ''
         ));
+
+        /* Parse these blocks first
+         */
+        if ($isFinished) {
+            if ($canReview) {
+                $this->setVar(array(
+                        'attempt_resume_block' => ''
+                    ));
+
+                $this->parse('attempt_review_block', 'attempt_review');
+            }
+            else {
+                $this->setVar(array(
+                    'attempt_review_block' => ''
+                ));
+            }
+        }
+        else {
+            $finishDateValue = 'Unfinished';
+
+            /* Parse resume link
+             */
+            $this->setVar(array(
+                'attempt_review_block' => ''
+            ));
+
+            $this->parse('attempt_resume_block', 'attempt_resume');
+        }
 
         $this->parse('attempt_block', 'attempt', true);
 
@@ -167,7 +182,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
 		 */
 		$this->setVar(array(
 			'respondent_name_block' => '',
-			'attempt_resume_block' => ''
+            'attempt_review_block' => '',
+			'attempt_resume_block' => '',
 		));
     }
 }
