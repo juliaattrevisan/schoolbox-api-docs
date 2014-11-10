@@ -96,7 +96,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         /* Special datetime formatting for Submissions
          */
         if ($currentEvent instanceof Calendar_Event_Type_Submission) {
-            if ($currentEvent->getEndTime()->getDateTimeObject()->format('H:i:s') == '23:59:59') {
+            if ($currentEvent->getAllday()) {
                 $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d'));
                 $page->parse('event_allday_block', 'event_allday');
             }
