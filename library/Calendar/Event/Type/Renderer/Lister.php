@@ -86,13 +86,25 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                 'event_attendance_request_block' => '',
                 'event_timed_block' => '',
                 'event_allday_block' => '',
+                'event_submission_block' => '',
             )
         );
         if ($currentEvent->getCategoryId() > 0) {
             $page->parse('event_has_category_block', 'event_has_category');
         }
 
-        if ($currentEvent->getAllday()) {
+        /* Special datetime formatting for Submissions
+         */
+        if ($currentEvent instanceof Calendar_Event_Type_Submission) {
+            if ($currentEvent->getAllday()) {
+                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d'));
+                $page->parse('event_allday_block', 'event_allday');
+            }
+            else {
+                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d H:i:s'));
+                $page->parse('event_submission_block', 'event_submission');
+            }
+        } else if ($currentEvent->getAllday()) {
             $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d'));
             $page->parse('event_allday_block', 'event_allday');
         } else {
