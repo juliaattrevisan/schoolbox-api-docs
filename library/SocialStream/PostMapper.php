@@ -10,13 +10,14 @@
 
 namespace SocialStream;
 
+use Alaress\Async\Notification\Instance\Instance;
 use PDO;
 use Schoolbox;
 use Schoolbox\Collection;
 use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
-class PostMapper extends Schoolbox\Mapper
+class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMapperInterface
 {
 
     /**
@@ -136,7 +137,7 @@ class PostMapper extends Schoolbox\Mapper
      *
      * @param mixed $identifier
      * @return object|Model
-     * @throws \Exception
+     * @throws Schoolbox\Mapper\Exception
      */
     public function findById($identifier)
     {
@@ -167,7 +168,7 @@ class PostMapper extends Schoolbox\Mapper
 
             return $postItem;
         }
-        throw new \Exception('Instance of object not found');
+        throw new Schoolbox\Mapper\Exception('Instance of object not found');
     }
 
 
@@ -436,4 +437,48 @@ class PostMapper extends Schoolbox\Mapper
 
         return $collection;
     }
+
+
+    /**
+     * @param int $context
+     * @param int $limit
+     * @param int $offset
+     * @param int $time
+     * @return \Schoolbox\Collection|Instance[]
+     */
+    public function findForFeed($context, $limit, $offset = 0, $time = 0)
+    {
+        $time = date('Y-m-d H:i:s', $time ?: time());
+
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
+        $stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString()}
+			FROM
+				`{$this->getTable()}`
+			WHERE
+				`deleted_at` IS NULL
+				AND `created_at` < :time
+				AND `homepage_id` = :cat_id
+			ORDER BY `created_at` DESC
+			LIMIT $offset, $limit
+		");
+
+        $stmt->execute(array(
+            'time'   => $time,
+            'cat_id' => $context
+        ));
+
+        $c = $this->createCollection();
+
+        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var SocialStream_Post_Abstract $post */
+            $post = $this->hydrate($r);
+            $c->add($post);
+        }
+        return $c;
+    }
+
 }

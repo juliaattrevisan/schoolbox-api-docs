@@ -11,8 +11,11 @@ namespace SocialStream;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -30,7 +33,7 @@ use Schoolbox\UserMapper;
 use Scrub;
 use SocialStream_Post_Abstract;
 
-class PostNotifier extends AbstractModuleNotifier
+class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 {
 
     const TRIGGER_POSTED = 'posted';
@@ -181,7 +184,12 @@ class PostNotifier extends AbstractModuleNotifier
 
         // list of user's to notify: parent ("user replied to your post") and siblings ("user ALSO replied to")
         /** @var SocialStream_Post_Abstract $parent */
-        $parent = $this->mapper->findById($post->getParentId());
+        try {
+            $parent = $this->mapper->findById($post->getParentId());
+        } catch (Mapper\Exception $e) {
+            // this is a top-level post, so "replies" aren't relevant
+            return $envelope;
+        }
 
         $parentAuthorId = $parent->getOwnerId();
 
@@ -273,6 +281,35 @@ class PostNotifier extends AbstractModuleNotifier
     public function notifyStaffReplied($post, $author, $diff = null)
     {
         return $this->notifyReplied($post, $author, $diff);
+    }
+
+
+    /**
+     * Generate n Instances, from the perspective of casual observation (rather than targeted at a particular user).
+     *
+     * @param int    $context  - most likely a category ID or ignored
+     * @param string $roletype - the roletype of the user for whom this feed is being retrieved
+     * @param int    $limit    - how many messages to retrieve
+     * @param int    $offset   - by default, most recent
+     * @return Collection|Instance[]
+     */
+    public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
+    {
+        $c = new Collection();
+
+        // be sure the target method exists
+        if(!$this->mapper instanceof FeedableMapperInterface) {
+            return $c;
+        }
+
+        /** @var Collection|SocialStream_Post_Abstract[] $posts */
+        $posts = $this->mapper->findForFeed($context, $limit, $offset);
+
+        foreach($posts as $post) {
+            $c->merge(new Collection($this->notifyPosted(Role::STUDENT, $post, $this->userMapper->findById($post->getOwnerId()))->getAll($post->getCreatedAt()->getUnixTimestamp())));
+//            $c->merge(new Collection($this->notifyReplied($post, $this->userMapper->findById($post->getOwnerId()))->getAll($post->getCreatedAt()->getUnixTimestamp())));
+        }
+        return $c;
     }
 
 } 
