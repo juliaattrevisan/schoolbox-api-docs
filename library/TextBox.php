@@ -59,7 +59,7 @@ class TextBox extends DeprecatedModel {
                      FROM " . $this->_table . "
                     JOIN category ON categoryID = category.id
                   WHERE textBox.deleted = 'false' AND heading like '%" . $this->db->quote($keyword) . "%'
-                  AND category.deleted_at IS NOT NULL
+                  AND category.deleted_at IS NULL
                   ORDER BY $sort_by $sort_dir
                   LIMIT $offset, $limit";
 
