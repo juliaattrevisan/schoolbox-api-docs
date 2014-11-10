@@ -131,6 +131,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'TIME' => $currentEvent->getEventSpan(),
 				'FULL_TIME' => $currentEvent->getFullDate(),
 				'LOCATION' => Scrub::text($currentEvent->getLocation()),
+                'NOTE' => Scrub::text($currentEvent->getTitle()),
 				'DETAIL' => Scrub::html($currentEvent->getDetail()),
 				'COLOUR' => $currentEvent->getColour(),
 				'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
@@ -140,18 +141,28 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'AUTHOR_ID' => $currentEvent->getAuthorId(),
 				'ON_OFF' => ++$j % 2 ? 'dark' : '',
 				'EVENT_VISIBLE' => '',
-				'EVENT_LEVEL'   => '',
+                'EVENT_ID' => $currentEvent->getEventId(),
+				'EVENT_LEVEL' => '',
+                'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 			);
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
 				$eventOutput['EVENT_ID']   = '';
 				$eventOutput['EVENT_TYPE'] = 'submission';
-				$eventOutput['NOTE']       = Scrub::text($currentEvent->getTitle());
 			}
-			else {
-				$eventOutput['EVENT_ID']   = $currentEvent->getEventId();
-				$eventOutput['EVENT_TYPE'] = 'type' . $currentEvent->getType();
-				$eventOutput['NOTE']       = Scrub::text($currentEvent->getTitle());
-			}
+            elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
+                $eventOutput['EVENT_ID'] = '';
+                $eventOutput['TYPE'] = 'Booking';
+                $eventOutput['NOTE'] = sprintf(
+                    '(%s) %s',
+                    Scrub::text($currentEvent->getBooking()->getStatus()->getName()),
+                    $eventOutput['NOTE']
+                );
+                $eventOutput['DETAIL'] = sprintf(
+                    '(Booking for: %s)<br>%s',
+                    Scrub::text($currentEvent->getBooking()->getResource()->getName()),
+                    $eventOutput['DETAIL']
+                );
+            }
 			$this->setVar($eventOutput);
 
 			if ($currentEvent instanceof Calendar_Event_Type_Submission) {
@@ -178,6 +189,19 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				}
 				$this->parse('has_category_block', 'has_category');
 			}
+            elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
+                // Just go to the booking for that day
+                $this->setVar('MODIFY_ACTION', 'View Booking');
+                $this->setVar(
+                    'MODIFY_HREF',
+                    sprintf(
+                        '/resource-booking/item/%s?date=%s',
+                        $currentEvent->getBooking()->getResource()->getId(),
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                    )
+                );
+                $this->parse('modify_button_block', 'modify_button');
+            }
 			else {
 				if ($currentEvent->getIsEditable()) {
 					$this->setVar('MODIFY_ACTION', 'Modify');
