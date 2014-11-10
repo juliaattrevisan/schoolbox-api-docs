@@ -1,1 +1,0 @@
-ALTER TABLE `eotc_event` ADD COLUMN `publish_date` DATE NULL AFTER `endTime`;

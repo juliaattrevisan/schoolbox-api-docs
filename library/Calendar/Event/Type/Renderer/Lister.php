@@ -58,19 +58,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     {
         $page = $this->getPage();
 
-        /* Special logic for EOTC events
-         */
-        if ($currentEvent instanceof \Calendar_Event_Type_EOTC) {
-            $customValues = $currentEvent->getCustom();
-
-            if ($customValues['approved']) {
-                $cssClass = '';
-            }
-            else {
-                $cssClass = 'translucent';
-            }
-        }
-        elseif ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+        if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
         }
         else {

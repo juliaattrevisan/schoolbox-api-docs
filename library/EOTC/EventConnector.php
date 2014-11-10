@@ -327,6 +327,19 @@ class EventConnector extends EventMapper {
 					'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
 				));
 
+                /* Derive publishDate settings for front-end classes
+                 * If it's approved, set the publishDate in the past
+                 * Otherwise, set it in the future
+                 */
+                if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+                    $publishDate = new \Alaress_Date_Format(0, 'U');
+                }
+                else {
+                    $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+                }
+
+                $event->setPublishDate($publishDate);
+
 				$collection->add($event);
 			}
 		}
