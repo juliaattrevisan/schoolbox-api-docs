@@ -151,9 +151,9 @@ class RerouteOverrideMapper extends Mapper {
         $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
         $params    = array(
             'routeKey'  => $routeKey,
-            'startKey'  => $quotedKey.'.*',
-            'middleKey' => '*.'.$quotedKey.'.*',
-            'endKey'    => '*.'.$quotedKey,
+            'startKey'  => $quotedKey.'.%',
+            'middleKey' => '%.'.$quotedKey.'.%',
+            'endKey'    => '%.'.$quotedKey,
         );
         $params = array_merge($params, $this->getArrayParameters($userIds, 'user'));
         $statement = $this->getDatabase()->prepare($query);
