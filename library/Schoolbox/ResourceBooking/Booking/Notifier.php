@@ -144,7 +144,6 @@ class Notifier extends AbstractModuleNotifier
                 )
             )
         );
-        $bookingUrl    = '/resource-booking/booking/' . $object->getId() . '/edit';
         $messageParams = array(
             'user'     => array($user->formatName(), '/search/user/' . $user->getId()),
             'resource' => array($object->getResource()->getName(), $resourceUrl),
@@ -168,8 +167,6 @@ class Notifier extends AbstractModuleNotifier
                 $messageText = ':user put on hold booking of :resource for :owner for :date';
                 break;
             case 'cancelled':
-                // For Cancelled bookings, the booking URL is no longer relevant
-                $bookingUrl  = $resourceUrl;
                 $messageText = ':user cancelled booking of :resource for :owner for :date';
                 break;
             case 'updated':
@@ -181,14 +178,12 @@ class Notifier extends AbstractModuleNotifier
                 );
         }
 
-        // the message to be sent to owners - point this to the resource view
+        // Notify the owner of the booking (usually the person who the booking is for)
         $ownerMessage = new Message(
             $messageText,
             '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
             $resourceUrl
         );
-
-        // Notify the owner of the booking (usually the person who the booking is for)
         $ownerMessageParams = $messageParams;
         if ($isOwnerCreator) {
             $ownerMessageParams['owner'][0] = 'you';
@@ -201,14 +196,12 @@ class Notifier extends AbstractModuleNotifier
             $ownerMessageParams
         );
 
-        // Moderator message - point this to the actual booking
+        // Send a message to all the moderators of the object
         $moderatorMessage = new Message(
             $messageText,
             '/portrait.php?userId=' . $user->getExternalId() . '&size=square32',
-            $bookingUrl
+            $resourceUrl
         );
-
-        // Send a message to all the moderators of the object
         foreach ($object->getResource()->getModeratorList() as $moderator) {
             $messenger->targetToUser(
                 $moderator->getId(),
