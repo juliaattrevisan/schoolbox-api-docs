@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\File\MimetypeMapper;
 
 if (!Cfg::get('webdav_enable')) {
     error(2);
@@ -52,7 +53,11 @@ if (is_array($fileList) && count($fileList) > 0) {
         $class = array();
 
         // icon
-        $class[] = $allowedFiles->getClass(!empty($file['iconFile']) ? $file["iconFile"] : "txt.png");
+        try{
+            $mime = MimetypeMapper::getInstance()->getByFilename($file['description']);
+        } catch (Exception $e) {
+            $mime = MimetypeMapper::getInstance()->getUnknownMime();
+        }
 
         /* Note that WebDAV returns the $file['submitted'] value in a different format
            * than Schoolbox.
@@ -66,7 +71,7 @@ if (is_array($fileList) && count($fileList) > 0) {
             'FILE_MODIFIED' => $modifiedTime->getShort(),
             'FILE_SIZE' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
             'FOLDER_ID' => $file['parent'],
-            'CLASS' => implode(" ", $class),
+            'CLASS' => $mime->getClass(),
             'PUBLISHED' => $file['published'] != '' ? $file['published'] : '',
         );
 

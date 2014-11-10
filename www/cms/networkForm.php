@@ -2,8 +2,9 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+use \Schoolbox\File\MimetypeMapper;
+
 $page = new SitePage;
-$allowedFiles = new AllowedFile;
 
 
 $folderHandler = PortfolioWebDAV::factory();
@@ -38,12 +39,18 @@ elseif (is_numeric($_POST['categoryID'])) {
         foreach ($fileList as $file) {
             $modifiedDate = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
 
+            try{
+                $mime = MimetypeMapper::getInstance()->getByFilename($file['description']);
+            } catch (Exception $e) {
+                $mime = MimetypeMapper::getInstance()->getUnknownMime();
+            }
+
             $output[] = array('id' => $file['id'],
                 'name' => Scrub::text($file['description']),
                 'category' => $file['category'],
                 'modified' => $modifiedDate->getShort(),
                 'size' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
-                'icon' => $allowedFiles->getClass(!empty($file['iconFile']) ? $file["iconFile"] : "txt.png"),
+                'icon' => $mime->getClass(),
             );
         }
     }
