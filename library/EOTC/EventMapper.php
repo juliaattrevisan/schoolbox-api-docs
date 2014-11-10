@@ -36,6 +36,11 @@ class EventMapper extends Calendar\EventMapper {
 			'type' => self::TYPE_MODEL,
 			'join' => 'teacherInCharge',
 		));
+        $this->hasMap(array(
+            'column' => 'publish_date',
+            'property' => 'publishDate',
+            'type' => self::TYPE_DATE,
+        ));
 		$this->hasJoin('teacherInCharge', array(
 			'mapper'    => '\\Schoolbox\\UserMapper',
 			'this_key'  => 'teacher_in_charge_id',

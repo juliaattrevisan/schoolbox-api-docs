@@ -21,16 +21,23 @@ class Event extends Calendar\Event {
 	 *
 	 * An instance of EventMetadata
 	 *
-	 * @var EventMetadata
+	 * \EOTC\EventMetadata EventMetadata
 	 */
 	protected $metadata = null;
 
 	/**
 	 * A User object
 	 *
-	 * @var User
+	 * \Schoolbox\User User
 	 */
 	protected $teacherInCharge = null;
+
+    /**
+     * Publish Date
+     *
+     * \Alaress_Date_Format null
+     */
+    protected $publishDate = null;
 
 	/**
 	 * Hook method
@@ -83,4 +90,24 @@ class Event extends Calendar\Event {
 	public function getTeacherInCharge() {
 		return $this->teacherInCharge;
 	}
+
+    /**
+     * Set publish date
+     *
+     * @param mixed $publishDate
+     */
+    public function setPublishDate($publishDate)
+    {
+        $this->publishDate = $publishDate;
+    }
+
+    /**
+     * Get publish date
+     *
+     * @return mixed
+     */
+    public function getPublishDate()
+    {
+        return $this->publishDate;
+    }
 }
