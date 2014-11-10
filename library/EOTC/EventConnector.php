@@ -135,7 +135,7 @@ class EventConnector extends EventMapper {
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			WHERE
-				DATE(e.endDate) > DATE(FROM_UNIXTIME(:startTimestamp))
+				DATE(e.endDate) >= DATE(FROM_UNIXTIME(:startTimestamp))
 				AND
 				DATE(e.startDate) <= DATE(FROM_UNIXTIME(:endTimestamp))
 			ORDER BY e.startTime, e.endTime
