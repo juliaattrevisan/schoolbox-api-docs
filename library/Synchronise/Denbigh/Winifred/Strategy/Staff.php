@@ -43,7 +43,7 @@ class Synchronise_Denbigh_Winifred_Strategy_Staff extends Synchronise_Denbigh_Wi
             strtolower($currentUser['staffCode'] . "@frensham.nsw.edu.au"):
             $currentUser['email'];
         $newUser['local_email']         = 1;
-        $newUser['su']                  = 0;
+//        $newUser['su']                  = 0;
         $newUser['defaultCampus']       = self::DEFAULT_CAMPUS_ID;
         $newUser['eportfolio_enabled']  = self::EPORTFOLIO_STAFF_ENABLED ? 1 : 0;
 
