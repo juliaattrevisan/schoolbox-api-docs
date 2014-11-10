@@ -72,9 +72,9 @@ class ResourceVideoMapper extends Mapper {
 	/**
 	 * Find videos for a particular category
 	 *
-	 * @param $category
-	 * @param $options
-	 * @param bool $limit
+	 * @param  int   $category The category to search
+	 * @param  array $options sort, sortdir, mime
+	 * @param  bool  $limit
 	 * @return Collection
 	 */
 	public function findByCategory($category, $options, $limit = false) {
@@ -111,6 +111,10 @@ class ResourceVideoMapper extends Mapper {
 			$query .= "LIMIT 0,:lim";
 		}
 
+        // Logically, mimetype should always be video/*
+        if (!isset($options['mime'])) {
+            $options['mime'] = 'video';
+        }
         $mime = $options['mime'].'/%';
 		$statement = $this->database->prepare($query);
 		$statement->bindParam(':cat',$category);
