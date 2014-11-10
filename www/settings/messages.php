@@ -43,17 +43,18 @@ $muted = array(
     'disabled' => 0
 );
 
+$routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
 foreach ($muted as $k => $id) {
-    $search['user_id'] = $id;
-
-    $muted[$k] = RerouteOverrideMapper::getInstance()->findByColumnList($search)->map(
-        function ($override) {
-            /** @var RerouteOverride $override */
-            $matches = $override->getRouteKey();
-            return is_array($matches) ? $matches[1] : null;
-        },
-        false
-    )->getAll();
+    $muted[$k] = RerouteOverrideMapper::getInstance()
+        ->getMatchingRoutes("service.$service", 0, $id)
+        ->map(
+            function($override) use ($routeKeyRegex) {
+                /** @var RerouteOverride $override */
+                preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                return is_array($matches) ? $matches[1] : null;
+            },
+            false
+        )->getAll();
 }
 
 
