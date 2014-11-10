@@ -69,7 +69,7 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $section['section_id'],
         'TITLE' => Scrub::text($section['title']),
-        'DESCRIPTION' => Scrub::text($section['description']),
+        'DESCRIPTION' => Scrub::html($section['description']),
         'SEQUENCE' => $section['sequence'],
         'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
         'POOL' => $section['pool'] > 0 ? $section['pool'] : ''

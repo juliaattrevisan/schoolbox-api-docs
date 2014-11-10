@@ -82,7 +82,7 @@ $this->setVar(array(
     'SURVEY_CATEGORY_ID' => $survey['category_id'],
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
     'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
 ));
 
 /* Load all the questions for this section.

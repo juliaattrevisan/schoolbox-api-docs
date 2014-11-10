@@ -133,7 +133,7 @@ $this->setVar(array(
     'ATTEMPT_START' => $attemptStartDate->getShort(),
     'ATTEMPT_END' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
     'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+    'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
