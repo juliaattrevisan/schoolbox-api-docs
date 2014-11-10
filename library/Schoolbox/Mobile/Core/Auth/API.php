@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Mobile\Core\Auth;
 
+use Config;
 use Schoolbox\Mobile\Generic;
 use Response_HTTP;
 use Authenticator;
@@ -27,11 +28,23 @@ class API extends Generic\API {
         }
 
         // if url points directly to login, we'll be routing to webRoot
-        if(($i = strpos($_SERVER['QUERY_STRING'], 'url=m/core/auth/login')) === false) {
-            $redirect = substr($_SERVER['QUERY_STRING'], $i + 4);
-        }
-        else {
+        parse_str($_SERVER['QUERY_STRING'], $query);
+        if ($query['url'] === '/m/core/auth/login') {
             $redirect = '';
+        } else {
+            $redirect = $query['url'];
+        }
+
+        // Is SAML enabled? If so redirect to SAML auth instead
+        if (
+            Config::get('saml_enabled')
+            &&
+            strlen(Config::get('saml_sso_url'))
+            &&
+            $query['samlAuth'] !== '0'
+        ) {
+            $redirect = '/saml/index.php?page='.rawurlencode($query['url']);
+            $response->addHeader('Location', $redirect);
         }
 
         $response->setPage('title', 'Login');
