@@ -227,23 +227,25 @@
 
 	<!-- BEGIN date -->
 	<h2>{EVENT_DATE}</h2>
-	<ul class="js_happening">
+	<ul class="js_happening calendar">
 		<!-- BEGIN event -->
 		<li class="event {EVENT_SELECTORS}" style="background-color:{EVENT_COLOUR}">
 			<p class="{EVENT_CLASS}">
-				<!-- BEGIN event_allday -->
-				<time class="duration" datetime="{EVENT_TIMESTAMP}">All Day</time>
-				<!-- END event_allday -->
+				<span class="eventListing">
+					<!-- BEGIN event_allday -->
+					<strong class="duration">All Day</strong>
+					<!-- END event_allday -->
 
-				<!-- BEGIN event_timed -->
-				<time class="duration" datetime="{EVENT_TIMESTAMP}">{EVENT_START}&ndash;{EVENT_END}</time>
-				<!-- END event_timed -->
+					<!-- BEGIN event_timed -->
+					<strong class="duration">{EVENT_START}&ndash;{EVENT_END}</strong>
+					<!-- END event_timed -->
 
-				<!-- BEGIN event_submission -->
-				<time class="duration" datetime="{EVENT_TIMESTAMP}">{EVENT_END}</time>
-				<!-- END event_submission -->
+					<!-- BEGIN event_submission -->
+					<strong class="duration">{EVENT_END}</strong>
+					<!-- END event_submission -->
 
-				{EVENT_TITLE}
+					<span>{EVENT_TITLE}</span>
+				</span>
 			</p>
 
             <div class="hidden-fields clearfix">
