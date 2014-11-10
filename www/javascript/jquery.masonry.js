@@ -22,7 +22,9 @@
         sliderHandleClass = 'ui-slider-handle',
         emptyColumnClass  = 'empty-column',
         activeClass       = 'active',
-        pendingClass      = 'pending';
+        pendingClass      = 'pending',
+        loadingClass      = 'loading',
+        loadedClass       = 'loaded';
 
     var defaults = {
 
@@ -545,14 +547,26 @@
 
                 event.preventDefault();
 
+                if (!element.hasClass('disabled')) {
+                    element.addClass(loadingClass);
+                }
+
                 masonry.newComponentInstance(element, function () {
                     var leftColumn  = $(masonry.element).find(opt.column.position.left);
+
+                    element.addClass(loadedClass);
 
                     this.hide().prependTo(leftColumn).css('opacity', 0)
                         .slideDown(400, function () {
                             masonry.refreshColumns();
+
+                            // these 2 calls should happen together so there's no opacity flicker
+                            element.removeClass(loadingClass);
                             masonry.refreshPalette();
-                            $(this).animate({opacity: 1}, 300);
+
+                            $(this).animate({opacity: 1}, 300, function () {
+                                element.removeClass(loadedClass);
+                            });
 
                             // only go in for applying colours if you've got colours to set
                             if (masonry.spectrum) {
