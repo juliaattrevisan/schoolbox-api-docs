@@ -84,34 +84,6 @@ $values         = $_POST['value'];
 $criteria       = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
-
-// clean the manymany file relation
-SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
-
-if (isset($_POST['attachment'])) {
-//    var_dump($_POST['attachment']);
-
-    $factory = new CollectorFactory();
-    /** @var \Schoolbox\Storage[] $storages */
-    $storages = $factory->build($_POST['attachment'])->getAll();
-
-    $files = new \Schoolbox\Collection();
-
-    // iterate and link up
-    foreach ($storages as $storage) {
-        $file = new SubmissionBox\File();
-        $file->setFile($storage);
-        $file->setFileId($storage->getId());
-        $file->setSubmissionBoxId($submissionBoxID);
-        $files->add($file);
-    }
-
-    $affected = SubmissionBox\FileMapper::getInstance()->save($files);
-
-    $submission->setFileLinks(new SubmissionBox\FileCollection());
-}
-
-
 /* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
  * not equal to 12. This stops the date incrementing to the next day.
  *
@@ -278,6 +250,27 @@ if (isset($rubric)) {
         isset($invalidateExistingMarks) ? $invalidateExistingMarks : false,
         $submissionBoxID
     );
+}
+
+// clean and rebuild the manymany file relation
+SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
+
+if (isset($_POST['attachment'])) {
+    $factory = new CollectorFactory();
+    /** @var \Schoolbox\Storage[] $storages */
+    $storages = $factory->build($_POST['attachment'])->getAll();
+
+    $files = new \Schoolbox\Collection();
+
+    // iterate and link up
+    foreach ($storages as $storage) {
+        $file = new SubmissionBox\File();
+        $file->setFile($storage);
+        $file->setFileId($storage->getId());
+        $file->setSubmissionBoxId($submissionBoxID);
+        $files->add($file);
+    }
+    SubmissionBox\FileMapper::getInstance()->save($files);
 }
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');
