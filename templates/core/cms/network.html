@@ -229,7 +229,6 @@ $j(function() {
                 <col width="23%"/>
                 <thead>
                 <th>Name</th>
-                <th>Modified</th>
                 </thead>
             </table>
 
@@ -243,9 +242,6 @@ $j(function() {
                     <tr id="{TYPE}-{FILE_ID}" class="category-{FOLDER_ID}">
                         <td>
                             <span class="file {CLASS}">{FILE_NAME}</span>
-                        </td>
-                        <td>
-                            {FILE_MODIFIED}
                         </td>
                     </tr>
                     <!-- END file_list -->
@@ -274,14 +270,7 @@ $j(function() {
         <img src="{FOLDER_MIME_IMG}" alt="{FOLDER_NAME}" />
         <h3 class="rfolder name">{FOLDER_NAME}</h3>
         <p class="rfolder template">{FOLDER_TEMPLATE}</p>
-        <p class="rfolder type">
-          <span class="rfolder type">{FOLDER_TYPE}</span>
-          <a data-action="join" class="rfolder join-btn btn groups">
-            <span></span>Join
-          </a>
-          <span class="pending">Membership pending approval</span>
-        </p>
-
+        <p class="rfolder type"></p>
         <div class="rfolder actions clearfix">
           <h4 class="rfolder actions">Actions</h4>
           <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
