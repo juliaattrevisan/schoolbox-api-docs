@@ -1213,8 +1213,8 @@ Notifications
 }
 .homepage {
 	.add-component.pending {
-		border: dashed 1px #ccc;
-		background: #f7f7f7;
+		border: dashed 1px @std-grey;
+		background: lighten(@lgrey, @lighten-value);
 		width: 100%;
 		text-align: center;
 		h4 {
@@ -6915,7 +6915,7 @@ HOMEPAGE CUSTOMISE
 
 .add-component {
     border: solid 1px transparent;
-	background-color: rgba(255, 255, 255, 0);
+	background-color: fade(@white, 0%);
     border-right-color: @lgrey;
     position: relative;
     float: left;
@@ -7045,7 +7045,7 @@ HOMEPAGE CUSTOMISE
     }
 	&.insert-new {
 		border-color: @lgrey;
-		background-color: rgba(255, 255, 255, 1);
+		background-color: fade(@white, 100%);
 	}
 
 	&.loading:before {
@@ -8129,7 +8129,7 @@ form.context {
         color: @secondary-text;
     }
     .submit-ok {
-        background: #eff8ef;
+        background: lighten(@positive-color, @lighten-value);;
         color: darken(@positive-color,@darken-value);
     }
     .submit-warn {
@@ -11893,8 +11893,8 @@ textarea.event-detail {
 	}
 	li[data-source].browsing {
 		h3 a {
-			color: #000;
-			background: #e5eff7;
+			color: @white;
+			background: @link;
 			&:hover {
 				text-decoration: none;
 			}
@@ -11925,8 +11925,8 @@ textarea.event-detail {
 #ab-upload {
 	.dzone {
 		min-height: 100%;
-		border: dashed 2px #aaa;
-		background-color: #efefef;
+		border: dashed 2px @mgrey;
+		background-color: lighten(@lgrey, @lighten-value);
 		box-sizing: border-box;
 		margin-right: 4px;
 		.transition(
@@ -11954,8 +11954,8 @@ textarea.event-detail {
 		}
 	}
 	form.dzone.dz-drag-hover {
-		border-color: #393;
-		background-color: #efe;
+		border-color: darken(@positive-color, @darken-value);
+		background-color: lighten(@positive-color, @lighten-value);
 	}
 	.dz-error-mark, .dz-success-mark {
 		display: none;
@@ -11964,17 +11964,17 @@ textarea.event-detail {
 		left: 9px;
 	}
 	.dz-error-mark {
-		color: #d33;
+		color: darken(@negative-color, @darken-value);
 	}
 	.dz-success-mark {
-		color: #393;
+		color: darken(@positive-color, @darken-value);
 	}
 	.dz-preview {
 		&.dz-error {
-			background-color: #fee;
+			background-color: lighten(@negative-color, @lighten-value);
 		}
 		&.dz-success {
-			background-color: #efe;
+			background-color: lighten(@positive-color, @lighten-value);
 		}
 	}
 	.dz-error .dz-error-message {
@@ -11984,7 +11984,7 @@ textarea.event-detail {
 		width: 100px;
 		height: 100px;
 		margin: 9px;
-		background: rgba(255, 240, 240, 0.7);
+		background: fade(lighten(@negative-color, @lighten-value), 70%);
 		padding: 4px;
 		box-sizing: border-box;
 		text-align: center;
@@ -12003,11 +12003,11 @@ textarea.event-detail {
 		display: block;
 	}
 	.dz-preview {
-		background-color: #fff;
+		background-color: @white;
 		position: relative;
 		width: 120px;
 		height: 180px;
-		border: solid 1px #eee;
+		border: solid 1px @lgrey;
 		box-sizing: border-box;
 		float: left;
 	}
@@ -12040,14 +12040,14 @@ textarea.event-detail {
 			top: 45%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			color: #888;
-			text-shadow: 0 1px 0 #fff;
+			color: @dgrey;
+			text-shadow: 0 1px 0 @white;
 		}
 	}
 	.dz-progress [data-dz-uploadprogress] {
 		height: 100%;
 		display: block;
-		background: rgba(221, 238, 255, 0.7);
+		background: fade(lighten(@neutral-color, @lighten-value), 70%);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -12079,7 +12079,7 @@ ul.az-list {
 	> li {
 		clear: none;
 		padding: 4px 12px 4px 4px;
-		background-color: rgba(128, 128, 128, 0);
+		background-color: fade(@dgrey, 0%);
 		.transition(
 			opacity 100ms ease-in,
 			height 150ms ease-out 50ms,
@@ -12087,7 +12087,7 @@ ul.az-list {
 			background-color 500ms ease-out
 		);
 		&:nth-child(2n) {
-			background-color: rgba(128, 128, 128, 0.05);
+			background-color: fade(@dgrey, 5%);
 		}
 		&.detach {
 			opacity: 0;
@@ -12194,7 +12194,7 @@ ul.az-list {
 			border-color: transparent;
 			background-color: transparent;
 			background-image: none;
-			color: #000;
+			color: @black;
 			padding-left: 0;
 			span {
 				padding: 0;
@@ -12212,9 +12212,9 @@ ul.az-list {
 		border-width: 0;
 	}
 	&.dz-drag-hover .dzone {
-		border-color: #092;
-		color: #092;
-		background-color: rgba(240,255,240, 0.5);
+		border-color: darken(@positive-color, @darken-value);
+		color: darken(@positive-color, @darken-value);
+		background-color: fade(lighten(@positive-color, @lighten-value), 50%);
 	}
 
 	img[data-dz-thumbnail] {
@@ -12228,13 +12228,13 @@ ul.az-list {
 	.dzone {
 		position: relative;
 		overflow: hidden;
-		border: dashed 1px #ccc;
-		background-color: rgba(240, 240, 240, 0.5);
+		border: dashed 1px @std-grey;
+		background-color: fade(@lgrey, 50%);
 		background-repeat: no-repeat;
 		display: block;
 		box-sizing: border-box;
-		color: #777;
-		text-shadow: 0 1px 0 #fff;
+		color: @dgrey;
+		text-shadow: 0 1px 0 @white;
 		line-height: 1.1em;
 		width: 100%;
 		.transition(
@@ -12265,7 +12265,7 @@ ul.az-list {
 			opacity: 0;
 		}
 		.dz-upload {
-			background-color: rgba(255, 120, 120, 0.1);
+			background-color: fade(lighten(@negative-color, @lighten-value), 10%);
 		}
 	}
 	.dz-success {
@@ -12273,7 +12273,7 @@ ul.az-list {
 			background: none;
 		}
 		.dz-upload {
-			background-color: rgba(0, 102, 176, 0);
+			background-color: fade(@neutral-color, 0%);
 		}
 		.filename {
 			opacity: 1;
@@ -12283,7 +12283,7 @@ ul.az-list {
 		margin: 0;
 	}
 	.dz-upload {
-		background-color: rgba(0, 102, 176, 0.03);
+		background-color: fade(@neutral-color, 20%);
 		top: 0;
 		left: 0;
 	}
@@ -12301,7 +12301,7 @@ ul.az-list {
 		margin: 0;
 		padding: 8px;
 		&:nth-child(even) {
-			background-color: #eee;
+			background-color: @lgrey;
 		}
 		:last-child {
 			background-color: transparent;
@@ -12409,15 +12409,15 @@ ul.az-list {
 
 	z-index: 2;
 	opacity: 0.7;
-	border-color: #bbb;
-	background-color: #fff;
+	border-color: @std-grey;
+	background-color: @white;
 
 	&.dz-drag-hover {
 		z-index: 2;
-		border-color: #383;
-		background-color: #F0FFFA;
+		border-color: darken(@positive-color, @darken-value);
+		background-color: ligten(@positive-color, @lighten-value);
 		.dz-default span {
-			color: #383;
+			color: darken(@positive-color, @darken-value);
 		}
 	}
 
@@ -12488,16 +12488,16 @@ ul.az-list {
 .dz-filename {
 	.transition(color 200ms linear);
 	position: absolute;
-	color: #888;
+	color: @dgrey;
 	&.started {
-		color: #000;
+		color: @black;
 	}
 }
 .dz-upload {
 	.transition(width 150ms ease-out, background-color 800ms);
 	position: absolute;
 	width: 0;
-	background-color: rgba(0, 102, 176, 0.10);
+	background-color: fade(@neutral-color, 20%);
 
 	&:before {
 		display: block;
@@ -12506,22 +12506,22 @@ ul.az-list {
 		font-size: 20px;
 	}
 	&.complete {
-		background-color: rgba(100, 200, 100, 0.1);
+		background-color: fade(darken(@positive-color, @darken-value), 10%);
 		&:before {
 			content: "\2714";
-			color: #282;
+			color: darken(@positive-color, @darken-value);
 		}
 	}
 	&.error {
-		background-color: rgba(200, 100, 100, 0.1);
+		background-color: fade(darken(@negative-color, @darken-value), 10%);
 		&:before {
 			content: "\2718";
-			color: #822;
+			color: darken(@negative-color, @darken-value);
 		}
 	}
 }
 .dz-preview {
-	border-bottom: 1px solid #eeeeee;
+	border-bottom: 1px solid @lgrey;
 	position: relative;
 }
 .dz-wrap {
@@ -12532,7 +12532,7 @@ ul.az-list {
 	top: 50%;
 	left: 0;
 	width: 100%;
-	color: #888;
+	color: @dgrey;
 	text-align: center;
 	font-weight: bold;
 	.transform(
