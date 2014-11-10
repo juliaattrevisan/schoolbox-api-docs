@@ -45,7 +45,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             $this->setVar(array(
                 'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
                 'QUESTION_TYPE' => $currentQuestion['description'],
-                'QUESTION' => Scrub::text($currentQuestion['question']),
+                'QUESTION' => Scrub::html($currentQuestion['question']),
                 'MARKS' => $currentQuestion['marks'],
                 'answers_block' => '',
             ));
