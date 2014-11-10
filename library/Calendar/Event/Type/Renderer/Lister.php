@@ -58,11 +58,22 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     {
         $page = $this->getPage();
 
-        /* EOTC Events don't use a publishDate
+        /* Special logic for EOTC events
          */
-        if (($currentEvent->getPublishDate() instanceof \Alaress_Date_Format) && $currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+        if ($currentEvent instanceof \Calendar_Event_Type_EOTC) {
+            $customValues = $currentEvent->getCustom();
+
+            if ($customValues['approved']) {
+                $cssClass = '';
+            }
+            else {
+                $cssClass = 'translucent';
+            }
+        }
+        elseif ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
-        } else {
+        }
+        else {
             $cssClass = '';
         }
 
