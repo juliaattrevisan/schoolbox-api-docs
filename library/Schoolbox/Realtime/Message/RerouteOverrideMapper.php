@@ -113,15 +113,16 @@ class RerouteOverrideMapper extends Mapper {
         }, false);
     }
 
+
+
     /**
-     * Have message for this route key been muted?
-     *
      * @param string $routeKey
-     * @param int    $userId   If supplied, the user to check.
+     * @param int    $outgoingLevel
+     * @param int    $userId        If supplied, the user to check.
      *
-     * @return string
+     * @return Collection|RerouteOverride[]
      */
-    public function isRouteMuted($routeKey, $userId = null)
+    public function getMatchingRoutes($routeKey, $outgoingLevel, $userId = null)
     {
         $userIds = array(0);
         if (isset($userId)) {
@@ -134,7 +135,7 @@ class RerouteOverrideMapper extends Mapper {
         // ends with
         // Keep in mind that . is used as a sub-route separator.
         $query = "
-            SELECT COUNT(*)
+            SELECT {$this->getColumnString()}
             FROM {$this->getTable()}
             WHERE (
                   `msg_route_key` = :routeKey
@@ -146,10 +147,11 @@ class RerouteOverrideMapper extends Mapper {
                   `msg_route_key` LIKE :endKey
             )
             AND `user_id` IN {$this->getArrayPlaceholders($userIds, 'user')}
-            AND `outgoing_level` = 0
+            AND `outgoing_level` = :level
         ";
         $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
         $params    = array(
+            'level'     => $outgoingLevel,
             'routeKey'  => $routeKey,
             'startKey'  => $quotedKey.'.%',
             'middleKey' => '%.'.$quotedKey.'.%',
@@ -158,7 +160,19 @@ class RerouteOverrideMapper extends Mapper {
         $params = array_merge($params, $this->getArrayParameters($userIds, 'user'));
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
-        return $statement->fetchColumn();
+        return $this->hydrateList($statement);
     }
 
-} 
+    /**
+     * Have message for this route key been muted?
+     *
+     * @param string $routeKey
+     * @param int    $userId   If supplied, the user to check.
+     *
+     * @return string
+     */
+    public function isRouteMuted($routeKey, $userId = null)
+    {
+        return $this->getMatchingRoutes($routeKey, 0, $userId)->count();
+    }
+}
