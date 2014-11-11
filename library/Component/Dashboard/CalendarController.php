@@ -152,15 +152,25 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
                 $eventOutput['EVENT_ID'] = '';
                 $eventOutput['TYPE'] = 'Booking';
+
+                // Finagle better notes or details
+                if (strlen($eventOutput['NOTE']) === 0) {
+                    $eventOutput['NOTE'] = Scrub::text(
+                        'Booking: '.$currentEvent->getBooking()->getResource()->getName()
+                    );
+                } else {
+                    $eventOutput['DETAIL'] = sprintf(
+                        '(Booking for: %s)<br>%s',
+                        Scrub::text($currentEvent->getBooking()->getResource()->getName()),
+                        $eventOutput['DETAIL']
+                    );
+                }
+
+                // Add the status to the note/title
                 $eventOutput['NOTE'] = sprintf(
                     '(%s) %s',
                     Scrub::text($currentEvent->getBooking()->getStatus()->getName()),
                     $eventOutput['NOTE']
-                );
-                $eventOutput['DETAIL'] = sprintf(
-                    '(Booking for: %s)<br>%s',
-                    Scrub::text($currentEvent->getBooking()->getResource()->getName()),
-                    $eventOutput['DETAIL']
                 );
             }
 			$this->setVar($eventOutput);
