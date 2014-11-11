@@ -77,7 +77,6 @@ class EventConnector extends EventMapper {
 			$event->setEventId($eventItem->getId());
 			$event->setStartTime($eventItem->getStartDateTime());
 			$event->setEndTime($eventItem->getEndDateTime());
-            $event->setPublishDate($eventItem->getPublishDate());
 			$event->setCampusList(implode(',', $campusIds));
 
 			/* EOTC Events are always of the type "EOTC" for usage
@@ -101,6 +100,31 @@ class EventConnector extends EventMapper {
 			else {
 				$event->setIsEditable(false);
 			}
+
+            /* Accumulate the metadata for this event
+             * Only use the first record
+             */
+            $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = new EventMetadataMapper();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+            }
+
+            /* Derive publishDate settings for front-end classes
+             * If it's approved, set the publishDate in the past
+             * Otherwise, set it in the future
+             */
+            if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+                $publishDate = new \Alaress_Date_Format(0, 'U');
+            }
+            else {
+                $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+            }
+
+            $event->setPublishDate($publishDate);
 
 			$event->setAttendance(0);
 			$event->setCompleted(0);
