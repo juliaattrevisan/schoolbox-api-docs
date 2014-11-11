@@ -207,7 +207,7 @@ then
 	if [ $backup_data_dir -eq 1 ];
 	then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
-		tar -cz `readlink -f $data_dir` 2>>$logfile | split -b 10G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+		tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
 	else
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Skipping backup of $data_dir due to override set" >> $logfile;
 	fi
