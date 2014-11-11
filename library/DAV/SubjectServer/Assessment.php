@@ -65,6 +65,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 	 */
 	public function loadChildren() {
 		$mapper = new SubmissionMapper();
+        $nameGenerator = new Dav_NameGenerator();
 		$files  = $mapper->findByColumnList(array(
 			'owner'  => $this->getUser()->getId(),
 			'box_id' => $this->getAssessment()->getId(),
@@ -72,7 +73,13 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 		foreach ($files as $file) {
 			$file_location = $file->getFileLocation();
 			if (file_exists($file_location)) {
-				$child = new DAV_SubjectServer_Submission($file->getFilename(), file_get_contents($file_location));
+                $child = new DAV_SubjectServer_Submission(
+                    $nameGenerator->getUniqueChildName(
+                        $this,
+                        $nameGenerator->sanitiseName($file->getFilename())
+                    ),
+                    file_get_contents($file_location)
+                );
 				$child
 					->setUser($this->getUser())
 					->setSubmission($file)
