@@ -25,17 +25,8 @@
                 window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
             }
         });
-        jQuery.validator.addMethod("isURL", function (value, element) {
-            return this.optional(element) || /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.test(value);
-        }, "Please enter a URL beginning with http:// or https://");
 
-        $j('#urlForm').validate({
-            rules:{
-                url:{
-                    isURL:true
-                }
-            }
-        });
+        $j('#urlForm').validate();
     });
 
 </script>
@@ -53,7 +44,9 @@
         <tr>
         <tr>
             <td class="formLabelWidth"><h4>URL</h4>
-                <em>The internet address for the website, eg. http://www.google.com</em></td>
+                <em>The internet address for the website, eg. http://www.google.com.</em>
+                <em>Relative URLs (ones without a http:// prefix) are allowed, and will resolve relative to this domain.</em>
+            </td>
             <td><label><input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
                 <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
                 </p>
