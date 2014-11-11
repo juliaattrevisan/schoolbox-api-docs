@@ -3,6 +3,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use \Schoolbox\MyFileMapper;
 use \Schoolbox\MyFile;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -27,53 +28,46 @@ if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
 }
 
 // Upload a new file
-if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
+if (isset($_POST['description'])) {
 
-    $file = array(
-        'parent' => $_POST['parent'],
-        'description' => $_POST['description'],
-    );
-
-    if (is_numeric($_POST['fileID'])) {
-        // check user owns file
-        /** @var MyFile $currentFile */
-		$currentFile = MyFileMapper::getInstance()->findById($_POST['fileID']);
-
-        if ($currentFile->getOwner()->getId() != $userId) {
-            if ($ajax) {
-                header(':', true, 400);
-                die(json_encode('You do not have write permission to this ePortfolio.'));
-            } else {
-                error(47);
-            }
-
-        }
-    } else {
-        $allowedFileHandler = new AllowedFile;
-        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
-
-		/* TODO: this should be made consistent with File -_-
-		 */
-		$mime = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($_FILES['file']['name']);
-
-        $currentFile = new MyFile();
-		$currentFile->setTempFileLocation($_FILES['file']['tmp_name']);
-		$currentFile->setFilename($_FILES['file']['name']);
-		$currentFile->setFilesize(filesize($_FILES['file']['tmp_name']));
-		$currentFile->setMimetype($mime);
-		$currentFile->setCreatedAt(new Alaress_Date_Format(time(), 'U'));
-		$currentFile->setDeleted(false);
-    }
-
-    $parent = new \Schoolbox\MyFolder();
-    $parent->setId($_POST['parent']);
-
-    $currentFile->setParent($parent);
-    $currentFile->setOwner($_SESSION['user']);
-    $currentFile->setDescription($_POST['description']);
+    /** @var MyFile $file */
+    $file = null;
 
     try {
-        $affectedIds = MyFileMapper::getInstance()->save($currentFile);
+        // if we're editing an existing file, ensure the file exists
+        if (is_numeric($_POST['fileID'])) {
+            $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
+
+        } else {
+            $file = MyFileMapper::getInstance()->createModel();
+        }
+
+        if (isset($_POST['attachment'])) {
+            $factory = new CollectorFactory(MyFileMapper::getInstance());
+            /** @var MyFile $result */
+            $result  = $factory->build($_POST['attachment'])->getFirst();
+
+            if ($file->getId()) {
+                $result->setId($file->getId());
+            }
+
+            // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
+            $file = $result;
+        }
+
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit; // shut UP, storm.
+    }
+
+    // set attributes
+    $file->setCreatedAt(Alaress_Date_Format::now());
+    $file->setOwner($_SESSION['user']);
+    $file->setDescription($_POST['description']);
+    $file->setParent(\Schoolbox\MyFolderMapper::getInstance()->createModel()->setId($_POST['parent']));
+
+    try {
+        $affectedIds = MyFileMapper::getInstance()->save($file);
 
         /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
          */
@@ -87,7 +81,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
                         if ($authenticator->canModify()) {
                             $publishedFile = new \Component\Eportfolio\FileList();
                             $publishedFile->setPageId($currentPageId);
-                            $publishedFile->setFileId($currentFile->getId());
+                            $publishedFile->setFileId($file->getId());
                             $publishedFile->setCreatedAt($now);
                             $publishedFile->setUpdatedAt($now);
 
@@ -113,7 +107,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         // Output errors
         if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
             $code = 11;
-            $msg  = "Your file, '{$currentFile->getFilename()}' is not a valid filetype";
+            $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
 
         } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
             $code = 10;
