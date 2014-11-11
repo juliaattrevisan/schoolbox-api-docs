@@ -81,7 +81,8 @@
 							window.location = questionBank.url;
 						});
 					}
-
+				}
+				
 				return false;
 			},
 			rules:{
@@ -175,12 +176,18 @@
         /* Remove an answer option
          */
         $j(document).on('click', '.delete', function () {
-            if (($j('.inputs').length) !== 3) {
+            if ($('#answerCollection .inputs').length == 3) {
                 $j(this).parent().remove();
             }
 
             refreshList();
         });
+
+		/* Special hardcoded third option
+		 */
+		if ($('#answerCollection .inputs').length == 3) {
+			$('#answerCollection .inputs').last().append('<div class="delete"></div>');
+		}
 
         $j(document).on('click', '.answerCorrect', function () {
             $j(this).parent().parent().toggleClass("highlight");
