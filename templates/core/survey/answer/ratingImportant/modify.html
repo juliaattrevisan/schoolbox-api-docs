@@ -167,11 +167,17 @@
         /* Remove an answer option
          */
         $j(document).on('click', '.delete', function () {
-            if (($j('.inputs').length) !== 3) {
+            if ($('#answerCollection .inputs').length == 6) {
                 $j(this).parent().remove();
             }
             refreshList();
         });
+
+		/* Special hardcoded sixth option
+		 */
+		if ($('#answerCollection .inputs').length == 6) {
+			$('#answerCollection .inputs').last().append('<div class="delete"></div>');
+		}
 
         $j(document).on('click', '.answerCorrect', function () {
             refreshList();
