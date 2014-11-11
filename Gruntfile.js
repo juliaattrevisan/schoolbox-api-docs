@@ -114,7 +114,7 @@ module.exports = function(grunt) {
                     // Notifier
                     'www/javascript/jquery.notifier.js',
                     // Socialstream browser
-                    'socialstream/browser/browser.js'
+                    'www/socialstream/browser/browser.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
