@@ -112,7 +112,9 @@ module.exports = function(grunt) {
                     // Dropzone
                     'www/javascript/components/dropzone/downloads/dropzone.js',
                     // Notifier
-                    'www/javascript/jquery.notifier.js'
+                    'www/javascript/jquery.notifier.js',
+                    // Socialstream browser
+                    'www/socialstream/browser/browser.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
