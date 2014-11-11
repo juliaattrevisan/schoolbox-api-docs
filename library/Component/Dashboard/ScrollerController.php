@@ -69,7 +69,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
 	    $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
-        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 		$this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
 		/* Hide header bar if desired
@@ -113,12 +112,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
 
-        /* Controls such as Post Images
-         *
-         * For the dashboard component, hide the post image button as that
-         * shimmies you off to the homepage which you choze
-         */
-		$this->setVar("submit_image_block", "");
 
         // Iterate
         if (is_array($allFiles)) {
