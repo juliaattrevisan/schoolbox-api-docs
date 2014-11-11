@@ -75,6 +75,13 @@
 								configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 							};
 
+							/* Submit via POST and redirect to question creation screen upon done
+							 */
+							$j.post(theForm.attr('action'), data, function (responseText) {
+								window.location = questionBank.url;
+							});
+						}
+
 				return false;
 			},
 			rules:{
