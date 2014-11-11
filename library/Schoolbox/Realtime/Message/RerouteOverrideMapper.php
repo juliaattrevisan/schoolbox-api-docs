@@ -76,6 +76,8 @@ class RerouteOverrideMapper extends Mapper {
      * If no capture groups are specified, the result is identical to if this override did not exist
      * If capture groups are specified, each RerouteOverride::routeKey will be an array of the preg_matches
      *
+     * TODO deprecate this unique implementation, as its only use case is now covered by isRouteMuted?
+     *
      * @param array $columnList
      * @param array $options
      * @return Collection|RerouteOverride[]
@@ -111,4 +113,66 @@ class RerouteOverrideMapper extends Mapper {
         }, false);
     }
 
-} 
+
+
+    /**
+     * @param string $routeKey
+     * @param int    $outgoingLevel
+     * @param int    $userId        If supplied, the user to check.
+     *
+     * @return Collection|RerouteOverride[]
+     */
+    public function getMatchingRoutes($routeKey, $outgoingLevel, $userId = null)
+    {
+        $userIds = array(0);
+        if (isset($userId)) {
+            $userIds[] = $userId;
+        }
+        // Check all permutations of route key:
+        // exact match
+        // starts with
+        // in middle of route
+        // ends with
+        // Keep in mind that . is used as a sub-route separator.
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()}
+            WHERE (
+                  `msg_route_key` = :routeKey
+                  OR
+                  `msg_route_key` LIKE :startKey
+                  OR
+                  `msg_route_key` LIKE :middleKey
+                  OR
+                  `msg_route_key` LIKE :endKey
+            )
+            AND `user_id` IN {$this->getArrayPlaceholders($userIds, 'user')}
+            AND `outgoing_level` = :level
+        ";
+        $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
+        $params    = array(
+            'level'     => $outgoingLevel,
+            'routeKey'  => $routeKey,
+            'startKey'  => $quotedKey.'.%',
+            'middleKey' => '%.'.$quotedKey.'.%',
+            'endKey'    => '%.'.$quotedKey,
+        );
+        $params = array_merge($params, $this->getArrayParameters($userIds, 'user'));
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        return $this->hydrateList($statement);
+    }
+
+    /**
+     * Have message for this route key been muted?
+     *
+     * @param string $routeKey
+     * @param int    $userId   If supplied, the user to check.
+     *
+     * @return string
+     */
+    public function isRouteMuted($routeKey, $userId = null)
+    {
+        return $this->getMatchingRoutes($routeKey, 0, $userId)->count();
+    }
+}

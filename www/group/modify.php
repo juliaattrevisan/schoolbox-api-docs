@@ -65,8 +65,9 @@ if (is_numeric($this->arg[0])) {
         'outgoing_level' => 0
     );
 
-    // if result returned, it means group is muted
-    $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()->findByColumnList($search)->count();
+    $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()->isRouteMuted(
+        "service.1.{$category['id']}"
+    );
 
     $output = array(
         'MSG_ENABLED_CHECKED'      => '',
@@ -121,7 +122,10 @@ if (is_numeric($this->arg[0])) {
                 'outgoing_level' => 0
             );
 
-            $following = !RerouteOverrideMapper::getInstance()->findByColumnList($search)->count();
+            $following = !RerouteOverrideMapper::getInstance()->isRouteMuted(
+                "service.1.{$category['id']}",
+                $member['uid']
+            );
 
 			$output = array('USER_NAME'		=> $userHandler->formatName($member),
 							'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
