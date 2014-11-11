@@ -7,77 +7,82 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\User;
-use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Resource\Category;
+use Schoolbox\User;
 
 class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 {
-	/**
-	 * @var Category
-	 */
-	protected $category;
+    /**
+     * @var Category
+     */
+    protected $category;
 
-	/**
-	 * @var User
-	 */
-	protected $user;
+    /**
+     * @var User
+     */
+    protected $user;
 
-	/**
-	 * @param Category $category
-	 *
-	 * @return $this
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
+    /**
+     * @param Category $category
+     *
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
-	/**
-	 * @return Category
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
+    /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
-	/**
-	 * @param  User $user
-	 *
-	 * @return $this
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-		return $this;
-	}
+    /**
+     * @param  User $user
+     *
+     * @return $this
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * Loads children from the subject and user set in $this->setSubject().
-	 *
-	 * @return $this
-	 */
-	public function loadChildren() {
-		$mapper = new SubmissionBoxMapper();
+    /**
+     * Loads children from the subject and user set in $this->setSubject().
+     *
+     * @return $this
+     */
+    public function loadChildren()
+    {
+        $mapper        = new SubmissionBoxMapper();
         $nameGenerator = new Dav_NameGenerator();
-		foreach ($mapper->getSubmittable($this->getUser(), $this->getCategory()) as $assessment) {
-			$child = new DAV_SubjectServer_Assessment(
+        foreach ($mapper->getSubmittable($this->getUser(), $this->getCategory()) as $assessment) {
+            $child = new DAV_SubjectServer_Assessment(
                 $nameGenerator->getUniqueChildName(
                     $this,
                     $nameGenerator->sanitiseName($assessment->getName())
                 )
             );
-			$child
-				->setAssessment($assessment)
-				->setUser($this->getUser())
-				->loadChildren();
-			$this->addChild($child);
-		}
-		return $this;
-	}
+            $child
+                ->setAssessment($assessment)
+                ->setUser($this->getUser())
+                ->loadChildren();
+            $this->addChild($child);
+        }
+        return $this;
+    }
 }
