@@ -63,6 +63,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 	 * @return $this
 	 */
 	public function loadChildren() {
+        $nameGenerator = new Dav_NameGenerator();
 		$mapper = new SubmissionBoxMapper();
 		$categories = array();
 		foreach ($mapper->getSubmittable($this->getUser()) as $box) {
@@ -82,7 +83,12 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 			if (!empty($codes)) {
 				$name .= ' ('.implode(', ', $codes).')';
 			}
-			$child = new DAV_SubjectServer_Subject($this->getUniqueName($this->sanitiseName($name)));
+			$child = new DAV_SubjectServer_Subject(
+                $nameGenerator->getUniqueChildName(
+                    $this,
+                    $nameGenerator->sanitiseName($name)
+                )
+            );
 			$child
 				->setCategory($category)
 				->setUser($this->getUser())
@@ -90,50 +96,6 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 			$this->addChild($child);
 		}
 		return $this;
-	}
-
-	/**
-	 * Strips characters which may have special meaning in filenames.
-	 *
-	 * Currently strips out:
-	 * * All non-printable chars and null (\x00 - \x1F)
-	 * * The following characters: < > : " / \ | ? *
-	 *
-	 * @see http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-	 *
-	 * @param  string $name
-	 * @return string
-	 */
-	protected function sanitiseName($name) {
-		return preg_replace('/[<>:\\/\\\\|?*\\x00-\\x1F]/', '', $name);
-	}
-
-	/**
-	 * Attempts to resolve conflicts with subject names by appending a number to
-	 * the name if it's already in use.
-	 *
-	 * @throws Sabre\DAV\Exception if this method couldn't create a unique name
-	 *                             after 1000 attempts
-	 * @param  string $name
-	 * @return string
-	 */
-	protected function getUniqueName($name) {
-		if ($this->childExists($name)) {
-			for ($i = 1; $i <= 1000; $i++) {
-				$new_name = $name.'-'.$i;
-				if (!$this->childExists($new_name)) {
-					return $new_name;
-				}
-			}
-			//
-			// Fell through all the way to here? That means we couldn't find a
-			// unique name after way too many attempts.
-			// Maybe you should have an exception instead.
-			throw new Sabre\DAV\Exception('Could not assign a unique name to subject "'.$name.'"');
-		}
-		else {
-			return $name;
-		}
 	}
 
 	/**
