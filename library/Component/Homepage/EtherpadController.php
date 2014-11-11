@@ -90,12 +90,19 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 		 */
 		$padMapper = new \Etherpad\PadMapper();
 
-		$allPads = $padMapper->findByColumn('homepage_id', $homepageSource, array(
-			'order' => array(
-				$this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
-			),
-			'limit' => $this->getConfig('size')
-		));
+        $options = array(
+            'order' => array(
+                $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
+            )
+        );
+
+        /* Optional limits
+         */
+        if ($this->getConfig('size')) {
+            $options['limit'] = $this->getConfig('size');
+        }
+
+		$allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
 
 		/* Only provide Modify Document button to those with write access
 		 */
