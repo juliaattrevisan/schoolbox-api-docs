@@ -101,12 +101,37 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             if ($currentEvent->getAllday()) {
                 $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d'));
                 $page->parse('event_allday_block', 'event_allday');
-            }
-            else {
+            } else {
                 $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d H:i:s'));
                 $page->parse('event_submission_block', 'event_submission');
             }
-        } else if ($currentEvent->getAllday()) {
+        } elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
+            $page->setVar('EVENT_TYPE', 'Booking');
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d H:i:s'));
+            $page->setVar('EVENT_ID', '');
+
+            // Finagle better notes or details
+            $title = $currentEvent->getTitle();
+            if (strlen($title) === 0) {
+                $title = 'Booking: '.$currentEvent->getBooking()->getResource()->getName();
+            } else {
+                $page->setVar(
+                    'EVENT_DETAIL',
+                    sprintf(
+                        '(Booking for: %s)<br>%s',
+                        Scrub::text($currentEvent->getBooking()->getResource()->getName()),
+                        Scrub::html($currentEvent->getDetail())
+                    )
+                );
+            }
+            $title = sprintf(
+                '(%s) %s',
+                $currentEvent->getBooking()->getStatus()->getName(),
+                $title
+            );
+            $page->setVar('EVENT_TITLE', Scrub::text($title));
+            $page->parse('event_timed_block', 'event_timed');
+        } elseif ($currentEvent->getAllday()) {
             $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d'));
             $page->parse('event_allday_block', 'event_allday');
         } else {
@@ -139,6 +164,22 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                     'EVENT_BUTTON_TEXT' => 'Go to homepage',
                     'EVENT_BUTTON_TYPE' => '',
                     'EVENT_BUTTON_HREF' => '/homepage/' . $currentEvent->getCategoryId(),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
+        // Booking butonye
+        if ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'View Booking',
+                    'EVENT_BUTTON_TYPE' => '',
+                    'EVENT_BUTTON_HREF' => sprintf(
+                        '/resource-booking/item/%s?date=%s',
+                        $currentEvent->getBooking()->getResource()->getId(),
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                    ),
                 )
             );
             $page->parse('event_buttons_block', 'event_buttons', true);
