@@ -40,6 +40,7 @@ class Synchronise_Synergetic_Main {
 	public function synchronise() {
 		$this->getStrategy()->generateList();
 		$this->getStrategy()->createIfExists();
+        $this->getStrategy()->removeIfNotExists();
 	}
 
 	/**

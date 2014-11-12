@@ -230,6 +230,14 @@ abstract class Synchronise_Base_Strategy
     }
 
     /**
+     * Handle users who exist in Schoolbox but not Synergetic
+     * Blank code block, allowing customisation per site
+     */
+    public function removeIfNotExist()
+    {
+    }
+
+    /**
     * Determine if this person has a username
     *
     * @param  $currentUser
