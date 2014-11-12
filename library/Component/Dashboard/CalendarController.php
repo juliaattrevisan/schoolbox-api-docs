@@ -53,7 +53,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $days  = $this->getConfig('days');
 
         /* Get 30 days of events by default
-		 */
+         */
         if ($days <= 0) {
             $days = 30;
         }
@@ -61,7 +61,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $this->end->addDays($days);
 
         /* A list of submissions
-		 */
+         */
         $eventFactory = new Calendar_Api_Factory($this->user);
 
         $composite = $eventFactory->produce();
@@ -92,7 +92,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 
         /* Initialise, with date default set so no {VARIABLES} show when there's no events
-		 */
+         */
         $this->setVar(
             array(
                 'attendance_icon_block' => '',
@@ -227,16 +227,17 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 }
 
                 /* Event attendance
-				 */
+                 */
                 if ($currentEvent->canAttend()) {
                     $this->parse('attendance_icon_block', 'attendance_icon');
 
                     if ($this->getGroup()->isStudent($_SESSION['id'])) {
                         if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
-                            $currentEvent->getEventId(), $_SESSION['id']
+                            $currentEvent->getEventId(),
+                            $_SESSION['id']
                         )) {
-/* Attendance Status
-							 */
+                            /* Attendance Status
+                             */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');
                             } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
@@ -261,7 +262,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 }
 
                 /* Show a homepage if appropriate
-				 */
+                 */
                 if ($currentEvent->getCategoryId() > 0) {
                     $this->setVar(
                         array(
