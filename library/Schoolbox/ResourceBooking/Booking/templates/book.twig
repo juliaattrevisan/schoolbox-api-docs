@@ -217,7 +217,17 @@ $(document).ready(function() {
             errors = jqXHR.responseJSON.errors
             form.valid()
         }
-        $.ajax(ajaxParams).done(ajaxDone).fail(ajaxFail)
+
+        // Deactivate the button
+        var button   = form.find('input#resource-booking-save');
+        var oldValue = button.attr('value');
+        button.prop('disabled', true).attr('value', button.data('loading-value'));
+        $.ajax(ajaxParams)
+            .done(ajaxDone)
+            .fail(ajaxFail)
+            .always(function() {
+                button.prop('disabled', false).attr('value', oldValue);
+            });
     }
 
     // Submit resource booking form via AJAX
@@ -501,6 +511,7 @@ $(document).ready(function() {
            value="{% if item.id %}Update Booking{% else %}Book{% endif %}"
            class="submit-btn-plain"
            data-action="{{ saveAction }}"
+           data-loading-value="Validating..."
     />
 
     {% if item.id %}
