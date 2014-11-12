@@ -926,9 +926,12 @@ Notifications
 	ul, li, li a {
 		width: @navigation-width - @navigation-padding * 2;
 	}
-	li:hover > a,
+    li:hover > a,
+    li.hover > a,
 	ul li a:hover,
-	li li a:hover {
+	li li a:hover,
+    ul li a.hover,
+    li li a.hover {
 		color: @navigation-hover-color;
 		background: @navigation-hover-background;
 	}
@@ -946,13 +949,15 @@ Notifications
 			margin: 0;
             word-wrap: break-word;
             display: block;
-            &:hover {
+            &:hover,
+            &.hover {
                 color: @white;
                 text-decoration: none;
                 background: @tab-hover-color;
             }
         }
-        &:hover > ul:first-of-type {
+        &:hover > ul:first-of-type,
+        &.hover > ul:first-of-type {
             display: block;
         }
         &.parent > a span:after {
