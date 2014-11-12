@@ -179,6 +179,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				$isAssessment = $currentEvent->getIsAssessment();
 				if ($this->getGroup()->isStudent($_SESSION['id'])) {
 					$this->setVar('MODIFY_ACTION', 'View Details');
+                    $this->setVar('MODIFY_TYPE', 'modify');
 					$this->setVar(
 						'MODIFY_HREF',
 						$isAssessment ?
@@ -189,6 +190,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				}
 				elseif ($this->getGroup()->isStaff($_SESSION['id'])) {
 					$this->setVar('MODIFY_ACTION', 'View Submissions');
+                    $this->setVar('MODIFY_TYPE', 'modify');
 					$this->setVar(
 						'MODIFY_HREF',
 						$isAssessment ?
@@ -202,6 +204,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
                 // Just go to the booking for that day
                 $this->setVar('MODIFY_ACTION', 'View Booking');
+                $this->setVar('MODIFY_TYPE', 'view');
                 $this->setVar(
                     'MODIFY_HREF',
                     sprintf(
@@ -215,6 +218,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 			else {
 				if ($currentEvent->getIsEditable()) {
 					$this->setVar('MODIFY_ACTION', 'Modify');
+                    $this->setVar('MODIFY_TYPE', 'modify');
 					$this->setVar(
 						'MODIFY_HREF',
 						'/calendar/modify.php?eventID=' . $currentEvent->getEventId()
