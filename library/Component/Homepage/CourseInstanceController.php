@@ -433,6 +433,36 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Only show modify form if this is a simple task.
             // (No assessment or due work)
             if ($task->getType() == Task::TYPE_TASK) {
+
+                $zone = new \Schoolbox\Resource\Attachment\Zone('az-task-'.$task->getId());
+
+                if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
+                    $zone->attachFiles(array(substr($task->getLink(), -40)));
+                    $this->setVar(array(
+                        'UNIT_TASK_ATTACH_DISPLAY' => 'display: block;',
+                        'UNIT_TASK_URL_DISPLAY'    => 'display: none;'
+                    ));
+
+                } else {
+                    $this->setVar(array(
+                        'UNIT_TASK_ATTACH_DISPLAY' => 'display: none;',
+                        'UNIT_TASK_URL_DISPLAY'    => 'display: block;'
+                    ));
+
+                }
+
+                $zone
+                    ->setMulti(false)
+                    ->setReadOnly(false)
+                    ->setMimeFilter(null)
+                    ->setAttachmentsLabel('')
+                    ->setAttachPrompt('Attach file or folder')
+                    ->setModalTitle('Select File or Folder')
+                    ->setThumbnailSize(32)
+                    ->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+
+
+
                 $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
             }
         }

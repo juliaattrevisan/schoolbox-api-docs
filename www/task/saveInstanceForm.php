@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
@@ -58,6 +59,37 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
         }
     } else {
         $task_instance_id = $_POST['id'];
+
+        $url = '';
+
+        if (!empty($_POST['url'])) {
+            // give precedence to URL
+            $url = $_POST['url'];
+
+        } else {
+            // if the attachment points to a folder, use that for the URL
+            $str = \Schoolbox\Resource\Browser\NodeFactory::SBFS . '.folder:';
+            if (strpos($_POST['attachment'][0], $str) === 0) {
+                $url = '/homepage/' . substr($_POST['attachment'][0], strlen($str));
+                unset($_POST['attachment']);
+            }
+
+            // ok, so now if we still have an attachment we need to deal with it
+            if (is_array($_POST['attachment'])) {
+                try {
+                    $factory = new CollectorFactory();
+                    /** @var \Schoolbox\Storage $file */
+                    $file = $factory->build($_POST['attachment'])->getFirst();
+
+                    $url = '/storage/fetch.php?hash=' . $file->getHash();
+
+                } catch (InvalidArgumentException $e) {
+                    // noop - leave $url blank
+                }
+            }
+        }
+
+
         if ($task_instance_id) {
             /** @var Task\Instance $task_instance */
             $task_instance = Task\InstanceMapper::getInstance()->findOneByColumnList(
@@ -68,7 +100,7 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
             );
             $task_instance
                 ->setTitle($_POST['title'])
-                ->setLink($_POST['link'])
+                ->setLink($url)
                 ->setRequiresConfirmation(!$_POST['self_assess']);
         } else {
             // Make the task and set various fields
@@ -78,7 +110,7 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
                 ->setTask(null)
                 ->setUnitInstance($course_instance)
                 ->setTitle($_POST['title'])
-                ->setLink($_POST['link'])
+                ->setLink($url)
                 ->setRequiresConfirmation(!$_POST['self_assess']);
         }
         Task\InstanceMapper::getInstance()->save($task_instance);
