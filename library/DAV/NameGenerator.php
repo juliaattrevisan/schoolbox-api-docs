@@ -7,7 +7,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Dav_NameGenerator
+class DAV_NameGenerator
 {
     /**
      * Strips characters which may have special meaning in filenames.

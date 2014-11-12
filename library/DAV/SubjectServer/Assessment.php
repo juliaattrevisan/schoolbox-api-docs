@@ -70,7 +70,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
     public function loadChildren()
     {
         $mapper        = new SubmissionMapper();
-        $nameGenerator = new Dav_NameGenerator();
+        $nameGenerator = new DAV_NameGenerator();
         $files         = $mapper->findByColumnList(
             array(
                 'owner'  => $this->getUser()->getId(),

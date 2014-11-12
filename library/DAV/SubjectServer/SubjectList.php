@@ -66,7 +66,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection
      */
     public function loadChildren()
     {
-        $nameGenerator = new Dav_NameGenerator();
+        $nameGenerator = new DAV_NameGenerator();
         $mapper        = new SubmissionBoxMapper();
         $categories    = array();
         foreach ($mapper->getSubmittable($this->getUser()) as $box) {
