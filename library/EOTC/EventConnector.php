@@ -101,6 +101,31 @@ class EventConnector extends EventMapper {
 				$event->setIsEditable(false);
 			}
 
+            /* Accumulate the metadata for this event
+             * Only use the first record
+             */
+            $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = new EventMetadataMapper();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+            }
+
+            /* Derive publishDate settings for front-end classes
+             * If it's approved, set the publishDate in the past
+             * Otherwise, set it in the future
+             */
+            if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+                $publishDate = new \Alaress_Date_Format(0, 'U');
+            }
+            else {
+                $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+            }
+
+            $event->setPublishDate($publishDate);
+
 			$event->setAttendance(0);
 			$event->setCompleted(0);
 
@@ -134,7 +159,7 @@ class EventConnector extends EventMapper {
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
 			WHERE
-				DATE(e.endDate) > DATE(FROM_UNIXTIME(:startTimestamp))
+				DATE(e.endDate) >= DATE(FROM_UNIXTIME(:startTimestamp))
 				AND
 				DATE(e.startDate) <= DATE(FROM_UNIXTIME(:endTimestamp))
 			ORDER BY e.startTime, e.endTime
@@ -325,6 +350,19 @@ class EventConnector extends EventMapper {
 				$event->setCustom(array(
 					'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
 				));
+
+                /* Derive publishDate settings for front-end classes
+                 * If it's approved, set the publishDate in the past
+                 * Otherwise, set it in the future
+                 */
+                if ($eventItem->getMetadata()->getStatus()->isApproved()) {
+                    $publishDate = new \Alaress_Date_Format(0, 'U');
+                }
+                else {
+                    $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+                }
+
+                $event->setPublishDate($publishDate);
 
 				$collection->add($event);
 			}

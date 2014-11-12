@@ -157,6 +157,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$event->setDetail($_POST['detail']);
 			$event->setAllDay($_POST['allday']);
 
+            /* EOTC events don't use publishDate values, so hardcode this as per
+             * SB-5978 to always be published
+             */
+            $event->setPublishDate('1970-01-01');
+
 			/* Collections of ids
 			 */
 			$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
