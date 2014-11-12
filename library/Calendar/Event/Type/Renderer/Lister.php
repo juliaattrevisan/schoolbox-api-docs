@@ -168,6 +168,22 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             $page->parse('event_buttons_block', 'event_buttons', true);
         }
 
+        // Booking butonye
+        if ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
+            $page->setVar(
+                array(
+                    'EVENT_BUTTON_TEXT' => 'View Booking',
+                    'EVENT_BUTTON_TYPE' => '',
+                    'EVENT_BUTTON_HREF' => sprintf(
+                        '/resource-booking/item/%s?date=%s',
+                        $currentEvent->getBooking()->getResource()->getId(),
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                    ),
+                )
+            );
+            $page->parse('event_buttons_block', 'event_buttons', true);
+        }
+
         // Attendance butonye - needs access to calendar and group handlers
 //        if ($currentEvent->canAttend()) {
 //            if ($attendance = $page->getCalendar()->getAttendanceByEventAndUser(
