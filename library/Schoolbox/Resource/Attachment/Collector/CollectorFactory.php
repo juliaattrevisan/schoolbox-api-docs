@@ -53,7 +53,6 @@ class CollectorFactory {
         $storage = StorageMapper::getInstance();
         $file    = FileMapper::getInstance();
         $myFile  = MyFileMapper::getInstance();
-        $dav     = PortfolioWebDAV::factory();
         $conf    = new Loader();
 
         $storer  = $mapper ?: $storage;
@@ -70,9 +69,15 @@ class CollectorFactory {
             return new FileSystemHandler(NodeFactory::MYFILE, $conf->get('myfile_dir'), $myFile, $storer);
         });
 
-        $this->add(NodeFactory::WEBDAV, function () use ($dav, $storer) {
-            return new ExternalFileSystemHandler(NodeFactory::WEBDAV, $dav, $dav, $storer); // yup. totally passed it in twice
-        });
+        try {
+            $dav = PortfolioWebDAV::factory();
+            $this->add(NodeFactory::WEBDAV, function () use ($dav, $storer) {
+                return new ExternalFileSystemHandler(NodeFactory::WEBDAV, $dav, $dav, $storer); // yup. totally passed it in twice
+            });
+
+        } catch (\DomainException $e) {
+            // DAV isn't configured. we're ok with that.
+        }
     }
 
 
