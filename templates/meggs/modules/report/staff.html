@@ -1,0 +1,89 @@
+<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
+<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
+<script type="text/javascript">
+    $j(function () {
+
+        $j('.small-image').each(function () {
+            var largerImage = $j(this).siblings('.larger-image').html()
+            $j(this).qtip({
+                content:largerImage,
+                style: {
+                    classes: 'qtip-light qtip-shadow qtip-rounded',
+                    tip: {corner: false}
+                },
+                position: {
+                    my: 'middle left',
+                    at: 'top right'
+                }
+            });
+        });
+
+        $j('.print').click(function () {
+            window.print();
+            return false;
+        });
+
+        $j('.sort-it').tablesorter({
+            headers:{
+                0:{sorter:false},
+                1:{sorter:false},
+                8:{sorter:false},
+                9:{sorter:false}
+            },
+            widgets:['zebra'],
+            widgetZebra:{
+                css:["", "dark"]
+            },
+            cssHeader:"directory-sorter"
+        });
+    });
+</script>
+
+<div class="directory staff">
+    <h1>Staff Directory</h1>
+
+
+    <table class="table sort-it" width="100%">
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>First name</th>
+            <th>Surname</th>
+            <th>Code</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Campus</th>
+            <th>Ext</th>
+            <th>Phone</th>
+            <th>Email</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN staff -->
+        <tr>
+            <td>
+                <img class="small-image" src="/portrait.php?userId={STAFF_STAFFID}&size=square32">
+
+                <div class="larger-image"><img src="/portrait.php?userId={STAFF_STAFFID}&size=constrain200"></div>
+            </td>
+            <td>{STAFF_TITLE}</td>
+            <td>{STAFF_FIRSTNAME}</td>
+            <td>{STAFF_SURNAME}</td>
+            <td>{STAFF_STAFFCODE}</td>
+            <td>{STAFF_DEPARTMENT}</td>
+            <td>{STAFF_ROLE}</td>
+            <td>{STAFF_CAMPUS}</td>
+            <td class="number">{STAFF_EXTENSION}</td>
+            <td class="number">{STAFF_PHONE}</td>
+            <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+        </tr>
+        <!-- END staff -->
+        </tbody>
+    </table>
+</div>
+
+

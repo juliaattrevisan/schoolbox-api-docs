@@ -916,6 +916,7 @@ class External_Synergetic_User implements External_UserInterface
         $query = "
             SELECT
                 vStaff.StaffID,
+                vStaff.SchoolStaffCode,
                 vStaff.StaffTitle,
                 vStaff.StaffPreferredName,
                 vStaff.StaffSurname,
