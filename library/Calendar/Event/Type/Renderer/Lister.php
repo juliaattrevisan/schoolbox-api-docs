@@ -99,8 +99,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             if ($currentEvent->getAllday()) {
                 $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d'));
                 $page->parse('event_allday_block', 'event_allday');
-            }
-            else {
+            } else {
                 $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d H:i:s'));
                 $page->parse('event_submission_block', 'event_submission');
             }
