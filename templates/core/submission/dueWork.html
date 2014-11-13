@@ -122,10 +122,10 @@ $j(function () {
 <!-- END custom_head -->
 
 <script id="duework-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble wysiwyg">
+    <div class="duework-popup cal-bubble">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data clearfix"><h3><a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">{{=it.name}}</a></h3>
+            <div class="js-data clearfix wysiwyg"><h3><a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">{{=it.name}}</a></h3>
                 <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
                 {{? (it.description||'').length}}
                     <p class="comment">{{=it.description}}</p>
@@ -141,10 +141,10 @@ $j(function () {
 
 
 <script id="assess-popup-template" type="text/x-jquery-tmpl">
-    <div class="duework-popup cal-bubble wysiwyg">
+    <div class="duework-popup cal-bubble">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data clearfix"><h3>{{=it.name}}</h3>
+            <div class="js-data clearfix wysiwyg"><h3>{{=it.name}}</h3>
                 <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
                 {{? (it.description||'').length}}
                     <p class="comment">{{=it.description}}</p>
