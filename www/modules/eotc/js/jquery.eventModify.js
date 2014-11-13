@@ -366,6 +366,34 @@
 
 					// series
 					if (multi) {
+						$('.bulk-update').css('display', act === 'Update' ? 'inline' : 'none');
+						$('.bulk-delete').css('display', act === 'Delete' ? 'inline' : 'none');
+						$("#dialog-bulk").dialog({
+							resizable: false,
+							height: 180,
+							width: 500,
+							modal: true,
+							draggable: false,
+							buttons: {
+								"Only this event": function() {
+									$('#efficacy').val('self');
+									form.submit();
+								},
+								"All events in the series": function() {
+									$('#efficacy').val('series');
+									form.submit();
+								},
+								"Cancel": function() {
+									$(this).dialog("close");
+								}
+							},
+							close: function() {
+								return false;
+							}
+						});
+					}
+					// single event
+					else {
 						if (act == 'Update') {
 							$('.bulk-update').css('display', 'inline');
 							$('.bulk-delete').css('display', 'none');
