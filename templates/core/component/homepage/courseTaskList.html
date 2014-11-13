@@ -6,16 +6,47 @@
         <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
         <script type="text/javascript" src="/javascript/jquery.courseTaskList.js"></script>
         <script type="text/javascript" src="/javascript/jquery.ajaxUploadDialog.js"></script>
+        <script type='text/javascript' src='/javascript/resource/jquery.resourceAttach.js'></script>
         <script type="text/javascript">
             // Addition of an AJAX form submission - need to add here because
             // the session name and ID have to be passed.
             (function($) {
                 $(function() {
-                    $('#component{COMPONENT_INSTANCE_ID}').setupCourseTaskList({
+
+                    var component = $('#component{COMPONENT_INSTANCE_ID}');
+
+                    component.setupCourseTaskList({
                         session_name: '{SESSION_NAME}',
                         session_id:   '{SESSION_ID}',
                         units:        {UNIT_LIST}
                     });
+
+                    // Url attachment options
+                    component.on('click', 'form.edit_task_form a[data-value]', function() {
+                        var self = $(this),
+                          form = self.closest('form'),
+                          type = self.attr('data-value');
+
+                        form.find('input[name=type]').val(type);
+
+                        // show only the one we want
+                        var attachers = form.find('div.post-attachment');
+                        attachers.hide().filter('.'+type).show();
+
+                        form.find('input[name=url]').val('').prop('readonly', type == 'attach');
+
+                        if (type == 'url') {
+                            // tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
+                            // not jQuery.detach() - it can't trigger dropzone's event listener
+                            form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
+                                var event = new CustomEvent('click');
+                                this.dispatchEvent(event);
+                            });
+                        }
+
+                    });
+
+
                 });
             })(jQuery);
         </script>
@@ -54,6 +85,8 @@
                         <input type="hidden" name="id"        value="{TASK_ID}" />
                         <input type="hidden" name="category"  value="{ID}"/>
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        <input type="hidden" name="type"      value="string" />
+                        <input type="hidden" name="link"      value="{TASK_LINK}" id="link-{TASK_ID}" />
                         <button type="submit" class="btn delete"><span></span> Yes</button>
                         <a href="#" class="btn cross delete-reject"><span></span> No</a>
                     </form>
@@ -70,13 +103,22 @@
                             <dt><label for="title-{TASK_ID}">Task:</label></dt>
                             <dd><input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" /></dd>
 
-                            <dt><label for="link-{TASK_ID}">Link:</label></dt>
-                            <dd>
-                                <input id="link-{TASK_ID}" name="link" type="text" value="{TASK_LINK}" />
-                                <p class="interact">
-                                    <a href="#" data-function="browse" class="btn create"><span></span>Browse</a>
-                                    <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload a file</a>
-                                </p>
+                            <dd class="clearfix dz-wrap">
+                                <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
+                                    {ATTACH_ZONE}
+                                    <p class="alt-src">
+                                        or <a class='btn links sstream-attachment' data-value="url"><span></span>Link</a>
+                                    </p>
+                                </div>
+
+                                <div class="post-attachment url" style="{TASK_URL_DISPLAY}">
+                                    <label>
+                                        <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
+                                    </label>
+                                    <p class="alt-src">
+                                        or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
+                                    </p>
+                                </div>
                             </dd>
 
                             <dt><label for="self_assess-{TASK_ID}">Self-assessed?</label></dt>
@@ -87,6 +129,7 @@
                         </dl>
 
                         <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
+                        <div class="clearfix"></div>
 
                     </form>
                 </div>
