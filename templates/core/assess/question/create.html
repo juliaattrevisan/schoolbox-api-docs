@@ -49,7 +49,9 @@ $(function() {
 </script>
 
 <!-- END custom_head -->
-<h1>Create Question in Section {CURRENT_SECTION_TITLE}</h1>
+<h1>Create Question in {CURRENT_SECTION_TITLE}
+    <a class="btn go-back marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
+</h1>
 <div class="evaluation-content">
 	<h2>Question Details</h2>
 	<form id="createQuestionForm" action="/assess/question/create" class="clearfix" method="post">
