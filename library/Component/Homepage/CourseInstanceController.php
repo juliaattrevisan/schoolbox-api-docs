@@ -67,10 +67,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $class_handler    = new External_Class();
                 $classStudentList = $class_handler->getStudents($code);
                 if (is_array($classStudentList)) {
-                    $externalIdList     = array_map(
-                        function ($student) {
-                            return $student['synergy_id'];
-                        },
+                    $externalIdList = array_map(
+                        function($student) { return $student['synergy_id']; },
                         $classStudentList
                     );
                     $classStudentIdList = \Schoolbox\UserMapper::getInstance()
@@ -82,9 +80,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if (is_array($groupStudentList)) {
                 $groupStudentIdList = array_unique(
                     array_map(
-                        function ($student) {
-                            return $student['uid'];
-                        },
+                        function($student) { return $student['uid']; },
                         $groupStudentList
                     )
                 );
@@ -106,11 +102,9 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Get task instance IDs out of unit list.
             // Then, retrieve for: current user if a student, or all students if a
             // teacher.
-            $task_list       = array_reduce(
+            $task_list = array_reduce(
                 array_map(
-                    function ($v) {
-                        return $v->getColumnValues('id');
-                    },
+                    function($v) { return $v->getColumnValues('id'); },
                     $this->unit_list->getColumnValues('tasks')
                 ),
                 'array_merge',
@@ -142,41 +136,41 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->parseConfig();
 
-        $this->setVar(
-            array(
-                'SESSION_NAME'    => session_name(),
-                'SESSION_ID'      => session_id(),
-                'COMPONENT_NAME'  => $this->getConfig('componentname'),
-                'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
-            )
-        );
+        $this->setVar(array(
+            'SESSION_NAME'    => session_name(),
+            'SESSION_ID'      => session_id(),
+            'COMPONENT_NAME'  => $this->getConfig('componentname'),
+            'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
+        ));
 
         // Course selector blocks
         $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
 
         // Unit list blocks
-        $this->setBlock($templateHandle, 'course_unit_list', 'course_unit_list_block');
-        $this->setBlock('course_unit_list', 'unit', 'unit_block');
-        $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
-        $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
-        $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
-        $this->setBlock('unit', 'unit_modify', 'unit_modify_block');
-        $this->setBlock('unit', 'unit_delete', 'unit_delete_block');
-        $this->setBlock('unit', 'unit_task', 'unit_task_block');
-        $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
-        $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task', 'unit_task_count', 'unit_task_count_block');
-        $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
-        $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
-        $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
-        $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
-        $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
-        $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
+        $this->setBlock('course_unit_list', 'unit',                 'unit_block');
+        $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
+        $this->setBlock('unit',             'unit_no_expand',       'unit_no_expand_block');
+        $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
+        $this->setBlock('unit',             'unit_modify',          'unit_modify_block');
+        $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
+        $this->setBlock('unit',             'unit_task',            'unit_task_block');
+        $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
+        $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
+        $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
+        $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
+        $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
+        $this->setBlock('unit_task',        'unit_task_completion', 'unit_task_completion_block');
+        $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
+        $this->setBlock('unit_task',        'unit_task_modify',     'unit_task_modify_block');
+        $this->setBlock('unit_task',        'unit_task_delete',     'unit_task_delete_block');
+        $this->setBlock('unit_task',        'unit_task_modify_form', 'unit_task_modify_form_block');
+        $this->setBlock('unit_task',        'unit_task_delete_form', 'unit_task_delete_form_block');
 
-        $this->setVar('course_selector_block', '');
+        $this->setVar('course_selector_block',  '');
         $this->setVar('course_unit_list_block', '');
-        $this->setVar('course_modify_block', '');
-        $this->setVar('UNIT_READONLY', ($this->readOnly ? 'true' : 'false'));
+        $this->setVar('course_modify_block',    '');
+        $this->setVar('UNIT_READONLY',          ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
@@ -224,16 +218,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Group the task list by task, then student.
         $grouped_list  = array();
         $studentIdList = array_map(
-            function ($student) {
-                return $student['uid'];
-            },
+            function($student) { return $student['uid']; },
             $this->student_list
         );
         foreach ($this->completion_list as $item) {
             // Only add students who are in the list of students for this homepage.
             $student_id = $item->getStudent()->getId();
             if (in_array($student_id, $studentIdList)) {
-                $task_instance_id                             = $item->getTaskInstance()->getId();
+                $task_instance_id = $item->getTaskInstance()->getId();
                 $grouped_list[$task_instance_id][$student_id] = $item;
             }
         }
@@ -324,14 +316,15 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             }
         }
         $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
-        $this->setVar('UNIT_RELATIVE_DATE', Scrub::text($rel_time->getRelativeTime()));
-        $this->setVar('UNIT_UPCOMING_URGENCY', Scrub::text($urgency));
+        $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
+        $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
         $this->parse('unit_completion_block', 'unit_completion');
 
         // Output list of tasks within units, only if the task is open
         $display_task_list =
             $unit->getTasks()->count() > 0 &&
-            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
+            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly)
+        ;
         if ($display_task_list) {
             $this->parse('unit_expand_block', 'unit_expand');
         } else {
@@ -342,6 +335,9 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $this->renderTaskInUnit($task, $unit, $grouped_list[$task->getId()]);
             }
         }
+
+        $this->newZone('az-new-task-unit-' . $unit->getId(), 'ATTACH_ZONE');
+
         $this->parse('unit_block', 'unit', true);
     }
 
@@ -434,8 +430,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // (No assessment or due work)
             if ($task->getType() == Task::TYPE_TASK) {
 
-                $zone = new \Schoolbox\Resource\Attachment\Zone('az-task-'.$task->getId());
-
+                $zone = $this->newZone('az-task-'.$task->getId());
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
                     $zone->attachFiles(array(substr($task->getLink(), -40)));
                     $this->setVar(array(
@@ -451,21 +446,36 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
                 }
 
-                $zone
-                    ->setMulti(false)
-                    ->setReadOnly(false)
-                    ->setMimeFilter(null)
-                    ->setAttachmentsLabel('')
-                    ->setAttachPrompt('Attach file or folder')
-                    ->setModalTitle('Select File or Folder')
-                    ->setThumbnailSize(32)
-                    ->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
-
-
+                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
 
                 $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
             }
         }
         $this->parse('unit_task_block', 'unit_task', true);
     }
+
+
+    /**
+     * @param string $id
+     * @param string $target
+     * @return \Schoolbox\Resource\Attachment\Zone
+     */
+    protected function newZone($id, $target = '')
+    {
+        $zone = new \Schoolbox\Resource\Attachment\Zone($id);
+        $zone->setMulti(false)
+          ->setReadOnly(false)
+          ->setMimeFilter(null)
+          ->setAttachmentsLabel('')
+          ->setAttachPrompt('Attach file or folder')
+          ->setModalTitle('Select File or Folder')
+          ->setThumbnailSize(32);
+
+        if ($target) {
+            $zone->renderIntoSitePage($this->sitepage, $target);
+        }
+
+        return $zone;
+    }
+
 }

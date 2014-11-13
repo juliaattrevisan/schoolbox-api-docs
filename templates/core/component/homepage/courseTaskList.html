@@ -22,7 +22,7 @@
                     });
 
                     // Url attachment options
-                    component.on('click', 'form.edit_task_form a[data-value]', function() {
+                    component.on('click', 'form .post-attachment a[data-value]', function() {
                         var self = $(this),
                           form = self.closest('form'),
                           type = self.attr('data-value');
@@ -155,14 +155,22 @@
                 <dt><label for="title-new_task">Task:</label></dt>
                 <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
 
-                <dt><label for="link-new_task">Link:</label></dt>
-                <dd>
-                    <input id="link-new_task" name="link" type="text" value="" />
-                    <p class="interact">
-                        <a href='#' data-function='link' class='btn links'><span></span>Link</a>
-                        <a href="#" data-function="upload" class="btn up-arrow"><span></span>Upload</a>
-                        <a href="#" data-function="browse" class="btn folder"><span></span>Browse Resources</a>
-                    </p>
+                <dd class="clearfix dz-wrap">
+                    <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
+                        {ATTACH_ZONE}
+                        <p class="alt-src">
+                            or <a class='btn links sstream-attachment' data-value="url"><span></span>Link</a>
+                        </p>
+                    </div>
+
+                    <div class="post-attachment url" style="{TASK_URL_DISPLAY}">
+                        <label>
+                            <input type="text" class="url" name="url" maxlength='1024' placeholder="http://" value="{TASK_LINK}" />
+                        </label>
+                        <p class="alt-src">
+                            or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
+                        </p>
+                    </div>
                 </dd>
 
                 <dt><label for="self_assess-new_task">Self-assessed?</label></dt>

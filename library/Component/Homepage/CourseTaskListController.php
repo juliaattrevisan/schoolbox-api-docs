@@ -138,7 +138,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
 
-                $zone = new \Schoolbox\Resource\Attachment\Zone('az-task-'.$task->getId());
+                $zone = $this->newZone('az-task-'.$task->getId());
 
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
                     $zone->attachFiles(array(substr($task->getLink(), -40)));
@@ -154,15 +154,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                     ));
                 }
 
-                $zone
-                    ->setMulti(false)
-                    ->setReadOnly(false)
-                    ->setMimeFilter(null)
-                    ->setAttachmentsLabel('')
-                    ->setAttachPrompt('Attach file or folder')
-                    ->setModalTitle('Select File or Folder')
-                    ->setThumbnailSize(32)
-                    ->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
 
                 $this->parse('edit_task_form_block', 'edit_task_form');
                 $this->setVar('TASK_TYPE', 'task');
@@ -180,7 +172,33 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->parse('task_block', 'task', true);
         }
 
+        $this->newZone('az-new-task', 'ATTACH_ZONE');
+
         return true;
+    }
+
+
+    /**
+     * @param string $id
+     * @param string $target
+     * @return \Schoolbox\Resource\Attachment\Zone
+     */
+    protected function newZone($id, $target = '')
+    {
+        $zone = new \Schoolbox\Resource\Attachment\Zone($id);
+        $zone->setMulti(false)
+             ->setReadOnly(false)
+             ->setMimeFilter(null)
+             ->setAttachmentsLabel('')
+             ->setAttachPrompt('Attach file or folder')
+             ->setModalTitle('Select File or Folder')
+             ->setThumbnailSize(32);
+
+        if ($target) {
+            $zone->renderIntoSitePage($this->sitepage, $target);
+        }
+
+        return $zone;
     }
 
 }
