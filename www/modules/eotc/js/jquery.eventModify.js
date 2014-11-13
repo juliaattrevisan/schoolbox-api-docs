@@ -260,12 +260,12 @@
 
 		/**
 		 * Apply button actions
+		 *
+		 * Now, all #b{action} change the form's action.
 		 */
 		function setupFormActions() {
-			var key = '#b' + config.functionLabel;
-
-			$(key).click(function() {
-				$('#action').val(config.functionLabel);
+			config.element.find(':submit[id^="b"]').on('click', function() {
+				config.element.find('#action').val(this.id.substr(1));
 			});
 		}
 
