@@ -1,10 +1,10 @@
 <!-- BEGIN settings_link -->
-<a class="edit" href="#">
+<a class="edit" data-target="settings" href="#">
   <em>Settings</em>
   <span>&#9660;</span>
 </a>
 <!-- END settings_link -->
-<a class="close-delete" href="#">
+<a class="close-delete" href="#" data-target="delete-it">
   <span>&times;</span>
 </a>
 <!-- BEGIN settings_panel -->
@@ -30,10 +30,10 @@
     <input type="hidden" name="page_id" value="{PAGE_ID}" />
     <input type="hidden" name="delete" value="{COMPONENT_INSTANCE_ID}" />
     <input type="hidden" name="component" value="{COMPONENT_DEFINITION_ID}" />
-    <a href="#" class="delete-accept btn delete">
+    <a href="#" class="delete-accept btn delete" data-remove="1">
         <span></span>Yes
     </a>
-    <a href="#" class="delete-reject btn cross">
+    <a href="#" class="delete-reject btn cross" data-remove="0">
         <span></span>No
     </a>
   </form>
