@@ -6,24 +6,6 @@ $j(function() {
 		$j(this).confirmDialog();
 	});
 
-	$j('.show-section-options').click(function() {
-        $j(this).parent().siblings('.sectionOptions').children(":first-child").slideToggle();
-		$j(this).toggleClass('active')
-		return false;
-	});
-
-	$j(".show-assess-options, .show-section-options")
-        .mouseenter(function () {
-            $j(this).children('span').stop(true, true).fadeIn("fast");
-            $j(this).css('background-image', "none");
-        })
-        .mouseleave(function () {
-            var $this = $j(this)
-            $this.children('span').stop(true, true).fadeOut("fast", function() {
-                $this.removeAttr('style');
-            });
-        });
-
 	/* Make questions sortable
 	 */
 	$j(".question-list").sortable({
@@ -69,21 +51,17 @@ $j(function() {
 
 	<!-- BEGIN section -->
 	<div class="evaluation-section">
-		<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
+		<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}
+            <a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete no-text"><span></span></a>
+            <a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text"><span></span></a>
 
-		<ul class='sectionOptions'>
-			<li class="hide evaluation-section-options clearfix">
-				<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
-				<a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-			</li>
-		</ul>
-
+        </h3>
 		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
 			<!-- BEGIN question -->
 			<li id='question_{QUESTION_QUESTION_ID}'>
 				<strong>Q{QUESTION_SEQUENCE})</strong>
 				{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
-				<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+				<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Modify</a> |
 				<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 			</li>
 			<!-- END question -->
