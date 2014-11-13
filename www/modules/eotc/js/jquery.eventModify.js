@@ -395,37 +395,28 @@
 					// single event
 					else {
 						if (act == 'Update') {
-							$('.bulk-update').css('display', 'inline');
-							$('.bulk-delete').css('display', 'none');
-							$("#dialog-bulk").dialog({
+							form.submit();
+						} else if (act == 'Delete') {
+							// dialog time
+							$("#dialog-delete").dialog({
 								resizable: false,
-								height: 180,
-								width: 400,
-								modal: true,
-								draggable: false,
-								buttons: {
-									"Only this event": function() {
-										$('#efficacy').val('self');
+									height: 180,
+									width: 500,
+									modal: true,
+									draggable: false,
+									buttons: {
+									"Yes": function() {
 										form.submit();
 									},
-									"All events in the series": function() {
-										$('#efficacy').val('series');
-										form.submit();
+									"No": function() {
+										$(this).dialog("close");
 									}
 								},
 								close: function() {
 									return false;
 								}
 							});
-						}
-					}
-					// single event
-					else {
-						if (act == 'Update') {
-							form.submit();
-						}
-						else {
-							// add
+						} else {
 							form.submit();
 						}
 					}
