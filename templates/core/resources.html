@@ -32,7 +32,16 @@ $(function() {
         complete: function (file, response) {
             $(file.previewElement).find('img').attr('src', '');
             if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                $('#node-'+relationID).trigger('click');
+
+                // cachewipe
+                $('tr.category-' + relationID).addClass('inactive');
+
+                $(tree)
+                  .data()
+                  .resourceTreeThreePanelBridge
+                  .onSelectNode(null, { node: { id: $(file.previewElement).data('node') } }, function () {
+                      $('#file-window').find('div.dz-preview').detach();
+                  });
             }
         }
 

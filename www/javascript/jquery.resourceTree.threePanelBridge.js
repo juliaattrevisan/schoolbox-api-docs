@@ -122,7 +122,7 @@
                 scope: 'resourceFile',
                 hoverClass: "accept",
                 greedy: true,
-                tolerance: 'pointer',
+                tolerance: 'pointer'
             })
             .on('drop',                self.onDropOntoTreeNode.bind(self))
     };
@@ -146,36 +146,31 @@
      *
      * Fired on the trigger of a select node event.
      *
-     * @param event  The event object
-     * @param jstree The JsTree object
+     * @param event    The event object
+     * @param jstree   The JsTree object
+     * @param callback A callback to be executed when node selection is complete
      */
-    ResourceTreeThreePanelBridge.prototype.onSelectNode = function(event, jstree) {
-        var self       = this;
-        var relationID = jstree.node.id;
+    ResourceTreeThreePanelBridge.prototype.onSelectNode = function(event, jstree, callback) {
+        var self       = this,
+            relationID = jstree.node.id,
+            allFiles   = $('#file-list').find('tr'),
+            files      = allFiles.filter('.category-' + relationID).not('.inactive'),
+            ghosts     = allFiles.filter('.inactive.category-' + relationID),
+            ajaxParams;
 
-        /* hide and deselect all files */
+        /* deselect all files */
         // threePanel.clearSelection();
-        $('#file-list tbody tr').removeClass('selected').hide();
+        allFiles.removeClass('selected');
 
         // threePanel.getFiles(relationId);
-        var files = $('tr.category-' + relationID);
 
-        // Is there a dropzone preview?
-        // Remove it and all files in the previous selected directory,
-        // so they get reloaded.
-        if (self.selectedId) {
-            var preview = $('.dz-preview');
-            if (preview.length) {
-                preview.remove();
-                $('tr.category-'+String(self.selectedId)).remove();
-            }
-        }
         self.selectedId = relationID;
 
         self.threePanel.getMeta(relationID);
 
         if (files.length > 0) {
             // threePanel.showFiles(relationId);
+            allFiles.hide();
             /* files exist, show them */
             files.show();
             self.initializeFiles(relationID);
@@ -187,18 +182,31 @@
 
             /* remember tree branch */
             // threePanel.on('selectBranch');
-            var ajaxParams = self.options.savePosition(self, relationID);
+            ajaxParams = self.options.savePosition(self, relationID);
             if (ajaxParams) {
-                $.ajax(ajaxParams)
+                $.ajax(ajaxParams).done(function () {
+                    ghosts.detach();
+
+                    if ($.isFunction(callback)) {
+                        callback();
+                    }
+                });
             }
         }
         else {
 
             /* ajax load files */
             // threePanel.loadFiles(relationId)
-            var ajaxParams = self.options.loadFolderFiles(self, relationID);
+            ajaxParams = self.options.loadFolderFiles(self, relationID);
             $.ajax(ajaxParams)
                 .done(function(data) {
+                    ghosts.detach();
+                    allFiles.hide();
+
+                    if ($.isFunction(callback)) {
+                        callback();
+                    }
+
                     // draw callback
                     self.options.drawFiles(self, relationID, data);
 
