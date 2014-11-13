@@ -100,7 +100,7 @@ switch ($_POST['action']) {
          */
         try {
             // Author might've been deleted, so don't die if they don't exist
-            $event->setAuthor($userMapper->findById($_POST['author_id']));
+            $event->setAuthor($userMapper->findById($_POST['authorId']));
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
         }
