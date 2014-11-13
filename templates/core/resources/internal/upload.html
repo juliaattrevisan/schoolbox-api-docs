@@ -127,6 +127,16 @@
                 });
 
                 this.on('error', function (file, msg, xhr) {
+                    if (xhr) {
+                        try {
+                            data = JSON.parse(msg).hash.split(':')[1];
+
+                        } catch (err) {
+                            data = msg;
+                        }
+
+                        $(file.previewElement).find('span[data-dz-errormessage]').html(data);
+                    }
                     checkState.call(this);
                 });
 
