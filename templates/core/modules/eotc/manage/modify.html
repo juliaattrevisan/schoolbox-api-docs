@@ -98,11 +98,20 @@
             maxTime: '12:59pm',
             step: 60
         });
-        $('input[data-timepicker="minute"]').timepicker({
-            timeFormat: "i",
-            step: 5,
-            minTime: '12:00am',
-            maxTime: '12:59am'
+        // Minute picker:
+        // Set up a timepicker, but don't let it interpret the minute value as
+        // an actual time.
+        $('input[data-timepicker="minute"]').each(function() {
+            var minutePicker = $(this);
+            var minuteValue  = minutePicker.val();
+            minutePicker
+                .timepicker({
+                    timeFormat: "i",
+                    step: 5,
+                    minTime: '12:00am',
+                    maxTime: '12:59am'
+                })
+                .val(minuteValue);
         });
     });
 </script>
