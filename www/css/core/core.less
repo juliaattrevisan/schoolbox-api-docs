@@ -6851,8 +6851,10 @@ HOMEPAGE CUSTOMISE
         border-radius: 0;
         box-sizing: border-box;
         padding: 0px 15px;
-        transition: all 500ms ease;
         max-height: 0px;
+        .transition(
+            all 200ms cubic-bezier(.0, .45, .45, .1)
+        );
         &.open{
 			margin-bottom: 16px;
             border: 1px solid @std-grey;
@@ -6860,7 +6862,9 @@ HOMEPAGE CUSTOMISE
             background-color: @dark;
             //display: block;
             max-height: 1000px;
-            .transition(all 500ms cubic-bezier(.0, .45, .45, .1));
+            .transition(
+                all 400ms cubic-bezier(.0, .45, .45, .1) 800ms
+            );
         }
     }
 }
