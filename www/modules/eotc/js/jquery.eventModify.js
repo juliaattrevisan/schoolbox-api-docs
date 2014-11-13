@@ -260,12 +260,12 @@
 
 		/**
 		 * Apply button actions
+		 *
+		 * Now, all #b{action} change the form's action.
 		 */
 		function setupFormActions() {
-			var key = '#b' + config.functionLabel;
-
-			$(key).click(function() {
-				$('#action').val(config.functionLabel);
+			config.element.find(':submit[id^="b"]').on('click', function() {
+				config.element.find('#action').val(this.id.substr(1));
 			});
 		}
 
@@ -366,38 +366,57 @@
 
 					// series
 					if (multi) {
+						$('.bulk-update').css('display', act === 'Update' ? 'inline' : 'none');
+						$('.bulk-delete').css('display', act === 'Delete' ? 'inline' : 'none');
+						$("#dialog-bulk").dialog({
+							resizable: false,
+							height: 180,
+							width: 500,
+							modal: true,
+							draggable: false,
+							buttons: {
+								"Only this event": function() {
+									$('#efficacy').val('self');
+									form.submit();
+								},
+								"All events in the series": function() {
+									$('#efficacy').val('series');
+									form.submit();
+								},
+								"Cancel": function() {
+									$(this).dialog("close");
+								}
+							},
+							close: function() {
+								return false;
+							}
+						});
+					}
+					// single event
+					else {
 						if (act == 'Update') {
-							$('.bulk-update').css('display', 'inline');
-							$('.bulk-delete').css('display', 'none');
-							$("#dialog-bulk").dialog({
+							form.submit();
+						} else if (act == 'Delete') {
+							// dialog time
+							$("#dialog-delete").dialog({
 								resizable: false,
-								height: 180,
-								width: 400,
-								modal: true,
-								draggable: false,
-								buttons: {
-									"Only this event": function() {
-										$('#efficacy').val('self');
+									height: 180,
+									width: 500,
+									modal: true,
+									draggable: false,
+									buttons: {
+									"Yes": function() {
 										form.submit();
 									},
-									"All events in the series": function() {
-										$('#efficacy').val('series');
-										form.submit();
+									"No": function() {
+										$(this).dialog("close");
 									}
 								},
 								close: function() {
 									return false;
 								}
 							});
-						}
-					}
-					// single event
-					else {
-						if (act == 'Update') {
-							form.submit();
-						}
-						else {
-							// add
+						} else {
 							form.submit();
 						}
 					}
