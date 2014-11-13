@@ -61,6 +61,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(41);
         exit; // shut UP, storm.
+    } catch (\Schoolbox\Resource\Exception $e) {
+        error(43);
+        exit;
     }
 
     // if file was synchronously uploaded

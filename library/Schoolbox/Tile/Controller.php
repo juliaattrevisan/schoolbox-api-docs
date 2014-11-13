@@ -289,11 +289,15 @@ class Controller extends Base
             ->setHoverColor($post['hover_color'] ?: '00000000');
 
         if (is_array($post['attachment'])) {
-            $factory = new CollectorFactory();
-            /** @var \Schoolbox\Storage $image */
-            $image = $factory->build($post['attachment'])->getFirst();
-            $item->setBackgroundImage($image);
-
+            try {
+                $factory = new CollectorFactory();
+                /** @var \Schoolbox\Storage $image */
+                $image = $factory->build($post['attachment'])->getFirst();
+                $item->setBackgroundImage($image);
+            } catch (\Schoolbox\Resource\Exception $e) {
+                error(43);
+                exit;
+            }
         } else {
             $item->setBackgroundImage(null);
 
