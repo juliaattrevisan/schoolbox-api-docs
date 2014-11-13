@@ -60,21 +60,29 @@
 						configuration: JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
 					};
 
-						/* Collate the usual fields containing ids.
-						 * Collate the checkboxes too but append all the possibilities as well!
-						 */
-						if (typeof questionBank == "undefined") {
-							var data = {
-								question:tinyMCE.get('question').getContent(),
-								question_id:theForm.find('input[name=question_id]').val(),
-								section_id:theForm.find('input[name=section_id]').val(),
-								sequence:theForm.find('input[name=sequence]').val(),
-								type_id:theForm.find('input[name=type_id]').val(),
-								marks:theForm.find('input[name=marks]').val(),
-								allAnswers:JSON.stringify(answerCollection),
-								configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
-							};
+					/* Collate the usual fields containing ids.
+					 * Collate the checkboxes too but append all the possibilities as well!
+					 */
+					if (typeof questionBank == "undefined") {
+						var data = {
+							question:tinyMCE.get('question').getContent(),
+							question_id:theForm.find('input[name=question_id]').val(),
+							section_id:theForm.find('input[name=section_id]').val(),
+							sequence:theForm.find('input[name=sequence]').val(),
+							type_id:theForm.find('input[name=type_id]').val(),
+							marks:theForm.find('input[name=marks]').val(),
+							allAnswers:JSON.stringify(answerCollection),
+							configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+						};
 
+						/* Submit via POST and redirect to question creation screen upon done
+						 */
+						$j.post(theForm.attr('action'), data, function (responseText) {
+							window.location = questionBank.url;
+						});
+					}
+				}
+				
 				return false;
 			},
 			rules:{
@@ -168,12 +176,18 @@
         /* Remove an answer option
          */
         $j(document).on('click', '.delete', function () {
-            if (($j('.inputs').length) !== 3) {
+            if ($('#answerCollection .inputs').length == 3) {
                 $j(this).parent().remove();
             }
 
             refreshList();
         });
+
+		/* Special hardcoded third option
+		 */
+		if ($('#answerCollection .inputs').length == 3) {
+			$('#answerCollection .inputs').last().append('<div class="delete"></div>');
+		}
 
         $j(document).on('click', '.answerCorrect', function () {
             $j(this).parent().parent().toggleClass("highlight");
