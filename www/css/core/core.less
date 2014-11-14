@@ -6387,16 +6387,45 @@ ul.js_happening li span:hover {
     padding: 10px;
 }
 
-#file-window #file-list tbody tr td {
-    padding: 0.3em 3em 0.3em 0.6em;
+#file-list td span, span[data-dz-name] {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    padding-right: 6px !important;
+    min-width: 32px !important;
 }
 
-#file-window #file-list tbody tr td span {
-    background-repeat: no-repeat;
-    line-height: 22px;
+#file-list {
     display: block;
-    padding: 0 0 0 28px;
+    tbody, tr, td {
+        display: block;
+    }
+    td {
+        padding: 0.3em 0 0.3em 0.6em;
+        width: ~'calc(100% - 8px)';
+        height: 25px;
+        span {
+            background-repeat: no-repeat;
+            line-height: 26px;
+            display: block;
+            padding: 0 0 0 28px;
+        }
+    }
+    tfoot {
+        display: none;
+    }
 }
+
+#file-window {
+    .scroller {
+        overflow: hidden;
+    }
+    .dz-filename {
+        width: ~'calc(100% - 40px)';
+    }
+}
+
 
 .rfolder .btn {
   float: left;
