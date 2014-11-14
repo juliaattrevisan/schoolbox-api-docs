@@ -55,6 +55,9 @@ backup_failure_email='';
 # Backup of the data directory override - 1 is backup data dir, 0 is skip backup
 backup_data_dir=1;
 
+# Use multiple rsync runs instead of tar/gz/split (experimental)
+use_rsync=0;
+
 ############## End of Config Options ##############
 ########### DO NOT EDIT past this line! ###########
 
@@ -207,7 +210,22 @@ then
 	if [ $backup_data_dir -eq 1 ];
 	then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
-		tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+		if [ $use_rsync -eq 0 ];
+		then
+			tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+		else
+			# Use rsync for the data dir transfer (experimental)
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Creating data directory for rsync backup" >> $logfile;
+			mkdir -vp $targetdir/data >> $logfile 2>&1;
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup via rsync" >> $logfile;
+			rsync -rtv `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
+			if [ $? -ne 0 ];
+			then
+				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] First rsync run had errors, attempting again for safety" >> $logfile;
+				# TODO - maybe recheck cifs mount again here?
+				rsync -rtv `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
+			fi
+		fi
 	else
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Skipping backup of $data_dir due to override set" >> $logfile;
 	fi
