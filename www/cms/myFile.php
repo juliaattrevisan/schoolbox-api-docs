@@ -1,6 +1,8 @@
 <?php
 
 use Eportfolio\PageMapper;
+use Schoolbox\MyFileMapper;
+use Schoolbox\Resource\Attachment\GenericZone;
 
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
@@ -12,6 +14,14 @@ $this->setTab('myfiles');
  * @uri /cms/myFile/new/:userId[/:myFolderId][/:publishComponent]
  * @uri /cms/myFile/:myFileId/:userId
  */
+
+$zone = new GenericZone('cms', MyFileMapper::getInstance());
+$zone->setAttachmentsLabel('')
+     ->setAttachPrompt('Post file')
+     ->setMimeFilter('*/*')
+     ->setMulti(false)
+     ->setThumbnailSize(64)
+     ->setModalTitle('Select file');
 
 // userId is always arg[1]
 $userId = $this->arg[1] ?: $_SESSION['id'];
@@ -53,6 +63,8 @@ if($this->arg[0] == 'new') {
 
 	$this->setVar($output);
 
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $parent['id']);
 	renderPublishingOptions($this, $userId, true, $publishComponent);
@@ -65,6 +77,8 @@ elseif(is_numeric($this->arg[0])) {
 	$file = $fileHandler->getByID($myFileId);
 	if (!is_array($file))
 		error(41);
+
+    $zone->attachFiles(array($myFileId));
 
 	$ft = new FileType('', $file['mime_type']);
 
@@ -79,6 +93,8 @@ elseif(is_numeric($this->arg[0])) {
 		'PARENT_ID' => $file['parent'],
 	);
 	$this->setVar($output);
+
+    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 	$folderTree = $folderHandler->getFolderTree();
 	renderTreeSelect($this, $folderTree, $file['parent']);

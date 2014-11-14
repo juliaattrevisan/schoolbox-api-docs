@@ -1,15 +1,8 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 
 $j(function() {
-	$j('.prettify').prettyFileInput({
-		additionalButtonClasses: 'no-marg float-left',
-		buttonActiveClass: 'tick',
-		defaultText: '<span></span>Choose file',
-		defaultFileSelectedText: '<span></span>File selected'
-	});
-	
 	$j('#fileForm').validate();
 });
 </script>
@@ -27,8 +20,7 @@ $j(function() {
 				<h4>File</h4>
 			</td>
 			<td>
-				<input type="file" name="file" class="prettify"/>
-				<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/>
+				{ATTACH_ZONE}
 			</td>
 		</tr>
 		<!-- END browse_row -->

@@ -137,6 +137,25 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $task_type = $task->getType();
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
+
+                $zone = $this->newZone('az-task-'.$task->getId());
+
+                if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
+                    $zone->attachFiles(array(substr($task->getLink(), -40)));
+                    $this->setVar(array(
+                        'TASK_ATTACH_DISPLAY' => 'display: block;',
+                        'TASK_URL_DISPLAY'    => 'display: none;'
+                    ));
+
+                } else {
+                    $this->setVar(array(
+                        'TASK_ATTACH_DISPLAY' => 'display: none;',
+                        'TASK_URL_DISPLAY'    => 'display: block;'
+                    ));
+                }
+
+                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+
                 $this->parse('edit_task_form_block', 'edit_task_form');
                 $this->setVar('TASK_TYPE', 'task');
                 if (strlen($task->getLink()) > 0) {
@@ -153,7 +172,33 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $this->parse('task_block', 'task', true);
         }
 
+        $this->newZone('az-new-task', 'ATTACH_ZONE');
+
         return true;
+    }
+
+
+    /**
+     * @param string $id
+     * @param string $target
+     * @return \Schoolbox\Resource\Attachment\Zone
+     */
+    protected function newZone($id, $target = '')
+    {
+        $zone = new \Schoolbox\Resource\Attachment\Zone($id);
+        $zone->setMulti(false)
+             ->setReadOnly(false)
+             ->setMimeFilter(null)
+             ->setAttachmentsLabel('')
+             ->setAttachPrompt('Attach file or folder')
+             ->setModalTitle('Select File or Folder')
+             ->setThumbnailSize(32);
+
+        if ($target) {
+            $zone->renderIntoSitePage($this->sitepage, $target);
+        }
+
+        return $zone;
     }
 
 }

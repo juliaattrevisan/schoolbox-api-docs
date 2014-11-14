@@ -247,12 +247,6 @@ class Zone {
         $page->setBlock(self::TPL, 'attachment_list', 'attachment_list_block');
         $page->setBlock('attachment_list', 'attachment_editable', 'attachment_editable_block');
 
-        if ($this->readOnly) {
-            $page->setVar('can_drop_block', '');
-        } else {
-            $page->parse('can_drop_block', 'can_drop');
-        }
-
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
 
@@ -275,6 +269,12 @@ class Zone {
 
             'attachment_list_block' => '',
         ));
+
+        if ($this->readOnly) {
+            $page->setVar('can_drop_block', '');
+        } else {
+            $page->parse('can_drop_block', 'can_drop');
+        }
 
         foreach ($this->attachments as $file) {
             $page->setVar('attachment_editable_block', '');

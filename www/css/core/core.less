@@ -11020,6 +11020,9 @@ ul.activity-list li,
 	.submit-btn-plain {
 		margin: 8px 12px 8px 0;
 	}
+	.dz-wrap div.post-attachment {
+		margin: 0 124px 0 80px;
+	}
 	.post-attachment {
 		margin: 0 124px 0 80px;
 		&.url {
@@ -11031,13 +11034,12 @@ ul.activity-list li,
 			}
 		}
 	}
-	.alt-src {
-		position: absolute;
-		top: 4px;
-		line-height: 32px;
-		right: 0;
-	}
-
+}
+.alt-src {
+	position: absolute;
+	top: 4px;
+	line-height: 32px;
+	right: 0;
 }
 
 .information-list, .socialstream-form {
@@ -12231,7 +12233,7 @@ ul.az-list {
 }
 
 .attachzone {
-	min-width: 250px;
+	min-width: 40px;
 	&.dz-unsupported, &.dz-max-files-reached {
 		.dzone {
 			border-color: transparent;
@@ -12567,9 +12569,44 @@ ul.az-list {
 	border-bottom: 1px solid @lgrey;
 	position: relative;
 }
+
+ul li.dz-wrap {
+	padding-top: 0 !important;
+	margin-top: 8px;
+	min-height: 40px;
+}
+
+dd.dz-wrap {
+	float: none;
+	margin: 0 0 0 98px;
+	clear: both;
+	.post-attachment {
+		margin: 0 124px 0 0;
+		&.url {
+			label {
+				display: block;
+			}
+			input {
+				width: 100%;
+				float: none;
+			}
+		}
+	}
+}
+
 .dz-wrap {
 	position: relative;
+	.post-attachment {
+		margin: 0 108px 0 0;
+		&.attach {
+			margin-left: 2px;
+		}
+		&.url {
+			padding-top: 5px;
+		}
+	}
 }
+
 .dz-default span {
 	position: absolute;
 	top: 50%;

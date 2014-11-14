@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\CategoryMapper;
 
 $page = new SitePage();
@@ -58,11 +59,41 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
         }
     } else {
         $task_id = $_POST['id'];
+
+        $url = '';
+
+        if (!empty($_POST['url'])) {
+            // give precedence to URL
+            $url = $_POST['url'];
+
+        } else {
+            // if the attachment points to a folder, use that for the URL
+            $str = \Schoolbox\Resource\Browser\NodeFactory::SBFS . '.folder:';
+            if (strpos($_POST['attachment'][0], $str) === 0) {
+                $url = '/homepage/' . substr($_POST['attachment'][0], strlen($str));
+                unset($_POST['attachment']);
+            }
+
+            // ok, so now if we still have an attachment we need to deal with it
+            if (is_array($_POST['attachment'])) {
+                try {
+                    $factory = new CollectorFactory();
+                    /** @var \Schoolbox\Storage $file */
+                    $file = $factory->build($_POST['attachment'])->getFirst();
+
+                    $url = '/storage/fetch.php?hash=' . $file->getHash();
+
+                } catch (InvalidArgumentException $e) {
+                    // noop - leave $url blank
+                }
+            }
+        }
+
         if ($task_id) {
             $task = TaskMapper::getInstance()->findById($task_id);
             $task
                 ->setTitle($_POST['title'])
-                ->setLink($_POST['link'])
+                ->setLink($url)
                 ->setRequiresConfirmation(!$_POST['self_assess']);
             $category_id = $task->getCategory()->getId();
         } else {
@@ -74,7 +105,7 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
                 ->setOwner($_SESSION['id'])
                 ->setTitle($_POST['title'])
                 ->setCategory($category)
-                ->setLink($_POST['link'])
+                ->setLink($url)
                 ->setRequiresConfirmation(!$_POST['self_assess']);
         }
         TaskMapper::getInstance()->save($task);
