@@ -32,6 +32,13 @@
             //}
 
         });
+
+        // Touch anywhere outside this menu? close it.
+        $(document).on('touchstart.touchMenu, pointerdown.touchMenu, MSPointerDown.touchMenu', function(event) {
+            if (!$.contains(self.element[0], event.target)) {
+                self.closeMenus();
+            }
+        });
     }
 
     TouchMenu.prototype.closeMenus = function(exception) {
