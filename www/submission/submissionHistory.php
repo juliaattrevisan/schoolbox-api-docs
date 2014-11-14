@@ -104,7 +104,7 @@ if ($parentOnly && Config::get('restrict_student_submissions')) {
 $user = $userHandler->getByID($userID);
 
 if (!isset($user['uid'])) {
-	error(2);
+    error(2);
 }
 
 
@@ -439,8 +439,8 @@ if (count($submission_history)) {
                 }
 
                 // file return rather than mark
-                if($history['HISTORY_RETURN_FILE_NAME']) {
-                    if($parentOnly) {
+                if ($history['HISTORY_RETURN_FILE_NAME']) {
+                    if ($parentOnly) {
                         $this->setVar('history_returned_block', 'returned work');
                     } else {
                         $this->parse('history_returned_block', 'history_returned');
@@ -448,10 +448,8 @@ if (count($submission_history)) {
                 }
 
                 $this->parse('work_grade_block', 'work_grade');
-            }
-            else {
-
-                /* For styling reasons
+            } else {
+/* For styling reasons
                  */
                 $this->setVar(array(
                     'HAS_GRADE' => ''
@@ -505,7 +503,7 @@ if (isset($recent_submission)) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     } else {
-        $this->setVar('OVERDUE','');
+        $this->setVar('OVERDUE', '');
         $this->setVar('overdue_block', '');
     }
 
@@ -607,7 +605,7 @@ if (isset($recent_submission)) {
     }
 
     // if parent, hide the "view submitted work" button
-    if($parentOnly) {
+    if ($parentOnly) {
         $this->setVar('recent_submission_block', '');
     } else {
         $this->parse('recent_submission_download_block', 'recent_submission_download');
@@ -633,7 +631,7 @@ if (isset($recent_submission)) {
         }
         $this->parse('action_submit_block', 'action_submit');
     } else {
-        $this->setVar('action_submit_block','');
+        $this->setVar('action_submit_block', '');
     }
 
     $this->setVar('recent_submission_block', '');
@@ -660,7 +658,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     $ftype  = $allowedHandler->getByField('mime', $mime);
     $size   = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
-    $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
+    $returnDate = new Alaress_Date_Relative($submission->getDueDate(), 'y-m-d');
 
     $this->setVar(
         array(
@@ -703,7 +701,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     if ($return->getFilename() && !$parentOnly) {
         $this->parse('return_file_block', 'return_file');
     } else {
-        $this->setVar('return_file_block','');
+        $this->setVar('return_file_block', '');
     }
 
     $this->parse('returned_work_block', 'returned_work');
@@ -712,7 +710,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
 }
 
 // do fun rubric things
-if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
+if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rb = new DueWork_Rubric_Lightbox($this);
     $rb->render('rubric_block', $submission->getId(), $user['uid']);
 } else {
