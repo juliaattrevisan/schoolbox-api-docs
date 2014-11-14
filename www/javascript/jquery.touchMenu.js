@@ -20,6 +20,12 @@
         // Touch start on a menu item: toggle it
         self.element.on('touchstart.touchMenu, pointerdown.touchMenu, MSPointerDown.touchMenu', 'li', function(event) {
             var item = $(this);
+
+            // Ignore this touch totally if this is a mouse event
+            if (event.originalEvent.pointerType === 'mouse') {
+                return;
+            }
+
             if (item.hasClass('hover')) {
                 // Already hovered? Remove the hover, and don't prevent the
                 // link in the menu from triggering.
