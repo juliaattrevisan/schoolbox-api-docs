@@ -4,11 +4,6 @@
         var self = this;
         self.element = element;
 
-        // Make sure all of these hovers go away when an actual mouseenter event occurs
-        self.element.on('mouseenter.touchMenu', function(event) {
-            self.closeMenus();
-        });
-
         // Touch start on a menu item: toggle it
         self.element.on('touchstart.touchMenu, pointerdown.touchMenu, MSPointerDown.touchMenu', 'li', function(event) {
             var item = $(this);
