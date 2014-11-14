@@ -223,7 +223,7 @@ if ($userID == $currentUserId) {
 /* Check whether a file is associated with the work
  */
 $legacy_file_id = $submission->getLegacyFileId();
-$file_links = $submission->getFileLinks();
+$file_links     = $submission->getFileLinks();
 if ($file_links->count() > 0) {
     /** @var \Schoolbox\Assessment\Component\SubmissionBox\File[] $file_links */
     foreach ($file_links as $file_link) {
@@ -247,7 +247,7 @@ if ($file_links->count() > 0) {
     $this->setVar(
         array(
             'FILE_ID'    => $legacy_file_id,
-            'FILE_THUMB' => $file['iconFile'] ? : 'txt.png',
+            'FILE_THUMB' => $file['iconFile'] ?: 'txt.png',
             'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file['file_size']),
             'FILE_NAME'  => $file['realname'],
             'FILE_DATE'  => date('jS M Y, g:ia', $file['submitted'])
@@ -264,8 +264,8 @@ if ($file_links->count() > 0) {
 $teacher = $userHandler->getByID($submission->getOwner()->getId());
 
 $teacher_details = array(
-    'TEACHER_ID' => $teacher['uid'],
-    'TEACHER_NAME' => $userHandler->formatName($teacher),
+    'TEACHER_ID'    => $teacher['uid'],
+    'TEACHER_NAME'  => $userHandler->formatName($teacher),
     'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
 );
 $this->setVar($teacher_details);
@@ -273,7 +273,7 @@ $this->setVar($teacher_details);
 
 /* Output student submission terms, only if they actually have them.
  */
-$policy = Config::get('lms_student_policy');
+$policy    = Config::get('lms_student_policy');
 $html2text = new \Html2Text\Html2Text($policy);
 // Ensure that a policy that contains ONLY an image still displays,
 // by allowing img tags through unmolested
@@ -290,15 +290,15 @@ $usersList = array();
 
 $zone = new \Schoolbox\Resource\Attachment\Zone('submission-file');
 $zone->setAttachPrompt('Attach submission')
-     ->setAttachmentsLabel('')
-     ->setMulti(true)
-     ->setMimeFilter('*/*')
-     ->setModalTitle('Select file');
+    ->setAttachmentsLabel('')
+    ->setMulti(true)
+    ->setMimeFilter('*/*')
+    ->setModalTitle('Select file');
 
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 $recent_submission = null;
-$recent_return = null;
+$recent_return     = null;
 if (count($submission_history)) {
     $j = 0;
 
@@ -326,14 +326,14 @@ if (count($submission_history)) {
         $workDate = new Alaress_Date_Relative($activity_item->getDate(), 'U');
 
         // if submission item
-        $mark = '';
+        $mark      = '';
         $norm_mark = 0;
-        $gradient = 0;
-        $file_id = 0;
+        $gradient  = 0;
+        $file_id   = 0;
 
         //
         // User details: default to teacher.
-        $owner = $teacher_details['TEACHER_ID'];
+        $owner   = $teacher_details['TEACHER_ID'];
         $history = array(
             'HISTORY_CLASS'                => null,
             'HISTORY_ICON'                 => null,
@@ -344,16 +344,16 @@ if (count($submission_history)) {
             'HISTORY_FILE_ID'              => $submission->getLegacyFileId(),
             'HISTORY_SUBMISSION_FILE_ID'   => null,
             'HISTORY_SUBMISSION_FILE_NAME' => null,
-            'HISTORY_RETURN_FILE_ID' => null,
-            'HAS_GRADE' => '',
+            'HISTORY_RETURN_FILE_ID'       => null,
+            'HAS_GRADE'                    => '',
         );
         if ($activity_item->isSubmission()) {
             $history['HISTORY_CLASS'] = 'submit';
-            $history['HISTORY_ICON'] = 'up-arrow';
+            $history['HISTORY_ICON']  = 'up-arrow';
 
             //
             // submission file ID, submission file name
-            $history['HISTORY_SUBMISSION_FILE_ID'] = $activity_item->getSubmission()->getId();
+            $history['HISTORY_SUBMISSION_FILE_ID']   = $activity_item->getSubmission()->getId();
             $history['HISTORY_SUBMISSION_FILE_NAME'] = $activity_item->getSubmission()->getFilename();
 
             //
@@ -368,10 +368,10 @@ if (count($submission_history)) {
             } else {
                 // mark given
                 $history['HISTORY_CLASS'] = 'mark';
-                $history['HISTORY_ICON'] = 'tick';
+                $history['HISTORY_ICON']  = 'tick';
             }
 
-            $mark = $activity_item->getReturnedWork()->getMark();
+            $mark      = $activity_item->getReturnedWork()->getMark();
             $norm_mark = $activity_item->getReturnedWork()->getNormalizedMark();
 
             if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
@@ -381,21 +381,21 @@ if (count($submission_history)) {
             } else {
                 $mark = Scrub::Text($mark);
             }
-            $history['HISTORY_MARK'] = $mark;
-            $history['HAS_GRADE'] = ($mark || $mark === 0) ? 'grade' : '';
-            $history['HISTORY_COMMENT'] = Scrub::text($activity_item->getReturnedWork()->getComment());
+            $history['HISTORY_MARK']     = $mark;
+            $history['HAS_GRADE']        = ($mark || $mark === 0) ? 'grade' : '';
+            $history['HISTORY_COMMENT']  = Scrub::text($activity_item->getReturnedWork()->getComment());
             $history['HISTORY_GRADIENT'] = $activity_item->getReturnedWork()->getGradientFromNormalizedMark();
 
             //
             // submission file ID, submission file name
-            $history['HISTORY_RETURN_FILE_ID'] = $activity_item->getReturnedWork()->getId();
+            $history['HISTORY_RETURN_FILE_ID']   = $activity_item->getReturnedWork()->getId();
             $history['HISTORY_RETURN_FILE_NAME'] = Scrub::text($activity_item->getReturnedWork()->getFilename());
 
             $owner = $activity_item->getReturnedWork()->getMarker()->getId();
         } else {
             // otherwise extension
             $history['HISTORY_CLASS'] = 'extend';
-            $history['HISTORY_ICON'] = 'clock';
+            $history['HISTORY_ICON']  = 'clock';
         }
         $this->setVar($history);
 
@@ -429,8 +429,8 @@ if (count($submission_history)) {
 
         }
         // return by teacher
-        $parentsCanSee =  !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent());
-        $isSuperuser = $groupHandler->isSuperuser();
+        $parentsCanSee = !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent());
+        $isSuperuser   = $groupHandler->isSuperuser();
 
         if ($activity_item->isReturn()) {
             if ($isSuperuser || $parentsCanSee) {
@@ -449,11 +449,13 @@ if (count($submission_history)) {
 
                 $this->parse('work_grade_block', 'work_grade');
             } else {
-/* For styling reasons
+                /* For styling reasons
                  */
-                $this->setVar(array(
-                    'HAS_GRADE' => ''
-                ));
+                $this->setVar(
+                    array(
+                        'HAS_GRADE' => ''
+                    )
+                );
             }
 
             $this->parse('history_marked_block', 'history_marked');
@@ -511,22 +513,22 @@ if (isset($recent_submission)) {
 
     // get filetype details
     $student_submission = $recent_submission->getSubmission();
-    $mime = $student_submission->getMimetype()->getMime();
+    $mime               = $student_submission->getMimetype()->getMime();
     if ($student_submission->isOnlineSubmission()) {
         $size = strlen($student_submission->getBody());
     } else {
-        $ext = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
+        $ext  = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
         $size = $recent_submission->getSubmission()->getFilesize();
     }
     $ftype = $allowedHandler->getByField('mime', $mime);
-    $size = Alaress_Byte_Format::bytesToString($size);
+    $size  = Alaress_Byte_Format::bytesToString($size);
 
     // populate details into page
     $this->setVar(
         array(
             'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
             'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
-            'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'] ? : 'txt.png',
+            'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
             'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
             'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
         )
@@ -669,7 +671,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
             'RETURNED_WORK_FILE_SIZE'  => $size,
             'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
             'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
-            'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'] ? : 'txt.png',
+            'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
         )
     );
 
@@ -693,7 +695,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
         $this->setVar(
             array(
                 'RETURNED_WORK_SUBMISSION_ID' => '',
-                'return_file_uuid_block' => '',
+                'return_file_uuid_block'      => '',
             )
         );
     }
