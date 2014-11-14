@@ -35,14 +35,14 @@
     }
 
     TouchMenu.prototype.closeMenus = function(exception) {
-        //if (arguments.length) {
+        if (arguments.length) {
             this.element.find('.hover')
                 .not(exception)
                 .not(exception.parents('.hover'))
                 .removeClass('hover');
-        //} else {
-        //    this.element.find('.hover').removeClass('hover');
-        //}
+        } else {
+            this.element.find('.hover').removeClass('hover');
+        }
     };
 
     /**
