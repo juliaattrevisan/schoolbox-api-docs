@@ -16,7 +16,8 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Course\Task;
 
-class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * A list of units within this course.
@@ -47,7 +48,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * {@inheritdoc}
      */
-    public function execute() {
+    public function execute()
+    {
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
         $code = $this->getContext('code');
@@ -66,7 +68,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $classStudentList = $class_handler->getStudents($code);
                 if (is_array($classStudentList)) {
                     $externalIdList = array_map(
-                        function($student) { return $student['synergy_id']; },
+                        function($student) { return $student['synergy_id'];
+                        },
                         $classStudentList
                     );
                     $classStudentIdList = \Schoolbox\UserMapper::getInstance()
@@ -78,7 +81,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if (is_array($groupStudentList)) {
                 $groupStudentIdList = array_unique(
                     array_map(
-                        function($student) { return $student['uid']; },
+                        function($student) { return $student['uid'];
+                        },
                         $groupStudentList
                     )
                 );
@@ -102,7 +106,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // teacher.
             $task_list = array_reduce(
                 array_map(
-                    function($v) { return $v->getColumnValues('id'); },
+                    function($v) { return $v->getColumnValues('id');
+                    },
                     $this->unit_list->getColumnValues('tasks')
                 ),
                 'array_merge',
@@ -115,8 +120,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
                 $task_list, $this_student_id
             );
-        }
-        else {
+        } else {
             if ($this->readOnly) {
                 return false;
             }
@@ -127,7 +131,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * {@inheritdoc}
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'courseInstance')) {
             return false;
         }
@@ -145,36 +150,35 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
 
         // Unit list blocks
-        $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
-        $this->setBlock('course_unit_list', 'unit',                 'unit_block');
-        $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
-        $this->setBlock('unit',             'unit_no_expand',       'unit_no_expand_block');
-        $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
-        $this->setBlock('unit',             'unit_modify',          'unit_modify_block');
-        $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
-        $this->setBlock('unit',             'unit_task',            'unit_task_block');
-        $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
-        $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
-        $this->setBlock('unit_task',        'unit_task_completion', 'unit_task_completion_block');
-        $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
-        $this->setBlock('unit_task',        'unit_task_modify',     'unit_task_modify_block');
-        $this->setBlock('unit_task',        'unit_task_delete',     'unit_task_delete_block');
-        $this->setBlock('unit_task',        'unit_task_modify_form', 'unit_task_modify_form_block');
-        $this->setBlock('unit_task',        'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock($templateHandle, 'course_unit_list', 'course_unit_list_block');
+        $this->setBlock('course_unit_list', 'unit', 'unit_block');
+        $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
+        $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
+        $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
+        $this->setBlock('unit', 'unit_modify', 'unit_modify_block');
+        $this->setBlock('unit', 'unit_delete', 'unit_delete_block');
+        $this->setBlock('unit', 'unit_task', 'unit_task_block');
+        $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
+        $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
+        $this->setBlock('unit_task', 'unit_task_count', 'unit_task_count_block');
+        $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
+        $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
+        $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
+        $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
+        $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
+        $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
 
-        $this->setVar('course_selector_block',  '');
+        $this->setVar('course_selector_block', '');
         $this->setVar('course_unit_list_block', '');
-        $this->setVar('course_modify_block',    '');
-        $this->setVar('UNIT_READONLY',          ($this->readOnly ? 'true' : 'false'));
+        $this->setVar('course_modify_block', '');
+        $this->setVar('UNIT_READONLY', ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
         // If it isn't, then a selector is displayed (if user has write access)
         if (count($this->unit_list)) {
             $this->renderTemplateForUnitList();
-        }
-        else {
+        } else {
             $this->renderTemplateForCourseSelector();
         }
 
@@ -184,7 +188,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * Renders the unit list template for this component.
      */
-    protected function renderTemplateForUnitList() {
+    protected function renderTemplateForUnitList()
+    {
         // unit list will be a collection of Unit models
         $this->setVar('unit_block', '');
         $i = 0;
@@ -198,7 +203,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * Renders the course selector template for this component.
      */
-    protected function renderTemplateForCourseSelector() {
+    protected function renderTemplateForCourseSelector()
+    {
         $this->parse('course_selector_block', 'course_selector');
     }
 
@@ -207,12 +213,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      *
      * @param UnitInstance $unit The unit that the task is rendered into
      */
-    public function renderUnitInUnitList(UnitInstance $unit) {
+    public function renderUnitInUnitList(UnitInstance $unit)
+    {
 
         // Group the task list by task, then student.
         $grouped_list = array();
         $studentIdList = array_map(
-            function($student) { return $student['uid']; },
+            function($student) { return $student['uid'];
+            },
             $this->student_list
         );
         foreach ($this->completion_list as $item) {
@@ -237,8 +245,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 ) {
                     $is_completed = false;
                     break;
-                }
-                else {
+                } else {
                     $completion_date_list[] = $completion->getCompletionDate()->getDateTimeObject();
                 }
             }
@@ -295,27 +302,24 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $completion_status = 'Completed';
             $rel_time          = new Alaress_Date_Relative(max($completion_date_list));
             $urgency           = 10;
-        }
-        else {
+        } else {
             // Otherwise, show a standard open/due message.
             if ($unit->isBeforeOpenDate()) {
                 $completion_status = 'Opens';
                 $rel_time          = $unit->getRelativeOpenDate();
                 $urgency           = null;
-            }
-            elseif ($unit->isOpen()) {
+            } elseif ($unit->isOpen()) {
                 $completion_status = 'Due';
                 $rel_time          = $unit->getRelativeDueDate();
-            }
-            else {
+            } else {
                 $completion_status = 'Closed';
                 $rel_time          = $unit->getRelativeDueDate();
                 $urgency           = 0;
             }
         }
         $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
-        $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
-        $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
+        $this->setVar('UNIT_RELATIVE_DATE', Scrub::text($rel_time->getRelativeTime()));
+        $this->setVar('UNIT_UPCOMING_URGENCY', Scrub::text($urgency));
         $this->parse('unit_completion_block', 'unit_completion');
 
         // Output list of tasks within units, only if the task is open
@@ -325,8 +329,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         ;
         if ($display_task_list) {
             $this->parse('unit_expand_block', 'unit_expand');
-        }
-        else {
+        } else {
             $this->parse('unit_no_expand_block', 'unit_no_expand');
         }
         if ($display_task_list || $is_completed) {
@@ -344,7 +347,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
      * @param UnitInstance              $unit            The unit that the task is rendered into
      * @param Task\InstanceCompletion[] $completion_list The list of completions, keyed by student
      */
-    public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list) {
+    public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list)
+    {
 
         // Students only:
         // Output whether this item is complete.
@@ -373,17 +377,16 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $complete_count = count($completion_list);
 
-		/* Prevent division by zero issue when there are no students
+        /* Prevent division by zero issue when there are no students
 		 * in student_list
 		 */
-		$num = count($this->student_list);
+        $num = count($this->student_list);
 
-		if ($num) {
-        	$gradient = round($complete_count / $num * 10);
-		}
-		else {
-			$gradient = 100;
-		}
+        if ($num) {
+            $gradient = round($complete_count / $num * 10);
+        } else {
+            $gradient = 100;
+        }
 
         $this->setVar(
             array(
@@ -417,8 +420,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
                 $this->parse('unit_task_start_block', 'unit_task_start');
             }
-        }
-        else {
+        } else {
             $this->parse('unit_task_count_block', 'unit_task_count');
             $this->parse('unit_task_delete_block', 'unit_task_delete');
             $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
@@ -431,5 +433,4 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         }
         $this->parse('unit_task_block', 'unit_task', true);
     }
-
 }
