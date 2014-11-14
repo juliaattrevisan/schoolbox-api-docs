@@ -11,8 +11,11 @@ $groupHandler = new Group();
 
 
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
+    $url = new Url($_POST['url']);
+    if (!($url->isURL() || $url->isLocalURL())) {
+        error(139);
+    }
     if (is_numeric($_POST['linkID'])) {
-
         /* Modify existing link
          */
         try {
