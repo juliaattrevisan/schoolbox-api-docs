@@ -118,4 +118,25 @@
         var selected = $(element).find(':selected[value]')
         return (selected.length > 0)
     }, 'Please select a value');
+
+    /**
+     * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
+     * or relative URL.
+     */
+    $.validator.addMethod("isURL", function (value, element) {
+        if (this.optional(element)) {
+            return true;
+        }
+
+        // Create a link out of the value, and get its protocol that way.
+        var anchor = $('<a />').attr('href', value);
+        switch (anchor.prop('protocol')) {
+            case 'http:':
+            case 'https:':
+            case 'ftp:':
+                return true;
+        }
+        return false;
+    }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
+
 }(jQuery));

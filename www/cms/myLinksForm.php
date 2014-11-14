@@ -6,8 +6,7 @@ $myLinksHandler = new MyLinks();
 
 if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description']) && $_REQUEST['description']) {
 	$url = new Url($_REQUEST['url']);
-
-	if (!$url->isUrl()) {
+	if (!($url->isURL() || $url->isLocalURL())) {
 		error(139);
 	}
 
