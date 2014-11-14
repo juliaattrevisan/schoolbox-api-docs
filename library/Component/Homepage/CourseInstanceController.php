@@ -9,12 +9,12 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Assessment\Course\Task;
 
 class Component_Homepage_CourseInstanceController extends Component_Homepage_ControllerAbstract
 {
@@ -52,7 +52,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     {
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
-        $code = $this->getContext('code');
+        $code          = $this->getContext('code');
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
@@ -64,11 +64,12 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $classStudentIdList = array();
             $groupStudentIdList = array();
             if ($code && Config::get('external_enable')) {
-                $class_handler = new External_Class();
+                $class_handler    = new External_Class();
                 $classStudentList = $class_handler->getStudents($code);
                 if (is_array($classStudentList)) {
-                    $externalIdList = array_map(
-                        function($student) { return $student['synergy_id'];
+                    $externalIdList     = array_map(
+                        function ($student) {
+                            return $student['synergy_id'];
                         },
                         $classStudentList
                     );
@@ -81,7 +82,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if (is_array($groupStudentList)) {
                 $groupStudentIdList = array_unique(
                     array_map(
-                        function($student) { return $student['uid'];
+                        function ($student) {
+                            return $student['uid'];
                         },
                         $groupStudentList
                     )
@@ -104,9 +106,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Get task instance IDs out of unit list.
             // Then, retrieve for: current user if a student, or all students if a
             // teacher.
-            $task_list = array_reduce(
+            $task_list       = array_reduce(
                 array_map(
-                    function($v) { return $v->getColumnValues('id');
+                    function ($v) {
+                        return $v->getColumnValues('id');
                     },
                     $this->unit_list->getColumnValues('tasks')
                 ),
@@ -139,12 +142,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->parseConfig();
 
-        $this->setVar(array(
-            'SESSION_NAME'    => session_name(),
-            'SESSION_ID'      => session_id(),
-            'COMPONENT_NAME'  => $this->getConfig('componentname'),
-            'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
-        ));
+        $this->setVar(
+            array(
+                'SESSION_NAME'    => session_name(),
+                'SESSION_ID'      => session_id(),
+                'COMPONENT_NAME'  => $this->getConfig('componentname'),
+                'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
+            )
+        );
 
         // Course selector blocks
         $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
@@ -194,7 +199,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('unit_block', '');
         $i = 0;
         foreach ($this->unit_list as $unit) {
-            $this->setVar('UNIT_BACKGROUND', ($i++%2 === 1 ? 'dark' : ''));
+            $this->setVar('UNIT_BACKGROUND', ($i++ % 2 === 1 ? 'dark' : ''));
             $this->renderUnitInUnitList($unit);
         }
         $this->parse('course_unit_list_block', 'course_unit_list');
@@ -217,9 +222,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     {
 
         // Group the task list by task, then student.
-        $grouped_list = array();
+        $grouped_list  = array();
         $studentIdList = array_map(
-            function($student) { return $student['uid'];
+            function ($student) {
+                return $student['uid'];
             },
             $this->student_list
         );
@@ -227,7 +233,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Only add students who are in the list of students for this homepage.
             $student_id = $item->getStudent()->getId();
             if (in_array($student_id, $studentIdList)) {
-                $task_instance_id = $item->getTaskInstance()->getId();
+                $task_instance_id                             = $item->getTaskInstance()->getId();
                 $grouped_list[$task_instance_id][$student_id] = $item;
             }
         }
@@ -255,21 +261,21 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         $this->setVar(
             array(
-                'UNIT_ID'                  => Scrub::text($unit->getId()),
-                'UNIT_HOMEPAGE_ID'         => Scrub::text($unit->getUnitCategory()->getId()),
-                'UNIT_NAME'                => Scrub::text($unit->getTitle()),
-                'UNIT_OPEN_DATE'           => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
-                'UNIT_DUE_DATE'            => Scrub::text($unit->getDueDate()->getDatabaseDate()),
-                'UNIT_STUDENT_COUNT'       => count($this->student_list),
-                'UNIT_TASK_COMPLETE_CLASS' => '',
-                'UNIT_EXPANDED_STATE'      => ($is_expanded ? 'expanded' : 'collapsed'),
-                'UNIT_LIST_CLASS'          => ($is_expanded ? ''         : 'hide'),
-                'unit_task_block'          => '',
-                'unit_completion_block'    => '',
-                'unit_expand_block'        => '',
-                'unit_no_expand_block'     => '',
-                'unit_delete_block'        => '',
-                'unit_modify_block'        => '',
+                'UNIT_ID'                     => Scrub::text($unit->getId()),
+                'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getUnitCategory()->getId()),
+                'UNIT_NAME'                   => Scrub::text($unit->getTitle()),
+                'UNIT_OPEN_DATE'              => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
+                'UNIT_DUE_DATE'               => Scrub::text($unit->getDueDate()->getDatabaseDate()),
+                'UNIT_STUDENT_COUNT'          => count($this->student_list),
+                'UNIT_TASK_COMPLETE_CLASS'    => '',
+                'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
+                'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
+                'unit_task_block'             => '',
+                'unit_completion_block'       => '',
+                'unit_expand_block'           => '',
+                'unit_no_expand_block'        => '',
+                'unit_delete_block'           => '',
+                'unit_modify_block'           => '',
                 'unit_report_actions_block'   => '',
                 'unit_add_task_actions_block' => '',
             )
@@ -325,8 +331,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Output list of tasks within units, only if the task is open
         $display_task_list =
             $unit->getTasks()->count() > 0 &&
-            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly)
-        ;
+            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
         if ($display_task_list) {
             $this->parse('unit_expand_block', 'unit_expand');
         } else {
