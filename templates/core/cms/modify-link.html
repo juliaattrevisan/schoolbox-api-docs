@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script language="javascript" type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script language="JavaScript" type="text/javascript">
 
 
@@ -25,20 +26,6 @@
                 window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
             }
         });
-        jQuery.validator.addMethod("isURL", function (value, element) {
-            if (this.optional(element)) {
-                return true;
-            }
-            var anchor = $('<a />').attr('href', value);
-            switch (anchor.prop('protocol')) {
-                case 'http:':
-                case 'https:':
-                case 'ftp:':
-                    return true;
-            }
-            return false;
-        }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
-
         $j('#urlForm').validate({
             rules:{
                 url:{
