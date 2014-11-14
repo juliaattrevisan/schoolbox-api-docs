@@ -1,36 +1,32 @@
 (function($) {
 
     var TouchMenu = function(element) {
-        var self = this;
+        var self     = this;
         self.element = element;
 
         // Touch start on a menu item: toggle it
         self.element.on('touchstart.touchMenu, pointerdown.touchMenu, MSPointerDown.touchMenu', 'li', function(event) {
             var item = $(this);
-
-            //if (item.hasClass('hover')) {
-            //    // Already hovered? Remove it, and allow the click event to trigger
-            //    //self.closeMenus();
-            //} else {
+            if (item.hasClass('hover')) {
+                // Already hovered? Remove the hover, and don't prevent the
+                // link in the menu from triggering.
+                self.closeMenus();
+            } else {
                 // Add hover to the item I just touched
                 item.addClass('hover');
                 // Remove hovers on events I didn't touch
                 self.closeMenus(item);
+                // Counterintuitively required to allow presses on leaves to fire events
+                event.stopPropagation();
 
-            // Counterintuitively required to allow presses on leaves to fire events
-            event.stopPropagation();
-
-                // Does this have a link on it other than #? Ignore it.
-                // (this only triggers on the first press on this item.)
-                var target  = $(event.target).closest('a');
-                var submenu = item.find('> ul');
-                if (submenu.length && target.attr('href') !== '#') {
+                // If this menu item has a submenu, prevent its click event from firing,
+                // just this once.
+                if (item.find('> ul').length) {
                     item.one('click.touchMenu', function(innerEvent) {
                         innerEvent.preventDefault();
                     });
                 }
-            //}
-
+            }
         });
 
         // Touch anywhere outside this menu? close it.
