@@ -56,20 +56,10 @@
      * @param options
      */
     $.fn.touchMenu = function() {
-        var elements = this;
-        elements.each(function() {
-            $(this).data('touchMenu', new TouchMenu($(this)));
+        this.each(function() {
+            var element = $(this);
+            element.data('touchMenu', new TouchMenu(element));
         });
-
-        // Apply the body handler
-        var touchStartHandler = function(event) {
-            if (event.namespace != 'touchMenu') {
-                elements.each(function() {
-                    $(this).data('touchMenu').closeMenus();
-                })
-            }
-        };
-        //$(document).on('touchstart, pointerdown, MSPointerDown', touchStartHandler);
-        return elements ;
+        return this;
     }
 })(jQuery);
