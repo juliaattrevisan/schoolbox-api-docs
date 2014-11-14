@@ -103,12 +103,19 @@ if (!isset($userID)) {
 }
 
 // prevent students from seeing anything but their own work
+$restrictSubmissions = false;
 if ($groupHandler->isStudent()) {
     if ($userID != $_SESSION['id']) {
         error(19);
     }
-} elseif (!($groupHandler->isStaff() || ($groupHandler->isParentOfChild($userID) && !Config::get('restrict_parent_duework_access')))) {
-    error(19);
+}
+elseif (!$groupHandler->isStaff() && $groupHandler->isParent()) {
+    $restrictSubmissions = Config::get('restrict_student_submissions');
+    if ($groupHandler->isParentOfChild($userID)
+        && Config::get('restrict_parent_duework_access')
+    ) {
+        error(19);
+    }
 }
 
 if (!isset($targetDate)) {
