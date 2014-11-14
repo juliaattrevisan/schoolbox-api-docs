@@ -155,8 +155,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit',             'unit_task',            'unit_task_block');
         $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
         $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
-        $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
         $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
         $this->setBlock('unit_task',        'unit_task_completion', 'unit_task_completion_block');
         $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
@@ -399,8 +397,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_TASK_GRADIENT'          => $gradient,
                 'UNIT_TASK_COMPLETION_STATUS' => $unit_task_status,
                 'UNIT_TASK_COMPLETE_CLASS'    => $unit_task_class,
-                'unit_task_link_block'        => '',
-                'unit_task_no_link_block'     => '',
                 'unit_task_count_block'       => '',
                 'unit_task_completion_block'  => '',
                 'unit_task_start_block'       => '',
@@ -410,14 +406,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_task_modify_form_block' => '',
             )
         );
-
-        // Is there a link for this item?
-        if (strlen($task->getLink()) > 0) {
-            $this->parse('unit_task_link_block', 'unit_task_link');
-        }
-        else {
-            $this->parse('unit_task_no_link_block', 'unit_task_no_link');
-        }
 
         // Teacher sees the number of students that have completed
         // this task, nobody else does.
