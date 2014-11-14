@@ -25,8 +25,27 @@
                 window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
             }
         });
+        jQuery.validator.addMethod("isURL", function (value, element) {
+            if (this.optional(element)) {
+                return true;
+            }
+            var anchor = $('<a />').attr('href', value);
+            switch (anchor.prop('protocol')) {
+                case 'http:':
+                case 'https:':
+                case 'ftp:':
+                    return true;
+            }
+            return false;
+        }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
 
-        $j('#urlForm').validate();
+        $j('#urlForm').validate({
+            rules:{
+                url:{
+                    isURL:true
+                }
+            }
+        });
     });
 
 </script>
@@ -45,7 +64,7 @@
         <tr>
             <td class="formLabelWidth"><h4>URL</h4>
                 <em>The internet address for the website, eg. http://www.google.com.</em>
-                <em>Relative URLs (ones without a http:// prefix) are allowed, and will resolve relative to this domain.</em>
+                <em>Relative URLs are allowed, and will resolve relative to this domain.</em>
             </td>
             <td><label><input class="required" type="text" name="url" id="url" size="40" maxlength="250" value="{URL}"/></label>
                 <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
