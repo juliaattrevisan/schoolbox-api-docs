@@ -1,5 +1,18 @@
+/**
+ * Plugin for making hover menus touch-friendly.
+ *
+ * Relies on styles for class "hover" mirroring pseudo-selector :hover exactly.
+ *
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
 (function($) {
+    "use strict";
 
+    /**
+     * @param element The menu to apply touch events to.
+     * @constructor
+     */
     var TouchMenu = function(element) {
         var self     = this;
         self.element = element;
@@ -37,6 +50,11 @@
         });
     }
 
+    /**
+     * Closes touch menus.
+     *
+     * @param exception If supplied, doesn't close this menu.
+     */
     TouchMenu.prototype.closeMenus = function(exception) {
         if (arguments.length) {
             this.element.find('.hover')
@@ -48,11 +66,6 @@
         }
     };
 
-    /**
-     * Touch-friendly menu
-     *
-     * @param options
-     */
     $.fn.touchMenu = function() {
         this.each(function() {
             var element = $(this);
