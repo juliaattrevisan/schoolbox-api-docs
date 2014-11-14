@@ -108,8 +108,7 @@ if ($groupHandler->isStudent()) {
     if ($userID != $_SESSION['id']) {
         error(19);
     }
-}
-elseif (!$groupHandler->isStaff() && $groupHandler->isParent()) {
+} elseif (!$groupHandler->isStaff() && $groupHandler->isParent()) {
     $restrictSubmissions = Config::get('restrict_student_submissions');
     if ($groupHandler->isParentOfChild($userID)
         && Config::get('restrict_parent_duework_access')
@@ -343,8 +342,12 @@ foreach ($categoryList as $category) {
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
             $assess_mapper->getStudentMarks($category['id'], $userID)
         );
-        usort($studentGrades, function ($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
-        $studentGrades = array_map(function ($row) { return $row['mark']; }, $studentGrades);
+        usort($studentGrades, function ($a, $b) { return $a['date'] > $b['date'] ? -1 : 1;
+
+        });
+        $studentGrades = array_map(function ($row) { return $row['mark'];
+
+        }, $studentGrades);
     } else {
         $studentGrades = array();
     }
@@ -561,10 +564,10 @@ $this->dropDown('subject', $summary, '', TEMPLATE_content, array('cid' => 'SUBJE
 // Output category colour styles
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 $colourIndex = 0;
-foreach($summary as $category) {
+foreach ($summary as $category) {
     $this->setVar('CATEGORY_COLOUR', Scrub::text($colourList->offsetGet($colourIndex % count($colourList))->getHexColour()));
     $this->setVar('CATEGORY_ID', $category['cid']);
-    $this->parse('subject_colour_block', 'subject_colour',true);
+    $this->parse('subject_colour_block', 'subject_colour', true);
     $colourIndex++;
 }
 
