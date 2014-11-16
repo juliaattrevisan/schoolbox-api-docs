@@ -315,7 +315,10 @@ class UnitInstanceMapper extends Mapper {
     /**
      * Post-save callback:
      * * if a new item, save a new task instance for each task in this unit.
-     * * if not, update existing task instances for this course.
+     *
+     * Existing task instances for this course are no longer updated here,
+     * because users generally didn't want to clobber the open or due date of
+     * due work items or quizzes associated with a task.
      *
      * @param  UnitInstance $object
      * @param  UnitInstance $previous
@@ -339,17 +342,6 @@ class UnitInstanceMapper extends Mapper {
                 $task_instance_collection->add($task_instance);
             }
             Task\InstanceMapper::getInstance()->save($task_instance_collection);
-        }
-        else {
-            /** @var Task\Instance $task_instance_list */
-            $task_instance_list = Task\InstanceMapper::getInstance()->findByColumn(
-                'course_unit_instance_id',
-                $object->getId()
-            );
-            foreach ($task_instance_list as $task_instance) {
-                $cloner = new Cloner($task_instance);
-                $cloner->updateLinkedItems();
-            }
         }
     }
 
