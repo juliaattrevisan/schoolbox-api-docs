@@ -220,7 +220,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             ) {
                                 $this->setVar(
                                     array(
-                                        'ATTENDANCE_CLASS_CODE' => $period['campus'].'/'.$period['code'],
+                                        'ATTENDANCE_CLASS_CODE' => $period['campus'] ? $period['campus'].'/'.$period['code'] : '0/'.$period['code'],
                                         'ATTENDANCE_ATTENDANCE_DATE' => $attendance_date,
                                         'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                     )
