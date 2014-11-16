@@ -198,7 +198,7 @@ class Cloner
      *
      * @return \Alaress_Date_Format
      */
-    protected function getOpenTimeFromTask()
+    public function getOpenTimeFromTask()
     {
         return new \Alaress_Date_Format(
             new \DateTime($this->unit->getOpenDate()->getUsingFormat('Y-m-d 00:00:00'))
@@ -212,7 +212,7 @@ class Cloner
      *
      * @return Alaress_Date_Format
      */
-    protected function getSubmissionBoxCloseTimeFromTask()
+    public function getSubmissionBoxCloseTimeFromTask()
     {
         $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
 
@@ -226,7 +226,7 @@ class Cloner
      *
      * @return Alaress_Date_Format
      */
-    protected function getAssessmentCloseTimeFromTask()
+    public function getAssessmentCloseTimeFromTask()
     {
         $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
 
