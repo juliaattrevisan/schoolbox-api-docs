@@ -96,8 +96,8 @@ class clean {
 		}
 
 		//thumbnails
-		foreach(glob(Cfg::get('thumbnail_dir').'/*.jpg') as $file) {
-			preg_match('/.*\/([0-9]+)-.*\.jpg/', $file, $matches);
+		foreach(glob(Cfg::get('thumbnail_dir').'/*.dat') as $file) {
+			preg_match('/.*\/([0-9]+)-.*\.dat/', $file, $matches);
 
 			if($matches[1]) {
 				$query = "SELECT id FROM file WHERE id = '{$matches[1]}'";
