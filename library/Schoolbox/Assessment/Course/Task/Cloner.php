@@ -161,15 +161,59 @@ class Cloner
      */
     public function updateLinkedItems()
     {
+        $this->updateTaskOpenTime();
+        $this->updateTaskCloseTime();
+    }
+
+    /**
+     * Updates this task's open time.
+     *
+     * @return $this
+     */
+    public function updateTaskOpenTime()
+    {
         try {
             $assess_id = $this->task_instance->getAssessment()->getId();
             if ($assess_id) {
                 /** @var OnlineAssessment $assess_object */
                 $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
-                $assess_object
-                    ->setStart($this->getOpenTimeFromTask())
-                    ->setFinish($this->getAssessmentCloseTimeFromTask())
-                ;
+                $assess_object->setStart($this->getOpenTimeFromTask());
+                OnlineAssessmentMapper::getInstance()->save($assess_object);
+            }
+        } catch (Exception $e) {
+            // quiz may have been deleted. Nothing to see here, move along
+        }
+        try {
+            $box_id = $this->task_instance->getSubmissionBox()->getId();
+            if ($box_id) {
+                /** @var SubmissionBox $box */
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+                $box->setOpenDate($this->getOpenTimeFromTask());
+                SubmissionBoxMapper::getInstance()->save($box);
+            }
+        } catch (Exception $e) {
+            // box may have been deleted. Nothing to see here, move along
+        }
+        return $this;
+    }
+
+
+    /**
+     * Updates this task's close time.
+     *
+     * @return $this
+     */
+    public function updateTaskCloseTime()
+    {
+        try {
+            $assess_id = $this->task_instance->getAssessment()->getId();
+            if ($assess_id) {
+                /** @var OnlineAssessment $assess_object */
+                $closeTime = $this->getAssessmentCloseTimeFromTask();
+                $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                // If this item's close time is the same as the task's close time,
+                // update it
+                $assess_object->setFinish($closeTime);
                 OnlineAssessmentMapper::getInstance()->save($assess_object);
             }
         } catch (Exception $e) {
@@ -181,7 +225,6 @@ class Cloner
                 /** @var SubmissionBox $box */
                 $box = SubmissionBoxMapper::getInstance()->findById($box_id);
                 $box
-                    ->setOpenDate($this->getOpenTimeFromTask())
                     ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
                     ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
                 ;
@@ -190,6 +233,7 @@ class Cloner
         } catch (Exception $e) {
             // box may have been deleted. Nothing to see here, move along
         }
+        return $this;
     }
 
     /**
