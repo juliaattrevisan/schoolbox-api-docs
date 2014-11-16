@@ -220,7 +220,7 @@ class Attendance_Synergetic_AttendanceMaster {
             $this->setAttendanceMasterSeq( $result['output']['@wkAttendanceMasterSeq']);
         }
         else {
-            throw new Exception_Schoolbox('Cannot setup attendance record');
+            throw new Exception_Schoolbox('Cannot setup attendance record, ' . $result['message']);
         }
 
 	}
