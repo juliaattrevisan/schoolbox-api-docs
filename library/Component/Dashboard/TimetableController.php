@@ -5,10 +5,8 @@
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  *
  */
-
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
     private $externalTimetable;
@@ -54,9 +52,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $checked_campus_list[$campus_code] = true;
                     $day_number = $timetableHandler->getDayNumber($campus_id);
                     if ($day_number) {
-                        $this->dayNumber[$campus_id]     = $timetableHandler->getDayNumber($campus_id);
+                        $this->dayNumber[$campus_id] = $timetableHandler->getDayNumber($campus_id);
                         $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
-                        $this->timetable[$campus_id]     = $timetableHandler->getDayTimetable(
+                        $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
                             $_SESSION['sid'], $_SESSION['id'], $campus_id, $day_number
                         );
                     }
@@ -77,7 +75,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
 
-        $this->setBlock($templateHandle,    "campus_timetable", "campus_timetable_block");
+        $this->setBlock($templateHandle, "campus_timetable", "campus_timetable_block");
         $this->setBlock("campus_timetable", "timetable_campus_name", "timetable_campus_name_block");
         $this->setBlock("campus_timetable", "timetable_period", "timetable_period_block");
         $this->setBlock("campus_timetable", "timetable_header", "timetable_header_block");
@@ -103,17 +101,17 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $this->setVar("campus_timetable_block", '');
-        $now             = new Alaress_Date_Format(time(), 'U');
+        $now = new Alaress_Date_Format(time(), 'U');
         $attendance_date = $now->getDatabaseDate();
 
         foreach ($this->timetable as $campus_id => $timetable) {
             $classCount = 0;
 
             /* Find out if the current campus timetable has any classes associated
-			 * with the timetable definition. If not, skip its rendering altogether
-			 */
+            * with the timetable definition. If not, skip its rendering altogether
+            */
             if (is_array($timetable) && count($timetable)) {
-                foreach($timetable as $currentPeriod) {
+                foreach ($timetable as $currentPeriod) {
                     if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
                         $classCount++;
                     }
@@ -147,29 +145,28 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->setVar("PERIOD_END", $period['periodEnd']);
                         $periodCount++;
 
-						/* Always highlight the current cell, regardless of
-						 * whether it has something on or not
-						 */
-						if ($current_period['PeriodNumber'] == $period['periodNumber']) {
-							$this->setVar(
-								array(
-									'PERIOD_CLASS' => 'current',
-									'PERIOD_TH_CLASS' => 'dayCurrent'
-								)
-							);
-						}
-						else {
-							$this->setVar(
-								array(
-									'PERIOD_CLASS' => 'normal',
-									'PERIOD_TH_CLASS' => 'normal'
-								)
-							);
-						}
+                        /* Always highlight the current cell, regardless of
+                         * whether it has something on or not
+                         */
+                        if ($current_period['PeriodNumber'] == $period['periodNumber']) {
+                            $this->setVar(
+                                array(
+                                    'PERIOD_CLASS'    => 'current',
+                                    'PERIOD_TH_CLASS' => 'dayCurrent'
+                                )
+                            );
+                        } else {
+                            $this->setVar(
+                                array(
+                                    'PERIOD_CLASS'    => 'normal',
+                                    'PERIOD_TH_CLASS' => 'normal'
+                                )
+                            );
+                        }
 
-						/* Display info only if it exists
-						 * Otherwise empty cell
-						 */
+                        /* Display info only if it exists
+                         * Otherwise empty cell
+                         */
                         if ($period['description']) {
                             $this->setVar('PERIOD_DESC', $period['description']);
                             $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
@@ -180,15 +177,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             if ($current_period['PeriodNumber'] == $period['periodNumber']) {
                                 $this->setVar(
                                     array(
-                                        'PERIOD_CLASS' => 'current',
+                                        'PERIOD_CLASS'    => 'current',
                                         'PERIOD_TH_CLASS' => 'dayCurrent'
                                     )
                                 );
-                            }
-                            else {
+                            } else {
                                 $this->setVar(
                                     array(
-                                        'PERIOD_CLASS' => 'normal',
+                                        'PERIOD_CLASS'    => 'normal',
                                         'PERIOD_TH_CLASS' => 'normal'
                                     )
                                 );
@@ -220,8 +216,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             ) {
                                 $this->setVar(
                                     array(
-                                        'ATTENDANCE_CLASS_CODE' => $period['campus'] ? $period['campus'].'/'.$period['code'] : '0/'.$period['code'],
-                                        'ATTENDANCE_ATTENDANCE_DATE' => $attendance_date,
+                                        'ATTENDANCE_CLASS_CODE'        => $period['campus'] ? $period['campus'] . '/' . $period['code'] : '0/' . $period['code'],
+                                        'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
                                         'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                     )
                                 );
@@ -231,12 +227,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         } else {
                             $this->setVar(
                                 array(
-                                    'PERIOD_COLOUR' => '',
-                                    'PERIOD_DESC' => '',
-                                    'PERIOD_CODE' => '',
-                                    'PERIOD_ROOM' => '',
-                                    'PERIOD_ABSENTEES' => '',
-                                    'PERIOD_URL' => '#',
+                                    'PERIOD_COLOUR'         => '',
+                                    'PERIOD_DESC'           => '',
+                                    'PERIOD_CODE'           => '',
+                                    'PERIOD_ROOM'           => '',
+                                    'PERIOD_ABSENTEES'      => '',
+                                    'PERIOD_URL'            => '#',
                                     'has_attendances_block' => '',
                                 )
                             );
