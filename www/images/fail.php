@@ -47,13 +47,13 @@ switch ($_GET['transform_type']) {
 		$path          = '/images/core/placeholder.png';
 		$transform     = new Alaress_Image_Transformation_Portrait();
 		$transform_key = $_GET['transform'];
-		$cache_key     = "portrait:$transform_key";
+		$cache_key     = "portrait-$transform_key";
 		break;
 
 	case 'storage':
 		$transform     = new Alaress_Image_Transformation_Storage();
 		$transform_key = $_GET['transform'];
-		$cache_key     = "storage:$transform_key";
+		$cache_key     = "storage-$transform_key";
 		break;
 
 	default:
