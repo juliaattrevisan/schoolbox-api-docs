@@ -65,7 +65,9 @@
                     <tr>
                         <td>Name</td>
                         <td>Open Date</td>
+                        <td>Update?</td>
                         <td>Due Date</td>
+                        <td>Update?</td>
                     </tr>
                     <!-- BEGIN unit -->
                     <tr data-type="unit_row" data-enabled="{UNIT_ENABLED}" data-unit_id="{UNIT_ID}">
@@ -79,6 +81,8 @@
                         </td>
                         <td>
                             <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="10" maxlength="10" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
+                        </td>
+                        <td>
                             <label for="update_open_date-{UNIT_COUNT}">
                                 <input name="unit[{UNIT_COUNT}][update_open_date]"
                                        type="hidden"
@@ -87,11 +91,12 @@
                                        type="checkbox"
                                        value="1"
                                        id="update_open_date-{UNIT_COUNT}" />
-                                Update open dates?
                             </label>
                         </td>
                         <td>
                             <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="10" maxlength="10" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
+                        </td>
+                        <td>
                             <label for="update_due_date-{UNIT_COUNT}">
                                 <input name="unit[{UNIT_COUNT}][update_due_date]"
                                        type="hidden"
@@ -100,7 +105,6 @@
                                        id="update_due_date-{UNIT_COUNT}"
                                        value="1"
                                        type="checkbox" />
-                                Update due dates?
                             </label>
                         </td>
                     </tr>
