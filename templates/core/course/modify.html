@@ -55,8 +55,9 @@
                 <h4>Units</h4>
                 <em>You will need to set a start and end date for each unit that you want to import.</em>
                 <em>
-                    If you want to preserve changes to the open or due dates of any quizzes
-                    or due work items in your course, leave the "Preserve" checkboxes checked.
+                    By default, open and due dates of assessments and quizzes in each unit will not
+                    be updated if you update the due date.
+                    Check the checkboxes if you want them to be synced.
                 </em>
             </td>
             <td>
@@ -78,30 +79,28 @@
                         </td>
                         <td>
                             <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="10" maxlength="10" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
-                            <label for="preserve_open_date-{UNIT_COUNT}">
-                                <input name="unit[{UNIT_COUNT}][preserve_open_date]"
+                            <label for="update_open_date-{UNIT_COUNT}">
+                                <input name="unit[{UNIT_COUNT}][update_open_date]"
                                        type="hidden"
                                        value="0" />
-                                <input name="unit[{UNIT_COUNT}][preserve_open_date]"
+                                <input name="unit[{UNIT_COUNT}][update_open_date]"
                                        type="checkbox"
                                        value="1"
-                                       id="preserve_open_date-{UNIT_COUNT}"
-                                       checked />
-                                Preserve?
+                                       id="update_open_date-{UNIT_COUNT}" />
+                                Update open dates?
                             </label>
                         </td>
                         <td>
                             <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="10" maxlength="10" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
-                            <label for="preserve_due_date-{UNIT_COUNT}">
-                                <input name="unit[{UNIT_COUNT}][preserve_due_date]"
+                            <label for="update_due_date-{UNIT_COUNT}">
+                                <input name="unit[{UNIT_COUNT}][update_due_date]"
                                        type="hidden"
                                        value="0" />
-                                <input name="unit[{UNIT_COUNT}][preserve_due_date]"
-                                       id="preserve_due_date-{UNIT_COUNT}"
+                                <input name="unit[{UNIT_COUNT}][update_due_date]"
+                                       id="update_due_date-{UNIT_COUNT}"
                                        value="1"
-                                       type="checkbox"
-                                       checked />
-                                Preserve?
+                                       type="checkbox" />
+                                Update due dates?
                             </label>
                         </td>
                     </tr>
