@@ -133,10 +133,7 @@ if(isset($_POST['to']) && $_POST['to'] && Cfg::get('mail_enable'))
 
     sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments);
 
-    //output code to send the browser to where it came from
-    $back = -2;
-    include("../include/back.php");
-    exit;
+    $page->backToTheFuture(2);
 }
 else
 {
