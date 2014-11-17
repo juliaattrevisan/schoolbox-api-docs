@@ -110,6 +110,10 @@ class EventRecurrenceMapper {
 					$this->setSeriesEventData($seriesEvent, $event);
 
 					$this->getEventMapper()->save($seriesEvent);
+
+                    /* Assign relations
+                     */
+                    $eventRelations->resetRelations($seriesEvent);
 				}
 			}
 			/* Modify an existing event and add recurring incidents
@@ -126,6 +130,10 @@ class EventRecurrenceMapper {
 
 				$this->getEventMapper()->save($event);
 
+                /* Assign relations
+                 */
+                $eventRelations->resetRelations($event);
+
 				/* Skip the first element, spawn new event records
 				 */
 				$eventRecurrence->getDateCollection()->next();
@@ -139,6 +147,10 @@ class EventRecurrenceMapper {
 					$event->setEndDate($currentDate['end']);
 
 					$this->getEventMapper()->save($event);
+
+                    /* Assign relations
+                     */
+                    $eventRelations->resetRelations($event);
 				}
 			}
 		}
@@ -156,6 +168,10 @@ class EventRecurrenceMapper {
 				$event->setEndDate($currentDate['end']);
 
 				$this->getEventMapper()->save($event);
+
+                /* Assign relations
+                 */
+                $eventRelations->resetRelations($event);
 			}
 		}
 	}
