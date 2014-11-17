@@ -35,6 +35,7 @@ $data = {
         {% endfor %}
     </ul>
     {% if not attachzone.readonly %}
+    <ul class="az-error-list"></ul>
     <div class="dzone" id="{{ attachzone.camelId }}Zone">
         <ul data-template>
             <li>
