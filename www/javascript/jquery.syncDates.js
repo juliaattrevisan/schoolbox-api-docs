@@ -41,10 +41,10 @@
             var endDate   = settings.converter(settings.endDate.val());
             if (endDate < startDate) {
                 if (thisInput.is(settings.startDate)) {
-                    settings.endDate.val(settings.startDate.val())
+                    settings.endDate.val(settings.startDate.val()).change();
                 }
                 else {
-                    settings.startDate.val(settings.endDate.val())
+                    settings.startDate.val(settings.endDate.val()).change();
                 }
             }
         }
