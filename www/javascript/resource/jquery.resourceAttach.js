@@ -155,9 +155,28 @@ if(typeof window.location.origin == 'undefined') {
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
-                    if (xhr === undefined) {
-                        this.removeFile(file);
+                    var data, element, t,
+                        errList = azone.children('.az-error-list');
+
+                    if (typeof errMsg == 'string') {
+                        try {
+                            data = JSON.parse(errMsg).hash.split(':')[1];
+                        } catch (e) {
+                            data = errMsg;
+                        }
+                    } else {
+                        data = errMsg.hash.split(':')[1];
                     }
+
+                    element = $(file.previewElement).clone();
+
+                    element.appendTo(errList);
+
+                    element.children('.dz-progress, input').detach();
+                    t = element.children('.filename').text();
+                    element.children('.filename').text(t + ' failed').attr('title', data);
+
+                    this.removeFile(file);
                 });
 
             },
