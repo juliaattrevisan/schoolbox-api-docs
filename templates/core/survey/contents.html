@@ -7,24 +7,6 @@ $j(function() {
 		$j(this).confirmDialog();
 	});
 
-    $j('.show-section-options').click(function() {
-        $j(this).parent().siblings('.sectionOptions').children(":first-child").slideToggle();
-        $j(this).toggleClass('active')
-		return false;
-	});
-
-	$j(".show-survey-options, .show-section-options").hover(
-	function () {
-		$j(this).children('span').stop(true, true).fadeIn("fast");
-		$j(this).css('background-image', "none");
-	},
-	function () {
-		var $this = $j(this)
-		$this.children('span').stop(true, true).fadeOut("fast", function() {
-			$this.removeAttr('style');
-		});
-	});
-
 	/* Make questions sortable
 	 */
 	$j(".question-list").sortable({
@@ -59,30 +41,24 @@ $j(function() {
 <h2>Manage Survey</h2>
 <div class="pad-it">
 	<p class="clearfix tiny-btns no-marg">
-		<a class="btn add float-left marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
+		<a class="btn add float-left marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add Section</a>
         <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify</a>
         <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
 		<a href="/survey/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
-        <a class="btn go-back float-left marg tiny" href="/homepage/{ASSESS_CATEGORY_ID}"><span></span>Return to Homepage</a>
     </p>
 
 	<!-- BEGIN section -->
 	<div class="evaluation-section">
-		<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
-
-		<ul class='sectionOptions'>
-			<li class="hide evaluation-section-options clearfix">
-				<a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
-				<a href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
-			</li>
-		</ul>
-
+		<h3>{SECTION_TITLE}
+            <a href="/survey/section/delete/{SECTION_SECTION_ID}" class="btn delete no-text"><span></span></a>
+            <a href="/survey/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text"><span></span></a>
+        </h3>
 		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
 			<!-- BEGIN question -->
 			<li id='question_{QUESTION_QUESTION_ID}'>
 				<strong>Q{QUESTION_SEQUENCE})</strong>
 				{QUESTION_QUESTION}
-				<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
+				<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Modify</a> |
 				<a class="delete" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 			</li>
 			<!-- END question -->
