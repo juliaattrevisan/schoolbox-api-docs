@@ -248,10 +248,15 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$registry->notify();
 			}
 
-			/* Save this event and any recurring incidents too
-			 */
+            /* Set up individual relations for each event in the series
+             * Event object is provided within eventRecurrenceMapper
+             */
+            $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
+
+            /* Save this event and any recurring incidents too
+             */
 			$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
-			$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
+			$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, null, $eventRelations);
 
 			/* Superuser modifying some arbitrary event
 			 */
