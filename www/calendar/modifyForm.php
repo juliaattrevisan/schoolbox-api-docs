@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\EventRelations;
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -136,22 +137,15 @@ switch ($_POST['action']) {
             }
         }
 
-        /****
-         * This needs to be moved into its own class
-         *
-         * And then that class needs to be used in $eventRecurrenceMapper
-         * so that all series-based events receive the same relations as
-         * the last instance
+        /* Set up individual relations for each event in the series
+         * Event object is provided within eventRecurrenceMapper
          */
-//        $relations = new \Schoolbox\Calendar\EventRelations($event, $_POST['level'], $_POST['group'], $_POST['roles']);
-        /**
-         * End migration
-         */
+        $eventRelations = new \Schoolbox\Calendar\EventRelations($_POST['level'], $_POST['group'], $_POST['roles']);
 
         /* Save this event and any recurring incidents too
          */
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
-        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $relations);
+        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $eventRelations);
 
         /* If you were editing an event on someone else's calendar, don't
          * get stuffed around by time travel's one-index-offset rip in

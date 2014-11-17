@@ -81,14 +81,14 @@ class EventRecurrenceMapper {
      * Totally custom save method
      *
      * @param Event $event
-     * @param string $efficacy
-     * @param string $repeatSetting
-     * @param Alaress_Date_Format $until
+     * @param $efficacy
+     * @param $repeatSetting
+     * @param $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param bool $relationOptions
+     * @param null $eventRelations
      */
-	public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, $relationOptions = false) {
+    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, $eventRelations = null) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence

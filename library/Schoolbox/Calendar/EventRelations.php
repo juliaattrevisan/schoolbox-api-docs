@@ -51,13 +51,11 @@ class EventRelations {
     /**
      * Constructor
      *
-     * @param $event
      * @param $level
      * @param $group
      * @param $roles
      */
-    public function __construct($event, $level, $group, $roles) {
-        $this->setEvent($event);
+    public function __construct($level, $group, $roles) {
         $this->setLevel($level);
         $this->setGroup($group);
         $this->setRoles($roles);
@@ -66,7 +64,8 @@ class EventRelations {
     /**
      * Reset and reassign relations
      */
-    public function resetRelations() {
+    public function resetRelations($event) {
+        $this->setEvent($event);
 
         /* Purge existing sids, insert new ones
          */
