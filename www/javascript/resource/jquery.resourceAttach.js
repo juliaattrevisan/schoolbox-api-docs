@@ -143,14 +143,16 @@ if(typeof window.location.origin == 'undefined') {
 
                     try {
                         data = JSON.parse(response);
-                        $(file.previewElement)
-                            .find('input[data-az-attachment]')
-                            .val(data.hash);
-                        self.attach(data);
                     }
                     catch (err) {
-                        // noop
+                        data = response;
                     }
+
+                    $(file.previewElement)
+                        .find('input[data-az-attachment]')
+                        .val(data.hash);
+                    self.attach(data);
+
 
                 });
 
