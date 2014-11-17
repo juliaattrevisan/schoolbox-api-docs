@@ -49,6 +49,27 @@ class EventRelations {
     private $roles = array();
 
     /**
+     * An instance of PersonalMapper
+     *
+     * @var Relation\PersonalMapper
+     */
+    private $personalMapper = null;
+
+    /**
+     * An instance of CategoryMapper
+     *
+     * @var Relation\CategoryMapper
+     */
+    private $categoryMapper = null;
+
+    /**
+     * An instance of RoleMapper
+     *
+     * @var Relation\RoleMapper
+     */
+    private $roleMapper = null;
+
+    /**
      * Constructor
      *
      * @param $level
@@ -59,6 +80,12 @@ class EventRelations {
         $this->setLevel($level);
         $this->setGroup($group);
         $this->setRoles($roles);
+
+        /* Spawn mappers only once while iterating in series
+         */
+        $this->setPersonalMapper(new PersonalMapper());
+        $this->setCategoryMapper(new CategoryMapper());
+        $this->setRoleMapper(new RoleMapper());
     }
 
     /**
@@ -69,14 +96,9 @@ class EventRelations {
 
         /* Purge existing sids, insert new ones
          */
-        $userRelationMapper = new PersonalMapper();
-        $userRelationMapper->cleanse($this->getEvent());
-
-        $roleRelationMapper = new RoleMapper();
-        $roleRelationMapper->cleanse($this->getEvent());
-
-        $categoryRelationMapper = new CategoryMapper();
-        $categoryRelationMapper->cleanse($this->getEvent());
+        $this->getPersonalMapper()->cleanse($this->getEvent());
+        $this->getCategoryMapper()->cleanse($this->getEvent());
+        $this->getRoleMapper()->cleanse($this->getEvent());
 
         /* Save new relations based on its access level
          */
@@ -87,7 +109,7 @@ class EventRelations {
                 $userRelation = new Personal();
                 $userRelation->setEventId($this->getEvent()->getId());
                 $userRelation->setUserId($this->getEvent()->getOwner()->getId());
-                $userRelationMapper->save($userRelation);
+                $this->getPersonalMapper()->save($userRelation);
                 break;
 
             /* Access Type 2 (Category)
@@ -97,7 +119,7 @@ class EventRelations {
                     $categoryRelation = new Category();
                     $categoryRelation->setEventId($this->getEvent()->getId());
                     $categoryRelation->setCategoryId($currentGroup);
-                    $categoryRelationMapper->save($categoryRelation);
+                    $this->getCategoryMapper()->save($categoryRelation);
                 }
                 break;
 
@@ -108,7 +130,7 @@ class EventRelations {
                     $roleRelation = new Role();
                     $roleRelation->setEventId($this->getEvent()->getId());
                     $roleRelation->setRoleId($currentRole);
-                    $roleRelationMapper->save($roleRelation);
+                    $this->getRoleMapper()->save($roleRelation);
                 }
                 break;
 
@@ -198,5 +220,65 @@ class EventRelations {
     private function getRoles()
     {
         return $this->roles;
+    }
+
+    /**
+     * Set CategoryMapper
+     *
+     * @param \Schoolbox\Calendar\Relation\CategoryMapper $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get CategoryMapper
+     *
+     * @return \Schoolbox\Calendar\Relation\CategoryMapper
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
+
+    /**
+     * Set PersonalMapper
+     *
+     * @param \Schoolbox\Calendar\Relation\PersonalMapper $personalMapper
+     */
+    private function setPersonalMapper($personalMapper)
+    {
+        $this->personalMapper = $personalMapper;
+    }
+
+    /**
+     * Get PersonalMapper
+     *
+     * @return \Schoolbox\Calendar\Relation\PersonalMapper
+     */
+    private function getPersonalMapper()
+    {
+        return $this->personalMapper;
+    }
+
+    /**
+     * Set RoleMapper
+     *
+     * @param \Schoolbox\Calendar\Relation\RoleMapper $roleMapper
+     */
+    private function setRoleMapper($roleMapper)
+    {
+        $this->roleMapper = $roleMapper;
+    }
+
+    /**
+     * Get RoleMapper
+     *
+     * @return \Schoolbox\Calendar\Relation\RoleMapper
+     */
+    private function getRoleMapper()
+    {
+        return $this->roleMapper;
     }
 }
