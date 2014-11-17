@@ -1,14 +1,53 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type="text/javascript" src="https://az523909.vo.msecnd.net/cv-events-api/1.0.0/cv-events-api.min.js"></script>
     <h2>ClickView</h2>
     {CONFIGURATION}
-    <!-- BEGIN has_clickview -->
-    <script type='text/javascript' src="http://webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
-    <!-- END has_clickview -->
-    <!-- BEGIN online_clickview -->
-    <script type="text/javascript" src="http://online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
-    <!-- END online_clickview -->
-    <!-- BEGIN iframe_clickview -->
-    <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="http://online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
-    <!-- END iframe_clickview -->
+    <div id="videohere{COMPONENT_INSTANCE_ID}">
+        <!-- BEGIN has_clickview -->
+        <script type='text/javascript' src="http://webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
+        <!-- END has_clickview -->
+        <!-- BEGIN online_clickview -->
+        <script type="text/javascript" src="http://online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
+        <!-- END online_clickview -->
+        <!-- BEGIN iframe_clickview -->
+        <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="100%" height="360" src="http://online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
+        <!-- END iframe_clickview -->
+    </div>
+    <div id="plugin{COMPONENT_INSTANCE_ID}" >
+        <iframe frameborder="0" id="plugin-frame{COMPONENT_INSTANCE_ID}" src="http://online.clickview.com.au/lmsplugin?consumerKey=60d47cd387d5" width="100%" height="401" style="border: 0;"></iframe>
+    </div>
+    <script>
+        $(function() {
+            $('#plugin{COMPONENT_INSTANCE_ID}').dialog({ autoOpen: false, width: 721, height: 458, resizable: false });
+
+            $('#videoadd{COMPONENT_INSTANCE_ID}').click(function () {
+
+                // Use the ClickView Events API to catch the cv-lms-addvideo event
+                var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
+                eventsApi.on("cv-lms-addvideo", function (event, args) {
+                    $('#videohere{COMPONENT_INSTANCE_ID}').html(args.embedHtml);
+                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe').width('100%');
+                    $.ajax({
+                        url: '/homepage/configForm.php',
+                        type: 'GET',
+                        data: { cid: '{ID}',
+                            type: 'config',
+                            component: '{COMPONENT_INSTANCE_ID}',
+                            url: args.embedLink
+                        }
+                    });
+                    $('#plugin{COMPONENT_INSTANCE_ID}').dialog('close');
+                    //The plugin should be reinitialised to be used again, to do this simply reload the iframe.
+                    $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src', $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src'));
+
+                    // We are done with this listener
+                    eventsApi.off("cv-lms-addvideo");
+                });
+                $('#plugin{COMPONENT_INSTANCE_ID}').dialog("open");
+
+            });
+        })
+    </script>
+    <a href="#" class="btn create" id="videoadd{COMPONENT_INSTANCE_ID}"><span></span>Select Video</a>
 </div>
 
