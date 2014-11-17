@@ -14,13 +14,15 @@
 </script>
 <!-- END custom_head -->
 
-<div class="breadcrumbs navhelp">
-	<p>
-		<a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a>
-		<!-- BEGIN thread_link --> &gt; <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a> <!-- END thread_link -->
-	</p>
-</div>
+
 <h1>{ACTION} {THREAD_POST}</h1>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
+    <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
+    <!-- BEGIN thread_link -->
+    <li class="last"><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></li>
+    <!-- END thread_link -->
+</ul>
 <form id="forumForm"  method="post" enctype="multipart/form-data" action="/forum/modifyForm.php" class="clearfix">
 	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
 	<input type="hidden" name="threadID" value="{THREAD_ID}" />
@@ -31,9 +33,7 @@
 			<td class="formLabelWidth"><h4>Title</h4></td>
 			<td><label><input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" class="required" /></label></td>
 		</tr>
-		<!-- END title --> 
-		<!-- BEGIN quote -->
-		<!-- END quote -->
+		<!-- END title -->
 		<tr>
 			<td class="formLabelWidth"><h4>Post</h4></td>
 			<td><textarea id="forumBody" name="body" style="width:100%;height:350px">{BODY}</textarea></td>

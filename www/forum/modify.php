@@ -11,10 +11,9 @@ $groupHandler = new Group();
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
-$this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
 $this->setVar('title_block', '');
-$this->setVar('quote_block', '');
+
 
 if (is_numeric($this->arg[0])) {
     /* Category exists
@@ -129,7 +128,6 @@ if (is_numeric($this->arg[0])) {
 
     /* output quote
      */
-    $this->setVar('quote_block', '');
 
     $quotePostID = $this->arg[3];
 
@@ -149,7 +147,6 @@ if (is_numeric($this->arg[0])) {
             }
 
             $this->setVar($output);
-            $this->parse('quote_block', 'quote', true);
         } catch (Exception $e) {
         }
     }

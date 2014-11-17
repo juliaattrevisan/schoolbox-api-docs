@@ -23,13 +23,14 @@
     });
 </script>
 <!-- END custom_head -->
-<div class="breadcrumbs navhelp">
-    <p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE}
-        {LOCKED}
-        <a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to homepage</a></p>
-</div>
-<p class="clearfix">
+<h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
+<ul class="breadcrumb">
+    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
+    <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
+    <li class="last"><a href="#">{THREAD_TITLE}</a></li>
+</ul>
 
+<p class="clearfix">
     <!-- BEGIN reply -->
     <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
     <!-- END reply -->
@@ -40,8 +41,6 @@
     <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" class="btn delete float-left"><span></span>Delete
         Thread</a>
     <!-- END modify_thread -->
-
-
 </p>
 <div class="forum listing">
     <ul class="comments">
