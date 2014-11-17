@@ -174,7 +174,7 @@ if(typeof window.location.origin == 'undefined') {
 
                     element.children('.dz-progress, input').detach();
                     t = element.children('.filename').text();
-                    element.children('.filename').text(t + ' failed').attr('title', data);
+                    element.children('.filename').text(t + ' failed: ' + data).attr('title', data);
 
                     this.removeFile(file);
                 });
