@@ -12,6 +12,34 @@ $j(function() {
 		checkboxName: 'cleanupEventId[]'
 	});
 
+	/* Special modifiers
+	 * Automatically activate these two checkboxes whenever
+	 * selectAll is triggered
+	 */
+	$('input[data-selectall="true"]').change(function(event) {
+		var selectors = $('[data-modifier-control]');
+
+		if ($(this).is(':checked')) {
+			selectors.prop('checked', true);
+		}
+		else {
+			selectors.prop('checked', false);
+		}
+	});
+
+	/* Customise selection modifiers
+	 */
+	$('[data-modifier-control]').change(function(event) {
+		var selectors = $('.table').find('input[data-modifier="' + $(this).val() + '"]');
+
+		if ($(this).is(':checked')) {
+			selectors.prop('checked', true);
+		}
+		else {
+			selectors.prop('checked', false);
+		}
+	});
+
     $j('#name')
         .selectizeSelector({
             ajax: {
@@ -173,6 +201,7 @@ $j(function() {
 			</div>
 			<!-- END eventType -->
 
+			<input type="hidden" name='action' value='subscribe' />
             <input type="submit" class="submit-btn-plain" value='Update' />
 		</form>
 	</div>
@@ -194,8 +223,20 @@ $j(function() {
 					<input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" style="width:100px" value="{CLEANUP_HAS_DATES_TO}" />
 				</label>
 
+				<input type="hidden" name='action' value='cleanup' />
 				<input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
 			</form>
+
+			<div class="clearfix"></div>
+
+			<div>
+				<label>
+					<input type="checkbox" data-modifier-control="true" value="personal" />Select Personal Events<br />
+				</label>
+				<label>
+					<input type="checkbox" data-modifier-control="true" value="group" />Select Group Events<br />
+				</label>
+			</div>
 
 			<div class="clearfix"></div>
 
@@ -211,24 +252,29 @@ $j(function() {
 							<th>Author</th>
 							<th>Start</th>
 							<th>End</th>
-							<th>Campus</th>
+							<th>Applies to</th>
 						</tr>
 					</thead>
 					<tbody>
 						<!-- BEGIN cleanup_event -->
 						<tr>
-							<td><input type="checkbox" name="cleanupEventId[]" value="{CLEANUP_EVENT_ID}" /></td>
+							<td><input type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" /></td>
 							<td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
 							<td>{CLEANUP_EVENT_EVENTTYPE}</td>
 							<td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
 							<td>{CLEANUP_EVENT_START}</td>
 							<td>{CLEANUP_EVENT_END}</td>
-							<td>{CLEANUP_EVENT_CAMPUSES}</td>
+							<td>
+								{CLEANUP_EVENT_USERS}
+								{CLEANUP_EVENT_CATEGORIES}
+								{CLEANUP_EVENT_CAMPUSES}
+							</td>
 						</tr>
 						<!-- END cleanup_event -->
 					</tbody>
 				</table>
 
+				<input type="hidden" name='action' value='cleanup' />
 				<input type="submit" class='submit-btn-plain' value="Remove Selected Events" />
 			</form>
 			<!-- END cleanup_has_events -->

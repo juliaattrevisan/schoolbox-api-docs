@@ -21,7 +21,7 @@ $this->checkList(
     '',
     TEMPLATE_content,
     array(
-        'id'   => 'CAMPUSID',
+        'id' => 'CAMPUSID',
         'name' => 'CAMPUSNAME'
     )
 );
@@ -31,7 +31,7 @@ $this->checkList(
     '',
     TEMPLATE_content,
     array(
-        'id'   => 'USERGROUPID',
+        'id' => 'USERGROUPID',
         'name' => 'USERGROUPNAME'
     )
 );
@@ -86,8 +86,8 @@ if (is_array($typeList)) {
                   */
         $this->setVar(
             array(
-                'SETTING_TAB_NAME'    => $type['type'],
-                'SETTING_TAB_URL'     => urlencode($type['type']),
+                'SETTING_TAB_NAME' => $type['type'],
+                'SETTING_TAB_URL' => urlencode($type['type']),
                 'SETTING_TAB_CURRENT' => '',
             )
         );
@@ -103,8 +103,7 @@ if (is_array($typeList)) {
          */
         if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
             $this->parse('import_block', 'import');
-        }
-        elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+        } elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
             /* Subscribe page
              */
             $allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
@@ -118,7 +117,7 @@ if (is_array($typeList)) {
                 $this->setVar(
                     array(
                         'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
-                        'EVENTTYPE_NAME'  => $currentEventType,
+                        'EVENTTYPE_NAME' => $currentEventType,
                     )
                 );
 
@@ -169,10 +168,10 @@ if (is_array($typeList)) {
 
                         /* Whether this connector displays at Ticked or not
                          */
-                        $connectorActive  = 'connector-active';
+                        $connectorActive = 'connector-active';
                         $connectorChecked = 'checked="checked"';
                     } else {
-                        $connectorActive  = '';
+                        $connectorActive = '';
                         $connectorChecked = '';
                     }
 
@@ -181,7 +180,7 @@ if (is_array($typeList)) {
                     $this->setVar(
                         array(
                             'CONNECTOR_CHECKED' => $connectorChecked,
-                            'CONNECTOR_ACTIVE'  => $connectorActive,
+                            'CONNECTOR_ACTIVE' => $connectorActive,
                         )
                     );
 
@@ -205,63 +204,98 @@ if (is_array($typeList)) {
         } /* Cleanup page
          */
         elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+
             /* If both dates specified, find events between those two dates inclusive
-                         */
+             */
             if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
                 $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
-                $to   = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+                $to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+            } else {
+                $from = new \Alaress_Date_Format(strtotime('-1 month'), 'U');
+                $to = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            }
+
+            $this->setVar(
+                array(
+                    'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
+                    'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
+                )
+            );
+
+            $eventMapper = new \Schoolbox\Calendar\EventMapper();
+            $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+
+            foreach ($allEvents as $currentEvent) {
+
+                /* Auxiliary collections
+                 */
+                $allUsers = array();
+
+                foreach ($currentEvent->getUserCollection() as $currentUser) {
+                    $allUsers[] = $currentUser->getFullname();
+                }
+
+                $allCategories = array();
+
+                foreach ($currentEvent->getCategoryCollection() as $currentCategory) {
+                    $allCategories[] = $currentCategory->getName();
+                }
+
+                $allCampuses = array();
+
+                foreach ($currentEvent->getCampusCollection() as $currentCampus) {
+                    $allCampuses[] = $currentCampus->getName();
+                }
+
+                /* Special selection modifiers for javascript control
+                 */
+                if ($currentEvent->isPersonalLevel()) {
+                    $modifier = 'personal';
+                } else {
+                    if ($currentEvent->isGroupLevel()) {
+                        $modifier = 'group';
+                    } else {
+                        if ($currentEvent->isCampusLevel()) {
+                            $modifier = 'school';
+                        }
+                    }
+                }
 
                 $this->setVar(
                     array(
-                        'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
-                        'CLEANUP_HAS_DATES_TO'   => $to->getLocalShort()
+                        'CLEANUP_EVENT_ID' => $currentEvent->getId(),
+                        'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
+                        'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
+                        'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
+                        'CLEANUP_EVENT_AUTHOR' => $currentEvent->getAuthor()->getFullName(),
+                        'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent->getAuthor()->getId(),
+                        'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
+                        'CLEANUP_EVENT_USERS' => implode('<br />', $allUsers),
+                        'CLEANUP_EVENT_CATEGORIES' => implode('<br />', $allCategories),
+                        'CLEANUP_EVENT_CAMPUSES' => implode('<br />', $allCampuses),
+                        'CLEANUP_EVENT_MODIFIER' => $modifier,
                     )
                 );
 
-                $eventMapper = new \Schoolbox\Calendar\EventMapper();
-                $allEvents   = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
+                $this->parse('cleanup_event_block', 'cleanup_event', true);
+            }
 
-                foreach ($allEvents as $currentEvent) {
-                    $this->setVar(
-                        array(
-                            'CLEANUP_EVENT_ID'        => $currentEvent['event']->getId(),
-                            'CLEANUP_EVENT_TITLE'     => $currentEvent['event']->getTitle(),
-                            'CLEANUP_EVENT_START'     => $currentEvent['event']->getStartDateTime()->getShort(),
-                            'CLEANUP_EVENT_END'       => $currentEvent['event']->getEndDateTime()->getShort(),
-                            'CLEANUP_EVENT_AUTHOR'    => $currentEvent['event']->getAuthor()->getFullName(),
-                            'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent['event']->getAuthor()->getId(),
-                            'CLEANUP_EVENT_EVENTTYPE' => $currentEvent['event']->getType()->getType(),
-                            'CLEANUP_EVENT_CAMPUSES'  => Scrub::text($currentEvent['auxiliary']['campuses']),
-                        )
-                    );
+            if ($allEvents->count()) {
+                $this->parse('cleanup_has_events_block', 'cleanup_has_events');
 
-                    $this->parse('cleanup_event_block', 'cleanup_event', true);
-                }
-
-                if ($allEvents->count()) {
-                    $this->parse('cleanup_has_events_block', 'cleanup_has_events');
-
-                    $this->setVar(
-                        array(
-                            'cleanup_has_no_events_block' => ''
-                        )
-                    );
-                } else {
-                    $this->setVar(
-                        array(
-                            'cleanup_has_events_block' => ''
-                        )
-                    );
-
-                    $this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
-                }
+                $this->setVar(
+                    array(
+                        'cleanup_has_no_events_block' => ''
+                    )
+                );
             } else {
                 $this->setVar(
                     array(
-                        'CLEANUP_HAS_DATES_FROM' => '',
-                        'CLEANUP_HAS_DATES_TO'   => ''
+                        'cleanup_has_events_block' => ''
                     )
                 );
+
+                $this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
             }
 
             $this->parse('cleanup_block', 'cleanup');

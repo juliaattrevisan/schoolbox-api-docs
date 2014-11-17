@@ -11,64 +11,70 @@
  */
 namespace Schoolbox\Calendar\Relation;
 
-class Category {
+class Category
+{
 
-	/**
-	 * eventId to which this sid belongs
-	 *
-	 * @var null
-	 */
-	private $eventId = null;
+    /**
+     * eventId to which this sid belongs
+     *
+     * @var null
+     */
+    private $eventId = null;
 
-	/**
-	 * Sid value
-	 *
-	 * @var null
-	 */
-	private $categoryId = null;
+    /**
+     * Sid value
+     *
+     * @var null
+     */
+    private $categoryId = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set event id
-	 *
-	 * @param null $eventId
-	 */
-	public function setEventId($eventId) {
-		$this->eventId = $eventId;
-	}
+    /**
+     * Set event id
+     *
+     * @param null $eventId
+     */
+    public function setEventId($eventId)
+    {
+        $this->eventId = $eventId;
+    }
 
-	/**
-	 * Get event id
-	 *
-	 * @return null
-	 */
-	public function getEventId() {
-		return $this->eventId;
-	}
+    /**
+     * Get event id
+     *
+     * @return null
+     */
+    public function getEventId()
+    {
+        return $this->eventId;
+    }
 
-	/**
-	 * Set category id
-	 *
-	 * @param null $categoryId
-	 */
-	public function setCategoryId($categoryId) {
-		$this->categoryId = $categoryId;
-	}
+    /**
+     * Set category id
+     *
+     * @param null $categoryId
+     */
+    public function setCategoryId($categoryId)
+    {
+        $this->categoryId = $categoryId;
+    }
 
-	/**
-	 * Get category id
-	 *
-	 * @return null
-	 */
-	public function getCategoryId() {
-		return $this->categoryId;
-	}
+    /**
+     * Get category id
+     *
+     * @return null
+     */
+    public function getCategoryId()
+    {
+        return $this->categoryId;
+    }
 }

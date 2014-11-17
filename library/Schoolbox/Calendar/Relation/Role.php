@@ -11,64 +11,70 @@
  */
 namespace Schoolbox\Calendar\Relation;
 
-class Role {
+class Role
+{
 
-	/**
-	 * eventId to which this sid belongs
-	 *
-	 * @var null
-	 */
-	private $eventId = null;
+    /**
+     * eventId to which this sid belongs
+     *
+     * @var null
+     */
+    private $eventId = null;
 
-	/**
-	 * Sid value
-	 *
-	 * @var null
-	 */
-	private $roleId = null;
+    /**
+     * Sid value
+     *
+     * @var null
+     */
+    private $roleId = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set event id
-	 *
-	 * @param null $eventId
-	 */
-	public function setEventId($eventId) {
-		$this->eventId = $eventId;
-	}
+    /**
+     * Set event id
+     *
+     * @param null $eventId
+     */
+    public function setEventId($eventId)
+    {
+        $this->eventId = $eventId;
+    }
 
-	/**
-	 * Get event id
-	 *
-	 * @return null
-	 */
-	public function getEventId() {
-		return $this->eventId;
-	}
+    /**
+     * Get event id
+     *
+     * @return null
+     */
+    public function getEventId()
+    {
+        return $this->eventId;
+    }
 
-	/**
-	 * Set role id
-	 *
-	 * @param null $roleId
-	 */
-	public function setRoleId($roleId) {
-		$this->roleId = $roleId;
-	}
+    /**
+     * Set role id
+     *
+     * @param null $roleId
+     */
+    public function setRoleId($roleId)
+    {
+        $this->roleId = $roleId;
+    }
 
-	/**
-	 * Get role id
-	 *
-	 * @return null
-	 */
-	public function getRoleId() {
-		return $this->roleId;
-	}
+    /**
+     * Get role id
+     *
+     * @return null
+     */
+    public function getRoleId()
+    {
+        return $this->roleId;
+    }
 }
