@@ -11010,7 +11010,7 @@ ul.activity-list li,
 			margin: 0 16px;
 			clear: both;
 		}
-		li {
+		li:not(.dz-processing) {
 			padding: 7px 16px 0 12px  !important;
 			border-bottom: none;
 		}
@@ -12074,7 +12074,7 @@ textarea.event-detail {
 }
 
 // attach-zone
-ul.az-list {
+ul.az-list, ul.az-error-list {
 	position: relative;
 	> li {
 		clear: none;
@@ -12115,6 +12115,24 @@ ul.az-list {
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+}
+
+ul.az-error-list {
+    background: #fee;
+    margin-top: 4px;
+    .dz-error {
+        height: 24px;
+    }
+    .filename {
+        line-height: 24px;
+        height: 24px;
+        text-decoration: underline;
+        font-style: italic;
+        cursor: pointer;
+    }
+    .actions .btn {
+        margin-top: 0;
+    }
 }
 
 /* 32px attachzone */
