@@ -208,7 +208,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $c = new Collection();
 
         // if parents aren't allowed to see due work, return an empty collection
-        if ($roletype == Role::PARENT && !$this->conf->get('restrict_parent_duework_access')) {
+        if ($roletype == Role::PARENT && $this->conf->get('restrict_parent_duework_access')) {
             return $c;
         }
 
