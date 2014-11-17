@@ -94,49 +94,57 @@ class EventRelations {
     public function resetRelations($event) {
         $this->setEvent($event);
 
-        /* Purge existing sids, insert new ones
+        /* Save new relations based on its access level
+         * Skip this entirely if no level is specified/detected
          */
+        if (is_numeric($this->getLevel())) {
+            $this->purgeAllRelations();
+
+            switch ($this->getLevel()) {
+                /* Access Type 1 (Personal)
+                 */
+                case 1:
+                    $userRelation = new Personal();
+                    $userRelation->setEventId($this->getEvent()->getId());
+                    $userRelation->setUserId($this->getEvent()->getOwner()->getId());
+                    $this->getPersonalMapper()->save($userRelation);
+                    break;
+
+                /* Access Type 2 (Category)
+                 */
+                case 2:
+                    foreach ($this->getGroup() as $currentGroup) {
+                        $categoryRelation = new Category();
+                        $categoryRelation->setEventId($this->getEvent()->getId());
+                        $categoryRelation->setCategoryId($currentGroup);
+                        $this->getCategoryMapper()->save($categoryRelation);
+                    }
+                    break;
+
+                /* Access Type 3 (Campus)
+                 */
+                case 3:
+                    foreach ($this->getRoles() as $currentRole) {
+                        $roleRelation = new Role();
+                        $roleRelation->setEventId($this->getEvent()->getId());
+                        $roleRelation->setRoleId($currentRole);
+                        $this->getRoleMapper()->save($roleRelation);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Purge existing sids, before inserting new ones
+     */
+    private function purgeAllRelations() {
         $this->getPersonalMapper()->cleanse($this->getEvent());
         $this->getCategoryMapper()->cleanse($this->getEvent());
         $this->getRoleMapper()->cleanse($this->getEvent());
-
-        /* Save new relations based on its access level
-         */
-        switch ($this->getLevel()) {
-            /* Access Type 1 (Personal)
-             */
-            case 1:
-                $userRelation = new Personal();
-                $userRelation->setEventId($this->getEvent()->getId());
-                $userRelation->setUserId($this->getEvent()->getOwner()->getId());
-                $this->getPersonalMapper()->save($userRelation);
-                break;
-
-            /* Access Type 2 (Category)
-             */
-            case 2:
-                foreach ($this->getGroup() as $currentGroup) {
-                    $categoryRelation = new Category();
-                    $categoryRelation->setEventId($this->getEvent()->getId());
-                    $categoryRelation->setCategoryId($currentGroup);
-                    $this->getCategoryMapper()->save($categoryRelation);
-                }
-                break;
-
-            /* Access Type 3 (Campus)
-             */
-            case 3:
-                foreach ($this->getRoles() as $currentRole) {
-                    $roleRelation = new Role();
-                    $roleRelation->setEventId($this->getEvent()->getId());
-                    $roleRelation->setRoleId($currentRole);
-                    $this->getRoleMapper()->save($roleRelation);
-                }
-                break;
-
-            default:
-                break;
-        }
     }
 
     /* Getters/Setters
