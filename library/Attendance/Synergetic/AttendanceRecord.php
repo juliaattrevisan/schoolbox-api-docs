@@ -1,38 +1,42 @@
 <?php
+
 /**
  * Attendance_Synergetic_AttendanceRecord
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Attendance_Synergetic_AttendanceRecord {
+class Attendance_Synergetic_AttendanceRecord
+{
 
-	/**
-	 * An MSSQL database instance
-	 *
-	 * @var \Database
-	 */
-	protected $database = null;
+    /**
+     * An MSSQL database instance
+     *
+     * @var \Database
+     */
+    protected $database = null;
 
-	/**
-	 * @param $database
-	 */
-	public function __construct($database) {
-		$this->setDatabase($database);
-	}
+    /**
+     * @param $database
+     */
+    public function __construct($database)
+    {
+        $this->setDatabase($database);
+    }
 
-	/**
-	 * Update an attendance record
-	 *
-	 * @param $data
-	 *
-	 * @return \PDOStatement
-	 */
-	public function update($data) {
+    /**
+     * Update an attendance record
+     *
+     * @param $data
+     *
+     * @return \PDOStatement
+     */
+    public function update($data)
+    {
 
-        if(isset($data['ID']) && isset($data['AttendanceMasterSeq'])) {
+        if (isset($data['ID']) && isset($data['AttendanceMasterSeq'])) {
 
             $userID = $data['ID'];
             $AttendanceMasterSeq = $data['AttendanceMasterSeq'];
@@ -42,11 +46,11 @@ class Attendance_Synergetic_AttendanceRecord {
             $query = "UPDATE SynergyOne.dbo.wkAttendances SET";
 
             /* Set through all the data contained in array and set it */
-            foreach($data as $key => $value) {
+            foreach ($data as $key => $value) {
                 $query .= " $key = '$value',";
             }
 
-            $query = substr($query,0,-1);
+            $query = substr($query, 0, -1);
 
             /* Set based on two key values sequence and user id */
             $query .= "
@@ -54,30 +58,31 @@ class Attendance_Synergetic_AttendanceRecord {
                 AND	ID = '$userID'
             ";
             return $this->getDatabase()->query($query);
-        }
-        else {
+        } else {
             return false;
         }
-	}
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set database
-	 *
-	 * @param \Database $database
-	 */
-	protected function setDatabase($database) {
-		$this->database = $database;
-	}
+    /**
+     * Set database
+     *
+     * @param \Database $database
+     */
+    protected function setDatabase($database)
+    {
+        $this->database = $database;
+    }
 
-	/**
-	 * Get database
-	 *
-	 * @return \Database
-	 */
-	protected function getDatabase() {
-		return $this->database;
-	}
+    /**
+     * Get database
+     *
+     * @return \Database
+     */
+    protected function getDatabase()
+    {
+        return $this->database;
+    }
 }
