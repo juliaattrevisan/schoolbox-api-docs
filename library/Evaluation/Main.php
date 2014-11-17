@@ -346,18 +346,27 @@ abstract class Evaluation_Main extends DeprecatedModel
         $groupHandler = new Group();
         $assess       = $this->getByID($assess_id);
 
-        $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
+        // Users with write access can always do the assessment (generally teachers)
+        if($groupHandler->getPermission($assess['category_id']) >= WRITE_ACCESS) {
+            return true;
+        }
 
-        /* See if you're in the Category first
-           */
-        if (is_array($categoryList)) {
-            foreach ($categoryList as $key => $value) {
-                if ($value['id'] == $assess['category_id']) {
-                    return true;
+
+        // Students that are involved in the class can do the assessment, but not other students
+        if($groupHandler->getPermission($assess['category_id']) >= READ_ACCESS) {
+
+            $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
+
+            /* See if you're in the Category first
+               */
+            if (is_array($categoryList)) {
+                foreach ($categoryList as $key => $value) {
+                    if ($value['id'] == $assess['category_id']) {
+                        return true;
+                    }
                 }
             }
         }
-
         return false;
     }
 
