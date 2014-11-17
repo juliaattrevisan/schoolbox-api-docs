@@ -8,14 +8,17 @@
 ;
 (function ($, undefined) {
 
-    var pluginName = 'droptab';
+    var pluginName = 'droptab',
+        noop       = function () {};
 
     var defaults = {
         buttonSelector: null,
         tabSelector: '> *',
         hoverClass: 'hover',
         openClass: 'open',
-        dataAttr: 'tab'
+        dataAttr: 'tab',
+        onOpen: noop,
+        onClose: noop
     };
 
     function Droptab(element, options) {
@@ -54,6 +57,9 @@
 
             if (openMe) {
                 $('#'+$(this).data(attr)).addClass(open);
+                self.options.onOpen.apply(this);
+            } else {
+                self.options.onClose.apply(this);
             }
         });
     }
