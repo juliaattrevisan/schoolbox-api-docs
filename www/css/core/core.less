@@ -1252,7 +1252,7 @@ Notifications
 .homepage .column {
 	position: relative;
 }
-.marker, .empty-column {
+.marker {
     border: 1px dashed @positive-color;
     min-height: 48px;
     margin: 0 0 16px 0;
@@ -1276,19 +1276,34 @@ Notifications
 	top: 50%;
 	width: 94%;
 	left: 0;
-	transform: translateY(-50%);
+	.transform(
+        translateY(-50%)
+    );
 	padding: 0 3%;
 }
 
+.show-empty .empty-column {
+    border-color: @std-grey;
+    min-height: 48px;
+    margin-bottom: 16px;
+    line-height: 48px;
+    p.placeholder {
+        height: auto;
+        opacity: 1;
+    }
+}
 
 .empty-column {
+    .transition(
+        all 480ms ease-out
+    );
 	display: block;
-    min-height: 48px;
+    min-height: 0;
     height: auto;
-    line-height: 48px;
+    line-height: 0;
     background: none;
     color: @std-grey;
-    border-color: @std-grey;
+    border: 1px dashed transparent;
     filter: none;
     position: relative;
     p {
@@ -1307,8 +1322,9 @@ Notifications
 	}
 	p.placeholder {
 		display: block;
+        opacity: 0;
 		.transition(
-			height 90ms ease
+            all 90ms ease 390ms
 		);
 	}
 }
