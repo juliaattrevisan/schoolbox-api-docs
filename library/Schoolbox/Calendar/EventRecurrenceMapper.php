@@ -87,9 +87,10 @@ class EventRecurrenceMapper {
      * @param $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
+     * @param $access
      * @param \Schoolbox\Calendar\EventRelations $eventRelations
      */
-    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, EventRelations $eventRelations) {
+    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, $access, EventRelations $eventRelations) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
@@ -106,6 +107,7 @@ class EventRecurrenceMapper {
 			 */
 			if ($efficacy == 'series') {
 				$series = $this->getEventMapper()->getAllInSeries($event);
+                $event->setAccess($access);
 
 				foreach($series as $seriesEvent) {
 					$this->setSeriesEventData($seriesEvent, $event);
@@ -128,6 +130,7 @@ class EventRecurrenceMapper {
 				$event->setSeriesId($eventRecurrence->getSeriesId());
 				$event->setStartDate($first_date_set['start']);
 				$event->setEndDate($first_date_set['end']);
+                $event->setAccess($access);
 
 				$this->getEventMapper()->save($event);
 
@@ -146,6 +149,7 @@ class EventRecurrenceMapper {
 					$event->setSeriesId($eventRecurrence->getSeriesId());
 					$event->setStartDate($currentDate['start']);
 					$event->setEndDate($currentDate['end']);
+                    $event->setAccess($access);
 
 					$this->getEventMapper()->save($event);
 
@@ -167,6 +171,7 @@ class EventRecurrenceMapper {
 				$event->setSeriesId($eventRecurrence->getSeriesId());
 				$event->setStartDate($currentDate['start']);
 				$event->setEndDate($currentDate['end']);
+                $event->setAccess($access);
 
 				$this->getEventMapper()->save($event);
 
@@ -224,6 +229,7 @@ class EventRecurrenceMapper {
 		$seriesEvent->setAllDay($coreEvent->getAllDay());
 		$seriesEvent->setCampusCollection($coreEvent->getCampusCollection());
 		$seriesEvent->setRoleCollection($coreEvent->getRoleCollection());
+        $seriesEvent->setAccess($coreEvent->getAccess());
 	}
 
 	/**

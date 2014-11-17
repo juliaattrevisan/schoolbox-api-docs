@@ -145,7 +145,7 @@ switch ($_POST['action']) {
         /* Save this event and any recurring incidents too
          */
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
-        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $eventRelations);
+        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $_POST['level'], $eventRelations);
 
         /* If you were editing an event on someone else's calendar, don't
          * get stuffed around by time travel's one-index-offset rip in
