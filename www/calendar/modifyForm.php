@@ -135,52 +135,24 @@ switch ($_POST['action']) {
                 error(158);
             }
         }
+
+        /****
+         * This needs to be moved into its own class
+         *
+         * And then that class needs to be used in $eventRecurrenceMapper
+         * so that all series-based events receive the same relations as
+         * the last instance
+         */
+//        $relations = new \Schoolbox\Calendar\EventRelations($event, $_POST['level'], $_POST['group'], $_POST['roles']);
+        /**
+         * End migration
+         */
+
         /* Save this event and any recurring incidents too
          */
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($eventMapper);
-        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate);
-        /* Purge existing sids, insert new ones
-         */
-        $userRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
-        $userRelationMapper->cleanse($event);
-        $roleRelationMapper = new \Schoolbox\Calendar\Relation\RoleMapper();
-        $roleRelationMapper->cleanse($event);
-        $categoryRelationMapper = new \Schoolbox\Calendar\Relation\CategoryMapper();
-        $categoryRelationMapper->cleanse($event);
-        /* Save new relations based on its access level
-         */
-        switch ($_POST['level']) {
-            /* Access Type 1 (Personal)
-             */
-            case 1:
-                $userRelation = new \Schoolbox\Calendar\Relation\Personal();
-                $userRelation->setEventId($event->getId());
-                $userRelation->setUserId($owner->getId());
-                $userRelationMapper->save($userRelation);
-                break;
-            /* Access Type 2 (Category)
-             */
-            case 2:
-                foreach ($_POST['group'] as $currentGroup) {
-                    $categoryRelation = new \Schoolbox\Calendar\Relation\Category();
-                    $categoryRelation->setEventId($event->getId());
-                    $categoryRelation->setCategoryId($currentGroup);
-                    $categoryRelationMapper->save($categoryRelation);
-                }
-                break;
-            /* Access Type 3 (Campus)
-             */
-            case 3:
-                foreach ($_POST['roles'] as $currentRole) {
-                    $roleRelation = new \Schoolbox\Calendar\Relation\Role();
-                    $roleRelation->setEventId($event->getId());
-                    $roleRelation->setRoleId($currentRole);
-                    $roleRelationMapper->save($roleRelation);
-                }
-                break;
-            default:
-                break;
-        }
+        $eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, $relations);
+
         /* If you were editing an event on someone else's calendar, don't
          * get stuffed around by time travel's one-index-offset rip in
          * the space-time continuum
@@ -188,19 +160,19 @@ switch ($_POST['action']) {
         /* Superuser modifying some arbitrary event
          */
         if (!in_array($_SESSION['user']->getId(), array($event->getAuthor()->getId(), $event->getOwner()->getId()))) {
-            $page->backToTheFuture(3);
-        } elseif (
-            ($event->getAuthor()->getId() != $event->getOwner()->getId())
-            && ($event->getAuthor()->getId() == $_SESSION['user']->getId())
-        ) {
-            /* Teacher modifying self-created event for some arbitrary person
-             */
-            $page->backToTheFuture(3);
-        } elseif (!empty($_POST['return'])) {
-            $page->localRedir($_POST['return']);
-        } else {
-            $page->backToTheFuture(2);
-        }
+                $page->backToTheFuture(3);
+            } elseif (
+                ($event->getAuthor()->getId() != $event->getOwner()->getId())
+                && ($event->getAuthor()->getId() == $_SESSION['user']->getId())
+            ) {
+                /* Teacher modifying self-created event for some arbitrary person
+                 */
+                $page->backToTheFuture(3);
+            } elseif (!empty($_POST['return'])) {
+                $page->localRedir($_POST['return']);
+            } else {
+                $page->backToTheFuture(2);
+            }
         break;
 
     case 'Delete':
