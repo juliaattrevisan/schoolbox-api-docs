@@ -385,16 +385,13 @@ body.login{
 
     #loginForm{
       margin: 0;
-      ::-webkit-input-placeholder { color: #000000; }
-      :-moz-placeholder { color: #000000; } /* Firefox 18- */
-      ::-moz-placeholder { color: #000000; } /* Firefox 19+ */
-      :-ms-input-placeholder { color: #000000; }
 
       input[type="text"],
       input[type="password"] {
-        width: 94%;
+        .placeholder(@black);
+        width: 100%;
         height: 26px;
-        padding: 7px 3%;
+        padding: 7px;
       }
 
       .submit-btn-plain{
@@ -410,6 +407,7 @@ body.login{
 
         &:hover{ background: @link-hover url('/images/tigs/arrow.png') 276px 11px no-repeat; }
       }
+      label{ color: @link; }
     }
     .forgotten{ margin: 15px 0; }
     p,a{ color: #2a688f; }
