@@ -10,6 +10,7 @@
 
         abUploadForm.dropzone({
             paramName: 'upload',
+            parallelUploads: {MAX_FILES},
             dictDefaultMessage: 'Click or drag here to upload',
             dictFallbackText: 'Your browser does not support drag and drop. Please select a file to upload.',
             maxFiles: maxFiles,
@@ -113,6 +114,8 @@
             init: function () {
                 var dz = this;
 
+                abUpload.data('dropzone', this);
+
                 abUploadCancelBtn.on('click', function (e) {
                     dz.removeAllFiles(true);
                 });
@@ -151,28 +154,38 @@
                 this.on('success', function (file, xhr) {
                     try {
                         data = JSON.parse(xhr);
-                        file.hash = data.hash;
                     }
                     catch (err) {
+                        data = xhr;
                     }
+                    file.hash = data.hash;
                 });
 
                 this.on('queuecomplete', function () {
-                  var accepted = this.getAcceptedFiles(),
-                      data = [],
-                      i;
+                    var accepted = this.getAcceptedFiles(),
+                        data = [],
+                        i;
 
-                  for (i = 0; i < accepted.length; ++i) {
-                    data.push({
-                        title: accepted[i].name,
-                        mimeType: accepted[i].type,
-                        filesize: accepted[i].size,
-                        hash: accepted[i].hash
-                    });
-                  }
-                  setTimeout(function () {
-                      window.top.postMessage(JSON.stringify({ data: data }), location.origin);
-                  }, 1000);
+                    if (!abUploadSubmitBtn.data('uploading')) {
+                        return;
+                    }
+
+                    if (accepted.length) {
+                        for (i = 0; i < accepted.length; ++i) {
+                            if (accepted[i].hash) {
+                                data.push({
+                                    title: accepted[i].name,
+                                    mimeType: accepted[i].type,
+                                    filesize: accepted[i].size,
+                                    hash: accepted[i].hash
+                                });
+                            }
+                        }
+
+                        setTimeout(function () {
+                            window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+                        }, 1000);
+                    }
                 });
             }
         });
