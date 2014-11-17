@@ -642,7 +642,7 @@
                 To publish at the start of the day, leave the time fields blank.</em>
         </td>
         <td>
-            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20"/>
+            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
             <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
             <span>:</span>
             <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
@@ -659,7 +659,7 @@
                 To allow submissions from the start of the day, leave the time fields blank.</em>
         </td>
         <td>
-            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20"/>
+            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
             <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField"/>
             <span>:</span>
             <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField"/>
@@ -675,7 +675,7 @@
             <em>Actual date the work is due. This is the date that will be published.
                 To allow submissions until the end of the day, leave the time fields blank.</em></td>
         <td>
-            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20"/>
+            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
             <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
             <span>:</span>
             <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
@@ -691,7 +691,7 @@
             <em>Students will not be able to submit after this date.
                 To allow submissions until the end of the day, leave the time fields blank.</em></td>
         <td>
-            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20"/>
+            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
             <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
             <span>:</span>
             <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">
