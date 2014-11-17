@@ -12,6 +12,7 @@ namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
 use DateTime;
+use Schoolbox\Calendar\EventRelations;
 
 class EventRecurrenceMapper {
 
@@ -86,9 +87,9 @@ class EventRecurrenceMapper {
      * @param $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param null $eventRelations
+     * @param \Schoolbox\Calendar\EventRelations $eventRelations
      */
-    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, $eventRelations = null) {
+    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, EventRelations $eventRelations) {
 
 		/* Set up recurrences, if appropriate
 		 * This is mandatory as events are saved via EventRecurrence
