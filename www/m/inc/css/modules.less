@@ -82,14 +82,16 @@
 /* =============================================================================
    Login
    ========================================================================== */
-#loading                    { background: @login-color;
+#loading                    { background: @login-color; color: @submit-bg;
     #switch                 { position: absolute; bottom: 10px; color: @submit-bg; margin: 0 auto; width: 100%; text-align: center;
                               font-size: @dp4; text-shadow: none;
     }
 }
 
 #login_frm                  { margin-top: @dp6; position: relative;
-    input                   { background: @input-bg; border: none; box-sizing: border-box; padding: @dp4; height: 48px;
+    input[type="text"],
+    input[type="password"],
+    input[type="submit"]    { background: @input-bg; border: none; box-sizing: border-box; padding: @dp4; height: 48px;
                             font-size: 18px; text-align: center; width: 100%; -webkit-appearance: none; border-radius: 0;
         &:focus             { background: darken(@input-bg, 5%); outline: none; }
         &::-webkit-input-placeholder { color: darken(@input-bg, 50%); }
@@ -98,6 +100,7 @@
         // no opera support available :(
     }
     input[type="submit"]    { background: @submit-bg; padding: @dp4; color: #fff; }
+    input[type="checkbox"]  { margin: 0 6px 0 0; }
     li                      { border-bottom: none; }
 }
 
