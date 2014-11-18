@@ -35,18 +35,18 @@ function init(){
 		<p class="error">{ERROR}</p>
 		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php?{GET_PARAMS}">
 			<fieldset>
-				<label for="username">Login Name:</label>
-				<input type="text" name="username" id="username" />
-			</fieldset>
-			<fieldset>
-				<label for="password">Password:</label>
-				<input type="password" name="password" id="password" />
-			</fieldset>
-			<input type="hidden" name="page" value="{HIDDEN}" />
-			<input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
-            <!-- BEGIN remember_me -->
-            <label><input type="checkbox" name="rememberme" value="1" />Remember me?</label>
-            <!-- END remember_me -->
+                <!--[if lt IE 10]>Username:<![endif]-->
+                <input type="text" name="username" id="username" placeholder="Username" />
+                </fieldset>
+                <fieldset>
+                <!--[if lt IE 10]>Password:<![endif]-->
+                <input type="password" name="password" id="password" placeholder="Password" />
+                </fieldset>
+                <input type="hidden" name="page" value="{HIDDEN}" />
+                <input class="login submit-btn-plain" type="submit" name="Submit" value="Log in" alt="Log in" />
+                <!-- BEGIN remember_me -->
+                <label><input type="checkbox" name="rememberme" value="1" />Remember me?</label>
+                <!-- END remember_me -->
 		</form>
 		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
 	</div>
