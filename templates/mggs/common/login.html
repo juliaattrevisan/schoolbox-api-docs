@@ -31,8 +31,9 @@ function init(){
   <!--<a href="/" class="logo"><img src="/images/{SITE_LOCATION}/logo.png" alt="{SITE_NAME}" /></a>-->
 <!--</div>-->
 <div id="container" class=" login">
-    <div id="login-bg"></div>
-
+    <div id="login-bg">
+        <div id="login-bg-inner" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;min-width:50%;min-height:50%;background-position:center center;background-size:cover;"></div>
+    </div>
   <div id="content" class="clearfix">
     <div id="content-inner">
         <div id="login-logo">
@@ -72,6 +73,33 @@ function init(){
     </div>
   </div>
 </div>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var images = ['login-1.jpg',
+            'login-2.jpg',
+            'login-3.jpg',
+            'login-4.jpg',
+            'login-5.jpg'];
+
+        $('#login-bg-inner')
+            .css({
+                'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
+            });
+
+        $(document).ready(function(){
+            $('#loginForm').validate({
+                errorPlacement: function(error, element) {
+                    if (element.attr("name") == "tandc"  ) {
+                        error.appendTo("#error-msg");
+                    } else {
+                        error.appendTo(element);
+                    }
+                }
+            });
+        })
+    });
+</script>
 <!-- IF IE - use Placeholder Fallback -->
 <!--[if lt IE 10 ]>
 <script type="text/javascript">
