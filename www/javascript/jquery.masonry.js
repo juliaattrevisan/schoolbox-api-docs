@@ -363,33 +363,31 @@
                     masonry.refreshColumns();
 
                     // retrieve a new instance of this component
-                    masonry.newComponentInstance(cl, function () {
-                        // 'this' is a $(response_html_from_server)
+                    masonry.newComponentInstance(cl)
+                        .done(function(response) {
+                            var $response = $(response);
 
+                            // nek level cheating for pretty animationz -_-
+                            $response.css({
+                                visibility: 'hidden',
+                                position: 'fixed',
+                                width: ui.item.width()
+                            });
 
-                        // nek level cheating for pretty animationz -_-
-                        this.css({
-                            visibility: 'hidden',
-                            position: 'fixed',
-                            width: ui.item.width()
+                            // drop it invisibly onto the page
+                            $('body').append($response);
+
+                            // grab its computed height
+                            var css = { height: $response.height(), opacity: 0 };
+
+                            var that = $response;
+
+                            ui.item.animate(css, 550, function () {
+                                $(this).replaceWith(that.removeAttr('style'));
+                                masonry.saveSorting();
+                                masonry.refreshPalette();
+                            });
                         });
-
-                        // drop it invisibly onto the page
-                        $('body').append(this);
-
-                        // grab its computed height
-                        var css = { height: this.height(), opacity: 0 };
-
-                        var that = this;
-
-                        ui.item.animate(css, 550, function () {
-                            $(this).replaceWith(that.removeAttr('style'));
-                            masonry.saveSorting();
-                            masonry.refreshPalette();
-                        });
-
-                    });
-
                 } else {
                     ui.item.removeClass(sortingClass);
                     masonry.saveSorting();
@@ -486,6 +484,8 @@
      *
      * @param {$} element
      * @param {Function} callback
+     *
+     * @return AJAX
      */
     Masonry.prototype.newComponentInstance = function (element, callback) {
 
@@ -506,14 +506,11 @@
             return;
         }
 
-        $.ajax({
+        return $.ajax({
             type: 'POST',
             url: url,
             data: data,
-            dataType: 'html',
-            success: function (response) {
-                callback.call($(response));
-            }
+            dataType: 'html'
         });
 
     };
@@ -552,29 +549,30 @@
                     element.addClass(loadingClass);
                 }
 
-                masonry.newComponentInstance(element, function () {
-                    var leftColumn  = $(masonry.element).find(opt.column.position.left);
+                masonry.newComponentInstance(element)
+                    .done(function(response) {
+                        var leftColumn  = $(masonry.element).find(opt.column.position.left);
 
-                    element.addClass(loadedClass);
+                        element.addClass(loadedClass);
 
-                    this.hide().prependTo(leftColumn).css('opacity', 0)
-                        .slideDown(400, function () {
-                            masonry.refreshColumns();
+                        $(response).hide().prependTo(leftColumn).css('opacity', 0)
+                            .slideDown(400, function () {
+                                masonry.refreshColumns();
 
-                            // these 2 calls should happen together so there's no opacity flicker
-                            element.removeClass(loadingClass);
-                            masonry.refreshPalette();
+                                // these 2 calls should happen together so there's no opacity flicker
+                                element.removeClass(loadingClass);
+                                masonry.refreshPalette();
 
-                            $(this).animate({opacity: 1}, 300, function () {
-                                element.removeClass(loadedClass);
+                                $(this).animate({opacity: 1}, 300, function () {
+                                    element.removeClass(loadedClass);
+                                });
+
+                                // only go in for applying colours if you've got colours to set
+                                if (masonry.spectrum) {
+                                    masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
+                                }
                             });
-
-                            // only go in for applying colours if you've got colours to set
-                            if (masonry.spectrum) {
-                                masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
-                            }
-                        });
-                });
+                    })
             });
         }
 
