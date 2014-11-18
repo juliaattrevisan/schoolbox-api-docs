@@ -10,12 +10,17 @@
 namespace Schoolbox\Permission\Access;
 
 
+use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -105,60 +110,84 @@ class UserAccessNotifier extends AbstractModuleNotifier {
 
 	/* ASYNC METHODS */
 
-	/**
-	 * @param string $body
-	 * @param string $label
-	 * @param UserAccess $userAccess
-	 * @param User $user
-	 * @return Messenger
-	 */
-	protected function notifyAdmin($body, $label, $userAccess, $user) {
-		$msgr = new Messenger();
+    /**
+     * @param string $body
+     * @param string $label
+     * @param UserAccess $userAccess
+     * @param User $effector
+     * @return Messenger
+     */
+    protected function notifyAdmin($body, $label, $userAccess, $effector = null) {
+        $envelope = new Envelope();
 
-		/** @var Category $cat */
-		$cat = CategoryMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        $bob = new Builder();
 
-		$msg = new Message($body, "/portrait.php?size=square32&userId=".$user->getExternalId(),
-			"/group/modify/".$cat->getId()
-		);
+        /** @var Category $cat */
+        $cat  = CategoryMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
-		$msgr->broadcastToCategoryAdmin($cat->getId(), $msg, "group.{$cat->getId()}.$label", Logger::NOTICE, array(
-			'user' => array($user->formatName(), '/search/user/'.$user->getId()),
-			'groupname' => array($cat->getName(), '/homepage/'.$cat->getId())
-		));
+        /** @var User $user */
+        $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
 
-		return $msgr;
-	}
+        /** @var ParameterInterface[] $params */
+        $params = array(
+            'user'      => new UserParam($user),
+            'groupname' => new CategoryParam($cat)
+        );
 
+        if ($effector) {
+            $params['effector'] = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+        }
 
-	/**
-	 * @param UserAccess $userAccess
-	 * @param User $user
-	 * @return Messenger
-	 */
-	public function notifyStaffJoined($userAccess, $user) {
-		return $this->notifyAdmin(':user has joined :groupname', self::TRIGGER_JOINED, $userAccess, $user);
-	}
+        $bob->setTitle($body)
+            ->setHref("/group/modify/".$cat->getId())
+            ->setIcon("/portrait.php?size=square32&userId=".$user->getExternalId())
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addTopic("group.{$cat->getId()}.$label")
+            ->setParams($params);
 
+        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_FULL, $bob->build());
 
-	/**
-	 * @param UserAccess $userAccess
-	 * @param User $user
-	 * @return Messenger
-	 */
-	public function notifyStaffLeft($userAccess, $user) {
-		return $this->notifyAdmin(':user has left :groupname', self::TRIGGER_LEFT, $userAccess, $user);
-	}
+        return $envelope;
+    }
 
 
-	/**
-	 * @param UserAccess $userAccess
-	 * @param User $user
-	 * @return Messenger
-	 */
-	public function notifyStaffRequested($userAccess, $user) {
-		return $this->notifyAdmin(":user has asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess, $user);
-	}
+    /**
+     * @param UserAccess $userAccess
+     * @param User $user
+     * @return Messenger
+     */
+    public function notifyStaffJoined($userAccess, $user) {
+        if ($userAccess->getUser()->getId() == $user->getId()) {
+            return $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
+        } else {
+            return $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
+        }
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $user
+     * @return Messenger
+     */
+    public function notifyStaffLeft($userAccess, $user) {
+        if ($userAccess->getUser()->getId() == $user->getId()) {
+            return $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
+        } else {
+            return $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess, $user);
+        }
+    }
+
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $user
+     * @return Messenger
+     */
+    public function notifyStaffRequested($userAccess, $user) {
+        return $this->notifyAdmin(":user asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess);
+    }
 
 
 	/**
