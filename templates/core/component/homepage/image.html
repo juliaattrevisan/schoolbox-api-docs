@@ -54,7 +54,16 @@
             .closest('.dz-container')
             .find('.dz-preview').remove();
       },
-      success: function (file) {
+      success: function (file, response) {
+          var el = $(file.previewElement);
+
+          el.attr('data-file', response.id)
+            .removeClass('dz-processing')
+            .find('span.dz-upload')
+            .addClass('complete');
+
+          el.find('img.dz-pending').detach();
+
         var frm = $('#'+this.element.id.replace('dropzone','component')+' > .settings > form');
         frm.find('select[name=image]').remove();
         frm.append($('<input/>').attr('name', 'image').val(file.name.substr(0, file.name.lastIndexOf('.'))));
