@@ -12,6 +12,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage();
 $categoryHandler = new Category();
 $categoryMapper = CategoryMapper::getInstance();
+$categoryMapper->setSessionData($_SESSION);
 $groupHandler = new Group();
 
 if ($_POST['name']) {
