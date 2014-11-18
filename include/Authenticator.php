@@ -26,13 +26,10 @@ class Authenticator {
      * @param $password
      * @param string $method
      */
-    public function authenticate($username, &$password) {
+    public function authenticate($username, $password) {
 
         $s = new Session();
         $this->authenticated = $s->authenticate($username, $password);
-
-        // for security, unset password that was delivered
-        unset($password);
 
         // if successful, go ahead and create a session
         if($this->isAuthenticated())
@@ -47,7 +44,7 @@ class Authenticator {
      * @param $password
      * @param string $method
      */
-    public function reauthenticate($username, &$password, $method = 'all') {
+    public function reauthenticate($username, $password, $method = 'all') {
         $this->authenticated = false;
         $this->authenticate($username, $password, $method);
     }
