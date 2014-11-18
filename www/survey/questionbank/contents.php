@@ -9,6 +9,7 @@ $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 $this->setBlock('question', 'select_question', 'select_question_block');
 $this->setBlock('question', 'missing_class', 'missing_class_block');
+$this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block');
 
 $this->setVar(array(
     'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
@@ -118,14 +119,27 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         /* There are no questions: hide the add/remove functionality and display a
          * little message
          */
-        $this->setVar('show_submit_block', '');
-        $this->setVar('show_delete_block', '');
-        $this->setVar('question_block', '');
-        $this->setVar('welcome_block', '');
+        $this->setVar(
+            array(
+                'show_submit_block' => '',
+                'show_delete_block' => '',
+                'question_block' => '',
+                'welcome_block' => ''
+            )
+        );
+
         $this->parse('no_questions_block', 'no_questions');
         $this->parse('category_selected_block', 'category_selected');
+        $this->parse('has_edit_category_block', 'has_edit_category');
     }
 } else {
+    $this->setVar(
+        array(
+            'QUESTION_CATEGORY' => '',
+            'category_selected_block' => '',
+            'has_edit_category_block' => ''
+        )
+    );
+
     $this->parse('welcome_block', 'welcome');
-    $this->setVar('category_selected_block', '');
 }
