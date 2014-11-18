@@ -41,7 +41,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 				new Schoolbox\Resource\CategoryNotifier($conf),
 				new Schoolbox\Resource\FileNotifier($conf),
 				new Schoolbox\Resource\LinkNotifier($conf),
-				new Schoolbox\Resource\TextboxNotifier($conf)
+				new Schoolbox\Resource\TextboxNotifier($conf),
+                new SocialStream\PostNotifier($conf)
 			),
 			$this->getContext('id'), $user->getRole()->getType(), $this->getConfig('size')
 		);
