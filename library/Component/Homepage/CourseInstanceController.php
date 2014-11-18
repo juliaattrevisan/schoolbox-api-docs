@@ -68,7 +68,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $classStudentList = $class_handler->getStudents($code);
                 if (is_array($classStudentList)) {
                     $externalIdList = array_map(
-                        function($student) { return $student['synergy_id']; },
+                        function($student) { return $student['synergy_id'];
+                        },
                         $classStudentList
                     );
                     $classStudentIdList = \Schoolbox\UserMapper::getInstance()
@@ -80,7 +81,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             if (is_array($groupStudentList)) {
                 $groupStudentIdList = array_unique(
                     array_map(
-                        function($student) { return $student['uid']; },
+                        function($student) { return $student['uid'];
+                        },
                         $groupStudentList
                     )
                 );
@@ -104,7 +106,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // teacher.
             $task_list = array_reduce(
                 array_map(
-                    function($v) { return $v->getColumnValues('id'); },
+                    function($v) { return $v->getColumnValues('id');
+                    },
                     $this->unit_list->getColumnValues('tasks')
                 ),
                 'array_merge',
@@ -147,33 +150,33 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
 
         // Unit list blocks
-        $this->setBlock($templateHandle,    'course_unit_list',     'course_unit_list_block');
-        $this->setBlock('course_unit_list', 'unit',                 'unit_block');
-        $this->setBlock('unit',             'unit_expand',          'unit_expand_block');
-        $this->setBlock('unit',             'unit_no_expand',       'unit_no_expand_block');
-        $this->setBlock('unit',             'unit_completion',      'unit_completion_block');
-        $this->setBlock('unit',             'unit_modify',          'unit_modify_block');
-        $this->setBlock('unit',             'unit_delete',          'unit_delete_block');
-        $this->setBlock('unit',             'unit_task',            'unit_task_block');
-        $this->setBlock('unit',             'unit_report_actions',   'unit_report_actions_block');
-        $this->setBlock('unit',             'unit_add_task_actions', 'unit_add_task_actions_block');
-        $this->setBlock('unit_task',        'unit_task_quiz_results',    'unit_task_quiz_results_block');
-        $this->setBlock('unit_task',        'unit_task_quiz_attempts',   'unit_task_quiz_attempts_block');
-        $this->setBlock('unit_task',        'unit_task_duework_results', 'unit_task_duework_results_block');
-        $this->setBlock('unit_task',        'unit_task_link',       'unit_task_link_block');
-        $this->setBlock('unit_task',        'unit_task_no_link',    'unit_task_no_link_block');
-        $this->setBlock('unit_task',        'unit_task_count',      'unit_task_count_block');
-        $this->setBlock('unit_task',        'unit_task_completion', 'unit_task_completion_block');
-        $this->setBlock('unit_task',        'unit_task_start',      'unit_task_start_block');
-        $this->setBlock('unit_task',        'unit_task_modify',     'unit_task_modify_block');
-        $this->setBlock('unit_task',        'unit_task_delete',     'unit_task_delete_block');
-        $this->setBlock('unit_task',        'unit_task_modify_form', 'unit_task_modify_form_block');
-        $this->setBlock('unit_task',        'unit_task_delete_form', 'unit_task_delete_form_block');
+        $this->setBlock($templateHandle, 'course_unit_list', 'course_unit_list_block');
+        $this->setBlock('course_unit_list', 'unit', 'unit_block');
+        $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
+        $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
+        $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
+        $this->setBlock('unit', 'unit_modify', 'unit_modify_block');
+        $this->setBlock('unit', 'unit_delete', 'unit_delete_block');
+        $this->setBlock('unit', 'unit_task', 'unit_task_block');
+        $this->setBlock('unit', 'unit_report_actions', 'unit_report_actions_block');
+        $this->setBlock('unit', 'unit_add_task_actions', 'unit_add_task_actions_block');
+        $this->setBlock('unit_task', 'unit_task_quiz_results', 'unit_task_quiz_results_block');
+        $this->setBlock('unit_task', 'unit_task_quiz_attempts', 'unit_task_quiz_attempts_block');
+        $this->setBlock('unit_task', 'unit_task_duework_results', 'unit_task_duework_results_block');
+        $this->setBlock('unit_task', 'unit_task_link', 'unit_task_link_block');
+        $this->setBlock('unit_task', 'unit_task_no_link', 'unit_task_no_link_block');
+        $this->setBlock('unit_task', 'unit_task_count', 'unit_task_count_block');
+        $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
+        $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
+        $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
+        $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
+        $this->setBlock('unit_task', 'unit_task_modify_form', 'unit_task_modify_form_block');
+        $this->setBlock('unit_task', 'unit_task_delete_form', 'unit_task_delete_form_block');
 
-        $this->setVar('course_selector_block',  '');
+        $this->setVar('course_selector_block', '');
         $this->setVar('course_unit_list_block', '');
-        $this->setVar('course_modify_block',    '');
-        $this->setVar('UNIT_READONLY',          ($this->readOnly ? 'true' : 'false'));
+        $this->setVar('course_modify_block', '');
+        $this->setVar('UNIT_READONLY', ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
         // This means that the units and tasks that were imported are displayed.
@@ -221,7 +224,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Group the task list by task, then student.
         $grouped_list  = array();
         $studentIdList = array_map(
-            function($student) { return $student['uid']; },
+            function($student) { return $student['uid'];
+            },
             $this->student_list
         );
         foreach ($this->completion_list as $item) {
@@ -319,8 +323,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             }
         }
         $this->setVar('UNIT_COMPLETION_STATUS', Scrub::text($completion_status));
-        $this->setVar('UNIT_RELATIVE_DATE',     Scrub::text($rel_time->getRelativeTime()));
-        $this->setVar('UNIT_UPCOMING_URGENCY',  Scrub::text($urgency));
+        $this->setVar('UNIT_RELATIVE_DATE', Scrub::text($rel_time->getRelativeTime()));
+        $this->setVar('UNIT_UPCOMING_URGENCY', Scrub::text($urgency));
         $this->parse('unit_completion_block', 'unit_completion');
 
         // Output list of tasks within units, only if the task is open
@@ -442,7 +446,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             // Only show modify form if this is a simple task.
             // (No assessment or due work)
             if ($task->getType() == Task::TYPE_TASK) {
-
                 $zone = $this->newZone('az-task-'.$task->getId());
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
                     $zone->attachFiles(array(substr($task->getLink(), -40)));
@@ -496,5 +499,4 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         return $zone;
     }
-
 }
