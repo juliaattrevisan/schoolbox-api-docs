@@ -60,6 +60,14 @@ if (isset($_POST['description'])) {
         exit; // shut UP, storm.
     }
 
+    // if file was synchronously uploaded
+    if ( $_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+        $file->setTempFileLocation($_FILES['file']['tmp_name']);
+        $file->setFilename($_FILES['file']['name']);
+        $file->setFilesize(filesize($_FILES['file']['tmp_name']));
+        $file->setMimetype(\Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($file->getFilename()));
+    }
+
     // set attributes
     $file->setCreatedAt(Alaress_Date_Format::now());
     $file->setOwner($_SESSION['user']);
