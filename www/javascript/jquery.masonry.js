@@ -390,7 +390,12 @@
                             });
                         })
                         .fail(function() {
-                            ui.item.addClass('failed').slideUp().remove();
+                            ui.item.addClass(failedClass).slideUp(
+                                1000,
+                                function() {
+                                    $(this).remove()
+                                }
+                            );
                         });
                 } else {
                     ui.item.removeClass(sortingClass);
@@ -579,7 +584,12 @@
                     })
                     .fail(function() {
                         masonry.refreshColumns();
-                        element.removeClass(loadingClass).addClass(failedClass);
+                        element.removeClass(loadingClass);
+                        element.animate({opacity: 1}, 300, function () {
+                            element
+                                .addClass(failedClass)
+                                .removeClass(failedClass, 2000);
+                        });
                         masonry.refreshPalette();
                     });
             });
