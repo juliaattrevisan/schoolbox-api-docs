@@ -58,7 +58,8 @@ $this->setBlock(TEMPLATE_content, 'course', 'course_block');
 $this->setBlock('course', 'course_breadcrumb', 'course_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'class_breadcrumb', 'class_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'unit', 'unit_block');
-$this->setBlock('unit', 'task', 'task_block');
+$this->setBlock('unit', 'unit_update_open_date', 'unit_update_open_date_block');
+$this->setBlock('unit', 'unit_update_due_date', 'unit_update_due_date_block');
 
 $this->setVar(
     array(
@@ -145,9 +146,10 @@ foreach ($course_list as $unit) {
             'UNIT_NAME'            => Scrub::text($unit->getUnitCategory()->getName()),
             'UNIT_OPEN_DATE'       => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
             'UNIT_DUE_DATE'        => $unit->getDueDate()->getUsingFormat('d/m/Y'),
-            'task_block'           => '',
         )
     );
+    $this->parse('unit_update_due_date_block', 'unit_update_due_date');
+    $this->parse('unit_update_open_date_block', 'unit_update_open_date');
     $this->parse('unit_block', 'unit', true);
 }
 
@@ -166,15 +168,16 @@ foreach ($child_list as $unit) {
     }
     $this->setVar(
         array(
-            'UNIT_ID'              => Scrub::text($unit_id),
-            'UNIT_COUNT'           => $count++,
-            'UNIT_ENABLED'         => 0,
-            'UNIT_ENABLED_CHECKED' => '',
-            'UNIT_INSTANCE_ID'     => '',
-            'UNIT_NAME'            => Scrub::text($unit->getName()),
-            'UNIT_OPEN_DATE'       => '',
-            'UNIT_DUE_DATE'        => '',
-            'task_block'           => '',
+            'UNIT_ID'                     => Scrub::text($unit_id),
+            'UNIT_COUNT'                  => $count++,
+            'UNIT_ENABLED'                => 0,
+            'UNIT_ENABLED_CHECKED'        => '',
+            'UNIT_INSTANCE_ID'            => '',
+            'UNIT_NAME'                   => Scrub::text($unit->getName()),
+            'UNIT_OPEN_DATE'              => '',
+            'UNIT_DUE_DATE'               => '',
+            'unit_update_due_date_block'  => '',
+            'unit_update_open_date_block' => '',
         )
     );
     $this->parse('unit_block', 'unit', true);

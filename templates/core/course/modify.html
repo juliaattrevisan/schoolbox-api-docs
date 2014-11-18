@@ -109,6 +109,7 @@
                             <input class="open_date" id="open_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][open_date]" type="text" size="10" maxlength="10" value="{UNIT_OPEN_DATE}" data-interaction="datepicker" />
                         </td>
                         <td>
+                            <!-- BEGIN unit_update_open_date -->
                             <label for="update_open_date-{UNIT_COUNT}">
                                 <input name="unit[{UNIT_COUNT}][update_open_date]"
                                        type="hidden"
@@ -118,11 +119,13 @@
                                        value="1"
                                        id="update_open_date-{UNIT_COUNT}" />
                             </label>
+                            <!-- END unit_update_open_date -->
                         </td>
                         <td>
                             <input class="due_date" id="due_date-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][due_date]" type="text" size="10" maxlength="10" value="{UNIT_DUE_DATE}" data-interaction="datepicker" />
                         </td>
                         <td>
+                            <!-- BEGIN unit_update_due_date -->
                             <label for="update_due_date-{UNIT_COUNT}">
                                 <input name="unit[{UNIT_COUNT}][update_due_date]"
                                        type="hidden"
@@ -132,6 +135,7 @@
                                        value="1"
                                        id="update_due_date-{UNIT_COUNT}" />
                             </label>
+                            <!-- END unit_update_due_date -->
                         </td>
                     </tr>
                     <!-- END unit -->
