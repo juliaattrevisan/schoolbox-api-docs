@@ -76,6 +76,8 @@ $j(function() {
 
         });
 
+        $j('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
+
         $j.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
             history.back(-1);
         });
@@ -84,7 +86,8 @@ $j(function() {
 
     });
 
-    $j('#disp-lightbox').click(function() {
+    $j('#disp-lightbox').click(function(e) {
+        e.preventDefault();
         $j('#crit-list-lightbox').dialog({
             modal: true,
             resizable: false,
@@ -93,7 +96,8 @@ $j(function() {
         });
     });
 
-    $j('#close-lightbox').click(function() {
+    $j('#close-lightbox').click(function(e) {
+        e.preventDefault();
         $j('#crit-list-lightbox').dialog('close');
     });
 
