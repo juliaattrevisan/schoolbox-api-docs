@@ -25,7 +25,8 @@
         pendingClass      = 'pending',
         loadingClass      = 'loading',
         loadedClass       = 'loaded',
-        showEmptyClass    = 'show-empty';
+        showEmptyClass    = 'show-empty',
+        failedClass       = 'failed';
 
     var defaults = {
 
@@ -387,6 +388,9 @@
                                 masonry.saveSorting();
                                 masonry.refreshPalette();
                             });
+                        })
+                        .fail(function() {
+                            ui.item.addClass('failed').slideUp().remove();
                         });
                 } else {
                     ui.item.removeClass(sortingClass);
@@ -573,6 +577,11 @@
                                 }
                             });
                     })
+                    .fail(function() {
+                        masonry.refreshColumns();
+                        element.removeClass(loadingClass).addClass(failedClass);
+                        masonry.refreshPalette();
+                    });
             });
         }
 
