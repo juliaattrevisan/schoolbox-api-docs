@@ -24,16 +24,16 @@ class Authenticator {
      * Encapsulating authentication method. Takes password by reference because it will unset it at the end of its use
      * @param $username
      * @param $password
-     * @param string $method
+     * @param bool $remember
      */
-    public function authenticate($username, $password) {
+    public function authenticate($username, $password, $remember = false) {
 
         $s = new Session();
         $this->authenticated = $s->authenticate($username, $password);
 
         // if successful, go ahead and create a session
         if($this->isAuthenticated())
-            $this->createSession($username);
+            $this->createSession($username, $remember);
         else
             throw new Exception_Schoolbox_AccessDenied('Username or password is incorrect.');
     }
@@ -42,16 +42,16 @@ class Authenticator {
      * Explicitly deauthenticates any existing authentication and retests
      * @param $username
      * @param $password
-     * @param string $method
+     * @param bool $remember
      */
-    public function reauthenticate($username, $password, $method = 'all') {
+    public function reauthenticate($username, $password, $remember = false) {
         $this->authenticated = false;
-        $this->authenticate($username, $password, $method);
+        $this->authenticate($username, $password, $remember);
     }
 
     /* Session Functions */
 
-    public function createSession($username) {
+    public function createSession($username, $remember = false) {
         // do nothing if I don't know you
         if(!$this->isAuthenticated())
             throw new Exception_Schoolbox_NotAuthenticated('Cannot create session, not authenticated.');
@@ -60,7 +60,7 @@ class Authenticator {
 
         // start by creating a desktop session, then we will add the mobile elements into it
         $session = new Session();
-        $session->create($username);
+        $session->create($username, $remember);
 
         return session_start() ? $this->appendSession($username) : false;
     }
