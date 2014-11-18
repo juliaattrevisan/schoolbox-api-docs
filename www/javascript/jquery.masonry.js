@@ -558,42 +558,41 @@
 
                 if (!element.hasClass('disabled')) {
                     element.addClass(loadingClass);
-                }
+                    masonry.newComponentInstance(element)
+                        .done(function(response) {
+                            var leftColumn  = $(masonry.element).find(opt.column.position.left);
 
-                masonry.newComponentInstance(element)
-                    .done(function(response) {
-                        var leftColumn  = $(masonry.element).find(opt.column.position.left);
+                            element.addClass(loadedClass);
 
-                        element.addClass(loadedClass);
+                            $(response).hide().prependTo(leftColumn).css('opacity', 0)
+                                .slideDown(400, function () {
+                                    masonry.refreshColumns();
 
-                        $(response).hide().prependTo(leftColumn).css('opacity', 0)
-                            .slideDown(400, function () {
-                                masonry.refreshColumns();
+                                    // these 2 calls should happen together so there's no opacity flicker
+                                    element.removeClass(loadingClass);
+                                    masonry.refreshPalette();
 
-                                // these 2 calls should happen together so there's no opacity flicker
-                                element.removeClass(loadingClass);
-                                masonry.refreshPalette();
+                                    $(this).animate({opacity: 1}, 300, function () {
+                                        element.removeClass(loadedClass);
+                                    });
 
-                                $(this).animate({opacity: 1}, 300, function () {
-                                    element.removeClass(loadedClass);
+                                    // only go in for applying colours if you've got colours to set
+                                    if (masonry.spectrum) {
+                                        masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
+                                    }
                                 });
-
-                                // only go in for applying colours if you've got colours to set
-                                if (masonry.spectrum) {
-                                    masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
-                                }
+                        })
+                        .fail(function() {
+                            masonry.refreshColumns();
+                            element.removeClass(loadingClass);
+                            element.animate({opacity: 1}, 300, function () {
+                                element
+                                    .addClass(failedClass)
+                                    .removeClass(failedClass, 2000);
                             });
-                    })
-                    .fail(function() {
-                        masonry.refreshColumns();
-                        element.removeClass(loadingClass);
-                        element.animate({opacity: 1}, 300, function () {
-                            element
-                                .addClass(failedClass)
-                                .removeClass(failedClass, 2000);
+                            masonry.refreshPalette();
                         });
-                        masonry.refreshPalette();
-                    });
+                }
             });
         }
 
