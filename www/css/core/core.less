@@ -7147,6 +7147,21 @@ HOMEPAGE CUSTOMISE
 			color: darken(@positive-color, @darken-value);
 		}
 	}
+    &.failed {
+        background-color: lighten(@negative-color, @lighten-value);
+        &:before {
+            content: "\2717";
+            height: auto;
+            font-size: 1em;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 4px 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: darken(@negative-color, @darken-value);
+        }
+    }
 }
 
 .add-component p {
