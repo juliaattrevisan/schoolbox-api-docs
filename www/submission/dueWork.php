@@ -21,9 +21,9 @@ $this->setBlock(TEMPLATE_content, 'is_parent', 'is_parent_block');
 $this->setVar('activity_block', '');
 $this->setVar('is_parent_block', '');
 
-$groupHandler = new Group();
-$userHandler = new User();
-$returnHandler = new SubmissionReturn();
+$groupHandler      = new Group();
+$userHandler       = new User();
+$returnHandler     = new SubmissionReturn();
 $submissionHandler = new Submission();
 
 //
@@ -103,12 +103,18 @@ if (!isset($userID)) {
 }
 
 // prevent students from seeing anything but their own work
+$restrictSubmissions = false;
 if ($groupHandler->isStudent()) {
     if ($userID != $_SESSION['id']) {
         error(19);
     }
-} elseif (!($groupHandler->isStaff() || ($groupHandler->isParentOfChild($userID) && !Config::get('restrict_parent_duework_access')))) {
-    error(19);
+} elseif (!$groupHandler->isStaff() && $groupHandler->isParent()) {
+    $restrictSubmissions = Config::get('restrict_student_submissions');
+    if ($groupHandler->isParentOfChild($userID)
+        && Config::get('restrict_parent_duework_access')
+    ) {
+        error(19);
+    }
 }
 
 if (!isset($targetDate)) {
@@ -123,13 +129,17 @@ if (!isset($user['uid'])) {
 }
 
 // supplement the user array with additional information
-$user['self'] = $user['uid'] == $_SESSION['id'];
+$user['self']         = $user['uid'] == $_SESSION['id'];
 $user['person_label'] = $user['self'] ? 'You' : $user['firstname'];
 
 // if parent, output the child selector
 if (is_array($_SESSION['children'])) {
     $this->dropDown(
-        'child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME')
+        'child',
+        $_SESSION['children'],
+        $user['uid'],
+        'is_parent',
+        array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME')
     );
     $this->parse('is_parent_block', 'is_parent');
 }
@@ -153,30 +163,30 @@ if (!isset($categoryIDList)) {
 
 // output general data
 $output = array(
-    'CURRENT_DATE' => date('F Y', $targetDate->getUnixTimestamp()),
-    'NOT_TODAY' => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
-    'TODAY_DATE' => date('Y-m-d'),
-    'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $targetDate->getUsingFormat('U'))),
-    'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $targetDate->getUsingFormat('U'))),
-    'SELECTED_DATE' => $targetDate->getLocalShort(),
-    'WORK_USER_ID' => $userID,
+    'CURRENT_DATE'   => date('F Y', $targetDate->getUnixTimestamp()),
+    'NOT_TODAY'      => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
+    'TODAY_DATE'     => date('Y-m-d'),
+    'NEXT_MONTH'     => date('Y-m-d', strtotime('+1 month', $targetDate->getUsingFormat('U'))),
+    'PREV_MONTH'     => date('Y-m-d', strtotime('-1 month', $targetDate->getUsingFormat('U'))),
+    'SELECTED_DATE'  => $targetDate->getLocalShort(),
+    'WORK_USER_ID'   => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
-    'USER_TOKEN' => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
-    'WORK_SEMESTER' => DueWork_All::getSemester(),
-    'WORK_YEAR' => date('Y')
+    'USER_TOKEN'     => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
+    'WORK_SEMESTER'  => DueWork_All::getSemester(),
+    'WORK_YEAR'      => date('Y')
 );
 
 $this->setVar($output);
 
 $selectedMonth = $targetDate->getUsingFormat('n');
-$selectedYear = $targetDate->getUsingFormat('Y');
+$selectedYear  = $targetDate->getUsingFormat('Y');
 
 /* calculate month layout
  */
-$firstDay = (int)date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
+$firstDay       = (int)date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
 $numDaysinMonth = (int)date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
-$numWeeksMonth = ceil(($firstDay + $numDaysinMonth) / 7);
-$totalDays = $numWeeksMonth * 7 + (6 - $firstDay);
+$numWeeksMonth  = ceil(($firstDay + $numDaysinMonth) / 7);
+$totalDays      = $numWeeksMonth * 7 + (6 - $firstDay);
 
 $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
 
@@ -185,14 +195,14 @@ $summary = array();
 
 /* Have to replace all the other $user's with this one -_-
  */
-$event_api = new Calendar_Api_EventType_Submission_Schoolbox_Default(
+$event_api         = new Calendar_Api_EventType_Submission_Schoolbox_Default(
     (isset($userID) ? Schoolbox\UserMapper::getInstance()->findById($userID) : $_SESSION['user']),
     null
 );
-$event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
+$event_list        = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list as $event_object) {
-    $date = $event_object->getStartTime()->getUsingFormat('dmY');
+    $date                       = $event_object->getStartTime()->getUsingFormat('dmY');
     $event_list_by_day[$date][] = $event_object;
 }
 
@@ -206,11 +216,11 @@ for ($i = 0; $i < $totalDays; $i++) {
     }
 
     $this_day = date('dmY', $currentDay);
-    $output = array(
-        'DATE' => date("j", $currentDay),
-        'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
+    $output   = array(
+        'DATE'   => date("j", $currentDay),
+        'PAST'   => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
         'ACTIVE' => $this_day == $targetDate->getUsingFormat('dmY') ? 'active' : '',
-        'TODAY' => date('dmY') == $this_day ? 'today' : '',
+        'TODAY'  => date('dmY') == $this_day ? 'today' : '',
         'RIGHTY' => $day > 3 ? 'righty' : '',
     );
 
@@ -223,13 +233,13 @@ for ($i = 0; $i < $totalDays; $i++) {
 
         $event_id = $event->getSubmissionBoxId();
         if ($event->getIsAssessment()) {
-            $event_id = 'assess-'.$event_id;
+            $event_id = 'assess-' . $event_id;
         }
         $category_id = $event->getCategoryId();
-        $output = array(
-            'EVENT_ID' => $event_id,
-            'TIME' => $event->getTime(),
-            'EVENT' => Scrub::text($event->getSubmissionBoxName()),
+        $output      = array(
+            'EVENT_ID'     => $event_id,
+            'TIME'         => $event->getTime(),
+            'EVENT'        => Scrub::text($event->getSubmissionBoxName()),
             'EVENT_CAT_ID' => $category_id,
         );
 
@@ -238,10 +248,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
         /* record overview for summary box */
         $summary[$category_id] = array(
-            'name' => $event->getCategoryName(),
+            'name'  => $event->getCategoryName(),
             'cid'   => $category_id,
             'total' => ++$summary[$category_id]['total'],
-            'code' => $event->getCategoryCodeString(),
+            'code'  => $event->getCategoryCodeString(),
         );
     }
 
@@ -256,10 +266,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 
 // create a custom instance of the upcoming work controller, and set it up for this context
-$chf = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$cdm = Component_DefinitionMapper::getInstance();
+$chf        = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$cdm        = Component_DefinitionMapper::getInstance();
 $definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
-$instance = new Component_Instance();
+$instance   = new Component_Instance();
 $instance->setDefinition($definition);
 
 $dueWorkController = $chf->buildComponent($instance);
@@ -267,10 +277,10 @@ $dueWorkController = $chf->buildComponent($instance);
 // apply configs
 $dueWorkController->setup(
     array(), array(
-        'actionable' => array('label' => 'actionable', 'value' => true),
+        'actionable'    => array('label' => 'actionable', 'value' => true),
         'allow_parents' => array('label' => 'allow_parents', 'value' => true),
-        'size' => array('label' => 'size', 'value' => 0),
-        'user' => array('label' => 'user', 'value' => $userID),
+        'size'          => array('label' => 'size', 'value' => 0),
+        'user'          => array('label' => 'user', 'value' => $userID),
     )
 );
 
@@ -279,7 +289,7 @@ $dueWorkController->renderTemplate('UPCOMING_WORK');
 
 
 // subject listings
-$j = 0;
+$j        = 0;
 $synClass = new External_Class;
 
 $return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
@@ -294,8 +304,8 @@ foreach ($categoryList as $category) {
     /* yes it actually requires THIS MUCH code to get a teachers name. */
     if (Cfg::get('external_enable')) {
         $teacherOutput = array();
-        $teacherList = array();
-        $codeList = explode(',', $category['code']);
+        $teacherList   = array();
+        $codeList      = explode(',', $category['code']);
 
         if (is_array($codeList)) {
             foreach ($codeList as $code) {
@@ -311,12 +321,12 @@ foreach ($categoryList as $category) {
                 if (is_array($teacher)) {
                     $teacherName = $userHandler->formatName($teacher);
 
-                    $emailObj = new Email();
+                    $emailObj     = new Email();
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                     $teacherOutput[] = array(
-                        'id' => $teacher['uid'],
-                        'name' => $teacherName,
+                        'id'    => $teacher['uid'],
+                        'name'  => $teacherName,
                         'email' => $_SESSION['mailhandle'] . $emailAddress,
                         'synid' => $teacherSynID,
                     );
@@ -326,7 +336,7 @@ foreach ($categoryList as $category) {
     }
 
     $categoryIDs[] = $categoryID;
-    $categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
+    $categoryCode  = $category['code'] ? '(' . $category['code'] . ')' : '';
 
     //
     // retrieve subject grades.
@@ -336,8 +346,18 @@ foreach ($categoryList as $category) {
             $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
             $assess_mapper->getStudentMarks($category['id'], $userID)
         );
-        usort($studentGrades, function ($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
-        $studentGrades = array_map(function ($row) { return $row['mark']; }, $studentGrades);
+        usort(
+            $studentGrades,
+            function ($a, $b) {
+                return $a['date'] > $b['date'] ? -1 : 1;
+            }
+        );
+        $studentGrades = array_map(
+            function ($row) {
+                return $row['mark'];
+            },
+            $studentGrades
+        );
     } else {
         $studentGrades = array();
     }
@@ -345,10 +365,10 @@ foreach ($categoryList as $category) {
     $gradeAvg    = -1;
     $grade_count = count($studentGrades);
     $show_grades = Cfg::get('show_overall_grade') && !$restrict_grades;
-    $trendDir = '';
-    $trendAmt = '';
+    $trendDir    = '';
+    $trendAmt    = '';
     if ($show_grades) {
-        $card = new Schoolbox\Assessment\SubjectReportCard(
+        $card  = new Schoolbox\Assessment\SubjectReportCard(
             $category['id'],
             $userID,
             $selectedYear,
@@ -377,29 +397,30 @@ foreach ($categoryList as $category) {
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
     $output = array(
-        'SUBJ_CAT_ID' => $categoryID,
+        'SUBJ_CAT_ID'       => $categoryID,
         'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
         'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
         'SUBJ_SUBJECT_CODE' => $categoryCode,
-        'SUBJ_SUBJECT_URL' => '/homepage/' . $categoryID,
-        'SUBJ_TOTAL' => $summary[$category['id']]['total'],
-        'SUBJ_TREND_DIR' => $trendDir,
-        'SUBJ_TREND_AMT' => $trendAmt,
-        'SUBJ_HAS_GRADE' => $show_grades ? 'grade' : '',
-        'DARK' => ++$j % 2 ? '' : 'dark'
+        'SUBJ_SUBJECT_URL'  => '/homepage/' . $categoryID,
+        'SUBJ_TOTAL'        => $summary[$category['id']]['total'],
+        'SUBJ_TREND_DIR'    => $trendDir,
+        'SUBJ_TREND_AMT'    => $trendAmt,
+        'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
+        'DARK'              => ++$j % 2 ? '' : 'dark'
     );
     $this->setVar($output);
 
     if ($gradeAvg == -1) {
         $this->setVar('subject_grade_block', '');
     } else {
-        $this->setVar(array(
-            'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg, $grade['groups']),
-            'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
-        ));
+        $this->setVar(
+            array(
+                'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg, $grade['groups']),
+                'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
+            )
+        );
         $this->parse('subject_grade_block', 'subject_grade');
     }
-
 
 
     if (Cfg::get('external_enable')) {
@@ -407,11 +428,11 @@ foreach ($categoryList as $category) {
         if (isset($teacherOutput) && count($teacherOutput)) {
             foreach ($teacherOutput as $teacher) {
                 $tOutput = array(
-                    'SUBJ_TEACHER_ID' => $teacher['id'],
-                    'SUBJ_TEACHER_NAME' => $teacher['name'],
-                    'SUBJ_TEACHER_URL' => $teacher['email'],
-                    'SUBJ_TEACHER_ROLE' => 'Teacher',
-                    'SUBJ_TEACHER_AVATAR' => "/portrait?userId={$teacher['synid']}&size=square32",
+                    'SUBJ_TEACHER_ID'           => $teacher['id'],
+                    'SUBJ_TEACHER_NAME'         => $teacher['name'],
+                    'SUBJ_TEACHER_URL'          => $teacher['email'],
+                    'SUBJ_TEACHER_ROLE'         => 'Teacher',
+                    'SUBJ_TEACHER_AVATAR'       => "/portrait?userId={$teacher['synid']}&size=square32",
                     'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
                 );
                 $this->setVar($tOutput);
@@ -428,12 +449,11 @@ foreach ($categoryList as $category) {
 $feedItems = array();
 
 foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restrict_grades) as $activity) {
-    $mark = null;
+    $mark        = null;
     $numericMark = null;
 
-    $categoryName = '<a href="/homepage/' . $activity->getCategory()->getId() . '">' . Scrub::text(
-        $activity->getCategory()->getName()
-    ) . '</a>';
+    $categoryName = '<a href="/homepage/' . $activity->getCategory()->getId() . '">'
+        . Scrub::text($activity->getCategory()->getName()) . '</a>';
 
     //
     // box URL depends on whether this is an assessment or submission
@@ -448,31 +468,41 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                 $activity->getName()
             );
         }
-    } else {
+    } elseif (!$restrictSubmissions) {
         $boxUrl = sprintf(
             '<a href="/submission/submissionHistory/%d/%d">%s</a>',
             $activity->getId(),
             $userID,
             $activity->getName()
         );
+    } else {
+        $boxUrl = $activity->getName();
     }
 
     switch ($activity->getEvent()) {
         case 'new':
             $stringDesc = sprintf(
-                'New %s %s added in %s', strtolower($activity->getTypeName()), $boxUrl, $categoryName
+                'New %s %s added in %s',
+                strtolower($activity->getTypeName()),
+                $boxUrl,
+                $categoryName
             );
             break;
 
         case 'overdue':
             $stringDesc = sprintf(
-                '<span class="overdue">"%s" in %s is due</span>', $boxUrl, $categoryName
+                '<span class="overdue">"%s" in %s is due</span>',
+                $boxUrl,
+                $categoryName
             );
             break;
 
         case 'submitted':
             $stringDesc = sprintf(
-                '%s submitted work for %s in %s', $user['person_label'], $boxUrl, $categoryName
+                '%s submitted work for %s in %s',
+                $user['person_label'],
+                $boxUrl,
+                $categoryName
             );
             break;
 
@@ -486,7 +516,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                 $base_mark = $activity->getReturnedNormalizedMark();
                 if (isset($base_mark)) {
                     // format for output
-                    $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
+                    $rtn       = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
                     $marksheet = Marksheet_Factory::build($rtn['slug']);
 
                     // legacy support
@@ -497,7 +527,10 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                     }
 
                     $mark = sprintf(
-                        '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $numericMark
+                        '<a href="/submission/submissionHistory/%s/%s">%s</a>',
+                        $rtn['box_id'],
+                        $rtn['owner'],
+                        $numericMark
                     );
 
                     $beginning = $user['person_label'] . ' received ' . $mark;
@@ -527,10 +560,10 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     $mark = $returnHandler->shortenGrade($numericMark);
 
     $feedItems[] = array(
-        'content' => $stringDesc,
-        'time' => $activityTime->getRelativeTime(),
-        'icon' => $activity->getEvent(),
-        'grade' => isset($mark) ? $mark : null,
+        'content'   => $stringDesc,
+        'time'      => $activityTime->getRelativeTime(),
+        'icon'      => $activity->getEvent(),
+        'grade'     => isset($mark) ? $mark : null,
         'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
         'has_grade' => isset($mark) ? 'grade' : 'no-grade',
     );
@@ -550,12 +583,15 @@ if (empty($feedItems)) {
 $this->dropDown('subject', $summary, '', TEMPLATE_content, array('cid' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
 
 // Output category colour styles
-$colourList = Timetable_ColourMapper::getInstance()->findAll();
+$colourList  = Timetable_ColourMapper::getInstance()->findAll();
 $colourIndex = 0;
-foreach($summary as $category) {
-    $this->setVar('CATEGORY_COLOUR', Scrub::text($colourList->offsetGet($colourIndex % count($colourList))->getHexColour()));
+foreach ($summary as $category) {
+    $this->setVar(
+        'CATEGORY_COLOUR',
+        Scrub::text($colourList->offsetGet($colourIndex % count($colourList))->getHexColour())
+    );
     $this->setVar('CATEGORY_ID', $category['cid']);
-    $this->parse('subject_colour_block', 'subject_colour',true);
+    $this->parse('subject_colour_block', 'subject_colour', true);
     $colourIndex++;
 }
 
@@ -583,14 +619,12 @@ function getActivities($user, $limit, $categories, $visibilities, $is_restricted
     $activities    = $box_mapper
         ->getActivities($user, $limit, $categories)
         ->merge($assess_mapper->getActivities($user, $limit, $categories))
-        ->merge($submit_mapper->getActivities($user, $limit, $categories))
-    ;
+        ->merge($submit_mapper->getActivities($user, $limit, $categories));
     if (!$is_restricted) {
         $activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
     }
     $activities
         ->sortBy('date', 'desc')
-        ->limit(0, 15)
-    ;
+        ->limit(0, 15);
     return $activities;
 }
