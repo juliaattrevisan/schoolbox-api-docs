@@ -132,19 +132,19 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $cat = $this->catMapper->findById($post->getHomepageId());
 
         if ($post instanceof \SocialStream_Post_Url) {
-            $text = ':author posted a link in :cat';
+            $posted = 'posted a link';
         } elseif ($post instanceof \SocialStream_Post_Video) {
-            $text = ':author posted a video in :cat';
+            $posted = 'posted a video';
         } elseif ($post instanceof \SocialStream_Post_Image) {
-            $text = ':author posted an image in :cat';
+            $posted = 'posted an image';
         } // string
         else {
-            $text = ':author posted in :cat';
+            $posted = 'posted';
         }
 
         $href = '/homepage/' . $cat->getId();
 
-        $bob->setTitle($text)
+        $bob->setTitle(":author $posted in the social stream in :cat")
             ->setParams(
                 array(
                     'author' => new UserParam($author),
