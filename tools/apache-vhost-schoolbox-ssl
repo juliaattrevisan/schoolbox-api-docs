@@ -1,6 +1,6 @@
 <IfModule mod_ssl.c>
-NameVirtualHost 192.168.1.1:443
-<VirtualHost 192.168.1.1:443>
+NameVirtualHost *:443
+<VirtualHost *:443>
         ServerName schoolbox.schoolname.edu
         DocumentRoot /usr/share/schoolbox/www
 
@@ -18,9 +18,9 @@ NameVirtualHost 192.168.1.1:443
         </Directory>
 
         SSLEngine on
-        SSLCertificateFile    /etc/apache2/certs/wildcard.crt
-        SSLCertificateKeyFile /etc/apache2/certs/private.key
-        SSLCertificateChainFile /etc/apache2/certs/intermediate.crt
+        SSLCertificateFile    /etc/apache2/certs/schoolbox.crt
+        SSLCertificateKeyFile /etc/apache2/certs/schoolbox-private.key
+        SSLCertificateChainFile /etc/apache2/certs/schoolbox-intermediate.crt
         #SSLCACertificateFile /etc/apache2/certs/root.crt
         SSLProtocol all -SSLv2 -SSLv3
         # Enabling the below cipher order will stop IE8 on WinXP being able to connect at all on SSL/TLS
