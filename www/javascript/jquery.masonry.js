@@ -24,7 +24,8 @@
         activeClass       = 'active',
         pendingClass      = 'pending',
         loadingClass      = 'loading',
-        loadedClass       = 'loaded';
+        loadedClass       = 'loaded',
+        showEmptyClass    = 'show-empty';
 
     var defaults = {
 
@@ -699,6 +700,8 @@
     Masonry.prototype.refreshColumns = function () {
         var masonry = this,
             opts    = masonry.options;
+
+        opts.column.onToggle.apply(this);
 
         this.columns.each(function() {
             var column, components, dragging, markerHeight, componentSelector;

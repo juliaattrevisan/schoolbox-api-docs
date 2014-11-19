@@ -113,7 +113,16 @@
             },
             column: {
                 leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-                placeholderTpl: '<p class="placeholder" />'
+                placeholderTpl: '<p class="placeholder" />',
+                onToggle: function () {
+                    var page = $(this.element);
+
+                    if (page.find('.ui-sortable-helper').length || $('#tabs-1').is('.open')) {
+                        page.addClass('show-empty');
+                    } else {
+                        page.removeClass('show-empty');
+                    }
+                }
             },
             palette: {
                 url: url,
@@ -162,7 +171,17 @@
 
         $('#tabs-homepage').droptab({
             buttonSelector: '#tab-control a.btn',
-            tabSelector: '> div.customise-components'
+            tabSelector: '> div.customise-components',
+            onOpen: function () {
+                if (this.id == 'tab-component') {
+                    $('#e-portfolio').addClass('show-empty');
+                } else {
+                    $('#e-portfolio').removeClass('show-empty');
+                }
+            },
+            onClose: function () {
+                $('#e-portfolio').removeClass('show-empty');
+            }
         });
 
     });
