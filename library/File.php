@@ -108,7 +108,7 @@ class File extends DeprecatedModel {
             'object' => 'file', 'objectId' => $fileID, 'action' => $action, 'user' => $_SESSION['id'],
         );
 	    $notif = new Notif(Notif::TOPIC_CMS);
-	    $notif->info("CRUD", $logEntry);
+	    $notif->notice("CRUD", $logEntry);
     }
 
     /**
