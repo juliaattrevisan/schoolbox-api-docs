@@ -16,6 +16,13 @@ if (!$groupHandler->isStaff()) {
 $questionBankHandler = new Assess_Question_Bank();
 
 if (!empty($_POST)) {
+
+    /* Don't add it if you haven't chozen a category
+     */
+    if (!is_numeric($_POST['question_category'])) {
+        error(166);
+    }
+
     $questionBankHandler->addQuestion(
 		new Assess_Question(),
         $_POST['question_category'],
