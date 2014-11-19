@@ -5950,9 +5950,6 @@ CALENDAR
 
         span {
             position: absolute;
-//            top: 4px;
-//            left: 7px;
-//            height: 14px;
             width: 12px;
         }
         &.list span {
@@ -6025,6 +6022,7 @@ CALENDAR
         cursor: pointer;
         display: block;
         padding: 4px 5px;
+        margin: 0;
         &:hover {
             cursor: pointer;
         }
@@ -10724,7 +10722,7 @@ table img { max-width: none; }
             margin: 5px 3px;
             &.fc-today-button {
                 color: @black;
-                &:hover{ color: @white; }
+                &:hover{ text-decoration: underline; }
                 &.fc-state-disabled {
                     color: @dgrey;
                     &:hover{
