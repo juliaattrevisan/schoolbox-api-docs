@@ -169,8 +169,12 @@ then
 	# Remove backup directory if already exists
 	if [ -d $targetdir ]
 	then
-		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of duplicate backup: $targetdir" >> $logfile;
-		rm -rf $targetdir >> $logfile 2>&1;
+		# Only remove the current backup if not using rsync
+		if [ $use_rsync -eq 0 ];
+		then
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of duplicate backup: $targetdir" >> $logfile;
+			rm -rf $targetdir >> $logfile 2>&1;
+		fi
 	fi
 else
 	if [ $mount_count -eq 0 ];
@@ -214,17 +218,7 @@ then
 		then
 			tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
 		else
-			# Use rsync for the data dir transfer (experimental)
-			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Creating data directory for rsync backup" >> $logfile;
-			mkdir -vp $targetdir/data >> $logfile 2>&1;
-			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup via rsync" >> $logfile;
-			rsync -rtv `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
-			if [ $? -ne 0 ];
-			then
-				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] First rsync run had errors, attempting again for safety" >> $logfile;
-				# TODO - maybe recheck cifs mount again here?
-				rsync -rtv `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
-			fi
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Ignoring data directory backup as using hourly rsync instead" >> $logfile;
 		fi
 	else
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Skipping backup of $data_dir due to override set" >> $logfile;
