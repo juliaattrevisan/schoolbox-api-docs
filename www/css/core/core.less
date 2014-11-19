@@ -1806,7 +1806,7 @@ Notifications
  * action buttons in the bottom right corner, or floated to the right of a component
  * Actions are the buttons to interact with the list item, such as edit, delete
  */
-td,li,span {
+td,li,span,.row {
   .actions {
     position: relative;
     z-index: 1;
@@ -1850,7 +1850,8 @@ td .actions {
 
 // Obsfucate buttons unless hovering over the line
 tr:hover td > .actions .btn,
-li:hover > .actions .btn
+li:hover > .actions .btn,
+.row:hover .actions .btn
 {
 	border-color: @lgrey;
 	background: @dark;
