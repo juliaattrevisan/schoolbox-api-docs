@@ -90,15 +90,13 @@
                             uploads = JSON.parse(str);
 
                             for (i = 0; i < uploads.hash.length; ++i) {
-                                // don't include upload failures
-                                if (uploads.hash[i].split(':')[0] != 'exception') {
-                                    data.push({
-                                        title: uploads.meta[i].name,
-                                        mimeType: uploads.meta[i].type,
-                                        filesize: uploads.meta[i].size,
-                                        hash: uploads.hash[i]
-                                    });
-                                }
+                                // this will include upload failures
+                                data.push({
+                                    title: uploads.meta[i].name,
+                                    mimeType: uploads.meta[i].type,
+                                    filesize: uploads.meta[i].size,
+                                    hash: uploads.hash[i]
+                                });
                             }
 
                             window.top.postMessage(JSON.stringify({ data: data }), location.origin);
@@ -132,13 +130,13 @@
                 this.on('error', function (file, msg, xhr) {
                     if (xhr) {
                         try {
-                            data = JSON.parse(msg).hash.split(':')[1];
-
+                            msg = JSON.parse(msg);
                         } catch (err) {
-                            data = msg;
+                            // noop
                         }
+                        file.hash = msg.hash;
 
-                        $(file.previewElement).find('span[data-dz-errormessage]').html(data);
+                        $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
                     }
                     checkState.call(this);
                 });
@@ -169,6 +167,8 @@
                     if (!abUploadSubmitBtn.data('uploading')) {
                         return;
                     }
+
+                    $.extend(accepted, this.getRejectedFiles());
 
                     if (accepted.length) {
                         for (i = 0; i < accepted.length; ++i) {
