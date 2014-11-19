@@ -142,7 +142,7 @@ then
 			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Creating data directory for rsync backup" >> $logfile;
 			mkdir -vp $targetdir/data >> $logfile 2>&1;
 			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup via rsync" >> $logfile;
-			rsync -rtv --delete-after `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
+			nice rsync -rtv --delete-after `readlink -f $data_dir`/ $targetdir/data/ >> $logfile 2>&1;
 			if [ $? -ne 0 ];
 			then
 				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Rsync run had errors, umounting share for safety" >> $logfile;
