@@ -136,7 +136,7 @@ class Mediator {
 
             // username and password set
             if( (isset($_POST['username']) && isset($_POST['password']) ) ) {
-                $auth->reauthenticate($_POST['username'], $_POST['password']);
+                $auth->reauthenticate($_POST['username'], $_POST['password'], $_POST['rememberme']);
                 // if there's an environmental indicator, push that into the session
                 if(isset($_POST['env'])) {
                     // store this as an array since it will be being continuously [un]serialised
