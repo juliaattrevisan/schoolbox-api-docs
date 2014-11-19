@@ -712,7 +712,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
 }
 
 // do fun rubric things
-if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
+if (canViewRubric($submission, $_SESSION['user'])) {
     $rb = new DueWork_Rubric_Lightbox($this);
     $rb->render('rubric_block', $submission->getId(), $user['uid']);
 } else {
@@ -761,4 +761,28 @@ if ($user['eportfolio_enabled'] && (isset($recent_submission) || isset($recent_r
     $this->parse('action_publish_block', 'action_publish');
 } else {
     $this->setVar('action_publish_block', '');
+}
+
+/**
+ * @param Component\SubmissionBox $box
+ * @param Schoolbox\User $user
+ * @return bool
+ */
+function canViewRubric($box, $user)
+{
+    // no rubric to view
+    if (!$box->isRubric()) {
+        return false;
+    }
+
+    switch ($user->getRole()->getType()) {
+        case \Schoolbox\Role::PARENT:
+            return $box->isMarkShownToParents();
+        case \Schoolbox\Role::STUDENT:
+            return $box->isMarkShownToStudents();
+        case \Schoolbox\Role::STAFF:
+            return true;
+        default:
+            return false;
+    }
 }
