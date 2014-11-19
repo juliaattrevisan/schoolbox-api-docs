@@ -123,7 +123,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             )
         );
 
-        $allItems = $this->getBlogMapper()->findForCategory($this->source);
+        $allItems = $this->getBlogMapper()->findForCategory($this->source, $this->getConfig('size'));
 
         /* Iterate
          */
