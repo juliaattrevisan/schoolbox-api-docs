@@ -1273,7 +1273,7 @@ class Mapper implements Serializable
             }
         );
         $is_multiple       = !empty($join_identifier['multiple']);
-        $this_set_method   = $options['set_method'] ? : $this->getSetMethodName($this_mapping['property']);
+        $this_set_method   = isset($options['set_method']) ? $options['set_method'] : $this->getSetMethodName($this_mapping['property']);
         $other_id_method   = $join_mapper->getGetIdentifierMethodName();
         foreach ($collection as $item) {
             // Is this a multiple join? If so, how do I know?
