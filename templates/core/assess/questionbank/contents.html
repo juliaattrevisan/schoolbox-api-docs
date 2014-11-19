@@ -36,7 +36,15 @@
 
         $j("#categoryTree")
             .on('ready.jstree', function(event, jstree) {
-                jstree.instance.open_node(jstree.instance.get_node({SELECTED_NODES}));
+                var openNodes = [{SELECTED_NODES}];
+
+                jstree.instance.open_node(openNodes);
+
+                /* Style selected node if one was chozen
+                 */
+                if (openNodes.length) {
+                    $('#' + openNodes[0]).children('a.jstree-anchor').addClass('jstree-clicked');
+                }
             })
             .on('click', 'a.jstree-anchor', function() {
                 location.href = this.href
@@ -52,8 +60,8 @@
                 });
             })
             .jstree({
-                "animation":50,
                 "core":{
+                    animation: 0,
                     force_text: true,
                     check_callback: true,
                     multiple:false,
@@ -63,7 +71,7 @@
                         "icons" : false
                     }
                 },
-                "plugins":["dnd", "state"],
+                "plugins":["dnd"],
                 dnd: {
                     copy: false
                 }
