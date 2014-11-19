@@ -47,10 +47,11 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
 					{$this->_table}.*,
 					COUNT(assess_question_bank.question_category_id) AS numQuestions
 				  FROM {$this->_table}
-				  LEFT JOIN assess_question_bank ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
+				  LEFT JOIN assess_question_bank
+				    ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
+				    AND assess_question_bank.deleted_at IS NULL
 				  WHERE availability = '{$this->getAvailability()}'
 				  AND parent_id = " . $this->db->smartQuote($parent_id) . "
-				  AND assess_question_bank.deleted_at IS NULL
 				  AND {$this->_table}.deleted_at IS NULL
 				  GROUP BY question_category_id
 				  ORDER BY name";
