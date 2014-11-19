@@ -231,15 +231,16 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * the same method), is another level of abstraction that isn't needed
      * in most places
      *
-     * Takes an optional $page in case you need to subtemplate stuff
-     *
      * @param $attempt_id
      * @param $question_id
-     * @param null $page
      * @return mixed
      */
-    public function resultsForQuestion($attempt_id, $question_id, $page = null) {
-        return $this->exportResponseToCSV($attempt_id, $question_id);
+    public function resultsForQuestion($attempt_id, $question_id) {
+        $data = $this->exportResponseToCSV($attempt_id, $question_id);
+
+        $data['responses'] = Scrub::text($data['response']);
+
+        return $data;
     }
 
 	/* Getters/Setters

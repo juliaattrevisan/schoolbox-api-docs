@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Answer extends Evaluation_Answer {
+abstract class Survey_Answer extends Evaluation_Answer {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
 
