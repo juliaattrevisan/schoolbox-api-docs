@@ -103,7 +103,7 @@ class EventRelations {
             switch ($this->getLevel()) {
                 /* Access Type 1 (Personal)
                  */
-                case 1:
+                case EventMapper::ACCESS_PERSONAL:
                     $userRelation = new Personal();
                     $userRelation->setEventId($this->getEvent()->getId());
                     $userRelation->setUserId($this->getEvent()->getOwner()->getId());
@@ -112,7 +112,7 @@ class EventRelations {
 
                 /* Access Type 2 (Category)
                  */
-                case 2:
+                case EventMapper::ACCESS_GROUP:
                     foreach ($this->getGroup() as $currentGroup) {
                         $categoryRelation = new Category();
                         $categoryRelation->setEventId($this->getEvent()->getId());
@@ -123,7 +123,7 @@ class EventRelations {
 
                 /* Access Type 3 (Campus)
                  */
-                case 3:
+                case EventMapper::ACCESS_CAMPUS:
                     foreach ($this->getRoles() as $currentRole) {
                         $roleRelation = new Role();
                         $roleRelation->setEventId($this->getEvent()->getId());
