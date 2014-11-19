@@ -187,7 +187,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Event $relEvent */
         $relEvent     = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId   = $relEvent->getId();
-        $relEventNote = $relEvent->getNote();
+        $relEventNote = $relEvent->getTitle();
 
         // pray that these are actually User objects
         $teacherInCharge   = $relEvent->getTeacherInCharge();
@@ -274,7 +274,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Event $relEvent */
         $relEvent     = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId   = $relEvent->getId();
-        $relEventNote = $relEvent->getNote();
+        $relEventNote = $relEvent->getTitle();
         // pray that these are actually User objects
         $teacherInCharge   = $relEvent->getTeacherInCharge();
         $teacherInChargeId = $teacherInCharge->getId();
