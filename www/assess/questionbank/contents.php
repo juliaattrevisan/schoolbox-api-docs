@@ -86,7 +86,16 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                 }
             }
 
+            /* Show delete functionality
+             */
+            $this->parse('show_delete_block', 'show_delete');
             $this->parse('question_block', 'question', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar(array(
+                'show_delete_block' => ''
+            ));
 
             $previous = $currentQuestion['question_category_id'];
         }
@@ -100,10 +109,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         } else {
             $this->setVar('show_submit_block', '');
         }
-
-        /* Show delete functionality
-         */
-        $this->parse('show_delete_block', 'show_delete');
 
         /* Hide 'no questions' message
          */
