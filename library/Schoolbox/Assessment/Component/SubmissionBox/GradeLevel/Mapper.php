@@ -49,6 +49,13 @@ class Mapper extends BaseMapper
         );
         $this->hasMap(
             array(
+                'column'   => 'raw_grade',
+                'property' => 'rawGrade',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'caption',
                 'property' => 'caption',
                 'type'     => self::TYPE_STRING,
