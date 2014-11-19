@@ -16,7 +16,7 @@ use Alaress\Async\AMQP\Bunny\ControlInterface;
 use Alaress\Async\Queue\AMQPQueue;
 use OutOfBoundsException;
 use RuntimeException;
-use Schoolbox\Notif\Queue\QueueFactory;
+use Schoolbox\Notif\AbstractQueueFactory;
 use Schoolbox\User;
 
 class UserQueueBinder
@@ -37,7 +37,7 @@ class UserQueueBinder
     /** @var ControlInterface */
     protected $rabbitCtrl;
 
-    /** @var QueueFactory */
+    /** @var AbstractQueueFactory */
     protected $queueFactory;
 
     /** @var Generator */
@@ -45,12 +45,12 @@ class UserQueueBinder
 
 
     /**
-     * @param AMQPInterface    $amqp
-     * @param ControlInterface $rabbitCtrl
-     * @param QueueFactory     $qFactory
-     * @param Generator        $gen
+     * @param AMQPInterface        $amqp
+     * @param ControlInterface     $rabbitCtrl
+     * @param AbstractQueueFactory $qFactory
+     * @param Generator            $gen
      */
-    public function __construct(AMQPInterface $amqp, ControlInterface $rabbitCtrl, QueueFactory $qFactory, Generator $gen)
+    public function __construct(AMQPInterface $amqp, ControlInterface $rabbitCtrl, AbstractQueueFactory $qFactory, Generator $gen)
     {
         $this->amqp         = $amqp;
         $this->rabbitCtrl   = $rabbitCtrl;

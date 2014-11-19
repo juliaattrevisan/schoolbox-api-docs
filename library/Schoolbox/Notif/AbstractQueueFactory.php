@@ -11,8 +11,10 @@ namespace Schoolbox\Notif;
 
 
 use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Async\UserQueue\UserQueue;
 use InvalidArgumentException;
 use Predis\ClientInterface;
+use UnexpectedValueException;
 
 abstract class AbstractQueueFactory {
 
@@ -83,5 +85,12 @@ abstract class AbstractQueueFactory {
         }
         throw new InvalidArgumentException("Redis client not defined");
     }
+
+    /**
+     * @param int $userId
+     * @throws UnexpectedValueException
+     * @return UserQueue
+     */
+    public abstract function buildForUser($userId);
 
 } 
