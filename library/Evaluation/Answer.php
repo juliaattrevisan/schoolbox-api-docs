@@ -219,6 +219,26 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return $this->useLongAnswers;
     }
 
+    abstract public function exportResponseToCSV($attempt_id, $question_id);
+
+    /**
+     * Identical to exportResponseToCSV(), which generates data on the
+     * resultsForQuestion screen and the csv file itself, unless otherwise
+     * specified.
+     *
+     * This special method for having a different csv export response value, than
+     * to the one you see on resultsForQuestion screens (which by default use
+     * the same method), is another level of abstraction that isn't needed
+     * in most places
+     *
+     * @param $attempt_id
+     * @param $question_id
+     * @return mixed
+     */
+    public function resultsForQuestion($attempt_id, $question_id) {
+        return $this->exportResponseToCSV($attempt_id, $question_id);
+    }
+
 	/* Getters/Setters
  	 */
 

@@ -212,7 +212,7 @@ class Evaluation_Export_Graph {
 
 									/* Load answer template into answerOption block
 									 */
-									$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
+									$data = $answerHandler->resultsForQuestion($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
 
 									$responseValues = str_replace("\t", '', $data['response']);
 									$commentValues = $data['comment'];

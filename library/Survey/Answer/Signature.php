@@ -44,6 +44,34 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     }
 
     /**
+     * Generate signature representation differently for some screens and
+     * for the csv file itself. The CSV file probably won't benefit from
+     * having a numerical representation of svg graphics, so it uses
+     * the states "Signed" and "Unsigned", whereas this draws the sig itself
+     *
+     * @param $attempt_id
+     * @param $question_id
+     * @return mixed
+     */
+    public function resultsForQuestion($attempt_id, $question_id) {
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        /* SVG data
+         */
+        $data['response'] = $response['response'];
+
+        /* Append commentary
+         */
+        $data['comment'] = $response['comment'];
+
+        /* Append awarded mark
+         */
+        $data['mark'] = $response['mark'];
+
+        return $data;
+    }
+
+    /**
      * Get the response for a particular question
      *
      * @param  $attempt_id
