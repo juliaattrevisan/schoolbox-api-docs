@@ -8,11 +8,18 @@
  * @version     SVN: $Id$
  */
 
-/* Direct access to modify.php -_-
- */
-require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
+// scopecheck!
+if (isset($this)) {
+    $page   = $this;
+    $render = false;
+} else {
+    /* Direct access to modify.php -_-
+     */
+    require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
+    $page   = new SitePage();
+    $render = true;
+}
 
-$page = new SitePage();
 $page->setFile(TEMPLATE_content, 'modules/eotc/manage/modify.html');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
@@ -420,4 +427,6 @@ else {
 	$page->setVar('event_campus_list_block', '');
 }
 
-$page->outputPage();
+if ($render) {
+    $page->outputPage();
+}

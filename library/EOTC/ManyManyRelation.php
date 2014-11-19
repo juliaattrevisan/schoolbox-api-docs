@@ -69,7 +69,7 @@ class ManyManyRelation extends \Schoolbox\Mapper {
 			$ids[] = $row[$join['relation']['column']];
 		}
 
-		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, $join['relation']['options']);
+		$allInstances = $join['relation']['mapper']->findByColumn($join['relation']['key'], $ids, isset($join['relation']['options']) ? $join['relation']['options'] : array());
 
 		return $allInstances;
 	}
