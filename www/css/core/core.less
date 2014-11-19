@@ -2236,9 +2236,6 @@ li:hover > .actions .btn
         display: block;
     }
     .status-option {
-        display: flex;
-        justify-content: space-between;
-        white-space: nowrap;
         padding: 2px;
     }
     .status-option:hover {
@@ -2248,10 +2245,9 @@ li:hover > .actions .btn
 
 .status-buttons .status-option .status-label,
 .status-buttons .status-option .btn {
-    float: none;
-    display: inline-flex;
+    float: left;
     margin: 2px;
-    line-height: 28px;
+    line-height: 24px;
 }
 .status-selector {
     cursor: pointer;
@@ -6876,10 +6872,10 @@ HOMEPAGE CUSTOMISE
         .status-option{
             background: transparent;
             border-top: 1px solid @lgrey;
+            display: block;
             color: @black;
             text-align: left;
-            justify-content: inherit;
-            white-space: nowrap;
+            overflow: auto;
             &:hover{
                 background: lighten(@lgrey,15%);
                 text-decoration: underline;
