@@ -90,6 +90,7 @@
             <thead>
                 <tr>
                     <th>Lower Bound</th>
+                    <th>Raw Grade</th>
                     <th>Caption</th>
                 </tr>
             </thead>
@@ -115,6 +116,13 @@
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][lower_bound]"
                    value="{{! it.lowerBound }}"
                    placeholder="Lower Bound"
+            />
+        </td>
+        <td>
+            <input type="text"
+                   name="group[{{! it.group.id }}][grade][{{! it.id }}][raw_mark]"
+                   value="{{! it.rawGrade }}"
+                   placeholder="Raw Grade"
             />
         </td>
         <td>
@@ -163,6 +171,7 @@
                             <thead>
                             <tr>
                                 <th>Lower Bound</th>
+                                <th>Raw Grade</th>
                                 <th>Caption</th>
                             </tr>
                             </thead>
@@ -174,6 +183,13 @@
                                            name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
                                            value="{SUBMISSION_GRADE_LOWER_BOUND}"
                                            placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{{! it.group.id }}][grade][{{! it.id }}][raw_mark]"
+                                           value="{SUBMISSION_GRADE_RAW_GRADE}"
+                                           placeholder="Raw Grade"
                                             />
                                 </td>
                                 <td>
