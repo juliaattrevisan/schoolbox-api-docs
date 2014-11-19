@@ -492,11 +492,10 @@
      * Generates a new instance, based on the element that was clicked
      *
      * @param {$} element
-     * @param {Function} callback
      *
      * @return AJAX
      */
-    Masonry.prototype.newComponentInstance = function (element, callback) {
+    Masonry.prototype.newComponentInstance = function (element) {
 
         var url = this.options.palette.url,
             // TODO remove this find(a)
