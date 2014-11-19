@@ -56,9 +56,23 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     public function resultsForQuestion($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
+        /* This is called to manufacture $sectionValues, but that's really
+         * high up to keep passing around a sitepage just for one question
+         */
+        $page = new SitePage(false);
+        $page->setLite(true);
+        $page->setFile('signaturePad', 'survey/answer/signature/rendered.html');
+
+        $page->setVar(array(
+            'ID' => $attempt_id,
+            'RESPONSE' => $response['response']
+        ));
+
+        $page->parse('renderedSignature', 'signaturePad');
+
         /* SVG data
          */
-        $data['response'] = $response['response'];
+        $data['response'] = $page->getVar('renderedSignature');
 
         /* Append commentary
          */

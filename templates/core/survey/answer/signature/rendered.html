@@ -1,0 +1,17 @@
+<!-- injectable for rendering signature vector data into signaturePad -->
+
+<script type="text/javascript">
+    $(function() {
+        $('#sigPad{ID}').signaturePad({
+            displayOnly: true
+        }).regenerate({RESPONSE});
+    });
+</script>
+<div class="answer-given-container">
+    <label id='sigPad{ID}' class="sigPad">
+        <div class="sigPadWrapper">
+            <div class="typed"></div>
+            <canvas class="pad" width="500" height="100"></canvas>
+        </div>
+    </label>
+</div>

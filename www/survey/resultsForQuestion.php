@@ -102,7 +102,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 $this->setVar(
                     array(
                         'RESPONDENT_NAME'            => Scrub::text($currentAttempt['name']),
-                        'RESPONDENT_RESPONSE'        => Scrub::text($currentAttempt['responses']),
+                        'RESPONDENT_RESPONSE'        => $currentAttempt['responses'],
                         'RESPONDENT_START_DATETIME'  => $start->getShort(),
                         'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
                     )
