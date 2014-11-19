@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox;
+use Alaress_Byte_Format;
 use Schoolbox;
 use Schoolbox\Mapper;
 use Schoolbox\File\MimetypeMapper;
@@ -125,12 +126,16 @@ class StorageMapper extends Mapper implements StorageMapperInterface {
 	public function upload($filename, $temp_location, $user_id) {
 		$file = new Storage();
 		$file->setFilename($filename);
-        $file->setMimeType(MimetypeMapper::getInstance()->getByFilename($filename));
+        try {
+            $file->setMimeType(MimetypeMapper::getInstance()->getByFilename($filename));
 
-        /* Check mime type is allowed */
-		if (!($file->isUploadAllowed())) {
-			throw new File\Exception('Invalid mime type', File\Exception::CODE_MIMETYPE_NOT_FOUND);
-		}
+            /* Check mime type is allowed */
+            if (!($file->isUploadAllowed())) {
+                throw new File\Exception("Mimetype exists, but is not enabled");
+            }
+        } catch (File\Exception $e) {
+            throw new File\Exception("Your file, '{$file->getFilename()}' is not a valid file type", File\Exception::CODE_MIMETYPE_NOT_FOUND, $e);
+        }
 		$file->setTempLocation($temp_location);
 		$file->setUploadedBy(UserMapper::getInstance()->createModel($user_id));
 		$file->loadHashFromTempLocation();
@@ -147,7 +152,8 @@ class StorageMapper extends Mapper implements StorageMapperInterface {
 
 		/* Check maximum allowed file size */
         if($file->getMimeType()->getMaxFileSize() < $file->getFilesize()) {
-            throw new File\Exception('File too large', File\Exception::CODE_FILE_TOO_LARGE);
+            $humanSize =  Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize());
+            throw new File\Exception("The size of the uploaded file exceeds the file size restrictions of $humanSize.", File\Exception::CODE_FILE_TOO_LARGE);
         }
 
 		$this->save($file);

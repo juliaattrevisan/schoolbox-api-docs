@@ -27,7 +27,7 @@ class UploadController extends AbstractController implements InternalInterface {
         }
 
         $page->setVar(array(
-            'MAX_FILES'      => $this->multi ? 'null' : '1',
+            'MAX_FILES'      => $this->multi ? '32' : '1',
             'ACCEPTED_FILES' => $mime
         ));
     }

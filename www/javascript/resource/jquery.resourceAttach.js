@@ -143,21 +143,21 @@ if(typeof window.location.origin == 'undefined') {
 
                     try {
                         data = JSON.parse(response);
-                        $(file.previewElement)
-                            .find('input[data-az-attachment]')
-                            .val(data.hash);
-                        self.attach(data);
                     }
                     catch (err) {
-                        // noop
+                        data = response;
                     }
+
+                    $(file.previewElement)
+                        .find('input[data-az-attachment]')
+                        .val(data.hash);
+                    self.attach(data);
+
 
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
-                    if (xhr === undefined) {
-                        this.removeFile(file);
-                    }
+                    self.rejectFile(file, errMsg, this);
                 });
 
             },
@@ -254,6 +254,39 @@ if(typeof window.location.origin == 'undefined') {
         // prepare the dialog in the background
         this.build();
     }
+
+
+    /**
+     *
+     * @param {File|object}   file
+     * @param {string|object} errMsg
+     */
+    ResourceAttach.prototype.rejectFile = function (file, errMsg) {
+        var data, element, t,
+            errList = $(this.element).children('.az-error-list');
+
+        if (typeof errMsg == 'string') {
+            try {
+                data = JSON.parse(errMsg).hash.split(':')[1];
+            } catch (e) {
+                data = errMsg;
+            }
+        } else {
+            data = errMsg.hash.split(':')[1];
+        }
+
+        element = $(file.previewElement).clone().addClass('dz-error');
+
+        element.appendTo(errList);
+
+        element.children('.dz-progress, input').detach();
+        t = element.children('.filename').text();
+        element.children('.filename').text(t + ' failed: ' + data).attr('title', data);
+
+        if (this.dropzone) {
+            this.dropzone.removeFile(file);
+        }
+    };
 
 
     ResourceAttach.prototype.build = function () {
@@ -366,6 +399,11 @@ if(typeof window.location.origin == 'undefined') {
                 this.fallbackFiles.push(data);
 
                 this.fallbackMaxFilesReached();
+            }
+
+            // now the file has been added...if it's buggy, take it out again
+            if (data.hash.split(':')[0] == 'exception') {
+                this.rejectFile(data, data);
             }
         }
 
