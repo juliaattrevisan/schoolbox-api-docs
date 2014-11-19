@@ -26,15 +26,15 @@
 // Generic colors
 @body-background: 				#E6E4F2; // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
-@dark: 							#F4F4F8; // Alternate tigerstriping color
-@border-color: 					#EEEEEE; // Bordering @dark
-@alternate-background: 			#FAF9F5; // Sections such as admin
+@dark: 							      #F4F4F8; // Alternate tigerstriping color
+@border-color: 					  #EEEEEE; // Bordering @dark
+@alternate-background: 		#FAF9F5; // Sections such as admin
 
 // Basic type
-@body-text: 					@black;
-@secondary-text: 				#797979;
-@link: 							#0066B0;
-@link-hover: 					#176D76;
+@body-text: 					   @black;
+@secondary-text: 				 #797979;
+@link: 							     #0066B0;
+@link-hover: 					   #176D76;
 
 // Main banner & Search
 @banner-background: 			#1E125E;
@@ -117,9 +117,10 @@ body.login{
       left: 0;
       top: 50px;
       padding: 0 9%;
-      .error, .forgotten{
-        margin: 35px 0;
+      .forgotten{
         text-decoration: none;
+        clear: both;
+        font-size: 16px;
       }
       a{ color: @module-background; }
       #loginForm{
@@ -127,7 +128,8 @@ body.login{
         :-moz-placeholder { color: @secondary-text; font-size: 17px; font-weight: bold; } /* Firefox 18- */
         ::-moz-placeholder { color: @secondary-text; font-size: 17px; font-weight: bold; } /* Firefox 19+ */
         :-ms-input-placeholder { color: @secondary-text; font-size: 17px; font-weight: bold; }
-        input{
+        input[type="text"],
+        input[type="password"]{
           .gradient (#ebeaea, #ffffff);
           color: #5b5b5b;
           font-size: 17px;
@@ -149,6 +151,7 @@ body.login{
           text-align: center;
           &:hover{background: #f5da85;}
         }
+        label{ margin-bottom: 20px; font-size: 16px; }
         fieldset{ padding: 0; color: #ffffff; }
       }
     }
@@ -206,7 +209,6 @@ body.login{
               box-sizing: border-box;
               top: 15px;
               #login-logo{ margin-bottom: 15px; }
-              .error, .forgotten{ display: none; }
           }
           #login-bg,
           #footer{ display: none; }
