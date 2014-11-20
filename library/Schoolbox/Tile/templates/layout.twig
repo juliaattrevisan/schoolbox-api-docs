@@ -188,6 +188,7 @@
                     // Toggle classes for selected pane
                     thisPane.addClass('selected');
                     panes.not(thisPane).removeClass('selected');
+                    validator.form();
                 })
                 // and switch on the ones for the selected shape
                 .filter(':checked').change();
