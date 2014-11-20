@@ -16,19 +16,11 @@ if (!$groupHandler->isStaff()) {
 
 $questionBankHandler = new Assess_Question_Bank();
 
-if (!empty($_POST)) {
-    $i = 0;
-
-    foreach ($_POST['question_bank_id'] as $questionBankId) {
-        $questionBankHandler->update(array(
-            'question_bank_id' => $questionBankId,
+if (is_numeric($this->arg[0])) {
+    $questionBankHandler->update(array(
+            'question_bank_id' => $this->arg[0],
             'deleted_at' => 'NOW()',
         ));
-
-        $i++;
-    }
 }
 
-echo "$i questions removed.";
-
-exit();
+$this->backToTheFuture(1);
