@@ -9,13 +9,16 @@ $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 $this->setBlock('question', 'select_question', 'select_question_block');
 $this->setBlock('question', 'missing_class', 'missing_class_block');
+$this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block');
 
 /* TODO FIXME... XSS attack */
-$this->setVar(array(
-    'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
-    'ASSESS_ID' => $this->arg[1],
-    'SECTION_ID' => $this->arg[2],
-));
+$this->setVar(
+    array(
+        'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
+        'ASSESS_ID' => $this->arg[1],
+        'SECTION_ID' => $this->arg[2],
+    )
+);
 
 $questionBankHandler = new Assess_Question_Bank();
 
@@ -23,7 +26,8 @@ $questionBankHandler = new Assess_Question_Bank();
  */
 $questionBankCategoryHandler = new Assess_Question_Category();
 
-$questionCategoryList = new Assess_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath());
+$questionCategoryList = new Assess_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath(
+));
 $questionCategoryList->render();
 
 /* If expanding a particular category
@@ -31,9 +35,11 @@ $questionCategoryList->render();
 if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
     $category = $questionBankCategoryHandler->getByID($this->arg[0]);
 
-    $this->setVar(array(
-        'QUESTION_CATEGORY' => Scrub::text($category['name']),
-    ));
+    $this->setVar(
+        array(
+            'QUESTION_CATEGORY' => Scrub::text($category['name']),
+        )
+    );
 
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
 
@@ -43,13 +49,15 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         $previousCategory = false;
         $factory = new Assess_Factory();
         foreach ($allQuestions as $currentQuestion) {
-            $this->setVar(array(
-                'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
-                'QUESTION_TYPE' => Scrub::text($currentQuestion['description']),
-                'QUESTION' => Scrub::html($currentQuestion['question']),
-                'MARKS' => $currentQuestion['marks'],
-                'answers_block' => '',
-            ));
+            $this->setVar(
+                array(
+                    'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
+                    'QUESTION_TYPE' => Scrub::text($currentQuestion['description']),
+                    'QUESTION' => Scrub::html($currentQuestion['question']),
+                    'MARKS' => $currentQuestion['marks'],
+                    'answers_block' => '',
+                )
+            );
 
             //
             // Need to be able to create a question and answer for this question
@@ -57,8 +65,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             if ($factory->isQuestionTypeAvailable($currentQuestion['type_id'])) {
                 $this->parse('select_question_block', 'select_question');
                 $this->setVar('missing_class_block', '');
-            }
-            else {
+            } else {
                 $this->setVar('select_question_block', '');
                 $this->parse('missing_class_block', 'missing_class');
             }
@@ -73,7 +80,10 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                                * multiple choice
                                */
                         if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
-                            $this->setVar('ANSWER_DESCRIPTION', Scrub::Text($answer->answerLeft . ' - ' . $answer->answerRight));
+                            $this->setVar(
+                                'ANSWER_DESCRIPTION',
+                                Scrub::Text($answer->answerLeft . ' - ' . $answer->answerRight)
+                            );
                         } else {
                             $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->description));
                         }
@@ -114,19 +124,34 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
          */
         $this->setVar('no_questions_block', '');
         $this->setVar('welcome_block', '');
+
+        $this->parse('has_edit_category_block', 'has_edit_category');
     } else {
 
         /* There are no questions: hide the add/remove functionality and display a
          * little message
          */
-        $this->setVar('show_submit_block', '');
-        $this->setVar('show_delete_block', '');
-        $this->setVar('question_block', '');
-        $this->setVar('welcome_block', '');
+        $this->setVar(
+            array(
+                'show_submit_block' => '',
+                'show_delete_block' => '',
+                'question_block' => '',
+                'welcome_block' => ''
+            )
+        );
+
         $this->parse('no_questions_block', 'no_questions');
         $this->parse('category_selected_block', 'category_selected');
+        $this->parse('has_edit_category_block', 'has_edit_category');
     }
 } else {
+    $this->setVar(
+        array(
+            'QUESTION_CATEGORY' => '',
+            'category_selected_block' => '',
+            'has_edit_category_block' => ''
+        )
+    );
+
     $this->parse('welcome_block', 'welcome');
-    $this->setVar('category_selected_block', '');
 }
