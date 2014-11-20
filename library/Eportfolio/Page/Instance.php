@@ -321,20 +321,21 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderColours()
     {
-        // Defaults
-        $this->getPage()->setVar(array(
-            'COLOUR_ARRAY' => 'defaults'
-        ));
+        foreach(array('defaults', 'original', 'pickers') as $currentType) {
+            $this->getPage()->setVar(array(
+                'COLOUR_ARRAY' => $currentType
+            ));
 
-        foreach ($this->getColours() as $field => $colour) {
-            $vars = array(
-                $field => $colour
-            );
+            foreach ($this->getColours() as $field => $colour) {
+                $vars = array(
+                    $field => $colour
+                );
 
-            $this->getPage()->setVar($vars);
+                $this->getPage()->setVar($vars);
+            }
+
+            $this->getPage()->parse('colour_list_block', 'colour_list', true);
         }
-
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }
 
     /**
