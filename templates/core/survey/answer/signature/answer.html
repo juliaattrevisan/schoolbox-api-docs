@@ -3,18 +3,22 @@
 	/* Timeout closure
 	 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
 	 */
+    var signatureTimer = 0;
+
 	var createDelayManager = function() {
-		var timer = 0;
 		return function(callback, ms) {
-			clearTimeout(timer);
-			timer = setTimeout(callback, ms);
+			clearTimeout(signatureTimer);
+            signatureTimer = setTimeout(callback, ms);
 		};
 	}
 
-	var dm1 = createDelayManager();
+	var dm = createDelayManager();
 
 	$j(function() {
 		$('.sigPad').signaturePad({
+            lineTop: 102,
+            lineWidth: 0,
+            lineMargin: 16,
 			drawOnly: true,
 			onDrawEnd: function() {
 
@@ -23,11 +27,11 @@
 				 *
 				 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
 				 */
-				dm1(function() {
+				dm(function() {
 					$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
 						id: {QUESTION_ID}
 					});
-				}, 1500);
+				}, 3000);
 			}
 		}).regenerate({ANSWER});
 	});
@@ -44,10 +48,10 @@
     <!-- BEGIN answerOption -->
 	<div class="sigPadWrapper">
 		<div class="typed"></div>
-		<canvas class="pad" width="500" height="100"></canvas>
+		<canvas class="pad" width="500" height="142"></canvas>
 
 		<!-- opacity:0, for validator to work - it doesn't like hidden fields -->
-		<input type="text" name="answer" class="output" style="opacity:0;">
+		<input type="text" name="answer" class="output" style="border:0;opacity:0;height:0px;padding:0px;margin:0px">
 	</div>
 
 	<p class="clearButton">
