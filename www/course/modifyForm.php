@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Course\Task;
 
 $site_page = new SitePage();
 
@@ -40,6 +41,8 @@ if ($group->getPermission($component->getIdentifier()) < WRITE_ACCESS) {
 
 // Save each set of units.
 if (!$permission_denied) {
+    /** @var Collection|UnitInstance[] $saved_list */
+    /** @var Collection|UnitInstance[] $deleted_list */
     $saved_list   = new Collection();
     $deleted_list = new Collection();
     if ($_POST['action'] === 'delete') {
@@ -102,7 +105,44 @@ if (!$permission_denied) {
         }
     }
     if (count($saved_list)) {
-        UnitInstanceMapper::getInstance()->save($saved_list);
+        if (UnitInstanceMapper::getInstance()->save($saved_list)) {
+            // Update due dates of items, if required
+            $taskMapper = Task\InstanceMapper::getInstance();
+            foreach ($saved_list as $savedInstance) {
+                $unitInstanceId = $savedInstance->getId();
+                $updateOpenDate = true;
+                $updateDueDate  = true;
+                foreach ($_POST['unit'] as $unitPost) {
+                    if ($unitPost['unit_instance_id'] == $unitInstanceId) {
+                        $updateOpenDate = $unitPost['update_open_date'];
+                        $updateDueDate  = $unitPost['update_due_date'];
+                        break;
+                    }
+                }
+
+                // Not updating either? Go no further
+                if (!($updateOpenDate || $updateDueDate)) {
+                    continue;
+                }
+
+                // Get all the tasks out, and update their due dates
+                /** @var Task\Instance[] $taskList */
+                $taskList = $taskMapper->findByColumn(
+                    'course_unit_instance_id',
+                    $savedInstance->getId()
+                );
+                foreach ($taskList as $task) {
+                    $cloner = new Task\Cloner($task);
+                    if ($updateOpenDate) {
+                        $cloner->updateTaskOpenTime();
+                    }
+                    if ($updateDueDate) {
+                        $cloner->updateTaskCloseTime();
+                    }
+                }
+//                $taskMapper->save($taskList);
+            }
+        }
     }
     if (count($deleted_list)) {
         UnitInstanceMapper::getInstance()->delete($deleted_list);
