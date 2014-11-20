@@ -8,18 +8,63 @@
         var xInput   = form.find('input[name="aspect_ratio_x"]');
         var yInput   = form.find('input[name="aspect_ratio_y"]');
 
+        // Validation -_-
+        var rules = {
+            grid_width: {
+                required: true,
+                digits: true,
+                min: 1,
+                max: 5000
+            },
+            column_count: {
+                required: true,
+                digits: true,
+                min: 1,
+                max: 250
+            },
+            aspect_ratio_x: {
+                required: true,
+                digits: true,
+                min: 1,
+                max: 100
+            },
+            aspect_ratio_y: {
+                required: true,
+                digits: true,
+                min: 1,
+                max: 100
+            }
+        };
+        var validator = form.validate({
+            rules: rules,
+            errorPlacement: function(error, element) {
+                var closestPane = element.closest('.pane');
+                if (closestPane.length) {
+                    error.appendTo(closestPane);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
 
             // Get aspect ratio. If it's invalid, don't resize anything
-            var xAspect = Number(xInput.val());
-            var yAspect = Number(yInput.val());
+            var xAspect = Math.max(rules.aspect_ratio_x.min, Math.min(rules.aspect_ratio_x.max, Number(xInput.val())));
+            var yAspect = Math.max(rules.aspect_ratio_y.min, Math.min(rules.aspect_ratio_y.max, Number(yInput.val())));
             if (xAspect > 0 && yAspect > 0) {
                 // start resizing
                 var aspect = yAspect / xAspect;
                 if (form.find('input#layout_type_grid').is(':checked')) {
-                    // grid layout
-                    var gridWidth = Number(form.find('input[name="grid_width"]').val());
+                    // grid layout - keep within min and max
+                    var gridWidth = Math.max(
+                        rules.grid_width.min,
+                        Math.min(
+                            rules.grid_width.max,
+                            Number(form.find('input[name="grid_width"]').val())
+                        )
+                    );
                     if (gridWidth > 0) {
                         tileList.find('.tile').css({
                             "width":          String(gridWidth)+"px",
@@ -27,8 +72,14 @@
                         })
                     }
                 } else if (form.find('input#layout_type_column').is(':checked')) {
-                    // column layout
-                    var colCount = Number(form.find('input[name="column_count"]').val());
+                    // column layout - keep within min and max
+                    var colCount = Math.max(
+                        rules.column_count.min,
+                        Math.min(
+                            rules.column_count.max,
+                            Number(form.find('input[name="column_count"]').val())
+                        )
+                    );
                     if (colCount > 0) {
                         var width = (100/colCount);
                         tileList.find('.tile').css({
@@ -153,11 +204,12 @@
                     // Toggle classes for selected pane
                     thisPane.addClass('selected');
                     panes.not(thisPane).removeClass('selected');
+                    validator.form();
                 })
                 // and switch on the ones for the selected shape
                 .filter(':checked').change();
             ;
-        })
+        });
     })
 })(jQuery);
 </script>
