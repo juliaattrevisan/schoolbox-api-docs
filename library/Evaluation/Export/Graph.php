@@ -212,15 +212,14 @@ class Evaluation_Export_Graph {
 
 									/* Load answer template into answerOption block
 									 */
-									$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
+                                    $data = $answerHandler->resultsForQuestion($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
 
-									$responseValues = str_replace("\t", '', $data['response']);
 									$commentValues = $data['comment'];
 
 									$this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(
 										'synergy_id' => $currentAttempt['synergy_id'],
 										'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
-										'responses' => $responseValues,
+										'responses' => $data['responses'],
 										'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES),
 										'start' => $currentAttempt['start'],
 										'finish' => $currentAttempt['finish'],

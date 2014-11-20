@@ -44,6 +44,48 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     }
 
     /**
+     * Generate signature representation differently for some screens and
+     * for the csv file itself. The CSV file probably won't benefit from
+     * having a numerical representation of svg graphics, so it uses
+     * the states "Signed" and "Unsigned", whereas this draws the sig itself
+     *
+     * @param $attempt_id
+     * @param $question_id
+     * @return mixed
+     */
+    public function resultsForQuestion($attempt_id, $question_id) {
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        /* This is called to manufacture $sectionValues, but that's really
+         * high up to keep passing around a sitepage just for one question
+         */
+        $page = new SitePage(false);
+        $page->setLite(true);
+        $page->setFile('signaturePad', 'survey/answer/signature/rendered.html');
+
+        $page->setVar(array(
+            'ID' => $attempt_id,
+            'RESPONSE' => $response['response']
+        ));
+
+        $page->parse('renderedSignature', 'signaturePad');
+
+        /* SVG data
+         */
+        $data['responses'] = $page->getVar('renderedSignature');
+
+        /* Append commentary
+         */
+        $data['comment'] = $response['comment'];
+
+        /* Append awarded mark
+         */
+        $data['mark'] = $response['mark'];
+
+        return $data;
+    }
+
+    /**
      * Get the response for a particular question
      *
      * @param  $attempt_id
