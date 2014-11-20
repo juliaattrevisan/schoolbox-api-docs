@@ -319,25 +319,19 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 	 */
     private function renderColours()
     {
-        // Colors (original)
-        $this->getPage()->setVar('COLOUR_ARRAY', 'original');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-
-        // Colors (picker)
-        $this->getPage()->setVar('COLOUR_ARRAY', 'pickers');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-
         // Defaults
 
         $columns = array('top', 'left', 'right');
-        $this->getPage()->setVar('COLOUR_ARRAY', 'defaults');
+//        $this->getPage()->setVar(array(
+//            'COLOUR_ARRAY' => 'defaults'
+//        ));
 
-        foreach ($columns as $col) {
-            foreach ($this->getColours() as $field => $colour) {
-                $this->getPage()->setVar($col . '_' . $field, $colour);
-            }
+        foreach ($this->getColours() as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
+
+            $this->getPage()->setVar($vars);
         }
 
         $this->getPage()->parse('colour_list_block', 'colour_list', true);
