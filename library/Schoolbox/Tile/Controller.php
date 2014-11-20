@@ -70,11 +70,11 @@ class Controller extends Base
         $code   = 200;
         $layout = $this->getLayoutFromComponent($component);
         $layout
-            ->setLayoutType($this->getRequest()->post['layout_type'])
-            ->setGridWidth($this->getRequest()->post['grid_width'])
-            ->setColumnCount($this->getRequest()->post['column_count'])
-            ->setAspectRatioX($this->getRequest()->post['aspect_ratio_x'])
-            ->setAspectRatioY($this->getRequest()->post['aspect_ratio_y'])
+            ->setLayoutType(intval($this->getRequest()->post['layout_type']))
+            ->setGridWidth(intval($this->getRequest()->post['grid_width']))
+            ->setColumnCount(intval($this->getRequest()->post['column_count']))
+            ->setAspectRatioX(intval($this->getRequest()->post['aspect_ratio_x']))
+            ->setAspectRatioY(intval($this->getRequest()->post['aspect_ratio_y']))
         ;
 
         if ($this->getLayoutMapper()->save($layout)) {
