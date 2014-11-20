@@ -208,7 +208,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $bob = new Builder();
         $bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
-            ->setHref("/homepage/$categoryId")
+            ->setHref("/homepage/$categoryId#$kind-$id")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams(array(
                 'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
