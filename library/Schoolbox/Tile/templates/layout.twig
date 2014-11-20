@@ -8,6 +8,41 @@
         var xInput   = form.find('input[name="aspect_ratio_x"]');
         var yInput   = form.find('input[name="aspect_ratio_y"]');
 
+        // Validation -_-
+        var validator = form.validate({
+            rules: {
+                grid_width: {
+                    required: true,
+                    digits: true,
+                    min: 1
+                },
+                column_count: {
+                    required: true,
+                    digits: true,
+                    min: 1,
+                    max: 250
+                },
+                aspect_ratio_x: {
+                    required: true,
+                    digits: true,
+                    min: 1
+                },
+                aspect_ratio_y: {
+                    required: true,
+                    digits: true,
+                    min: 1
+                }
+            },
+            errorPlacement: function(error, element) {
+                var closestPane = element.closest('.pane');
+                if (closestPane.length) {
+                    error.appendTo(closestPane);
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
         // Updater for tile shape and layout
         form.find(':input[data-function="update-layout"]').change(function() {
 
@@ -157,7 +192,7 @@
                 // and switch on the ones for the selected shape
                 .filter(':checked').change();
             ;
-        })
+        });
     })
 })(jQuery);
 </script>
