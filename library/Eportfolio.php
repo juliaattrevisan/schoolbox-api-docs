@@ -420,6 +420,7 @@ class Eportfolio {
 	 * @return resource
 	 */
 	public function saveDisplayProperties($listColor) {
+
 		$query = "
 			UPDATE {$this->getContext()}_page
 			SET
@@ -437,8 +438,7 @@ class Eportfolio {
 		$query .= implode(',', $stack);
 
 		$query .= "
-			WHERE uid = '{$this->getUserId()}'
-			AND page_id = {$this->getPageId()}
+			WHERE page_id = {$this->getPageId()}
 		";
 
 		return $this->db->query($query);
