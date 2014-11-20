@@ -495,7 +495,13 @@ class Controller extends Base
                             $recurrenceRule,
                             new Alaress_Date_Format($repeatUntil->modify('23:59:59')),
                             $event->getStartDateTime(),
-                            $event->getEndDateTime()
+                            $event->getEndDateTime(),
+                            Calendar\EventMapper::ACCESS_PERSONAL,
+                            new Calendar\EventRelations(
+                                Calendar\EventMapper::ACCESS_PERSONAL,
+                                array(),
+                                array()
+                            )
                         );
                         // Create a whole set of bookings based on this event.
                         $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
