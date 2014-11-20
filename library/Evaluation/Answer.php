@@ -219,7 +219,11 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return $this->useLongAnswers;
     }
 
-    abstract public function exportResponseToCSV($attempt_id, $question_id);
+    /**
+     * Export response to csv - manually enforced in each subclass due to handlers
+     */
+    public function exportResponseToCSV($attempt_id, $question_id) {
+    }
 
     /**
      * Identical to exportResponseToCSV(), which generates data on the
