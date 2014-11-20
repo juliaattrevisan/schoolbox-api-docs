@@ -1152,11 +1152,13 @@ class SitePage extends Page
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
-                        $this->setVar($key, Scrub::text($value));
-                        if (in_array($value, $selected)) {
-                            $this->setVar($key . '_SELECTED', 'selected="selected"');
-                        } else {
-                            $this->setVar($key . '_SELECTED', '');
+                        if (is_scalar($value)) {
+                            $this->setVar($key, Scrub::text($value));
+                            if (in_array($value, $selected)) {
+                                $this->setVar($key . '_SELECTED', 'selected="selected"');
+                            } else {
+                                $this->setVar($key . '_SELECTED', '');
+                            }
                         }
                     }
                 } elseif (is_object($row)) {
@@ -1168,11 +1170,13 @@ class SitePage extends Page
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get' . ucfirst($property);
                         $value      = $row->$get_method();
-                        $this->setVar($template_var, Scrub::text($value));
-                        if (in_array($value, $selected)) {
-                            $this->setVar($template_var . '_SELECTED', 'selected="selected"');
-                        } else {
-                            $this->setVar($template_var . '_SELECTED', '');
+                        if (is_scalar($value)) {
+                            $this->setVar($template_var, Scrub::text($value));
+                            if (in_array($value, $selected)) {
+                                $this->setVar($template_var . '_SELECTED', 'selected="selected"');
+                            } else {
+                                $this->setVar($template_var . '_SELECTED', '');
+                            }
                         }
                     }
                 }
