@@ -103,12 +103,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             'customise_page_block' => '',
             'colour_list_block' => '',
         ));
-
-        if ($this->getPermission() > WRITE_ACCESS) {
-            $this->getPage()->parse('edit_page_block', 'edit_page');
-            $this->getPage()->parse('modify_layout_block', 'modify_layout');
-            $this->getPage()->parse('customise_page_block', 'customise_page');
-        }
     }
 
     /**
@@ -126,6 +120,14 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         $this->renderColumnWidths();
         $this->renderAllowedFileTypes();
         $this->renderPermissions();
+
+        /* Container blocks must parse after their inner organs
+         */
+        if ($this->getPermission() > WRITE_ACCESS) {
+            $this->getPage()->parse('edit_page_block', 'edit_page');
+            $this->getPage()->parse('modify_layout_block', 'modify_layout');
+            $this->getPage()->parse('customise_page_block', 'customise_page');
+        }
     }
 
     /**
@@ -320,11 +322,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     private function renderColours()
     {
         // Defaults
-
-        $columns = array('top', 'left', 'right');
-//        $this->getPage()->setVar(array(
-//            'COLOUR_ARRAY' => 'defaults'
-//        ));
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => 'defaults'
+        ));
 
         foreach ($this->getColours() as $field => $colour) {
             $vars = array(
