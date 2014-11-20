@@ -342,46 +342,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }
-//
-//    /**
-//	 * Apply default colours to everything
-//	 */
-//    private function renderDefaultColours()
-//    {
-//        $defaultColour = array(
-//            'head_font' => Cfg::get('homepage_colour_head_font'),
-//            'head_bg' => Cfg::get('homepage_colour_head_bg'),
-//            'font' => Cfg::get('homepage_colour_font'),
-//            'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-//            'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-//            'link' => Cfg::get('homepage_colour_link'),
-//            'hover' => Cfg::get('homepage_colour_hover')
-//        );
-//
-//        $this->getPage()->setVar('COLOUR_ARRAY', 'defaults');
-//
-//        $columns = array('top', 'left', 'right');
-//
-//        foreach ($columns as $col) {
-//            foreach ($defaultColour as $field => $colour) {
-//                $this->getPage()->setVar($col . '_' . $field, $colour);
-//            }
-//        }
-//
-//        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-//
-//        /* Javascript colour values for the original
-//		 */
-//        $this->getPage()->setVar('COLOUR_ARRAY', 'original');
-//        $this->getPage()->setVar($this->getColours());
-//        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-//
-//        /* Javascript colour values for the picker
-//		 */
-//        $this->getPage()->setVar('COLOUR_ARRAY', 'pickers');
-//        $this->getPage()->setVar($this->getColours());
-//        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-//    }
 
     /**
 	 * Figure out column widths
