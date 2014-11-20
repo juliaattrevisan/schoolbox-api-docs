@@ -41,7 +41,7 @@ class TextboxNotifier extends ResourceNotifier {
 
 		$bob = new Builder();
 
-		$bob->setTitle(":author $action content from :homepage: \":heading\"")
+		$bob->setTitle(":author $action content in :homepage: \":heading\"")
 		    ->setParams(array(
 			    'author'   => new UserParam($effector),
 			    'homepage' => new CategoryParam($category),

@@ -52,8 +52,8 @@ class Feed extends Decorator {
 	public function renderAsFeedArray() {
 		$context = $this->renderAsSitePageArray();
 		foreach($context as $id => $n) {
-			if(preg_match("`,? in <a.+</a>$`", $n['title'], $matches, PREG_OFFSET_CAPTURE)) {
-				$context[$id]['title'] = substr($n['title'], 0, $matches[0][1]);
+			if(preg_match("`,? in <a[^>]+>[^<]+</a>`", $n['title'], $matches, PREG_OFFSET_CAPTURE)) {
+                $context[$id]['title'] = substr_replace($n['title'], '', $matches[0][1], strlen($matches[0][0]));
 			}
 		}
 		return $context;

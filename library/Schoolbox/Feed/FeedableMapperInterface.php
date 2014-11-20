@@ -11,7 +11,7 @@ namespace Schoolbox\Feed;
 
 
 use Alaress\Async\Notification\Instance\Instance;
-use Schoolbox\Column\Collection;
+use Schoolbox\Collection;
 
 interface FeedableMapperInterface {
 

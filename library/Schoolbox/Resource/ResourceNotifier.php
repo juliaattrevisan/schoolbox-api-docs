@@ -150,8 +150,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     protected function getFeedInternal($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0, $filter)
     {
-        $logs = LogMapper::getInstance()
-                         ->findForFeed($context, $filter, $limit, $offset);
+        $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
 
         $c = new Collection();
 
@@ -209,7 +208,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $bob = new Builder();
         $bob->setIcon("/portrait.php?userId=$effectorExtId&size=square32")
-            ->setHref("/homepage/$categoryId")
+            ->setHref("/homepage/$categoryId#$kind-$id")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams(array(
                 'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
@@ -332,7 +331,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         }
 
         // if changed in some other way...
-        if (count($diff)) {
+        if (count($diff) || is_null($diff)) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
                 new Param($resourceName), $effector, $category, $roleType

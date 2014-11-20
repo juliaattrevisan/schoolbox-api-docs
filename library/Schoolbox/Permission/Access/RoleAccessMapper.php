@@ -12,6 +12,8 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\RoleMapper;
@@ -114,4 +116,20 @@ class RoleAccessMapper extends Mapper {
 
 		return $c;
 	}
+
+
+    /**
+     * This model does not have any notifications
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool|void
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // noop
+        return;
+    }
+
 } 

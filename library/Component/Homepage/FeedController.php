@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\Feed\Feed;
+use Schoolbox\Feed\StandardFeed;
 use Schoolbox\User;
 
 /**
@@ -28,23 +29,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
 		$conf = \Schoolbox\Config\ConfigMapper::getInstance();
 
-		$this->feed = new Feed();
-		$this->feed->aggregate(
-			array(
-				new Schoolbox\Assessment\Component\SubmissionBoxNotifier($conf),
-				new Schoolbox\Assessment\Component\OnlineAssessmentNotifier($conf),
-				new Schoolbox\Resource\Category\NewsNotifier($conf),
-				new Schoolbox\Blog\BlogNotifier($conf),
-				new Schoolbox\Blog\CommentNotifier($conf),
-				new Schoolbox\Wiki\WikiNotifier($conf),
-				new Schoolbox\Wiki\RevisionNotifier($conf),
-				new Schoolbox\Resource\CategoryNotifier($conf),
-				new Schoolbox\Resource\FileNotifier($conf),
-				new Schoolbox\Resource\LinkNotifier($conf),
-				new Schoolbox\Resource\TextboxNotifier($conf)
-			),
-			$this->getContext('id'), $user->getRole()->getType(), $this->getConfig('size')
-		);
+		$this->feed = new StandardFeed($conf, $this->getContext('id'), $user->getRole()->getType(), $this->getConfig('size'));
 	}
 
 	/**
