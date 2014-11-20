@@ -7,7 +7,8 @@ echo "Detected Browser Info:\n\n";
 
 use phpbrowscap\Browscap;
 
-$bc = new Browscap(Config::get('file_dir'));
+$bc = new Browscap(__DIR__.'/../../tools/browscap');
+//$bc->remoteIniUrl = 'http://browscap.org/stream?q=Full_PHP_BrowsCapINI';
 // Don't attempt to update
 $bc->doAutoUpdate = false;
 // Use local version of the browscap.ini file

@@ -49,8 +49,10 @@ then
 		git branch -D master;
 		git checkout -b master;
 		# Download and include the cache file for browsercap
-		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browsercap-cache.php;
-		git add tools/browsercap-cache.php;
+		mkdir -p tools/browscap;
+		touch tools/browscap/browscap.ini;
+		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browscap/cache.php;
+		git add -f tools/browscap;
 		git commit -a -m "update changelog for building";
 		git branch -D upstream;
 		git branch upstream;
