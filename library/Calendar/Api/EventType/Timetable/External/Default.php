@@ -62,16 +62,21 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                     $period['staff']    = null;
                     $period['category'] = null;
                     try {
-                        $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id',
-                            $period['staffID']
-                        );
+                        if (!empty($period['staffID'])) {
+                            $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                                'synergy_id',
+                                $period['staffID']
+                            );
+                        }
                     } catch (Exception $e) {
+                        // noop
                     }
                     try {
-                        $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
-                            $period['code']
-                        );
+                        if (!empty($period['code'])) {
+                            $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                                $period['code']
+                            );
+                        }
                     } catch (Exception $e) {
                         // noop
                     }
