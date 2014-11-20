@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -34,6 +35,8 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'has_clickview', 'has_clickview_block');
         $this->setBlock($templateHandle, 'online_clickview', 'online_clickview_block');
         $this->setBlock($templateHandle, 'iframe_clickview', 'iframe_clickview_block');
+        $this->setBlock($templateHandle, 'select_video', 'select_video_block');
+
 
         $this->setVar('has_clickview_block', '');
         $this->setVar('online_clickview_block', '');
@@ -102,6 +105,13 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 }
             }
         }
+
+        if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('select_video_block', 'select_video');
+        } else {
+            $this->setVar('select_video_block', '');
+        }
+
 
         return true; // everything went according to plan
     }
