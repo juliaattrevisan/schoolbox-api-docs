@@ -114,6 +114,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
          */
         $this->setVar('no_questions_block', '');
         $this->setVar('welcome_block', '');
+
+        $this->parse('has_edit_category_block', 'has_edit_category');
     } else {
 
         /* There are no questions: hide the add/remove functionality and display a
