@@ -580,7 +580,16 @@ if (empty($feedItems)) {
 }
 
 // subject drop down
-$this->dropDown('subject', $summary, '', TEMPLATE_content, array('cid' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
+$this->dropDown(
+    'subject',
+    $summary,
+    '',
+    TEMPLATE_content,
+    array(
+        'cid'  => 'SUBJECT_ID',
+        'name' => 'SUBJECT_NAME'
+    )
+);
 
 // Output category colour styles
 $colourList  = Timetable_ColourMapper::getInstance()->findAll();
