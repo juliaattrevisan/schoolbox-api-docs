@@ -29,20 +29,17 @@
              */
             if (self.settings.autoNext) {
                 self.playerElement.data('mediaelementplayer').$media.on('ended.mediaPlaylist', function (event) {
-                    var match = this.src.match(/id=(\d+)/);
-                    if (match) {
-                        // Get list of rels in the playlist,
-                        // look for current ID in that list,
-                        // play the next one if there is one.
-                        var playlistRels = self.playlist.map(function() {
-                            return this.rel;
-                        }).toArray();
-                        var current = playlistRels.indexOf(match[1]);
-                        if (current >= 0) {
-                            var next = current + 1;
-                            if (next < playlistRels.length) {
-                                self.loadTrack(playlistRels[next], true);
-                            }
+                    // Get list of hrefs in the playlist,
+                    // look for current ID in that list,
+                    // play the next one if there is one.
+                    var playlistLinks = self.playlist.map(function() {
+                        return this.href;
+                    }).toArray();
+                    var current = playlistLinks.indexOf(this.src);
+                    if (current >= 0) {
+                        var next = current + 1;
+                        if (next < playlistLinks.length) {
+                            self.loadTrack(playlistLinks[next], true);
                         }
                     }
                 });
@@ -50,7 +47,7 @@
 
             self.playlist.on('click.mediaPlaylist', function (event) {
                 event.preventDefault();
-                self.loadTrack($(this).attr("rel"), self.settings.autoPlayOnClick);
+                self.loadTrack(this.href, self.settings.autoPlayOnClick);
             });
         }
     };
@@ -58,17 +55,17 @@
     /**
      * Loads a track with a given ID.
      *
-     * @param id
+     * @param href
      * @param autoplay Should the player play automatically? Defaults to false
      */
-    MediaPlaylist.prototype.loadTrack = function(id, autoplay) {
+    MediaPlaylist.prototype.loadTrack = function(href, autoplay) {
         var player = this.playerElement.data('mediaelementplayer');
         player.pause();
-        player.setSrc("/cms/sendVideo.php?type=sbfs&id=" + id);
+        player.setSrc(href);
 
         // Find the requested track in the playlist
         var playlistLink = this.playlist.filter(function () {
-            return id == this.rel;
+            return href == this.href;
         });
         if (playlistLink.length) {
             this.playerTitle.text(playlistLink.text());
@@ -77,7 +74,6 @@
             player.play();
         }
     };
-
 
     $.fn.mediaPlaylist = function(options) {
         this.each(function() {
