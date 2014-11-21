@@ -115,14 +115,23 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     private $rootPaths;
 
     /**
+     * Whether this instance will redirect on an authentication fail, or throw an exception
+     * @var bool
+     */
+    private $lite;
+
+    /**
      * @param \Sabre_DAV_Client_Extended $client
      * @param array $paths List of paths from the baseUri to access
+     * @param bool  $lite
      */
-    public function __construct(Sabre_DAV_Client_Extended $client, array $paths = array('/'))
+    public function __construct(Sabre_DAV_Client_Extended $client, array $paths = array('/'), $lite = false)
     {
         $this->client = $client;
 
         $this->rootPaths = $paths;
+
+        $this->lite = $lite;
 
         $this->buildTree();
     }
@@ -167,7 +176,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     }
 
-    public static function factory()
+    public static function factory($lite = false)
     {
         $groupHandler = new Group;
 
@@ -483,7 +492,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         $client = new Sabre_DAV_Client_Extended($settings);
 
-        return new self($client, $paths);
+        return new self($client, $paths, $lite);
     }
 
     /**
@@ -528,7 +537,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         } /* Handle Sabre_DAV_Exception specifically
          */
         catch (Sabre\DAV\Exception\NotAuthenticated $e) {
-            Sitepage::localRedir('/cms/networkLogin');
+            Sitepage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
         }
         catch (Sabre\DAV\Exception\NotFound $e) {
             /* In some cases we are told that something exists, only to be thrown a 404 error
