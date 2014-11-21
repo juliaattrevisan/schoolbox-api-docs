@@ -14,6 +14,11 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
     private $allowedFileHandler;
 
     /**
+     * @var \Schoolbox\Collection|\Schoolbox\Video\ResourceVideo[]
+     */
+    protected $outputList;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -34,15 +39,19 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         }
         $this->parseConfig();
 
+        $this->setBlock($templateHandle, 'default_audio', 'default_audio_block');
         $this->setBlock($templateHandle, 'audio_list', 'audio_list_block');
         $this->setBlock($templateHandle, 'audio_pending_list', 'audio_pending_list_block');
         $this->setVar(
             array(
+                'default_audio_block'      => '',
                 'audio_list_block'         => '',
                 'audio_pending_list_block' => '',
             )
         );
 
+        // There's not (yet) any default for the audio player.
+        // Just use the first in the list
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
         $source = $this->getConfig('src');
@@ -74,24 +83,34 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         if (count($this->outputList)) {
             $j = 0;
-            foreach ($this->outputList as $file) {
+            foreach ($this->outputList as $audio) {
+                if ($j === 0) {
+                    // output the default audio, and audio player
+                    $this->setVar('DEFAULT_AUDIO_ID', $audio->getFile()->getId());
+                    $this->parse('default_audio_block', 'default_audio');
+                }
                 $output = array(
-                    'AUDIO_MIME_IMAGE'	=> '',
-                    'AUDIO_URL'			=> '/send.php?id=' .$file->getFile()->getId(),
-                    'AUDIO_DESCRIPTION'	=> Scrub::text($file->getFile()->getDescription()),
-                    'AUDIO_COMMENT'		=> Scrub::text($file->getFile()->getComment()),
-                    'AUDIO_ID'			=> $file->getFile()->getId(),
-                    'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
+                    'AUDIO_LIST_ID' => $audio->getFile()->getId(),
+
+                    'AUDIO_LIST_TITLE'     => Scrub::text($audio->getFile()->getDescription()),
+                    'AUDIO_LIST_DURATION'  => $audio->getDuration() >= 3600
+                        ? gmdate('H:i:s', $audio->getDuration())
+                        : gmdate('i:s', $audio->getDuration()),
+                    'AUDIO_LIST_COMMENT'   => Scrub::text($audio->getFile()->getComment()),
+                    'AUDIO_LIST_HIDDEN'    => $audio->getFile()->getHidden() ? 'hidden' : '',
+                    'AUDIO_LIST_POSTER_ID' => $audio->getFile()->getOwner()->getId(),
+                    'AUDIO_LIST_POSTER'    => $audio->getFile()->getOwner()->getFullName(),
+                    'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                 );
 
                 $this->setVar($output);
-                if ($file->getStatus() == "completed") {
+                if ($audio->getStatus() == "completed") {
                     $this->parse('audio_list_block', 'audio_list', true);
                 } elseif ($this->permission >= WRITE_ACCESS) {
                     $this->setVar(
                         array(
-                            'AUDIO_LIST_STATUS'    => $file->getStatus(),
-                            'AUDIO_LIST_STATUSIMG' => $file->getStatusImage(),
+                            'AUDIO_LIST_STATUS'    => $audio->getStatus(),
+                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage(),
                         )
                     );
                     $this->parse('audio_pending_list_block', 'audio_pending_list', true);

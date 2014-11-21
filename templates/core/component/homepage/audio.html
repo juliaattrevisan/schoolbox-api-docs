@@ -6,39 +6,61 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Audio</h2>
 	{CONFIGURATION}
+
+    <!-- BEGIN default_audio -->
+    <div class="audioWrapper">
+        <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
+               controls
+               preload="none"
+               width="100%">
+            <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mp3" />
+        </audio>
+        <script>
+            var audioElement = $("#schoolbox_audio{COMPONENT_INSTANCE_ID}").mediaelementplayer();
+            var audio        = audioElement.data('mediaelementplayer');
+        </script>
+    </div>
+    <!-- END default_audio -->
+
   <div class="dz-wrap">
     <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
 	<ul class="information-list dz-container">
 		<!-- BEGIN audio_list -->
-		<li class="{ON_OFF}">
-			<div class="clearfix">
-				<h4 class="float-left"><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
-				<audio id="audio-player-{AUDIO_ID}" controls preload="none" class="float-right">
-					<source src="/cms/sendVideo.php?type=sbfs&id={AUDIO_ID}" type="audio/mp3" />
-				</audio>
-			</div>
-			<p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
-		</li>
+        <li class="{ON_OFF}">
+            <a class="audio-link" href="#" rel="{AUDIO_LIST_ID}">
+                <!-- Replace audio thumb with a play button -->
+                <!--<img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />-->
+                <!--<img class="thumbnail" width="64" height="64" src="/cms/audioThumb.php?type=sbfs&id={AUDIO_LIST_ID}" />-->
+                <h4>{AUDIO_LIST_TITLE}</h4>
+            </a>
+            <p class="meta">{AUDIO_LIST_DURATION} | Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+            <p>{AUDIO_LIST_COMMENT}</p>
+        </li>
 		<!-- END audio_list -->
         <!-- BEGIN audio_pending_list -->
         <li class="{ON_OFF}">
-            <div class="clearfix">
-                <h4 class="float-left"><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION} - Currently transcoding</a></h4>
-            </div>
-            <p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
+            <img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
+            <h4>{AUDIO_LIST_TITLE}</h4>
+            <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+            <p>{AUDIO_LIST_COMMENT}</p>
         </li>
         <!-- END audio_pending_list -->
 	</ul>
-	<script type="text/javascript">
-		// Turn all audio components into media elements
-		$("#component{COMPONENT_INSTANCE_ID} audio").mediaelementplayer();
-	</script>
   </div>
 	<!-- BEGIN submit_file -->
 	<p class="interact">
 		<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
 	</p>
   <script type="text/javascript">
+
+      // show the file name in a scroller in the component?
+      // Alternately, highlight the current playing file?
+      $('#component{COMPONENT_INSTANCE_ID} a.audio-link').click(function(event) {
+          event.preventDefault();
+          audio.pause();
+          audio.setSrc("/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel"));
+      });
+
     $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
       wrapClass: 'dragging',
       previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
