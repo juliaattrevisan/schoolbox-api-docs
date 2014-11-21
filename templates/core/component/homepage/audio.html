@@ -16,10 +16,6 @@
                width="100%">
             <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mp3" />
         </audio>
-        <script>
-            var audioElement = $("#schoolbox_audio{COMPONENT_INSTANCE_ID}").mediaelementplayer();
-            var audio        = audioElement.data('mediaelementplayer');
-        </script>
     </div>
     <!-- END default_audio -->
 
@@ -53,14 +49,62 @@
 		<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
 	</p>
   <script type="text/javascript">
+      var audioElement = $("#schoolbox_audio{COMPONENT_INSTANCE_ID}").mediaelementplayer();
+      var audio        = audioElement.data('mediaelementplayer');
+      var audioTitle   = $('#component{COMPONENT_INSTANCE_ID} [data-title]');
+      if (audioElement.length) {
+          var audioSrcLinks = $('#component{COMPONENT_INSTANCE_ID} a.audio-link');
+          var audioSrcList  = audioSrcLinks.map(function() {
+              return this.rel;
+          }).toArray();
 
-      // show the file name in a scroller in the component?
-      // Alternately, highlight the current playing file?
-      $('#component{COMPONENT_INSTANCE_ID} a.audio-link').click(function(event) {
-          event.preventDefault();
-          audio.pause();
-          audio.setSrc("/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel"));
-      });
+          /**
+           * Loads a video with a given ID into the player.
+           *
+           * @var id
+           * @var autoplay if true, play automatically
+           */
+          var loadSource = function(id, autoplay) {
+              audio.pause();
+              audio.setSrc("/cms/sendVideo.php?type=sbfs&id="+id);
+              // Find the link contents
+              var audioLink = audioSrcLinks.filter(function() {
+                  return id == this.rel;
+              });
+              if (audioLink.length) {
+                  audioTitle.text(audioLink.text());
+              }
+              if (autoplay) {
+                  audio.play();
+              }
+          };
+
+          /**
+           * This is a playlist: once a track ends, move onto the next one.
+           * (if there is one.)
+           */
+          audio.$media.on('ended', function(event) {
+              // What audio is playing now?
+              var match = this.src.match(/id=(\d+)/);
+              if (match) {
+                  var current = audioSrcList.indexOf(match[1]);
+                  if (current >= 0) {
+                      var next = current + 1;
+                      if (next < audioSrcList.length) {
+                          loadSource(audioSrcList[next], true);
+                      }
+                  }
+              }
+          });
+
+          /**
+           * Click a file name: load that file into the player
+           */
+          audioSrcLinks.click(function(event) {
+              event.preventDefault();
+              loadSource($(this).attr("rel"), true);
+          });
+      }
 
     $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
       wrapClass: 'dragging',
