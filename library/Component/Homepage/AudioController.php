@@ -115,7 +115,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                     $this->setVar(
                         array(
                             'AUDIO_LIST_STATUS'    => $audio->getStatus(),
-                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage(),
+                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
                         )
                     );
                     $this->parse('audio_pending_list_block', 'audio_pending_list', true);

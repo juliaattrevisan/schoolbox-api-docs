@@ -86,10 +86,13 @@ class ResourceVideo {
 	/**
 	 * Get the full path to the image used in statuses
 	 *
+	 * @param string $type Defaults to "video", but you could pass "audio" for
+	 *                     an audio thumbnail.
+	 *
 	 * @return string
 	 */
-	public function getStatusImage() {
-		return "/images/core/component/video-thumbnail-".strtolower($this->getStatus()).".gif";
+	public function getStatusImage($type = 'video') {
+		return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
 	}
 
 	/**
