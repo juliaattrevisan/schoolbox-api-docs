@@ -144,7 +144,7 @@ class ResourceVideoMapper extends Mapper
         $statement->bindParam(':mime', $mime);
 
         if ($limit != false) {
-            $statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
+            $statement->bindParam(':lim', intval($limit), \PDO::PARAM_INT);
         }
 
         $statement->execute();
