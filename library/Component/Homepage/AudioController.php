@@ -60,11 +60,11 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         $this->source_category_id = $source;
 
-        if ($this->getConfig('size') > 1) {
+        if ($this->getConfig('size') >= 1) {
             $this->outputList = $videoResourceMapper->findByCategory(
                 $source,
                 $sortConfig,
-                $this->getConfig('size') - 1
+                $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
             $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
