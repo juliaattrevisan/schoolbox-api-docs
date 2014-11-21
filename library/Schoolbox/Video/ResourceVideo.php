@@ -8,144 +8,167 @@
  */
 
 namespace Schoolbox\Video;
+
 use Schoolbox\ConfigLoader;
 
 use Schoolbox\Resource\File;
 
-class ResourceVideo {
-	protected $id;
-	protected $type;
-	protected $status;
-	protected $duration;
-	protected $file;
-	protected $fileID;
+class ResourceVideo
+{
+    protected $id;
+    protected $type;
+    protected $status;
+    protected $duration;
+    protected $file;
+    protected $fileID;
     protected $config;
 
-	/**
-	 * Creates object and sets up sub-objects.
-	 */
-	public function __construct() {
-		$this->setConfig( new ConfigLoader() );
-	}
+    /**
+    * Creates object and sets up sub-objects.
+    */
+    public function __construct()
+    {
+        $this->setConfig( new ConfigLoader() );
+    }
 
 
-    public function getFileLocation() {
-        if(is_readable($this->getVideoLocation())) {
+    public function getFileLocation()
+    {
+        if (is_readable($this->getVideoLocation())) {
              return $this->getVideoLocation();
-        }
-        elseif(is_readable($this->getAudioLocation())) {
+        } elseif (is_readable($this->getAudioLocation())) {
             return $this->getAudioLocation();
         }
     }
 
-	public function getVideoLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
-	}
+    public function getVideoLocation()
+    {
+        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
+    }
 
-    public function getAudioLocation() {
+    public function getAudioLocation()
+    {
         return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp3';
     }
 
-	public function getThumbnailLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
-	}
+    public function getThumbnailLocation()
+    {
+        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
+    }
 
-	public function getPosterLocation() {
-		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
-	}
+    public function getPosterLocation()
+    {
+        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
+    }
 
 
-	private function setConfig($config) {
-		$this->config = $config;
-	}
+    private function setConfig($config)
+    {
+        $this->config = $config;
+    }
 
-	public function setDuration($duration) {
-		$this->duration = $duration;
-	}
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+    }
 
-	public function getDuration() {
-		return $this->duration;
-	}
+    public function getDuration()
+    {
+        return $this->duration;
+    }
 
-	public function setMessage($message) {
-		$this->message = $message;
-	}
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
 
-	public function getMessage() {
-		return $this->message;
-	}
+    public function getMessage()
+    {
+        return $this->message;
+    }
 
-	public function setStatus($status) {
-		$this->status = $status;
-	}
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
 
-	public function getStatus() {
-		return $this->status;
-	}
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-	/**
-	 * Get the full path to the image used in statuses
-	 *
-	 * @param string $type Defaults to "video", but you could pass "audio" for
-	 *                     an audio thumbnail.
-	 *
-	 * @return string
-	 */
-	public function getStatusImage($type = 'video') {
-		return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
-	}
+    /**
+    * Get the full path to the image used in statuses
+    *
+    * @param string $type Defaults to "video", but you could pass "audio" for
+    *                     an audio thumbnail.
+    *
+    * @return string
+    */
+    public function getStatusImage($type = 'video')
+    {
+        return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
+    }
 
-	/**
-	 * Is this video processing completed?
-	 *
-	 * @return bool
-	 */
-	public function isComplete() {
-		if ($this->getStatus() == QueueMapper::STATUS_COMPLETED) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+    /**
+    * Is this video processing completed?
+    *
+    * @return bool
+    */
+    public function isComplete()
+    {
+        if ($this->getStatus() == QueueMapper::STATUS_COMPLETED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public function setType($type) {
-		$this->type = $type;
-	}
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
 
-	public function getType() {
-		return $this->type;
-	}
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	public function setFile($file) {
-		$this->file = $file;
-	}
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
 
-	public function getFile() {
-		return $this->file;
-	}
+    public function getFile()
+    {
+        return $this->file;
+    }
 
-	/**
-	 * @param  mixed $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+    * @param  mixed $id
+    * @return $this
+    */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+    * @return mixed
+    */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	public function setFileID($fileID) {
-		$this->fileID = $fileID;
-	}
+    public function setFileID($fileID)
+    {
+        $this->fileID = $fileID;
+    }
 
-	public function getFileID() {
-		return $this->fileID;
-	}
+    public function getFileID()
+    {
+        return $this->fileID;
+    }
 }
