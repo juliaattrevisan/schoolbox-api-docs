@@ -28,6 +28,8 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'podcast_list', 'podcast_list_block');
+        $this->setBlock($templateHandle, 'default_podcast', 'default_podcast_block');
+        $this->setVar('default_podcast_block', '');
         $this->setVar('podcast_list_block', '');
 
 
@@ -52,6 +54,17 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                         // check the podcast item has an enclosure element ()
                         if (!isset($item->enclosure)) {
                             continue;
+                        }
+
+                        // Is this the first podcast? output the player if so
+                        if ($j === 0) {
+                            $this->setVar(
+                                array(
+                                    'DEFAULT_PODCAST_URL'   => Scrub::text($item->enclosure['url']),
+                                    'DEFAULT_PODCAST_TITLE' => Scrub::text($item->title),
+                                )
+                            );
+                            $this->parse('default_podcast_block', 'default_podcast');
                         }
 
                         // Get file type information
