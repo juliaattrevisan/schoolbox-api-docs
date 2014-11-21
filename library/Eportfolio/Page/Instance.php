@@ -116,7 +116,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $this->renderTabList();
         }
 
+        /* This must occur before renderCurrentColours() due to phplibbery
+         */
         $this->renderColours();
+        $this->renderCurrentColours();
+
+        /* The rest
+         */
         $this->renderColumnWidths();
         $this->renderAllowedFileTypes();
         $this->renderPermissions();
@@ -317,25 +323,83 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     }
 
     /**
+     * Render the current colour set
+     */
+    private function renderCurrentColours() {
+
+        /* Current colour set
+         */
+        foreach ($this->getColours() as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
+
+            $this->getPage()->setVar($vars);
+        }
+
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => 'pickers'
+        ));
+
+        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+    }
+
+    /**
 	 * Render customised colours
 	 */
     private function renderColours()
     {
-        foreach(array('defaults', 'original', 'pickers') as $currentType) {
-            $this->getPage()->setVar(array(
-                'COLOUR_ARRAY' => $currentType
-            ));
+        /* Pickers colour set
+         */
+        foreach ($this->getColours() as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
 
-            foreach ($this->getColours() as $field => $colour) {
-                $vars = array(
-                    $field => $colour
-                );
-
-                $this->getPage()->setVar($vars);
-            }
-
-            $this->getPage()->parse('colour_list_block', 'colour_list', true);
+            $this->getPage()->setVar($vars);
         }
+
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => 'original'
+        ));
+
+        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+
+
+        /* Current colour set
+         */
+        foreach ($this->getColours() as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
+
+            $this->getPage()->setVar($vars);
+        }
+
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => 'pickers'
+        ));
+
+        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+
+
+        /* Default colour set
+         */
+        $defaultColours = $this->getEportfolioHandler()->getDefaultColorList();
+
+        foreach ($defaultColours as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
+
+            $this->getPage()->setVar($vars);
+        }
+
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => 'defaults'
+        ));
+
+        $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }
 
     /**
