@@ -10,17 +10,35 @@
  * @version     SVN: $Id$
  */
 
+/** @var SitePage $this */
+
 if (strlen($_POST['password'])) {
 	$_SESSION['password'] = $_POST['password'];
 
 	/* Redirect
 	 */
-	$this->localRedir('/cms/network');
+    $redir = isset($this->arg[0]) && $this->arg[0] == 'lite'
+        ? '/ajax/resource/tree/webdav'
+        : '/cms/network';
+
+	$this->localRedir($redir);
 }
 else {
 	$this->setFile(TEMPLATE_content, 'cms/networkLogin.html');
+    $this->setBlock(TEMPLATE_content, 'lite', 'lite_block');
 
-	$this->setVar(array(
-		'NETWORK_DRIVES_USERNAME' => $_SESSION['username']
-	));
+    $this->setVar(array(
+        'NETWORK_DRIVES_USERNAME' => $_SESSION['username'],
+        'SELF'                    => '/cms/networkLogin/' . implode('/', $this->arg)
+    ));
+
+    if (isset($this->arg[0]) && $this->arg[0] == 'lite') {
+        $this->parse('lite_block', 'lite');
+        $this->setAjax();
+        $this->template->pparse('finaloutput', TEMPLATE_content);
+
+    } else {
+        $this->setVar('lite_block', '');
+    }
+
 }
