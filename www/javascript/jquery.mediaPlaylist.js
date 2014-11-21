@@ -34,7 +34,7 @@
                         // Get list of rels in the playlist,
                         // look for current ID in that list,
                         // play the next one if there is one.
-                        var playlistRels = playlist.map(function() {
+                        var playlistRels = self.playlist.map(function() {
                             return this.rel;
                         }).toArray();
                         var current = playlistRels.indexOf(match[1]);
