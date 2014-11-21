@@ -125,14 +125,25 @@ $j(function () {
     <div class="duework-popup cal-bubble">
         <div class="middle">
             <div class="close">x</div>
-            <div class="js-data clearfix wysiwyg"><h3><a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">{{=it.name}}</a></h3>
+            <div class="js-data clearfix wysiwyg">
+                <h3>
+                    {{? (it.action||'').length}}
+                    <a href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}">
+                    {{?}}
+                        {{=it.name}}
+                    {{? (it.action||'').length}}
+                    </a>
+                    {{?}}
+                </h3>
                 <p class="bubble-name"><span><a href="/homepage/{{=it.cid}}">{{=it.category}}</a></span> - <em>{{=it.typeName}}</em></p>
                 {{? (it.description||'').length}}
                     <p class="comment">{{=it.description}}</p>
                 {{?}}
+                {{? (it.action||'').length}}
                 <p class="details clearfix">
                 <a class="btn modify float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
                 </p>
+                {{?}}
             </div>
             <div class="bottom"><strong></strong></div>
         </div>
@@ -149,9 +160,11 @@ $j(function () {
                 {{? (it.description||'').length}}
                     <p class="comment">{{=it.description}}</p>
                 {{?}}
+                {{? (it.action||'').length}}
                 <p class="details clearfix">
                     <a class="btn up-arrow float-left" href="/assess/intro/{{=it.id}}"><span></span>{{=it.action}}</a>
                 </p>
+                {{?}}
             </div>
             <div class="bottom"><strong></strong></div>
         </div>
