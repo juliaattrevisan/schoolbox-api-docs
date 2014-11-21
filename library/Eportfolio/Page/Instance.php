@@ -116,13 +116,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $this->renderTabList();
         }
 
-        /* This must occur before renderCurrentColours() due to phplibbery
-         */
-        $this->renderColours();
         $this->renderCurrentColours();
-
-        /* The rest
-         */
+        $this->renderColours();
         $this->renderColumnWidths();
         $this->renderAllowedFileTypes();
         $this->renderPermissions();
@@ -338,8 +333,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         }
 
         $this->getPage()->setVar(array(
-                'COLOUR_ARRAY' => $key
-            ));
+            'COLOUR_ARRAY' => $key
+        ));
 
         $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }
@@ -350,12 +345,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
      */
     private function renderCurrentColours() {
         foreach ($this->getColours() as $field => $colour) {
-            $vars = array(
-                $field => $colour
-            );
-
-            $this->getPage()->setVar($vars);
+            $vars['current_' . $field] = $colour;
         }
+
+        $this->getPage()->setVar($vars);
     }
 
     /**
