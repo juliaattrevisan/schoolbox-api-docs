@@ -94,31 +94,33 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                     );
                     $this->parse('default_audio_block', 'default_audio');
                 }
-                $output = array(
-                    'AUDIO_LIST_ID' => $audio->getFile()->getId(),
+                if (count($this->outputList) > 1) {
+                    $output = array(
+                        'AUDIO_LIST_ID' => $audio->getFile()->getId(),
 
-                    'AUDIO_LIST_TITLE'     => Scrub::text($audio->getFile()->getDescription()),
-                    'AUDIO_LIST_DURATION'  => $audio->getDuration() >= 3600
-                        ? gmdate('H:i:s', $audio->getDuration())
-                        : gmdate('i:s', $audio->getDuration()),
-                    'AUDIO_LIST_COMMENT'   => Scrub::text($audio->getFile()->getComment()),
-                    'AUDIO_LIST_HIDDEN'    => $audio->getFile()->getHidden() ? 'hidden' : '',
-                    'AUDIO_LIST_POSTER_ID' => $audio->getFile()->getOwner()->getId(),
-                    'AUDIO_LIST_POSTER'    => $audio->getFile()->getOwner()->getFullName(),
-                    'ON_OFF'               => ++$j % 2 ? '' : 'dark'
-                );
-
-                $this->setVar($output);
-                if ($audio->getStatus() == "completed") {
-                    $this->parse('audio_list_block', 'audio_list', true);
-                } elseif ($this->permission >= WRITE_ACCESS) {
-                    $this->setVar(
-                        array(
-                            'AUDIO_LIST_STATUS'    => $audio->getStatus(),
-                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
-                        )
+                        'AUDIO_LIST_TITLE'     => Scrub::text($audio->getFile()->getDescription()),
+                        'AUDIO_LIST_DURATION'  => $audio->getDuration() >= 3600
+                            ? gmdate('H:i:s', $audio->getDuration())
+                            : gmdate('i:s', $audio->getDuration()),
+                        'AUDIO_LIST_COMMENT'   => Scrub::text($audio->getFile()->getComment()),
+                        'AUDIO_LIST_HIDDEN'    => $audio->getFile()->getHidden() ? 'hidden' : '',
+                        'AUDIO_LIST_POSTER_ID' => $audio->getFile()->getOwner()->getId(),
+                        'AUDIO_LIST_POSTER'    => $audio->getFile()->getOwner()->getFullName(),
+                        'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     );
-                    $this->parse('audio_pending_list_block', 'audio_pending_list', true);
+
+                    $this->setVar($output);
+                    if ($audio->getStatus() == "completed") {
+                        $this->parse('audio_list_block', 'audio_list', true);
+                    } elseif ($this->permission >= WRITE_ACCESS) {
+                        $this->setVar(
+                            array(
+                                'AUDIO_LIST_STATUS'    => $audio->getStatus(),
+                                'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
+                            )
+                        );
+                        $this->parse('audio_pending_list_block', 'audio_pending_list', true);
+                    }
                 }
             }
         } else {
