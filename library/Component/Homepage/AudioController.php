@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var AllowedFile
@@ -23,7 +24,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->allowedFileHandler = new AllowedFile();
         $this->sortFields = array('Date');
     }
@@ -33,8 +35,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'audio')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'audio')) {
             return false;
         }
         $this->parseConfig();
@@ -134,10 +137,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         } else {
             $this->parse("submit_file_block", "submit_file");
         }
-
-
-
         return true;
     }
-
 }
