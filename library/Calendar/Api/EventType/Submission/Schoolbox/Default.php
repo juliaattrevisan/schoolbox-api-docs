@@ -10,6 +10,7 @@
  */
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
+    /** @var Calendar */
     private $calendarHandler = null;
 
     /**
@@ -31,7 +32,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param $endTimestamp
      *
      * @internal param $currentDay
-     * @return Calendar_Event_Collection
+     * @return Calendar_Event_Collection|Calendar_Event_Type_Submission[]
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -56,8 +57,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         $box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
         $assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+
+        /** @var \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[] $activities */
         $activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
         $activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
+
         foreach ($activities as $activity) {
             $event = new Calendar_Event_Type_Submission();
             $event->setCategoryId($activity->getCategory()->getId());
@@ -131,7 +135,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /**
      * Set calendar handler
      *
-     * @param $calendarHandler
+     * @param Calendar $calendarHandler
      */
     public function setCalendarHandler($calendarHandler)
     {
@@ -141,7 +145,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /**
      * Get calendar handler
      *
-     * @return null
+     * @return Calendar
      */
     public function getCalendarHandler()
     {

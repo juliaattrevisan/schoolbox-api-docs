@@ -199,6 +199,7 @@ $event_api         = new Calendar_Api_EventType_Submission_Schoolbox_Default(
     (isset($userID) ? Schoolbox\UserMapper::getInstance()->findById($userID) : $_SESSION['user']),
     null
 );
+/** @var Calendar_Event_Type_Submission[] $event_list */
 $event_list        = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list as $event_object) {
@@ -226,6 +227,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
     $this->setVar($output);
 
+    /** @var Calendar_Event_Type_Submission[] $eventList */
     $eventList = isset($event_list_by_day[$this_day]) ? $event_list_by_day[$this_day] : array();
 
     foreach ($eventList as $event) {
@@ -613,7 +615,7 @@ foreach ($summary as $category) {
  * @param array $visibilities  Which submission box visibilities are viewable?
  * @param bool  $is_restricted Are student's marks restricted?
  *
- * @return \Schoolbox\Assessment\ActivityCollection
+ * @return \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[]
  */
 function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
 {
