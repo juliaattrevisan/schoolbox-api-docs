@@ -214,13 +214,36 @@ class Eportfolio {
 		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
+    /**
+     * Spawn a list of default colours
+     *
+     * @return array
+     */
+    public function getDefaultColorList() {
+        $colourSet = array();
+
+        foreach(array('top','left','right') as $position) {
+            $colourSet = array_merge($colourSet, array(
+                $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
+                $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
+                $position . '_font' => Cfg::get('homepage_colour_font'),
+                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+                $position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+                $position . '_link' => Cfg::get('homepage_colour_link'),
+                $position . '_hover' => Cfg::get('homepage_colour_hover')
+            ));
+        }
+
+        return $colourSet;
+    }
+
 	/**
 	 * Get a list of colours for a particular page
 	 *
 	 * @return array|bool
 	 */
 	public function getColorList() {
-		$colourList = array(
+        $colourList = array(
 			'left_head_font' => $this->getPageInstance()->getLeftHeadFont(),
 			'left_head_bg' => $this->getPageInstance()->getLeftHeadBg(),
 			'left_font' => $this->getPageInstance()->getLeftFont(),
@@ -245,15 +268,6 @@ class Eportfolio {
 			'top_link' => $this->getPageInstance()->getTopLink(),
 			'top_hover' => $this->getPageInstance()->getTopHover(),
 		);
-
-		// use defaults for missing colours
-		$defaultColours = unserialize(HOMEPAGE_colors);
-
-		if (is_array($colourList)) {
-			foreach ($colourList as $key => $value) {
-				if (empty($value)) $colourList[$key] = $defaultColours[$key];
-			}
-		}
 
 		return $colourList;
 	}
@@ -420,6 +434,7 @@ class Eportfolio {
 	 * @return resource
 	 */
 	public function saveDisplayProperties($listColor) {
+
 		$query = "
 			UPDATE {$this->getContext()}_page
 			SET
@@ -437,8 +452,7 @@ class Eportfolio {
 		$query .= implode(',', $stack);
 
 		$query .= "
-			WHERE uid = '{$this->getUserId()}'
-			AND page_id = {$this->getPageId()}
+			WHERE page_id = {$this->getPageId()}
 		";
 
 		return $this->db->query($query);

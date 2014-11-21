@@ -103,12 +103,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             'customise_page_block' => '',
             'colour_list_block' => '',
         ));
-
-        if ($this->getPermission() > WRITE_ACCESS) {
-            $this->getPage()->parse('edit_page_block', 'edit_page');
-            $this->getPage()->parse('modify_layout_block', 'modify_layout');
-            $this->getPage()->parse('customise_page_block', 'customise_page');
-        }
     }
 
     /**
@@ -120,13 +114,21 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         if ($this->getPermission() > WRITE_ACCESS) {
             $this->renderTabList();
-            $this->renderColours();
         }
 
-        $this->renderDefaultColours();
+        $this->renderCurrentColours();
+        $this->renderColours();
         $this->renderColumnWidths();
         $this->renderAllowedFileTypes();
         $this->renderPermissions();
+
+        /* Container blocks must parse after their inner organs
+         */
+        if ($this->getPermission() > WRITE_ACCESS) {
+            $this->getPage()->parse('edit_page_block', 'edit_page');
+            $this->getPage()->parse('modify_layout_block', 'modify_layout');
+            $this->getPage()->parse('customise_page_block', 'customise_page');
+        }
     }
 
     /**
@@ -316,81 +318,58 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     }
 
     /**
-	 * Render customised colours
-	 */
-    private function renderColours()
-    {
-        // Colors (original)
-        $this->getPage()->setVar('COLOUR_ARRAY', 'original');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+     * Macro
+     *
+     * @param $set
+     * @param $key
+     */
+    private function renderColourSet($set, $key) {
+        foreach ($set as $field => $colour) {
+            $vars = array(
+                $field => $colour
+            );
 
-        // Colors (picker)
-        $this->getPage()->setVar('COLOUR_ARRAY', 'pickers');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
-
-        // Defaults
-        $defaultColour = array(
-            'head_font' => Cfg::get('eportfolio_colour_head_font'),
-            'head_bg' => Cfg::get('eportfolio_colour_head_bg'),
-            'font' => Cfg::get('eportfolio_colour_font'),
-            'bg_primary' => Cfg::get('eportfolio_colour_bg_primary'),
-            'bg_secondary' => Cfg::get('eportfolio_colour_bg_secondary'),
-            'link' => Cfg::get('eportfolio_colour_link'),
-            'hover' => Cfg::get('eportfolio_colour_hover')
-        );
-
-        $columns = array('top', 'left', 'right');
-        $this->getPage()->setVar('COLOUR_ARRAY', 'defaults');
-
-        foreach ($columns as $col) {
-            foreach ($defaultColour as $field => $colour) {
-                $this->getPage()->setVar($col . '_' . $field, $colour);
-            }
+            $this->getPage()->setVar($vars);
         }
+
+        $this->getPage()->setVar(array(
+            'COLOUR_ARRAY' => $key
+        ));
 
         $this->getPage()->parse('colour_list_block', 'colour_list', true);
     }
 
     /**
-	 * Apply default colours to everything
-	 */
-    private function renderDefaultColours()
-    {
-        $defaultColour = array(
-            'head_font' => Cfg::get('homepage_colour_head_font'),
-            'head_bg' => Cfg::get('homepage_colour_head_bg'),
-            'font' => Cfg::get('homepage_colour_font'),
-            'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-            'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-            'link' => Cfg::get('homepage_colour_link'),
-            'hover' => Cfg::get('homepage_colour_hover')
-        );
-
-        $this->getPage()->setVar('COLOUR_ARRAY', 'defaults');
-
-        $columns = array('top', 'left', 'right');
-
-        foreach ($columns as $col) {
-            foreach ($defaultColour as $field => $colour) {
-                $this->getPage()->setVar($col . '_' . $field, $colour);
-            }
+     * Render the current colour set
+     * These are unblocked phplibbery
+     */
+    private function renderCurrentColours() {
+        foreach ($this->getColours() as $field => $colour) {
+            $vars['current_' . $field] = $colour;
         }
 
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+        $this->getPage()->setVar($vars);
+    }
 
-        /* Javascript colour values for the original
-		 */
-        $this->getPage()->setVar('COLOUR_ARRAY', 'original');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+    /**
+	 * Render customised colours for:
+     * the pickers' boxes,
+     * the currently-chosen set of colours on the components themselves,
+     * and the values to which pickers' boxes reset themselves
+	 */
+    private function renderColours()
+    {
+        /* Current colour set (currently chosen and saved in db)
+         */
+        $this->renderColourSet($this->getColours(), 'original');
 
-        /* Javascript colour values for the picker
-		 */
-        $this->getPage()->setVar('COLOUR_ARRAY', 'pickers');
-        $this->getPage()->setVar($this->getColours());
-        $this->getPage()->parse('colour_list_block', 'colour_list', true);
+        /* Pickers colour set (when you choose new colours for components)
+         */
+        $this->renderColourSet($this->getColours(), 'pickers');
+
+        /* Default colour set (reset)
+         */
+        $this->renderColourSet($this->getEportfolioHandler()->getDefaultColorList(), 'defaults');
     }
 
     /**
