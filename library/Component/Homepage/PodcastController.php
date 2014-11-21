@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
     }
 
     /**
@@ -21,8 +23,9 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'podcast')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'podcast')) {
             return false;
         }
         $this->parseConfig();
@@ -44,8 +47,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 // Iterate through each item in the channel
                 if (strlen(trim($this->getConfig('url')))) {
                     for ($i = 0; $i < count($xml->channel->item); $i++) {
-
-                        if($i >= $this->getConfig('size') && $this->getConfig('size') != 0) {
+                        if ($i >= $this->getConfig('size') && $this->getConfig('size') != 0) {
                             break;
                         }
 
@@ -89,19 +91,16 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                     $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL does not contain any valid audio podcasts');
                     $this->setVar('podcast_list_block', '');
                 }
-            }
-            // no channel found in xml
+            } // no channel found in xml
             else {
                 $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - channel not found at URL');
                 $this->setVar('podcast_list_block', '');
             }
-        }
-        else {
+        } else {
             $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
             $this->setVar('podcast_list_block', '');
         }
-        
+
         return true; // everything went according to plan
     }
-
 }
