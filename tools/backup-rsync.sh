@@ -148,6 +148,8 @@ then
 				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Rsync run had errors, umounting share for safety" >> $logfile;
 				umount $backup_dir >> $logfile 2>&1;
 				exit 1;
+			else
+				echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Rsync backup complete" >> $logfile;
 			fi
 		fi
 	else
