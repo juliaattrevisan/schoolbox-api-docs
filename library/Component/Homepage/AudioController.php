@@ -86,7 +86,12 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             foreach ($this->outputList as $audio) {
                 if ($j === 0) {
                     // output the default audio, and audio player
-                    $this->setVar('DEFAULT_AUDIO_ID', $audio->getFile()->getId());
+                    $this->setVar(
+                        array(
+                            'DEFAULT_AUDIO_TITLE' => Scrub::text($audio->getFile()->getDescription()),
+                            'DEFAULT_AUDIO_ID'    => $audio->getFile()->getId(),
+                        )
+                    );
                     $this->parse('default_audio_block', 'default_audio');
                 }
                 $output = array(
