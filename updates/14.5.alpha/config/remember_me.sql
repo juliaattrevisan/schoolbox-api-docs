@@ -1,1 +1,1 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('session_remember', '1', 'Allow Remember Me', 'f checked users will be able to request their session lasts for 60 days, rather than the normal session limit.', '3', '2', 'true');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('session_remember', '1', 'Allow Remember Me', 'If checked users will be able to request their session lasts for 60 days, rather than the normal session limit.', '3', '2', 'true');
