@@ -162,16 +162,11 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                         }
                     }
 
-                    /* Modified this check so that only the owner or a superuser can get
-                     * these links which allow you to modify the assessment
+                    /* This allows all users with write access to modify
                      */
                     $this->setVar('teacherLink_block', '');
-                    if ($surveyHandler->isOwner($currentSurvey['assess_id'])
-                        || $this->groupHandler->getPermission($currentSurvey['category_id']) >= WRITE_ACCESS
-                    ) {
-                        if ($this->getMaximumPermission() >= WRITE_ACCESS) {
-                            $this->parse('teacherLink_block', 'teacherLink');
-                        }
+                    if ($this->permission >= WRITE_ACCESS) {
+                        $this->parse('teacherLink_block', 'teacherLink');
                     }
                     $this->parse('survey_block', 'survey', true);
                 }
