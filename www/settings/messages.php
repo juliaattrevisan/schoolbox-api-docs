@@ -94,7 +94,9 @@ $methods = array(
 $this->setTitle('Message Settings');
 $this->setFile(TEMPLATE_content, 'settings/messages.html');
 
-$this->setBlock(TEMPLATE_content, 'follow', 'follow_block');
+$this->setBlock(TEMPLATE_content, 'group', 'group_block');
+$this->setBlock('group', 'follow', 'follow_block');
+
 $this->setBlock(TEMPLATE_content, 'digestible', 'digestible_block');
 $this->setBlock(TEMPLATE_content, 'digestible_col', 'digestible_col_block');
 $this->setBlock(TEMPLATE_content, 'namespace', 'namespace_block');
@@ -124,6 +126,12 @@ foreach ($cats as $cat) {
         'CATEGORY_FOLLOWING_DISABLED' => $forced ? 'disabled="disabled"' : ''
     ));
     $this->parse('follow_block', 'follow', true);
+}
+
+if (count($cats)) {
+    $this->parse('group_block', 'group');
+} else {
+    $this->setVar('group_block', '');
 }
 
 
