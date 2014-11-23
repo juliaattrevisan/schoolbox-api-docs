@@ -164,20 +164,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 							$this->setVar('resumeLink_block', '');
 						} /* only show test link to owner and enrolled students */
 						else {
-
-							$enroled = false;
-							$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true);
-							/* See if you're in the Category first
-							 */
-							if (is_array($categoryList)) {
-								foreach ($categoryList as $key => $value) {
-									if ($value['id'] == $this->getContext('id')) {
-										$enroled = true;
-									}
-								}
-							}
-
-							if ($enroled || $currentAssess['user_id'] == $_SESSION['id']) {
+							if ($assessHandler->canDoAssessment($currentAssess['assess_id'])) {
 								$numAttempts = $attemptHandler->userHasAttempted(
 									$currentAssess['assess_id'], $_SESSION['id']
 								);
