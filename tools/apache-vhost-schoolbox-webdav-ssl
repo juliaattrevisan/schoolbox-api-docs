@@ -1,5 +1,5 @@
 <IfModule mod_ssl.c>
-<VirtualHost 192.168.1.1:443>
+<VirtualHost *:443>
         ServerName schoolboxdav.schoolname.edu
         DocumentRoot /usr/share/schoolbox/dav
 
@@ -12,9 +12,9 @@
         </Directory>
 
         SSLEngine on
-        SSLCertificateFile    /etc/apache2/certs/wildcard.crt
-        SSLCertificateKeyFile /etc/apache2/certs/private.key
-        SSLCertificateChainFile /etc/apache2/certs/intermediate.crt
+        SSLCertificateFile    /etc/apache2/certs/schoolbox.crt
+        SSLCertificateKeyFile /etc/apache2/certs/schoolbox-private.key
+        SSLCertificateChainFile /etc/apache2/certs/schoolbox-intermediate.crt
         #SSLCACertificateFile /etc/apache2/certs/root.crt
         SSLProtocol all -SSLv2 -SSLv3
         # Enabling the below cipher order will stop IE8 on WinXP being able to connect at all on SSL/TLS
@@ -53,7 +53,7 @@
         php_flag session.cookie_httponly On
         php_value session.save_handler redis
         php_value session.save_path "tcp://127.0.0.1:6379"
-        php_value newrelic.appname "Schoolbox 14.0"
+        php_value newrelic.appname "Schoolbox 14.5"
 
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d

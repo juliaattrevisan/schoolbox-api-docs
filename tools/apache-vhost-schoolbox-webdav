@@ -28,7 +28,11 @@
         php_flag session.cookie_httponly On
         php_value session.save_handler redis
         php_value session.save_path "tcp://127.0.0.1:6379"
-        php_value newrelic.appname "Schoolbox 14.0"
+        php_value newrelic.appname "Schoolbox 14.5"
+
+        # Force SSL
+        #RewriteCond %{SERVER_PORT} !^443$
+        #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
