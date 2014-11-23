@@ -1,0 +1,1 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('parent_search_enable', '1', 'Allow Parent Search', 'If checked parents will appear in the search results conducted by students and other parents.', '3', '5', 'true');
