@@ -41,16 +41,14 @@
     <div class="wysiwyg">{SECTION_DESCRIPTION}</div>
 	<!-- BEGIN question -->
 	<form id='questionForm-{QUESTION_QUESTION_ID}' data-plugin='{QUESTION_PLUGIN}' action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-		<div class="wysiwyg no-pad clearfix">
-			<h3><strong>Q{QUESTION_SEQUENCE}) {QUESTION_MANDATORY}</strong> {QUESTION_QUESTION}</h3>
-
-			<!-- error messages for radio/checkbox questions -->
-			<div data-evaluationerrors="1"></div>
-		</div>
-		<div class="evaluation-answer clearfix">
-			<!-- BEGIN answerInputs -->
-			<!-- END answerInputs -->
-		</div>
+        <h3><strong>Q{QUESTION_SEQUENCE}) {QUESTION_MANDATORY}</strong></h3>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
+        <!-- error messages for radio/checkbox questions -->
+        <div data-evaluationerrors="1"></div>
+        <div class="evaluation-answer clearfix">
+        <!-- BEGIN answerInputs -->
+        <!-- END answerInputs -->
+        </div>
 	</form>
 	<!-- END question -->
 
