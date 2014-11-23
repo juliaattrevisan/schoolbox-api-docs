@@ -39,9 +39,8 @@ $j(function() {
 	<div class="wysiwyg">{SECTION_DESCRIPTION}</div>
 	<!-- BEGIN question -->
 	<form id='questionForm-{QUESTION_QUESTION_ID}' data-plugin='{QUESTION_PLUGIN}' action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-		<div class="wysiwyg no-pad clearfix">
-			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
-		</div>
+        <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
 		<div class="evaluation-answer clearfix">
 			<!-- BEGIN answerInputs -->
 			<!-- END answerInputs -->
@@ -75,8 +74,8 @@ $j(function() {
 			<div id="evaluation-countdown"></div>
 		</div>
 		
-		You began at: {ATTEMPT_START}<br />
-		You must finish this quiz by: {ATTEMPT_END}
+		You began on {ATTEMPT_START}<br />
+		You must finish this quiz by {ATTEMPT_END}
 		<hr />
 			
 		<!-- BEGIN sectionPercentageComplete -->
