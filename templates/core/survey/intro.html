@@ -1,39 +1,23 @@
 <h2>{ASSESS_TITLE}</h2>
-<div class="pad-it">
-	<p><strong>Introduction</strong><br/>
-		{ASSESS_DESCRIPTION}
-	</p>
-
-	<p><strong>Created by</strong><br/>
-		{ASSESS_AUTHOR}
-	</p>
-
-	<p>
-		<strong>Open Date: </strong><br/>
-		{ASSESS_START}
-	</p>
-
-	<p>
-		<strong>Close Date: </strong><br/>
-		{ASSESS_FINISH}
-	</p>
-
-	<ul>
-		<li><strong>Sections:</strong></li>
-		<!-- BEGIN section -->
-		<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS}
-			questions)
-		</li>
-		<!-- END section -->
-	</ul>
-	<br>
-
-	<p class="clearfix">
-		<a href="/survey/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}"
-		   class="btn go-to float-left"><span></span >Begin Survey</a>
-	</p>
-
-	<!-- BEGIN startTest -->
-
-	<!-- END startTest -->
+<div class="wysiwyg">
+    {ASSESS_DESCRIPTION}
 </div>
+
+<p><strong>Created by</strong><br />
+    {ASSESS_AUTHOR}
+</p>
+<table class="table ruler">
+    <thead>
+    <tr><th>Section</th><th>Number of questions</th></tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN section -->
+    <tr><td>{SECTION_TITLE}</td><td>{SECTION_NUMQUESTIONS}</td></tr>
+    <!-- END section -->
+    </tbody>
+</table>
+<p class="clearfix">
+    <a href="/survey/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="btn go-to float-left"><span></span >Begin Survey</a>
+</p>
+<!-- BEGIN startTest -->
+<!-- END startTest -->
