@@ -85,12 +85,13 @@
                name="group[{{! it.id }}][name]"
                value="{{! it.name }}"
                placeholder="Grouping Name"
+               class="gradeInput-groupingName"
         />
         <table>
             <thead>
                 <tr>
                     <th>Lower Bound</th>
-                    <th>Raw Grade</th>
+                    <th>Normalised Grade</th>
                     <th>Caption</th>
                 </tr>
             </thead>
@@ -116,13 +117,15 @@
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][lower_bound]"
                    value="{{! it.lowerBound }}"
                    placeholder="Lower Bound"
+                   class="gradeInput-lowerBound"
             />
         </td>
         <td>
             <input type="text"
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][raw_mark]"
                    value="{{! it.rawGrade }}"
-                   placeholder="Raw Grade"
+                   placeholder="Normalised Grade"
+                   class="gradeInput-rawGrade"
             />
         </td>
         <td>
@@ -130,6 +133,7 @@
                    name="group[{{! it.group.id }}][grade][{{! it.id }}][caption]"
                    value="{{! it.caption }}"
                    placeholder="Caption"
+                   class="gradeInput-caption"
             />
         </td>
     </tr>
@@ -147,12 +151,36 @@
     <div class="level clearfix">
         <form id="gradesForm" method="POST" action="/adminv2/gradesForm.php">
             <div class="half listing">
-                <ul>
-                    <li>Edit the grades and groupings for grades here. These options will be available to use on all submissions.</li>
-                    <li>Note that once grades or groupings have been created, they cannot be removed; they can be renamed, but ensure that if you do
-                        that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
-                    <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
-                </ul>
+                <h3>Guide</h3>
+                <dl>
+                    <dt class="gradeTerm">Creating Grades</dt>
+                    <dd class="gradeDescription">
+                        Type into empty fields to create a new grade grouping,
+                        or a new grade level for an existing grouping.
+                        There should not be any overlap between lower bounds and normalised grades between grade levels
+                        in the same grouping.
+                    </dd>
+                    <dd class="gradeDescription">
+                        Once grades or groupings have been created, they cannot be removed;
+                        they can be renamed, but ensure that if you do that you rename them to something semantically
+                        equivalent, since it will affect all marks already given.
+                    </dd>
+                </dl>
+
+                <h3>Glossary</h3>
+                <dl>
+                    <dt class="gradeTerm">Lower Bound</dt>
+                    <dd class="gradeDescription">
+                        This value is used for the purpose of displaying a grade average for a student or assessment.
+                        If the average grade falls between this value and the normalized grade for a grade level, this grade
+                        level's caption will be displayed.
+                    </dd>
+                    <dt class="gradeTerm">Normalised Grade</dt>
+                    <dd class="gradeDescription">
+                        The value (out of 100) that will be used for grade average calculations
+                        for an assessment that you give this grade.
+                    </dd>
+                </dl>
             </div>
             <div class="half last">
                 <ul id="gradeGroupList">
@@ -166,12 +194,13 @@
                                name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
                                value="{SUBMISSION_GRADE_GROUP_NAME}"
                                placeholder="Grouping Name"
+                               class="gradeInput-groupingName"
                         />
                         <table>
                             <thead>
                             <tr>
                                 <th>Lower Bound</th>
-                                <th>Raw Grade</th>
+                                <th>Normalised Grade</th>
                                 <th>Caption</th>
                             </tr>
                             </thead>
@@ -183,13 +212,15 @@
                                            name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
                                            value="{SUBMISSION_GRADE_LOWER_BOUND}"
                                            placeholder="Lower Bound"
+                                           class="gradeInput-lowerBound"
                                             />
                                 </td>
                                 <td>
                                     <input type="text"
                                            name="group[{{! it.group.id }}][grade][{{! it.id }}][raw_mark]"
                                            value="{SUBMISSION_GRADE_RAW_GRADE}"
-                                           placeholder="Raw Grade"
+                                           placeholder="Normalised Grade"
+                                           class="gradeInput-rawGrade"
                                             />
                                 </td>
                                 <td>
@@ -197,6 +228,7 @@
                                            name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
                                            value="{SUBMISSION_GRADE_CAPTION}"
                                            placeholder="Caption"
+                                           class="gradeInput-caption"
                                             />
                                 </td>
                             </tr>
