@@ -345,15 +345,15 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         $groupHandler = new Group();
         $assess       = $this->getByID($assess_id);
+        $perm         = $groupHandler->getPermission($assess['category_id']);
 
         // Users with write access can always do the assessment (generally teachers)
-        if($groupHandler->getPermission($assess['category_id']) >= WRITE_ACCESS) {
+        if($perm >= WRITE_ACCESS) {
             return true;
         }
 
-
         // Students that are involved in the class can do the assessment, but not other students
-        if($groupHandler->getPermission($assess['category_id']) >= READ_ACCESS) {
+        if($perm >= READ_ACCESS) {
 
             $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
 
