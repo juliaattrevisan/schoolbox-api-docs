@@ -1,35 +1,32 @@
 <h2>{ASSESS_TITLE}</h2>
-	<div class="pad-it">
-		<p><strong>Introduction</strong><br />
-			{ASSESS_DESCRIPTION}
-		</p>
-		<p><strong>Created by</strong><br />
-			{ASSESS_AUTHOR}
-		</p>
-		<p>
-			<strong>Time allowed: </strong><br />
-			{ASSESS_DURATION}
-		</p>
-		<p>
-			<strong>Open Date: </strong><br />
-			{ASSESS_START}
-		</p>
-		<p>
-			<strong>Close Date: </strong><br />
-			{ASSESS_FINISH}
-		</p>
+    <div class="wysiwyg">
+        {ASSESS_DESCRIPTION}
+    </div>
 
-		<ul><li><strong>Sections:</strong></li>
-			<!-- BEGIN section -->
-			<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
-			<!-- END section -->
-		</ul>
+    <p><strong>Created by</strong><br />
+        {ASSESS_AUTHOR}
+    </p>
+    <p><strong>Time allowed: </strong><br />
+        {ASSESS_DURATION}
+    </p>
+    <p><strong>Due Date: </strong><br />
+        {ASSESS_FINISH}
+    </p>
+    <table class="table ruler">
+         <thead>
+         <tr><th>Section</th><th>Number of questions</th></tr>
+         </thead>
+        <tbody>
+        <!-- BEGIN section -->
+        <tr><td>{SECTION_TITLE}</td><td>{SECTION_NUMQUESTIONS}</td></tr>
+        <!-- END section -->
+    </tbody>
+    </table>
 
-		<!-- BEGIN startTest -->
-		<br>
+    <!-- BEGIN startTest -->
+    <br>
 
-		<p class="clearfix">
-			<a href="/assess/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="btn go-to float-left"><span></span>Begin quiz</a>
-		</p>
-		<!-- END startTest -->
-</div>
+    <p class="clearfix">
+        <a href="/assess/init/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="btn go-to float-left"><span></span>Begin quiz</a>
+    </p>
+    <!-- END startTest -->

@@ -12,23 +12,16 @@ $j(function() {
 </script>
 <!-- END custom_head -->
 
-<h1>View your responses</h1>
-
+<h1>View your responses
+    <a href="/homepage/{SURVEY_CATEGORY_ID}" class="btn go-back marg tiny"><span></span>Return to Homepage</a>
+</h1>
 <div class="evaluation-content mark-test student-review">
-	<p class="clearfix">
-		<a href="/homepage/{SURVEY_CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to Homepage</a>
-		<a href="/submission/dueWork" class="btn go-back float-left"><span></span>Go to My Work</a>
-	</p>
-
-	<h2>Section: {SECTION_TITLE}</h2>	
-
-	<p class="pad-it">{SECTION_DESCRIPTION}</p>
-
+	<h2>{SECTION_TITLE}</h2>
+	<div class="wysiwyg">{SECTION_DESCRIPTION}</div>
 	<!-- BEGIN question -->
 	<div class="question no-pad">
-		<div class="wysiwyg no-pad clearfix">
-       		<h3><strong>Q{QUESTION_SEQUENCE})</strong></h3>
-		</div>
+        <h3><strong>Q{QUESTION_SEQUENCE})</strong></h3>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
 		<div class="evaluation-answer clearfix">
         <!-- BEGIN answerInputs -->
         <!-- END answerInputs -->

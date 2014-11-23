@@ -1,26 +1,33 @@
-<h1>Summary of your Quiz<a class="btn modify" href="/assess/modify/{ASSESS_ASSESS_ID}"><span></span>Modify</a></h1>
+<h1>Quiz Summary <a class="btn modify" href="/assess/modify/{ASSESS_ASSESS_ID}"><span></span>Modify</a></h1>
 <div class="evaluation-content">
 <h2>{ASSESS_TITLE}</h2>
-	<div class="pad-it">
-		<p>{ASSESS_DESCRIPTION}</p>
-	
-		<p class="clearfix">
-			<strong>Quiz open:</strong>
-			{ASSESS_START}
-			<span class="edit-assess-arrow"></span>
-			{ASSESS_FINISH}
-		</p>
-
-		<ul class="summary-sections">
-			<!-- BEGIN section -->
-			<li>
-				<a href="/assess/section/modify/{SECTION_SECTION_ID}">
-					Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions) - <span>Modify</span>
-				</a>
-			</li>
-			<!-- END section -->
-		</ul>
-	</div>
+    <div class="wysiwyg">{ASSESS_DESCRIPTION}</div>
+    <p class="clearfix">
+        <strong>Quiz open:</strong>
+        {ASSESS_START}
+        <span class="edit-assess-arrow"></span>
+        {ASSESS_FINISH}
+    </p>
+    <table class="table ruler">
+        <thead>
+        <tr>
+            <th>Section</th>
+            <th>Number of questions</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN section -->
+        <tr><td>{SECTION_TITLE}</td>
+            <td>{SECTION_NUMQUESTIONS}</td>
+            <td><span class="actions">
+                <a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
+                </span>
+            </td>
+        </tr>
+        <!-- END section -->
+        </tbody>
+    </table>
 </div>
 <div class="evaluation-menu duration">
 

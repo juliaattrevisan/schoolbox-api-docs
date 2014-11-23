@@ -95,9 +95,8 @@ $j(document).ready(function() {
 
 	<!-- BEGIN question -->
 	<form action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" name="question-submit" class='validation_{RESPONSE_ID} questionForm' method="post">
-		<div class="wysiwyg no-pad clearfix">
-			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}<span> - ({QUESTION_MARKS} marks)</span></h3>
-		</div>
+        <h3><strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong></h3>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
 		<div class="evaluation-answer clearfix">
 			<!-- BEGIN answerInputs -->
 			<!-- END answerInputs -->
