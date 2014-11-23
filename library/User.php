@@ -188,7 +188,10 @@ class User extends DeprecatedModel
         $wherePart .= ')';
 
         //If parent search policy is disabled, only staff will see parents in search results
-        if(!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1) {
+        //Guests never see parents
+        if( $_SESSION['user']->getRole()->isGuest() ||
+            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+        ) {
             $wherePart .= " AND `groups`.`group_type` != 'parent' ";
         }
 
@@ -223,7 +226,10 @@ class User extends DeprecatedModel
         $keyword = $this->db->quote($keyword);
 
         //If parent search policy is disabled, only staff will see parents in search results
-        if(!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1) {
+        //Guests never see parents
+        if( $_SESSION['user']->getRole()->isGuest() ||
+            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+        ) {
             $wherePart = " AND `groups`.`group_type` != 'parent' ";
         }
 
