@@ -1,20 +1,14 @@
 <!-- BEGIN section -->
 <div class="box">
-	<h2>Section {SECTION_SEQUENCE}: {SECTION_TITLE}</h2>
-	<ul class="information-list">
-
-		<!-- BEGIN question -->
-		<li class="{ON_OFF}">
-			<span class="actions">
-				<a class="btn go-to" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}"><span></span>Review question</a>
-			</span>
-			<h3><a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">Q{QUESTION_SEQUENCE})</a></h3>
-			<p class="meta">{QUESTION_MARKS} marks</p>
-			{QUESTION_QUESTION}
-
-		</li>
-		<!-- END question -->
-	</ul>
+	<h2>{SECTION_TITLE}</h2>
+    <!-- BEGIN question -->
+        <h3><a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">Q{QUESTION_SEQUENCE}) {QUESTION_MARKS} marks</a>
+            <span class="actions">
+            <a class="btn go-to" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}"><span></span>Review question</a>
+        </span>
+        </h3>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
+    <!-- END question -->
 </div>
 <!-- END section -->
 
