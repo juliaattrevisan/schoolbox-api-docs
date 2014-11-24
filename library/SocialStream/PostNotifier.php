@@ -142,7 +142,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             $posted = 'posted';
         }
 
-        $href = '/homepage/' . $cat->getId();
+        $href = '/homepage/' . $cat->getId() . '#social';
 
         $bob->setTitle(":author $posted in the social stream in :cat")
             ->setParams(
