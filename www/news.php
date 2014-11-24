@@ -49,23 +49,37 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->setVar('add_news_block', '');
 }
 
+/* Create the feed url
+ */
+$urlString = "{$_SERVER['HTTP_HOST']}/feed/news-school-rss.php?user={$_SESSION['user']->getHash()}";
+
 // generate news and topic lists
-$topicList = $newsHandler->getTopicList();
-array_unshift($topicList, array('name' => 'All'));
+$topicMapper = new \Schoolbox\News\TopicMapper();
+$topicList = $topicMapper->findAll();
+
+$all = new \Schoolbox\News\Topic();
+$all->setName('All');
+$topicList->prepend($all);
 
 $topicSlugMap = array();
 // output the list of topics for the sidebar
 foreach ($topicList as $sidebarTopic) {
-    $url = new Url($sidebarTopic['name']);
     $output = array(
-        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
-        'LIST_TOPIC_CLEAN' => $url->getSlug(),
-        'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'current' : '',
+        'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic->getName()),
+        'LIST_TOPIC_CLEAN' => $sidebarTopic->getSlug(),
+        'LIST_TOPIC_SELECTED' => $selectedTopic == $sidebarTopic->getSlug() ? 'current' : '',
     );
     $this->setVar($output);
-    $topicSlugMap[$url->getSlug()] = $sidebarTopic['name'];
+
+    if($sidebarTopic->getName() != 'All' && $selectedTopic == $sidebarTopic->getSlug()) {
+        $urlString .= "&topic={$sidebarTopic->getId()}";
+    }
+
+    $topicSlugMap[$sidebarTopic->getSlug()] = $sidebarTopic->getName();
     $this->parse('topic_list_block', 'topic_list', true);
 }
+
+$this->setVar('SCHOOL_NEWS_RSS_FEED_URL', $urlString);
 
 // forcibly remap 'all' to blank
 $topicSlugMap['all'] = '';
@@ -119,10 +133,10 @@ $outputPagination = array(
 $this->setVar($outputPagination);
 
 $items = $newsHandler->getNewsListing(false, $topicSlugMap[$selectedTopic], 0, 0, $newsIndex, $newsPerPage, true);
-
 $this->setVar('TOPIC_CLEAN', $selectedTopic);
 
 if (is_array($items)) {
+
     $i = 0;
     $total = count($items);
     $userHandler = new User();
@@ -130,6 +144,7 @@ if (is_array($items)) {
 
     if ($items) {
         foreach ($items as $article) {
+
             $i++;
 
             /* The usual stuff
@@ -161,10 +176,12 @@ if (is_array($items)) {
                 $this->setVar('news_image_block');
             }
 
-
-            $this->parse("news_block", "news", true);
+            $this->parse('news_block', 'news',true);
         }
     }
 } else {
+
     $this->setVar('news_block', 'No current news in this topic.');
 }
+
+
