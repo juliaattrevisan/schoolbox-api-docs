@@ -13,7 +13,7 @@ class Marksheet_Letter extends Marksheet_Abstract
     {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(
-            'norm_mark' => $grade['lower_bound'],
+            'norm_mark' => $grade['raw_grade'],
             'mark'      => $grade['caption']
         );
     }
