@@ -188,18 +188,6 @@
 </script>
 <!-- END modify_layout -->
 <!-- END custom_head -->
-<ul class='admin-nav'>
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-	<!-- BEGIN eportfolio_page -->
-	<li><a {EPORTFOLIO_CURRENT_PAGE} href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-	<!-- END eportfolio_page -->
-	<!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add"><span></span> Add page</a></li>
-	<!-- END can_add_page -->
-</ul>
-
-<div class='clearfix'></div>
 
 <h1><span>{HEADING}</span> - {PAGE_TITLE}</h1>
 
@@ -212,6 +200,19 @@
     <li><a id="tab-component" class="btn homepage-component no-text" data-tab="tabs-1" title="Add components"><span></span></a></li>
     <!-- END edit_page -->
 </ul>
+
+<ul class='admin-nav'>
+    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+    <!-- BEGIN eportfolio_page -->
+    <li><a {EPORTFOLIO_CURRENT_PAGE} href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+    <!-- END eportfolio_page -->
+    <!-- BEGIN can_add_page -->
+    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add"><span></span> Add page</a></li>
+    <!-- END can_add_page -->
+</ul>
+
+<div class='clearfix'></div>
 
 <!-- BEGIN customise_page -->
 <div id="tabs-homepage">
