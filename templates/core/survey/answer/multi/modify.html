@@ -47,7 +47,7 @@
 					/* Submit via POST and redirect to question creation screen upon done
 					*/
 					$j.post(theForm.attr('action'), data, function (responseText) {
-						window.location = '/survey/question/modify/' + data.question_id;
+						window.location = '/survey/question/create/' + data.section_id;
 					});
 				}
 				else {
