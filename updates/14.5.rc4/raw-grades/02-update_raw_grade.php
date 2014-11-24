@@ -2,6 +2,9 @@
 /**
  * Update for setting all raw grades.
  *
+ * Each mark's raw grade is set to halfway between lower and upper bound
+ * (which is the next highest lower bound).
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -15,7 +18,7 @@ $newGrades = new \Schoolbox\Collection();
 
 /** @var \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model[] $oldGrades */
 foreach ($oldGrades as $oldGrade) {
-    $oldLowerBound = $oldGrade->getLowerBound();
+    $lowerBound = $oldGrade->getLowerBound();
 
 //    if ($oldLowerBound == 0) {
 //        $oldGrade->setRawGrade(0);
@@ -23,7 +26,7 @@ foreach ($oldGrades as $oldGrade) {
 //    }
 
     // Find whatever the next highest grade is, in this grade group.
-    $rawGrade = null;
+    $upperBound = null;
     foreach ($oldGrades as $nextGrade) {
         if ($nextGrade->getGroup()->getId() != $oldGrade->getGroup()->getId()) {
             continue;
@@ -35,18 +38,18 @@ foreach ($oldGrades as $oldGrade) {
         // This grade has a higher lower bound than the grade I'm updating.
         // If it's the lowest such lower bound, use this as the raw grade.
         $nextLowerBound = $nextGrade->getLowerBound();
-        if ($nextLowerBound > $oldLowerBound) {
-            if (!isset($rawGrade) || $nextLowerBound < $rawGrade) {
-                $rawGrade = $nextLowerBound;
+        if ($nextLowerBound > $lowerBound) {
+            if (!isset($upperBound) || $nextLowerBound < $upperBound) {
+                $upperBound = $nextLowerBound;
             }
         }
     }
 
     // No lower bound found?
     // This must be at the top of the scale.
-    if (!isset($rawGrade)) {
-        $rawGrade = 100;
+    if (!isset($upperBound)) {
+        $upperBound = 100;
     }
-    $oldGrade->setRawGrade($rawGrade);
+    $oldGrade->setRawGrade(intval(($upperBound + $lowerBound) / 2));
 }
 $mapper->save($oldGrades);
