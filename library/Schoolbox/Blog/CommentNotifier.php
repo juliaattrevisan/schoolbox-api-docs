@@ -142,7 +142,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 			    'catname' => new CategoryParam($category)
 		    ))
 		    ->setIcon("/portrait.php?userId=$authorExtId&size=square32")
-		    ->setHref("/homepage/$categoryId#blog-".$blog->getId()) // dedupe per blog
+		    ->setHref("/homepage/$categoryId#blogComment_".$blog->getId()) // dedupe per blog
 		    ->setSeverity(Logger::INFO)
 		    ->setTimestamp($comment->getCreated()->getUnixTimestamp())
 		    ->setNamespace($this->getSlug())
