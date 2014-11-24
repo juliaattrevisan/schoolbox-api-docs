@@ -1339,9 +1339,6 @@ Notifications
     .text {
         padding: 8px 16px;
     }
-	h2:not(.permanent) {
-		cursor: move;
-	}
     h3 {
         font-weight: bold;
         padding: 7px 0;
@@ -11725,6 +11722,9 @@ th.rotate {
 }
 
 .ui-sortable {
+	h2 {
+		cursor: move;
+	}
 	&> li {
 		background-image: url('/images/core/tablesorter/sort.gif');
 		background-repeat: no-repeat;
