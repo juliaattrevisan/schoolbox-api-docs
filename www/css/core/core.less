@@ -3211,14 +3211,22 @@ input.timeField {
     &.homepage-component span {
       .btn-icon(88);
     }
-    &.homepage-component:hover span {
-      .btn-icon(89);
+    &.homepage-component {
+        &:hover, &.hover {
+            span {
+                .btn-icon(89);
+            }
+        }
     }
     &.homepage-columns span {
       .btn-icon(90);
     }
-    &.homepage-columns:hover span {
-      .btn-icon(91);
+    &.homepage-columns {
+        &:hover, &.hover {
+            span {
+                .btn-icon(91);
+            }
+        }
     }
     &.homepage-overflow span {
       .btn-icon(92);
@@ -6861,7 +6869,9 @@ HOMEPAGE CUSTOMISE
         height: 29px;
         width: 4px;
         span{ top: 8px; left: 8px !important; }
-        &:hover{ background-color: @link; }
+        &:hover, &.hover {
+            background-color: @link;
+        }
     }
     .ui-tabs-active{
         .btn.homepage-overflow span{ .btn-icon(93); }
