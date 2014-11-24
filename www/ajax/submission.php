@@ -92,5 +92,10 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
 
 }
 
+// just remove parent links, don't even worry about the config flag
+if ($_SESSION['user']->getRole()->isParent()) {
+    $output['action'] = '';
+}
+
 header("Content-type: application/json");
 print json_encode($output);
