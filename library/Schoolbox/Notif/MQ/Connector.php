@@ -65,7 +65,8 @@ class Connector extends AMQPConnector {
 				$this->conf->get('amqp_host'),
 				$this->conf->get('amqp_port'),
 				$this->conf->get('amqp_user'),
-				$this->conf->get('amqp_pass')
+				$this->conf->get('amqp_pass'),
+                $this->conf->get('amqp_vhost')
 			);
 		}
 	}
