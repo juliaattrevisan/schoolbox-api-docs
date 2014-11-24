@@ -96,11 +96,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
         $submission_counts = array();
-        if ($this->groupHandler->isStudent()) {
+        $isStudent         = $this->groupHandler->isStudent();
+        $isStaff           = $this->groupHandler->isStaff();
+        $userId            = $_SESSION['id'];
+        if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');
             $submission_counts = SubmissionBox\SubmissionMapper::getInstance()->findCountsForSubmissionBoxes(
                 $box_id_list,
-                $_SESSION['id']
+                $userId
             );
         }
         $time = new Alaress_Date_Format(new DateTime());
@@ -111,6 +114,14 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $isTask = $submission->getTask()->getId();
             if (!$isTask && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
                 continue;
+            }
+
+            // Don't show unpublished work to non-staff,
+            // but allow it to always show to owner
+            if ($submission->getPublishDate()->getDateTimeObject() > $time->getDateTimeObject()) {
+                if (!($isStaff || $submission->getOwner()->getId() == $userId)) {
+                    continue;
+                }
             }
 
             /* If student can no longer submit to this box,

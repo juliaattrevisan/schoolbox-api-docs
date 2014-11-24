@@ -31,10 +31,11 @@
 		});
 
         // setup datepickers
-        var openDate = $j('#open_date');
-        var dueDate  = $j('#due_date');
-        var lateDate = $j('#late_date');
-        openDate.add(dueDate).add(lateDate).datepicker({
+        var publishDate = $j('#publish_date');
+        var openDate    = $j('#open_date');
+        var dueDate     = $j('#due_date');
+        var lateDate    = $j('#late_date');
+        openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
@@ -47,6 +48,7 @@
                 })
             }
         });
+        publishDate.syncDates({endDate: openDate});
         openDate.syncDates({endDate: dueDate});
         dueDate.syncDates({endDate: lateDate});
 
@@ -128,7 +130,15 @@
 
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
         var submission_form = $j('#createSubmissionForm');
-        var open_date_valid = { dateValid: true };
+        var publish_date_valid = { dateValid: true };
+        var open_date_valid = {
+            dateValid: true,
+            dateNotBefore: {
+                message: 'Please enter a date that is not before the publish date.',
+                param:   'publish',
+                depends: isAcceptSubmit
+            }
+        };
         var due_date_valid  = {
             dateValid: true,
             dateNotBefore: {
@@ -158,6 +168,10 @@
                     markTypeRubricCriteriaExists: true,
                     markTypeRubricCriteriaCheck: true
                 },
+                publish_date:   publish_date_valid,
+                publish_hour:   publish_date_valid,
+                publish_minute: publish_date_valid,
+                publish_period: publish_date_valid,
                 open_date:   open_date_valid,
                 open_hour:   open_date_valid,
                 open_minute: open_date_valid,
@@ -172,6 +186,10 @@
                 late_period: late_date_valid
             },
             messages: {
+                open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
+                open_period: {dateNotBefore: open_date_valid.dateNotBefore.message},
                 due_date:    {dateNotBefore: due_date_valid.dateNotBefore.message},
                 due_hour:    {dateNotBefore: due_date_valid.dateNotBefore.message},
                 due_minute:  {dateNotBefore: due_date_valid.dateNotBefore.message},
@@ -618,13 +636,30 @@
     </tr>
 
     <!-- BEGIN duework_timespan -->
-    <tr class="accept-hide dark">
+    <tr class="dark">
+        <td class="formLabelWidth"><h4>Publish Date</h4>
+            <em>This due work will not show on your student's calendar until this date.
+                To publish at the start of the day, leave the time fields blank.</em>
+        </td>
+        <td>
+            <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
+            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
+            <span>:</span>
+            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
+            <select name="publish_period" class="short">
+                <option value="am">AM</option>
+                <option value="pm"
+                {PUBLISH_PM}>PM</option>
+            </select>
+        </td>
+    </tr>
+    <tr class="dark accept-hide">
         <td class="formLabelWidth"><h4>Open Date</h4>
             <em>The date from when the due work will be available for submission.
                 To allow submissions from the start of the day, leave the time fields blank.</em>
         </td>
         <td>
-            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20"/>
+            <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
             <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField"/>
             <span>:</span>
             <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField"/>
@@ -640,7 +675,7 @@
             <em>Actual date the work is due. This is the date that will be published.
                 To allow submissions until the end of the day, leave the time fields blank.</em></td>
         <td>
-            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20"/>
+            <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
             <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
             <span>:</span>
             <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
@@ -656,7 +691,7 @@
             <em>Students will not be able to submit after this date.
                 To allow submissions until the end of the day, leave the time fields blank.</em></td>
         <td>
-            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20"/>
+            <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
             <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
             <span>:</span>
             <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">

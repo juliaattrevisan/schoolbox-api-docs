@@ -33,9 +33,11 @@ $submissionHandler = new Submission();
 $visibilities = array(
     \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
 );
+$isStaff = false;
 if ($groupHandler->isStudent()) {
     $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 } elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+    $isStaff        = true;
     $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
     $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 }
@@ -203,6 +205,10 @@ $event_api         = new Calendar_Api_EventType_Submission_Schoolbox_Default(
 $event_list        = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list as $event_object) {
+    // Filter out items not yet published, for non-staff
+    if (!$isStaff && $event_object->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
+        continue;
+    }
     $date                       = $event_object->getStartTime()->getUsingFormat('dmY');
     $event_list_by_day[$date][] = $event_object;
 }

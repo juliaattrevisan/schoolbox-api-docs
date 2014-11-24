@@ -112,6 +112,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'type'       => self::TYPE_MODEL,
             'join'       => 'task_instance',
         ));
+        $this->hasMap(
+            array(
+                'column'   => 'publish_date',
+                'property' => 'publishDate',
+                'type'     => self::TYPE_DATETIME,
+            )
+        );
         $this->hasMap(array(
             'column'     => 'open_date',
             'property'   => 'openDate',
@@ -756,6 +763,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // Get list of valid categories for the given user.
         $params      = array();
         $where_parts = array(
+            'sb.open_date <= NOW()',
             'sb.late_date > NOW()',
             'sb.accept_submission IS TRUE',
             'sb.deleted IS FALSE',

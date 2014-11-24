@@ -6,16 +6,17 @@
         var field_name = date_field;
         var element    = null;
         if (typeof date_field === 'object') {
-            field_name = $j(date_field).attr('name').replace(/_\w+$/, '');
-            element    = $j(date_field).closest('form');
+            field_name = $(date_field).attr('name').replace(/_\w+$/, '');
+            element    = $(date_field).closest('form');
         }
         else {
-            element = $j(form);
+            element = $(form);
         }
-        var date     = element.find(':input[name="'+field_name+'_date"]').val();
-        var hour     = element.find(':input[name="'+field_name+'_hour"]').val();
-        var minute   = element.find(':input[name="'+field_name+'_minute"]').val();
-        var meridian = element.find(':input[name="'+field_name+'_period"]').val();
+        var dateInput = element.find(':input[name="'+field_name+'_date"]');
+        var date      = dateInput.val();
+        var hour      = element.find(':input[name="'+field_name+'_hour"]').val();
+        var minute    = element.find(':input[name="'+field_name+'_minute"]').val();
+        var meridian  = element.find(':input[name="'+field_name+'_period"]').val();
 
         if (hour.length) {
             //
@@ -41,13 +42,17 @@
             hour = Number(hour);
         }
         else {
-            if (field_name === 'open') {
-                hour   = 0;
-                minute = 0;
-            }
-            else {
-                hour   = 23;
-                minute = 59;
+            // Use default hour and minute from the default_time data attribute
+            // if it's there.
+            hour   = 0;
+            minute = 0;
+            var defaultTime = dateInput.data('default_time');
+            if (defaultTime.match) {
+                var split = dateInput.data('default_time').match(/^(\d+):(\d+)$/);
+                if (split) {
+                    hour   = split[1];
+                    minute = split[2];
+                }
             }
         }
 
@@ -103,7 +108,7 @@
      * than another one.
      */
     $.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
-        var item = $j(element);
+        var item = $(element);
         var form = item.closest('form');
         return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
     }, 'Please enter a date that is after');

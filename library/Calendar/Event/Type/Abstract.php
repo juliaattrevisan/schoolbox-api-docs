@@ -127,7 +127,7 @@ abstract class Calendar_Event_Type_Abstract
      * The date when the event was published (made visible to users)
      * Stored always as an Alaress_Date_Format() instance
      *
-     * @var null
+     * @var Alaress_Date_Format
      */
     protected $publishDate = null;
 
@@ -681,7 +681,7 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * Set publish date object
      *
-     * @param $publishDate
+     * @param Alaress_Date_Format $publishDate
      */
     public function setPublishDate($publishDate)
     {
@@ -691,7 +691,7 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * Get publish date
      *
-     * @return null
+     * @return Alaress_Date_Format
      */
     public function getPublishDate()
     {

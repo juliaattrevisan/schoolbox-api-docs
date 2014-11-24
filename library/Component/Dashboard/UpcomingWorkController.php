@@ -108,9 +108,14 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             $this->showAssessLink = !Config::get('restrict_student_submissions');
         }
 
+        $isStaff = $groupHandler->isStaff();
         foreach ($upcoming as $item) {
             unset($output);
             // find out if we're actually showing this item
+            // Skip if I'm not a staff member and this isn't yet open
+            if (!$isStaff && $item['publish_date'] > $now) {
+                continue;
+            }
             if ($item['kind'] == 0) {
                 // duework
                 if ($item['submittable']) {
