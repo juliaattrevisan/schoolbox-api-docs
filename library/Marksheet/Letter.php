@@ -68,7 +68,7 @@ class Marksheet_Letter extends Marksheet_Abstract
             $grades[] = array(
                 'id'      => $grade->getId(),
                 'caption' => $grade->getCaption(),
-                'group'   => $grade->getGroup()->getId(),
+                'group'   => $grade->getGroup()->getId() ?: 0,
             );
         }
         $page->dropdown(
