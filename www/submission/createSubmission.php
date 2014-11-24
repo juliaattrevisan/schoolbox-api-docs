@@ -9,8 +9,11 @@ $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 // Instead of all this block BS I'll create a sub-template
 $this->setFile('rubricTpl', 'submission/_submissionRubrics.html');
 $this->setBlock('rubricTpl', 'rubric_type_label', 'rubric_type_label_block');
-$this->setBlock('rubricTpl', 'no_crit_group', 'no_crit_group_block');
-$this->setBlock('rubricTpl', 'crit_group', 'crit_group_block');
+$this->setBlock('rubricTpl', 'criteria_allowed', 'criteria_allowed_block');
+$this->setBlock('rubricTpl', 'no_criteria_allowed', 'no_criteria_allowed_block');
+
+$this->setBlock('criteria_allowed', 'no_crit_group', 'no_crit_group_block');
+$this->setBlock('criteria_allowed', 'crit_group', 'crit_group_block');
 $this->setBlock('crit_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
 
@@ -447,70 +450,86 @@ function outputCriteria(
         )
     );
 
-    $page->setVar('rubric_type_label_block', '');
+    $page->setVar(
+        array(
+            'rubric_type_label_block'   => '',
+            'criteria_allowed_block'    => '',
+            'no_criteria_allowed_block' => '',
+        )
+    );
     if ($is_for_task) {
         $page->parse('rubric_type_label_block', 'rubric_type_label');
     } else {
         $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
     }
 
-    $page->setVar(
-        array(
-            'no_crit_group_block' => '',
-            'crit_group_block'    => '',
-            'criterion_block'     => ''
-        )
-    );
+    if ($catID) {
+        // Display the criteria for this category, if there are any
+        $page->setVar(
+            array(
+                'no_crit_group_block' => '',
+                'crit_group_block'    => '',
+                'criterion_block'     => ''
+            )
+        );
 
-    $hasCritGroup = false;
-    if ($criterionCollection->count()) {
-        $currentGrouping = $criterionCollection->first()->getGrouping();
+        $hasCritGroup = false;
+        if ($criterionCollection->count()) {
+            $currentGrouping = $criterionCollection->first()->getGrouping();
 
-        foreach ($criterionCollection as $criterion) {
-            if ($criterion->getGrouping() != $currentGrouping) {
-                $hasCritGroup = true;
-                $page->parse('crit_group_block', 'crit_group', true);
-                $page->setVar('criterion_block', '');
-            }
-
-            $page->setVar('crit_input_block', '');
-            $page->setVar(
-                array(
-                    'CRIT_ID'      => $criterion->getId(),
-                    'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
-                    'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
-                    'CRIT_NAME'    => Scrub::text($criterion->getName()),
-                    'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
-                )
-            );
-
-            if (is_array($descriptors[$criterion->getId()])) {
-                foreach ($descriptors[$criterion->getId()] as $descriptor) {
-                    $page->setVar(
-                        array(
-                            'CRIT_INPUT_VALUE'  => $descriptor->getDescription(),
-                            'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
-                        )
-                    );
-                    $page->parse('crit_input_block', 'crit_input', true);
+            foreach ($criterionCollection as $criterion) {
+                if ($criterion->getGrouping() != $currentGrouping) {
+                    $hasCritGroup = true;
+                    $page->parse('crit_group_block', 'crit_group', true);
+                    $page->setVar('criterion_block', '');
                 }
-            } else {
-                // disply blank inputs, they weren't used
-                for ($i = 0; $i < $descriptorCount; ++$i) {
-                    $page->setVar('CRIT_INPUT_VALUE', '');
-                    $page->setVar('CRIT_INPUT_WEIGHT', $i);
-                    $page->parse('crit_input_block', 'crit_input', true);
-                }
-            }
-            $page->parse('criterion_block', 'criterion', true);
 
-            $currentGrouping = $criterion->getGrouping();
+                $page->setVar('crit_input_block', '');
+                $page->setVar(
+                    array(
+                        'CRIT_ID'      => $criterion->getId(),
+                        'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
+                        'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
+                        'CRIT_NAME'    => Scrub::text($criterion->getName()),
+                        'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
+                    )
+                );
+
+                if (is_array($descriptors[$criterion->getId()])) {
+                    foreach ($descriptors[$criterion->getId()] as $descriptor) {
+                        $page->setVar(
+                            array(
+                                'CRIT_INPUT_VALUE'  => $descriptor->getDescription(),
+                                'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
+                            )
+                        );
+                        $page->parse('crit_input_block', 'crit_input', true);
+                    }
+                } else {
+                    // disply blank inputs, they weren't used
+                    for ($i = 0; $i < $descriptorCount; ++$i) {
+                        $page->setVar('CRIT_INPUT_VALUE', '');
+                        $page->setVar('CRIT_INPUT_WEIGHT', $i);
+                        $page->parse('crit_input_block', 'crit_input', true);
+                    }
+                }
+                $page->parse('criterion_block', 'criterion', true);
+
+                $currentGrouping = $criterion->getGrouping();
+            }
+            $page->parse('crit_group_block', 'crit_group', true);
         }
-        $page->parse('crit_group_block', 'crit_group', true);
-    }
 
-    if (!$hasCritGroup) {
-        $page->parse('no_crit_group_block', 'no_crit_group');
+        if (!$hasCritGroup) {
+            $page->parse('no_crit_group_block', 'no_crit_group');
+        }
+        $page->parse('criteria_allowed_block', 'criteria_allowed');
+    } else {
+        // There is no category.
+        // If you're seeing this then you created a course builder in a
+        // category without a parent, and we're viewing the non-existent
+        // parent category.
+        $page->parse('no_criteria_allowed_block', 'no_criteria_allowed');
     }
 
     $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
