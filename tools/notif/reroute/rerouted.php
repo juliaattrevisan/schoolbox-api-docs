@@ -82,7 +82,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
         $stompc = $stompf->createClient(array(
             'host'     => $conf->get('amqp_host'),
             'port'     => $conf->get('amqp_stomp_port'),
-            'vhost'    => '/',
+            'vhost'    => $conf->get('amqp_vhost'),
             'login'    => $conf->get('amqp_user'),
             'passcode' => $conf->get('amqp_pass'),
         ));
