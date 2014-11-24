@@ -48,6 +48,11 @@
             container.slideUp('fast', function() {
                 // reload all tasks too.
                 reloadTaskList(data);
+
+                form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
+                    var event = new CustomEvent('click');
+                    this.dispatchEvent(event);
+                });
             });
         }
 
