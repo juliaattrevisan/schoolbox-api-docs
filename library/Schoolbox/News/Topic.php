@@ -9,7 +9,6 @@
 
 namespace Schoolbox\News;
 
-
 class Topic {
 
 	/** @var int */
@@ -18,6 +17,8 @@ class Topic {
 	/** @var string */
 	protected $name;
 
+    /** @var  string */
+    protected $slug;
 
 	/**
 	 * @param int $id
@@ -38,6 +39,8 @@ class Topic {
 	 */
 	public function setName($name) {
 		$this->name = $name;
+        $url = new \Url($name);
+        $this->setSlug($url->getSlug());
 	}
 
 	/**
@@ -46,5 +49,19 @@ class Topic {
 	public function getName() {
 		return $this->name;
 	}
+
+    /**
+     * @param string $slug
+     */
+    public function setSlug($slug) {
+        $this->slug = $slug;
+    }
+    /**
+     * Returns the slug version of the name
+     * @return string
+     */
+    public function getSlug() {
+        return $this->slug;
+    }
 
 } 
