@@ -93,7 +93,7 @@ class Scheduler extends StompScheduler
         return $stompFactory->createClient(array(
             'host'     => $this->conf->get('amqp_host'),
             'port'     => $this->conf->get('amqp_stomp_port'),
-            'vhost'    => '/',
+            'vhost'    => $this->conf->get('amqp_vhost'),
             'login'    => $this->conf->get('amqp_user'),
             'passcode' => $this->conf->get('amqp_pass'),
         ));

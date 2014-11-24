@@ -55,7 +55,7 @@ $stompFactory = new \React\Stomp\Factory($loop);
 $stomp = $stompFactory->createClient(array(
 	'host'      => Cfg::get('amqp_host'),
 	'port'      => Cfg::get('amqp_stomp_port'),
-	'vhost'     => '/',
+	'vhost'     => Cfg::get('amqp_vhost'),
 	'login'     => Cfg::get('amqp_user'),
 	'passcode'  => Cfg::get('amqp_pass'),
 ));
