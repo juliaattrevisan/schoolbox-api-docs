@@ -88,6 +88,8 @@
         #RewriteCond %{REQUEST_URI} ^/login/.* [OR]
         #RewriteCond %{REQUEST_URI} ^/saml [OR]
         #RewriteCond %{REQUEST_URI} ^/saml/.* [OR]
+        #RewriteCond %{REQUEST_URI} ^/cms/network [OR]
+        #RewriteCond %{REQUEST_URI} ^/cms/network/.* [OR]
         #RewriteCond %{REQUEST_URI} ^/account/modify [OR]
         #RewriteCond %{REQUEST_URI} ^/account/modify/.*
         #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
@@ -100,6 +102,8 @@
         #RewriteCond %{REQUEST_URI} !^/m/.*
         #RewriteCond %{REQUEST_URI} !^/saml
         #RewriteCond %{REQUEST_URI} !^/saml/.*
+        #RewriteCond %{REQUEST_URI} !^/cms/network
+        #RewriteCond %{REQUEST_URI} !^/cms/network/.*
         #RewriteCond %{REQUEST_URI} !^/account/modify
         #RewriteCond %{REQUEST_URI} !^/account/modify/.*
         #RewriteCond %{REQUEST_URI} !^/ajax/.*
