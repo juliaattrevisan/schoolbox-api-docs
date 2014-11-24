@@ -131,7 +131,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$catName = $cat->getName();
 
 		$text = ":user posted the news :title in :catname";
-		$href = "/homepage/$catId";
+		$href = "/homepage/$catId#news-$articleId";
 
 		$authorName = $user->formatName();
 		$authorId = $user->getId();

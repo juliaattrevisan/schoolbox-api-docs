@@ -143,7 +143,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 		$msg = new Message(
 			':author revised the wiki :title in :catname',
 			"/portrait.php?userId=$authorExtId&size=square32",
-			"/homepage/$categoryId"
+			"/wiki/$categoryId/$revisionSlug"
 		);
 
 		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$revisionId.created", Logger::INFO, array(
