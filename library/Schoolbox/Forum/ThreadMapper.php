@@ -18,21 +18,23 @@ class ThreadMapper extends Mapper {
         $this->hasModel('\\Schoolbox\\Forum\\Thread');
         $this->hasMap(array(
                 'column'     => 'threadID',
-                'property'   => 'threadID',
+                'property'   => 'id',
                 'type'       => self::TYPE_INTEGER,
                 'identifier' => true
             ));
 
         $this->hasMap(array(
                 'column'     => 'categoryID',
-                'property'   => 'categoryID',
-                'type'       => self::TYPE_INTEGER
+                'property'   => 'category',
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'category'
             ));
 
         $this->hasMap(array(
                 'column'     => 'userID',
-                'property'   => 'userID',
-                'type'       => self::TYPE_INTEGER
+                'property'   => 'user',
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'owner'
             ));
 
         $this->hasMap(array(
@@ -71,7 +73,8 @@ class ThreadMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'last_post_id',
                 'property'   => 'lastPost',
-                'type'       => self::TYPE_INTEGER
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'post'
             ));
 
         $this->hasMap(array(
@@ -83,14 +86,45 @@ class ThreadMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'last_post_user_id',
                 'property'   => 'lastPostUser',
-                'type'       => self::TYPE_INTEGER
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'lastPoster'
             ));
+
+        $this->hasJoin('owner', array(
+            'mapper'    => '\Schoolbox\UserMapper',
+            'this_key'  => 'userID',
+            'other_key' => 'id'
+        ));
+
+        $this->hasJoin('lastPoster', array(
+            'mapper'    => '\Schoolbox\UserMapper',
+            'this_key'  => 'last_post_user_id',
+            'other_key' => 'id'
+        ));
+
+        $this->hasJoin('category', array(
+            'mapper'    => '\Schoolbox\Resource\CategoryMapper',
+            'this_key'  => 'categoryID',
+            'other_key' => 'id'
+        ));
+
+        $this->hasJoin('post', array(
+            'mapper'    => '\Schoolbox\Forum\PostMapper',
+            'this_key'  => 'last_post_id',
+            'other_key' => 'postID'
+        ));
 
     }
 
+
+    /**
+     * @param int $id
+     * @return Thread
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function findById($id) {
 
-        $post_mapper = PostMapper::getInstance();
+        $post_mapper = $this->getJoinMapper('post');
 
         $query=
             "SELECT
@@ -105,10 +139,10 @@ class ThreadMapper extends Mapper {
         $statement->execute(array($id));
 
         if (($row = $statement->fetch()) !== false) {
-            $post = $this->hydrate($row, 'thread');
-            $post->setFirstPost($post_mapper->hydrate($row,'firstPost'));
-            $this->throwIfDeleted($post);
-            return $post;
+            $thread = $this->hydrate($row, 'thread');
+            $thread->setFirstPost($post_mapper->hydrate($row,'firstPost'));
+            $this->throwIfDeleted($thread);
+            return $thread;
         }
         else {
             throw new Mapper\Exception('Instance of object not found');

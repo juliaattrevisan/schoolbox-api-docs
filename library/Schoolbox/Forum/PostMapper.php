@@ -18,15 +18,16 @@ class PostMapper extends Mapper {
         $this->hasModel('\\Schoolbox\\Forum\\Post');
         $this->hasMap(array(
                 'column'     => 'postID',
-                'property'   => 'postID',
+                'property'   => 'id',
                 'type'       => self::TYPE_INTEGER,
                 'identifier' => true
             ));
 
         $this->hasMap(array(
                 'column'     => 'threadID',
-                'property'   => 'threadID',
-                'type'       => self::TYPE_INTEGER
+                'property'   => 'thread',
+                'type'       => self::TYPE_MODEL,
+                'join'       => 'thread'
             ));
 
         $this->hasMap(array(
@@ -70,13 +71,25 @@ class PostMapper extends Mapper {
             ));
 
         $this->hasJoin('owner', array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'userID',
-                'other_key' => 'id',
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'userID',
+            'other_key' => 'id',
+        ));
+
+        $this->hasJoin('thread', array(
+            'mapper'    => '\\Schoolbox\\Forum\\ThreadMapper',
+            'this_key'  => 'threadID',
+            'other_key' => 'threadID',
         ));
 
     }
 
+
+    /**
+     * @param int $id
+     * @return Post
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function findById($id) {
         $query=
             "SELECT

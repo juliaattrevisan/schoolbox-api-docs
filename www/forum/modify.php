@@ -19,6 +19,7 @@ if (is_numeric($this->arg[0])) {
     /* Category exists
      */
     try {
+        /** @var \Schoolbox\Resource\Category $folder */
         $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
         error(2);
@@ -55,8 +56,12 @@ if (is_numeric($this->arg[0])) {
      */
     if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         try {
+            /** @var \Schoolbox\Forum\Post $post */
             $post   = PostMapper::getInstance()->findById($this->arg[2]);
-            $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
+
+            /** @var \Schoolbox\Forum\Thread $thread */
+            $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         } catch (Exception $e) {
@@ -77,15 +82,16 @@ if (is_numeric($this->arg[0])) {
             error(19);
         }
 
-        if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
+        // first!
+        if ($thread->getFirstPost()->getId() == $post->getId()) {
             $output['THREAD_TITLE'] = $thread->getTitle();
             $this->parse('title_block', 'title');
         }
 
         $output['ACTION']      = 'Modify';
         $output['THREAD_POST'] = 'Post';
-        $output['THREAD_ID']   = $thread->getThreadId();
-        $output['POST_ID']     = $post->getPostId();
+        $output['THREAD_ID']   = $thread->getId();
+        $output['POST_ID']     = $post->getId();
         $output['BODY']        = Scrub::text($post->getBody());
 
 
@@ -94,6 +100,7 @@ if (is_numeric($this->arg[0])) {
         /* Add new reply
          */
         try {
+            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
@@ -110,7 +117,7 @@ if (is_numeric($this->arg[0])) {
 
         $output['ACTION']       = 'Post';
         $output['THREAD_POST']  = 'Reply';
-        $output['THREAD_ID']    = $thread->getThreadId();
+        $output['THREAD_ID']    = $thread->getId();
         $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
 
 
@@ -133,7 +140,7 @@ if (is_numeric($this->arg[0])) {
 
     if (!is_numeric($quotePostID) && $this->arg[1]) {
         //Gets the oldest post to use as a thread reply
-        $quotePostID = $thread->getFirstPost()->getPostID();
+        $quotePostID = $thread->getFirstPost()->getId();
     }
 
     if (is_numeric($quotePostID) && $quotePostID > 0) {
@@ -142,7 +149,7 @@ if (is_numeric($this->arg[0])) {
             if (!$output['BODY']) {
                 $output['BODY'] =
                     '<blockquote class="mceNonEditable">' . Scrub::html($quote->getBody()) .
-                    '<cite>' . $quote->getOwner()->formatName($user) . '</cite>' .
+                    '<cite>' . $quote->getOwner()->formatName() . '</cite>' .
                     '</blockquote><p></p>';
             }
 

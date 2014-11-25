@@ -9,21 +9,23 @@
  */
 
 namespace Schoolbox\Forum;
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\User;
 
 
 class Post implements ISoftDeletable {
 
     /** @var int */
-    protected $postID;
+    protected $id;
 
     /** @var int */
-    protected $threadID;
+    protected $thread;
 
-    /** @var \Schoolbox\User */
+    /** @var User */
     protected $owner;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $date;
 
     /** @var string */
@@ -32,7 +34,7 @@ class Post implements ISoftDeletable {
     /** @var string */
     protected $deleted = 'false';
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $modified;
 
     /** @var string */
@@ -40,11 +42,11 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @param int $postID
+     * @param int $id
      * @return self
      */
-    public function setPostID($postID) {
-        $this->postID = $postID;
+    public function setId($id) {
+        $this->id = $id;
         return $this;
     }
 
@@ -52,31 +54,31 @@ class Post implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getPostID() {
-        return $this->postID;
+    public function getId() {
+        return $this->id;
     }
 
 
     /**
-     * @param int $threadID
+     * @param Thread $thread
      * @return self
      */
-    public function setThreadID($threadID) {
-        $this->threadID = $threadID;
+    public function setThread($thread) {
+        $this->thread = $thread;
         return $this;
     }
 
 
     /**
-     * @return int
+     * @return Thread
      */
-    public function getThreadID() {
-        return $this->threadID;
+    public function getThread() {
+        return $this->thread;
     }
 
 
     /**
-     * @param int $userID
+     * @param User $owner
      * @return self
      */
     public function setOwner($owner) {
@@ -86,7 +88,7 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @return int
+     * @return User
      */
     public function getOwner() {
         return $this->owner;
@@ -94,7 +96,7 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @param \Alaress_Date_Format $date
+     * @param Alaress_Date_Format $date
      * @return self
      */
     public function setDate($date) {
@@ -104,7 +106,7 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getDate() {
         return $this->date;
@@ -148,7 +150,7 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @param \Alaress_Date_Format $modified
+     * @param Alaress_Date_Format $modified
      * @return self
      */
     public function setModified($modified) {
@@ -158,7 +160,7 @@ class Post implements ISoftDeletable {
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getModified() {
         return $this->modified;
