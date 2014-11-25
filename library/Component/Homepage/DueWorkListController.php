@@ -249,8 +249,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             )
         );
 
-
-        if ($this->groupHandler->isStudent()) {
+        // Allow students or staff acting as students to see the view results buttons.
+        // (Staff have no context for actually following the view result button)
+        if ($this->permission == READ_ACCESS) {
             // is the current user a member of this category?
             $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
             $subAccess = false;
