@@ -176,7 +176,7 @@ class User extends DeprecatedModel
             return $this->searchExact($keyword, $offset, $limit, $count, $sort_by, $sort_dir);
         }
         // Don't allow LIKE searches on keywords < 3 chars long
-        $wherePart = sprintf("synergy_id = '%s'", $this->db->quote($keyword));
+        $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
         if (mb_strlen($keyword, 'UTF-8') >= 3) {
             $wherePart .= sprintf(
                 " OR CONCAT_WS(' ',title,firstname,lastname) LIKE '%1\$s'
@@ -185,6 +185,16 @@ class User extends DeprecatedModel
                 $this->db->quote('%' . $this->db->quoteForLike($keyword) . '%')
             );
         }
+        $wherePart .= ')';
+
+        //If parent search policy is disabled, only staff will see parents in search results
+        //Guests never see parents
+        if( $_SESSION['user']->getRole()->isGuest() ||
+            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+        ) {
+            $wherePart .= " AND `groups`.`group_type` != 'parent' ";
+        }
+
         // retreive results
         /* Allow search on synergy id
          */
@@ -199,7 +209,8 @@ class User extends DeprecatedModel
         $query .= " ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;";
         // retreive count
-        $count_query = "SELECT COUNT(*) FROM `user` WHERE $wherePart";
+        $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
+
         $count       = $this->db->getOne($count_query);
         return $this->db->getAll($query);
     }
@@ -213,23 +224,35 @@ class User extends DeprecatedModel
         $sort_dir = 'ASC'
     ) {
         $keyword = $this->db->quote($keyword);
+
+        //If parent search policy is disabled, only staff will see parents in search results
+        //Guests never see parents
+        if( $_SESSION['user']->getRole()->isGuest() ||
+            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+        ) {
+            $wherePart = " AND `groups`.`group_type` != 'parent' ";
+        }
+
         // retrieve results
         $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                     LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-                    WHERE firstname = '$keyword'
+                    WHERE ( firstname = '$keyword'
                     OR lastname = '$keyword'
-                    OR username = '$keyword'
+                    OR username = '$keyword' )
+                    $wherePart
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
-                                WHERE firstname = '$keyword'
-                OR lastname = '$keyword'
-                                OR username = '$keyword'";
+                                LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                                WHERE ( firstname = '$keyword'
+                                OR lastname = '$keyword'
+                                OR username = '$keyword' )
+                                $wherePart";
         $count       = $this->db->getOne($count_query);
         return $this->db->getAll($query);
     }
