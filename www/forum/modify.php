@@ -11,6 +11,7 @@ $groupHandler = new Group();
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
+$this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
 $this->setVar('title_block', '');
 
@@ -143,17 +144,18 @@ if (is_numeric($this->arg[0])) {
         $quotePostID = $thread->getFirstPost()->getId();
     }
 
+    $this->setVar('quote_block', '');
+
     if (is_numeric($quotePostID) && $quotePostID > 0) {
         try {
             $quote = PostMapper::getInstance()->findById($quotePostID);
-            if (!$output['BODY']) {
-                $output['BODY'] =
-                    '<blockquote class="mceNonEditable">' . Scrub::html($quote->getBody()) .
-                    '<cite>' . $quote->getOwner()->formatName() . '</cite>' .
-                    '</blockquote><p></p>';
-            }
 
-            $this->setVar($output);
+            $this->setVar(array(
+                'QUOTE_BODY' => Scrub::html($quote->getBody()),
+                'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
+                'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
+            ));
+            $this->parse('quote_block', 'quote');
         } catch (Exception $e) {
         }
     }
