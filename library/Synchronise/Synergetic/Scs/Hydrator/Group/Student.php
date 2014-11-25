@@ -27,6 +27,12 @@ class Synchronise_Synergetic_Scs_Hydrator_Group_Student implements Synchronise_B
         $year = $externalUser['StudentYearLevel'];
 
 		switch($year) {
+            case 30:
+                // Assume 30 = ELC, like other Synergetic schools
+                return 3;
+            case 40:
+                // Assume 40 = Prep, like other Synergetic schools
+                return 7;
 			case 1: return 8;
 			case 2: return 9;
 			case 3: return 10;
