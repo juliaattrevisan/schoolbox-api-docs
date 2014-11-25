@@ -233,7 +233,7 @@ abstract class Synchronise_Base_Strategy
      * Handle users who exist in Schoolbox but not Synergetic
      * Blank code block, allowing customisation per site
      */
-    public function removeIfNotExist()
+    public function removeIfNotExists()
     {
     }
 
