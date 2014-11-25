@@ -6945,8 +6945,11 @@ HOMEPAGE CUSTOMISE
         font-weight: bold;
         text-align: center;
         margin-bottom: 15px;
-        &:hover, &.selected {
+        &:hover {
             background: lighten(@highlight-color,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
+        }
+        &.selected{
+        	background: @highlight-color url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
         }
     }
     #left{ margin-right: 15px; }
