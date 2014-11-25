@@ -20,14 +20,15 @@ $(document).ready(function() {
     }
     var calendarView = {{ calendar.view|json_encode|raw }};
     switch (calendarView) {
-        case 'week':
-            calendarView = 'agendaWeek';
-            break;
         case 'day':
             calendarView = 'agendaDay';
             break;
-        default:
+        case 'month':
             calendarView = 'month';
+            break;
+        case 'week':
+        default:
+            calendarView = 'agendaWeek';
             break;
     }
 
