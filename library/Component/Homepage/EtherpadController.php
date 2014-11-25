@@ -123,7 +123,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 				'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
 			));
 
-			if ($isCreator) {
+			if ($isCreator && $this->permission > READ_ACCESS) {
 				$this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
 			}
 
@@ -138,7 +138,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
 		/* Only provide Create Document button to those with write access
 		 */
-		if ($isCreator) {
+		if ($isCreator && $this->permission > READ_ACCESS) {
 			$this->parse('etherpad_has_create_block', 'etherpad_has_create');
 		}
 
