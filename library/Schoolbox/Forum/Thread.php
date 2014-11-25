@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Forum;
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
@@ -45,6 +46,9 @@ class Thread implements ISoftDeletable {
 
     /** @var Post */
     protected $lastPost;
+
+    /** @var Collection|Post[] */
+    protected $posts;
 
     /** @var Alaress_Date_Format */
     protected $lastPostDate;
@@ -232,6 +236,26 @@ class Thread implements ISoftDeletable {
      */
     public function getLastPost() {
         return $this->lastPost;
+    }
+
+
+    /**
+     * @param Collection|Post[] $posts
+     * @return self
+     */
+    public function setPosts($posts)
+    {
+        $this->posts = $posts;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection|Post[]
+     */
+    public function getPosts()
+    {
+        return $this->posts;
     }
 
 

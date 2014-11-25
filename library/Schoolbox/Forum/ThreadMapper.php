@@ -140,8 +140,11 @@ class ThreadMapper extends Mapper {
 
         if (($row = $statement->fetch()) !== false) {
             $thread = $this->hydrate($row, 'thread');
-            $thread->setFirstPost($post_mapper->hydrate($row,'firstPost'));
             $this->throwIfDeleted($thread);
+
+            $thread->setFirstPost($post_mapper->hydrate($row,'firstPost'));
+            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
+
             return $thread;
         }
         else {
