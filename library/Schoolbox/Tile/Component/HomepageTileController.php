@@ -80,10 +80,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
             ->parseBlocks(
                 $this,
                 $this->delegate->fetchTwigContent($this, $this->sitepage),
-                $this->groupHandler->getPermission(
-                    $this->getContext('id'),
-                    $this->user->getId()
-                )
+                $this->permission
             );
         return true;
     }
