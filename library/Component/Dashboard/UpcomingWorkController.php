@@ -186,7 +186,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 'UPCOMING_TITLE'   => $item['title'],
                 'UPCOMING_TYPE'    => $item['type'],
                 'UPCOMING_DATE'    => $adr->getRelativeTime(),
-                'UPCOMING_TIME'    => $adr->getUsingFormat('Hi') == '2359' ? $adr->getDateOnly() : $adr->getShort(),
+                'UPCOMING_TIME'    => $adr->isAtEndOfDay() ? $adr->getDateOnly() : $adr->getShort(),
                 'UPCOMING_URGENCY' => $urgency,
 
                 'UPCOMING_SUBJ_NAME' => $item['subj_name'],
