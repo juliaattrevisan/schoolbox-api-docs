@@ -154,7 +154,12 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     ($actionURL ? '<a href="' . $actionURL . '">' : "")
                     . Scrub::text($submission->getName())
                     . ($actionURL ? '</a>' : "");
-                $dateHTML = $submission->getDueDate()->getDateOnly();
+                // Show due time if there is one
+                if ($submission->getDueDate()->getUsingFormat('Hi') == '2359') {
+                    $dateHTML = $submission->getDueDate()->getDateOnly();
+                } else {
+                    $dateHTML = $submission->getDueDate()->getShort();
+                }
             }
 
             $this->setVar('duework_result_link_block', '');
