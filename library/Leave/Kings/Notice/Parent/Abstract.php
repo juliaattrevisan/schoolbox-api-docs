@@ -9,6 +9,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+
 abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;
 	protected $emailTemplateFile = '../../kings/modules/leave/parentNoticeEmail.html';
@@ -18,32 +22,23 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 	/**
 	 * Setup
 	 */
-	public function setup() {
-
+    public function setup()
+    {
 		/* For getting all the parents of a child
 		 */
 		$this->setExternalUser(new External_User());
 
-                // hmarray(house id) = housemaster id
-                $hmarray['5'] = '1568'; // House to be deleted
-                $hmarray['6'] = '10345';
-                $hmarray['7'] = '1629'; // House to be deleted
-                $hmarray['9'] = '1568'; // House to be deleted
-                $hmarray['11'] = '1700';
-                $hmarray['13'] = '1568';
-                $hmarray['14'] = '1632';
-                $hmarray['20'] = '1570';
+        // Housemaster - I can only really work with one
+        $accessMapper = new UserAccessMapper();
+        foreach ($accessMapper->findUsersForService(
+            UserAccess::SERVICE_HOUSEMASTER,
+            $this->getRequest()->getUser()->getResidentialHouse()
+        ) as $housemaster) {
+            $housemasterName  = $housemaster->formatName();
+            $housemasterEmail = $housemaster->getEmail();
 
-		// $housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouse());
-
-		$userHandler = new User();
-		// $housemaster = $userHandler->getByUsername($housemasterInitials);
-		$housemaster = $userHandler->getByID($hmarray[$this->getRequest()->getUser()->getResidentialHouse()]);
-
-		$housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
-		$housemasterEmail = $housemaster['alt_email'];
-
-		$subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
+            $subject = '(Parent) Leave Request Status Update for '
+                . $this->getRequest()->getUser()->formatName();
 
 		/* Set destination email address in loop in send()
 		 */
@@ -55,20 +50,25 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
 		$email->setBlock($email->t_label, 'rejected_by', 'rejected_by_block');
 
-		$email->setVar(array(
-			'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
-			'LEAVE_AUTHOR_NAME' => $this->getRequest()->getAuthor()->formatName(),
-			'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
-			'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
-			'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),
-			'LEAVE_DESCRIPTION' => $this->getRequest()->getDescription(),
-			'LEAVE_HOST_NAME' => $this->getRequest()->getHostName(),
-			'LEAVE_HOST_PHONE' => $this->getRequest()->getHostPhone(),
-			'LEAVE_STUDENT_PHONE' => $this->getRequest()->getUserPhone(),
-			'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
-		));
+            $email->setVar(
+                array(
+                    'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
+                    'LEAVE_AUTHOR_NAME' => $this->getRequest()->getAuthor()->formatName(),
+                    'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
+                    'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
+                    'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),
+                    'LEAVE_DESCRIPTION' => $this->getRequest()->getDescription(),
+                    'LEAVE_HOST_NAME' => $this->getRequest()->getHostName(),
+                    'LEAVE_HOST_PHONE' => $this->getRequest()->getHostPhone(),
+                    'LEAVE_STUDENT_PHONE' => $this->getRequest()->getUserPhone(),
+                    'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
+                )
+            );
+            $this->setEmail($email);
 
-		$this->setEmail($email);
+            // only send one email from housemaster
+            break;
+        }
 	}
 
 	/**

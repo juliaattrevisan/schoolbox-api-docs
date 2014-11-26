@@ -257,7 +257,7 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    public function ajaxSearch($keyword, $group = 0, $boardersOnly = false, $limit = false)
+    public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false)
     {
         //search for a user based on at least one of the above fields
         //assumes at least one contains something
@@ -315,8 +315,10 @@ class User extends DeprecatedModel
             }
         }
         // Only students in boarding house are fetched
-        if ($boardersOnly) {
-            $query .= "AND IFNULL(residential_house_id, 0) > 0 ";
+        if (!empty($residentialHouseIds)) {
+            $query .= "AND residential_house_id IN ("
+                . implode(',', array_map('intval', $residentialHouseIds))
+                . ')';
         }
         $query .= "ORDER BY group_id, year, lastname, firstname";
         if (is_numeric($limit)) {
