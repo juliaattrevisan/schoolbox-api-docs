@@ -12,9 +12,20 @@
 
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Property\ICalendar;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Mapper;
 
 class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_Abstract
 {
+    /**
+     * @var EventTypeMapper
+     */
+    protected $eventTypeMapper;
+
+    protected function setup()
+    {
+        $this->setEventTypeMapper(new EventTypeMapper());
+    }
 
     /**
      * @var VCalendar
@@ -33,14 +44,17 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
         /* Show visible events only, in export
          */
         if ($this->isVisible($currentEvent)) {
-            $eventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-            $eventType = $eventTypeMapper->findById($currentEvent->getType());
             /** @var Sabre\VObject\Component\Vevent $vevent */
             $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $currentEvent->getEventId()
             $vevent->add('UID', $currentEvent->getEventId() . '/' . $currentEvent->getConnectorId());
             $vevent->add('DTSTAMP', DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']));
-            $vevent->add('CATEGORIES', $eventType->getType());
+            try {
+                $eventType = $this->getEventTypeMapper()->findById($currentEvent->getType());
+                $vevent->add('CATEGORIES', $eventType->getType());
+            } catch (Mapper\Exception $e) {
+                // noop
+            }
             $vevent->add('LOCATION', $currentEvent->getLocation());
             $vevent->add('DESCRIPTION', \Scrub::html2text($currentEvent->getDetail()));
 
@@ -83,5 +97,23 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
     public function getVCalendar()
     {
         return $this->vcalendar;
+    }
+
+    /**
+     * @return EventTypeMapper
+     */
+    public function getEventTypeMapper()
+    {
+        return $this->eventTypeMapper;
+    }
+
+    /**
+     * @param  EventTypeMapper $eventTypeMapper
+     * @return $this
+     */
+    public function setEventTypeMapper($eventTypeMapper)
+    {
+        $this->eventTypeMapper = $eventTypeMapper;
+        return $this;
     }
 }
