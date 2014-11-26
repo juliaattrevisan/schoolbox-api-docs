@@ -334,11 +334,14 @@ class Creational extends AbstractFactory {
 		$this->getProduct()->setParentId($data['parentId']);
 		$this->getProduct()->setHomepageId($data['homepageId']);
 		$this->getProduct()->setOwnerId($data['ownerId']);
-		$this->getProduct()->setUrl(trim($data['url']));
 		$this->getProduct()->setBody(trim($data['body']));
 		$this->getProduct()->setCreatedAt($data['requestTime']);
 		$this->getProduct()->setUpdatedAt($data['requestTime']);
 		$this->getProduct()->setDeletedAt(null);
+
+        /* This is set in a special way in socialstream/modifyForm.php
+         */
+        $this->getProduct()->setUrl($this->getUrl());
 	}
 
 	/* Spawn metadata and thumbnails via different ways
