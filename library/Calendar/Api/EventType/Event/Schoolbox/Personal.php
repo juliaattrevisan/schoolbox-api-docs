@@ -27,7 +27,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_Event
 			$this->getUser(),
 			$startTimestamp,
 			$endTimestamp,
-			array('personal' => true)
+			array('personal' => $this->getUser()->getId())
 		);
 	}
 }
