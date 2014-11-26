@@ -333,4 +333,27 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		return $this->getUsingFormat('c');
 	}
 
+    /**
+     * Is this date object at the start of the day?
+     *
+     * Currently this check ignores seconds.
+     *
+     * @return bool
+     */
+    public function isAtStartOfDay()
+    {
+        return $this->getUsingFormat('Hi') == '0000';
+    }
+
+    /**
+     * Is this date object at the end of the day?
+     *
+     * Currently this check ignores seconds.
+     *
+     * @return bool
+     */
+    public function isAtEndOfDay()
+    {
+        return $this->getUsingFormat('Hi') == '2359';
+    }
 }

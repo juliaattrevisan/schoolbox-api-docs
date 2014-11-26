@@ -155,7 +155,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     . Scrub::text($submission->getName())
                     . ($actionURL ? '</a>' : "");
                 // Show due time if there is one
-                if ($submission->getDueDate()->getUsingFormat('Hi') == '2359') {
+                if ($submission->getDueDate()->isAtEndOfDay()) {
                     $dateHTML = $submission->getDueDate()->getDateOnly();
                 } else {
                     $dateHTML = $submission->getDueDate()->getShort();
