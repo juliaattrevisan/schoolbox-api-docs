@@ -57,6 +57,16 @@ echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
 mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-latest.sql
 
+# Check if flag provided to use a specific External DB
+if [ ! -z $1 ];
+then
+        if [ $1 == "schoolbox" -o $1 == "synergetic" ];
+        then
+		echo -e "$vag An External DB was specified - Setting to: $1";
+                mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$1' where name='external_type'";
+        fi
+fi
+
 echo "$vag Creating Schoolbox data directories";
 cd /vagrant;
 tar -xzf /home/vagrant/schoolboxdemo-latest.tar.gz;
