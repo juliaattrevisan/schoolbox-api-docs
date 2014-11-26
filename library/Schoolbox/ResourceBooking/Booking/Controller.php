@@ -472,7 +472,15 @@ class Controller extends Base
                     break;
                 }
                 if ($recurs) {
-                    $eventList = $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
+                    $eventList = $this->eventRecurrenceMapper->createSequenceFromIterator(
+                        $event,
+                        $period,
+                        new Calendar\EventRelations(
+                            Calendar\EventMapper::ACCESS_PERSONAL,
+                            array(),
+                            array()
+                        )
+                    );
                 }
             }
 

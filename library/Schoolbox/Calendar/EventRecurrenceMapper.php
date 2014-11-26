@@ -237,12 +237,21 @@ class EventRecurrenceMapper {
 	 *
 	 * @param Event                   $event
 	 * @param DateTime[]|\Traversable $dateSource
-	 *
+	 * @param EventRelations          $eventRelations
 	 * @return Collection|Event[]
 	 */
-	public function createSequenceFromIterator(Event $event, $dateSource = null) {
+	public function createSequenceFromIterator(
+		Event $event,
+		$dateSource = null,
+		EventRelations $eventRelations = null
+	) {
 		$sequence = $this->getSequenceFromIterator($event, $dateSource);
-		$this->getEventMapper()->save($sequence);
+		foreach ($sequence as $event) {
+			$this->getEventMapper()->save($event);
+			if ($eventRelations instanceof EventRelations) {
+				$eventRelations->resetRelations($event);
+			}
+		}
 		return $sequence;
 	}
 
