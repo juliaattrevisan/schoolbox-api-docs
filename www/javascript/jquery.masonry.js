@@ -63,6 +63,7 @@
         // Box that contains the options to drag into play: if `palette` or `palette.selector` is null, no create-new-on-drag JS will be loaded
         palette: {
             selector: null,
+            containerSelector: 'div.components',
             handleSelector: 'div.add-component',
             cursor: 'move',
             disabledCursor: 'default',
@@ -536,7 +537,9 @@
             throw new Error("Palette is already initialised");
         }
 
-        this.palette = $(palOpt.selector);
+        this.palette = $(palOpt.selector).find(palOpt.containerSelector);
+
+        $(palOpt.selector).tabs();
 
         // apply qtips to each element
         this.applyQTip($(palOpt.handleSelector));
