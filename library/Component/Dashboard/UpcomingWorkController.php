@@ -60,11 +60,12 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
     public function execute()
     {
         $this->userID = $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id'];
-        // if actionable is absent, then this is the dashboard component and restricted should be true
+        // if actionable is absent, then this is the dashboard component and restricted should be true.
+        // It should still be actionable though.
         if ($this->hasConfig('actionable')) {
             $this->actionable = $this->getConfig('actionable') ? true : false;
         } else {
-            $this->actionable = false;
+            $this->actionable = true;
             $this->restrictedMode = true;
         }
 
