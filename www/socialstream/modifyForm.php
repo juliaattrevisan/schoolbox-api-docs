@@ -68,6 +68,15 @@ else {
 		'requestTime' => \Alaress_Date_Format::now(),
 	));
 
+    /* Check that you have a message, and one of Attachment or URL
+     * to prevent you from submitting wholly empty data
+     */
+    if (!strlen(trim($data['body']))) {
+        if (!count($data['attachment']) && !strlen(trim($data['url']))) {
+            error(2);
+        }
+    }
+
     $url = '';
 
     if (!empty($_POST['url'])) {
