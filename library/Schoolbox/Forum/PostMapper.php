@@ -9,9 +9,13 @@
  */
 
 namespace Schoolbox\Forum;
+use Alaress\Async\Notification\Instance\Instance;
+use PDO;
+use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-class PostMapper extends Mapper {
+class PostMapper extends Mapper implements FeedableMapperInterface {
 
     protected function mapping() {
         $this->hasTable('forumPost');
@@ -125,6 +129,56 @@ class PostMapper extends Mapper {
             throw new Mapper\Exception('Instance of object not found');
         }
 
+    }
+
+
+    /**
+     * @param int $context
+     * @param int $limit
+     * @param int $offset
+     * @param int $time
+     * @return Collection|Post[]
+     */
+    public function findForFeed($context, $limit, $offset = 0, $time = 0)
+    {
+        $time = date('Y-m-d H:i:s', $time ? : time());
+
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
+        $stmt = $this->database->prepare("
+            SELECT
+                {$this->getColumnString('p')},
+                {$this->getJoinColumnString('owner', 'o')},
+                {$this->getJoinColumnString('thread', 't')}
+            FROM `{$this->getTable()}` p
+              LEFT JOIN {$this->getJoinSql('owner', 'p', 'o')}
+              LEFT JOIN {$this->getJoinSql('thread', 'p', 't')}
+            WHERE p.deleted = 'false'
+            AND t.categoryID = :cat
+            AND p.date < :time
+            LIMIT $offset, $limit
+        ");
+
+        $stmt->execute(
+            array(
+                'cat'  => $context,
+                'time' => $time
+            )
+        );
+
+        $c = $this->createCollection();
+
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Post $post */
+            $post = $this->hydrate($r, 'p');
+            $post->setOwner($this->hydrateJoin($r, 'owner', 'o'));
+            $post->setThread($this->hydrateJoin($r, 'thread', 't'));
+
+            $c->add($post);
+        }
+
+        return $c;
     }
 
 }
