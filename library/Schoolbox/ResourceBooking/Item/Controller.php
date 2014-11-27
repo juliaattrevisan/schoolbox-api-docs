@@ -161,7 +161,7 @@ class Controller extends Base {
                     'item'     => $item,
                     'calendar' => array(
                         'date' => $calendarDate->format('Y-m-d'),
-                        'view' => $this->request->query['view'] ?: 'month',
+                        'view' => $this->request->query['view'] ?: 'week',
                     )
                 ),
             )
