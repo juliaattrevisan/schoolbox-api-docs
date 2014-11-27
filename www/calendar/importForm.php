@@ -23,36 +23,45 @@ else {
 	$campusList = array();
 	$file = $_FILES['file']['tmp_name'];
 
-	if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
-		$factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
-		$strategy = $factory->build();
-		$strategy->load();
+    try {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($_POST['homepageId']);
 
-		$allEvents = $strategy->getOutput();
+        if (strlen($_FILES['file']['tmp_name']) && $_FILES['file']['size']) {
+            $factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
+            $strategy = $factory->build();
+            $strategy->load();
 
-		$this->setFile(TEMPLATE_content, 'calendar/importForm.html');
-		$this->setBlock(TEMPLATE_content, 'event', 'event_block');
+            $allEvents = $strategy->getOutput();
 
-		if ($allEvents && count($allEvents)) {
-			foreach ($allEvents as $currentEvent) {
-				$this->setVar(array(
-					'EVENT_NAME' => $currentEvent['name'],
-					'EVENT_STATUS' => $currentEvent['status'],
-					'EVENT_ERROR' => $currentEvent['error'],
-				));
+            $this->setFile(TEMPLATE_content, 'calendar/importForm.html');
+            $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
-				$this->parse('event_block', 'event', true);
-			}
-		}
-		else {
-			$this->setVar('event_block', '');
-		}
+            if ($allEvents && count($allEvents)) {
+                foreach ($allEvents as $currentEvent) {
+                    $this->setVar(array(
+                        'EVENT_NAME' => $currentEvent['name'],
+                        'EVENT_STATUS' => $currentEvent['status'],
+                        'EVENT_ERROR' => $currentEvent['error'],
+                    ));
 
-		$this->setVar(array(
-			'HOMEPAGE_ID' => $_POST['homepageId']
-		));
-	}
-	else {
-		error(2);
-	}
+                    $this->parse('event_block', 'event', true);
+                }
+            }
+            else {
+                $this->setVar('event_block', '');
+            }
+
+            $this->setVar(array(
+                'HOMEPAGE_ID' => $category->getId(),
+                'HOMEPAGE_NAME' => $category->getName()
+            ));
+        }
+        else {
+            error(2);
+        }
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
 }
