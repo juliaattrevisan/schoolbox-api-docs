@@ -1,4 +1,5 @@
-<input name="{{ name }}[date]"
+<input type="text"
+       name="{{ name }}[date]"
        data-datepicker=""
        {% if id %}id="{{ id }}"{% endif %}
        value="{{ value is empty ? "" : value|date('d/m/Y') }}" />

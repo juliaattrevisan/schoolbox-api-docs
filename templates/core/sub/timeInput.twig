@@ -1,7 +1,9 @@
-<input name="{{ name }}[hour]"
+<input type="text"
+       name="{{ name }}[hour]"
        class="timeField"
        value="{{ value is empty ? "" : value|date("h") }}" /> :
-<input name="{{ name }}[minute]"
+<input type="text"
+       name="{{ name }}[minute]"
        class="timeField"
        value="{{ value is empty ? "" : value|date("i") }}" />
 <select name="{{ name }}[meridien]">
