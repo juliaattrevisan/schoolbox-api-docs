@@ -31,6 +31,13 @@ class PostMapper extends Mapper {
             ));
 
         $this->hasMap(array(
+            'column'     => 'parentID',
+            'property'   => 'parent',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'parent'
+        ));
+
+        $this->hasMap(array(
                 'column'     => 'userID',
                 'property'   => 'owner',
                 'type'       => self::TYPE_MODEL,
@@ -74,6 +81,12 @@ class PostMapper extends Mapper {
             'mapper'    => '\\Schoolbox\\UserMapper',
             'this_key'  => 'userID',
             'other_key' => 'id',
+        ));
+
+        $this->hasJoin('parent', array(
+            'mapper'    => '\\Schoolbox\\Forum\\PostMapper',
+            'this_key'  => 'parentID',
+            'other_key' => 'postID',
         ));
 
         $this->hasJoin('thread', array(

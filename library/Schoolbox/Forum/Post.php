@@ -22,6 +22,9 @@ class Post implements ISoftDeletable {
     /** @var int */
     protected $thread;
 
+    /** @var Post */
+    protected $parent = null;
+
     /** @var User */
     protected $owner;
 
@@ -75,6 +78,27 @@ class Post implements ISoftDeletable {
     public function getThread() {
         return $this->thread;
     }
+
+
+    /**
+     * @return Post
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+
+    /**
+     * @param Post $parent
+     * @return self
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
 
 
     /**
