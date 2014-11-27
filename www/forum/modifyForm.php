@@ -117,6 +117,11 @@ if (is_numeric($_POST['categoryID'])) {
         $post->setOwner($_SESSION['user']);
         $post->setBody($_POST['body']);
         $post->setThread($thread);
+
+        if ($_POST['quoteID']) {
+            $post->setParent(PostMapper::getInstance()->createModel()->setId($_POST['quoteID']));
+        }
+
         PostMapper::getInstance()->save($post);
 
         /* update thread */
