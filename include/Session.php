@@ -53,22 +53,23 @@ class Session
 
         $ip = Session::getIP();
 
-        if($remember == true) {
-            session_set_cookie_params(5184000);
-        }
-        else {
-            session_set_cookie_params(0);
-        }
-
         /* if user is found and session is started create our user record */
         if (is_array($user) && session_start()) {
 
+            /* Store remember me cookie so user can return in the future */
+            if($remember == true) {
+                $key = sha1(microtime(true).mt_rand(10000,90000));
+                $expire = strtotime('+2 month');
+                setcookie('remember',$key, $expire, '/', $_SERVER['HTTP_HOST'], false, true);
+                $redis = \Alaress\Redis::getClientInstance();
+                $redis->executeCommand($redis->createCommand('set',array($key, $username) ));
+                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - mktime()))));
+            }
 
             //register users id
             $_SESSION['title'] = $user['title'];
             $_SESSION['firstname'] = $user['firstname'];
             $_SESSION['lastname'] = $user['lastname'];
-            $_SESSION['remember'] = $remember;
             $_SESSION['id'] = $user['uid'];
             $_SESSION['sid'] = $user['synergy_id'];
             $_SESSION['gid'] = $user['group_id'];
@@ -115,8 +116,10 @@ class Session
 	        // add mobile session data
             $sbmAuth = new Authenticator();
             return $sbmAuth->appendSession($username);
-        } else
+
+        } else {
             return false;
+        }
     }
 
     public function destroy()

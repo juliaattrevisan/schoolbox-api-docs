@@ -6,6 +6,11 @@ require_once('../include/Bootstrap.php');
 session_start();
 session_destroy();
 
+//Destroy remember me cookie
+$redis = \Alaress\Redis::getClientInstance();
+$username = $redis->executeCommand($redis->createCommand('del',array($_COOKIE['remember'])));
+setcookie('remember', '', 1, '/');
+
 
 $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
 

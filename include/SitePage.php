@@ -393,28 +393,31 @@ class SitePage extends Page
     {
         session_start();
 
-        if (!isset($_SESSION['id'])) {
+        if (!isset($_SESSION['id']) || //If session does not exist
+            ( ($_SESSION['lasttime'] + \Config::get('session_length')) < mktime() ) || //If session has expired
+            ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
+        ) {
+
+            $sessionHandler = new Session;
+            //Catch users with the remember me cookie
+            if(\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
+
+                $redis = \Alaress\Redis::getClientInstance();
+                $username = $redis->executeCommand($redis->createCommand('get',array($_COOKIE['remember'])));
+
+                if (!$sessionHandler->create($username)) {
+                    $this->goLoginPage();
+                }
+            }
             //Catch already logged in users via kerberos or other means
-            if (Cfg::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
-                $sessionHandler = new Session;
+            else if (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
                     $this->goLoginPage();
                 }
-
             } else {
                 $this->goLoginPage();
             }
-        }
-
-        //if ip tracking enabled ensure user has same ip as when they logged in
-        if (Cfg::get('track_ip') && $_SESSION['ip'] != Session::getIP()) {
-            $this->goLoginPage();
-        }
-
-        //if session remember is disabled and check session has not expired
-        if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + Cfg::get('session_length')) < mktime())) {
-            $this->goLoginPage();
         }
 
         // If we've fallen through to this point, the user must be logged in.
