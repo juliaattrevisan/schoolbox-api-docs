@@ -156,6 +156,26 @@ class Post implements ISoftDeletable {
 
 
     /**
+     * Removes all the content before the final </blockquote> so it's just the text the user wrote
+     *
+     * @return string
+     */
+    public function getBodyWithoutQuote() {
+        $tag = 'blockquote';
+
+        if (($i = strrpos($this->body, "</$tag>")) !== false) {
+            $trimmed = trim(substr($this->body, $i + strlen("</$tag>")));
+
+            if (strlen($trimmed)) {
+                return $trimmed;
+            }
+        }
+
+        return $this->body;
+    }
+
+
+    /**
      * @param string $deleted
      * @return self
      */
