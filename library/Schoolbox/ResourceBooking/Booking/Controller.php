@@ -910,29 +910,68 @@ class Controller extends Base
     }
 
     /**
-     * Changes status of booking and any related bookings, if series efficacy is
+     * Validates the status change for this booking
+     *
+     * @param Model $booking
+     * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
+     */
+    protected function validateChangeStatus(Model $booking, $status)
+    {
+        switch ($status) {
+            case Status\Model::STATUS_APPROVED:
+                return $this->validateConflicts(
+                    $booking->getResource(),
+                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                    $booking
+                );
+            default:
+                return array();
+        }
+    }
+
+    /**
+     * Attempts to changes status of booking. Also attempts to change any
+     * related bookings, if series efficacy is
      * set.
      *
      * @param Model $booking
      * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
      */
     protected function changeStatus(Model $booking, $status)
     {
+        $collection  = new Collection();
         $currentUser = $this->getUser();
-        $update      = function (Model $booking) use ($status, $currentUser) {
-            $booking
-                ->setStatus($status)
-                ->setReviewer($currentUser);
-        };
-        $update($booking);
-        $this->getBookingMapper()->save($booking);
+
+        // validate this booking
+        $booking
+            ->setStatus($status)
+            ->setReviewer($currentUser);
+        $errors = $this->validateChangeStatus($booking, $status);
+        $collection->add($booking);
+
+        // Validate the series (if there is one)
         $series = $this->getSeriesBookings($booking);
         if (count($series)) {
             foreach ($series as $relatedBooking) {
-                $update($relatedBooking);
+                $relatedBooking
+                    ->setStatus($status)
+                    ->setReviewer($currentUser);
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateChangeStatus($relatedBooking, $status)
+                );
+                $collection->add($relatedBooking);
             }
-            $this->getBookingMapper()->save($series);
         }
+        if (empty($errors)) {
+            $this->getBookingMapper()->save($collection);
+        }
+        return $errors;
     }
 
     /**
