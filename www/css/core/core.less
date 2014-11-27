@@ -6646,23 +6646,28 @@ COLOUR ADJUSTMENT BOX
 
 .colours {
     float: left;
-    width:  29%;
-//    height: 350px;
+    width:  100%;
     position: relative;
     zoom: 1;
 }
 
 .colours h3 {
-    margin-bottom: 8px;
+	float: left;
+	padding: 0;
     font-weight: bold;
     font-size: 14px;
+	line-height: 20px;
 }
 
-.colours-split h3 {
-    font-size: 12px;
-    padding-left: 8px;
-    padding-bottom: 4px;
-    font-weight: bold;
+.colours-split{
+	width: 100%;
+	overflow: auto;
+	margin-bottom: 10px;
+}
+
+.colours-buttons{
+	border-top: 1px solid @border-color;
+	padding-top: 10px;
 }
 
 .colours p {
@@ -6671,6 +6676,7 @@ COLOUR ADJUSTMENT BOX
 }
 
 .colour {
+	float: left;
     padding: 0 8px;
     margin-bottom: 8px;
     display: block;
@@ -6688,11 +6694,6 @@ COLOUR ADJUSTMENT BOX
     margin-right: 7px;
 }
 
-.colours-split {
-    padding: 8px 0;
-    margin: 0 8px 8px 0
-}
-
 .top-split {
     border-bottom: 2px solid @alternate-background;
 }
@@ -6702,23 +6703,8 @@ COLOUR ADJUSTMENT BOX
 }
 
 .colour:hover {
-
     cursor: pointer;
 }
-
-//.colours-buttons {
-//    background: @white;
-//    padding: 16px;
-//    padding-bottom: 8px;
-//}
-//
-//.colours-buttons .submit-btn-plain {
-//    margin-bottom: 8px;
-//}
-//
-//.colours-buttons .save-colours, .colours-buttons .save-layout {
-//    margin-right: 32px;
-//}
 
 #tabs-2, #tabs-3 {
     padding: 16px 0 0 0;
@@ -6877,8 +6863,8 @@ HOMEPAGE CUSTOMISE
     }
 
     .status-buttons{
-        top: 34px;
-        right: -15px;
+        top: 38px;
+		right: -16px;
         .status-header{
             background: @module-background;
             border-top: 1px solid @lgrey;
@@ -6935,7 +6921,7 @@ HOMEPAGE CUSTOMISE
 /*CUSTOMISE COMPONENT*/
 
 .column-colours{
-    width: 69%;
+    width: 100%;
     float: left;
     .columns{
         background: lighten(@lgrey,@lighten-value) url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
@@ -6952,14 +6938,16 @@ HOMEPAGE CUSTOMISE
         	background: @highlight-color url(/images/core/component/color-wheel.png) 8px 50% no-repeat;
         }
     }
-    #left{ margin-right: 15px; }
+    #left{ margin-right: 1%; }
+    #right{ margin-left: 1%; }
     .left-right{
-        width: 48.1%;
+    	box-sizing: border-box;
+        width: 49%;
         float: left;
     }
     #top,
     #bottom{
-        width: 98.7%;
+        width: 100%;
     }
 }
 
@@ -10141,15 +10129,28 @@ table.descs {
     height: 15px;
     border: 1px solid @black;
     cursor: pointer;
+    box-shadow: none;
     &.sp-replacer {
         // Special styles for spectrum colorpicker
         padding: 0;
-        border: 1px solid black;
-        margin-right: 1em;
+        border: 1px solid @lgrey;
+        margin-right: 0.5em;
+        width: 20px;
+		height: 20px;
+		&:hover,
+		&.active{
+			border-color: @lgrey;
+		}
         .sp-preview {
-            border-width: 0;
+            border: 0;
         }
     }
+    &.sp-replacer.sp-active{
+    	border-color: @lgrey;
+    }
+}
+.sp-container{
+	border: 1px solid @lgrey !important;
 }
 .selected {
     font-weight: bold;
