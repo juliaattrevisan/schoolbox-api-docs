@@ -3254,20 +3254,32 @@ input.timeField {
     &.homepage-edit span {
       .btn-icon(100);
     }
-    &.homepage-edit:hover span {
-      .btn-icon(101);
+    &.homepage-edit {
+    	&:hover, &.hover {
+            span {
+                .btn-icon(101);
+            }
+        }
     }
     &.homepage-delete span {
       .btn-icon(102);
     }
-    &.homepage-delete:hover span {
-      .btn-icon(103);
+    &.homepage-delete {
+    	&:hover, &.hover {
+            span {
+                .btn-icon(103);
+            }
+        }
     }
     &.homepage-permissions span {
       .btn-icon(104);
     }
-    &.homepage-permissions:hover span {
-      .btn-icon(105);
+    &.homepage-permissions {
+      	&:hover, &.hover {
+            span {
+                .btn-icon(105);
+            }
+        }
     }
     &.submit {
         .submit-btn-plain();
