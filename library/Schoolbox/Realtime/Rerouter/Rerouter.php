@@ -204,7 +204,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 			$tx = $this->transaction;
 
             $this->log->debug("Importing user data");
-			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper);
+			$this->subscriber->getSubscriptionList()->importFromSource($this->userMapper, false);
 			$count = $this->subscriber->subscribeAll(function($frame, $data) use ($tx) {
 				/**
 				 * This closure is executed every time a message is sent to the client based on the given subscription
@@ -235,6 +235,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         $tx         = $this->transaction;
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
+
+        $subList->importFromSource($this->userMapper, false);
 
         return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
             /**
