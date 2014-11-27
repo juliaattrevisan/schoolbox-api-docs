@@ -50,13 +50,17 @@ class UserSubscriptionList extends SubscriptionList {
 			$this->queues = array();
 		}
 
-		/** @var Collection|User[] $users */
-		$users = $source->findAll();
+        // this isn't exactly kosher, but it sure beats dummy-hydrating every user in the db
+		$stmt = $source->getDatabase()->query("SELECT id from `user`");
 
-		foreach($users as $user) {
-            $user = $source->findById($user->getId()); // TODO srsly. this has to change.
-            $name = $this->createQueueName($user->getId());
-            $this->queues[$name] = $user;
+		while ($id = $stmt->fetchColumn()) {
+            $name = $this->createQueueName($id);
+
+            // with clear, everyone gets reloaded; without, only new users get loaded
+            if ($clear || empty($this->queues[$name])) {
+                $user = $source->findById($id); // TODO srsly. this has to change.
+                $this->queues[$name] = $user;
+            }
 		}
 	}
 
