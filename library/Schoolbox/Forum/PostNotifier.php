@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Collection;
@@ -109,7 +110,20 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
     {
-        return new Collection();
+        $c = new Collection();
+
+        if(!$this->mapper instanceof FeedableMapperInterface) {
+            return $c;
+        }
+
+        /** @var Collection|Post[] $posts */
+        $posts = $this->mapper->findForFeed($context, $limit, $offset);
+
+        foreach ($posts as $post) {
+            $c->merge(new Collection($this->notifyFollowed($roletype, $post, $post->getOwner())->getAll($post->getDate()->getUnixTimestamp())));
+        }
+
+        return $c;
     }
 
 
