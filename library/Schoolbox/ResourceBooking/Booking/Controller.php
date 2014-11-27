@@ -610,39 +610,10 @@ class Controller extends Base
             // I do however want to allow a booking to start at the same time
             // that the previous booking ended.
             // (We may need to implement a down time between bookings.)
-            $conflictingBookings = $this->getBookingMapper()->findForResource(
-                $resource->getId(),
-                $startDate->getTimestamp() + 1,
-                $endDate->getTimestamp() - 1,
-                array(Status\Model::STATUS_APPROVED)
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateConflicts($resource, $startDate, $endDate, $existingBooking)
             );
-            // If updating a booking - Remove the item being updated from the
-            // check (because it's being moved)
-            if ($existingBooking instanceof Model) {
-                $existingId          = $existingBooking->getId();
-                $conflictingBookings = $conflictingBookings->filter(
-                    function ($item) use ($existingId) {
-                        return $item->getId() != $existingId;
-                    }
-                );
-            }
-            if (count($conflictingBookings)) {
-                $errors['start_datetime'][] = 'conflict';
-            } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
-                // Check if there's a timetabled class here, too.
-                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                    $this->getUser(),
-                    array()
-                );
-                $roomSource->setRoomCode($roomCode);
-                $roomEvents = $roomSource->getEvents(
-                    $startDate->getTimestamp(),
-                    $endDate->getTimestamp()
-                );
-                if (count($roomEvents)) {
-                    $errors['start_datetime'][] = 'timetabled_class';
-                }
-            }
         }
 
         // If updating a booking and its timespan hasn't changed:
@@ -670,6 +641,60 @@ class Controller extends Base
         // If there's any related resources: validate for those too.
         // Ensure that the user has the right to book this page
         // (though that's an authentication issue, not a data integrity one)
+        return $errors;
+    }
+
+    /**
+     * Validates whether a booking for this resource conflicts with any
+     * bookings that already exist.
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param Model      $existingBooking
+     *
+     * @return array
+     */
+    protected function validateConflicts(
+        Item\Model $resource,
+        $startDate,
+        $endDate,
+        Model $existingBooking = null
+    ) {
+        $errors = array();
+        $conflictingBookings = $this->getBookingMapper()->findForResource(
+            $resource->getId(),
+            $startDate->getTimestamp() + 1,
+            $endDate->getTimestamp() - 1,
+            array(Status\Model::STATUS_APPROVED)
+        );
+        // If updating a booking - Remove the item being updated from the
+        // check (because it's being moved)
+        if ($existingBooking instanceof Model) {
+            $existingId          = $existingBooking->getId();
+            $conflictingBookings = $conflictingBookings->filter(
+                function ($item) use ($existingId) {
+                    return $item->getId() != $existingId;
+                }
+            );
+        }
+        if (count($conflictingBookings)) {
+            $errors['start_datetime'][] = 'conflict';
+        } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+            // Check if there's a timetabled class here, too.
+            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(),
+                array()
+            );
+            $roomSource->setRoomCode($roomCode);
+            $roomEvents = $roomSource->getEvents(
+                $startDate->getTimestamp(),
+                $endDate->getTimestamp()
+            );
+            if (count($roomEvents)) {
+                $errors['start_datetime'][] = 'timetabled_class';
+            }
+        }
         return $errors;
     }
 
