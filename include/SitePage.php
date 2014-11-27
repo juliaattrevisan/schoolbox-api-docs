@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+
 class SitePage extends Page
 {
 
@@ -745,16 +747,28 @@ class SitePage extends Page
         $this->setBlock("navTpl", "mgroup", "mgroup_section");
         $this->setBlock("mgroup", "mgroup_block", "my_groups");
 
+        // get overrides for this user
+        $overrides = RerouteOverrideMapper::getInstance()->getMatchingRoutes('service.'.HOMEPAGE_SERVICE, 0, $_SESSION['id'])->map(function($v) {
+            if (preg_match('`service.\d+.(\d+)`', $v->getRouteKey(), $matches)) {
+                return (int)$matches[1];
+            }
+            return null;
+        }, false)->getAll();
+
+        $overrides = $overrides ?: array(0);
+
         $query = "
             SELECT cat.name, ua.sid, ua.type
             FROM userAccess AS ua
             INNER JOIN category AS cat ON ua.sid=cat.id
             INNER JOIN homepage_config AS hc ON cat.id=hc.cid
-            WHERE ua.uid = %d AND service = %d
+            WHERE ua.uid = %d
+            AND service = %d
+            AND ua.sid NOT IN (%s)
             AND ua.type > 0
             ORDER BY cat.name
         ";
-        $this->db->query(sprintf($query, $_SESSION['id'], HOMEPAGE_SERVICE));
+        $this->db->query(sprintf($query, $_SESSION['id'], HOMEPAGE_SERVICE, implode(', ', $overrides)));
         if ($this->db->countRows() > 0) {
             while ($group = $this->db->getNextArray()) {
                 $this->setVar("MGNAME", Scrub::text($group['name']));
