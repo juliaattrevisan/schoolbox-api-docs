@@ -92,6 +92,13 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
             // amqp
             $amqp = Connector::getInstance();
 
+            // make sure our endpoint exists
+            $mqc = \Schoolbox\Notif\MQ\Connector::getInstance();
+            $q   = INSTANCE_ID . Rerouter::QUEUE_COMMAND;
+
+            $mqc->declareQueue($q)
+                ->bindQueue($q, '*.' . Notif::TOPIC_CMD_REROUTE);
+
             // redis
             $redisf = new Redis();
             $redisc = $redisf->getClientInstance();

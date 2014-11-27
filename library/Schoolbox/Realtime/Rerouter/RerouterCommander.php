@@ -70,7 +70,7 @@ class RerouterCommander extends AbstractCommander {
      */
     public function __construct(Mapper $userMapper)
     {
-        parent::__construct(Notif::TOPIC_CMD_SCHED);
+        parent::__construct(Notif::TOPIC_CMD_REROUTE);
         $this->mapper = $userMapper;
     }
 

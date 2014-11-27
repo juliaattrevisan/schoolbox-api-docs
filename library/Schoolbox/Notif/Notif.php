@@ -53,8 +53,8 @@ class Notif implements LoggerInterface {
 	const TOPIC_AUTH         = 'login';   //     "           "   authentication events
 	const TOPIC_CMS          = 'cms';     //     "           "   cms events to be logged
 
-	const TOPIC_CMD_SCHED    = 'cmd.sched';  //  "           "   async actions the scheduler needs to perform
-	const TOPIC_CMD_DIGEST   = 'cmd.digest'; //  "           "   async actions the digester needs to perform
+	const TOPIC_CMD_REROUTE  = 'cmd.reroute'; // "           "   async actions the scheduler needs to perform
+	const TOPIC_CMD_DIGEST   = 'cmd.digest';  // "           "   async actions the digester needs to perform
 
 	/** @var IConfigLoader */
 	protected $conf;
@@ -212,7 +212,7 @@ class Notif implements LoggerInterface {
 		if($this->isSystemTopic($this->topic)) {
 
 			// [3a] internal application message
-			if(in_array($this->topic, array(self::TOPIC_APPLICATION, self::TOPIC_CMD_SCHED, self::TOPIC_CMD_DIGEST))) {
+			if(in_array($this->topic, array(self::TOPIC_APPLICATION, self::TOPIC_CMD_REROUTE, self::TOPIC_CMD_DIGEST))) {
 				if(!isset($this->handlers['amqp'])) {
 					$this->handlers['amqp'] = new AMQPHandler($this->mqc, Logger::NOTICE, false);
 				}
