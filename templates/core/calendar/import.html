@@ -13,12 +13,22 @@
 <h2>Import events into Group Calendar for {HOMEPAGE_NAME}</h2>
 <form id='uploadForm' action="/calendar/importForm" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}" />
-	
+
 	<table class="standardForm">
 		<tbody>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>CSV Template</h4>
+                <em>Download an example CSV template which you can edit and upload.</em>
+            </td>
+            <td>
+                <a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left"><span></span>Download</a>
+            </td>
+        </tr>
 			<tr>
 				<td class="formLabelWidth">
 					<h4>Import File</h4>
+                    <em>Upload a Microsoft Outlook .ics file or a CSV file.</em>
 				</td>
 				<td>
 					<input type="file" name="file" class="prettify" />
