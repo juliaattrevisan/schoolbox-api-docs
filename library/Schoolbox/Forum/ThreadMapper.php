@@ -9,7 +9,9 @@
  */
 
 namespace Schoolbox\Forum;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class ThreadMapper extends Mapper {
 
@@ -151,5 +153,32 @@ class ThreadMapper extends Mapper {
             throw new Mapper\Exception('Instance of object not found');
         }
 
+    }
+
+
+    /**
+     * Return the collection of Users who are involved in this thread
+     *
+     * @param Thread $thread
+     * @return Collection|User[]
+     */
+    public function findInvolvedUsers(Thread $thread)
+    {
+        $stmt = $this->database->prepare("
+            SELECT DISTINCT p.userID
+            FROM forumThread t
+            LEFT JOIN forumPost p ON t.threadID = p.threadID
+            WHERE t.threadID = ?
+        ");
+
+        $stmt->execute(array($thread->getId()));
+
+        $ids = array();
+
+        while ($id = $stmt->fetchColumn()) {
+            $ids[] = $id;
+        }
+
+        return $this->getJoinMapper('owner')->findByColumn('id', $ids);
     }
 }
