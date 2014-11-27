@@ -20,8 +20,8 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 	private function setupVcal() {
 		$calendar = new VCalendar();
 		$calendar->add('method', 'PUBLISH');
-		$calendar->add('X-WR-CALNAME', 'Calendar export');
-		$calendar->add('X-WR-CALDESC', 'The portal school calendar');
+		$calendar->add('X-WR-CALNAME', Config::get('title').' Calendar');
+		$calendar->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
 		return $calendar;
 	}
 
