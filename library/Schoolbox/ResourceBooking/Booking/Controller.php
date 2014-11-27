@@ -992,8 +992,8 @@ class Controller extends Base
      */
     public function approve(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_APPROVED);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -1003,8 +1003,8 @@ class Controller extends Base
      */
     public function reject(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_REJECTED);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_REJECTED);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -1014,8 +1014,8 @@ class Controller extends Base
      */
     public function setPending(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_PENDING);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_PENDING);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -1076,17 +1076,19 @@ class Controller extends Base
      *
      * @param Model  $booking
      * @param string $callbackUrl
+     * @param array  $errors      If not empty, this contains the errors for this change.
      */
-    protected function setUpdateStatusResponse(Model $booking, $callbackUrl)
+    protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = array())
     {
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
                     'data'   => array(
                         'item'        => $booking,
                         'callbackUrl' => $callbackUrl,
+                        'errors'      => $errors,
                     ),
                 )
             );
