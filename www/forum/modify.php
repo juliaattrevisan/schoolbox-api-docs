@@ -48,6 +48,7 @@ if (is_numeric($this->arg[0])) {
         'THREAD_ID'    => '',
         'THREAD_TITLE' => '',
         'POST_ID'      => '',
+        'QUOTE_ID'     => '',
         'CATEGORY_ID'  => $folder->getId(),
         'CATEGORY'     => Scrub::text($folder->getName()),
         'BODY'         => '',
@@ -151,6 +152,7 @@ if (is_numeric($this->arg[0])) {
             $quote = PostMapper::getInstance()->findById($quotePostID);
 
             $this->setVar(array(
+                'QUOTE_ID' => $quotePostID,
                 'QUOTE_BODY' => Scrub::html($quote->getBody()),
                 'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
                 'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
