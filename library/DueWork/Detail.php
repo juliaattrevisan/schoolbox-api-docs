@@ -165,7 +165,7 @@ class DueWork_Detail
         $formatDateOnly = 'l, jS F Y';
         $formatDateTime = $formatDateOnly . ' g:ia';
 
-        if ($closeADF->getUsingFormat('Hi') == '2359') {
+        if ($closeADF->isAtEndOfDay()) {
             $closeString = $closeADF->getUsingFormat($formatDateOnly);
         } else {
             $closeString = $closeADF->getUsingFormat($formatDateTime);

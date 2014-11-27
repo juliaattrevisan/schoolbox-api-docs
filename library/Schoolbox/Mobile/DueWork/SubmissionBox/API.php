@@ -95,7 +95,7 @@ class API extends Generic\API {
         $d = $due->getUsingFormat('jS M');
         $rel = $due->getRelativeTime();
 
-        if($due->getUsingFormat('Hi') != '2359') {
+        if (!$due->isAtEndOfDay()) {
             $d .= $due->getUsingFormat(' h:ia');
         }
         $d = "$rel ($d)";

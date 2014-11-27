@@ -317,12 +317,12 @@ $late_date    = $submission->getLateDate();
 
 $publish_hour = '';
 $publish_min  = '';
-if ($publish_date->getUsingFormat('H:i:s') != '00:00:00') {
+if (!$publish_date->isAtStartOfDay()) {
     $publish_hour = $publish_date->getUsingFormat('g');
     $publish_min  = $publish_date->getUsingFormat('i');
 }
 
-if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
+if ($open_date->isAtStartOfDay()) {
     $open_hour = '';
     $open_min  = '';
 } else {
@@ -330,7 +330,7 @@ if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
     $open_min  = $open_date->getUsingFormat('i');
 }
 
-if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
+if ($due_date->isAtEndOfDay()) {
     $due_hour = '';
     $due_min  = '';
 } else {
@@ -338,7 +338,7 @@ if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
     $due_min  = $due_date->getUsingFormat('i');
 }
 
-if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
+if ($late_date->isAtEndOfDay()) {
     $late_hour = '';
     $late_min  = '';
 } else {

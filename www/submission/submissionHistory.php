@@ -203,6 +203,7 @@ $this->setVar(
         'CATEGORY_ID'          => $submission->getCategory()->getId(),
         'CATEGORY_THUMB'       => '',
         'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
+        'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
         'BOX_DUEDATE_GRADIENT' => $gradient,
         'BOX_ID'               => $submission->getId(),
         'BOX_NAME'             => Scrub::text($submission->getName()),

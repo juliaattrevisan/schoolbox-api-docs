@@ -174,14 +174,14 @@ if (!empty($subList) && is_array($subList)) {
         $formatDateOnly = 'D, jS M Y';
         $formatDateTime = $formatDateOnly . ' g:ia';
 
-        if($openADF->getUsingFormat('Hi') == '0000') {
+        if($openADF->isAtStartOfDay()) {
             $openString = $openADF->getUsingFormat($formatDateOnly);
         }
         else {
             $openString = $openADF->getUsingFormat($formatDateTime);
         }
 
-        if($closeADF->getUsingFormat('Hi') == '2359') {
+        if($closeADF->isAtEndOfDay()) {
             $closeString = $closeADF->getUsingFormat($formatDateOnly);
         }
         else {
