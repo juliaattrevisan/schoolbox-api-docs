@@ -13,15 +13,14 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $groupHandler = new Group();
 
 if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
-	error(19);
-}
-else {
-	$user = $_SESSION['user'];
-	$author = $_SESSION['user'];
-	$categoryList = array($_POST['homepageId']);
-	$groupList = array();
-	$campusList = array();
-	$file = $_FILES['file']['tmp_name'];
+    error(19);
+} else {
+    $user = $_SESSION['user'];
+    $author = $_SESSION['user'];
+    $categoryList = array($_POST['homepageId']);
+    $groupList = array();
+    $campusList = array();
+    $file = $_FILES['file']['tmp_name'];
 
     try {
         $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
@@ -39,29 +38,30 @@ else {
 
             if ($allEvents && count($allEvents)) {
                 foreach ($allEvents as $currentEvent) {
-                    $this->setVar(array(
-                        'EVENT_NAME' => $currentEvent['name'],
-                        'EVENT_STATUS' => $currentEvent['status'],
-                        'EVENT_ERROR' => $currentEvent['error'],
-                    ));
+                    $this->setVar(
+                        array(
+                            'EVENT_NAME' => $currentEvent['name'],
+                            'EVENT_STATUS' => $currentEvent['status'],
+                            'EVENT_ERROR' => $currentEvent['error'],
+                        )
+                    );
 
                     $this->parse('event_block', 'event', true);
                 }
-            }
-            else {
+            } else {
                 $this->setVar('event_block', '');
             }
 
-            $this->setVar(array(
-                'HOMEPAGE_ID' => $category->getId(),
-                'HOMEPAGE_NAME' => $category->getName()
-            ));
-        }
-        else {
+            $this->setVar(
+                array(
+                    'HOMEPAGE_ID' => $category->getId(),
+                    'HOMEPAGE_NAME' => $category->getName()
+                )
+            );
+        } else {
             error(2);
         }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 }
