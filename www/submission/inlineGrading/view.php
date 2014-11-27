@@ -25,6 +25,10 @@ use \Rubric\Renderer\Vertical;
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
 
+// Security check
+$studentRetHandler = new SubmissionReturn();
+$studentRetHandler->securityCheck($submissionBoxId);
+
 /* This is an optional argument
  */
 $submissionId = $this->arg[2];
