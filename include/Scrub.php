@@ -131,6 +131,7 @@ class Scrub
                 'wikieducator.org/',
                 'www.google.com(?:.[a-z]{2})?/maps',
                 'maps.google.com(?:.[a-z]{2})?/',
+                'mapsengine.google.com(?:.[a-z]{2})?/',
                 'docs.google.com(?:.[a-z]{2})?/',
                 'www.tiki-toki.com/timeline/embed/',
                 'www.thinglink.com/card/',
