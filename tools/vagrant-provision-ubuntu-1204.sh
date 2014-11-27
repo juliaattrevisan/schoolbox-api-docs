@@ -1,6 +1,8 @@
 #!/bin/bash
 vag="[schoolbox]";
-cd /home/vagrant;
+cachedir='/vagrant/vagrantcache';
+mkdir -p $cachedir;
+cd $cachedir;
 echo "$vag Retrieving latest Demo Data files";
 curl http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt > schoolboxdemo-latest-sha1.txt 2>/dev/null
 if [ $? -eq 0 ];
@@ -55,7 +57,7 @@ rm /vagrant/data/* -fR;
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
-mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql
 
 # Check if flag provided to use a specific External DB
 if [ ! -z $1 ];
@@ -69,7 +71,7 @@ fi
 
 echo "$vag Creating Schoolbox data directories";
 cd /vagrant;
-tar -xzf /home/vagrant/schoolboxdemo-latest.tar.gz;
+tar -xzf $cachedir/schoolboxdemo-latest.tar.gz;
 rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
 
@@ -94,7 +96,7 @@ rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "$vag Generating data dir sql fixes";
-cp -f /home/vagrant/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
+cp -f $cachedir/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
 /vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
 
 echo "$vag Applying vagrant SQL fixes";
@@ -127,12 +129,12 @@ cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-websocket.conf;
 
 echo "$vag Set up video cronjobs"
-cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
-sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
-sed -i 's/var\/log/vagrant\/data/g' /home/vagrant/schoolboxdemo-latest-cron
-sed -i 's/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
-sed -i 's/www-data/root/g' /home/vagrant/schoolboxdemo-latest-cron
-cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
+cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
+sed -i 's/usr\/share\/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
+sed -i 's/var\/log/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
+sed -i 's/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
+sed -i 's/www-data/root/g' $cachedir/schoolboxdemo-latest-cron
+cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 
 echo "$vag Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
