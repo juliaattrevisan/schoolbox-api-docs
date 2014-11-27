@@ -34,8 +34,6 @@
         this.buttons = $(this.options.buttonSelector);
         this.tabs    = $(this.element).find(this.options.tabSelector);
 
-        this.tabs.tabs();
-
         this.buttons.on('click', function (event) {
             var hover  = self.options.hoverClass,
                 open   = self.options.openClass,
