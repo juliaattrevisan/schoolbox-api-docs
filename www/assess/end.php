@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
 
 $assessHandler = new Assess_Main();
@@ -59,12 +61,14 @@ $this->setBlock(TEMPLATE_content, 'has_marks', 'has_marks_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
-    $attemptFinishDate = new Alaress_Date_Format(time(), 'U');
+    $attemptFinishDate = Alaress_Date_Format::now();
 
-    $attemptHandler->update(array(
-        'attempt_id' => $_SESSION['attempt_id'],
-        'finish' => $attemptFinishDate->getDatabase(),
-    ));
+    /** @var Attempt $attempt */
+    $attempt = AttemptMapper::getInstance()->findById($_SESSION['attempt_id']);
+
+    $attempt->setFinish($attemptFinishDate);
+
+    AttemptMapper::getInstance()->save($attempt);
 
     $this->setVar(array(
         'ASSESS_TITLE' => Scrub::text($assess['title']),

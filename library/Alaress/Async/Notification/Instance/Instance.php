@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use OutOfBoundsException;
 use TextFormatter;
+use RuntimeException;
 
 /**
  * Basically a really big container of specific things that get put together in a special way
@@ -113,17 +114,18 @@ class Instance implements JsonSerializable {
 
 
 	/**
-	 * @param string $text
-	 * @param string $namespace
-	 * @param string $icon
-	 * @param string $href
+	 * @param string               $text
+	 * @param string               $namespace
+	 * @param string               $icon
+	 * @param string               $href
 	 * @param ParameterInterface[] $params
-	 * @param int $severity
-	 * @param array $topics
-	 * @param int $time
-	 * @param array $meta
-	 * @param array $context
-	 * @throws \OutOfBoundsException
+	 * @param int                  $severity
+	 * @param array                $topics
+	 * @param int                  $time
+	 * @param array                $meta
+	 * @param array                $context
+	 * @throws RuntimeException
+	 * @throws OutOfBoundsException
 	 */
 	public function __construct($text, $namespace, $icon, $href, $params, $severity, $topics, $time = null,
 								$meta = null, $context = null) {
@@ -136,13 +138,21 @@ class Instance implements JsonSerializable {
 		}
 
 		// cast params to array to prevent errors
-		$params = (array)$params;
+		if(!is_array($params)) {
+			$params = array($params);
+		}
 
 		// test template vs tokens
-		if(count(array_diff(array_keys($params), $this->tokens))) {
+		if(!$this->arraysIdentical(array_keys($params), $this->tokens)) {
 			$a = json_encode($this->tokens);
 			$b = json_encode(array_keys($params));
 			throw new OutOfBoundsException("Parameters supplied must exactly match the :tokens in the message string: expected $a, got $b");
+		}
+
+		foreach($params as $p) {
+			if(!$p instanceof ParameterInterface) {
+				throw new RuntimeException("Parameter must implement ParameterInterface");
+			}
 		}
 
 		$this->messageString = (string)$text;
@@ -328,4 +338,15 @@ class Instance implements JsonSerializable {
 		return sha1(json_encode($list));
 	}
 
+
+	/**
+	 * @param array $a
+	 * @param array $b
+	 * @return bool
+	 */
+	protected function arraysIdentical($a, $b) {
+		sort($a);
+		sort($b);
+		return $a == $b;
+	}
 }

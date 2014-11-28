@@ -162,11 +162,16 @@ $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setTitle('Results for: ' . $assess['title']);
 
+$category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($assess['category_id']);
+
 $this->setVar(
     array(
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
         'CID' => $assess['category_id'],
+        'CATEGORY_NAME' => Scrub::text($category->getName()),
+        'DUEWORK_YEAR'     => date('Y', strtotime($assess['finish'])),
+        'DUEWORK_SEMESTER' => DueWork_All::getSemester(strtotime($assess['finish'])),
     )
 );
 
@@ -182,13 +187,13 @@ $this->setVar(
  * join up all the attempts via php, so we can see who has submitted to this
  * Assess but are no longer in the class
  */
-$categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 
-if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
+
+if (($category->getCodeString() != '') && Cfg::get('external_enable')) {
     /* If synergy code get synergy students
       */
     $synHandler = new External_Class();
-    $allStudents = $synHandler->getStudents($categoryCode['codes']);
+    $allStudents = $synHandler->getStudents($category->getCodeString());
 } else {
     //Retrieve student list from group membership
     $allStudents = $groupHandler->getMemberList($assess['category_id']);

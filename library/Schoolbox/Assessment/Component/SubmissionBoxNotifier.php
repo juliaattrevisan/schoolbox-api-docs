@@ -25,8 +25,6 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -37,7 +35,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -60,28 +58,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     // this should be configurable, but this will do for now
     const UPCOMING_WINDOW = 2;
 
-
-    /** @var UserMapper */
-    protected $userMapper;
-
     /** @var SubmissionMapper */
     protected $submissionMapper;
 
     /** @var CategoryMapper */
     protected $categoryMapper;
 
-    /** @var RoleMapper */
-    protected $roleMapper;
-
     /** @var ReturnedWorkMapper */
     protected $returnedWorkMapper;
-
-    /** @var \User */
-    protected $_DEPRECATED_USER_HANDLER;
-
-    /** @var \External_Class */
-    protected $_DEPRECATED_EXTERNAL_CLASS_HANDLER;
-
 
     /**
      * Instantiate all your dependencies within yourself. Effectively a sub-constructor.
@@ -91,15 +75,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->userMapper         = UserMapper::getInstance();
-        $this->submissionMapper   = SubmissionMapper::getInstance();
-        $this->categoryMapper     = CategoryMapper::getInstance();
-        $this->roleMapper         = RoleMapper::getInstance();
-        $this->returnedWorkMapper = ReturnedWorkMapper::getInstance();
-
-        $this->_DEPRECATED_USER_HANDLER           = new \User();
-        $this->_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-
+        if(empty($dependencies['submissionMapper'])) {
+            $dependencies['submissionMapper'] = SubmissionMapper::getInstance();
+        }
+        if(empty($dependencies['categoryMapper'])) {
+            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+        }
+        if(empty($dependencies['returnedWorkMapper'])) {
+            $dependencies['returnedWorkMapper'] = ReturnedWorkMapper::getInstance();
+        }
         parent::loadDependencies($dependencies);
     }
 
@@ -114,7 +98,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
     /**
-     * @param TriggerBundle $bundle
+     * @param TriggerBundleInterface $bundle
      * @throws ScheduleException
      */
     public function bundleTriggers($bundle)
@@ -318,11 +302,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentUpdated($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
+        $envelope = new Envelope();
+        $bob = new Builder();
 
         $boxId = $submissionBox->getId();
 
@@ -336,7 +321,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // if the box hasn't even opened yet, we don't want to know about it at all
         if ($openStamp > $now) {
-            return $msgr;
+            return $envelope;
         }
 
         // INCREASE in mark visibility (box can be closed in this instance)
@@ -361,108 +346,146 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // if the box is closed, or there's no remaining diff, we're done here
         if ($closeStamp < $now || !count($diff)) {
-            return $msgr;
+            return $envelope;
         }
 
-        $boxName = $submissionBox->getName();
-
-        $cat   = $submissionBox->getCategory();
-        $catId = $cat->getId();
-
-        $authorId    = $user->getId();
-        $authorExtId = $user->getExternalId();
-        $authorName  = $user->formatName();
-
-        $icon = "/portrait?userId=$authorExtId&size=square32";
-        $href = "/submission/submissionHistory/$boxId";
-
-        /* use the diff to establish what changed */
+        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square32")
+            ->setHref("/submission/submissionHistory/$boxId")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addFilter('roletype', Role::STUDENT);
 
         // renamed
-        if (isset($diff['name'])) {
-            // parameterised text, link and icon
-            $msg = new Message(":author renamed :oldname to :newname in :catname", $icon, $href);
-
-            // params for this instance - oldname doesn't have an associated href
-            $params = array(
-                'author'  => array($authorName, "/search/user/$authorId"),
-                'oldname' => $diff['name'][1],
-                'newname' => array($diff['name'][0], "/submission/submissionHistory/$boxId"),
-                'catname' => array($cat->getName(), "/homepage/$catId")
-            );
-
-            $msgr->broadcastToCategory($catId, $msg, "duework.$boxId.renamed", Logger::NOTICE, $params, array('roletype' => Role::STUDENT));
-
-            unset($diff['name']);
-        }
+        $this->notifyRenamed($diff, $envelope, $bob, $user, $submissionBox);
+        unset($diff['name']);
 
         // extended or shortened
-        if (isset($diff['dueDate'])) {
-            // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
-            $oldDate = strtotime($diff['dueDate'][1]);
-            $newDate = strtotime($diff['dueDate'][0]);
-
-            $verb       = $newDate > $oldDate ? 'extended' : 'changed the due date of';
-            $relative   = new Alaress_Date_Relative($newDate);
-            $dateformat = ((int)$relative->getUsingFormat('Hi') == '1159' ? 'g:ia \o\n ' : '') . 'D, jS M';
-
-            $msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
-
-            $msgr->broadcastToCategory($catId, $msg, "duework.$boxId.datechanged", Logger::NOTICE,
-                array(
-                    'author'  => array($authorName, "/search/user/$authorId"),
-                    'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-                    'date'    => date($dateformat, $relative->getUnixTimestamp()),
-                    'catname' => array($cat->getName(), "/homepage/$catId")
-                ),
-                array(
-                    'roletype' => Role::STUDENT
-                )
-            );
-
-            unset($diff['dueDate']);
-        }
+        $this->notifyDueDateChanged($diff, $envelope, $bob, $user, $submissionBox);
+        unset($diff['dueDate']);
 
         // changed accepting online submissions
-        if (isset($diff['acceptOnline'])) {
-            if ($submissionBox->getAcceptOnline()) {
-                $m = "You now need to submit online for :boxname in :catname";
-            } else {
-                $m = "You no longer need to submit online for :boxname in :catname";
-            }
-
-            $msg = new Message($m, $icon, $href);
-
-            $msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,
-                array(
-                    'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-                    'catname' => array($cat->getName(), "/homepage/$catId")
-                ),
-                array(
-                    'roletype' => Role::STUDENT
-                )
-            );
-
-            unset($diff['acceptOnline']);
-        }
+        $this->notifyAcceptOnlineChanged($diff, $envelope, $bob, $submissionBox);
+        unset($diff['acceptOnline']);
 
         // if none of the above apply, but there are changes, just be generic
-        if (count($diff) && $msgr->isEmpty()) {
-            $msg = new Message(":author updated :boxname in :catname", $icon, $href);
-
-            $msgr->broadcastToCategory($catId, $msg, "duework.$boxId.updated", Logger::NOTICE,
-                array(
-                    'author'  => array($authorName, "/search/user/$authorId"),
-                    'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-                    'catname' => array($cat->getName(), "/homepage/$catId")
-                ),
-                array(
-                    'roletype' => Role::STUDENT
-                )
-            );
+        if ($envelope->count() == 0) {
+            $this->notifyUpdated($diff, $envelope, $bob, $user, $submissionBox);
         }
 
-        return $msgr;
+        return $envelope;
+    }
+
+
+    /**
+     * @param array         $diff
+     * @param Envelope      $envelope
+     * @param Builder       $bob
+     * @param User          $author
+     * @param SubmissionBox $box
+     */
+    protected function notifyRenamed($diff, $envelope, $bob, $author, $box)
+    {
+        if (empty($diff['name'])) {
+            return;
+        }
+
+        // parameterised text, link and icon
+        $bob->setTitle(":author renamed :oldname to :newname in :catname")
+            // params for this instance - oldname doesn't have an associated href
+            ->setParams(array(
+                'author'  => new UserParam($author),
+                'oldname' => new Param($diff['name'][1]),
+                'newname' => new Param($diff['name'][0], "/submission/submissionHistory/" . $box->getId()),
+                'catname' => new CategoryParam($box->getCategory())
+            ))
+            ->setTopics(array("duework.{$box->getId()}.renamed"));
+
+        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+    }
+
+
+    /**
+     * @param array         $diff
+     * @param Envelope      $envelope
+     * @param Builder       $bob
+     * @param User          $author
+     * @param SubmissionBox $box
+     */
+    protected function notifyDueDateChanged($diff, $envelope, $bob, $author, $box)
+    {
+        if (empty($diff['dueDate'])) {
+            return;
+        }
+
+        // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
+        $oldDate    = strtotime($diff['dueDate'][1]);
+        $newDate    = strtotime($diff['dueDate'][0]);
+        $verb       = $newDate > $oldDate ? 'extended' : 'changed the due date of';
+        $relative   = new Alaress_Date_Relative($newDate);
+        $dateformat = ((int)$relative->getUsingFormat('Hi') == '1159' ? 'g:ia \o\n ' : '') . 'D, jS M';
+        $bob->setTitle(":author $verb :boxname to :date in :catname")
+            ->setTopics(array("duework.{$box->getId()}.datechanged"))
+            ->setParams(array(
+                'author'  => new UserParam($author),
+                'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
+                'date'    => new Param(date($dateformat, $relative->getUnixTimestamp())),
+                'catname' => new CategoryParam($box->getCategory())
+            ));
+
+        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+    }
+
+
+    /**
+     * @param array         $diff
+     * @param Envelope      $envelope
+     * @param Builder       $bob
+     * @param SubmissionBox $box
+     */
+    protected function notifyAcceptOnlineChanged($diff, $envelope, $bob, $box)
+    {
+        if (empty($diff['acceptOnline'])) {
+            return;
+        }
+        if ($box->getAcceptOnline()) {
+            $m = "You now need to submit online for :boxname in :catname";
+        } else {
+            $m = "You no longer need to submit online for :boxname in :catname";
+        }
+
+        $bob->setTitle($m)
+            ->setParams(array(
+                'boxname' => new Param($box->getName(), "/submission/submissionHistory/", $box->getId()),
+                'catname' => new CategoryParam($box->getCategory())
+            ))
+            ->setTopics(array("duework.{$box->getId()}.updated"));
+
+        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+    }
+
+
+    /**
+     * @param array         $diff
+     * @param Envelope      $envelope
+     * @param Builder       $bob
+     * @param User          $author
+     * @param SubmissionBox $box
+     */
+    protected function notifyUpdated($diff, $envelope, $bob, $author, $box)
+    {
+        if (!count($diff)) {
+            return;
+        }
+
+        $bob->setTitle(":author updated :boxname in :catname")
+            ->setParams(array(
+                'author'  => new UserParam($author),
+                'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
+                'catname' => new CategoryParam($box->getCategory())
+            ))
+            ->setTopics(array("duework.{$box->getId()}.updated"));
+
+        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
     }
 
 
@@ -472,45 +495,46 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentUpcoming($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
-
-        $boxId = $submissionBox->getId();
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $boxId    = $submissionBox->getId();
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline()) {
-            return $msgr;
+            return $envelope;
         }
 
         $boxName = $submissionBox->getName();
-
         $cat     = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
-        $catId   = $cat->getId();
-        $catName = $cat->getName();
+        $href    = "/submission/submissionHistory/$boxId";
+        $when    = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
 
-        $icon = '/images/icon.php?size=32&icon=work';
-        $href = "/submission/submissionHistory/$boxId";
-
-        $when = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
-        $msg  = new Message(":boxname is due in $when in :catname", $icon, $href);
+        $bob->setTitle(":boxname is due in $when in :catname")
+            ->setParams(array(
+                'boxname' => new Param($boxName, $href),
+                'catname' => new CategoryParam($cat),
+            ))
+            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::WARNING)
+            ->addTopic("duework.$boxId.upcoming")
+            ->addFilter('roletype', Role::STUDENT);
 
         $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
         foreach ($unsubmittedStudents->getColumnValues('id') as $id) {
-            $msgr->targetToUser($id, $msg, "duework.$boxId.upcoming", Logger::WARNING,
-                array(
-                    'boxname' => array($boxName, $href),
-                    'catname' => array($catName, "/homepage/$catId"),
-                )
-            );
+            $envelope->targetToUser($id, $bob->build());
         }
-        return $msgr;
+
+        return $envelope;
     }
 
 
@@ -520,56 +544,44 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentUpcoming($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
-
-        $boxId = $submissionBox->getId();
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $boxId    = $submissionBox->getId();
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
 
-        // don't raise notifications if this box doesn't accept online submissions
-        if (!$submissionBox->getAcceptOnline()) {
-            return $msgr;
+        // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
+        if (!$submissionBox->getAcceptOnline() || $this->conf->get('restrict_student_submissions')) {
+            return $envelope;
         }
 
-        $boxName = $submissionBox->getName();
-        $catId   = $submissionBox->getCategory()->getId();
-        $catName = $submissionBox->getCategory()->getName();
+        $bob->setTitle(":child has not yet submitted work for :boxname in :catname")
+            ->setParams(array(
+                'catname' => new CategoryParam($submissionBox->getCategory()),
+                'boxname' => new Param($submissionBox->getName(), "/submission/submissionHistory/$boxId")
+            ))
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::WARNING)
+            ->addTopic("duework.$boxId.upcoming");
 
         // get a list of students who haven't submitted
         $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
         foreach ($unsubmittedStudents as $student) {
-            $childName  = $student->getFirstname();
-            $childId    = $student->getId();
-            $childExtId = $student->getExternalId();
-
+            $childId = $student->getId();
             // target the parents of this particular student
-
-            $icon = "/portrait?userId=$childExtId&size=square32";
-            $href = "/submission/submissionHistory/$boxId/$childId";
-
-            $msg = new Message(":child has not yet submitted work for :boxname in :catname", $icon, $href);
-
-            // don't provide a link for parents to click on if it's just going to give the a 403
-            $boxdata = $this->conf->get('restrict_student_submissions')
-                ? $boxName
-                : array($boxName, "/submission/submissionHistory/$boxId");
-
-            $msgr->targetToParent($childId, $msg, "duework.$boxId.upcoming", Logger::WARNING,
-                array(
-                    'child'   => array($childName, "/search/user/$childId"),
-                    'boxname' => $boxdata,
-                    'catname' => array($catName, "/homepage/$catId")
-                )
-            );
+            $bob->setIcon('/portrait?size=square32&userId=' . $student->getExternalId())
+                ->setHref("/submission/submissionHistory/$boxId/$childId")
+                ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
+            $envelope->targetToParent($childId, $bob->build());
         }
 
-        return $msgr;
+        return $envelope;
     }
 
 
@@ -579,39 +591,87 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyFeedClosed($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
-
-        $boxId = $submissionBox->getId();
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $boxId    = $submissionBox->getId();
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimestamp() > time()) {
-            return $msgr;
+            return $envelope;
+        }
+
+        $href = "/submission/submissionHistory/$boxId";
+        $bob->setTitle("Submissions have closed for :boxname in :catname")
+            ->setParams(array(
+                'boxname' => new Param($submissionBox->getName(), $href),
+                'catname' => new CategoryParam($submissionBox->getCategory()),
+            ))
+            ->setIcon('/images/icon.php?size=32&icon=cross')
+            ->setHref($href)
+            ->setSeverity(Logger::NOTICE)
+            ->setNamespace($this->getSlug())
+            ->addTopic("duework.$boxId.closed");
+
+        $envelope->broadcastToCategory($submissionBox->getCategory(), UserAccess::ACCESS_READ, $bob->build());
+
+        return $envelope;
+    }
+
+
+    /**
+     * @param SubmissionBox $submissionBox
+     * @param Envelope      $envelope
+     * @param Builder       $bob
+     * @param callable      $callback
+     * @return Envelope
+     */
+    protected function notifyOverdue($submissionBox, $envelope, $bob, $callback)
+    {
+        $boxId = $submissionBox->getId();
+
+        /** @var SubmissionBox $submissionBox */
+        $submissionBox = $this->mapper->findById($boxId);
+
+        // don't raise notifications if this box doesn't accept online submissions
+        if (!$submissionBox->getAcceptOnline()) {
+            return $envelope;
+        }
+
+        // if the late date has passed, ignore this message
+        if ($submissionBox->getLateDate()->getUnixTimestamp() > time()) {
+            return $envelope;
         }
 
         $boxName = $submissionBox->getName();
-        $catId   = $submissionBox->getCategory()->getId();
-        $catName = $submissionBox->getCategory()->getName();
+        $cat     = $submissionBox->getCategory();
+        $href    = "/submission/submissionHistory/$boxId";
 
-        $icon = '/images/icon.php?size=32&icon=cross';
-        $href = "/submission/submissionHistory/$boxId";
+        $bob->setParams(array(
+            'boxname' => new Param($boxName, $href),
+            'catname' => new CategoryParam($cat),
+        ))
+            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setHref($href)
+            ->setSeverity(Logger::ERROR)
+            ->setNamespace($this->getSlug())
+            ->addTopic("duework.$boxId.overdue");
 
-        $msg = new Message("Submissions have closed for :boxname in :catname", $icon, $href);
+        $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
-        $msgr->broadcastToCategory($catId, $msg, "duework.$boxId.closed", Logger::NOTICE,
-            array(
-                'boxname' => array($boxName, $href),
-                'catname' => array($catName, "/homepage/$catId"),
-            )
-        );
+        if (is_callable($callback)) {
+            foreach ($unsubmittedStudents as $user) {
+                call_user_func($callback, $user);
+            }
+        }
 
-        return $msgr;
+        return $envelope;
     }
 
 
@@ -621,50 +681,18 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentOverdue($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
+        $envelope = new Envelope();
+        $bob      = new Builder();
 
-        $boxId = $submissionBox->getId();
+        $bob->setTitle(":boxname is now overdue in :catname");
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
-
-        // don't raise notifications if this box doesn't accept online submissions
-        if (!$submissionBox->getAcceptOnline()) {
-            return $msgr;
-        }
-
-        // if the late date has passed, ignore this message
-        if ($submissionBox->getLateDate()->getUnixTimestamp() > time()) {
-            return $msgr;
-        }
-
-        $boxName = $submissionBox->getName();
-
-        $cat     = $submissionBox->getCategory();
-        $catId   = $cat->getId();
-        $catName = $cat->getName();
-
-        $icon = '/images/icon.php?size=32&icon=work';
-        $href = "/submission/submissionHistory/$boxId";
-
-        $msg = new Message(":boxname is now overdue in :catname", $icon, $href);
-
-        $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
-
-        foreach ($unsubmittedStudents as $user) {
-            $msgr->targetToUser($user->getId(), $msg, "duework.$boxId.overdue", Logger::ERROR,
-                array(
-                    'boxname' => array($boxName, $href),
-                    'catname' => array($catName, "/homepage/$catId"),
-                )
-            );
-        }
-
-        return $msgr;
+        return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
+            $envelope->targetToUser($student->getId, $bob->build());
+        });
     }
 
 
@@ -674,50 +702,23 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentOverdue($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
+        $envelope = new Envelope();
+        $bob      = new Builder();
 
-        $boxId = $submissionBox->getId();
+        $bob->setTitle(":child did not submit work for :boxname in :catname");
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
-
-        // don't raise notifications if this box doesn't accept online submissions
-        if (!$submissionBox->getAcceptOnline()) {
-            return $msgr;
+        if ($this->conf->get('restrict_student_submissions')) {
+            return $envelope;
         }
 
-        $boxName = $submissionBox->getName();
-        $catId   = $submissionBox->getCategory()
-                                 ->getId();
-        $catName = $submissionBox->getCategory()
-                                 ->getName();
-
-        $icon = '/images/icon.php?size=32&icon=work';
-        $href = "/submission/submissionHistory/$boxId";
-
-        $msg = new Message(":child did not submit work for :boxname in :catname", $icon, $href);
-
-        // get a list of students who haven't submitted, and get their parents too
-        $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
-
-        foreach ($unsubmittedStudents as $student) {
-            $childName = $student->getFirstname();
-            $childId   = $student->getId();
-
-            $msgr->targetToParent($childId, $msg, "duework.$boxId.overdue", Logger::ERROR,
-                array(
-                    'child'   => array($childName, "/search/user/$childId"),
-                    'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-                    'catname' => array($catName, "/homepage/$catId")
-                )
-            );
-        }
-
-        return $msgr;
+        return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
+            $bob->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
+            $envelope->targetToParent($student->getId(), $bob->build());
+        });
     }
 
 
@@ -727,43 +728,42 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffClosed($submissionBox, $user, $diff = null)
     {
-        $msgr = new Messenger();
-
-        $boxId = $submissionBox->getId();
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $boxId    = $submissionBox->getId();
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline()) {
-            return $msgr;
+            return $envelope;
         }
-
-        $totalUnsubmitted = $this->getStudentsUnsubmittedList($submissionBox)
-                                 ->count();
+        $totalUnsubmitted = $this->getStudentsUnsubmittedList($submissionBox)->count();
 
         // everyone submitted! woohoo!
         if ($totalUnsubmitted == 0) {
-            return $msgr;
+            return $envelope;
         }
 
-        $icon = '/images/icon.php?size=32&icon=work';
-        $href = "/submission/viewSubmission/$boxId";
+        $bob->setTitle(":boxname has closed and :number did not submit work")
+            ->setIcon('/images/icon.php?size=32&icon=work')
+            ->setHref("/submission/viewSubmission/$boxId")
+            ->setNamespace($this->getSlug())
+            ->setParams(array(
+                'boxname' => new Param($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
+                'number'  => new Param(sprintf("%s student%s", $totalUnsubmitted, $totalUnsubmitted == 1 ? '' : 's'))
+            ))
+            ->setSeverity(Logger::ERROR)
+            ->addTopic("duework.$boxId.closed");
 
-        $msg = new Message(":boxname has closed and :number did not submit work", $icon, $href);
+        $envelope->targetToUser($user->getId(), $bob->build());
 
-        $msgr->targetToUser($user->getId(), $msg, "duework.$boxId.closed", Logger::ERROR,
-            array(
-                'boxname' => array($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
-                'number'  => sprintf("%s student%s", $totalUnsubmitted, $totalUnsubmitted == 1 ? '' : 's')
-            )
-        );
-
-        return $msgr;
+        return $envelope;
     }
 
 }

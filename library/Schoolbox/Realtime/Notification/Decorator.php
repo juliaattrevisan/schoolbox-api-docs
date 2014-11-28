@@ -259,12 +259,13 @@ class Decorator extends NotificationBundle {
 					case ParameterInterface::STACKING_REPLACE:
 						$subst = $this->param2html($param, $fqdn);
 						break;
-					case ParameterInterface::STACKING_IGNORE:
-						// ignore? ok, ignored.
-						continue;
 					case ParameterInterface::STACKING_APPEND:
 						$stack[] = $param;
 						break;
+					case ParameterInterface::STACKING_IGNORE:
+					default:
+						// ignore? ok, ignored.
+						continue;
 				}
 			}
 
@@ -297,7 +298,7 @@ class Decorator extends NotificationBundle {
 	 * @param string $fqdn
 	 * @return string
 	 */
-	protected function param2html($param, $fqdn = '') {
+	protected function param2html(ParameterInterface $param, $fqdn = '') {
 		if($param->getHref()) {
 			return sprintf('<a href="%s%s">%s</a>', $fqdn, $param->getHref(), $param->getText());
 		}
