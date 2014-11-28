@@ -10,6 +10,7 @@
 namespace Alaress\Async\UserQueue;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
 use OutOfBoundsException;
@@ -85,7 +86,7 @@ abstract class UserQueue {
     /**
      * @param int    $fetch
      * @param bool   $refresh
-     * @return array
+     * @return Notification[]
      * @throws OutOfBoundsException
      */
     public function fetchNotifications($fetch = 10, $refresh = false)
