@@ -191,7 +191,7 @@ class Controller extends Base
 
             // Expand into bookings for recurrence
             if (!empty($this->request->post['repeat'])) {
-                $bookingList = $this->expandBookingForRecurrence(
+                $bookingList = $this->saveBookingsForRecurrences(
                     $bookingList,
                     $this->getRequest()->post['repeat'],
                     DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
@@ -215,14 +215,12 @@ class Controller extends Base
 
             // Expand into related items.
             if (!empty($this->request->post['related_item'])) {
-                $bookingList = $this->expandBookingForRelatedItems(
+                $bookingList = $this->getBookingsForRelatedItems(
                     $bookingList,
                     $this->request->post['related_item'] ? : array()
                 );
-            } else {
-                // Just save the booking.
-                $this->bookingMapper->save($bookingList);
             }
+            $this->bookingMapper->save($bookingList);
         } else {
             $code = 400;
         }
@@ -273,35 +271,15 @@ class Controller extends Base
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
 
         if (empty($errors)) {
-            // Get the date and time changes.
-            // These will be applied to the whole series.
-            $startDate     = $this->getDateFromForm('start_datetime');
-            $endDate       = $this->getDateFromForm('end_datetime');
-            $startDelta    = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
-                $startDate
+            $isTimeChanged = false;
+            $series = $this->getUpdatedSeries(
+                $item,
+                $this->getDateFromForm('start_datetime'),
+                $this->getDateFromForm('end_datetime'),
+                $this->request->post['related_item'] ?: array(),
+                $this->request->post['efficacy'],
+                $isTimeChanged
             );
-            $endDelta      = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
-                $endDate
-            );
-            $isTimeChanged =
-                $startDelta->getSecondTotal() !== 0
-                || $endDelta->getSecondTotal() !== 0;
-
-            /** @var Collection|Model[] $series */
-            if ($this->request->post['efficacy'] === 'series') {
-                // Load whole series
-                $series = $this->bookingMapper->findSeriesBookings(
-                    $item->getId(),
-                    $item->getEvent()->getSeriesId()
-                );
-            } else {
-                // Divorce booking from its series
-                $series = new Collection();
-                $item->getEvent()->setSeriesId(null);
-            }
-            $series->add($item);
 
             // Save the whole series
             $bookingList = new Collection();
@@ -310,78 +288,19 @@ class Controller extends Base
                 // Role and campus currently need to be set to something.
                 $event->setRoleCollection(new Collection());
                 $event->setCampusCollection(new Collection());
-
-                // Adjust the current event, if its time changed.
-                // If times changed, the event's status will need to change.
-                if ($isTimeChanged) {
-                    $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
-                        $startDelta->getAsDateInterval()
-                    );
-                    $event->setStartDateTime(new Alaress_Date_Format($newStart));
-                    $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
-                        $endDelta->getAsDateInterval()
-                    );
-                    $event->setEndDateTime(new Alaress_Date_Format($newEnd));
-                }
                 $event->setDetail($this->request->post['notes']);
                 $this->eventMapper->save($event);
 
                 // Adjust $booking
                 $booking->setName($this->request->post['name']);
 
-                // Get all the related bookings for this event at this time.
-                $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
-                foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-                    $relatedBooking = null;
-                    foreach ($existingRelatedBookings as $existing) {
-                        if ($existing->getResource()->getId() == $relatedResource->getId()) {
-                            $relatedBooking = $existing;
-                            break;
-                        }
-                    }
-                    $inNew = in_array(
-                        $relatedResource->getId(),
-                        $this->request->post['related_item'] ? : array()
-                    );
-
-                    if ($inNew) {
-                        if ($relatedBooking instanceof Model) {
-                            // update
-
-                            // Has the booking time changed?
-                            // That invalidates existing bookings
-                            if ($isTimeChanged) {
-                                $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
-                            }
-                        } else {
-                            // create
-                            $relatedBooking = new Model();
-                            $relatedBooking
-                                ->setEvent($event)
-                                ->setResource($relatedResource)
-                                ->setStatus(Status\Model::STATUS_PENDING);
-                        }
-
-                        // Open resource: automatically confirm
-                        if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                            $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
-                        }
-
-                        // Status:
-                        // pending if new, or time was changed
-                        $relatedBooking
-                            ->setName($this->request->post['name'])
-                            ->addRelatedBooking($booking);
-                        $booking->addRelatedBooking($relatedBooking);
-                        $this->bookingMapper->save($relatedBooking);
-                        $bookingList->add($relatedBooking);
-                    } elseif ($relatedBooking instanceof Model) {
-                        // delete
-                        $this->bookingMapper->delete($relatedBooking);
-                    }
+                // getUpdatedSeries() sets deleted field if the item isn't in
+                // the sequence.
+                if ($booking->isDeleted()) {
+                    $this->bookingMapper->delete($booking);
+                } else {
+                    $bookingList->add($booking);
                 }
-
-                $bookingList->add($booking);
             }
             $this->bookingMapper->save($bookingList);
         } else {
@@ -421,20 +340,14 @@ class Controller extends Base
     }
 
     /**
-     * Expands each item in a list of bookings into a set of bookings for
-     * related items.
-     *
-     * The bookings are saved after this step.
-     *
-     * @todo make this a mapper method
+     * Expands $bookingList with a booking for each item in $relatedItems.
      *
      * @param Collection|Model[] $bookingList
      * @param array              $relatedItems
      *
      * @return Collection
      */
-    protected function expandBookingForRelatedItems(Collection $bookingList, $relatedItems)
-    {
+    protected function getBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
         if (empty($relatedItems)) {
             return $bookingList;
         }
@@ -455,14 +368,75 @@ class Controller extends Base
             }
             $newList->add($booking);
         }
+        return $newList;
+    }
+
+    /**
+     * Saves each item in a list of bookings into a set of bookings for related items.
+     *
+     * @todo make this a mapper method
+     *
+     * @param Collection|Model[] $bookingList
+     * @param array              $relatedItems
+     *
+     * @return Collection
+     */
+    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
+        $newList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
         $this->bookingMapper->save($newList);
         return $newList;
     }
 
     /**
-     * Expands each item in a list of bookings into a series of bookings.
+     * Creates a DatePeriod or other traversable list of DateTime objects that
+     * corresponds to a list of event recurrences.
      *
-     * The events that are created are saved.
+     * @param DateTime $startTime      The event that is to recur.
+     * @param string   $recurrenceRule The recurrence rule:
+     *                                 "daily", "weekly", "fortnightly",
+     *                                 "monthly" or "timetable".
+     *                                 Anything else is treated as a single
+     *                                 event.
+     * @param DateTime $repeatUntil    The day to expand this event to.
+     * @param int      $campus         The campus to use when determining when a
+     *                                 timetable day recurs.
+     *
+     * @return DateTime[]
+     */
+    protected function getRecurrencePeriod(
+        DateTime $startTime,
+        $recurrenceRule,
+        DateTime $repeatUntil,
+        $campus
+    ) {
+        switch ($recurrenceRule) {
+            case 'daily':
+            case 'weekly':
+            case 'fortnightly':
+            case 'monthly':
+                $period = new \DatePeriod(
+                    $startTime,
+                    \DateInterval::createFromDateString('+1 day'),
+                    $repeatUntil->modify('+1 day')
+                );
+                break;
+            case 'timetable':
+                $period = new \External_TimetableDatePeriod(
+                    $startTime,
+                    $repeatUntil->modify('+1 day'),
+                    $this->getExternalTimetableHandler(),
+                    $campus
+                );
+                break;
+            default:
+                $period = array();
+                break;
+        }
+        return $period;
+    }
+
+    /**
+     * Saves each item in a list of bookings into a series of bookings.
      *
      * @todo make this a mapper method
      *
@@ -473,7 +447,7 @@ class Controller extends Base
      *
      * @return Collection
      */
-    protected function expandBookingForRecurrence(
+    protected function saveBookingsForRecurrences(
         Collection $bookingList,
         $recurrenceRule,
         DateTime $repeatUntil,
@@ -483,44 +457,31 @@ class Controller extends Base
         foreach ($bookingList as $booking) {
             $event     = $booking->getEvent();
             $eventList = new Collection();
-            switch ($recurrenceRule) {
-                case 'daily':
-                case 'weekly':
-                case 'fortnightly':
-                case 'monthly':
-                    if ($repeatUntil instanceof DateTime) {
-                        $this->eventRecurrenceMapper->save(
-                            $event,
-                            'series',
-                            $recurrenceRule,
-                            new Alaress_Date_Format($repeatUntil->modify('23:59:59')),
-                            $event->getStartDateTime(),
-                            $event->getEndDateTime(),
+            if ($repeatUntil instanceof DateTime) {
+                $period = $this->getRecurrencePeriod(
+                    $event->getStartDateTime()->getDateTimeObject(),
+                    $recurrenceRule,
+                    $repeatUntil,
+                    $campus
+                );
+                // dateperiod doesn't implement count(), so check if there's any
+                // dates in $period.
+                $recurs = false;
+                foreach ($period as $blah) {
+                    $recurs = true;
+                    break;
+                }
+                if ($recurs) {
+                    $eventList = $this->eventRecurrenceMapper->createSequenceFromIterator(
+                        $event,
+                        $period,
+                        new Calendar\EventRelations(
                             Calendar\EventMapper::ACCESS_PERSONAL,
-                            new Calendar\EventRelations(
-                                Calendar\EventMapper::ACCESS_PERSONAL,
-                                array(),
-                                array()
-                            )
-                        );
-                        // Create a whole set of bookings based on this event.
-                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
-                    }
-                    break;
-                case 'timetable':
-                    if ($repeatUntil instanceof DateTime) {
-                        $period = new \External_TimetableDatePeriod(
-                            $event->getStartDateTime()->getDateTimeObject(),
-                            $repeatUntil->modify('+1 day'),
-                            $this->getExternalTimetableHandler(),
-                            $campus
-                        );
-                        $this->eventRecurrenceMapper->createSequenceFromIterator($event, $period);
-                        $eventList = $this->eventMapper->findByColumn('series_id', $event->getSeriesId());
-                    }
-                    break;
-                default:
-                    break;
+                            array(),
+                            array()
+                        )
+                    );
+                }
             }
 
             if (count($eventList)) {
@@ -604,6 +565,11 @@ class Controller extends Base
                     $errors['end_datetime'][] = 'too_long';
                 }
             }
+            
+//            // Check conflicts in series and for related items.
+//            $relatedItems = $this->request->post['related_item'];
+
+
             // Check conflicting bookings as well for this item.
             // Only check approved bookings. Wow, the calendar population method
             // can do exactly that!
@@ -612,8 +578,89 @@ class Controller extends Base
             // (We may need to implement a down time between bookings.)
             $errors = array_merge_recursive(
                 $errors,
-                $this->validateConflicts($resource, $startDate, $endDate, $existingBooking)
+                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
             );
+            if (!($existingBooking instanceof Model)) {
+                // Validating a new booking?
+                // Expand this single booking out to a list of related items,
+                // and validate them all.
+                $dateParts = array(
+                    array($resource, $startDate, $endDate),
+                );
+
+                // Check each in series (if there is one)
+                $repeatUntil = DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']);
+                $series      = array();
+                if ($repeatUntil instanceof DateTime) {
+                    $series = $this->getRecurrencePeriod(
+                        $startDate,
+                        $this->request->post['repeat'],
+                        $repeatUntil,
+                        $this->request->post['timetable']['campus']
+                    );
+                }
+                $difference = $startDate->diff($endDate);
+                foreach ($series as $occurenceStart) {
+                    $occurenceEnd = clone $occurenceStart;
+                    $occurenceEnd->add($difference);
+
+                    // Check all of $occurenceStart and $occurenceEnd
+                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                }
+
+                $relatedItems = $this->request->post['related_item'] ?: array();
+                foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                    if (in_array($relatedResource->getId(), $relatedItems)) {
+                        $dateParts[] = array($relatedResource, $startDate, $endDate);
+
+                        foreach ($series as $occurenceStart) {
+                            $occurenceEnd = clone $occurenceStart;
+                            $occurenceEnd->add($difference);
+
+                            // Check all of $occurenceStart and $occurenceEnd
+                            $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                        }
+                    }
+                }
+
+                foreach ($dateParts as $check) {
+                    list($resource, $thisStart, $thisEnd) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
+                    );
+                }
+            }
+            else {
+                // Validating an existing booking?
+                // Check each item in the series, adjusting its dates.
+                // Work with a fresh copy of the booking, because it can get
+                // messed with.
+                $isTimeChanged = false;
+                $series = $this->getUpdatedSeries(
+                    $this->bookingMapper->findById($existingBooking->getId()),
+                    $startDate,
+                    $endDate,
+                    $this->request->post['related_item'] ?: array(),
+                    $this->request->post['efficacy'],
+                    $isTimeChanged
+                );
+
+                $dateParts = array();
+                foreach ($series as $thisBooking) {
+                    if (!($thisBooking->isDeleted())) {
+                        $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
+                    }
+                }
+
+                foreach ($dateParts as $check) {
+                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                    );
+                }
+            }
         }
 
         // If updating a booking and its timespan hasn't changed:
@@ -647,37 +694,62 @@ class Controller extends Base
     /**
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
-     *
-     * @param Item\Model $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
-     * @param Model      $existingBooking
-     *
+     * 
+     * @param  Item\Model $resource
+     * @param  DateTime   $startDate
+     * @param  DateTime   $endDate
+     * @param  Model      $existingBooking
      * @return array
      */
-    protected function validateConflicts(
+    protected function validateForConflicts(
         Item\Model $resource,
-        $startDate,
-        $endDate,
+        DateTime $startDate,
+        DateTime $endDate,
         Model $existingBooking = null
     ) {
         $errors = array();
+
+        // Only check approved bookings. Wow, the calendar population method
+        // can do exactly that!
+        // I do however want to allow a booking to start at the same time
+        // that the previous booking ended.
+        // (We may need to implement a down time between bookings.)
+        /** @var Collection|Model[] $conflictingBookings */
         $conflictingBookings = $this->getBookingMapper()->findForResource(
             $resource->getId(),
             $startDate->getTimestamp() + 1,
             $endDate->getTimestamp() - 1,
             array(Status\Model::STATUS_APPROVED)
         );
-        // If updating a booking - Remove the item being updated from the
-        // check (because it's being moved)
+
+        // Conflicting bookings could include the existing booking.
+        // Remove it, because a booking can't conflict with itself!
+        // Also remove any items in the same series, because bookings can't
+        // conflict with bookings in the same series (they're all offset at the
+        // same time)
+        // There may be rare occurrences where they can (a booking that is so
+        // long it overlaps the next item in series!), but I'm not going to
+        // worry about those.
         if ($existingBooking instanceof Model) {
-            $existingId          = $existingBooking->getId();
-            $conflictingBookings = $conflictingBookings->filter(
-                function ($item) use ($existingId) {
-                    return $item->getId() != $existingId;
-                }
-            );
+            $existingId = $existingBooking->getId();
+            if ($existingId) {
+                $existingSeries = $existingBooking->getEvent()->getSeriesId();
+                $conflictingBookings = $conflictingBookings->filter(
+                    function($item) use($existingId, $existingSeries) {
+                        /** @var Model $item */
+                        if ($item->getId() == $existingId) {
+                            return false;
+                        }
+                        if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
+                            return false;
+                        }
+                        return true;
+                    }
+                );
+            }
         }
+
+        // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
             $errors['start_datetime'][] = 'conflict';
         } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
@@ -695,6 +767,7 @@ class Controller extends Base
                 $errors['start_datetime'][] = 'timetabled_class';
             }
         }
+
         return $errors;
     }
 
@@ -1193,5 +1266,114 @@ class Controller extends Base
     public function getExternalTimetableHandler()
     {
         return $this->externalTimetableHandler;
+    }
+
+    /**
+     * Gets a series for update, adjusting their start and end dates.
+     *
+     * @param Model    $item
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param array    $relatedItems
+     * @param string   $efficacy
+     * @param bool&    $isTimeChanged Were any bookings changed?
+     *
+     * @return Collection|Model[]
+     */
+    protected function getUpdatedSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        $efficacy,
+        &$isTimeChanged
+    ) {
+        // Get the date and time changes.
+        $startDelta = Interval::createFromDateTimeDifference(
+            $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+            $startDate
+        );
+        $endDelta = Interval::createFromDateTimeDifference(
+            $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+            $endDate
+        );
+        $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+
+        /** @var Collection|Model[] $series */
+        if ($efficacy === 'series') {
+            // Load whole series
+            $series = $this->bookingMapper->findSeriesBookings(
+                $item->getId(),
+                $item->getEvent()->getSeriesId()
+            );
+        }
+        else {
+            // Divorce booking from its series
+            $series = new Collection();
+            $item->getEvent()->setSeriesId(null);
+        }
+        $series->add($item);
+
+        $bookingList = new Collection();
+
+        // Adjust the datetimes for the events in the series
+        foreach ($series as $booking) {
+            $event = $booking->getEvent();
+            $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
+                $startDelta->getAsDateInterval()
+            );
+            $event->setStartDateTime(new Alaress_Date_Format($newStart));
+            $newEnd = $event->getEndDateTime()->getDateTimeObject()->add(
+                $endDelta->getAsDateInterval()
+            );
+            $event->setEndDateTime(new Alaress_Date_Format($newEnd));
+
+            $bookingList->add($booking);
+
+            // Set up bookings for related items
+            $existingRelatedBookings = $this->bookingMapper->findRelatedBookings($booking->getId());
+            foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
+                $relatedBooking = null;
+                foreach ($existingRelatedBookings as $existing) {
+                    if ($existing->getResource()->getId() == $relatedResource->getId()) {
+                        $relatedBooking = $existing;
+                        break;
+                    }
+                }
+                $inNew = in_array($relatedResource->getId(), $relatedItems);
+
+                if ($inNew) {
+                    if ($relatedBooking instanceof Model) {
+                        // update
+
+                        // Has the booking time changed?
+                        // That invalidates existing bookings
+                        if ($isTimeChanged) {
+                            $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+                        }
+                    }
+                    else {
+                        // create
+                        $relatedBooking = new Model();
+                        $relatedBooking
+                            ->setResource($relatedResource)
+                            ->setStatus(Status\Model::STATUS_PENDING);
+                    }
+
+                    // Open resource: automatically confirm
+                    if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+                        $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+                    }
+                }
+                elseif ($relatedBooking instanceof Model) {
+                    // delete or don't add. Maybe mark as deleted?
+                    $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
+                }
+                $relatedBooking->setEvent($event);
+                $bookingList->add($relatedBooking);
+            }
+        }
+
+        return $bookingList;
     }
 }

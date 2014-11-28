@@ -481,16 +481,23 @@ $(document).ready(function() {
             </td>
             <td>
                 {# Related resources - not sure whether this list should be editable after save #}
-                <ul>
-                {% for relatedItem in item.resource.relatedResourceList %}
-                    <li>
-                        <input id="related-item-{{ relatedItem.id }}"
-                               type="checkbox"
-                               name="related_item[]"
-                               value="{{ relatedItem.id }}"
-                               {% if item.hasRelatedBookingForResource(relatedItem.id) %}checked{% endif %}
-                        />
-                        <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
+                <ul class="information-list related-resource-list">
+                    {% for relatedItem in item.resource.relatedResourceList %}
+                    <li class="resource">
+                        <label for="related-item-{{ relatedItem.id }}">
+                            <input id="related-item-{{ relatedItem.id }}"
+                                   type="checkbox"
+                                   name="related_item[]"
+                                   value="{{ relatedItem.id }}"
+                                   {% if item.hasRelatedBookingForResource(relatedItem.id) %}checked{% endif %}
+                                    />
+                            <span class="resource-name">{{ relatedItem.name }}</span>
+                            <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}"
+                               class="resource-read-link btn no-text"
+                               id="resource-read-{{relatedItem.id}}"
+                               title="View Bookings"
+                            ><span></span></a>
+                        </label>
                     </li>
                 {% else %}
                     <li>This resource has no related resources.</li>
