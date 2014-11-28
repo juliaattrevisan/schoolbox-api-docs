@@ -448,7 +448,8 @@
             $('#gradegroup_explanation').dialog({'title':$(this).find(':selected').text()});
         }).change();
 
-        $('#show-grade').click(function() {
+        $('#show-grade').click(function(event) {
+            event.preventDefault();
             $( '#gradegroup_explanation').dialog("open");
         });
 
