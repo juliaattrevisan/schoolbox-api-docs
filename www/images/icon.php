@@ -19,7 +19,7 @@ $size = isset($_GET['size']) ? $_GET['size'] : 64;
 try {
 	$transform = new Alaress_Image_Transformation_Icon($icon, $size);
 	$transform_key = "Icon";
-	$cache_key = "$icon:$size";
+	$cache_key = "$icon-$size";
 
 	$imageProcessor = new Alaress_Image_Processor_Freeform(
 		new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
