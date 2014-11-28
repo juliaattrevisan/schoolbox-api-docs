@@ -58,6 +58,7 @@ if ($accessLevel >= Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE) {
 if (!$hasPermission) {
     error(19);
 }
+unset($groupHandler);
 
 /* Augment navigation data
  */
