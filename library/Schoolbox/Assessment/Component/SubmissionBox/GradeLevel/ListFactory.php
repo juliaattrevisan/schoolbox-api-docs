@@ -57,6 +57,7 @@ class ListFactory
             $noneOption
                 ->setId(-1)
                 ->setLowerBound(-1)
+                ->setRawGrade(-1)
                 ->setCaption('(none)');
             $collection->add($noneOption);
 
@@ -78,6 +79,7 @@ class ListFactory
                 $errorOption
                     ->setId($errorGrade->getDisplayAs())
                     ->setLowerBound(-1)
+                    ->setRawGrade(-1)
                     ->setCaption($errorGrade->getDisplayAs());
                 $collection->add($errorOption);
             }

@@ -753,6 +753,7 @@ class Submission extends DeprecatedModel
             array(
                 'grade_id'    => '-1',
                 'lower_bound' => '-1',
+                'raw_grade'   => '-1',
                 'caption'     => '(none)'
             )
         );

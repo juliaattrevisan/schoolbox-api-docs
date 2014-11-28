@@ -13,7 +13,7 @@ class Marksheet_Letter extends Marksheet_Abstract
     {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(
-            'norm_mark' => $grade['lower_bound'],
+            'norm_mark' => $grade['raw_grade'],
             'mark'      => $grade['caption']
         );
     }
@@ -36,8 +36,10 @@ class Marksheet_Letter extends Marksheet_Abstract
             $rawMark = -1;
         }
         // use extra_params if they were set, what a mess
+        // For now, output default if more than one group - otherwise it's even
+        // more of a mess.
         $params = $this->getExtraParams();
-        if (!empty($params['gradeGroup'])) {
+        if (!empty($params['gradeGroup']) && count($params['gradeGroup']) === 1) {
             $result = array();
             foreach ($params['gradeGroup'] as $gradeGroup) {
                 $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark, $gradeGroup);
@@ -66,7 +68,7 @@ class Marksheet_Letter extends Marksheet_Abstract
             $grades[] = array(
                 'id'      => $grade->getId(),
                 'caption' => $grade->getCaption(),
-                'group'   => $grade->getGroup()->getId(),
+                'group'   => $grade->getGroup()->getId() ?: 0,
             );
         }
         $page->dropdown(

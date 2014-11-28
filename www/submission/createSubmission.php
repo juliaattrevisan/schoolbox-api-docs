@@ -263,6 +263,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             $this->setVar(
                 array(
                     'GRADEGROUP_LEVEL_LOWER_BOUND' => $level->getLowerBound(),
+                    'GRADEGROUP_LEVEL_RAW_GRADE'   => $level->getRawGrade(),
                     'GRADEGROUP_LEVEL_CAPTION'     => $level->getCaption(),
                 )
             );

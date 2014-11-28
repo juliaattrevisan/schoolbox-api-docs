@@ -36,6 +36,7 @@ foreach (GradeLevel\Group\Mapper::getInstance()->findAllWithGradeLevels() as $gr
                 'SUBMISSION_GRADE_ID'          => Scrub::text($level->getId()),
                 'SUBMISSION_GRADE_CAPTION'     => Scrub::text($level->getCaption()),
                 'SUBMISSION_GRADE_LOWER_BOUND' => Scrub::text($level->getLowerBound()),
+                'SUBMISSION_GRADE_RAW_GRADE'   => Scrub::text($level->getRawGrade()),
             )
         );
         $this->parse('submission_grade_block', 'submission_grade', true);

@@ -35,6 +35,17 @@ class Model
     protected $lowerBound;
 
     /**
+     * Raw grade (0-100) for this selected grade.
+     * If a submission return is given this grade, it is treated as having this
+     * grade for averaging purposes.
+     *
+     * This, along with lower bounds
+     *
+     * @var int
+     */
+    protected $rawGrade;
+
+    /**
      * Caption for this grade level.
      * This is used as the display value for submission returns.
      *
@@ -119,6 +130,24 @@ class Model
     public function setLowerBound($lowerBound)
     {
         $this->lowerBound = $lowerBound;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRawGrade()
+    {
+        return $this->rawGrade;
+    }
+
+    /**
+     * @param  int   $rawGrade
+     * @return $this
+     */
+    public function setRawGrade($rawGrade)
+    {
+        $this->rawGrade = $rawGrade;
         return $this;
     }
 }

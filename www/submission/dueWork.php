@@ -423,7 +423,7 @@ foreach ($categoryList as $category) {
     } else {
         $this->setVar(
             array(
-                'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg, $grade['groups']),
+                'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg),
                 'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
             )
         );

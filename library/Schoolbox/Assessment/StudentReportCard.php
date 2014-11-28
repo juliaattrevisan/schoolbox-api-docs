@@ -393,7 +393,7 @@ class StudentReportCard
         $page->setVar(
             array(
                 'SUBJ_GRADEIENT'   => (isset($gradeAvg['grade']) ? (int)($gradeAvg['grade'] / 10) : ''),
-                'SUBJ_GRADE_AVG'   => $returnHandler->percent2letter($gradeAvg['grade'], $gradeAvg['groups']),
+                'SUBJ_GRADE_AVG'   => $returnHandler->percent2letter($gradeAvg['grade']),
                 'SUBJ_GRADE_TREND' => $gradeAvg['trend'] != 0
                     ? sprintf("%0.1f%% %s", $gradeAvg['trend'], $trendDir)
                     : ''
@@ -1008,7 +1008,7 @@ class StudentReportCard
                 // All letters together?
                 $page->setVar(
                     array(
-                        'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg, $grade['groups']),
+                        'SUBJ_GRADE'     => $returnHandler->percent2letter($gradeAvg),
                         'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
                     )
                 );
