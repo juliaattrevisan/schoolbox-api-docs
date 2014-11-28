@@ -127,8 +127,7 @@
           color: @module-heading;
           line-height: 16px;
           padding: 6px;
-          width: 245px;
-          height: 19px;
+          width: 258px;
           background: #fff;
           .border-radius(3px);
           -webkit-box-shadow: inset 0px 2px 5px 0px rgba(0, 0, 0, 0.2);
@@ -308,7 +307,8 @@ body.login{
     #loginForm{
       max-width: 453px;
 
-      label{
+      label[for=username],
+      label[for=password]{
         display: block;
         text-indent: -9000px;
         height: 40px;
@@ -319,14 +319,13 @@ body.login{
       label[for=password]{
         background: url('/images/loreto/password.png') center left no-repeat;
       }
-      input{
+      input[type="text"],
+      input[type="password"]{
         border: 1px solid @black;
         padding: 8px;
-        height: 26px;
-        width: 320px;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
+        width: 100%;
+        height: 40px;
+        .border-radius(3px);
       }
       .submit-btn-plain{
         background: url('/images/loreto/login-btn.png') top left no-repeat;
@@ -338,6 +337,10 @@ body.login{
         margin-right: 0;
         text-indent: -9000px;
         &:hover{ background: url('/images/loreto/login-btn.png') bottom left no-repeat; }
+      }
+      a{
+        margin: 8px 0;
+        display: block;
       }
     }
   }
