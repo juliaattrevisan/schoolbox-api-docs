@@ -63,7 +63,7 @@ class Session
                 setcookie('remember',$key, $expire, '/', $_SERVER['HTTP_HOST'], false, true);
                 $redis = \Alaress\Redis::getClientInstance();
                 $redis->executeCommand($redis->createCommand('set',array($key, $username) ));
-                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - mktime()))));
+                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
 
             //register users id
