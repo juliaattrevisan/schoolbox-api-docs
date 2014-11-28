@@ -10,7 +10,7 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-eplver='1.4.0';
+eplver='1.4.1';
 
 # Create directories for completing the build
 builddir="/tmp/build-dir-`date -I`";
@@ -32,6 +32,9 @@ npm install ep_disableChat;
 
 # Install disable author name change plugin
 npm install ep_disable_change_author_name;
+
+# Install headings plugins
+npm install ep_headings;
 
 # Add in upstart init script and logrotate
 cd $builddir/etherpad-lite-$eplver;

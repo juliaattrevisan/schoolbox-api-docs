@@ -179,7 +179,7 @@ cp -f /vagrant/tools/init/upstart-rerouted.conf /etc/init/schoolbox-rerouted.con
 cp -f /vagrant/tools/init/upstart-rerouted.override /etc/init/schoolbox-rerouted.override;
 
 echo "$vag Ensure schoolbox-epl is of the required version";
-eplver='1.4.0-4';
+eplver='1.4.1-4';
 if [ "`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`" != "$eplver" ];
 then
 	apt-get update >/dev/null 2>&1;

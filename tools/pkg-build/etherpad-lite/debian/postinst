@@ -21,7 +21,8 @@ case "$1" in
     configure)
         chown -R schoolboxepl:adm /usr/share/schoolbox-epl/src/static/custom;
         chown -R schoolboxepl:adm /var/log/schoolbox-epl;
-	chown -R schoolboxepl:adm /usr/share/schoolbox-epl;
+        chown -R schoolboxepl:adm /usr/share/schoolbox-epl;
+        service schoolbox-epl restart 2>&1;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
