@@ -53,22 +53,22 @@
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                                                class="status-option">
-                                                <span class="status-label">Approve</span>
                                                 <span class="actions btn no-text tick"><span></span></span>
+                                                <span class="status-label">Approve</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
                                                class="status-option">
-                                                <span class="status-label">Pending</span>
                                                 <span class="actions btn no-text time-table"><span></span></span>
+                                                <span class="status-label">Pending</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
                                                class="status-option">
-                                                <span class="status-label">Deny</span>
                                                 <span class="actions btn no-text cross"><span></span></span>
+                                                <span class="status-label">Deny</span>
                                             </a>
                                         </li>
                                     </ul>
