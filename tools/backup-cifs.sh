@@ -55,6 +55,9 @@ backup_failure_email='';
 # Backup of the data directory override - 1 is backup data dir, 0 is skip backup
 backup_data_dir=1;
 
+# Use multiple rsync runs instead of tar/gz/split (experimental)
+use_rsync=0;
+
 ############## End of Config Options ##############
 ########### DO NOT EDIT past this line! ###########
 
@@ -138,7 +141,7 @@ mount_count=`df | grep $backup_dir | wc -l`;
 if [[ $mount_count -ne 0 && $errorcheck -eq 0 ]];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] CIFS remote share ($backup_share) is mounted" >> $logfile;
-	mount_space=`df | grep $backup_dir | awk '{print $5;}' | cut -d'%' -f1`;
+	mount_space=`df | grep $backup_dir | awk '{print $(NF-1)}' | cut -d'%' -f1`;
 	if [ -z $mount_space ];
 	then
 		echo -e "Error: CIFS remote share not mounted correctly.\nHalting backup." >> $logfile;
@@ -166,8 +169,12 @@ then
 	# Remove backup directory if already exists
 	if [ -d $targetdir ]
 	then
-		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of duplicate backup: $targetdir" >> $logfile;
-		rm -rf $targetdir >> $logfile 2>&1;
+		# Only remove the current backup if not using rsync
+		if [ $use_rsync -eq 0 ];
+		then
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of duplicate backup: $targetdir" >> $logfile;
+			rm -rf $targetdir >> $logfile 2>&1;
+		fi
 	fi
 else
 	if [ $mount_count -eq 0 ];
@@ -207,7 +214,12 @@ then
 	if [ $backup_data_dir -eq 1 ];
 	then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
-		tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+		if [ $use_rsync -eq 0 ];
+		then
+			tar -cz `readlink -f $data_dir` 2>>$logfile | split -a 4 -b 2G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+		else
+			echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Ignoring data directory backup as using hourly rsync instead" >> $logfile;
+		fi
 	else
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Skipping backup of $data_dir due to override set" >> $logfile;
 	fi
