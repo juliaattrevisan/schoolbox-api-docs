@@ -9,23 +9,27 @@
  */
 
 namespace Schoolbox\Forum;
+use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Category;
+use Schoolbox\User;
 
 class Thread implements ISoftDeletable {
 
     /** @var int */
-    protected $threadID;
+    protected $id;
 
-    /** @var int */
-    protected $categoryID;
+    /** @var Category */
+    protected $category;
 
-    /** @var int */
-    protected $userID;
+    /** @var User */
+    protected $user;
 
     /** @var string */
     protected $title;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $date;
 
     /** @var string */
@@ -43,19 +47,22 @@ class Thread implements ISoftDeletable {
     /** @var Post */
     protected $lastPost;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Collection|Post[] */
+    protected $posts;
+
+    /** @var Alaress_Date_Format */
     protected $lastPostDate;
 
-    /** @var object */
+    /** @var User */
     protected $lastPostUser;
 
 
     /**
-     * @param int $threadID
+     * @param int $id
      * @return self
      */
-    public function setThreadID($threadID) {
-        $this->threadID = $threadID;
+    public function setId($id) {
+        $this->id = $id;
         return $this;
     }
 
@@ -63,44 +70,44 @@ class Thread implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getThreadID() {
-        return $this->threadID;
+    public function getId() {
+        return $this->id;
     }
 
 
     /**
-     * @param int $categoryID
+     * @param Category $category
      * @return self
      */
-    public function setCategoryID($categoryID) {
-        $this->categoryID = $categoryID;
+    public function setCategory($category) {
+        $this->category = $category;
         return $this;
     }
 
 
     /**
-     * @return int
+     * @return Category
      */
-    public function getCategoryID() {
-        return $this->categoryID;
+    public function getCategory() {
+        return $this->category;
     }
 
 
     /**
-     * @param int $userID
+     * @param User $user
      * @return self
      */
-    public function setUserID($userID) {
-        $this->userID = $userID;
+    public function setUser($user) {
+        $this->user = $user;
         return $this;
     }
 
 
     /**
-     * @return int
+     * @return User
      */
-    public function getUserID() {
-        return $this->userID;
+    public function getUser() {
+        return $this->user;
     }
 
 
@@ -123,7 +130,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @param \Alaress_Date_Format $date
+     * @param Alaress_Date_Format $date
      * @return self
      */
     public function setDate($date) {
@@ -133,7 +140,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getDate() {
         return $this->date;
@@ -194,7 +201,8 @@ class Thread implements ISoftDeletable {
     }
 
     /**
-     * @param \Schoolbox\Forum\Post $firstPost
+     * @param Post $firstPost
+     * @return self
      */
     public function setFirstPost($firstPost)
     {
@@ -203,7 +211,7 @@ class Thread implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\Forum\Post
+     * @return Post
      */
     public function getFirstPost()
     {
@@ -214,7 +222,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @param object $lastPost
+     * @param Post $lastPost
      * @return self
      */
     public function setLastPost($lastPost) {
@@ -224,7 +232,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @return object
+     * @return Post
      */
     public function getLastPost() {
         return $this->lastPost;
@@ -232,7 +240,27 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @param \Alaress_Date_Format $lastPostDate
+     * @param Collection|Post[] $posts
+     * @return self
+     */
+    public function setPosts($posts)
+    {
+        $this->posts = $posts;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection|Post[]
+     */
+    public function getPosts()
+    {
+        return $this->posts;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $lastPostDate
      * @return self
      */
     public function setLastPostDate($lastPostDate) {
@@ -242,7 +270,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getLastPostDate() {
         return $this->lastPostDate;

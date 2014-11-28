@@ -11,6 +11,7 @@ $groupHandler = new Group();
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');
 $this->setBlock(TEMPLATE_content, 'title', 'title_block');
+$this->setBlock(TEMPLATE_content, 'quote', 'quote_block');
 
 $this->setVar('title_block', '');
 
@@ -19,6 +20,7 @@ if (is_numeric($this->arg[0])) {
     /* Category exists
      */
     try {
+        /** @var \Schoolbox\Resource\Category $folder */
         $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
         error(2);
@@ -46,6 +48,7 @@ if (is_numeric($this->arg[0])) {
         'THREAD_ID'    => '',
         'THREAD_TITLE' => '',
         'POST_ID'      => '',
+        'QUOTE_ID'     => '',
         'CATEGORY_ID'  => $folder->getId(),
         'CATEGORY'     => Scrub::text($folder->getName()),
         'BODY'         => '',
@@ -55,8 +58,12 @@ if (is_numeric($this->arg[0])) {
      */
     if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         try {
+            /** @var \Schoolbox\Forum\Post $post */
             $post   = PostMapper::getInstance()->findById($this->arg[2]);
-            $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
+
+            /** @var \Schoolbox\Forum\Thread $thread */
+            $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
         } catch (Exception $e) {
@@ -77,15 +84,16 @@ if (is_numeric($this->arg[0])) {
             error(19);
         }
 
-        if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
+        // first!
+        if ($thread->getFirstPost()->getId() == $post->getId()) {
             $output['THREAD_TITLE'] = $thread->getTitle();
             $this->parse('title_block', 'title');
         }
 
         $output['ACTION']      = 'Modify';
         $output['THREAD_POST'] = 'Post';
-        $output['THREAD_ID']   = $thread->getThreadId();
-        $output['POST_ID']     = $post->getPostId();
+        $output['THREAD_ID']   = $thread->getId();
+        $output['POST_ID']     = $post->getId();
         $output['BODY']        = Scrub::text($post->getBody());
 
 
@@ -94,6 +102,7 @@ if (is_numeric($this->arg[0])) {
         /* Add new reply
          */
         try {
+            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
@@ -110,7 +119,7 @@ if (is_numeric($this->arg[0])) {
 
         $output['ACTION']       = 'Post';
         $output['THREAD_POST']  = 'Reply';
-        $output['THREAD_ID']    = $thread->getThreadId();
+        $output['THREAD_ID']    = $thread->getId();
         $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
 
 
@@ -133,20 +142,22 @@ if (is_numeric($this->arg[0])) {
 
     if (!is_numeric($quotePostID) && $this->arg[1]) {
         //Gets the oldest post to use as a thread reply
-        $quotePostID = $thread->getFirstPost()->getPostID();
+        $quotePostID = $thread->getFirstPost()->getId();
     }
+
+    $this->setVar('quote_block', '');
 
     if (is_numeric($quotePostID) && $quotePostID > 0) {
         try {
             $quote = PostMapper::getInstance()->findById($quotePostID);
-            if (!$output['BODY']) {
-                $output['BODY'] =
-                    '<blockquote class="mceNonEditable">' . Scrub::html($quote->getBody()) .
-                    '<cite>' . $quote->getOwner()->formatName($user) . '</cite>' .
-                    '</blockquote><p></p>';
-            }
 
-            $this->setVar($output);
+            $this->setVar(array(
+                'QUOTE_ID' => $quotePostID,
+                'QUOTE_BODY' => Scrub::html($quote->getBody()),
+                'QUOTE_AUTHOR' => $quote->getOwner()->formatName(),
+                'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
+            ));
+            $this->parse('quote_block', 'quote');
         } catch (Exception $e) {
         }
     }

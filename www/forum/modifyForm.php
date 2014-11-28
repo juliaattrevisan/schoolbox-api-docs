@@ -38,7 +38,8 @@ if (is_numeric($_POST['categoryID'])) {
 	 */
 	if (is_numeric($_POST['postID'])) {
 
-        try{
+        try {
+            /** @var \Schoolbox\Forum\Post $post */
             $post = PostMapper::getInstance()->findById($_POST['postID']);
         } catch (Exception $e) {
             error(2);
@@ -52,7 +53,8 @@ if (is_numeric($_POST['categoryID'])) {
 		}
 
         try {
-            $thread = ThreadMapper::getInstance()->findById($post->getThreadId());
+            /** @var \Schoolbox\Forum\Thread $thread */
+            $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
         } catch (Exception $e) {
             error(2);
         }
@@ -65,7 +67,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 		/* modify thread
 		 */
-		if ($thread->getFirstPost()->getPostId() == $post->getPostId()) {
+		if ($thread->getFirstPost()->getId() == $post->getId()) {
 
             $thread->setTitle($_POST['title']);
 
@@ -84,15 +86,17 @@ if (is_numeric($_POST['categoryID'])) {
 		/* create thread
 		 */
 		if (!is_numeric($_POST['threadID'])) {
+            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->createModel();
-            $thread->setCategoryID($_POST['categoryID']);
-		    $thread->setUserID($_SESSION['id']);
+            $thread->setCategory(CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']));
+		    $thread->setUser($_SESSION['user']);
 			$thread->setTitle($_POST['title']);
 
             ThreadMapper::getInstance()->save($thread);
 		}
 		else {
             try {
+                /** @var \Schoolbox\Forum\Thread $thread */
                 $thread = ThreadMapper::getInstance()->findById($_POST['threadID']);
             } catch (Exception $e) {
                 error(2);
@@ -105,29 +109,37 @@ if (is_numeric($_POST['categoryID'])) {
 			}
 		}
 
-		/* create post
-		 */
+        /**
+         * create post
+         * @var \Schoolbox\Forum\Post $post
+         */
         $post = PostMapper::getInstance()->createModel();
         $post->setOwner($_SESSION['user']);
         $post->setBody($_POST['body']);
-        $post->setThreadId($thread->getThreadID());
+        $post->setThread($thread);
+
+        if ($_POST['quoteID']) {
+            $post->setParent(PostMapper::getInstance()->createModel()->setId($_POST['quoteID']));
+        }
+
         PostMapper::getInstance()->save($post);
 
         /* update thread */
-        $thread->setLastPostUser($_SESSION['id']);  //this probably should be deprecated can be retrieved from post ID
-        $thread->setLastPostDate(new DateTime('now')); //this probably should be deprecated can be retrieved from post ID
+        $thread->setLastPostUser($_SESSION['user']);  //this probably should be deprecated can be retrieved from post ID
+        $thread->setLastPostDate(Alaress_Date_Format::now()); //this probably should be deprecated can be retrieved from post ID
         $thread->setLastPost($post);
         ThreadMapper::getInstance()->save($thread);
 
    	}
 
-	SitePage::localRedir('/forum/thread/' . $thread->getThreadId() . '/' . $forumHandler->getPageNumber($post->getPostId()) . '/#' . $post->getPostId());
+	SitePage::localRedir('/forum/thread/' . $thread->getId() . '/' . $forumHandler->getPageNumber($post->getId()) . '/#' . $post->getId());
 }
 else if (is_numeric($_GET['toggleLock'])) {
 
 	/* thread exists
 	 */
     try {
+        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($_GET['toggleLock']);
     } catch (Exception $e) {
         error(2);
@@ -135,16 +147,16 @@ else if (is_numeric($_GET['toggleLock'])) {
 
 	/* forum exists
 	 */
-	if (!$forumHandler->hasForum($thread->getCategoryID())) {
-		SitePage::localRedir('/homepage/' . $thread->getCategoryID());
+	if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
+		SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
 	}
 
 	/* check permissions
 	 */
-	if ($groupHandler->getPermission($thread->getCategoryID()) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
 		error(19);
 	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategoryID())) {
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
 		error(19);
 	}
 
@@ -159,6 +171,7 @@ else if (is_numeric($_GET['deleteThread'])) {
 	/* thread exists
 	 */
     try {
+        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($_GET['deleteThread']);
     } catch (Exception $e) {
         error(2);
@@ -166,40 +179,41 @@ else if (is_numeric($_GET['deleteThread'])) {
 
 	/* forum exists
 	 */
-	if (!$forumHandler->hasForum($thread->getCategoryID())) {
-		SitePage::localRedir('/homepage/' . $thread->getCategoryID());
+	if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
+		SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
 	}
 
 	/* check permissions
 	 */
-	if ($groupHandler->getPermission($thread->getCategoryID()) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
 		error(19);
 	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategoryID())) {
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
 		error(19);
 	}
 
-	$forumHandler->delete($thread->getThreadID());
+	$forumHandler->delete($thread->getId());
 
-	SitePage::localRedir('/forum/' . $thread->getCategoryID());
+	SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
 }
 else if (is_array($_POST['deleteThreads'])) {
 	foreach ($_POST['deleteThreads'] as $threadID) {
 		/* thread exists
 		 */
         try {
+            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($threadID);
 
 			/* check permissions
 			 */
-			if ($groupHandler->getPermission($thread->getCategoryID()) < WRITE_ACCESS) {
+			if ($groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
 				error(19);
 			}
-			if ($groupHandler->hasChildAccessOnly($thread->getCategoryID())) {
+			if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
 				error(19);
 			}
 
-            $categoryID = $thread->getCategoryID();
+            $categoryID = $thread->getCategory()->getId();
 
             ThreadMapper::getInstance()->delete($thread);
         } catch (Exception $e) { }
@@ -211,33 +225,36 @@ else if (is_numeric($_GET['deletePost'])) {
 
 	/* post exists
 	 */
-    try{
-        $post = PostMapper::getInstance()->findById($_GET['deletePost']);
-        $thread = ThreadMapper::getInstance()->findById($post->getThreadID());
+    try {
+        /** @var \Schoolbox\Forum\Post $post */
+        $post   = PostMapper::getInstance()->findById($_GET['deletePost']);
+
+        /** @var \Schoolbox\Forum\Thread $thread */
+        $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
     } catch (Exception $e) {
         error(2);
     }
 
 	/* check locked
 	 */
-	if ($thread->isLocked() && $groupHandler->getPermission($thread->getCategoryId()) < WRITE_ACCESS) {
+	if ($thread->isLocked() && $groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
 		error(19);
 	}
 
 	/* check permissions
 	 */
-	if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($thread->getCategoryId()) < WRITE_ACCESS) {
+	if ($post->getOwner()->getId() != $_SESSION['id'] && $groupHandler->getPermission($thread->getCategory()->getId()) < WRITE_ACCESS) {
 		error(19);
 	}
-	if ($groupHandler->hasChildAccessOnly($thread->getCategoryId())) {
+	if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId())) {
 		error(19);
 	}
 
-	$pageNumber = $forumHandler->getPageNumber($post->getPostID());
+	$pageNumber = $forumHandler->getPageNumber($post->getId());
 
     PostMapper::getInstance()->delete($post);
 
-	SitePage::localRedir('/forum/thread/' . $post->getThreadId() . '/' . $pageNumber);
+	SitePage::localRedir('/forum/thread/' . $post->getThread()->getId() . '/' . $pageNumber);
 }
 else {
 	error(2);
