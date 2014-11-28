@@ -66,8 +66,19 @@ class RedisQueue implements QueueInterface
 
         $result = $this->exec("MGET", $idList);
 
-        foreach ($result as $data) {
+        $count = count($idList);
+
+        for ($i = 0; $i < $count; ++$i) {
+            // $key  = $idList[$i];
+            $data = $result[$i];
+
             // attempt to unserialize the message
+            if (is_null($data)) {
+                // the thing we're pointing at doesn't exist? remove the reference
+                // $this->exec('SREM', $this->getRedisSetKey(), $key);
+                continue;
+            }
+
             $instances[] = $this->inflate($data);
         }
 
