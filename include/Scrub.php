@@ -165,6 +165,8 @@ class Scrub
             $config->set('Output.FlashCompat', true);
             $config->set('HTML.FlashAllowFullScreen', true);
 
+            $config->set('Attr.EnableID', true);
+
             $config->set(
                 'Attr.AllowedFrameTargets', array(
                     '_blank',
