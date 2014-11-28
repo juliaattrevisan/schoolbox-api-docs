@@ -1373,6 +1373,9 @@ Notifications
         &:hover {
             text-decoration: none;
             cursor: pointer;
+            em{
+				display: block;
+            }
             span {
                 background: @black;
                 color: @white;
@@ -1407,6 +1410,12 @@ Notifications
             background: @dark;
         }
     }
+    a.active{
+    	background: @lgrey;
+    	em{
+    		display: block;
+    	}
+    }	
 }
 
 .dark {
@@ -2474,6 +2483,9 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
 	select{
     	margin: 6px 0;
     }
+    .submit-btn-plain{
+    	margin: 6px 0 0 0;
+    }
 }
 
 .box {
@@ -2504,6 +2516,7 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
         clear: both;
         padding: 8px 7px;
         background: @lgrey;
+        overflow: auto;
         label {
             display: inline;
         }
@@ -4391,6 +4404,7 @@ HOMEPAGE TEMPLATES
         form {
             line-height: 25px;
             text-align: left;
+            overflow: auto;
         }
         .submit-btn {
             clear: both;
@@ -4418,7 +4432,6 @@ HOMEPAGE TEMPLATES
         border: solid 1px @std-grey;
     }
     form {
-        padding-bottom: 16px;
         .errmsg {
             display: block;
             color: darken(@negative-color,@darken-value);
@@ -8961,19 +8974,6 @@ tr span.leave-pending {
     display: none;
 }
 
-.homepage {
-	.edit:hover em {
-		display: block;
-	}
-	.active {
-		background: @lgrey;
-		em {
-			display: block;
-		}
-	}
-}
-
-
 .add-component.undeveloped .btn {
     display: none;
 }
@@ -9035,18 +9035,6 @@ h4 a.hidden {
     right: 20px;
 }
 
-#rubric-criteria {
-//    textarea {
-//        width: 340px;
-//        margin-right: 5px;
-//        height: 5em;
-//    }
-//    span input {
-//        display: block;
-//        margin-left: 30px;
-//    }
-}
-
 .rubric .warning span,
 .admin-contents h2 span.question,
 .admin-contents h3 span.question,
@@ -9056,7 +9044,6 @@ h4 a.hidden {
     .rounded-corners(100%)
 }
 
-//.standardForm td { border-bottom-color: ; }
 .active-checkbox {
     background: @module-background;
     padding: 1px 10px 3px 2px;
@@ -9697,7 +9684,6 @@ input[type="email"],
 input[type="tel"],
 input[type="number"],
 input[type="date"],
-input,
 select,
 textarea {
     border: solid 1px @std-grey;
