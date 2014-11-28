@@ -172,8 +172,14 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
                          ->addFilter('roletype', array($roletype));
 
+        /** @var Post $parent */
+        $parent   = $this->mapper->findById($post->getParent()->getId());
+        $quotedId = $parent->getOwner()->getId();
+
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
-            $envelope->targetToUser($user->getId(), $bob->build());
+            if ($user->getId() != $quotedId) {
+                $envelope->targetToUser($user->getId(), $bob->build());
+            }
         }
 
         return $envelope;
