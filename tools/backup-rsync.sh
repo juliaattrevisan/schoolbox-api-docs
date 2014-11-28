@@ -116,9 +116,9 @@ processes=`pgrep backup-rsync.sh`;
 process=`echo $processes | wc -w`;
 if [ $process -gt 1 ];
 then
-	echo -e "Error: Script already running\nReported Processses: $process\n$processes" >> $logfile;
-	echo -e "Error: Script already running\nReported Processses: $process\n$processes";
-	exit 1;
+	echo -e "Warning: Script already running\nReported Processses: $process\n$processes" >> $logfile;
+	echo -e "Warning: Script already running\nReported Processses: $process\n$processes";
+	exit 0;
 fi
 
 # Mount smb/cifs share if required and perform basic checks
