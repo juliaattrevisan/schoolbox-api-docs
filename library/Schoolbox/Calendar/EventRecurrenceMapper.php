@@ -11,6 +11,7 @@
 namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
+use Alaress\Date\Interval;
 use DateTime;
 use Schoolbox\Calendar\EventRelations;
 
@@ -109,9 +110,22 @@ class EventRecurrenceMapper {
 				$series = $this->getEventMapper()->getAllInSeries($event);
                 $event->setAccess($access);
 
-				foreach($series as $seriesEvent) {
-					$this->setSeriesEventData($seriesEvent, $event);
+				// Use start and end deltas to set time of each series event
+				$originalEvent = $this->getEventMapper()->findById($event->getId());
+				$startDelta = Interval::createFromDateTimeDifference(
+					$originalEvent->getStartDateTime()->getDateTimeObject(),
+					$startDate->getDateTimeObject()
+				)->getAsDateInterval();
+				$endDelta   = Interval::createFromDateTimeDifference(
+					$originalEvent->getEndDateTime()->getDateTimeObject(),
+					$endDate->getDateTimeObject()
+				)->getAsDateInterval();
 
+				foreach ($series as $seriesEvent) {
+					$this->setSeriesEventData($seriesEvent, $event);
+					// Adjust each event's start and end individually
+					$seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
+					$seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
 					$this->getEventMapper()->save($seriesEvent);
 
                     /* Assign relations
