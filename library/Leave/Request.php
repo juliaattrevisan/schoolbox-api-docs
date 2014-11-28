@@ -2,13 +2,6 @@
 
 class Leave_Request {
 
-	/**
-	 * A collection of host type instances
-	 *
-	 * @var \Schoolbox\Collection
-	 */
-	private $allHostTypes = null;
-
     /* Leave Requests confirmation types and their presentation labels
       */
     private $confirmedByMap = array(
@@ -55,17 +48,6 @@ class Leave_Request {
      * @var Leave_Request_TravelType
      */
     protected $travelType;
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-
-		/* Set up host types again
-		 */
-		$hostTypeMapper = new \Leave\HostTypeMapper();
-		$this->setAllHostTypes($hostTypeMapper->findAll());
-	}
 
 	/**
 	 * Get duration
@@ -204,16 +186,10 @@ class Leave_Request {
     /**
      * Get host type
      *
-     * @param bool $string
-     *
      * @return string
      */
-    public function getHostType($string = false) {
-        if ($string) {
-            return $this->getHostTypeMapIndex($this->hostType);
-        } else {
-            return $this->hostType;
-        }
+    public function getHostType() {
+        return $this->hostType;
     }
 
     /**
@@ -332,6 +308,7 @@ class Leave_Request {
             } elseif ($this->isDeleted()) {
                 return 'Deleted';
             }
+            return '';
         } else {
             return $this->status;
         }
@@ -453,25 +430,6 @@ class Leave_Request {
     }
 
     /**
-     * Get host type map array
-     *
-     * @return array
-     */
-    public function getHostTypeMap() {
-        return $this->hostTypeMap;
-    }
-
-    /**
-     * Get host type label for a host type id
-     *
-     * @param $index
-     * @return mixed
-     */
-    public function getHostTypeMapIndex($index) {
-		return $this->getAllHostTypes()->getBy('id', $index);
-    }
-
-    /**
      * Get confirmed by
      *
      * @return mixed
@@ -540,24 +498,6 @@ class Leave_Request {
 	 */
 	public function getAuthor() {
 		return $this->author;
-	}
-
-	/**
-	 * Set all host types
-	 *
-	 * @param \Schoolbox\Collection $allHostTypes
-	 */
-	private function setAllHostTypes($allHostTypes) {
-		$this->allHostTypes = $allHostTypes;
-	}
-
-	/**
-	 * Set all host types
-	 *
-	 * @return \Schoolbox\Collection
-	 */
-	public function getAllHostTypes() {
-		return $this->allHostTypes;
 	}
 
 	/**

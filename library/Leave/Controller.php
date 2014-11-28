@@ -48,6 +48,13 @@ class Leave_Controller extends Controller
     protected $travelTypes;
 
     /**
+     * Host types for a leave request.
+     *
+     * @var \Schoolbox\Collection|\Leave\HostType[]
+     */
+    protected $hostTypes;
+
+    /**
 	 * Time map array
      * A map of actual time values => presentation information
      * used in the Leave Time/Return Time dropdowns
@@ -132,6 +139,9 @@ class Leave_Controller extends Controller
         }
 
         $this->setTravelTypes($travelMethods);
+
+        // Set host types too
+        $this->setHostTypes(\Leave\HostTypeMapper::getInstance()->findAll());
     }
 
     /**
@@ -156,8 +166,8 @@ class Leave_Controller extends Controller
 
         /* Iterate through each option and preselect
 		 */
-        foreach($request->getAllHostTypes() as $currentHostType) {
-            if ($request->getHostType() == $currentHostType->getId()) {
+        foreach ($this->getHostTypes() as $currentHostType) {
+            if ($request->getHostType()->getId() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
             } else {
                 $selected = '';
@@ -622,7 +632,7 @@ class Leave_Controller extends Controller
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => Scrub::text($house->getHouse()),
                     'USER_HOUSE_ID' => $house->getId(),
-                    'HOST_TYPE' => $request->getHostType(),
+                    'HOST_TYPE' => $this->getHostTypes()->getBy('id', $request->getHostType()->getId())->getName(),
                     'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
                     'REQUEST_START_TIME' => $request->getStart()->getTimeOnly(),
                     'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
@@ -777,7 +787,7 @@ class Leave_Controller extends Controller
                 $rowData[] = $request->getUser()->getYear();
                 $rowData[] = $request->getStart()->getAustralian();
                 $rowData[] = $request->getFinish()->getAustralian();
-                $rowData[] = $request->getHostTypeMapIndex($request->getHostType());
+                $rowData[] = $request->getHostType()->getName();
                 $rowData[] = $request->getStatus(true);
                 $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
                 $rowData[] = $request->getAuthorisationUser()->getFirstname() . ' ' . $request->getAuthorisationUser(
@@ -849,7 +859,7 @@ class Leave_Controller extends Controller
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_START' => $request->getStart()->getAustralian(),
                     'REQUEST_DURATION' => $request->getDuration(),
-                    'REQUEST_HOST_TYPE' => $request->getAllHostTypes()->getBy('id', $request->getHostType())->getName()
+                    'REQUEST_HOST_TYPE' => $this->getHostTypes()->getBy('id', $request->getHostType()->getId())->getName()
                 ));
 
                 if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
@@ -958,7 +968,7 @@ class Leave_Controller extends Controller
                     $rowData[] = $request->getUser()->getYear();
                     $rowData[] = $request->getStart()->getAustralian();
                     $rowData[] = $request->getFinish()->getAustralian();
-                    $rowData[] = $request->getHostTypeMapIndex($request->getHostType())->getName();
+                    $rowData[] = $request->getHostType()->getName();
                     $rowData[] = $request->getStatus(true);
                     $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
                     $rowData[] = $request->getAuthorisationUser()->formatName();
@@ -1034,7 +1044,7 @@ class Leave_Controller extends Controller
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getAustralian(),
                             'REQUEST_DURATION' => $request->getDuration(),
-                            'REQUEST_HOST_TYPE' => $request->getHostTypeMapIndex($request->getHostType())->getName()
+                            'REQUEST_HOST_TYPE' => $request->getHostType()->getName()
                         )
                     );
 
@@ -1514,5 +1524,21 @@ class Leave_Controller extends Controller
     public function getTravelTypes()
     {
         return $this->travelTypes;
+    }
+
+    /**
+     * @param  \Schoolbox\Collection|\Leave\HostType[] $hostTypes
+     * @return $this
+     */
+    public function setHostTypes($hostTypes) {
+        $this->hostTypes = $hostTypes;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Collection|\Leave\HostType[]
+     */
+    public function getHostTypes() {
+        return $this->hostTypes;
     }
 }

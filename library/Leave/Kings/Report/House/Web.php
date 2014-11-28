@@ -84,7 +84,7 @@ class Leave_Kings_Report_House_Web
 
             $combined[$key]['request_id'][$request->getId()] = $request->getId();
             $combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
-            $combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
+            $combined[$key]['request_host_type'][$request->getId()] = $request->getHostType()->getName();
             $combined[$key]['request_description'][$request->getId()] = $request->getDescription();
 
             /* Pending leave requests get a css class for the row
@@ -361,7 +361,7 @@ class Leave_Kings_Report_House_Web
                     $hostTypes = array();
 
                     foreach($currentPerson['request_host_type'] as $currentHostType) {
-                        if ($currentHostType !== null) {
+                        if (!empty($currentHostType)) {
                             $hostTypes[] = $currentHostType->getName();
                         }
                     }
@@ -624,7 +624,7 @@ class Leave_Kings_Report_House_Web
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     protected function getPage()
     {

@@ -344,9 +344,10 @@ class Event_Attendance_Controller extends Controller
         $request = new Leave_Request;
 
         $request->setUser($attendance['user_id']);
+        $request->setAuthor($_SESSION['user']);
         $request->setStart( $start->getDatabase() );
         $request->setFinish( $finish->getDatabase() );
-        $request->setHostType(array_search('Other', $request->getHostTypeMap()));
+        $request->setHostType(Leave\HostType::TYPE_OTHER);
         $request->setHostName( $this->getUserHandler()->formatName($event) );
         $request->setHostPhone('');
         $request->setUserPhone('');
@@ -401,11 +402,17 @@ class Event_Attendance_Controller extends Controller
         return $this->userHandler;
     }
 
+    /**
+     * @param Leave_RequestMapper $leaveRequestMapper
+     */
     public function setLeaveRequestMapper($leaveRequestMapper)
     {
         $this->leaveRequestMapper = $leaveRequestMapper;
     }
 
+    /**
+     * @return Leave_RequestMapper
+     */
     public function getLeaveRequestMapper()
     {
         return $this->leaveRequestMapper;
