@@ -41,7 +41,7 @@
         $j(document).on('click', '.modify', function () {
             var trigger = 0;
 
-            level = $j(this).parent().parent()
+            level = $j(this).parent().parent().parent()
 
             $j('.form-holder').each(function () {
                 if ($j(this).is(':visible')) {
@@ -231,7 +231,10 @@
                 </div>
                 <div class="inline clearfix">
                     <p>{FILE_INLINE}</p>
-                    <a href="#" class="btn no-text modify" title="Modify"><span></span></a></div>
+                    <span class="actions">
+                        <a href="#" class="btn no-text modify" title="Modify"><span></span></a>
+                    </span>
+                </div>
             </div>
             <div class="row form-holder">
 
