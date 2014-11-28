@@ -167,7 +167,9 @@ class Leave_Controller extends Controller
         /* Iterate through each option and preselect
 		 */
         foreach ($this->getHostTypes() as $currentHostType) {
-            if ($request->getHostType()->getId() == $currentHostType->getId()) {
+
+
+            if ($request->getHostType() instanceof \Leave\HostType && $request->getHostType()->getId() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
             } else {
                 $selected = '';
