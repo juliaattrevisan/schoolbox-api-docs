@@ -23,6 +23,11 @@ $user = $userMapper->findById($_POST['uid']);
 $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
 
+// Security check
+$studentRetHandler = new SubmissionReturn();
+$studentRetHandler->securityCheck($submissionBox->getId());
+unset($studentRetHandler);
+
 /* Some weird format that's built in javascript for some reason
  * See jquery.marksheet.js
  */
