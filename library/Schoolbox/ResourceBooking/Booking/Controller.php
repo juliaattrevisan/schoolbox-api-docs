@@ -610,39 +610,10 @@ class Controller extends Base
             // I do however want to allow a booking to start at the same time
             // that the previous booking ended.
             // (We may need to implement a down time between bookings.)
-            $conflictingBookings = $this->getBookingMapper()->findForResource(
-                $resource->getId(),
-                $startDate->getTimestamp() + 1,
-                $endDate->getTimestamp() - 1,
-                array(Status\Model::STATUS_APPROVED)
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateConflicts($resource, $startDate, $endDate, $existingBooking)
             );
-            // If updating a booking - Remove the item being updated from the
-            // check (because it's being moved)
-            if ($existingBooking instanceof Model) {
-                $existingId          = $existingBooking->getId();
-                $conflictingBookings = $conflictingBookings->filter(
-                    function ($item) use ($existingId) {
-                        return $item->getId() != $existingId;
-                    }
-                );
-            }
-            if (count($conflictingBookings)) {
-                $errors['start_datetime'][] = 'conflict';
-            } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
-                // Check if there's a timetabled class here, too.
-                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                    $this->getUser(),
-                    array()
-                );
-                $roomSource->setRoomCode($roomCode);
-                $roomEvents = $roomSource->getEvents(
-                    $startDate->getTimestamp(),
-                    $endDate->getTimestamp()
-                );
-                if (count($roomEvents)) {
-                    $errors['start_datetime'][] = 'timetabled_class';
-                }
-            }
         }
 
         // If updating a booking and its timespan hasn't changed:
@@ -670,6 +641,60 @@ class Controller extends Base
         // If there's any related resources: validate for those too.
         // Ensure that the user has the right to book this page
         // (though that's an authentication issue, not a data integrity one)
+        return $errors;
+    }
+
+    /**
+     * Validates whether a booking for this resource conflicts with any
+     * bookings that already exist.
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param Model      $existingBooking
+     *
+     * @return array
+     */
+    protected function validateConflicts(
+        Item\Model $resource,
+        $startDate,
+        $endDate,
+        Model $existingBooking = null
+    ) {
+        $errors = array();
+        $conflictingBookings = $this->getBookingMapper()->findForResource(
+            $resource->getId(),
+            $startDate->getTimestamp() + 1,
+            $endDate->getTimestamp() - 1,
+            array(Status\Model::STATUS_APPROVED)
+        );
+        // If updating a booking - Remove the item being updated from the
+        // check (because it's being moved)
+        if ($existingBooking instanceof Model) {
+            $existingId          = $existingBooking->getId();
+            $conflictingBookings = $conflictingBookings->filter(
+                function ($item) use ($existingId) {
+                    return $item->getId() != $existingId;
+                }
+            );
+        }
+        if (count($conflictingBookings)) {
+            $errors['start_datetime'][] = 'conflict';
+        } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+            // Check if there's a timetabled class here, too.
+            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                $this->getUser(),
+                array()
+            );
+            $roomSource->setRoomCode($roomCode);
+            $roomEvents = $roomSource->getEvents(
+                $startDate->getTimestamp(),
+                $endDate->getTimestamp()
+            );
+            if (count($roomEvents)) {
+                $errors['start_datetime'][] = 'timetabled_class';
+            }
+        }
         return $errors;
     }
 
@@ -885,29 +910,68 @@ class Controller extends Base
     }
 
     /**
-     * Changes status of booking and any related bookings, if series efficacy is
+     * Validates the status change for this booking
+     *
+     * @param Model $booking
+     * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
+     */
+    protected function validateChangeStatus(Model $booking, $status)
+    {
+        switch ($status) {
+            case Status\Model::STATUS_APPROVED:
+                return $this->validateConflicts(
+                    $booking->getResource(),
+                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                    $booking
+                );
+            default:
+                return array();
+        }
+    }
+
+    /**
+     * Attempts to changes status of booking. Also attempts to change any
+     * related bookings, if series efficacy is
      * set.
      *
      * @param Model $booking
      * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
      */
     protected function changeStatus(Model $booking, $status)
     {
+        $collection  = new Collection();
         $currentUser = $this->getUser();
-        $update      = function (Model $booking) use ($status, $currentUser) {
-            $booking
-                ->setStatus($status)
-                ->setReviewer($currentUser);
-        };
-        $update($booking);
-        $this->getBookingMapper()->save($booking);
+
+        // validate this booking
+        $booking
+            ->setStatus($status)
+            ->setReviewer($currentUser);
+        $errors = $this->validateChangeStatus($booking, $status);
+        $collection->add($booking);
+
+        // Validate the series (if there is one)
         $series = $this->getSeriesBookings($booking);
         if (count($series)) {
             foreach ($series as $relatedBooking) {
-                $update($relatedBooking);
+                $relatedBooking
+                    ->setStatus($status)
+                    ->setReviewer($currentUser);
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateChangeStatus($relatedBooking, $status)
+                );
+                $collection->add($relatedBooking);
             }
-            $this->getBookingMapper()->save($series);
         }
+        if (empty($errors)) {
+            $this->getBookingMapper()->save($collection);
+        }
+        return $errors;
     }
 
     /**
@@ -928,8 +992,8 @@ class Controller extends Base
      */
     public function approve(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_APPROVED);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -939,8 +1003,8 @@ class Controller extends Base
      */
     public function reject(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_REJECTED);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_REJECTED);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -950,8 +1014,8 @@ class Controller extends Base
      */
     public function setPending(Model $item)
     {
-        $this->changeStatus($item, Status\Model::STATUS_PENDING);
-        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl());
+        $errors = $this->changeStatus($item, Status\Model::STATUS_PENDING);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), $errors);
     }
 
     /**
@@ -1012,17 +1076,19 @@ class Controller extends Base
      *
      * @param Model  $booking
      * @param string $callbackUrl
+     * @param array  $errors      If not empty, this contains the errors for this change.
      */
-    protected function setUpdateStatusResponse(Model $booking, $callbackUrl)
+    protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = array())
     {
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->status->setCode(200);
+            $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
                     'data'   => array(
                         'item'        => $booking,
                         'callbackUrl' => $callbackUrl,
+                        'errors'      => $errors,
                     ),
                 )
             );

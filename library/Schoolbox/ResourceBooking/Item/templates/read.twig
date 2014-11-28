@@ -174,9 +174,13 @@ $(document).ready(function() {
             event.preventDefault()
             var href     = this.href
             var callback = function(data) {
-                $.ajax(href, {data: data}).done(function() {
-                    c.dom.fullCalendar('refetchEvents')
-                })
+                return $.ajax(href, {data: data})
+                    .done(function() {
+                        c.dom.fullCalendar('refetchEvents')
+                    })
+                    .fail(function() {
+                        // fail in some way, not yet sure how
+                    });
             }
             var seriesId = $(this).data('seriesId')
             if (seriesId) {
