@@ -10,12 +10,14 @@
 
 vag="[schoolbox]";
 
+cachedir='/vagrant/vagrantcache';
+
 echo "$vag Removing current Schoolbox MySQL database";
 mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
-mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql
 
 echo "$vag Building SQL updates";
 cd /vagrant/tools;
@@ -29,10 +31,10 @@ rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -vR /var/lib/vagrant > /dev/null;
 
 echo "$vag Generating data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /home/vagrant/schoolboxdemo-vagrant-latest.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> $cachedir/schoolboxdemo-vagrant-latest.sql;
 
 echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-vagrant-latest.sql
 
 # Need to re-enable modules too, because they're off by default
 echo "$vag Enabling modules";
