@@ -231,10 +231,20 @@ class Calendar extends DeprecatedModel
                 return 0;
 
             case self::ACCESS_GROUP:
+                // Need to check all groups, not just one.
+                if (is_array($event['categoryList'])) {
+                    $categoryList = $event['categoryList'];
+                } else {
+                    $categoryList = $this->getEventCategory($event['id']);
+                }
+
                 $this->groupHandler->setService(HOMEPAGE_SERVICE);
-                $permission = $this->groupHandler->getPermission($event['sid']);
+                $permissions = array(0);
+                foreach ($categoryList as $category) {
+                    $permissions[] = $this->groupHandler->getPermission($category);
+                }
                 $this->groupHandler->setService(CALENDAR_SERVICE);
-                return $permission;
+                return max($permissions);
 
             case self::ACCESS_CAMPUS:
 
@@ -866,7 +876,6 @@ class Calendar extends DeprecatedModel
                 if ($currentEvent['access'] == self::ACCESS_GROUP) {
                     $mapper       = new \Schoolbox\Calendar\Relation\CategoryMapper();
                     $allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
-
                     $event->setCategoryCollection($allRelations);
                 } else if ($currentEvent['access'] == self::ACCESS_CAMPUS) {
                     $event->setCampusList($currentEvent['campusList']);
@@ -953,10 +962,17 @@ class Calendar extends DeprecatedModel
         return $stack;
     }
 
-    function getEventGroup($eventID)
+    /**
+     * Gets all event groups for the given event ID.
+     *
+     * @param int $eventID
+     *
+     * @return array
+     */
+    public function getEventGroup($eventID)
     {
         $output = array();
-        $query  = "SELECT group_id FROM event_group WHERE event_id = $eventID";
+        $query  = "SELECT group_id FROM event_group WHERE event_id = ".intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['group_id'];
@@ -964,13 +980,38 @@ class Calendar extends DeprecatedModel
         return $output;
     }
 
-    function getEventCampus($eventID)
+    /**
+     * Gets all event campuses for the given event ID.
+     *
+     * @param int $eventID
+     *
+     * @return array
+     */
+    public function getEventCampus($eventID)
     {
         $output = array();
-        $query  = "SELECT campus_id FROM event_campus WHERE event_id = $eventID";
+        $query  = "SELECT campus_id FROM event_campus WHERE event_id = ".intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['campus_id'];
+        }
+        return $output;
+    }
+
+    /**
+     * Gets all event categories for the given event ID.
+     *
+     * @param int $eventID
+     *
+     * @return array
+     */
+    public function getEventCategory($eventID)
+    {
+        $output = array();
+        $query  = "SELECT category_id FROM event_category WHERE event_id = ".intval($eventID);
+        $result = $this->db->query($query);
+        while ($event = $this->db->getNextArray($result)) {
+            $output[] = $event['category_id'];
         }
         return $output;
     }
