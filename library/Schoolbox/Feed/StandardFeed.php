@@ -40,6 +40,7 @@ class StandardFeed extends Feed
                 new Schoolbox\Resource\LinkNotifier($conf),
                 new Schoolbox\Resource\TextboxNotifier($conf),
                 new SocialStream\PostNotifier($conf),
+                new Schoolbox\Forum\ThreadNotifier($conf),
                 new Schoolbox\Forum\PostNotifier($conf)
             ),
             $context, $roleType, $limit, $offset
