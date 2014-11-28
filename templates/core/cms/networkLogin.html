@@ -4,7 +4,7 @@
 	Please enter your password to access Network Drives.
 </p>
 
-<form action="/cms/networkLogin" method="post">
+<form action="{SELF}" method="post" id="network-login">
 	<table class="standardForm table">
 		<tr>
 			<td class="formLabelWidth">
@@ -26,3 +26,24 @@
 
 	<input type="submit" class='submit-btn-plain' value="Submit" />
 </form>
+<!-- BEGIN lite -->
+<script type="text/javascript">
+    $(function () {
+
+        $('#network-login').on('submit', function (e) {
+            var form = $(this),
+                data = form.serialize();
+
+            e.preventDefault();
+
+            form.find('input').attr('disabled', 'disabled');
+
+            $.post(this.action, data, function () {
+                var explorer = form.closest('.explorer');
+                explorer.load(explorer.data('url'));
+            });
+        });
+
+    });
+</script>
+<!-- END lite -->

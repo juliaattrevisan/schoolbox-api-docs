@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Browser\WebDav;
 
 
 use InvalidArgumentException;
+use Sabre\DAV\Exception\NotAuthenticated;
 use Schoolbox\Resource\Browser\AbstractNode;
 
 class Node extends AbstractNode {
@@ -25,7 +26,7 @@ class Node extends AbstractNode {
     {
         parent::__construct($nodeId, $mimeFilter);
 
-        $dav = \PortfolioWebDAV::factory();
+        $dav = \PortfolioWebDAV::factory(true);
 
         if (!$dav) {
             throw new InvalidArgumentException("Could not connect to WebDAV");
