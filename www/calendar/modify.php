@@ -110,7 +110,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
                 $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['sid'],
+                $_GET['homepageId'],
                 $_GET['userId']
             ),
         )
@@ -198,7 +198,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
                 $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['sid'],
+                $_GET['homepageId'],
                 $_GET['userId']
             ),
         )
@@ -241,7 +241,7 @@ $groupList    = $groupHandler->involvedInCategoryList($selectedUser->getId(), tr
  */
 foreach ($groupList as $currentUserGroup) {
     $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']);
-    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['sid'] == $currentUserGroup['id']));
+    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentUserGroup['id']));
 
     /* If you have already chosen these categories, or if it's specified
      * from a homepage via Group Calendar > Add Event
