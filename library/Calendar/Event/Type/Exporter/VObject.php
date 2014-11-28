@@ -24,7 +24,7 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
 
     protected function setup()
     {
-        $this->setEventTypeMapper(new EventTypeMapper::getInstance());
+        $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 
     /**
