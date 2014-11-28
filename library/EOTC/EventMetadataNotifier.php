@@ -369,6 +369,9 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     }
                 }
 
+                $bob->setHref($hrefReg)
+                    ->setParam('event', new Param($relEventNote, $hrefReg));
+
                 // Tell everyone in the activity log that this event got cancelled
                 foreach ($relEvent->getMetadata()->getActivityLog() as $log) {
                     /** @var \EOTC\ActivityLog\Log $log */
