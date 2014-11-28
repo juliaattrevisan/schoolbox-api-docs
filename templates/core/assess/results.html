@@ -70,6 +70,13 @@
         <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
         <!-- END modify_btn -->
     </span>
+    <div class="listing">
+        <ul class="breadcrumb">
+            <li><a href="/submission/listSubmission" >Submissions</a></li>
+            <li><a href="/submission/listSubmission/{DUEWORK_YEAR}/{DUEWORK_SEMESTER}/{CID}" >{CATEGORY_NAME}</a></li>
+            <li class="last"><a href="#">{ASSESS_TITLE}</a></li>
+        </ul>
+    </div>
 
     <form action='/assess/deleteAttempt' method='post'>
         <table width="100%" class="table">
