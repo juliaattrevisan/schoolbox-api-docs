@@ -186,7 +186,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$assess   = $this->assessMapper->findById($assessId);
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
-		$studentId = $assess->getUser()->getId();
+		$studentId = $attempt->getUser()->getId();
 
 		$href = "/assess/attempts/$assessId/$studentId";
 
