@@ -8,7 +8,9 @@
  * @version     SVN: $Id$
  */
 
-/* /submission/inline/view/<box_id>/<user_id>
+use Schoolbox\Assessment\Component;
+
+/* /submission/inline/viewStudent/<box_id>/<user_id>
  */
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
@@ -17,7 +19,7 @@ $currentUid = $this->arg[1];
  */
 $submissionId = $this->arg[2];
 
-$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+$submissionBoxMapper = new Component\SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
 /* Add category codes
@@ -33,6 +35,30 @@ $submissionHandler = new Submission();
 $userMapper = new \Schoolbox\UserMapper();
 $currentStudent = $userMapper->findById($currentUid);
 
+// Permission check
+$groupHandler  = new Group();
+$accessLevel   = $groupHandler->getPermission($submissionBox->getCategory()->getId());
+$hasPermission = false;
+if ($accessLevel >= Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE) {
+    $hasPermission = true;
+} elseif ($_SESSION['user']->getId() == $currentUid) {
+    if ($submissionBox->getMarkVisibility()
+        >= Component\SubmissionBox::MARK_VISIBILITY_STUDENT
+    ) {
+        $hasPermission = true;
+    }
+} elseif ($groupHandler->isParentOfChild($currentUid)) {
+    if ($submissionBox->getMarkVisibility()
+        >= Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT
+        && !Config::get('restrict_student_submissions')
+    ) {
+        $hasPermission = true;
+    }
+}
+if (!$hasPermission) {
+    error(19);
+}
+
 /* Augment navigation data
  */
 $currentAugmented = array(
@@ -47,7 +73,7 @@ $currentAugmented = array(
 
 /* Trim out only this student
  */
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submissionMapper = new Component\SubmissionBox\SubmissionMapper();
 
 /* Load a specific submission for this box/person
  */
