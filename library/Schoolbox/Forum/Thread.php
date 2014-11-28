@@ -104,7 +104,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @return int
+     * @return User
      */
     public function getUser() {
         return $this->user;
