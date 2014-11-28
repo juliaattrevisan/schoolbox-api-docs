@@ -141,7 +141,7 @@ mount_count=`df | grep $backup_dir | wc -l`;
 if [[ $mount_count -ne 0 && $errorcheck -eq 0 ]];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] CIFS remote share ($backup_share) is mounted" >> $logfile;
-	mount_space=`df | grep $backup_dir | awk '{print $5;}' | cut -d'%' -f1`;
+	mount_space=`df | grep $backup_dir | awk '{print $(NF-1)}' | cut -d'%' -f1`;
 	if [ -z $mount_space ];
 	then
 		echo -e "Error: CIFS remote share not mounted correctly.\nHalting backup." >> $logfile;
