@@ -994,7 +994,7 @@ class Controller extends Base
     {
         switch ($status) {
             case Status\Model::STATUS_APPROVED:
-                return $this->validateConflicts(
+                return $this->validateForConflicts(
                     $booking->getResource(),
                     $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
                     $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
