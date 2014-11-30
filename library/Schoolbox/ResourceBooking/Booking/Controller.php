@@ -347,7 +347,8 @@ class Controller extends Base
      *
      * @return Collection
      */
-    protected function getBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
+    protected function getBookingsForRelatedItems(Collection $bookingList, $relatedItems)
+    {
         if (empty($relatedItems)) {
             return $bookingList;
         }
@@ -381,7 +382,8 @@ class Controller extends Base
      *
      * @return Collection
      */
-    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems) {
+    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems)
+    {
         $newList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
         $this->bookingMapper->save($newList);
         return $newList;
@@ -630,8 +632,7 @@ class Controller extends Base
                         $this->validateForConflicts($resource, $thisStart, $thisEnd)
                     );
                 }
-            }
-            else {
+            } else {
                 // Validating an existing booking?
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
@@ -694,7 +695,7 @@ class Controller extends Base
     /**
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
-     * 
+     *
      * @param  Item\Model $resource
      * @param  DateTime   $startDate
      * @param  DateTime   $endDate
@@ -735,7 +736,7 @@ class Controller extends Base
             if ($existingId) {
                 $existingSeries = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-                    function($item) use($existingId, $existingSeries) {
+                    function($item) use ($existingId, $existingSeries) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
                             return false;
@@ -1306,8 +1307,7 @@ class Controller extends Base
                 $item->getId(),
                 $item->getEvent()->getSeriesId()
             );
-        }
-        else {
+        } else {
             // Divorce booking from its series
             $series = new Collection();
             $item->getEvent()->setSeriesId(null);
@@ -1351,8 +1351,7 @@ class Controller extends Base
                         if ($isTimeChanged) {
                             $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
                         }
-                    }
-                    else {
+                    } else {
                         // create
                         $relatedBooking = new Model();
                         $relatedBooking
@@ -1364,8 +1363,7 @@ class Controller extends Base
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
                         $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
                     }
-                }
-                elseif ($relatedBooking instanceof Model) {
+                } elseif ($relatedBooking instanceof Model) {
                     // delete or don't add. Maybe mark as deleted?
                     $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
                 }
