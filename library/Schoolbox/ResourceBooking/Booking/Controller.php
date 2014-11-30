@@ -232,7 +232,8 @@ class Controller extends Base
              * process in whatever way it needs. This allows a decoupling between
              * Resource Booking any any modules that use it.
              *
-             * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+             * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
+             * (name/startdate/enddate/details)
              */
             $callbackUrl = '';
 
@@ -311,7 +312,8 @@ class Controller extends Base
          * process in whatever way it needs. This allows a decoupling between
          * Resource Booking any any modules that use it.
          *
-         * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId} (name/startdate/enddate/details)
+         * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
+         * (name/startdate/enddate/details)
          */
         $callbackUrl = '';
 
@@ -866,7 +868,8 @@ class Controller extends Base
         // Datetime objects?
         /** @var Model[] $bookings */
         $source = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-            $this->getUser(), array()
+            $this->getUser(),
+            array()
         );
         $source
             ->setResourceId($item->getId())
