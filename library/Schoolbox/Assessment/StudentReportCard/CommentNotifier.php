@@ -22,6 +22,7 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class CommentNotifier extends AbstractModuleNotifier
 {
@@ -31,11 +32,17 @@ class CommentNotifier extends AbstractModuleNotifier
     /** @var CategoryMapper */
     protected $categoryMapper;
 
+    /** @var UserMapper */
+    protected $userMapper;
+
 
     public function loadDependencies($dependencies = null)
     {
         if (empty($dependencies['categoryMapper'])) {
             $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+        }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -99,6 +106,19 @@ class CommentNotifier extends AbstractModuleNotifier
 
 
     /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    protected function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+
+
+    /**
      * @param Comment $comment
      * @param User    $author
      * @return Envelope
@@ -112,8 +132,13 @@ class CommentNotifier extends AbstractModuleNotifier
         $student  = $comment->getStudent();
         $category = $comment->getCategory();
 
+        // selective hydrations
         if (!$category->getName()) {
             $category = $this->categoryMapper->findById($category->getId());
+        }
+
+        if (!$student->getFirstname()) {
+            $student = $this->userMapper->findById($comment->getStudent()->getId());
         }
 
         // perform magic
