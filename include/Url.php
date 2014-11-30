@@ -42,7 +42,7 @@ class Url
             $this->setSiteHostname(Cfg::get('site_hostname'));
             $this->setSiteDomain(Cfg::get('site_domain'));
 
-            if (isset($_SERVER)) {
+            if (isset($_SERVER['HTTP_HOST'])) {
                 $this->setServerHost($_SERVER['HTTP_HOST']);
             }
 
@@ -101,7 +101,11 @@ class Url
      */
     public function isLocalURL()
     {
-        list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
+        if ($this->getServerHost()) {
+            list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
+        } else {
+            $hostname = $this->getSiteHostname();
+        }
 
         // get the first character of the url if it's already a local link
         $lead = substr($this->getUrl(), 0, 1);
