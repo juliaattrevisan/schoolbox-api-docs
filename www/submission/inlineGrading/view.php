@@ -191,7 +191,7 @@ $renderer->render();
 $oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
-$dueWorkDetail = new DueWork_Detail($submissionBoxId);
+$dueWorkDetail = new DueWork_Detail($submissionBoxId, $submissionBox);
 $dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 
