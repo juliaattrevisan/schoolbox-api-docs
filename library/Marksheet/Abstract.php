@@ -17,6 +17,11 @@ abstract class Marksheet_Abstract {
     protected $subReturnHandler;
 
     /**
+     * @var \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    protected $submissionBox;
+
+    /**
      * Assorted extra params that this marksheet could use.
      *
      * @var array
@@ -31,7 +36,7 @@ abstract class Marksheet_Abstract {
         $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
-        $this->submissionBox = $submissionBox;
+        $this->setSubmissionBox($submissionBox);
     }
 
     /* Getters ans setters */
@@ -84,6 +89,25 @@ abstract class Marksheet_Abstract {
      */
     public function getSubmissionReturnHandler() {
         return $this->subReturnHandler;
+    }
+
+    /**
+     * @return \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submissionBox;
+    }
+
+    /**
+     * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
+     *
+     * @return $this
+     */
+    public function setSubmissionBox($submissionBox)
+    {
+        $this->submissionBox = $submissionBox;
+        return $this;
     }
 
     /**
