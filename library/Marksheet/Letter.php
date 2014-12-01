@@ -38,6 +38,8 @@ class Marksheet_Letter extends Marksheet_Abstract
         // use extra_params if they were set, what a mess
         // For now, output default if more than one group - otherwise it's even
         // more of a mess.
+        // TODO remove extra_params entirely
+        // they were a hack to allow display of marks in multiple scales
         $params = $this->getExtraParams();
         if (!empty($params['gradeGroup']) && count($params['gradeGroup']) === 1) {
             $result = array();
@@ -47,7 +49,11 @@ class Marksheet_Letter extends Marksheet_Abstract
             }
             return implode(' / ', $result);
         } else {
-            $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
+            // Use the submission box's grade group, otherwise use the default
+            $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue(
+                $rawMark,
+                $this->getSubmissionBox()->getGradeGroup()->getId() ?: null
+            );
             return $grade['caption'];
         }
     }
