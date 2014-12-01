@@ -183,6 +183,11 @@ abstract class Marksheet_Abstract
      * Extract a normalised mark from the database, and format it for the UI
      *
      * @abstract
+     *
+     * @todo remove $box_id parameter, as submission box is passed in constructor
+     *       (There may be implementations which create a single marksheet, and
+     *        call this method with a different box_id each pass.)
+     *
      * @param $user_id
      * @param $box_id
      * @param bool $asText
