@@ -12,6 +12,7 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\Collection;
 use Schoolbox\FolderInterface;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ISoftDeletable;
 
@@ -220,7 +221,7 @@ class Category implements ISoftDeletable, FolderInterface
     /**
      * Returns the teacher collection
      *
-     * @return Collection
+     * @return Collection|User[]
      */
     public function getTeachers()
     {
