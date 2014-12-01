@@ -173,8 +173,12 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                          ->addFilter('roletype', array($roletype));
 
         /** @var Post $parent */
-        $parent   = $this->mapper->findById($post->getParent()->getId());
-        $quotedId = $parent->getOwner()->getId();
+        if (($parentId = $post->getParent()->getId()) !== null) {
+            $parent   = $this->mapper->findById($parentId);
+            $quotedId = $parent->getOwner()->getId();
+        } else {
+            $quotedId = 0;
+        }
 
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
             if ($user->getId() != $quotedId) {

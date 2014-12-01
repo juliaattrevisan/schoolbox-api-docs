@@ -67,25 +67,30 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         try {
             /** @var Group $group */
-            $group = GroupMapper::getInstance()
-                                ->findOneByColumn('cid', $userAccess->getServiceIdentifier());
+            $group = GroupMapper::getInstance()->findOneByColumn('cid', $userAccess->getServiceIdentifier());
         } catch (Exception $e) {
             // no group, do nothing
             return;
         }
 
         if ($method == Mapper::METHOD_CREATE) {
-            // new useraccess was created
-            if ($group->isModerated() && $userAccess->getAccessLevel() == UserAccess::ACCESS_DENY) {
+            if ($group->isFree() && $userAccess->getUser()->getId() == $bundle->getEvent()->getEffector()->getId()) {
+                // if user added themselves
+                $bundle->attach(self::TRIGGER_JOINED, self::IMMEDIATELY);
+
+            } elseif ($userAccess->getAccessLevel() == UserAccess::ACCESS_DENY) {
                 // if this is a request to join a moderated group
                 $bundle->attach(self::TRIGGER_REQUESTED, self::IMMEDIATELY);
+
             } else {
-                // if public or private, or not ACCESS_DENY
-                $bundle->attach(self::TRIGGER_JOINED, self::IMMEDIATELY);
+                // if the user was added by someone else
+                $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
             }
+
         } elseif ($method == Mapper::METHOD_DELETE) {
             // useraccess revoked
             $bundle->attach(self::TRIGGER_LEFT, self::IMMEDIATELY);
+
         } elseif ($method == Mapper::METHOD_UPDATE) {
             // access level changed (usually moderation)
             $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
