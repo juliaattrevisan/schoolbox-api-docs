@@ -44,7 +44,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
         )
     );
 
-    $marksheet = \Marksheet_Factory::build($submissionBox->getMarkType()->getSlug());
+    $marksheet = \Marksheet_Factory::build($submissionBox->getMarkType()->getSlug(), $submissionBox);
     $mark = $marksheet->retrieveMark($user->getId(), $submissionBox->getId(), false, false);
 
     $this->setVar('MARK_TYPE_COMMENT', $marksheet->getComment());

@@ -28,7 +28,7 @@ class Submission_View extends Submission_Perspective {
         parent::__construct($studentList, array($submissionBoxID));
 
         $this->submissionBox = $this->submissionHandler->getByID($submissionBoxID);
-        $this->marksheet = Marksheet_Factory::build($this->submissionBox['mark_type_slug']);
+        $this->marksheet = Marksheet_Factory::build($this->submissionBox['mark_type_slug'], $this->submissionBox);
     }
 
 

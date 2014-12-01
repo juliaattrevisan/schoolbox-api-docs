@@ -122,7 +122,7 @@ class Factory
         /* Internally used instances
          */
         $this->setReturnedWorkMapper(new ReturnedWorkMapper());
-        $this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
+        $this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug(), $submissionBox));
 
         /* Sometimes you don't submit numeric values - this mainly consists
          * of possibilities like Absent, Not Submitted, etc. These cause an error
