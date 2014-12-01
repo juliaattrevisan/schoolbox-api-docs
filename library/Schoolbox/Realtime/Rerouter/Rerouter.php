@@ -322,6 +322,8 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         list($removed, $added) = $this->binder->setUser($user)->performBind(array(UserQueue::Q_TOSORT, UserQueue::Q_UNREAD));
 
         $this->log->debug(sprintf("BIND %4s %4d  %s", "-{$removed}", "+{$added}", $user->getUsername()));
+
+        $this->subscribeUser($user->getId());
     }
 
 
