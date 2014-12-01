@@ -284,7 +284,8 @@ $dueWorkController = $chf->buildComponent($instance);
 
 // apply configs
 $dueWorkController->setup(
-    array(), array(
+    array(),
+    array(
         'actionable'    => array('label' => 'actionable', 'value' => true),
         'allow_parents' => array('label' => 'allow_parents', 'value' => true),
         'size'          => array('label' => 'size', 'value' => 0),
