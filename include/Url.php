@@ -11,11 +11,22 @@
  */
 class Url
 {
+
+    /** @var string */
     private $url = '';
+
+    /** @var bool */
     private $useCfg = false;
+
+    /** @var string */
     private $siteHostname;
+
+    /** @var string */
     private $siteDomain;
+
+    /** @var string */
     private $serverHost;
+
 
     /**
      * @param $url
@@ -30,7 +41,11 @@ class Url
         if ($this->getUseCfg()) {
             $this->setSiteHostname(Cfg::get('site_hostname'));
             $this->setSiteDomain(Cfg::get('site_domain'));
-            $this->setServerHost($_SERVER['HTTP_HOST']);
+
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $this->setServerHost($_SERVER['HTTP_HOST']);
+            }
+
         }
     }
 
@@ -38,7 +53,6 @@ class Url
      * Creates slugs from a string.
      * Not sure what the third replacement is supposed to do
      *
-     * @param  $string
      * @return string
      */
     public function getSlug()
@@ -87,7 +101,11 @@ class Url
      */
     public function isLocalURL()
     {
-        list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
+        if ($this->getServerHost()) {
+            list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
+        } else {
+            $hostname = $this->getSiteHostname();
+        }
 
         // get the first character of the url if it's already a local link
         $lead = substr($this->getUrl(), 0, 1);
@@ -111,7 +129,7 @@ class Url
         return false;
     }
 
-    /*
+    /**
      * Returns true if url is an ftp link
      */
     public function isFTPURL()
@@ -126,25 +144,24 @@ class Url
     /**
      * Get a relative url variant of $url
      *
-     * @param  $url
      * @return mixed
      */
     public function getRelativeURL()
     {
-
-        list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
-
         /* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
-           * (that originally caused the issue with links not being correct)
-           */
+         * (that originally caused the issue with links not being correct)
+         */
         $hosts = array(
             'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
             'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-            'http://' . $this->getServerHost(),
-            'https://' . $this->getServerHost(),
             'http://' . $this->getSiteHostname(),
             'https://' . $this->getSiteHostname(),
         );
+
+        if ($this->getServerHost()) {
+            $hosts[] = 'http://' . $this->getServerHost();
+            $hosts[] = 'https://' . $this->getServerHost();
+        }
 
         return str_replace($hosts, '', $this->getUrl());
     }
@@ -219,7 +236,7 @@ class Url
     /**
      * Get site hostname
      *
-     * @return
+     * @return string
      */
     private function getSiteHostname()
     {
@@ -240,7 +257,7 @@ class Url
     /**
      * Get site domain
      *
-     * @return
+     * @return string
      */
     private function getSiteDomain()
     {
@@ -260,7 +277,7 @@ class Url
     /**
      * Get server host
      *
-     * @return
+     * @return string
      */
     private function getServerHost()
     {

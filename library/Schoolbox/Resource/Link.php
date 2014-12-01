@@ -11,6 +11,7 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
+use Url;
 
 class Link implements ISoftDeletable {
 	/**
@@ -28,10 +29,7 @@ class Link implements ISoftDeletable {
      */
     protected $folder;
 
-
-    /**
-     * @var string
-     */
+    /** @var Url */
     protected $url;
 
 	/**
@@ -116,7 +114,7 @@ class Link implements ISoftDeletable {
      */
     public function setUrl($url)
     {
-        $this->url = $url;
+        $this->url = new Url($url);
     }
 
     /**
@@ -124,7 +122,69 @@ class Link implements ISoftDeletable {
      */
     public function getUrl()
     {
-        return $this->url;
+        return $this->url->getUrl();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUrl()
+    {
+        return $this->url->isUrl();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLocalUrl()
+    {
+        return $this->url->isLocalURL();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFtpUrl()
+    {
+        return $this->url->isFTPURL();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelativeUrl()
+    {
+        return $this->url->getRelativeURL();
+    }
+
+    /**
+     * @return string
+     */
+    public function getBase64EncodedRedirect()
+    {
+        return $this->url->getBase64EncodedRedirect();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->url->getSlug();
+    }
+
+    /**
+     * @return string
+     */
+    public function getHref()
+    {
+        if ($this->isLocalUrl()) {
+            return $this->getRelativeURL();
+        } elseif ($this->isFTPURL()) {
+            return $this->getUrl();
+        } else {
+            return $this->getBase64EncodedRedirect();
+        }
     }
 
 	/**
@@ -171,10 +231,18 @@ class Link implements ISoftDeletable {
 		return $this->description;
 	}
 
+
+    /**
+     * @param bool $hidden
+     */
 	public function setHidden($hidden) {
 		$this->hidden = $hidden;
 	}
 
+
+    /**
+     * @return bool
+     */
 	public function getHidden() {
 		return $this->hidden;
 	}

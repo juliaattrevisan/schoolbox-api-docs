@@ -45,7 +45,7 @@ class LinkNotifier extends ResourceNotifier {
 
 		return $this->notify(
 			LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
-			new Param($link->getDescription(), $link->getUrl()),            // the :resource param
+			new Param($link->getDescription(), $link->getHref()),           // the :resource param
 			$effector, $category, $roletype
 		);
 	}
