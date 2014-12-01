@@ -17,7 +17,7 @@ class Marksheet_Factory
      * @param array  $extraParams Any extra params to pass to the constructor
      * @return Marksheet_Abstract|null
      */
-    public static function build($slug, $extraParams = array())
+    public static function build($slug, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $extraParams = array())
     {
         $className = "Marksheet_" . ucwords(strtolower($slug));
 
@@ -25,10 +25,10 @@ class Marksheet_Factory
         $markType = $subHandler->getMarkTypeBySlug($slug);
 
         if (class_exists($className) && in_array(strtolower($slug), self::$marktypes)) {
-            return new $className($markType, $extraParams);
+            return new $className($markType, $submissionBox, $extraParams);
         } else {
             // if something went wrong, assume free for legacy
-            return new Marksheet_Free($markType, $extraParams);
+            return new Marksheet_Free($markType, $submissionBox, $extraParams);
         }
     }
 }

@@ -61,17 +61,21 @@ class ListFactory
                 ->setCaption('(none)');
             $collection->add($noneOption);
 
-            // Options for this grade group
-            $collection->merge(
-                $this->gradeLevelMapper->findAll(
-                    array(
-                        'order' => array(
-                            'submission_grade_group_id' => 'asc',
-                            'lower_bound'               => 'asc',
-                        ),
-                    )
+            /* FindAll gets all the options but we only want the ones associated
+             * with the submissionBox, via its gradeGroup id. That wasn't being
+             * updated, it was always the first one that was chosen regardless
+             */
+            $collection->merge($this->gradeLevelMapper->findByColumnList(
+                array(
+                    'submission_grade_group_id' => $box->getGradeGroup()->getId()
+                ),
+                array(
+                    'order' => array(
+                        'submission_grade_group_id' => 'asc',
+                        'lower_bound'               => 'asc',
+                    ),
                 )
-            );
+            ));
 
             // Options built from errors
             foreach (\DueWork_ErrorMapper::getInstance()->findAll() as $errorGrade) {

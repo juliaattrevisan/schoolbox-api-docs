@@ -23,7 +23,7 @@ abstract class Marksheet_Abstract {
      */
     protected $extraParams;
 
-    public function __construct($mark_type, $extraParams) {
+    public function __construct($mark_type, $submissionBox, $extraParams) {
         $this->id = $mark_type['mark_type_id'];
         $this->setName($mark_type['hr_name']);
         $this->setSlug($mark_type['slug']);
@@ -31,6 +31,7 @@ abstract class Marksheet_Abstract {
         $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
+        $this->submissionBox = $submissionBox;
     }
 
     /* Getters ans setters */

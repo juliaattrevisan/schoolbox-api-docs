@@ -31,7 +31,7 @@ $submissionBox->getCategory()->setCodes($categoryCode);
 
 $studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
 
-$dueWorkDetail = new DueWork_Detail($submissionBox->getId());
+$dueWorkDetail = new DueWork_Detail($submissionBox->getId(), $submissionBox);
 $dueWorkDetail->processStudents($studentList);
 $dueWorkDetail->renderDetails($this);
 

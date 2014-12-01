@@ -82,7 +82,15 @@ class SubmissionReturn extends DeprecatedModel
         if ($result) {
             // append normalised mark information onto each of the results
             foreach ($result as &$r) {
-                $mark = Marksheet_Factory::build($r['slug']);
+                if (!$box_id) {
+                    $mark = Marksheet_Factory::build($r['slug'], new \Schoolbox\Assessment\Component\SubmissionBox());
+                }
+                else {
+                    $mapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+                    $box = $mapper->findById($box_id);
+
+                    $mark = Marksheet_Factory::build($r['slug'], $box);
+                }
             }
             // legacy support
             if ($r['slug'] == 'free') {

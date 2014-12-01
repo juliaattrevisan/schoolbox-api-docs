@@ -59,10 +59,8 @@ class Marksheet_Letter extends Marksheet_Abstract
         // Only allow letter grades for the selected submission box
         // TODO allow the submission to be passed in here
         $factory = new Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\ListFactory();
-        $submission = new \Schoolbox\Assessment\Component\SubmissionBox();
-        $submission->getMarkType()->setId(
-            \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_LETTER
-        );
+        $submission = $this->submissionBox;
+
         $grades = array();
         foreach ($factory->buildGradeList($submission) as $grade) {
             $grades[] = array(
