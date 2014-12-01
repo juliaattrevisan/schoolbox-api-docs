@@ -6,25 +6,28 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Marksheet_Rubric extends Marksheet_Abstract {
+class Marksheet_Rubric extends Marksheet_Abstract
+{
 
     private $rubricHandler;
 
-    public function __construct($mark_type, $submissionBox, $extraParams) {
+    public function __construct($mark_type, $submissionBox, $extraParams)
+    {
         parent::__construct($mark_type, $submissionBox, $extraParams);
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
-	/**
-	 * Take a UI-formatted mark and normalise it
-	 *
-	 * @param $rubric
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
-	 * @return array|mixed
-	 */
-	public function normaliseMark($rubric, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
+    /**
+    * Take a UI-formatted mark and normalise it
+    *
+    * @param $rubric
+    * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
+    * @return array|mixed
+    */
+    public function normaliseMark($rubric, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    {
         $mark = 0;
-        foreach($rubric as $i) {
+        foreach ($rubric as $i) {
             $mark += $i;
         }
 
@@ -33,10 +36,10 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         $normalised = (($mark / $max) * 100);
 
         // validation: must be inside bounds
-        if($normalised < 0) {
+        if ($normalised < 0) {
             $normalised = 0;
             $mark = 0;
-        } else if($normalised > 100) {
+        } elseif ($normalised > 100) {
             $normalised = 100;
             $mark = $max;
         }
@@ -56,7 +59,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param bool $blankZero
      * @return mixed
      */
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    {
 
         // we can't trust the submission_box table, because it may have been set to null, so retrieve rubric data
         $marks = $this->getRubricHandler()->getStudentMarksTotal($user_id, $box_id);
@@ -85,7 +89,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param bool $asText
      * @param bool $blankZero
      */
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
+    {
         $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
@@ -97,7 +102,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param SitePage $page
      * @param array $mark
      */
-    public function outputUI(SitePage $page, $mark) {
+    public function outputUI(SitePage $page, $mark)
+    {
 
         $page->setBlock('mark_type_rubric', 'rubric_marked', 'rubric_marked_block');
         $page->setBlock('mark_type_rubric', 'rubric_unmarked', 'rubric_unmarked_block');
@@ -110,11 +116,10 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         $page->setVar($output);
 
         // no mark given yet
-        if($mark['max_mark'] == -1) {
+        if ($mark['max_mark'] == -1) {
             $page->parse('rubric_unmarked_block', 'rubric_unmarked');
             $page->setVar('rubric_marked_block', '');
-        }
-        else {
+        } else {
             $page->parse('rubric_marked_block', 'rubric_marked');
             $page->setVar('rubric_unmarked_block', '');
         }
@@ -122,7 +127,7 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         $grades = array();
         $dem = DueWork_ErrorMapper::getInstance();
         $errs = $dem->listDisplayValues();
-        foreach($errs as $e) {
+        foreach ($errs as $e) {
             $grades[] = array(
                 'grade_id' => $e,
                 'caption' => $e,
@@ -140,8 +145,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
     /**
      * @return DueWork_Rubric_Handler
      */
-    public function getRubricHandler() {
+    public function getRubricHandler()
+    {
         return $this->rubricHandler;
     }
-
 }
