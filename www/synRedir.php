@@ -23,7 +23,7 @@ unset($ch);
 
 /* Handles deep linking */
 if($_GET['page'])
-    $action = $action . '?returnPage='.$_GET['page'].'.aspx';
+    $action = $action . '?ReturnUrl='.$_GET['page'].'.aspx';
 
 
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
