@@ -9,7 +9,7 @@
 class Marksheet_Letter extends Marksheet_Abstract
 {
 
-    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    public function normaliseMark($mark)
     {
         $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
         return array(

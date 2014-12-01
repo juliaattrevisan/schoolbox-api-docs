@@ -21,17 +21,16 @@ class Marksheet_Rubric extends Marksheet_Abstract
     * Take a UI-formatted mark and normalise it
     *
     * @param $rubric
-    * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
     * @return array|mixed
     */
-    public function normaliseMark($rubric, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    public function normaliseMark($rubric)
     {
         $mark = 0;
         foreach ($rubric as $i) {
             $mark += $i;
         }
 
-        $max = $this->getRubricHandler()->getRubricMaxScore($subbox->getId());
+        $max = $this->getRubricHandler()->getRubricMaxScore($this->getSubmissionBox()->getId());
 
         $normalised = (($mark / $max) * 100);
 

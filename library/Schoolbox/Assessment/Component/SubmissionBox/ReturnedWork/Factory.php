@@ -302,7 +302,7 @@ class Factory
         } elseif ($this->getSubmissionBox()->isRubric()) {
             /* If it's a rubric, it normalises in a special way
              */
-            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric(), $this->getSubmissionBox());
+            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric());
 
             $returnedWork->setMark($normalisedMarkArray['mark']);
             $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
@@ -314,7 +314,7 @@ class Factory
         } else {
 /* Just do it in the normal way
              */
-            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
+            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
             $returnedWork->setMark($normalisedMarkArray['mark']);
             $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
         }

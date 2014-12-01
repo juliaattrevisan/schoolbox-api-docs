@@ -9,7 +9,7 @@
  */
 class Marksheet_Percent extends Marksheet_Abstract {
 
-    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
+    public function normaliseMark($mark) {
 
         // validation: must be within 0 - 100
         if($mark < 0) {

@@ -172,14 +172,12 @@ abstract class Marksheet_Abstract
     /**
     * Take a UI-formatted mark, normalise it, and insert it into the database
     *
-    * @todo Remove $subbox parameter, as it's passed in constructor now
-    *
     * @abstract
     * @param $mark
     * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
     * @return mixed
     */
-    abstract public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox);
+    abstract public function normaliseMark($mark);
 
     /**
      * Extract a normalised mark from the database, and format it for the UI
