@@ -625,7 +625,7 @@ class Marksheet {
 				$gradient = (int)($row['avg'] / 10);
 				// This letter grade is an average of grades for this class,
 				// and therefore doesn't have an actual submission box.
-				$average = \Marksheet_Factory::build(
+				$average = $this->marktypeFactoryHandler->build(
 					'letter',
 					new SubmissionBox()
 				)->convertRawMark($row['avg'], null, true, false);
