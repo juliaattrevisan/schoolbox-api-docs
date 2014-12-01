@@ -38,7 +38,7 @@ class DueWork_Detail
     protected $sitepageData;
 
 
-    public function __construct($id)
+    public function __construct($id, $submissionBox)
     {
         $this->userHandler = new User();
         $this->submissionHandler = new Submission();
@@ -49,7 +49,7 @@ class DueWork_Detail
         // set things we're interested in
         $this->dueWork = $this->submissionHandler->getByID($id);
         $this->dueWork['submissionCount'] = 0;
-        $this->marksheet = Marksheet_Factory::build($this->dueWork['mark_type_slug']);
+        $this->marksheet = Marksheet_Factory::build($this->dueWork['mark_type_slug'], $submissionBox);
     }
 
     /**
