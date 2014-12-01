@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Submission_View extends Submission_Perspective {
+class Submission_View extends Submission_Perspective
+{
 
     const UNSUBMITTED = 'Unsubmitted';
     const SUBMITTED   = 'Submitted';
@@ -24,7 +25,8 @@ class Submission_View extends Submission_Perspective {
      * @param $submissionBoxID
      * @deps User, Submission, SubmissionStudent, SubmissionReturn
      */
-    public function __construct($studentList, $submissionBoxID) {
+    public function __construct($studentList, $submissionBoxID)
+    {
         parent::__construct($studentList, array($submissionBoxID));
 
         $this->submissionBox = $this->submissionHandler->getByID($submissionBoxID);
@@ -32,61 +34,56 @@ class Submission_View extends Submission_Perspective {
     }
 
 
-    public function getStudentInteractions($student) {
+    public function getStudentInteractions($student)
+    {
         // attempt lookup by id
         if ($student['uid']) {
             $user = $this->userHandler->getByID($student['uid']);
             $submissions = $this->submissionStudentHandler->getByUserID($this->submissionBox['id'], $student['uid']);
-        }
-        // attempt lookup by synergy
+        } // attempt lookup by synergy
         elseif ($student['synergy_id']) {
             $user = $this->userHandler->getBySynergy($student['synergy_id']);
             $submissions = $this->submissionStudentHandler->getBySynergyID($this->submissionBox['id'], $student['synergy_id']);
-        }
-        // le fail
+        } // le fail
         else {
             return array();
         }
 
-        if(!$user['uid']) {
+        if (!$user['uid']) {
             return array();
         }
 
 
         // if multi-submit has been disabled, only display the most recent submission
-        if(!$this->getFromSubmissionBox('multi_submission') && $submissions) {
+        if (!$this->getFromSubmissionBox('multi_submission') && $submissions) {
             $submissions = array($submissions[0]);
         }
 
         // set the user status
-        if(!$submissions) {
+        if (!$submissions) {
             // 'cast' false to empty array
             $submissions = array();
             $user['status'] = self::UNSUBMITTED;
-        }
-        // multiple submissions
-        elseif(count($submissions) > 1) {
+        } // multiple submissions
+        elseif (count($submissions) > 1) {
             $user['status'] = self::RESUBMITTED;
-        }
-        else {
+        } else {
             $user['status'] = self::SUBMITTED;
         }
 
 
         // set the status colour
-        if(!$submissions) {
+        if (!$submissions) {
             $user['class'] = self::CLASS_UNSUBMITTED;
-        }
-        else {
+        } else {
             // get status from the most recent submission
             $submitDate = strtotime($submissions[0]['datestamp']);
             $closeDate = strtotime($this->getFromSubmissionBox('date'));
 
-            if($submitDate < $closeDate) {
+            if ($submitDate < $closeDate) {
                 $user['class'] = self::CLASS_ON_TIME;
                 $user['status'] .= self::ON_TIME;
-            }
-            else {
+            } else {
                 $user['class'] = self::CLASS_LATE;
                 $user['status'] .= self::LATE;
             }
@@ -100,7 +97,7 @@ class Submission_View extends Submission_Perspective {
         // get returns
         $returns = $this->submissionReturnHandler->getByUser($user['uid'], $this->getFromSubmissionBox('id'));
 
-        if(!$returns) {
+        if (!$returns) {
             $returns = array();
         }
 
@@ -116,11 +113,13 @@ class Submission_View extends Submission_Perspective {
      * @param $field
      * @return mixed
      */
-    public function getFromSubmissionBox($field) {
+    public function getFromSubmissionBox($field)
+    {
         return parent::getFromSubmissionBox(0, $field);
     }
 
-    public function insertMarkingTemplate(SitePage $page, $handle, $student) {
+    public function insertMarkingTemplate(SitePage $page, $handle, $student)
+    {
         parent::insertMarkingTemplate($page, $handle, 0, $student);
     }
 }
