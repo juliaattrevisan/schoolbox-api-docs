@@ -713,7 +713,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     }
 
     var xPos = mouseEvent.pageX
-    var yPos = $j(targetElement).offset().top + 5
+    var yPos = mouseEvent.pageY + 5
     this.fillForm(id, eventData)
     this.showForm(id, xPos, yPos)
 }
