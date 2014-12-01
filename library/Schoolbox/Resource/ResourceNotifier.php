@@ -279,9 +279,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         // setup data from the different resource types
         $resourceName  = $this->getResourceName($resource);
         $category      = $this->getResourceCategory($resource);
+        $categoryId    = $category->getId();
         $resourceKind  = $this->getResourceKind();
         $nameField     = $this->getResourceNameProperty();
         $categoryField = $this->getResourceCategoryProperty();
+        $resourceHref  = "/homepage/$categoryId#$resourceKind-$resourceId";
 
         // remove unnecessary diff fields
         unset($diff['hidden']);
@@ -307,7 +309,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                 ->setParams(array(
                     'user'     => $userParam,
                     'oldname'  => new Param($diff[$nameField][1]),
-                    'newname'  => new Param($resourceName),
+                    'newname'  => new Param($resourceName, $resourceHref),
                     'category' => $catParam
                 ));
 
@@ -321,7 +323,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             $bob->setTitle(":user moved the $resourceKind :name into :category")
                 ->setParams(array(
                     'user'     => $userParam,
-                    'name'     => new Param($resourceName),
+                    'name'     => new Param($resourceName, $resourceHref),
                     'category' => $catParam
                 ));
 
@@ -334,7 +336,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         if (count($diff) || is_null($diff)) {
             $instances = $this->notify(
                 $resourceKind, $resourceId, self::TRIGGER_UPDATED,
-                new Param($resourceName), $effector, $category, $roleType
+                new Param($resourceName, $resourceHref), $effector, $category, $roleType
             )->getAll();
 
             foreach ($instances as $inst) {
