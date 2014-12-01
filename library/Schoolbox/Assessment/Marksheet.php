@@ -312,7 +312,10 @@ class Marksheet
             });
 
             $studentGrades = Grades::getInstance()->getStudentGradesForSubject(
-                $studentCollection, $this->category, $this->year, $this->semester
+                $studentCollection,
+                $this->category,
+                $this->year,
+                $this->semester
             );
 
             foreach ($studentCollection as $student) {
