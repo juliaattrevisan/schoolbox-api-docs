@@ -38,7 +38,7 @@ class DueWork_Detail
     protected $sitepageData;
 
 
-    public function __construct($id, $submissionBox)
+    public function __construct($id, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox)
     {
         $this->userHandler = new User();
         $this->submissionHandler = new Submission();
