@@ -159,6 +159,8 @@ abstract class Marksheet_Abstract {
 	/**
 	 * Take a UI-formatted mark, normalise it, and insert it into the database
 	 *
+	 * @todo Remove $subbox parameter, as it's passed in constructor now
+	 *
 	 * @abstract
 	 * @param $mark
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
