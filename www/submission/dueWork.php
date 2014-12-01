@@ -525,7 +525,14 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                 if (isset($base_mark)) {
                     // format for output
                     $rtn       = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
-                    $marksheet = Marksheet_Factory::build($rtn['slug']);
+                    // Activity should never not be a submission box
+                    $marksheet = Marksheet_Factory::build(
+                        $rtn['slug'],
+                        ($activity->isSubmission()
+                            ? $activity->getSubmissionBox()
+                            : new \Schoolbox\Assessment\Component\SubmissionBox()
+                        )
+                    );
 
                     // legacy support
                     if ($rtn['slug'] == 'free') {
