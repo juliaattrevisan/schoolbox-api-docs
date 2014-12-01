@@ -261,9 +261,10 @@ class Marksheet {
 					$classAvg = null;
 				}
 				else {
-					$classAvg = $this->marktypeFactoryHandler->build($mtSlug, $extraParams)->convertRawMark(
-						$stats['mean'], $maxMark, true, false
-					);
+					$classAvg = $this->marktypeFactoryHandler->build(
+						$mtSlug,
+						($object instanceof SubmissionBox ? $object : new SubmissionBox())
+					)->convertRawMark($stats['mean'], $maxMark, true, false);
 				}
 
 
@@ -622,8 +623,12 @@ class Marksheet {
 			}
 			else {
 				$gradient = (int)($row['avg'] / 10);
-				$average = \Marksheet_Factory::build('letter', array('gradeGroup' => $this->gradeGroups))
-					->convertRawMark($row['avg'], null, true, false);
+				// This letter grade is an average of grades for this class,
+				// and therefore doesn't have an actual submission box.
+				$average = \Marksheet_Factory::build(
+					'letter',
+					new SubmissionBox()
+				)->convertRawMark($row['avg'], null, true, false);
 			}
 
 
