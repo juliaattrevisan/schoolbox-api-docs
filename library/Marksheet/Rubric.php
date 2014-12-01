@@ -10,8 +10,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
 
     private $rubricHandler;
 
-    public function __construct($mark_type, $extraParams) {
-        parent::__construct($mark_type, $extraParams);
+    public function __construct($mark_type, $submissionBox, $extraParams) {
+        parent::__construct($mark_type, $submissionBox, $extraParams);
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
