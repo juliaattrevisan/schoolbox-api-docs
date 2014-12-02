@@ -284,7 +284,8 @@ $dueWorkController = $chf->buildComponent($instance);
 
 // apply configs
 $dueWorkController->setup(
-    array(), array(
+    array(),
+    array(
         'actionable'    => array('label' => 'actionable', 'value' => true),
         'allow_parents' => array('label' => 'allow_parents', 'value' => true),
         'size'          => array('label' => 'size', 'value' => 0),
@@ -525,7 +526,14 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                 if (isset($base_mark)) {
                     // format for output
                     $rtn       = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
-                    $marksheet = Marksheet_Factory::build($rtn['slug']);
+                    // Activity should never not be a submission box
+                    $marksheet = Marksheet_Factory::build(
+                        $rtn['slug'],
+                        ($activity->isSubmission()
+                            ? $activity->getSubmissionBox()
+                            : new \Schoolbox\Assessment\Component\SubmissionBox()
+                        )
+                    );
 
                     // legacy support
                     if ($rtn['slug'] == 'free') {

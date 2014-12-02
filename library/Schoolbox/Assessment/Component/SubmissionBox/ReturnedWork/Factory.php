@@ -122,7 +122,7 @@ class Factory
         /* Internally used instances
          */
         $this->setReturnedWorkMapper(new ReturnedWorkMapper());
-        $this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug()));
+        $this->setMarksheet(\Marksheet_Factory::build($submissionBox->getMarkType()->getSlug(), $submissionBox));
 
         /* Sometimes you don't submit numeric values - this mainly consists
          * of possibilities like Absent, Not Submitted, etc. These cause an error
@@ -295,8 +295,7 @@ class Factory
         $errors = $this->getErrors();
 
         if (isset($errors[$this->getMark()])) {
-
-            /* A string mark was submitted (Absent, Not Submitted, etc)
+/* A string mark was submitted (Absent, Not Submitted, etc)
              */
             $returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
             $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
@@ -308,14 +307,12 @@ class Factory
             $returnedWork->setMark($normalisedMarkArray['mark']);
             $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
         } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
-
-            /* Empty mark (not zero) - treat as null
+/* Empty mark (not zero) - treat as null
              */
             $returnedWork->setMark(null);
             $returnedWork->setNormalizedMark(null);
         } else {
-
-            /* Just do it in the normal way
+/* Just do it in the normal way
              */
             $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark(), $this->getSubmissionBox());
             $returnedWork->setMark($normalisedMarkArray['mark']);

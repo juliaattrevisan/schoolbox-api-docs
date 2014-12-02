@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Assessment\Component\SubmissionBox;
+
 class Marksheet_Factory
 {
 
@@ -13,11 +16,17 @@ class Marksheet_Factory
 
     /**
      * @static
-     * @param string $slug        Used to generate the class name
-     * @param array  $extraParams Any extra params to pass to the constructor
-     * @return Marksheet_Abstract|null
+     *
+     * @todo remove $extraParams as it's not used now $submissionBox is passed.
+     *
+     * @param string        $slug          Used to generate the class name
+     * @param SubmissionBox $submissionBox Used by convertRawMark() to convert a raw mark
+     *                                     into the appropriate format.
+     * @param array         $extraParams   Any extra params to pass to the constructor
+     *
+     * @return Marksheet_Abstract
      */
-    public static function build($slug, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox, $extraParams = array())
+    public static function build($slug, SubmissionBox $submissionBox, $extraParams = array())
     {
         $className = "Marksheet_" . ucwords(strtolower($slug));
 

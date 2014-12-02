@@ -7,7 +7,8 @@
  * @version     SVN: $Id$
  */
 
-abstract class Marksheet_Abstract {
+abstract class Marksheet_Abstract
+{
 
     protected $id;
     protected $name;
@@ -17,13 +18,19 @@ abstract class Marksheet_Abstract {
     protected $subReturnHandler;
 
     /**
+     * @var \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    protected $submissionBox;
+
+    /**
      * Assorted extra params that this marksheet could use.
      *
      * @var array
      */
     protected $extraParams;
 
-    public function __construct($mark_type, $submissionBox, $extraParams) {
+    public function __construct($mark_type, $submissionBox, $extraParams)
+    {
         $this->id = $mark_type['mark_type_id'];
         $this->setName($mark_type['hr_name']);
         $this->setSlug($mark_type['slug']);
@@ -31,59 +38,89 @@ abstract class Marksheet_Abstract {
         $this->setSubmissionHandler(new Submission());
         $this->setSubmissionReturnHandler(new SubmissionReturn());
         $this->setExtraParams($extraParams);
-        $this->submissionBox = $submissionBox;
+        $this->setSubmissionBox($submissionBox);
     }
 
     /* Getters ans setters */
 
-    public function getID() {
+    public function getID()
+    {
         return $this->id;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setSlug($slug) {
+    public function setSlug($slug)
+    {
         $this->slug = $slug;
     }
 
-    public function getSlug() {
+    public function getSlug()
+    {
         return $this->slug;
     }
 
-    public function setComment($comment) {
+    public function setComment($comment)
+    {
         $this->comment = $comment;
     }
 
-    public function getComment() {
+    public function getComment()
+    {
         return $this->comment;
     }
 
-    public function setSubmissionHandler($handler) {
+    public function setSubmissionHandler($handler)
+    {
         $this->subHandler = $handler;
     }
 
     /**
      * @return Submission
      */
-    public function getSubmissionHandler() {
+    public function getSubmissionHandler()
+    {
         return $this->subHandler;
     }
 
-    public function setSubmissionReturnHandler($handler) {
+    public function setSubmissionReturnHandler($handler)
+    {
         $this->subReturnHandler = $handler;
     }
 
     /**
      * @return SubmissionReturn
      */
-    public function getSubmissionReturnHandler() {
+    public function getSubmissionReturnHandler()
+    {
         return $this->subReturnHandler;
+    }
+
+    /**
+     * @return \Schoolbox\Assessment\Component\SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submissionBox;
+    }
+
+    /**
+     * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
+     *
+     * @return $this
+     */
+    public function setSubmissionBox($submissionBox)
+    {
+        $this->submissionBox = $submissionBox;
+        return $this;
     }
 
     /**
@@ -112,35 +149,37 @@ abstract class Marksheet_Abstract {
      * @param bool $blankZero
      * @return int|string
      */
-    function clean_num($value, $decimals, $blankZero = true) {
+    function clean_num($value, $decimals, $blankZero = true)
+    {
 
         // handle null value and blank string, distinct from zero
-        if($value === null || $value === '') {
+        if ($value === null || $value === '') {
             return '';
-        }
-        // handle zero
-        elseif($value === 0) {
+        } // handle zero
+        elseif ($value === 0) {
             return $blankZero ? '' : 0;
         }
 
-        if($decimals < 1) {
+        if ($decimals < 1) {
             $num = number_format($value, 1, '.', '');
             return substr($num, 0, strpos($num, '.'));
         }
-        return trim(trim(number_format($value, $decimals, '.', ''),'0'),'.');
+        return trim(trim(number_format($value, $decimals, '.', ''), '0'), '.');
     }
 
     /* Abstract functions for extending classes to implement */
 
-	/**
-	 * Take a UI-formatted mark, normalise it, and insert it into the database
-	 *
-	 * @abstract
-	 * @param $mark
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
-	 * @return mixed
-	 */
-	public abstract function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox);
+    /**
+    * Take a UI-formatted mark, normalise it, and insert it into the database
+    *
+    * @todo Remove $subbox parameter, as it's passed in constructor now
+    *
+    * @abstract
+    * @param $mark
+    * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
+    * @return mixed
+    */
+    abstract public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox);
 
     /**
      * Extract a normalised mark from the database, and format it for the UI
@@ -152,7 +191,7 @@ abstract class Marksheet_Abstract {
      * @param bool $blankZero
      * @return mixed
      */
-    public abstract function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true);
+    abstract public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true);
 
     /**
      * Format a pre-extracted value for the UI
@@ -163,7 +202,7 @@ abstract class Marksheet_Abstract {
      * @param bool $asText
      * @param bool $blankZero
      */
-    public abstract function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true);
+    abstract public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true);
 
     /**
      * Use the sitepage instance passed to output the user interface elements for this marktype.
@@ -173,5 +212,5 @@ abstract class Marksheet_Abstract {
      * @param SitePage $page
      * @param array $mark
      */
-    public abstract function outputUI(SitePage $page, $mark);
+    abstract public function outputUI(SitePage $page, $mark);
 }
