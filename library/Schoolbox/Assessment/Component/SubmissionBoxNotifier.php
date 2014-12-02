@@ -89,6 +89,40 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
     /**
+     * @param SubmissionMapper $submissionMapper
+     * @return self
+     */
+    protected function setSubmissionMapper($submissionMapper)
+    {
+        $this->submissionMapper = $submissionMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @return self
+     */
+    protected function setReturnedWorkMapper($returnedWorkMapper)
+    {
+        $this->returnedWorkMapper = $returnedWorkMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param CategoryMapper $categoryMapper
+     * @return self
+     */
+    protected function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+
+
+    /**
      * @return string
      */
     protected function getSlug()
