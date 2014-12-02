@@ -174,7 +174,6 @@ abstract class Marksheet_Abstract
     *
     * @abstract
     * @param $mark
-    * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
     * @return mixed
     */
     abstract public function normaliseMark($mark);
