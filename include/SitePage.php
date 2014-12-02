@@ -1242,17 +1242,42 @@ class SitePage extends Page
 
     function __outputMenu($list, $level)
     {
-
         $text = "<ul>\n";
 
         for ($i = 0; $list[$i]; $i++) {
-            if ($list[$i]['target']) {
-                $target = " target={$list[$i]['target']}";
-            } else {
-                $target = '';
-            }
+            $aTag = $this->generateMenuAnchor($list[$i]);
 
-            $url = new Url($list[$i]['url']);
+            if (is_array($list[$i]['children'])) {
+                $text .= '<li class="parent">' . $aTag;
+                $text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
+
+            } else {
+                $text .= "<li>$aTag";
+
+            }
+            $text .= "</li>\n";
+        }
+        $text .= "</ul>\n";
+        return $text;
+    }
+
+
+    /**
+     * @param array $listitem
+     * @return string
+     */
+    protected function generateMenuAnchor($listitem)
+    {
+        if ($listitem['target']) {
+            $target = " target={$listitem['target']}";
+
+        } else {
+            $target = '';
+        }
+
+        if ($listitem['url']) {
+            // derive the URL based on where it leads
+            $url = new Url($listitem['url']);
 
             if ($url->isLocalUrl()) {
                 $linkUrl = $url->getRelativeURL();
@@ -1262,19 +1287,33 @@ class SitePage extends Page
                 $linkUrl = $url->getBase64EncodedRedirect();
             }
 
-            if (is_array($list[$i]['children'])) {
-                $text .= '<li class="parent"><a href="' . $linkUrl . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
-                $text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
+        } elseif (is_array($listitem['children'])) {
+            // if this is a parent, it has to have SOME kind of href
+            $linkUrl = '#';
+
+        } else {
+            // otherwise, no href
+            $linkUrl = '';
+        }
+
+        $caption = trim($listitem['txt']);
+
+        if (preg_match('`^(<[hb]r ?/>)|<li>(&nbsp;|\\s+)?</li>$`', $caption, $matches)) {
+            if ($matches[1]) {
+                // matched <hr/> or <br/>
+                $caption = $matches[1];
 
             } else {
-                $text .= '<li><a href="' . $linkUrl . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
-
+                // matched <li></li>
+                $caption = '<li>'. $matches[2] . '</li>';
             }
-            $text .= "</li>\n";
+        } else {
+            $caption = Scrub::text($caption);
         }
-        $text .= "</ul>\n";
-        return $text;
+
+        return $linkUrl ? sprintf('<a href="%s"%s><span>%s</span></a>', $linkUrl, $target, $caption) : "<a><span>$caption</span></a>";
     }
+
 
 
     public function parseFooterMobileLink($parent = TEMPLATE_content)

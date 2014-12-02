@@ -926,13 +926,14 @@ Notifications
     }
 	ul, li, li a {
 		width: @navigation-width - @navigation-padding * 2;
+		text-decoration: none;
 	}
-    li:hover > a,
-    li.hover > a,
-	ul li a:hover,
-	li li a:hover,
-    ul li a.hover,
-    li li a.hover {
+    li:hover > a[href],
+    li.hover > a[href],
+	ul li a[href]:hover,
+	li li a[href]:hover,
+    ul li a[href].hover,
+    li li a[href].hover {
 		color: @navigation-hover-color;
 		background: @navigation-hover-background;
 	}
@@ -950,10 +951,9 @@ Notifications
 			margin: 0;
             word-wrap: break-word;
             display: block;
-            &:hover,
-            &.hover {
+            &[href]:hover,
+            &[href].hover {
                 color: @white;
-                text-decoration: none;
                 background: @tab-hover-color;
             }
         }

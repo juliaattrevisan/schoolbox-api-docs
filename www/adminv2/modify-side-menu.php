@@ -25,7 +25,7 @@ if (is_numeric($this->arg[0])) {
 
     $output = array(
         'MENUITEMLIST' => '',
-        'TEXT' => $menuItem['txt'],
+        'TEXT' => Scrub::text($menuItem['txt']),
         'URL' => $menuItem['url'],
         'BLANK_SELECTED' => $menuItem['target'] == '_blank' ? 'selected="selected"' : '',
         'ID' => $menuItem['id'],
