@@ -28,7 +28,8 @@ class Marksheet_Raw extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
+    public function retrieveMark($user_id, $asText = false, $blankZero = true) {
+        $box_id = $this->getSubmissionBox()->getId();
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
 

@@ -183,17 +183,12 @@ abstract class Marksheet_Abstract
      *
      * @abstract
      *
-     * @todo remove $box_id parameter, as submission box is passed in constructor
-     *       (There may be implementations which create a single marksheet, and
-     *        call this method with a different box_id each pass.)
-     *
      * @param $user_id
-     * @param $box_id
      * @param bool $asText
      * @param bool $blankZero
      * @return mixed
      */
-    abstract public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true);
+    abstract public function retrieveMark($user_id, $asText = false, $blankZero = true);
 
     /**
      * Format a pre-extracted value for the UI

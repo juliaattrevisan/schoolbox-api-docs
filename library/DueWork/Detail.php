@@ -125,7 +125,7 @@ class DueWork_Detail
             }
 
             // get student's mark, if there is one
-            $insertion['mark'] = $this->marksheet->retrieveMark($user->getId(), $this->dueWork['id']);
+            $insertion['mark'] = $this->marksheet->retrieveMark($user->getId());
 
             $returns = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
             $insertion['return'] = is_array($returns) ? $returns[0] : array();

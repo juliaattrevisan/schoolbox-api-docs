@@ -18,8 +18,9 @@ class Marksheet_Letter extends Marksheet_Abstract
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    public function retrieveMark($user_id, $asText = false, $blankZero = true)
     {
+        $box_id = $this->getSubmissionBox()->getId();
         $return = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
 

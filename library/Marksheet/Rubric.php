@@ -53,14 +53,13 @@ class Marksheet_Rubric extends Marksheet_Abstract
      * Extract a normalised mark from the database, and format it for the UI
      *
      * @param $user_id
-     * @param $box_id
      * @param bool $asText
      * @param bool $blankZero
      * @return mixed
      */
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    public function retrieveMark($user_id, $asText = false, $blankZero = true)
     {
-
+        $box_id = $this->getSubmissionBox()->getId();
         // we can't trust the submission_box table, because it may have been set to null, so retrieve rubric data
         $marks = $this->getRubricHandler()->getStudentMarksTotal($user_id, $box_id);
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);

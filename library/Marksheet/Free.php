@@ -16,8 +16,11 @@ class Marksheet_Free extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
-        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
+    public function retrieveMark($user_id, $asText = false, $blankZero = true) {
+        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser(
+            $user_id,
+            $this->getSubmissionBox()->getId()
+        );
         return array(
             'mark'     => $subReturn['mark'],
             'comment'  => $subReturn['comment']
