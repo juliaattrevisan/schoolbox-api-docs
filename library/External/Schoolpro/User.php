@@ -505,8 +505,20 @@ class External_Schoolpro_User implements External_UserInterface {
 		return array();
 	}
 
-	/* Getters/Setters
-	 */
+    /**
+     * List of campuses a staff member is involved in based on timetable
+     *
+     * @param int $staffID
+     * @return array|bool
+     */
+    public function getCampusFromTimetable($staffID)
+    {
+        return array();
+    }
+
+
+    /* Getters/Setters
+     */
 
 	/**
 	 * Set db
