@@ -100,6 +100,11 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		/** @var OnlineAssessment $quiz */
 		$quiz = $bundle->getEvent()->getObject();
 
+        // the mere fact that this is required is ludicrous
+        if (!($quiz->getStart() && $quiz->getFinish())) {
+            $quiz = $this->fullyHydrateQuiz($quiz);
+        }
+
 		$open = $quiz->getStart()->getUnixTimestamp();
 		$closed = $quiz->getFinish()->getUnixTimestamp();
 		$upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
