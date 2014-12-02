@@ -39,7 +39,7 @@ class Marksheet_Percent extends Marksheet_Abstract
         if (in_array($subReturn['mark'], $errs)) {
             $rawMark = $subReturn['mark'];
         } else {
-            $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
+            $mark = $this->cleanNumber($subReturn['norm_mark'], 0, $blankZero);
             $rawMark = $asText ? "$mark%" : $mark;
         }
 
@@ -52,7 +52,7 @@ class Marksheet_Percent extends Marksheet_Abstract
 
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
-        $mark = $this->clean_num($rawMark, 0, $blankZero);
+        $mark = $this->cleanNumber($rawMark, 0, $blankZero);
         return $asText ? "$mark%" : $mark;
     }
 

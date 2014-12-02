@@ -45,7 +45,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
 
         return array(
             'norm_mark' => $normalised,
-            'mark'      => $this->clean_num($mark, 4, false) . " / " . $max
+            'mark'      => $this->cleanNumber($mark, 4, false) . " / " . $max
         );
     }
 
@@ -66,7 +66,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
 
 /*
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
-        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
+        $mark = $this->cleanNumber(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
 */
 
         return array(
@@ -89,7 +89,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
      */
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
-        $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
+        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, 4, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 
