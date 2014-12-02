@@ -83,18 +83,6 @@ function init(){
             .css({
                 'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
             });
-
-        $(document).ready(function(){
-            $('#loginForm').validate({
-                errorPlacement: function(error, element) {
-                    if (element.attr("name") == "tandc"  ) {
-                        error.appendTo("#error-msg");
-                    } else {
-                        error.appendTo(element);
-                    }
-                }
-            });
-        })
     });
 </script>
 </body>
