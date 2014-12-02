@@ -35,12 +35,14 @@
         this.setSelectOptions(selectOptions);
         var inputHeight = this.textInputElement.outerHeight();
         var buttonLeftPosition = this.textInputElement.outerWidth() + 0;
-        var showSelectorButton = jQuery(
-            '<a href="#" class="combobox_button" '+
-            'style="position:absolute; height:'+(inputHeight-2)+'px; width:'+
-            (inputHeight-2)+'px; top:0; left:'+buttonLeftPosition+'px;"><div class="combobox_arrow">&#9660;</div></a>'
-        );
-        this.textInputElement.css('margin', '0 '+showSelectorButton.outerWidth()+'px 0 0');
+        var showSelectorButton = jQuery('<a href="#" class="combobox_button"></a>')
+            .css({
+                position: 'absolute',
+                height: (inputHeight-2)+'px',
+                top: 0,
+                left: buttonLeftPosition+'px'
+            })
+            .append('<div class="combobox_arrow">&#9660;</div>')
         showSelectorButton.insertAfter(this.textInputElement);
         var thisSelector = this.selector;
         var thisCombobox = this;
