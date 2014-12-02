@@ -215,7 +215,10 @@ class Grades {
 							$returnGrades[$userId]['avg-int'] = (int)($avgSum / 10);
 							break;
 						case 'letter':
-							$returnGrades[$userId]['avg-letter'] = \Marksheet_Factory::build('letter')->convertRawMark($avgSum);
+							$returnGrades[$userId]['avg-letter'] = \Marksheet_Factory::build(
+								'letter',
+								new SubmissionBox()
+							)->convertRawMark($avgSum);
 							break;
 					}
 				}
