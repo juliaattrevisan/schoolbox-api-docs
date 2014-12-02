@@ -6,18 +6,20 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Marksheet_Raw extends Marksheet_Abstract {
+class Marksheet_Raw extends Marksheet_Abstract
+{
 
-    public function normaliseMark($mark) {
+    public function normaliseMark($mark)
+    {
 
         $max = $this->getSubmissionBox()->getMaxMark();
         $normalised = (($mark / $max) * 100);
 
         // validation: must be inside bounds
-        if($normalised < 0) {
+        if ($normalised < 0) {
             $normalised = 0;
             $mark = 0;
-        } else if($normalised > 100) {
+        } elseif ($normalised > 100) {
             $normalised = 100;
             $mark = $max;
         }
@@ -28,7 +30,8 @@ class Marksheet_Raw extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $asText = false, $blankZero = true) {
+    public function retrieveMark($user_id, $asText = false, $blankZero = true)
+    {
         $box_id = $this->getSubmissionBox()->getId();
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
@@ -36,10 +39,9 @@ class Marksheet_Raw extends Marksheet_Abstract {
         $dem = DueWork_ErrorMapper::getInstance();
         $errs = $dem->listDisplayValues();
 
-        if(in_array($subReturn['mark'], $errs)) {
+        if (in_array($subReturn['mark'], $errs)) {
             $rawMark = $subReturn['mark'];
-        }
-        else {
+        } else {
             $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 0, $blankZero);
             $rawMark = $asText ? "$mark / {$subbox['max_mark']}" : $mark;
         }
@@ -52,13 +54,15 @@ class Marksheet_Raw extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
+    {
         // do we trust what's stored in the database?
         $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 
-    public function outputUI(SitePage $page, $mark) {
+    public function outputUI(SitePage $page, $mark)
+    {
         $output = array(
             'MAX_MARK' => Scrub::text($mark['max_mark']),
             'MARK'     => Scrub::text($mark['mark']),
@@ -66,5 +70,4 @@ class Marksheet_Raw extends Marksheet_Abstract {
         );
         $page->setVar($output);
     }
-
 }
