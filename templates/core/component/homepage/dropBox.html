@@ -1,21 +1,21 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-<script type="text/javascript">
-    $(function() {
-
-        $j('input[type=file].pretty-file-input').prettyFileInput({
-            additionalButtonClasses: 'no-marg float-left',
-            buttonActiveClass: 'tick',
-            defaultText: '<span></span>Choose file',
-            defaultFileSelectedText: '<span></span>File selected'
-        });
-
-        $j('.dropBox').validate();
-    });
-</script>
-<!-- END custom_head -->
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <!-- BEGIN custom_head -->
+    <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+    <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+    <script type="text/javascript">
+        $(function() {
+
+            $j('input[type=file].pretty-file-input').prettyFileInput({
+                additionalButtonClasses: 'no-marg float-left',
+                buttonActiveClass: 'tick',
+                defaultText: '<span></span>Choose file',
+                defaultFileSelectedText: '<span></span>File selected'
+            });
+
+            $j('.dropBox').validate();
+        });
+    </script>
+    <!-- END custom_head -->
     <h2>Drop Box</h2>
     {CONFIGURATION}
     <div class="listing clearfix">
