@@ -54,31 +54,27 @@ class SideMenu extends DeprecatedModel {
         return $list;
     }
 
-    function outputTree($list, $level=0, $selectable = false)
+    function outputTree($list, $level = 0, $selectable = false)
     {
-            $text = "<ul>\n";
+        $text = "<ul>\n";
 
-            for($i=0; $list[$i]; $i++)
-            {
-                    if($list[$i]['target'])
-                            $target = " target={$list[$i]['target']}";
-                    else $target = '';
+        for ($i = 0; $list[$i]; $i++) {
+            $text .= '<li id="node_' . $list[$i]['id'] . '">';
 
-                    $text .= '<li id="node_'.$list[$i]['id'].'">';
-
-                    if($selectable)
-                        $text .= '<a id="' . $list[$i]['id'] . '" href="#">' . $list[$i]['txt'] . "</a>";
-                    else
-                        $text .= '<a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].'</a>';
-
-                    if(is_array($list[$i]['children'])) {
-                            $text .= $this->outputTree($list[$i]['children'], ($level + 1), $selectable);
-                    }
-
-                    $text .= "</li>\n";
+            if ($selectable) {
+                $text .= '<a id="' . $list[$i]['id'] . '" href="#">' . $list[$i]['txt'] . "</a>";
+            } else {
+                $text .= '<a href="/adminv2/modify-side-menu/' . $list[$i]['id'] . '">' . Scrub::text($list[$i]['txt']) . '</a>';
             }
-            $text .= "</ul>\n";
-            return $text;
+
+            if (is_array($list[$i]['children'])) {
+                $text .= $this->outputTree($list[$i]['children'], ($level + 1), $selectable);
+            }
+
+            $text .= "</li>\n";
+        }
+        $text .= "</ul>\n";
+        return $text;
     }
 
     function create($item) {
