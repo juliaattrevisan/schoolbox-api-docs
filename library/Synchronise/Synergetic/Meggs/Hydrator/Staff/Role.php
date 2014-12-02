@@ -8,6 +8,9 @@
  */
 class Synchronise_Synergetic_Meggs_Hydrator_Staff_Role implements Synchronise_Base_IHydrator
 {
+    const ROLE_TEACHERS = 1;
+    const ROLE_NON_TEACHING = 2;
+
     /**
      * Hydrates role based on category type.
      *
@@ -20,12 +23,12 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Role implements Synchronise_Ba
             case 'ADMIN':
             case 'COACH':
             case 'SA':
-                $group = 1;
+                $role = self::ROLE_TEACHERS;
                 break;
             case 'CASUAL':
             case 'MUSI':
             case 'TCHO':
-                $group = 2;
+                $role = self::ROLE_NON_TEACHING;
                 break;
             default:
                 throw new Exception(
@@ -35,7 +38,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Role implements Synchronise_Ba
                     )
                 );
         }
-        $newUser['group_id'] = $group;
+        $newUser['group_id'] = $role;
         return $newUser;
     }
 }

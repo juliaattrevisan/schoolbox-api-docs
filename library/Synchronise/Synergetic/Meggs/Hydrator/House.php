@@ -8,6 +8,12 @@
  */
 class Synchronise_Synergetic_Meggs_Hydrator_House implements Synchronise_Base_IHydrator
 {
+    const HOUSE_GRAMMAR = 20;
+    const HOUSE_KENT    = 21;
+    const HOUSE_MCCOWAN = 22;
+    const HOUSE_STMARGS = 23;
+
+
     /**
      * {@inheritdoc}
      */
@@ -32,13 +38,13 @@ class Synchronise_Synergetic_Meggs_Hydrator_House implements Synchronise_Base_IH
     {
         switch (strtoupper(trim($externalUser['StudentHouse']))) {
             case 'GR':
-                return 20;
+                return self::HOUSE_GRAMMAR;
             case 'KT':
-                return 21;
+                return self::HOUSE_KENT;
             case 'MC':
-                return 22;
+                return self::HOUSE_MCCOWAN;
             case 'SM':
-                return 23;
+                return self::HOUSE_STMARGS;
             default:
                 return 0;
         }

@@ -8,6 +8,9 @@
  */
 class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_Base_IHydrator
 {
+    const ROLE_JUNIOR_STUDENTS = 5;
+    const ROLE_SENIOR_STUDENTS = 6;
+
     /**
      * Hydrates role based on year level.
      *
@@ -25,7 +28,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
             case 4:
             case 5:
             case 6:
-                $group = 5;
+                $role = self::ROLE_JUNIOR_STUDENTS;
                 break;
             case 7:
             case 8:
@@ -33,7 +36,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
             case 10:
             case 11:
             case 12:
-                $group = 6;
+                $role = self::ROLE_SENIOR_STUDENTS;
                 break;
             default:
                 throw new Exception(
@@ -43,7 +46,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
                     )
                 );
         }
-        $newUser['group_id'] = $group;
+        $newUser['group_id'] = $role;
         return $newUser;
     }
 }
