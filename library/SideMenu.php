@@ -62,7 +62,7 @@ class SideMenu extends DeprecatedModel {
             $text .= '<li id="node_' . $list[$i]['id'] . '">';
 
             if ($selectable) {
-                $text .= '<a id="' . $list[$i]['id'] . '" href="#">' . $list[$i]['txt'] . "</a>";
+                $text .= '<a id="' . $list[$i]['id'] . '" href="#">' . Scrub::text($list[$i]['txt']) . "</a>";
             } else {
                 $text .= '<a href="/adminv2/modify-side-menu/' . $list[$i]['id'] . '">' . Scrub::text($list[$i]['txt']) . '</a>';
             }
