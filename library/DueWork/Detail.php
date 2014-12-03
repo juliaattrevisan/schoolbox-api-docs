@@ -181,7 +181,6 @@ class DueWork_Detail
                 'DUEWORK_DUEDATE'       => $closeString,
                 'CATEGORY_ID'           => $this->dueWork['cid'],
                 'BOX_ID'                => $this->dueWork['id'],
-                'BOX_GRADE_GROUP_ID'    => $this->dueWork['submission_grade_group_id'],
                 'SITE_ROOT'             => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
