@@ -172,12 +172,13 @@ body.login{
     #loginForm{
       color: #373b3b;
       font-weight: bold;
-
+      label{ color: @white; }
       input[type="text"],
       input[type="password"]{
-        width: 94%;
-        height: 26px;
-        padding: 7px 3%;
+        width: 100%;
+        height: 40px;
+        padding: 7px 12px;
+        margin-bottom: 12px;
       }
 
       #error-msg label{
@@ -187,7 +188,7 @@ body.login{
       }
 
       .tandc{
-        color: #fff;
+        color: @white;
         float: none;
         width: auto;
         label{
@@ -200,11 +201,7 @@ body.login{
         height: auto;
         padding: 0;
       }
-
-      ::-webkit-input-placeholder { color: #7a7a7a; }
-      :-moz-placeholder { color: #7a7a7a; } /* Firefox 18- */
-      ::-moz-placeholder { color: #7a7a7a; } /* Firefox 19+ */
-      :-ms-input-placeholder { color: #7a7a7a; }
+      .placeholder(#7a7a7a);
 
       .submit-btn-plain{
         background: #cb042d;
