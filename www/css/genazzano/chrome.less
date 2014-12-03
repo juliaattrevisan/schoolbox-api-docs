@@ -120,13 +120,14 @@ body.login{
         :-moz-placeholder { color: #a9a9a9; font-size: 17px; } /* Firefox 18- */
         ::-moz-placeholder { color: #a9a9a9; font-size: 17px; } /* Firefox 19+ */
         :-ms-input-placeholder { color: #a9a9a9; font-size: 17px; }
-        input{
+        input[type="text"],
+        input[type="password"]{
           color: #5b5b5b;
           font-size: 17px;
-          width: 94%;
-          height: 38px;
+          width: 100%;
+          height: 66px;
           margin: 0 0 1px 0;
-          padding: 10px 2.7%;
+          padding: 10px 12px;
         }
         .submit-btn-plain{
           background: #470416;

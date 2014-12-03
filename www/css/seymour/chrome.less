@@ -174,11 +174,12 @@ body.login{
         :-moz-placeholder { color: @black; font-size: 17px; }
         ::-moz-placeholder { color: @black; font-size: 17px; }
         :-ms-input-placeholder { color: @black; font-size: 17px; }
-        input{
+        input[type="text"],
+        input[type="password"]{
           background: #eee;
           color: @black;
           font-size: 17px;
-          width: 90%;
+          width: 100%;
           margin: 0 0 16px 0;
           padding: 10px 5%;
         }
