@@ -163,7 +163,7 @@ try {
 		$fq = "on weekdays";
 	}
 	else {
-		$fq = 'on ' . implode(', ', array_intersect_key($test, $days));
+		$fq = 'on ' . implode(', ', array_intersect_key($test, array_flip($days)));
         if (($pos = strrpos($fq, ',')) !== false) {
             $fq = substr_replace($fq, ' &amp;', $pos, 1);
         }
