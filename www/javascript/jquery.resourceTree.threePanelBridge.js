@@ -403,7 +403,7 @@
 
         /* drag files */
         var permission = categoryNode.data('permission');
-        if (permission === 'full' || categoryNode === 'write') {
+        if (permission === 'full' || permission === 'write') {
             newChildren.find('span.file').draggable({
                 scope: 'resourceFile',
                 cursor: 'move',
