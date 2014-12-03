@@ -10,7 +10,9 @@
  * @version     SVN: $Id$
  */
 class Synchronise_Synergetic_Main {
-	private $strategy = null;
+
+    /** @var Synchronise_Base_Strategy */
+    private $strategy = null;
 
 	/**
 	 * Choose your strategy wisely
@@ -66,7 +68,7 @@ class Synchronise_Synergetic_Main {
 	/**
 	 * Set the Strategy
 	 *
-	 * @param  $val
+	 * @param Synchronise_Base_Strategy $val
 	 * @return void
 	 */
 	public function setStrategy($val) {
@@ -76,7 +78,7 @@ class Synchronise_Synergetic_Main {
 	/**
 	 * Get the Strategy
 	 *
-	 * @return null
+	 * @return Synchronise_Base_Strategy
 	 */
 	public function getStrategy() {
 		return $this->strategy;
