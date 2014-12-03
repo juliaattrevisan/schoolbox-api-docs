@@ -86,10 +86,43 @@ if (is_numeric($_REQUEST['id']) && is_numeric($_REQUEST['uid'])) {
 
     /* Check involved in subject */
     $groupHandler = new Group;
-    if (!$groupHandler->involvedInSubject($output['cid']) && !$groupHandler->involvedInGroup($_REQUEST['uid'], $output['cid'])) {
-        exit();
+
+    /* Students must always be involved
+     */
+    $involvedCategories = $groupHandler->involvedInCategoryList($_REQUEST['uid']);
+
+    $isStudentInvolved = false;
+
+    foreach ($involvedCategories as $currentCategory) {
+        if ($output['cid'] == $currentCategory['id']) {
+            $isStudentInvolved = true;
+
+            break;
+        }
     }
 
+    if ($isStudentInvolved) {
+        if ($_SESSION['user']->getRole()->isParent()) {
+
+            /* Parents must be owners of a child and Hide Work From Parents
+             * (restrict_student_submissions) disabled in order to see bubbles
+             */
+            $isParentOfChild = $groupHandler->isParentOfChild($_REQUEST['uid']);
+            $isRestricted = Cfg::get('restrict_student_submissions');
+
+            if (!$isParentOfChild || $isRestricted) {
+                exit();
+            }
+        }
+        /* Be a bad host
+         */
+        else if ($_SESSION['user']->getRole()->isGuest()) {
+            exit();
+        }
+    }
+    else {
+        exit();
+    }
 }
 
 // just remove parent links, don't even worry about the config flag
