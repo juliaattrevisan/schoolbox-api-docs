@@ -66,15 +66,15 @@ class EventNotifier extends AbstractModuleNotifier
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
             // advise 10 minutes before start, and only advise updated once published
 
-            $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
-                ? $event->getPublishDateTime()
-                        ->getUnixTimestamp()
-                : self::IMMEDIATELY;
+            $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
 
-            $bundle->attachEach(array(
-                self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
-                self::TRIGGER_UPDATED  => $pubstamp
-            ));
+            $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
+                ? $event->getPublishDateTime()->getUnixTimestamp()
+                : false;
+
+            if ($pubstamp) {
+                $bundle->attach(self::TRIGGER_UPDATED, $pubstamp);
+            }
         }
     }
 
@@ -90,14 +90,12 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function newBuilder($trigger, $roleType, $event)
     {
-        $plain = new Html2Text($event->getDetail());
         $bob   = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon('/images/icon.php?size=32&icon=clock')
             ->setHref('/calendar/' . $event->getStartDateTime()->getUsingFormat('d-m-Y'))
-            ->setBody($plain->get_text())
-            ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-            ->addTopic("calendar.{$event->getType()->getType()}.{$event->getId()}.$trigger")
+            ->setBody($event->getDetail())
+            ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
             ->addFilter('roletype', array($roleType))
             ->setSeverity(Logger::INFO);
 
@@ -116,6 +114,7 @@ class EventNotifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $bob      = $this->newBuilder('upcoming', $roleType, $event)
                          ->setTitle(':name is about to start')
+                         ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
                          ->setParam('name', new Param($event->getTitle()));
 
         $instance = $bob->build();
@@ -147,9 +146,10 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
-        $envelope = new Envelope();
-        $bob      = $this->newBuilder('upcoming', $roleType, $event);
-
+        $envelope  = new Envelope();
+        /** @var Event $event */
+        $event     = $this->mapper->findById($event->getId());
+        $bob       = $this->newBuilder('updated', $roleType, $event);
         $instances = array();
 
         // title changed
@@ -215,7 +215,16 @@ class EventNotifier extends AbstractModuleNotifier
                 break;
             case Calendar::ACCESS_GROUP:
                 foreach ($instances as $instance) {
-                    $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
+                    if ($cat = $event->getCategory()) {
+                        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $instance);
+                    }
+                    if ($cats = $event->getCategoryCollection()) {
+                        if ($cats->count()) {
+                            foreach ($cats as $cat) {
+                                $envelope->broadcastToCategory($cat->getCategoryId(), UserAccess::ACCESS_READ, $instance);
+                            }
+                        }
+                    }
                 }
                 break;
             case Calendar::ACCESS_PERSONAL:
