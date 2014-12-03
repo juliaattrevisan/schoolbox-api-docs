@@ -902,7 +902,7 @@ class Event
     /**
      * Set category collection
      *
-     * @param null $categoryCollection
+     * @param Collection|\Schoolbox\Calendar\Relation\Category[] $categoryCollection
      */
     public function setCategoryCollection($categoryCollection)
     {
@@ -912,7 +912,7 @@ class Event
     /**
      * Get category collection
      *
-     * @return null
+     * @return Collection|\Schoolbox\Calendar\Relation\Category[]
      */
     public function getCategoryCollection()
     {
@@ -922,7 +922,7 @@ class Event
     /**
      * Set user collection
      *
-     * @param null $userCollection
+     * @param Collection|User[] $userCollection
      */
     public function setUserCollection($userCollection)
     {
@@ -932,7 +932,7 @@ class Event
     /**
      * Get user collection
      *
-     * @return null
+     * @return Collection|User[]
      */
     public function getUserCollection()
     {
