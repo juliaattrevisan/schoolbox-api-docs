@@ -21,6 +21,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Student extends Synchronise_Base_Strat
             ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeCompanyCodes())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
+            ->addHydrator(new Synchronise_Tass_Toowoomba_Hydrator_UsernameFromGivenName())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
