@@ -13,18 +13,6 @@
 		});
 
 		$j('.combobox').combobox({COMBO_OPTIONS});
-
-        // Hide options for all work types other than this one
-        // Leave groupless ones there, though.
-        var gradeGroupId = {BOX_GRADE_GROUP_ID};
-        $('select[data-marktype="letter"] option').each(function() {
-            var option           = $(this);
-            var thisGradeGroupId = option.data('groupid');
-            if (thisGradeGroupId && thisGradeGroupId != gradeGroupId) {
-                option.remove();
-                // If this was selected: select the closest item that does match gradeGroupId
-            }
-        })
 	});
 </script>
 <!-- END custom_head -->
