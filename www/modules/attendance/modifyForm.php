@@ -94,12 +94,12 @@ if (is_array($_POST['studentID'])) {
 
         if($_POST['LateArrivalTime'][$i]) {
             $data['LateArrivalFlag'] = 1;
-            $data['LateArrivalTime'] = trim($_POST['LateArrivalTime'][$i]);
+            $data['LateArrivalTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['LateArrivalTime'][$i])));
         }
 
         if($_POST['EarlyDepartureTime'][$i]) {
             $data['EarlyDepartureFlag'] = 1;
-            $data['EarlyDepartureTime'] = trim($_POST['EarlyDepartureTime'][$i]);
+            $data['EarlyDepartureTime'] = date("Y-m-d H:i:s", strtotime(trim($_POST['EarlyDepartureTime'][$i])));
         }
 
         $attendanceRecord->update($data);
