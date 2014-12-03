@@ -117,7 +117,6 @@ process=`echo $processes | wc -w`;
 if [ $process -gt 1 ];
 then
 	echo -e "Warning: Script already running\nReported Processses: $process\n$processes" >> $logfile;
-	echo -e "Warning: Script already running\nReported Processses: $process\n$processes";
 	exit 0;
 fi
 
