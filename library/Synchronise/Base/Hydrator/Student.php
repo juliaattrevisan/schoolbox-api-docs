@@ -19,6 +19,8 @@ class Synchronise_Base_Hydrator_Student implements Synchronise_Base_IHydrator {
         $newUser['group_id']   = self::DEFAULT_STUDENT_GROUP;
         if (strlen(trim($externalUser['StudentOccupEmail']))) {
             $newUser['alt_email'] = $externalUser['StudentOccupEmail'];
+        } else {
+            $newUser['alt_email'] = '';
         }
         return $newUser;
     }
