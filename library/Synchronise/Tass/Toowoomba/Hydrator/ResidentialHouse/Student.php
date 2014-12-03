@@ -27,6 +27,9 @@ class Synchronise_Tass_Toowoomba_Hydrator_ResidentialHouse_Student implements Sy
     public function getResidentialHouseFromUser($externalUser)
     {
         switch ($externalUser['boarder']) {
+            case 'Y':
+                // I don't know how to tell which board house a student is in
+                return 1;
             case 'N':
             default:
                 return 0;
