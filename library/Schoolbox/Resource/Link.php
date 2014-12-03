@@ -122,7 +122,12 @@ class Link implements ISoftDeletable {
      */
     public function getUrl()
     {
-        return $this->url->getUrl();
+        if ($this->url instanceof Url) {
+            return $this->url->getUrl();
+        } else {
+            // account for stale messages (that somehow still have self::$url as a primitive)
+            return $this->url;
+        }
     }
 
     /**
