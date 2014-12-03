@@ -11,10 +11,10 @@ namespace Schoolbox\Calendar;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Calendar;
-use Html2Text\Html2Text;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -111,29 +111,15 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpcoming($roleType, $event, $author)
     {
-        $envelope = new Envelope();
-        $bob      = $this->newBuilder('upcoming', $roleType, $event)
-                         ->setTitle(':name is about to start')
-                         ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-                         ->setParam('name', new Param($event->getTitle()));
+        /** @var Event $event */
+        $event = $this->mapper->findById($event->getId());
 
-        $instance = $bob->build();
+        $bob   = $this->newBuilder('upcoming', $roleType, $event)
+                      ->setTitle(':name is about to start')
+                      ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
+                      ->setParam('name', new Param($event->getTitle()));
 
-        switch ($event->getAccess()) {
-            case Calendar::ACCESS_CAMPUS:
-                foreach ($event->getCampusCollection() as $campus) {
-                    $envelope->broadcastToCampus($campus, $instance);
-                }
-                break;
-            case Calendar::ACCESS_GROUP:
-                $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
-                break;
-            case Calendar::ACCESS_PERSONAL:
-                $envelope->targetToUser($event->getOwner(), $instance);
-                break;
-        }
-
-        return $envelope;
+        return $this->notify($event, array($bob->build()));
     }
 
 
@@ -146,22 +132,21 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
-        $envelope  = new Envelope();
         /** @var Event $event */
         $event     = $this->mapper->findById($event->getId());
         $bob       = $this->newBuilder('updated', $roleType, $event);
         $instances = array();
 
         // title changed
-        if (isset($diff['note'])) {
+        if (isset($diff['title'])) {
             $bob->setTitle(':user renamed the event :old to :new')
                 ->setParams(array(
                     'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                    'old'  => new Param($diff['note'][1]),
+                    'old'  => new Param($diff['title'][1]),
                     'new'  => new Param($event->getTitle())
                 ));
             $instances[] = $bob->build();
-            unset($diff['note']);
+            unset($diff['title']);
         }
 
         // location changed
@@ -177,7 +162,7 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         // time changed
-        if (isset($diff['startDate']) && isset($diff['startTime'])) {
+        if (isset($diff['startDate']) || isset($diff['startTime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(array(
                     'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
@@ -201,6 +186,18 @@ class EventNotifier extends AbstractModuleNotifier
             $instances[] = $bob->build();
         }
 
+        return $this->notify($event, $instances);
+    }
+
+
+    /**
+     * @param Event      $event
+     * @param Instance[] $instances
+     * @return Envelope
+     */
+    protected function notify(Event $event, $instances)
+    {
+        $envelope  = new Envelope();
 
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
@@ -213,6 +210,7 @@ class EventNotifier extends AbstractModuleNotifier
                     }
                 }
                 break;
+
             case Calendar::ACCESS_GROUP:
                 foreach ($instances as $instance) {
                     if ($cat = $event->getCategory()) {
@@ -227,6 +225,7 @@ class EventNotifier extends AbstractModuleNotifier
                     }
                 }
                 break;
+
             case Calendar::ACCESS_PERSONAL:
                 foreach ($instances as $instance) {
                     $envelope->targetToUser($event->getOwner(), $instance);
