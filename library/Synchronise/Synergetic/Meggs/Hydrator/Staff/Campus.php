@@ -48,7 +48,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Campus implements Synchronise_
 
         // for each campus returned, cast to the appropriate schoolbox campus list
         foreach ($synergyCampuses as $c) {
-            switch ($c) {
+            switch ($c['campus']) {
                 case 'J':
                     $schoolboxCampuses[Campus::CAMPUS_ELC] = Campus::CAMPUS_ELC;
                     $schoolboxCampuses[Campus::CAMPUS_JNR] = Campus::CAMPUS_JNR;
@@ -61,6 +61,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Campus implements Synchronise_
                     $schoolboxCampuses[Campus::CAMPUS_YR11] = Campus::CAMPUS_YR11;
                     $schoolboxCampuses[Campus::CAMPUS_YR12] = Campus::CAMPUS_YR12;
                     break;
+                // no default case (some users have a campus 'X' we can ignore)
             }
         }
 

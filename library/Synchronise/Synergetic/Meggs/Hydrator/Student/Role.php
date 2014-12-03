@@ -22,6 +22,9 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
         switch ($externalUser['StudentYearLevel']) {
             case 'ELC':
             case 'PREP':
+            case 20:
+            case 30:
+            case 40:
             case 1:
             case 2:
             case 3:
@@ -42,7 +45,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
                 throw new Exception(
                     sprintf(
                         'Year level "%s" not recognized',
-                        $externalUser['StaffCategoryType']
+                        $externalUser['StudentYearLevel']
                     )
                 );
         }

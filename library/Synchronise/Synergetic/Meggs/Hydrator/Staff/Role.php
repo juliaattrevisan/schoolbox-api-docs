@@ -19,7 +19,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Role implements Synchronise_Ba
      */
     public function hydrate($externalUser, $newUser)
     {
-        switch ($externalUser['StaffCategoryType']) {
+        switch ($externalUser['StaffCategory']) {
             case 'ADMIN':
             case 'COACH':
             case 'SA':
@@ -34,7 +34,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Role implements Synchronise_Ba
                 throw new Exception(
                     sprintf(
                         'Category type "%s" not recognized',
-                        $externalUser['StaffCategoryType']
+                        $externalUser['StaffCategory']
                     )
                 );
         }

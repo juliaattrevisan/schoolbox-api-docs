@@ -28,6 +28,9 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Campus implements Synchronis
     {
         switch (trim($externalUser['StudentYearLevel'])) {
             case 'ELC':
+            case 20:
+            case 30:
+            case 40:
                 $campus = self::CAMPUS_ELC;
                 break;
             case 'PREP':
@@ -58,7 +61,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Campus implements Synchronis
                 $campus = self::CAMPUS_YR12;
                 break;
             default:
-                throw new Exception("No campus found");
+                throw new Exception("Could not map campus from year '{$externalUser['StudentYearLevel']}'");
         }
 
         $newUser['campus'] = array($campus);
