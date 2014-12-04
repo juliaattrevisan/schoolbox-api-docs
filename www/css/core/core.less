@@ -8227,7 +8227,7 @@ form.context {
                     .comment {
                     	width: 72%;
                     	height: 40px;
-                        float: left;
+                        vertical-align: top;
                     }
                     .combobox{
                         margin: 0 8px 0 0;
@@ -9488,18 +9488,11 @@ td.name {
     .mark-input {
         height: 40px;
         font-size: 12px;
-        float: left;
-    }
-    select {
-    	float: left;
+        vertical-align: top;
     }
     &.error {
         border-color: @negative-color !important;
         background: lighten(@highlight-color,@lighten-value);
-    }
-    label.error {
-        position: absolute;
-        width: 300px;
     }
 }
 
@@ -9588,14 +9581,10 @@ td.name {
     position: relative;
 
     .rubric-edit {
-    	display: block;
-    	float: left;
+        display: inline-block;
     	height: 14px;
     	width: 14px;
-    	margin: 0 15px 10px 0;
-    	position: relative;
-    	top: 3px;
-    	left: 6px;
+        margin: 13px 0;
     	background: url(/images/core/icons/btn-icons.png) no-repeat;
     	background-position: 0 -308px;
     	&:hover {
