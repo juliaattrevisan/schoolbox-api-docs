@@ -16,6 +16,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Calendar;
 use Monolog\Logger;
+use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -65,16 +66,14 @@ class EventNotifier extends AbstractModuleNotifier
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
             // advise 10 minutes before start, and only advise updated once published
-
-            $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
-
             $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
                 ? $event->getPublishDateTime()->getUnixTimestamp()
-                : false;
+                : self::IMMEDIATELY;
 
-            if ($pubstamp) {
-                $bundle->attach(self::TRIGGER_UPDATED, $pubstamp);
-            }
+            $bundle->attachEach(array(
+                self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
+                self::TRIGGER_UPDATED  => $pubstamp
+            ));
         }
     }
 
@@ -202,8 +201,9 @@ class EventNotifier extends AbstractModuleNotifier
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
                 $collection = $event->getCampusCollection();
-                if (!($collection instanceof \Traversable || is_array($collection))) {
-                    foreach ($event->getCampusCollection() as $campus) {
+                if ($collection instanceof \Traversable || is_array($collection)) {
+                    foreach ($collection as $campus) {
+                        $campus = $campus instanceof Campus ? $campus->getCampusId() : $campus;
                         foreach ($instances as $instance) {
                             $envelope->broadcastToCampus($campus, $instance);
                         }
@@ -231,6 +231,9 @@ class EventNotifier extends AbstractModuleNotifier
                     $envelope->targetToUser($event->getOwner(), $instance);
                 }
                 break;
+
+            default:
+                throw new \DomainException("Event not Campus, Group or Personal");
         }
 
         return $envelope;
