@@ -77,8 +77,17 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 		echo "\n------------------------------------------------------------\n";
 	}
 
+    /**
+     * Handle users who exist in Schoolbox but not Synergetic
+     * Blank code block, allowing customisation per site
+     */
+    public function removeIfNotExists()
+    {
+    }
+
 	/* Getters/Setters
 	 */
+
 
 	/**
 	 * Set a list of people to process
