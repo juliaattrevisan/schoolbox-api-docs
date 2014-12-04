@@ -48,8 +48,7 @@ switch (count($this->arg)) {
 try {
     $category = CategoryMapper::getInstance()->findById($class_id);
     CategoryMapper::getInstance()->loadJoinedModel('codes', $category, array('set_method' => 'setCodes'));
-}
-catch (Schoolbox\Mapper\Exception $e) {
+} catch (Schoolbox\Mapper\Exception $e) {
     error(6);
 }
 
@@ -83,13 +82,11 @@ if (!isset($unit_id)) {
     }
     if (isset($unit_id)) {
         $this->localRedir('/task/progressReport/'.$class_id.'/'.$unit_id);
-    }
-    else {
+    } else {
         $this->localRedir('/task/progressReport/'.$class_id.'/'.$firstId);
     }
     exit;
-}
-else {
+} else {
     // Check that the requested unit exists within this class.
     /** @var UnitInstance $current_unit */
     $current_unit = null;
@@ -115,7 +112,8 @@ if ($code && Config::get('external_enable')) {
     $class_list    = $class_handler->getStudents($code);
     if (is_array($student_list)) {
         $externalIdList = array_map(
-            function($student) { return $student['synergy_id']; },
+            function($student) { return $student['synergy_id'];
+            },
             $class_list
         );
         $classStudentIdList = \Schoolbox\UserMapper::getInstance()
@@ -128,7 +126,8 @@ $group_list    = $group_handler->getMemberList($category->getId());
 if (is_array($group_list)) {
     $groupStudentIdList = array_unique(
         array_map(
-            function($student) { return $student['uid']; },
+            function($student) { return $student['uid'];
+            },
             $group_list
         )
     );
@@ -147,7 +146,8 @@ foreach ($current_unit->getTasks() as $task) {
 
 /** @var User[] $userCollection */
 $userCollection = UserMapper::getInstance()->findByColumn(
-    'id', array_merge($classStudentIdList, $groupStudentIdList, $removedStudentIdList),
+    'id',
+    array_merge($classStudentIdList, $groupStudentIdList, $removedStudentIdList),
     array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
 );
 foreach ($userCollection as $userObject) {
@@ -274,12 +274,11 @@ foreach ($task_list as $task) {
         )
     );
     if (!empty($box_id)) {
-        $detail = new DueWork_Detail($box_id);
+        $detail = new DueWork_Detail($box_id, $task->getSubmissionBox());
         $detail->processStudents($userCollection);
         $student_submission_list[$box_id] = $detail->getSitepageData();
         $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
-    }
-    elseif (!empty($assess_id)) {
+    } elseif (!empty($assess_id)) {
         // attempt_list is a list of all valid attempts, ordered chronologically.
         // Filter to most recent submission only.
         $attempt_list = $handler->getList($assess_id);
@@ -295,8 +294,7 @@ foreach ($task_list as $task) {
             unset($attempt);
         }
         $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
-    }
-    else {
+    } else {
         $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
     }
     $this->parse('subheader_unit_task_block', 'subheader_unit_task', true);
@@ -325,9 +323,7 @@ foreach ($student_list as $student) {
     );
     $this->setVar('student_unit_task_block', '');
     foreach ($current_unit->getTasks() as $task) {
-
-
-        // Get the completion status for this student.
+// Get the completion status for this student.
         $student_status = Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE;
         foreach ($task->getCompletionList() as $completion) {
             if ($completion->getStudent()->getId() == $student['uid']) {
@@ -366,13 +362,11 @@ foreach ($student_list as $student) {
                 }
                 $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_GRADIENT', $gradient);
                 $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');
-            }
-            else {
+            } else {
                 $this->parse('student_unit_task_submission_box_no_mark_block', 'student_unit_task_submission_box_no_mark');
             }
             $this->parse('student_unit_task_submission_box_block', 'student_unit_task_submission_box');
-        }
-        elseif (!empty($assess_id)) {
+        } elseif (!empty($assess_id)) {
             // What is the mark for this student?
             $this->setVar(
                 array(
@@ -400,13 +394,11 @@ foreach ($student_list as $student) {
                 }
                 $this->setVar('STUDENT_UNIT_TASK_ASSESS_GRADIENT', $gradient);
                 $this->parse('student_unit_task_online_assess_mark_block', 'student_unit_task_online_assess_mark');
-            }
-            else {
+            } else {
                 $this->parse('student_unit_task_online_assess_no_mark_block', 'student_unit_task_online_assess_no_mark');
             }
             $this->parse('student_unit_task_online_assess_block', 'student_unit_task_online_assess');
-        }
-        else {
+        } else {
             $this->setVar(
                 array(
                     'STUDENT_UNIT_TASK_STATUS_TEXT'  => $status_list[$student_status]['text'],
