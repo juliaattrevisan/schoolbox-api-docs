@@ -128,6 +128,9 @@
 
 			config.element.each(function() {
 				$j(this).validate({
+                    errorPlacement: function(error, element) {
+                        error.appendTo(element.closest('td'));
+                    },
 					submitHandler: function(form) {
 						// Any inline submit forms? (there will be, if we are
 						// focused on a form element.) Use them if so.
