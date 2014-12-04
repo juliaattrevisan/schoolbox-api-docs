@@ -373,46 +373,51 @@
             categoryNode = $('#' + String(relationID)),
             self         = this;
 
+        // Unbind and rebind so that events aren't triggered multiple times
+
         /* double click files, default action */
-        newChildren.dblclick(function() {
-            if ($(this).hasClass("link")) {
-                window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank");
-            }
-            else {
-                window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank");
-            }
-        });
+        newChildren
+            .unbind('dblclick.resourceTree.threePanelBridge')
+            .bind('dblclick.resourceTree.threePanelBridge', function() {
+                if ($(this).hasClass("link")) {
+                    window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank");
+                }
+                else {
+                    window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank");
+                }
+            });
 
         /* select files */
-        newChildren.click(function (event) {
+        newChildren
+            .unbind('click.resourceTree.threePanelBridge')
+            .bind('click.resourceTree.threePanelBridge', function (event) {
+                /* allow multiple select */
+                if (!event.ctrlKey && !event.shiftKey)
+                    $('#file-list tr.selected').removeClass('selected');
 
-            /* allow multiple select */
-            if (!event.ctrlKey && !event.shiftKey)
-                $('#file-list tr.selected').removeClass('selected');
-
-            if (event.ctrlKey)
-                $(this).toggleClass('selected');
-            else
-                $(this).addClass('selected');
-
-            /* select range */
-            if (event.shiftKey) {
-
-                var node1 = $('#file-list tr').index($('#file-list tr.current'));
-                var node2 = $('#file-list tr').index(this);
-
-                if (node1 > node2)
-                    $('#file-list tr').slice(node2, node1).addClass('selected');
+                if (event.ctrlKey)
+                    $(this).toggleClass('selected');
                 else
-                    $('#file-list tr').slice(node1, node2).addClass('selected');
-            }
+                    $(this).addClass('selected');
 
-            $('#file-list tr.current').removeClass('current');
-            $(this).addClass('current');
+                /* select range */
+                if (event.shiftKey) {
 
-            self.threePanel.getMeta(relationID, $('#file-list tr.selected'))
+                    var node1 = $('#file-list tr').index($('#file-list tr.current'));
+                    var node2 = $('#file-list tr').index(this);
 
-        });
+                    if (node1 > node2)
+                        $('#file-list tr').slice(node2, node1).addClass('selected');
+                    else
+                        $('#file-list tr').slice(node1, node2).addClass('selected');
+                }
+
+                $('#file-list tr.current').removeClass('current');
+                $(this).addClass('current');
+
+                self.threePanel.getMeta(relationID, $('#file-list tr.selected'))
+
+            });
 
         /* drag files */
         var permission = categoryNode.data('permission');
