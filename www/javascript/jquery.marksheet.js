@@ -128,6 +128,7 @@
 
 			config.element.each(function() {
 				$j(this).validate({
+                    focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
                         var markingElement = element.closest('.inlineform');
