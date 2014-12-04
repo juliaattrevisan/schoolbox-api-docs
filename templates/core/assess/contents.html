@@ -12,7 +12,7 @@ $j(function() {
 		placeholder: "sortable-placeholder",
 		forcePlaceholderSize: true,
 		stop: function(event, ui) {
-			var allQuestions = $j(this).find('li');
+			var allQuestions = $j(this).children('li');
 			var section = $j(this).attr('id');
 			var data = new Array();
 
@@ -25,8 +25,9 @@ $j(function() {
 			$j.post('/assess/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
 				var sequence = 1;
 
-				$j.each($j('#' + section).find('li'), function(index, element) {
-					$j(element).find('strong').html('Q' + sequence);
+				$j.each($j('#' + section).children('li'), function(index, element) {
+          var strong = $j(element).find('strong');
+          strong.html(strong.text().replace(/^Q\d+/, 'Q' + sequence));
 					sequence++;
 				});
 			});
