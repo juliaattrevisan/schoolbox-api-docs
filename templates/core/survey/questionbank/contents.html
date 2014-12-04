@@ -26,11 +26,6 @@
             $j(this).closest('.question').toggleClass('checked')
         })
 
-        $j('.show-answers').click(function () {
-            $j(this).siblings('.question-answers').slideToggle();
-            return false;
-        });
-
         $j("#categoryTree")
                 .on('ready.jstree', function (event, jstree) {
                     var openNodes = [
@@ -95,6 +90,12 @@
         });
 
         $j('#subcategoryForm').validate();
+
+        $('[data-show-answer-content="true"]').click(function(event) {
+            $(this).parents('tr').find('[data-answer-content="true"]').slideToggle();
+
+            return false;
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -102,7 +103,7 @@
 <span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
 
 
-<div class="evaluation-content question-bank">
+<div class="evaluation-questionbank-container">
     <!-- BEGIN welcome -->
     <h2>Welcome</h2>
 
@@ -122,41 +123,57 @@
     <form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
         <input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
-        <!-- BEGIN question -->
-        <div class="add-to-evaluation">
-            <label class="question clearfix">
+        <table class="table ruler">
+            <colgroup>
+                <col width="20" />
+                <col />
+                <col width="128" />
+            </colgroup>
+            <!-- BEGIN question -->
+            <tr>
                 <!-- BEGIN select_question -->
-                <div class="question-checkbox">
-                    <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
-                </div>
+                <td>
+                    <label>
+                        <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
+                    </label>
+                </td>
                 <!-- END select_question -->
-                <span class="question-content">{QUESTION}</span>
-                <!-- BEGIN show_delete -->
-                <a class="btn delete no-text" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}"><span></span></a>
-                <!-- END show_delete -->
-                <a class="btn modify no-text" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}"><span></span></a>
-            </label>
+                <td>
+                    <div class="wysiwyg">
+                        {QUESTION}
+                    </div>
 
-            <!-- BEGIN missing_class -->
-            <p class="error-notification">
-                This question type no longer exists - it cannot be copied to the
-                survey, and should be removed from the question bank.
-            </p>
-            <!-- END missing_class -->
+                    <div>
+                        <!-- BEGIN missing_class -->
+                        <p class="error-notification">
+                            This question type no longer exists - it cannot be copied to the
+                            survey, and should be removed from the question bank.
+                        </p>
+                        <!-- END missing_class -->
 
-            <a href="#" class="show-answers">Show Answers</a>
-
-            <div class="question question-answers">
-                <ul>
-                    <!-- BEGIN answers -->
-                    <li>
-                        {ANSWER_DESCRIPTION}
-                    </li>
-                    <!-- END answers -->
-                </ul>
-            </div>
-        </div>
-        <!-- END question -->
+                        <div class='answer-content' data-answer-content="true">
+                            <ul>
+                                <!-- BEGIN answers -->
+                                <li>
+                                    {ANSWER_DESCRIPTION}
+                                </li>
+                                <!-- END answers -->
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="actions">
+                        <a class="btn eyeball no-text" href="#" data-show-answer-content="true" title="Show Answers"><span></span></a>
+                        <!-- BEGIN show_delete -->
+                        <a class="btn delete no-text" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete"><span></span></a>
+                        <!-- END show_delete -->
+                        <a class="btn modify no-text" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}" title="Modify"><span></span></a>
+                    </span>
+                </td>
+            </tr>
+            <!-- END question -->
+        </table>
 
         <p class="clearfix no-marg ">
             <!-- BEGIN show_submit -->

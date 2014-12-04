@@ -77,8 +77,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                     foreach ($answerList as $answer) {
 
                         /* Matching pairs uses a different property than
-                               * multiple choice
-                               */
+                         * multiple choice
+                         */
                         if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
                             $this->setVar(
                                 'ANSWER_DESCRIPTION',
@@ -91,7 +91,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                         $this->parse('answers_block', 'answers', true);
                     }
                 } else {
-                    $this->setVar('ANSWER_DESCRIPTION', Scrub::text($currentQuestion['answer']));
+                    $this->setVar('ANSWER_DESCRIPTION', Scrub::html($currentQuestion['answer']));
                     $this->parse('answers_block', 'answers', true);
                 }
             }

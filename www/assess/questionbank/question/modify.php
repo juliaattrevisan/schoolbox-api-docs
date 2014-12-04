@@ -126,6 +126,7 @@ else {
     $this->parse('answerInputs_block', 'answerFormFragment', true);
 
     $this->setVar(array(
+        'ASSESS_CATEGORY_ID' => 0,
 		'QUESTION_BANK_ID' => $question['question_bank_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
