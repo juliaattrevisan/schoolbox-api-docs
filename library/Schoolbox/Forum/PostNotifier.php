@@ -128,6 +128,22 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * If returns false, the given model will be hydrated before being returned to the calling method
+     *
+     * @param Post $model
+     * @return bool
+     */
+    protected function isHydrated($model)
+    {
+        $thread = !!$model->getThread()->getId();
+        $owner  = !!$model->getOwner()->getId();
+        // not testing getParent() - is allowed to be null
+
+        return $thread && $owner;
+    }
+
+
+    /**
      * @param Post   $post
      * @param User   $poster
      * @param string $title
@@ -168,6 +184,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      */
     protected function notifyFollowed($roletype, $post, $poster)
     {
+        /** @var Post $post */
+        $post     = $this->hydrate($post);
         $envelope = new Envelope();
         $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
                          ->addFilter('roletype', array($roletype));
@@ -198,6 +216,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      */
     protected function notifyMentioned($roletype, $post, $poster)
     {
+        /** @var Post $post */
+        $post     = $this->hydrate($post);
         $envelope = new Envelope();
         $bob      = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
                          ->addFilter('roletype', array($roletype));

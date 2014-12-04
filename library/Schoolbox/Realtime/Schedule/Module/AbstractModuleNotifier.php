@@ -139,6 +139,35 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
 
     /**
+     * Conditionally hydrates the model given, depending on whether or not it's already sufficiently hydrated
+     *
+     * @param object $model
+     * @return object
+     */
+    protected function hydrate($model)
+    {
+        if (!$this->isHydrated($model)) {
+            $getId = $this->mapper->getGetIdentifierMethodName();
+            $model = $this->mapper->findById($model->$getId());
+        }
+
+        return $model;
+    }
+
+
+    /**
+     * Test whether or not the given model is sufficiently hydrated, and return a boolean indicating such
+     *
+     * @param object $model
+     * @return bool
+     */
+    protected function isHydrated($model)
+    {
+        // simply return true here for most cases, implementing classes to override
+        return true;
+    }
+
+    /**
      * Return the list of callbacks that are associated with this trigger.
      * Uses SQL lookup to determine code paths. Dirty and awful, but at the moment the best way forward.
      *
