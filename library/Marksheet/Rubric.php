@@ -21,17 +21,16 @@ class Marksheet_Rubric extends Marksheet_Abstract
     * Take a UI-formatted mark and normalise it
     *
     * @param $rubric
-    * @param \Schoolbox\Assessment\Component\SubmissionBox $subbox
     * @return array|mixed
     */
-    public function normaliseMark($rubric, \Schoolbox\Assessment\Component\SubmissionBox $subbox)
+    public function normaliseMark($rubric)
     {
         $mark = 0;
         foreach ($rubric as $i) {
             $mark += $i;
         }
 
-        $max = $this->getRubricHandler()->getRubricMaxScore($subbox->getId());
+        $max = $this->getRubricHandler()->getRubricMaxScore($this->getSubmissionBox()->getId());
 
         $normalised = (($mark / $max) * 100);
 
@@ -46,7 +45,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
 
         return array(
             'norm_mark' => $normalised,
-            'mark'      => $this->clean_num($mark, 4, false) . " / " . $max
+            'mark'      => $this->cleanNumber($mark, 4, false) . " / " . $max
         );
     }
 
@@ -54,21 +53,20 @@ class Marksheet_Rubric extends Marksheet_Abstract
      * Extract a normalised mark from the database, and format it for the UI
      *
      * @param $user_id
-     * @param $box_id
      * @param bool $asText
      * @param bool $blankZero
      * @return mixed
      */
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true)
+    public function retrieveMark($user_id, $asText = false, $blankZero = true)
     {
-
+        $box_id = $this->getSubmissionBox()->getId();
         // we can't trust the submission_box table, because it may have been set to null, so retrieve rubric data
         $marks = $this->getRubricHandler()->getStudentMarksTotal($user_id, $box_id);
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
 
 /*
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
-        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
+        $mark = $this->cleanNumber(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
 */
 
         return array(
@@ -91,7 +89,7 @@ class Marksheet_Rubric extends Marksheet_Abstract
      */
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
-        $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
+        $mark = $this->cleanNumber(($rawMark / 100) * $maxMark, 4, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 

@@ -125,7 +125,7 @@ class DueWork_Detail
             }
 
             // get student's mark, if there is one
-            $insertion['mark'] = $this->marksheet->retrieveMark($user->getId(), $this->dueWork['id']);
+            $insertion['mark'] = $this->marksheet->retrieveMark($user->getId());
 
             $returns = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
             $insertion['return'] = is_array($returns) ? $returns[0] : array();
@@ -147,7 +147,7 @@ class DueWork_Detail
         // setup blocks, etc
         $page->setTab('submission');
         $page->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
-        $page->setTitle( Scrub::text($this->dueWork['categoryName']).': '.Scrub::text($this->dueWork['name']));
+        $page->setTitle(Scrub::text($this->dueWork['categoryName']).': '.Scrub::text($this->dueWork['name']));
 
         $page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
         $page->setBlock('student_row', 'submission_row', 'submission_row_block');
@@ -266,7 +266,9 @@ class DueWork_Detail
 
                     $plagHref = sprintf(
                         "%s%s/submission/plagiarismReport/%s/?zx_h=600px",
-                        $page->conType(), $_SERVER['HTTP_HOST'], $submission['plag_doc_id']
+                        $page->conType(),
+                        $_SERVER['HTTP_HOST'],
+                        $submission['plag_doc_id']
                     );
 
                     $page->setVar(

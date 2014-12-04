@@ -7,15 +7,16 @@
  * @version     SVN: $Id$
  *
  */
-class Marksheet_Percent extends Marksheet_Abstract {
+class Marksheet_Percent extends Marksheet_Abstract
+{
 
-    public function normaliseMark($mark, \Schoolbox\Assessment\Component\SubmissionBox $subbox) {
+    public function normaliseMark($mark)
+    {
 
         // validation: must be within 0 - 100
-        if($mark < 0) {
+        if ($mark < 0) {
             $mark = 0;
-        }
-        elseif($mark > 100) {
+        } elseif ($mark > 100) {
             $mark = 100;
         }
 
@@ -25,17 +26,20 @@ class Marksheet_Percent extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
-        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
+    public function retrieveMark($user_id, $asText = false, $blankZero = true)
+    {
+        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser(
+            $user_id,
+            $this->getSubmissionBox()->getId()
+        );
 
         $dem = DueWork_ErrorMapper::getInstance();
         $errs = $dem->listDisplayValues();
 
-        if(in_array($subReturn['mark'], $errs)) {
+        if (in_array($subReturn['mark'], $errs)) {
             $rawMark = $subReturn['mark'];
-        }
-        else {
-            $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
+        } else {
+            $mark = $this->cleanNumber($subReturn['norm_mark'], 0, $blankZero);
             $rawMark = $asText ? "$mark%" : $mark;
         }
 
@@ -46,17 +50,18 @@ class Marksheet_Percent extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
-        $mark = $this->clean_num($rawMark, 0, $blankZero);
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
+    {
+        $mark = $this->cleanNumber($rawMark, 0, $blankZero);
         return $asText ? "$mark%" : $mark;
     }
 
-    public function outputUI(SitePage $page, $mark) {
+    public function outputUI(SitePage $page, $mark)
+    {
         $output = array(
             'MARK' => Scrub::text($mark['mark']),
             'COMMENT'  => Scrub::text($mark['comment'])
         );
         $page->setVar($output);
     }
-
 }
