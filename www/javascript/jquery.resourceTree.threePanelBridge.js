@@ -389,8 +389,8 @@
 
         /* double click files, default action */
         newChildren
-            .unbind('dblclick.resourceTree.threePanelBridge')
-            .bind('dblclick.resourceTree.threePanelBridge', function() {
+            .off('dblclick.resourceTree.threePanelBridge')
+            .on('dblclick.resourceTree.threePanelBridge', function() {
                 if ($(this).hasClass("link")) {
                     window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank");
                 }
@@ -401,8 +401,8 @@
 
         /* select files */
         newChildren
-            .unbind('click.resourceTree.threePanelBridge')
-            .bind('click.resourceTree.threePanelBridge', function (event) {
+            .off('click.resourceTree.threePanelBridge')
+            .on('click.resourceTree.threePanelBridge', function (event) {
                 /* allow multiple select */
                 if (!event.ctrlKey && !event.shiftKey)
                     $('#file-list tr.selected').removeClass('selected');
@@ -434,9 +434,9 @@
         /* drag files */
         var permission = categoryNode.data('permission');
         if (permission === 'full' || permission === 'write') {
-            newChildren.find('span.file').on(
-                'mousedown',
-                function(event) {
+            newChildren
+                .off('mousedown.resourceTree.threePanelBridge', 'span.file')
+                .on('mousedown.resourceTree.threePanelBridge', 'span.file', function(event) {
                     var length     = $('#file-list tr.selected').length;
                     var helperText = length > 1
                         ? ('('+String(length)+' files)')
