@@ -1,41 +1,41 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-$j(function() {
-	$j('a.delete').click(function(event) {
-		event.preventDefault();
-		$j(this).confirmDialog();
-	});
+    $(function () {
+        $('a.delete').click(function (event) {
+            event.preventDefault();
+            $(this).confirmDialog();
+        });
 
-	/* Make questions sortable
-	 */
-	$j(".question-list").sortable({
-		placeholder: "sortable-placeholder",
-		forcePlaceholderSize: true,
-		stop: function(event, ui) {
-			var allQuestions = $j(this).children('li');
-			var section = $j(this).attr('id');
-			var data = new Array();
+        /* Make questions sortable
+         */
+        $(".question-list").sortable({
+            placeholder: "sortable-placeholder",
+            forcePlaceholderSize: true,
+            stop: function () {
+                var allQuestions = $(this).children('li'),
+                    section      = $(this).attr('id'),
+                    data         = [];
 
-			$j.each(allQuestions, function(index, element) {
-				data.push(element.id);
-			});
+                $.each(allQuestions, function (index, element) {
+                    data.push(element.id);
+                });
 
-			/* Reorder questions upon reorder completion
-			 */
-			$j.post('/assess/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
-				var sequence = 1;
+                /* Reorder questions upon reorder completion
+                 */
+                $.post('/assess/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function () {
+                    var sequence = 1;
 
-				$j.each($j('#' + section).children('li'), function(index, element) {
-          var strong = $j(element).find('strong');
-          strong.html(strong.text().replace(/^Q\d+/, 'Q' + sequence));
-					sequence++;
-				});
-			});
-		}
-	});
+                    $.each($('#' + section).children('li'), function (index, element) {
+                        var strong = $(element).find('strong');
 
-	$j(".question-list" ).disableSelection();
-});
+                        strong.html(strong.text().replace(/^Q\d+/, 'Q' + sequence));
+                        sequence++;
+                    });
+                });
+            }
+        })
+        .disableSelection();
+    });
 </script>
 
 <h2>Manage Quiz</h2>
