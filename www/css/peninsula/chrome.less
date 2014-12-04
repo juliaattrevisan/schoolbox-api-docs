@@ -24,6 +24,7 @@
 @logo-width: 					194px;
 @logo-height: 					48px;
 @infopanel-bellsprite:			'/images/peninsula/bell.png';
+@infopanel-height:				30px;
 
 // Generic colors
 @dark-blue:                     #013A63; // Dark Schoolbox Blue
@@ -44,7 +45,7 @@
 @banner-color:      			#FFFFFF;
 @banner-links:      			@banner-color;
 @search-color:                  @banner-color;
-@banner-height:     			72px;
+@banner-height:     			112px;
 
 // Modules
 @module-heading: 				@link;
@@ -52,7 +53,7 @@
 @admin-nav:                     @secondary-text;
 
 // Refers to the left navigation
-@navigation-width:				200px;
+@navigation-width:				192px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#ffd91e;
@@ -146,7 +147,7 @@ body{
 	.homepage-controls{
 		li a{
 			margin: 0 0 0 8px;
-			&:hover{ background: @link; }
+			&:hover, &.hover{ background: @link; }
 		}
 		.status-buttons {
 			top: 27px;
@@ -156,6 +157,7 @@ body{
 }
 
 #nav{
+	top: 110px;
 	h3{
 		font-size: 18px;
 		font-weight: normal;
@@ -166,7 +168,7 @@ body{
 #header{
 	.logo{
 		left: 16px;
-		top: 7px;
+		top: 8px;
 	}
 	#search-field{
 		background: #111436;
@@ -178,19 +180,21 @@ body{
 	#tabs{
 		.gradient(#ea3640,#bc1215);
 		border-top-left-radius: 6px;
-		border-top-right-radius: 6px;
 		height: 48px;
 		padding: 8px 16px;
 		box-sizing: border-box;
+		position: relative;
+		top: 15px;
+		z-index: 1;
 		li a{
 			.border-radius(3px);
 			height: 32px;
 			line-height: 32px;
-			font-size: 16px;
+			font-size: 15px;
 		}
 		.navthis a{ font-weight: normal; }
 	}
-	#infoPanel .bell{
+	#infoPanel [data-unread]:not([data-unread="0"]) {
 		.box-shadow(0px, 3px, 0px, #134e7d);
 		.border-radius(3px);
 	}
