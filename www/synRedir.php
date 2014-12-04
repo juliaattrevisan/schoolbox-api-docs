@@ -10,6 +10,7 @@ $user = $userHandler->getByID($_SESSION['id']);
 /* Setup form variable */
 $form="Form1";
 $action=Cfg::get('external_portal').'login.aspx';
+
 $method="POST";
 
 $ch = curl_init();
@@ -19,6 +20,11 @@ curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/'.Cfg::get('site_version'));
 $login = curl_exec($ch);
 curl_close($ch);
 unset($ch);
+
+/* Handles deep linking */
+if($_GET['page'])
+    $action = $action . '?ReturnUrl='.$_GET['page'].'.aspx';
+
 
 preg_match('/id="__VIEWSTATE" value="(.*?)"/', $login, $viewState);
 preg_match('/id="__EVENTVALIDATION" value="(.*?)"/', $login, $eventValidation);
