@@ -295,24 +295,27 @@ class Factory
         $errors = $this->getErrors();
 
         if (isset($errors[$this->getMark()])) {
-/* A string mark was submitted (Absent, Not Submitted, etc)
+            /* A string mark was submitted (Absent, Not Submitted, etc)
              */
             $returnedWork->setMark($errors[$this->getMark()]->getDisplayAs());
             $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
         } elseif ($this->getSubmissionBox()->isRubric()) {
             /* If it's a rubric, it normalises in a special way
+             * However: if I submitted this from the view submission page there's no rubric set.
+             * Don't change the norm mark if this happened.
              */
-            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric());
-
-            $returnedWork->setMark($normalisedMarkArray['mark']);
-            $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+            if ($this->getRubric()) {
+                $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric());
+                $returnedWork->setMark($normalisedMarkArray['mark']);
+                $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+            }
         } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
-/* Empty mark (not zero) - treat as null
+            /* Empty mark (not zero) - treat as null
              */
             $returnedWork->setMark(null);
             $returnedWork->setNormalizedMark(null);
         } else {
-/* Just do it in the normal way
+            /* Just do it in the normal way
              */
             $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
             $returnedWork->setMark($normalisedMarkArray['mark']);
