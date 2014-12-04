@@ -12,12 +12,19 @@ class Synchronise_Synergetic_Spags_Strategy_Staff extends Synchronise_Base_Strat
      */
     protected function setup() {
         $this->verbose_filter = new Synchronise_Synergetic_Spags_Verbose();
+
+        $unsetter = new Synchronise_Base_Hydrator_UnsetOnUpdate();
+        $unsetter->setClearFields(array('webmail', 'local_email', 'mail_handler'));
+
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
-            ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
+            ->addHydrator(new Synchronise_Base_Hydrator_Webmail())
+            ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
+            ->addHydrator(new Synchronise_Synergetic_Spags_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Synergetic_Spags_Hydrator_Group_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator($unsetter)
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }

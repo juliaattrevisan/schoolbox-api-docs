@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Synergetic_Spags_Hydrator_Campus implements Synchronise_Base_IHydrator {
+class Synchronise_Synergetic_Spags_Hydrator_Campus_Student implements Synchronise_Base_IHydrator {
 
     /**
      * Hydrates user's campus and default campus.
