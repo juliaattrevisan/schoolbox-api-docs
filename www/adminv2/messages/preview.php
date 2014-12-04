@@ -32,9 +32,12 @@ if(empty($this->arg[0])) {
 $bob = new \Alaress\Async\Notification\Instance\Builder(false);
 $decorator = new \Schoolbox\Realtime\Notification\Decorator();
 
+$coreContext = new \Schoolbox\Mail\CoreContext(new \Schoolbox\Config\Loader());
+
 switch($this->arg[0]) {
 	case 'instant':
 		$email = new \Schoolbox\Mail\TwigEmail('instantmail.twig');
+        $email->setCoreContext($coreContext->getContext());
 		$email->setContext(array(
 			'recipient' => $_SESSION['user']->getFirstname()
 		));
@@ -61,6 +64,7 @@ switch($this->arg[0]) {
 	case 'digest':
 	default:
 		$email = new \Schoolbox\Mail\TwigEmail('digestmail.twig');
+        $email->setCoreContext($coreContext->getContext());
 		$cctx = $email->getCoreContext();
 
 		$decorator->appendInstance($bob
