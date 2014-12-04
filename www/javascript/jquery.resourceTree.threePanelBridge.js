@@ -125,6 +125,19 @@
                 tolerance: 'pointer'
             })
             .on('drop',                self.onDropOntoTreeNode.bind(self))
+        ;
+
+        // select_node doesn't trigger on initial tree load.
+        // The best I can do is init files when I hover over the list.
+        if (self.options.selected) {
+            $('#file-window').one(
+                'hover',
+                'tr.category-' + self.options.selected + ':not(.empty)',
+                function() {
+                    self.initializeFiles(self.options.selected);
+                }
+            )
+        }
     };
 
     /**
