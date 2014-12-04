@@ -11,11 +11,12 @@ namespace Schoolbox\Calendar;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Calendar;
-use Html2Text\Html2Text;
 use Monolog\Logger;
+use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -65,10 +66,8 @@ class EventNotifier extends AbstractModuleNotifier
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
             // advise 10 minutes before start, and only advise updated once published
-
             $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
-                ? $event->getPublishDateTime()
-                        ->getUnixTimestamp()
+                ? $event->getPublishDateTime()->getUnixTimestamp()
                 : self::IMMEDIATELY;
 
             $bundle->attachEach(array(
@@ -90,14 +89,12 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function newBuilder($trigger, $roleType, $event)
     {
-        $plain = new Html2Text($event->getDetail());
         $bob   = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon('/images/icon.php?size=32&icon=clock')
             ->setHref('/calendar/' . $event->getStartDateTime()->getUsingFormat('d-m-Y'))
-            ->setBody($plain->get_text())
-            ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-            ->addTopic("calendar.{$event->getType()->getType()}.{$event->getId()}.$trigger")
+            ->setBody($event->getDetail())
+            ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
             ->addFilter('roletype', array($roleType))
             ->setSeverity(Logger::INFO);
 
@@ -113,28 +110,15 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpcoming($roleType, $event, $author)
     {
-        $envelope = new Envelope();
-        $bob      = $this->newBuilder('upcoming', $roleType, $event)
-                         ->setTitle(':name is about to start')
-                         ->setParam('name', new Param($event->getTitle()));
+        /** @var Event $event */
+        $event = $this->mapper->findById($event->getId());
 
-        $instance = $bob->build();
+        $bob   = $this->newBuilder('upcoming', $roleType, $event)
+                      ->setTitle(':name is about to start')
+                      ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
+                      ->setParam('name', new Param($event->getTitle()));
 
-        switch ($event->getAccess()) {
-            case Calendar::ACCESS_CAMPUS:
-                foreach ($event->getCampusCollection() as $campus) {
-                    $envelope->broadcastToCampus($campus, $instance);
-                }
-                break;
-            case Calendar::ACCESS_GROUP:
-                $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
-                break;
-            case Calendar::ACCESS_PERSONAL:
-                $envelope->targetToUser($event->getOwner(), $instance);
-                break;
-        }
-
-        return $envelope;
+        return $this->notify($event, array($bob->build()));
     }
 
 
@@ -147,21 +131,21 @@ class EventNotifier extends AbstractModuleNotifier
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
     {
-        $envelope = new Envelope();
-        $bob      = $this->newBuilder('upcoming', $roleType, $event);
-
+        /** @var Event $event */
+        $event     = $this->mapper->findById($event->getId());
+        $bob       = $this->newBuilder('updated', $roleType, $event);
         $instances = array();
 
         // title changed
-        if (isset($diff['note'])) {
+        if (isset($diff['title'])) {
             $bob->setTitle(':user renamed the event :old to :new')
                 ->setParams(array(
                     'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                    'old'  => new Param($diff['note'][1]),
+                    'old'  => new Param($diff['title'][1]),
                     'new'  => new Param($event->getTitle())
                 ));
             $instances[] = $bob->build();
-            unset($diff['note']);
+            unset($diff['title']);
         }
 
         // location changed
@@ -177,7 +161,7 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         // time changed
-        if (isset($diff['startDate']) && isset($diff['startTime'])) {
+        if (isset($diff['startDate']) || isset($diff['startTime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(array(
                     'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
@@ -201,28 +185,55 @@ class EventNotifier extends AbstractModuleNotifier
             $instances[] = $bob->build();
         }
 
+        return $this->notify($event, $instances);
+    }
+
+
+    /**
+     * @param Event      $event
+     * @param Instance[] $instances
+     * @return Envelope
+     */
+    protected function notify(Event $event, $instances)
+    {
+        $envelope  = new Envelope();
 
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
                 $collection = $event->getCampusCollection();
-                if (!($collection instanceof \Traversable || is_array($collection))) {
-                    foreach ($event->getCampusCollection() as $campus) {
+                if ($collection instanceof \Traversable || is_array($collection)) {
+                    foreach ($collection as $campus) {
+                        $campus = $campus instanceof Campus ? $campus->getCampusId() : $campus;
                         foreach ($instances as $instance) {
                             $envelope->broadcastToCampus($campus, $instance);
                         }
                     }
                 }
                 break;
+
             case Calendar::ACCESS_GROUP:
                 foreach ($instances as $instance) {
-                    $envelope->broadcastToCategory($event->getCategory(), UserAccess::ACCESS_READ, $instance);
+                    if ($cat = $event->getCategory()) {
+                        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $instance);
+                    }
+                    if ($cats = $event->getCategoryCollection()) {
+                        if ($cats->count()) {
+                            foreach ($cats as $cat) {
+                                $envelope->broadcastToCategory($cat->getCategoryId(), UserAccess::ACCESS_READ, $instance);
+                            }
+                        }
+                    }
                 }
                 break;
+
             case Calendar::ACCESS_PERSONAL:
                 foreach ($instances as $instance) {
                     $envelope->targetToUser($event->getOwner(), $instance);
                 }
                 break;
+
+            default:
+                throw new \DomainException("Event not Campus, Group or Personal");
         }
 
         return $envelope;
