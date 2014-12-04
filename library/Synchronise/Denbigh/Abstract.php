@@ -77,6 +77,13 @@ abstract class Synchronise_Denbigh_Abstract {
         echo "\n------------------------------------------------------------\n";
     }
 
+    /**
+     * Handle users who exist in Schoolbox but not Synergetic
+     * Blank code block, allowing customisation per site
+     */
+    public function removeIfNotExists()
+    {
+    }
 
     /* Getters and Setters */
 

@@ -25,4 +25,13 @@ interface Synchronise_Synergetic_Strategy_Interface {
 	 * @abstract
 	 */
 	public function createIfExists();
+
+
+    /**
+     * Optionally remove them
+     *
+     * @abstract
+     */
+    public function removeIfNotExists();
+
 }
