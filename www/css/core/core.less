@@ -8186,11 +8186,6 @@ form.context {
         margin-top: 6px;
         margin-bottom: 6px;
 	}
-
-    input {
-      margin-bottom: 6px;
-    }
-
 }
 
 .view-submission {
@@ -8230,7 +8225,6 @@ form.context {
                         vertical-align: top;
                     }
                     .combobox{
-                        margin: 0 8px 0 0;
                         min-width: 5em;
                         max-width: 10em;
                     }
@@ -10440,40 +10434,26 @@ div.colours p {
  * Date: 2012-01-15
  */
 .combobox {
-    margin-right: 0.1em;
 }
 .combobox_arrow {
     background: transparent;
     display: block;
     height: 100%;
     width: 100%;
-    padding: 0px 2px;
     font-size: 9px;
+    text-align: center;
+    vertical-align: middle;
     color: @secondary-text;
 }
 .combobox_button {
-    -webkit-border-radius: 0 4px 4px 0;
-    -moz-border-radius: 0 4px 4px 0;
-    border-radius: 0 4px 4px 0;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    background: @std-grey;
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, @std-grey), color-stop(0.6, @lgrey));
-    background-image: -webkit-linear-gradient(center bottom, @std-grey 0%, @lgrey 60%);
-    background-image: -moz-linear-gradient(center bottom, @std-grey 0%, @lgrey 60%);
-    background-image: -o-linear-gradient(bottom, @std-grey 0%, @lgrey 60%);
-    background-image: -ms-linear-gradient(top, @std-grey 0%,@lgrey 60%);
-    filter: "progid:DXImageTransform.Microsoft.gradient( startColorstr='@{std-grey}', endColorstr='@{lgrey}',GradientType=0 )";
-    background-image: linear-gradient(top, @std-grey 0%,@lgrey 60%);
+    background: @lgrey;
     position: absolute;
-    right: 0;
-    top: 0;
+    // No border, so make this fit inside a bordered input
+    right: 1px;
+    top: 1px;
     display: block;
     height: 100%;
     width: 18px;
-    border: solid 1px @std-grey;
-    border-left: none;
 }
 
 .combobox_button:hover {

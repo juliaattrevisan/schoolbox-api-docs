@@ -37,10 +37,8 @@
         var buttonLeftPosition = this.textInputElement.outerWidth() + 0;
         var showSelectorButton = jQuery('<a href="#" class="combobox_button"></a>')
             .css({
-                position: 'absolute',
                 height: (inputHeight-2)+'px',
-                top: 0,
-                left: buttonLeftPosition+'px'
+                lineHeight: (inputHeight-2)+'px'
             })
             .append('<div class="combobox_arrow">&#9660;</div>')
         showSelectorButton.insertAfter(this.textInputElement);
