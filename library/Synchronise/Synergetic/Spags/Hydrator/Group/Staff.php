@@ -7,11 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 class Synchronise_Synergetic_Spags_Hydrator_Group_Staff implements Synchronise_Base_IHydrator {
+
     /**
      * Hydrates groups according to following:
-     * * TEACHER => 2
-     * * STAFF   => 19
-     * * default => 19
      */
     public function hydrate($externalUser, $newUser) {
 
