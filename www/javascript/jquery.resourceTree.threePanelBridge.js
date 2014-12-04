@@ -118,14 +118,26 @@
             .on('after_open.jstree',   self.onAfterOpen.bind(self))
             .on('hover_node.jstree',   self.onHoverNode.bind(self))
             .on('dehover_node.jstree', self.onDehoverNode.bind(self))
-            .droppable({
-                scope: 'resourceFile',
-                hoverClass: "accept",
-                greedy: true,
-                tolerance: 'pointer'
-            })
-            .on('drop',                self.onDropOntoTreeNode.bind(self))
         ;
+
+        // Set up jsTree's drag/drop, because inexplicably jstree leaves
+        // don't take kindly to jQuery droppables
+        $(document)
+            .on('dnd_stop.vakata', function(event, data) {
+                // Am I dragging onto the jstree, and is there a hovered ID?
+                if (data.data.jstree
+                    && self.hoveredId
+                    && $(data.element).is('span.file')
+                ) {
+                    // This is a file, do the drag/drop thing
+                    self.onDropOntoTreeNode(
+                        event,
+                        {
+                            draggable: $(data.element)
+                        }
+                    );
+                }
+            });
 
         // select_node doesn't trigger on initial tree load.
         // The best I can do is init files when I hover over the list.
@@ -317,13 +329,13 @@
         // Why not just set the whole tree as droppable and figure out
         // which node is selected?
         var self          = this,
-            scope         = $(event.currentTarget).droppable('option', 'scope'),
+            //scope         = $(event.currentTarget).droppable('option', 'scope'),
             node          = $(ui.draggable).closest("tr"),
             destinationId = this.hoveredId,
             fileContainer = node.parent()
-        if (scope != 'resourceFile') {
-            return;
-        }
+        //if (scope != 'resourceFile') {
+        //    return;
+        //}
         if (!destinationId) {
             return;
         }
@@ -422,25 +434,27 @@
         /* drag files */
         var permission = categoryNode.data('permission');
         if (permission === 'full' || permission === 'write') {
-            newChildren.find('span.file').draggable({
-                scope: 'resourceFile',
-                cursor: 'move',
-                cursorAt: {top: 5, left: 5},
-                helper: function (event) {
-                    // How many items are selected?
-                    // More than one - show the number of files, not the name.
-                    var length = $('#file-list tr.selected').length;
-                    var node   = $(event.currentTarget).clone().addClass('accept').css('z-index', 100);
-                    if (length > 1) {
-                        node.text('('+String(length)+' files)');
-                    }
-                    return node;
-                },
-                opacity: 1,
-                revert: "invalid",
-                revertDuration: 300,
-                scroll: true
-            });
+            newChildren.find('span.file').on(
+                'mousedown',
+                function(event) {
+                    var length     = $('#file-list tr.selected').length;
+                    var helperText = length > 1
+                        ? ('('+String(length)+' files)')
+                        : $(this).text()
+                    ;
+                    // No nodes actually get added to the tree
+                    return $.vakata.dnd.start(
+                        event, {
+                            'jstree' : true,
+                            'obj' : $(this),
+                            'nodes' : []
+                        },
+                        '<div id="jstree-dnd" class="jstree-default"><i class="jstree-icon jstree-er"></i>'
+                        + helperText
+                        + '</div>'
+                    );
+                }
+            );
         }
     };
 
