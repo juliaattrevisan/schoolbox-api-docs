@@ -75,6 +75,32 @@ readsqlver() {
 	tempsqlver=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_version'" 2>/dev/null`;
 }
 
+readsqlconfig() {
+	# Retrive some of the Schoolbox config from MySQL using provided credentials
+	tempsqlsitehostname=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_hostname'" 2>/dev/null`;
+	tempsqlsitedomain=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_domain'" 2>/dev/null`;
+	tempsqlamqpuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_user'" 2>/dev/null`;
+	tempsqlamqppass=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_pass'" 2>/dev/null`;
+	tempsqlamqpvhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_vhost'" 2>/dev/null`;
+	tempsqlwebsocketport=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port'" 2>/dev/null`;
+	tempsqlwebsocketportssl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port_ssl'" 2>/dev/null`;
+	tempsqlexternaldbhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_host'" 2>/dev/null`;
+	tempsqlexternalportal=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_portal'" 2>/dev/null`;
+}
+
+setsqlconfig() {
+	# Set some of the Schoolbox config from MySQL using provided credentials
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsitehostname' WHERE name='site_hostname'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsitedomain' WHERE name='site_domain'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqpuser' WHERE name='amqp_user'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqppass' WHERE name='amqp_pass'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqpvhost' WHERE name='amqp_vhost'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketport' WHERE name='websocket_port'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketportssl' WHERE name='websocket_port_ssl'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbhost' WHERE name='external_db_host'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternalportal' WHERE name='external_portal'";
+}
+
 tempconffile="$conffile";
 readconf;
 
@@ -449,6 +475,7 @@ fi
 # Re-read the conf file to ensure safety
 tempconffile="$conffile";
 readconf;
+readsqlconfig;
 cd $curdir;
 
 # Backup this installs database
@@ -462,17 +489,12 @@ fi
 
 # Restore the DB
 echo -e "\nStarting restore of the database";
-## Drop resource booking tables in a specific order due to foreign keys
-for table in `echo "resource_moderator resource_relation resource_booking lu_resource_booking_status resource lu_resource_moderation_type resource_category"`;
-do
-	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "DROP TABLE IF EXISTS \`$table\`";
-done;
-## Drop all existing database tables
-for table in `mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SHOW TABLES"`;
-do
-	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "DROP TABLE IF EXISTS \`$table\`";
-done;
-
+## Backup the current DB config separately
+mysqldump --allow-keywords -i -e -q -a --skip-extended-insert -c -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb config > /tmp/$sqldb-config-`date -I`.sql;
+## Drop existing DB and reload just config table
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "DROP DATABASE $sqldb;";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb;";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
 ## Restore specified database
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
 
@@ -510,10 +532,6 @@ fi
 echo "";
 $instdir/tools/update-sql.sh;
 
-## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
-echo -e "\nRunning Notifications Binder";
-php $instdir/tools/mq/binder.php -v 2>/dev/null;
-
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
 	tempsqltitle=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
@@ -531,12 +549,14 @@ then
 	titleprefix='[Vagrant]';
 	updatetitle;
 	setmailcatcher;
+	setsqlconfig;
 fi
 if [ "$package" = 'schoolboxdev' ];
 then
 	titleprefix='[Dev]';
 	updatetitle;
 	setmailcatcher;
+	setsqlconfig;
 fi
 
 # Restart apache
@@ -560,19 +580,24 @@ then
 	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
 	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
 	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolboxdev-rerouted restart >/dev/null 2>&1;
 else
 	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
 	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
 	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
+	/usr/sbin/service schoolbox-rerouted restart >/dev/null 2>&1;
 fi
+
+## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
+echo -e "\nRunning Notifications Binder";
+php $instdir/tools/mq/binder.php -vvv 2>/dev/null;
 
 # Cleanup
 umount $backup_dir 2>/dev/null;
 
 echo -e "\nManual Task Reminders:";
-echo -e "* check websocket ports in the config table";
-echo -e "* recheck the title in the config table";
-echo -e "* set the correct site_hostname and site_domain in the config table";
+echo -e "* check all the following config settings in the config table";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT name,value FROM config WHERE name in ('site_hostname','site_domain','external_db_host','external_portal','websocket_port','websocket_port_ssl','amqp_vhost','amqp_user','amqp_pass','title')";
 echo "";
 
 exit;
