@@ -7796,6 +7796,14 @@ p.forgotten {
     &.no-pad {
         padding: 0;
     }
+
+    /* All wizzywig images should dynamically resize regardless of their
+     * specified dimensions, to fit within containign elements
+     */
+    img {
+        width: 100%;
+        height: auto;
+    }
 }
 
 .revision-box {
