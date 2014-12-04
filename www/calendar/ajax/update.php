@@ -69,10 +69,10 @@ if ($updatedEvent['allday']) {
     $updatedEvent['endTime']   = '00:00:00';
 }
 
-if (isset($_POST['note']) && isset($_POST['detail'])) {
+if (isset($_POST['title']) && isset($_POST['detail'])) {
     /* For tasks
      */
-    $updatedEvent['title']     = $_POST['note'];
+    $updatedEvent['title']     = $_POST['title'];
     $updatedEvent['detail']    = $_POST['detail'];
     $updatedEvent['completed'] = $_POST['completed'];
 } elseif (isset($_POST['completed'])) {

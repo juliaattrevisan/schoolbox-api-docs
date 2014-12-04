@@ -171,7 +171,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ID'             => '',
             'EVENT_USER_ID'        => $selectedUser->getId(),
             'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
-            'EVENT_TITLE'          => '',
+            'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_START_DATE'     => $event->getStartDateTime()->getUsingFormat('d/m/Y'),

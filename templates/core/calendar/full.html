@@ -306,7 +306,7 @@
             c.getForm('createTask').show()
 
             // copy details from event to task
-            cp('event', 'task', ['date', 'displayDate', 'note', 'allDay'])
+            cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
 
         });
 
@@ -317,7 +317,7 @@
             c.getForm('createTask').hide()
 
             // copy details from event to task
-            cp('task', 'event', ['date', 'displayDate', 'note', 'allDay'])
+            cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
 
         })
 
@@ -492,7 +492,7 @@
                 <input name="allDay" type="hidden" value="" />
                 <input name="date" type="hidden" value="" />
                 <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
-                <label>Event Title<input name="note" type="text" value="" /></label>
+                <label>Event Title<input name="title" type="text" value="" /></label>
                 <label>Event Type<select name="type">
                     <!-- BEGIN event_type -->
                     <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
@@ -512,7 +512,7 @@
                 <input name="date" type="hidden" value="" />
                 <input name="allDay" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
-                <label>Task<input name="note" type="text" value="" /></label>
+                <label>Task<input name="title" type="text" value="" /></label>
                 <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label class="detail">Note<textarea name="detail"></textarea></label>
                 <input class="btn modify float-right no-icon" type="submit" value="Create Task" />
@@ -555,7 +555,7 @@
                 <input type="hidden" name="eventId" />
                 <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
                 <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
-                <label>Task<input id="modifyTaskBubbleNote" name="note" type="text" value="" /></label>
+                <label>Task<input id="modifyTaskBubbleNote" name="title" type="text" value="" /></label>
                 <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
                 <input type="submit" class="btn float-right no-icon" value="Update Task" />
                 <a href="#" class="deleteTask btn no-icon float-right">Delete</a>

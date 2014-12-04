@@ -110,7 +110,7 @@ switch ($_POST['action']) {
         $event->setOwner($owner);
         $event->setAccess($_POST['level']);
         $event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
-        $event->setTitle($_POST['note']);
+        $event->setTitle($_POST['title']);
         $event->setStartDateTime($startDate);
         $event->setEndDateTime($endDate);
         $event->setLocation($_POST['location']);
