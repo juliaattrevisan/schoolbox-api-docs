@@ -129,7 +129,13 @@
 			config.element.each(function() {
 				$j(this).validate({
                     errorPlacement: function(error, element) {
-                        error.appendTo(element.closest('td'));
+                        // Attach to a table row if there is one there
+                        var markingElement = element.closest('.inlineform');
+                        if (markingElement.length) {
+                            error.appendTo(markingElement);
+                        } else {
+                            error.insertAfter(element);
+                        }
                     },
 					submitHandler: function(form) {
 						// Any inline submit forms? (there will be, if we are
