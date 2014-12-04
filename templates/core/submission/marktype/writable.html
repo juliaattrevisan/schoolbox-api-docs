@@ -1,7 +1,7 @@
 <div id="inlineform{UFID}" class="inlineform markForm clearfix">
     <!-- BEGIN mark_type_percent -->
     <input name="mark[{OWNER_ID}]" class="combobox mark-input percent" type="text" value="{MARK}"/>
-    <span>&nbsp;%</span>
+    <span class="combobox_label">&nbsp;%</span>
     <!-- END mark_type_percent -->
     <!-- BEGIN mark_type_letter -->
     <select data-marktype="letter" id="mark" class="mark-input" name="mark[{OWNER_ID}]">
@@ -12,7 +12,7 @@
     <!-- END mark_type_letter -->
     <!-- BEGIN mark_type_raw -->
     <input name="mark[{OWNER_ID}]" class="combobox mark-input out-of" type="text" maxlength="15" value="{MARK}"/>
-    <span>&nbsp;/&nbsp;<strong class="validation-limit">{MAX_MARK}</strong></span>
+    <span class="combobox_label">&nbsp;/&nbsp;<strong class="validation-limit">{MAX_MARK}</strong></span>
     <!-- END mark_type_raw -->
     <!-- BEGIN mark_type_free -->
     <input name="mark[{OWNER_ID}]" class="mark-input free" type="text" size="4" maxlength="15" value="{MARK}"/>
