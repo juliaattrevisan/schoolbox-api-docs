@@ -60,11 +60,13 @@
     <h2>Categories</h2>
     <ul class="resourcecategory-list admin-nav vertical">
         <li class="resourcecategory">
-            <a href="{{ routeLookup('resourceItem.browse') }}">All</a>
+            <a href="{{ routeLookup('resourceItem.browse') }}"
+               class="{% if not categoryId %}current{% endif %}"
+            >All</a>
         </li>
         {% for item in categoryList %}
             <li class="resourcecategory">
-                {% include '@resourceItem/sub/searchLink.twig' %}
+                {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
             </li>
         {% endfor %}
     </ul>
