@@ -660,7 +660,7 @@ $(function() {
 						</table>
 					</form>
 </div>
-<div class="level last clearfix">
+<div class="level clearfix">
     <h3>Recent Activity Logs</h3>
     <div class="split-container forty">
         <div class="split">
@@ -706,4 +706,18 @@ $(function() {
 			</table>
 		</div>
 	</div>
+</div>
+<div class="level clearfix last">
+  <h3>Send Message to {FULLNAME}</h3>
+  <p>
+    <em>{FIRSTNAME} must be signed in to receive a popup alert</em>
+  </p>
+  <form action="/adminv2/sendAlert" method="POST">
+    <label><strong>Message from {SITE_LOGINNAME}:</strong>
+      <input type="hidden" name="user" value="{USERID}" />
+      <input type="text" value="" name="body" />
+    </label>
+    <input class="submit-btn-plain" type="submit" value="Send" />
+  </form>
+</div>
 </div>
