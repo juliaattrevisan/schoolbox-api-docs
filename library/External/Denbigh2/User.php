@@ -262,7 +262,7 @@ class External_Denbigh2_User implements External_UserInterface
 
             /* Thing to look for
              */
-            $pattern = '/' . strtolower($name) . '/';
+            $pattern = "/{$name}/i";
 
             /* Places to look in
              */
