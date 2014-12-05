@@ -582,6 +582,14 @@ Notifications
   }
 }
 
+#alert-dialog {
+	padding: 0;
+	+ .ui-dialog-buttonpane {
+		border-top: none;
+		margin-top: 0;
+	}
+}
+
 #infoPanel {
 	margin: 8px 24px 8px 0;
 	position: relative;
@@ -765,7 +773,7 @@ Notifications
 	right: -16px;
 	top: @infopanel-height + @flyout-pad-height;
 	padding-left: 0;
-//	min-width: 300px;
+	//	min-width: 300px;
 	h4 {
 		font-weight: bold;
 		color: @flyout-header-color;
@@ -784,6 +792,8 @@ Notifications
 	img {
 		position: static;
 	}
+}
+.msg-tray {
 	.messages {
 		padding: 0;
 		&.header {
@@ -866,6 +876,9 @@ Notifications
 				span {
 					margin-right: 32px;
 				}
+			}
+			&.tpl {
+				display: none;
 			}
 			a {
 				display: block;
