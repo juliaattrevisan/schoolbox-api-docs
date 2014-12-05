@@ -458,9 +458,12 @@
                             },
                             close: closeDialog
                         });
+                    } else {
+                        // reset the countdown
+                        clearTimeout(ii);
                     }
 
-                    //ii = setTimeout(closeDialog, (amqpMsg.meta.ttl || settings.alertTtl) * 1000);
+                    ii = setTimeout(closeDialog, (amqpMsg.meta.ttl || settings.alertTtl) * 1000);
 
                     // jQuery loop equiv for "break"
                     return false;
