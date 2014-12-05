@@ -59,7 +59,45 @@ class External_Denbigh2_User implements External_UserInterface
         ));
 
         if (!count($api->getErrors())) {
-            $result = $api->getResult();
+            $result = $api->getResult()->data[0];
+
+            $data = array(
+                'StudentID' => $result->{'Student ID'},
+                'StudentGiven1' => $result->{'Given Names'},
+                'StudentSurname' => $result->{'Surname'},
+                'StudentBirthDate' => $result->{'Date of Birth'},
+                'StudentHouseDescription' => $result->{'House'},
+                'StudentHouse' => $result->{'House'},
+                'HeadOfHouseID' => '',
+                'StudentHeadOfHouse' => '',
+                'StudentBoarder' => '',
+                'StudentForm' => '',
+                'FormDescription' => '',
+                'StudentFormStaffName' => '',
+                'StudentTutor' => '',
+                'StudentTutorName' => '',
+                'StudentTutorDescription' => '',
+                'TeacherFormID' => '',
+                'TeacherTutorID' => '',
+                'StudentYearLevel' => $result->{'Academic Year'},
+                'YearLevelCoordID' => '',
+                'StudentYearLevelCoordinator' => '',
+                'StudentLockerBook' => '',
+                'StudentEmergencyName' => $result->{'Father'} . ' ' . $result->{'Father Surname'},
+                'StudentEmergencyPhone' => $result->{'Father Phone'},
+                'StudentEmergencyPhoneAlt' => '',
+                'StudentEmergency2Name' => $result->{'Mother'} . ' ' . $result->{'Mother Surname'},
+                'StudentEmergency2Phone' => $result->{'Mother Phone'},
+                'StudentEmergency2PhoneAlt' => '',
+                'StudentEmergency3Name' => '',
+                'StudentEmergency3Phone' => '',
+                'StudentEmergency3PhoneAlt' => '',
+                'StudentMedicalAlert' => $result->{'Medical Alert Label'},
+                'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
+                'AlertMessage' => '',
+            );
+
+            return $data;
         }
     }
 
@@ -326,10 +364,10 @@ class External_Denbigh2_User implements External_UserInterface
      * staff by using the Schoolbox $userId
      *
      * returns array(
-     *      'code' => class category code
-     *      'name' => class name
-     *      'classType' => a string e.g. academic, music, maths
-     *      'campusCode' => the campus this class is in
+     *      'code'  => $result->{class category code
+     *      'name'  => $result->{class name
+     *      'classType'  => $result->{a string e.g. academic, music, maths
+     *      'campusCode'  => $result->{the campus this class is in
      * )
      *
      * @param $externalUserId
