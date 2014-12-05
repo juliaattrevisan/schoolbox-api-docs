@@ -345,8 +345,6 @@ class External_Denbigh2_User implements External_UserInterface
         $api = new External_Denbigh2_Api('Students', array());
 
         if (!count($api->getErrors())) {
-
-
             foreach ($api->getResult()->data as $currentStudent) {
                 // TODO: I guess I need the NetworkLogin
                 // TODO: Campus isn't being populated
