@@ -215,6 +215,7 @@ class Instance implements JsonSerializable {
 			'icon'      => $this->icon,
 			'href'      => $this->href,
 			'meta'      => $this->meta,
+            'level'     => $this->severity,
 		);
 	}
 
@@ -240,6 +241,7 @@ class Instance implements JsonSerializable {
 		$href          = $array['href'];
 		$time          = $array['time'];
 		$meta          = $array['meta'];
+        $severity      = isset($array['level']) ? $array['level'] : 0;
 
 		// cast param array to objects
 		$params = array();
@@ -250,13 +252,19 @@ class Instance implements JsonSerializable {
 		}
 
 		// these vars are lost on (and not relevant to) reconstitution
-		$severity      = 0;
 		$topics        = array();
 		$context       = array();
 
 		return new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
 	}
 
+
+    /**
+     * @return string
+     */
+    public function getNamespace() {
+        return $this->namespace;
+    }
 
 	/**
 	 * @return array
