@@ -83,7 +83,9 @@ else {
     $this->setVar(array(
         'ACTION' => 'modify',
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_ACTION' => 'Modify Survey',
+        'ASSESS_ACTION'    => 'Modify',
+        'ASSESS_KIND'      => 'Survey',
+        'ASSESS_KIND_LC'   => 'survey',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION' => $assess['description'],
@@ -143,9 +145,7 @@ else {
 
     /* Show this Survey's contents
      */
-    $this->setFile('assessContentsFragment', 'survey/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
 
     $assess = new Survey_Main();
     $assess->renderAssessContents($this->arg[0], $this);

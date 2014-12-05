@@ -154,8 +154,6 @@ if (!empty($_POST)) {
     /* Show this Assess' contents
     */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
@@ -170,6 +168,8 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'ASSESS_KIND_LC'   => 'assess',
+        'ASSESS_KIND'      => 'Quiz',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],

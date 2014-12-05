@@ -128,7 +128,9 @@ else {
 
     $this->setVar(array(
         'ACTION'                  => 'modify',
-        'ASSESS_ACTION'           => 'Modify Quiz',
+        'ASSESS_ACTION'           => 'Modify',
+        'ASSESS_KIND_LC'          => 'assess',
+        'ASSESS_KIND'             => 'Quiz',
         'ASSESS_IS_TASK'          => !empty($task_id) ? 1 : 0,
         'ASSESS_ASSESS_ID'        => $assessment->getId(),
         'ASSESS_CATEGORY_ID'      => $assessment->getCategory()->getId(),
@@ -208,8 +210,6 @@ else {
 	/* Show this Assess' contents
 	 */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
 
     $assess = new Assess_Main();
     $assess->renderAssessContents($this->arg[0], $this);

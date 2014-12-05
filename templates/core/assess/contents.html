@@ -22,7 +22,7 @@
 
                 /* Reorder questions upon reorder completion
                  */
-                $.post('/assess/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function () {
+                $.post('/{ASSESS_KIND_LC}/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function () {
                     var sequence = 1;
 
                     $.each($('#' + section).children('li'), function (index, element) {
@@ -38,30 +38,35 @@
     });
 </script>
 
-<h2>Manage Quiz</h2>
+<h2>Manage {ASSESS_KIND}</h2>
 <div class="pad-it">
 
-	<p class="clearfix">
-		<a class="btn add float-left marg" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add Section</a>
-		<a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify</a>
-		<a href="/assess/export/xml/{ASSESS_ASSESS_ID}" class="btn export float-left marg" ><span></span>Export</a>
-		<a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
+	<p class="clearfix tiny-btns">
+		<a class="btn add float-left marg" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
+		<a href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify</a>
+		<a href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
+		<a href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
     </p>
 
 	<!-- BEGIN section -->
 	<div class="evaluation-section">
 		<h3>{SECTION_TITLE}
-            <a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete no-text"><span></span></a>
-            <a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text"><span></span></a>
+            <a href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}" class="btn delete no-text"><span></span></a>
+            <a href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}" class="btn modify no-text"><span></span></a>
 
         </h3>
 		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
 			<!-- BEGIN question -->
 			<li id='question_{QUESTION_QUESTION_ID}'>
-				<strong>Q{QUESTION_SEQUENCE}) ({QUESTION_MARKS} marks)</strong>
-                <div class="wysiwyg">{QUESTION_QUESTION}</div>
-				<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Modify</a> |
-				<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
+				<strong>
+          Q{QUESTION_SEQUENCE})
+          <!-- BEGIN has_mark -->
+          ({QUESTION_MARKS} marks)
+          <!-- END has_mark -->
+        </strong>
+        <div class="wysiwyg">{QUESTION_QUESTION}</div>
+				<a href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}">Modify</a> |
+				<a class="delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 			</li>
 			<!-- END question -->
 		</ul>
@@ -69,8 +74,8 @@
 		<ul>
 			<li class="clearfix">
 				<p class="clearfix no-marg">
-					<a class="btn add marg" href="/assess/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
-					<a class="btn download marg" href="/assess/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Add from Question Bank</a>
+					<a class="btn add marg" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
+					<a class="btn download marg" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Add from Question Bank</a>
 				</p>
 			</li>
 		</ul>

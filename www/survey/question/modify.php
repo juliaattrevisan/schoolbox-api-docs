@@ -153,9 +153,7 @@ else {
 
     /* Show this Survey' contents
       */
-    $this->setFile('assessContentsFragment', 'survey/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
@@ -170,6 +168,8 @@ else {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'ASSESS_KIND_LC'   => 'survey',
+        'ASSESS_KIND'      => 'Survey',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],

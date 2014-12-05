@@ -66,6 +66,8 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
+        'ASSESS_KIND_LC'   => 'assess',
+        'ASSESS_KIND'      => 'Quiz',
         'ASSESS_TITLE' => Scrub::text($assess['title']),
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => '',
@@ -75,8 +77,6 @@ if (!empty($_POST)) {
     /* Show this Assess' contents
      */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
 
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 

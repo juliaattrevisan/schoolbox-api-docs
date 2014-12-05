@@ -123,13 +123,17 @@ abstract class Evaluation_Main extends DeprecatedModel
     /**
      * Get a list of Sections and their Questions for a particular Assess.
      *
-     * @param  $assess_id
-     * @param  $page
+     * @param  int      $assess_id
+     * @param  SitePage $page
      *
      * @return void
      */
     public function renderAssessContents($assess_id, $page)
     {
+        $page->setBlock('assessContentsFragment', 'section', 'section_block');
+        $page->setBlock('section', 'question', 'question_block');
+        $page->setBlock('question', 'has_mark', 'has_mark_block');
+
         $allQuestions = $this->getContents($assess_id);
 
         $currentSection = $allQuestions[0]['section_id'];
@@ -183,6 +187,12 @@ abstract class Evaluation_Main extends DeprecatedModel
                                     : floor($currentQuestion['marks']),
                         )
                     );
+
+                    if ($page->getVar('ASSESS_KIND_LC') == 'survey') {
+                        $page->setVar('has_mark_block', '');
+                    } else {
+                        $page->parse('has_mark_block', 'has_mark');
+                    }
 
                     $page->parse('question_block', 'question', true);
 
