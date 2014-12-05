@@ -53,12 +53,14 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        $api = new External_Denbigh2_Api('Students.json', array(
+        $api = new External_Denbigh2_Api('Students', array(
             'Student ID' => $externalUserId,
             'RFMmax' => 1
         ));
 
-        new \Alaress_Probe($api->getResult());
+        if (!count($api->getErrors())) {
+            $result = $api->getResult();
+        }
     }
 
     /**

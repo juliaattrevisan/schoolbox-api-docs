@@ -37,11 +37,11 @@ class External_Denbigh2_Api {
      *
      * Curly whirly upon instantiation
      *
-     * @param $url
+     * @param $type
      * @param $keyvalues
      */
-    public function __construct($url, $keyvalues) {
-        $curl = new \Alaress_Curl_Url($this->generateGetRequest($url, $keyvalues));
+    public function __construct($type, $keyvalues) {
+        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues));
 
         $this->setCurl($curl)->getCurl()->exec();
     }
@@ -49,12 +49,15 @@ class External_Denbigh2_Api {
     /**
      * Manufacture url
      *
-     * @param $url
+     * @param $type
      * @param $keyvalues
      * @return string
      */
-    private function generateGetRequest($url, $keyvalues) {
-        $url = "{$this->getHost()}/{$url}";
+    private function generateGetRequest($type, $keyvalues) {
+
+        /* Explicitly use the .json return structure
+         */
+        $url = "{$this->getHost()}/{$type}.json";
 
         /* Merge in authentication stuff
          */
@@ -86,7 +89,7 @@ class External_Denbigh2_Api {
      * @return mixed
      */
     public function getResult() {
-        return $this->getCurl()->getResult();
+        return json_decode($this->getCurl()->getResult());
     }
 
     /* Getters/Setters
