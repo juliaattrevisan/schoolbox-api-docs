@@ -135,7 +135,23 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        // TODO: Implement getStudentContactList() method.
+        /* Gotta get the famiry code out of the Student result set
+         */
+        $api = new External_Denbigh2_Api('Students', array(
+            'Student ID' => $externalUserId,
+        ));
+
+        if (!count($api->getErrors())) {
+            $result = $api->getResult()->data[0];
+
+            $api = new External_Denbigh2_Api('Family', array(
+                'Family Code' => $result->{'Family Code'},
+            ));
+
+            if (!count($api->getErrors())) {
+                new \Alaress_Probe($api->getResult());
+            }
+        }
     }
 
     /**
@@ -196,6 +212,13 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
+        $api = new External_Denbigh2_Api('', array(
+            'Student ID' => $externalUserId,
+        ));
+
+        if (!count($api->getErrors())) {
+            new \Alaress_Probe($api->getResult());
+        }
         // TODO: Implement getStudentContactListExtended() method.
     }
 

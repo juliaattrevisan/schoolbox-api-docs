@@ -35,13 +35,19 @@ class External_Denbigh2_Api {
      * $url is the data file ie. Students.json, Staff.json etc
      * $keyvalues is a key-value array
      *
-     * Curly whirly upon instantiation
+     * $options is an array of query options such as offsets,
+     * limits, min/max settings and other undocumented novelties
+     * These don't conform to RFMsF<n> and RFMsV<n> structure, so
+     * they need to be amalgamated separately if provided
+     *
+     * Curly-whirl upon instantiation
      *
      * @param $type
      * @param $keyvalues
+     * @param $options
      */
-    public function __construct($type, $keyvalues) {
-        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues));
+    public function __construct($type, $keyvalues, $options = array()) {
+        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues, $options));
 
         $this->setCurl($curl)->getCurl()->exec();
     }
@@ -51,9 +57,10 @@ class External_Denbigh2_Api {
      *
      * @param $type
      * @param $keyvalues
+     * @param $options
      * @return string
      */
-    private function generateGetRequest($type, $keyvalues) {
+    private function generateGetRequest($type, $keyvalues, $options) {
 
         /* Explicitly use the .json return structure
          */
@@ -65,7 +72,28 @@ class External_Denbigh2_Api {
             'RFMkey' => $this->getKey()
         );
 
-        $dataset = array_merge($authentication, $keyvalues);
+        /* Munge up the $keyvalues into the format expected,
+         * using RFMsF and RFMsV keys and values because yeah
+         *
+         * So I decided to make it easier to use, with just normal
+         * key-value pairs being passed in here for processing
+         */
+        $keys = array_keys($keyvalues);
+        $values = array_values($keyvalues);
+
+        $mungedValues = array();
+
+        for ($i=0; $i<count($keys); $i++) {
+            $index = $i+1;
+
+            $keystring = "RFMsF{$index}";
+            $valuestring = "RFMsV{$index}";
+
+            $mungedValues[$keystring] = $keys[$i];
+            $mungedValues[$valuestring] = $values[$i];
+        }
+
+        $dataset = array_merge($authentication, $mungedValues, $options);
 
         /* Implode all that
          */
