@@ -13,13 +13,15 @@
             content:   '#msg-content',
             list:      '#message-list',
             readall:   '#msg-mar',
+            alertBox:  '#alert-dialog',
 
             prefetch:  5,
             maxstack:  3,
             debug:     false,
             domwait:   1000,
             transport: 'socket',
-            timeout:   5000
+            timeout:   5000,
+            alertTtl:  30
         }, options);
 
         // cast boolean from potential string
@@ -280,6 +282,7 @@
                     if(data.fetch)     { self.pipeFetch(data.fetch); }
                     if(data.push)      { self.pipePush(data.push); }
                     if(data.ack)       { self.pipeMarkAsRead(data.ack); }
+                    if(data.alert)     { self.pipeAlert(data.alert); }
                     if(data.error)     { self.pipeError(data); }
                 }
                 catch(err) {
@@ -421,6 +424,47 @@
                     return true;
                 });
                 updateDOM();
+            }
+
+            this.pipeAlert = function (data) {
+                if(settings.debug) { console.log('Message from server: parsing alert'); }
+                // while there will always only be one, it follows the same data structure as the others
+                $.each(data, function (msgId, amqpMsg) {
+
+                    var ii,
+                        box         = $(settings.alertBox),
+                        msg         = box.find('li.tpl').clone().removeClass('tpl'),
+                        noModal     = typeof box.data('ui-dialog') == 'undefined',
+                        closeDialog = function () {
+                            box.dialog('close').find('li.msg').not('.tpl').detach();
+                            clearTimeout(ii);
+                        };
+
+                    msg.attr('id', 'm-'+msgId);
+                    msg.find('a.action').attr('href', amqpMsg.href);
+                    msg.find('img').attr('src', amqpMsg.icon);
+                    msg.find('span.descript').html(amqpMsg.body);
+
+                    box.find('ul.content').append(msg);
+
+                    if (noModal || !box.data('ui-dialog')._isOpen) {
+                        box.dialog({
+                            title: amqpMsg.meta.title,
+                            modal: true,
+                            width: 300,
+                            resizable: false,
+                            buttons: {
+                                Ok: closeDialog
+                            },
+                            close: closeDialog
+                        });
+                    }
+
+                    //ii = setTimeout(closeDialog, (amqpMsg.meta.ttl || settings.alertTtl) * 1000);
+
+                    // jQuery loop equiv for "break"
+                    return false;
+                });
             }
 
             /**

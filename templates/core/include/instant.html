@@ -1,6 +1,6 @@
 <li class="bell" data-unread="{WEBSOCKET_UNREAD_COUNT}">
   <a id="go-msg" href="/messages" data-menu="message-list">{WEBSOCKET_UNREAD_LABEL}</a>
-  <ul id="message-list" class="flyout-menu">
+  <ul id="message-list" class="flyout-menu msg-tray">
     <li class="messages header">
       <h4>
         <span>Messages</span>
@@ -19,8 +19,20 @@
     </li>
   </ul>
 </li>
+<div id="alert-dialog" class="open content" style="display:none;">
+  <div class="msg-tray">
+    <ul class="messages content">
+      <li class="msg tpl" id="m">
+        <a class="action" href="#">
+          <img width="32" height="32" src="">
+          <span class="descript"></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
 <script type="text/javascript">
-  $(function() {
+  $(function () {
     // launch the notifier
     $('#infoPanel').children('li.bell').notifier({
       host:     '{WEBSOCKET_HOST}',
@@ -29,5 +41,9 @@
       secure:   '{PAGE_SECURE}',
       maxstack: '{WEBSOCKET_STACK_LIMIT}'
     });
+
+    $('#alert-dialog').on('click', 'a.action', function (e) {
+      e.preventDefault();
+    })
   });
 </script>
