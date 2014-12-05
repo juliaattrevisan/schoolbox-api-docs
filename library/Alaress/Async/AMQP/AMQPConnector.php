@@ -283,22 +283,23 @@ abstract class AMQPConnector implements AMQPInterface {
 	}
 
 
-	/**
-	 * Publish a message to a particular routing key.
-	 *
-	 * @param AMQPMessage|string $message
-	 * @param string $routingKey
-	 * @param string $channelId
-	 * @return self
-	 */
-	public function publish($message, $routingKey, $channelId = null) {
+    /**
+     * Publish a message to a particular routing key.
+     *
+     * @param AMQPMessage|string $message
+     * @param string             $routingKey
+     * @param array              $properties
+     * @param string             $channelId
+     * @return self
+     */
+	public function publish($message, $routingKey, $properties = array(), $channelId = null) {
 		// wrap message in object if it's not already
 		if(!$message instanceof AMQPMessage) {
 			$properties = array(
 				'message_id'    => $this->hashMessage($message, $channelId),
 				'delivery_mode' => $this->persist,
-				'timestamp'     => time(),
-				'expiration'    => $this->expiry
+				'timestamp'     => isset($properties['timestamp']) ? $properties['timestamp'] : time(),
+				'expiration'    => isset($properties['expiration']) ? $properties['expiration'] : $this->expiry
 			);
 			$message = new AMQPMessage($message, $properties);
 		}
