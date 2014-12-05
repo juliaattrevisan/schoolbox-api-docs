@@ -53,6 +53,8 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
+        $data = array();
+
         $api = new External_Denbigh2_Api('Students', array(
             'Student ID' => $externalUserId,
         ));
@@ -95,9 +97,9 @@ class External_Denbigh2_User implements External_UserInterface
                 'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
                 'AlertMessage' => '',
             );
-
-            return $data;
         }
+
+        return $data;
     }
 
     /**
@@ -135,6 +137,8 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
+        $data = array();
+
         /* Gotta get the famiry code out of the Student result set
          */
         $api = new External_Denbigh2_Api('Students', array(
@@ -178,10 +182,10 @@ class External_Denbigh2_User implements External_UserInterface
                     'StudentContactType' => '',
                     'StudentContactSpouseRelation' => '',
                 );
-
-                return $data;
             }
         }
+
+        return $data;
     }
 
     /**
@@ -336,10 +340,12 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
+        $allStudents = array();
+
         $api = new External_Denbigh2_Api('Students', array());
 
         if (!count($api->getErrors())) {
-            $allStudents = array();
+
 
             foreach ($api->getResult()->data as $currentStudent) {
                 // TODO: I guess I need the NetworkLogin
@@ -364,9 +370,9 @@ class External_Denbigh2_User implements External_UserInterface
 
                 $allStudents[] = $student;
             }
-
-            new \Alaress_Probe($allStudents);
         }
+
+        return $allStudents;
     }
 
     /**
