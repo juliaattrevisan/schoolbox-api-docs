@@ -55,7 +55,6 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $api = new External_Denbigh2_Api('Students', array(
             'Student ID' => $externalUserId,
-            'RFMmax' => 1
         ));
 
         if (!count($api->getErrors())) {
