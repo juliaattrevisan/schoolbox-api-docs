@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Denbigh2_User
  *
@@ -7,14 +8,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class External_Denbigh2_User implements External_UserInterface {
-
-    /* Student-specific
-     */
+class External_Denbigh2_User implements External_UserInterface
+{
 
     /**
      * Get student info for $externalUserId
-     * 
+     *
      * StudentID,
      * StudentGiven1,
      * StudentSurname,
@@ -52,7 +51,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return array
      */
-    public function getStudent($externalUserId) {}
+    public function getStudent($externalUserId)
+    {
+        // TODO: Implement getStudent() method.
+    }
 
     /**
      * Get a list of student contacts (parents) and their contact information
@@ -86,7 +88,10 @@ class External_Denbigh2_User implements External_UserInterface {
      *
      * @param $externalUserId
      */
-    public function getStudentContactList($externalUserId) {}
+    public function getStudentContactList($externalUserId)
+    {
+        // TODO: Implement getStudentContactList() method.
+    }
 
     /**
      * Gets a list of Contacts for all Students in a particular year level.
@@ -144,7 +149,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $boardingStatus
      * @param $form
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {}
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+        // TODO: Implement getStudentContactListExtended() method.
+    }
 
     /**
      * Gets some basic information about a student
@@ -165,7 +173,10 @@ class External_Denbigh2_User implements External_UserInterface {
      *
      * @return array
      */
-    public function getStudentUserAccountInfo() {}
+    public function getStudentUserAccountInfo()
+    {
+        // TODO: Implement getStudentUserAccountInfo() method.
+    }
 
     /**
      * Returns a list of email parent email addresseses for students.
@@ -174,10 +185,10 @@ class External_Denbigh2_User implements External_UserInterface {
      *
      * @return array
      */
-    public function getParentEmails($synergyIds) {}
-
-    /* Parent-specific
-     */
+    public function getParentEmails($synergyIds)
+    {
+        // TODO: Implement getParentEmails() method.
+    }
 
     /**
      * Gets the contact info of the person who is a Student's Contact.
@@ -186,7 +197,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return array
      */
-    public function getParent($externalUserId) {}
+    public function getParent($externalUserId)
+    {
+        // TODO: Implement getParent() method.
+    }
 
     /**
      * Gets the contact info of the person who is a Student's Contact. The ID
@@ -204,7 +218,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return array
      */
-    public function getParentSync($externalUserId) {}
+    public function getParentSync($externalUserId)
+    {
+        // TODO: Implement getParentSync() method.
+    }
 
     /**
      * Get the following fields for all parents
@@ -230,10 +247,10 @@ class External_Denbigh2_User implements External_UserInterface {
      *
      * @return array
      */
-    public function getParentUserAccountInfo() {}
-
-    /* Staff-specific
-     */
+    public function getParentUserAccountInfo()
+    {
+        // TODO: Implement getParentUserAccountInfo() method.
+    }
 
     /**
      * Get the following fields for the staff member $externalUserId
@@ -251,7 +268,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return array
      */
-    public function getStaff($externalUserId) {}
+    public function getStaff($externalUserId)
+    {
+        // TODO: Implement getStaff() method.
+    }
 
     /**
      * Get staff account information
@@ -260,17 +280,20 @@ class External_Denbigh2_User implements External_UserInterface {
      *
      * @return array
      */
-    public function getStaffUserAccountInfo() {}
-
-    /* Common methods
-     */
+    public function getStaffUserAccountInfo()
+    {
+        // TODO: Implement getStaffUserAccountInfo() method.
+    }
 
     /**
      * Get contact list for staff directory
      *
      * @return array
      */
-    public function getStaffContactListExtended() {}
+    public function getStaffContactListExtended()
+    {
+        // TODO: Implement getStaffContactListExtended() method.
+    }
 
     /**
      * Find out the current semester and current year
@@ -283,7 +306,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param null $externalUserId
      * @return null
      */
-    public function getCurrentSemester($externalUserId = null) {}
+    public function getCurrentSemester($externalUserId = null)
+    {
+        // TODO: Implement getCurrentSemester() method.
+    }
 
     /**
      * Get a list of subjects for $externalUserId
@@ -303,7 +329,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $userId
      * @return array
      */
-    public function getSubjectList($externalUserId, $userId) {}
+    public function getSubjectList($externalUserId, $userId)
+    {
+        // TODO: Implement getSubjectList() method.
+    }
 
     /**
      * Get all the enrolled students belonging to $externalUserId
@@ -312,7 +341,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return array
      */
-    public function getEnrolledStudents($externalUserId) {}
+    public function getEnrolledStudents($externalUserId)
+    {
+        // TODO: Implement getEnrolledStudents() method.
+    }
 
     /**
      * Get the email address as a string for a particular person
@@ -320,7 +352,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return string
      */
-    public function getEmail($externalUserId) {}
+    public function getEmail($externalUserId)
+    {
+        // TODO: Implement getEmail() method.
+    }
 
     /**
      * Get the portrait for a particular user
@@ -329,7 +364,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $externalUserId
      * @return string
      */
-    public function getPortrait($externalUserId) {}
+    public function getPortrait($externalUserId)
+    {
+        // TODO: Implement getPortrait() method.
+    }
 
     /**
      * Determine whether someone is a day boarder or not
@@ -337,7 +375,10 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $boarderValue
      * @return string
      */
-    public function determineBoarderType($boarderValue) {}
+    public function determineBoarderType($boarderValue)
+    {
+        // TODO: Implement determineBoarderType() method.
+    }
 
     /**
      * Find the housemasterId for a particular house
@@ -345,5 +386,8 @@ class External_Denbigh2_User implements External_UserInterface {
      * @param $houseID
      * @return string
      */
-    public function getHousemasterByHouseId($houseID) {}
+    public function getHousemasterByHouseId($houseID)
+    {
+        // TODO: Implement getHousemasterByHouseId() method.
+    }
 }
