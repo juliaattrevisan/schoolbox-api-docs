@@ -336,14 +336,37 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $api = new External_Denbigh2_Api('', array(
-            'Student ID' => $externalUserId,
-        ));
+        $api = new External_Denbigh2_Api('Students', array());
 
         if (!count($api->getErrors())) {
-            new \Alaress_Probe($api->getResult());
+            $allStudents = array();
+
+            foreach ($api->getResult()->data as $currentStudent) {
+                // TODO: I guess I need the NetworkLogin
+                // TODO: Campus isn't being populated
+                // TODO: Boarders - dunno
+
+                $student = array(
+                    'StudentID' => $currentStudent->{'Student ID'},
+                    'NetworkLogin' => '',
+                    'StudentTitle' => '',
+                    'StudentPreferred' => $currentStudent->{'Preferred Name'},
+                    'StudentSurname' => $currentStudent->{'Surname'},
+                    'StudentGender' => $currentStudent->{'Gender'},
+                    'StudentEmail' => $currentStudent->{'Email Address'},
+                    'StudentOccupEmail' => '',
+                    'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                    'StudentHouse' => $currentStudent->{'House'},
+                    'StudentBoarder' => '',
+                    'StudentBoardingHouse' => '',
+                    'StudentCampus' => $currentStudent->{'Campus'},
+                );
+
+                $allStudents[] = $student;
+            }
+
+            new \Alaress_Probe($allStudents);
         }
-        // TODO: Implement getStudentUserAccountInfo() method.
     }
 
     /**
@@ -355,6 +378,13 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
+        $api = new External_Denbigh2_Api('', array(
+            'Student ID' => $externalUserId,
+        ));
+
+        if (!count($api->getErrors())) {
+            new \Alaress_Probe($api->getResult());
+        }
         // TODO: Implement getParentEmails() method.
     }
 
