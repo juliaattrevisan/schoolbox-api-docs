@@ -239,17 +239,80 @@ class External_Denbigh2_User implements External_UserInterface
      * @param $name
      * @param $boardingStatus
      * @param $form
+     *
+     * @return array
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        $api = new External_Denbigh2_Api('', array(
-            'Student ID' => $externalUserId,
-        ));
+        $params = array();
+        $allNameSources = array();
+        $pattern = null;
+        $collection = array();
+
+        /* Filter by year level
+         */
+        if (strlen($yearlevel) && is_numeric($yearlevel)) {
+            $params['Academic Year'] = (int)$yearlevel;
+        }
+
+        /* Filter by name
+         */
+        if (strlen(trim($name))) {
+            $pregName = true;
+
+            /* Thing to look for
+             */
+            $pattern = '/' . strtolower($name) . '/';
+
+            /* Places to look in
+             */
+            $allNameSources = array(
+                'Given Names', 'First Name', 'Surname', 'Preferred Name'
+            );
+        }
+        else {
+            $pregName = false;
+        }
+
+        /* TODO: Boarding house and Form information not available?
+         */
+
+        /* Proceed
+         */
+        $api = new External_Denbigh2_Api('Students', $params);
 
         if (!count($api->getErrors())) {
-            new \Alaress_Probe($api->getResult());
+            $allStudents = $api->getResult()->data;
+
+            /* Filter people out by name, if provided
+             * Otherwise just restack them
+             */
+            foreach ($allStudents as $currentStudent) {
+
+                /* Filter by name
+                 */
+                if ($pregName) {
+                    foreach($allNameSources as $currentSource) {
+
+                        /* Check names
+                         */
+                        if (preg_match($pattern, $currentStudent->{$currentSource})) {
+                            $collection[] = $currentStudent;
+                            break;
+                        }
+                    }
+                }
+                /* TODO: Check anything else in a similar manner
+                 */
+                /* Otherwise just stack up everyone
+                 */
+                else {
+                    $collection[] = $currentStudent;
+                }
+            }
         }
-        // TODO: Implement getStudentContactListExtended() method.
+
+        return $collection;
     }
 
     /**
@@ -273,6 +336,13 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
+        $api = new External_Denbigh2_Api('', array(
+            'Student ID' => $externalUserId,
+        ));
+
+        if (!count($api->getErrors())) {
+            new \Alaress_Probe($api->getResult());
+        }
         // TODO: Implement getStudentUserAccountInfo() method.
     }
 

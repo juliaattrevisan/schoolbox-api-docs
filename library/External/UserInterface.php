@@ -85,6 +85,7 @@ interface External_UserInterface {
      * StudentContactSpouseRelation
      *
      * @param $externalUserId
+     * @return array
      */
     public function getStudentContactList($externalUserId);
 
@@ -143,6 +144,7 @@ interface External_UserInterface {
      * @param $name
      * @param $boardingStatus
      * @param $form
+     * @return array
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 
