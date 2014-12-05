@@ -131,6 +131,7 @@ class External_Denbigh2_User implements External_UserInterface
      * StudentContactSpouseRelation
      *
      * @param $externalUserId
+     * @return array
      */
     public function getStudentContactList($externalUserId)
     {
@@ -148,7 +149,37 @@ class External_Denbigh2_User implements External_UserInterface
             ));
 
             if (!count($api->getErrors())) {
-                new \Alaress_Probe($api->getResult());
+                $family = $api->getResult()->data[0];
+
+                $data = array(
+                    'StudentContactID' => '',
+                    'StudentContactTitle' => $family->{'Father Title'},
+                    'StudentContactPreferred' => $family->{'Father Preferred Name'},
+                    'StudentContactSurname' => $family->{'Father Surname'},
+                    'StudentContactDefaultEmail' => $family->{'Father email'},
+                    'ValidAddressFlag' => '',
+                    'StudentContactAddress1' => $family->{'Residential Address Street'},
+                    'StudentContactAddress2' => '',
+                    'StudentContactAddress3' => '',
+                    'StudentContactSuburb' => $family->{'Residential Address Suburb'},
+                    'StudentContactPostCode' => $family->{'Residential Address PostCode'},
+                    'StudentContactState' => $family->{'Residential Address State'},
+                    'StudentContactPhoneActual' => '',
+                    'StudentContactMobilePhone' => $family->{'Father Mobile'},
+                    'StudentContactOccupPhone' => $family->{'Father Phone'},
+                    'StudentContactRelation' => '',
+                    'StudentContactSpouseID' => '',
+                    'StudentContactSpouseTitle' => $family->{'Mother Title'},
+                    'StudentContactSpousePreferred' => $family->{'Mother Preferred Name'},
+                    'StudentContactSpouseSurname' => $family->{'Mother Surname'},
+                    'StudentContactSpouseMobilePhone' => $family->{'Mother Mobile'},
+                    'StudentContactSpouseOccupPhone' => $family->{'Mother Phone'},
+                    'StudentContactSpouseDefaultEmail' => $family->{'Mother Email'},
+                    'StudentContactType' => '',
+                    'StudentContactSpouseRelation' => '',
+                );
+
+                return $data;
             }
         }
     }
