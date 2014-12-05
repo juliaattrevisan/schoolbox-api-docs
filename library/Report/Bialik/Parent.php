@@ -5,10 +5,8 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  */
 
-namespace Bialik;
 
-
-class ParentReport extends Report_Parent
+class Report_Bialik_Parent extends \Report_Parent
 {
     /**
      * Constructor
@@ -50,7 +48,7 @@ class ParentReport extends Report_Parent
              */
             if (strlen($this->getYearLevel().$this->getSearchName().$this->getSearchForm().$this->getSearchBoardingStatus())) {
                 $this->setAllRecords(
-                    $this->->getStudentContact(
+                    $this->getStudentContactList(
                         $this->getYearLevel(),
                         $this->getSearchName(),
                         $this->getSearchBoardingStatus(),
@@ -71,6 +69,9 @@ class ParentReport extends Report_Parent
      * Custom query function for fetching student contact results from Synergetic for Bialik
      */
     protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form) {
+
+        $db = new MSSQL();
+
         $query = "
             SELECT
                 StudentID,
@@ -86,7 +87,7 @@ class ParentReport extends Report_Parent
                 StudentContactLegalFullName,
                 StudentContactSurname,
                 StudentContactDefaultEmail,
-                ValidAddressFlag,
+                vStudentContactAllAddress.ValidAddressFlag,
                 StudentContactAddress1,
                 StudentContactAddress2,
                 StudentContactAddress3,
@@ -116,10 +117,21 @@ class ParentReport extends Report_Parent
                 StudentContactSilentPhoneFlag,
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-                StudentParentsSeparatedFlag
+                StudentParentsSeparatedFlag,
+                Contact.UserFlag1 ContactUserFlag1,
+                Contact.UserFlag2 ContactUserFlag2,
+                Contact.UserFlag3 ContactUserFlag3,
+                Contact.UserFlag4 ContactUserFlag4,
+                Contact.UserFlag5 ContactUserFlag5,
+                Addresses.UserFlag1 AddressUserFlag1,
+                Addresses.UserFlag2 AddressUserFlag2,
+                Addresses.UserFlag3 AddressUserFlag3,
+                Addresses.UserFlag4 AddressUserFlag4,
+                Addresses.UserFlag5 AddressUserFlag5
             FROM SynergyOne.dbo.vStudentContactAllAddress
             LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
             LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+            LEFT JOIN SynergyOne.dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
             LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus
                 AND StudentHouse = House.Code
             LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code
@@ -142,13 +154,13 @@ class ParentReport extends Report_Parent
             } else {
                 // if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
                 $query .= "
-                AND Year.Description = '{$this->getDatabase()->quote($yearlevel)}'";
+                AND Year.Description = '{$db->quote($yearlevel)}'";
             }
         }
         /* Search for a student name
          */
         if (strlen($name)) {
-            $name = $this->getDatabase()->quote($name);
+            $name = $db->quote($name);
             $query .= "
                 AND (
                     (StudentSurname LIKE '%{$name}%')
@@ -179,7 +191,7 @@ class ParentReport extends Report_Parent
         /* Search for a particular form
          */
         if ($form) {
-            $form = $this->getDatabase()->quote($form);
+            $form = $db->quote($form);
             $query .= "
                 AND StudentForm = '{$form}'
             ";
@@ -187,9 +199,9 @@ class ParentReport extends Report_Parent
         $query .= "
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
-        $contactList = $this->getDatabase()->getAll($query);
+        $contactList = $db->getAll($query);
         foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0) {
+            if ($row['ValidAddressFlag'] == 0 || $row['AddressUserFlag1'] == 'Home Address (Opt Out)') {
                 $row['StudentContactAddress1']        = '';
                 $row['StudentContactAddress2']        = '';
                 $row['StudentContactAddress3']        = '';
@@ -209,6 +221,12 @@ class ParentReport extends Report_Parent
                 = $row['StudentContactHomeCountryCode'] == 'Not Selected' ? '' : $row['StudentContactHomeCountryCode'];
             $row['StudentContactCountryCode']
                 = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
+
+            if($row['ContactUserFlag1'] == 'Default Email (Opt Out)')
+                $row['StudentContactDefaultEmail'] = '';
+
+            if($row['ContactUserFlag2'] == 'Default Mobile (Opt Out)')
+                $row['StudentContactMobilePhone'] = '';
         }
         return $contactList;
     }

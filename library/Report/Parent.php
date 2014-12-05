@@ -495,7 +495,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @param boolean $searchBoardingStatus
 	 */
-	private function setSearchBoardingStatus($searchBoardingStatus) {
+	protected function setSearchBoardingStatus($searchBoardingStatus) {
 		$this->searchBoardingStatus = $searchBoardingStatus;
 	}
 
@@ -504,7 +504,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @return boolean
 	 */
-	private function getSearchBoardingStatus() {
+    protected function getSearchBoardingStatus() {
 		return $this->searchBoardingStatus;
 	}
 
@@ -513,7 +513,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @param string $searchForm
 	 */
-	private function setSearchForm($searchForm) {
+	protected function setSearchForm($searchForm) {
 		$this->searchForm = $searchForm;
 	}
 
@@ -522,7 +522,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @return string
 	 */
-	private function getSearchForm() {
+    protected function getSearchForm() {
 		return $this->searchForm;
 	}
 
@@ -531,7 +531,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @param string $searchName
 	 */
-	private function setSearchName($searchName) {
+	protected function setSearchName($searchName) {
 		$this->searchName = $searchName;
 	}
 
@@ -540,7 +540,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @return string
 	 */
-	private function getSearchName() {
+	protected function getSearchName() {
 		return $this->searchName;
 	}
 
@@ -549,7 +549,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @param array $boardingStatusOptions
 	 */
-	private function setBoardingStatusOptions($boardingStatusOptions) {
+    protected function setBoardingStatusOptions($boardingStatusOptions) {
 		$this->boardingStatusOptions = $boardingStatusOptions;
 	}
 
@@ -558,7 +558,7 @@ class Report_Parent extends Report_Abstract {
 	 *
 	 * @return array
 	 */
-	private function getBoardingStatusOptions() {
+    protected function getBoardingStatusOptions() {
 		return $this->boardingStatusOptions;
 	}
 }
