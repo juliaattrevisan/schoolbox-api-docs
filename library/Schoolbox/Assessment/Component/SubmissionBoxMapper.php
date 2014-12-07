@@ -480,7 +480,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $query = "
 			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
 			FROM category
-			LEFT JOIN categoryCode cc ON category.id = cc.categoryID
+			LEFT JOIN categoryCode cc ON category.id = cc.categoryID AND cc.deleted_at IS NULL
 			WHERE category.id IN (
 				SELECT DISTINCT sb.category
 				FROM submission_box sb
