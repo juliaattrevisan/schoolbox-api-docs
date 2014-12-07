@@ -623,8 +623,8 @@ class Submission extends DeprecatedModel
         }
         if ($semester) {
             $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
-                    $semester
-                );
+                $semester
+            );
             $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
 
@@ -845,19 +845,19 @@ class Submission extends DeprecatedModel
 
         $query = " ( SELECT open_date activity_date, s.type, f.name typeName,s.id box_id, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, lu_submission_type f
                       WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (" . implode(
-                ',', $categoryList
-            ) . ") )
+        ',', $categoryList
+        ) . ") )
                     UNION
                     ( SELECT `date`, u.type, l.name typeName, u.id box_id, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, lu_submission_type l )
                       LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
                       WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (" . implode(
-                ',', $categoryList
-            ) . ") )
+        ',', $categoryList
+        ) . ") )
                     UNION
                     ( SELECT `late_date`, t.type, i.name typeName, t.id box_id, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, lu_submission_type i
                       WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (" . implode(
-                ',', $categoryList
-            ) . ") )
+        ',', $categoryList
+        ) . ") )
                     UNION
                     ( SELECT g.`submitted` activity_date, m.type, g.realname typeName, m.id box_id, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
                       WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )

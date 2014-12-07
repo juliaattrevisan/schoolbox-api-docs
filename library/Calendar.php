@@ -250,7 +250,7 @@ class Calendar extends DeprecatedModel
 
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
-                } else if ($event['id']) {
+                } elseif ($event['id']) {
                     $campusList = $this->getEventCampus($event['id']);
                 }
 
@@ -586,10 +586,9 @@ class Calendar extends DeprecatedModel
         $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
-
-            foreach ($tempList as $temp) {
+foreach ($tempList as $temp) {
                 $groupList[] = $temp['id'];
-            }
+        }
 
             /* If there are no groups prevent sql error
              */
@@ -731,9 +730,9 @@ class Calendar extends DeprecatedModel
              */
             if (count($groupList)) {
                 $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
-                        ',',
-                        $groupList
-                    ) . "))";
+                    ',',
+                    $groupList
+                ) . "))";
             }
         }
 
@@ -877,7 +876,7 @@ class Calendar extends DeprecatedModel
                     $mapper       = new \Schoolbox\Calendar\Relation\CategoryMapper();
                     $allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
                     $event->setCategoryCollection($allRelations);
-                } else if ($currentEvent['access'] == self::ACCESS_CAMPUS) {
+                } elseif ($currentEvent['access'] == self::ACCESS_CAMPUS) {
                     $event->setCampusList($currentEvent['campusList']);
                 }
 
@@ -904,9 +903,9 @@ class Calendar extends DeprecatedModel
 						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
 							AND (
 								  (access = '3' AND event_campus.campus_id IN(" . implode(
-                ',',
-                $campusList
-            ) . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
+    ',',
+    $campusList
+) . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
