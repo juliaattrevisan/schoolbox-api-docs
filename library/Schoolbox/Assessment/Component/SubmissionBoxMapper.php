@@ -57,7 +57,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->setConfigLoader(new ConfigLoader());
     }
 
-    protected function mapping ()
+    protected function mapping()
     {
         $this->hasTable('submission_box');
         $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox');
@@ -988,7 +988,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             /** @var SubmissionBox $box */
             $box = $this->hydrate($r, 'sb');
             $box->setCategory($this->hydrateJoin($r, 'category', 'c'));
-            $box->setOwner(   $this->hydrateJoin($r, 'owner', 'u'));
+            $box->setOwner($this->hydrateJoin($r, 'owner', 'u'));
             $box->setWorkType($this->hydrateJoin($r, 'work_type', 't'));
             $c->add($box);
         }

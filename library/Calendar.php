@@ -586,9 +586,9 @@ class Calendar extends DeprecatedModel
         $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
-foreach ($tempList as $temp) {
+            foreach ($tempList as $temp) {
                 $groupList[] = $temp['id'];
-        }
+            }
 
             /* If there are no groups prevent sql error
              */
@@ -848,11 +848,15 @@ foreach ($tempList as $temp) {
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
                     new Alaress_Date_Format(
-                        $currentEvent['startDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'
+                        $currentEvent['startDate'] . ' ' . $currentEvent['startTime'],
+                        'y-m-d h:i:s'
                     )
                 );
                 $event->setEndTime(
-                    new Alaress_Date_Format($currentEvent['endDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s')
+                    new Alaress_Date_Format(
+                        $currentEvent['endDate'] . ' ' . $currentEvent['endTime'],
+                        'y-m-d h:i:s'
+                    )
                 );
                 $event->setType($currentEvent['type']);
                 $event->setTitle($currentEvent['title']);
@@ -902,10 +906,8 @@ foreach ($tempList as $temp) {
 						LEFT JOIN event_group ON event.id = event_group.event_id
 						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
 							AND (
-								  (access = '3' AND event_campus.campus_id IN(" . implode(
-    ',',
-    $campusList
-) . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
+								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
+            . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
