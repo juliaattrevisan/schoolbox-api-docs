@@ -689,7 +689,7 @@ class Group extends DeprecatedModel
 			SELECT
 			category.name, category.id, type,
 			GROUP_CONCAT(cc.code) as code
-			FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
+			FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
 			WHERE userAccess.uid = '$userID'
 			AND userAccess.sid = category.id
 			AND userAccess.service = '" . $this->_service . "'
@@ -727,7 +727,9 @@ class Group extends DeprecatedModel
         }
 
         //get list of groups involved in
-        $query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID
+        $query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code
+        FROM userAccess, category
+        LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
 		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
 		AND userAccess.type >= '$accessType'
 		GROUP BY category.id
