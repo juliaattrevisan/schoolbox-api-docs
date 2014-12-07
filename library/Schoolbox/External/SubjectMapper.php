@@ -58,7 +58,7 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 		$statement = $this->database->prepare('
 			SELECT c.id, c.name, GROUP_CONCAT(co.code) AS code
 			FROM category c
-			LEFT JOIN categoryCode co ON co.categoryID = c.id
+			LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
 			WHERE co.id=?
 		');
 		$statement->execute(array($id));
@@ -88,7 +88,7 @@ class SubjectMapper extends Schoolbox\External\Mapper {
 		$category_statement = $this->database->prepare('
 			SELECT c.id, GROUP_CONCAT(co.code) AS code
 			FROM category c
-			LEFT JOIN categoryCode co ON co.categoryID = c.id
+			LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
 			WHERE co.code=?
 		');
 		$add_id_map = function($subject) use ($category_statement) {
