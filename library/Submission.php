@@ -106,7 +106,7 @@ class Submission extends DeprecatedModel
               smt.slug mark_type_slug, sn.type notif_type, sn.enabled notif_enabled, sn.sent notif_sent
             FROM submission_box s
             JOIN category c ON s.category = c.id
-            LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+            LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
             LEFT JOIN file ON s.fid = file.id
             LEFT JOIN lu_submission_type ft ON s.type = ft.id
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
@@ -172,7 +172,7 @@ class Submission extends DeprecatedModel
                     FROM ( submission_box s, category c )
                     LEFT JOIN student_submission t ON t.box_id = s.id
                     AND t.owner = $userID
-                    LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+                    LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
                     WHERE s.deleted = 0
                     AND s.category = c.id
                     AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
@@ -204,6 +204,7 @@ class Submission extends DeprecatedModel
                     FROM assess
                     LEFT JOIN category ON category.id = assess.category_id
                     LEFT JOIN categoryCode ON categoryCode.categoryID = assess.category_id
+                        AND categoryCode.deleted_at IS NULL
                     WHERE assess.deleted_at IS NULL
                     AND assess.availability = 'assess'
                     AND assess.task_id IS NULL
@@ -689,7 +690,7 @@ class Submission extends DeprecatedModel
                         FROM student_submission ss
                         LEFT JOIN submission_box sb ON ss.box_id = sb.id
                         LEFT JOIN category c ON c.id = sb.category
-                        LEFT JOIN categoryCode co ON co.categoryID = c.id
+                        LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
                         WHERE sb.owner = '$userID'
                         AND sb.deleted = '0'
                         AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= submitted)
@@ -711,7 +712,7 @@ class Submission extends DeprecatedModel
                         FROM assess_attempt aa
                         LEFT JOIN assess a ON a.assess_id = aa.assess_id
                         LEFT JOIN category c ON c.id = a.category_id
-                        LEFT JOIN categoryCode co ON co.categoryID = c.id
+                        LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
                         WHERE a.availability = 'assess'
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
@@ -1022,7 +1023,7 @@ class Submission extends DeprecatedModel
               teacher.firstname, teacher.lastname, teacher.title, teacher.alt_email, teacher.local_email, teacher.username
             FROM submission_box sb
             LEFT JOIN category c ON sb.category = c.id
-            LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+            LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
             LEFT JOIN `user` teacher ON sb.owner = teacher.id
             INNER JOIN submission_notification sn ON sb.id = sn.box_id
             WHERE $where
@@ -1221,7 +1222,7 @@ class Submission extends DeprecatedModel
 
         $sql = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
                 FROM category
-                LEFT JOIN categoryCode cc ON category.id = categoryID
+                LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
                 WHERE category.id IN (
                     SELECT DISTINCT sb.category
                     FROM submission_box sb
