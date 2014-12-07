@@ -123,7 +123,7 @@ class Category extends DeprecatedModel {
 		}
 
 		$query .= "
-			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 			WHERE (category.name LIKE \"%{$quotedName}%\"
 			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_at IS NULL";
 
@@ -140,7 +140,7 @@ class Category extends DeprecatedModel {
     function getCodeForCategory($category_id) {
         $query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
 				  FROM category
-				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 				  WHERE category.id = '$category_id'
 				  AND category.deleted_at IS NULL";
 
@@ -172,7 +172,7 @@ class Category extends DeprecatedModel {
                 WHERE l.parent = ca.id AND t.deleted_at IS NULL
             ) taskCount
             FROM category ca
-            LEFT JOIN categoryCode co ON co.categoryID = ca.id
+            LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
             WHERE ca.deleted_at IS NULL AND parent $cats
             GROUP BY ca.id";
@@ -193,7 +193,7 @@ class Category extends DeprecatedModel {
     public function getSimpleCategoryList($categoryId) {
         $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
       				  FROM category ca
-      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
       				  WHERE ca.deleted_at IS NULL AND parent = $categoryId
       				  GROUP BY ca.id
@@ -222,7 +222,7 @@ class Category extends DeprecatedModel {
 
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, g.force_follow, cf.template
 				  FROM (category c)
-				  LEFT JOIN categoryCode co ON co.categoryID = c.id
+				  LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
 				  LEFT JOIN user u on u.id = a.uid
 				  LEFT JOIN userGroups g ON g.cid = c.id
@@ -237,7 +237,7 @@ class Category extends DeprecatedModel {
 
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
                   FROM (category c)
-                  LEFT JOIN categoryCode co ON co.categoryID = c.id
+                  LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
                   LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
@@ -742,7 +742,7 @@ class Category extends DeprecatedModel {
 					LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
 						AND `userAccess`.service = 1
 						AND `userAccess`.uid = {$_SESSION['id']}
-					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 					WHERE (`perms`.cid OR `userAccess`.sid)
 					    AND category.deleted_at IS NULL
 						AND (
