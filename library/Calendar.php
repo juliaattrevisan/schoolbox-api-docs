@@ -506,7 +506,7 @@ class Calendar extends DeprecatedModel
 					DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
 					submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created
 				FROM (category, submission_box )
-				LEFT JOIN categoryCode co ON co.categoryID = category.id
+				LEFT JOIN categoryCode co ON co.categoryID = category.id AND co.deleted_at IS NULL
 				LEFT JOIN user ON user.id = submission_box.owner ";
 
             /* If you aren't part of any categories, don't try to
