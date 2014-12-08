@@ -119,10 +119,13 @@ module.exports = function(grunt) {
                     // Flyout menu, on user profile drop down
                     'www/javascript/jquery.flyout.js',
                     // Fix touch on side navigation
-                    'www/javascript/jquery.touchMenu.js'
+                    'www/javascript/jquery.touchMenu.js',
+                    //Random scripts
+                    'www/javascript/scripts.js'
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
+
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
