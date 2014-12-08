@@ -12,6 +12,7 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Component_InstanceMapper;
 use External_User;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Tile\Mapper;
 use Schoolbox\Tile\Module;
@@ -32,6 +33,7 @@ class Tile implements ModuleConfigInterface
             ->setMapper(Mapper::getInstance())
             ->setCategoryMapper(CategoryMapper::getInstance())
             ->setComponentInstanceMapper(Component_InstanceMapper::getInstance())
+            ->setRoleAccessMapper(RoleAccessMapper::getInstance())
             ->setExternalDb(new External_User());
         $module->init('/tile');
     }

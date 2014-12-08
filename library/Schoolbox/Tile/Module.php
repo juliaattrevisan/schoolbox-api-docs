@@ -19,6 +19,7 @@ use Component_Instance;
 use Component_InstanceMapper;
 use External_UserInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
@@ -52,6 +53,16 @@ class Module extends BaseModule
      * @var Component_InstanceMapper
      */
     protected $componentInstanceMapper;
+
+    /**
+     * Dependency on role access mapper.
+     *
+     * Required for checking the user's access to the homepage that this tile
+     * belongs to, based on the role level permissions for that homepage.
+     *
+     * @var RoleAccessMapper
+     */
+    protected $roleAccessMapper;
 
     /**
      * Dependency on external user database.
@@ -189,7 +200,7 @@ class Module extends BaseModule
                     }
                     return $params['homepage']->getId();
                 },
-                new \Schoolbox\Permission\Access\RoleAccessMapper()
+                $this->getRoleAccessMapper()
             ),
             new Rule\IsTeacherOfClass(
                 $this->getExternalDb(),
@@ -268,6 +279,25 @@ class Module extends BaseModule
     public function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
+    }
+
+    /**
+     * @return RoleAccessMapper
+     */
+    public function getRoleAccessMapper()
+    {
+        return $this->roleAccessMapper;
+    }
+
+    /**
+     * @param  RoleAccessMapper $roleAccessMapper
+     *
+     * @return $this
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
     }
 
     /**
