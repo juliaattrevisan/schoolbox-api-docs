@@ -13,4 +13,16 @@ use Alaress\Web\Controller\Base;
 
 class Controller extends Base
 {
+    /**
+     * Index for Meriden's pastoral page
+     */
+    public function index()
+    {
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@customMeridenPastoral/index.twig',
+                'data'     => array(),
+            )
+        );
+    }
 }
