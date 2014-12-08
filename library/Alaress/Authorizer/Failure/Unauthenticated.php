@@ -12,4 +12,6 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Unauthenticated extends Base {}
+class Unauthenticated extends Base
+{
+}

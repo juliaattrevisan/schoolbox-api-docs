@@ -9,4 +9,6 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Base extends \RuntimeException {}
+class Base extends \RuntimeException
+{
+}

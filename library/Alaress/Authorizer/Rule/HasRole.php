@@ -8,10 +8,12 @@
  */
 
 namespace Alaress\Authorizer\Rule;
+
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
-class HasRole implements IAuthorizationRule {
+class HasRole implements IAuthorizationRule
+{
 
     /**
      * The role to check against.
@@ -25,14 +27,16 @@ class HasRole implements IAuthorizationRule {
     /**
      * @param string $role The role to check.
      */
-    public function __construct($role) {
+    public function __construct($role)
+    {
         $this->role = $role;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null) {
+    public function authorize(array $params = array(), User $user = null)
+    {
         if ($user instanceof User) {
             if ($user->getRole()->getType() == $this->role) {
                 return;
@@ -40,5 +44,4 @@ class HasRole implements IAuthorizationRule {
         }
         throw new Unauthorized();
     }
-
 }
