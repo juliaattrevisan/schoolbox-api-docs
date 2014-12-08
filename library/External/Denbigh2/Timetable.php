@@ -112,7 +112,15 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         }
     }
 
-    private function getStaffTimetable($externalUserId, $dayNumber) {
+    public function getStaffTimetable($externalUserId, $dayNumber) {
+        $api = new External_Denbigh2_Api('StaffTimetable', array(
+            'Staff Code' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            new \Alaress_Probe($api->getResult());
+        }
+
         return;
     }
 
