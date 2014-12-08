@@ -41,7 +41,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:resourceBooking',
+            'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
     }
