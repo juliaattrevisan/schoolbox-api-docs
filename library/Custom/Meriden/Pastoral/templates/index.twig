@@ -1,1 +1,12 @@
-Meriden Pastoral Demo
+<h1>School Report - {{ report.year }}</h1>
+
+{# Show the student's portrait - exactly the same as /submission/allWork/{{ report.student.id }} #}
+<div id="student">
+    <a class="bar large button" href="/search/user/{{ report.student.id }}">
+        <img src="/portrait.php?userId={{ report.student.externalId }}&amp;size=square64">
+        <span class="name">{{ report.student.formatName }}</span>
+        <span class="group">Year {{ report.student.year }} Student</span>
+    </a>
+</div>
+
+{# Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }} #}

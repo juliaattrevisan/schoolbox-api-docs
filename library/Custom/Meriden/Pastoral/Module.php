@@ -10,8 +10,10 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -22,8 +24,26 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $router->addGet('customMeridenPastoral.index', $basePath);
+        $router->addGet('customMeridenPastoral.index', $basePath.'/{year}/{id}');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // Search for the user
+//        $this->getUserMapper();
+        $matcher->add(
+            '/^customMeridenPastoral.index/',
+            function($params) {
+                return array(
+                    'student' => UserMapper::getInstance()->findById($params['id']),
+                );
+            }
+        );
+    }
+
 
     /**
      * {@inheritdoc}
