@@ -205,7 +205,19 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getSubjectName($classCode)
     {
-        // TODO: Implement getSubjectName() method.
+        $name = '';
+
+        $api = new External_Denbigh2_Api('Classes', array(
+            'Class' => $classCode
+        ));
+
+        if (!count($api->getErrors())) {
+            $currentClass = $api->getResult()->data[0];
+
+            $name = $currentClass->{'Subject Name'};
+        }
+
+        return $name;
     }
 
     /**
