@@ -382,14 +382,29 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        $api = new External_Denbigh2_Api('', array(
-            'Student ID' => $externalUserId,
-        ));
+        $allEmails = array();
 
-        if (!count($api->getErrors())) {
-            new \Alaress_Probe($api->getResult());
+        if (count($synergyIds)) {
+            foreach($synergyIds as $currentExternalId) {
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Student ID' => $currentExternalId,
+                ));
+
+                if (!count($api->getErrors())) {
+                    $currentStudent = $api->getResult()->data[0];
+
+                    if (strlen(trim($currentStudent->{'email Father'}))) {
+                        $allEmails[] = $currentStudent->{'email Father'};
+                    }
+
+                    if (strlen(trim($currentStudent->{'email Mother'}))) {
+                        $allEmails[] = $currentStudent->{'email Mother'};
+                    }
+                }
+            }
         }
-        // TODO: Implement getParentEmails() method.
+
+        return $allEmails;
     }
 
     /**
