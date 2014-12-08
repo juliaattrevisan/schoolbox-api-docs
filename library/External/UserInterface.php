@@ -185,6 +185,26 @@ interface External_UserInterface {
      * Gets the contact info of the person who is a Student's Contact.
      * $externalId is that of the Contact, not the Student
      *
+     * Title,
+     * Preferred,
+     * Surname,
+     * Email,
+     * OccupEmail,
+     * DefaultEmailCode,
+     * HomePhone,
+     * SilentPhoneFlag,
+     * MobilePhone,
+     * DirectoryIncludeFlag,
+     * SpouseID,
+     * SpouseTitle,
+     * SpousePreferred,
+     * SpouseSurname,
+     * SpouseEmail,
+     * SpouseOccupEmail,
+     * SpouseDefaultEmailCode,
+     * SpouseMobilePhone,
+     * SpouseDirectoryIncludeFlag
+     *
      * @param $externalUserId
      * @return array
      */
@@ -192,12 +212,12 @@ interface External_UserInterface {
 
     /**
      * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Synergetic of the Contact, not the Student. Anyone who is
-     * not supposed to be having their details publicised (via the
+     * passed is the $externalUserId of the Contact, not the Student. Anyone who
+     * is not supposed to be having their details publicised (via the
      * DirectoryIncludeFlag) are not included in the result set.
      *
      * I think this was used to only update parents of current Schoolbox
-     * students, rather tha updating everyone blindly
+     * students, rather than updating everyone blindly
      *
      * Used in Synchronise
      *
