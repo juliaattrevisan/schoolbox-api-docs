@@ -601,7 +601,40 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        // TODO: Implement getSubjectList() method.
+        $class = array();
+
+        $api = new External_Denbigh2_Api('Enrolments', array(
+            'Student ID' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $allEnrolments = $api->getResult()->data;
+
+            foreach($allEnrolments as $currentEnrolment) {
+                new \Alaress_Probe($currentEnrolment);
+
+                /* Find out more info about the class
+                 */
+                $api = new External_Denbigh2_Api('Classes', array(
+                    'Class' => $currentEnrolment->{'Class'}
+                ));
+
+                if (!count($api->getErrors())) {
+                    $classData = $api->getResult()->data[0];
+
+                    // TODO: No campus for class?
+
+                    $class = array(
+                        'code' => $classData->{'Class'},
+                        'name' => $classData->{'Subject Name'},
+                        'classType' => $classData->{'Subject Name'},
+                        'campusCode' => ''
+                    );
+                }
+            }
+        }
+
+        return $class;
     }
 
     /**
