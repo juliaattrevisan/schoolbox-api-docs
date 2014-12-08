@@ -152,6 +152,12 @@ class Kernel extends \Alaress\Application\Kernel
                 // TODO replace the call to Sitepage::error() method
                 error($e->getCode(), $e->getMessage(), 403);
             }
+            catch (Unauthorized $e) {
+                // This seems to be the most appropriate error code for unauthorized calls.
+                // TODO set headers on $response instead of calling header()
+                header('WWW-Authenticate: FormBased');
+                error($e->getCode(), $e->getMessage(), 401);
+            }
             catch (Base $e) {
                 error($e->getCode(), $e->getMessage(), 500);
             }
