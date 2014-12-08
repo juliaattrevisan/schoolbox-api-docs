@@ -611,7 +611,6 @@ class External_Denbigh2_User implements External_UserInterface
             $allEnrolments = $api->getResult()->data;
 
             foreach($allEnrolments as $currentEnrolment) {
-                new \Alaress_Probe($currentEnrolment);
 
                 /* Find out more info about the class
                  */
