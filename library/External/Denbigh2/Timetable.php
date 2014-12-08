@@ -9,6 +9,22 @@
  */
 
 class External_Denbigh2_Timetable implements External_TimetableInterface {
+
+    /**
+     * An instance of Group
+     *
+     * @var Group
+     */
+    private $groupHandler = null;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setGroupHandler(new Group());
+    }
+
     /**
      * The headings of the timetable, going horizontally
      * from left to right containing all the times and day numbers
@@ -87,7 +103,17 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-        // TODO: Implement getDayTimetable() method.
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            return $this->getStudentTimetable($externalUserId, $dayNumber);
+        } else {
+            if ($this->getGroupHandler()->isStaff($userId)) {
+                return $this->getStaffTimetable($externalUserId, $dayNumber);
+            }
+        }
+    }
+
+    private function getStaffTimetable($externalUserId, $dayNumber) {
+        return;
     }
 
     /**
@@ -185,4 +211,26 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         // TODO: Implement getRoomTimetable() method.
     }
 
-} 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set group handler
+     *
+     * @param \Group $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * Get group handler
+     *
+     * @return \Group
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+}
