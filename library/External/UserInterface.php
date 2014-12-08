@@ -331,6 +331,8 @@ interface External_UserInterface {
      * Get all the enrolled students belonging to $externalUserId
      * (usually a parent)
      *
+     * Returns an array of $externalId
+     *
      * @param $externalUserId
      * @return array
      */

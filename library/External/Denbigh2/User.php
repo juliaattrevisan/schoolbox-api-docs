@@ -640,12 +640,30 @@ class External_Denbigh2_User implements External_UserInterface
      * Get all the enrolled students belonging to $externalUserId
      * (usually a parent)
      *
+     * Returns an array of $externalId
+     *
      * @param $externalUserId
      * @return array
      */
     public function getEnrolledStudents($externalUserId)
     {
-        // TODO: Implement getEnrolledStudents() method.
+        $ids = array();
+
+        // TODO: Made an assumption that the Family Code can get us there
+
+        $api = new External_Denbigh2_Api('Students', array(
+            'Family Code' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $allStudents = $api->getResult()->data;
+
+            foreach($allStudents as $currentStudent) {
+                $ids[] = $currentStudent->{'Student ID'};
+            }
+        }
+
+        return $ids;
     }
 
     /**
