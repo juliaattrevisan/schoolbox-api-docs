@@ -123,6 +123,11 @@ class Report_Bialik_Parent extends \Report_Parent
                 Contact.UserFlag3 ContactUserFlag3,
                 Contact.UserFlag4 ContactUserFlag4,
                 Contact.UserFlag5 ContactUserFlag5,
+                Spouse.UserFlag1 SpouseUserFlag1,
+                Spouse.UserFlag2 SpouseUserFlag2,
+                Spouse.UserFlag3 SpouseUserFlag3,
+                Spouse.UserFlag4 SpouseUserFlag4,
+                Spouse.UserFlag5 SpouseUserFlag5,
                 Addresses.UserFlag1 AddressUserFlag1,
                 Addresses.UserFlag2 AddressUserFlag2,
                 Addresses.UserFlag3 AddressUserFlag3,
@@ -201,7 +206,7 @@ class Report_Bialik_Parent extends \Report_Parent
         ";
         $contactList = $db->getAll($query);
         foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0 || $row['AddressUserFlag1'] == 'Home Address (Opt Out)') {
+            if ($row['ValidAddressFlag'] == 0 || $row['AddressUserFlag1'] == 1) {
                 $row['StudentContactAddress1']        = '';
                 $row['StudentContactAddress2']        = '';
                 $row['StudentContactAddress3']        = '';
@@ -222,11 +227,21 @@ class Report_Bialik_Parent extends \Report_Parent
             $row['StudentContactCountryCode']
                 = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
 
-            if($row['ContactUserFlag1'] == 'Default Email (Opt Out)')
+            if($row['AddressUserFlag2'] == 1)
+                $row['StudentContactPhoneActual'] = '';
+
+            if($row['ContactUserFlag1'] == 1)
                 $row['StudentContactDefaultEmail'] = '';
 
-            if($row['ContactUserFlag2'] == 'Default Mobile (Opt Out)')
+            if($row['ContactUserFlag2'] == 1)
                 $row['StudentContactMobilePhone'] = '';
+
+            if($row['SpouseUserFlag1'] == 1)
+                $row['StudentContactSpouseDefaultEmail'] = '';
+
+            if($row['SpouseUserFlag2'] == 1)
+                $row['StudentContactSpouseMobilePhone'] = '';
+
         }
         return $contactList;
     }
