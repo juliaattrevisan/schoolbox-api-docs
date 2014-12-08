@@ -26,7 +26,46 @@ class External_Denbigh2_Class implements External_ClassInterface {
      */
     public function getStudents($classCode)
     {
-        // TODO: Implement getStudents() method.
+        $students = array();
+
+        $api = new External_Denbigh2_Api('Enrolments', array(
+            'Class' => $classCode
+        ));
+
+        if (!count($api->getErrors())) {
+            $allStudents = $api->getResult()->data;
+
+            foreach ($allStudents as $currentStudent) {
+
+                /* Find out more about each student
+                 */
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Student ID' => $currentStudent->{'Student ID'}
+                ));
+
+                if (!count($api->getErrors())) {
+                    $allStudentData = $api->getResult()->data;
+
+                    foreach ($allStudentData as $currentStudentData) {
+
+                        // TODO: No campus for classes?
+
+                        $students[] = array(
+                            'lastname' => $currentStudentData->{'Surname'},
+                            'firstname' => $currentStudentData->{'Preferred Name'},
+                            'yearlevel' => $currentStudentData->{'Academic Year'},
+                            'house' => $currentStudentData->{'House'},
+                            'StudentMedicalAlert' => $currentStudentData->{'Medical Alert Label'},
+                            'StudentSpecialNeedsFlag' => $currentStudentData->{'Special Needs'},
+                            'synergy_id' => $currentStudentData->{'Student ID'},
+                            'ClassCampus' => ''
+                        );
+                    }
+                }
+            }
+        }
+
+        return $students;
     }
 
     /**
