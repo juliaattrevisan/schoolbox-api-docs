@@ -674,7 +674,30 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-        // TODO: Implement getEmail() method.
+        $emailAddress = '';
+
+        // TODO: Currently no way of knowing which parent to return email address for
+
+        $api = new External_Denbigh2_Api('Students', array(
+            'Student ID' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $currentStudent = $api->getResult()->data[0];
+
+            /* School address normally
+             */
+            if (strlen(trim($currentStudent->{'Email Address'}))) {
+                $emailAddress = $currentStudent->{'Email Address'};
+            }
+            /* Try emailing home lol
+             */
+            else if (strlen(trim($currentStudent->{'email Home'}))) {
+                $emailAddress = $currentStudent->{'email Home'};
+            }
+        }
+
+        return $emailAddress;
     }
 
     /**
