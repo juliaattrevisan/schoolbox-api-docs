@@ -486,13 +486,40 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        $api = new External_Denbigh2_Api('Students', array(
-            'Student ID' => $externalUserId,
-        ));
+        $allParents = array();
+
+        $api = new External_Denbigh2_Api('Students', array());
 
         if (!count($api->getErrors())) {
-            $currentStudent = $api->getResult()->data[0];
+            $allStudents = $api->getResult()->data;
+
+            foreach($allStudents as $currentStudent) {
+                // TODO: Parents have no networkLogin equivalent?
+                // TODO: Parents have no unique id?
+
+                $parent = array(
+                    'StudentContactNetworkLogin' => '',
+                    'StudentContactID' => '',
+                    'StudentContactTitle' => $currentStudent->{'Father Title'},
+                    'StudentContactPreferred' => $currentStudent->{'Father'},
+                    'StudentContactSurname' => $currentStudent->{'Father Surname'},
+                    'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
+                    'StudentContactSpouseNetworkLogin' => '',
+                    'StudentContactSpouseID' => '',
+                    'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
+                    'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
+                    'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
+                    'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
+                    'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                    'StudentCampus' => $currentStudent->{'Campus'},
+                    'StudentGender' => $currentStudent->{'Gender'},
+                );
+
+                $allParents[] = $parent;
+            }
         }
+
+        return $allParents;
     }
 
     /**
