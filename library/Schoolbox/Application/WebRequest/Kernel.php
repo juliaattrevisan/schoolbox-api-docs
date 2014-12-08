@@ -11,6 +11,7 @@ namespace Schoolbox\Application\WebRequest;
 
 use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di;
 use Aura\Router\Route;
@@ -113,12 +114,12 @@ class Kernel extends \Alaress\Application\Kernel
                 $auth = $this->di->get('authorizer');
                 try {
                     $auth->authorizePathForUser($route->name, $params, $user);
-                } catch (Unauthorized $ue) {
-                    // Unauthorized:
+                } catch (Unauthenticated $ue) {
+                    // Unauthenticated:
                     // always throw this, even if there was preloader exception
                     throw $ue;
                 } catch (\Exception $ae) {
-                    // Some other exception:
+                    // Some other exception (including unauthorized):
                     // throw the preloader exception in preference to this
                     if ($preloaderException instanceof \Exception) {
                         throw $preloaderException;
@@ -142,8 +143,8 @@ class Kernel extends \Alaress\Application\Kernel
                 }
                 $method->invokeArgs($controller, $args);
                 $response = $controller->getResponse();
-            } catch (Unauthorized $e) {
-                // Really basic unauthorized response - redirect to a login page.
+            } catch (Unauthenticated $e) {
+                // Really basic unauthenticated response - redirect to a login page.
                 $response = $this->di->get('webFactory')->newResponse();
                 $response->redirect->to('/login/?page='.urlencode($path));
             }
