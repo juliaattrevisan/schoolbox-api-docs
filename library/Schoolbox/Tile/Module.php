@@ -181,6 +181,16 @@ class Module extends BaseModule
                     return $params['homepage']->getId();
                 }
             ),
+            new Rule\HasHomepagePermissionThroughRole(
+                UserAccess::ACCESS_WRITE,
+                function ($params) {
+                    if ($params['component']->getModule() != 'homepage') {
+                        throw new \Exception('homepage permission does not apply to dashboard tiles');
+                    }
+                    return $params['homepage']->getId();
+                },
+                new \Schoolbox\Permission\Access\RoleAccessMapper()
+            ),
             new Rule\IsTeacherOfClass(
                 $this->getExternalDb(),
                 function ($params) {
