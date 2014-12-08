@@ -20,50 +20,16 @@ use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Serializable;
 
-class MailNotifier implements Serializable {
-
-    /** @var IConfigLoader */
-    protected $conf;
-
-	/** @var LoggerInterface */
-	protected $log;
+class MailNotifier extends WorkNotifier {
 
     /** @var UserQueueFactory */
     protected $uqf;
-
-	/**
-	 * @param IConfigLoader   $configLoader
-	 * @param LoggerInterface $log
-	 */
-    public function __construct($configLoader = null, $log = null) {
-        $this->conf = $configLoader ?: ConfigMapper::getInstance();
-    }
-
-
-	/**
-	 * @param LoggerInterface $debug
-	 */
-	public function setLogger($debug) {
-		$this->log = $debug;
-	}
-
-
-    /**
-     * @return LoggerInterface
-     */
-    public function log()
-    {
-        // lazyload
-        if (empty($this->log)) {
-            $this->log = new Logger(null);
-        }
-        return $this->log;
-    }
 
 
     /**
@@ -88,7 +54,7 @@ class MailNotifier implements Serializable {
 	 * @param Role $role - the role to digest
 	 * @return int
 	 */
-	public function processDigest($role) {
+	public function process($role) {
 
 		// get a list of users
         /** @var Collection|User[] $users */
@@ -159,33 +125,6 @@ class MailNotifier implements Serializable {
 		// return the number of emails successfully sent
 		$this->log()->info("Finished digesting {$role->getName()}: $result emails sent");
 		return $result;
-	}
-
-
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * String representation of object
-	 * @link http://php.net/manual/en/serializable.serialize.php
-	 * @return string the string representation of the object or null
-	 */
-	public function serialize() {
-		// no serialization
-		return 'mailnotifier';
-	}
-
-
-	/**
-	 * (PHP 5 &gt;= 5.1.0)<br/>
-	 * Constructs the object
-	 * @link http://php.net/manual/en/serializable.unserialize.php
-	 * @param string $serialized <p>
-	 * The string representation of the object.
-	 * </p>
-	 * @return void
-	 */
-	public function unserialize($serialized) {
-		// no serialization
-		$this->__construct();
 	}
 
 }
