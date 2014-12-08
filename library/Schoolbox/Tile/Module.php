@@ -180,37 +180,34 @@ class Module extends BaseModule
         // If it's a subject, this could include people involved in subject.
         // For dashboards: the homepage rules don't apply, therefore only
         // superusers may edit dashboard tiles
+
+        // Callback for extracting homepage from route params
+        $getHomepageCallback = function ($params) {
+            if ($params['component']->getModule() != 'homepage') {
+                throw new \Exception('homepage permission does not apply to dashboard tiles');
+            }
+            return $params['homepage'];
+        };
+
+        // Callback for extracting homepage ID from route params
+        $getHomepageIdCallback = function ($params) use ($getHomepageCallback) {
+            $homepage = $getHomepageCallback($params);
+            return $homepage->getId();
+        };
+
         $rule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_WRITE,
-                function ($params) {
-                    if ($params['component']->getModule() != 'homepage') {
-                        throw new \Exception('homepage permission does not apply to dashboard tiles');
-                    }
-                    return $params['homepage']->getId();
-                }
+                $getHomepageIdCallback
             ),
             new Rule\HasHomepagePermissionThroughRole(
                 UserAccess::ACCESS_WRITE,
-                function ($params) {
-                    if ($params['component']->getModule() != 'homepage') {
-                        throw new \Exception('homepage permission does not apply to dashboard tiles');
-                    }
-                    return $params['homepage']->getId();
-                },
+                $getHomepageIdCallback,
                 $this->getRoleAccessMapper()
             ),
-            new Rule\IsTeacherOfClass(
-                $this->getExternalDb(),
-                function ($params) {
-                    if ($params['component']->getModule() != 'homepage') {
-                        throw new \Exception('homepage permission does not apply to dashboard tiles');
-                    }
-                    return $params['homepage'];
-                }
-            )
+            new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
         );
         $authorizer->addRule('/^tile\\..*/', new Rule\IsLoggedIn());
         $authorizer->addRule('/^tile\\..*/', $rule);
