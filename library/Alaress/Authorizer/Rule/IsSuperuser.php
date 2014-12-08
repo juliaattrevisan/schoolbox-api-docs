@@ -10,13 +10,13 @@
 
 namespace Alaress\Authorizer\Rule;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsSuperuser implements IAuthorizationRule {
 
     public function authorize(array $params = array(), User $user = null) {
         if (!($user instanceof User && $user->getId() && $user->isSuperuser())) {
-            throw new Forbidden();
+            throw new Unauthorized();
         }
     }
 

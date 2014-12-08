@@ -10,7 +10,7 @@
 
 namespace Alaress\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthorized;
 use External_UserInterface;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
@@ -82,6 +82,6 @@ class IsInvolvedInClass implements IAuthorizationRule
                 }
             }
         }
-        throw new Forbidden();
+        throw new Unauthorized();
     }
 }

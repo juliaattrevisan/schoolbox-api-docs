@@ -29,7 +29,7 @@ class UserOwnsBooking implements Rule\IAuthorizationRule {
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws Failure\Forbidden if the request isn't authorized.
+     * @throws Failure\Unauthorized if the request isn't authorized.
      */
     public function authorize(array $params = array(), User $user = null) {
         // Hopefully, the item has been loaded in the module's preloader.
@@ -47,7 +47,7 @@ class UserOwnsBooking implements Rule\IAuthorizationRule {
         if ($user->getId() == $event->getOwner()->getId()) {
             return;
         }
-        throw new Failure\Forbidden();
+        throw new Failure\Unauthorized();
     }
 
     /**

@@ -11,7 +11,7 @@
 namespace Alaress\Authorizer\Rule;
 
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthorized;
 
 class HasServicePermission implements IAuthorizationRule
 {
@@ -93,6 +93,6 @@ class HasServicePermission implements IAuthorizationRule
                 }
             }
         }
-        throw new Forbidden();
+        throw new Unauthorized();
     }
 }

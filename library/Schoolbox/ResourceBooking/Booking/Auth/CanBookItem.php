@@ -50,7 +50,7 @@ class CanBookItem implements Rule\IAuthorizationRule {
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws Failure\Forbidden if the request isn't authorized.
+     * @throws Failure\Unauthorized if the request isn't authorized.
      */
     public function authorize(array $params = array(), User $user = null) {
         // TODO simplify this rule, and define it as separate ones
@@ -83,7 +83,7 @@ class CanBookItem implements Rule\IAuthorizationRule {
                                 }
                             }
                         }
-                        throw new Failure\Forbidden();
+                        throw new Failure\Unauthorized();
                     }
                 )
             );
