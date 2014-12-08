@@ -589,10 +589,10 @@ class External_Denbigh2_User implements External_UserInterface
      * staff by using the Schoolbox $userId
      *
      * returns array(
-     *      'code'  => $result->{class category code
-     *      'name'  => $result->{class name
-     *      'classType'  => $result->{a string e.g. academic, music, maths
-     *      'campusCode'  => $result->{the campus this class is in
+     *      'code' => class category code
+     *      'name' => class name
+     *      'classType' => a string e.g. academic, music, maths
+     *      'campusCode' => the campus this class is in
      * )
      *
      * @param $externalUserId
