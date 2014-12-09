@@ -100,9 +100,12 @@
 {##
  # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
  # except I guess they will link to this page instead.
+ #
+ # Meriden have requested that no email links display on this page,
+ # due to the possiblilty of parents getting drunk and sending emails to teachers.
+ # Whatever happened to the saying "Give a man enough rope..."?
  #}
 {% for subjectGroup in report.subjects %}
-    {% set emailList = [] %}
     <h2>{{ subjectGroup.name }}</h2>
     <ul>
         {% for subject in subjectGroup.subjects %}
@@ -120,17 +123,9 @@
                             <span class="name">{{ teacher.formatName }}</span>
                             <span class="role">{{ teacher.role.name }}</span>
                         </a>
-                        {% if teacher.email %}
-                            {% set emailList = emailList ~ ',' ~ teacher.email %}
-                            <a class="mail-teacher" href="/mail/createMail.php?replyto={{ teacher.email }}">Mail</a>
-                        {% endif %}
                     </div>
                 {% endfor %}
             </li>
         {% endfor %}
     </ul>
-    {# Email all teachers #}
-    {% if emailList|length %}
-        <a class="mail-teacher" href="/mail/createMail.php?replyto={{ emailList|join(',') }}">Email all</a>
-    {% endif %}
 {% endfor %}
