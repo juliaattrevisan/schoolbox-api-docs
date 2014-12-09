@@ -8,7 +8,7 @@
 
 $groupHandler = new Group;
 
-if ($groupHandler->isStaff()) {
+if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $userHandler = new User;
     $categoryHandler = new Category;
     $synergeticClass = new External_Class;
