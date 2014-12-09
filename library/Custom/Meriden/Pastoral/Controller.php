@@ -41,4 +41,15 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * Meriden's subject page
+     *
+     * @param int    $year
+     * @param User   $student
+     * @param string $subject
+     */
+    public function subject($year, User $student, $subject)
+    {
+    }
 }
