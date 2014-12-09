@@ -75,13 +75,14 @@ class WorkerProcess extends AbstractProcess
                 list($callback, $model, $user, $diff) = $data;
                 return $this->publish($callback, $model, $user, $diff);
 
-            // digest messages
+            // digest or alert messages
             case DefaultDispatchStrategy::TASK_DIGEST:
+            case DefaultDispatchStrategy::TASK_TIMETABLE:
                 $data = unserialize($args[0]);
                 if (!(is_array($data) && count($data) >= 2)) {
                     throw new RuntimeException("Data should be array(2+); is " . gettype($data) . "(" . count($data) . ")");
                 }
-                return $this->digest($data[0], $data[1]);
+                return $this->sendTo($data[0], $data[1]);
         }
 
         throw new InvalidArgumentException("Can't process '$command'.");
@@ -167,12 +168,12 @@ class WorkerProcess extends AbstractProcess
 
     /**
      * @param callable $callback
-     * @param Role     $role
+     * @param object   $object
      * @throws RuntimeException
      * @throws InvalidArgumentException
      * @return string
      */
-    protected function digest($callback, $role)
+    protected function sendTo($callback, $object)
     {
         if (!is_callable($callback)) {
             throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
@@ -188,7 +189,7 @@ class WorkerProcess extends AbstractProcess
 
         $this->log->debug("Executing " . $this->callable2string($callback));
         // this call MUST return an integer
-        $return = call_user_func($callback, $role);
+        $return = call_user_func($callback, $object);
         $this->log->debug("Callback complete");
         // handle standard digest case
 

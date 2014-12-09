@@ -38,10 +38,11 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     const WORKER_SOFT_TIMEOUT = 90000; // 1.5 minutes
     const WORKER_HARD_TIMEOUT = 180000; // 2.5 minutes
 
-    const TASK_FETCH   = 'fetch';
-    const TASK_PUBLISH = 'publish';
-    const TASK_DIGEST  = 'digest';
-    const TASK_REROUTE = 'reroute';
+    const TASK_FETCH     = 'fetch';
+    const TASK_PUBLISH   = 'publish';
+    const TASK_DIGEST    = 'digest';
+    const TASK_REROUTE   = 'reroute';
+    const TASK_TIMETABLE = 'timetable';
 
     protected $flywheelSpins;
 
@@ -151,7 +152,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      */
     public function getSupportedActions()
     {
-        return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST);
+        return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST, self::TASK_TIMETABLE);
     }
 
 
