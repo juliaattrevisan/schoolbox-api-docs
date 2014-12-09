@@ -387,7 +387,7 @@ then
 		sourcedb="$sourcep2";
 		sourcedata=${sourcep2%/*};
 		echo -e "\nPerforming Data Transfer";
-		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
+		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
 	fi
