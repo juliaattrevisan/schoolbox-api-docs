@@ -1,6 +1,11 @@
 <?php
 /**
- * Base authorization method - contains a session object.
+ * Authorization failure - user is forbidden from viewing this page.
+
+ * This failure roughly corresponds to a 403 Forbidden error - this error code
+ * states that authentication will not make this response valid.
+ * Therefore, the Unauthorized failure state is more appropriate for stating
+ * that the authenticated user does not have permission to access a resource.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -9,7 +14,8 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Forbidden extends Base {
+class Forbidden extends Base
+{
     /**
      * Default error code - corresponds to message "you do not have permission..."
      *

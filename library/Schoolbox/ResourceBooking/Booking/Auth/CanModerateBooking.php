@@ -18,7 +18,8 @@ use Schoolbox\ResourceBooking\Booking\Model;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Booking\Mapper;
 
-class CanModerateBooking implements Rule\IAuthorizationRule {
+class CanModerateBooking implements Rule\IAuthorizationRule
+{
 
     /**
      * @var Mapper
@@ -32,9 +33,10 @@ class CanModerateBooking implements Rule\IAuthorizationRule {
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws Failure\Forbidden if the request isn't authorized.
+     * @throws Failure\Unauthorized if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null) {
+    public function authorize(array $params = array(), User $user = null)
+    {
         // Authorize results should be cached, as hitting DB for each perm
         // check is expensive.
         if ($user instanceof User) {
@@ -50,14 +52,15 @@ class CanModerateBooking implements Rule\IAuthorizationRule {
                 return;
             }
         }
-        throw new Failure\Forbidden();
+        throw new Failure\Unauthorized();
     }
 
     /**
      * @param  Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper) {
+    public function setMapper($mapper)
+    {
         $this->mapper = $mapper;
         return $this;
     }
@@ -65,8 +68,8 @@ class CanModerateBooking implements Rule\IAuthorizationRule {
     /**
      * @return Mapper
      */
-    public function getMapper() {
+    public function getMapper()
+    {
         return $this->mapper;
     }
-
 }

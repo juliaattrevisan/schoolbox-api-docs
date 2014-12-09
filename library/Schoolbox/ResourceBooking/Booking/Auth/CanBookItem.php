@@ -29,7 +29,8 @@ use Schoolbox\User;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Permission\Access\UserAccess;
 
-class CanBookItem implements Rule\IAuthorizationRule {
+class CanBookItem implements Rule\IAuthorizationRule
+{
 
     /**
      * @var Item\Mapper
@@ -50,14 +51,14 @@ class CanBookItem implements Rule\IAuthorizationRule {
      * @param  User  $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
-     * @throws Failure\Forbidden if the request isn't authorized.
+     * @throws Failure\Unauthorized if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null) {
+    public function authorize(array $params = array(), User $user = null)
+    {
         // TODO simplify this rule, and define it as separate ones
         if ($params['item'] instanceof Item\Model) {
             $item = $params['item'];
-        }
-        else {
+        } else {
             $item = $this->getMapper()->findById($params['id']);
         }
         $moderateRule = new Item\Auth\CanModerateItem();
@@ -73,7 +74,7 @@ class CanBookItem implements Rule\IAuthorizationRule {
             // allow $user to book the item.
             $auth->prependRule(
                 new Rule\Callback(
-                    function($params = array(), User $user = null) use($item) {
+                    function($params = array(), User $user = null) use ($item) {
                         if ($user instanceof User) {
                             foreach ($item->getRoleList() as $rolePermission) {
                                 if ($rolePermission->getRole()->getId() == $user->getRole()->getId()) {
@@ -83,7 +84,7 @@ class CanBookItem implements Rule\IAuthorizationRule {
                                 }
                             }
                         }
-                        throw new Failure\Forbidden();
+                        throw new Failure\Unauthorized();
                     }
                 )
             );
@@ -95,7 +96,8 @@ class CanBookItem implements Rule\IAuthorizationRule {
      * @param  Item\Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper) {
+    public function setMapper($mapper)
+    {
         $this->mapper = $mapper;
         return $this;
     }
@@ -103,8 +105,8 @@ class CanBookItem implements Rule\IAuthorizationRule {
     /**
      * @return Item\Mapper
      */
-    public function getMapper() {
+    public function getMapper()
+    {
         return $this->mapper;
     }
-
 }

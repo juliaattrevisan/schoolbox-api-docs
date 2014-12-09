@@ -1,6 +1,6 @@
 <?php
 /**
- * Base authorization method - contains a session object.
+ * Base authorization failure class.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -9,4 +9,6 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class Base extends \RuntimeException {}
+class Base extends \RuntimeException
+{
+}

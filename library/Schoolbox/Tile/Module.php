@@ -19,6 +19,7 @@ use Component_Instance;
 use Component_InstanceMapper;
 use External_UserInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
@@ -52,6 +53,16 @@ class Module extends BaseModule
      * @var Component_InstanceMapper
      */
     protected $componentInstanceMapper;
+
+    /**
+     * Dependency on role access mapper.
+     *
+     * Required for checking the user's access to the homepage that this tile
+     * belongs to, based on the role level permissions for that homepage.
+     *
+     * @var RoleAccessMapper
+     */
+    protected $roleAccessMapper;
 
     /**
      * Dependency on external user database.
@@ -169,27 +180,34 @@ class Module extends BaseModule
         // If it's a subject, this could include people involved in subject.
         // For dashboards: the homepage rules don't apply, therefore only
         // superusers may edit dashboard tiles
+
+        // Callback for extracting homepage from route params
+        $getHomepageCallback = function ($params) {
+            if ($params['component']->getModule() != 'homepage') {
+                throw new \Exception('homepage permission does not apply to dashboard tiles');
+            }
+            return $params['homepage'];
+        };
+
+        // Callback for extracting homepage ID from route params
+        $getHomepageIdCallback = function ($params) use ($getHomepageCallback) {
+            $homepage = $getHomepageCallback($params);
+            return $homepage->getId();
+        };
+
         $rule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_WRITE,
-                function ($params) {
-                    if ($params['component']->getModule() != 'homepage') {
-                        throw new \Exception('homepage permission does not apply to dashboard tiles');
-                    }
-                    return $params['homepage']->getId();
-                }
+                $getHomepageIdCallback
             ),
-            new Rule\IsTeacherOfClass(
-                $this->getExternalDb(),
-                function ($params) {
-                    if ($params['component']->getModule() != 'homepage') {
-                        throw new \Exception('homepage permission does not apply to dashboard tiles');
-                    }
-                    return $params['homepage'];
-                }
-            )
+            new Rule\HasHomepagePermissionThroughRole(
+                UserAccess::ACCESS_WRITE,
+                $getHomepageIdCallback,
+                $this->getRoleAccessMapper()
+            ),
+            new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
         );
         $authorizer->addRule('/^tile\\..*/', new Rule\IsLoggedIn());
         $authorizer->addRule('/^tile\\..*/', $rule);
@@ -258,6 +276,25 @@ class Module extends BaseModule
     public function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
+    }
+
+    /**
+     * @return RoleAccessMapper
+     */
+    public function getRoleAccessMapper()
+    {
+        return $this->roleAccessMapper;
+    }
+
+    /**
+     * @param  RoleAccessMapper $roleAccessMapper
+     *
+     * @return $this
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
     }
 
     /**

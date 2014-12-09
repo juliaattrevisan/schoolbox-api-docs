@@ -10,18 +10,20 @@
  */
 
 namespace Alaress\Authorizer\Rule;
+
+use Alaress\Authorizer\Failure\Unauthenticated;
 use Schoolbox\User;
-use Alaress\Authorizer\Failure\Unauthorized;
 
-class IsLoggedIn implements IAuthorizationRule {
+class IsLoggedIn implements IAuthorizationRule
+{
 
-    public function authorize(array $params = array(), User $user = null) {
+    public function authorize(array $params = array(), User $user = null)
+    {
         // True:  skip to next item in chain
         // False: break chain with request that redirects somewhere
         // These rules should define what to do on failure too.
         if (!($user instanceof User && $user->getId())) {
-            throw new Unauthorized();
+            throw new Unauthenticated();
         }
     }
-
 }
