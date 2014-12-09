@@ -10,13 +10,14 @@
 </div>
 
 {# Selector - like the grades selector, but displays only years #}
-{#
 <div id="enrolment">
     <form id="semesters">
         <a class="sem-back" href="#">&lsaquo;</a>
         <select id="semester">
             {% for year in report.year.list %}
-            <option value="{{ year }}" label="{{ year }} eReport">{{ year }} eReport</option>
+            <option value="{{ year }}"
+                    label="{{ year }} eReport"
+                    >{{ year }} eReport</option>
             {% endfor %}
         </select>
         <a class="sem-fwd" href="#">&rsaquo;</a>
@@ -25,13 +26,14 @@
         <span class="elbow">&#9492;</span>
         <select id="enrolled-subjects">
             <option disabled="disabled" selected="selected">Select a subject</option>
-            {% for subject in report.subjects %}
-            <option value="{{ subject.id }}">{{ subject.name }}</option>
+            {% for subject in report.student.subjectCollection %}
+            <option value="{{ subject.code }}"
+                    label="{{ subject.name }} ({{ subject.code }})"
+                    >{{ subject.name }} ({{ subject.code }})</option>
             {% endfor %}
         </select>
     </form>
 </div>
-#}
 
 {# Table of contents #}
 <img src="/images/meriden/crest.png" />

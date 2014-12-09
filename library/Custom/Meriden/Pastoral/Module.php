@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\External\SubjectMapper;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
@@ -37,8 +38,10 @@ class Module extends BaseModule
         $matcher->add(
             '/^customMeridenPastoral.index/',
             function($params) {
+                $student = UserMapper::getInstance()->findById($params['id']);
+                $student->setSubjectCollection(SubjectMapper::getInstance()->findAllForStudent($student));
                 return array(
-                    'student' => UserMapper::getInstance()->findById($params['id']),
+                    'student' => $student,
                 );
             }
         );

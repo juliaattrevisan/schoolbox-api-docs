@@ -27,8 +27,15 @@ class Controller extends Base
                 'template' => '@customMeridenPastoral/index.twig',
                 'data'     => array(
                     'report' => array(
-                        'year'    => $year,
-                        'student' => $student,
+                        'year'     => array(
+                            'current' => $year,
+                            'list'    => array(
+                                date('Y'),
+                                date('Y') + 1,
+                                date('Y') + 2,
+                            ),
+                        ),
+                        'student'  => $student,
                     )
                 ),
             )
