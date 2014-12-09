@@ -30,8 +30,9 @@ function init(){
 
   <div id="content">
     <h1 style="text-transform:capitalize">{SITE_LOCATION} Portal</h1>
-    <p class="error">{ERROR}</p>
-    <form id="loginForm" method="post" action="/loginForm.php?{GET_PARAMS}">
+      <p >Use of Lampada is governed by School policy which is deemed to be accepted at login time. A summary of the policy can be found <a href="/policy.php">here</a>. Staff and Students are expected to keep themselves informed of the full policy requirements which are available in Lampada.</p>
+      <p class="error">{ERROR}</p>
+    <form id="loginForm" class="clearfix" method="post" action="/loginForm.php?{GET_PARAMS}">
     	<fieldset>
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" />
@@ -41,12 +42,12 @@ function init(){
         <input type="password" name="password" id="password" />
       </fieldset>
         <input type="hidden" name="page" value="{HIDDEN}" />
-        <input class="login" type="submit" name="Submit" value="Login" alt="Login" />
+        <input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
         <!-- BEGIN remember_me -->
-        <label><input type="checkbox" name="rememberme" value="1" />Remember me</label>
+        <label class="remember"><input type="checkbox" name="rememberme" value="1" />Remember me</label>
         <!-- END remember_me -->
     </form>
-	 	<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+      <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
   	<div class="float-fix"></div>
   </div>
 </div>
