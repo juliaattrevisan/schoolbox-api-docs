@@ -624,6 +624,14 @@ class SitePage extends Page
                     }
                     break;
 
+                case 'tigs':
+                    if ($this->groupHandler->isStaff()) {
+                        $location = 'https://webmail.tigs.nsw.edu.au/owa';
+                    } elseif ($this->groupHandler->isStudent()) {
+                        $location = 'https://mail.google.com/a/tigs.com.au';
+                    }
+                    break;
+
                 default:
                     $location = Cfg::get('mail_webmail');
                     break;
