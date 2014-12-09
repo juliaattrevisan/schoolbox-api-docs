@@ -11,6 +11,8 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Async\SignalEmitter;
+use Alaress\Date\Clock;
+use Alaress\Date\IClock;
 use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
@@ -39,6 +41,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     /** @var DispatcherInterface */
     protected $dispatcher;
 
+    /** @var IClock */
+    protected $clock;
+
     // TODO release this dependency on the Schoolbox domain
     /** @var \Schoolbox\IConfigLoader */
     protected $conf;
@@ -52,15 +57,22 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IConfigLoader             $conf
+     * @param IClock                    $clock
      */
-    public function __construct($loop, $dispatchStrategy, $log, $conf = null)
-    {
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        LoggerInterface $log,
+        IConfigLoader $conf = null,
+        IClock $clock = null
+    ) {
         parent::__construct($loop);
 
         $this->loop       = $loop;
         $this->log        = $log;
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy);
         $this->conf       = $conf ? : ConfigMapper::getInstance();
+        $this->clock      = $clock ?: new Clock();
     }
 
 
@@ -90,7 +102,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
             $this->unschedule($trigger);
             return;
         }
-        $interval = $trigger->getTimestamp() - time();
+        $interval = $trigger->getTimestamp() - $this->clock->time();
 
         if ($interval <= self::IMMEDIATELY) {
             $this->log->info("Immediately dispatching trigger");
@@ -171,7 +183,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $label = $trigger->getLabel();
 
         /** @var TimerInterface $timer */
-        $timer = $this->loop->addTimer($trigger->getTimestamp() - time(), $callable);
+        $timer = $this->loop->addTimer($trigger->getTimestamp() - $this->clock->time(), $callable);
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
