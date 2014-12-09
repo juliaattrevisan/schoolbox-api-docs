@@ -384,6 +384,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             $task_id = ($task instanceof Task) ? $task->getId() : $task;
             if ($task_id) {
                 $time = new \Alaress_Date_Format(time(), 'U');
+                $object->setPublishDate($time);
                 $object->setOpenDate($time);
                 $object->setDueDate($time);
                 $object->setLateDate($time);
