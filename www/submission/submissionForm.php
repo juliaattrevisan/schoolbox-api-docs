@@ -56,7 +56,7 @@ if (empty($check_id) || $groupHandler->getPermission($check_id) < WRITE_ACCESS) 
 if ($action == 'delete') {
     $mapper->delete($mapper->findById($_GET['deleteBox']));
     // BTFF this thing
-    $page->backToTheFuture(1);
+    $page->backToTheFuture(isset($_GET['next']) ? $_GET['next'] : 1);
 } elseif ($action == 'visibility') {
     /* This is used for an ajax update request of just the visibility */
     try {
