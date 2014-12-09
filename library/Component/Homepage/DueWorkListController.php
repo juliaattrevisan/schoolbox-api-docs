@@ -112,13 +112,19 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             // if the late date has passed, then don't display this item (to staff or students)
             // unless it's a task.
             $isTask = $submission->getTask()->getId();
-            if (!$isTask && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()) {
+            if (!$isTask
+                && $submission->getLateDate() instanceof Alaress_Date_Format
+                && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()
+            ) {
                 continue;
             }
 
             // Don't show unpublished work to non-staff,
             // but allow it to always show to owner
-            if ($submission->getPublishDate()->getDateTimeObject() > $time->getDateTimeObject()) {
+            if (!$isTask
+                && $submission->getPublishDate() instanceof Alaress_Date_Format
+                && $submission->getPublishDate()->getDateTimeObject() > $time->getDateTimeObject()
+            ) {
                 if (!($isStaff || $submission->getOwner()->getId() == $userId)) {
                     continue;
                 }
