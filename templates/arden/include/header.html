@@ -1,9 +1,8 @@
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/javascript/math/jqmath-0.4.0.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css?v={SITE_VERSION}" />
+<link rel="stylesheet" type="text/css" media="print" href="/css/core/print.css?v={SITE_VERSION}" />
+<link href='//fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
 
 <link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
-<link href='//fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
 <!-- BEGIN header_css -->
 <link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
 <!-- END header_css -->
@@ -15,16 +14,15 @@
 </script>
 <![endif]-->
 
-<script type="text/javascript" src="/javascript/components/schoolbox.min.js"></script>
-<script type="text/javascript" src="/javascript/scripts.js"></script>
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
 <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
-<script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">M.$mathQ = false; </script> <!-- Disables $ formula encoding -->
-<script type="text/javascript" src="/javascript/jquery.notifier.js"></script>
-<script type="text/javascript" src="/javascript/jquery.flyout.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
+    $(document).ready(function() { $('#infoPanel').find('a[data-menu]').flyout(); });
+    $(document).ready(function() {
+        $('#nav').touchMenu();
+    });
 </script>
 <!-- Classes on document for when IE < 11 -->
 <!--[if lt IE 10]>
