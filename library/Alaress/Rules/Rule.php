@@ -91,5 +91,21 @@ class Rule
         return $this->conditions->count();
     }
 
+
+    /**
+     * @return Condition[]
+     */
+    public function getConditions()
+    {
+        $all = array();
+
+        // cast SPLOS to array
+        foreach ($this->conditions as $c) {
+            $all[] = $c;
+        }
+
+        return $all;
+    }
+
 }
 
