@@ -31,6 +31,11 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase {
 	 */
 	protected $proxyServer;
 
+    protected function setUp()
+    {
+        $this->markTestSkipped('Proxy Server tests are currently skipped due to external dependencies');
+    }
+
 	protected function tearDown() {
 		parent::tearDown();
 		// destroy the object so another test can't accidentally use it
