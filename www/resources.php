@@ -66,6 +66,17 @@ if ($groupHandler->getPermission($openCategory) < READ_ACCESS) {
 	$openCategory = 0;
 }
 
+// Check if the category even exists
+$categoryMapper = CategoryMapper::getInstance();
+try {
+    $categoryMapper->findById($openCategory);
+} catch (Schoolbox\Mapper\Exception\Deleted $e) {
+    // Deleted: load the parent
+    $openCategory = $e->getDeletedObject()->getParent()->getId();
+} catch (Schoolbox\Mapper\Exception $e) {
+    $openCategory = 0;
+}
+
 // log view
 if ($openCategory > 0) {
 	$categoryHandler->logPageView($openCategory);
@@ -73,7 +84,7 @@ if ($openCategory > 0) {
 
 // Build a tree up to the last resource we looked at
 $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-	CategoryMapper::getInstance(),
+    $categoryMapper,
 	TaskMapper::getInstance(),
 	$groupHandler
 );

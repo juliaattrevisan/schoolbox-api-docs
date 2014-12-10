@@ -181,7 +181,7 @@ if ($_POST['name']) {
     try {
         $category = $categoryMapper->findById($_GET['deleteAll']);
         $categoryMapper->recursiveDelete($category);
-        $_SESSION['resourcesID'] = $category->getParent();
+        $_SESSION['resourcesID'] = $category->getParent()->getId();
     }
     catch (Exception $e) {
         error(2);

@@ -367,6 +367,7 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         if (!($category instanceof Category)) {
             throw new \Schoolbox\Mapper\Exception('Instance of object not found');
         }
+        $this->throwIfDeleted($category);
         return $category;
     }
 
