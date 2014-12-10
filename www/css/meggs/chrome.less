@@ -104,8 +104,17 @@ h1,h2,
     font-weight: bold;
 }
 
+html {
+    background: url(/images/meggs/bg-crest.png) no-repeat @body-background;
+    body {
+        background-color: transparent;
+        &.login {
+            background-color: transparent;
+        }
+    }
+}
+
 #wrap{
-    background: url(/images/meggs/bg-crest.png) top left no-repeat;
     #header{
         .logo{
             top: 0;
