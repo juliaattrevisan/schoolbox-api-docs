@@ -13,7 +13,6 @@
             forcePlaceholderSize: true,
             stop: function () {
                 var allQuestions = $(this).children('li'),
-                    section      = $(this).attr('id'),
                     data         = [];
 
                 $.each(allQuestions, function (index, element) {
@@ -25,10 +24,10 @@
                 $.post('/{ASSESS_KIND_LC}/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function () {
                     var sequence = 1;
 
-                    $.each($('#' + section).children('li'), function (index, element) {
+                    allQuestions.each(function (index, element) {
                         var strong = $(element).find('strong');
 
-                        strong.html(strong.text().replace(/^Q\d+/, 'Q' + sequence));
+                        strong.html(strong.text().trim().replace(/^Q\d+/, 'Q' + sequence));
                         sequence++;
                     });
                 });
