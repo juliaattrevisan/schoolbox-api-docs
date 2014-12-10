@@ -29,7 +29,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\Rules\Ruleset;
-use Schoolbox\WebDav\Rules\UserInCondition;
+use Schoolbox\WebDav\Rules\UserCondition;
 
 
 /* OAKBURN */
@@ -37,7 +37,7 @@ $set = new Ruleset('http://davusers.soc.tas.edu.au/', 'soc/{:username}');
 
 $set->newRule(array(
     // IF :input.roletype IN ('staff')
-    new UserInCondition('roletype', array(Role::STAFF))
+    new UserCondition('role.type', array(Role::STAFF))
     // THEN
 ), array('paths' => array(
     '{:base_uri}Academic/',
@@ -60,33 +60,35 @@ $set->newRule(array(
 )));
 
 $set->newRule(array(
-    // IF :input.roletype IN ('staff')
-    new UserInCondition('roletype', array(Role::STAFF)),
-    // AND :input.defaultCampus IN (1)
-    new UserInCondition('defaultCampus', array(1))
+    // IF :input.role.type = 'staff'
+    new UserCondition('role.type', Role::STAFF),
+    // AND :input.defaultCampus.id = 1
+    new UserCondition('defaultCampus.id', 1)
     // THEN
 ),  array('paths' => array('{:base_uri}penquitestaff/{:username}/Documents/')));
 
 $set->newRule(array(
-    // IF :input.roletype IN ('staff')
-    new UserInCondition('roletype', array(Role::STAFF)),
-    // AND :input.defaultCampus NOT IN (1)
-    new UserInCondition('defaultCampus', array(1), true)
+    // IF :input.role.type = 'staff'
+    new UserCondition('role.type', Role::STAFF),
+    // AND :input.defaultCampus.id NOT = 1
+    new UserCondition('defaultCampus.id', 1, true)
     // THEN
 ),  array('paths' => array('{:base_uri}elphinstaff/{:username}/Documents/')));
 
 $set->newRule(array(
-    // IF :input.roletype IN ('student')
-    new UserInCondition('roletype', array(Role::STUDENT)),
+    // IF :input.role.type = 'student'
+    new UserCondition('role.type', Role::STUDENT),
     // AND :input.year IN (6 .. 12)
-    new UserInCondition('year', array(6, 7, 8, 9, 10, 11, 12))
+    new UserCondition('year', array(6, 7, 8, 9, 10, 11, 12))
+    // THEN
 ),  array('paths' => array('{:base_uri}penquitestudents/Year12in{:yr12_YYYY}/{:username}/Documents/')));
 
 $set->newRule(array(
-    // IF :input.roletype IN ('student')
-    new UserInCondition('roletype', array(Role::STUDENT)),
+    // IF :input.role.type = 'student'
+    new UserCondition('role.type', array(Role::STUDENT)),
     // AND :input.year NOT IN (6 .. 12)
-    new UserInCondition('year', array(6, 7, 8, 9, 10, 11, 12), true)
+    new UserCondition('year', array(6, 7, 8, 9, 10, 11, 12), true)
+    // THEN
 ),  array('paths' => array('{:base_uri}elphinstudents/Year12in{:yr12_YYYY}/{:username}/Documents/')));
 
 
