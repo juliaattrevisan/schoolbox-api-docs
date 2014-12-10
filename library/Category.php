@@ -480,7 +480,7 @@ class Category extends DeprecatedModel
             return false;
         }
 
-        $query = "SELECT * FROM categoryCode WHERE deleted_at IS NULL ";
+        $query = "SELECT * FROM categoryCode WHERE deleted_at IS NULL AND ";
 
         /* When updating ignore the item your updating */
         if ($updateID) {
