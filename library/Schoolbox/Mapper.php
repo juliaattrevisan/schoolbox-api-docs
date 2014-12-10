@@ -1594,11 +1594,15 @@ class Mapper implements Serializable
      *                            defaults to this mapper's table name.
      * @param string $other_alias The alias to use for the other side of the
      *                            join, defaults to other mapper's table name.
+     * @param bool $joinDeleted   If true, soft-deleted rows in the joined table
+     *                            will not be filtered out.
+     *                            Defaults to false, as usually you want to
+     *                            ignore the existence of soft-deleted rows.
      *
      * @return string
      * @throws Mapper\DefinitionException if join $name isn't on this mapper
      */
-    public function getJoinSql($name, $this_alias = '', $other_alias = '')
+    public function getJoinSql($name, $this_alias = '', $other_alias = '', $joinDeleted = false)
     {
         $join         = $this->getJoinDefinition($name);
         $this_table   = $this->getTable();
@@ -1627,6 +1631,12 @@ class Mapper implements Serializable
             $params[':via_alias']     = "v_$other_alias";
         } else {
             $join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+        }
+        if (!$joinDeleted) {
+            $filterSoftDeleteSql = $other_mapper->getSoftDeleteFilterSql($other_alias);
+            if (isset($filterSoftDeleteSql)) {
+                $join_sql .= ' AND '.$filterSoftDeleteSql;
+            }
         }
         if (isset($join['extra']) && strlen($join['extra']) > 0) {
             $join_sql .= ' AND ' . $join['extra'];

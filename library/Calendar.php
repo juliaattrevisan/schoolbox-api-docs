@@ -250,7 +250,7 @@ class Calendar extends DeprecatedModel
 
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
-                } else if ($event['id']) {
+                } elseif ($event['id']) {
                     $campusList = $this->getEventCampus($event['id']);
                 }
 
@@ -506,7 +506,7 @@ class Calendar extends DeprecatedModel
 					DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
 					submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created
 				FROM (category, submission_box )
-				LEFT JOIN categoryCode co ON co.categoryID = category.id
+				LEFT JOIN categoryCode co ON co.categoryID = category.id AND co.deleted_at IS NULL
 				LEFT JOIN user ON user.id = submission_box.owner ";
 
             /* If you aren't part of any categories, don't try to
@@ -586,7 +586,6 @@ class Calendar extends DeprecatedModel
         $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
-
             foreach ($tempList as $temp) {
                 $groupList[] = $temp['id'];
             }
@@ -731,9 +730,9 @@ class Calendar extends DeprecatedModel
              */
             if (count($groupList)) {
                 $groupQuery = "OR (access = " . self::ACCESS_GROUP . " AND event_category.category_id IN (" . implode(
-                        ',',
-                        $groupList
-                    ) . "))";
+                    ',',
+                    $groupList
+                ) . "))";
             }
         }
 
@@ -849,11 +848,15 @@ class Calendar extends DeprecatedModel
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
                     new Alaress_Date_Format(
-                        $currentEvent['startDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'
+                        $currentEvent['startDate'] . ' ' . $currentEvent['startTime'],
+                        'y-m-d h:i:s'
                     )
                 );
                 $event->setEndTime(
-                    new Alaress_Date_Format($currentEvent['endDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s')
+                    new Alaress_Date_Format(
+                        $currentEvent['endDate'] . ' ' . $currentEvent['endTime'],
+                        'y-m-d h:i:s'
+                    )
                 );
                 $event->setType($currentEvent['type']);
                 $event->setTitle($currentEvent['title']);
@@ -877,7 +880,7 @@ class Calendar extends DeprecatedModel
                     $mapper       = new \Schoolbox\Calendar\Relation\CategoryMapper();
                     $allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
                     $event->setCategoryCollection($allRelations);
-                } else if ($currentEvent['access'] == self::ACCESS_CAMPUS) {
+                } elseif ($currentEvent['access'] == self::ACCESS_CAMPUS) {
                     $event->setCampusList($currentEvent['campusList']);
                 }
 
@@ -903,10 +906,8 @@ class Calendar extends DeprecatedModel
 						LEFT JOIN event_group ON event.id = event_group.event_id
 						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
 							AND (
-								  (access = '3' AND event_campus.campus_id IN(" . implode(
-                ',',
-                $campusList
-            ) . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
+								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
+            . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";

@@ -3,9 +3,11 @@
 
 use Schoolbox\Notif\Notif;
 
-class Category extends DeprecatedModel {
+class Category extends DeprecatedModel
+{
 
-    function Category() {
+    function Category()
+    {
 
         $this->_table = "category";
         $this->_index = "id";
@@ -98,14 +100,15 @@ class Category extends DeprecatedModel {
         return $this->softDeleteFilterAll(parent::getAllByFields($fields, $type));
     }
 
-	/**
-	 * Get a category by name
-	 *
-	 * @param $name
-	 * @param bool $userGroupsOnly
-	 * @return array|bool
-	 */
-	public function searchByName($name, $userGroupsOnly = false) {
+    /**
+    * Get a category by name
+    *
+    * @param $name
+    * @param bool $userGroupsOnly
+    * @return array|bool
+    */
+    public function searchByName($name, $userGroupsOnly = false)
+    {
         $quotedName = $this->db->quoteForLike($name);
 
         $query = "
@@ -113,17 +116,17 @@ class Category extends DeprecatedModel {
 			FROM category
 		";
 
-		/* Filter result set further by only returning records that are also
+        /* Filter result set further by only returning records that are also
 		 * in the userGroups table
 		 */
-		if ($userGroupsOnly) {
-			$query .= "
+        if ($userGroupsOnly) {
+            $query .= "
 				INNER JOIN userGroups ON category.id = userGroups.cid
 			";
-		}
+        }
 
-		$query .= "
-			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+        $query .= "
+			LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 			WHERE (category.name LIKE \"%{$quotedName}%\"
 			OR categoryCode.code LIKE \"%{$quotedName}%\") AND category.deleted_at IS NULL";
 
@@ -137,17 +140,19 @@ class Category extends DeprecatedModel {
      * @param <type> $category_id
      * @return <type>
      */
-    function getCodeForCategory($category_id) {
+    function getCodeForCategory($category_id)
+    {
         $query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
 				  FROM category
-				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 				  WHERE category.id = '$category_id'
 				  AND category.deleted_at IS NULL";
 
         return $this->db->getRow($query);
     }
 
-    function getCategoryList($categoryID, $config = false) {
+    function getCategoryList($categoryID, $config = false)
+    {
 
         if (is_array($categoryID)) {
             $cats = " IN ('" . implode("', '", $categoryID) . "') ";
@@ -172,7 +177,7 @@ class Category extends DeprecatedModel {
                 WHERE l.parent = ca.id AND t.deleted_at IS NULL
             ) taskCount
             FROM category ca
-            LEFT JOIN categoryCode co ON co.categoryID = ca.id
+            LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
             WHERE ca.deleted_at IS NULL AND parent $cats
             GROUP BY ca.id";
@@ -190,10 +195,11 @@ class Category extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    public function getSimpleCategoryList($categoryId) {
+    public function getSimpleCategoryList($categoryId)
+    {
         $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
       				  FROM category ca
-      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
       				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
       				  WHERE ca.deleted_at IS NULL AND parent = $categoryId
       				  GROUP BY ca.id
@@ -204,7 +210,8 @@ class Category extends DeprecatedModel {
         return $categoryList;
     }
 
-    function hasChildren($categoryID) {
+    function hasChildren($categoryID)
+    {
         $query = "SELECT c.id as children
 				  FROM category c
 				  WHERE c.deleted_at IS NULL AND parent = $categoryID
@@ -213,16 +220,18 @@ class Category extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 
-    function getParent($categoryID) {
+    function getParent($categoryID)
+    {
         $query = "SELECT parent FROM category WHERE id = $categoryID AND deleted_at IS NULL";
         return $this->db->getOne($query);
     }
 
-    function getByID($categoryID) {
+    function getByID($categoryID)
+    {
 
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, g.force_follow, cf.template
 				  FROM (category c)
-				  LEFT JOIN categoryCode co ON co.categoryID = c.id
+				  LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
 				  LEFT JOIN user u on u.id = a.uid
 				  LEFT JOIN userGroups g ON g.cid = c.id
@@ -233,11 +242,12 @@ class Category extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getByCode($code) {
+    function getByCode($code)
+    {
 
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
                   FROM (category c)
-                  LEFT JOIN categoryCode co ON co.categoryID = c.id
+                  LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
                   LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
@@ -248,7 +258,8 @@ class Category extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function logPageView($categoryID) {
+    function logPageView($categoryID)
+    {
         // new mechanism for storing pageviews
         // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
         // shoved into a date field, but it can be safely ignored: the data inserts correctly
@@ -282,7 +293,8 @@ class Category extends DeprecatedModel {
         $this->db->query($query);
     }
 
-    function lastVisit($categoryID, $userID) {
+    function lastVisit($categoryID, $userID)
+    {
         //get the time since the last visit to this homepage
         $query = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
 				  WHERE category.id = '$categoryID'
@@ -293,7 +305,8 @@ class Category extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 
-    function getComponents($categoryID) {
+    function getComponents($categoryID)
+    {
 
         $query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
                         homepage_comp_location.config, name, method, filename
@@ -305,7 +318,8 @@ class Category extends DeprecatedModel {
 
     }
 
-    function getComponent($categoryID, $componentID) {
+    function getComponent($categoryID, $componentID)
+    {
 
         $query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
                         homepage_comp_location.config, name, method, filename
@@ -316,7 +330,8 @@ class Category extends DeprecatedModel {
 
     }
 
-    function getImages($categoryID, $limit = 0, $excludeWork = false) {
+    function getImages($categoryID, $limit = 0, $excludeWork = false)
+    {
         $query = "SELECT id, file.description, file.comment
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
@@ -335,12 +350,12 @@ class Category extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getCategoryTree($parent = 0, $indent = '') {
+    function getCategoryTree($parent = 0, $indent = '')
+    {
 
         $categoryList = $this->getCategoryList($parent);
         if (is_array($categoryList)) {
             foreach ($categoryList as $category) {
-
                 $thisRow['CAT_ID'] = $category['id'];
                 $thisRow['CAT_NAME'] = $indent . Scrub::text($category['name']) . ' ' . Scrub::text($category['code']);
                 array_push($this->categoryTree, $thisRow);
@@ -361,7 +376,8 @@ class Category extends DeprecatedModel {
      *
      * @return array
      */
-    function getCategoryNode($categoryID = 0, $base = null) {
+    function getCategoryNode($categoryID = 0, $base = null)
+    {
         $categoryID = (int)$categoryID;
 
         // get folder contents
@@ -390,14 +406,16 @@ class Category extends DeprecatedModel {
         }
     }
 
-    function getGroupPerms($categoryID) {
+    function getGroupPerms($categoryID)
+    {
         $query = "SELECT id, name, type FROM groups g
 				  LEFT JOIN perms p ON p.gid = g.id AND p.cid = '$categoryID'
 				  ORDER BY id";
         return $this->db->getAll($query);
     }
 
-    function checkForChildren($id) {
+    function checkForChildren($id)
+    {
         //check for child folders
         $query = "SELECT id FROM category WHERE deleted_at IS NULL AND parent = '" . $id . "' LIMIT 1";
         if ($this->db->getOne($query)) {
@@ -420,7 +438,8 @@ class Category extends DeprecatedModel {
     }
 
 
-    function logAction($categoryID, $action) {
+    function logAction($categoryID, $action)
+    {
         $logEntry = array(
             'object' => 'folder',
             'objectId' => $categoryID,
@@ -428,15 +447,17 @@ class Category extends DeprecatedModel {
             'user' => $_SESSION['id'],
         );
 
-	    $notif = new Notif(Notif::TOPIC_CMS);
-	    $notif->info("CRUD", $logEntry);
+        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif->info("CRUD", $logEntry);
     }
 
-    function deletePerms($cid) {
+    function deletePerms($cid)
+    {
         $this->db->delete('perms', 'cid', $cid);
     }
 
-    function insertPerm($cid, $group, $access) {
+    function insertPerm($cid, $group, $access)
+    {
         $perm = array(
             'cid' => $cid,
             'gid' => $group,
@@ -453,7 +474,8 @@ class Category extends DeprecatedModel {
      * @param $updateID ID of element to ignore in update situation
      * @return array|bool
      */
-    public function isCodeExists($codeList, $updateID = false) {
+    public function isCodeExists($codeList, $updateID = false)
+    {
         if (empty($codeList)) {
             return false;
         }
@@ -468,7 +490,6 @@ class Category extends DeprecatedModel {
         /* Re-implode the filtered components into a query-friendly format
          */
         if (is_array($codeList) && count($codeList)) {
-
             foreach ($codeList as $currentCode) {
                 $temp[] = '"' . $currentCode . '"';
             }
@@ -484,7 +505,8 @@ class Category extends DeprecatedModel {
     }
 
 
-    public function applyPermissions($id, $group, $recursive) {
+    public function applyPermissions($id, $group, $recursive)
+    {
 
         // do you have permission to alter my permissions??
 
@@ -522,7 +544,8 @@ class Category extends DeprecatedModel {
      * @param  $data
      * @return int
      */
-    public function create($data) {
+    public function create($data)
+    {
         $group = $data['group'];
         $template = $data['template'];
         unset($data['group']);
@@ -583,7 +606,8 @@ class Category extends DeprecatedModel {
      * @param  $data
      * @return void
      */
-    public function update($data) {
+    public function update($data)
+    {
 
         /* Check if the category code exists. If it already does, spawn error;
          * otherwise continue creating. array_filter() removes empty, false
@@ -643,7 +667,8 @@ class Category extends DeprecatedModel {
     }
 
 
-    function delete($categoryID) {
+    function delete($categoryID)
+    {
 
         /* Check its empty before deleting */
         if ($this->checkForChildren($categoryID)) {
@@ -655,14 +680,14 @@ class Category extends DeprecatedModel {
 
 
         // locate all the component instances associated with this homepage, and clear them out
-	    /** @var Component_InstanceMapper $cim */
+        /** @var Component_InstanceMapper $cim */
         $cim = Component_InstanceMapper::getInstance();
         $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
         $cim->delete($collection);
 
-	    // locate all the component instances that reference this category as an alt source, and delete them too
-		$referencingComponents = $cim->findComponentByConfigValue('src', $categoryID);
-	    $cim->delete($referencingComponents);
+        // locate all the component instances that reference this category as an alt source, and delete them too
+        $referencingComponents = $cim->findComponentByConfigValue('src', $categoryID);
+        $cim->delete($referencingComponents);
 
         /* Delete group */
         $groupHandler = new Group();
@@ -673,7 +698,8 @@ class Category extends DeprecatedModel {
         parent::delete($categoryID);
     }
 
-    function recursiveDelete($categoryID, $deleteSelf = true) {
+    function recursiveDelete($categoryID, $deleteSelf = true)
+    {
 
         $groupHandler = new Group;
 
@@ -725,7 +751,8 @@ class Category extends DeprecatedModel {
      * @param string $sort_dir
      * @return array|bool
      */
-    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc')
+    {
         $keyword = $this->db->quote($keyword);
 
         $query = "SELECT SQL_CALC_FOUND_ROWS `category`.*, GROUP_CONCAT(categoryCode.code) as code,
@@ -742,7 +769,7 @@ class Category extends DeprecatedModel {
 					LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
 						AND `userAccess`.service = 1
 						AND `userAccess`.uid = {$_SESSION['id']}
-					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+					LEFT JOIN categoryCode ON category.id = categoryCode.categoryID AND categoryCode.deleted_at IS NULL
 					WHERE (`perms`.cid OR `userAccess`.sid)
 					    AND category.deleted_at IS NULL
 						AND (
@@ -768,7 +795,8 @@ class Category extends DeprecatedModel {
      * @param $id
      * @return array
      */
-    function breadcrumb($id) {
+    function breadcrumb($id)
+    {
         $breadcrumb = array();
 
         // get the breadcrumb back up to the root directory
@@ -786,5 +814,3 @@ class Category extends DeprecatedModel {
         return array_reverse($breadcrumb);
     }
 }
-
-?>
