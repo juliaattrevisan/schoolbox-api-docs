@@ -99,6 +99,7 @@ module.exports = function(grunt) {
                     'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
                     // jQuery Validation
                     'www/javascript/components/jquery-validation/jquery.validate.js',
+                    'www/javascript/jquery.validate.extensions.js',
                     // jQueryUI
                     'www/javascript/components/jquery.ui/dist/jquery-ui.js',
                     // jQueryUI Touch Punch
@@ -114,7 +115,17 @@ module.exports = function(grunt) {
                     // Notifier
                     'www/javascript/jquery.notifier.js',
                     // Socialstream browser
-                    'www/socialstream/browser/browser.js'
+                    'www/socialstream/browser/browser.js',
+                    // Flyout menu, on user profile drop down
+                    'www/javascript/jquery.flyout.js',
+                    // Fix touch on side navigation
+                    'www/javascript/jquery.touchMenu.js',
+                    //Random scripts
+                    'www/javascript/scripts.js'
+                    //Maths formulas
+                    //'www/javascript/math/jscurry-0.3.0.js',
+                    //'www/javascript/math/jqmath-0.4.0.js'
+
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             }
