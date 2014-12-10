@@ -159,11 +159,7 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
     ));
 
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
     $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
@@ -178,6 +174,9 @@ if (!empty($_POST)) {
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
+
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Derive and render a category list
       */

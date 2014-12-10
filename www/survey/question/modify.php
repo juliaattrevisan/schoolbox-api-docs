@@ -155,15 +155,11 @@ else {
       */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
 
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
     /* Options for importing into the Question Bank
       */
     $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
     $assessHandler = new Survey_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
@@ -178,6 +174,9 @@ else {
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
+
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Derive and render a category list
       */
