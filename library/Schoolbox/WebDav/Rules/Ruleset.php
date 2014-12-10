@@ -10,7 +10,6 @@
 namespace Schoolbox\WebDav\Rules;
 
 use Alaress\Rules\Condition;
-use Alaress\Rules\Rule;
 use Alaress\Rules\Ruleset as Super;
 use Schoolbox\User;
 
@@ -99,6 +98,22 @@ class Ruleset extends Super {
         }
 
         return $settings;
+    }
+
+
+    /**
+     * @return Rule[]
+     */
+    public function getRules()
+    {
+        $all = array();
+
+        // cast SPLOS to array
+        foreach ($this->rules as $r) {
+            $all[] = $r;
+        }
+
+        return $all;
     }
 
 } 
