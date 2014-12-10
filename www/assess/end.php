@@ -80,7 +80,8 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     // completed (pending, instead of completed?)
     if (!empty($assess['task_instance_id'])) {
         Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-            $assess['task_instance_id'], $attempt['user_id']
+            $assess['task_instance_id'],
+            $attempt->getUser()->getId()
         );
     }
 
