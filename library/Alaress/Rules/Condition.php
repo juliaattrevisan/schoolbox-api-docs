@@ -37,7 +37,26 @@ abstract class Condition
      */
     public function test($input)
     {
-        return $this->negate ^ call_user_func($this->test, $input);
+        try {
+            return $this->negate ^ call_user_func($this->test, $input);
+        } catch (\DomainException $e) {
+            return false;
+        }
     }
+
+
+    /**
+     * @return bool
+     */
+    public function isNegated()
+    {
+        return $this->negate;
+    }
+
+
+    /**
+     * @return string
+     */
+    public abstract function getSummary();
 
 }

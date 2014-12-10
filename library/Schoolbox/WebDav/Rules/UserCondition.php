@@ -56,4 +56,15 @@ class UserCondition extends Condition\In {
         return in_array($value, $this->validValues);
     }
 
+
+    /**
+     * @return string
+     */
+    public function getSummary()
+    {
+        $pattern = count($this->validValues) == 1 ? "user.%s %s= %s" : "user.%s %sIN (%s)";
+
+        return sprintf($pattern, $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
+    }
+
 }

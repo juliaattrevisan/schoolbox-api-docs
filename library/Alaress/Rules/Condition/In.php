@@ -19,8 +19,12 @@ use Alaress\Rules\Condition as Super;
  */
 abstract class In extends Super
 {
+    /** @var string */
+    protected $field;
+
     /** @var array */
     protected $validValues;
+
 
     /**
      * @param string $field
@@ -29,7 +33,7 @@ abstract class In extends Super
      */
     public function __construct($field, $validValues, $negate = false)
     {
-        $this->field = (string)$field;
+        $this->field       = (string)$field;
         $this->validValues = is_array($validValues) ? $validValues : array($validValues);
 
         parent::__construct(array($this, 'assertIn'), $negate);
@@ -41,4 +45,32 @@ abstract class In extends Super
      * @return bool
      */
     public abstract function assertIn($input);
+
+
+    /**
+     * @return array
+     */
+    public function getValidValues()
+    {
+        return $this->validValues;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getSummary()
+    {
+        return sprintf("IF :input.%s %sIN (%s)", $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
+    }
+
 }
