@@ -16,6 +16,7 @@ class UserQueueFactoryTest extends PHPUnit_Framework_TestCase {
 	 * @return \Schoolbox\Notif\Queue\UserQueueFactory
 	 */
 	protected function newUserQueueFactory($messages = array()) {
+        $this->markTestSkipped('\\Schoolbox\\Notif\\Queue\\UserQueueFactory no longer exists');
 
 		$uqf = new \Schoolbox\Notif\Queue\UserQueueFactory(new \Schoolbox\Notif\MQ\Test\MockAMQPConnector($messages));
 

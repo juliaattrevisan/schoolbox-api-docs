@@ -26,4 +26,8 @@ class ProxyServerTestConfigLoader implements \Schoolbox\IConfigLoader {
 		}
 		return null;
 	}
+
+    public function dropCache()
+    {
+    }
 }
