@@ -11,14 +11,13 @@ namespace Schoolbox\WebDav\Rules;
 
 use Alaress\Rules\Condition;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class UserCondition extends Condition\In {
 
     /**
-     * @param string $field
-     * @param array  $validValues
-     * @param bool   $negate
+     * @param string           $field
+     * @param array|string|int $validValues
+     * @param bool             $negate
      */
     public function __construct($field, $validValues, $negate = false)
     {
@@ -34,24 +33,26 @@ class UserCondition extends Condition\In {
     {
 //        printf("ASSERT: %s.%s IN (%s)\n", $user->getUsername(), $this->field, implode(', ', $this->validValues));
 
-        switch ($this->field) {
-            case 'roletype':
-                $value = $user->getRole()->getType();
-                break;
-            case 'defaultCampus':
-                $value = $user->getDefaultCampus()->getId();
-                break;
-            default:
-                // cast $field to :input->get$Field();
-                $getField = UserMapper::getInstance()->getGetMethodName($this->field);
-                if (method_exists($user, $this->field)) {
-                    $value = call_user_func(array($user, $getField));
-                    $value = is_object($value) ? $value->getId() : $value;
-                } else {
-                    $value = '';
-                }
-                break;
+        if (strpos($this->field, '.') !== false) {
+            $path = explode('.', $this->field);
+        } else {
+            $path = array($this->field);
         }
+
+        // could be something like role.type or defaultCampus.id
+        // will be cast to $user->getRole()->getType()
+        $value  = $user;
+        $string = 'User';
+
+        foreach ($path as $get) {
+            $string .= '->get'.ucfirst($get).'()';
+            $method = array($value, "get$get"); // methods aren't case sensitive......
+            if (!is_callable($method)) {
+                throw new \DomainException("Failed to call $string, method does not exist");
+            }
+            $value = call_user_func($method);
+        }
+
         return in_array($value, $this->validValues);
     }
 
