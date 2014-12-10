@@ -13,7 +13,7 @@ use Alaress\Rules\Condition;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class UserInCondition extends Condition\In {
+class UserCondition extends Condition\In {
 
     /**
      * @param string $field
