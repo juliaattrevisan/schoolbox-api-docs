@@ -43,10 +43,10 @@
 	</ul>
 
 	<script type="text/javascript">
-		$j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
+		$('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
 			event.preventDefault();
-			var $target = "/cms/sendVideo.php?type=sbfs&id="+$j(this).attr("rel");
-			var $poster = "/cms/videoThumb.php?type=sbfs&id="+$j(this).attr("rel")+"&size=poster";
+			var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
+			var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
 			// setting video plugin's poster doesn't work as expected,
 			// so set the video's poster directly
 			videoElement.attr('poster', $poster);

@@ -1,26 +1,26 @@
 <script type='text/javascript' src="/javascript/evaluation/evaluation.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
-   	var validator = $j("#createQuestionForm").submit(function() {
+$(document).ready(function() {
+   	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
 	 }).validate({
 		submitHandler: function() {
-				var theForm = $j('#createQuestionForm'),
+				var theForm = $('#createQuestionForm'),
 					answerCollection = new Array(),
 					content = tinyMCE.activeEditor.getContent(); // get the content
 
-   			$j('#question').val(content); // put it in the textarea
+   			$('#question').val(content); // put it in the textarea
 			
 
-			$j.each($j('#answerCollection').find('li'), function(index, element) {
-					var elem = $j(element),
+			$.each($('#answerCollection').find('li'), function(index, element) {
+					var elem = $(element),
 						description = elem.find('.answerDescription').val(),
 						code = elem.find('.answerCode').val();
 
 				/* Ignore empty answers that weren't removed
 				 */
-				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
+				if (($.trim(description) != '') && ($.trim(code) != '')) {
 					answerCollection.push({
 						description: description,
 						value: code,
@@ -38,10 +38,10 @@ $j(document).ready(function() {
 					question: tinyMCE.get('question').getContent(),
 					marks: theForm.find('input[name=marks]').val(),
 					allAnswers:JSON.stringify(answerCollection),
-					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+					configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
 				};
 
-				$j.post(theForm.attr('action'), data, function(responseText) {
+				$.post(theForm.attr('action'), data, function(responseText) {
 					window.location = '/assess/question/modify/' + data.question_id;
 				});
 			}
@@ -55,10 +55,10 @@ $j(document).ready(function() {
 					question: tinyMCE.get('question').getContent(),
 					marks: theForm.find('input[name=marks]').val(),
 					allAnswers:JSON.stringify(answerCollection),
-					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+					configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
 				};
 
-				$j.post(theForm.attr('action'), data, function(responseText) {
+				$.post(theForm.attr('action'), data, function(responseText) {
 					window.location = questionBank.url;
 				});
 			}
@@ -89,7 +89,7 @@ $j(document).ready(function() {
         errorPlacement: function(error, element) {
           
             error.addClass('message');  // add a class to the wrapper
-			var pos = $j('ul#answerCollection').height();
+			var pos = $('ul#answerCollection').height();
 			
 			
 			if (element.hasClass("answerDescription")) {
@@ -107,15 +107,15 @@ $j(document).ready(function() {
     jQuery.validator.addMethod('emptyInputs', function(value, element) {
         var fieldsAreFilled = true;
 
-        $j.each($j('#answerCollection').find('li'), function(index, element) {
-            var elem = $j(element);
+        $.each($('#answerCollection').find('li'), function(index, element) {
+            var elem = $(element);
 
             var description = elem.find('.answerDescription').val();
             var code = elem.find('.answerCode').attr('value');
 
             /* Ignore empty answers that weren't removed
              */
-            if ($j.trim(description) == '') {
+            if ($.trim(description) == '') {
                 fieldsAreFilled = false;
             }
 	    });
@@ -131,8 +131,8 @@ $j(document).ready(function() {
 	   
 	    var oneFieldChecked = true;
 
-        $j.each($j('#answerCollection').find('li'), function(index, element) {
-            var elem = $j(element);
+        $.each($('#answerCollection').find('li'), function(index, element) {
+            var elem = $(element);
 
             var checkit = elem.find('.answerCorrect').is(':checked');
 
@@ -157,16 +157,16 @@ $j(document).ready(function() {
 	
     /* Add a new answer option
      */
-        $j(document).on('click', '.makeNewAnswer', function(e) {
+        $(document).on('click', '.makeNewAnswer', function(e) {
 			e.preventDefault();
 
 			var maxItems = 702;
 
 			/* Obey limit
 			 */
-			if ($j('#answerCollection li.inputs > .list-item').length < maxItems) {
-		var thing = $j('.hidden-clone ul:first-child').clone();
-		$j('ul#answerCollection').append(thing);		
+			if ($('#answerCollection li.inputs > .list-item').length < maxItems) {
+		var thing = $('.hidden-clone ul:first-child').clone();
+		$('ul#answerCollection').append(thing);
 		refreshList();
 		}
 	
@@ -175,41 +175,41 @@ $j(document).ready(function() {
 	
 	/* Remove an answer option
 	 */
-		$j(document).on('click', 'div.delete', function(e) {
-			if (($j('.inputs').length) !== 3) {
-			$j(this).parent().remove();
+		$(document).on('click', 'div.delete', function(e) {
+			if (($('.inputs').length) !== 3) {
+			$(this).parent().remove();
 				refreshList();
 		}	
 
 			return false;
     });
 	
-        $j('.answerCorrect').each(function (e) {
-            if ($j(this).is(':checked')) {
-                $j(this).closest('li').addClass("highlight");
+        $('.answerCorrect').each(function (e) {
+            if ($(this).is(':checked')) {
+                $(this).closest('li').addClass("highlight");
             }
         });
 
-        $j('.check-it').click(function (e) {
-            $j(this).closest('li').toggleClass("highlight");
+        $('.check-it').click(function (e) {
+            $(this).closest('li').toggleClass("highlight");
         });
 
 	function refreshList() {
 			var i = 1;
 
-			$j('#answerCollection li.inputs > .list-item').each(function(index, element) {
+			$('#answerCollection li.inputs > .list-item').each(function(index, element) {
 				$(element).children('span').html($.fn.evaluation.findLetterIndex(i) + ')');
 				$(element).children('input').val(i);
 				i++;
 		});
 		
-		var pos = $j('ul#answerCollection').height();
+		var pos = $('ul#answerCollection').height();
 		
-		$j('#listItems').css({
+		$('#listItems').css({
 			'top': pos
 		});
 		
-		$j('#wrongCheckbox').css({
+		$('#wrongCheckbox').css({
 			'top':  pos
 		});
 	}

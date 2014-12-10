@@ -1,20 +1,20 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
-$j(function () {
+$(function () {
 
-	$j('#feedbackForm').submit(function ($event) {
+	$('#feedbackForm').submit(function ($event) {
 
-		var message = '', form = $j(this);
-		if ($j('#name').val() == '')
+		var message = '', form = $(this);
+		if ($('#name').val() == '')
 			message += 'Please enter your name.\n';
 		
-		if ($j('#email').val() == '')
+		if ($('#email').val() == '')
 			message += 'Please enter your email address.\n';
 		
-        if ($j('#message').val() == '')
+        if ($('#message').val() == '')
             message += 'Please enter a message.\n';
 
-        if ($j('#recaptcha_response_field').val() == '')
+        if ($('#recaptcha_response_field').val() == '')
             message += 'Please enter the two corrosponding words for the human checker.\n';
 
 		if (message != '') {

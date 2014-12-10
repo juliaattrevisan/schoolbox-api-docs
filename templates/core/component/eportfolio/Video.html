@@ -46,10 +46,10 @@
     </div>
 
     <script type="text/javascript">
-        $j('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function (event) {
+        $('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function (event) {
             event.preventDefault();
-            var $target = "/cms/sendVideo.php?type=myfile&id=" + $j(this).attr("rel");
-            var $poster = "/cms/videoThumb.php?type=myfile&id=" + $j(this).attr("rel") + "&size=poster";
+            var $target = "/cms/sendVideo.php?type=myfile&id=" + $(this).attr("rel");
+            var $poster = "/cms/videoThumb.php?type=myfile&id=" + $(this).attr("rel") + "&size=poster";
             // setting video plugin's poster doesn't work as expected,
             // so set the video's poster directly
             videoElement.attr('poster', $poster);
@@ -64,7 +64,7 @@
         <a href="/cms/myFile/new/{ID}/0/{COMPONENT_INSTANCE_ID}" class="btn up-arrow"><span></span>Post Video</a>
     </p>
     <script type="text/javascript">
-        $j('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
             wrapClass: 'dragging',
             previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
             tplWrap: '<li class="dz-preview" />',

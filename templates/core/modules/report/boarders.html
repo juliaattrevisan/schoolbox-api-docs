@@ -2,8 +2,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
-$j(function(){
-    $j('.private h2').qtip({
+$(function(){
+    $('.private h2').qtip({
         content: 'Details have not been made available',
         style: {
             classes: 'qtip-green qtip-shadow qtip-rounded',
@@ -15,7 +15,7 @@ $j(function(){
         }
     });
 
-	$j('.print').click(function() {
+	$('.print').click(function() {
 		window.print();
 		return false;
 	});

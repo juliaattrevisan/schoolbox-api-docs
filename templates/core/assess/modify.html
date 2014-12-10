@@ -12,40 +12,40 @@ $(function() {
 	});
 
 	/* date picker */
-	$j('#start_date, #finish_date').datepicker({
+	$('#start_date, #finish_date').datepicker({
 		dateFormat: 'dd/mm/yy',
 		showOn: 'both',
 		buttonImage: '/images/core/calendar/calendar-click.png',
 		buttonImageOnly: true,
 		constrainInput: false,
 		onClose: function (string) {
-			var input = $j(this);
-			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+			var input = $(this);
+			$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 				input.val(data.time);
 			})
 		}
 	});
-	$j('#start_date').syncDates({endDate: $j('#finish_date')});
+	$('#start_date').syncDates({endDate: $('#finish_date')});
 	/* date picker */
 
-	$j('.show-duration').click(function() {
-		if ($j('.edit-duration').is(':visible')) {
-			$j('.edit-duration').toggle();
-			$j('#minHours').val('0');
-			$j('#minDuration').val('00');
+	$('.show-duration').click(function() {
+		if ($('.edit-duration').is(':visible')) {
+			$('.edit-duration').toggle();
+			$('#minHours').val('0');
+			$('#minDuration').val('00');
 		} else {
-			$j('.edit-duration').toggle();
-			$j('#minDuration').val('15');
+			$('.edit-duration').toggle();
+			$('#minDuration').val('15');
 		}
 	});
 
-	if ($j('.show-duration').is(':checked')) {
-        $j('.edit-duration').show();
+	if ($('.show-duration').is(':checked')) {
+        $('.edit-duration').show();
 	}
 
 	var actionPlace = '{ACTION}';
 
-	$j('#createAssess').validate({
+	$('#createAssess').validate({
 		rules: {
 			title: {
 				required: true,

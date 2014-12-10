@@ -19,15 +19,15 @@
 <script type='text/javascript' src='/javascript/evaluation/signature.js'></script>
 
 <script type="text/javascript">
-	$j(function() {
+	$(function() {
 
 		/* Start all the navigation controls
 		 */
-		$j.fn.evaluation.initNavigators();
+		$.fn.evaluation.initNavigators();
 
 		/* Pass necessary values
 		 */
-		$j('#evaluation-countdown').evaluationCountdown({
+		$('#evaluation-countdown').evaluationCountdown({
 			evaluationId: '{ASSESS_ASSESS_ID}',
 			timeLeft: '{ASSESS_TIME_REMAINING}'
 		});

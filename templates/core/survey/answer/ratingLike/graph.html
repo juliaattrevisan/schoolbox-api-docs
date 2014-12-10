@@ -1,6 +1,6 @@
 <script type='text/javascript'>
-$j(function() {
-	$j.plot($j("#{GRAPH_ID}"), [
+$(function() {
+	$.plot($("#{GRAPH_ID}"), [
 		<!-- BEGIN series -->
 		{
 			label: "{SERIES_LABEL}",
@@ -14,7 +14,7 @@ $j(function() {
 		<!-- END series -->
 	], {
 		legend: {
-			container: $j('#legend_{GRAPH_ID}')
+			container: $('#legend_{GRAPH_ID}')
 		},
 		xaxis: {
 			show: false,

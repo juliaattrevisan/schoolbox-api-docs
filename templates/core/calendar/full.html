@@ -35,7 +35,7 @@
     };
 
     // once the DOM has loaded, punch a fancy calendar into it
-    $j(document).ready(function() {
+    $(document).ready(function() {
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
@@ -144,7 +144,7 @@
                         }
                     }
 
-                    $j(jsEvent).addClass(calEvent.data.styles.visible);
+                    $(jsEvent).addClass(calEvent.data.styles.visible);
 
                     // Add booking styles
                     if (calEvent.data.booking) {
@@ -218,7 +218,7 @@
                  * @param view
                  */
                 windowResize: function(view) {
-                    var wHeight = $j(window).height()
+                    var wHeight = $(window).height()
                     var calTop = c.dom.offset().top
                     c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
                 },
@@ -233,9 +233,9 @@
 					/* Show loading div right in the middle
 					 */
 					if (isLoading === true) {
-						$j('#calendar-loading').css({
-							top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
-							left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+						$('#calendar-loading').css({
+							top: ($('#calendar').height() - $('#calendar-loading').height())/2,
+							left: ($('#calendar').width() - $('#calendar-loading').width())/2
 						}).show();
 					}
 					/* Has finished loading
@@ -244,11 +244,11 @@
 
 						/* Hide loading div
 						 */
-						$j('#calendar-loading').hide();
+						$('#calendar-loading').hide();
 
                         // update any tasks that have been completed by strikethrough-ing them
-                        $j(this).find('input[type=checkbox]').each(function() {
-                            var self = $j(this)
+                        $(this).find('input[type=checkbox]').each(function() {
+                            var self = $(this)
 
                             if(self.prop('checked')) {
                                 self.siblings('.fc-title').addClass('strike')
@@ -261,7 +261,7 @@
                         // update datepicker
                         var d = c.dom.fullCalendar('getDate')
 
-                        $j('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
                     }
                 },
 
@@ -278,7 +278,7 @@
 
                 // Stream location
                 events: function(start, end, timezone, callback) {
-                    $j.ajax({
+                    $.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
                         data: {
@@ -300,7 +300,7 @@
 
         /* LISTENERS */
         // toggle onto the create task form
-        $j('#showCreateTaskForm').click(function(e) {
+        $('#showCreateTaskForm').click(function(e) {
             e.preventDefault()
             c.getForm('createEvent').hide()
             c.getForm('createTask').show()
@@ -311,7 +311,7 @@
         });
 
         // toggle onto the create event form
-        $j('#showCreateEventForm').click(function(e) {
+        $('#showCreateEventForm').click(function(e) {
             e.preventDefault()
             c.getForm('createEvent').show()
             c.getForm('createTask').hide()
@@ -322,13 +322,13 @@
         })
 
         // click 'Edit Event' and push data through to main form page
-        $j('#edit-full').click(function(e) {
-            var getstring = $j(this).closest('form').serialize();
+        $('#edit-full').click(function(e) {
+            var getstring = $(this).closest('form').serialize();
             window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
         })
 
         // hide bubbles if any header buttons are clicked
-        $j('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
+        $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
             c.bubble.hide()
         })
 
@@ -352,7 +352,7 @@
 
         // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
         c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
-            var self = $j(this)
+            var self = $(this)
             var eventId = self.closest('form').find('input[name=eventId]').val()
             var chk = c.dom.find('#t'+eventId)
             chk.prop('checked', self.prop('checked'))
@@ -360,7 +360,7 @@
         })
 
         c.getForm('editTask').on('click', '.deleteTask', function(e) {
-            var id = $j(this).siblings('input[name=eventId]').val()
+            var id = $(this).siblings('input[name=eventId]').val()
             c.cdelete({eventId: id})
             c.bubble.hide()
             e.preventDefault()
@@ -384,13 +384,13 @@
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
         // to click.
-        $j('#calendar-export form').submit(function(event) {
+        $('#calendar-export form').submit(function(event) {
             event.preventDefault();
-            var form = $j(this);
-            $j('#calendar-export-dialog').dialog({
+            var form = $(this);
+            $('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
-                    $j(event.target).find('#calendar-export-dialog-url')
-                        .text($j.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
+                    $(event.target).find('#calendar-export-dialog-url')
+                        .text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
                 },
                 minWidth: 400,
                 modal: true
@@ -441,7 +441,7 @@
         // if a checkbox on the calendar is interacted, ajax
         c.dom.on('change', 'input[type=checkbox]', function(e) {
 
-            var self = $j(this)
+            var self = $(this)
             var ttl = self.siblings('.fc-title')
             if(self.prop('checked')) {
                 ttl.addClass('strike')

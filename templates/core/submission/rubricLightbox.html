@@ -42,24 +42,24 @@
 </div>
 <script type="text/javascript">
     // listener for submit
-    $j('#closebox').click(function() {
-        $j('#rubric-lightbox').dialog('close');
+    $('#closebox').click(function() {
+        $('#rubric-lightbox').dialog('close');
     });
 </script>
 
 <script type="text/javascript">
     var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-    $j(function() {
-        var plot = $j.plot($j('#rubric-chart'), rubricData.spidata.points, rubricData.options);
-        $j(document).ready(function() {
+    $(function() {
+        var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
+        $(document).ready(function() {
             plot.draw();
         });
 
-        $j(document).ready(function() {
-            var radios = $j('#rubric-tbody :radio');
+        $(document).ready(function() {
+            var radios = $('#rubric-tbody :radio');
             radios.removeClass('focused').parent('td').removeClass('focused');
-            $j('#rubric-tbody :checked').each(function() {
-                var self = $j(this);
+            $('#rubric-tbody :checked').each(function() {
+                var self = $(this);
                 self.addClass('focused').parent('td').addClass('focused');
                 self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
             })

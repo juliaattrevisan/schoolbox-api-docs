@@ -89,7 +89,7 @@ $('#rubric-tbody').inlineGradingRubrics({
 				allRadios: element.find(':radio')
 			}
 
-			var merged = $j.extend(defaults, derived, options);
+			var merged = $.extend(defaults, derived, options);
 
 			return merged;
 		}
@@ -190,7 +190,7 @@ $('#rubric-tbody').inlineGradingRubrics({
 		function updateWarningElements() {
 			var success = true;
 
-			$j(config.element).find('.criterion-label-group').each(function() {
+			$(config.element).find('.criterion-label-group').each(function() {
 				var groupName = $(this).data('class');
 
 				var container = $(config.element).find('td[data-class="'+groupName+'"]')
@@ -220,7 +220,7 @@ $('#rubric-tbody').inlineGradingRubrics({
 		 * Set up validation behaviours for rubrics form
 		 */
 		function initForm() {
-			$j(config.formElement).validate({
+			$(config.formElement).validate({
 				submitHandler: function(form) {
 					var success = updateWarningElements();
 
@@ -228,7 +228,7 @@ $('#rubric-tbody').inlineGradingRubrics({
 						form.submit();
 					}
 					else {
-						$j('#errnotif').removeClass('hide');
+						$('#errnotif').removeClass('hide');
 					}
 				}
 			});

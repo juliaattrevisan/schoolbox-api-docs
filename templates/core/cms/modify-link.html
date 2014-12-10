@@ -3,30 +3,30 @@
 <script language="JavaScript" type="text/javascript">
 
 
-    $j(document).ready(function () {
+    $(document).ready(function () {
 
         /*
          * Modal for URL homepage selection
          * */
 
-        $j('#urlForm').on('click', '.open-modal', function() {
+        $('#urlForm').on('click', '.open-modal', function() {
 
-            $j('#resource-browser').socialstreamBrowser({
+            $('#resource-browser').socialstreamBrowser({
                 title: 'Choose a folder',
                 categoryId: 0,
                 mimeFilter: false,
                 submitCallback: function(url, filename) {
-                    $j('#url').val(url);
+                    $('#url').val(url);
                 }
             });
         });
 
-        $j('#deleteLink').click(function () {
+        $('#deleteLink').click(function () {
             if (confirm('Are you sure you want to delete this link?')) {
                 window.location = '/cms/linkForm.php?delete={LINK_ID}&redirect=/homepage/{CATEGORY_ID}';
             }
         });
-        $j('#urlForm').validate({
+        $('#urlForm').validate({
             rules:{
                 url:{
                     isURL:true

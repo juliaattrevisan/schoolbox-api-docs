@@ -77,7 +77,7 @@
     };
     <!-- END colour_list -->
 
-    $j(function() {
+    $(function() {
 
         var url = '/eportfolio/configForm.php';
 
@@ -154,11 +154,11 @@
 		});
 
 		// all forms should submit without prevention
-		$j("#e-portfolio").on('submit', 'form',  function() {
+		$("#e-portfolio").on('submit', 'form',  function() {
 			window.check = false;
 		});
 
-		$j('#addIndividualPermission').selectizeSelector({
+		$('#addIndividualPermission').selectizeSelector({
 			multiple: true,
 			value: {USER_LIST},
 			ajax: {

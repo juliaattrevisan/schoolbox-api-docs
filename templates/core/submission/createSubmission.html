@@ -9,8 +9,8 @@
 
 <script type="text/javascript">
     // from http://stackoverflow.com/a/5259788
-    $j.fn.outerHTML = function () {
-        $t = $j(this);
+    $.fn.outerHTML = function () {
+        $t = $(this);
         if ($t[0] === undefined) {
             return '';
         }
@@ -24,26 +24,26 @@
         }
     };
 
-    $j(function () {
+    $(function () {
 		$.fn.alaressTiny({
 			mode: 'exact',
 			elements: 'description-box'
 		});
 
         // setup datepickers
-        var publishDate = $j('#publish_date');
-        var openDate    = $j('#open_date');
-        var dueDate     = $j('#due_date');
-        var lateDate    = $j('#late_date');
+        var publishDate = $('#publish_date');
+        var openDate    = $('#open_date');
+        var dueDate     = $('#due_date');
+        var lateDate    = $('#late_date');
         openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
             buttonImageOnly:true,
             onClose:function (string) {
-                var input = $j(this);
+                var input = $(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time).blur();
                 })
             }
@@ -53,36 +53,36 @@
         dueDate.syncDates({endDate: lateDate});
 
         var marktype = {
-            total:$j('#marktype-total'),
-            rubric:$j('tr.marktype-rubric'),
-            letter:$j('#marktype-letter')
+            total:$('#marktype-total'),
+            rubric:$('tr.marktype-rubric'),
+            letter:$('#marktype-letter')
         };
 
         var rubric = {
-            resultset:$j('#rubric-results :checked')
+            resultset:$('#rubric-results :checked')
         };
 
         showHideMarktype(0);
 
         if (document.getElementById('rs-0').checked) {
-            $j('#rubric-criteria').find('.crit').each(function () {
-                if ($j(this).find(':checked').length) {
+            $('#rubric-criteria').find('.crit').each(function () {
+                if ($(this).find(':checked').length) {
                     descriptor('show', this, 0);
                 }
             });
         }
 
-        $j('#marktype').change(function () {
+        $('#marktype').change(function () {
             showHideMarktype(500);
         });
 
 
         // cache lookups
-        var acceptSubmit = $j('input:checkbox[name=accept_submission]');
-        var acceptHide = $j('.accept-hide');
+        var acceptSubmit = $('input:checkbox[name=accept_submission]');
+        var acceptHide = $('.accept-hide');
 
         acceptSubmit.change(function () {
-            if ($j(this).is(':checked')) {
+            if ($(this).is(':checked')) {
                 acceptHide.show(500);
             } else {
                 acceptHide.hide(500);
@@ -94,7 +94,7 @@
         }
 
         // validation rules
-        $j.validator.addMethod("markTypeTotalCheck", function(value, element) {
+        $.validator.addMethod("markTypeTotalCheck", function(value, element) {
             if(marktype.total.is(':visible')) {
                 return value > 0;
             }
@@ -103,26 +103,26 @@
             }
         }, "Please enter a numeric mark amount");
 
-        $j.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
+        $.validator.addMethod('markTypeRubricCriteriaExists', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                return $j('#rubric-criteria').find('input[type="checkbox"]').length >= 1;
+                return $('#rubric-criteria').find('input[type="checkbox"]').length >= 1;
             }
             else {
                 return true;
             }
         }, 'Please ensure at least one criterion exists');
-        $j.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
+        $.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                return $j('#rubric-criteria').find('input:checked').length >= 1;
+                return $('#rubric-criteria').find('input:checked').length >= 1;
             }
             else {
                 return true;
             }
         }, 'Please select at least one criterion');
 
-        $j.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
+        $.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                return $j('#rubric-results').find('input:checked').length == 1;
+                return $('#rubric-results').find('input:checked').length == 1;
             }
             else {
                 return true;
@@ -130,7 +130,7 @@
         }, 'Please select a result set');
 
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
-        var submission_form = $j('#createSubmissionForm');
+        var submission_form = $('#createSubmissionForm');
         var publish_date_valid = { dateValid: true };
         var open_date_valid = {
             dateValid: true,
@@ -234,53 +234,53 @@
             );
 
         // trigger show or hide of descriptors when radio off
-        $j('#rubric-results input').change(function () {
+        $('#rubric-results input').change(function () {
             var v = document.getElementById('rs-0').checked;
 
             // hide the descriptors
             if (!v) {
-                descriptor('hide', $j('#rubric-criteria div'), 100);
+                descriptor('hide', $('#rubric-criteria div'), 100);
             }
             // show them if checked
             else {
-                $j('#rubric-criteria div').each(function () {
-                    var checked = $j(this).children(':checkbox').prop('checked');
+                $('#rubric-criteria div').each(function () {
+                    var checked = $(this).children(':checkbox').prop('checked');
                     descriptor(checked ? 'show' : 'hide', this, 100)
                 });
             }
         });
 
-        $j('#rubric-criteria :checkbox').change(function () {
+        $('#rubric-criteria :checkbox').change(function () {
             var act = 'hide';
 
             // show if and only if both the descriptors radio and myself are checked
-            var x = $j('#rs-0').prop('checked'),
+            var x = $('#rs-0').prop('checked'),
                     y = this.checked;
 
             if (x && y) {
                 act = 'show';
             }
-            descriptor(act, $j(this).parent('div'), 100);
+            descriptor(act, $(this).parent('div'), 100);
         });
 
         // trigger change of descriptor count when dropdown changed
-        $j('#descriptor-count').change(function () {
-            var target = $j('#descriptor-count option:selected').first().val();
+        $('#descriptor-count').change(function () {
+            var target = $('#descriptor-count option:selected').first().val();
 
-            $j('#rubric-criteria tr').each(function () {
+            $('#rubric-criteria tr').each(function () {
                 var i,
-                        inputCount = $j(this).find('td').length,
+                        inputCount = $(this).find('td').length,
                         diff = target - inputCount;
 
                 if (diff < 0) {
                     for (i = 0; i < 0 - diff; ++i) {
                         // remove trailing li's
-                        $j(this).find('td:last-child').detach();
+                        $(this).find('td:last-child').detach();
                     }
                 }
                 else if (diff > 0) {
                     var insertList = '',
-                            last = $j(this).children('td').last(),
+                            last = $(this).children('td').last(),
                             newItem;
 
                     for (i = 0; i < diff; ++i) {
@@ -290,7 +290,7 @@
                         // clear the descriptor value
                         newItem.find('textarea').val('');
                         newItem.find('input').val( parseInt(newItem.find('input').val()) + (i+1) );
-                        $j(this).append( newItem );
+                        $(this).append( newItem );
                     }
                 }
             });
@@ -326,7 +326,7 @@
         });
 
         function showHideMarktype(timeout) {
-            var v = $j('#marktype option:selected').first().data('slug');
+            var v = $('#marktype option:selected').first().data('slug');
             if (v == 'raw') {
                 marktype.letter.hide(timeout);
                 marktype.rubric.hide(timeout, function () {
@@ -353,22 +353,22 @@
         }
 
         function descriptor(action, element, timeout) {
-            $j(element).find(':input:not(:checkbox)').parent('td').each(function () {
+            $(element).find(':input:not(:checkbox)').parent('td').each(function () {
                 if (action == 'show') {
-                    $j(this).show();
-                    $j(element).addClass('highlight').find(inputSelector).first().trigger('click');
+                    $(this).show();
+                    $(element).addClass('highlight').find(inputSelector).first().trigger('click');
                 }
                 else if (action == 'hide') {
-                    $j(element).removeClass('highlight');
-                    $j(this).hide();
+                    $(element).removeClass('highlight');
+                    $(this).hide();
                 }
             });
         }
         //
         // File uploader
         // May need custom file to be uploaded.
-        var form        = $j('form');
-        var file_upload = $j('#custom_file_upload');
+        var form        = $('form');
+        var file_upload = $('#custom_file_upload');
         file_upload.uploadify({
             'uploader':'/javascript/uploadify/uploadify.swf',
             'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}',
@@ -386,8 +386,8 @@
                 if (!parsed_output.success) {
                     alert('Error: '+parsed_output.message);
                 }
-                $j('#custom_file_upload'+code).prepend(
-                    $j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
+                $('#custom_file_upload'+code).prepend(
+                    $('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
                 );
             },
             'onAllComplete':function(event, upload) {
@@ -401,29 +401,29 @@
         // trigger Uploadify uploader instead of submitting form. The Uploadify
         // uploader submits the form once it's done.
         form.submit(function(event) {
-            var uploads = $j('#custom_file_uploadQueue .uploadifyQueueItem');
+            var uploads = $('#custom_file_uploadQueue .uploadifyQueueItem');
             if (uploads.length > 0 && 'originalEvent' in event) {
                 event.preventDefault();
                 file_upload.uploadifyUpload();
             }
         });
 
-        $j('a.delete_existing').click(function(event) {
+        $('a.delete_existing').click(function(event) {
             event.preventDefault();
-            var link    = $j(this);
+            var link    = $(this);
             var file_id = link.data('file_id');
             var box_id  = link.data('box_id');
             var row     = link.closest('.existing_file');
             //
             // Send to file delete form
-            $j.post(
-                $j(this).attr('href'),
+            $.post(
+                $(this).attr('href'),
                 {file_id: file_id, box_id: box_id},
                 function(data) {
                     //
                     // Old file: remove from fileID element too
                     if (file_id === 'old') {
-                        $j('input[name="fileId"]').val('');
+                        $('input[name="fileId"]').val('');
                     }
                     if (!data.success) {
                         alert('Error: '+data.message);
@@ -454,7 +454,7 @@
         });
 
 
-        $j('#deleteBox').click(function() {
+        $('#deleteBox').click(function() {
 			if (confirm('Are you sure you want to delete this submission box?')) {
 				window.location = '/submission/submissionForm.php?deleteBox={ID}&next=2';
 			}

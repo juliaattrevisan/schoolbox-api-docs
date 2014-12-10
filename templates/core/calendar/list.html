@@ -14,22 +14,22 @@
 		})
 
 		/* date picker */
-		$j('#start_date, #finish_date').datepicker({
+		$('#start_date, #finish_date').datepicker({
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/core/calendar/calendar-click.png',
 			buttonImageOnly: true,
 			constrainInput: false,
 			onClose: function (string) {
-				var input = $j(this);
-				$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				var input = $(this);
+				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 					input.val(data.time);
 				})
 			}
 		});
 
-		$j('#start_date').syncDates({
-			endDate: $j('#finish_date')
+		$('#start_date').syncDates({
+			endDate: $('#finish_date')
 		});
 
 		$('.btn.export').click(function(event) {
@@ -42,13 +42,13 @@
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
-		$j('#calendar-export form').submit(function(event) {
+		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
-			var form = $j(this);
-			$j('#calendar-export-dialog').dialog({
+			var form = $(this);
+			$('#calendar-export-dialog').dialog({
 				open: function(event, ui) {
-					$j(event.target).find('#calendar-export-dialog-url')
-							.text($j.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
+					$(event.target).find('#calendar-export-dialog-url')
+							.text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
 				},
 				minWidth: 400,
 				modal: true

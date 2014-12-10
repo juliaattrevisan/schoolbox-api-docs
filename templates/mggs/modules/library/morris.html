@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
 <script type="text/javascript">
 
-    $j(function () {
+    $(function () {
         //in order for the boxes to complete their height adjustments effectively.
 /*        $j('tr td:first').each(function () {
             var oneHeight = $j(this).outerHeight()-34;
@@ -13,22 +13,22 @@
         */
 
         //autoclear the catalogue search
-        $j('#library-search-field').placeholder();
+        $('#library-search-field').placeholder();
 
 
-        $j('#galleryCycle').children('div:not(:first-child)').each(function () {
-            $j(this).hide();
+        $('#galleryCycle').children('div:not(:first-child)').each(function () {
+            $(this).hide();
         });
     });
 
-    $j(window).load(function () {
-        $j('#galleryCycle').cycle({
+    $(window).load(function () {
+        $('#galleryCycle').cycle({
             cleartypeNoBg: true,
             before:function () {
-                $j('#galleryCycle span').slideUp();
+                $('#galleryCycle span').slideUp();
             },
             after:function () {
-                $j('span', this).slideDown();
+                $('span', this).slideDown();
             }
         });
     });

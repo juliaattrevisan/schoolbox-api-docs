@@ -36,7 +36,7 @@
 		 * Plot graph
 		 */
 		function plot() {
-			$j.ajax({
+			$.ajax({
 				url: config.url,
 				method: 'GET',
 				dataType: 'json',
@@ -101,7 +101,7 @@
 		 * Plot graph
 		 */
 		function plot() {
-			$j.ajax({
+			$.ajax({
 				url: config.url,
 				method: 'GET',
 				dataType: 'json',

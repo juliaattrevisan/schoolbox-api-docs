@@ -84,10 +84,10 @@
 </table>
 
 <script type="text/javascript">
-$j(function() {
-	$j('#addNewRow').click(function() {
-		var newRow = $j('#newData').find('tr').clone();
-		$j('#tableData').find('tbody').append(newRow);
+$(function() {
+	$('#addNewRow').click(function() {
+		var newRow = $('#newData').find('tr').clone();
+		$('#tableData').find('tbody').append(newRow);
 		return false;
 	});
 });

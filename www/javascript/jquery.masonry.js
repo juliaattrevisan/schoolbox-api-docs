@@ -216,7 +216,7 @@
                     return;
                 }
 
-                $j.post(opt.slider.url, data, opt.slider.complete);
+                $.post(opt.slider.url, data, opt.slider.complete);
             }
         });
     };

@@ -32,7 +32,7 @@
 
 		var url = '{PAPERCUT_SERVER}/rpc/api/web/user/' + pcUsername + '/details.js';
 
-		$j.getScript(url, function(script, textStatus, jqXHR) {
+		$.getScript(url, function(script, textStatus, jqXHR) {
 			if (pcUserDetails.balanceFormatted != undefined) {
 				document.getElementById('userBalance').innerHTML = pcUserDetails.balanceFormatted;
 				document.getElementById('userPages').innerHTML = pcUserDetails.printStats.pages;

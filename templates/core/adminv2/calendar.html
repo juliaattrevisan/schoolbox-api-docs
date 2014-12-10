@@ -6,7 +6,7 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 	$('.table').selectAll({
 		key: 'selectall',
 		checkboxName: 'cleanupEventId[]'
@@ -40,7 +40,7 @@ $j(function() {
 		}
 	});
 
-    $j('#name')
+    $('#name')
         .selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
@@ -50,15 +50,15 @@ $j(function() {
             }
         })
         .on('selectize.item_add', function(event, value) {
-            $j('#userid').val(value)
+            $('#userid').val(value)
         })
         .on('selectize.item_remove', function() {
-            $j('#userid').val('')
+            $('#userid').val('')
         })
 
-    $j('h3 span').each(function() {
-        var activeContent = $j(this).siblings('em').html();
-        $j(this).qtip({
+    $('h3 span').each(function() {
+        var activeContent = $(this).siblings('em').html();
+        $(this).qtip({
             content: activeContent,
             style: {
                 classes: 'qtip-green qtip-shadow'
@@ -71,21 +71,21 @@ $j(function() {
     });
 
 	/* date picker */
-	$j('#start_date, #finish_date').datepicker({
+	$('#start_date, #finish_date').datepicker({
 		dateFormat: 'dd/mm/yy',
 		showOn: 'both',
 		buttonImage: '/images/core/calendar/calendar-click.png',
 		buttonImageOnly: true,
 		constrainInput: false,
 		onClose: function (string) {
-			var input = $j(this);
-			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+			var input = $(this);
+			$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 				input.val(data.time);
 			})
 		}
 	});
 
-	$j('#start_date').syncDates({endDate: $j('#finish_date')});
+	$('#start_date').syncDates({endDate: $('#finish_date')});
 });
 </script>
 <!-- END custom_head-->
@@ -290,7 +290,7 @@ $j(function() {
 <!-- BEGIN custom_javascript -->
 <script type='text/javascript' src='/javascript/admin/calendar.js'></script>
 <script type='text/javascript'>
-	$j(function() {
+	$(function() {
 		calendar.init();
 	});
 </script>

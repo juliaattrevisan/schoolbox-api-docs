@@ -12,10 +12,10 @@ function ThreePanelView(callbackURL, context) {
     this.context = typeof(context) === 'undefined' ? 'resources' : context
 
     // cache panels
-    this.detailsContainer = $j('#detail-window')
-    this.folderDetail = $j('#folder-detail')
-    this.fileDetail = $j('#file-detail')
-    this.multiFileDetail = $j('#multi-file-detail')
+    this.detailsContainer = $('#detail-window')
+    this.folderDetail = $('#folder-detail')
+    this.fileDetail = $('#file-detail')
+    this.multiFileDetail = $('#multi-file-detail')
 
     // initially hide these
     this.fileDetail.hide()
@@ -30,8 +30,8 @@ function ThreePanelView(callbackURL, context) {
  * Resize the three panels to match window
  */
 ThreePanelView.prototype.resizePanels = function() {
-    $j('#category-window, #file-window, #detail-window').height(
-        $j(window).height() - $j('#header').height() - $j('#footer').height() - 50
+    $('#category-window, #file-window, #detail-window').height(
+        $(window).height() - $('#header').height() - $('#footer').height() - 50
     )
 }
 
@@ -51,7 +51,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
     // retrieve folder
     if(fileArray === undefined) {
 
-        $j.post(this.callbackURL, {folderId: folderId}, function(response) {
+        $.post(this.callbackURL, {folderId: folderId}, function(response) {
 
             var meta, mime, responseType = (typeof(response)).toLowerCase()
 
@@ -131,7 +131,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             parmsTable.html('')
 
             if(typeof(meta.permissions) == "object") {
-                $j.each(meta.permissions, function(k, perm) {
+                $.each(meta.permissions, function(k, perm) {
                     parmsTable.append('<tr class="' + perm.on_off + '"><th scope="row">' + perm.group + ':</th><td>' + threePanel.accessLevels[perm.access] + '</td></tr>')
                 })
 
@@ -149,7 +149,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             // list of actions to display
             var actionButtons = threePanel.folderDetail.find('.actions a')
             actionButtons.hide()
-            $j.each(meta.actions, function(k, v) {
+            $.each(meta.actions, function(k, v) {
                 actionButtons.filter('.r'+v).show()
             })
 
@@ -173,15 +173,15 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
     else if(fileArray instanceof Object) {
 
         var idList = {}, i = 0
-        $j(fileArray).each(function() {
-            var type = $j(this).hasClass('link') ? 'link' : 'file'
+        $(fileArray).each(function() {
+            var type = $(this).hasClass('link') ? 'link' : 'file'
             if(typeof(idList[type]) == 'undefined') {
                 idList[type] = []
             }
-            idList[type].push($j(this).attr('id').substring(5))
+            idList[type].push($(this).attr('id').substring(5))
         })
 
-        $j.post(this.callbackURL, {folderId: folderId, files: idList}, function(response) {
+        $.post(this.callbackURL, {folderId: folderId, files: idList}, function(response) {
 
             var meta, responseType = (typeof(response)).toLowerCase()
 
@@ -199,7 +199,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             // show multi
             if(typeof(meta.name) == 'undefined') {
 
-                threePanel.multiFileDetail.find('.count').text($j('#file-list tr.selected').length + ' files selected')
+                threePanel.multiFileDetail.find('.count').text($('#file-list tr.selected').length + ' files selected')
                 threePanel.multiFileDetail.find('.actions').data('id', idList)
                 threePanel.multiFileDetail.find('img').attr('src', '/images/mime/128x128/multi.png')
 
@@ -275,7 +275,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 // list of actions to display
                 var actionButtons = threePanel.fileDetail.find('.actions a')
                 actionButtons.hide()
-                $j.each(meta.actions, function(k, v) {
+                $.each(meta.actions, function(k, v) {
                     actionButtons.filter('.r'+v).show()
                 })
 
@@ -294,9 +294,9 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
                     var sel = frm.find('select[name=pageId]').text('')
                     threePanel.fileDetail.find('form.unpublish').find('input[name=fileId]').val(meta.id)
-                    $j.each(meta.publish, function(i, dest) {
+                    $.each(meta.publish, function(i, dest) {
                         sel.append(
-                            $j('<option/>').val(dest.pageId + '&componentInstanceId=' + dest.componentInstanceId)
+                            $('<option/>').val(dest.pageId + '&componentInstanceId=' + dest.componentInstanceId)
                                 .text(dest.pageTitle)
                         )
                     })
@@ -323,7 +323,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 ThreePanelView.prototype.actionBind = function(actions) {
 
     this.detailsContainer.on('click', 'a.btn', function(event) {
-        var a = $j(this)
+        var a = $(this)
         var context = a.parent()
 
         var kind = context.data('kind')
@@ -332,21 +332,21 @@ ThreePanelView.prototype.actionBind = function(actions) {
 
         // is file or link
         if(context.hasClass('rfile')) {
-            if($j.isFunction(actions.cms[action])) {
+            if($.isFunction(actions.cms[action])) {
                 actions.cms[action](kind, id)
             }
         }
 
         // is a folder
         else if(context.hasClass('rfolder')) {
-            if($j.isFunction(actions.folder[action])) {
+            if($.isFunction(actions.folder[action])) {
                 actions.folder[action](id)
             }
         }
 
         // is multifile
         else if(context.hasClass('rmultifile')) {
-            if($j.isFunction(actions.multi[action])) {
+            if($.isFunction(actions.multi[action])) {
                 actions.multi[action]()
             }
         }

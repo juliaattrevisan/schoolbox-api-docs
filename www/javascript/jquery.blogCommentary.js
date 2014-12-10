@@ -24,7 +24,7 @@
 		function init(options, element) {
 			var defaults = {
 				id: 0,
-				component: $j(element)
+				component: $(element)
 			}
 
 			var derived = {
@@ -48,7 +48,7 @@
 			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
 			 */
 			component.find('.closeComment').unbind('click').click(function() {
-				var id = $j(this).attr('rel');
+				var id = $(this).attr('rel');
 				component.find('#' + id).toggle();
 			});
 
@@ -58,7 +58,7 @@
 			component.find('.viewComments').unbind('click').click(function(event) {
 				event.preventDefault();
 
-				var matches = $j(this).attr('rel').match(/^viewComments_(\d+)$/);
+				var matches = $(this).attr('rel').match(/^viewComments_(\d+)$/);
 
 				if (matches) {
 					var postId = matches[1];
@@ -70,7 +70,7 @@
 					 */
 					var button = component.find('a[rel=viewComments_' + postId + ']');
 
-					if ($j(element).is(':visible')) {
+					if ($(element).is(':visible')) {
 						var state = 'Hide';
 					}
 					else {

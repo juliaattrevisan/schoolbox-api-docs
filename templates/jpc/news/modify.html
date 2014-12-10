@@ -11,27 +11,27 @@
         }
     }
 
-    $j(function () {
+    $(function () {
 		$.fn.alaressTiny({
 			mode: 'textareas'
 		});
 
-        $j('#item_datetime_published, #item_datetime_expires').datepicker({
+        $('#item_datetime_published, #item_datetime_expires').datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
             buttonImageOnly:true,
             constrainInput:false,
             onClose:function (string) {
-                var input = $j(this);
+                var input = $(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time);
                 })
             }
         });
 
-        $j('#addUser')
+        $('#addUser')
             .selectizeSelector({
                 multiple: true,
                 value: {USER_LIST},
@@ -43,59 +43,59 @@
                 }
             })
 
-        $j('#type_form input').each(function () {
-            $j(this).click(function () {
-                $j.get('/group/modifyForm.php', {categoryID:'{CATEGORY_ID}', type:$j(this).val()});
+        $('#type_form input').each(function () {
+            $(this).click(function () {
+                $.get('/group/modifyForm.php', {categoryID:'{CATEGORY_ID}', type:$(this).val()});
             });
         });
 
-        $j(document).on('click', '.delete-from-list', function (event) {
+        $(document).on('click', '.delete-from-list', function (event) {
             event.preventDefault();
-            $j(this).parent().remove();
-            $j('#addUser').val("").focus();
+            $(this).parent().remove();
+            $('#addUser').val("").focus();
         });
 
-        $j(':checkbox').each(function () {
-            if ($j(this).is(':checked')) {
-                $j(this).parent().addClass('active-checkbox');
+        $(':checkbox').each(function () {
+            if ($(this).is(':checked')) {
+                $(this).parent().addClass('active-checkbox');
             }
         });
 
-        $j(':checkbox').click(function () {
-            if ($j(this).parent().hasClass('active-checkbox')) {
-                $j(this).parent().removeClass('active-checkbox')
-				if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
-					$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+        $(':checkbox').click(function () {
+            if ($(this).parent().hasClass('active-checkbox')) {
+                $(this).parent().removeClass('active-checkbox')
+				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 				}
             } else {
-                $j(this).parent().addClass('active-checkbox');
+                $(this).parent().addClass('active-checkbox');
             }
         });
 
-        $j('.customise').click(function (event) {
+        $('.customise').click(function (event) {
             event.preventDefault();
-            $j(this).children('span').toggle();
-            $j('.advanced').toggle();
-            if ($j('.advanced').is(':visible')) {
-                $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+            $(this).children('span').toggle();
+            $('.advanced').toggle();
+            if ($('.advanced').is(':visible')) {
+                $('.advanced').children('td').delay(1000).animate({opacity:'1'});
             } else {
-                $j('.advanced').queue('fx', []);
+                $('.advanced').queue('fx', []);
             }
         });
 
-		$j('.select_all').change(function(){
-			if($j(this).is(':checked')){
-				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+		$('.select_all').change(function(){
+			if($(this).is(':checked')){
+				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
 			} else {
-				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 			}
 		});
 
 
         jQuery.validator.addMethod("groupCheck", function (value, element) {
-            console.log($j(element).prop("checked"));
+            console.log($(element).prop("checked"));
 
-            if (($j('.visible-users').children('li').length < 1) && ($j('.groups input:checked').length < 1 )) {
+            if (($('.visible-users').children('li').length < 1) && ($('.groups input:checked').length < 1 )) {
                 return false;
             } else {
                 return true;
@@ -104,7 +104,7 @@
 
         }, "Please tick at least one group");
 
-        $j('#newsForm').validate({
+        $('#newsForm').validate({
 
             rules:{
                 'group[]':{

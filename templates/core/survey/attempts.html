@@ -2,16 +2,16 @@
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
 <script type="text/javascript">
 $(function() {
-	$j.tablesorter.addParser({
+	$.tablesorter.addParser({
 		id: 'dataDate',
 		is: function() { return false },
 		format: function(value, table, cell) {
-			return $j(cell).data('timestamp')
+			return $(cell).data('timestamp')
 		},
 		type: 'numeric'
 	});
 
-	$j('.sort-it').tablesorter({
+	$('.sort-it').tablesorter({
 		headers:{
 			0:{sorter:true},
 			1:{sorter:true},

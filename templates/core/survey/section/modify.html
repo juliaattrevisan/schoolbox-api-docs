@@ -3,29 +3,29 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
-$j(function() {
+$(function() {
 	$.fn.alaressTiny({
 		mode: 'exact',
 		elements: 'description',
 		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
 	});
 
-	if ($j('.checkbox').prop("checked")) {
-		$j('.hide-questions').show();
-		$j('.hide-questions :input').prop('disabled', false);
+	if ($('.checkbox').prop("checked")) {
+		$('.hide-questions').show();
+		$('.hide-questions :input').prop('disabled', false);
 	}
 
-	$j('.checkbox').click(function() {
-		if ($j('.hide-questions').css("display") == "block") {
-			$j('.hide-questions').hide();
-			$j('.hide-questions :input').prop('disabled', true);
+	$('.checkbox').click(function() {
+		if ($('.hide-questions').css("display") == "block") {
+			$('.hide-questions').hide();
+			$('.hide-questions :input').prop('disabled', true);
 		} else {
-			$j('.hide-questions').show();
-			$j('.hide-questions :input').prop('disabled', false);
+			$('.hide-questions').show();
+			$('.hide-questions :input').prop('disabled', false);
 		}
 	});
 
-	$j('#modifySection').validate({
+	$('#modifySection').validate({
 		rules: {
 			title: {
 				required: true,

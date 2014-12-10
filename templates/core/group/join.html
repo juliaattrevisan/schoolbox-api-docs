@@ -1,40 +1,40 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-    $j(document).ready(function () {
-        $j('.greenCheck').click(function () {
+    $(document).ready(function () {
+        $('.greenCheck').click(function () {
             var data;
-            if ($j(this).is(':checked')) {
+            if ($(this).is(':checked')) {
                 data = {
-                    join : $j(this).attr('rel'),
+                    join : $(this).attr('rel'),
                     ajax : 1
                 }
 
-                $j(this).prop('checked', true);
+                $(this).prop('checked', true);
             }
             else {
                 data = {
-                    leave : $j(this).attr('rel'),
+                    leave : $(this).attr('rel'),
                     ajax : 1
                 }
 
-                $j(this).prop('checked', false);
+                $(this).prop('checked', false);
             }
 
-            $j.get('/group/joinForm.php', data);
+            $.get('/group/joinForm.php', data);
         });
 
-        $j(':checkbox').each(function () {
-            if ($j(this).is(':checked')) {
-                $j(this).parent().addClass('active-checkbox');
+        $(':checkbox').each(function () {
+            if ($(this).is(':checked')) {
+                $(this).parent().addClass('active-checkbox');
             }
         })
 
-        $j(':checkbox').click(function () {
-            if ($j(this).parent().hasClass('active-checkbox')) {
-                $j(this).parent().removeClass('active-checkbox')
+        $(':checkbox').click(function () {
+            if ($(this).parent().hasClass('active-checkbox')) {
+                $(this).parent().removeClass('active-checkbox')
 
             } else {
-                $j(this).parent().addClass('active-checkbox');
+                $(this).parent().addClass('active-checkbox');
             }
         });
     });

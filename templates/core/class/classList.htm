@@ -1,15 +1,15 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
 	/* Add "select all" functionality
 	 */
-	$j('#select-all').addSelectAll({
-		source: $j('#contact-table')
+	$('#select-all').addSelectAll({
+		source: $('#contact-table')
 	});
 
-	var form = $j('#contact-table-form');
+	var form = $('#contact-table-form');
 
 	// Validators for if no student or parent emails were found
 	$.validator.addMethod(
@@ -45,7 +45,7 @@ $j(function() {
 			}
 		},
 		errorPlacement: function(error, element) {
-			$j('#errors').html(error);
+			$('#errors').html(error);
 		}
 	});
 });
@@ -123,18 +123,18 @@ $j(function() {
 
 <!-- BEGIN email_class -->
 <script type="text/javascript">
-$j(function() {
-	$j('#email-selected-students').click(function(event) {
+$(function() {
+	$('#email-selected-students').click(function(event) {
 		event.preventDefault();
 
-		var form = $j('#contact-table-form');
+		var form = $('#contact-table-form');
 		form.data('noStudentEmails', false).data('noParentEmails', false)
 		if (form.valid()) {
-			$j('#email-selected-students').emailSelected({
-				source: $j('#contact-table'),
+			$('#email-selected-students').emailSelected({
+				source: $('#contact-table'),
 				url: '/subject/classList/ajax/emailStudentsById.php',
 				classCode: '{CLASS_CODE}',
-				target: $j(this).find('input[name=bcc]')
+				target: $(this).find('input[name=bcc]')
 			})
 			.on('emailSelected.noEmail', function() {
 				// Trigger the no student email error
@@ -153,18 +153,18 @@ $j(function() {
 
 <!-- BEGIN parent_email -->
 <script type="text/javascript">
-$j(function() {
-	$j('#email-selected-parents').click(function(event) {
+$(function() {
+	$('#email-selected-parents').click(function(event) {
 		event.preventDefault();
 
-		var form = $j('#contact-table-form');
+		var form = $('#contact-table-form');
 		form.data('noStudentEmails', false).data('noParentEmails', false)
 		if (form.valid()) {
-			$j('#email-selected-parents').emailSelected({
-				source: $j('#contact-table'),
+			$('#email-selected-parents').emailSelected({
+				source: $('#contact-table'),
 				url: '/subject/classList/ajax/emailParentsById.php',
 				classCode: '{CLASS_CODE}',
-				target: $j(this).find('input[name=bcc]')
+				target: $(this).find('input[name=bcc]')
 			})
 			.on('emailSelected.noEmail', function() {
 				// Trigger the no parent email error

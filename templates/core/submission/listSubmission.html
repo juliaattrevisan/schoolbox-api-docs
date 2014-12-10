@@ -1,16 +1,16 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
-$j(function(){
-    $j.tablesorter.addParser({
+$(function(){
+    $.tablesorter.addParser({
         id: 'dataDate',
         is: function() { return false },
         format: function(value, table, cell) {
-            return $j(cell).data('timestamp')
+            return $(cell).data('timestamp')
         },
         type: 'numeric'
     })
-    $j(".ruler").tablesorter({
+    $(".ruler").tablesorter({
         cssHeader: 'sortable',
         cssAsc: 'ascending',
         cssDesc: 'descending',

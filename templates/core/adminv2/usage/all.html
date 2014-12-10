@@ -9,24 +9,24 @@
 <script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
 
 <script type='text/javascript'>
-	$j(function() {
-		$j('#global-usage').usageTotal({
+	$(function() {
+		$('#global-usage').usageTotal({
 			url: '/adminv2/usage/ajax/allAjax?type=total',
 			title: 'Total'
 		});
 
-		$j('#group-usage').usageGroup({
+		$('#group-usage').usageGroup({
 			url: '/adminv2/usage/ajax/allAjax?type=group',
 			title: 'Roles'
 
 		});
 
-		$j('#type-usage').usageType({
+		$('#type-usage').usageType({
 			url: '/adminv2/usage/ajax/allAjax?type=type',
 			title: 'Category'
 		});
 
-		$j('#user-usage').usageTabulator({
+		$('#user-usage').usageTabulator({
 			url: '/adminv2/usage/ajax/allAjax?type=user',
 			title: 'Users',
 			orderBy: 'bytes',

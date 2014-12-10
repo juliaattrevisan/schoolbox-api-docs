@@ -309,7 +309,7 @@ $.widget("ui.chat",  {
                     $('.light', $self.element).css('background-position', "bottom");
                     $('.light', $self.element).addClass('is-active');
                 } else {
-                    $j('.light', $self.element).css('background-position', "top");
+                    $('.light', $self.element).css('background-position', "top");
 
                     $self.options.body_el.prop('disabled', true);
                 }

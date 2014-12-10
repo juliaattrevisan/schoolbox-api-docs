@@ -4,7 +4,7 @@
     <script type="text/javascript" src="/javascript/components/eventEmitter/EventEmitter.js"></script>
     <script type="text/javascript" src="/javascript/components/imagesloaded/imagesloaded.js"></script>
     <script type="text/javascript">
-        $j(function () {
+        $(function () {
             //
             // Calculate slide position and margin for elements
             var slide_position = 'left';
@@ -26,10 +26,10 @@
             //
             // Callback for when slide changes.
             var slideCallback = function() {
-                $j(this).css('text-align', slide_position);
+                $(this).css('text-align', slide_position);
             };
 
-            var container = $j('#galleryCycle-{COMPONENT_INSTANCE_ID}');
+            var container = $('#galleryCycle-{COMPONENT_INSTANCE_ID}');
             var slideshow = container.find('.slideshow-cycle');
             if (slideshow.length > 1) {
                 slideshow.hide();
@@ -42,7 +42,7 @@
                     // Set width to widest slide.
                     var width = 0;
                     container.find('.slideshow-cycle').each(function() {
-                        var this_width = $j(this).width();
+                        var this_width = $(this).width();
                         if (this_width > width) {
                             width = this_width;
                         }

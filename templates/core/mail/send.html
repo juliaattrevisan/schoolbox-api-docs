@@ -30,12 +30,12 @@ $(function() {
             }
         }
     }
-    $j('#to').selectizeSelector($j.extend({}, options, {value: {REPLYTO}}))
-    $j('#cc').selectizeSelector(options)
-    $j('#bcc').selectizeSelector($j.extend({}, options, {value: {BCC}}))
+    $('#to').selectizeSelector($.extend({}, options, {value: {REPLYTO}}))
+    $('#cc').selectizeSelector(options)
+    $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
     // dialogs for copying email fields
-    $j('label[data-role="copy-emails"]').click(function(event) {
+    $('label[data-role="copy-emails"]').click(function(event) {
         event.preventDefault();
         var element = $(this);
         var target  = $('#'+element.attr('for'));

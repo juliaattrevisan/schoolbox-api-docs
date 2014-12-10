@@ -1,6 +1,6 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 	$.fn.alaressTiny({
 		mode: 'specific_textareas',
 		editor_selector: 'richtext-answer',
@@ -10,12 +10,12 @@ $j(function() {
 		disable_toolbars: [2, 3, 4]
 	});
 
-	$j(document).on('click', '#create', function() {
+	$(document).on('click', '#create', function() {
 		var content = tinyMCE.activeEditor.getContent(); // get the content
-   		$j('#question').val(content); // put it in the textarea
+   		$('#question').val(content); // put it in the textarea
 	});
 
-	var validator = $j("#createQuestionForm").submit(function() {
+	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
 	 }).validate({

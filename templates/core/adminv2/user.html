@@ -4,9 +4,9 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
-    $j('#modify')
+    $('#modify')
         .selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
@@ -16,25 +16,25 @@ $j(function() {
             }
         })
         .on('selectize.item_add', function(event, value) {
-            $j('#user-to-mod').val(value)
-            $j('#modify-user-button').removeClass('disabled').focus();
+            $('#user-to-mod').val(value)
+            $('#modify-user-button').removeClass('disabled').focus();
         })
         .on('selectize.item_remove', function() {
-            $j('#user-to-mod').val('')
-            $j('#modify-user-button').addClass('disabled');
+            $('#user-to-mod').val('')
+            $('#modify-user-button').addClass('disabled');
         })
 
     var openModifyScreen = function(event) {
         event.preventDefault();
-        if (!$j('#modify-user-button').hasClass('disabled')) {
-            window.open('/adminv2/modify-user/'+$j('#user-to-mod').val(), '_self');
+        if (!$('#modify-user-button').hasClass('disabled')) {
+            window.open('/adminv2/modify-user/'+$('#user-to-mod').val(), '_self');
         }
     }
-    $j('#modify-user-button').click(openModifyScreen);
-    $j('#modify-user').submit(openModifyScreen);
+    $('#modify-user-button').click(openModifyScreen);
+    $('#modify-user').submit(openModifyScreen);
 
-    $j('h2 span').each(function() {
-        $j(this).qtip({
+    $('h2 span').each(function() {
+        $(this).qtip({
             content: 'If you are wanting to deal with large lists at once, use this section.',
             style: {
                 classes: 'qtip-green qtip-shadow'

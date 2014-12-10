@@ -50,7 +50,7 @@
 			var derived = {
 			}
 
-			var merged = $j.extend(defaults, derived, options);
+			var merged = $.extend(defaults, derived, options);
 
 			return merged;
 		}
@@ -61,7 +61,7 @@
 			// uniqu-ified, then ajax submitted
 			var inputs = config.element.find('input.mark-input');
 			inputs.each(function() {
-				var self = $j(this);
+				var self = $(this);
 				var pInline = self.closest('.inlineform');
 				var uid = pInline.find('input.uid');
 
@@ -77,12 +77,12 @@
 			/* Only ajax submit on change if this setting is on
 			 */
 			if (config.submitOnChange === true) {
-				$j('.mark-input').blur(function(){
-					$j(this).closest('.inlineform').submit();
+				$('.mark-input').blur(function(){
+					$(this).closest('.inlineform').submit();
 				});
 
-				$j('.comment').change(function(){
-					$j(this).closest('.inlineform').submit();
+				$('.comment').change(function(){
+					$(this).closest('.inlineform').submit();
 				});
 			}
 
@@ -106,7 +106,7 @@
 						return true;
 					}
 				}
-				var markLimit = parseInt($j(element).closest('.inlineform').find('.validation-limit').text());
+				var markLimit = parseInt($(element).closest('.inlineform').find('.validation-limit').text());
 				if (value !== "") {
 					var v = parseInt(value);
 					return v <= markLimit && v >= 0;
@@ -127,7 +127,7 @@
 			});
 
 			config.element.each(function() {
-				$j(this).validate({
+				$(this).validate({
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
@@ -143,13 +143,13 @@
 						// focused on a form element.) Use them if so.
 						// (Thankfully, the change event triggers before blur
 						//  in all browsers.)
-						if ($j(form).find('div.inline-submit').length) {
+						if ($(form).find('div.inline-submit').length) {
 							// perform ajax update of work, no file upload
-							var submitDiv = $j(form).find('div.inline-submit');
+							var submitDiv = $(form).find('div.inline-submit');
 
 							var notification = submitDiv.find('input, select, textarea');
 
-							$j.post(config.submitUrl, submitDiv.find('input, select, textarea').serialize(), function(data) {
+							$.post(config.submitUrl, submitDiv.find('input, select, textarea').serialize(), function(data) {
 
 								// Why don't I have a class for this?
 								notification.addClass('ajax-updated');
@@ -161,8 +161,8 @@
 						}
 						else {
 							// perform standard form submit, will encapsulate file uploads. set the mark update fields to false
-							$j('.mark-update').each(function() {
-								$j(this).val('false');
+							$('.mark-update').each(function() {
+								$(this).val('false');
 							});
 							form.submit();
 						}
@@ -175,23 +175,23 @@
 			var inputs = config.element.find(':input');
 
 			inputs.focus(function() {
-				$j(this).closest('.inlineform').addClass('inline-submit');
+				$(this).closest('.inlineform').addClass('inline-submit');
 			})
 			inputs.blur(function() {
-				$j(this).closest('.inlineform').removeClass('inline-submit');
+				$(this).closest('.inlineform').removeClass('inline-submit');
 			})
 		}
 
 		function selectGrouping() {
-			$j('#content select.mark-input').each(function() {
+			$('#content select.mark-input').each(function() {
 				// if the select doesn't contain a separator for the error codes, slot it in
-				var self = $j(this);
+				var self = $(this);
 				if (self.find('optgroup').length == 0) {
 					// find the first error (non-numeric) option
 					self.children('option').each(function() {
-						if(!isNumber($j(this).val())) {
+						if(!isNumber($(this).val())) {
 							// insert before me
-							$j(this).before('<optgroup></optgroup>');
+							$(this).before('<optgroup></optgroup>');
 							// break the loop
 							return false;
 						}

@@ -49,12 +49,12 @@ search = {
 	 * Load data in
 	 */
 	load: function() {
-		if (!$j(this).hasClass('loaded')) {
-			$j(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&page=" + search.getPageNumber(), function() {
+		if (!$(this).hasClass('loaded')) {
+			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&page=" + search.getPageNumber(), function() {
 
 				/* Flag it as having loaded
 				 */
-				$j(search.getTargetDiv()).addClass('loaded');
+				$(search.getTargetDiv()).addClass('loaded');
 
 				/* Add pagination again
 				 */
@@ -69,12 +69,12 @@ search = {
 	 * Add pagination events to all the <a> links
 	 */
 	paginate: function(){
-		$j('.admin-nav.foot li > a').bind('click', function(event) {
+		$('.admin-nav.foot li > a').bind('click', function(event) {
 			event.preventDefault();
 
 			/* Set the page number
 			 */
-            search.setPageNumber( $j(this).attr('rel') );
+            search.setPageNumber( $(this).attr('rel') );
 
 			/* Update hash configuration
 			 */
@@ -86,7 +86,7 @@ search = {
 
 			/* Load search results in, update pagination and styles
 			 */
-			$j(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), function() {
+			$(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), function() {
 				search.paginate();
 				search.updateStyles();
 			});
@@ -112,8 +112,8 @@ search = {
 	 * Hide irrelevant tabs
 	 */
 	hideTabs: function() {
-		$j('div.results > div').hide();
-		$j(this.getTargetDiv()).show();
+		$('div.results > div').hide();
+		$(this.getTargetDiv()).show();
 	},
 
 	/**
@@ -159,11 +159,11 @@ search = {
 	updateStyles: function() {
 		/* Alternating row colours when data is loaded
 		 */
-		$j('.information-list li:nth-child(even)').addClass('dark');
+		$('.information-list li:nth-child(even)').addClass('dark');
 
 		/* Remove all selected classes
 		 */
-		$j('#type a').removeClass('current');
+		$('#type a').removeClass('current');
 
 		/* Select only the current section
 		 */
@@ -173,7 +173,7 @@ search = {
 		 * through this particular section
 		 */
 		if (this.getSection() == 'all') {
-			$j('.admin-nav.foot').remove();
+			$('.admin-nav.foot').remove();
 		}
 	},
 

@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$j(function() {
+	$(function() {
 		$.fn.alaressTiny({
 			mode : "exact",
 			elements: "question",
@@ -13,18 +13,18 @@
 
 		/* Enforce two decimal places
 		 */
-		$j('input[name=marks]').change(function() {
-			$j(this).val(parseFloat($j(this).val()).toFixed(2));
+		$('input[name=marks]').change(function() {
+			$(this).val(parseFloat($(this).val()).toFixed(2));
 		});
 
         /* Category tree
          */
-        $j("#categoryTree")
+        $("#categoryTree")
             .on('select_node.jstree', function(event, jstree) {
-                $j('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
+                $('#question_category').val(jstree.selected[0].replace(/^node_/, ''));
             })
             .on('deselect_node.jstree', function() {
-                $j('#question_category').val('');
+                $('#question_category').val('');
             })
             .jstree({
                 "animation":50,

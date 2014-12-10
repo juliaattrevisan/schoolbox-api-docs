@@ -11,8 +11,8 @@ function verify()
 		msg += "You need to enter a URL\n";
 	}
 	var ok = false;
-	$j('input.category').each(function () {
-		if ($j(this).prop("checked"))
+	$('input.category').each(function () {
+		if ($(this).prop("checked"))
 			ok = true;
 	});
 	if (!ok)

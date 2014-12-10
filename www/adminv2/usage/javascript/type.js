@@ -34,7 +34,7 @@
 		 * Plot graph
 		 */
 		function plot() {
-			$j.ajax({
+			$.ajax({
 				url: config.url,
 				method: 'GET',
 				dataType: 'json',
@@ -63,7 +63,7 @@
 		 * @param datasets
 		 */
 		function makePie(datasets) {
-			$j.plot(config.element.find('div'), datasets, {
+			$.plot(config.element.find('div'), datasets, {
 				series: {
 					pie: {
 						show: true,

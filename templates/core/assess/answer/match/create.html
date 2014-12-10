@@ -1,12 +1,12 @@
 <script type="text/javascript">
-$j(document).ready(function() {
+$(document).ready(function() {
 	
 	//add a clone!
-	var thing = $j('.hidden-clone li:first-child').clone();
-	$j('ul#answerCollection').append(thing);
+	var thing = $('.hidden-clone li:first-child').clone();
+	$('ul#answerCollection').append(thing);
 
 
-	var validator = $j("#createQuestionForm").submit(function() {
+	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
 	 
@@ -14,20 +14,20 @@ $j(document).ready(function() {
 
 			submitHandler: function() {
 			
-			var theForm = $j('#createQuestionForm');
+			var theForm = $('#createQuestionForm');
 				var answerCollection = new Array();
 		
 				/* Collate possible answers and their correctness status
 				 */
-				$j.each($j('#answerCollection').find('li'), function(index, element) {
-					var elem = $j(element);
+				$.each($('#answerCollection').find('li'), function(index, element) {
+					var elem = $(element);
 		
 					var answerLeft = elem.find('.answerLeft').val();
 					var answerRight = elem.find('.answerRight').val();
 		
 					/* Ignore empty answers that weren't removed
 					 */
-					if (($j.trim(answerLeft) != '') && ($j.trim(answerRight) != '')) {
+					if (($.trim(answerLeft) != '') && ($.trim(answerRight) != '')) {
 						answerCollection.push({
 							answerLeft: answerLeft,
 							answerRight: answerRight
@@ -49,7 +49,7 @@ $j(document).ready(function() {
 		
 				/* Submit via POST and redirect to question creation screen upon done
 				 */
-				$j.post(theForm.attr('action'), data, function(responseText) {
+				$.post(theForm.attr('action'), data, function(responseText) {
 					window.location = '/assess/question/create/' + data.section_id;
 				});
 		
@@ -83,14 +83,14 @@ $j(document).ready(function() {
 	
 		jQuery.validator.addMethod('emptyLeftInputs', function(value, element) {     
 			   var fieldsAreFilled = true;
-			   $j.each($j('#answerCollection').find('li'), function(index, element) {
-					var elem = $j(element);
+			   $.each($('#answerCollection').find('li'), function(index, element) {
+					var elem = $(element);
 		
 					var answerLeft = elem.find('.answerLeft').val();
 		
 					/* Ignore empty answers that weren't removed
 					 */
-					if ($j.trim(answerLeft) == '') {
+					if ($.trim(answerLeft) == '') {
 						fieldsAreFilled = false;
 					}
 				});	
@@ -105,14 +105,14 @@ $j(document).ready(function() {
 	
 		 jQuery.validator.addMethod('emptyRightInputs', function(value, element) {     
 			   var fieldsAreFilled = true;
-			   $j.each($j('#answerCollection').find('li'), function(index, element) {
-					var elem = $j(element);
+			   $.each($('#answerCollection').find('li'), function(index, element) {
+					var elem = $(element);
 		
 					var answerRight = elem.find('.answerRight').val();
 		
 					/* Ignore empty answers that weren't removed
 					 */
-					if ($j.trim(answerRight) == '') {
+					if ($.trim(answerRight) == '') {
 						fieldsAreFilled = false;
 					}
 				});	
@@ -130,26 +130,26 @@ $j(document).ready(function() {
 
 		/* Add a new answer option
 		 */
-		$j(document).on('click', '#makeNewAnswer', function() {
-			var thing = $j('.hidden-clone li:first-child').clone();
-			$j('ul#answerCollection').append(thing);
+		$(document).on('click', '#makeNewAnswer', function() {
+			var thing = $('.hidden-clone li:first-child').clone();
+			$('ul#answerCollection').append(thing);
 			placeErrors()
 			return false;
 		});
 		
 		/* Remove an answer option
 		 */
-		$j(document).on('click', '.delete', function(){
-			if (($j('.inputs').length) !== 3) {
-				$j(this).parent().remove();
+		$(document).on('click', '.delete', function(){
+			if (($('.inputs').length) !== 3) {
+				$(this).parent().remove();
 			}
 			placeErrors()	
 		});
 		
 		function placeErrors() {
-			var pos = $j('ul#answerCollection').height();
-			$j('#leftError').css('top',  pos );
-			$j('#rightError').css('top',  pos);
+			var pos = $('ul#answerCollection').height();
+			$('#leftError').css('top',  pos );
+			$('#rightError').css('top',  pos);
 		}
 });
 </script>

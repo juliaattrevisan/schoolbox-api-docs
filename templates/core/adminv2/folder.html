@@ -2,10 +2,10 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
-$j(function() {
-    $j('h3 span').each(function() {
-        var activeContent = $j(this).siblings('em').html();
-        $j(this).qtip({
+$(function() {
+    $('h3 span').each(function() {
+        var activeContent = $(this).siblings('em').html();
+        $(this).qtip({
             content: activeContent,
             style: {
                 classes: 'qtip-green qtip-shadow'
@@ -16,7 +16,7 @@ $j(function() {
             }
         });
     });
-    $j('#form').validate({
+    $('#form').validate({
         errorPlacement: function(error, element) {
             error.insertAfter(element.parent().parent().children(':last-child').children('span'));
         }

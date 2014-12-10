@@ -1,14 +1,14 @@
 <!-- BEGIN custom_head -->
 <script language="JavaScript" type="text/javascript">
 
-$j(document).ready(function() {
-    $j('#deleteLink').click(function() {
+$(document).ready(function() {
+    $('#deleteLink').click(function() {
         if (confirm('Are you sure you want to delete this link?')) {
             window.location = '/cms/eportfolioLinkForm.php?delete={LINK_ID}&redirect=/eportfolio/{USER_ID}';
         }
     });
 	
-	$j('#urlForm').validate();
+	$('#urlForm').validate();
 	
 	
 });

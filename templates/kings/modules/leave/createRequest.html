@@ -2,9 +2,9 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
-	$j('#startDate, #finishDate').datepicker({
+	$('#startDate, #finishDate').datepicker({
 		dateFormat: 'dd/mm/yy',
 		showOn: 'both',
 		buttonImage: '/images/core/calendar/calendar-click.png',
@@ -12,30 +12,30 @@ $j(function() {
 		constrainInput: false,
 		minDate: new Date(),
 		onClose: function (string) {
-			var input = $j(this);
+			var input = $(this);
 
-			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+			$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 				input.val(data.time);
 			})
 
 		}
 	});
 
-	$j('#requestForm').validate();
+	$('#requestForm').validate();
 
-	$j('#requesthostType').change(function(){
-		if(($j(this).val() == '4') && $j('#hostDetails').is(':visible')){
-			$j('#hostDetails').slideUp();
-			$j('#hostDetails input').removeClass('required');
+	$('#requesthostType').change(function(){
+		if(($(this).val() == '4') && $('#hostDetails').is(':visible')){
+			$('#hostDetails').slideUp();
+			$('#hostDetails input').removeClass('required');
 		} else {
-			$j('#hostDetails').slideDown();
-			$j('#hostDetails input').addClass('required');
+			$('#hostDetails').slideDown();
+			$('#hostDetails input').addClass('required');
 		}
 	});
 
 	//<!-- BEGIN student_autocomplete_javascript -->
 
-	$j('#user')
+	$('#user')
 		.selectizeSelector({
 			ajax: {
 				url:      '/ajax/user.php',
@@ -45,10 +45,10 @@ $j(function() {
 			}
 		})
 		.on('selectize.item_add', function(event, value) {
-			$j('#userId').val(value)
+			$('#userId').val(value)
 		})
 		.on('selectize.item_remove', function() {
-			$j('#userId').val('')
+			$('#userId').val('')
 		})
 
 	//<!-- END student_autocomplete_javascript -->
@@ -63,8 +63,8 @@ $j(function() {
 		description: {
 			maxLength: 100,
 			warningLength: 67,
-			element: $j('#description'),
-			warning: $j('#descriptionWarning'),
+			element: $('#description'),
+			warning: $('#descriptionWarning'),
 
 			/**
 			 * Remove excess content from the description field

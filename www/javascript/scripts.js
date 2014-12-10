@@ -1,30 +1,28 @@
 // We used to use another library which consumed the $ variable.
 // That library is long gone, so no need to release $ anymore.
-var $j = jQuery;
-
-$j(function() {
+$(function() {
     /**
      * Remove the layerX and layerY console log reports from Webkit.
      */
-    var all = $j.event.props,
+    var all = $.event.props,
         len = all.length,
         res = [];
     while (len--) {
       var el = all[len];
       if (el != 'layerX' && el != 'layerY') res.push(el);
     }
-    $j.event.props = res
+    $.event.props = res
 
     /**
      * Autoclear the main site search field (works without polyfill in all but IE9)
      */
-    $j('#search-field').placeholder();
+    $('#search-field').placeholder();
 
     /**
      * Submit the form with a href links with the classes below
      */
-    $j(document).on('click', '.submit, .submit-this', function(event) {
-        var form = $j(this).closest('form');
+    $(document).on('click', '.submit, .submit-this', function(event) {
+        var form = $(this).closest('form');
         if (form.length > 0) {
             event.preventDefault();
             form.submit();
@@ -34,7 +32,7 @@ $j(function() {
     /**
      * Open rel="external" links in a new tab.
      */
-    $j(document).on('click', 'a[rel=external]', function() {
+    $(document).on('click', 'a[rel=external]', function() {
         $(this).attr('target','_blank')
     })
 
@@ -62,9 +60,9 @@ $j(function() {
      * Each skin does NOT have a slightly different header height or a different left navigation.
      * From now on, it's always placed relative to the clicked element.
      */
-    $j(document).on('click', 'ul.js_happening li', function(event) {
+    $(document).on('click', 'ul.js_happening li', function(event) {
         var currentObject = $(this);
-        var bubble = $j('.cal-bubble');
+        var bubble = $('.cal-bubble');
         bubble.find('.bottom, .bottom strong').removeAttr("style");
         bubble.find('.bottom').show();
         var dynamicHTML = currentObject.children('.hidden-fields').html();
@@ -96,7 +94,7 @@ $j(function() {
     /**
      * Close the calendar popup no matter what!
      */
-    $j(document).on('click', '.cal-bubble .close', function() {
-        $j(this).closest('.cal-bubble').hide();
+    $(document).on('click', '.cal-bubble .close', function() {
+        $(this).closest('.cal-bubble').hide();
     })
 });

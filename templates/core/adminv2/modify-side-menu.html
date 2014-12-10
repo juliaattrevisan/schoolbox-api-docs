@@ -3,18 +3,18 @@
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 
-    $j(function () {
+    $(function () {
 
         // setup tree structure
-        $j("#side-menu")
+        $("#side-menu")
             .on('ready.jstree', function(event, jstree) {
                 jstree.instance.open_node(jstree.instance.get_node('node_0'));
             })
             .on('select_node.jstree', function(event, jstree) {
-                $j('#prent').val(jstree.selected[0].replace(/^node_/, ''));
+                $('#prent').val(jstree.selected[0].replace(/^node_/, ''));
             })
             .on('deselect_node.jstree', function() {
-                $j('#prent').val('');
+                $('#prent').val('');
             })
             .jstree({
                 "animation":50,
@@ -33,43 +33,43 @@
          * Modal for URL homepage selection
          * */
 
-      $j('#form').on('click', '.open-modal', function() {
+      $('#form').on('click', '.open-modal', function() {
 
-        $j('#resource-browser').socialstreamBrowser({
+        $('#resource-browser').socialstreamBrowser({
           title: 'Choose a folder',
           categoryId: 0,
           mimeFilter: false,
           submitCallback: function(url, filename) {
-            $j('#url').val(url);
+            $('#url').val(url);
           }
         });
       });
 
 
 		//greenerising the checkboxes if they're ticked.
-		$j(':checkbox').each(function () {
-			if ($j(this).is(':checked')) {
-				$j(this).parent().addClass('active-checkbox');
+		$(':checkbox').each(function () {
+			if ($(this).is(':checked')) {
+				$(this).parent().addClass('active-checkbox');
 			}
 		});
 
-		$j(':checkbox').click(function () {
-			if ($j(this).parent().hasClass('active-checkbox')) {
-				$j(this).parent().removeClass('active-checkbox')
-				if($j(this).closest('.checkboxes').find('.select_all').is(':checked')){
-					$j(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+		$(':checkbox').click(function () {
+			if ($(this).parent().hasClass('active-checkbox')) {
+				$(this).parent().removeClass('active-checkbox')
+				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 				}
 			}
 			else {
-				$j(this).parent().addClass('active-checkbox');
+				$(this).parent().addClass('active-checkbox');
 			}
 		});
 
-		$j('.select_all').change(function(){
-			if($j(this).is(':checked')){
-				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+		$('.select_all').change(function(){
+			if($(this).is(':checked')){
+				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
 			} else {
-				$j(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
 			}
 		});
 

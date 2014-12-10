@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
         var options = {
             ajax: {
                 url:      '/ajax/textbox.php',
@@ -10,19 +10,19 @@
                 dataType: 'json'
             }
         }
-        var id = $j("#textboxSearch{COMPONENT_TEXTBOX_ID}").val()
+        var id = $("#textboxSearch{COMPONENT_TEXTBOX_ID}").val()
         if (id != 0) {
             options.value = {
                 id:   id,
-                name: $j("#textbox_search{COMPONENT_TEXTBOX_ID}").val()
+                name: $("#textbox_search{COMPONENT_TEXTBOX_ID}").val()
             }
         }
-        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').selectizeSelector(options)
+        $('#textbox_search{COMPONENT_TEXTBOX_ID}').selectizeSelector(options)
         .on('selectize.item_add', function(event, value) {
-            $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(value)
+            $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(value)
         })
         .on('selectize.item_remove', function() {
-            $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val('')
+            $('#textboxSearch{COMPONENT_TEXTBOX_ID}').val('')
         })
     });
 </script>

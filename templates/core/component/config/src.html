@@ -1,25 +1,25 @@
 <script type="text/javascript" src="/textbox/javascript/availableByCategory.js"></script>
 <script type="text/javascript">
-  $j(function () {
+  $(function () {
     /* Modal for URL homepage selection
      */
 
-    $j('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
-      var self = $j(this);
+    $('#launch-browser-{COMPONENT_HANDLE}').on('click', function() {
+      var self = $(this);
 
-      $j('#resource-browser').socialstreamBrowser({
+      $('#resource-browser').socialstreamBrowser({
         title: 'Choose a source',
         categoryId: '{COMPONENT_CONFIG_SRC_CID}',
         mimeFilter: false,
         submitCallback: function(url, filename) {
 
-          var src = $j('#src-{COMPONENT_HANDLE}');
-          var lbl = $j('#text-{COMPONENT_HANDLE}');
+          var src = $('#src-{COMPONENT_HANDLE}');
+          var lbl = $('#text-{COMPONENT_HANDLE}');
 
           src.val(url);
           lbl.attr('href', url).html(filename);
 
-          var select = $j('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select');
+          var select = $('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select');
 
           if (select) {
             src.availableByCategory({

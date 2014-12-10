@@ -7,12 +7,12 @@ setupCustomise = {
 
     emptyColumnCheck: function(target) {
         for (i=0; i < target.length; i++ ) {
-            var column = $j(target[i]);
+            var column = $(target[i]);
             if (column.find('.box').length == 0) {
                 column.addClass('empty-column');
-                if ($j('#tabs-homepage').is(':visible')) {
-                    $j('.empty-column').each(function() {
-                        $j(this).show();
+                if ($('#tabs-homepage').is(':visible')) {
+                    $('.empty-column').each(function() {
+                        $(this).show();
                     })
                 }
                 column.html('<p class="placeholder">You can drag components into this space.</p>');
@@ -31,13 +31,13 @@ setupCustomise = {
          *
          */
         init: function() {
-            $j('#tabs-homepage').tabs();
-            $j('#tabs-sub').tabs();
-            $j('.customise').click(function(event) {
-                $j('#tabs-homepage, .empty-column').slideToggle();
-                $j(this).children('span').toggle();
-                $j('h2.hide').each(function () {
-                    $j(this).toggle();
+            $('#tabs-homepage').tabs();
+            $('#tabs-sub').tabs();
+            $('.customise').click(function(event) {
+                $('#tabs-homepage, .empty-column').slideToggle();
+                $(this).children('span').toggle();
+                $('h2.hide').each(function () {
+                    $(this).toggle();
                 });
                 return false;
             });
@@ -51,8 +51,8 @@ setupCustomise = {
          * Allows for control of the components in the customise dropdown.
          */
         components: function() {
-            $j('.add-component strong').each(function() {
-                var howManyInstances = $j(this).children('em').html();
+            $('.add-component strong').each(function() {
+                var howManyInstances = $(this).children('em').html();
                 if (howManyInstances == 0) {
                     howManyInstances = '<strong>no</strong> instances '
                 } else if (howManyInstances == 1)  {
@@ -61,7 +61,7 @@ setupCustomise = {
                     howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
                 }
 
-                $j(this).qtip({
+                $(this).qtip({
                     content: 'You have '+ howManyInstances +'of this component currently active',
                     style: {
                         classes: 'qtip-green qtip-shadow qtip-rounded'
@@ -74,26 +74,26 @@ setupCustomise = {
             });
 
 
-            $j(document).on('click', ".add-component a", function(event) {
+            $(document).on('click', ".add-component a", function(event) {
                 event.preventDefault();
-                var $this = $j(this);
+                var $this = $(this);
 
                 /* Polymorphic key
                  */
                 var data = {
-                    add : $j(this).attr('rel')
+                    add : $(this).attr('rel')
                 };
 
                 data[setupCustomise.key] = setupCustomise.id;
 
-                $j.ajax({
+                $.ajax({
                     type: "POST",
                     url: setupCustomise.ajaxURL,
                     data: data,
                     success: function(data){
-                        $j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-                            setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
-                            $j(this).animate({opacity:1}, 300);
+                        $(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
+                            setupCustomise.emptyColumnCheck([$('div.top'), $('div.right'), $('div.left')]);
+                            $(this).animate({opacity:1}, 300);
                             /*
                              * When a new component is added in we need it to
                              * be able to get the colours that have been changed before
@@ -102,31 +102,31 @@ setupCustomise = {
                              * 2. "add" is clicked on any component
                              * 3. Apply the colour change to this new component's DOM elements.
                              * */
-                            var newComponent = $j(this);
+                            var newComponent = $(this);
 
                             newComponent.find('h2').css({
-                                'background-color': $j('#left_head_bg').css('background-color'),
-                                'color': $j('#left_head_font').css('background-color')
+                                'background-color': $('#left_head_bg').css('background-color'),
+                                'color': $('#left_head_font').css('background-color')
                             });
 
                             newComponent.find('.text, .listing').css({
-                                'background-color': $j('#left_bg_primary').css('background-color')
+                                'background-color': $('#left_bg_primary').css('background-color')
                             });
 
                             newComponent.css({
-                                'color': $j('#left_font').css('background-color')
+                                'color': $('#left_font').css('background-color')
                             });
 
                             newComponent.find('p').css({
-                                'color': $j('#left_font').css('background-color')
+                                'color': $('#left_font').css('background-color')
                             });
 
                             newComponent.find('.dark').css({
-                                'background-color' : $j('#left_bg_secondary').css('background-color')
+                                'background-color' : $('#left_bg_secondary').css('background-color')
                             });
 
                             newComponent.find('a').css({
-                                'color' : $j('#left_link').css('background-color')
+                                'color' : $('#left_link').css('background-color')
                             });
 
                         });
@@ -136,7 +136,7 @@ setupCustomise = {
 
                 if($this.parent().hasClass('one-only')) {
                     $this.parent().addClass('disabled');
-                } else if ($j('.how-many').html() == '') {
+                } else if ($('.how-many').html() == '') {
                     //if there are no modules but you can add one
                     $this.siblings('.how-many').append('You already have <em>1</em>');
                 } else {
@@ -148,7 +148,7 @@ setupCustomise = {
 
                 if (!$this.siblings('.notification').is(':visible')) {
                     $this.siblings('.notification').fadeIn(200, function() {
-                        $j(this).delay(2000).fadeOut();
+                        $(this).delay(2000).fadeOut();
                     });
                 }
 
@@ -163,7 +163,7 @@ setupCustomise = {
 
     sortComponents: function() {
 
-        $j('div.homepage').sortable({
+        $('div.homepage').sortable({
             cursor: 'move',
             distance: 0,
             dropOnEmpty: true,
@@ -174,33 +174,33 @@ setupCustomise = {
             tolerance: 'pointer',
             zIndex: 2000,
             start: function() {
-                $j('.marker').text('This is the new position of your component');
+                $('.marker').text('This is the new position of your component');
             },
             stop: function () {
                 var left = '';
                 var right = '';
                 var top = '';
-                $j('.homepage div.left').children('div.box').each(function () {
+                $('.homepage div.left').children('div.box').each(function () {
 
                     /* Two components in ePorfolio have no id's (My Profile, Teacher Notes)
                      * and always appear in the same positions. So we do a check to see if
                      * an id is set. If it isn't, and we don't do the check, the script breaks
                      * and components cannot be relocated successfully
                      */
-                    if ($j(this).attr('id') != undefined) {
-                        left += $j(this).attr('id').substring(9) + ',';
+                    if ($(this).attr('id') != undefined) {
+                        left += $(this).attr('id').substring(9) + ',';
                     }
                 });
 
-                $j('.homepage div.right').children('div.box').each(function () {
-                    if ($j(this).attr('id') != undefined) {
-                        right += $j(this).attr('id').substring(9) + ',';
+                $('.homepage div.right').children('div.box').each(function () {
+                    if ($(this).attr('id') != undefined) {
+                        right += $(this).attr('id').substring(9) + ',';
                     }
                 });
 
-                $j('.homepage div.top').children('div.box').each(function () {
-                    if ($j(this).attr('id') != undefined) {
-                        top += $j(this).attr('id').substring(9) + ',';
+                $('.homepage div.top').children('div.box').each(function () {
+                    if ($(this).attr('id') != undefined) {
+                        top += $(this).attr('id').substring(9) + ',';
                     }
                 });
 
@@ -213,32 +213,32 @@ setupCustomise = {
 
                 data[setupCustomise.key] = setupCustomise.id;
 
-                $j.post(setupCustomise.ajaxURL, data);
+                $.post(setupCustomise.ajaxURL, data);
 
-                setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')])
+                setupCustomise.emptyColumnCheck([$('.homepage div.top'), $('.homepage div.right'), $('.homepage div.left')])
             },
             sort: function (event, ui) {
-                var leftOffset = $j('.homepage div.left').offset();
-                var topOffset = $j('.homepage div.top').offset();
+                var leftOffset = $('.homepage div.left').offset();
+                var topOffset = $('.homepage div.top').offset();
 
-                if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
-                    event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
+                if (event.pageX < (leftOffset.left + $('.homepage div.left').width()) &&
+                    event.pageY > (leftOffset.top + $('.homepage div.left').height())) {
                     // left bottom
-                    ui.placeholder.appendTo($j('.homepage div.left'));
+                    ui.placeholder.appendTo($('.homepage div.left'));
                 }
-                else if (event.pageX > (leftOffset.left + $j('.homepage div.left').width()) &&
-                    event.pageY > ($j('.homepage div.right').offset().top + $j('.homepage div.right').height())) {
+                else if (event.pageX > (leftOffset.left + $('.homepage div.left').width()) &&
+                    event.pageY > ($('.homepage div.right').offset().top + $('.homepage div.right').height())) {
                     // right bottom
-                    ui.placeholder.appendTo($j('.homepage div.right'))
+                    ui.placeholder.appendTo($('.homepage div.right'))
 
-                } else if (event.pageX < (topOffset.left + $j('.homepage div.top').width()) &&
-                    event.pageY < (topOffset.top + $j('.homepage div.top').height())) {
+                } else if (event.pageX < (topOffset.left + $('.homepage div.top').width()) &&
+                    event.pageY < (topOffset.top + $('.homepage div.top').height())) {
                     // top bottom
-                    if ($j('.homepage div.top').find('.box').length == 0) {
-                        ui.placeholder.appendTo($j('.homepage div.top'));
+                    if ($('.homepage div.top').find('.box').length == 0) {
+                        ui.placeholder.appendTo($('.homepage div.top'));
                     }
                 }
-                $j('.cal-bubble').hide();
+                $('.cal-bubble').hide();
 
             }
         });
@@ -246,35 +246,35 @@ setupCustomise = {
 
     activeComponents: function() {
 
-        $j('.box h2').css('cursor', 'move');
-        $j(".box h2").mousemove(function(e){
-            $j("#tooltip").show();
-            $j("#tooltip").css({
+        $('.box h2').css('cursor', 'move');
+        $(".box h2").mousemove(function(e){
+            $("#tooltip").show();
+            $("#tooltip").css({
                 top: (e.pageY -8) + "px",
                 left: (e.pageX + 20) + "px"
             });
         });
-        $j(".box h2").mouseout(function(e){
-            $j("#tooltip").hide();
+        $(".box h2").mouseout(function(e){
+            $("#tooltip").hide();
         });
 
-        $j("a.config-this").mouseenter(function() {
-            var $this = $j(this);
+        $("a.config-this").mouseenter(function() {
+            var $this = $(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').addClass('show-it');
             }
 
         }).mouseleave(function() {
-            var $this = $j(this);
+            var $this = $(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').removeClass('show-it' );
             }
 
         });
-        $j(document).on('click', 'a.config-this', function(event) {
-            var $this = $j(this);
+        $(document).on('click', 'a.config-this', function(event) {
+            var $this = $(this);
             event.preventDefault();
 
             if ($this.siblings('.editPanel.delete-it').is(':visible')) {
@@ -296,9 +296,9 @@ setupCustomise = {
 
         });
 
-        $j(document).on('click', '.delete-this', function(event){
+        $(document).on('click', '.delete-this', function(event){
             event.preventDefault();
-            var $this = $j(this);
+            var $this = $(this);
 
             if ($this.siblings('.editPanel.settings').is(':visible')) {
                 $this.siblings('.editPanel.settings').slideUp();
@@ -309,21 +309,21 @@ setupCustomise = {
             $this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
         });
 
-        $j(document).on('click', '.delete-accept', function(event) {
+        $(document).on('click', '.delete-accept', function(event) {
 
             $this = homepageControl;
 
             // console.log($this);
 
-            $j(document).on('click', '.delete-this', function() {
-                var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+            $(document).on('click', '.delete-this', function() {
+                var $instanceId = $(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
-                $j(this).parent().slideUp(100,function() {
-                    $j(this).remove();
+                $(this).parent().slideUp(100,function() {
+                    $(this).remove();
                     $this.refreshPalette();
                 });
 
-                $j.post('/adminv2/homepage/remove-instance', {instanceId: $instanceId}, function () {
+                $.post('/adminv2/homepage/remove-instance', {instanceId: $instanceId}, function () {
 
                 });
 
@@ -356,9 +356,9 @@ setupCustomise = {
 
         });
 
-        $j(document).on('click', '.delete-reject', function(event) {
+        $(document).on('click', '.delete-reject', function(event) {
             event.preventDefault();
-            $j(this).closest('.delete-it').slideUp();
+            $(this).closest('.delete-it').slideUp();
         });
     }
 };
