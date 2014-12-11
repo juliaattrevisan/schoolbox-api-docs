@@ -15,6 +15,8 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Intervention\Image\Image;
+
 class Constrain extends BaseStrategy implements StrategyInterface
 {
 
@@ -40,12 +42,9 @@ class Constrain extends BaseStrategy implements StrategyInterface
     }
 
     /**
-    * Manipulate image
-    *
-    * @param $image
-    * @return null
-    */
-    public function manipulate($image)
+     * {@inheritdoc}
+     */
+    public function manipulate(Image $image)
     {
 
         /* Figure out resized dimensions

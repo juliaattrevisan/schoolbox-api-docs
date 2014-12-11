@@ -17,6 +17,8 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Intervention\Image\Image;
+
 class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
 {
 
@@ -50,14 +52,9 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
     }
 
     /**
-    * Manipulate image
-    *
-    * Extended canvas backgrounds are always transparent
-    *
-    * @param $image
-    * @return null
-    */
-    public function manipulate($image)
+     * {@inheritdoc}
+     */
+    public function manipulate(Image $image)
     {
 
         /* Figure out resized dimensions
