@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6a3e46366527c9f82e6174ab88e22c34",
+    "hash": "83eb307d1b58fc3e8bdabe9101573532",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -386,6 +386,48 @@
             "time": "2014-07-26 13:44:22"
         },
         {
+            "name": "caxy/php-htmldiff",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/caxy/php-htmldiff.git",
+                "reference": "a2da731bceb50af036e30294d58e3546513f1d47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/a2da731bceb50af036e30294d58e3546513f1d47",
+                "reference": "a2da731bceb50af036e30294d58e3546513f1d47",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Caxy\\HtmlDiff": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Schroeder",
+                    "email": "jschroeder@caxy.com",
+                    "homepage": "http://www.caxy.com"
+                }
+            ],
+            "description": "A library for comparing two HTML files/snippets and highlighting the differences using simple HTML.",
+            "homepage": "https://github.com/caxy/php-htmldiff",
+            "keywords": [
+                "diff",
+                "html"
+            ],
+            "time": "2014-09-25 21:46:36"
+        },
+        {
             "name": "cboden/ratchet",
             "version": "v0.3.2",
             "source": {
@@ -743,50 +785,6 @@
             ],
             "description": "Converts HTML to formatted plain text",
             "time": "2014-06-05 23:50:44"
-        },
-        {
-            "name": "icap/html-diff",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/iCAPLyon1/HtmlDiff.git",
-                "reference": "c9477e69ac9db15eb3a7a34c0053b80b8daf88d0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/iCAPLyon1/HtmlDiff/zipball/c9477e69ac9db15eb3a7a34c0053b80b8daf88d0",
-                "reference": "c9477e69ac9db15eb3a7a34c0053b80b8daf88d0",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Icap\\HtmlDiff\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Panagiotis Tsavdaris",
-                    "email": "ptsavdar@gmail.com"
-                },
-                {
-                    "name": "ICAP development team",
-                    "homepage": "https://github.com/iCAPLyon1"
-                }
-            ],
-            "description": "A PHP5 library that diffs (compares) HTML files.",
-            "keywords": [
-                "daisy diff",
-                "html diff"
-            ],
-            "time": "2014-01-16 16:31:34"
         },
         {
             "name": "maximebf/debugbar",
@@ -4043,6 +4041,7 @@
         "aura/web": 10,
         "aura/session": 10,
         "0x46616c6b/etherpad-lite-client": 20,
+        "caxy/php-htmldiff": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
     },
