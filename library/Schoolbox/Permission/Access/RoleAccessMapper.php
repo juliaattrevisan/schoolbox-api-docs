@@ -124,12 +124,12 @@ class RoleAccessMapper extends Mapper {
      * @param object $object
      * @param string $verb
      * @param null   $previous
-     * @return bool|void
+     * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
     {
         // noop
-        return;
+        return false;
     }
 
 } 

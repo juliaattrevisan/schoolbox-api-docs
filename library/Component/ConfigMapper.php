@@ -39,4 +39,20 @@ class Component_ConfigMapper extends \Schoolbox\Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 	}
+
+
+    /**
+     * This model does not have any notifications
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // noop
+        return false;
+    }
+
 }
