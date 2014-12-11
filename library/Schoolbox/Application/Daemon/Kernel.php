@@ -221,7 +221,13 @@ EOL;
 		if(strpos($errStr, 'pclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
-        $this->logger()->info("$errStr in $errFile:$errLine [$errNum]", array('char' => 'e'));
+
+        try {
+            $this->logger()->info("$errStr in $errFile:$errLine [$errNum]", array('char' => 'e'));
+        } catch (IOException $e) {
+            // it's possible that the warning was from the STDOUT pipe having been closed,
+            // in which case attempting to log is only going to exacerbate the issue
+        }
 
 		throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
 	}
@@ -231,7 +237,11 @@ EOL;
 	 * @param Exception $e
 	 */
 	public function onException($e) {
-        $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), array($e));
+        try {
+            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), array($e));
+        } catch (IOException $e) {
+            // can't do anything, STDOUT has been closed
+        }
 		exit;
 	}
 
@@ -261,7 +271,11 @@ EOL;
 
 		// report
         $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
-        $this->logger()->alert($message);
+        try {
+            $this->logger()->alert($message);
+        } catch (IOException $e) {
+            // can't do anything, STDOUT has been closed
+        }
 
 		exit(1);
 	}
