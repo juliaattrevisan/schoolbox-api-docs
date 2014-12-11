@@ -29,11 +29,8 @@ $cache->init($post->getThumbnail());
 $cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 
 try {
-	$processor = new \Alaress_Image_Processor_Standard($cache, new \Alaress_Image_Transformation_Storage());
-	$processor->load()->stream();
+    $processor = new \Alaress_Image_Processor_Standard($cache, new \Alaress_Image_Transformation_Storage());
+    $processor->load()->stream();
+} catch (\Exception_Schoolbox $e) {
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }
-catch(\Exception_Schoolbox $e) {
-	\SitePage::redirectToBrokenImageWithTransform('storage', $size);
-}
-
-
