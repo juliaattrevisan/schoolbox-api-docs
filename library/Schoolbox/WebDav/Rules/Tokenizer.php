@@ -9,34 +9,75 @@
 
 namespace Schoolbox\WebDav\Rules;
 
-use Alaress\Rules\Tokenizer as Super;
+use Alaress\Rules\Token\Token;
+use Alaress\Rules\Token\Tokenizer as Super;
 use Schoolbox\User;
 
 class Tokenizer extends Super {
 
     /**
-     * @param string $token
-     * @param User   $user
-     * @param array  $settings
-     * @return string
+     * TODO this could probably be better...
      */
-    protected function renderToken($token, $user, $settings)
+    public function __construct()
     {
-        switch ($token) {
-            case 'username':    return $user->getUsername();
-            case 'password':    return $user->getPassword();
-            case 'lc_username': return strtolower($user->getUsername());
-            case 'pc_username': return ucwords($user->getUsername());
-            case 'YYYY':        return $user->getYear();
-            case 'YY':          return str_pad($user->getYear(), 2, '0', STR_PAD_LEFT);
-            case 'yr12_YY':     return 12 - $user->getYear() + date('y');
-            case 'yr12_YYYY':   return 12 - $user->getYear() + date('Y');
-            case 'yr7_YYYY':    return date('Y') - ($user->getYear() - 7);
-            case 'yr7_YY':      return date('y') - ($user->getYear() - 7);
-            case 'base_uri':    return $settings['baseUri'];
-            default:
-                return '';
-        }
+        parent::__construct();
+
+        $this->addToken(new Token('username', "The user's username", function ($user, $settings) {
+            /** @var User $user */
+            return $user->getUsername();
+        }));
+
+        $this->addToken(new Token('username|lc', "The user's username cast to lowercase", function ($user, $settings) {
+            /** @var User $user */
+            return strtolower($user->getUsername());
+        }));
+
+        $this->addToken(new Token('username|pc', "The user's username cast to ProperCase", function ($user, $settings) {
+            /** @var User $user */
+            return ucwords($user->getUsername());
+        }));
+
+        $this->addToken(new Token('password', "The user's password", function ($user, $settings) {
+            /** @var User $user */
+            return $user->getPassword();
+        }));
+
+        $this->addToken(new Token('year', "The user's year level", function ($user, $settings) {
+            /** @var User $user */
+            return $user->getYear();
+        }));
+
+        $this->addToken(new Token('year|YY', "The user's year level cast to 2 digits", function ($user, $settings) {
+            /** @var User $user */
+            return str_pad($user->getYear(), 2, '0', STR_PAD_LEFT);
+        }));
+
+        $this->addToken(new Token('yr12|YY', "The user's graduating year, cast to 2 digits", function ($user, $settings) {
+            /** @var User $user */
+            return 12 - $user->getYear() + date('y');
+        }));
+
+        $this->addToken(new Token('yr12|YYYY', "The user's graduating year, cast to 4 digits", function ($user, $settings) {
+            /** @var User $user */
+            return 12 - $user->getYear() + date('Y');
+        }));
+
+        $this->addToken(new Token('yr7|YY', "The user's starting year, cast to 2 digits", function ($user, $settings) {
+            /** @var User $user */
+            return date('y') - ($user->getYear() - 7);
+        }));
+
+
+        $this->addToken(new Token('yr7|YY', "The user's starting year, cast to 4 digits", function ($user, $settings) {
+            /** @var User $user */
+            return date('Y') - ($user->getYear() - 7);
+        }));
+
+        $this->addToken(new Token('uri', "The base URI defined for the user", function ($user, $settings) {
+            /** @var User $user */
+            return $settings['baseUri'];
+        }));
+
     }
 
 }
