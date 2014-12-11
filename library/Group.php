@@ -459,8 +459,8 @@ class Group extends DeprecatedModel
             }
 
             /* Check subjects, allow users directly involved in a subject access regardless */
-            if ($permission < READ_ACCESS && $userID == $_SESSION['id']) {
-                if ($this->involvedInSubject($relationID)) {
+            if ($permission < READ_ACCESS) {
+                if ($this->involvedInSubject($relationID, $userID)) {
                     if ($this->isStaff($userID)) {
                         $permission = WRITE_ACCESS;
                     } else {
