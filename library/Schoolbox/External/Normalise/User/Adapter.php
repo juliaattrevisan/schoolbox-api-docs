@@ -80,8 +80,7 @@ class Adapter {
                     $currentResult['StudentContactOccupPhone'],
                     false
                 ))
-                ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag'])
-            );
+                ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag']);
 
             $guardian2 = new Guardian();
             $guardian2
@@ -120,8 +119,7 @@ class Adapter {
                         $currentResult['StudentContactSpouseOccupPhone'],
                         false
                     ))
-                ->setPubliclyVisible($currentResult['SpouseDirectoryIncludeFlag'])
-            );
+                ->setPubliclyVisible($currentResult['SpouseDirectoryIncludeFlag']);
 
             /* Compile student record with known data
              */
