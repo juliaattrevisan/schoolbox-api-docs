@@ -142,11 +142,6 @@ abstract class Base {
     protected $publiclyVisible = true;
 
     /**
-     * Constructor
-     */
-    public function __construct() {}
-
-    /**
      * Set account
      *
      * @param Account $account
