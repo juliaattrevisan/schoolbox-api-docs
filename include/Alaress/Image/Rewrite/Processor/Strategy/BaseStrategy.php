@@ -12,10 +12,15 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Intervention\Image\Image;
+
 abstract class BaseStrategy implements StrategyInterface
 {
 
-    /* Canvas image resource
+    /**
+     * Canvas image resource
+     *
+     * @var Image
      */
     protected $canvas = null;
     protected $canvasWidth = 0;
@@ -38,12 +43,15 @@ abstract class BaseStrategy implements StrategyInterface
     protected function applyBackgroundColor($bgColorArray)
     {
         if (is_array($bgColorArray)) {
-            $bgColor = imagecolorallocate($this->getCanvas(), $bgColorArray['red'], $bgColorArray['blue'], $bgColorArray['green']);
+            $bgColorArray = array(
+                $bgColorArray['red'],
+                $bgColorArray['green'],
+                $bgColorArray['blue']
+            );
         } else {
-            $bgColor = imagecolorallocate($this->getCanvas(), 255, 255, 255);
+            $bgColorArray = array(255, 255, 255);
         }
-
-        imagefilledrectangle($this->getCanvas(), 0, 0, $this->getCanvasWidth(), $this->getCanvasHeight(), $bgColor);
+        $this->getCanvas()->fill($bgColorArray);
     }
 
     /**
@@ -52,16 +60,16 @@ abstract class BaseStrategy implements StrategyInterface
     *
     * If it can fit within the canvas, just return original size
     *
-    * @param $image
+    * @param  Image $image
     * @return array
     */
-    protected function boundingBox($image)
+    protected function boundingBox(Image $image)
     {
 
         /* Figure out resized dimensions
         */
-        $currentWidth = imagesx($image);
-        $currentHeight = imagesy($image);
+        $currentWidth  = $image->getWidth();
+        $currentHeight = $image->getHeight();
 
         $resizedWidth = $currentWidth;
         $resizedHeight = $currentHeight;
@@ -93,7 +101,7 @@ abstract class BaseStrategy implements StrategyInterface
     /**
     * Set canvas image resource
     *
-    * @param $canvas
+    * @param Image $canvas
     */
     protected function setCanvas($canvas)
     {
@@ -103,7 +111,7 @@ abstract class BaseStrategy implements StrategyInterface
     /**
     * Get canvas image resource
     *
-    * @return null
+    * @return Image
     */
     protected function getCanvas()
     {
@@ -156,23 +164,24 @@ abstract class BaseStrategy implements StrategyInterface
      *
      * This should be called before calling imagecopyresampled() on $canvas.
      *
-     * @param resource $canvas The canvas resource to fill, or
-     *                         $this->getCanvas() if not set.
+     * @param Image $canvas The canvas resource to fill, or
+     *                      $this->getCanvas() if not set.
      *
      * @return void
      */
-    protected function alphaFill($canvas = null)
+    protected function alphaFill(Image $canvas = null)
     {
-        if (!($this->getSupportsAlphaChannel())) {
-            return;
-        }
-        if (!isset($canvas)) {
-            $canvas = $this->getCanvas();
-        }
-        imagealphablending($canvas, false);
-        imagesavealpha($canvas, true);
-        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
-        imagefill($canvas, 0, 0, $transparent);
+        return;
+//        if (!($this->getSupportsAlphaChannel())) {
+//            return;
+//        }
+//        if (!isset($canvas)) {
+//            $canvas = $this->getCanvas();
+//        }
+//        imagealphablending($canvas, false);
+//        imagesavealpha($canvas, true);
+//        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+//        imagefill($canvas, 0, 0, $transparent);
     }
 
     /**

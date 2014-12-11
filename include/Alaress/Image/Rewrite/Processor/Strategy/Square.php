@@ -14,6 +14,7 @@
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
 use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 
 class Square extends BaseStrategy implements StrategyInterface
 {
@@ -30,9 +31,8 @@ class Square extends BaseStrategy implements StrategyInterface
 
         /* Create canvas at specified dimensions
          */
-        $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
-
-        $this->setCanvas($canvas);
+        $manager = new ImageManager();
+        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
     }
 
     /**
