@@ -14,7 +14,11 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $postId = $_GET['id'];
 $size = $_GET['size'];
 
-$post = PostMapper::getInstance()->findById($postId);
+try {
+    $post = PostMapper::getInstance()->findById($postId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size);
+}
 
 $cache = new Cache\Original();
 $cache->init($post->getThumbnail());
