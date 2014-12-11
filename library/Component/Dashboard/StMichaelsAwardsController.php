@@ -141,8 +141,8 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $absenceFilter = function ($absence) {
             return !($absence['LateArrivalFlag']);
         };
-        $this->lateArrivalList = array_filter($absenceList, $lateFilter);
-        $this->absenceList     = array_filter($absenceList, $absenceFilter);
+        $this->lateArrivalList = array_filter($absenceList ?: array(), $lateFilter);
+        $this->absenceList     = array_filter($absenceList ?: array(), $absenceFilter);
         return true;
     }
 
@@ -159,16 +159,10 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             return false;
         }
 
-        if (empty($this->detentionList)
-            && empty($this->awardList)
-            && empty($this->absenceList)
-        ) {
-            return false;
-        }
-
         $this->parseConfig();
 
         // <!-- BEGIN blockages -->
+        $this->setBlock($templateHandle,   'emptyList',       'emptyList_block');
         $this->setBlock($templateHandle,   'awardList',       'awardList_block');
         $this->setBlock('awardList',       'award',           'award_block');
         $this->setBlock('award',           'awardLine',       'awardLine_block');
@@ -184,15 +178,18 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         // {VARIABLES}
         $this->setVar(
             array(
+                'emptyList_block'       => '',
                 'awardList_block'       => '',
                 'detentionList_block'   => '',
                 'absenceList_block'     => '',
                 'lateArrivalList_block' => '',
             )
         );
+        $emptyList = true;
 
         // Awards
         if (!empty($this->awardList)) {
+            $emptyList = false;
             $this->parse('awardList_block', 'awardList');
             $this->setVar('award_block', '');
             foreach ($this->awardList as $award) {
@@ -218,6 +215,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Detentions
         if (!empty($this->detentionList)) {
+            $emptyList = false;
             $this->parse('detentionList_block', 'detentionList');
             $this->setVar('detention_block', '');
             foreach ($this->detentionList as $detention) {
@@ -242,6 +240,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Absences
         if (!empty($this->absenceList)) {
+            $emptyList = false;
             $count = count($this->absenceList);
             $this->parse('absenceList_block', 'absenceList');
             $this->setVar(
@@ -272,6 +271,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 
         // Lateness
         if (!empty($this->lateArrivalList)) {
+            $emptyList = false;
             $count = count($this->lateArrivalList);
             $this->parse('lateArrivalList_block', 'lateArrivalList');
             $this->setVar(
@@ -302,6 +302,10 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                 $this->setVar($params);
                 $this->parse('lateArrival_block', 'lateArrival', true);
             }
+        }
+
+        if ($emptyList) {
+            $this->parse('emptyList_block', 'emptyList');
         }
 
         return true;
