@@ -37,17 +37,8 @@ class Campus {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $id
-     * @param $name
-     * @param $code
      */
-    public function __construct($id, $name, $code) {
-        $this->setId($id);
-        $this->setName($name);
-        $this->setCode($code);
+    public function __construct() {
     }
 
     /* Getters/Setters
@@ -57,10 +48,12 @@ class Campus {
      * Set code
      *
      * @param string $code
+     * @return $this
      */
-    private function setCode($code)
+    public function setCode($code)
     {
         $this->code = $code;
+        return $this;
     }
 
     /**
@@ -77,10 +70,12 @@ class Campus {
      * Set id
      *
      * @param string $id
+     * @return $this
      */
-    private function setId($id)
+    public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -97,10 +92,12 @@ class Campus {
      * Set name
      *
      * @param string $name
+     * @return $this
      */
-    private function setName($name)
+    public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**

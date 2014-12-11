@@ -53,69 +53,23 @@ class Staff extends Base {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $id
-     * @param $title
-     * @param $givenName
-     * @param $preferredName
-     * @param $lastname
-     * @param $gender
-     * @param $dob
-     * @param $portrait
-     * @param Account $account
-     * @param Address $postalAddress
-     * @param Address $homeAddress
-     * @param $email
-     * @param $extension
-     * @param Phone $phoneHome
-     * @param Phone $phoneMobile
-     * @param Phone $phoneWork
-     * @param Collection $campus
-     * @param Type $type
-     * @param $publiclyVisible
      */
-    public function __construct(
-        $id,
-        $title,
-        $givenName,
-        $preferredName,
-        $lastname,
-        $gender,
-        $dob,
-        $portrait,
-        Account $account,
-        Address $postalAddress,
-        Address $homeAddress,
-        $email,
-        $extension,
-        Phone $phoneHome,
-        Phone $phoneMobile,
-        Phone $phoneWork,
-        Collection $campus,
-        Type $type,
-        $publiclyVisible
-    ) {
-        $this->setId($id);
-        $this->setTitle($title);
-        $this->setGivenName($givenName);
-        $this->setPreferredName($preferredName);
-        $this->setLastname($lastname);
-        $this->setGender($gender);
-        $this->setDob($dob);
-        $this->setPortrait($portrait);
-        $this->setAccount($account);
-        $this->setPostalAddress($postalAddress);
-        $this->setHomeAddress($homeAddress);
-        $this->setEmail($email);
-        $this->setExtension($extension);
-        $this->setPhoneHome($phoneHome);
-        $this->setPhoneMobile($phoneMobile);
-        $this->setPhoneWork($phoneWork);
-        $this->setCampus($campus);
-        $this->setType($type);
-        $this->setPubliclyVisible($publiclyVisible);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setAccount(new Account());
+        $this->setPostalAddress(new Address());
+        $this->setHomeAddress(new Address());
+        $this->setPhoneHome(new Phone());
+        $this->setPhoneMobile(new Phone());
+        $this->setPhoneWork(new Phone());
+        $this->setCampus(new Collection());
+        $this->setType(new Type());
     }
 
     /* Getters/Setters
@@ -125,10 +79,12 @@ class Staff extends Base {
      * Set phone work
      *
      * @param Phone $phoneWork
+     * @return $this
      */
-    protected function setPhoneWork($phoneWork)
+    public function setPhoneWork($phoneWork)
     {
         $this->phoneWork = $phoneWork;
+        return $this;
     }
 
     /**
@@ -145,10 +101,12 @@ class Staff extends Base {
      * Set campus
      *
      * @param null $campus
+     * @return $this
      */
-    protected function setCampus($campus)
+    public function setCampus($campus)
     {
         $this->campus = $campus;
+        return $this;
     }
 
     /**
@@ -165,10 +123,12 @@ class Staff extends Base {
      * Set extension
      *
      * @param string $extension
+     * @return $this
      */
-    protected function setExtension($extension)
+    public function setExtension($extension)
     {
         $this->extension = $extension;
+        return $this;
     }
 
     /**
@@ -185,10 +145,12 @@ class Staff extends Base {
      * Set type
      *
      * @param Type $type
+     * @return $this
      */
-    protected function setType($type)
+    public function setType($type)
     {
         $this->type = $type;
+        return $this;
     }
 
     /**

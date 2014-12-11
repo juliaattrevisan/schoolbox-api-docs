@@ -103,100 +103,38 @@ class Student extends Base {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $id
-     * @param $title
-     * @param $givenName
-     * @param $preferredName
-     * @param $lastname
-     * @param $gender
-     * @param $dob
-     * @param $portrait
-     * @param $medical
-     * @param $specialNeeds
-     * @param $alert
-     * @param $locker
-     * @param Student\Year $year
-     * @param Student\Form $form
-     * @param Staff $tutor
-     * @param House $house
-     * @param Account $account
-     * @param Address $postalAddress
-     * @param Address $homeAddress
-     * @param $email
-     * @param Phone $phoneHome
-     * @param Phone $phoneMobile
-     * @param \Schoolbox\Collection $guardians
-     * @param $guardiansSeparated
-     * @param Collection $campus
-     * @param $publiclyVisible
      */
-    public function __construct(
-        $id,
-        $title,
-        $givenName,
-        $preferredName,
-        $lastname,
-        $gender,
-        $dob,
-        $portrait,
-        $medical,
-        $specialNeeds,
-        $alert,
-        $locker,
-        Year $year,
-        Form $form,
-        Staff $tutor,
-        House $house,
-        Account $account,
-        Address $postalAddress,
-        Address $homeAddress,
-        $email,
-        Phone $phoneHome,
-        Phone $phoneMobile,
-        Collection $guardians,
-        $guardiansSeparated,
-        Collection $campus,
-        $publiclyVisible
-    ) {
-        $this->setId($id);
-        $this->setTitle($title);
-        $this->setGivenName($givenName);
-        $this->setPreferredName($preferredName);
-        $this->setLastname($lastname);
-        $this->setGender($gender);
-        $this->setDob($dob);
-        $this->setPortrait($portrait);
-        $this->setMedical($medical);
-        $this->setSpecialNeeds($specialNeeds);
-        $this->setAlert($alert);
-        $this->setLocker($locker);
-        $this->setYear($year);
-        $this->setForm($form);
-        $this->setTutor($tutor);
-        $this->setHouse($house);
-        $this->setAccount($account);
-        $this->setPostalAddress($postalAddress);
-        $this->setHomeAddress($homeAddress);
-        $this->setEmail($email);
-        $this->setPhoneHome($phoneHome);
-        $this->setPhoneMobile($phoneMobile);
-        $this->setGuardians($guardians);
-        $this->setGuardiansSeparated($guardiansSeparated);
-        $this->setCampus($campus);
-        $this->setPubliclyVisible($publiclyVisible);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setYear(new Year());
+        $this->setForm(new Form());
+        $this->setTutor(new Staff());
+        $this->setHouse(new House());
+        $this->setAccount(new Account());
+        $this->setPostalAddress(new Address());
+        $this->setHomeAddress(new Address());
+        $this->setPhoneHome(new Phone());
+        $this->setPhoneMobile(new Phone());
+        $this->setGuardians(new Collection());
+        $this->setCampus(new Collection());
     }
 
     /**
      * Set alert
      *
      * @param string $alert
+     * @return $this
      */
-    protected function setAlert($alert)
+    public function setAlert($alert)
     {
         $this->alert = $alert;
+        return $this;
     }
 
     /**
@@ -212,17 +150,19 @@ class Student extends Base {
     /**
      * Set form
      *
-     * @param \Schoolbox\External\Normalise\User\Student\Form $form
+     * @param Form $form
+     * @return $this
      */
-    protected function setForm($form)
+    public function setForm($form)
     {
         $this->form = $form;
+        return $this;
     }
 
     /**
      * Get form
      *
-     * @return \Schoolbox\External\Normalise\User\Student\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -232,11 +172,13 @@ class Student extends Base {
     /**
      * Set guardians
      *
-     * @param \Schoolbox\Collection $guardians
+     * @param Collection $guardians
+     * @return $this
      */
-    protected function setGuardians($guardians)
+    public function setGuardians($guardians)
     {
         $this->guardians = $guardians;
+        return $this;
     }
 
     /**
@@ -253,10 +195,12 @@ class Student extends Base {
      * Set guardians separated flag
      *
      * @param boolean $guardiansSeparated
+     * @return $this
      */
-    protected function setGuardiansSeparated($guardiansSeparated)
+    public function setGuardiansSeparated($guardiansSeparated)
     {
         $this->guardiansSeparated = $guardiansSeparated;
+        return $this;
     }
 
     /**
@@ -272,17 +216,19 @@ class Student extends Base {
     /**
      * Set house
      *
-     * @param \Schoolbox\External\Normalise\User\Common\House $house
+     * @param House $house
+     * @return $this
      */
-    protected function setHouse($house)
+    public function setHouse($house)
     {
         $this->house = $house;
+        return $this;
     }
 
     /**
      * Get house
      *
-     * @return \Schoolbox\External\Normalise\User\Common\House
+     * @return House
      */
     public function getHouse()
     {
@@ -293,10 +239,12 @@ class Student extends Base {
      * Set locker
      *
      * @param string $locker
+     * @return $this
      */
-    protected function setLocker($locker)
+    public function setLocker($locker)
     {
         $this->locker = $locker;
+        return $this;
     }
 
     /**
@@ -313,10 +261,12 @@ class Student extends Base {
      * Set medical
      *
      * @param string $medical
+     * @return $this
      */
-    protected function setMedical($medical)
+    public function setMedical($medical)
     {
         $this->medical = $medical;
+        return $this;
     }
 
     /**
@@ -333,10 +283,12 @@ class Student extends Base {
      * Set special needs
      *
      * @param string $specialNeeds
+     * @return $this
      */
-    protected function setSpecialNeeds($specialNeeds)
+    public function setSpecialNeeds($specialNeeds)
     {
         $this->specialNeeds = $specialNeeds;
+        return $this;
     }
 
     /**
@@ -352,17 +304,19 @@ class Student extends Base {
     /**
      * Set tutor
      *
-     * @param \Schoolbox\External\Normalise\User\Staff $tutor
+     * @param Staff $tutor
+     * @return $this
      */
-    protected function setTutor($tutor)
+    public function setTutor($tutor)
     {
         $this->tutor = $tutor;
+        return $this;
     }
 
     /**
      * Get tutor
      *
-     * @return \Schoolbox\External\Normalise\User\Staff
+     * @return Staff
      */
     public function getTutor()
     {
@@ -372,17 +326,19 @@ class Student extends Base {
     /**
      * Set year
      *
-     * @param \Schoolbox\External\Normalise\User\Student\Year $year
+     * @param Year $year
+     * @return $this
      */
-    protected function setYear($year)
+    public function setYear($year)
     {
         $this->year = $year;
+        return $this;
     }
 
     /**
      * Get year
      *
-     * @return \Schoolbox\External\Normalise\User\Student\Year
+     * @return Year
      */
     public function getYear()
     {

@@ -11,7 +11,7 @@
  */
 
 namespace Schoolbox\External\Normalise\User\Student;
-
+use Schoolbox\External\Normalise\User\Staff;
 
 class Form {
 
@@ -27,21 +27,22 @@ class Form {
     /**
      * Form teacher/Staff member in charge
      *
-     * @var \Schoolbox\External\Normalise\User\Staff
+     * @var Staff
      */
     protected $coordinator = null;
 
     /**
      * Constructor
-     *
-     * Immutable
-     * 
-     * @param $level
-     * @param $coordinator
      */
-    public function __construct($level, $coordinator) {
-        $this->setLevel($level);
-        $this->setCoordinator($coordinator);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setCoordinator(new Staff());
     }
 
     /* Getters/Setters
@@ -50,17 +51,19 @@ class Form {
     /**
      * Set coordinator
      *
-     * @param \Schoolbox\External\Normalise\User\Base $coordinator
+     * @param Staff $coordinator
+     * @return $this
      */
     protected function setCoordinator($coordinator)
     {
         $this->coordinator = $coordinator;
+        return $this;
     }
 
     /**
      * Get coordinator
      *
-     * @return \Schoolbox\External\Normalise\User\Base
+     * @return Staff
      */
     public function getCoordinator()
     {
@@ -71,10 +74,12 @@ class Form {
      * Set level
      *
      * @param int $level
+     * @return $this
      */
-    protected function setLevel($level)
+    public function setLevel($level)
     {
         $this->level = $level;
+        return $this;
     }
 
     /**

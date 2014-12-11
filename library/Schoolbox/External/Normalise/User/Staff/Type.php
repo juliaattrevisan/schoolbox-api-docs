@@ -36,17 +36,17 @@ class Type {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $type
-     * @param $department
-     * @param $position
      */
-    public function __construct($type, $department, $position) {
-        $this->setType($type);
-        $this->setDepartment($department);
-        $this->setPosition($position);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setType(new Type());
+        $this->setPosition(new Position());
     }
 
     /* Getters/Setters
@@ -56,10 +56,12 @@ class Type {
      * Set department
      *
      * @param string $department
+     * @return $this
      */
-    private function setDepartment($department)
+    public function setDepartment($department)
     {
         $this->department = $department;
+        return $this;
     }
 
     /**
@@ -75,15 +77,19 @@ class Type {
     /**
      * Set position
      *
-     * @param \Schoolbox\External\Normalise\User\Staff\Position $position
+     * @param Position $position
+     * @return $this
      */
     private function setPosition($position)
     {
         $this->position = $position;
+        return $this;
     }
 
     /**
-     * @return \Schoolbox\External\Normalise\User\Staff\Position
+     * Get position
+     *
+     * @return Position
      */
     public function getPosition()
     {
@@ -93,17 +99,19 @@ class Type {
     /**
      * Set type
      *
-     * @param string $type
+     * @param Type $type
+     * @return $this
      */
     private function setType($type)
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
      * Get type
      *
-     * @return string
+     * @return Type
      */
     public function getType()
     {

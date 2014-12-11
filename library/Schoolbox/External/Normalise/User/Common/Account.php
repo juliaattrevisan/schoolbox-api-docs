@@ -29,15 +29,8 @@ class Account {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $login
-     * @param $active
      */
-    public function __construct($login, $active) {
-        $this->setLogin($login);
-        $this->setActive($active);
+    public function __construct() {
     }
 
     /* Getters/Setters
@@ -47,10 +40,13 @@ class Account {
      * Set active
      *
      * @param boolean $active
+     * @return $this
      */
-    private function setActive($active)
+    public function setActive($active)
     {
         $this->active = $active;
+
+        return $this;
     }
 
     /**
@@ -67,10 +63,13 @@ class Account {
      * Set login
      *
      * @param string $login
+     * @return $this
      */
-    private function setLogin($login)
+    public function setLogin($login)
     {
         $this->login = $login;
+
+        return $this;
     }
 
     /**

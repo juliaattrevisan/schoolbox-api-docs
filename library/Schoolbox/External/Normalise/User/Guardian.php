@@ -30,63 +30,22 @@ class Guardian extends Base {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $id
-     * @param $title
-     * @param $givenName
-     * @param $preferredName
-     * @param $lastname
-     * @param $gender
-     * @param $dob
-     * @param $portrait
-     * @param Account $account
-     * @param Address $postalAddress
-     * @param Address $homeAddress
-     * @param $email
-     * @param Phone $phoneHome
-     * @param Phone $phoneMobile
-     * @param Phone $phoneWork
-     * @param Collection $campus
-     * @param $publiclyVisible
      */
-    public function __construct(
-        $id,
-        $title,
-        $givenName,
-        $preferredName,
-        $lastname,
-        $gender,
-        $dob,
-        $portrait,
-        Account $account,
-        Address $postalAddress,
-        Address $homeAddress,
-        $email,
-        Phone $phoneHome,
-        Phone $phoneMobile,
-        Phone $phoneWork,
-        Collection $campus,
-        $publiclyVisible
-    ) {
-        $this->setId($id);
-        $this->setTitle($title);
-        $this->setGivenName($givenName);
-        $this->setPreferredName($preferredName);
-        $this->setLastname($lastname);
-        $this->setGender($gender);
-        $this->setDob($dob);
-        $this->setPortrait($portrait);
-        $this->setAccount($account);
-        $this->setPostalAddress($postalAddress);
-        $this->setHomeAddress($homeAddress);
-        $this->setEmail($email);
-        $this->setPhoneHome($phoneHome);
-        $this->setPhoneMobile($phoneMobile);
-        $this->setPhoneWork($phoneWork);
-        $this->setCampus($campus);
-        $this->setPubliclyVisible($publiclyVisible);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setAccount(new Account());
+        $this->setPostalAddress(new Address());
+        $this->setHomeAddress(new Address());
+        $this->setPhoneHome(new Phone());
+        $this->setPhoneMobile(new Phone());
+        $this->setPhoneWork(new Phone());
+        $this->setCampus(new Collection());
     }
 
     /* Getters/Setters
@@ -96,10 +55,12 @@ class Guardian extends Base {
      * Set phone work
      *
      * @param Phone $phoneWork
+     * @return $this
      */
-    protected function setPhoneWork($phoneWork)
+    public function setPhoneWork($phoneWork)
     {
         $this->phoneWork = $phoneWork;
+        return $this;
     }
 
     /**

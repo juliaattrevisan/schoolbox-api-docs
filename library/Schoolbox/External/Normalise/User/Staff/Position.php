@@ -37,17 +37,17 @@ class Position {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $description
-     * @param $startDate
-     * @param $endDate
      */
-    public function __construct($description, $startDate, $endDate) {
-        $this->setDescription($description);
-        $this->setStartDate($startDate);
-        $this->setEndDate($endDate);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setStartDate(new \Alaress_Date_Format(null, 'U'));
+        $this->setEndDate(new \Alaress_Date_Format(null, 'U'));
     }
 
     /* Getters/Setters
@@ -57,10 +57,12 @@ class Position {
      * Set description
      *
      * @param string $description
+     * @return $this
      */
-    private function setDescription($description)
+    public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
@@ -77,10 +79,12 @@ class Position {
      * Set end date
      *
      * @param \Alaress_Date_Format $endDate
+     * @return $this
      */
-    private function setEndDate($endDate)
+    public function setEndDate($endDate)
     {
         $this->endDate = $endDate;
+        return $this;
     }
 
     /**
@@ -97,10 +101,12 @@ class Position {
      * Set start date
      *
      * @param \Alaress_Date_Format $startDate
+     * @return $this
      */
-    private function setStartDate($startDate)
+    public function setStartDate($startDate)
     {
         $this->startDate = $startDate;
+        return $this;
     }
 
     /**
