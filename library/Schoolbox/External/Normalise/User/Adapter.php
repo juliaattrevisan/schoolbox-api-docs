@@ -26,7 +26,7 @@ class Adapter {
     /**
      * Accepts an External_User
      *
-     * @param $handler
+     * @param \External_User $handler
      */
     public function __construct(\External_User $handler) {
         $this->setHandler($handler);
@@ -57,7 +57,7 @@ class Adapter {
     /**
      * Set handler
      *
-     * @param null $handler
+     * @param \External_User $handler
      */
     private function setHandler($handler)
     {
@@ -67,7 +67,7 @@ class Adapter {
     /**
      * Get handler
      *
-     * @return null
+     * @return \External_User
      */
     private function getHandler()
     {
