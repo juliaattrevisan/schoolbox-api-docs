@@ -35,7 +35,7 @@ class Adapter {
     /**
      * Get a bunch of students
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     public function getStudentBoarderContactListExtended() {
         $collection = new Collection();
