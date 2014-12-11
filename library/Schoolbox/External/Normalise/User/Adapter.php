@@ -89,36 +89,36 @@ class Adapter {
                 ->setPreferredName($currentResult['StudentContactSpousePreferred'])
                 ->setLastname($currentResult['StudentContactSpouseSurname'])
                 ->setPostalAddress(new Common\Address(
-                        $currentResult['StudentContactSpouseAddress1'],
-                        $currentResult['StudentContactSpouseAddress2'],
-                        $currentResult['StudentContactSpouseAddress3'],
-                        $currentResult['StudentContactSpouseSuburb'],
-                        $currentResult['StudentContactSpouseState'],
-                        $currentResult['StudentContactSpousePostCode'],
-                        $currentResult['StudentContactSpouseCountryDesc']
-                    ))
+                    $currentResult['StudentContactSpouseAddress1'],
+                    $currentResult['StudentContactSpouseAddress2'],
+                    $currentResult['StudentContactSpouseAddress3'],
+                    $currentResult['StudentContactSpouseSuburb'],
+                    $currentResult['StudentContactSpouseState'],
+                    $currentResult['StudentContactSpousePostCode'],
+                    $currentResult['StudentContactSpouseCountryDesc']
+                ))
                 ->setHomeAddress(new Common\Address(
-                        $currentResult['StudentContactSpouseAddress1'],
-                        $currentResult['StudentContactSpouseAddress2'],
-                        $currentResult['StudentContactSpouseAddress3'],
-                        $currentResult['StudentContactSpouseSuburb'],
-                        $currentResult['StudentContactSpouseState'],
-                        $currentResult['StudentContactSpousePostCode'],
-                        $currentResult['StudentContactSpouseCountryDesc']
-                    ))
+                    $currentResult['StudentContactSpouseAddress1'],
+                    $currentResult['StudentContactSpouseAddress2'],
+                    $currentResult['StudentContactSpouseAddress3'],
+                    $currentResult['StudentContactSpouseSuburb'],
+                    $currentResult['StudentContactSpouseState'],
+                    $currentResult['StudentContactSpousePostCode'],
+                    $currentResult['StudentContactSpouseCountryDesc']
+                ))
                 ->setEmail($currentResult['StudentContactSpouseDefaultEmail'])
                 ->setPhoneHome(new Common\Phone(
-                        $currentResult['StudentContactSpousePhoneActual'],
-                        $currentResult['StudentContactSpouseSilentPhoneFlag']
-                    ))
+                    $currentResult['StudentContactSpousePhoneActual'],
+                    $currentResult['StudentContactSpouseSilentPhoneFlag']
+                ))
                 ->setPhoneMobile(new Common\Phone(
-                        $currentResult['StudentContactSpousePhoneMobile'],
-                        false
-                    ))
+                    $currentResult['StudentContactSpousePhoneMobile'],
+                    false
+                ))
                 ->setPhoneWork(new Common\Phone(
-                        $currentResult['StudentContactSpouseOccupPhone'],
-                        false
-                    ))
+                    $currentResult['StudentContactSpouseOccupPhone'],
+                    false
+                ))
                 ->setPubliclyVisible($currentResult['SpouseDirectoryIncludeFlag']);
 
             /* Compile student record with known data
