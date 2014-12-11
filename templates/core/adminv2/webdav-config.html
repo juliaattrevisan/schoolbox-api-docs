@@ -4,17 +4,37 @@
   .wd-rule > a {
     display: block;
     transition: all 200ms ease-out;
-    border-left: solid 4px transparent;
+    border-left: solid 2px transparent;
     padding-left: 4px;
+    margin-left: 2px;
   }
-  .wd-rule > a:hover {
-    text-decoration: none;
-    color: #000;
-    border-left-color: #000;
-  }
-  .wd-rule > a em {
+  .wd-rule > em {
     white-space: pre;
     font-family: monospace;
+  }
+  em .ctrl {
+    font-weight: bold;
+    color: #37a;
+  }
+  .wd-token-list {
+    margin-left: 24px;
+  }
+  .wd-token {
+    list-style: disc;
+  }
+  .wd-token code, em .tok {
+    font-weight: bold;
+    color: #407;
+  }
+  .admin-contents > div:first-of-type {
+    float: left;
+    margin: 0 1% 0 0 !important;
+  }
+  .admin-contents > div {
+    margin: 0 !important;
+  }
+  .wd-token {
+    margin-bottom: 4px;
   }
 
 </style>
@@ -27,37 +47,54 @@
 </ul>
 <div class="admin-contents clearfix">
   <h2>WebDAV Configuration</h2>
-
+  <p>
+    The rules defined here will dictate how users' WebDAV configurations will be determined.
+    In order for a rule to match, <strong>ALL</strong> conditions of the rule must evaluate to
+    true for the given user, otherwise the conditions of that rule will not be applied. This can
+    be used for making distinctions between subgroups, such as differentiating on both Role and
+    Campus simultaneously.
+  </p>
+  <p>
+    If multiple rules match a user, each will be applied in ascending order of precedence (defined
+    as the number of conditions, and then rule order). In the case of <code>paths</code>, values will
+    be appended; in the case of <code>URI</code>, <code>username</code> and <code>password</code>, values will be overwritten.
+  </p>
   <div class="two-thirds">
     <div class="level clearfix">
       <h3>Mapping Rules</h3>
+      <ul class="wd-rules">
       <!-- BEGIN rule -->
-      <div class="wd-rule">
-        <hr/>
-        <a href="#">
+        <li class="wd-rule">
+          <hr/>
+          <span class="actions">
+            <a href="/adminv2/webdav-config/example/rule/{WD_RULE_N}" class="btn no-text eyeball" title="See an example of this rule"><span></span></a>
+            <a href="/adminv2/webdav-config/modify/rule/{WD_RULE_N}"  class="btn no-text modify"  title="Modify this rule"><span></span></a>
+            <a href="/adminv2/webdav-config/delete/rule/{WD_RULE_N}"  class="btn no-text delete"  title="Delete this rule"><span></span></a>
+          </span>
           <em>{WD_RULE_SUMMARY}</em>
-        </a>
-        <div style="display: none;">
-          <ul class="wd-conditions">
-            <!-- BEGIN condition -->
-            <li class="wd-condition">
-              Condition: <a href="#">{WD_CONDITION}</a>
-            </li>
-            <!-- END condition -->
-          </ul>
-          <div class="wd-effect">
-            <!-- BEGIN effect -->
-            <fieldset>
-              <label>{WD_EFFECT_KEY}
-                <input type="checkbox" name="effect[{RULE_ID}][baseUri]" />
-              </label>
-              <textarea style="width:100%;">{WD_EFFECT}</textarea>
-            </fieldset>
-            <!-- END effect -->
+          <div style="display: none;">
+            <ul class="wd-conditions">
+              <!-- BEGIN condition -->
+              <li class="wd-condition">
+                Condition: <a href="#">{WD_CONDITION}</a>
+              </li>
+              <!-- END condition -->
+            </ul>
+            <div class="wd-effect">
+              <!-- BEGIN effect -->
+              <fieldset>
+                <label>{WD_EFFECT_KEY}
+                  <input type="checkbox" name="effect[{RULE_ID}][baseUri]" />
+                </label>
+                <textarea style="width:100%;">{WD_EFFECT}</textarea>
+              </fieldset>
+              <!-- END effect -->
+            </div>
           </div>
-        </div>
-      </div>
+        </li>
       <!-- END rule -->
+      </ul>
+      <hr />
       <a class="submit-btn-plain">New Rule</a>
     </div>
   </div>
@@ -78,6 +115,22 @@
         </label>
         <input value="Save" type="submit" class="submit-btn-plain" />
       </form>
+    </div>
+  </div>
+  <div class="one-third">
+    <div class="level">
+      <h3>Tokens</h3>
+      <p>
+        The following tokens can be used in rules to define output relative to the user being tested:
+      <ul class="wd-token-list">
+        <!-- BEGIN token -->
+        <li class="wd-token">
+          <code>{TOKEN}</code> - {TOKEN_DESCR}
+        </li>
+        <!-- END token -->
+      </ul>
+      </p>
+
     </div>
   </div>
 

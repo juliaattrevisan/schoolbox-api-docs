@@ -35,23 +35,23 @@ $set->newRule(array(
     new UserCondition('role.type', array(Role::STAFF))
     // THEN
 ), array('paths' => array(
-    '{:base_uri}Academic/',
-    '{:base_uri}BIT/',
-    '{:base_uri}CommunityRelations/',
-    '{:base_uri}DramaAndDance/',
-    '{:base_uri}EdOutdoors/',
-    '{:base_uri}English/',
-    '{:base_uri}HPE/',
-    '{:base_uri}Humanities/',
-    '{:base_uri}LOTE/',
-    '{:base_uri}Maths/',
-    '{:base_uri}Music/',
-    '{:base_uri}PhotoStore/',
-    '{:base_uri}Science/',
-    '{:base_uri}Technology/',
-    '{:base_uri}VisualArts/',
-    '{:base_uri}RoundSquare/',
-    '{:base_uri}AdminDocs/'
+    '{:uri}Academic/',
+    '{:uri}BIT/',
+    '{:uri}CommunityRelations/',
+    '{:uri}DramaAndDance/',
+    '{:uri}EdOutdoors/',
+    '{:uri}English/',
+    '{:uri}HPE/',
+    '{:uri}Humanities/',
+    '{:uri}LOTE/',
+    '{:uri}Maths/',
+    '{:uri}Music/',
+    '{:uri}PhotoStore/',
+    '{:uri}Science/',
+    '{:uri}Technology/',
+    '{:uri}VisualArts/',
+    '{:uri}RoundSquare/',
+    '{:uri}AdminDocs/'
 )));
 
 $set->newRule(array(
@@ -60,7 +60,7 @@ $set->newRule(array(
     // AND :input.defaultCampus.id = 1
     new UserCondition('defaultCampus.id', 1)
     // THEN
-),  array('paths' => array('{:base_uri}penquitestaff/{:username}/Documents/')));
+),  array('paths' => array('{:uri}penquitestaff/{:username}/Documents/')));
 
 $set->newRule(array(
     // IF :input.role.type = 'staff'
@@ -68,7 +68,7 @@ $set->newRule(array(
     // AND :input.defaultCampus.id NOT = 1
     new UserCondition('defaultCampus.id', 1, true)
     // THEN
-),  array('paths' => array('{:base_uri}elphinstaff/{:username}/Documents/')));
+),  array('paths' => array('{:uri}elphinstaff/{:username}/Documents/')));
 
 $set->newRule(array(
     // IF :input.role.type = 'student'
@@ -77,7 +77,7 @@ $set->newRule(array(
     new UserCondition('year', array(6, 7, 8, 9, 10, 11, 12))
     // THEN
 ),  array(
-        'paths'    => array('{:base_uri}penquitestudents/Year12in{:yr12_YYYY}/{:username}/Documents/'),
+        'paths'    => array('{:uri}penquitestudents/Year12in{:yr12_YYYY}/{:username}/Documents/'),
         'username' => 'socs/{:lc_username}'
     )
 );
@@ -88,7 +88,7 @@ $set->newRule(array(
     // AND :input.year NOT IN (6 .. 12)
     new UserCondition('year', array(6, 7, 8, 9, 10, 11, 12), true)
     // THEN
-),  array('paths' => array('{:base_uri}elphinstudents/Year12in{:yr12_YYYY}/{:username}/Documents/')));
+),  array('paths' => array('{:uri}elphinstudents/Year12in{:yr12_YYYY}/{:username}/Documents/')));
 
 
 
@@ -101,6 +101,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/webdav-config.html');
 $this->setBlock(TEMPLATE_content, 'rule', 'rule_block');
 $this->setBlock('rule', 'condition', 'condition_block');
 $this->setBlock('rule', 'effect',    'effect_block');
+$this->setBlock(TEMPLATE_content, 'token', 'token_block');
 
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'setting');
@@ -123,7 +124,7 @@ foreach ($set->getRules() as $i => $rule) {
 
     $this->setVar(array(
         'WD_RULE_N' => $i + 1,
-        'WD_RULE_SUMMARY' => $rule->getSummary()
+        'WD_RULE_SUMMARY' => $rule->getHtmlSummary()
     ));
 
     $this->setVar('effect_block', '');
@@ -142,4 +143,12 @@ foreach ($set->getRules() as $i => $rule) {
     }
 
     $this->parse('rule_block', 'rule', true);
+}
+
+foreach ($set->getTokens() as $tok) {
+    $this->setVar(array(
+        'TOKEN'       => '{:'.$tok->getToken().'}',
+        'TOKEN_DESCR' => $tok->getDescription()
+    ));
+    $this->parse('token_block', 'token', true);
 }
