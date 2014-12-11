@@ -142,4 +142,20 @@ class CategoryCodeMapper extends Mapper
             }
         }
     }
+
+
+    /**
+     * This model does not have any notifications
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // noop
+        return false;
+    }
+
 }
