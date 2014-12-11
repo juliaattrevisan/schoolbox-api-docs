@@ -11,11 +11,12 @@ namespace Schoolbox\WebDav\Rules;
 
 use Alaress\Rules\Condition;
 use Alaress\Rules\Ruleset as Super;
+use Alaress\Rules\Token\Token;
 use Schoolbox\User;
 
 class Ruleset extends Super {
 
-    /** @var \Alaress\Rules\Tokenizer */
+    /** @var \Alaress\Rules\Token\Tokenizer */
     protected $tokenizer;
 
 
@@ -114,6 +115,15 @@ class Ruleset extends Super {
         }
 
         return $all;
+    }
+
+
+    /**
+     * @return Token[]
+     */
+    public function getTokens()
+    {
+        return $this->tokenizer->getTokens();
     }
 
 } 
