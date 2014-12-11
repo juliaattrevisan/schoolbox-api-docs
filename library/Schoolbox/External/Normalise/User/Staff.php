@@ -21,13 +21,6 @@ class Staff extends Base {
      */
 
     /**
-     * Associated campus
-     *
-     * @var null
-     */
-    private $campus = null;
-
-    /**
      * Staff type
      *
      * @var Type
