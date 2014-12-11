@@ -16,7 +16,7 @@ class Alaress_Image_Processor_Abstract {
 
 	/* Strategies for image manipulation
 	 */
-	protected $processorStrategyPrefix = 'Alaress_Image_Processor_Strategy_';
+	protected $processorStrategyPrefix = 'Alaress\\Image\\Rewrite\\Processor\\Strategy\\';
 
 	/**
 	 * @var Alaress_Image_Processor_Strategy_Interface
