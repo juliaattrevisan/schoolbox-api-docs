@@ -603,13 +603,17 @@ class Group extends DeprecatedModel
         return $this->db->getOne($query);
     }
 
-    function involvedInSubject($code)
+    function involvedInSubject($code, $userId = null)
     {
+        if (!isset($userId)) {
+            $userId = $_SESSION['id'];
+        }
+        $subjects = $this->involvedInSubjects($userId);
         //returns true on user being involved in subject (case-insensitive)
 
-        if (is_array($_SESSION['subjects'])) {
+        if (is_array($subjects)) {
             //$code = strtoupper($code);
-            foreach ($_SESSION['subjects'] as $subject) {
+            foreach ($subjects as $subject) {
                 if (is_numeric($code) && $code == $subject['id']) {
                     return true;
                 }
