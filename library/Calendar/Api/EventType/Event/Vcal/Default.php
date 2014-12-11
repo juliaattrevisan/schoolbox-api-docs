@@ -140,16 +140,18 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $collection = new Calendar_Event_Collection();
 
         $currentConfig = $this->loadConnectorConfiguration();
-        $group_handler = new Group();
-        $is_superuser  = $group_handler->isSuperuser();
-
         $decodedConfig = $currentConfig->decodeConfig();
 
         /* Check permissions - if you can view these events according to the Permissions
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
          */
-        if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
+        if ($this->getUser()->isSuperuser()
+            || $decodedConfig->hasPermissions(
+                $this->getUser()->getCampusCollection()->getColumnValues('id'),
+                $this->getUser()->getRole()->getId()
+            )
+        ) {
             /* Load calendar from locker cache
              * Cache step 1: cache load of VCAL file from URL
              */
