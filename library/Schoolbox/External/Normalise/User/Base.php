@@ -145,10 +145,12 @@ abstract class Base {
      * Set account
      *
      * @param Account $account
+     * @return $this
      */
-    protected function setAccount($account)
+    public function setAccount($account)
     {
         $this->account = $account;
+        return $this;
     }
 
     /**
@@ -165,10 +167,12 @@ abstract class Base {
      * Set campus collection
      *
      * @param Collection $campus
+     * @return $this
      */
-    protected function setCampus($campus)
+    public function setCampus($campus)
     {
         $this->campus = $campus;
+        return $this;
     }
 
     /**
@@ -185,10 +189,12 @@ abstract class Base {
      * Set dob
      *
      * @param \Alaress_Date_Format $dob
+     * @return $this
      */
-    protected function setDob($dob)
+    public function setDob($dob)
     {
         $this->dob = $dob;
+        return $this;
     }
 
     /**
@@ -205,10 +211,12 @@ abstract class Base {
      * Set email
      *
      * @param string $email
+     * @return $this
      */
-    protected function setEmail($email)
+    public function setEmail($email)
     {
         $this->email = $email;
+        return $this;
     }
 
     /**
@@ -225,10 +233,12 @@ abstract class Base {
      * Set gender
      *
      * @param string $gender
+     * @return $this
      */
-    protected function setGender($gender)
+    public function setGender($gender)
     {
         $this->gender = $gender;
+        return $this;
     }
 
     /**
@@ -245,10 +255,12 @@ abstract class Base {
      * Set given name
      *
      * @param string $givenName
+     * @return $this
      */
-    protected function setGivenName($givenName)
+    public function setGivenName($givenName)
     {
         $this->givenName = $givenName;
+        return $this;
     }
 
     /**
@@ -265,10 +277,12 @@ abstract class Base {
      * Set home address
      *
      * @param Address $homeAddress
+     * @return $this
      */
-    protected function setHomeAddress($homeAddress)
+    public function setHomeAddress($homeAddress)
     {
         $this->homeAddress = $homeAddress;
+        return $this;
     }
 
     /**
@@ -283,12 +297,14 @@ abstract class Base {
 
     /**
      * Set id
-     * 
+     *
      * @param string $id
+     * @return $this
      */
-    protected function setId($id)
+    public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -305,10 +321,12 @@ abstract class Base {
      * Set lastname
      *
      * @param string $lastname
+     * @return $this
      */
-    protected function setLastname($lastname)
+    public function setLastname($lastname)
     {
         $this->lastname = $lastname;
+        return $this;
     }
 
     /**
@@ -324,11 +342,13 @@ abstract class Base {
     /**
      * Set phone home
      *
-     * @param \Schoolbox\External\Normalise\User\Common\Phone $phoneHome
+     * @param Phone $phoneHome
+     * @return $this
      */
-    protected function setPhoneHome($phoneHome)
+    public function setPhoneHome($phoneHome)
     {
         $this->phoneHome = $phoneHome;
+        return $this;
     }
 
     /**
@@ -345,10 +365,12 @@ abstract class Base {
      * Set phone mobile
      *
      * @param Phone $phoneMobile
+     * @return $this
      */
-    protected function setPhoneMobile($phoneMobile)
+    public function setPhoneMobile($phoneMobile)
     {
         $this->phoneMobile = $phoneMobile;
+        return $this;
     }
 
     /**
@@ -365,10 +387,12 @@ abstract class Base {
      * Set portrait
      *
      * @param string $portrait
+     * @return $this
      */
-    protected function setPortrait($portrait)
+    public function setPortrait($portrait)
     {
         $this->portrait = $portrait;
+        return $this;
     }
 
     /**
@@ -385,10 +409,12 @@ abstract class Base {
      * Set postal address
      *
      * @param Address $postalAddress
+     * @return $this
      */
-    protected function setPostalAddress($postalAddress)
+    public function setPostalAddress($postalAddress)
     {
         $this->postalAddress = $postalAddress;
+        return $this;
     }
 
     /**
@@ -405,10 +431,12 @@ abstract class Base {
      * Set preferred name
      *
      * @param string $preferredName
+     * @return $this
      */
-    protected function setPreferredName($preferredName)
+    public function setPreferredName($preferredName)
     {
         $this->preferredName = $preferredName;
+        return $this;
     }
 
     /**
@@ -425,10 +453,12 @@ abstract class Base {
      * Set publiclyVisible
      *
      * @param boolean $publiclyVisible
+     * @return $this
      */
-    protected function setPubliclyVisible($publiclyVisible)
+    public function setPubliclyVisible($publiclyVisible)
     {
         $this->publiclyVisible = $publiclyVisible;
+        return $this;
     }
 
     /**
@@ -445,10 +475,12 @@ abstract class Base {
      * Set title
      *
      * @param string $title
+     * @return $this
      */
-    protected function setTitle($title)
+    public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
     }
 
     /**

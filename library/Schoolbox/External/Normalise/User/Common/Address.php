@@ -64,35 +64,23 @@ class Address {
 
     /**
      * Constructor
-     *
-     * Immutable
-     * 
-     * @param $address1
-     * @param $address2
-     * @param $address3
-     * @param $suburb
-     * @param $state
-     * @param $postcode
-     * @param $country
      */
-    public function __construct($address1, $address2, $address3, $suburb, $state, $postcode, $country) {
-        $this->setAddress1($address1);
-        $this->setAddress2($address2);
-        $this->setAddress3($address3);
-        $this->setSuburb($suburb);
-        $this->setState($state);
-        $this->setPostcode($postcode);
-        $this->setCountry($country);
+    public function __construct() {
     }
+
+    /* Getters/Setters
+     */
 
     /**
      * Set address 1
      *
      * @param string $address1
+     * @return $this
      */
-    private function setAddress1($address1)
+    public function setAddress1($address1)
     {
         $this->address1 = $address1;
+        return $this;
     }
 
     /**
@@ -109,10 +97,12 @@ class Address {
      * Set address 2
      *
      * @param string $address2
+     * @return $this
      */
-    private function setAddress2($address2)
+    public function setAddress2($address2)
     {
         $this->address2 = $address2;
+        return $this;
     }
 
     /**
@@ -129,10 +119,12 @@ class Address {
      * Set address 3
      *
      * @param string $address3
+     * @return $this
      */
-    private function setAddress3($address3)
+    public function setAddress3($address3)
     {
         $this->address3 = $address3;
+        return $this;
     }
 
     /**
@@ -149,10 +141,12 @@ class Address {
      * Set country
      *
      * @param string $country
+     * @return $this
      */
-    private function setCountry($country)
+    public function setCountry($country)
     {
         $this->country = $country;
+        return $this;
     }
 
     /**
@@ -169,10 +163,12 @@ class Address {
      * Set postcode
      *
      * @param string $postcode
+     * @return $this
      */
-    private function setPostcode($postcode)
+    public function setPostcode($postcode)
     {
         $this->postcode = $postcode;
+        return $this;
     }
 
     /**
@@ -189,10 +185,12 @@ class Address {
      * Set state
      *
      * @param string $state
+     * @return $this
      */
-    private function setState($state)
+    public function setState($state)
     {
         $this->state = $state;
+        return $this;
     }
 
     /**
@@ -209,10 +207,12 @@ class Address {
      * Set suburb
      *
      * @param string $suburb
+     * @return $this
      */
-    private function setSuburb($suburb)
+    public function setSuburb($suburb)
     {
         $this->suburb = $suburb;
+        return $this;
     }
 
     /**

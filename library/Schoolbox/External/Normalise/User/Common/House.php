@@ -9,6 +9,7 @@
  */
 
 namespace Schoolbox\External\Normalise\User\Common;
+use Schoolbox\External\Normalise\User\Staff;
 
 
 class House {
@@ -39,7 +40,7 @@ class House {
     /**
      * A housemaster is just another normalised user
      *
-     * @var Base
+     * @var Staff
      */
     private $housemaster = null;
 
@@ -52,21 +53,16 @@ class House {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $id
-     * @param $name
-     * @param $code
-     * @param $housemaster
-     * @param $boarder
      */
-    public function __construct($id, $name, $code, $housemaster, $boarder) {
-        $this->setId($id);
-        $this->setName($name);
-        $this->setCode($code);
-        $this->setHousemaster($housemaster);
-        $this->setBoarder($boarder);
+    public function __construct() {
+        $this->setup();
+    }
+
+    /**
+     * Hook method
+     */
+    protected function setup() {
+        $this->setHousemaster(new Staff());
     }
 
     /* Getters/Setters
@@ -76,10 +72,12 @@ class House {
      * Set code
      *
      * @param string $code
+     * @return $this
      */
-    private function setCode($code)
+    public function setCode($code)
     {
         $this->code = $code;
+        return $this;
     }
 
     /**
@@ -96,10 +94,12 @@ class House {
      * Set id
      *
      * @param string $id
+     * @return $this
      */
-    private function setId($id)
+    public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -116,10 +116,12 @@ class House {
      * Set name
      *
      * @param string $name
+     * @return $this
      */
-    private function setName($name)
+    public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -135,17 +137,19 @@ class House {
     /**
      * Set housemaster
      *
-     * @param \Schoolbox\External\Normalise\User\Base $housemaster
+     * @param Staff $housemaster
+     * @return $this
      */
-    private function setHousemaster($housemaster)
+    public function setHousemaster($housemaster)
     {
         $this->housemaster = $housemaster;
+        return $this;
     }
 
     /**
      * Get housemaster
      *
-     * @return \Schoolbox\External\Normalise\User\Base
+     * @return Staff
      */
     public function getHousemaster()
     {
@@ -156,10 +160,12 @@ class House {
      * Set boarder
      *
      * @param boolean $boarder
+     * @return $this
      */
-    private function setBoarder($boarder)
+    public function setBoarder($boarder)
     {
         $this->boarder = $boarder;
+        return $this;
     }
 
     /**

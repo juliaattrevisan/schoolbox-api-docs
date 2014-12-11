@@ -29,15 +29,8 @@ class Phone {
 
     /**
      * Constructor
-     *
-     * Immutable
-     *
-     * @param $number
-     * @param $silent
      */
-    public function __construct($number, $silent) {
-        $this->setNumber($number);
-        $this->setSilent($silent);
+    public function __construct() {
     }
 
     /* Getters/Setters
@@ -47,10 +40,12 @@ class Phone {
      * Set number
      *
      * @param string $number
+     * @return $this
      */
-    private function setNumber($number)
+    public function setNumber($number)
     {
         $this->number = $number;
+        return $this;
     }
 
     /**
@@ -67,10 +62,12 @@ class Phone {
      * Set silent
      *
      * @param boolean $silent
+     * @return $this
      */
-    private function setSilent($silent)
+    public function setSilent($silent)
     {
         $this->silent = $silent;
+        return $this;
     }
 
     /**

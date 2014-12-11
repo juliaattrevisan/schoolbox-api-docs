@@ -43,24 +43,13 @@ class Adapter {
         $allResults = $this->getHandler()->getStudentBoarderContactListExtended();
 
         foreach($allResults as $currentResult) {
-            new \Alaress_Probe($currentResult);
-
-            $guardianCollection = new \Schoolbox\Collection();
-
-            $guardian1 = new Guardian(
-                $currentResult['StudentContactId'],
-                $currentResult['StudentContactTitle'],
-                '',
-                $currentResult['StudentContactPreferred'],
-                $currentResult['StudentContactSurname'],
-                '',
-                '',
-                '',
-                new Common\Account(
-                    '',
-                    false
-                ),
-                new Common\Address(
+            $guardian1 = new Guardian();
+            $guardian1
+                ->setId($currentResult['StudentContactId'])
+                ->setTitle($currentResult['StudentContactTitle'])
+                ->setPreferredName($currentResult['StudentContactPreferred'])
+                ->setLastname($currentResult['StudentContactSurname'])
+                ->setPostalAddress(new Common\Address(
                     $currentResult['StudentContactAddress1'],
                     $currentResult['StudentContactAddress2'],
                     $currentResult['StudentContactAddress3'],
@@ -68,8 +57,8 @@ class Adapter {
                     $currentResult['StudentContactState'],
                     $currentResult['StudentContactPostCode'],
                     $currentResult['StudentContactCountryDesc']
-                ),
-                new Common\Address(
+                ))
+                ->setHomeAddress(new Common\Address(
                     $currentResult['StudentContactAddress1'],
                     $currentResult['StudentContactAddress2'],
                     $currentResult['StudentContactAddress3'],
@@ -77,118 +66,85 @@ class Adapter {
                     $currentResult['StudentContactState'],
                     $currentResult['StudentContactPostCode'],
                     $currentResult['StudentContactCountryDesc']
-                ),
-                $currentResult['StudentContactDefaultEmail'],
-                new Common\Phone(
+                ))
+                ->setEmail($currentResult['StudentContactDefaultEmail'])
+                ->setPhoneHome(new Common\Phone(
                     $currentResult['StudentContactPhoneActual'],
                     $currentResult['StudentContactSilentPhoneFlag']
-                ),
-                new Common\Phone(
+                ))
+                ->setPhoneMobile(new Common\Phone(
                     $currentResult['StudentContactPhoneMobile'],
                     false
-                ),
-                new Common\Phone(
+                ))
+                ->setPhoneWork(new Common\Phone(
                     $currentResult['StudentContactOccupPhone'],
                     false
-                ),
-                new Collection(),
-                $currentResult['PrimaryDirectoryIncludeFlag']
+                ))
+                ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag'])
             );
 
-            $guardian2 = new Guardian(
-                $currentResult['StudentContactSpouseId'],
-                $currentResult['StudentContactSpouseTitle'],
-                '',
-                $currentResult['StudentContactSpousePreferred'],
-                $currentResult['StudentContactSpouseSurname'],
-                '',
-                '',
-                '',
-                new Common\Account(
-                    '',
-                    false
-                ),
-                new Common\Address(
-                    $currentResult['StudentContactSpouseAddress1'],
-                    $currentResult['StudentContactSpouseAddress2'],
-                    $currentResult['StudentContactSpouseAddress3'],
-                    $currentResult['StudentContactSpouseSuburb'],
-                    $currentResult['StudentContactSpouseState'],
-                    $currentResult['StudentContactSpousePostCode'],
-                    $currentResult['StudentContactSpouseCountryDesc']
-                ),
-                new Common\Address(
-                    $currentResult['StudentContactSpouseAddress1'],
-                    $currentResult['StudentContactSpouseAddress2'],
-                    $currentResult['StudentContactSpouseAddress3'],
-                    $currentResult['StudentContactSpouseSuburb'],
-                    $currentResult['StudentContactSpouseState'],
-                    $currentResult['StudentContactSpousePostCode'],
-                    $currentResult['StudentContactSpouseCountryDesc']
-                ),
-                $currentResult['StudentContactSpouseDefaultEmail'],
-                new Common\Phone(
-                    $currentResult['StudentContactSpousePhoneActual'],
-                    false
-                ),
-                new Common\Phone(
-                    $currentResult['StudentContactSpousePhoneMobile'],
-                    false
-                ),
-                new Common\Phone(
-                    $currentResult['StudentContactSpouseOccupPhone'],
-                    false
-                ),
-                new Collection(),
-                $currentResult['SpouseDirectoryIncludeFlag']
+            $guardian2 = new Guardian();
+            $guardian2
+                ->setId($currentResult['StudentContactSpouseId'])
+                ->setTitle($currentResult['StudentContactSpouseTitle'])
+                ->setPreferredName($currentResult['StudentContactSpousePreferred'])
+                ->setLastname($currentResult['StudentContactSpouseSurname'])
+                ->setPostalAddress(new Common\Address(
+                        $currentResult['StudentContactSpouseAddress1'],
+                        $currentResult['StudentContactSpouseAddress2'],
+                        $currentResult['StudentContactSpouseAddress3'],
+                        $currentResult['StudentContactSpouseSuburb'],
+                        $currentResult['StudentContactSpouseState'],
+                        $currentResult['StudentContactSpousePostCode'],
+                        $currentResult['StudentContactSpouseCountryDesc']
+                    ))
+                ->setHomeAddress(new Common\Address(
+                        $currentResult['StudentContactSpouseAddress1'],
+                        $currentResult['StudentContactSpouseAddress2'],
+                        $currentResult['StudentContactSpouseAddress3'],
+                        $currentResult['StudentContactSpouseSuburb'],
+                        $currentResult['StudentContactSpouseState'],
+                        $currentResult['StudentContactSpousePostCode'],
+                        $currentResult['StudentContactSpouseCountryDesc']
+                    ))
+                ->setEmail($currentResult['StudentContactSpouseDefaultEmail'])
+                ->setPhoneHome(new Common\Phone(
+                        $currentResult['StudentContactSpousePhoneActual'],
+                        $currentResult['StudentContactSpouseSilentPhoneFlag']
+                    ))
+                ->setPhoneMobile(new Common\Phone(
+                        $currentResult['StudentContactSpousePhoneMobile'],
+                        false
+                    ))
+                ->setPhoneWork(new Common\Phone(
+                        $currentResult['StudentContactSpouseOccupPhone'],
+                        false
+                    ))
+                ->setPubliclyVisible($currentResult['SpouseDirectoryIncludeFlag'])
             );
 
-            $student = new Student(
-                $currentResult['StudentID'],
-                '',
-                $currentResult['StudentGiven1'],
-                $currentResult['StudentGiven1'],
-                $currentResult['StudentSurname'],
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                new Student\Year(
-                    $currentResult['StudentYearLevel'],
-                    new Staff()
-                ),
-                new Student\Form(
-                    '',
-                    new Staff()
-                ),
-                new Staff(),
-                new Common\House(
-                    '',
-                    $currentResult['StudentHouse'],
-                    '',
-                    new Staff(),
-                    false
-                ),
-                new Common\Account(),
-                new Common\Address(),
-                new Common\Address(),
-                '',
-                new Common\Phone(),
-                new Common\Phone(),
-                $guardianCollection,
-                false,
-                new \Schoolbox\Collection(),
-                false
-            );
+            /* Compile student record with known data
+             */
+            $student = new Student();
+            $student
+                ->setId($currentResult['StudentID'])
+                ->setGivenName($currentResult['StudentGiven1'])
+                ->setPreferredName($currentResult['StudentGiven1'])
+                ->setLastname($currentResult['StudentSurname']);
+
+            /* Relations
+             */
+            $student->getYear()->setLevel($currentResult['StudentYearLevel']);
+            $student->getHouse()->setName($currentResult['StudentHouse']);
+
+            /* Parents/Guardians
+             */
+            $student->getGuardians()->add($guardian1);
+            $student->getGuardians()->add($guardian2);
 
             /* Stack it up
              */
             $collection->add($student);
-
-            // TODO: Populate nice objects with crappy array data
         }
 
         return $collection;
