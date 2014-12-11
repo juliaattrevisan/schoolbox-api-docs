@@ -120,6 +120,13 @@ abstract class Base {
      */
     protected $phoneMobile = '';
 
+    /**
+     * A collection of Common\Campus instances
+     *
+     * @var \Schoolbox\Collection
+     */
+    protected $campus = null;
+
     /* Publicity
      */
 
