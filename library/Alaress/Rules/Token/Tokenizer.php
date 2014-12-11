@@ -7,10 +7,29 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Rules;
+namespace Alaress\Rules\Token;
 
 
 abstract class Tokenizer {
+
+    /** @var Token[] */
+    protected $tokens;
+
+    /**
+     */
+    public function __construct()
+    {
+        $this->tokens = array();
+    }
+
+
+    /**
+     * @return Token[]
+     */
+    public function getTokens()
+    {
+        return array_values($this->tokens);
+    }
 
     /**
      * @param array $settings
@@ -27,6 +46,17 @@ abstract class Tokenizer {
         return $settings;
     }
 
+
+    /**
+     * @param Token $token
+     * @return self
+     */
+    protected function addToken($token)
+    {
+        // index by token
+        $this->tokens[strtolower($token->getToken())] = $token;
+        return $this;
+    }
 
     /**
      * @param array  $settings
@@ -62,6 +92,14 @@ abstract class Tokenizer {
      * @param array  $settings
      * @return string
      */
-    protected abstract function renderToken($token, $input, $settings);
+    protected function renderToken($token, $input, $settings)
+    {
+        $token = strtolower($token);
+        if (empty($this->tokens[$token])) {
+            // TODO should this throw an OOB?
+            return '';
+        }
+        return $this->tokens[$token]->apply($input, $settings);
+    }
 
 }
