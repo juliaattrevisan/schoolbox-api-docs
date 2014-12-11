@@ -45,7 +45,6 @@ class Type {
      * Hook method
      */
     protected function setup() {
-        $this->setType(new Type());
         $this->setPosition(new Position());
     }
 
@@ -99,7 +98,7 @@ class Type {
     /**
      * Set type
      *
-     * @param Type $type
+     * @param string $type
      * @return $this
      */
     private function setType($type)
@@ -111,7 +110,7 @@ class Type {
     /**
      * Get type
      *
-     * @return Type
+     * @return string
      */
     public function getType()
     {
