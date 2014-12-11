@@ -162,17 +162,17 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->parseConfig();
 
         // <!-- BEGIN blockages -->
-        $this->setBlock($templateHandle,   'emptyList',       'emptyList_block');
-        $this->setBlock($templateHandle,   'awardList',       'awardList_block');
-        $this->setBlock('awardList',       'award',           'award_block');
-        $this->setBlock('award',           'awardLine',       'awardLine_block');
-        $this->setBlock($templateHandle,   'detentionList',   'detentionList_block');
-        $this->setBlock('detentionList',   'detention',       'detention_block');
-        $this->setBlock('detention',       'detentionLine',   'detentionLine_block');
-        $this->setBlock($templateHandle,   'absenceList',     'absenceList_block');
-        $this->setBlock('absenceList',     'absence',         'absence_block');
-        $this->setBlock($templateHandle,   'lateArrivalList', 'lateArrivalList_block');
-        $this->setBlock('lateArrivalList', 'lateArrival',     'lateArrival_block');
+        $this->setBlock($templateHandle, 'emptyList', 'emptyList_block');
+        $this->setBlock($templateHandle, 'awardList', 'awardList_block');
+        $this->setBlock('awardList', 'award', 'award_block');
+        $this->setBlock('award', 'awardLine', 'awardLine_block');
+        $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
+        $this->setBlock('detentionList', 'detention', 'detention_block');
+        $this->setBlock('detention', 'detentionLine', 'detentionLine_block');
+        $this->setBlock($templateHandle, 'absenceList', 'absenceList_block');
+        $this->setBlock('absenceList', 'absence', 'absence_block');
+        $this->setBlock($templateHandle, 'lateArrivalList', 'lateArrivalList_block');
+        $this->setBlock('lateArrivalList', 'lateArrival', 'lateArrival_block');
         // <!-- END blockages -->
 
         // {VARIABLES}
