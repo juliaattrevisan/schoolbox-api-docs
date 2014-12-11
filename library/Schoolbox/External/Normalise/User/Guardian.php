@@ -11,6 +11,9 @@
  */
 
 namespace Schoolbox\External\Normalise\User;
+use Schoolbox\External\Normalise\User\Common\Account;
+use Schoolbox\External\Normalise\User\Common\Address;
+use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\Collection;
 
 class Guardian extends Base {
@@ -21,7 +24,7 @@ class Guardian extends Base {
     /**
      * Work phone
      *
-     * @var \Schoolbox\External\Normalise\User\Common\Phone
+     * @var Phone
      */
     protected $phoneWork = '';
 
@@ -38,13 +41,13 @@ class Guardian extends Base {
      * @param $gender
      * @param $dob
      * @param $portrait
-     * @param Common\Account $account
-     * @param Common\Address $postalAddress
-     * @param Common\Address $homeAddress
+     * @param Account $account
+     * @param Address $postalAddress
+     * @param Address $homeAddress
      * @param $email
-     * @param Common\Phone $phoneHome
-     * @param Common\Phone $phoneMobile
-     * @param Common\Phone $phoneWork
+     * @param Phone $phoneHome
+     * @param Phone $phoneMobile
+     * @param Phone $phoneWork
      * @param Collection $campus
      * @param $publiclyVisible
      */
@@ -57,13 +60,13 @@ class Guardian extends Base {
         $gender,
         $dob,
         $portrait,
-        Common\Account $account,
-        Common\Address $postalAddress,
-        Common\Address $homeAddress,
+        Account $account,
+        Address $postalAddress,
+        Address $homeAddress,
         $email,
-        Common\Phone $phoneHome,
-        Common\Phone $phoneMobile,
-        Common\Phone $phoneWork,
+        Phone $phoneHome,
+        Phone $phoneMobile,
+        Phone $phoneWork,
         Collection $campus,
         $publiclyVisible
     ) {
@@ -92,7 +95,7 @@ class Guardian extends Base {
     /**
      * Set phone work
      *
-     * @param \Schoolbox\External\Normalise\User\Common\Phone $phoneWork
+     * @param Phone $phoneWork
      */
     protected function setPhoneWork($phoneWork)
     {
@@ -102,7 +105,7 @@ class Guardian extends Base {
     /**
      * Get phone work
      *
-     * @return \Schoolbox\External\Normalise\User\Common\Phone
+     * @return \Phone
      */
     public function getPhoneWork()
     {
