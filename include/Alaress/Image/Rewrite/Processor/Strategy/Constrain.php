@@ -16,7 +16,6 @@
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
 use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
 
 class Constrain extends BaseStrategy implements StrategyInterface
 {
@@ -29,15 +28,6 @@ class Constrain extends BaseStrategy implements StrategyInterface
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
-
-        /* Create canvas at specified dimensions
-         */
-        $manager = new ImageManager();
-        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
-
-        /* Apply background color
-         */
-        $this->applyBackgroundColor($args['bgcolor']);
     }
 
     /**

@@ -17,7 +17,6 @@
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
 use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
 
 class Placement extends BaseStrategy implements StrategyInterface
 {
@@ -43,16 +42,7 @@ class Placement extends BaseStrategy implements StrategyInterface
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
         $this->setPosition($args['position']);
-
-        /* Create canvas at specified dimensions
-         */
-        $manager = new ImageManager();
-        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
-
-        /* Apply background color
-         */
         $this->setBgColors($args['bgcolor']);
-        $this->applyBackgroundColor($args['bgcolor']);
     }
 
     /**

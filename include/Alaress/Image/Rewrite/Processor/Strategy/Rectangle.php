@@ -46,15 +46,15 @@ class Rectangle extends BaseStrategy implements StrategyInterface
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
 
-        /* Create canvas at specified dimensions
-         */
-        $manager = new ImageManager();
-        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
+//        /* Create canvas at specified dimensions
+//         */
+//        $manager = new ImageManager();
+//        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
 
         /* Apply background color
          */
         $this->setBgColors($args['bgcolor']);
-        $this->applyBackgroundColor($args['bgcolor']);
+//        $this->applyBackgroundColor($args['bgcolor']);
 
         $this->setSmallImageUpscales($args['smallImageUpscales']);
     }
