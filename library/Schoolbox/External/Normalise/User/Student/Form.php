@@ -25,6 +25,13 @@ class Form {
     protected $level = -1;
 
     /**
+     * Some kind of textual description
+     *
+     * @var string
+     */
+    protected $description = '';
+
+    /**
      * Form teacher/Staff member in charge
      *
      * @var Staff
@@ -90,5 +97,25 @@ class Form {
     public function getLevel()
     {
         return $this->level;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 }
