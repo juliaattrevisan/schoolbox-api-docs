@@ -67,7 +67,7 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     public function save(Image $image, $filename)
     {
-        $image->save($filename);
+        file_put_contents($filename, $image->encode());
     }
 
     protected function outputHeaders()
