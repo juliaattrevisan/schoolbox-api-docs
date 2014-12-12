@@ -25,7 +25,7 @@ class Alaress_Image_Processor_Abstract {
 
 	/* Strategies for polymorphic image output
 	 */
-	protected $filetypeStrategyPrefix = 'Alaress_Image_Filetype_';
+	protected $filetypeStrategyPrefix = 'Alaress\\Image\\Rewrite\\Filetype\\';
 
 	/**
 	 * @var Alaress_Image_Filetype_Interface
