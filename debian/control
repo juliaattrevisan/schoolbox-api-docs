@@ -12,7 +12,7 @@ Package: schoolbox
 Architecture: all
 Depends: apache2-mpm-prefork, libapache2-mod-php5,
  php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
- php-pear, php-apc,
+ php-pear, php-apc, php5-imagick,
  mysql-client, mysql-server,
  freetds-common,
  wget,
