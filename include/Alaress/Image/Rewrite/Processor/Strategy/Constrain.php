@@ -35,7 +35,13 @@ class Constrain extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-        return $image->resize($image->getWidth(), $image->getHeight());
+        return $image->resize(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight(),
+            function ($constraint) {
+                $constraint->aspectRatio();
+            }
+        );
 //
 //        /* Figure out resized dimensions
 //        */
