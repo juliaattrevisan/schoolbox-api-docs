@@ -18,11 +18,14 @@ class Collection implements ICollection, JsonSerializable {
 	protected $stack = array();
 	protected $position = 0;
 
-	/**
-	 * @param $element
-	 */
+    /**
+     * @param $element
+     * @return $this
+     */
 	public function add($element) {
 		$this->stack[] = $element;
+
+        return $this;
 	}
 
 	/**
