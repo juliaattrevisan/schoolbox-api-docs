@@ -11,60 +11,9 @@ namespace Alaress\Image\Rewrite\Filetype;
 
 class Gif extends BaseFiletype
 {
-
-    /**
-     * Create an image
-     *
-     * @param $filename
-     * @return resource
-     */
-    public function loadImageResource($filename)
+    protected function outputSpecificHeaders()
     {
-        //
-        // Sadly silence operator is needed for all imagecreatefrom* methods,
-        // otherwise error output corrupts image output.
-        return @imagecreatefromgif($filename);
-    }
-
-    /**
-     * Save image to file system
-     *
-     * @param $image
-     * @param $filename
-     */
-    public function save($image, $filename)
-    {
-        imagegif($image, $filename);
-    }
-
-
-    private function outputHeaders()
-    {
-        header('Cache-Control: max-age=10800, private');
-        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-        header('Pragma: private');
         header('Content-type: image/gif');
-    }
-
-    /**
-     * Stream image to browser directly
-     *
-     * @param $image
-     */
-    public function stream($image)
-    {
-        $this->outputHeaders();
-        imagegif($image);
-        exit;
-    }
-
-    public function streamFile($filename)
-    {
-        $this->outputHeaders();
-        header('Content-length: ' . filesize($filename));
-        header('Last-Modified: ' . date('r', filemtime($filename)));
-        readfile($filename);
-        exit;
     }
 
     /**
