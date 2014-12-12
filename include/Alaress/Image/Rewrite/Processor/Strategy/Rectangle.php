@@ -93,7 +93,9 @@ class Rectangle extends BaseStrategy implements StrategyInterface
         return $image->resizeCanvas(
             $this->getCanvasWidth(),
             $this->getCanvasHeight(),
-            'center'
+            'center',
+            false,
+            $this->translateColorArray($this->getBgColors())
         );
     }
 
