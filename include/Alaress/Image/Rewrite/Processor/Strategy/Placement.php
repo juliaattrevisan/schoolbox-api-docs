@@ -80,62 +80,6 @@ class Placement extends BaseStrategy implements StrategyInterface
                 return $position;
         }
     }
-//
-//    /**
-//    * Figure out where the image resampling starts and ends, on the canvas
-//    *
-//    * @param $resizedWidth
-//    * @param $resizedHeight
-//    * @return array
-//    */
-//    private function determinePositioning($resizedWidth, $resizedHeight)
-//    {
-//
-//        /* Top row
-//         */
-//        if ($this->getPosition() == 'topleft') {
-//            $dst_x = 0;
-//            $dst_y = 0;
-//        }         elseif ($this->getPosition() == 'top') {
-//            $dst_x = floor(($this->getCanvasWidth() - $resizedWidth)/2);
-//            $dst_y = 0;
-//        } elseif ($this->getPosition() == 'topright') {
-//            $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
-//            $dst_y = 0;
-//        } /* Middle row
-//         */
-//        elseif ($this->getPosition() == 'left') {
-//            $dst_x = 0;
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight)/2);
-//        } elseif ($this->getPosition() == 'middle') {
-//            $dst_x = floor(($this->getCanvasWidth() - $resizedWidth)/2);
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight)/2);
-//        } elseif ($this->getPosition() == 'right') {
-//            $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight)/2);
-//        } /* Bottom row
-//         */
-//        elseif ($this->getPosition() == 'bottomleft') {
-//            $dst_x = 0;
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight));
-//        } elseif ($this->getPosition() == 'bottom') {
-//            $dst_x = floor(($this->getCanvasWidth() - $resizedWidth)/2);
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight));
-//        } elseif ($this->getPosition() == 'bottomright') {
-//            $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
-//            $dst_y = floor(($this->getCanvasHeight() - $resizedHeight));
-//        } /* Default
-//         */
-//        else {
-//            $dst_x = 0;
-//            $dst_y = 0;
-//        }
-//
-//        return array(
-//            'dst_x' => $dst_x,
-//            'dst_y' => $dst_y
-//        );
-//    }
 
     /* Getters/Setters
      */
