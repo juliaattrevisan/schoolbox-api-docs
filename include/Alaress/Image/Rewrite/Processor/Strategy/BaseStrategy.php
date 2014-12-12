@@ -38,21 +38,29 @@ abstract class BaseStrategy implements StrategyInterface
     * otherwise use generic old white
     *
     * @param $bgColorArray
-    * @return int
     */
     protected function applyBackgroundColor($bgColorArray)
     {
+        $this->getCanvas()->fill($this->translateColorArray($bgColorArray));
+    }
+
+    /**
+     * Translates color array to a hex string, otherwise returns white
+     *
+     * @param  array  $bgColorArray
+     * @return string
+     */
+    protected function translateColorArray($bgColorArray)
+    {
         if (is_array($bgColorArray)) {
-            $bgColor = sprintf(
+            return sprintf(
                 '#%02x%02x%02x',
                 min(255, max(0, $bgColorArray['red'])),
                 min(255, max(0, $bgColorArray['green'])),
                 min(255, max(0, $bgColorArray['blue']))
             );
-        } else {
-            $bgColor = '#ffffff';
         }
-        $this->getCanvas()->fill($bgColor);
+        return '#ffffff';
     }
 
     /**
