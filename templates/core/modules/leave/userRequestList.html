@@ -1,8 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
-    $j(function () {
-        $j("#pendingRequestList").tablesorter({
+    $(function () {
+        $("#pendingRequestList").tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
             cssDesc:'descending',
@@ -12,7 +12,7 @@
             }
         });
 
-        $j("#previousRequestList").tablesorter({
+        $("#previousRequestList").tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
             cssDesc:'descending',
@@ -21,8 +21,8 @@
             }
         });
 
-        $j("#pendingRequestList, #previousRequestList").bind('sortEnd', function () {
-            var requestList = $j(this);
+        $("#pendingRequestList, #previousRequestList").bind('sortEnd', function () {
+            var requestList = $(this);
 
             requestList.find('tbody tr').removeClass('dark');
             requestList.find('tbody tr:even').addClass('dark');

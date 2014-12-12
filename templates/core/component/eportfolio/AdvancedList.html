@@ -1,40 +1,40 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<script type='text/javascript'>
-		$j(function() {
-			$j('a.modify_advanced').click(function() {
-				var id = $j(this).attr('rel');
+		$(function() {
+			$('a.modify_advanced').click(function() {
+				var id = $(this).attr('rel');
 
 				/* Show editor form
 				 */
-				$j('#modify_advanced_form_' + id).show();
-				$j('#modify_advanced_form_' + id).find('.firstFocus').focus();
+				$('#modify_advanced_form_' + id).show();
+				$('#modify_advanced_form_' + id).find('.firstFocus').focus();
 
 				/* Hide actual content
 				 */
-				$j('#list_item_advanced_content_' + id).hide();
+				$('#list_item_advanced_content_' + id).hide();
 			});
 
             /* Create button, swap form in
              */
-            $j('a.create_advanced').click(function(event) {
+            $('a.create_advanced').click(function(event) {
 				event.preventDefault();
 
-                $j(this).hide();
-                $j(this).parent().next('.editPanelImitation').show();
+                $(this).hide();
+                $(this).parent().next('.editPanelImitation').show();
             });
 
 			/* Close button
 			 */
-			$j('a.modify_advanced_close').click(function() {
-				var id = $j(this).attr('rel');
+			$('a.modify_advanced_close').click(function() {
+				var id = $(this).attr('rel');
 
 				/* Show actual content
 				 */
-				$j('#list_item_advanced_content_' + id).show();
+				$('#list_item_advanced_content_' + id).show();
 
 				/* Hide editor form
 				 */
-				$j('#modify_advanced_form_' + id).hide();
+				$('#modify_advanced_form_' + id).hide();
 			});
 		});
 	</script>

@@ -9,8 +9,8 @@
     <script type="text/javascript">
     function validatePoll () {
         var valid = false;
-        $j('input.pollOption').each(function () {
-            if ($j(this).prop('checked'))
+        $('input.pollOption').each(function () {
+            if ($(this).prop('checked'))
                 valid = true;
         });
         if (valid)
@@ -36,8 +36,8 @@
     <!-- END poll_vote -->
     <!-- BEGIN poll_chart -->
     <script type='text/javascript'>
-    $j(function() {
-        $j.plot($j("#poll-graph{POLL_ID}"),
+    $(function() {
+        $.plot($("#poll-graph{POLL_ID}"),
             [
                 <!-- BEGIN poll_responses -->
                 {

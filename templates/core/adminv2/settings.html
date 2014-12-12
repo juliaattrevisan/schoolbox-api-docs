@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$j(function() {
+	$(function() {
     var settings = $('#settings');
 
 		$.fn.alaressTiny({
@@ -12,9 +12,9 @@
 			editor_selector: "mceEditor"
 		});
 
-		$j('label span').each(function() {
-			var activeContent = $j(this).siblings('em').html();
-			$j(this).qtip({
+		$('label span').each(function() {
+			var activeContent = $(this).siblings('em').html();
+			$(this).qtip({
 				content: activeContent,
 				style: {
 					classes: 'qtip-green qtip-shadow'
@@ -31,7 +31,7 @@
 		// Homepage selector and its event
         settings.on('click', ':button[data-interaction="homepage_selector"]', function() {
 
-        $j('#resource-browser').socialstreamBrowser({
+        $('#resource-browser').socialstreamBrowser({
             title: 'Choose a folder',
             mimeFilter: false,
             categoryId: 0,
@@ -46,14 +46,14 @@
     /* Force submission of checkboxes regardless of whether they are ticked
      * or not.
      */
-    $j('input[type=checkbox]').change(function() {
-        var name = 'input[name=' + $j(this).attr('name') + ']';
+    $('input[type=checkbox]').change(function() {
+        var name = 'input[name=' + $(this).attr('name') + ']';
 
-        if ($j(this).val() == 0) {
-            $j(name).val(1);
+        if ($(this).val() == 0) {
+            $(name).val(1);
         }
         else {
-            $j(name).val(0);
+            $(name).val(0);
         }
     });
 

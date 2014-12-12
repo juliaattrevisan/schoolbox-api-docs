@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-	$j(function () {
-		$j('#startDate, #finishDate').datepicker({
+	$(function () {
+		$('#startDate, #finishDate').datepicker({
 			dateFormat:'dd/mm/yy',
 			showOn:'both',
 			buttonImage:'/images/core/calendar/calendar-click.png',
@@ -9,21 +9,21 @@
 			constrainInput:false,
 			minDate:new Date(),
 			onClose:function (string) {
-				var input = $j(this);
+				var input = $(this);
 
-				$j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+				$.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
 					input.val(data.time);
 				})
 			}
 		});
 
-		$j('#requesthostType').change(function () {
-			if (($j(this).val() == '4') && $j('#hostDetails').is(':visible')) {
-				$j('#hostDetails').slideUp();
-				$j('#hostDetails input').removeClass('required');
+		$('#requesthostType').change(function () {
+			if (($(this).val() == '4') && $('#hostDetails').is(':visible')) {
+				$('#hostDetails').slideUp();
+				$('#hostDetails input').removeClass('required');
 			} else {
-				$j('#hostDetails').slideDown();
-				$j('#hostDetails input').addClass('required');
+				$('#hostDetails').slideDown();
+				$('#hostDetails input').addClass('required');
 			}
 		});
 	});

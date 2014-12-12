@@ -2,8 +2,8 @@
 <script language="javascript" type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 
-$j(function() {
-	$j('#form').validate({
+$(function() {
+	$('#form').validate({
 		rules: {
 			url: {
 				isURL:true
@@ -13,14 +13,14 @@ $j(function() {
 
 	/* Dropdown inline editor for rows
 	 */
-	$j(document).on('click', '.modify', function(event) {
+	$(document).on('click', '.modify', function(event) {
 		event.preventDefault();
-		$j(this).closest('.row-holder').siblings('.row-holder').show();
-		$j(this).closest('.row-holder').hide();
+		$(this).closest('.row-holder').siblings('.row-holder').show();
+		$(this).closest('.row-holder').hide();
 		// Disable any form inputs in other rows, enable ones in this row
-		$j(this).closest('.row-holder').siblings('.form-holder').hide()
+		$(this).closest('.row-holder').siblings('.form-holder').hide()
 				.find(':input').prop('disabled', true);
-		$j(this).closest('.row-holder').next('.form-holder').show()
+		$(this).closest('.row-holder').next('.form-holder').show()
 				.find(':input').prop('disabled', false);
 	});
 });

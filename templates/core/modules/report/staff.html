@@ -3,11 +3,11 @@
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
 
-        $j('.small-image').each(function () {
-            var largerImage = $j(this).siblings('.larger-image').html()
-            $j(this).qtip({
+        $('.small-image').each(function () {
+            var largerImage = $(this).siblings('.larger-image').html()
+            $(this).qtip({
                 content:largerImage,
                 style: {
                     classes: 'qtip-light qtip-shadow qtip-rounded',
@@ -20,12 +20,12 @@
             });
         });
 
-        $j('.print').click(function () {
+        $('.print').click(function () {
             window.print();
             return false;
         });
 
-        $j('.sort-it').tablesorter({
+        $('.sort-it').tablesorter({
             headers:{
                 0:{sorter:false},
                 1:{sorter:false},

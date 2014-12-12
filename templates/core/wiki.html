@@ -2,24 +2,24 @@
 
 <script type="text/javascript">
 
-$j(function() {
-    $j('.left').css('width','100%');
-    $j('.right').hide();
+$(function() {
+    $('.left').css('width','100%');
+    $('.right').hide();
 
-    $j('.update').click(function(evt) {
+    $('.update').click(function(evt) {
 
-        if (!$j(this).hasClass('open')) {
-            $j(this).addClass('open');
-            $j('.left').stop().animate({'width':"69.5%"},function() {
-                $j('.right').stop().fadeIn();
-                $j('.update').html('<span></span>Hide Revisions');
+        if (!$(this).hasClass('open')) {
+            $(this).addClass('open');
+            $('.left').stop().animate({'width':"69.5%"},function() {
+                $('.right').stop().fadeIn();
+                $('.update').html('<span></span>Hide Revisions');
             });
 
         } else {
-            $j(this).removeClass('open');
-            $j('.right').stop().fadeOut(function() {
-                $j('.left').stop().animate({'width':"100%"});
-                $j('.update').html('<span></span>View Revisions');
+            $(this).removeClass('open');
+            $('.right').stop().fadeOut(function() {
+                $('.left').stop().animate({'width':"100%"});
+                $('.update').html('<span></span>View Revisions');
             });
 
         }

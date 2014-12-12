@@ -2,37 +2,37 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script language="JavaScript" type="text/javascript">
-$j(function() {
+$(function() {
 	$.fn.alaressTiny({
 		mode: 'textareas',
 		file_browser_category_id : {CATEGORY_ID}
 	});
 
-	$j('#newsForm').validate();
+	$('#newsForm').validate();
 
-    $j('#datetime_published, #datetime_expires').datepicker({
+    $('#datetime_published, #datetime_expires').datepicker({
         dateFormat: 'dd/mm/yy',
         showOn: 'both',
         buttonImage: '/images/core/calendar/calendar-click.png',
         buttonImageOnly: true,
         constrainInput: false,
         onClose: function (string) {
-            var input = $j(this);
+            var input = $(this);
 
-            $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+            $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
                 input.val(data.time);
             })
         }
     });
 
-    $j('.customise').click(function(event) {
+    $('.customise').click(function(event) {
         event.preventDefault();
-        $j(this).children('span').toggle();
-        $j('.advanced').toggle();
-        if ($j('.advanced').is(':visible')) {
-            $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+        $(this).children('span').toggle();
+        $('.advanced').toggle();
+        if ($('.advanced').is(':visible')) {
+            $('.advanced').children('td').delay(1000).animate({opacity:'1'});
         } else {
-             $j('.advanced').queue('fx', []);
+             $('.advanced').queue('fx', []);
         }
     });
 });

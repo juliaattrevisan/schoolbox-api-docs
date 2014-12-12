@@ -3,30 +3,30 @@
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type='text/javascript'>
-    $j(function () {
-        $j('#deleteButton').click(function (event) {
-            var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
+    $(function () {
+        $('#deleteButton').click(function (event) {
+            var allQuestions = $('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
             if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-                $j.post('/assess/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function (response) {
+                $.post('/assess/questionbank/removeQuestion', $('#questionBankForm').serialize(), function (response) {
                     alert(response);
                     location.reload();
                 });
             }
             event.preventDefault();
-            $j(this).confirmDialog();
+            $(this).confirmDialog();
         });
 
-        $j('a.delete').click(function (event) {
+        $('a.delete').click(function (event) {
             event.preventDefault();
-            $j(this).confirmDialog();
+            $(this).confirmDialog();
         });
 
-        $j('input[type=checkbox]').click(function () {
-            $j(this).closest('.question').toggleClass('checked')
+        $('input[type=checkbox]').click(function () {
+            $(this).closest('.question').toggleClass('checked')
         })
 
-        $j("#categoryTree")
+        $("#categoryTree")
                 .on('ready.jstree', function (event, jstree) {
                     var openNodes = [
                         {SELECTED_NODES}
@@ -44,7 +44,7 @@
                     location.href = this.href
                 })
                 .on('move_node.jstree', function (e, data) {
-                    $j.ajax({
+                    $.ajax({
                         url: '/assess/questionbank/move.php',
                         data: {
                             position: data.position,
@@ -89,7 +89,7 @@
             $('#subcategoryForm').dialog("open");
         });
 
-        $j('#subcategoryForm').validate();
+        $('#subcategoryForm').validate();
 
         $('[data-show-answer-content="true"]').click(function(event) {
             $(this).parents('tr').find('[data-answer-content="true"]').slideToggle();

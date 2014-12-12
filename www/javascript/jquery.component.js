@@ -7,12 +7,12 @@ setupCustomise = {
 
 	emptyColumnCheck: function(target) {
 		for (i=0; i < target.length; i++ ) {
-			var column = $j(target[i]);
+			var column = $(target[i]);
 			if (column.find('.box').length == 0) {
 				column.addClass('empty-column');
-				if ($j('#tabs-homepage').is(':visible')) {
-					$j('.empty-column').each(function() {
-						$j(this).show();
+				if ($('#tabs-homepage').is(':visible')) {
+					$('.empty-column').each(function() {
+						$(this).show();
 					})
 				}
 				column.html('<p class="placeholder">You can drag components into this space.</p>');
@@ -31,8 +31,8 @@ setupCustomise = {
 		 *
          */
 		init: function() {
-			$j('#tabs-homepage').tabs();
-			$j('#tabs-sub').tabs();
+			$('#tabs-homepage').tabs();
+			$('#tabs-sub').tabs();
 //			$j('.customise').click(function(event) {
 //				$j('#tabs-homepage, .empty-column').slideToggle();
 //				$j(this).children('span').toggle();
@@ -43,7 +43,7 @@ setupCustomise = {
 //			});
 
 			// Component and column buttons
-			var buttons = $j('.homepage-controls .btn');
+			var buttons = $('.homepage-controls .btn');
 			buttons.click(function(event) {
 				event.preventDefault;
 				var openMe = true;
@@ -71,8 +71,8 @@ setupCustomise = {
 		 * Allows for control of the components in the customise dropdown.
 		 */
 		components: function() {
-			$j('.add-component strong').each(function() {
-				var howManyInstances = $j(this).children('em').html();
+			$('.add-component strong').each(function() {
+				var howManyInstances = $(this).children('em').html();
 				if (howManyInstances == 0) {
 					howManyInstances = '<strong>no</strong> instances '
 				} else if (howManyInstances == 1)  {
@@ -81,7 +81,7 @@ setupCustomise = {
 					howManyInstances = '<strong>' + howManyInstances + '</strong> instances '
 				}
 
-                $j(this).qtip({
+                $(this).qtip({
                     content: 'You have '+ howManyInstances +'of this component currently active',
                     style: {
                         classes: 'qtip-green qtip-shadow qtip-rounded'
@@ -94,13 +94,13 @@ setupCustomise = {
             });
 
 
-			$j(document).on('click', ".add-component a", function(event) {
+			$(document).on('click', ".add-component a", function(event) {
 				event.preventDefault();
-				var $this = $j(this);
+				var $this = $(this);
 
 				/* Polymorphic key
 				 */
-				var rel = $j(this).attr('rel').split(' ');
+				var rel = $(this).attr('rel').split(' ');
 
 				/* In eportfolio it sends as a pair: definitionId and componentInstanceId
 				 */
@@ -118,14 +118,14 @@ setupCustomise = {
 
 				data[setupCustomise.key] = setupCustomise.id;
 
-				$j.ajax({
+				$.ajax({
 				 type: "POST",
 					url: setupCustomise.ajaxURL,
 					data: data,
 					success: function(data){
-						$j(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')/*, $j('div.bottom')*/]);
-							$j(this).animate({opacity:1}, 300);
+						$(data).hide().prependTo('#container .left').css('opacity','0').slideDown(400,function(){
+							setupCustomise.emptyColumnCheck([$('div.top'), $('div.right'), $('div.left')/*, $j('div.bottom')*/]);
+							$(this).animate({opacity:1}, 300);
 							/*
 							* When a new component is added in we need it to
 							* be able to get the colours that have been changed before
@@ -134,31 +134,31 @@ setupCustomise = {
 							* 2. "add" is clicked on any component
 							* 3. Apply the colour change to this new component's DOM elements.
 							* */
-							var newComponent = $j(this);
+							var newComponent = $(this);
 
 							newComponent.find('h2').css({
-								'background-color': $j('#left_head_bg').css('background-color'),
-								'color': $j('#left_head_font').css('background-color')
+								'background-color': $('#left_head_bg').css('background-color'),
+								'color': $('#left_head_font').css('background-color')
 							});
 
 							newComponent.find('.text, .listing').css({
-								'background-color': $j('#left_bg_primary').css('background-color')
+								'background-color': $('#left_bg_primary').css('background-color')
 							});
 
 							newComponent.css({
-								'color': $j('#left_font').css('background-color')
+								'color': $('#left_font').css('background-color')
 							});
 
 							newComponent.find('p').css({
-								'color': $j('#left_font').css('background-color')
+								'color': $('#left_font').css('background-color')
 							});
 
 							newComponent.find('.dark').css({
-								'background-color' : $j('#left_bg_secondary').css('background-color')
+								'background-color' : $('#left_bg_secondary').css('background-color')
 							});
 
 							newComponent.find('a').css({
-								'color' : $j('#left_link').css('background-color')
+								'color' : $('#left_link').css('background-color')
 							});
 
 						});
@@ -168,7 +168,7 @@ setupCustomise = {
 
 				if($this.parent().hasClass('one-only')) {
 					$this.parent().addClass('disabled');
-				} else if ($j('.how-many').html() == '') {
+				} else if ($('.how-many').html() == '') {
 					//if there are no modules but you can add one
 					$this.siblings('.how-many').append('You already have <em>1</em>');
 				} else {
@@ -180,7 +180,7 @@ setupCustomise = {
 
 				if (!$this.siblings('.notification').is(':visible')) {
 					$this.siblings('.notification').fadeIn(200, function() {
-						$j(this).delay(2000).fadeOut();
+						$(this).delay(2000).fadeOut();
 					});
 				}
 
@@ -192,7 +192,7 @@ setupCustomise = {
 
 		colours: function() {
 			// Each colorpicker can represent colors for multiple sections.
-			$j('input[data-colorpicker]').spectrum({
+			$('input[data-colorpicker]').spectrum({
 				showPalette: false,
 				showSelectionPalette: false,
 				showButtons: false,
@@ -225,10 +225,10 @@ setupCustomise = {
 				}
 			}
 
-			$j('#restore').click(function() {
+			$('#restore').click(function() {
 				resetColours(['.top', '.left' ,'.right'], defaults);
 				// copy values from defaults into pickers
-				pickers = $j.extend({}, pickers, defaults);
+				pickers = $.extend({}, pickers, defaults);
 				self.loadColorpickerColors();
 			});
 
@@ -236,29 +236,29 @@ setupCustomise = {
 
 				colours = colours || defaults;
 
-				$j.each(area, function(index, value) {
+				$.each(area, function(index, value) {
 
 					var areaClass = value,
 					areaVariable = value.substr(1);
 
-					$j(areaClass).find('h2').css({
+					$(areaClass).find('h2').css({
 						"color": colours[areaVariable+'_head_font'],
 						"background-color": colours[areaVariable+'_head_bg']
 					});
 
-					$j(areaClass).find('p, h3, .listing p.small').css({
+					$(areaClass).find('p, h3, .listing p.small').css({
 						"color": colours[areaVariable+'_font']
 					});
 
-					$j(areaClass).find('a, .listing p.small a').css({
+					$(areaClass).find('a, .listing p.small a').css({
 						'color': colours[areaVariable+'_link']
 					});
 
-					$j(areaClass).find('.text, .listing').css({
+					$(areaClass).find('.text, .listing').css({
 						'background': colours[areaVariable+'_bg_primary']
 					});
 
-					$j(areaClass).find('.dark').css({
+					$(areaClass).find('.dark').css({
 						'background':  colours[areaVariable+'_bg_secondary']
 					});
 
@@ -266,39 +266,39 @@ setupCustomise = {
 				return false;
 			}
 
-			$j('#cancel').click(function() {
+			$('#cancel').click(function() {
 				resetColours(['.top', '.left' ,'.right'], original);
 				// copy values from original into pickers
-				pickers = $j.extend({}, pickers, original);
+				pickers = $.extend({}, pickers, original);
 				self.loadColorpickerColors();
 			});
 
 
-			$j('#saveColour').click(function () {
+			$('#saveColour').click(function () {
 				var data = {
 					colors: pickers
 				};
 
 				data[setupCustomise.key] = setupCustomise.id;
 
-			   $j.post(setupCustomise.ajaxURL, data, function() {
-					$j('.saved-colours').slideDown(150).delay(2000).slideUp(150);
+			   $.post(setupCustomise.ajaxURL, data, function() {
+					$('.saved-colours').slideDown(150).delay(2000).slideUp(150);
 			   });
 			});
 		},
 
 		columnWidths: function() {
-			$j("#slider" ).slider({
+			$("#slider" ).slider({
 				'min': 30,
 				'max':70,
 				value: setupCustomise.leftColumnWidth,
 				slide: function(event, ui) {
-					$j('.left').css('width', (ui.value-.5)+'%')
-					$j('.right').css('width', (100 - ui.value-.5)+'%')
+					$('.left').css('width', (ui.value-.5)+'%')
+					$('.right').css('width', (100 - ui.value-.5)+'%')
 
 				},
 				create: function(event, ui){
-					$j('.ui-slider-handle').append('<span></span>');
+					$('.ui-slider-handle').append('<span></span>');
 				},
 				'stop':function(event, ui) {
 					var data = {
@@ -308,9 +308,9 @@ setupCustomise = {
 
 					data[setupCustomise.key] = setupCustomise.id;
 
-					$j.post(setupCustomise.ajaxURL, data,
+					$.post(setupCustomise.ajaxURL, data,
 						function() {
-							$j('.saved-layout').hide().slideDown(150).delay(2000).slideUp(150);
+							$('.saved-layout').hide().slideDown(150).delay(2000).slideUp(150);
 			   		})
 				}
 			});
@@ -322,7 +322,7 @@ setupCustomise = {
 		 */
 		columnSelectors: function() {
 			var self = this;
-			$j('[data-column-selector]').click(function(event) {
+			$('[data-column-selector]').click(function(event) {
 				event.preventDefault();
 				// Don't allow deselect of the only column selected
 				var element  = $(this);
@@ -343,7 +343,7 @@ setupCustomise = {
 		 */
 		loadColorpickerColors: function() {
 			var columns = this.getSelectedColumns();
-			$j('input[data-colorpicker]').each(function() {
+			$('input[data-colorpicker]').each(function() {
 				var id     = this.id;
 				var colors = columns.map(function(column) {
 					var thisId    = column + '_' + id;
@@ -371,7 +371,7 @@ setupCustomise = {
 		 * @returns array
 		 */
 		getSelectedColumns: function() {
-			return $j('[data-column-selector]')
+			return $('[data-column-selector]')
 				.filter(function() {
 					return $(this).data('interaction-state') === 'selected';
 				})
@@ -382,7 +382,7 @@ setupCustomise = {
 
 	sortComponents: function() {
 
-		$j('div.homepage').sortable({
+		$('div.homepage').sortable({
 			cursor: 'move',
 			distance: 0,
 			dropOnEmpty: true,
@@ -393,44 +393,44 @@ setupCustomise = {
 			tolerance: 'pointer',
 			zIndex: 2000,
 			start: function() {
-				$j('.marker').text('This is the new position of your component');
+				$('.marker').text('This is the new position of your component');
 
 				/* Allow tinys to work in sortable context
 				 */
-				$j(this).find('.mceEditor').each(function(){
-					tinyMCE.execCommand( 'mceRemoveControl', false, $j(this).attr('id') );
+				$(this).find('.mceEditor').each(function(){
+					tinyMCE.execCommand( 'mceRemoveControl', false, $(this).attr('id') );
 				});
 			},
 			stop: function() {
-				$j(this).find('.mceEditor').each(function(){
-					tinyMCE.execCommand( 'mceAddControl', true, $j(this).attr('id') );
-					$j(this).sortable("refresh");
+				$(this).find('.mceEditor').each(function(){
+					tinyMCE.execCommand( 'mceAddControl', true, $(this).attr('id') );
+					$(this).sortable("refresh");
 				});
 				var left = '';
 				var right = '';
 				var top = '';
                 var bottom = '';
-				$j('.homepage div.left').children('div.box').each(function () {
+				$('.homepage div.left').children('div.box').each(function () {
 
 					/* Two components in ePorfolio have no id's (My Profile, Teacher Notes)
 					 * and always appear in the same positions. So we do a check to see if
 					 * an id is set. If it isn't, and we don't do the check, the script breaks
 					 * and components cannot be relocated successfully
 					 */
-					if ($j(this).attr('id') != undefined) {
-						left += $j(this).attr('id').substring(9) + ',';
+					if ($(this).attr('id') != undefined) {
+						left += $(this).attr('id').substring(9) + ',';
 					}
 				});
 
-				$j('.homepage div.right').children('div.box').each(function () {
-					if ($j(this).attr('id') != undefined) {
-						right += $j(this).attr('id').substring(9) + ',';
+				$('.homepage div.right').children('div.box').each(function () {
+					if ($(this).attr('id') != undefined) {
+						right += $(this).attr('id').substring(9) + ',';
 					}
 				});
 
-				$j('.homepage div.top').children('div.box').each(function () {
-					if ($j(this).attr('id') != undefined) {
-						top += $j(this).attr('id').substring(9) + ',';
+				$('.homepage div.top').children('div.box').each(function () {
+					if ($(this).attr('id') != undefined) {
+						top += $(this).attr('id').substring(9) + ',';
 					}
 				});
 
@@ -450,9 +450,9 @@ setupCustomise = {
 
 				data[setupCustomise.key] = setupCustomise.id;
 
-				$j.post(setupCustomise.ajaxURL, data);
+				$.post(setupCustomise.ajaxURL, data);
 
-				setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')/*,  $j('.homepage div.bottom')*/])
+				setupCustomise.emptyColumnCheck([$('.homepage div.top'), $('.homepage div.right'), $('.homepage div.left')/*,  $j('.homepage div.bottom')*/])
 
 				// Reapply colors as well.
 				$.each(pickers, function(element, color) {
@@ -460,25 +460,25 @@ setupCustomise = {
 				})
 			},
 			sort: function (event, ui) {
-				var leftOffset = $j('.homepage div.left').offset();
-				var topOffset = $j('.homepage div.top').offset();
+				var leftOffset = $('.homepage div.left').offset();
+				var topOffset = $('.homepage div.top').offset();
 //                var bottomOffset = $j('.homepage div.bottom').offset();
 
-				if (event.pageX < (leftOffset.left + $j('.homepage div.left').width()) &&
-					event.pageY > (leftOffset.top + $j('.homepage div.left').height())) {
+				if (event.pageX < (leftOffset.left + $('.homepage div.left').width()) &&
+					event.pageY > (leftOffset.top + $('.homepage div.left').height())) {
 					// left bottom
-					ui.placeholder.appendTo($j('.homepage div.left'));
+					ui.placeholder.appendTo($('.homepage div.left'));
 				}
-				else if (event.pageX > (leftOffset.left + $j('.homepage div.left').width()) &&
-						 event.pageY > ($j('.homepage div.right').offset().top + $j('.homepage div.right').height())) {
+				else if (event.pageX > (leftOffset.left + $('.homepage div.left').width()) &&
+						 event.pageY > ($('.homepage div.right').offset().top + $('.homepage div.right').height())) {
 					// right bottom
-					ui.placeholder.appendTo($j('.homepage div.right'))
+					ui.placeholder.appendTo($('.homepage div.right'))
 
-				} else if (event.pageX < (topOffset.left + $j('.homepage div.top').width()) &&
-						   event.pageY < (topOffset.top + $j('.homepage div.top').height())) {
+				} else if (event.pageX < (topOffset.left + $('.homepage div.top').width()) &&
+						   event.pageY < (topOffset.top + $('.homepage div.top').height())) {
 					// top bottom
-					if ($j('.homepage div.top').find('.box').length == 0) {
-						ui.placeholder.appendTo($j('.homepage div.top'));
+					if ($('.homepage div.top').find('.box').length == 0) {
+						ui.placeholder.appendTo($('.homepage div.top'));
 					}
                 }
 //                else if (event.pageX < (bottomOffset.left + $j('.homepage div.bottom').width()) &&
@@ -488,7 +488,7 @@ setupCustomise = {
 //                        ui.placeholder.appendTo($j('.homepage div.bottom'));
 //                    }
 //                }
-				$j('.cal-bubble').hide();
+				$('.cal-bubble').hide();
 
 			}
 		});
@@ -496,35 +496,35 @@ setupCustomise = {
 
 	activeComponents: function() {
 
-		$j('.box h2').css('cursor', 'move');
-		$j(".box h2").mousemove(function(e){
-			$j("#tooltip").show();
-			$j("#tooltip").css({
+		$('.box h2').css('cursor', 'move');
+		$(".box h2").mousemove(function(e){
+			$("#tooltip").show();
+			$("#tooltip").css({
 				top: (e.pageY -8) + "px",
 				left: (e.pageX + 20) + "px"
 			});
 		});
-		$j(".box h2").mouseout(function(e){
-			$j("#tooltip").hide();
+		$(".box h2").mouseout(function(e){
+			$("#tooltip").hide();
 		});
 
-		$j("a.edit").mouseenter(function() {
-			var $this = $j(this);
+		$("a.edit").mouseenter(function() {
+			var $this = $(this);
 
 			if(!$this.children('em').data('pinned')) {
 				$this.children('em').addClass('show-it');
 			}
 
         }).mouseleave(function() {
-            var $this = $j(this);
+            var $this = $(this);
 
             if(!$this.children('em').data('pinned')) {
                 $this.children('em').removeClass('show-it' );
             }
 
 		});
-		$j(document).on('click', "a.edit", function(event) {
-			var $this = $j(this);
+		$(document).on('click', "a.edit", function(event) {
+			var $this = $(this);
 			event.preventDefault();
 
 			if ($this.siblings('.editPanel.delete-it').is(':visible')) {
@@ -537,9 +537,9 @@ setupCustomise = {
 
 		});
 
-		$j(document).on('click', '.close-delete', function(event){
+		$(document).on('click', '.close-delete', function(event){
 			event.preventDefault();
-			var $this = $j(this);
+			var $this = $(this);
 
 			if ($this.siblings('.editPanel.settings').is(':visible')) {
 				$this.siblings('.editPanel.settings').slideUp();
@@ -550,32 +550,32 @@ setupCustomise = {
 			$this.siblings('.editPanel.delete-it.hide').slideToggle("fast");
 		});
 
-		$j(document).on('click', '.delete-accept', function(event){
+		$(document).on('click', '.delete-accept', function(event){
 			event.preventDefault();
 			//update with an ajax call here.
-			$j.post(setupCustomise.ajaxURL, $j(this).closest('form').serialize());
+			$.post(setupCustomise.ajaxURL, $(this).closest('form').serialize());
 
-			$j(this).closest('.box').animate({opacity:0}, 300,
+			$(this).closest('.box').animate({opacity:0}, 300,
 				function() {
-					$j(this).slideUp(200, function() {
-						$j(this).remove();
+					$(this).slideUp(200, function() {
+						$(this).remove();
 					});
 			});
 
-			var componentToDelete = Number($j(this).siblings("input[name=component]").val());
-			var currentAmount = Number($j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
+			var componentToDelete = Number($(this).siblings("input[name=component]").val());
+			var currentAmount = Number($('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html());
 			currentAmount--;
-			$j('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
+			$('a[rel='+componentToDelete+']').siblings('h4').children('strong').children('em').html(currentAmount);
 
-			if ($j('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
-				$j('a[rel='+componentToDelete+']').parent().removeClass('disabled')
+			if ($('a[rel='+componentToDelete+']').parent().hasClass('disabled')) {
+				$('a[rel='+componentToDelete+']').parent().removeClass('disabled')
 			}
 
 		});
 
-		$j(document).on('click','.delete-reject',function(event) {
+		$(document).on('click','.delete-reject',function(event) {
 			event.preventDefault();
-			$j(this).closest('.delete-it').slideUp();
+			$(this).closest('.delete-it').slideUp();
 		});
 	},
 
@@ -587,67 +587,67 @@ setupCustomise = {
 	updateColor: function(element, color) {
 		switch (element) {
 			case 'top_bg_primary':
-				return $j('.top .text, .top .listing, .top .information-list li').css('background-color', color);
+				return $('.top .text, .top .listing, .top .information-list li').css('background-color', color);
 				break;
 			case 'top_bg_secondary':
-				return $j('.top .dark').css('background-color', color);
+				return $('.top .dark').css('background-color', color);
 				break;
 			case 'top_head_font':
-				return $j('.top h2').css('color', color);
+				return $('.top h2').css('color', color);
 				break;
 			case 'top_head_bg':
-				return $j('.top h2').css('background-color', color)
+				return $('.top h2').css('background-color', color)
 				break;
 			case 'top_font':
-				return $j('.top, .top p').css('color', color)
+				return $('.top, .top p').css('color', color)
 				break;
 			case 'top_link':
-				return $j('.top a').css('color', color);
+				return $('.top a').css('color', color);
 				break;
 			case 'left_bg_primary':
-				return $j('.left .text, .left .listing, .left .information-list li').css('background-color', color);
+				return $('.left .text, .left .listing, .left .information-list li').css('background-color', color);
 				break;
 			case 'left_bg_secondary':
-				return $j('.left .dark').css('background-color', color);
+				return $('.left .dark').css('background-color', color);
 				break;
 			case 'left_head_font':
-				return $j('.left h2').css('color', color);
+				return $('.left h2').css('color', color);
 				break;
 			case 'left_head_bg':
-				return $j('.left h2').css('background-color', color)
+				return $('.left h2').css('background-color', color)
 				break;
 			case 'left_font':
-				return $j('.left, .left p').css('color', color)
+				return $('.left, .left p').css('color', color)
 				break;
 			case 'left_link':
-				return $j('.left a').css('color', color);
+				return $('.left a').css('color', color);
 				break;
 			case 'left_hover':
-				return $j('.right a:hover').css('color', color);
+				return $('.right a:hover').css('color', color);
 				break;
 			case 'right_bg_primary':
-				return $j('.right .text, .right .listing, .right .information-list li').css('background-color', color);
+				return $('.right .text, .right .listing, .right .information-list li').css('background-color', color);
 				break;
 			case 'right_bg_secondary':
-				return $j('.right .dark').css('background-color', color);
+				return $('.right .dark').css('background-color', color);
 				break;
 			case 'right_head_font':
-				return $j('.right h2').css('color', color);
+				return $('.right h2').css('color', color);
 				break;
 			case 'right_head_bg':
-				return $j('.right h2').css('background-color', color);
+				return $('.right h2').css('background-color', color);
 				break;
 			case 'right_font':
-				return $j('.right, .right p').css('color', color);
+				return $('.right, .right p').css('color', color);
 				break;
 			case 'right_link':
-				return $j('.right a').css('color', color);
+				return $('.right a').css('color', color);
 				break;
 			case 'right_hover':
-				return $j('.right a:hover').css('color', color);
+				return $('.right a:hover').css('color', color);
 				break;
 			default:
-				return $j('.left .text').css('background-color', color);
+				return $('.left .text').css('background-color', color);
 				break;
 		}
 	}

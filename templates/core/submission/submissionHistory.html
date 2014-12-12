@@ -6,21 +6,21 @@
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script language="JavaScript" type="text/javascript">
-    $j(function () {
+    $(function () {
         var x = 5, i = x - 1;
-        $j('#history li:gt(' + i + ')').hide();
-        if ($j('#history li:hidden').length) {
-            $j('#history-more').show();
+        $('#history li:gt(' + i + ')').hide();
+        if ($('#history li:hidden').length) {
+            $('#history-more').show();
         }
-        $j('#history-more').click(function (e) {
+        $('#history-more').click(function (e) {
             e.preventDefault();
             i += 2 * x + 1;
-            $j('#history li:lt(' + i + ')').slideDown(100);
-            if (!$j('#history li:hidden').length) {
-                $j('#history-more').hide();
+            $('#history li:lt(' + i + ')').slideDown(100);
+            if (!$('#history li:hidden').length) {
+                $('#history-more').hide();
             }
         });
-        $j('#closebox').remove();
+        $('#closebox').remove();
 
 
 

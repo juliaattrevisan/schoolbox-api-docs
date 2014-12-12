@@ -3,9 +3,9 @@
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
-$j(function() {
-    $j('h3 span').each(function() {
-        $j(this).qtip({
+$(function() {
+    $('h3 span').each(function() {
+        $(this).qtip({
             content: 'Edit the user\'s details.',
             style: {
                 classes: 'qtip-green qtip-shadow'
@@ -18,21 +18,21 @@ $j(function() {
     });
 	
 	///this function for the access ticks need to be recondigured.
-	$j('.accessGranted').each(function () {
-		$j(this).click(function () {
-			if ($j(this).attr('src').indexOf('greentick') != -1) {
-				$j(this).attr('src', '/images/emptybox.gif');
-				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 1});
+	$('.accessGranted').each(function () {
+		$(this).click(function () {
+			if ($(this).attr('src').indexOf('greentick') != -1) {
+				$(this).attr('src', '/images/emptybox.gif');
+				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 1});
 			} else {
-				$j(this).attr('src', '/images/greentick.gif');
-				$j.get('/group/modifyForm.php', {categoryID: $j(this).attr('rel'), userID: '{ID}', write: 2});
+				$(this).attr('src', '/images/greentick.gif');
+				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 2});
 			}		
 		});
-		$j(this).css('cursor','pointer');
+		$(this).css('cursor','pointer');
 	});
 	
 	
-	$j('.admin-form').validate({
+	$('.admin-form').validate({
 		rules: {
 			year: {
 			  	customValid : true
@@ -58,7 +58,7 @@ $j(function() {
 		
 	});
 	
-	$j.validator.addMethod("customValid", function(value, element) {
+	$.validator.addMethod("customValid", function(value, element) {
 		inputValue = (parseInt(value));
 		if (isNaN(inputValue)) {
 

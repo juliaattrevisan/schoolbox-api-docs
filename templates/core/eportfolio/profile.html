@@ -1,11 +1,11 @@
 <script>
-    $j(document).ready(function(){
-        $j('#add-coverphoto').click(function(event){
+    $(document).ready(function(){
+        $('#add-coverphoto').click(function(event){
             event.preventDefault();
-            $j('#coverphoto-image').show().trigger('click').hide();
+            $('#coverphoto-image').show().trigger('click').hide();
         });
-        $j('#coverphoto-image').change(function(){
-            $j('#coverphoto-form').submit();
+        $('#coverphoto-image').change(function(){
+            $('#coverphoto-form').submit();
         })
     });
 </script>

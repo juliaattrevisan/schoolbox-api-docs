@@ -1,15 +1,15 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
     <script type='text/javascript'>
-        $j(function () {
-            $j(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
+        $(function () {
+            $(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
                 event.preventDefault();
 
-                var button = $j(this);
+                var button = $(this);
 
                 var data = button.parent('form').serialize();
 
-                $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+                $.post('/service/attendance/processToggleAttendance', data, function (data) {
 
                     if (data.error == undefined) {
                         if (button.text() == 'Attend') {
@@ -24,12 +24,12 @@
             //
             // Form listener for exporter - brings up a dialog box that offers a URL
             // to click.
-            $j('#calendar-export').click(function(event) {
+            $('#calendar-export').click(function(event) {
                 event.preventDefault();
-                $j('#calendar-export-dialog').dialog({
+                $('#calendar-export-dialog').dialog({
                     open: function(event, ui) {
-                        $j(event.target).find('#calendar-export-dialog-url')
-                            .text($j.getExportCalendarLink(
+                        $(event.target).find('#calendar-export-dialog-url')
+                            .text($.getExportCalendarLink(
                                 '{USER_TOKEN}',
                                 {'export': 'group', 'group': '{ID}'}
                             )

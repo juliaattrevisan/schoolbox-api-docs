@@ -14,7 +14,7 @@
 
 	var dm = createDelayManager();
 
-	$j(function() {
+	$(function() {
 		$('.sigPad').signaturePad({
             lineTop: 102,
             lineWidth: 0,
@@ -28,7 +28,7 @@
 				 * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
 				 */
 				dm(function() {
-					$j('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+					$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
 						id: {QUESTION_ID}
 					});
 				}, 3000);

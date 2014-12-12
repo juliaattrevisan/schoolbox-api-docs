@@ -1,15 +1,15 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script language="JavaScript" type="text/javascript">
-	$j(document).ready(function() {
-		$j('input[type=file].prettify').prettyFileInput({
+	$(document).ready(function() {
+		$('input[type=file].prettify').prettyFileInput({
 			additionalButtonClasses: 'no-marg float-left',
 			buttonActiveClass: 'tick',
 			defaultText: '<span></span>Choose file',
 			defaultFileSelectedText: '<span></span>File selected'
 		});
 		
-		$j('#zipUpload').validate({
+		$('#zipUpload').validate({
 			rules: { 
 				file: {
 					required: true,

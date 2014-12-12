@@ -1,41 +1,41 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 
-$j(function() {
+$(function() {
 
 
 
-    $j(window).load( function() {
+    $(window).load( function() {
         // test that the non-js page has not been requested
         if(window.location.pathname.indexOf("nojscript") == -1) {
             // replace the default www status 'untested' with 'testing'
-            $j('#www-light > span').html('Testing...');
+            $('#www-light > span').html('Testing...');
 
             // load the user statistics via ajax
-            $j.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
+            $.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
                 for (i in data) {
                     var row = data[i];
 
                     if(row.GROUP_ID > 0) {
-                        $j('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                        $('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
                            '</a></td><td>' + row.GROUP_USER +
-                           '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                           '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
                     } else {
-                        $j('<tr><td nowrap="nowrap"><strong>' + row.GROUP_NAME +
+                        $('<tr><td nowrap="nowrap"><strong>' + row.GROUP_NAME +
                                 '</strong></td><td>' + row.GROUP_USER +
-                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
                     }
                 }
             });
 
             // load service statuses via ajax
-            $j.post('/ajax/adminStats.php', { module : 'service_www' }, function(data) {
+            $.post('/ajax/adminStats.php', { module : 'service_www' }, function(data) {
                 for(i in data) {
                     var light = data[i].WWW_LIGHT;
                     var status = data[i].WWW_STATUS;
                 }
-                $j('#www-light > span').html(status);
-                $j('#www-light').addClass(light);
+                $('#www-light > span').html(status);
+                $('#www-light').addClass(light);
             });
         }
     });

@@ -6,13 +6,13 @@
 <script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
-$j(function () {
+$(function () {
 
-    $j(function() {
-        $j('#definition-palette').configurator().start();
+    $(function() {
+        $('#definition-palette').configurator().start();
     });
 
-    $j("#side-menu")
+    $("#side-menu")
         .on('ready.jstree', function(event, jstree) {
             jstree.instance.open_node(jstree.instance.get_node('node_0'));
         })
@@ -41,7 +41,7 @@ $j(function () {
             var pos = data.position;
             var tid = data.parent.split('_').pop();
             var oid = data.node.id.split('_').pop();
-            $j.ajax({
+            $.ajax({
                 url: '/adminv2/side-menuForm.php',
                 data: {pos:pos, tid:tid, oid:oid}
             });

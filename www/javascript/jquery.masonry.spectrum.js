@@ -215,67 +215,67 @@
     MasonrySpectrum.prototype.updateColor = function (element, color) {
         switch (element) {
             case 'top_bg_primary':
-                return $j('.top .text, .top .listing, .top .information-list li').css('background-color', color);
+                return $('.top .text, .top .listing, .top .information-list li').css('background-color', color);
                 break;
             case 'top_bg_secondary':
-                return $j('.top .dark').css('background-color', color);
+                return $('.top .dark').css('background-color', color);
                 break;
             case 'top_head_font':
-                return $j('.top h2').css('color', color);
+                return $('.top h2').css('color', color);
                 break;
             case 'top_head_bg':
-                return $j('.top h2').css('background-color', color);
+                return $('.top h2').css('background-color', color);
                 break;
             case 'top_font':
-                return $j('.top, .top p').css('color', color);
+                return $('.top, .top p').css('color', color);
                 break;
             case 'top_link':
-                return $j('.top a').css('color', color);
+                return $('.top a').css('color', color);
                 break;
             case 'left_bg_primary':
-                return $j('.left .text, .left .listing, .left .information-list li').css('background-color', color);
+                return $('.left .text, .left .listing, .left .information-list li').css('background-color', color);
                 break;
             case 'left_bg_secondary':
-                return $j('.left .dark').css('background-color', color);
+                return $('.left .dark').css('background-color', color);
                 break;
             case 'left_head_font':
-                return $j('.left h2').css('color', color);
+                return $('.left h2').css('color', color);
                 break;
             case 'left_head_bg':
-                return $j('.left h2').css('background-color', color);
+                return $('.left h2').css('background-color', color);
                 break;
             case 'left_font':
-                return $j('.left, .left p').css('color', color);
+                return $('.left, .left p').css('color', color);
                 break;
             case 'left_link':
-                return $j('.left a').css('color', color);
+                return $('.left a').css('color', color);
                 break;
             case 'left_hover':
-                return $j('.right a:hover').css('color', color);
+                return $('.right a:hover').css('color', color);
                 break;
             case 'right_bg_primary':
-                return $j('.right .text, .right .listing, .right .information-list li').css('background-color', color);
+                return $('.right .text, .right .listing, .right .information-list li').css('background-color', color);
                 break;
             case 'right_bg_secondary':
-                return $j('.right .dark').css('background-color', color);
+                return $('.right .dark').css('background-color', color);
                 break;
             case 'right_head_font':
-                return $j('.right h2').css('color', color);
+                return $('.right h2').css('color', color);
                 break;
             case 'right_head_bg':
-                return $j('.right h2').css('background-color', color);
+                return $('.right h2').css('background-color', color);
                 break;
             case 'right_font':
-                return $j('.right, .right p').css('color', color);
+                return $('.right, .right p').css('color', color);
                 break;
             case 'right_link':
-                return $j('.right a').css('color', color);
+                return $('.right a').css('color', color);
                 break;
             case 'right_hover':
-                return $j('.right a:hover').css('color', color);
+                return $('.right a:hover').css('color', color);
                 break;
             default:
-                return $j('.left .text').css('background-color', color);
+                return $('.left .text').css('background-color', color);
                 break;
         }
     };

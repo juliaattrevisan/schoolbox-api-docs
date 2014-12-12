@@ -1,14 +1,14 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
+$(document).ready(function() {
 
    var currentForm = '';
-	$j('form').each(function(index, formElement) {
-   		 $j(formElement).validate({
+	$('form').each(function(index, formElement) {
+   		 $(formElement).validate({
 			submitHandler: function() {
 				showAlert(formElement);
-				$j.post($j(formElement).attr('action'), $j(formElement).serialize(), function(responseText) {
+				$.post($(formElement).attr('action'), $(formElement).serialize(), function(responseText) {
 					var dataFunction = new Function('return ' + responseText);
 					var result = dataFunction();
 				});
@@ -29,10 +29,10 @@ $j(document).ready(function() {
    		});
 	});
 
-	$j('.textarea-container textarea').blur(function() {
-		if ($j(this).val() !== '') {
-			$j.post($j(this).closest('form').attr('action'),
-			$j(this).closest('form').serialize(),
+	$('.textarea-container textarea').blur(function() {
+		if ($(this).val() !== '') {
+			$.post($(this).closest('form').attr('action'),
+			$(this).closest('form').serialize(),
 			function(responseText) {
 				var dataFunction = new Function('return ' + responseText);
 				var result = dataFunction();
@@ -41,10 +41,10 @@ $j(document).ready(function() {
 		}
 	});
 
-	$j('.marks-amount input').blur(function() {
-		showAlert($j(this));
-		$j.post($j(this).closest('form').attr('action'),
-		$j(this).closest('form').serialize(),
+	$('.marks-amount input').blur(function() {
+		showAlert($(this));
+		$.post($(this).closest('form').attr('action'),
+		$(this).closest('form').serialize(),
 		function(responseText) {
 			var dataFunction = new Function('return ' + responseText);
 			var result = dataFunction();
@@ -57,12 +57,12 @@ $j(document).ready(function() {
 
 
 	if (assessAttempted == 'true') {
-		$j('.tick').html('<span></span>Resubmit Review')
-		$j('.review-submitted').show();
+		$('.tick').html('<span></span>Resubmit Review')
+		$('.review-submitted').show();
 	}
 
 	function showAlert(target) {
-		var relevantLabel = $j(target).closest('form').find('.assess-alert');
+		var relevantLabel = $(target).closest('form').find('.assess-alert');
 		if (assessAttempted == "false") {
 			relevantLabel.fadeIn(200);
 		}
@@ -71,9 +71,9 @@ $j(document).ready(function() {
 		}
 	}
 
-	$j('a.finish-review').click(function(event) {
+	$('a.finish-review').click(function(event) {
 		event.preventDefault();
-		$j(this).confirmDialog();
+		$(this).confirmDialog();
 	});
 
 

@@ -91,29 +91,29 @@
 <!-- BEGIN CUSTOM_JAVASCRIPT -->
 <script>
     // Hide averages rows
-    var subTableRow = $j('.sub-table-row');
+    var subTableRow = $('.sub-table-row');
     subTableRow.hide();
 
     // Toggle averages rows and change arrow direction
-    $j('.toggle-averages').click(function(event){
+    $('.toggle-averages').click(function(event){
         event.preventDefault();
         if (subTableRow.is(':visible')) {
-            $j(this).html('&#x25BC;');
-            $j('.sub-table-row').hide();
+            $(this).html('&#x25BC;');
+            $('.sub-table-row').hide();
         }
         else {
-            $j(this).html('&#x25B2;');
-            $j('.sub-table-row').show();
+            $(this).html('&#x25B2;');
+            $('.sub-table-row').show();
 
-            $j('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
+            $('.sub-table-row').find('a[data-menu]').flyout({element : 'td'});
 
         }
     });
 
-  var table = $j('#content').children('table.mark-sheet');
+  var table = $('#content').children('table.mark-sheet');
 
   table.on('change', 'input', function(e) {
-    var self = $j(this);
+    var self = $(this);
 
     // disable self
     this.disabled = 'disabled';
@@ -122,7 +122,7 @@
     var data = {}
     data[this.name] = self.val();
 
-    $j.ajax({
+    $.ajax({
       type : 'POST',
       url : '/ajax/submission/marks.php',
       data : data,
@@ -134,7 +134,7 @@
 
         var tbody = table.children('tbody');
 
-        $j.each(data, function(k, v) {
+        $.each(data, function(k, v) {
           var userId   = k,
               gradient = v['avg-int'],
               letter   = v['avg-letter'];
@@ -158,12 +158,12 @@
     });
   });
 
-    $j('a[href][rel=flyout-option]').click(function(event){
+    $('a[href][rel=flyout-option]').click(function(event){
         event.preventDefault();
-        var self = $j(this);
-        var href = $j(this).attr('href');
+        var self = $(this);
+        var href = $(this).attr('href');
         var visibility = href.substr(href.length-1);
-        $j.ajax({url: href}).done(function(data) {
+        $.ajax({url: href}).done(function(data) {
             self.closest('td').find('span.visibility-btn').removeClass('visibility_0 visibility_1 visibility_2').addClass('visibility_'+visibility);
             self.closest('td').removeClass('open');
         });

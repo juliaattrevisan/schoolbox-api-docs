@@ -10,7 +10,7 @@ $(function() {
 		disable_toolbars: [2, 3, 4]
 	});
 
-	var validator = $j("#createQuestionForm").submit(function() {
+	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave(); 
 	}).validate({

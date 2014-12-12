@@ -106,10 +106,10 @@
 
   function update(sources) {
     sources.each(function() {
-      var source = $j(this);
+      var source = $(this);
 
       source.find('input.toggle:checked').each(function() {
-        var self = $j(this);
+        var self = $(this);
         var v = self.val();
 
         if(typeof v === 'undefined') {
@@ -130,7 +130,7 @@
 
   function describe(sources) {
     sources.each(function() {
-      var source = $j(this);
+      var source = $(this);
 
       var summary = source.find('h4 em.summary');
       var table = source.find('table.roles');
@@ -140,7 +140,7 @@
       var count = 0;
 
       inputs.each(function() {
-        var i = $j(this);
+        var i = $(this);
 
         var role = i.data('role');
         var lbl = desc[i.val()];
@@ -181,7 +181,7 @@
     };
 
     sources.find('tr').each(function() {
-      var row = $j(this);
+      var row = $(this);
 
       var hiddens = row.find('input[type=hidden]');
 
@@ -218,17 +218,17 @@
   function submit(self) {
     var form = self.closest('form');
     var data = form.serialize();
-    $j.post(form.attr('action'), data, function() {
+    $.post(form.attr('action'), data, function() {
       describe(form.closest('li.source'));
     });
   }
 
 
-  $j('#content').on('click', 'a.exp', function(e) {
+  $('#content').on('click', 'a.exp', function(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    var self = $j(this);
+    var self = $(this);
 
     if(self.hasClass('darr')) {
       // change to uarr, expand content
@@ -244,8 +244,8 @@
     return false;
   });
 
-  $j('#content').on('change', 'input.toggle', function() {
-    var self = $j(this);
+  $('#content').on('change', 'input.toggle', function() {
+    var self = $(this);
     update(self.closest('li.source'));
     if(self.val() == 0 && self.is(':checked')) {
       var row = self.closest('tr.role');
@@ -258,11 +258,11 @@
     }
   });
 
-  $j('#content').on('change', 'input[type=hidden]', function() {
+  $('#content').on('change', 'input[type=hidden]', function() {
 
     // validate, and if passes, ajax form
 
-    var cell = $j(this).closest('td.perms');
+    var cell = $(this).closest('td.perms');
 
 //    console.log(cell);
 
@@ -281,8 +281,8 @@
     return true;
   });
 
-  $j(document).ready(function() {
-    var sources = $j('#content').find('li.source');
+  $(document).ready(function() {
+    var sources = $('#content').find('li.source');
 
     update(sources);
     describe(sources);

@@ -48,8 +48,8 @@
 		 * Apply sortorder controls
 		 */
 		function applySortorder() {
-			$j.each(config.element.find('a.control'), function(index, element) {
-				$j(element).click(function(event) {
+			$.each(config.element.find('a.control'), function(index, element) {
+				$(element).click(function(event) {
 					event.preventDefault();
 
 					/* Toggle ordering upon click
@@ -65,7 +65,7 @@
 						url: config.url,
 						title: config.title,
 						columns: config.columns,
-						orderBy: $j(this).attr('rel'),
+						orderBy: $(this).attr('rel'),
 						order: order,
 						index: 0,
 						numPerPage: config.numPerPage,
@@ -79,8 +79,8 @@
 		 * Paginate things
 		 */
 		function applyPaginator() {
-			$j.each(config.element.find('li a'), function(index, element) {
-				$j(element).click(function(event) {
+			$.each(config.element.find('li a'), function(index, element) {
+				$(element).click(function(event) {
 					event.preventDefault();
 
 					config.element.usageTabulator({
@@ -88,7 +88,7 @@
 						columns: config.columns,
 						orderBy: config.orderBy,
 						order: config.order,
-						index: parseInt($j(this).attr('rel')),
+						index: parseInt($(this).attr('rel')),
 						numPerPage: config.numPerPage,
 						numTotal: config.numTotal
 					});
@@ -100,7 +100,7 @@
 		 * Plot graph
 		 */
 		function plot() {
-			$j.ajax({
+			$.ajax({
 				url: config.url,
 				method: 'GET',
 				dataType: 'text',

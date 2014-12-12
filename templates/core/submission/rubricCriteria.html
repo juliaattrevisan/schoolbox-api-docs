@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
     // logic for adding new inputs
-    $j('#crit-list input.new').keyup(function() {
+    $('#crit-list input.new').keyup(function() {
         if(this.value.length > 0) {
-            var input = $j(this);
+            var input = $(this);
             var li = input.parent();
 
             var newli = li.clone(true, true);
@@ -20,17 +20,17 @@ $j(function() {
     });
 
     // logic for removing inputs
-    $j('#crit-list .delete:not(.disabled)').click(function(e) {
-        var self = $j(this);
+    $('#crit-list .delete:not(.disabled)').click(function(e) {
+        var self = $(this);
         var target = self.parent('.item');
         target.remove();
         e.preventDefault();
     });
 
     // logic for removing inputs that are currently in use
-    $j('#crit-list .delete.disabled').click(function(e) {
+    $('#crit-list .delete.disabled').click(function(e) {
         if(confirm('You are about to remove a criterion that is currently in use.  Removing this criterion will make it unavailable for future assessments.  It will remain visible on the existing assessments.')) {
-            var self = $j(this);
+            var self = $(this);
             var target = self.parent('.item');
             target.remove();
         }
@@ -40,17 +40,17 @@ $j(function() {
 
 
     // logic for handling the form submit
-    $j('#folderForm').submit(function(e) {
+    $('#folderForm').submit(function(e) {
         var data = {},
-            self = $j(this),
+            self = $(this),
             fields = self.find('input[type=text]'),
-            catID = $j('#categoryID').val(),
+            catID = $('#categoryID').val(),
             x = -1,
             y = {MAX_CRIT_ID};
 
         // validate all the input fields
         fields.each(function() {
-            var self = $j(this);
+            var self = $(this);
 
             // new group
             if(self.hasClass('new')) {
@@ -76,9 +76,9 @@ $j(function() {
 
         });
 
-        $j('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
+        $('#folderForm').children('input.submit-btn-plain').attr('disabled', 'disabled').val('Saving Changes...');
 
-        $j.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
+        $.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
             history.back(-1);
         });
 
@@ -86,9 +86,9 @@ $j(function() {
 
     });
 
-    $j('#disp-lightbox').click(function(e) {
+    $('#disp-lightbox').click(function(e) {
         e.preventDefault();
-        $j('#crit-list-lightbox').dialog({
+        $('#crit-list-lightbox').dialog({
             modal: true,
             resizable: false,
             title: 'Example Criteria',
@@ -96,9 +96,9 @@ $j(function() {
         });
     });
 
-    $j('#close-lightbox').click(function(e) {
+    $('#close-lightbox').click(function(e) {
         e.preventDefault();
-        $j('#crit-list-lightbox').dialog('close');
+        $('#crit-list-lightbox').dialog('close');
     });
 
 });

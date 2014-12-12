@@ -42,8 +42,8 @@
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/admin/jquery.makeAdmin.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
-	$j('.makeAdmin').makeAdmin({
+$(document).ready(function() {
+	$('.makeAdmin').makeAdmin({
 		currentUserId: '{MAKEADMIN_CURRENT_USER_ID}',
 		currentAdminId: '{MAKEADMIN_CURRENT_ADMIN_ID}',
 		super: '{MAKEADMIN_SUPER}'
@@ -60,7 +60,7 @@ $j(document).ready(function() {
         $.get('/group/modifyForm.php', data);
     });
 
-    var addUserSelector = $j('#addUser');
+    var addUserSelector = $('#addUser');
     var addUserButton   = addUserSelector.closest('form').find(':submit');
     addUserSelector
         .selectizeSelector({
@@ -127,18 +127,18 @@ $j(document).ready(function() {
     });
 
 
-	$j('input.checkAll').each(function () {
-		$j(this).mouseup(function () {
-			var node = $j(this);
-			$j("input." + $j(this).attr("id")).each(function () {
-				$j(this).prop("checked",  !(node.prop("checked")));
+	$('input.checkAll').each(function () {
+		$(this).mouseup(function () {
+			var node = $(this);
+			$("input." + $(this).attr("id")).each(function () {
+				$(this).prop("checked",  !(node.prop("checked")));
 			});
 		});
 	});
 
-	$j('#deleteButton').click(function () {
+	$('#deleteButton').click(function () {
 		if (confirm('Delete all selected users?'))
-			$j('#deleteForm').submit();
+			$('#deleteForm').submit();
 	});
 
     /**

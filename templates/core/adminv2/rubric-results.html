@@ -1,9 +1,9 @@
 
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-    $j(function() {
-        $j(document).on('change', '#rubric-results input', function(e) {
-            var self = $j(this);
+    $(function() {
+        $(document).on('change', '#rubric-results input', function(e) {
+            var self = $(this);
             var anchor = self.siblings('a').first();
             if(self.val() == anchor.data('label')) {
                 anchor.addClass('hidden');
@@ -16,16 +16,16 @@
                 self.parent('li').removeClass('err');
             }
         });
-        $j(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
-            var self = $j(this);
+        $(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
+            var self = $(this);
             var input = self.siblings('input').first();
             input.val(self.data('label'));
             input.trigger('change');
             self.addClass('hidden');
             e.preventDefault();
         });
-        $j(document).on('change', '#rubric-results li.new-item input', function(e) {
-            var self = $j(this);
+        $(document).on('change', '#rubric-results li.new-item input', function(e) {
+            var self = $(this);
             var li = self.parent('li');
             var newli = li.clone();
             var code = newli.find('code');
@@ -37,12 +37,12 @@
             li.parent('ul').append(newli);
             newli.find(':input:visible:first').focus();
         });
-        $j(document).on('click', '#add-set', function(e) {
+        $(document).on('click', '#add-set', function(e) {
             e.preventDefault();
         });
-        $j(document).on('click', '#save-changes', function(e) {
+        $(document).on('click', '#save-changes', function(e) {
             var valid = true;
-            var frm = $j('#rubricForm');
+            var frm = $('#rubricForm');
             var method = frm.attr('method');
             var action = frm.attr('action');
 
@@ -50,7 +50,7 @@
             var ii = 0;
             var j = 0;
             frm.find('input').each(function() {
-                var self = $j(this);
+                var self = $(this);
 
                 if(!self.hasClass('nullable')) {
                     if(self.val() == '') {
@@ -77,7 +77,7 @@
 
             if(valid) {
                 // console.log(frmdata);
-                $j.ajax({
+                $.ajax({
                     async: false,
                     url: action,
                     type: method,
@@ -96,7 +96,7 @@
             }
             else {
                 e.preventDefault();
-                $j('#err-expl').css('display', 'block');
+                $('#err-expl').css('display', 'block');
             }
         });
     });

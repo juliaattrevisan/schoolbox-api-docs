@@ -1,31 +1,31 @@
 <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
 <script type="text/javascript">
 
-$j(function() {
+$(function() {
 	//autoclear the catalogue search
-	$j('#library-search-field').placeholder();
-	$j('#galleryCycle').children('div:not(:first-child)').each(function() {
-		$j(this).hide();
+	$('#library-search-field').placeholder();
+	$('#galleryCycle').children('div:not(:first-child)').each(function() {
+		$(this).hide();
 	});
 		
 });
 
 
-$j(window).load(function(){	
-	$j('#galleryCycle').cycle({
+$(window).load(function(){
+	$('#galleryCycle').cycle({
         cleartype: true,
         cleartypeNoBg: true,
         before: function() {
-            $j('#galleryCycle span').slideUp();
+            $('#galleryCycle span').slideUp();
         },
         after: function() {
-            $j('span', this).slideDown();
+            $('span', this).slideDown();
         }
     });
 });
 
 
-$j(window).resize(function() {
+$(window).resize(function() {
 
 });
 

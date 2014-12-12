@@ -3,11 +3,11 @@
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 
-    $j(function () {
+    $(function () {
 
-        $j.extend(
+        $.extend(
             true,
-            $j.fn.qtip.defaults,
+            $.fn.qtip.defaults,
             {
                 style: {
                     classes: 'qtip-green qtip-shadow',
@@ -20,38 +20,38 @@
             }
         );
 
-        $j('.allowed-files tr:first th:first').qtip({
+        $('.allowed-files tr:first th:first').qtip({
             content:'Controls if files of this type can be uploaded'});
 
-        $j('.allowed-files tr:first th:nth-child(2)').qtip({
+        $('.allowed-files tr:first th:nth-child(2)').qtip({
             content:'A simple name for the type of file'});
 
-        $j('.allowed-files tr:first th:nth-child(3)').qtip({
+        $('.allowed-files tr:first th:nth-child(3)').qtip({
             content:'The mime type for a file can be found by searching google'});
 
-        $j('.allowed-files tr:first th:nth-child(4)').qtip({
+        $('.allowed-files tr:first th:nth-child(4)').qtip({
             content:'The file extension, everything after the dot. Comma seperate multiple extensions'});
 
-        $j('.allowed-files tr:first th:nth-child(5)').qtip({
+        $('.allowed-files tr:first th:nth-child(5)').qtip({
             content:'The maximum file size when uploading a file of this type - defaults to system-wide max file size'});
 
-        $j('.allowed-files tr:first th:nth-child(6)').qtip({
+        $('.allowed-files tr:first th:nth-child(6)').qtip({
             content:'Determines if file will be opened in the browser or by a third party application'});
 
-        $j(document).on('click', '.modify', function () {
+        $(document).on('click', '.modify', function () {
             var trigger = 0;
 
-            level = $j(this).parent().parent().parent()
+            level = $(this).parent().parent().parent()
 
-            $j('.form-holder').each(function () {
-                if ($j(this).is(':visible')) {
+            $('.form-holder').each(function () {
+                if ($(this).is(':visible')) {
 
                     level.slideUp(function () {
                         level.siblings('.form-holder').slideDown();
                     });
 
-                    $j(this).siblings().slideDown();
-                    $j(this).slideUp();
+                    $(this).siblings().slideDown();
+                    $(this).slideUp();
                     trigger = 1;
 
                 }
@@ -67,34 +67,34 @@
             return false;
         });
 
-        $j('#dialog').dialog({
+        $('#dialog').dialog({
             modal:true,
             width:650,
             autoOpen:false
 
         });
 
-        $j('.open-dialog').click(function () {
-            $j('#dialog').dialog('open');
-            $j('#dialog').children('.store-here').html($j(this).siblings('.chosen-one').attr('ID'));
+        $('.open-dialog').click(function () {
+            $('#dialog').dialog('open');
+            $('#dialog').children('.store-here').html($(this).siblings('.chosen-one').attr('ID'));
             // /images/mime/22x22/
 
 
             return false;
         });
 
-        $j('.new-button').click(function () {
+        $('.new-button').click(function () {
 
-            var currentID = '#' + $j(this).siblings('.store-here').html();
+            var currentID = '#' + $(this).siblings('.store-here').html();
 
-            $j(currentID).val($j(this).children('img').attr('alt'));
-            $j(currentID).siblings('.open-dialog').children('img').attr('src', $j(this).children('img').attr('src'));
+            $(currentID).val($(this).children('img').attr('alt'));
+            $(currentID).siblings('.open-dialog').children('img').attr('src', $(this).children('img').attr('src'));
 
-            $j('#dialog').dialog('close');
+            $('#dialog').dialog('close');
 
         });
 
-		$j('form#newAllowedFile').validate({
+		$('form#newAllowedFile').validate({
 			rules: {
 				description: {
 					required: true,
@@ -117,22 +117,22 @@
 			submitHandler: function (form) {
 				//
 				// Some sort of form validation - check for no duplicate mimetypes.
-				var create_form  = $j('form#newAllowedFile');
-				var update_forms = $j('form[id^="allowed-file"]');
+				var create_form  = $('form#newAllowedFile');
+				var update_forms = $('form[id^="allowed-file"]');
 
 				create_form.add(update_forms);
 
-				var this_mimetype = $j(this).find(':input[name="mime"]').val();
+				var this_mimetype = $(this).find(':input[name="mime"]').val();
 
-				var mimetype_list = $j.map(
+				var mimetype_list = $.map(
 					update_forms.not(this).find(':input[name="mime"]'),
 
 						function(element) {
-						return $j(element).val();
+						return $(element).val();
 					}
 				);
 
-				if ($j.inArray(this_mimetype, mimetype_list) >= 0) {
+				if ($.inArray(this_mimetype, mimetype_list) >= 0) {
 					alert('The mime type you have chosen for this file type is already in use.')
 					event.preventDefault();
 				}
@@ -142,15 +142,15 @@
 			}
 		});
 
-        $j('.delete').click(function (event) {
+        $('.delete').click(function (event) {
 
 
             event.preventDefault();
             if (confirm("Are you sure you want to delete?")) {
-                var nearestAction = $j(this).closest('form').attr('action');
-                var nearestFID = $j(this).closest('form').find('input[name=fileTypeID]').val();
-                $j(this).closest('form').attr('action', nearestAction + "?delete=" + nearestFID);
-                $j(this).closest('form').submit();
+                var nearestAction = $(this).closest('form').attr('action');
+                var nearestFID = $(this).closest('form').find('input[name=fileTypeID]').val();
+                $(this).closest('form').attr('action', nearestAction + "?delete=" + nearestFID);
+                $(this).closest('form').submit();
             }
 
             return false;
@@ -293,22 +293,22 @@
     <!-- END image -->
 </div>
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
 
         /* Force submission of checkboxes regardless of whether they are ticked
          * or not.
          */
-        $j('input[type=checkbox]').change(function () {
-            var name = 'input[name=' + $j(this).attr('name') + ']';
+        $('input[type=checkbox]').change(function () {
+            var name = 'input[name=' + $(this).attr('name') + ']';
 
-            if ($j(this).prop('checked')) {
-                $j(name).val('true');
+            if ($(this).prop('checked')) {
+                $(name).val('true');
             }
             else {
-                $j(name).val('false');
+                $(name).val('false');
             }
         });
 
-        $j.each($j('input[type=checkbox]').is(':checked'));
+        $.each($('input[type=checkbox]').is(':checked'));
     });
 </script>

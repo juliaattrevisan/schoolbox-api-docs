@@ -2,11 +2,11 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
+$(document).ready(function() {
     /**
      * Add to this group from people in an existing system group
      */
-    $j('#addUsersBySystemGroup').selectizeSelector({
+    $('#addUsersBySystemGroup').selectizeSelector({
         ajax: {
             url:      '/ajax/addUserByGroup.php',
             type:     'GET',
@@ -15,16 +15,16 @@ $j(document).ready(function() {
         }
     })
     .on('selectize.item_add', function(event, value) {
-        $j('#systemGroupID').val(value)
+        $('#systemGroupID').val(value)
     })
     .on('selectize.item_remove', function() {
-        $j('#systemGroupID').val('')
+        $('#systemGroupID').val('')
     })
 
     /**
      * Add to this group from people in an existing system group
      */
-    $j('#addUsersByIndividualGroup').selectizeSelector({
+    $('#addUsersByIndividualGroup').selectizeSelector({
         ajax: {
             url:      '/ajax/addUserByGroup.php',
             type:     'GET',
@@ -33,10 +33,10 @@ $j(document).ready(function() {
         }
     })
     .on('selectize.item_add', function(event, value) {
-        $j('#individualGroupID').val(value)
+        $('#individualGroupID').val(value)
     })
     .on('selectize.item_remove', function() {
-        $j('#individualGroupID').val('')
+        $('#individualGroupID').val('')
     })
 });
 </script>

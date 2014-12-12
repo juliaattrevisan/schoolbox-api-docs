@@ -1,23 +1,23 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
 
-        $j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
+        $('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
 
-        $j('a.delete.float-left').click(function () {
+        $('a.delete.float-left').click(function () {
             if (confirm('Are you sure you want to delete this thread?'))
-                window.open($j(this).attr('href'), '_self', '');
+                window.open($(this).attr('href'), '_self', '');
             return false;
         });
 
-        $j('a.delete.no-text').click(function () {
+        $('a.delete.no-text').click(function () {
             if (confirm('Are you sure you want to delete this post?'))
-                window.open($j(this).attr('href'), '_self', '');
+                window.open($(this).attr('href'), '_self', '');
             return false;
         });
 
-        if ($j('.post').length !== 1) {
-            $j('.post:last').css("border", "0")
+        if ($('.post').length !== 1) {
+            $('.post:last').css("border", "0")
         }
 
     });

@@ -3,13 +3,13 @@
 	<script type="text/javascript" src="/javascript/jquery.blogCommentary.js"></script>
 
 	<script type="text/javascript">
-	$j(function() {
-        $j('a.delete-comment').click(function(event) {
+	$(function() {
+        $('a.delete-comment').click(function(event) {
             event.preventDefault();
-            $j(this).confirmDialog({text:'Delete this comment?'});
+            $(this).confirmDialog({text:'Delete this comment?'});
         });
 
-		$j('#component{COMPONENT_INSTANCE_ID}').blogCommentary();
+		$('#component{COMPONENT_INSTANCE_ID}').blogCommentary();
 	});
 	</script>
 

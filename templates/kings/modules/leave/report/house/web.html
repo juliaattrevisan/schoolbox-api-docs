@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
 
-        $j('#container').css('width', $j('.ruler').outerWidth());
+        $('#container').css('width', $('.ruler').outerWidth());
 
-        $j(".sortable-table").tablesorter({
+        $(".sortable-table").tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
             cssDesc:'descending',
@@ -24,52 +24,52 @@
             }
         });
 
-        $j("#requestList").find('tbody tr').removeClass('dark');
+        $("#requestList").find('tbody tr').removeClass('dark');
 
-        $j("#requestList").find('tbody tr:even').addClass('dark');
+        $("#requestList").find('tbody tr:even').addClass('dark');
 
-        $j("#requestList").bind('sortEnd', function () {
-            var requestList = $j(this);
+        $("#requestList").bind('sortEnd', function () {
+            var requestList = $(this);
             requestList.find('tbody tr').removeClass('dark');
             requestList.find('tbody tr:even').addClass('dark');
         });
 
-        $j('#reportDate').datepicker({
+        $('#reportDate').datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
             buttonImageOnly:true,
             constrainInput:false,
             onClose:function (string) {
-                var input = $j(this);
+                var input = $(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time);
                 })
             }
         });
 
-        $j('#reportFilter').submit(function (event) {
+        $('#reportFilter').submit(function (event) {
             event.preventDefault();
-            var form = $j(this);
-            var houseId = $j('#reportHouse').val();
-            var date = $j('#reportDate').val().replace(/\//g, '-');
+            var form = $(this);
+            var houseId = $('#reportHouse').val();
+            var date = $('#reportDate').val().replace(/\//g, '-');
 
             window.location = location.protocol + '//' + location.host + '/modules/leave/report/house/' + houseId + '/' + date;
         });
 
-        $j('#reportFilterSubmit').click(function () {
-            $j('#reportFilter').submit();
+        $('#reportFilterSubmit').click(function () {
+            $('#reportFilter').submit();
         });
 
-        $j('#reportExportButton').click(function (e) {
-            var date = $j('#reportDate').val().toString().replace(/\//g, "-");
-            window.location = $j(this).attr('href') + "/" + date + '/export';
+        $('#reportExportButton').click(function (e) {
+            var date = $('#reportDate').val().toString().replace(/\//g, "-");
+            window.location = $(this).attr('href') + "/" + date + '/export';
             e.preventDefault();
         });
 
-        $j('.print').click(function (e) {
-            var date = $j('#reportDate').val().replace(/\//g, '-');
+        $('.print').click(function (e) {
+            var date = $('#reportDate').val().replace(/\//g, '-');
             window.open(
                     location.protocol + '//' + location.host + '/modules/leave/report/house/{HOUSE_ID}/' + date + '/print',
                     '_blank' // <- This is what makes it open in a new window.
@@ -80,7 +80,7 @@
         /*
          * Hack for the hidden column next to the BS.
          * */
-        $j('.leaveReportHeaderDate:first').attr('colspan', 2)
+        $('.leaveReportHeaderDate:first').attr('colspan', 2)
 
     });
 </script>

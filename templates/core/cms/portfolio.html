@@ -6,7 +6,7 @@
 <script type="text/javascript" src="/javascript/jquery.resourceTree.threePanelBridge.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
+$(document).ready(function() {
     var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php', 'eportfolio')
     var tree = $('#tree');
     tree
@@ -66,16 +66,16 @@ $j(document).ready(function() {
                 }
                 else if (data.length == 0) {
                     /* display empty message */
-                    var empty = $j('#file-list tr.category-'+categoryId+'.empty');
+                    var empty = $('#file-list tr.category-'+categoryId+'.empty');
                     if (empty.length) {
                         empty.show();
                     }
                     else {
-                        $j('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                        $('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
                     }
                 }
                 else {
-                    var template = $j('#file-template');
+                    var template = $('#file-template');
 
                     for (i in data) {
                         var row = data[i];
@@ -95,7 +95,7 @@ $j(document).ready(function() {
                             clone.addClass('hidden');
                         }
 
-                        clone.appendTo($j('#file-list')).show();
+                        clone.appendTo($('#file-list')).show();
                     }
                 }
             }
@@ -107,10 +107,10 @@ $j(document).ready(function() {
 
     // set up resizing
     threePanel.resizePanels()
-    $j(window).resize(threePanel.resizePanels())
+    $(window).resize(threePanel.resizePanels())
 
     // bind actions to their buttons
-    $j(document).ready(function() {
+    $(document).ready(function() {
 
     var actions = {
       cms : {
@@ -142,7 +142,7 @@ $j(document).ready(function() {
           return true
         },
         f_delete : function(id) {
-          var name = $j('#folder-detail h3.name').html()
+          var name = $('#folder-detail h3.name').html()
           if(confirm("Are you sure you want to delete " + name + " and all its contents?")) {
             window.open("/cms/myFolderForm.php?delete=" + id, "_self")
           }
@@ -159,11 +159,11 @@ $j(document).ready(function() {
       },
       multi : {
         f_delete : function() {
-          var selected = $j('#file-list tr.selected'), fileList = '', id
+          var selected = $('#file-list tr.selected'), fileList = '', id
 
           if(selected.length > 1) {
             selected.each(function() {
-              fileList += $j(this).attr("id").substring(5) + ','
+              fileList += $(this).attr("id").substring(5) + ','
             })
 
             if (confirm("Are you sure you want to delete this selection?")) {
@@ -178,7 +178,7 @@ $j(document).ready(function() {
 
     // intercept the publish submitter and splice out the page/component destination IDs
     threePanel.fileDetail.find('form.publish').submit(function(event) {
-      window.open($j(this).attr('action') + '?' + $j(this).serialize().replace(/%26/,'&').replace(/%3D/,'='), '_self')
+      window.open($(this).attr('action') + '?' + $(this).serialize().replace(/%26/,'&').replace(/%3D/,'='), '_self')
       return false
     })
   })

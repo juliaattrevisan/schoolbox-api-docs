@@ -493,7 +493,7 @@
                 e.stopPropagation();
 
                 var unreads = [];
-                $j(settings.content).find('li.unread').each(function() {
+                $(settings.content).find('li.unread').each(function() {
                     unreads.push(this.id.substr(2));
                 });
 
@@ -504,10 +504,10 @@
 
             // testing: toggle indicator
             if(settings.debug) {
-                var bell = $j('#infoPanel').children('li.bell');
-                var a = $j('#go-msg');
+                var bell = $('#infoPanel').children('li.bell');
+                var a = $('#go-msg');
                 // test add remove count
-                $j('#header a.logo').on('click', function(e) {
+                $('#header a.logo').on('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     if(bell.attr('data-unread') == 0) {

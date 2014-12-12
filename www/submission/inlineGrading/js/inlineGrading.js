@@ -41,7 +41,7 @@
 				}
 			}
 
-			var merged = $j.extend(defaults, derived, options);
+			var merged = $.extend(defaults, derived, options);
 			merged.boxId = parseInt(merged.boxId);
 			merged.submissionId = parseInt(merged.submissionId);
 
@@ -145,7 +145,7 @@
 				direct: []
 			}
 
-			var merged = $j.extend(defaults, derived, options);
+			var merged = $.extend(defaults, derived, options);
 			merged.currentId = parseInt(merged.currentId);
 
 			/* Force parse of array as string into actual array structure

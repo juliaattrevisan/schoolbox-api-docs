@@ -13,14 +13,14 @@
 	}
 </style>
 <script type="text/javascript">
-$j(document).ready(function () {
-	$j('#accountForm').submit(function (event) {
+$(document).ready(function () {
+	$('#accountForm').submit(function (event) {
 
 		event.stopPropagation();
 
-		var current = $j('#current_password').val(),
-			password = $j('#new_password').val(),
-			confirmp = $j('#confirm_password').val(),
+		var current = $('#current_password').val(),
+			password = $('#new_password').val(),
+			confirmp = $('#confirm_password').val(),
 			msgs = {
 				current_password: [],
 				new_password:     [],
@@ -69,7 +69,7 @@ $j(document).ready(function () {
 			msgs.confirm_password.push('Your password couldn’t be changed because you didn’t enter the same password in both the New Password and Confirm New Password boxes.');
 		}
 
-		var slots = $j('#current_password_messages, #new_password_messages, #confirm_password_messages');
+		var slots = $('#current_password_messages, #new_password_messages, #confirm_password_messages');
 		slots.hide().empty();
 		if (msgs.current_password.length === 0
 			&& msgs.new_password.length === 0
@@ -78,10 +78,10 @@ $j(document).ready(function () {
 			return true;
 		}
 		else {
-			$j.each(msgs, function(key) {
-				var slot = $j('#'+key+'_messages');
-				$j.each(this, function(k,text) {
-					slot.append($j('<li></li>').text(text).addClass("error-notification"));
+			$.each(msgs, function(key) {
+				var slot = $('#'+key+'_messages');
+				$.each(this, function(k,text) {
+					slot.append($('<li></li>').text(text).addClass("error-notification"));
 				});
 			});
 			slots.fadeIn('fast');

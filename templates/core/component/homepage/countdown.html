@@ -3,15 +3,15 @@
     {CONFIGURATION}
     <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
     <script type='text/javascript'>
-        $j(function () {
-            var element       = $j('#countdown{COMPONENT_INSTANCE_ID}');
+        $(function () {
+            var element       = $('#countdown{COMPONENT_INSTANCE_ID}');
             var weekDisplay   = element.find('.weeks_dash   .digit');
             var dayDisplay    = element.find('.days_dash    .digit');
             var hourDisplay   = element.find('.hours_dash   .digit');
             var minuteDisplay = element.find('.minutes_dash .digit');
             var secondDisplay = element.find('.seconds_dash .digit');
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
-            $j('#countdown{COMPONENT_INSTANCE_ID}').countdown(endTime)
+            $('#countdown{COMPONENT_INSTANCE_ID}').countdown(endTime)
                 .on('update.countdown', function(event) {
                     // Parse time into weeks, days, hours, minutes, seconds
                     weekDisplay.text(event.strftime('%w'));

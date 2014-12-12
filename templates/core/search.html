@@ -3,7 +3,7 @@
 <script type="text/javascript" src="/javascript/jquery.search.js"></script>
 <script type="text/javascript">
 
-$j(function() {
+$(function() {
 
 	/* Set initial conditions
 	 */
@@ -23,23 +23,23 @@ $j(function() {
 		}
 	}
 
-    $j(document).ready(function() {
-        $j('#content div.results').on('click', 'a.more', function() {
-            var type = $j(this).attr('rel');
+    $(document).ready(function() {
+        $('#content div.results').on('click', 'a.more', function() {
+            var type = $(this).attr('rel');
             var selector = '#type a[rel='+type+']';
-            $j(selector).trigger('click');
+            $(selector).trigger('click');
             event.preventDefault();
         });
     });
 
-	search.runOnce(keyword, section, $j('#type a[rel=' + section + ']'), pageNumber);
+	search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
 
 	/* Runs when you change sections
 	 */
-	$j('#type a[class!=disabled]').click(function(event) {
+	$('#type a[class!=disabled]').click(function(event) {
 		event.preventDefault();
 
-		search.runOnce(keyword, $j(this).attr('rel'), $j(this), 1);
+		search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
 	});
 
 

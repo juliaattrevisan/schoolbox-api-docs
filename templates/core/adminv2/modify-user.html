@@ -4,53 +4,53 @@
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
 
-$j(function() {
+$(function() {
 
 	/* Ajax Update group access permissions
 	 */
-	$j('.updateGroupsForm').find('input[name=type]').change(function() {
+	$('.updateGroupsForm').find('input[name=type]').change(function() {
 		var data = {
-			type: $j(this).val(),
-			uid: $j(this).siblings('input[name=uid]').val(),
-			sid: $j(this).siblings('input[name=sid]').val(),
-			service: $j(this).siblings('input[name=service]').val(),
+			type: $(this).val(),
+			uid: $(this).siblings('input[name=uid]').val(),
+			sid: $(this).siblings('input[name=sid]').val(),
+			service: $(this).siblings('input[name=service]').val(),
 			updateGroups: true
 		}
 
-		$j.post('/adminv2/userForm.php', data);
+		$.post('/adminv2/userForm.php', data);
 	});		
 
 	/* Ajax Update service access permissions
 	 */
-	$j('.updateServicesForm').find('input[name=type]').change(function() {
+	$('.updateServicesForm').find('input[name=type]').change(function() {
 		var data = {
-			type: $j(this).val(),
-			uid: $j(this).siblings('input[name=uid]').val(),
-			sid: $j(this).siblings('input[name=sid]').val(),
-			service: $j(this).siblings('input[name=service]').val(),
+			type: $(this).val(),
+			uid: $(this).siblings('input[name=uid]').val(),
+			sid: $(this).siblings('input[name=sid]').val(),
+			service: $(this).siblings('input[name=service]').val(),
 			updateServices: true
 		}
 
-		$j.post('/adminv2/userForm.php', data);
+		$.post('/adminv2/userForm.php', data);
 	}); 
 
 	/* Ajax Update SID values
 	 */
-	$j('.updateSIDForm').find('select[name=sid]').change(function() {
+	$('.updateSIDForm').find('select[name=sid]').change(function() {
 		var data = {
-			type: $j(this).val(),
-			uid: $j(this).siblings('input[name=uid]').val(),
-			sid: $j(this).val(),
-			previousSid: $j(this).siblings('input[name=previousSid]').val(),
-			service: $j(this).siblings('input[name=service]').val(),
+			type: $(this).val(),
+			uid: $(this).siblings('input[name=uid]').val(),
+			sid: $(this).val(),
+			previousSid: $(this).siblings('input[name=previousSid]').val(),
+			service: $(this).siblings('input[name=service]').val(),
 			updateSID: true
 		}
 
-		$j.post('/adminv2/userForm.php', data);
+		$.post('/adminv2/userForm.php', data);
 	});
 
-    $j('h3 span.question').each(function() {
-        $j(this).qtip({
+    $('h3 span.question').each(function() {
+        $(this).qtip({
             content: 'Edit the user\'s details.',
             style: {
                 classes: 'qtip-green qtip-shadow'
@@ -62,21 +62,21 @@ $j(function() {
         });
     });
 
-	$j('a.show-pass').click(function() {
+	$('a.show-pass').click(function() {
 
-        $j(this).siblings('em').show().css('display', 'block');
-		$j(this).siblings('a.hide-pass').show().css('display', 'block');
-		$j(this).hide();
+        $(this).siblings('em').show().css('display', 'block');
+		$(this).siblings('a.hide-pass').show().css('display', 'block');
+		$(this).hide();
 
 		return false;
 
 	});
 	
-	$j('a.hide-pass').click(function() {
+	$('a.hide-pass').click(function() {
 
-        $j(this).siblings('em').hide();
-		$j(this).siblings('a.show-pass').show();
-		$j(this).hide();
+        $(this).siblings('em').hide();
+		$(this).siblings('a.show-pass').show();
+		$(this).hide();
 		
 		return false;
 
@@ -107,9 +107,9 @@ $j(function() {
 
 	/* Remember which sids were used for each service
 	 */
-	$j.each($j('.updateSIDForm'), function(index, value) {
-		var service = $j(value).find('input[name=service]').val();
-		var sid = $j(value).find('input[name=sid]').val();
+	$.each($('.updateSIDForm'), function(index, value) {
+		var service = $(value).find('input[name=service]').val();
+		var sid = $(value).find('input[name=sid]').val();
 
 		for (var i = 0; i < registry.length; i++) {
 			if (registry[i].service == service) {
@@ -120,22 +120,22 @@ $j(function() {
 
 	/* Make unavailable options invisible
 	 */
-	$j('#serviceCloneForm').find('select[name=service]').change(function() {
-		var service = $j(this).val();
+	$('#serviceCloneForm').find('select[name=service]').change(function() {
+		var service = $(this).val();
 
 		/* Default states
 		 */
-		$j.each($j('#serviceCloneForm').find('select[name=sid] option'), function (index, element) {
-			$j(element).show();
+		$.each($('#serviceCloneForm').find('select[name=sid] option'), function (index, element) {
+			$(element).show();
 		});
 
 		/* Exclusions
 		 */
-		if ([5,6,7].indexOf(Number($j(this).val())) >= 0) {
-			$j('#serviceCloneForm').find('select[name=sid]').hide();
+		if ([5,6,7].indexOf(Number($(this).val())) >= 0) {
+			$('#serviceCloneForm').find('select[name=sid]').hide();
 		}
 		else {
-			$j('#serviceCloneForm').find('select[name=sid]').show();
+			$('#serviceCloneForm').find('select[name=sid]').show();
 
 			/* Find this service, and all the options that
 			 * are being used
@@ -146,10 +146,10 @@ $j(function() {
 				 * already in use
 				 */
 				if (registry[i].service == service) {
-					$j.each($j('#serviceCloneForm').find('select[name=sid] option[value!=0]'), function(index, element2) {
+					$.each($('#serviceCloneForm').find('select[name=sid] option[value!=0]'), function(index, element2) {
 						for (var j = 0; j < registry[i].sid.length; j++) {
-							if ($j(element2).val() == registry[i].sid[j]) {
-								$j(element2).hide();
+							if ($(element2).val() == registry[i].sid[j]) {
+								$(element2).hide();
 							}
 						}
 					});
@@ -162,7 +162,7 @@ $j(function() {
 	/**********
 	Custom Validation
 	**********/
-	$j('.admin-form').validate({
+	$('.admin-form').validate({
 		rules: {
 			year: {
 			  	customValid : true
@@ -199,7 +199,7 @@ $j(function() {
 		
 	});
 	
-	$j.validator.addMethod("customValid", function(value, element) {
+	$.validator.addMethod("customValid", function(value, element) {
 		inputValue = (parseInt(value));
 		if (isNaN(inputValue)) {
 			
@@ -220,7 +220,7 @@ $j(function() {
 
 	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
 
-	$j('#serviceCloneForm').validate({
+	$('#serviceCloneForm').validate({
 		rules: {
 			sid: {
 				customCampus: true	
@@ -232,10 +232,10 @@ $j(function() {
 		
 	});
 	
-	$j('#groupAdd').validate();
+	$('#groupAdd').validate();
 	
-	$j.validator.addMethod("customCampus", function(value, element) {
-		if ($j(element).is(':visible')) { 
+	$.validator.addMethod("customCampus", function(value, element) {
+		if ($(element).is(':visible')) {
 			if (value !== "") {
 				return true;	
 			} else {
@@ -247,7 +247,7 @@ $j(function() {
 
 	}, "Please select an option");
 
-	$j.validator.addMethod("customService", function(value, element) {
+	$.validator.addMethod("customService", function(value, element) {
 		
 		if (value !== "") {
 			return true;	
@@ -257,12 +257,12 @@ $j(function() {
 
 	}, "Please select an option");
 	
-	$j('#groupSelect, #campusSelect,#serviceSelect').change(function() {
-		$j(this).closest('form').validate().element($j(this));
+	$('#groupSelect, #campusSelect,#serviceSelect').change(function() {
+		$(this).closest('form').validate().element($(this));
 	})
 
   // locate the assume button and add a listener if it's disabled
-  $j('#content')
+  $('#content')
       .children('.admin-contents')
       .children('form.modify-form')
       .children('a.user.disabled')
@@ -270,7 +270,7 @@ $j(function() {
   {
       var con = confirm("This account is deactivated. Are you sure you want to log in as this user?");
       if(con) {
-        $j(this).closest('form').submit();
+        $(this).closest('form').submit();
       }
   })
 

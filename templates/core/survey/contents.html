@@ -1,40 +1,40 @@
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
-	$j('a.delete').click(function(event) {
+	$('a.delete').click(function(event) {
 		event.preventDefault();
-		$j(this).confirmDialog();
+		$(this).confirmDialog();
 	});
 
 	/* Make questions sortable
 	 */
-	$j(".question-list").sortable({
+	$(".question-list").sortable({
 		placeholder: "sortable-placeholder",
 		forcePlaceholderSize: true,
 		stop: function(event, ui) {
-			var allQuestions = $j(this).find('li');
-			var section = $j(this).attr('id');
+			var allQuestions = $(this).find('li');
+			var section = $(this).attr('id');
 			var data = new Array();
 
-			$j.each(allQuestions, function(index, element) {
+			$.each(allQuestions, function(index, element) {
 				data.push(element.id);
 			});
 
 			/* Reorder questions upon reorder completion
 			 */
-			$j.post('/survey/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
+			$.post('/survey/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
 				var sequence = 1;
 
-				$j.each($j('#' + section).find('li'), function(index, element) {
-					$j(element).find('strong').html('Q' + sequence);
+				$.each($('#' + section).find('li'), function(index, element) {
+					$(element).find('strong').html('Q' + sequence);
 					sequence++;
 				});
 			});
 		}
 	});
 
-	$j(".question-list" ).disableSelection();
+	$(".question-list" ).disableSelection();
 });
 </script>
 

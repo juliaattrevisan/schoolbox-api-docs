@@ -1,39 +1,39 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-    $j(function() {
-        $j('#reportDate').datepicker({
+    $(function() {
+        $('#reportDate').datepicker({
             dateFormat: 'dd/mm/yy',
             showOn: 'both',
             buttonImage: '/images/core/calendar/calendar-click.png',
             buttonImageOnly: true,
             constrainInput: false,
             onClose: function (string) {
-                var input = $j(this);
+                var input = $(this);
 
-                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
                     input.val(data.time);
                 })
             }
         });
 
-        $j('#reportFilter').submit( function (event) {
+        $('#reportFilter').submit( function (event) {
             event.preventDefault();
 
-            var form = $j(this);
+            var form = $(this);
 
-            var date = $j('#reportDate').val().replace(/\//g, '-');
+            var date = $('#reportDate').val().replace(/\//g, '-');
 
             window.location = location.protocol+'//'+ location.host + '/modules/leave/report/catering/' + date;
         } );
 
-        $j('#reportFilterSubmit').click( function () {
-            $j('#reportFilter').submit();
+        $('#reportFilterSubmit').click( function () {
+            $('#reportFilter').submit();
         } );
 
-        $j('#reportExportButton').click( function () {
+        $('#reportExportButton').click( function () {
             window.location = window.location + '/export';
         } );
-        $j('#container').css('width', $j('.ruler').outerWidth());
+        $('#container').css('width', $('.ruler').outerWidth());
     });
 </script>
 <!-- END custom_head -->

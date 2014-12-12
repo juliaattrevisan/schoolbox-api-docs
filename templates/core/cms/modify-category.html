@@ -1,8 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-$j(function() {
+$(function() {
 
-	$j('#folderForm').validate({
+	$('#folderForm').validate({
 		rules: {
 			'group[{REQUIRED_PERMS}]': {
 				groupCheck: true
@@ -12,8 +12,8 @@ $j(function() {
 
 
   jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-    var hasDefaultPerms = $j("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-    var individualPerms = $j('input[name=groupcheck]').is(':checked');
+    var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+    var individualPerms = $('input[name=groupcheck]').is(':checked');
 
     if ((hasDefaultPerms < 2) && !individualPerms) {
       return confirm("You do not currently have write access to this folder. Do you wish to continue?");

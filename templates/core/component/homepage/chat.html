@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascript/chat.js"></script>
 <script type="text/javascript">
-    $j(function () {
-        $j('#component{COMPONENT_INSTANCE_ID}').chat({
+    $(function () {
+        $('#component{COMPONENT_INSTANCE_ID}').chat({
             state: '{CHAT_STATE}',
             category_id: '{ID}',
             component_id: '{CHAT_COMPONENT_ID}',
@@ -13,14 +13,14 @@
             send_el: 'a.btn.chat'
         });
 
-        $j('.show-users').click(function(event) {
+        $('.show-users').click(function(event) {
             event.preventDefault();
-            $j('.chat-users').slideToggle();
-            $j(this).toggleClass('active')
+            $('.chat-users').slideToggle();
+            $(this).toggleClass('active')
         });
 
         /* IE : defer focus to the chat message box */
-        $j(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
+        $(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
             var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
             if(msgbox.setActive) {
                 msgbox.setActive();
@@ -32,7 +32,7 @@
 <script type="text/javascript">
     window.check = true;
     window.onbeforeunload = function (e) {
-        if(window.check) if($j('#component{COMPONENT_INSTANCE_ID}').chat("get_state") == 'Active') {
+        if(window.check) if($('#component{COMPONENT_INSTANCE_ID}').chat("get_state") == 'Active') {
             var confirm = "If you leave this page, the chat will be disabled for any students still in it.";
             var e = e || window.event;
             if (e) { e.returnValue = confirm; }

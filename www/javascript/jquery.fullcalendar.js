@@ -17,7 +17,7 @@ String.prototype.capitalise = function() {
 function Calendar(id, bubbleId, opts) {
     var self = this
     this.id = id
-    this.dom = $j('#'+id)
+    this.dom = $('#'+id)
     this.bubble = new Bubble(this, bubbleId)
     this.suppress = false
 
@@ -50,7 +50,7 @@ function Calendar(id, bubbleId, opts) {
             listViewButton: true
         },
         fullCalendar: {
-            contentHeight: $j(window).height() - this.dom.offset().top - 60,
+            contentHeight: $(window).height() - this.dom.offset().top - 60,
             header: {
                 left: 'prev,today,next',
                 center: 'title',
@@ -80,7 +80,7 @@ function Calendar(id, bubbleId, opts) {
             eventClick: function(calEvent, jsEvent, view) {
 
                 // setup data to be displayed
-                var data = $j.extend(true, {}, calEvent.data.meta)
+                var data = $.extend(true, {}, calEvent.data.meta)
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
@@ -145,7 +145,7 @@ function Calendar(id, bubbleId, opts) {
                 }
                 catch (e) {}
 
-                $j.each(calEvent.data.attendance, function(k, v) {
+                $.each(calEvent.data.attendance, function(k, v) {
                     data['attendance' + k.capitalise()] = v
                 })
 
@@ -214,11 +214,11 @@ function Calendar(id, bubbleId, opts) {
         interaction: function(cal) {
 
             // Only set up interactions that actually exist.
-            var calendarButtons = $j(cal.options.filter.btnSelector)
-            var exportButtons   = $j(cal.options.filter.exportButtonSelector)
+            var calendarButtons = $(cal.options.filter.btnSelector)
+            var exportButtons   = $(cal.options.filter.exportButtonSelector)
 
-            var calendarControls = $j(cal.options.filter.parentSelector)
-            var exportControls   = $j(cal.options.filter.exportSelector)
+            var calendarControls = $(cal.options.filter.parentSelector)
+            var exportControls   = $(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
@@ -253,14 +253,14 @@ function Calendar(id, bubbleId, opts) {
                 calendarControls.on('click', cal.options.filter.applyFiltersSelector, function() {
                     cal.filters.organise(cal, ["campus", "groups", "sources"])
                     calendarControls.find(cal.options.filter.boxSelector).hide()
-                    $j(cal.options.filter.btnSelector).removeClass('engaged')
+                    $(cal.options.filter.btnSelector).removeClass('engaged')
                     return false
                 })
             }
 
-            $j('body').click(function() {
-                $j(cal.options.filter.boxSelector).hide()
-                $j(cal.options.filter.btnSelector).removeClass('engaged')
+            $('body').click(function() {
+                $(cal.options.filter.boxSelector).hide()
+                $(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
             if (cal.options.filter.boxSelector) {
@@ -276,7 +276,7 @@ function Calendar(id, bubbleId, opts) {
             performAjax = performAjax === undefined ? true : performAjax
 
             var flist = {}, selected_classes = ['personal'];
-            var calendarControls = $j(cal.options.filter.parentSelector)
+            var calendarControls = $(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
                 // Each filter array can contain a comma-separated list of IDs
@@ -284,7 +284,7 @@ function Calendar(id, bubbleId, opts) {
                 flist[i] = [filterArray[i], {}]
 
                 calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
-                    var n = $j(this).attr('value')
+                    var n = $(this).attr('value')
                     // show related entries
                     if(this.checked) {
 
@@ -306,7 +306,7 @@ function Calendar(id, bubbleId, opts) {
             flist[filterArray.length] = ['events', {}]
 
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
-                var n = $j(this).attr('value')
+                var n = $(this).attr('value')
                 // show related entries
                 if(this.checked) {
                     flist[i][1][k++] = n
@@ -317,14 +317,14 @@ function Calendar(id, bubbleId, opts) {
             //
             // Get events, put an 'is_rendered' field on them.
             var events = cal.dom.fullCalendar('clientEvents');
-            $j.each(events, function(event_no, event) {
+            $.each(events, function(event_no, event) {
                 var is_rendered = true;
 
                 //
                 // Is this event rendered?
                 // It must match at least one selected filter in each group
                 // (filters are in event.className) to be rendered.
-                $j.each(event.className, function(class_no, classes) {
+                $.each(event.className, function(class_no, classes) {
                     var is_filter_selected = false;
                     if (!classes.trim().length) {
                         //
@@ -337,7 +337,7 @@ function Calendar(id, bubbleId, opts) {
                         //
                         // Check that at least one class in this_classes is in
                         // selected_classes.
-                        $j.each(selected_classes, function(selected_class_no, selected_class) {
+                        $.each(selected_classes, function(selected_class_no, selected_class) {
                             for (var i in this_classes) {
                                 if (this_classes[i] == selected_class) {
                                     is_filter_selected = true;
@@ -362,7 +362,7 @@ function Calendar(id, bubbleId, opts) {
             var cal_object = cal.dom.data('fullCalendar');
             if (cal_object && 'reportEvents' in cal_object) {
                 cal_object.reportEvents(
-                    $j.grep(events, function(event) { return event.is_rendered; })
+                    $.grep(events, function(event) { return event.is_rendered; })
                 );
             }
             else {
@@ -378,12 +378,12 @@ function Calendar(id, bubbleId, opts) {
     }
 
     // preserve the filter and fullCalendar specs
-    var filter = $j.extend({}, this.options.filter, opts.filter)
-    var fullCalendar = $j.extend({}, this.options.fullCalendar, opts.fullCalendar)
-    var datepicker   = $j.extend({}, this.options.datepicker,   opts.datepicker)
+    var filter = $.extend({}, this.options.filter, opts.filter)
+    var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar)
+    var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker)
 
     // perform the merge
-    $j.extend(this.options,opts)
+    $.extend(this.options,opts)
 
     // rewrite the preserved submerge back into the options
     this.options.filter = filter
@@ -442,11 +442,11 @@ Calendar.prototype.init = function() {
     var header = this.dom.find('.fc-toolbar')
     header.addClass('calendar-controls')
     header.find('.fc-button').each(function() {
-        var self = $j(this)
+        var self = $(this)
         self.addClass('filter-change');
     })
     header.find('.fc-right .fc-button').each(function() {
-        var self = $j(this)
+        var self = $(this)
         self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
     })
 
@@ -463,7 +463,7 @@ Calendar.prototype.init = function() {
     headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
 
     // Event creation form listeners
-    $j.each(this.getForms(), function(k, v) {
+    $.each(this.getForms(), function(k, v) {
         if (typeof this.data('no-calendar-listener') === 'undefined') {
             if(k.slice(0, 6) == 'create') {
                 this.submit(function(event) {
@@ -501,7 +501,7 @@ Calendar.prototype.init = function() {
             else {
                 this.submit(function(event) {
                     event.preventDefault();
-                    var data = $j(this).serialize()
+                    var data = $(this).serialize()
 
                     var matchEvents = function(eventId) {
                         return function(event) {
@@ -531,7 +531,7 @@ Calendar.prototype.init = function() {
 
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
-    $j('#datepicker').datepicker(c.options.datepicker);
+    $('#datepicker').datepicker(c.options.datepicker);
 
     return this
 }
@@ -571,7 +571,7 @@ Calendar.prototype.post = function(url, data, successCallback, refetch) {
 
     var cal = this
 
-    $j.post(url, data, function(data) {
+    $.post(url, data, function(data) {
         // if a callback is defined, just use that
         if (successCallback && typeof(successCallback) === "function") {
             successCallback(data)
@@ -591,7 +591,7 @@ Calendar.prototype.post = function(url, data, successCallback, refetch) {
 }
 
 Calendar.prototype.clearForms = function() {
-    $j.each(this.getForms(), function() {
+    $.each(this.getForms(), function() {
         this.find('input[type=text], textarea').val('')
     })
 }
@@ -649,7 +649,7 @@ Calendar.prototype.cdelete = function(data, callback) {
 function Bubble(calendar, bubbleDomId) {
     this.calendar = calendar
     this.forms = {}
-    this.dom = $j('#'+bubbleDomId)
+    this.dom = $('#'+bubbleDomId)
     this.initForms(bubbleDomId)
 }
 
@@ -658,14 +658,14 @@ function Bubble(calendar, bubbleDomId) {
  * @param bubbleDomId
  */
 Bubble.prototype.initForms = function(bubbleDomId) {
-    var bbl = $j('#'+bubbleDomId)
+    var bbl = $('#'+bubbleDomId)
 
     // define a way for the each loop to reach the parent
     var self = this
 
     // cache the forms found within the bubble
     bbl.find('form').each(function() {
-        var frm = $j(this)
+        var frm = $(this)
         self.forms[frm.attr('id')] = frm
     })
 
@@ -698,18 +698,18 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 	 * (This happens on subscribed vcals for example)
 	 */
 	if (eventData.authorId == -1) {
-		$j('dd.post-by').hide();
+		$('dd.post-by').hide();
 	}
 	else {
-		$j('dd.post-by').show();
+		$('dd.post-by').show();
 	}
 
     // Hide reviewed by as well
     if (!('reviewerId' in eventData) || eventData.reviewerId == -1) {
-        $j('dd.reviewed-by').hide();
+        $('dd.reviewed-by').hide();
     }
     else {
-        $j('dd.reviewed-by').show();
+        $('dd.reviewed-by').show();
     }
 
     var xPos = mouseEvent.pageX
@@ -727,11 +727,11 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 Bubble.prototype.showForm = function(id, x, y) {
 
     var minEdgeDistance = 5
-    var navWidth = $j('#nav').width()
+    var navWidth = $('#nav').width()
 
     // hide the bubble, but keep it displayed
     this.dom.css({visibility:'hidden', display:'block'})
-    $j.each(this.forms, function(i, elem) {
+    $.each(this.forms, function(i, elem) {
         if(i == id) {
             this.css({display:'block'})
         }
@@ -760,7 +760,7 @@ Bubble.prototype.showForm = function(id, x, y) {
 
     // don't allow the bubble to fall off the right edge of the page
 //    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
-    leftEdge = Math.min(x, leftEdge, $j(window).width() - bubbleWidth - minEdgeDistance)
+    leftEdge = Math.min(x, leftEdge, $(window).width() - bubbleWidth - minEdgeDistance)
 
     var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
 
@@ -813,7 +813,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
     }
 
     // iterate across the variables supplied, and insert them into the appropriate form elements
-    $j.each(vars, function(k, v) {
+    $.each(vars, function(k, v) {
         // first test if it's an input with the name we're after
         var element = form.find('[name=' + k + ']')
         if(element.length) {
@@ -849,9 +849,9 @@ Bubble.prototype.fillForm = function(formId, vars) {
  */
 function cp(from, to, selector) {
 
-    $j.each(selector, function() {
+    $.each(selector, function() {
         // copy the date in the createEvent form into the createTask form
-        $j(['input[name='+this+']', '.'+this]).each(function() {
+        $(['input[name='+this+']', '.'+this]).each(function() {
             var orig = c.bubble.forms['create'+from.capitalise()].find(this.toString())
             var targ = c.bubble.forms['create'+to.capitalise()].find(this.toString())
 

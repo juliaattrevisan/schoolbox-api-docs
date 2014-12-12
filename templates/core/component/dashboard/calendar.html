@@ -58,15 +58,15 @@
 </div>
 
 <script type="text/javascript">
-    $j(function () {
-        $j(document).on('click', 'a.attendance-request', function (event) {
+    $(function () {
+        $(document).on('click', 'a.attendance-request', function (event) {
             event.preventDefault();
 
-            var button = $j(this);
+            var button = $(this);
 
             var data = button.parent('form').serialize();
 
-            $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+            $.post('/service/attendance/processToggleAttendance', data, function (data) {
                 if (data.error == undefined) {
                     if (button.text() == 'Attend') {
                         button.html('<span></span>Unattend');

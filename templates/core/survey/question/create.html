@@ -2,31 +2,31 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-$j(document).ready(function() {
+$(document).ready(function() {
 
     var section_id = '{SECTION_ID}';
 
 	/* Set current state of dropdown
 	 * Can't get val() of a disabled option element
 	 */
-	if ($j('.question-type-select :selected').text() == '-- Select Type --') {
-		$j('.next-stepm,.question-holder,.marks-holder, #importQuestion').hide();
+	if ($('.question-type-select :selected').text() == '-- Select Type --') {
+		$('.next-stepm,.question-holder,.marks-holder, #importQuestion').hide();
 	}
 	else {
-		if ($j('#type_id').val() == 'import') {
-			$j('.next-step,.question-holder,.marks-holder,#create').hide();
-			$j('#importQuestion').show();
+		if ($('#type_id').val() == 'import') {
+			$('.next-step,.question-holder,.marks-holder,#create').hide();
+			$('#importQuestion').show();
 		}
 		else {
-			$j('.next-step, .question-holder, .marks-holder').show();
-			$j('#importQuestion').hide();
+			$('.next-step, .question-holder, .marks-holder').show();
+			$('#importQuestion').hide();
 		}
 	}
 
 	/* Change state
 	 */
-	$j('#type_id').change(function() {
-		var url = '/survey/question/create/' + section_id + '/' + $j('#type_id').val();
+	$('#type_id').change(function() {
+		var url = '/survey/question/create/' + section_id + '/' + $('#type_id').val();
 		window.location = url;
 	});
 

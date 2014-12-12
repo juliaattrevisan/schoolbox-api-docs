@@ -1,15 +1,15 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-	$j(function() {
-		$j('a.post_comment').click(function() {
-			$j(this).closest('li').find('form').toggle();
-			$j(this).hide();
+	$(function() {
+		$('a.post_comment').click(function() {
+			$(this).closest('li').find('form').toggle();
+			$(this).hide();
 			return false;
 		});
-		$j('a.delete-comment').click(function(event) {
+		$('a.delete-comment').click(function(event) {
 			event.preventDefault();
-			$j(this).confirmDialog({text:'Delete this comment?'});
+			$(this).confirmDialog({text:'Delete this comment?'});
 		})
 	});
 </script>

@@ -22,11 +22,11 @@
 
 </style>
 <script type="text/javascript">
-$j(document).ready(function() {
-    $j('#submit-btn').on('click', function() {
+$(document).ready(function() {
+    $('#submit-btn').on('click', function() {
         this.disabled = 'disabled';
         this.value = 'Saving...';
-        $j(this).closest('form').submit();
+        $(this).closest('form').submit();
         return true;
     });
 });

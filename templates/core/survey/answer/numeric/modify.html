@@ -1,35 +1,35 @@
 <script type="text/javascript">
-$j(function() {
-	$j(document).on('click', '#create', function() {
+$(function() {
+	$(document).on('click', '#create', function() {
 		var content = tinyMCE.activeEditor.getContent(); // get the content
-   		$j('#question').val(content); // put it in the textarea
+   		$('#question').val(content); // put it in the textarea
 	});
 
-	var validator = $j("#createQuestionForm").submit(function() {
+	var validator = $("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
 	}).validate({
 		submitHandler:function () {
-			var theForm = $j('#createQuestionForm');
+			var theForm = $('#createQuestionForm');
 			/* Form preprocessing
 			 */
 			var answerCollection = new Array();
 			tinyMCE.triggerSave();
 
 			var content = tinyMCE.activeEditor.getContent(); // get the content
-			$j('#question').val(content); // put it in the textarea
+			$('#question').val(content); // put it in the textarea
 
 			/* Collate possible answers and their correctness status
 			 */
-			$j.each($j('#answerCollection').find('li'), function (index, element) {
-				var elem = $j(element);
+			$.each($('#answerCollection').find('li'), function (index, element) {
+				var elem = $(element);
 
 				var description = elem.find('.answerDescription').val();
 				var code = elem.find('.answerCode').val();
 
 				/* Ignore empty answers that weren't removed
 				 */
-				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
+				if (($.trim(description) != '') && ($.trim(code) != '')) {
 					answerCollection.push({
 						description: description,
 						value: code
@@ -49,12 +49,12 @@ $j(function() {
 					type_id: theForm.find('input[name=type_id]').val(),
 					marks: theForm.find('input[name=marks]').val(),
 					allAnswers: JSON.stringify(answerCollection),
-					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+					configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
 				};
 
 				/* Submit via POST and redirect to question creation screen upon done
 				 */
-				$j.post(theForm.attr('action'), data, function (responseText) {
+				$.post(theForm.attr('action'), data, function (responseText) {
 					window.location = '/survey/question/create/' + data.section_id;
 				});
 			}
@@ -65,12 +65,12 @@ $j(function() {
 					type_id: theForm.find('input[name=type_id]').val(),
 					question: tinyMCE.get('question').getContent(),
 					allAnswers: JSON.stringify(answerCollection),
-					configuration:JSON.stringify($j('#configuration').find('input, textarea, select').serializeArray())
+					configuration:JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
 				};
 
 				/* Submit via POST and redirect to question creation screen upon done
 				 */
-				$j.post(theForm.attr('action'), data, function (responseText) {
+				$.post(theForm.attr('action'), data, function (responseText) {
 					window.location = questionBank.url
 				});
 			}

@@ -2,32 +2,32 @@
 <script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript">
-$j(function () {
+$(function () {
     /* Subject Filter */
-    $j('#subjectFilter').change(function () {
-        $j('li.event').fadeTo(0, 1);
+    $('#subjectFilter').change(function () {
+        $('li.event').fadeTo(0, 1);
 
-        var categoryID = $j(this).val();
+        var categoryID = $(this).val();
         if (categoryID != '') {
-            $j('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
+            $('li.event:not(.category-' + categoryID + ')').fadeTo(0, 0.4);
         }
 
     });
 
-    $j('#childSelect').change(function () {
+    $('#childSelect').change(function () {
 
-        window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$j(this).val()), '_self', '');
+        window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$(this).val()), '_self', '');
         return false;
     });
 
-    var templateAssess  = doT.template($j('script#assess-popup-template').html().trim());
-    var templateDueWork = doT.template($j('script#duework-popup-template').html().trim());
+    var templateAssess  = doT.template($('script#assess-popup-template').html().trim());
+    var templateDueWork = doT.template($('script#duework-popup-template').html().trim());
 
     /* Calendar Popup */
-    $j(document).on("click", '.calendarTable ul li span', function(){
-        $j('.duework-popup.cal-bubble.cal-bubble').remove();
-        var position = $j(this).parent().offset();
-        var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
+    $(document).on("click", '.calendarTable ul li span', function(){
+        $('.duework-popup.cal-bubble.cal-bubble').remove();
+        var position = $(this).parent().offset();
+        var node = $(this).closest('li'), ev = node.attr("id").substring(6);
 
         var is_assess = 0;
         if (ev.match(/^assess-/)) {
@@ -35,11 +35,11 @@ $j(function () {
             is_assess = 1;
         }
 
-        $j.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
+        $.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
 
             if (data !== null) {
                 var template = is_assess ? templateAssess : templateDueWork;
-                var output   = $j(template(data));
+                var output   = $(template(data));
                 output.appendTo('body');
                 movePopup(position);
             }
@@ -49,32 +49,32 @@ $j(function () {
         return false;
     });
 
-    $j(document).on("click", '.close', function() {
-        $j('.duework-popup.cal-bubble.cal-bubble').remove();
+    $(document).on("click", '.close', function() {
+        $('.duework-popup.cal-bubble.cal-bubble').remove();
     });
 
     function movePopup (location) {
-        var annoyingHeight = ($j('duework-popup.cal-bubble .middle').height() + ($j('duework-popup.cal-bubble .top').height()) + ($j('duework-popup.cal-bubble .bottom').height()))
+        var annoyingHeight = ($('duework-popup.cal-bubble .middle').height() + ($('duework-popup.cal-bubble .top').height()) + ($('duework-popup.cal-bubble .bottom').height()))
 
-        $j('.duework-popup.cal-bubble').css("left", (location.left - 300));
+        $('.duework-popup.cal-bubble').css("left", (location.left - 300));
 
-        $j('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));
+        $('.duework-popup.cal-bubble').css("top", (location.top - annoyingHeight - 130));
 
-        if (($j('.duework-popup.cal-bubble').css("left")) < '0px') {
-            $j('.duework-popup.cal-bubble').css("left", '0');
+        if (($('.duework-popup.cal-bubble').css("left")) < '0px') {
+            $('.duework-popup.cal-bubble').css("left", '0');
         }
 
         closeBubble();
     }
 
     function closeBubble () {
-        $j('a.bubble-close').click(function() {
-            $j(this).closest('div.bubble').remove();
+        $('a.bubble-close').click(function() {
+            $(this).closest('div.bubble').remove();
             return false;
         });
     }
 
-    $j('.datepicker').datepicker({
+    $('.datepicker').datepicker({
         dateFormat:'yy-mm-dd',
         showOn:'both',
         buttonImage:'/images/core/calendar/calendar-click.png',
@@ -89,12 +89,12 @@ $j(function () {
     //
     // Form listener for exporter - brings up a dialog box that offers a URL
     // to click.
-    $j('#calendar-export').click(function(event) {
+    $('#calendar-export').click(function(event) {
         event.preventDefault();
-        $j('#calendar-export-dialog').dialog({
+        $('#calendar-export-dialog').dialog({
             open: function(event, ui) {
-                $j(event.target).find('#calendar-export-dialog-url')
-                    .text($j.getExportCalendarLink(
+                $(event.target).find('#calendar-export-dialog-url')
+                    .text($.getExportCalendarLink(
                         '{USER_TOKEN}',
                         {'export': 'duework'}
                     )

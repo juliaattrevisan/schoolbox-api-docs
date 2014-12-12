@@ -3,15 +3,15 @@
  * @param opts - defaults are for dashboard implementation
  * @return {*} - self
  */
-$j.fn.configurator = function(opts) {
+$.fn.configurator = function(opts) {
     var defaults = {
         context: 'dashboard',
         dropDownSelector: '#group-select',
         disabledMsg: 'This component can only be used once, and is already active for the group selected.'
     };
-    var options = $j.extend({}, defaults, opts);
+    var options = $.extend({}, defaults, opts);
     var configurator = this;
-    var dropDownSelector = $j(options.dropDownSelector);
+    var dropDownSelector = $(options.dropDownSelector);
 
     /* METHODS */
     this.start = function() {
@@ -26,9 +26,9 @@ $j.fn.configurator = function(opts) {
 
 
     this.help = function() {
-        $j('h2 span').each(function() {
-            var activeContent = $j(this).siblings('em').html();
-            $j(this).qtip({
+        $('h2 span').each(function() {
+            var activeContent = $(this).siblings('em').html();
+            $(this).qtip({
                 content: activeContent,
                 style: {
                     classes: 'qtip-green qtip-shadow qtip-rounded'
@@ -41,9 +41,9 @@ $j.fn.configurator = function(opts) {
         });
 
         // We'll encapsulate our .qtip() call in your .on() handler method
-        $j(document).on('mouseover', '.disabled', function(event) {
+        $(document).on('mouseover', '.disabled', function(event) {
             // Bind the qTip within the event handler
-            $j(this).qtip({
+            $(this).qtip({
                 overwrite: false,
                 content: options.disabledMsg,
                 show: {
@@ -65,10 +65,10 @@ $j.fn.configurator = function(opts) {
         var hashStripped = location.href.split("#")[1];
         if (hashStripped) {
             dropDownSelector.val(hashStripped);
-            $j.get('/adminv2/component/get/'+options.context+'/'+hashStripped, function ($layout) {
-                $j('#'+options.context+'-layout').fadeOut(function() {
-                    $j(this).empty().append($layout);
-                    $j(this).fadeIn();
+            $.get('/adminv2/component/get/'+options.context+'/'+hashStripped, function ($layout) {
+                $('#'+options.context+'-layout').fadeOut(function() {
+                    $(this).empty().append($layout);
+                    $(this).fadeIn();
                     configurator.dragAndDrop();
                 });
             });
@@ -79,14 +79,14 @@ $j.fn.configurator = function(opts) {
         var instID;
         var templID;
 
-        $j('#'+options.context+'-layout .component-holder').sortable({
+        $('#'+options.context+'-layout .component-holder').sortable({
             helper: 'clone',
             connectWith: '#'+options.context+'-layout .component-holder',
             update: function (event, ui) {
 
                 var instanceID;
-                if($j(ui.item).attr('id'))
-                    instanceID = $j(ui.item).attr('id').match(/instance\-id\-(\d+)/);
+                if($(ui.item).attr('id'))
+                    instanceID = $(ui.item).attr('id').match(/instance\-id\-(\d+)/);
                 else
                     instanceID = null;
 
@@ -94,14 +94,14 @@ $j.fn.configurator = function(opts) {
                     instanceID = instanceID[1];
                 }
 
-                var definitionID = $j(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
+                var definitionID = $(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
 
                 var groupID = dropDownSelector.val();
                 templID = groupID;
 
-                var position = $j(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
+                var position = $(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
 
-                var sequence = $j(ui.item).index() + 1;
+                var sequence = $(ui.item).index() + 1;
 
                 var component = {
                     context: options.context,
@@ -118,9 +118,9 @@ $j.fn.configurator = function(opts) {
                 }
 
                 // need async to be false because this call needs to complete before the GET below begins
-                $j.ajaxSetup({async: false});
-                $j.post('/adminv2/component/save', component, function (instance) {
-                    $j(ui.item).attr('id', 'instance-id-'+instance.id);
+                $.ajaxSetup({async: false});
+                $.post('/adminv2/component/save', component, function (instance) {
+                    $(ui.item).attr('id', 'instance-id-'+instance.id);
                     instID = instance.id;
                     // console.log(instID);
                     configurator.refreshPalette();
@@ -137,7 +137,7 @@ $j.fn.configurator = function(opts) {
                         cid: templID
                     };
                     // console.log(data);
-                    $j.ajax({
+                    $.ajax({
                         async: false,
                         url: "/adminv2/component/config",
                         data: data,
@@ -154,26 +154,26 @@ $j.fn.configurator = function(opts) {
             cancel: '.nodrag,:input,option'
         });
 
-        $j('#definition-palette .component').draggable({
+        $('#definition-palette .component').draggable({
             helper: 'clone',
             connectToSortable: '#'+options.context+'-layout .component-holder'
         });
 
-        $j('#'+options.context+'-layout .component-holder').sortable('refresh');
+        $('#'+options.context+'-layout .component-holder').sortable('refresh');
 
         this.refreshPalette();
     };
 
     this.refreshPalette = function() {
 
-        $j('#definition-palette .component').each( function () {
-            var definitionElement = $j(this);
+        $('#definition-palette .component').each( function () {
+            var definitionElement = $(this);
             var definitionIDClass = definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
 
             var search = '#'+options.context+'-layout .component.' + definitionIDClass;
 
             var singleton = definitionElement.hasClass('single-instance');
-            var instantiated = $j(search).length > 0;
+            var instantiated = $(search).length > 0;
 
             // console.log('searching for ' + search + ': ' + $j(search).length + ' found');
 
@@ -202,13 +202,13 @@ $j.fn.configurator = function(opts) {
 
     this.roleSelect = function() {
         dropDownSelector.change(function () {
-            var self = $j(this);
+            var self = $(this);
             var groupID = self.val();
             location.hash = groupID;
 
-            $j.get('/adminv2/component/get/'+options.context+'/'+groupID, function ($layout) {
-                $j('#'+options.context+'-layout').fadeOut(function() {
-                    var self = $j(this);
+            $.get('/adminv2/component/get/'+options.context+'/'+groupID, function ($layout) {
+                $('#'+options.context+'-layout').fadeOut(function() {
+                    var self = $(this);
                     self.empty().append($layout);
                     self.fadeIn();
                     configurator.dragAndDrop();
@@ -218,8 +218,8 @@ $j.fn.configurator = function(opts) {
     };
 
     this.deleteComponent = function() {
-        $j(document).on('click', '.delete-this', function() {
-            var self = $j(this);
+        $(document).on('click', '.delete-this', function() {
+            var self = $(this);
             var component = self.parents('.component').first();
             var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
@@ -228,7 +228,7 @@ $j.fn.configurator = function(opts) {
                 configurator.refreshPalette();
             });
 
-            $j.post('/adminv2/component/remove', { instanceId: $instanceId },
+            $.post('/adminv2/component/remove', { instanceId: $instanceId },
                 function () {
                     // hook into the post-success if you want
                 }
@@ -245,15 +245,15 @@ $j.fn.configurator = function(opts) {
         // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
-        $j(document).on('submit', '#'+options.context+'-layout form', function(event) {
-            var self = $j(this);
+        $(document).on('submit', '#'+options.context+'-layout form', function(event) {
+            var self = $(this);
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');
             var bgcol = component.css('background-color');
             var postdata = self.serialize();
 
             // perform the ajax
-            $j.ajax({
+            $.ajax({
                 async: false,
                 url: "/adminv2/component/config",
                 data: postdata,
@@ -275,7 +275,7 @@ $j.fn.configurator = function(opts) {
                     component.css({'background-color': '#fdd'});
                     setTimeout(function() {
                         self.find('.errmsg').slideUp(300, function() {
-                            $j(this).remove();
+                            $(this).remove();
                             component.css({'background-color': bgcol});
                         });
 

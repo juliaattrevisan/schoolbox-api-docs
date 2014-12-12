@@ -2,15 +2,15 @@
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript">
 
-    $j(function () {
-        $j('.prettify').prettyFileInput({
+    $(function () {
+        $('.prettify').prettyFileInput({
             additionalButtonClasses:'no-marg float-left',
             buttonActiveClass:'tick',
             defaultText:'<span></span>Choose file',
             defaultFileSelectedText:'<span></span>File selected'
         });
 
-        $j('#fileForm').validate();
+        $('#fileForm').validate();
     });
 </script>
 <!-- END custom_head -->

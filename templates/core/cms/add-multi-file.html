@@ -2,10 +2,10 @@
 <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
 <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
 <script type="text/javascript">
-    $j(function () {
+    $(function () {
         var uploadQueue = new Array();
 
-        $j('#custom_file_upload').uploadify({
+        $('#custom_file_upload').uploadify({
             'uploader':'/javascript/uploadify/uploadify.swf',
             'script':'/cms/fileForm.php?{SESSION_NAME}={SESSION_ID}',
             'cancelImg':'/javascript/uploadify/cancel.png',
@@ -25,8 +25,8 @@
                 history.back(-1);
             },
             'onSelectOnce':function () {
-                if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
-                    $j('.uploadifyQueueItem').prepend('<table width="100%" class="heading-table table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>');
+                if (!$('.uploadifyQueueItem').find('.heading-table').length > 0) {
+                    $('.uploadifyQueueItem').prepend('<table width="100%" class="heading-table table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>');
                 }
                 ;
 
@@ -35,7 +35,7 @@
 
         /* Check for errors with custom file starter
          */
-        $j('#startUpload').click(function (event) {
+        $('#startUpload').click(function (event) {
             event.preventDefault();
             var errors = 0;
             var prefill = true;
@@ -45,14 +45,14 @@
              * there are any previously uploaded files as they become inaccessible
              * after being uploaded
              */
-            $j.each(uploadQueue, function (k, v) {
-                if ($j('input[name=uploaded_' + v + ']').val() == 0) {
-                    var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+            $.each(uploadQueue, function (k, v) {
+                if ($('input[name=uploaded_' + v + ']').val() == 0) {
+                    var elem = $('input[name=description_custom_file_upload_' + v + ']');
 
                     /* Prefill file names for mass upload
                      */
                     if (prefill) {
-                        var filename = $j('input[name=fullname_' + v + ']').val();
+                        var filename = $('input[name=fullname_' + v + ']').val();
 
                         /* If there is no description, try to put the filename in.
                          * Otherwise leave it as entered
@@ -78,12 +78,12 @@
                 alert('Please enter a description for each file.');
             }
             else {
-                $j.each(uploadQueue, function (k, v) {
-                    if ($j('input[name=uploaded_' + v + ']').val() == 0) {
-                        var elem = $j('input[name=description_custom_file_upload_' + v + ']');
+                $.each(uploadQueue, function (k, v) {
+                    if ($('input[name=uploaded_' + v + ']').val() == 0) {
+                        var elem = $('input[name=description_custom_file_upload_' + v + ']');
                         var hidden = 0;
 
-                        if ($j('input[name=hidden]').prop('checked')) {
+                        if ($('input[name=hidden]').prop('checked')) {
                             hidden = 1;
                         }
 
@@ -94,13 +94,13 @@
                             'hidden':hidden
                         };
 
-                        $j('#custom_file_upload').uploadifySettings('scriptData', data);
+                        $('#custom_file_upload').uploadifySettings('scriptData', data);
 
-                        $j('#custom_file_upload').uploadifyUpload(v);
+                        $('#custom_file_upload').uploadifyUpload(v);
 
                         /* Mark as uploaded
                          */
-                        $j('input[name=uploaded_' + v + ']').val(1);
+                        $('input[name=uploaded_' + v + ']').val(1);
                     }
                 });
 

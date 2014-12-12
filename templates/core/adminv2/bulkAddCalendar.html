@@ -2,10 +2,10 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
-$j(function() {
-    $j('thead td').each(function() {
-        var activeContent = $j(this).find('em').html();
-        $j(this).qtip({
+$(function() {
+    $('thead td').each(function() {
+        var activeContent = $(this).find('em').html();
+        $(this).qtip({
             content: activeContent,
             style: {
                 classes: 'qtip-green qtip-shadow',

@@ -3,25 +3,25 @@
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 
 <script type="text/javascript">
-$j(function() {
+$(function() {
 	$.fn.alaressTiny({
 		mode: 'exact',
 		elements: 'description',
 		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
 	});
 
-	$j('.checkbox').click(function() {
-		if ($j('.hide-questions').is(":visible")) {
-			$j('.hide-questions :input').prop('disabled', true);
+	$('.checkbox').click(function() {
+		if ($('.hide-questions').is(":visible")) {
+			$('.hide-questions :input').prop('disabled', true);
 		} else {
-			$j('.hide-questions :input').prop('disabled', false);
+			$('.hide-questions :input').prop('disabled', false);
 		}
-		$j('.hide-questions').toggle();
+		$('.hide-questions').toggle();
 	});
 
 	jQuery.validator.addMethod("combo", function(value, element)
 		{
-		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
+		if (($('.checkbox').is(':checked')) && ($('.pool').val() == ""))
 		{
 		  return false;
 		}
@@ -30,7 +30,7 @@ $j(function() {
 	  "You've selected random selection of questions. Please enter the number of questions to put in the pool."
 	);
 
-	$j('#createSection').validate({
+	$('#createSection').validate({
 		rules: {
 			title: {
 				required: true,

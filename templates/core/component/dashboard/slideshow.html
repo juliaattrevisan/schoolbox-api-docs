@@ -1,13 +1,13 @@
 <script type="text/javascript" src="/javascript/components/jquery-cycle/jquery.cycle.all.js"></script>
 <script type="text/javascript">
-	$j(function(){
-		$j('#galleryCycle').cycle({
+	$(function(){
+		$('#galleryCycle').cycle({
 			cleartypeNoBg: true,
 			before: function() {
-				$j('#galleryCycle span').slideUp();
+				$('#galleryCycle span').slideUp();
 			},
 			after: function() {
-				$j('span', this).slideDown();
+				$('span', this).slideDown();
 			}
 		});
 	});

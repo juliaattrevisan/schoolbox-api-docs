@@ -1,10 +1,10 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 
-$j(function() {
-	$j('.textarea-container').each(function() {
-		if ($j(this).html() == "") {
-			$j(this).parent().remove();
+$(function() {
+	$('.textarea-container').each(function() {
+		if ($(this).html() == "") {
+			$(this).parent().remove();
 		}
 	});
 });

@@ -1,14 +1,14 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <script type='text/javascript'>
-        $j(function () {
-            $j(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
+        $(function () {
+            $(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
                 event.preventDefault();
 
-                var button = $j(this);
+                var button = $(this);
 
                 var data = button.parent('form').serialize();
 
-                $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+                $.post('/service/attendance/processToggleAttendance', data, function (data) {
 
                     if (data.error == undefined) {
                         if (button.text() == 'Attend') {

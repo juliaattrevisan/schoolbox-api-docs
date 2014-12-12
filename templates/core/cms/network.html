@@ -6,7 +6,7 @@
 <script type="text/javascript" src="/javascript/jquery.resourceTree.threePanelBridge.js"></script>
 <script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
-$j(function() {
+$(function() {
     var threePanel = new ThreePanelView('/ajax/resource/networkMeta.php', 'network')
     var tree       = $('#tree');
     tree
@@ -66,15 +66,15 @@ $j(function() {
                 }
                 else if (data.length == 0) {
                     /* display empty message */
-                    var empty = $j('#file-list tr.category-' + categoryId + '.empty');
+                    var empty = $('#file-list tr.category-' + categoryId + '.empty');
                     if (empty.length) {
                         empty.show();
                     } else {
-                        $j('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                        $('<tr class="category-' + categoryId + ' empty"><td>No files to display</td></tr>').appendTo($('#file-list'));
                     }
                 }
                 else {
-                    var template = $j('#file-template');
+                    var template = $('#file-template');
 
                     for (i in data) {
                         var row = data[i];
@@ -93,7 +93,7 @@ $j(function() {
                             clone.addClass('hidden');
                         }
 
-                        clone.appendTo($j('#file-list')).show();
+                        clone.appendTo($('#file-list')).show();
                     }
                 }
             }
@@ -105,7 +105,7 @@ $j(function() {
   threePanel.getMeta({OPEN});
 
   threePanel.resizePanels()
-  $j(window).resize(threePanel.resizePanels());
+  $(window).resize(threePanel.resizePanels());
 
   var actions = {
     cms : {
@@ -159,11 +159,11 @@ $j(function() {
     },
     multi : {
       f_delete : function() {
-        var selected = $j('#file-list tr.selected'), fileList = '', id
+        var selected = $('#file-list tr.selected'), fileList = '', id
 
         if(selected.length > 1) {
           selected.each(function() {
-            fileList += $j(this).attr("id").substring(5) + ','
+            fileList += $(this).attr("id").substring(5) + ','
           })
           if (confirm("Are you sure you want to delete this selection?")) {
             window.open("/cms/fileForm.php?fileList="+fileList+"&deleteList=1", "_self")
@@ -175,7 +175,7 @@ $j(function() {
     }
   };
 
-  $j(document).ready(function() {
+  $(document).ready(function() {
     threePanel.actionBind(actions)
   });
 });
