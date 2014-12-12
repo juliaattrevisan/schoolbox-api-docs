@@ -41,28 +41,29 @@ class Crop extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
         /* Figure out resized dimensions
          */
-        $currentWidth = imagesx($image);
-        $currentHeight = imagesy($image);
+        $currentWidth  = $image->getWidth();
+        $currentHeight = $image->getHeight();
 
         /* Width of area to crop
          */
-        $src_w = $currentWidth * ($this->getCoordinates('x1') - $this->getCoordinates('x0'));
+        $src_w = $currentWidth  * ($this->getCoordinates('x1') - $this->getCoordinates('x0'));
         $src_h = $currentHeight * ($this->getCoordinates('y1') - $this->getCoordinates('y0'));
 
-        $src_x = $currentWidth * $this->getCoordinates('x0');
+        $src_x = $currentWidth  * $this->getCoordinates('x0');
         $src_y = $currentHeight * $this->getCoordinates('y0');
 
-        /* Create canvas at specified dimensions
-         */
-        $canvas = imagecreatetruecolor($src_w, $src_h);
+        return $image->crop($src_w, $src_h, $src_x, $src_y);
 
-        $this->alphaFill($canvas);
-        imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
-
-        return $canvas;
+//        /* Create canvas at specified dimensions
+//         */
+//        $canvas = imagecreatetruecolor($src_w, $src_h);
+//
+//        $this->alphaFill($canvas);
+//        imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
+//
+//        return $canvas;
     }
 
     /**

@@ -14,10 +14,11 @@
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
 use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
 
 class Square extends BaseStrategy implements StrategyInterface
 {
+
+    protected $innerProcessor = null;
 
     /**
     * Constructor
@@ -26,13 +27,8 @@ class Square extends BaseStrategy implements StrategyInterface
     */
     public function __construct($args)
     {
-        $this->setCanvasWidth($args['width']);
-        $this->setCanvasHeight($args['width']);
-
-        /* Create canvas at specified dimensions
-         */
-        $manager = new ImageManager();
-        $this->setCanvas($manager->canvas($this->getCanvasWidth(), $this->getCanvasHeight()));
+        $args['height'] = $args['width'];
+        $this->innerProcessor = new Rectangle($args);
     }
 
     /**
@@ -40,53 +36,6 @@ class Square extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
-        /* Center of source image
-         */
-        $currentWidth = imagesx($image);
-        $currentHeight = imagesy($image);
-
-        $centerX = floor($currentWidth/2);
-        $centerY = floor($currentHeight/2);
-
-        /* Landscape
-         * Constrain by width
-         */
-        if ($centerX > $centerY) {
-            $ratio = $currentHeight / $this->getCanvasHeight();
-
-            $resizedWidth = $currentWidth / $ratio;
-            $resizedHeight = $currentHeight / $ratio;
-
-            $startX = ($currentWidth - $currentHeight)/2;
-            $startY = 0;
-        } /* Portrait
-         */
-        elseif ($centerX < $centerY) {
-            $ratio = $currentWidth / $this->getCanvasWidth();
-
-            $resizedWidth = $currentWidth / $ratio;
-            $resizedHeight = $currentHeight / $ratio;
-
-            $startX = 0;
-            $startY = ($currentHeight - $currentWidth)/2;
-        } /* Square already
-         */
-        else {
-            $resizedWidth = $this->getCanvasWidth();
-            $resizedHeight = $this->getCanvasHeight();
-
-            $startX = 0;
-            $startY = 0;
-        }
-
-        $this->alphaFill();
-
-        /* Resize the canvas to fit the new resized dimensions, so
-         * you don't get excess canvas space
-         */
-        imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
-
-        return $this->getCanvas();
+        return $this->innerProcessor->manipulate($image);
     }
 }

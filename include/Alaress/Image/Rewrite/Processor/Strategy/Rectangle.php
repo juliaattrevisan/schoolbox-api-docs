@@ -67,8 +67,8 @@ class Rectangle extends BaseStrategy implements StrategyInterface
 
         /* Center of source image
          */
-        $currentWidth = imagesx($image);
-        $currentHeight = imagesy($image);
+        $currentWidth  = $image->getWidth();
+        $currentHeight = $image->getHeight();
 
         $currentRatio = $currentWidth / $currentHeight;
         $finalRatio = $this->getCanvasWidth() / $this->getCanvasHeight();
@@ -80,12 +80,12 @@ class Rectangle extends BaseStrategy implements StrategyInterface
             || $currentHeight > $this->getCanvasHeight()
             || $this->getSmallImageUpscales()
         ) {
-            /* Landscape
-             */
             if (($this->getCanvasWidth()/$this->getCanvasHeight()) >= 1) {
-/* Current image is more panoramic than final canvas -_-;
+                /* Landscape
                  */
                 if ($currentRatio > $finalRatio) {
+                    /* Current image is more panoramic than final canvas -_-;
+                     */
                     /* The edges that get lopped off
                      */
                     $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
@@ -95,9 +95,9 @@ class Rectangle extends BaseStrategy implements StrategyInterface
 
                     $endX = $currentWidth - 2*$trim;
                     $endY = $currentHeight;
-                } /* Canvas is more panoramic than current image -_-;
-                 */
-                else {
+                } else {
+                    /* Canvas is more panoramic than current image -_-;
+                     */
                     /* The edges that get lopped off
                      */
                     $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
@@ -108,12 +108,12 @@ class Rectangle extends BaseStrategy implements StrategyInterface
                     $endX = $currentWidth;
                     $endY = $currentHeight - 2*$trim;
                 }
-            } /* Portrait
-             */
-            else {
-/* Canvas is taller than current image -_-;
+            } else {
+                /* Portrait
                  */
                 if ($currentRatio > $finalRatio) {
+                    /* Canvas is taller than current image -_-;
+                     */
                     /* The edges that get lopped off
                      */
                     $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
@@ -123,9 +123,9 @@ class Rectangle extends BaseStrategy implements StrategyInterface
 
                     $endX = $currentWidth - 2*$trim;
                     $endY = $currentHeight;
-                } /* Current image is taller than final canvas -_-;
-                 */
-                else {
+                } else {
+                    /* Current image is taller than final canvas -_-;
+                     */
                     /* The edges that get lopped off
                      */
                     $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
@@ -141,17 +141,33 @@ class Rectangle extends BaseStrategy implements StrategyInterface
             /* Resize the canvas to fit the new resized dimensions, so
              * you don't get excess canvas space
              */
-            $this->alphaFill();
-            imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $this->getCanvasWidth(), $this->getCanvasHeight(), $endX, $endY);
+            return $image
+                ->resize($endX, $endY)
+                ->resizeCanvas($this->getCanvasWidth(), $this->getCanvasHeight(), 'center')
+            ;
+//            $this->alphaFill();
+//            imagecopyresampled(
+//                $this->getCanvas(),
+//                $image,
+//                0,
+//                0,
+//                $startX,
+//                $startY,
+//                $this->getCanvasWidth(),
+//                $this->getCanvasHeight(),
+//                $endX,
+//                $endY
+//            );
         } else {
-            // Create a new truecolor canvas of the same size, and copy onto it.
-            $this->setCanvas(imagecreatetruecolor($currentWidth, $currentHeight));
-            $this->alphaFill();
-            imagecopy($this->getCanvas(), $image, 0, 0, 0, 0, $currentWidth, $currentHeight);
+            return $image->resizeCanvas($currentWidth, $currentHeight, 'center');
+//            // Create a new truecolor canvas of the same size, and copy onto it.
+//            $this->setCanvas(imagecreatetruecolor($currentWidth, $currentHeight));
+//            $this->alphaFill();
+//            imagecopy($this->getCanvas(), $image, 0, 0, 0, 0, $currentWidth, $currentHeight);
         }
-
-
-        return $this->getCanvas();
+//
+//
+//        return $this->getCanvas();
     }
 
     /* Getters/Setters

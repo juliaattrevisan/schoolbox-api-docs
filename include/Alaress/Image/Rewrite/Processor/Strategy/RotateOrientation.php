@@ -35,22 +35,21 @@ class RotateOrientation extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
-        $exif = @exif_read_data($this->filePath);
-        if (!empty($exif['Orientation'])) {
-            switch($exif['Orientation']) {
-                case 8:
-                    $image = imagerotate($image, 90, 0);
-                    break;
-                case 3:
-                    $image = imagerotate($image, 180, 0);
-                    break;
-                case 6:
-                    $image = imagerotate($image, -90, 0);
-                    break;
-            }
-        }
-
-        return $image;
+        return $image->orientate();
+//        $exif = @exif_read_data($this->filePath);
+//        if (!empty($exif['Orientation'])) {
+//            switch($exif['Orientation']) {
+//                case 8:
+//                    $image = imagerotate($image, 90, 0);
+//                    break;
+//                case 3:
+//                    $image = imagerotate($image, 180, 0);
+//                    break;
+//                case 6:
+//                    $image = imagerotate($image, -90, 0);
+//                    break;
+//            }
+//        }
+//        return $image;
     }
 }

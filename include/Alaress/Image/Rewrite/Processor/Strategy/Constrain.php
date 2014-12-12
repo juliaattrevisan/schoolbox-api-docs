@@ -45,25 +45,26 @@ class Constrain extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
-        /* Figure out resized dimensions
-        */
-        $dimensions = $this->boundingBox($image);
-
-        /* If resultant dimensions are the same, just return
-         * what you were provided instead of copying out again
-         */
-        if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
-            return $image;
-        } /* Resize the canvas to fit the new resized dimensions, so
-         * you don't get excess canvas space
-         */
-        else {
-            $resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
-            $this->alphaFill($resizedCanvas);
-            imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
-
-            return $resizedCanvas;
-        }
+        return $image->resize($image->getWidth(), $image->getHeight());
+//
+//        /* Figure out resized dimensions
+//        */
+//        $dimensions = $this->boundingBox($image);
+//
+//        /* If resultant dimensions are the same, just return
+//         * what you were provided instead of copying out again
+//         */
+//        if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
+//            return $image;
+//        } /* Resize the canvas to fit the new resized dimensions, so
+//         * you don't get excess canvas space
+//         */
+//        else {
+//            $resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
+//            $this->alphaFill($resizedCanvas);
+//            imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+//
+//            return $resizedCanvas;
+//        }
     }
 }

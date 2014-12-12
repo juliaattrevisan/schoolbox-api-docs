@@ -56,17 +56,18 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
-        /* Figure out resized dimensions
-        */
-        $dimensions = $this->boundingBox($image);
-
-        $bgColor = $this->getBgColors();
-
-        $this->alphaFill();
-        imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
-
-        return $this->getCanvas();
+        return $image->resize($image->getWidth(), $image->getHeight());
+//
+//        /* Figure out resized dimensions
+//        */
+//        $dimensions = $this->boundingBox($image);
+//
+//        $bgColor = $this->getBgColors();
+//
+//        $this->alphaFill();
+//        imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+//
+//        return $this->getCanvas();
     }
 
     /* Getters/Setters
