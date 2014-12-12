@@ -70,7 +70,7 @@ class Student extends Base {
     /**
      * Tutor
      *
-     * @var Staff
+     * @var Tutor
      */
     protected $tutor = null;
 
@@ -114,7 +114,7 @@ class Student extends Base {
     protected function setup() {
         $this->setYear(new Year());
         $this->setForm(new Form());
-        $this->setTutor(new Staff());
+        $this->setTutor(new Tutor());
         $this->setHouse(new House());
         $this->setAccount(new Account());
         $this->setEmail(new Collection());
@@ -305,7 +305,7 @@ class Student extends Base {
     /**
      * Set tutor
      *
-     * @param Staff $tutor
+     * @param Tutor $tutor
      * @return $this
      */
     public function setTutor($tutor)
@@ -317,7 +317,7 @@ class Student extends Base {
     /**
      * Get tutor
      *
-     * @return Staff
+     * @return Tutor
      */
     public function getTutor()
     {

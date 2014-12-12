@@ -1,0 +1,45 @@
+<?php
+/**
+ * Tutor
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\External\Normalise\User;
+
+
+class Tutor extends Staff {
+
+    /**
+     * Tutor group
+     *
+     * @var string
+     */
+    protected $group = '';
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set group
+     *
+     * @param string $group
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+    }
+
+    /**
+     * Get group
+     *
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+}
