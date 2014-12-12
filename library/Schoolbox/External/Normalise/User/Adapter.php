@@ -343,8 +343,9 @@ class Adapter {
 
     /**
      * Get students
-     * 
+     *
      * @param $externalUserId
+     * @return Student
      */
     public function getStudent($externalUserId) {
         $currentResult = $this->getHandler()->getStudent($externalUserId);
@@ -454,6 +455,8 @@ class Adapter {
                     ->setId($currentResult['HeadOfHouseID'])
                     ->setPreferredName($currentResult['StudentHeadOfHouse'])
         ;
+
+        return $student;
     }
 
     /* Getters/Setters
