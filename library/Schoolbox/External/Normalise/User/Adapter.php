@@ -37,6 +37,7 @@ class Adapter {
         $this->setHandler($handler);
     }
 
+
     /**
      * Get portrait
      *
@@ -46,6 +47,9 @@ class Adapter {
     public function getPortrait($externalUserId) {
         return $this->getHandler()->getPortrait($externalUserId);
     }
+
+    /* Parents
+     */
 
     /**
      * Get parent $externalUserId
@@ -209,6 +213,9 @@ class Adapter {
         return $collection;
     }
 
+    /* Students
+     */
+
     /**
      * Get a bunch of students
      *
@@ -221,6 +228,8 @@ class Adapter {
 
         foreach($allResults as $currentResult) {
 
+            /* Guardian 1
+             */
             $guardian1Address = new Common\Address();
             $guardian1Address
                 ->setAddress1($currentResult['StudentContactAddress1'])
@@ -261,6 +270,8 @@ class Adapter {
                 ->setPhoneWork($guardian1PhoneWork)
                 ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag']);
 
+            /* Guardian 2
+             */
             $guardian2Address = new Common\Address();
             $guardian2Address
                 ->setAddress1($currentResult['StudentContactSpouseAddress1'])
@@ -317,8 +328,10 @@ class Adapter {
 
             /* Parents/Guardians
              */
-            $student->getGuardians()->add($guardian1);
-            $student->getGuardians()->add($guardian2);
+            $student->getGuardians()
+                ->add($guardian1)
+                ->add($guardian2)
+            ;
 
             /* Stack it up
              */
@@ -326,6 +339,121 @@ class Adapter {
         }
 
         return $collection;
+    }
+
+    /**
+     * Get students
+     * 
+     * @param $externalUserId
+     */
+    public function getStudent($externalUserId) {
+        $currentResult = $this->getHandler()->getStudent($externalUserId);
+
+        /* Guardian 1
+         */
+        $guardian1Phone1 = new Common\Phone();
+        $guardian1Phone1
+            ->setNumber($currentResult['StudentEmergencyPhone']);
+
+        $guardian1Phone2 = new Common\Phone();
+        $guardian1Phone2
+            ->setNumber($currentResult['StudentEmergencyPhoneAlt']);
+
+        $guardian1 = new Guardian();
+        $guardian1
+            ->setPreferredName($currentResult['StudentEmergencyName'])
+            ->setPhoneHome($guardian1Phone1)
+            ->setPhoneWork($guardian1Phone2)
+        ;
+
+        /* Guardian 2
+         */
+        $guardian2Phone1 = new Common\Phone();
+        $guardian2Phone1
+            ->setNumber($currentResult['StudentEmergency2Phone']);
+
+        $guardian2Phone2 = new Common\Phone();
+        $guardian2Phone2
+            ->setNumber($currentResult['StudentEmergency2PhoneAlt']);
+
+        $guardian2 = new Guardian();
+        $guardian2
+            ->setPreferredName($currentResult['StudentEmergency2Name'])
+            ->setPhoneHome($guardian2Phone1)
+            ->setPhoneWork($guardian2Phone2)
+        ;
+
+        $guardian3Phone1 = new Common\Phone();
+        $guardian3Phone1
+            ->setNumber($currentResult['StudentEmergency3Phone']);
+
+        $guardian3Phone2 = new Common\Phone();
+        $guardian3Phone2
+            ->setNumber($currentResult['StudentEmergency3PhoneAlt']);
+
+        $guardian3 = new Guardian();
+        $guardian3
+            ->setPreferredName($currentResult['StudentEmergency3Name'])
+            ->setPhoneHome($guardian3Phone1)
+            ->setPhoneWork($guardian3Phone2)
+        ;
+
+        $student = new Student();
+        $student
+            ->setId($currentResult['StudentID'])
+            ->setGivenName($currentResult['StudentGiven1'])
+            ->setLastname($currentResult['StudentSurname'])
+            ->setDob($currentResult['StudentBirthDate'])
+            ->setLocker($currentResult['StudentLockerBook'])
+            ->setMedical($currentResult['StudentMedicalAlert'])
+            ->setSpecialNeeds($currentResult['StudentSpecialNeedsFlag'])
+            ->setAlert($currentResult['AlertMessage'])
+        ;
+
+        $student
+            ->getGuardians()
+                ->add($guardian1)
+                ->add($guardian2)
+                ->add($guardian3)
+        ;
+
+        $student
+            ->getForm()
+                ->setLevel($currentResult['StudentForm'])
+                ->setDescription($currentResult['FormDescription'])
+        ;
+
+        $student
+            ->getForm()
+                ->getCoordinator()
+                    ->setId($currentResult['TeacherFormID'])
+                    ->setPreferredName($currentResult['StudentFormStaffName'])
+        ;
+
+        $student
+            ->getYear()
+            ->setLevel($currentResult['StudentYearLevel'])
+            ->getCoordinator()
+            ->setId($currentResult['YearLevelCoordID'])
+            ->setPreferredName($currentResult['StudentYearLevelCoordinator']);
+        ;
+
+        $student
+            ->getTutor()
+                ->setId($currentResult['TeacherTutorID'])
+                ->setPreferredName($currentResult['StudentTutorName'])
+                ->setGroup($currentResult['StudentTutorDescription'])
+        ;
+
+        $student
+            ->getHouse()
+                ->setId($currentResult['StudentHouse'])
+                ->setName($currentResult['StudentHouseDescription'])
+                ->setBoarder($currentResult['StudentBoarder'])
+                ->getHousemaster()
+                    ->setId($currentResult['HeadOfHouseID'])
+                    ->setPreferredName($currentResult['StudentHeadOfHouse'])
+        ;
     }
 
     /* Getters/Setters
