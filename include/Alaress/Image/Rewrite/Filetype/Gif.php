@@ -11,6 +11,8 @@ namespace Alaress\Image\Rewrite\Filetype;
 
 class Gif extends BaseFiletype
 {
+    protected $format = 'gif';
+
     protected function outputSpecificHeaders()
     {
         header('Content-type: image/gif');

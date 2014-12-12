@@ -12,7 +12,7 @@ namespace Alaress\Image\Rewrite\Filetype;
 
 class Png extends BaseFiletype
 {
-    protected $quality = 6;
+    protected $format = 'png';
 
     protected function outputSpecificHeaders()
     {

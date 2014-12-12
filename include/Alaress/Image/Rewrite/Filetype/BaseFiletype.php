@@ -10,20 +10,28 @@
 
 namespace Alaress\Image\Rewrite\Filetype;
 
-use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Imagick\Imagine;
 
 abstract class BaseFiletype implements FiletypeInterface
 {
     /**
-     * @var ImageManager
+     * A format (gif, png, jpg)
+     *
+     * @var string
+     */
+    protected $format = '';
+
+    /**
+     * @var ImagineInterface
      */
     protected $imageManager;
 
     public function __construct()
     {
         // TODO inject this instead of building it here
-        $this->imageManager = new ImageManager(array('driver' => 'imagick'));
+        $this->imageManager = new Imagine();
     }
 
     /**
@@ -31,7 +39,7 @@ abstract class BaseFiletype implements FiletypeInterface
     *
     * @param  $filename
     * @throws \Exception_Schoolbox_NotFound if file can't be read
-    * @return resource
+    * @return ImageInterface
     */
     public function create($filename)
     {
@@ -48,26 +56,26 @@ abstract class BaseFiletype implements FiletypeInterface
     /**
      * Create an image
      *
-     * @param $filename
-     * @return resource
+     * @param string $filename
+     * @return ImageInterface
      */
     public function loadImageResource($filename)
     {
         //
         // Sadly silence operator is needed for all imagecreatefrom* methods,
         // otherwise error output corrupts image output.
-        return $this->getImageManager()->make($filename);
+        return $this->getImageManager()->open($filename);
     }
 
     /**
      * Save image to file system
      *
-     * @param Image  $image
-     * @param string $filename
+     * @param ImageInterface $image
+     * @param string         $filename
      */
-    public function save(Image $image, $filename)
+    public function save(ImageInterface $image, $filename)
     {
-        file_put_contents($filename, $image->encode());
+        file_put_contents($filename, $image->get($this->getFormat()));
     }
 
     protected function outputHeaders()
@@ -85,12 +93,12 @@ abstract class BaseFiletype implements FiletypeInterface
     /**
      * Stream image to browser directly
      *
-     * @param $image
+     * @param ImageInterface $image
      */
-    public function stream(Image $image)
+    public function stream(ImageInterface $image)
     {
         $this->outputHeaders();
-        echo $image->encode();
+        echo $image->get($this->getFormat());
         exit;
     }
 
@@ -104,7 +112,7 @@ abstract class BaseFiletype implements FiletypeInterface
     }
 
     /**
-     * @return ImageManager
+     * @return ImagineInterface
      */
     public function getImageManager()
     {
@@ -112,13 +120,32 @@ abstract class BaseFiletype implements FiletypeInterface
     }
 
     /**
-     * @param  ImageManager $imageManager
+     * @param  ImagineInterface $imageManager
      *
      * @return $this
      */
     public function setImageManager($imageManager)
     {
         $this->imageManager = $imageManager;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    /**
+     * @param  string $format
+     *
+     * @return $this
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
         return $this;
     }
 }

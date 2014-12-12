@@ -11,6 +11,8 @@ namespace Alaress\Image\Rewrite\Filetype;
 
 class Jpg extends BaseFiletype
 {
+    protected $format = 'jpg';
+
     protected function outputSpecificHeaders()
     {
         header('Content-type: image/jpeg');

@@ -10,7 +10,7 @@
 
 namespace Alaress\Image\Rewrite\Filetype;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 interface FiletypeInterface
 {
@@ -26,17 +26,17 @@ interface FiletypeInterface
 
     public function loadImageResource($filename);
 
-    public function stream(Image $image);
+    public function stream(ImageInterface $image);
 
     public function streamFile($filename);
 
     /**
      * Save image to file system
      *
-     * @param Image  $image
-     * @param string $filename
+     * @param ImageInterface $image
+     * @param string         $filename
      */
-    public function save(Image $image, $filename);
+    public function save(ImageInterface $image, $filename);
 
     /**
      * Does this image type support the alpha (transparency) channel?
