@@ -43,15 +43,16 @@ abstract class BaseStrategy implements StrategyInterface
     protected function applyBackgroundColor($bgColorArray)
     {
         if (is_array($bgColorArray)) {
-            $bgColorArray = array(
-                $bgColorArray['red'],
-                $bgColorArray['green'],
-                $bgColorArray['blue']
+            $bgColor = sprintf(
+                '#%02x%02x%02x',
+                min(255, max(0, $bgColorArray['red'])),
+                min(255, max(0, $bgColorArray['green'])),
+                min(255, max(0, $bgColorArray['blue']))
             );
         } else {
-            $bgColorArray = array(255, 255, 255);
+            $bgColor = '#ffffff';
         }
-        $this->getCanvas()->fill($bgColorArray);
+        $this->getCanvas()->fill($bgColor);
     }
 
     /**
