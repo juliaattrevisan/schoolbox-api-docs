@@ -12,6 +12,7 @@ namespace Schoolbox\External\Normalise\User;
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
+use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\Collection;
 
 abstract class Base {
