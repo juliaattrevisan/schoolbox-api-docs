@@ -10,17 +10,17 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 interface StrategyInterface
 {
     /**
      * Manipulate image
      *
-     * @param  Image $image
-     * @return Image The manipulated image
+     * @param  ImageInterface $image
+     * @return ImageInterface The manipulated image
      */
-    public function manipulate(Image $image);
+    public function manipulate(ImageInterface $image);
 
     /**
      * @param  bool  $supports_alpha_channel

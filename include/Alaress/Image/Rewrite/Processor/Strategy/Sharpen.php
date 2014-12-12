@@ -12,28 +12,15 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 class Sharpen extends BaseStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
-        return $image->sharpen(15);
-//        $sharpenMatrix = array (
-//            array(-0.2, -1, -0.2),
-//            array(-1, 15, -1),
-//            array(-0.2, -1, -0.2)
-//        );
-//
-//        $divisor = array_sum(array_map('array_sum', $sharpenMatrix));
-//
-//        $offset = 0;
-//
-//        imageconvolution($image, $sharpenMatrix, $divisor, $offset);
-//
-//        return $image;
+        return $image->effects()->sharpen();
     }
 }

@@ -13,7 +13,7 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 class RotateOrientation extends BaseStrategy implements StrategyInterface
 {
@@ -33,23 +33,23 @@ class RotateOrientation extends BaseStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
-        return $image->orientate();
-//        $exif = @exif_read_data($this->filePath);
-//        if (!empty($exif['Orientation'])) {
-//            switch($exif['Orientation']) {
-//                case 8:
-//                    $image = imagerotate($image, 90, 0);
-//                    break;
-//                case 3:
-//                    $image = imagerotate($image, 180, 0);
-//                    break;
-//                case 6:
-//                    $image = imagerotate($image, -90, 0);
-//                    break;
-//            }
-//        }
-//        return $image;
+        $metadata = $image->metadata();
+        $exif = @exif_read_data($metadata['filepath']);
+        if (!empty($exif['Orientation'])) {
+            switch($exif['Orientation']) {
+                case 8:
+                    $image->rotate(90);
+                    break;
+                case 3:
+                    $image->rotate(180);
+                    break;
+                case 6:
+                    $image->rotate(270);
+                    break;
+            }
+        }
+        return $image;
     }
 }
