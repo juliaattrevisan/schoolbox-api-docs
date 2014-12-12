@@ -56,6 +56,11 @@ class Adapter {
     public function getParent($externalUserId) {
         $currentResult = $this->getHandler()->getParent($externalUserId);
 
+        /* Assemble first guardian
+         */
+        $guardian1Email = new Common\Email();
+        $guardian1Email->setAddress($currentResult['Email']);
+
         $guardian1PhoneHome = new Common\Phone();
         $guardian1PhoneHome
             ->setNumber($currentResult['HomePhone'])
@@ -70,10 +75,15 @@ class Adapter {
             ->setTitle($currentResult['Title'])
             ->setPreferredName($currentResult['Preferred'])
             ->setLastname($currentResult['Surname'])
-            ->setEmail($currentResult['Email'])
+            ->addEmail($guardian1Email)
             ->setPhoneHome($guardian1PhoneHome)
             ->setPhoneMobile($guardian1PhoneMobile)
             ->setPubliclyVisible($currentResult['DirectoryIncludeFlag']);
+
+        /* Assemble second guardian
+         */
+        $guardian2Email = new Common\Email();
+        $guardian2Email->setAddress($currentResult['SpouseEmail']);
 
         $guardian2PhoneMobile = new Common\Phone();
         $guardian2PhoneMobile
@@ -84,10 +94,12 @@ class Adapter {
             ->setTitle($currentResult['SpouseTitle'])
             ->setPreferredName($currentResult['SpousePreferred'])
             ->setLastname($currentResult['SpouseSurname'])
-            ->setEmail($currentResult['SpouseEmail'])
+            ->addEmail($guardian2Email)
             ->setPhoneMobile($guardian2PhoneMobile)
             ->setPubliclyVisible($currentResult['SpouseDirectoryIncludeFlag']);
 
+        /* Stack them up
+         */
         $collection = new Collection();
         $collection->add($guardian1);
         $collection->add($guardian2);
@@ -110,26 +122,32 @@ class Adapter {
 
         if (is_array($externalUserId)) {
             foreach ($allResults as $currentResult) {
+                $guardianEmail = new Common\Email();
+                $guardianEmail->setAddress($currentResult['Email']);
+
                 $guardian = new Guardian();
                 $guardian
                     ->setId($currentResult['ID'])
                     ->setTitle($currentResult['Title'])
                     ->setPreferredName($currentResult['Preferred'])
                     ->setLastname($currentResult['Surname'])
-                    ->setEmail($currentResult['Email'])
+                    ->addEmail($guardianEmail)
                     ->setPubliclyVisible($currentResult['DirectoryIncludeFlag']);
 
                 $collection->add($guardian);
             }
         }
         else {
+            $guardianEmail = new Common\Email();
+            $guardianEmail->setAddress($allResults['Email']);
+
             $guardian = new Guardian();
             $guardian
                 ->setId($allResults['ID'])
                 ->setTitle($allResults['Title'])
                 ->setPreferredName($allResults['Preferred'])
                 ->setLastname($allResults['Surname'])
-                ->setEmail($allResults['Email'])
+                ->addEmail($guardianEmail)
                 ->setPubliclyVisible($allResults['DirectoryIncludeFlag']);
 
             $collection->add($guardian);
@@ -139,21 +157,54 @@ class Adapter {
     }
 
     /**
-     * Get a list of emails for a bunch of ids
+     * Get a list of emails of parents for a bunch of student $externalUserIds
      *
      * TODO: This is synonymous with an updated version of getParent();
      *
-     * @param $externalUserId
+     * @param array $externalUserId
      * @return Collection
      */
     public function getParentEmails($externalUserId) {
-        $collection = new Collection();
+        $allGuardians = array();
 
         $allResults = $this->getHandler()->getParentEmails($externalUserId);
 
-        foreach ($allResults as $currentResult) {
-            $guardian = new Guardian();
+        /* Samuel made array keys in the format 131-0, 131-1
+         * to allow multiple email addresses from a connector
+         */
+        $allKeys = array_keys($allResults);
+
+        foreach ($allKeys as $currentKey) {
+
+            /* bits equals boom
+             */
+            $bits = explode('-', $currentKey);
+            $id = $bits[0];
+
+            /* Get the email address
+             */
+            $guardianEmail = new Common\Email();
+            $guardianEmail->setAddress($allResults[$currentKey]);
+
+            /* Check if the guardian already exists
+             * Otherwise spawn a new one
+             */
+            if ($allGuardians[$id] instanceof Guardian) {
+                $allGuardians[$id]->addEmail($guardianEmail);
+            }
+            else {
+                $guardian = new Guardian();
+                $guardian
+                    ->setId($id)
+                    ->addEmail($guardianEmail);
+
+                $allGuardians[$id] = $guardian;
+            }
         }
+
+        /* Stack 'em up
+         */
+        $collection = new Collection(array_values($allGuardians));
 
         return $collection;
     }
@@ -193,6 +244,9 @@ class Adapter {
             $guardian1PhoneWork
                 ->setNumber($currentResult['StudentContactOccupPhone']);
 
+            $guardian1Email = new Common\Email();
+            $guardian1Email->setAddress($currentResult['StudentContactDefaultEmail']);
+
             $guardian1 = new Guardian();
             $guardian1
                 ->setId($currentResult['StudentContactID'])
@@ -201,7 +255,7 @@ class Adapter {
                 ->setLastname($currentResult['StudentContactSurname'])
                 ->setPostalAddress($guardian1Address)
                 ->setHomeAddress($guardian1Address)
-                ->setEmail($currentResult['StudentContactDefaultEmail'])
+                ->addEmail($guardian1Email)
                 ->setPhoneHome($guardian1PhoneHome)
                 ->setPhoneMobile($guardian1PhoneMobile)
                 ->setPhoneWork($guardian1PhoneWork)
@@ -230,6 +284,9 @@ class Adapter {
             $guardian2PhoneWork
                 ->setNumber($currentResult['StudentContactSpouseOccupPhone']);
 
+            $guardian2Email = new Common\Email();
+            $guardian2Email->setAddress($currentResult['StudentContactSpouseDefaultEmail']);
+
             $guardian2 = new Guardian();
             $guardian2
                 ->setId($currentResult['StudentContactSpouseID'])
@@ -238,7 +295,7 @@ class Adapter {
                 ->setLastname($currentResult['StudentContactSpouseSurname'])
                 ->setPostalAddress($guardian2Address)
                 ->setHomeAddress($guardian2Address)
-                ->setEmail($currentResult['StudentContactSpouseDefaultEmail'])
+                ->addEmail($guardian2Email)
                 ->setPhoneHome($guardian2PhoneHome)
                 ->setPhoneMobile($guardian2PhoneMobile)
                 ->setPhoneWork($guardian2PhoneWork)

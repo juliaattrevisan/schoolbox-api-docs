@@ -117,6 +117,7 @@ class Student extends Base {
         $this->setTutor(new Staff());
         $this->setHouse(new House());
         $this->setAccount(new Account());
+        $this->setEmail(new Collection());
         $this->setPostalAddress(new Address());
         $this->setHomeAddress(new Address());
         $this->setPhoneHome(new Phone());
