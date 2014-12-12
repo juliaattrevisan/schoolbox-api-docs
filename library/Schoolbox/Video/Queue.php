@@ -256,7 +256,7 @@ class Queue extends ResourceVideo
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             return $sourceObject->getFileLocation();
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
-            return $sourceObject->getFileLoaction();
+            return $sourceObject->getFileLocation();
         } else {
             throw new \Exception_Schoolbox('Processing of this type of file is not implemented');
         }
