@@ -95,6 +95,7 @@ class Report_Bialik_Parent extends \Report_Parent
                 StudentContactPostCode,
                 StudentContactState,
                 StudentCountry.Description AS StudentContactCountryCode,
+                StudentContactAddressComma
                 StudentContactHomeAddress1,
                 StudentContactHomeAddress2,
                 StudentContactHomeAddress3,
@@ -146,8 +147,8 @@ class Report_Bialik_Parent extends \Report_Parent
             LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
-            AND FileSemester = " . $_SESSION['FileSemester'] . "
-            AND FileYear = " . $_SESSION['FileYear'];
+            AND FileSemester = '" . $_SESSION['FileSemester'] . "'
+            AND FileYear = '" . $_SESSION['FileYear']."'";
         /* Search for a particular year level
          */
         if (strlen($yearlevel)) {
@@ -205,22 +206,23 @@ class Report_Bialik_Parent extends \Report_Parent
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
         $contactList = $db->getAll($query);
+
         foreach ($contactList as &$row) {
-            if ($row['ValidAddressFlag'] == 0 || $row['AddressUserFlag1'] == 1) {
+           if ($row['ValidAddressFlag'] == 0 || ($row['AddressUserFlag1'] == 1 && $row['AddressUserFlag3'] != 1)) {
                 $row['StudentContactAddress1']        = '';
                 $row['StudentContactAddress2']        = '';
                 $row['StudentContactAddress3']        = '';
                 $row['StudentContactSuburb']          = '';
                 $row['StudentContactPostCode']        = '';
                 $row['StudentContactState']           = '';
-                $row['StudentContactCountryCode']     = '';
+                $row['StudentContactCountryDesc']     = '';
                 $row['StudentContactHomeAddress1']    = '';
                 $row['StudentContactHomeAddress2']    = '';
                 $row['StudentContactHomeAddress3']    = '';
                 $row['StudentContactHomeSuburb']      = '';
                 $row['StudentContactHomePostCode']    = '';
                 $row['StudentContactHomeState']       = '';
-                $row['StudentContactHomeCountryCode'] = '';
+                $row['StudentContactHomeCountryDesc'] = '';
             }
             $row['StudentContactHomeCountryCode']
                 = $row['StudentContactHomeCountryCode'] == 'Not Selected' ? '' : $row['StudentContactHomeCountryCode'];
@@ -229,6 +231,16 @@ class Report_Bialik_Parent extends \Report_Parent
 
             if($row['AddressUserFlag2'] == 1)
                 $row['StudentContactPhoneActual'] = '';
+
+            if($row['AddressUserFlag3'] == 1) {
+                $row['StudentContactHomeAddress1']  = $row['StudentContactAddress1'];
+                $row['StudentContactHomeAddress2']  = $row['StudentContactAddress2'];
+                $row['StudentContactHomeAddress3']  = $row['StudentContactAddress3'];
+                $row['StudentContactHomeSuburb']    = $row['StudentContactSuburb'];
+                $row['StudentContactHomePostCode']  = $row['StudentContactPostCode'];
+                $row['StudentContactHomeState']     = $row['StudentContactState'];
+                $row['StudentContactHomeCountryCode']     = $row['StudentContactCountryCode'];
+            }
 
             if($row['ContactUserFlag1'] == 1)
                 $row['StudentContactDefaultEmail'] = '';
