@@ -23,7 +23,7 @@ abstract class BaseFiletype implements FiletypeInterface
     public function __construct()
     {
         // TODO inject this instead of building it here
-        $this->imageManager = new ImageManager();
+        $this->imageManager = new ImageManager(array('driver' => 'imagick'));
     }
 
     /**
