@@ -53,25 +53,10 @@ class Placement extends BaseStrategy implements StrategyInterface
         return $image->resizeCanvas(
             $this->getCanvasWidth(),
             $this->getCanvasHeight(),
-            $this->translatePositioning()
+            $this->translatePositioning(),
+            false,
+            $this->translateColorArray($this->getBgColors())
         );
-//        /* Figure out resized dimensions
-//        */
-//        $resizedWidth  = $image->getWidth();
-//        $resizedHeight = $image->getHeight();
-//
-//
-//
-//        /* Constrain to half canvas width and position where told
-//         */
-//        $positioning = $this->determinePositioning($resizedWidth, $resizedHeight);
-//
-//        $bgColor = $this->getBgColors();
-//
-//        $this->alphaFill();
-//        imagecopyresampled($this->getCanvas(), $image, $positioning['dst_x'], $positioning['dst_y'], 0, 0, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
-//
-//        return $this->getCanvas();
     }
 
     protected function translatePositioning()
