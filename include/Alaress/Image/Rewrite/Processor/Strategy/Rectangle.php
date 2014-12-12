@@ -64,110 +64,37 @@ class Rectangle extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(Image $image)
     {
-
-        /* Center of source image
-         */
+        // Scale to largest of width/height,
+        // then crop to centered rectangle
         $currentWidth  = $image->getWidth();
         $currentHeight = $image->getHeight();
 
         $currentRatio = $currentWidth / $currentHeight;
-        $finalRatio = $this->getCanvasWidth() / $this->getCanvasHeight();
+        $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
 
-        /* Resize if image is larger than the canvas in either dimension
-         * (or upscaling small images)
-         */
-        if ($currentWidth > $this->getCanvasWidth()
-            || $currentHeight > $this->getCanvasHeight()
-            || $this->getSmallImageUpscales()
-        ) {
-            if (($this->getCanvasWidth()/$this->getCanvasHeight()) >= 1) {
-                /* Landscape
-                 */
-                if ($currentRatio > $finalRatio) {
-                    /* Current image is more panoramic than final canvas -_-;
-                     */
-                    /* The edges that get lopped off
-                     */
-                    $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
-
-                    $startX = $trim;
-                    $startY = 0;
-
-                    $endX = $currentWidth - 2*$trim;
-                    $endY = $currentHeight;
-                } else {
-                    /* Canvas is more panoramic than current image -_-;
-                     */
-                    /* The edges that get lopped off
-                     */
-                    $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
-
-                    $startX = 0;
-                    $startY = $trim;
-
-                    $endX = $currentWidth;
-                    $endY = $currentHeight - 2*$trim;
-                }
+        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
+            // Image doesn't fit within rectangle.
+            // Resize it down so one dimension does.
+            if ($currentRatio > $finalRatio) {
+                $image->heighten($this->getCanvasHeight());
             } else {
-                /* Portrait
-                 */
-                if ($currentRatio > $finalRatio) {
-                    /* Canvas is taller than current image -_-;
-                     */
-                    /* The edges that get lopped off
-                     */
-                    $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
-
-                    $startX = $trim;
-                    $startY = 0;
-
-                    $endX = $currentWidth - 2*$trim;
-                    $endY = $currentHeight;
-                } else {
-                    /* Current image is taller than final canvas -_-;
-                     */
-                    /* The edges that get lopped off
-                     */
-                    $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
-
-                    $startX = 0;
-                    $startY = $trim;
-
-                    $endX = $currentWidth;
-                    $endY = $currentHeight - 2*$trim;
-                }
+                $image->widen($this->getCanvasWidth());
             }
-
-            /* Resize the canvas to fit the new resized dimensions, so
-             * you don't get excess canvas space
-             */
-            return $image
-                ->resize($endX, $endY)
-                ->resizeCanvas($this->getCanvasWidth(), $this->getCanvasHeight(), 'center')
-            ;
-//            $this->alphaFill();
-//            imagecopyresampled(
-//                $this->getCanvas(),
-//                $image,
-//                0,
-//                0,
-//                $startX,
-//                $startY,
-//                $this->getCanvasWidth(),
-//                $this->getCanvasHeight(),
-//                $endX,
-//                $endY
-//            );
-        } else {
-            return $image->resizeCanvas($currentWidth, $currentHeight, 'center');
-//            // Create a new truecolor canvas of the same size, and copy onto it.
-//            $this->setCanvas(imagecreatetruecolor($currentWidth, $currentHeight));
-//            $this->alphaFill();
-//            imagecopy($this->getCanvas(), $image, 0, 0, 0, 0, $currentWidth, $currentHeight);
+        } elseif ($this->getSmallImageUpscales()) {
+            // Image does fit, but it's getting scaled up.
+            // Scale it up so that it barely fits.
+            if ($currentRatio > $finalRatio) {
+                $image->widen($this->getCanvasWidth());
+            } else {
+                $image->heighten($this->getCanvasHeight());
+            }
         }
-//
-//
-//        return $this->getCanvas();
+
+        return $image->resizeCanvas(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight(),
+            'center'
+        );
     }
 
     /* Getters/Setters
