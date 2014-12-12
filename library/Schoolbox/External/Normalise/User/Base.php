@@ -105,7 +105,7 @@ abstract class Base {
     /**
      * Email address
      *
-     * @var string
+     * @var \Schoolbox\Collection
      */
     protected $email = '';
 
@@ -140,6 +140,25 @@ abstract class Base {
      * @var bool
      */
     protected $publiclyVisible = true;
+
+    /**
+     * Delegate method
+     *
+     * Add an email to the collection
+     *
+     * @param Email $email
+     * @return $this
+     */
+    public function addEmail($email) {
+        if (strlen(trim($email->getAddress()))) {
+            $this->getEmail()->add($email);
+        }
+
+        return $this;
+    }
+
+    /* Getters/Setters
+     */
 
     /**
      * Set account
