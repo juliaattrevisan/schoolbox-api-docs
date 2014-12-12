@@ -14,7 +14,6 @@
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
 use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
 
 class Rectangle extends BaseStrategy implements StrategyInterface
 {

@@ -10,8 +10,6 @@
 
 namespace Alaress\Image\Rewrite\Filetype;
 
-use Intervention\Image\Image;
-
 class Png extends BaseFiletype
 {
     protected $quality = 6;
