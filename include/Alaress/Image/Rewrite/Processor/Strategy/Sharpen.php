@@ -21,6 +21,7 @@ class Sharpen extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        return $image->effects()->sharpen();
+        $image->effects()->sharpen();
+        return $image;
     }
 }
