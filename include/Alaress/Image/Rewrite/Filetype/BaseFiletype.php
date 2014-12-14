@@ -12,6 +12,7 @@ namespace Alaress\Image\Rewrite\Filetype;
 
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 
 abstract class BaseFiletype implements FiletypeInterface
@@ -32,6 +33,7 @@ abstract class BaseFiletype implements FiletypeInterface
     {
         // TODO inject this instead of building it here
         $this->imageManager = new Imagine();
+        $this->imageManager->setMetadataReader(new ExifMetadataReader());
     }
 
     /**
