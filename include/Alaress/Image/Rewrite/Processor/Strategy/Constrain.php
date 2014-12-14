@@ -36,7 +36,8 @@ class Constrain extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        return $image->resize(
+        // TODO preserve proportions
+        return $image->thumbnail(
             new Box(
                 $this->getCanvasWidth(),
                 $this->getCanvasHeight()
