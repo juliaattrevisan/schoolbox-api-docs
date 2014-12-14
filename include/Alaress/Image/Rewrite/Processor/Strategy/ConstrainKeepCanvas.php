@@ -49,21 +49,33 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-//        new \Imagine\Filter\Advanced\Canvas()
-        $canvas  = clone $image;
-        $palette = $canvas->palette();
-        $color   = $palette->color($this->translateColorArray($this->getBgColors()));
-        $canvas->fill(
-            new Fill\Gradient\Horizontal(1, $color, $color)
+        // This processor:
+        // constrain + placement
+        $canvasBox = new Box(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight()
         );
-        $image->thumbnail(
-            new Box(
-                $this->getCanvasWidth(),
-                $this->getCanvasHeight()
-            )
+        $filter = new \Imagine\Filter\Advanced\Canvas(
+            new \Imagine\Imagick\Imagine(),
+            $canvasBox,
+            $this->getImageBoxPoint($canvasBox, $image->getSize()),
+            $image->palette()->color($this->translateColorArray($this->getBgColors()))
         );
-        $canvas->paste($image, new Point(0, 0));
-        return $canvas;
+        return $filter->apply($image);
+//        $canvas  = clone $image;
+//        $palette = $canvas->palette();
+//        $color   = $palette->color($this->translateColorArray($this->getBgColors()));
+//        $canvas->fill(
+//            new Fill\Gradient\Horizontal(1, $color, $color)
+//        );
+//        $image->thumbnail(
+//            new Box(
+//                $this->getCanvasWidth(),
+//                $this->getCanvasHeight()
+//            )
+//        );
+//        $canvas->paste($image, new Point(0, 0));
+//        return $canvas;
     }
 
     /* Getters/Setters

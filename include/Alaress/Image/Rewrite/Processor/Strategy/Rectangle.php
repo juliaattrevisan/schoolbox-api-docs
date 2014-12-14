@@ -13,6 +13,7 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
 class Rectangle extends BaseStrategy implements StrategyInterface
@@ -53,34 +54,44 @@ class Rectangle extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        return $image;
+        // Scale to largest of width/height,
+        // then crop to centered rectangle
+        $currentWidth  = $image->getSize()->getWidth();
+        $currentHeight = $image->getSize()->getHeight();
 
-//        // Scale to largest of width/height,
-//        // then crop to centered rectangle
-//        $currentWidth  = $image->getSize()->getWidth();
-//        $currentHeight = $image->getSize()->getHeight();
-//
-//        $currentRatio = $currentWidth / $currentHeight;
-//        $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
-//
-//        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
-//            // Image doesn't fit within rectangle.
-//            // Resize it down so one dimension does.
-//            if ($currentRatio > $finalRatio) {
-//                $image->heighten($this->getCanvasHeight());
-//            } else {
-//                $image->widen($this->getCanvasWidth());
-//            }
-//        } elseif ($this->getSmallImageUpscales()) {
-//            // Image does fit, but it's getting scaled up.
-//            // Scale it up so that it barely fits.
-//            if ($currentRatio > $finalRatio) {
-//                $image->widen($this->getCanvasWidth());
-//            } else {
-//                $image->heighten($this->getCanvasHeight());
-//            }
-//        }
-//
+        $currentRatio = $currentWidth / $currentHeight;
+        $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
+
+        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
+            // Image doesn't fit within rectangle.
+            // Resize it down so one dimension does.
+            if ($currentRatio > $finalRatio) {
+                $image->resize($image->getSize()->heighten($this->getCanvasHeight()));
+            } else {
+                $image->resize($image->getSize()->widen($this->getCanvasWidth()));
+            }
+        } elseif ($this->getSmallImageUpscales()) {
+            // Image does fit, but it's getting scaled up.
+            // Scale it up so that it barely fits.
+            if ($currentRatio > $finalRatio) {
+                $image->resize($image->getSize()->widen($this->getCanvasWidth()));
+            } else {
+                $image->resize($image->getSize()->heighten($this->getCanvasHeight()));
+            }
+        }
+
+        $canvasBox = new Box(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight()
+        );
+        $filter = new \Imagine\Filter\Advanced\Canvas(
+            new \Imagine\Imagick\Imagine(),
+            $canvasBox,
+            $this->getImageBoxPoint($canvasBox, $image->getSize()),
+            $image->palette()->color($this->translateColorArray($this->getBgColors()))
+        );
+        return $filter->apply($image);
+
 //        return $image->resizeCanvas(
 //            $this->getCanvasWidth(),
 //            $this->getCanvasHeight(),

@@ -16,6 +16,7 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
 class Placement extends BaseStrategy implements StrategyInterface
@@ -50,15 +51,17 @@ class Placement extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-//        new Imagine\Filter\Advanced\Canvas();
-        return $image;
-//        return $image->resizeCanvas(
-//            $this->getCanvasWidth(),
-//            $this->getCanvasHeight(),
-//            $this->translatePositioning(),
-//            false,
-//            $this->translateColorArray($this->getBgColors())
-//        );
+        $canvasBox = new Box(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight()
+        );
+        $filter = new \Imagine\Filter\Advanced\Canvas(
+            new \Imagine\Imagick\Imagine(),
+            $canvasBox,
+            $this->getImageBoxPoint($canvasBox, $image->getSize()),
+            $image->palette()->color($this->translateColorArray($this->getBgColors()))
+        );
+        return $filter->apply($image);
     }
 
     protected function translatePositioning()
