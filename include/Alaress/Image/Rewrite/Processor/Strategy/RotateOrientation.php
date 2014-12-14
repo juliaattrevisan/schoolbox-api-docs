@@ -13,12 +13,20 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Imagine\Filter\Basic\Autorotate;
 use Imagine\Image\ImageInterface;
 
 class RotateOrientation extends BaseStrategy implements StrategyInterface
 {
 
     private $filePath = '';
+
+    /**
+     * Autorotate filter
+     *
+     * @var Autorotate
+     */
+    protected $filter;
 
     /**
      * Constructor
@@ -28,6 +36,7 @@ class RotateOrientation extends BaseStrategy implements StrategyInterface
     public function __construct($args)
     {
         $this->filePath = $args['FilePath'];
+        $this->filter   = new Autorotate();
     }
 
     /**
@@ -35,21 +44,6 @@ class RotateOrientation extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        $metadata = $image->metadata();
-        $exif = @exif_read_data($metadata['filepath']);
-        if (!empty($exif['Orientation'])) {
-            switch($exif['Orientation']) {
-                case 8:
-                    $image->rotate(90);
-                    break;
-                case 3:
-                    $image->rotate(180);
-                    break;
-                case 6:
-                    $image->rotate(270);
-                    break;
-            }
-        }
-        return $image;
+        return $this->filter->apply($image);
     }
 }
