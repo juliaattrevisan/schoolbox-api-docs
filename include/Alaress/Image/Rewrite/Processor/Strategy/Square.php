@@ -13,7 +13,7 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 class Square extends BaseStrategy implements StrategyInterface
 {
@@ -34,7 +34,7 @@ class Square extends BaseStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
         return $this->innerProcessor->manipulate($image);
     }

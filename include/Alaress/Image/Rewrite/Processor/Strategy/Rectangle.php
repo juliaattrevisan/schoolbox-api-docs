@@ -13,7 +13,7 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 class Rectangle extends BaseStrategy implements StrategyInterface
 {
@@ -51,41 +51,43 @@ class Rectangle extends BaseStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
-        // Scale to largest of width/height,
-        // then crop to centered rectangle
-        $currentWidth  = $image->getWidth();
-        $currentHeight = $image->getHeight();
+        return $image;
 
-        $currentRatio = $currentWidth / $currentHeight;
-        $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
-
-        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
-            // Image doesn't fit within rectangle.
-            // Resize it down so one dimension does.
-            if ($currentRatio > $finalRatio) {
-                $image->heighten($this->getCanvasHeight());
-            } else {
-                $image->widen($this->getCanvasWidth());
-            }
-        } elseif ($this->getSmallImageUpscales()) {
-            // Image does fit, but it's getting scaled up.
-            // Scale it up so that it barely fits.
-            if ($currentRatio > $finalRatio) {
-                $image->widen($this->getCanvasWidth());
-            } else {
-                $image->heighten($this->getCanvasHeight());
-            }
-        }
-
-        return $image->resizeCanvas(
-            $this->getCanvasWidth(),
-            $this->getCanvasHeight(),
-            'center',
-            false,
-            $this->translateColorArray($this->getBgColors())
-        );
+//        // Scale to largest of width/height,
+//        // then crop to centered rectangle
+//        $currentWidth  = $image->getSize()->getWidth();
+//        $currentHeight = $image->getSize()->getHeight();
+//
+//        $currentRatio = $currentWidth / $currentHeight;
+//        $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
+//
+//        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
+//            // Image doesn't fit within rectangle.
+//            // Resize it down so one dimension does.
+//            if ($currentRatio > $finalRatio) {
+//                $image->heighten($this->getCanvasHeight());
+//            } else {
+//                $image->widen($this->getCanvasWidth());
+//            }
+//        } elseif ($this->getSmallImageUpscales()) {
+//            // Image does fit, but it's getting scaled up.
+//            // Scale it up so that it barely fits.
+//            if ($currentRatio > $finalRatio) {
+//                $image->widen($this->getCanvasWidth());
+//            } else {
+//                $image->heighten($this->getCanvasHeight());
+//            }
+//        }
+//
+//        return $image->resizeCanvas(
+//            $this->getCanvasWidth(),
+//            $this->getCanvasHeight(),
+//            'center',
+//            false,
+//            $this->translateColorArray($this->getBgColors())
+//        );
     }
 
     /* Getters/Setters

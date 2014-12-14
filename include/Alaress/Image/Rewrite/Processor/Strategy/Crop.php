@@ -20,7 +20,9 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\Point;
 
 class Crop extends BaseStrategy implements StrategyInterface
 {
@@ -39,12 +41,12 @@ class Crop extends BaseStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
         /* Figure out resized dimensions
          */
-        $currentWidth  = $image->getWidth();
-        $currentHeight = $image->getHeight();
+        $currentWidth  = $image->getSize()->getWidth();
+        $currentHeight = $image->getSize()->getHeight();
 
         /* Width of area to crop
          */
@@ -54,16 +56,7 @@ class Crop extends BaseStrategy implements StrategyInterface
         $src_x = $currentWidth  * $this->getCoordinates('x0');
         $src_y = $currentHeight * $this->getCoordinates('y0');
 
-        return $image->crop($src_w, $src_h, $src_x, $src_y);
-
-//        /* Create canvas at specified dimensions
-//         */
-//        $canvas = imagecreatetruecolor($src_w, $src_h);
-//
-//        $this->alphaFill($canvas);
-//        imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
-//
-//        return $canvas;
+        return $image->crop(new Point($src_x, $src_y), new Box($src_w, $src_h));
     }
 
     /**

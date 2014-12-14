@@ -12,14 +12,14 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\ImageInterface;
 
 class Original extends BaseStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
         return $image;
     }
