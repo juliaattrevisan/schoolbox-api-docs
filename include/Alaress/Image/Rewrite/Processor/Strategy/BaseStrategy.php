@@ -12,6 +12,9 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
+use Imagine\Image\BoxInterface;
+use Imagine\Image\Point;
+use Imagine\Image\PointInterface;
 use Intervention\Image\Image;
 
 abstract class BaseStrategy implements StrategyInterface
@@ -61,6 +64,69 @@ abstract class BaseStrategy implements StrategyInterface
             );
         }
         return '#ffffff';
+    }
+
+    /**
+     * Gets the top left point of $imageBox when it is aligned at
+     * $alignment within $canvasBox.
+     *
+     * @param BoxInterface $canvasBox
+     * @param BoxInterface $imageBox
+     * @param string       $alignment
+     *
+     * @return PointInterface
+     */
+    protected function getImageBoxPoint(
+        BoxInterface $canvasBox,
+        BoxInterface $imageBox,
+        $alignment = 'center'
+    ) {
+        $xLeft   = 0;
+        $xRight  = $canvasBox->getWidth() - $imageBox->getWidth();
+        $xCenter = intval($xRight / 2);
+        $yTop    = 0;
+        $yBottom = $canvasBox->getHeight() - $imageBox->getHeight();
+        $yCenter = intval($yBottom / 2);
+        switch ($alignment) {
+            case 'top':
+                $xPoint = $xCenter;
+                $yPoint = $yTop;
+                break;
+            case 'top-right':
+                $xPoint = $xRight;
+                $yPoint = $yTop;
+                break;
+            case 'right':
+                $xPoint = $xRight;
+                $yPoint = $yCenter;
+                break;
+            case 'bottom-right':
+                $xPoint = $xRight;
+                $yPoint = $yBottom;
+                break;
+            case 'bottom':
+                $xPoint = $xCenter;
+                $yPoint = $yBottom;
+                break;
+            case 'bottom-left':
+                $xPoint = $xLeft;
+                $yPoint = $yBottom;
+                break;
+            case 'left':
+                $xPoint = $xLeft;
+                $yPoint = $yCenter;
+                break;
+            case 'top-left':
+                $xPoint = $xLeft;
+                $yPoint = $yTop;
+                break;
+            case 'center':
+            default:
+                $xPoint = $xCenter;
+                $yPoint = $yCenter;
+                break;
+        }
+        return new Point(intval($xPoint), intval($yPoint));
     }
 
     /**
