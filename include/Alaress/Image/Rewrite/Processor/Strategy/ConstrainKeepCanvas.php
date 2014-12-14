@@ -17,7 +17,10 @@
 
 namespace Alaress\Image\Rewrite\Processor\Strategy;
 
-use Intervention\Image\Image;
+use Imagine\Image\Fill;
+use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\Point;
 
 class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
 {
@@ -44,15 +47,23 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function manipulate(Image $image)
+    public function manipulate(ImageInterface $image)
     {
-        return $image->resize(
-            max($this->getCanvasWidth(), $image->getWidth()),
-            max($this->getCanvasHeight(), $image->getHeight()),
-            function ($constraint) {
-                $constraint->aspectRatio();
-            }
+//        new \Imagine\Filter\Advanced\Canvas()
+        $canvas  = clone $image;
+        $palette = $canvas->palette();
+        $color   = $palette->color($this->translateColorArray($this->getBgColors()));
+        $canvas->fill(
+            new Fill\Gradient\Horizontal(1, $color, $color)
         );
+        $image->thumbnail(
+            new Box(
+                $this->getCanvasWidth(),
+                $this->getCanvasHeight()
+            )
+        );
+        $canvas->paste($image, new Point(0, 0));
+        return $canvas;
     }
 
     /* Getters/Setters
