@@ -11,7 +11,7 @@
 namespace Schoolbox\External\Normalise\User\Staff;
 
 
-class Type {
+class Meta {
 
     /**
      * Category type (type of staff)
@@ -33,6 +33,13 @@ class Type {
      * @var Position
      */
     private $position = null;
+
+    /**
+     * Phone extension
+     *
+     * @var string
+     */
+    private $extension = '';
 
     /**
      * Constructor
@@ -115,5 +122,27 @@ class Type {
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set extension
+     *
+     * @param string $extension
+     * @return $this
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+        return $this;
+    }
+
+    /**
+     * Get extension
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
     }
 }

@@ -12,7 +12,7 @@ namespace Schoolbox\External\Normalise\User;
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
-use Schoolbox\External\Normalise\User\Staff\Type;
+use Schoolbox\External\Normalise\User\Staff\Meta;
 use Schoolbox\Collection;
 
 class Staff extends Base {
@@ -28,21 +28,14 @@ class Staff extends Base {
     private $code = '';
 
     /**
-     * Staff type
+     * Staff metadata
      *
-     * @var Type
+     * @var Meta
      */
-    private $type = null;
+    private $meta = null;
 
     /* Contact
      */
-
-    /**
-     * Phone extension
-     *
-     * @var string
-     */
-    private $extension = '';
 
     /**
      * Work phone
@@ -70,7 +63,7 @@ class Staff extends Base {
         $this->setPhoneMobile(new Phone());
         $this->setPhoneWork(new Phone());
         $this->setCampus(new Collection());
-        $this->setType(new Type());
+        $this->setMeta(new Meta());
     }
 
     /* Getters/Setters
@@ -121,47 +114,25 @@ class Staff extends Base {
     }
 
     /**
-     * Set extension
+     * Set meta
      *
-     * @param string $extension
+     * @param Meta $meta
      * @return $this
      */
-    public function setExtension($extension)
+    public function setMeta($meta)
     {
-        $this->extension = $extension;
+        $this->meta = $meta;
         return $this;
     }
 
     /**
-     * Get extension
+     * Get meta
      *
-     * @return string
+     * @return Meta
      */
-    public function getExtension()
+    public function getMeta()
     {
-        return $this->extension;
-    }
-
-    /**
-     * Set type
-     *
-     * @param Type $type
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return Type
-     */
-    public function getType()
-    {
-        return $this->type;
+        return $this->meta;
     }
 
     /**
