@@ -19,7 +19,7 @@ use Schoolbox\Collection;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter { //implements \External_UserInterface {
+class Adapter {// implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -1071,7 +1071,7 @@ class Adapter { //implements \External_UserInterface {
 
         $staff = new Staff();
         $staff
-            ->setId($currentResult['SchoolStaffCode'])
+            ->setCode($currentResult['SchoolStaffCode'])
             ->setExtension($currentResult['StaffExtension'])
         ;
 
@@ -1105,6 +1105,76 @@ class Adapter { //implements \External_UserInterface {
         ;
 
         return $staff;
+    }
+
+    /**
+     * Contact list for staff directory
+     * Exclude people who aren't active.
+     * Exclude people who are on leave (category description for this is 'Staff on leave')
+     *
+     * TODO: This is a variation of getStaff()
+     *
+     * @return mixed
+     */
+    public function getStaffContactListExtended() {
+        $collection = new Collection();
+
+        $allResults = $this->getHandler()->getStaffContactListExtended();
+
+        foreach ($allResults as $currentResult) {
+            $staff = new Staff();
+
+            $staff
+                ->setId($currentResult['StaffID'])
+                ->setCode($currentResult['SchoolStaffCode'])
+                ->setTitle($currentResult['StaffTitle'])
+                ->setPreferredName($currentResult['StaffPreferredName'])
+                ->setLastname($currentResult['StaffSurname'])
+                ->setExtension($currentResult['StaffExtension'])
+                ->getType()
+                    ->setType($currentResult['StaffCategoryType'])
+                    ->setDepartment($currentResult['StaffDepartment'])
+                    ->getPosition()
+                        ->setDescription($currentResult['JobPositionDescription'])
+                        ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'y-m-d h:i:s'))
+                        ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'y-m-d h:i:s'))
+            ;
+
+            /* Phone
+             */
+            $staff
+                ->getPhoneWork()
+                    ->setNumber($currentResult['StaffOccupPhone'])
+            ;
+
+            /* Campus
+             */
+            $campus = new Common\Campus();
+            $campus
+                ->setName($currentResult['StaffCampusDescription']);
+
+            $staff
+                ->getCampus()
+                    ->add($campus)
+            ;
+
+            /* Email
+             */
+            $email = new Common\Email();
+            $email
+                ->setAddress($currentResult['StaffOccupEmail'])
+            ;
+
+            $staff
+                ->addEmail($email)
+            ;
+
+            /* Stack it up
+             */
+            $collection->add($staff);
+        }
+
+        return $collection;
     }
 
     /* Getters/Setters
