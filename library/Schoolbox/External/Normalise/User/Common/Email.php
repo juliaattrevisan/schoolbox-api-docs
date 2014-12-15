@@ -21,14 +21,6 @@ class Email {
     private $address = '';
 
     /**
-     * This is the primary email address to use out of
-     * the entire collection
-     *
-     * @var bool
-     */
-    private $primary = false;
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -55,25 +47,5 @@ class Email {
     public function getAddress()
     {
         return $this->address;
-    }
-
-    /**
-     * Set primary
-     *
-     * @param boolean $primary
-     */
-    public function setPrimary($primary)
-    {
-        $this->primary = $primary;
-    }
-
-    /**
-     * Get primary
-     *
-     * @return boolean
-     */
-    public function getPrimary()
-    {
-        return $this->primary;
     }
 }
