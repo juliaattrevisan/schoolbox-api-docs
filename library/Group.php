@@ -188,7 +188,9 @@ class Group extends DeprecatedModel
         $query = "SELECT name, id, userAccess.type accessType
 				  FROM (category, userGroups )
 				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
-				  WHERE cid = id AND userGroups.type = '$type'";
+				  WHERE cid = id
+				  AND category.deleted_at IS NULL
+				  AND userGroups.type = '$type'";
         return $this->db->getAll($query);
     }
 
