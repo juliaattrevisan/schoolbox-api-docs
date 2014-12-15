@@ -21,6 +21,13 @@ class Staff extends Base {
      */
 
     /**
+     * Staff Code
+     *
+     * @var string
+     */
+    private $code = '';
+
+    /**
      * Staff type
      *
      * @var Type
@@ -155,5 +162,27 @@ class Staff extends Base {
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 }
