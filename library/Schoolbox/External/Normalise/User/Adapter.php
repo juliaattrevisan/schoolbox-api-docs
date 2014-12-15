@@ -709,7 +709,7 @@ class Adapter implements \External_UserInterface {
      */
     public function getStudentUserAccountInfo() {
         $collection = new Collection();
-        
+
         $allResults = $this->getHandler()->getStudentUserAccountInfo();
 
         foreach ($allResults as $currentResult) {
