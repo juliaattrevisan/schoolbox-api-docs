@@ -1192,7 +1192,61 @@ class Adapter {// implements \External_UserInterface {
         $allResults = $this->getHandler()->getStaffUserAccountInfo();
 
         foreach ($allResults as $currentResult) {
+            $staff = new Staff();
+            $staff
+                ->setId($currentResult['StaffID'])
+                ->setTitle($currentResult['StaffTitle'])
+                ->setPreferredName($currentResult['StaffPreferredName'])
+                ->setLastname($currentResult['StaffSurname'])
+                ->getMeta()
+                    ->setType($currentResult['StaffCategoryType'])
+                    ->setDepartment($currentResult['StaffDepartment'])
+            ;
+
+            /* Account
+             */
+            $staff
+                ->getAccount()
+                    ->setLogin($currentResult['NetworkLogin'])
+                    ->setActive($currentResult['ActiveFlag'])
+            ;
+
+            /* Email
+             */
+            $email1 = new Common\Email();
+            $email1
+                ->setAddress($currentResult['Email'])
+            ;
+
+            $email2 = new Common\Email();
+            $email2
+                ->setAddress($currentResult['OccupEmail'])
+            ;
+
+            foreach (array($email1, $email2) as $currentEmail) {
+                if (strlen($currentEmail->getAddress())) {
+                    $staff->addEmail($currentEmail);
+                }
+            }
+
+            /* Campus
+             */
+            $campus = new Common\Campus();
+            $campus
+                ->setName($currentResult['StaffCampus'])
+            ;
+
+            $staff
+                ->getCampus()
+                    ->add($campus)
+            ;
+
+            /* Stack it up
+             */
+            $collection->add($staff);
         }
+
+        return $collection;
     }
 
     /* Getters/Setters
