@@ -92,10 +92,12 @@ class Guardian extends Base {
      * Set type
      *
      * @param string $type
+     * @return $this
      */
     public function setType($type)
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
@@ -112,10 +114,12 @@ class Guardian extends Base {
      * Set role
      *
      * @param string $role
+     * @return $this
      */
     public function setRole($role)
     {
         $this->role = $role;
+        return $this;
     }
 
     /**
