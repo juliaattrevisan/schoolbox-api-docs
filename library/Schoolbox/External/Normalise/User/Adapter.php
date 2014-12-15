@@ -19,7 +19,7 @@ use Schoolbox\Collection;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter {// implements \External_UserInterface {
+class Adapter  implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -1310,6 +1310,21 @@ class Adapter {// implements \External_UserInterface {
         }
 
         return $collection;
+    }
+
+    /**
+     * Return a housemaster for a particular house
+     *
+     * @param $houseId
+     * @return Staff
+     */
+    public function getHousemasterByHouseId($houseId) {
+        $currentResult = $this->getHandler()->getHousemasterByHouseId($houseId);
+
+        $staff = new Staff();
+        $staff->setId($currentResult);
+
+        return $staff;
     }
 
     /* Getters/Setters
