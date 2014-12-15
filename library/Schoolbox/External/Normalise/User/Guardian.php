@@ -29,11 +29,18 @@ class Guardian extends Base {
     protected $phoneWork = '';
 
     /**
-     * Guardian type
+     * Guardian type e.g. SC1, SC2
      *
      * @var string
      */
     protected $type = '';
+
+    /**
+     * Guardian role e.g. mother, father
+     *
+     * @var string
+     */
+    protected $role = '';
 
     /**
      * Constructor
@@ -99,5 +106,25 @@ class Guardian extends Base {
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+    }
+
+    /**
+     * Get role
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 }
