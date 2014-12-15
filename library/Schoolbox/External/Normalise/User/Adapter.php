@@ -19,7 +19,7 @@ use Schoolbox\Collection;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter implements \External_UserInterface {
+class Adapter {// implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -36,7 +36,6 @@ class Adapter implements \External_UserInterface {
     public function __construct(\External_User $handler) {
         $this->setHandler($handler);
     }
-
 
     /**
      * Get portrait
@@ -105,8 +104,10 @@ class Adapter implements \External_UserInterface {
         /* Stack them up
          */
         $collection = new Collection();
-        $collection->add($guardian1);
-        $collection->add($guardian2);
+        $collection
+            ->add($guardian1)
+            ->add($guardian2)
+        ;
 
         return $collection;
     }
@@ -222,6 +223,8 @@ class Adapter implements \External_UserInterface {
 
     /**
      * Get students
+     *
+     * TODO: This is a variation of getStudentContactListExtended()
      *
      * @param $externalUserId
      * @return Student
@@ -347,6 +350,151 @@ class Adapter implements \External_UserInterface {
         }
 
         return $student;
+    }
+
+    /**
+     * Get a list of student contacts (parents) and their contact information
+     *
+     * TODO: This is a variation of getStudentContactListExtended()
+     *
+     * @param $externalUserId
+     *
+     * @return mixed
+     */
+    public function getStudentContactList($externalUserId) {
+        $collection = new Collection();
+
+        $allResults = $this->getHandler()->getStudentContactList($externalUserId);
+
+        foreach ($allResults as $currentResult) {
+
+            /* Guardian 1
+             */
+            $guardian1Email = new Common\Email();
+            $guardian1Email
+                ->setAddress($currentResult['StudentContactDefaultEmail'])
+            ;
+
+            $guardian1 = new Guardian();
+            $guardian1
+                ->setId($currentResult['StudentContactID'])
+                ->setTitle($currentResult['StudentContactTitle'])
+                ->setPreferredName($currentResult['StudentContactPreferred'])
+                ->setLastname($currentResult['StudentContactSurname'])
+                ->addEmail($guardian1Email)
+                ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag'])
+                ->setType($currentResult['StudentContactType'])
+                ->setRole($currentResult['StudentContactRelation'])
+            ;
+
+            $guardian1
+                ->getPostalAddress()
+                ->setAddress1($currentResult['StudentContactAddress1'])
+                ->setAddress2($currentResult['StudentContactAddress2'])
+                ->setAddress3($currentResult['StudentContactAddress3'])
+                ->setSuburb($currentResult['StudentContactSuburb'])
+                ->setState($currentResult['StudentContactState'])
+                ->setPostcode($currentResult['StudentContactPostCode'])
+            ;
+
+            $guardian1
+                ->getHomeAddress()
+                ->setAddress1($currentResult['StudentContactAddress1'])
+                ->setAddress2($currentResult['StudentContactAddress2'])
+                ->setAddress3($currentResult['StudentContactAddress3'])
+                ->setSuburb($currentResult['StudentContactSuburb'])
+                ->setState($currentResult['StudentContactState'])
+                ->setPostcode($currentResult['StudentContactPostCode'])
+            ;
+
+            $guardian1
+                ->getPhoneHome()
+                ->setNumber($currentResult['StudentContactPhoneActual'])
+                ->setSilent($currentResult['StudentContactSilentPhoneFlag'])
+            ;
+
+            $guardian1
+                ->getPhoneMobile()
+                ->setNumber($currentResult['StudentContactMobilePhone'])
+            ;
+
+            $guardian1
+                ->getPhoneWork()
+                ->setNumber($currentResult['StudentContactOccupPhone'])
+            ;
+
+            /* Guardian 2
+             */
+            $guardian2Email = new Common\Email();
+            $guardian2Email
+                ->setAddress($currentResult['StudentContactSpouseDefaultEmail'])
+            ;
+
+            $guardian2 = new Guardian();
+            $guardian2
+                ->setId($currentResult['StudentContactSpouseID'])
+                ->setTitle($currentResult['StudentContactSpouseTitle'])
+                ->setPreferredName($currentResult['StudentContactSpousePreferred'])
+                ->setLastname($currentResult['StudentContactSpouseSurname'])
+                ->addEmail($guardian2Email)
+                ->setType($currentResult['StudentContactType'])
+                ->setRole($currentResult['StudentContactSpouseRelation'])
+            ;
+
+            $guardian2
+                ->getPhoneMobile()
+                ->setNumber($currentResult['StudentContactSpouseMobilePhone'])
+            ;
+
+            $guardian2
+                ->getPhoneWork()
+                ->setNumber($currentResult['StudentContactSpouseOccupPhone'])
+            ;
+
+            /* Compile student record with known data
+             */
+            $student = new Student();
+            $student
+                ->setId($currentResult['StudentID'])
+                ->setGivenName($currentResult['StudentGiven1'])
+                ->setPreferredName($currentResult['StudentGiven1'])
+                ->setLastname($currentResult['StudentSurname'])
+                ->setGuardiansSeparated($currentResult['StudentParentsSeparatedFlag'])
+            ;
+
+            /* Relations
+             */
+            $student
+                ->getYear()
+                ->setLevel($currentResult['StudentYearLevel'])
+            ;
+
+            $student
+                ->getHouse()
+                ->setName($currentResult['StudentHouse'])
+            ;
+
+            // TODO: Refactor into adaptation layer
+
+            if ($currentResult['StudentBoarder'] == 'Y') {
+                $boardingHouse = new Common\BoardingHouse();
+                $student->setBoardingHouse($boardingHouse);
+            }
+
+            /* Parents/Guardians
+             */
+            foreach(array($guardian1, $guardian2) as $currentGuardian) {
+                if (strlen($currentGuardian->getPreferredName())) {
+                    $student->getGuardians()->add($currentGuardian);
+                }
+            }
+
+            /* Stack it up
+             */
+            $collection->add($student);
+        }
+
+        return $collection;
     }
 
     /**
@@ -525,6 +673,10 @@ class Adapter implements \External_UserInterface {
      * year level is stored in the external db.
      *
      * Used in reporting.
+     *
+     * TODO: This should be the new master method, with optional args for
+     * yearlevel, name, boardingStatus and form - each of which are used
+     * in a queryBuilder-style construct
      *
      * @param $yearlevel
      * @param $name
