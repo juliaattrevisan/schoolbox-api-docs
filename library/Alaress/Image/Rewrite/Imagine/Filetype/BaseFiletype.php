@@ -77,7 +77,15 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     public function save(ImageInterface $image, $filename)
     {
-        file_put_contents($filename, $image->get($this->getFormat()));
+        $options = array();
+        if ($image->layers()->count() > 1) {
+            $options['animated'] = true;
+            $options['animated.loops'] = 0;
+        }
+        file_put_contents(
+            $filename,
+            $image->get($this->getFormat(), $options)
+        );
     }
 
     protected function outputHeaders()
