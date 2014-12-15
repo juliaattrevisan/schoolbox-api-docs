@@ -43,6 +43,13 @@ class Guardian extends Base {
     protected $role = '';
 
     /**
+     * A collection of Student instances
+     *
+     * @var Collection
+     */
+    protected $students = null;
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -61,6 +68,20 @@ class Guardian extends Base {
         $this->setPhoneMobile(new Phone());
         $this->setPhoneWork(new Phone());
         $this->setCampus(new Collection());
+        $this->setStudents(new Collection());
+    }
+
+    /**
+     * Add a student to the collection
+     * This is a student belonging to this guardian
+     * 
+     * @param Student $student
+     * @return $this
+     */
+    public function addStudent(Student $student) {
+        $this->getStudents()->add($student);
+
+        return $this;
     }
 
     /* Getters/Setters
@@ -130,5 +151,25 @@ class Guardian extends Base {
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Set students
+     *
+     * @param Collection $students
+     */
+    private function setStudents($students)
+    {
+        $this->students = $students;
+    }
+
+    /**
+     * Get students
+     *
+     * @return Collection
+     */
+    public function getStudents()
+    {
+        return $this->students;
     }
 }
