@@ -1072,7 +1072,8 @@ class Adapter {// implements \External_UserInterface {
         $staff = new Staff();
         $staff
             ->setCode($currentResult['SchoolStaffCode'])
-            ->setExtension($currentResult['StaffExtension'])
+            ->getMeta()
+                ->setExtension($currentResult['StaffExtension'])
         ;
 
         $staff
@@ -1095,7 +1096,7 @@ class Adapter {// implements \External_UserInterface {
         /* Type
          */
         $staff
-            ->getType()
+            ->getMeta()
                 ->setType($currentResult['StaffCategoryDescription'])
                 ->setDepartment($currentResult['StaffDepartment'])
                 ->getPosition()
@@ -1130,10 +1131,10 @@ class Adapter {// implements \External_UserInterface {
                 ->setTitle($currentResult['StaffTitle'])
                 ->setPreferredName($currentResult['StaffPreferredName'])
                 ->setLastname($currentResult['StaffSurname'])
-                ->setExtension($currentResult['StaffExtension'])
-                ->getType()
+                ->getMeta()
                     ->setType($currentResult['StaffCategoryType'])
                     ->setDepartment($currentResult['StaffDepartment'])
+                    ->setExtension($currentResult['StaffExtension'])
                     ->getPosition()
                         ->setDescription($currentResult['JobPositionDescription'])
                         ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'y-m-d h:i:s'))
