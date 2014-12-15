@@ -1277,6 +1277,41 @@ class Adapter {// implements \External_UserInterface {
         return $this->getHandler()->getCurrentSemester($externalUserId);
     }
 
+    /**
+     * Get a list of subjects and their types
+     *
+     * @param $externalUserId
+     * @param $userId
+     *
+     * @return Collection
+     */
+    public function getSubjectList($externalUserId, $userId) {
+        $collection = new Collection();
+
+        $allResults = $this->getHandler()->getSubjectList($externalUserId, $userId);
+
+        foreach ($allResults as $currentResult) {
+            $campus = new Common\Campus();
+            $campus
+                ->setCode($currentResult['campusCode'])
+            ;
+
+            $subject = new Student\Subject();
+            $subject
+                ->setName($currentResult['name'])
+                ->setCode($currentResult['code'])
+                ->setType($currentResult['classType'])
+                ->setCampus($campus)
+            ;
+
+            /* Stack it up
+             */
+            $collection->add($subject);
+        }
+
+        return $collection;
+    }
+
     /* Getters/Setters
      */
 
@@ -1300,3 +1335,4 @@ class Adapter {// implements \External_UserInterface {
         return $this->handler;
     }
 }
+
