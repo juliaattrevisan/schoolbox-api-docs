@@ -744,6 +744,7 @@ class Group extends DeprecatedModel
         LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
 		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
 		AND userAccess.type >= '$accessType'
+		AND category.deleted_at IS NULL
 		GROUP BY category.id
 		ORDER BY category.name";
 
