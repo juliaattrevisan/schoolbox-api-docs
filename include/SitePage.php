@@ -771,7 +771,7 @@ class SitePage extends Page
         $query = "
             SELECT cat.name, ua.sid, ua.type
             FROM userAccess AS ua
-            INNER JOIN category AS cat ON ua.sid=cat.id
+            INNER JOIN category AS cat ON ua.sid=cat.id AND cat.deleted_at IS NULL
             INNER JOIN homepage_config AS hc ON cat.id=hc.cid
             WHERE ua.uid = %d
             AND service = %d
