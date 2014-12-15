@@ -1249,6 +1249,24 @@ class Adapter {// implements \External_UserInterface {
         return $collection;
     }
 
+    /* Misc
+     */
+
+    /**
+     * Get an email address belonging to $externalUserId
+     *
+     * @param $externalUserId
+     * @return Common\Email
+     */
+    public function getEmail($externalUserId) {
+        $currentResult = $this->getHandler()->getEmail($externalUserId);
+
+        $email = new Common\Email();
+        $email->setAddress($currentResult);
+
+        return $email;
+    }
+
     /* Getters/Setters
      */
 
