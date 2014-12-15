@@ -19,7 +19,7 @@ use Schoolbox\Collection;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter {
+class Adapter implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -346,6 +346,8 @@ class Adapter {
     /**
      * Get a bunch of boarder students and list their contacts
      *
+     * TODO: This is a variation of getStudentContactListExtended()
+     *
      * @return Collection
      */
     public function getStudentBoarderContactListExtended() {
@@ -510,9 +512,6 @@ class Adapter {
      * year level is stored in the external db.
      *
      * Used in reporting.
-     *
-     * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-     * so I changed it to use CountryCode instead.
      *
      * @param $yearlevel
      * @param $name
@@ -683,6 +682,56 @@ class Adapter {
 
         return $collection;
     }
+
+    /**
+     * Gets all Students' account info from external db
+     *
+     * TODO: This is a variation of getStudentContactListExtended()
+     */
+    public function getStudentUserAccountInfo() {
+        $allResults = $this->getHandler()->getStudentUserAccountInfo();
+
+        foreach ($allResults as $currentResult) {
+            $student = new Student();
+            $student
+                ->setId($currentResult['StudentID'])
+                ->setTitle($currentResult['StudentTitle'])
+                ->setPreferredName($currentResult['StudentPreferred'])
+                ->setLastname($currentResult['StudentSurname'])
+                ->setGender($currentResult['StudentGender'])
+            ;
+
+            $student
+                ->getYear()
+                    ->setLevel($currentResult['StudentYearLevel'])
+            ;
+
+            $student
+                ->getHouse()
+                    ->setName($currentResult['StudentHouse'])
+                    ->setBoarder($currentResult['StudentBoarder'])
+            ;
+
+            /* Assign emails
+             */
+            $email1 = new Common\Email();
+            $email1
+                ->setAddress($currentResult['StudentEmail']);
+
+            $email2 = new Common\Email();
+            $email2
+                ->setAddress($currentResult['StudentOccupEmail']);
+
+            foreach(array($email1, $email2) as $currentEmail) {
+                if (strlen($currentEmail->getAddress())) {
+                    $student->addEmail($currentEmail);
+                }
+            }
+        }
+    }
+
+    /* Staff
+     */
 
     /* Getters/Setters
      */
