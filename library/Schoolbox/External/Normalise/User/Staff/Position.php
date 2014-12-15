@@ -35,27 +35,6 @@ class Position {
     private $endDate = null;
 
     /**
-     * Room
-     *
-     * @var string
-     */
-    private $room = '';
-
-    /**
-     * Building
-     *
-     * @var string
-     */
-    private $building = '';
-
-    /**
-     * Voicemail
-     *
-     * @var string
-     */
-    private $voicemail = '';
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -137,71 +116,5 @@ class Position {
     public function getStartDate()
     {
         return $this->startDate;
-    }
-
-    /**
-     * Set building
-     *
-     * @param string $building
-     * @return $this
-     */
-    public function setBuilding($building)
-    {
-        $this->building = $building;
-        return $this;
-    }
-
-    /**
-     * Get building
-     *
-     * @return string
-     */
-    public function getBuilding()
-    {
-        return $this->building;
-    }
-
-    /**
-     * Set room
-     *
-     * @param string $room
-     * @return $this
-     */
-    public function setRoom($room)
-    {
-        $this->room = $room;
-        return $this;
-    }
-
-    /**
-     * Get room
-     *
-     * @return string
-     */
-    public function getRoom()
-    {
-        return $this->room;
-    }
-
-    /**
-     * Set voicemail
-     *
-     * @param string $voicemail
-     * @return $this
-     */
-    public function setVoicemail($voicemail)
-    {
-        $this->voicemail = $voicemail;
-        return $this;
-    }
-
-    /**
-     * Get voicemail
-     *
-     * @return string
-     */
-    public function getVoicemail()
-    {
-        return $this->voicemail;
     }
 }
