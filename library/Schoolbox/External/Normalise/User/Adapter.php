@@ -1099,10 +1099,9 @@ class Adapter {// implements \External_UserInterface {
             ->getMeta()
                 ->setType($currentResult['StaffCategoryDescription'])
                 ->setDepartment($currentResult['StaffDepartment'])
-                ->getPosition()
-                    ->setRoom($currentResult['StaffRoom'])
-                    ->setBuilding($currentResult['StaffBuilding'])
-                    ->setVoicemail($currentResult['StaffVoiceMail'])
+                ->setRoom($currentResult['StaffRoom'])
+                ->setBuilding($currentResult['StaffBuilding'])
+                ->setVoicemail($currentResult['StaffVoiceMail'])
         ;
 
         return $staff;
