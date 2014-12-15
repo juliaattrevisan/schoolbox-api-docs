@@ -54,10 +54,12 @@ class Subject {
      * Set campus
      *
      * @param \Schoolbox\External\Normalise\User\Common\Campus $campus
+     * @return $this
      */
     public function setCampus($campus)
     {
         $this->campus = $campus;
+        return $this;
     }
 
     /**
@@ -74,10 +76,12 @@ class Subject {
      * Set code
      *
      * @param string $code
+     * @return $this
      */
     public function setCode($code)
     {
         $this->code = $code;
+        return $this;
     }
 
     /**
@@ -94,10 +98,12 @@ class Subject {
      * Set name
      *
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -114,10 +120,12 @@ class Subject {
      * Set type
      *
      * @param string $type
+     * @return $this
      */
     public function setType($type)
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
