@@ -29,6 +29,13 @@ class Guardian extends Base {
     protected $phoneWork = '';
 
     /**
+     * Guardian type
+     *
+     * @var string
+     */
+    protected $type = '';
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -72,5 +79,25 @@ class Guardian extends Base {
     public function getPhoneWork()
     {
         return $this->phoneWork;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 }
