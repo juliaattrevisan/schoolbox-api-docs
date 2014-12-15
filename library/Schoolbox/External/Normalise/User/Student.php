@@ -16,6 +16,7 @@ use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Student\Year;
 use Schoolbox\External\Normalise\User\Student\Form;
 use Schoolbox\External\Normalise\User\Common\House;
+use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 
 class Student extends Base {
 
@@ -100,6 +101,12 @@ class Student extends Base {
      * @var House
      */
     protected $house = null;
+
+    /**
+     * Boarding House
+     * @var BoardingHouse
+     */
+    protected $boardingHouse = null;
 
     /**
      * Constructor
@@ -344,5 +351,25 @@ class Student extends Base {
     public function getYear()
     {
         return $this->year;
+    }
+
+    /**
+     * Set boarding house
+     *
+     * @param BoardingHouse $boardingHouse
+     */
+    public function setBoardingHouse($boardingHouse)
+    {
+        $this->boardingHouse = $boardingHouse;
+    }
+
+    /**
+     * Get boarding house
+     *
+     * @return BoardingHouse
+     */
+    public function getBoardingHouse()
+    {
+        return $this->boardingHouse;
     }
 }

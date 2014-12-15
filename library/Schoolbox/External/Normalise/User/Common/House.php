@@ -45,13 +45,6 @@ class House {
     private $housemaster = null;
 
     /**
-     * This is a boarding house
-     *
-     * @var bool
-     */
-    private $boarder = false;
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -154,27 +147,5 @@ class House {
     public function getHousemaster()
     {
         return $this->housemaster;
-    }
-
-    /**
-     * Set boarder
-     *
-     * @param boolean $boarder
-     * @return $this
-     */
-    public function setBoarder($boarder)
-    {
-        $this->boarder = $boarder;
-        return $this;
-    }
-
-    /**
-     * Get boarder
-     *
-     * @return boolean
-     */
-    public function getBoarder()
-    {
-        return $this->boarder;
     }
 }
