@@ -708,6 +708,8 @@ class Adapter implements \External_UserInterface {
      * TODO: This is a variation of getStudentContactListExtended()
      */
     public function getStudentUserAccountInfo() {
+        $collection = new Collection();
+        
         $allResults = $this->getHandler()->getStudentUserAccountInfo();
 
         foreach ($allResults as $currentResult) {
@@ -761,7 +763,20 @@ class Adapter implements \External_UserInterface {
 
             /* Campus
              */
+            $campus = new Common\Campus();
+            $campus
+                ->setName($currentResult['StudentCampus'])
+            ;
+
+            $student
+                ->getCampus()
+                    ->add($campus)
+            ;
+
+            $collection->add($student);
         }
+
+        return $collection;
     }
 
     /* Staff
