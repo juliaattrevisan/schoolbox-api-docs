@@ -334,11 +334,17 @@ class Adapter implements \External_UserInterface {
             ->getHouse()
                 ->setId($currentResult['StudentHouse'])
                 ->setName($currentResult['StudentHouseDescription'])
-                ->setBoarder($currentResult['StudentBoarder'])
                 ->getHousemaster()
                     ->setId($currentResult['HeadOfHouseID'])
                     ->setPreferredName($currentResult['StudentHeadOfHouse'])
         ;
+
+        // TODO: Refactor into adaptation layer
+
+        if ($currentResult['StudentBoarder'] == 'Y') {
+            $boardingHouse = new Common\BoardingHouse();
+            $student->setBoardingHouse($boardingHouse);
+        }
 
         return $student;
     }
@@ -490,6 +496,13 @@ class Adapter implements \External_UserInterface {
                 ->getHouse()
                     ->setName($currentResult['StudentHouse'])
             ;
+
+            // TODO: Refactor into adaptation layer
+
+            if ($currentResult['StudentBoarder'] == 'Y') {
+                $boardingHouse = new Common\BoardingHouse();
+                $student->setBoardingHouse($boardingHouse);
+            }
 
             /* Parents/Guardians
              */
@@ -664,8 +677,14 @@ class Adapter implements \External_UserInterface {
             $student
                 ->getHouse()
                     ->setName($currentResult['StudentHouse'])
-                    ->setBoarder($currentResult['StudentBoarder'])
             ;
+
+            // TODO: Refactor into adaptation layer
+
+            if ($currentResult['StudentBoarder'] == 'Y') {
+                $boardingHouse = new Common\BoardingHouse();
+                $student->setBoardingHouse($boardingHouse);
+            }
 
             /* Parents/Guardians
              */
@@ -709,7 +728,6 @@ class Adapter implements \External_UserInterface {
             $student
                 ->getHouse()
                     ->setName($currentResult['StudentHouse'])
-                    ->setBoarder($currentResult['StudentBoarder'])
             ;
 
             /* Assign emails
@@ -727,6 +745,22 @@ class Adapter implements \External_UserInterface {
                     $student->addEmail($currentEmail);
                 }
             }
+
+            // TODO: Refactor into adaptation layer
+
+            if ($currentResult['StudentBoarder'] == 'Y') {
+                $boardingHouse = new Common\BoardingHouse();
+                $boardingHouse
+                    ->setName($currentResult['StudentBoardingHouse'])
+                ;
+
+                $student
+                    ->setBoardingHouse($boardingHouse)
+                ;
+            }
+
+            /* Campus
+             */
         }
     }
 
