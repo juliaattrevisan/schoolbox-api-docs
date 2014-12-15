@@ -18,7 +18,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Processor\Strategy;
+namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;

@@ -1,30 +1,30 @@
 <?php
 /**
- * Alaress_Image_Filetype_Gif
+ * Alaress_Image_Filetype_Jpg
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Alaress\Image\Rewrite\Filetype;
+namespace Alaress\Image\Rewrite\Imagine\Filetype;
 
-class Gif extends BaseFiletype
+class Jpg extends BaseFiletype
 {
-    protected $format = 'gif';
+    protected $format = 'jpg';
 
     protected function outputSpecificHeaders()
     {
-        header('Content-type: image/gif');
+        header('Content-type: image/jpeg');
     }
 
     /**
-     * GIF does support the alpha channel
+     * JPEG does not support the alpha channel
      *
-     * @return bool Always true
+     * @return bool Always false
      */
     public function supportsAlphaChannel()
     {
-        return true;
+        return false;
     }
 }

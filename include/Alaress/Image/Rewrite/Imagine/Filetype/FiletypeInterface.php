@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Filetype;
+namespace Alaress\Image\Rewrite\Imagine\Filetype;
 
 use Imagine\Image\ImageInterface;
 

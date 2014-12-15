@@ -16,7 +16,7 @@ class Alaress_Image_Processor_Abstract {
 
 	/* Strategies for image manipulation
 	 */
-	protected $processorStrategyPrefix = 'Alaress\\Image\\Rewrite\\Processor\\Strategy\\';
+	protected $processorStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Processor\\Strategy\\';
 
 	/**
 	 * @var Alaress_Image_Processor_Strategy_Interface
@@ -25,7 +25,7 @@ class Alaress_Image_Processor_Abstract {
 
 	/* Strategies for polymorphic image output
 	 */
-	protected $filetypeStrategyPrefix = 'Alaress\\Image\\Rewrite\\Filetype\\';
+	protected $filetypeStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Filetype\\';
 
 	/**
 	 * @var Alaress_Image_Filetype_Interface
