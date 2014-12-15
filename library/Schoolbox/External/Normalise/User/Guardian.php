@@ -74,7 +74,7 @@ class Guardian extends Base {
     /**
      * Add a student to the collection
      * This is a student belonging to this guardian
-     * 
+     *
      * @param Student $student
      * @return $this
      */

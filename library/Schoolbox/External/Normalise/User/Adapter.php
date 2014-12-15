@@ -218,6 +218,132 @@ class Adapter {// implements \External_UserInterface {
         return $collection;
     }
 
+    /**
+     * Gets all Parents' account info from external db
+     */
+    public function getParentUserAccountInfo() {
+        $allGuardians = array();
+
+        $allResults = $this->getHandler()->getParentUserAccountInfo();
+
+        foreach ($allResults as $currentResult) {
+
+            /* Year (common to all Guardians)
+             */
+            $student = new Student();
+            $student
+                ->getYear()
+                ->setLevel($currentResult['StudentYearLevel'])
+            ;
+
+            /* Guardian 1
+             */
+            $guardian1 = new Guardian();
+            $guardian1
+                ->setId($currentResult['StudentContactID'])
+                ->setTitle($currentResult['StudentContactTitle'])
+                ->setPreferredName($currentResult['StudentContactPreferred'])
+                ->setLastname($currentResult['StudentContactSurname'])
+                ->setGender($currentResult['StudentGender'])
+            ;
+
+            /* Email
+             */
+            $email = new Common\Email();
+            $email
+                ->setAddress($currentResult['StudentContactDefaultEmail'])
+            ;
+
+            $guardian1
+                ->addEmail($email);
+
+            /* Account
+             */
+            $guardian1
+                ->getAccount()
+                    ->setLogin($currentResult['StudentContactNetworkLogin'])
+            ;
+
+            /* Campus
+             */
+            $campus = new Common\Campus();
+            $campus
+                ->setName($currentResult['StudentCampus'])
+            ;
+
+            $guardian1
+                ->getCampus()
+                    ->add($campus)
+            ;
+
+            /* Guardian 2
+             */
+            $guardian2 = new Guardian();
+            $guardian2
+                ->setId($currentResult['StudentContactSpouseID'])
+                ->setTitle($currentResult['StudentContactSpouseTitle'])
+                ->setPreferredName($currentResult['StudentContactSpousePreferred'])
+                ->setLastname($currentResult['StudentContactSpouseSurname'])
+            ;
+
+            /* Email
+             */
+            $email = new Common\Email();
+            $email
+                ->setAddress($currentResult['StudentContactSpouseDefaultEmail'])
+            ;
+
+            $guardian2
+                ->addEmail($email);
+
+            /* Account
+             */
+            $guardian2
+                ->getAccount()
+                ->setLogin($currentResult['StudentContactSpouseNetworkLogin'])
+            ;
+
+            /* Campus
+             */
+            $campus = new Common\Campus();
+            $campus
+                ->setName($currentResult['StudentCampus'])
+            ;
+
+            $guardian2
+                ->getCampus()
+                ->add($campus)
+            ;
+
+            /* Stack it up
+             */
+            foreach (array($guardian1, $guardian2) as $currentGuardian) {
+                if (strlen($currentGuardian->getPreferredName())) {
+
+                    /* Add guardian to the registry
+                     */
+                    if (!($allGuardians[$currentGuardian->getId()] instanceof Guardian)) {
+                        $allGuardians[$currentGuardian->getId()] = $currentGuardian;
+                    }
+
+                    /* Add student
+                     */
+                    $allGuardians[$currentGuardian->getId()]
+                        ->getStudents()
+                            ->add($student)
+                    ;
+                }
+            }
+        }
+
+        /* Reindex collection
+         */
+        $collection = new Collection($allGuardians);
+        $collection->reindex();
+
+        return $collection;
+    }
+
     /* Students
      */
 
