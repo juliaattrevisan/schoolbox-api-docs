@@ -705,6 +705,7 @@ class Group extends DeprecatedModel
 			AND userAccess.sid = category.id
 			AND userAccess.service = '" . $this->_service . "'
 			AND userAccess.type >= '$accessType'
+			AND category.deleted_at IS NULL
 			$exclude_part
 			GROUP BY category.id
 			ORDER BY category.name
