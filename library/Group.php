@@ -606,8 +606,11 @@ class Group extends DeprecatedModel
     {
         //returns true on user being involved in group
         $query = "SELECT userAccess.type FROM userAccess, category
-			WHERE userAccess.service = '" . $this->_service . "' AND userAccess.uid = '$uid'
-			AND userAccess.sid = category.id AND category.id = '$cid'";
+			WHERE userAccess.service = '" . $this->_service . "'
+			AND userAccess.uid = '$uid'
+			AND userAccess.sid = category.id
+			AND category.deleted_at IS NULL
+			AND category.id = '$cid'";
         return $this->db->getOne($query);
     }
 
