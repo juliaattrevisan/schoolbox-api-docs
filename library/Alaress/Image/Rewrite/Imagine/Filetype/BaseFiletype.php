@@ -86,6 +86,11 @@ abstract class BaseFiletype implements FiletypeInterface
             $filename,
             $image->get($this->getFormat(), $options)
         );
+//        if ($image->layers()->count() > 1) {
+//            // Awful hack to make animated GIFs loop, because imagick is buggy
+//            $filearg = escapeshellarg($filename);
+//            exec("convert $filearg -loop 0 $filearg");
+//        }
     }
 
     protected function outputHeaders()

@@ -76,6 +76,31 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * @return $this
      */
     private function manipulate() {
+//        $image = $this->getImage();
+//        if ($image->layers()->count() > 1) {
+//            $image->layers()->coalesce();
+//        }
+//        $manipulatedImage = $this->getProcessorStrategy()->manipulate($image);
+//        $this->setImage($manipulatedImage);
+//
+//        // TODO work this into a separate manipulator
+////        $manipulatedImage = $this->getImage();
+////        $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
+//        if ($manipulatedImage->layers()->count() > 1) {
+//            $manipulatedImage->layers()->coalesce();
+//            $newLayers = array();
+//            foreach ($manipulatedImage->layers() as $i => $layer) {
+//                $manipulatedImage->layers()->set($i, $this->getProcessorStrategy()->manipulate($layer));
+////                $newLayers[$i] = $this->getProcessorStrategy()->manipulate($layer);
+//            }
+////            foreach ($newLayers as $i => $layer) {
+//////                $manipulatedImage->layers()->remove($i);
+////                $manipulatedImage->layers()->set($i, $layer);
+////            }
+//            $manipulatedImage->layers()->animate('gif', null, 0);
+//        } else {
+//            $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
+//        }
         $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
 
         $this->setImage($manipulatedImage);
