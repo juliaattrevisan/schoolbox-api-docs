@@ -101,7 +101,7 @@ class Type {
      * @param string $type
      * @return $this
      */
-    private function setType($type)
+    public function setType($type)
     {
         $this->type = $type;
         return $this;

@@ -19,7 +19,7 @@ use Schoolbox\Collection;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter {// implements \External_UserInterface {
+class Adapter { //implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -1059,6 +1059,53 @@ class Adapter {// implements \External_UserInterface {
 
     /* Staff
      */
+
+    /**
+     * Get info for the staff member $externalUserId
+     *
+     * @param $externalUserId
+     * @return Staff
+     */
+    public function getStaff($externalUserId) {
+        $currentResult = $this->getHandler()->getStaff($externalUserId);
+
+        $staff = new Staff();
+        $staff
+            ->setId($currentResult['SchoolStaffCode'])
+            ->setExtension($currentResult['StaffExtension'])
+        ;
+
+        $staff
+            ->getPhoneMobile()
+                ->setNumber($currentResult['StaffMobilePhone'])
+        ;
+
+        /* Campus
+         */
+        $campus = new Common\Campus();
+        $campus
+            ->setName($currentResult['StaffCampusDescription'])
+        ;
+
+        $staff
+            ->getCampus()
+                ->add($campus)
+        ;
+
+        /* Type
+         */
+        $staff
+            ->getType()
+                ->setType($currentResult['StaffCategoryDescription'])
+                ->setDepartment($currentResult['StaffDepartment'])
+                ->getPosition()
+                    ->setRoom($currentResult['StaffRoom'])
+                    ->setBuilding($currentResult['StaffBuilding'])
+                    ->setVoicemail($currentResult['StaffVoiceMail'])
+        ;
+
+        return $staff;
+    }
 
     /* Getters/Setters
      */
