@@ -74,7 +74,7 @@ class Guardian extends Base {
     /**
      * Get phone work
      *
-     * @return \Phone
+     * @return Phone
      */
     public function getPhoneWork()
     {
