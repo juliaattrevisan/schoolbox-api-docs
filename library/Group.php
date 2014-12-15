@@ -213,7 +213,13 @@ class Group extends DeprecatedModel
 
     function groupList()
     {
-        $query = "SELECT name, id FROM category, userGroups WHERE cid = id ORDER BY name";
+        $query = "
+            SELECT name, id
+            FROM category, userGroups
+            WHERE cid = id
+            AND category.deleted_at IS NULL
+            ORDER BY name
+        ";
         return $this->db->getAll($query);
     }
 
