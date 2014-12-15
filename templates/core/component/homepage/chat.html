@@ -22,7 +22,7 @@
         /* IE : defer focus to the chat message box */
         $(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
             var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
-            if(msgbox.setActive) {
+            if(msgbox && msgbox.setActive) {
                 msgbox.setActive();
             }
         });
