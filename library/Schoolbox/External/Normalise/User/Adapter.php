@@ -1267,6 +1267,16 @@ class Adapter {// implements \External_UserInterface {
         return $email;
     }
 
+    /**
+     * Set session vars for current semester (fileyear, filesemester)
+     *
+     * @param null $externalUserId
+     * @return int
+     */
+    public function getCurrentSemester($externalUserId = null) {
+        return $this->getHandler()->getCurrentSemester($externalUserId);
+    }
+
     /* Getters/Setters
      */
 
