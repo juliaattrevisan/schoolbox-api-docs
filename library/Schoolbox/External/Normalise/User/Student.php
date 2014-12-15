@@ -134,6 +134,21 @@ class Student extends Base {
     }
 
     /**
+     * This student is a boarder
+     *
+     * Determined by presence of a BoardingHouse instance
+     *
+     * @return bool
+     */
+    public function isBoarder() {
+        if ($this->getBoardingHouse() instanceof BoardingHouse) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Set alert
      *
      * @param string $alert
