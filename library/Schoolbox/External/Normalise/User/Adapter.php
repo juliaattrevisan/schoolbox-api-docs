@@ -220,6 +220,8 @@ class Adapter {// implements \External_UserInterface {
 
     /**
      * Gets all Parents' account info from external db
+     *
+     * @return Collection
      */
     public function getParentUserAccountInfo() {
         $allGuardians = array();
@@ -485,7 +487,7 @@ class Adapter {// implements \External_UserInterface {
      *
      * @param $externalUserId
      *
-     * @return mixed
+     * @return Collection
      */
     public function getStudentContactList($externalUserId) {
         $collection = new Collection();
@@ -809,7 +811,7 @@ class Adapter {// implements \External_UserInterface {
      * @param $boardingStatus
      * @param $form
      *
-     * @return mixed
+     * @return Collection
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
         $collection = new Collection();
@@ -984,6 +986,8 @@ class Adapter {// implements \External_UserInterface {
      * Gets all Students' account info from external db
      *
      * TODO: This is a variation of getStudentContactListExtended()
+     *
+     * @return Collection
      */
     public function getStudentUserAccountInfo() {
         $collection = new Collection();
@@ -1114,7 +1118,7 @@ class Adapter {// implements \External_UserInterface {
      *
      * TODO: This is a variation of getStaff()
      *
-     * @return mixed
+     * @return Collection
      */
     public function getStaffContactListExtended() {
         $collection = new Collection();
@@ -1175,6 +1179,20 @@ class Adapter {// implements \External_UserInterface {
         }
 
         return $collection;
+    }
+
+    /**
+     * Gets all active Staff's account info from external db
+     *
+     * @return Collection
+     */
+    public function getStaffUserAccountInfo() {
+        $collection = new Collection();
+
+        $allResults = $this->getHandler()->getStaffUserAccountInfo();
+
+        foreach ($allResults as $currentResult) {
+        }
     }
 
     /* Getters/Setters
