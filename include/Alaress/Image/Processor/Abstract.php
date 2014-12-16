@@ -15,6 +15,13 @@ class Alaress_Image_Processor_Abstract
 	 */
     protected $cache = null;
 
+    /**
+     * A factory for building processors, replaces $processorStrategyPrefix.
+     *
+     * @var \Alaress\Image\Processor\Strategy\FactoryInterface
+     */
+    protected $processorFactory;
+
     /* Strategies for image manipulation
 	 */
     protected $processorStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Processor\\Strategy\\';
@@ -176,6 +183,25 @@ class Alaress_Image_Processor_Abstract
     protected function getProcessorStrategyPrefix()
     {
         return $this->processorStrategyPrefix;
+    }
+
+    /**
+     * @return \Alaress\Image\Processor\Strategy\FactoryInterface
+     */
+    public function getProcessorFactory()
+    {
+        return $this->processorFactory;
+    }
+
+    /**
+     * @param  \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
+     *
+     * @return $this
+     */
+    public function setProcessorFactory($processorFactory)
+    {
+        $this->processorFactory = $processorFactory;
+        return $this;
     }
 
     /**
