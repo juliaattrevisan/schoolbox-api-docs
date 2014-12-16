@@ -21,15 +21,4 @@ interface StrategyInterface
      * @return ImageInterface The manipulated image
      */
     public function manipulate(ImageInterface $image);
-
-    /**
-     * @param  bool  $supports_alpha_channel
-     * @return $this
-     */
-    public function setSupportsAlphaChannel($supports_alpha_channel);
-
-    /**
-     * @return bool
-     */
-    public function getSupportsAlphaChannel();
 }
