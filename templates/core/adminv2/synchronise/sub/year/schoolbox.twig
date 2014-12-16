@@ -1,0 +1,17 @@
+<h3>Year</h3>
+<table class="table ruler">
+    <thead>
+    <tr>
+        <th>Level</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in data.year.schoolbox %}
+        <tr>
+            <td>{{ i.getLevel() }}</td>
+            <td>{{ i.getDescription() }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
