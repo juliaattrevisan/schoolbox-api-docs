@@ -27,6 +27,10 @@ switch($section) {
         break;
 
     case 'student':
+        $adapter = new \Schoolbox\External\Normalise\User\Adapter(new \External_User());
+        $allPeople = $adapter->getStudentContactListExtended(null, null, null, null);
+        break;
+
     case 'parent':
         break;
     default:
