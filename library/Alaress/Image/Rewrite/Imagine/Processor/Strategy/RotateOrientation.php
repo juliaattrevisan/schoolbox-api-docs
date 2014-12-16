@@ -18,32 +18,39 @@ use Imagine\Image\ImageInterface;
 
 class RotateOrientation extends BaseStrategy implements StrategyInterface
 {
-
-    private $filePath = '';
-
-    /**
-     * Autorotate filter
-     *
-     * @var Autorotate
-     */
-    protected $filter;
-
-    /**
-     * Constructor
-     *
-     * @param $args
-     */
-    public function __construct($args)
-    {
-        $this->filePath = $args['FilePath'];
-        $this->filter   = new Autorotate();
-    }
-
     /**
      * {@inheritdoc}
      */
     public function manipulate(ImageInterface $image)
     {
-        return $this->filter->apply($image);
+        $metadata = $image->metadata();
+        switch (isset($metadata['ifd0.Orientation']) ? $metadata['ifd0.Orientation'] : null) {
+            case 1:
+                break;
+            case 2:
+                $image->flipHorizontally();
+                break;
+            case 3:
+                $image->rotate(180);
+                break;
+            case 4:
+                $image->rotate(180)->flipHorizontally();
+                break;
+            case 5:
+                $image->rotate(90)->flipHorizontally();
+                break;
+            case 6:
+                $image->rotate(90);
+                break;
+            case 7:
+                $image->rotate(-90)->flipHorizontally();
+                break;
+            case 8:
+                $image->rotate(-90);
+                break;
+            default:
+                break;
+        }
+        return $image;
     }
 }
