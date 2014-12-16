@@ -7,7 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract {
+class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
+{
 
     /**
      * Constructor
@@ -15,7 +16,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * @param $cache
      * @param $transformations
      */
-    public function __construct($cache, $transformations) {
+    public function __construct($cache, $transformations)
+    {
         $this->setCache($cache);
         $this->setTransformations($transformations);
     }
@@ -27,19 +29,20 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * @return $this
      */
-    public function load() {
+    public function load()
+    {
         $imageArray = $this->getCache()->load();
 
         /* Figure out what kind of file it is
          */
         $this->setFiletypeStrategy($imageArray);
-		$this->setFilePath($imageArray['filepath']);
+        $this->setFilePath($imageArray['filepath']);
 
         /* Prepare an image resource for chained manipulation
          */
         if (!$this->getCache()->isLoadedFromCache()) {
             $this->setImage($this->getFiletypeStrategy()->create($this->getFilePath()));
-			$this->transformAll();
+            $this->transformAll();
         }
 
         return $this;
@@ -55,7 +58,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * @param null $args
      * @return $this
      */
-    private function loadProcessorStrategy($strategy, $args = null) {
+    private function loadProcessorStrategy($strategy, $args = null)
+    {
         /** @var Alaress_Image_Processor_Strategy_Interface $processor */
         $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
         $processor    = new $strategyName($args);
@@ -75,7 +79,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * @return $this
      */
-    private function manipulate() {
+    private function manipulate()
+    {
 //        $image = $this->getImage();
 //        if ($image->layers()->count() > 1) {
 //            $image->layers()->coalesce();
@@ -115,15 +120,15 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * @return $this
      */
-    public function transformAll() {
+    public function transformAll()
+    {
 
         /* Retrieve the list of transformations and do 'em, if we haven't already
          * done them at some point in the past
          */
         if (!$this->getCache()->isLoadedFromCache()) {
-
             $allTransformations = array(array('method'=>'RotateOrientation','args'=>array('FilePath'=>$this->getFilePath())));
-            $allTransformations = array_merge($allTransformations,$this->getTransformations()->retrieve($this->getCache()->getKey()));
+            $allTransformations = array_merge($allTransformations, $this->getTransformations()->retrieve($this->getCache()->getKey()));
 
             /* Do it
              */
@@ -147,7 +152,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * @param null $args
      * @return $this
      */
-    public function transform($strategy, $args = null) {
+    public function transform($strategy, $args = null)
+    {
         $this->loadProcessorStrategy($strategy, $args);
         $this->manipulate();
 
@@ -159,24 +165,26 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      *
      * Cache then stream the manipulated image
      */
-    public function stream() {
-		if ($this->getCache()->isLoadedFromCache()) {
-			$this->getFiletypeStrategy()->streamFile($this->getFilePath());
-		}
-		else {
-			$this->save();
-			$this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
-		}
+    public function stream()
+    {
+        if ($this->getCache()->isLoadedFromCache()) {
+            $this->getFiletypeStrategy()->streamFile($this->getFilePath());
+        } else {
+            $this->save();
+            $this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
+        }
     }
 
-	public function streamFile() {
-	}
+    public function streamFile()
+    {
+    }
 
     /**
      * Saves the transformed image
      * @return $this
      */
-    public function save() {
+    public function save()
+    {
         $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());
         return $this;
     }
@@ -185,10 +193,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract 
      * Gets the filepath for processed image output
      * @return string
      */
-    public function getCachedFileLocation() {
+    public function getCachedFileLocation()
+    {
         return $this->getCache()->getCachedFileLocation();
     }
-
-
-
 }
