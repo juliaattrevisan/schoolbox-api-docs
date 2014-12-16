@@ -55,10 +55,24 @@ class Placement extends BaseStrategy implements StrategyInterface
             $this->getCanvasWidth(),
             $this->getCanvasHeight()
         );
+
+        // If canvas is smaller than image, then crop image to canvas
+        if (!$canvasBox->contains($image->getSize())) {
+            $cropBox = new Box(
+                min($canvasBox->getWidth(), $image->getSize()->getWidth()),
+                min($canvasBox->getHeight(), $image->getSize()->getHeight())
+            );
+            $image->crop(
+                $this->getImageBoxPoint($image->getSize(), $cropBox, $this->getPosition()),
+                $cropBox
+            );
+        }
+
+        // Then place the image inside the new canvas
         $filter = new \Imagine\Filter\Advanced\Canvas(
             new \Imagine\Imagick\Imagine(),
             $canvasBox,
-            $this->getImageBoxPoint($canvasBox, $image->getSize()),
+            $this->getImageBoxPoint($canvasBox, $image->getSize(), $this->getPosition()),
             $image->palette()->color($this->translateColorArray($this->getBgColors()))
         );
         return $filter->apply($image);
