@@ -55,6 +55,11 @@ class Factory implements FactoryInterface
                 $processor    = new $strategyName($strategyArgs);
                 break;
         }
+
+        // Set if this supports the alpha channel.
+        // Newer processors don't care, but this old one does.
+        /** @var \Alaress_Image_Processor_Strategy_Interface $processor */
+        /** @var \Alaress_Image_Filetype_Interface $filetype */
         $processor->setSupportsAlphaChannel($filetype->supportsAlphaChannel());
         return $processor;
     }
