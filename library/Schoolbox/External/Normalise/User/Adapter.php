@@ -1249,6 +1249,29 @@ class Adapter  implements \External_UserInterface {
         return $collection;
     }
 
+    /**
+     * Get a list of students belonging to $externalUserId
+     *
+     * @param $externalUserId
+     * @return \Schoolbox\Collection
+     */
+    public function getEnrolledStudents($externalUserId) {
+        $collection = new Collection();
+
+        $allResults = $this->getHandler()->getEnrolledStudents($externalUserId);
+
+        foreach ($allResults as $currentResult) {
+            $student = new Student();
+            $student
+                ->setId($currentResult)
+            ;
+
+            $collection->add($student);
+        }
+
+        return $collection;
+    }
+
     /* Misc
      */
 
@@ -1332,7 +1355,7 @@ class Adapter  implements \External_UserInterface {
      * e.g. translates D, W into "Day" and B into "Boarder"
      *
      * @param $boarderValue
-     * @return mixed
+     * @return string
      */
     public function determineBoarderType($boarderValue) {
         return $this->getHandler()->determineBoarderType($boarderValue);
@@ -1361,4 +1384,5 @@ class Adapter  implements \External_UserInterface {
         return $this->handler;
     }
 }
+
 
