@@ -160,30 +160,4 @@ abstract class BaseStrategy implements StrategyInterface
     {
         return $this->canvasWidth;
     }
-
-    /**
-     * Fills the given canvas with a blank alpha layer, so that alpha blending
-     * looks passable after the image is sharpened.
-     *
-     * This should be called before calling imagecopyresampled() on $canvas.
-     *
-     * @param Image $canvas The canvas resource to fill, or
-     *                      $this->getCanvas() if not set.
-     *
-     * @return void
-     */
-    protected function alphaFill(Image $canvas = null)
-    {
-        return;
-//        if (!($this->getSupportsAlphaChannel())) {
-//            return;
-//        }
-//        if (!isset($canvas)) {
-//            $canvas = $this->getCanvas();
-//        }
-//        imagealphablending($canvas, false);
-//        imagesavealpha($canvas, true);
-//        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
-//        imagefill($canvas, 0, 0, $transparent);
-    }
 }
