@@ -19,7 +19,6 @@ use Intervention\Image\Image;
 
 abstract class BaseStrategy implements StrategyInterface
 {
-
     /**
      * Canvas image resource
      *
@@ -28,24 +27,6 @@ abstract class BaseStrategy implements StrategyInterface
     protected $canvas = null;
     protected $canvasWidth = 0;
     protected $canvasHeight = 0;
-
-    /**
-     * Does this processor support alpha channel transformation?
-     *
-     * @var bool
-     */
-    protected $supports_alpha_channel;
-
-    /**
-    * Specify a background colour for canvas if provided
-    * otherwise use generic old white
-    *
-    * @param $bgColorArray
-    */
-    protected function applyBackgroundColor($bgColorArray)
-    {
-        $this->getCanvas()->fill($this->translateColorArray($bgColorArray));
-    }
 
     /**
      * Translates color array to a hex string, otherwise returns white
@@ -131,50 +112,6 @@ abstract class BaseStrategy implements StrategyInterface
     }
 
     /**
-    * Figure out what the resultant dimensions of an image are
-    * according to a bounding box
-    *
-    * If it can fit within the canvas, just return original size
-    *
-    * @param  Image $image
-    * @return array
-    */
-    protected function boundingBox(Image $image)
-    {
-
-        /* Figure out resized dimensions
-        */
-        $currentWidth  = $image->getWidth();
-        $currentHeight = $image->getHeight();
-
-        $resizedWidth = $currentWidth;
-        $resizedHeight = $currentHeight;
-
-        /* Constrain by width
-         */
-        if ($currentWidth > $this->getCanvasWidth()) {
-            $ratio = $currentWidth / $this->getCanvasWidth();
-
-            $resizedWidth = $currentWidth / $ratio;
-            $resizedHeight = $currentHeight / $ratio;
-        }
-
-        /* Constrain by height
-         */
-        if ($resizedHeight > $this->getCanvasHeight()) {
-            $ratio = $resizedHeight / $this->getCanvasHeight();
-
-            $resizedWidth = $resizedWidth / $ratio;
-            $resizedHeight = $resizedHeight / $ratio;
-        }
-
-        return array(
-            'width' => $resizedWidth,
-            'height' => $resizedHeight,
-        );
-    }
-
-    /**
     * Set canvas image resource
     *
     * @param Image $canvas
@@ -232,49 +169,5 @@ abstract class BaseStrategy implements StrategyInterface
     protected function getCanvasWidth()
     {
         return $this->canvasWidth;
-    }
-
-    /**
-     * Fills the given canvas with a blank alpha layer, so that alpha blending
-     * looks passable after the image is sharpened.
-     *
-     * This should be called before calling imagecopyresampled() on $canvas.
-     *
-     * @param Image $canvas The canvas resource to fill, or
-     *                      $this->getCanvas() if not set.
-     *
-     * @return void
-     */
-    protected function alphaFill(Image $canvas = null)
-    {
-        return;
-//        if (!($this->getSupportsAlphaChannel())) {
-//            return;
-//        }
-//        if (!isset($canvas)) {
-//            $canvas = $this->getCanvas();
-//        }
-//        imagealphablending($canvas, false);
-//        imagesavealpha($canvas, true);
-//        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
-//        imagefill($canvas, 0, 0, $transparent);
-    }
-
-    /**
-     * @param  bool  $supports_alpha_channel
-     * @return $this
-     */
-    public function setSupportsAlphaChannel($supports_alpha_channel)
-    {
-        $this->supports_alpha_channel = $supports_alpha_channel;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSupportsAlphaChannel()
-    {
-        return $this->supports_alpha_channel;
     }
 }
