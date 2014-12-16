@@ -59,4 +59,58 @@
             </tbody>
         </table>
     </div>
+
+    <h3>Campus</h3>
+    <table class="table ruler">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for i in data.campus.external %}
+            <tr>
+                <td>{{ i.getId() }}</td>
+                <td>{{ i.getName() }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Year</h3>
+    <table class="table ruler">
+        <thead>
+        <tr>
+            <th>Level</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for i in data.year.external %}
+            <tr>
+                <td>{{ i.getLevel() }}</td>
+                <td>{{ i.getDescription() }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>House</h3>
+    <table class="table ruler">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for i in data.house.external %}
+            <tr>
+                <td>{{ i.getId() }}</td>
+                <td>{{ i.getName() }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

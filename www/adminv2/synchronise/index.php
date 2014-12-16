@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\Collection;
 use \Schoolbox\External\Normalise\User\Adapter;
 
 $groupHandler = new Group();
@@ -19,29 +20,91 @@ if (!$groupHandler->isSuperuser()) {
 /* Section - sanitise template loading
  * and load corresponding data
  */
-$allPeople = new \Schoolbox\Collection();
+$allPeople = new Collection();
+$allCampus = new Collection();
+$allYear = new Collection();
+$allHouse = new Collection();
 
 $section = strtolower($this->arg[0]);
 
-switch($section) {
-    case 'staff':
-        $adapter = new Adapter(new \External_User());
-        $allPeople = $adapter->getStaffContactListExtended();
-        break;
+/* Staff
+ */
+if ($section == 'staff') {
+    $adapter = new Adapter(new \External_User());
+    $allPeople = $adapter->getStaffUserAccountInfo();
 
-    case 'student':
-        $adapter = new Adapter(new \External_User());
-        $allPeople = $adapter->getStudentContactListExtended(null, null, null, null);
-        break;
+    /* Find a list of all the campuses currently being used
+     */
+    $campus = array();
 
-    case 'parent':
-        $adapter = new Adapter(new \External_User());
-        $allPeople = $adapter->getParentUserAccountInfo();
-        break;
+    foreach($allPeople as $currentPeople) {
+        foreach($currentPeople->getCampus() as $currentCampus) {
+            $campus[$currentCampus->getName()] = $currentCampus;
+        }
+    }
 
-    default:
-        $section = 'intro';
-        break;
+    $allCampus = new Collection(array_values($campus));
+}
+/* Student
+ */
+else if ($section == 'student') {
+    $adapter = new Adapter(new \External_User());
+    $allPeople = $adapter->getStudentUserAccountInfo();
+
+    /* Find a list of all the campuses currently being used
+     */
+    $campus = array();
+
+    foreach($allPeople as $currentPeople) {
+        foreach($currentPeople->getCampus() as $currentCampus) {
+            $campus[$currentCampus->getName()] = $currentCampus;
+        }
+    }
+
+    $allCampus = new Collection(array_values($campus));
+
+    /* Find a list of all the years currently being used
+     */
+    $years = array();
+
+    foreach ($allPeople as $currentPeople) {
+        $years[$currentPeople->getYear()->getLevel()] = $currentPeople->getYear();
+    }
+
+    $allYear = new Collection(array_values($years));
+
+    /* Find a list of all the houses currently being used
+     */
+    $houses = array();
+
+    foreach ($allPeople as $currentPeople) {
+        $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+    }
+
+    $allHouse = new Collection(array_values($houses));
+}
+/* Parent
+ */
+else if ($section == 'parent') {
+    $adapter = new Adapter(new \External_User());
+    $allPeople = $adapter->getParentUserAccountInfo();
+
+    /* Find a list of all the campuses currently being used
+     */
+    $campus = array();
+
+    foreach($allPeople as $currentPeople) {
+        foreach($currentPeople->getCampus() as $currentCampus) {
+            $campus[$currentCampus->getName()] = $currentCampus;
+        }
+    }
+
+    $allCampus = new Collection(array_values($campus));
+}
+/* Default view
+ */
+else {
+    $section = 'intro';
 }
 
 /* Power to the phplib
@@ -58,6 +121,18 @@ $this->setVar(array(
         ),
         'data' => array(
             'allPeople' => $allPeople,
+            'campus' => array(
+                'external' => $allCampus,
+                'schoolbox' => new Collection()
+            ),
+            'year' => array(
+                'external' => $allYear,
+                'schoolbox' => new Collection()
+            ),
+            'house' => array(
+                'external' => $allHouse,
+                'schoolbox' => new Collection()
+            )
         ),
         'bucketface' => 'test'
     ))
