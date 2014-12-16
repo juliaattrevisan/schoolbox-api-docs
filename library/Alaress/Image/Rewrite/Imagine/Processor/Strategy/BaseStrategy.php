@@ -87,7 +87,7 @@ abstract class BaseStrategy implements StrategyInterface
         $yTop    = 0;
         $yBottom = $canvasBox->getHeight() - $imageBox->getHeight();
         $yCenter = intval($yBottom / 2);
-        switch ($alignment) {
+        switch (strtolower($alignment)) {
             case 'top':
                 $xPoint = $xCenter;
                 $yPoint = $yTop;
@@ -121,6 +121,7 @@ abstract class BaseStrategy implements StrategyInterface
                 $yPoint = $yTop;
                 break;
             case 'center':
+            case 'middle':
             default:
                 $xPoint = $xCenter;
                 $yPoint = $yCenter;
