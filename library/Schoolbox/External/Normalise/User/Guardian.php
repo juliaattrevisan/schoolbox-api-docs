@@ -72,6 +72,38 @@ class Guardian extends Base {
     }
 
     /**
+     * Get the students' year(s) as a string
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function getYearAsString($separator = "\n") {
+        $years = array();
+
+        foreach($this->getStudents() as $currentStudent) {
+            $years[] = $currentStudent->getYear()->getLevel();
+        }
+
+        return implode($separator, array_filter(array_unique($years)));
+    }
+
+    /**
+     * Get the students' campus(es) as a string
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function getCampusAsString($separator = "\n") {
+        $campuses = array();
+
+        foreach($this->getCampus() as $currentCampus) {
+            $campuses[] = $currentCampus->getName();
+        }
+
+        return implode($separator, array_filter(array_unique($campuses)));
+    }
+
+    /**
      * Add a student to the collection
      * This is a student belonging to this guardian
      *
