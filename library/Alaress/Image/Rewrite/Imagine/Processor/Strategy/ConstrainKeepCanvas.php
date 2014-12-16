@@ -45,8 +45,6 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
     */
     public function __construct($args)
     {
-        // Always centred
-        $args['position']          = 'center';
         $this->contstrainProcessor = new Constrain($args);
         $this->placementProcessor  = new Placement($args);
     }

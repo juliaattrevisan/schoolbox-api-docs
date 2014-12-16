@@ -18,35 +18,34 @@ use Imagine\Image\ImageInterface;
 
 class Rectangle extends BaseStrategy implements StrategyInterface
 {
+    /**
+     * Images smaller than the canvas maintain their dimensions and don't
+     * get resized if the canvas is larger.
+     *
+     * Set to true if you want it to upscale.
+     *
+     * @var bool
+     */
+    protected $smallImageUpscales = true;
 
     /**
-    * Images smaller than the canvas maintain their dimensions and don't
-    * get resized if the canvas is larger.
-    *
-    * Set to true if you want it to upscale.
-    *
-    * @var bool
-    */
-    private $smallImageUpscales = true;
+     * A placement processor
+     *
+     * @var StrategyInterface
+     */
+    protected $placementProcessor;
 
     /**
-    * Background colours are used for deciding transparency in pngs
-    *
-    * @var array
-    */
-    private $bgColors = array();
-
-    /**
-    * Constructor
-    *
-    * @param $args
-    */
+     * Constructor
+     *
+     * @param $args
+     */
     public function __construct($args)
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
-        $this->setBgColors($args['bgcolor']);
         $this->setSmallImageUpscales($args['smallImageUpscales']);
+        $this->placementProcessor = new Placement($args);
     }
 
     /**
@@ -55,16 +54,24 @@ class Rectangle extends BaseStrategy implements StrategyInterface
     public function manipulate(ImageInterface $image)
     {
         // This processor:
-        // resize + position + crop
-        // Scale to largest of width/height,
-        // then crop to centered rectangle
+        // resize:
+        // * scale down so one dimension fits, if image doesn't fit canvas
+        // * scale up to max size that fits within canvas, if it does
+        //   (and smallImageUpscales is on)
+        // placement:
+        // * place resized image in center of canvas
         $currentWidth  = $image->getSize()->getWidth();
         $currentHeight = $image->getSize()->getHeight();
 
         $currentRatio = $currentWidth / $currentHeight;
         $finalRatio   = $this->getCanvasWidth() / $this->getCanvasHeight();
 
-        if ($currentWidth > $this->getCanvasWidth() || $currentHeight > $this->getCanvasHeight()) {
+        $canvasBox = new Box(
+            $this->getCanvasWidth(),
+            $this->getCanvasHeight()
+        );
+
+        if (!$canvasBox->contains($image->getSize())) {
             // Image doesn't fit within rectangle.
             // Resize it down so one dimension does.
             if ($currentRatio > $finalRatio) {
@@ -82,76 +89,30 @@ class Rectangle extends BaseStrategy implements StrategyInterface
             }
         }
 
-        // Is the image larger than the canvas box?
-        // If so, crop it to the size of the canvas box (and center it)
-        $canvasBox = new Box(
-            $this->getCanvasWidth(),
-            $this->getCanvasHeight()
-        );
-        if ($image->getSize()->square() > $canvasBox->square()) {
-            $image->crop(
-                $this->getImageBoxPoint($image->getSize(), $canvasBox),
-                $canvasBox
-            );
-        }
-
-        // And now put in the middle of a canvas
-        $filter = new \Imagine\Filter\Advanced\Canvas(
-            new \Imagine\Imagick\Imagine(),
-            $canvasBox,
-            $this->getImageBoxPoint($canvasBox, $image->getSize()),
-            $image->palette()->color($this->translateColorArray($this->getBgColors()))
-        );
-        return $filter->apply($image);
-
-//        return $image->resizeCanvas(
-//            $this->getCanvasWidth(),
-//            $this->getCanvasHeight(),
-//            'center',
-//            false,
-//            $this->translateColorArray($this->getBgColors())
-//        );
+        // And send this to the placement processor
+        $image = $this->placementProcessor->manipulate($image);
+        return $image;
     }
 
     /* Getters/Setters
      */
 
     /**
-    * Set smallImageUpscales
-    * @param boolean $smallImageUpscales
-    */
+     * Set smallImageUpscales
+     * @param boolean $smallImageUpscales
+     */
     public function setSmallImageUpscales($smallImageUpscales)
     {
         $this->smallImageUpscales = $smallImageUpscales;
     }
 
     /**
-    * Get smallImageUpscales
-    *
-    * @return boolean
-    */
+     * Get smallImageUpscales
+     *
+     * @return boolean
+     */
     public function getSmallImageUpscales()
     {
         return $this->smallImageUpscales;
-    }
-
-    /**
-    * Set bgcolours
-    *
-    * @param array $bgColors
-    */
-    private function setBgColors($bgColors)
-    {
-        $this->bgColors = $bgColors;
-    }
-
-    /**
-    * Get bgcolours
-    *
-    * @return array
-    */
-    private function getBgColors()
-    {
-        return $this->bgColors;
     }
 }
