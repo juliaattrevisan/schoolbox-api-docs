@@ -16,7 +16,7 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
-class Rectangle extends BaseStrategy implements StrategyInterface
+class Rectangle extends BaseStrategy
 {
     /**
      * Images smaller than the canvas maintain their dimensions and don't
@@ -50,8 +50,10 @@ class Rectangle extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         // This processor:
         // resize:

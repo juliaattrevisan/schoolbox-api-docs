@@ -18,7 +18,7 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
-class Constrain extends BaseStrategy implements StrategyInterface
+class Constrain extends BaseStrategy
 {
     /**
     * Constructor
@@ -33,8 +33,10 @@ class Constrain extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         return $image->thumbnail(
             new Box(

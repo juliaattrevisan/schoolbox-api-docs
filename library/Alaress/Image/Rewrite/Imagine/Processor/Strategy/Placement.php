@@ -21,7 +21,7 @@ use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 
-class Placement extends BaseStrategy implements StrategyInterface
+class Placement extends BaseStrategy
 {
 
     /* Positioning of the image within the canvas
@@ -57,8 +57,10 @@ class Placement extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         $canvasBox = new Box(
             $this->getCanvasWidth(),

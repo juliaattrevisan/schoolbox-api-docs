@@ -9,6 +9,13 @@
 
 namespace Alaress\Image\Processor\Strategy;
 
-interface ProcessorInterface
+interface StrategyInterface
 {
+    /**
+     * Manipulate image
+     *
+     * @param  mixed $image
+     * @return mixed The manipulated image
+     */
+    public function manipulate($image);
 }

@@ -14,12 +14,14 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 
 use Imagine\Image\ImageInterface;
 
-class Sharpen extends BaseStrategy implements StrategyInterface
+class Sharpen extends BaseStrategy
 {
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         $image->effects()->sharpen();
         return $image;

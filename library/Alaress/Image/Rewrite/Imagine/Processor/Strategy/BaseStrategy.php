@@ -12,6 +12,7 @@
 
 namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 
+use Alaress\Image\Processor\Strategy\StrategyInterface;
 use Imagine\Image\BoxInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;

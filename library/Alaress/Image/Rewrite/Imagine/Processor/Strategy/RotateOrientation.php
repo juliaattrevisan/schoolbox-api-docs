@@ -16,12 +16,14 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 use Imagine\Filter\Basic\Autorotate;
 use Imagine\Image\ImageInterface;
 
-class RotateOrientation extends BaseStrategy implements StrategyInterface
+class RotateOrientation extends BaseStrategy
 {
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         $metadata = $image->metadata();
         switch (isset($metadata['ifd0.Orientation']) ? $metadata['ifd0.Orientation'] : null) {

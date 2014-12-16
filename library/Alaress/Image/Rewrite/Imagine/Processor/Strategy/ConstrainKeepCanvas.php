@@ -22,7 +22,7 @@ use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Point;
 
-class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
+class ConstrainKeepCanvas extends BaseStrategy
 {
     /**
      * A constrain processor
@@ -51,8 +51,10 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         $image = $this->contstrainProcessor->manipulate($image);
         $image = $this->placementProcessor->manipulate($image);

@@ -24,7 +24,7 @@ use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Point;
 
-class Crop extends BaseStrategy implements StrategyInterface
+class Crop extends BaseStrategy
 {
     private $coordinates = array();
 
@@ -40,8 +40,10 @@ class Crop extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var ImageInterface $image
      */
-    public function manipulate(ImageInterface $image)
+    public function manipulate($image)
     {
         /* Figure out resized dimensions
          */
