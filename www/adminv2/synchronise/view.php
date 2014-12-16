@@ -7,6 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\External\Normalise\User\Adapter;
+
 $groupHandler = new Group();
 
 if (!$groupHandler->isSuperuser()) {
@@ -22,17 +25,20 @@ $section = strtolower($this->arg[0]);
 
 switch($section) {
     case 'staff':
-        $adapter = new \Schoolbox\External\Normalise\User\Adapter(new \External_User());
+        $adapter = new Adapter(new \External_User());
         $allPeople = $adapter->getStaffContactListExtended();
         break;
 
     case 'student':
-        $adapter = new \Schoolbox\External\Normalise\User\Adapter(new \External_User());
+        $adapter = new Adapter(new \External_User());
         $allPeople = $adapter->getStudentContactListExtended(null, null, null, null);
         break;
 
     case 'parent':
+        $adapter = new Adapter(new \External_User());
+        $allPeople = $adapter->getParentUserAccountInfo();
         break;
+
     default:
         $section = 'intro';
         break;
