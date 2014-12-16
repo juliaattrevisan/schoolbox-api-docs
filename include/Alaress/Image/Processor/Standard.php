@@ -60,6 +60,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
      */
     private function loadProcessorStrategy($strategy, $args = null)
     {
+        // TODO replace this with a factory object
         /** @var Alaress_Image_Processor_Strategy_Interface $processor */
         $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
         $processor    = new $strategyName($args);
