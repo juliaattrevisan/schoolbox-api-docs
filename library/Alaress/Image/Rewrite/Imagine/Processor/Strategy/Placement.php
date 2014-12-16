@@ -36,11 +36,6 @@ class Placement extends BaseStrategy
     private $bgColors = array();
 
     /**
-     * @var ImagineInterface
-     */
-    protected $imageManager;
-
-    /**
      * Constructor
      *
      * @param $args
@@ -52,7 +47,7 @@ class Placement extends BaseStrategy
         $this->setCanvasHeight($args['height']);
         $this->setPosition($args['position']);
         $this->setBgColors($args['bgcolor']);
-        $this->imageManager = $imageManager;
+        $this->setImageManager($imageManager);
     }
 
     /**
@@ -81,7 +76,7 @@ class Placement extends BaseStrategy
 
         // Then place the image inside the new canvas
         $filter = new Canvas(
-            $this->imageManager,
+            $this->getImageManager(),
             $canvasBox,
             $this->getImageBoxPoint($canvasBox, $image->getSize(), $this->getPosition()),
             $image->palette()->color($this->translateColorArray($this->getBgColors()))

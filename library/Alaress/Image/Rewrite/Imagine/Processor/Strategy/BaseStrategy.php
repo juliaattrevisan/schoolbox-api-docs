@@ -14,6 +14,7 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 
 use Alaress\Image\Processor\Strategy\StrategyInterface;
 use Imagine\Image\BoxInterface;
+use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;
 
@@ -24,6 +25,13 @@ use Imagine\Image\PointInterface;
 
 abstract class BaseStrategy implements StrategyInterface
 {
+    /**
+     * Used for strategies that need to create a new image canvas.
+     *
+     * @var ImagineInterface
+     */
+    protected $imageManager;
+
     /**
      * Unused - was used in old implementation
      *
@@ -174,5 +182,24 @@ abstract class BaseStrategy implements StrategyInterface
     public function getSupportsAlphaChannel()
     {
         return $this->supportsAlphaChannel;
+    }
+
+    /**
+     * @return ImagineInterface
+     */
+    public function getImageManager()
+    {
+        return $this->imageManager;
+    }
+
+    /**
+     * @param  ImagineInterface $imageManager
+     *
+     * @return $this
+     */
+    public function setImageManager($imageManager)
+    {
+        $this->imageManager = $imageManager;
+        return $this;
     }
 }
