@@ -18,11 +18,6 @@ use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;
 
-// Parameters:
-// BoxFactory
-// PointFactory
-// ImagineInterface
-
 abstract class BaseStrategy implements StrategyInterface
 {
     /**
