@@ -72,7 +72,7 @@ class Staff extends Base {
      * @param $separator
      * @return string
      */
-    public function getAllEmails($separator) {
+    public function getAllEmails($separator = "\n") {
         $output = array();
 
         foreach($this->getEmail() as $currentEmail) {
@@ -88,7 +88,7 @@ class Staff extends Base {
      * @param $separator
      * @return string
      */
-    public function getAllCampuses($separator) {
+    public function getAllCampuses($separator = "\n") {
         $output = array();
 
         foreach($this->getCampus() as $currentCampus) {
