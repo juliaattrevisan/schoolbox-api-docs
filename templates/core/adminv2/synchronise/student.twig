@@ -60,9 +60,30 @@
         </table>
     </div>
 
-    {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+    <div class="left-column">
+        {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+    </div>
+    <div class="right-column">
+        {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
+    </div>
 
-    {% include 'adminv2/synchronise/sub/year/external.twig' %}
+    <div class="clearfix"></div>
 
-    {% include 'adminv2/synchronise/sub/house/external.twig' %}
+    <div class="left-column">
+        {% include 'adminv2/synchronise/sub/year/external.twig' %}
+    </div>
+    <div class="right-column">
+        {% include 'adminv2/synchronise/sub/year/schoolbox.twig' %}
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="left-column">
+        {% include 'adminv2/synchronise/sub/house/external.twig' %}
+    </div>
+    <div class="right-column">
+        {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+    </div>
+
+
 {% endblock %}
