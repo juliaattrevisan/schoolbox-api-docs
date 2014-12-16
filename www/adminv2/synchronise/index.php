@@ -140,7 +140,6 @@ $this->setVar(array(
                 'schoolbox' => $houseMapper->findAll()
             )
         ),
-        'bucketface' => 'test'
     ))
 ));
 
