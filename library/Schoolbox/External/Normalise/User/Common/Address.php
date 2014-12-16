@@ -68,6 +68,24 @@ class Address {
     public function __construct() {
     }
 
+    /**
+     * Get entire address as a string
+     *
+     * @param $separator
+     * @return string
+     */
+    public function getAsString($separator = "\n") {
+        $address = array_filter(array(
+            $this->getAddress1(),
+            $this->getAddress2(),
+            $this->getAddress3(),
+            "{$this->getSuburb()} {$this->getState()} {$this->getPostCode()}",
+            $this->getCountry()
+        ));
+
+        return implode($separator, $address);
+    }
+
     /* Getters/Setters
      */
 
