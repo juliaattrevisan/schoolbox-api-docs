@@ -69,6 +69,7 @@ class Placement extends BaseStrategy implements StrategyInterface
         }
 
         // Then place the image inside the new canvas
+        // TODO make at least the Imagine object injected
         $filter = new \Imagine\Filter\Advanced\Canvas(
             new \Imagine\Imagick\Imagine(),
             $canvasBox,
