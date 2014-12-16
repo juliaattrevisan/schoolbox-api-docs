@@ -47,7 +47,8 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 	$imageProcessor = new Alaress_Image_Processor_Freeform(
         $cache,
         new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']),
-        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
+        new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
     );
 	try {
 		$imageProcessor->load()->stream();
@@ -71,7 +72,8 @@ else {
 	$imageProcessor = new Alaress_Image_Processor_Standard(
         $cache,
         new Alaress_Image_Transformation_Storage(),
-        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
+        new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
     );
 	try {
 		$imageProcessor->load()->stream();

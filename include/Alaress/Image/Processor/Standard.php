@@ -14,16 +14,19 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
      *
      * @param $cache
      * @param $transformations
-     * @param Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+     * @param \Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+     * @param \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
      */
     public function __construct(
         $cache,
         $transformations,
-        Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+        \Alaress\Image\Filetype\FactoryInterface $filetypeFactory,
+        \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
     ) {
         $this->setCache($cache);
         $this->setTransformations($transformations);
         $this->setFiletypeFactory($filetypeFactory);
+        $this->setProcessorFactory($processorFactory);
     }
 
     /**

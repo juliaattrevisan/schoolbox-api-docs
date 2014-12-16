@@ -30,7 +30,8 @@ class Alaress_Image_Menclone {
 		$imageProcessor = new Alaress_Image_Processor_Standard(
             $cache,
             $transformations,
-            new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+            new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
+            new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
         );
 		$imageProcessor->load()->stream();
 	}
