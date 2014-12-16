@@ -12,20 +12,43 @@ namespace Alaress\Image\Filetype;
 interface FiletypeInterface
 {
     /**
-     * Create an image
+     * Create an image.
      *
-     * @param $filename
+     * @param  string $filename
      * @throws \Exception_Schoolbox_NotFound if file can't be read
-     * @return resource
+     * @return mixed An image object instance, or a resource.
+     *               TODO write an adapter class to tie together implementations
      */
     public function create($filename);
 
+    /**
+     * Loads an image.
+     *
+     * @param  string $filename
+     * @return mixed An image object instance, or a resource.
+     */
     public function loadImageResource($filename);
 
+    /**
+     * Streams an image from an image object, and then exits.
+     *
+     * @param mixed $image
+     */
     public function stream($image);
 
+    /**
+     * Streams an image file, and exits.
+     *
+     * @param string $filename
+     */
     public function streamFile($filename);
 
+    /**
+     * Saves an image.
+     *
+     * @param mixed  $image
+     * @param string $filename
+     */
     public function save($image, $filename);
 
     /**
