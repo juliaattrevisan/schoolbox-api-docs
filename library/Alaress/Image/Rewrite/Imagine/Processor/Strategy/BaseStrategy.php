@@ -16,8 +16,21 @@ use Imagine\Image\BoxInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;
 
+// Parameters:
+// BoxFactory
+// PointFactory
+// ImagineInterface
+
 abstract class BaseStrategy implements StrategyInterface
 {
+    /**
+     * Unused - was used in old implementation
+     *
+     * TODO remove once creation logic in Alaress_Image_Processor_Standard->loadProcessorStrategy is in factory
+     *
+     * @var bool
+     */
+    protected $supportsAlphaChannel = true;
     protected $canvasWidth = 0;
     protected $canvasHeight = 0;
 
@@ -142,5 +155,23 @@ abstract class BaseStrategy implements StrategyInterface
     protected function getCanvasWidth()
     {
         return $this->canvasWidth;
+    }
+
+    /**
+     * @param  bool  $supportsAlphaChannel
+     * @return $this
+     */
+    public function setSupportsAlphaChannel($supportsAlphaChannel)
+    {
+        $this->supportsAlphaChannel = $supportsAlphaChannel;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSupportsAlphaChannel()
+    {
+        return $this->supportsAlphaChannel;
     }
 }
