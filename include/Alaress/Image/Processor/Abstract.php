@@ -22,10 +22,6 @@ class Alaress_Image_Processor_Abstract
      */
     protected $processorFactory;
 
-    /* Strategies for image manipulation
-	 */
-    protected $processorStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Processor\\Strategy\\';
-
     /**
     * @var Alaress_Image_Processor_Strategy_Interface
     */
@@ -37,10 +33,6 @@ class Alaress_Image_Processor_Abstract
      * @var \Alaress\Image\Filetype\FactoryInterface
      */
     protected $filetypeFactory;
-
-    /* Strategies for polymorphic image output
-	 */
-    protected $filetypeStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Filetype\\';
 
     /**
     * @var Alaress_Image_Filetype_Interface
@@ -106,26 +98,6 @@ class Alaress_Image_Processor_Abstract
     }
 
     /**
-    * Set filetype strategy prefix for class names
-    *
-    * @param $filetypeStrategyPrefix
-    */
-    protected function setFiletypeStrategyPrefix($filetypeStrategyPrefix)
-    {
-        $this->filetypeStrategyPrefix = $filetypeStrategyPrefix;
-    }
-
-    /**
-    * Get filetype strategy prefix for class names
-    *
-    * @return string
-    */
-    protected function getFiletypeStrategyPrefix()
-    {
-        return $this->filetypeStrategyPrefix;
-    }
-
-    /**
     * Set processor strategy
     *
     * @param Alaress_Image_Processor_Strategy_Interface $processorStrategy
@@ -162,27 +134,6 @@ class Alaress_Image_Processor_Abstract
     protected function getProcessorStrategy()
     {
         return $this->processorStrategy;
-    }
-
-
-    /**
-    * Set processor strategy prefix
-    *
-    * @param $processorStrategyPrefix
-    */
-    protected function setProcessorStrategyPrefix($processorStrategyPrefix)
-    {
-        $this->processorStrategyPrefix = $processorStrategyPrefix;
-    }
-
-    /**
-    * Get processor strategy prefix
-    *
-    * @return string
-    */
-    protected function getProcessorStrategyPrefix()
-    {
-        return $this->processorStrategyPrefix;
     }
 
     /**
