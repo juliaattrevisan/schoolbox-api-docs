@@ -415,12 +415,30 @@ class Controller extends Base
     ) {
         switch ($recurrenceRule) {
             case 'daily':
-            case 'weekly':
-            case 'fortnightly':
-            case 'monthly':
                 $period = new \DatePeriod(
                     $startTime,
                     \DateInterval::createFromDateString('+1 day'),
+                    $repeatUntil->modify('+1 day')
+                );
+                break;
+            case 'weekly':
+                $period = new \DatePeriod(
+                    $startTime,
+                    \DateInterval::createFromDateString('+1 week'),
+                    $repeatUntil->modify('+1 day')
+                );
+                break;
+            case 'fortnightly':
+                $period = new \DatePeriod(
+                    $startTime,
+                    \DateInterval::createFromDateString('+2 weeks'),
+                    $repeatUntil->modify('+1 day')
+                );
+                break;
+            case 'monthly':
+                $period = new \DatePeriod(
+                    $startTime,
+                    \DateInterval::createFromDateString('+1 month'),
                     $repeatUntil->modify('+1 day')
                 );
                 break;
