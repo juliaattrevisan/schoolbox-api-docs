@@ -24,13 +24,19 @@ use Imagine\Image\Point;
 
 class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
 {
+    /**
+     * A constrain processor
+     *
+     * @var StrategyInterface
+     */
+    protected $contstrainProcessor;
 
     /**
-    * Background colours are used for deciding transparency in pngs
-    *
-    * @var array
-    */
-    private $bgColors = array();
+     * A placement processor
+     *
+     * @var StrategyInterface
+     */
+    protected $placementProcessor;
 
     /**
     * Constructor
@@ -39,9 +45,10 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
     */
     public function __construct($args)
     {
-        $this->setCanvasWidth($args['width']);
-        $this->setCanvasHeight($args['height']);
-        $this->setBgColors($args['bgcolor']);
+        // Always centred
+        $args['position']          = 'center';
+        $this->contstrainProcessor = new Constrain($args);
+        $this->placementProcessor  = new Placement($args);
     }
 
     /**
@@ -49,55 +56,8 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        // This processor:
-        // constrain + placement
-        $canvasBox = new Box(
-            $this->getCanvasWidth(),
-            $this->getCanvasHeight()
-        );
-        $filter = new \Imagine\Filter\Advanced\Canvas(
-            new \Imagine\Imagick\Imagine(),
-            $canvasBox,
-            $this->getImageBoxPoint($canvasBox, $image->getSize()),
-            $image->palette()->color($this->translateColorArray($this->getBgColors()))
-        );
-        return $filter->apply($image);
-//        $canvas  = clone $image;
-//        $palette = $canvas->palette();
-//        $color   = $palette->color($this->translateColorArray($this->getBgColors()));
-//        $canvas->fill(
-//            new Fill\Gradient\Horizontal(1, $color, $color)
-//        );
-//        $image->thumbnail(
-//            new Box(
-//                $this->getCanvasWidth(),
-//                $this->getCanvasHeight()
-//            )
-//        );
-//        $canvas->paste($image, new Point(0, 0));
-//        return $canvas;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-    * Set bgcolours
-    *
-    * @param array $bgColors
-    */
-    private function setBgColors($bgColors)
-    {
-        $this->bgColors = $bgColors;
-    }
-
-    /**
-    * Get bgcolours
-    *
-    * @return array
-    */
-    private function getBgColors()
-    {
-        return $this->bgColors;
+        $image = $this->contstrainProcessor->manipulate($image);
+        $image = $this->placementProcessor->manipulate($image);
+        return $image;
     }
 }
