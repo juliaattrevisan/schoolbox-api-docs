@@ -18,31 +18,44 @@ class Factory implements FactoryInterface
      */
     public function build($strategy, $strategyArgs, FiletypeInterface $filetype)
     {
+        $processor = null;
         switch ($strategy) {
             case 'ConstrainKeepCanvas':
-                return new \Alaress_Image_Processor_Strategy_ConstrainKeepCanvas($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_ConstrainKeepCanvas($strategyArgs);
+                break;
             case 'Constrain':
-                return new \Alaress_Image_Processor_Strategy_Constrain($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Constrain($strategyArgs);
+                break;
             case 'Crop':
-                return new \Alaress_Image_Processor_Strategy_Crop($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Crop($strategyArgs);
+                break;
             case 'Original':
-                return new \Alaress_Image_Processor_Strategy_Original($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Original($strategyArgs);
+                break;
             case 'Placement':
-                return new \Alaress_Image_Processor_Strategy_Placement($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Placement($strategyArgs);
+                break;
             case 'Rectangle':
-                return new \Alaress_Image_Processor_Strategy_Rectangle($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Rectangle($strategyArgs);
+                break;
             case 'RotateOrientation':
-                return new \Alaress_Image_Processor_Strategy_RotateOrientation($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_RotateOrientation($strategyArgs);
+                break;
             case 'Sharpen':
-                return new \Alaress_Image_Processor_Strategy_Sharpen($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Sharpen($strategyArgs);
+                break;
             case 'Square':
-                return new \Alaress_Image_Processor_Strategy_Square($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_Square($strategyArgs);
+                break;
             case 'StretchyButton':
-                return new \Alaress_Image_Processor_Strategy_StretchyButton($strategyArgs);
+                $processor = new \Alaress_Image_Processor_Strategy_StretchyButton($strategyArgs);
+                break;
             default:
                 $strategyName = '\\Alaress_Image_Processor_Strategy_' . $strategy;
                 $processor    = new $strategyName($strategyArgs);
-                return $processor;
+                break;
         }
+        $processor->setSupportsAlphaChannel($filetype->supportsAlphaChannel());
+        return $processor;
     }
 }

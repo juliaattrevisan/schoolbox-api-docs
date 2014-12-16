@@ -72,10 +72,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
             $args,
             $this->getFiletypeStrategy()
         );
-        // TODO either remove supportsAlphaChannel entirely or use the filetype instead
-        $processor->setSupportsAlphaChannel($this->getFiletypeStrategy()->supportsAlphaChannel());
         $this->setProcessorStrategy($processor);
-
         return $this;
     }
 
