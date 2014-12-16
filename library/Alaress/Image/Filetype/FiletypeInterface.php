@@ -1,6 +1,6 @@
 <?php
 /**
- * Filetype factory for the original image transform implementation.
+ * Interface for image file types.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
