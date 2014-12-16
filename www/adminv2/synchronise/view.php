@@ -36,6 +36,9 @@ $nav->parse($this, 'synchronise');
 
 $this->setVar(array(
     'CONTENT' => $this->getDi()->get('templateEngine')->render("adminv2/synchronise/{$section}.twig", array(
+        'nav' => array(
+            'section' => $section,
+        ),
         'bucketface' => 'test'
     ))
 ));
