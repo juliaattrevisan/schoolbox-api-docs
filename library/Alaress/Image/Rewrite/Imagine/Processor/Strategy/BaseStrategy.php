@@ -15,16 +15,9 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 use Imagine\Image\BoxInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;
-use Intervention\Image\Image;
 
 abstract class BaseStrategy implements StrategyInterface
 {
-    /**
-     * Canvas image resource
-     *
-     * @var Image
-     */
-    protected $canvas = null;
     protected $canvasWidth = 0;
     protected $canvasHeight = 0;
 
@@ -109,26 +102,6 @@ abstract class BaseStrategy implements StrategyInterface
                 break;
         }
         return new Point(intval($xPoint), intval($yPoint));
-    }
-
-    /**
-    * Set canvas image resource
-    *
-    * @param Image $canvas
-    */
-    protected function setCanvas($canvas)
-    {
-        $this->canvas = $canvas;
-    }
-
-    /**
-    * Get canvas image resource
-    *
-    * @return Image
-    */
-    protected function getCanvas()
-    {
-        return $this->canvas;
     }
 
     /**
