@@ -29,7 +29,8 @@ class Factory implements FactoryInterface
             case 'Original':
                 return new Original($strategyArgs);
             case 'Placement':
-                return new Placement($strategyArgs);
+                /** @var \Alaress\Image\Rewrite\Imagine\Filetype\FiletypeInterface $filetype */
+                return new Placement($strategyArgs, $filetype->getImageManager());
             case 'Rectangle':
                 return new Rectangle($strategyArgs);
             case 'RotateOrientation':
