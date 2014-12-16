@@ -27,7 +27,11 @@ class Alaress_Image_Filesystem {
 
 		/* Process and stream image
 		 */
-		$imageProcessor = new Alaress_Image_Processor_Standard($cache, $transformations);
+		$imageProcessor = new Alaress_Image_Processor_Standard(
+            $cache,
+            $transformations,
+            new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+        );
 		$imageProcessor->load()->stream();
 	}
 }

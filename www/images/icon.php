@@ -23,7 +23,8 @@ try {
 
 	$imageProcessor = new Alaress_Image_Processor_Freeform(
 		new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
-		$transform
+		$transform,
+        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
 	);
 
 	if (isset($transform_key)) {

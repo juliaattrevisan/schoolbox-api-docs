@@ -34,7 +34,11 @@ class Alaress_Image_Portrait {
 
         /* Process and stream image
          */
-        $this->imageProcessor = new Alaress_Image_Processor_Standard($cache, $transformations);
+        $this->imageProcessor = new Alaress_Image_Processor_Standard(
+            $cache,
+            $transformations,
+            new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+        );
         $this->imageProcessor->load()->transformAll();
     }
 
