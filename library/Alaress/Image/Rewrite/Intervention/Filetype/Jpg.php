@@ -15,14 +15,4 @@ class Jpg extends BaseFiletype
     {
         header('Content-type: image/jpeg');
     }
-
-    /**
-     * JPEG does not support the alpha channel
-     *
-     * @return bool Always false
-     */
-    public function supportsAlphaChannel()
-    {
-        return false;
-    }
 }

@@ -50,11 +50,4 @@ interface FiletypeInterface
      * @param string $filename
      */
     public function save($image, $filename);
-
-    /**
-     * Does this image type support the alpha (transparency) channel?
-     *
-     * @return bool
-     */
-    public function supportsAlphaChannel();
 }

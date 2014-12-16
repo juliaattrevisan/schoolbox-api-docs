@@ -17,14 +17,4 @@ class Gif extends BaseFiletype
     {
         header('Content-type: image/gif');
     }
-
-    /**
-     * GIF does support the alpha channel
-     *
-     * @return bool Always true
-     */
-    public function supportsAlphaChannel()
-    {
-        return true;
-    }
 }

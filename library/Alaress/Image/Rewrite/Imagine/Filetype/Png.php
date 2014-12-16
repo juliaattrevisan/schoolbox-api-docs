@@ -18,14 +18,4 @@ class Png extends BaseFiletype
     {
         header('Content-type: image/png');
     }
-
-    /**
-     * PNG does support the alpha channel
-     *
-     * @return bool Always true
-     */
-    public function supportsAlphaChannel()
-    {
-        return true;
-    }
 }

@@ -28,13 +28,6 @@ abstract class BaseStrategy implements StrategyInterface
     protected $canvasHeight = 0;
 
     /**
-     * Does this processor support alpha channel transformation?
-     *
-     * @var bool
-     */
-    protected $supports_alpha_channel;
-
-    /**
     * Specify a background colour for canvas if provided
     * otherwise use generic old white
     *
@@ -192,23 +185,5 @@ abstract class BaseStrategy implements StrategyInterface
 //        imagesavealpha($canvas, true);
 //        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
 //        imagefill($canvas, 0, 0, $transparent);
-    }
-
-    /**
-     * @param  bool  $supports_alpha_channel
-     * @return $this
-     */
-    public function setSupportsAlphaChannel($supports_alpha_channel)
-    {
-        $this->supports_alpha_channel = $supports_alpha_channel;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSupportsAlphaChannel()
-    {
-        return $this->supports_alpha_channel;
     }
 }
