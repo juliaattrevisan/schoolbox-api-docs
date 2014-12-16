@@ -14,11 +14,18 @@ if (!$groupHandler->isSuperuser()) {
 }
 
 /* Section - sanitise template loading
+ * and load corresponding data
  */
+$allPeople = new \Schoolbox\Collection();
+
 $section = strtolower($this->arg[0]);
 
 switch($section) {
     case 'staff':
+        $adapter = new \Schoolbox\External\Normalise\User\Adapter(new \External_User());
+        $allPeople = $adapter->getStaffContactListExtended();
+        break;
+
     case 'student':
     case 'parent':
         break;
@@ -38,6 +45,9 @@ $this->setVar(array(
     'CONTENT' => $this->getDi()->get('templateEngine')->render("adminv2/synchronise/{$section}.twig", array(
         'nav' => array(
             'section' => $section,
+        ),
+        'data' => array(
+            'allPeople' => $allPeople,
         ),
         'bucketface' => 'test'
     ))
