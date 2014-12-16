@@ -1,5 +1,3 @@
-{% include 'adminv2/synchronise/nav.twig' %}
-
 <style type="text/css">
     .synchronise-container tr.colspans th {
         border: 1px solid #ddd;
@@ -14,8 +12,13 @@
     }
 </style>
 
-{% block title %}
-{% endblock %}
+<h2>Synchronise</h2>
 
-{% block body %}
-{% endblock %}
+<div class="settings-nav-holder">
+    {% include 'adminv2/synchronise/nav.twig' %}
+</div>
+<div class="settings">
+
+    {% block body %}
+    {% endblock %}
+</div>
