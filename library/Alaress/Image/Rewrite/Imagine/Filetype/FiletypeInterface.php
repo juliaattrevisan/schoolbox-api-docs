@@ -11,6 +11,7 @@
 namespace Alaress\Image\Rewrite\Imagine\Filetype;
 
 use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
 
 interface FiletypeInterface
 {
@@ -44,4 +45,16 @@ interface FiletypeInterface
      * @return bool
      */
     public function supportsAlphaChannel();
+
+    /**
+     * @return ImagineInterface
+     */
+    public function getImageManager();
+
+    /**
+     * @param ImagineInterface $imageManager
+     *
+     * @return $this
+     */
+    public function setImageManager($imageManager);
 }
