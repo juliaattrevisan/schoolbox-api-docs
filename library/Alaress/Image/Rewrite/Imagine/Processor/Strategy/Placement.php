@@ -36,18 +36,14 @@ class Placement extends BaseStrategy
     private $bgColors = array();
 
     /**
-     * Constructor
-     *
-     * @param $args
-     * @param ImagineInterface $imageManager
+     * {@inheritdoc}
      */
-    public function __construct($args, ImagineInterface $imageManager)
+    protected function setup($args)
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
         $this->setPosition($args['position']);
         $this->setBgColors($args['bgcolor']);
-        $this->setImageManager($imageManager);
     }
 
     /**

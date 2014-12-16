@@ -21,11 +21,9 @@ use Imagine\Image\ImageInterface;
 class Constrain extends BaseStrategy
 {
     /**
-    * Constructor
-    *
-    * @param $args
-    */
-    public function __construct($args)
+     * {@inheritdoc}
+     */
+    protected function setup($args)
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);

@@ -29,11 +29,9 @@ class Crop extends BaseStrategy
     private $coordinates = array();
 
     /**
-    * Constructor
-    *
-    * @param $args
-    */
-    public function __construct($args)
+     * {@inheritdoc}
+     */
+    protected function setup($args)
     {
         $this->setCoordinates($args['coordinates']);
     }

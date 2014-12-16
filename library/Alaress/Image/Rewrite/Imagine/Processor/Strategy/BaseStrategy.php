@@ -44,6 +44,28 @@ abstract class BaseStrategy implements StrategyInterface
     protected $canvasHeight = 0;
 
     /**
+     * Constructor
+     *
+     * @param array            $args
+     * @param ImagineInterface $imageManager
+     */
+    public function __construct($args, ImagineInterface $imageManager)
+    {
+        $this->setImageManager($imageManager);
+        $this->setup($args);
+    }
+
+    /**
+     * Post-constructor setup
+     * $this->imageManager is guaranteed to be set up
+     *
+     * @param array $args
+     */
+    protected function setup($args)
+    {
+    }
+
+    /**
      * Translates color array to a hex string, otherwise returns white
      *
      * @param  array  $bgColorArray

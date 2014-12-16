@@ -23,14 +23,12 @@ class Square extends BaseStrategy
     protected $rectangleProcessor = null;
 
     /**
-    * Constructor
-    *
-    * @param $args
-    */
-    public function __construct($args)
+     * {@inheritdoc}
+     */
+    protected function setup($args)
     {
         $args['height'] = $args['width'];
-        $this->rectangleProcessor = new Rectangle($args);
+        $this->rectangleProcessor = new Rectangle($args, $this->getImageManager());
     }
 
     /**

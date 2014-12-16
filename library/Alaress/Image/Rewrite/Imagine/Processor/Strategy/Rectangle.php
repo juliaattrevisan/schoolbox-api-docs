@@ -36,16 +36,14 @@ class Rectangle extends BaseStrategy
     protected $placementProcessor;
 
     /**
-     * Constructor
-     *
-     * @param $args
+     * {@inheritdoc}
      */
-    public function __construct($args)
+    protected function setup($args)
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
         $this->setSmallImageUpscales($args['smallImageUpscales']);
-        $this->placementProcessor = new Placement($args);
+        $this->placementProcessor = new Placement($args, $this->getImageManager());
     }
 
     /**

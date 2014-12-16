@@ -39,14 +39,12 @@ class ConstrainKeepCanvas extends BaseStrategy
     protected $placementProcessor;
 
     /**
-    * Constructor
-    *
-    * @param $args
-    */
-    public function __construct($args)
+     * {@inheritdoc}
+     */
+    protected function setup($args)
     {
-        $this->contstrainProcessor = new Constrain($args);
-        $this->placementProcessor  = new Placement($args);
+        $this->contstrainProcessor = new Constrain($args, $this->getImageManager());
+        $this->placementProcessor  = new Placement($args, $this->getImageManager());
     }
 
     /**
