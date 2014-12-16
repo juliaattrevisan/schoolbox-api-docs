@@ -9,20 +9,15 @@
 
 namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
+use Alaress\Image\Filetype\FiletypeInterface;
 use Alaress\Image\Processor\Strategy\FactoryInterface;
-use Alaress\Image\Processor\Strategy\ProcessorInterface;
 
 class Factory implements FactoryInterface
 {
     /**
-     * Creates a filetype strategy.
-     *
-     * @param  string $strategy
-     * @param  array  $strategyArgs
-     * @return ProcessorInterface
-     * @throws \Exception_Schoolbox if image isn't recognised
+     * {@inheritdoc}
      */
-    public function build($strategy, $strategyArgs = null)
+    public function build($strategy, $strategyArgs, FiletypeInterface $filetype)
     {
         switch ($strategy) {
             case 'ConstrainKeepCanvas':

@@ -9,6 +9,8 @@
 
 namespace Alaress\Image\Processor\Strategy;
 
+use Alaress\Image\Filetype\FiletypeInterface;
+
 interface FactoryInterface
 {
     /**
@@ -16,8 +18,10 @@ interface FactoryInterface
      *
      * @param  string $strategy
      * @param  array  $strategyArgs
+     * @param  FiletypeInterface $filetype May be required for processing or setting
+     *                                     options on processor once built
      * @return ProcessorInterface
      * @throws \Exception_Schoolbox if image isn't recognised
      */
-    public function build($strategy, $strategyArgs = null);
+    public function build($strategy, $strategyArgs, FiletypeInterface $filetype);
 }
