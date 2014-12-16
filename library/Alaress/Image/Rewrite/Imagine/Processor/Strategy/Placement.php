@@ -19,7 +19,6 @@ namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 use Imagine\Filter\Advanced\Canvas;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
-use Imagine\Image\ImagineInterface;
 
 class Placement extends BaseStrategy
 {

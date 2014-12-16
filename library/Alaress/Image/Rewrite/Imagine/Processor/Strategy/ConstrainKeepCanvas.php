@@ -27,14 +27,14 @@ class ConstrainKeepCanvas extends BaseStrategy
     /**
      * A constrain processor
      *
-     * @var StrategyInterface
+     * @var BaseStrategy
      */
     protected $contstrainProcessor;
 
     /**
      * A placement processor
      *
-     * @var StrategyInterface
+     * @var BaseStrategy
      */
     protected $placementProcessor;
 

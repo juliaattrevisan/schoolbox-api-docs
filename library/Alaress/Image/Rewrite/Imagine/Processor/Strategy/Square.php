@@ -18,7 +18,7 @@ use Imagine\Image\ImageInterface;
 class Square extends BaseStrategy
 {
     /**
-     * @var StrategyInterface
+     * @var BaseStrategy
      */
     protected $rectangleProcessor = null;
 

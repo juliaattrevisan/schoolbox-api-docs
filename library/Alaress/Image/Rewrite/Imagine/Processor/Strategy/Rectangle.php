@@ -31,7 +31,7 @@ class Rectangle extends BaseStrategy
     /**
      * A placement processor
      *
-     * @var StrategyInterface
+     * @var BaseStrategy
      */
     protected $placementProcessor;
 
