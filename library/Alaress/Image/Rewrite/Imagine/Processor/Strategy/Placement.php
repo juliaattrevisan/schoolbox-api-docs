@@ -16,8 +16,10 @@
 
 namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
 
+use Imagine\Filter\Advanced\Canvas;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
 
 class Placement extends BaseStrategy implements StrategyInterface
 {
@@ -34,16 +36,23 @@ class Placement extends BaseStrategy implements StrategyInterface
     private $bgColors = array();
 
     /**
-    * Constructor
-    *
-    * @param $args
-    */
-    public function __construct($args)
+     * @var ImagineInterface
+     */
+    protected $imageManager;
+
+    /**
+     * Constructor
+     *
+     * @param $args
+     * @param ImagineInterface $imageManager
+     */
+    public function __construct($args, ImagineInterface $imageManager)
     {
         $this->setCanvasWidth($args['width']);
         $this->setCanvasHeight($args['height']);
         $this->setPosition($args['position']);
         $this->setBgColors($args['bgcolor']);
+        $this->imageManager = $imageManager;
     }
 
     /**
@@ -69,9 +78,8 @@ class Placement extends BaseStrategy implements StrategyInterface
         }
 
         // Then place the image inside the new canvas
-        // TODO make at least the Imagine object injected
-        $filter = new \Imagine\Filter\Advanced\Canvas(
-            new \Imagine\Imagick\Imagine(),
+        $filter = new Canvas(
+            $this->imageManager,
             $canvasBox,
             $this->getImageBoxPoint($canvasBox, $image->getSize(), $this->getPosition()),
             $image->palette()->color($this->translateColorArray($this->getBgColors()))
