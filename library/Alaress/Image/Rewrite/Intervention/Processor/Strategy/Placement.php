@@ -18,7 +18,7 @@ namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
 
-class Placement extends BaseStrategy implements StrategyInterface
+class Placement extends BaseStrategy
 {
 
     /* Positioning of the image within the canvas
@@ -47,8 +47,10 @@ class Placement extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var Image $image
      */
-    public function manipulate(Image $image)
+    public function manipulate($image)
     {
         return $image->resizeCanvas(
             $this->getCanvasWidth(),

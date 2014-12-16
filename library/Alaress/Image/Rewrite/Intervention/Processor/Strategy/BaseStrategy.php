@@ -13,6 +13,7 @@
 namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
+use Alaress\Image\Processor\Strategy\StrategyInterface;
 
 abstract class BaseStrategy implements StrategyInterface
 {

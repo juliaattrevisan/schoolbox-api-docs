@@ -14,12 +14,14 @@ namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
 
-class Sharpen extends BaseStrategy implements StrategyInterface
+class Sharpen extends BaseStrategy
 {
     /**
      * {@inheritdoc}
+     *
+     * @var Image $image
      */
-    public function manipulate(Image $image)
+    public function manipulate($image)
     {
         return $image->sharpen(15);
 //        $sharpenMatrix = array (

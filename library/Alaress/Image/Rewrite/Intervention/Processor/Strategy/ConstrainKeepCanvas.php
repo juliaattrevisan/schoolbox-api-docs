@@ -19,7 +19,7 @@ namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
 
-class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
+class ConstrainKeepCanvas extends BaseStrategy
 {
 
     /**
@@ -43,8 +43,10 @@ class ConstrainKeepCanvas extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var Image $image
      */
-    public function manipulate(Image $image)
+    public function manipulate($image)
     {
         return $image->resize(
             max($this->getCanvasWidth(), $image->getWidth()),

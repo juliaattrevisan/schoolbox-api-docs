@@ -22,7 +22,7 @@ namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
 
-class Crop extends BaseStrategy implements StrategyInterface
+class Crop extends BaseStrategy
 {
     private $coordinates = array();
 
@@ -38,8 +38,10 @@ class Crop extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var Image $image
      */
-    public function manipulate(Image $image)
+    public function manipulate($image)
     {
         /* Figure out resized dimensions
          */

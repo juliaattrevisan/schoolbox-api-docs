@@ -16,7 +16,7 @@ namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
-class Rectangle extends BaseStrategy implements StrategyInterface
+class Rectangle extends BaseStrategy
 {
 
     /**
@@ -51,8 +51,10 @@ class Rectangle extends BaseStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @var Image $image
      */
-    public function manipulate(Image $image)
+    public function manipulate($image)
     {
         // Scale to largest of width/height,
         // then crop to centered rectangle
