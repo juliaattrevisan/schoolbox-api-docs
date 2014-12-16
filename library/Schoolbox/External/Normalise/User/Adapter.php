@@ -1263,7 +1263,7 @@ class Adapter  implements \External_UserInterface {
         foreach ($allResults as $currentResult) {
             $student = new Student();
             $student
-                ->setId($currentResult)
+                ->setId($currentResult['RelatedID'])
             ;
 
             $collection->add($student);
