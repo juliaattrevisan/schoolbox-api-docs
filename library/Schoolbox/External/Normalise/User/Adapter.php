@@ -1327,6 +1327,17 @@ class Adapter  implements \External_UserInterface {
         return $staff;
     }
 
+    /**
+     * Translate a $boarderValue into a human-readable variant
+     * e.g. translates D, W into "Day" and B into "Boarder"
+     *
+     * @param $boarderValue
+     * @return mixed
+     */
+    public function determineBoarderType($boarderValue) {
+        return $this->getHandler()->determineBoarderType($boarderValue);
+    }
+
     /* Getters/Setters
      */
 
