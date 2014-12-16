@@ -1,0 +1,13 @@
+{% if nav.section == 'staff' %}
+    {% set staffselected = 'selected' %}
+{% elseif nav.section == 'student' %}
+    {% set studentselected = 'selected' %}
+{% elseif nav.section == 'parent' %}
+    {% set parentselected ='selected' %}
+{% endif %}
+
+<a href="/adminv2/synchronise/view/staff" class="{{ staffselected }}">Staff</a>
+<a href="/adminv2/synchronise/view/student" class="{{ studentselected }}">Student</a>
+<a href="/adminv2/synchronise/view/parent" class="{{ parentselected }}">Parent</a>
+
+
