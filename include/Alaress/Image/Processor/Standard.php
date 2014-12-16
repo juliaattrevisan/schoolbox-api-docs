@@ -43,11 +43,11 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
         /* Figure out what kind of file it is
          */
         $this->setFilePath($imageArray['filepath']);
+        $this->setFiletypeStrategy($this->getFiletypeFactory()->build($imageArray));
 
         /* Prepare an image resource for chained manipulation
          */
         if (!$this->getCache()->isLoadedFromCache()) {
-            $this->setFiletypeStrategy($this->getFiletypeFactory()->build($imageArray));
             $this->setImage($this->getFiletypeStrategy()->create($this->getFilepath()));
             $this->transformAll();
         }
