@@ -81,31 +81,11 @@ class Alaress_Image_Processor_Abstract
     /**
     * Set processing strategy
     *
-    * @param $imageArray
-    * @throws Exception_Schoolbox if image isn't recognised
+    * @param Alaress_Image_Filetype_Interface $filetypeStrategy
     */
-    protected function setFiletypeStrategy($imageArray)
+    protected function setFiletypeStrategy($filetypeStrategy)
     {
-        switch($imageArray['mime']) {
-            case 'image/jpeg':
-            case 'image/pjpeg':
-                $className = 'Jpg';
-                break;
-            case 'image/gif':
-                $className = 'Gif';
-                break;
-            case 'image/png':
-            case 'image/x-png':
-                $className = 'Png';
-                break;
-            default:
-                throw new Exception_Schoolbox('Unknown image type.');
-                break;
-        }
-
-        $strategyClass = $this->getFiletypeStrategyPrefix() . $className;
-
-        $this->filetypeStrategy = new $strategyClass();
+        $this->filetypeStrategy = $filetypeStrategy;
     }
 
     /**
