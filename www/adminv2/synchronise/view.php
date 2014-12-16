@@ -13,6 +13,20 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
+/* Section - sanitise template loading
+ */
+$section = strtolower($this->arg[0]);
+
+switch($section) {
+    case 'staff':
+    case 'student':
+    case 'parent':
+        break;
+    default:
+        $section = 'intro';
+        break;
+}
+
 /* Power to the phplib
  */
 $this->setFile(TEMPLATE_content, 'adminv2/synchronise/view.html');
@@ -21,7 +35,7 @@ $nav = new AdminV2_Nav();
 $nav->parse($this, 'synchronise');
 
 $this->setVar(array(
-    'CONTENT' => $this->getDi()->get('templateEngine')->render('adminv2/synchronise/view.twig', array(
+    'CONTENT' => $this->getDi()->get('templateEngine')->render("adminv2/synchronise/{$section}.twig", array(
         'bucketface' => 'test'
     ))
 ));
