@@ -66,6 +66,38 @@ class Staff extends Base {
         $this->setMeta(new Meta());
     }
 
+    /**
+     * Get a concatenated string representation of all the emails everywhere
+     *
+     * @param $separator
+     * @return string
+     */
+    public function getAllEmails($separator) {
+        $output = array();
+
+        foreach($this->getEmail() as $currentEmail) {
+            $output[] = $currentEmail->getAddress();
+        }
+
+        return implode($separator, $output);
+    }
+
+    /**
+     * Get a concatenated string representation of all the emails everywhere
+     *
+     * @param $separator
+     * @return string
+     */
+    public function getAllCampuses($separator) {
+        $output = array();
+
+        foreach($this->getCampus() as $currentCampus) {
+            $output[] = $currentCampus->getName();
+        }
+
+        return implode($separator, $output);
+    }
+
     /* Getters/Setters
      */
 
