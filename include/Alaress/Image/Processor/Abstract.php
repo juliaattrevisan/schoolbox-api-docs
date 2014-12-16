@@ -24,6 +24,13 @@ class Alaress_Image_Processor_Abstract
     */
     protected $processorStrategy = null;
 
+    /**
+     * A factory for building file types, replaces $filetypeStrategyPrefix.
+     *
+     * @var \Alaress\Image\Filetype\FactoryInterface
+     */
+    protected $filetypeFactory;
+
     /* Strategies for polymorphic image output
 	 */
     protected $filetypeStrategyPrefix = 'Alaress\\Image\\Rewrite\\Imagine\\Filetype\\';
@@ -139,6 +146,25 @@ class Alaress_Image_Processor_Abstract
     protected function setProcessorStrategy($processorStrategy)
     {
         $this->processorStrategy = $processorStrategy;
+    }
+
+    /**
+     * @return \Alaress\Image\Filetype\FactoryInterface
+     */
+    public function getFiletypeFactory()
+    {
+        return $this->filetypeFactory;
+    }
+
+    /**
+     * @param  \Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+     *
+     * @return $this
+     */
+    public function setFiletypeFactory($filetypeFactory)
+    {
+        $this->filetypeFactory = $filetypeFactory;
+        return $this;
     }
 
     /**

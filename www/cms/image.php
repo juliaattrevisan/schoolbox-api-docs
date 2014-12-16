@@ -43,7 +43,11 @@ $cache = new Alaress_Image_Cache_Image($_GET['id'], $key);
 
 /* Process and stream image
  */
-$imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
+$imageProcessor = new Alaress_Image_Processor_Freeform(
+    $cache,
+    new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']),
+    new \Alaress\Image\Rewrite\Imagine\Filetype\Factory()
+);
 try {
 	$imageProcessor->load()->stream();
 }

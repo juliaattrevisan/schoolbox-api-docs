@@ -9,17 +9,21 @@
  */
 class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 {
-
     /**
      * Constructor
      *
      * @param $cache
      * @param $transformations
+     * @param Alaress\Image\Filetype\FactoryInterface $filetypeFactory
      */
-    public function __construct($cache, $transformations)
-    {
+    public function __construct(
+        $cache,
+        $transformations,
+        Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+    ) {
         $this->setCache($cache);
         $this->setTransformations($transformations);
+        $this->setFiletypeFactory($filetypeFactory);
     }
 
     /**
@@ -41,7 +45,10 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
         /* Prepare an image resource for chained manipulation
          */
         if (!$this->getCache()->isLoadedFromCache()) {
-            $this->setImage($this->getFiletypeStrategy()->create($this->getFilePath()));
+            $this->setImage(
+                $this->getFiletypeFactory()->build($imageArray)
+                    ->create($this->getFilepath())
+            );
             $this->transformAll();
         }
 
@@ -64,6 +71,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
         /** @var Alaress_Image_Processor_Strategy_Interface $processor */
         $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
         $processor    = new $strategyName($args);
+        // TODO either remove supportsAlphaChannel entirely or use the filetype instead
         $processor->setSupportsAlphaChannel($this->getFiletypeStrategy()->supportsAlphaChannel());
         $this->setProcessorStrategy($processor);
 
