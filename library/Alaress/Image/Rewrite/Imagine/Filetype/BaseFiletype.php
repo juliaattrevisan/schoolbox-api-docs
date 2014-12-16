@@ -10,6 +10,7 @@
 
 namespace Alaress\Image\Rewrite\Imagine\Filetype;
 
+use Alaress\Image\Filetype\FiletypeInterface;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\ExifMetadataReader;
@@ -75,7 +76,7 @@ abstract class BaseFiletype implements FiletypeInterface
      * @param ImageInterface $image
      * @param string         $filename
      */
-    public function save(ImageInterface $image, $filename)
+    public function save($image, $filename)
     {
         $options = array();
         if ($image->layers()->count() > 1) {
@@ -110,7 +111,7 @@ abstract class BaseFiletype implements FiletypeInterface
      *
      * @param ImageInterface $image
      */
-    public function stream(ImageInterface $image)
+    public function stream($image)
     {
         $this->outputHeaders();
         echo $image->get($this->getFormat());
