@@ -54,6 +54,8 @@ class Rectangle extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
+        // This processor:
+        // resize + position + crop
         // Scale to largest of width/height,
         // then crop to centered rectangle
         $currentWidth  = $image->getSize()->getWidth();
@@ -80,10 +82,20 @@ class Rectangle extends BaseStrategy implements StrategyInterface
             }
         }
 
+        // Is the image larger than the canvas box?
+        // If so, crop it to the size of the canvas box (and center it)
         $canvasBox = new Box(
             $this->getCanvasWidth(),
             $this->getCanvasHeight()
         );
+        if ($image->getSize()->square() > $canvasBox->square()) {
+            $image->crop(
+                $this->getImageBoxPoint($image->getSize(), $canvasBox),
+                $canvasBox
+            );
+        }
+
+        // And now put in the middle of a canvas
         $filter = new \Imagine\Filter\Advanced\Canvas(
             new \Imagine\Imagick\Imagine(),
             $canvasBox,
