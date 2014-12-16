@@ -10,6 +10,7 @@
 
 namespace Alaress\Image\Rewrite\Intervention\Filetype;
 
+use Alaress\Image\Filetype\FiletypeInterface;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
@@ -31,7 +32,7 @@ abstract class BaseFiletype implements FiletypeInterface
     *
     * @param  $filename
     * @throws \Exception_Schoolbox_NotFound if file can't be read
-    * @return resource
+    * @return Image
     */
     public function create($filename)
     {
@@ -48,14 +49,11 @@ abstract class BaseFiletype implements FiletypeInterface
     /**
      * Create an image
      *
-     * @param $filename
-     * @return resource
+     * @param  string $filename
+     * @return Image
      */
     public function loadImageResource($filename)
     {
-        //
-        // Sadly silence operator is needed for all imagecreatefrom* methods,
-        // otherwise error output corrupts image output.
         return $this->getImageManager()->make($filename);
     }
 
@@ -65,11 +63,14 @@ abstract class BaseFiletype implements FiletypeInterface
      * @param Image  $image
      * @param string $filename
      */
-    public function save(Image $image, $filename)
+    public function save($image, $filename)
     {
         file_put_contents($filename, $image->encode());
     }
 
+    /**
+     * Outputs headers that are generic to all file types.
+     */
     protected function outputHeaders()
     {
         header('Cache-Control: max-age=10800, private');
@@ -78,6 +79,9 @@ abstract class BaseFiletype implements FiletypeInterface
         $this->outputSpecificHeaders();
     }
 
+    /**
+     * Outputs headers that are specific to a particular file type.
+     */
     protected function outputSpecificHeaders()
     {
     }
@@ -85,15 +89,18 @@ abstract class BaseFiletype implements FiletypeInterface
     /**
      * Stream image to browser directly
      *
-     * @param $image
+     * @param Image $image
      */
-    public function stream(Image $image)
+    public function stream($image)
     {
         $this->outputHeaders();
         echo $image->encode();
         exit;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function streamFile($filename)
     {
         $this->outputHeaders();

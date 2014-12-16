@@ -64,9 +64,6 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     public function loadImageResource($filename)
     {
-        //
-        // Sadly silence operator is needed for all imagecreatefrom* methods,
-        // otherwise error output corrupts image output.
         return $this->getImageManager()->open($filename);
     }
 
@@ -94,6 +91,9 @@ abstract class BaseFiletype implements FiletypeInterface
 //        }
     }
 
+    /**
+     * Outputs headers that are generic to all file types.
+     */
     protected function outputHeaders()
     {
         header('Cache-Control: max-age=10800, private');
@@ -102,6 +102,9 @@ abstract class BaseFiletype implements FiletypeInterface
         $this->outputSpecificHeaders();
     }
 
+    /**
+     * Outputs headers that are specific to a particular file type.
+     */
     protected function outputSpecificHeaders()
     {
     }
@@ -118,6 +121,9 @@ abstract class BaseFiletype implements FiletypeInterface
         exit;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function streamFile($filename)
     {
         $this->outputHeaders();
