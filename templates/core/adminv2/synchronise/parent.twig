@@ -54,21 +54,5 @@
         </table>
     </div>
 
-    <h3>Campus</h3>
-    <table class="table ruler">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for i in data.campus.external %}
-            <tr>
-                <td>{{ i.getId() }}</td>
-                <td>{{ i.getName() }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% include 'adminv2/synchronise/sub/campus.twig' %}
 {% endblock %}
