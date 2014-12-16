@@ -66,8 +66,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
     {
         // TODO replace this with a factory object
         /** @var Alaress_Image_Processor_Strategy_Interface $processor */
-        $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
-        $processor    = new $strategyName($args);
+        $processor = $this->getProcessorFactory()->build($strategy, $args);
         // TODO either remove supportsAlphaChannel entirely or use the filetype instead
         $processor->setSupportsAlphaChannel($this->getFiletypeStrategy()->supportsAlphaChannel());
         $this->setProcessorStrategy($processor);
