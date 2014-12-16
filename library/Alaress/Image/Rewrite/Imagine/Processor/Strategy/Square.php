@@ -17,8 +17,10 @@ use Imagine\Image\ImageInterface;
 
 class Square extends BaseStrategy implements StrategyInterface
 {
-
-    protected $innerProcessor = null;
+    /**
+     * @var StrategyInterface
+     */
+    protected $rectangleProcessor = null;
 
     /**
     * Constructor
@@ -28,7 +30,7 @@ class Square extends BaseStrategy implements StrategyInterface
     public function __construct($args)
     {
         $args['height'] = $args['width'];
-        $this->innerProcessor = new Rectangle($args);
+        $this->rectangleProcessor = new Rectangle($args);
     }
 
     /**
@@ -36,6 +38,6 @@ class Square extends BaseStrategy implements StrategyInterface
      */
     public function manipulate(ImageInterface $image)
     {
-        return $this->innerProcessor->manipulate($image);
+        return $this->rectangleProcessor->manipulate($image);
     }
 }
