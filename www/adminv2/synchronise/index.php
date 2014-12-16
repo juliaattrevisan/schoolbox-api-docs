@@ -107,6 +107,12 @@ else {
     $section = 'intro';
 }
 
+/* The Schoolbox Lists
+ */
+$campusMapper = new \Schoolbox\CampusMapper();
+$roleMapper = new \Schoolbox\RoleMapper();
+$houseMapper = new HouseMapper();
+
 /* Power to the phplib
  */
 $this->setFile(TEMPLATE_content, 'adminv2/synchronise/view.html');
@@ -123,15 +129,15 @@ $this->setVar(array(
             'allPeople' => $allPeople,
             'campus' => array(
                 'external' => $allCampus,
-                'schoolbox' => new Collection()
+                'schoolbox' => $campusMapper->findAll()
             ),
             'year' => array(
                 'external' => $allYear,
-                'schoolbox' => new Collection()
+                'schoolbox' => $roleMapper->findAll()
             ),
             'house' => array(
                 'external' => $allHouse,
-                'schoolbox' => new Collection()
+                'schoolbox' => $houseMapper->findAll()
             )
         ),
         'bucketface' => 'test'
