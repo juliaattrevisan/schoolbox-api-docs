@@ -65,4 +65,16 @@
         </div>
         <div class="clearfix"></div>
     </div>
+
+    <div class="synchronise-match-container">
+        <h3>Default User Options</h3>
+        <div class="half-column">
+            {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
+            {% include 'adminv2/synchronise/sub/webmail.twig' %}
+        </div>
+        <div class="half-column">
+            {% include 'adminv2/synchronise/sub/localEmail.twig' %}
+            {% include 'adminv2/synchronise/sub/externalMail.twig' %}
+        </div>
+    </div>
 {% endblock %}
