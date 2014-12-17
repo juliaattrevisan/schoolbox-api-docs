@@ -160,10 +160,13 @@ class editDuties
 
 $page = new editDuties($_GET['category'], $_GET['Year'], $_GET['Month'], $_GET['Day']);
 
-if($_POST['Submit'] == 'Save')
-	$page->doUpdate();
-if($_FILES['file']['name'])
-	$page->parseCSV();
+if ($_POST['Submit'] == 'Save') {
+    $page->doUpdate();
+}
+if ($_FILES['file']['name']) {
+    SitePage::extendExecutionTime(300);
+    $page->parseCSV();
+}
 
 
 $page->doOutput($message);
