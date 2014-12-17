@@ -1,4 +1,5 @@
 <?php
+SitePage::extendExecutionTime(300);
 
 $groupHandler = new Group();
 

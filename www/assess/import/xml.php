@@ -25,6 +25,7 @@ else {
     error(134);
 }
 
+SitePage::extendExecutionTime(300);
 $import = new Assess_Import_Xml($this->arg[0], new Assess_Main(), new Assess_Section(), new Assess_Factory(), $data, $this);
 $import->import();
 

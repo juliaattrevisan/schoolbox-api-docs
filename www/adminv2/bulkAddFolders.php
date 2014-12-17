@@ -1,5 +1,5 @@
 <?php
-ini_set('max_execution_time', 600);
+SitePage::extendExecutionTime(600);
 
 $groupHandler = new Group();
 

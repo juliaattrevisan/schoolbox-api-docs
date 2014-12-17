@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+SitePage::extendExecutionTime(300);
+
 if (!is_numeric($this->arg[0])) {
     error(18);
 }
