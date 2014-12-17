@@ -25,7 +25,7 @@
 
 // Generic colors
 @dark-blue:                     #013A63; // Dark Schoolbox Blue
-@body-background: 				#FFFFFF; // Body, but not the content area
+@body-background: 				lighten(@banner-background, 55%); // Body, but not the content area
 @content-background: 			#FFFFFF; // Used for forms
 @dark: 							#FAFAFA; // Alternate tigerstriping color
 @border-color: 					#EEEEEE; // Bordering @dark
@@ -54,10 +54,10 @@
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
 @navigation-color:  			#000000;
-@navigation-links:  			#666666;
-@navigation-hover-background: 	#a66312;
+@navigation-links:  			@link;
+@navigation-hover-background: 	@navigation-links;
 @navigation-hover-color:  		#FFFFFF;
-@navigation-sub-background:  	#bf8f40;
+@navigation-sub-background:  	lighten(@navigation-links, 5%);
 
 // Main "Tab" Navigation
 @tab-background:				transparent;
@@ -89,10 +89,6 @@
   display: none;
 }
 
-#wrap{
-    background: url("/images/iggs/body-bg.png") bottom left no-repeat;
-}
-
 #header{
     .logo{
         left: 30px;
@@ -108,7 +104,7 @@
         width: 220px;
         #search-field{
             background: #fff;
-            border: 1px solid @navigation-sub-background;
+            border: 1px solid #bf8f40;
             height: 32px;
             width: 198px;
         }
@@ -120,13 +116,13 @@
         }
     }
     #tabs{
-        background: @navigation-sub-background;
+        background: #bf8f40;
         height: 24px;
         padding: 4px 4px 0 4px;
         margin-left: 215px;
 
         .navthis a{
-            background: @navigation-hover-background;
+            background: #a66312;
             color: #fff;
         }
     }
@@ -140,13 +136,12 @@ body.login{
     background: transparent;
     #container.login{
         background: @banner-background;
-        width: 96%;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
         padding: 24px 2%;
-        min-height: 238px;
         position: fixed;
         top: 0;
-        right: auto;
-        left: 0;
         .large-3{
             float: left;
             width: 37%;
@@ -172,19 +167,6 @@ body.login{
             }
         }
         .centre{ width: 25%; }
-    }
-    #login-bg{
-        background: url('/images/iggs/login-bg.jpg') center center no-repeat;
-        background-size: cover ;
-        float: left;
-        width: 100%;
-        text-align: center;
-        height: 100%;
-        position: fixed;
-        left: 0px;
-        top: 286px;
-        z-index: -1;
-        height:88%;
     }
 }
 
