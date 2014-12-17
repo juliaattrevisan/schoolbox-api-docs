@@ -75,8 +75,6 @@
         </div>
     </div>
 
-    <div class="clearfix"></div>
-
     <div class="synchronise-match-container">
         <h3>House Mapping</h3>
         <div class="half-column">
@@ -85,6 +83,18 @@
         <div class="icon equals"></div>
         <div class="half-column">
             {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+        </div>
+    </div>
+
+    <div class="synchronise-match-container">
+        <h3>Default User Options</h3>
+        <div class="half-column">
+            {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
+            {% include 'adminv2/synchronise/sub/webmail.twig' %}
+        </div>
+        <div class="half-column">
+            {% include 'adminv2/synchronise/sub/localEmail.twig' %}
+            {% include 'adminv2/synchronise/sub/externalMail.twig' %}
         </div>
     </div>
 {% endblock %}
