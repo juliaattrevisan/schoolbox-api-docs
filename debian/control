@@ -21,6 +21,7 @@ Depends: apache2-mpm-prefork, libapache2-mod-php5,
  redis-server, php5-redis,
  libpspell-dev, php5-pspell, aspell-en,
  schoolbox-epl,
+ imagemagick,
  ${misc:Depends}
 Conflicts: javascript-common
 Description: Schoolbox LMS by Alaress Pty. Ltd.
