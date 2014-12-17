@@ -416,7 +416,7 @@ table.tablesorter {
 
   th {
     padding: 0 !important;
-    .tablesorter-header-inner{ padding: 7px 7px 7px 18px; }
+    .tablesorter-header-inner{ padding: 7px; }
     &.sortable:not(.sorter-false) {
       background: @dark url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 center;
       border-right: 1px solid @body-background;
@@ -7511,7 +7511,7 @@ STUDENT AND PARENT DIRECTORIES
 }
 
 .directory .directory-sorter:not(.sorter-false) {
-    background: darken(@dark,@darken-value / 4) url(/images/core/tablesorter/sort.gif) no-repeat 100% 50%;
+    background: darken(@dark,@darken-value / 4) url(/images/core/tablesorter/sort-ascending.gif) no-repeat 100% 50%;
     padding-right: 21px;
     &.tablesorter-headerAsc {
         background-image: url(/images/core/tablesorter/sort-ascending.gif);
