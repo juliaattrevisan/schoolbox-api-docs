@@ -111,7 +111,7 @@ else if (isset($_POST['action']) && $_POST['action'] == 'cleanup') {
     } elseif (is_array($_POST['cleanupEventId']) && count($_POST['cleanupEventId'])) {
         /* Mass cleanup of selected events
          */
-        ini_set('max_execution_time', 300);
+        SitePage::extendExecutionTime(300);
 
         /* Remove all the events
          */
