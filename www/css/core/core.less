@@ -3737,6 +3737,45 @@ ADMIN BODY
     }
 }
 
+/* Synchronise
+ */
+.synchronise-container {
+    overflow: scroll;
+    table.data {
+        min-width: 2500px;
+        tr.colspans th {
+            border: 1px solid #ddd;
+        }
+    }
+}
+
+.synchronise-match-container {
+    width: 100%;
+    clear: both;
+    .half-column {
+        width: 47%;
+        float: left;
+    }
+    .third-column {
+        width: 30%;
+        float: left;
+    }
+    .icon {
+        width: 33px;
+        height: 33px;
+        background-image: url('/images/core/admin/icons.png');
+        background-repeat: no-repeat;
+        margin: 40px 10px;
+        float: left;
+        &.plus {
+            background-position: 0px -132px;
+        }
+        &.equals {
+            background-position: 0px -99px;
+        }
+    }
+}
+
 // Style for the grades edit page guide.
 // Plonked here because it seems like the most appropriate place
 .gradeTerm {
