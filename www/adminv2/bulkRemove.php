@@ -18,24 +18,22 @@ $nav->parse($this, 'user');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkremove']['tmp_name']) && $_FILES['bulkremove']['tmp_name']) {
-	$bulkHandler = new Bulk_User($_FILES['bulkremove']['tmp_name']);
-	$allUsers = $bulkHandler->removeUsers();
+    $bulkHandler = new Bulk_User($_FILES['bulkremove']['tmp_name']);
+    $allUsers = $bulkHandler->removeUsers();
 
-	if ($allUsers && count($allUsers)) {
-		foreach ($allUsers as $currentUser) {
-			$this->setVar(array(
-				'USER_USERNAME' => $currentUser['username'],
-				'USER_STATUS' => $currentUser['status'],
-				'USER_ERROR' => $currentUser['error'],
-			));
+    if ($allUsers && count($allUsers)) {
+        foreach ($allUsers as $currentUser) {
+            $this->setVar(array(
+                'USER_USERNAME' => $currentUser['username'],
+                'USER_STATUS' => $currentUser['status'],
+                'USER_ERROR' => $currentUser['error'],
+            ));
 
-			$this->parse('user_block', 'user', true);
-		}
-	}
-	else {
-		$this->setVar('user_block', '');
-	}
-}
-else {
-	error(2);
+            $this->parse('user_block', 'user', true);
+        }
+    } else {
+        $this->setVar('user_block', '');
+    }
+} else {
+    error(2);
 }

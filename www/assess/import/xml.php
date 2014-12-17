@@ -20,8 +20,7 @@ if (!is_numeric($this->arg[0])) {
 
 if ($_FILES['importXML']['tmp_name']) {
     $data = file_get_contents($_FILES['importXML']['tmp_name']);
-}
-else {
+} else {
     error(134);
 }
 
@@ -34,34 +33,33 @@ $import->import();
 /** @var OnlineAssessment $assessment */
 $is_task = !empty($_POST['is_task']);
 if ($is_task) {
-	$task = new Task();
-	$task
-		->setCategory($this->arg[0])
-		->setOwner($_SESSION['id'])
-		->setTitle($import->getTitle());
+    $task = new Task();
+    $task
+        ->setCategory($this->arg[0])
+        ->setOwner($_SESSION['id'])
+        ->setTitle($import->getTitle());
 
-	TaskMapper::getInstance()->save($task);
+    TaskMapper::getInstance()->save($task);
 
-	$assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
-	$assessment->setTask($task);
-	OnlineAssessmentMapper::getInstance()->save($assessment);
+    $assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
+    $assessment->setTask($task);
+    OnlineAssessmentMapper::getInstance()->save($assessment);
 
-	$task->setAssessment($assessment);
-	TaskMapper::getInstance()->save($task);
-}
-elseif (!empty($_POST['unit_id'])) {
-	$task_instance = new Task\Instance();
-	$task_instance
-		->setUnitInstance($_POST['unit_id'])
-		->setOwner($_SESSION['id'])
-		->setTitle($import->getTitle());
+    $task->setAssessment($assessment);
+    TaskMapper::getInstance()->save($task);
+} elseif (!empty($_POST['unit_id'])) {
+    $task_instance = new Task\Instance();
+    $task_instance
+        ->setUnitInstance($_POST['unit_id'])
+        ->setOwner($_SESSION['id'])
+        ->setTitle($import->getTitle());
 
-	$assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
-	$assessment->setTaskInstance($task_instance);
-	OnlineAssessmentMapper::getInstance()->save($assessment);
+    $assessment = OnlineAssessmentMapper::getInstance()->findById($import->getAssessId());
+    $assessment->setTaskInstance($task_instance);
+    OnlineAssessmentMapper::getInstance()->save($assessment);
 
-	$task_instance->setAssessment($assessment);
-	Task\InstanceMapper::getInstance()->save($task_instance);
+    $task_instance->setAssessment($assessment);
+    Task\InstanceMapper::getInstance()->save($task_instance);
 }
 
 SitePage::localRedir('/assess/modify/' . $import->getAssessId());

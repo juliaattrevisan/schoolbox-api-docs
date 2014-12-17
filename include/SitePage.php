@@ -397,20 +397,17 @@ class SitePage extends Page
             ( ($_SESSION['lasttime'] + \Config::get('session_length')) < mktime() ) || //If session has expired
             ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
-
             $sessionHandler = new Session;
             //Catch users with the remember me cookie
-            if(\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-
+            if (\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
                 $redis = \Alaress\Redis::getClientInstance();
-                $username = $redis->executeCommand($redis->createCommand('get',array($_COOKIE['remember'])));
+                $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
                 if (!$sessionHandler->create($username)) {
                     $this->goLoginPage();
                 }
-            }
-            //Catch already logged in users via kerberos or other means
-            else if (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
+            } //Catch already logged in users via kerberos or other means
+            elseif (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
                     $this->goLoginPage();
@@ -1061,11 +1058,10 @@ class SitePage extends Page
             $this->setVar('HIDDEN', '');
         }
 
-        if(\Config::get('session_remember')) {
-            $this->parse('remember_me_block','remember_me');
-        }
-        else {
-            $this->setVar('remember_me_block','');
+        if (\Config::get('session_remember')) {
+            $this->parse('remember_me_block', 'remember_me');
+        } else {
+            $this->setVar('remember_me_block', '');
         }
 
         // Shove GET params (samlAuth and page at least) into the form
@@ -1141,7 +1137,7 @@ class SitePage extends Page
                             $this->setVar($key . '_SELECTED', '');
                         }
                     }
-                }  elseif (is_object($row)) {
+                } elseif (is_object($row)) {
                     //
                     // This is an object of some sort.
                     // SitePage is going to have to learn how to traverse models
