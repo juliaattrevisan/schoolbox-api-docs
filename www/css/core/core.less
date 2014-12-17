@@ -418,15 +418,15 @@ table.tablesorter {
     padding: 0 !important;
     .tablesorter-header-inner{ padding: 7px 7px 7px 18px; }
     &.sortable:not(.sorter-false) {
-      background: @dark url('/images/core/tablesorter/sort.gif') no-repeat 0 center;
+      background: @dark url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 center;
       border-right: 1px solid @body-background;
       cursor: pointer;
-      &:hover{ background: url('/images/core/tablesorter/sort.gif') no-repeat 0 center; }
+      &:hover{ background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 center; }
       &.descending .tablesorter-header-inner{
-        background: @body-background url('/images/core/tablesorter/sort-descending.gif') no-repeat 0 12.5px;
+        background: @body-background url('/images/core/tablesorter/sort-descending.gif') no-repeat 0 center;
       }
       &.ascending .tablesorter-header-inner{
-        background: @body-background url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 16.5px;
+        background: @body-background url('/images/core/tablesorter/sort-ascending.gif') no-repeat 0 center;
       }
     }
     &:last-child{ padding: 7px 16px 7px 9px; }
