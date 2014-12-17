@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for i in data.allPeople|slice(0, 13) %}
+                {% for i in data.allPeople|slice(0, 13) %}
                 <tr>
                     <td>{{ i.getId() }}</td>
                     <td>{{ i.getTitle() }}</td>
@@ -49,7 +49,7 @@
                     <td>{{ i.getCampusAsString(", ") }}</td>
                     <td>{{ i.getYearAsString(", ") }}</td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -58,8 +58,10 @@
         <div class="left-column">
             {% include 'adminv2/synchronise/sub/campus/external.twig' %}
         </div>
+        <div class="icon equals"></div>
         <div class="right-column">
             {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
         </div>
+        <div class="clearfix"></div>
     </div>
 {% endblock %}
