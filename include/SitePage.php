@@ -1402,4 +1402,27 @@ class SitePage extends Page
         }
         return 'localhost';
     }
+
+    /**
+     * Extends execution time limit.
+     *
+     * This is intended for page scripts that include uploads that are somehow
+     * processed - often, their processing stage takes more than the default
+     * max execution time.
+     *
+     * Of course the existence of this method (whether in SitePage or elsewhere!)
+     * is an anti-pattern - any processing of an uploaded file should be done in
+     * an asynchronous process, and if we did that then execution time limits
+     * would be unnecessary.
+     *
+     * @param int $seconds Amount to extend by, defaults to 5 minutes.
+     */
+    public static function extendExecutionTime($seconds = 300)
+    {
+        $currentLimit = intval(ini_get('max_execution_time'));
+        if ($currentLimit !== 0) {
+            // Don't touch if there is no max execution time
+            set_time_limit($currentLimit + $seconds);
+        }
+    }
 }
