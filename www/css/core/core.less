@@ -11699,6 +11699,12 @@ th.rotate {
 	}
 }
 
+.listing{
+	.ui-sortable {
+		&> .dark:hover{ background-color: lighten(@highlight-color,@lighten-value); }
+	}
+}
+
 textarea.event-detail {
 	width: 100%;
 	height: 350px;
