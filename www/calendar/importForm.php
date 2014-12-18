@@ -10,6 +10,8 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+SitePage::extendExecutionTime(300);
+
 $groupHandler = new Group();
 
 if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {

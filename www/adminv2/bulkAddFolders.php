@@ -1,5 +1,5 @@
 <?php
-ini_set('max_execution_time', 600);
+SitePage::extendExecutionTime(600);
 
 $groupHandler = new Group();
 
@@ -18,24 +18,22 @@ $nav->parse($this, 'folder');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-	$bulkHandler = new Bulk_Category($_FILES['bulkadd']['tmp_name'], Scrub::text($_POST['template']));
-	$allFolders = $bulkHandler->addCategories();
+    $bulkHandler = new Bulk_Category($_FILES['bulkadd']['tmp_name'], Scrub::text($_POST['template']));
+    $allFolders = $bulkHandler->addCategories();
 
-	if ($allFolders && count($allFolders)) {
-		foreach ($allFolders as $currentFolder) {
-			$this->setVar(array(
-				'FOLDER_FOLDER' => $currentFolder['category'],
-				'FOLDER_STATUS' => $currentFolder['status'],
-				'FOLDER_ERROR' => $currentFolder['error'],
-			));
+    if ($allFolders && count($allFolders)) {
+        foreach ($allFolders as $currentFolder) {
+            $this->setVar(array(
+                'FOLDER_FOLDER' => $currentFolder['category'],
+                'FOLDER_STATUS' => $currentFolder['status'],
+                'FOLDER_ERROR' => $currentFolder['error'],
+            ));
 
-			$this->parse('folder_block', 'folder', true);
-		}
-	}
-	else {
-		$this->setVar('folder_block', '');
-	}
-}
-else {
-	error(2);
+            $this->parse('folder_block', 'folder', true);
+        }
+    } else {
+        $this->setVar('folder_block', '');
+    }
+} else {
+    error(2);
 }

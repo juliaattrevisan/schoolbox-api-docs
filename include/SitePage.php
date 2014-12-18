@@ -397,20 +397,17 @@ class SitePage extends Page
             ( ($_SESSION['lasttime'] + \Config::get('session_length')) < mktime() ) || //If session has expired
             ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
-
             $sessionHandler = new Session;
             //Catch users with the remember me cookie
-            if(\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-
+            if (\Config::get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
                 $redis = \Alaress\Redis::getClientInstance();
-                $username = $redis->executeCommand($redis->createCommand('get',array($_COOKIE['remember'])));
+                $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
                 if (!$sessionHandler->create($username)) {
                     $this->goLoginPage();
                 }
-            }
-            //Catch already logged in users via kerberos or other means
-            else if (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
+            } //Catch already logged in users via kerberos or other means
+            elseif (\Config::get('kerb_enable') && $_SERVER['REMOTE_USER']) {
                 list($username, $domain) = explode('@', $_SERVER['REMOTE_USER']);
                 if (!$sessionHandler->create($username)) {
                     $this->goLoginPage();
@@ -1061,11 +1058,10 @@ class SitePage extends Page
             $this->setVar('HIDDEN', '');
         }
 
-        if(\Config::get('session_remember')) {
-            $this->parse('remember_me_block','remember_me');
-        }
-        else {
-            $this->setVar('remember_me_block','');
+        if (\Config::get('session_remember')) {
+            $this->parse('remember_me_block', 'remember_me');
+        } else {
+            $this->setVar('remember_me_block', '');
         }
 
         // Shove GET params (samlAuth and page at least) into the form
@@ -1141,7 +1137,7 @@ class SitePage extends Page
                             $this->setVar($key . '_SELECTED', '');
                         }
                     }
-                }  elseif (is_object($row)) {
+                } elseif (is_object($row)) {
                     //
                     // This is an object of some sort.
                     // SitePage is going to have to learn how to traverse models
@@ -1401,5 +1397,28 @@ class SitePage extends Page
             }
         }
         return 'localhost';
+    }
+
+    /**
+     * Extends execution time limit.
+     *
+     * This is intended for page scripts that include uploads that are somehow
+     * processed - often, their processing stage takes more than the default
+     * max execution time.
+     *
+     * Of course the existence of this method (whether in SitePage or elsewhere!)
+     * is an anti-pattern - any processing of an uploaded file should be done in
+     * an asynchronous process, and if we did that then execution time limits
+     * would be unnecessary.
+     *
+     * @param int $seconds Amount to extend by, defaults to 5 minutes.
+     */
+    public static function extendExecutionTime($seconds = 300)
+    {
+        $currentLimit = intval(ini_get('max_execution_time'));
+        if ($currentLimit !== 0) {
+            // Don't touch if there is no max execution time
+            set_time_limit($currentLimit + $seconds);
+        }
     }
 }

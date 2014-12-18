@@ -3,12 +3,10 @@
 /* Use $_POST['action'] to separate screens
  */
 if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
-
-    /* Subscription settings
+/* Subscription settings
      */
     if (is_array($_POST['record']) && count($_POST['record'])) {
-
-        /* Update the options for each connector
+/* Update the options for each connector
          */
         foreach ($_POST['record'] as $id => $attribs) {
             /** @var Calendar_Api_Config_Record $configRecord */
@@ -99,10 +97,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             }
         }
     }
-}
-else if (isset($_POST['action']) && $_POST['action'] == 'cleanup') {
-
-    /* Mass Cleanup
+} elseif (isset($_POST['action']) && $_POST['action'] == 'cleanup') {
+/* Mass Cleanup
      */
     if (isset($_POST['cleanupFrom']) && isset($_POST['cleanupTo'])) {
         /* Change selected date range for mass cleanup
@@ -111,7 +107,7 @@ else if (isset($_POST['action']) && $_POST['action'] == 'cleanup') {
     } elseif (is_array($_POST['cleanupEventId']) && count($_POST['cleanupEventId'])) {
         /* Mass cleanup of selected events
          */
-        ini_set('max_execution_time', 300);
+        SitePage::extendExecutionTime(300);
 
         /* Remove all the events
          */
