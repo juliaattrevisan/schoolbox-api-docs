@@ -350,9 +350,11 @@ class External_Tass_User implements External_UserInterface
                 '' AS StudentOccupEmail,
                 s.year_grp AS StudentYearLevel,
                 s.house AS StudentHouse,
-                s.campus_code AS StudentCampus, *
-                -- s.dol AS StudentLeavingDate
+                s.campus_code AS StudentCampus,
+                sb.resid_code AS StudentBoardingHouse,
+                s.*
             FROM student AS s
+            LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
             WHERE s.dol IS NULL
         ";
 
