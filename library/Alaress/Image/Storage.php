@@ -9,9 +9,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Storage
-{
 
+namespace Alaress\Image;
+
+class Storage
+{
     /**
     * Consructor
     * Sets up the caching implementation, image processor and streams it
@@ -25,11 +27,11 @@ class Alaress_Image_Storage
 
         /* Choose a caching method to use
          */
-        $cache = new Alaress_Image_Cache_Storage($resource, $key);
+        $cache = new \Alaress_Image_Cache_Storage($resource, $key);
 
         /* Process and stream image
          */
-        $imageProcessor = new Alaress_Image_Processor_Standard(
+        $imageProcessor = new \Alaress_Image_Processor_Standard(
             $cache,
             $transformations,
             new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
