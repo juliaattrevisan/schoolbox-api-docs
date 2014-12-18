@@ -31,4 +31,11 @@ abstract class BaseFiletype implements FiletypeInterface {
 		}
 		return $im;
 	}
+
+    /**
+     * Does this file type support the alpha channel?
+     *
+     * @return bool
+     */
+    abstract public function supportsAlphaChannel();
 }

@@ -7,7 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Filetype;
+namespace Alaress\Image\Implementation\Gd\Filetype;
+
+use Alaress\Image\Filetype\FactoryInterface;
 
 class Factory implements FactoryInterface
 {
@@ -23,12 +25,12 @@ class Factory implements FactoryInterface
         switch ($imageArray['mime']) {
             case 'image/jpeg':
             case 'image/pjpeg':
-                return new \Alaress_Image_Filetype_Jpg();
+                return new Jpg();
             case 'image/gif':
-                return new \Alaress_Image_Filetype_Gif();
+                return new Gif();
             case 'image/png':
             case 'image/x-png':
-                return new \Alaress_Image_Filetype_Png();
+                return new Png();
             default:
                 throw new \Exception_Schoolbox('Unknown image type.');
         }
