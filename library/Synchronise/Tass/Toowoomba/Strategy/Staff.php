@@ -19,8 +19,11 @@ class Synchronise_Tass_Toowoomba_Strategy_Staff extends Synchronise_Base_Strateg
         $this->verbose_filter = new Synchronise_Tass_Toowoomba_Verbose();
         $this
             ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeCompanyCodes())
+            ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeTerminated())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
+            ->addHydrator(new Synchronise_Tass_Toowoomba_Hydrator_Username_Staff())
+            ->addHydrator(new Synchronise_Tass_Toowoomba_Hydrator_Campus())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
