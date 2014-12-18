@@ -8,8 +8,9 @@
  * @link      http://www.alaress.com.au/
  */
 namespace Alaress\Session;
-use Aura\Session\Session;
-use Aura\Session\Segment;
+
+use Aura\Session\Session as BaseSession;
+use Aura\Session\Segment as BaseSegment;
 use Aura\Session\SegmentFactory as BaseSegmentFactory;
 
 /**
@@ -19,17 +20,17 @@ class SegmentFactory extends BaseSegmentFactory
 {
     /**
      * Creates a session segment object.
-     * 
-     * @param Session $manager
-     * @param string  $name
+     *
+     * @param BaseSession $manager
+     * @param string      $name
      *
      * @return Segment
      */
-    public function newInstance(Session $manager, $name) {
+    public function newInstance(BaseSession $manager, $name)
+    {
         if (isset($name)) {
-            return new Segment($manager, $name);
-        }
-        else {
+            return new BaseSegment($manager, $name);
+        } else {
             return new BaseSessionSegment($manager);
         }
     }
