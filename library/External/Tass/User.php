@@ -177,6 +177,7 @@ class External_Tass_User implements External_UserInterface
 			";
         }
         $this->getDatabase()->query($sql);
+        $subjectList = array();
         while ($subject = $this->getDatabase()->trimRow($this->getDatabase()->getNextArray())) {
             if (Cfg::get('site_location') == 'meriden') {
                 $subject['year_grp'] = '';
