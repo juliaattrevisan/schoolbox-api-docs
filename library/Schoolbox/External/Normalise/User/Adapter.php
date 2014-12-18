@@ -1354,7 +1354,7 @@ class Adapter  implements \External_UserInterface {
                 $collection->add($subject);
             }
         }
-        
+
         return $collection;
     }
 

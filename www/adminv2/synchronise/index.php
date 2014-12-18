@@ -24,6 +24,11 @@ $allPeople = new Collection();
 $allCampus = new Collection();
 $allYear = new Collection();
 $allHouse = new Collection();
+$schoolboxRoles = new Collection();
+
+$roleMapper = new \Schoolbox\RoleMapper();
+$campusMapper = new \Schoolbox\CampusMapper();
+$houseMapper = new HouseMapper();
 
 $section = strtolower($this->arg[0]);
 
@@ -39,11 +44,29 @@ if ($section == 'staff') {
 
     foreach($allPeople as $currentPeople) {
         foreach($currentPeople->getCampus() as $currentCampus) {
-            $campus[$currentCampus->getName()] = $currentCampus;
+            if (strlen($currentCampus->getName())) {
+                $campus[$currentCampus->getName()] = $currentCampus;
+            }
         }
     }
 
     $allCampus = new Collection(array_values($campus));
+
+    /* Find a list of all the roles
+     */
+    $roles = array();
+
+    foreach($allPeople as $currentPeople) {
+        if (strlen($currentPeople->getMeta()->getType())) {
+            $roles[$currentPeople->getMeta()->getType()] = $currentPeople->getMeta();
+        }
+    }
+
+    $allRoles = new Collection(array_values($roles));
+
+    /* Schoolbox list
+     */
+    $schoolboxRoles = $roleMapper->findByColumn('group_type', 'staff');
 }
 /* Student
  */
@@ -82,6 +105,10 @@ else if ($section == 'student') {
     }
 
     $allHouse = new Collection(array_values($houses));
+
+    /* Schoolbox list
+     */
+    $schoolboxRoles = $roleMapper->findByColumn('group_type', 'student');
 }
 /* Parent
  */
@@ -100,18 +127,16 @@ else if ($section == 'parent') {
     }
 
     $allCampus = new Collection(array_values($campus));
+
+    /* Schoolbox list
+     */
+    $schoolboxRoles = $roleMapper->findByColumn('group_type', 'parent');
 }
 /* Default view
  */
 else {
     $section = 'intro';
 }
-
-/* The Schoolbox Lists
- */
-$campusMapper = new \Schoolbox\CampusMapper();
-$roleMapper = new \Schoolbox\RoleMapper();
-$houseMapper = new HouseMapper();
 
 /* Power to the phplib
  */
@@ -138,7 +163,11 @@ $this->setVar(array(
             'house' => array(
                 'external' => $allHouse,
                 'schoolbox' => $houseMapper->findAll()
-            )
+            ),
+            'role' => array(
+                'external' => $allRoles,
+                'schoolbox' => $schoolboxRoles,
+            ),
         ),
     ))
 ));
