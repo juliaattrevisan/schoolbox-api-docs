@@ -25,16 +25,16 @@ class Student extends Base {
      * Generate data
      */
     public function execute() {
-        $adapter = new Adapter(new \External_User());
-        $allPeople = $this->getAdapter()->getStudentUserAccountInfo();
 
         /* Find a list of all the campuses currently being used
          */
         $campus = array();
 
-        foreach($allPeople as $currentPeople) {
+        foreach($this->getAllPeople() as $currentPeople) {
             foreach($currentPeople->getCampus() as $currentCampus) {
-                $campus[$currentCampus->getName()] = $currentCampus;
+                if (strlen($currentCampus->getName())) {
+                    $campus[$currentCampus->getName()] = $currentCampus;
+                }
             }
         }
 
@@ -44,7 +44,7 @@ class Student extends Base {
          */
         $years = array();
 
-        foreach ($allPeople as $currentPeople) {
+        foreach ($this->getAllPeople() as $currentPeople) {
             $years[$currentPeople->getYear()->getLevel()] = $currentPeople->getYear();
         }
 
@@ -54,8 +54,10 @@ class Student extends Base {
          */
         $houses = array();
 
-        foreach ($allPeople as $currentPeople) {
-            $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+        foreach ($this->getAllPeople() as $currentPeople) {
+            if (strlen($currentPeople->getHouse()->getName())) {
+                $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+            }
         }
 
         $this->setExternalHouse(new Collection(array_values($houses)));

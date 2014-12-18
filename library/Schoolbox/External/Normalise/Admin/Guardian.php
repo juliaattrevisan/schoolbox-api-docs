@@ -32,7 +32,9 @@ class Guardian extends Base {
 
         foreach($this->getAllPeople() as $currentPeople) {
             foreach($currentPeople->getCampus() as $currentCampus) {
-                $campus[$currentCampus->getName()] = $currentCampus;
+                if (strlen($currentCampus->getName())) {
+                    $campus[$currentCampus->getName()] = $currentCampus;
+                }
             }
         }
 
@@ -53,7 +55,9 @@ class Guardian extends Base {
         $houses = array();
 
         foreach ($this->getAllPeople() as $currentPeople) {
-            $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+            if (strlen($currentPeople->getHouse()->getName())) {
+                $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+            }
         }
 
         $this->setExternalHouse(new Collection(array_values($houses)));
