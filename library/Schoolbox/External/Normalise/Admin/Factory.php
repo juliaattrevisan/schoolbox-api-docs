@@ -39,7 +39,9 @@ class Factory {
             case 'staff': return new Staff();
             case 'student': return new Student();
             case 'parent': return new Guardian();
-            default: return new Intro();
+            default:
+                $this->setSection('intro');
+                return new Intro();
         }
     }
 
