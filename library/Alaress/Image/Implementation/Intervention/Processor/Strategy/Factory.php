@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
+namespace Alaress\Image\Implementation\Intervention\Processor\Strategy;
 
 use Alaress\Image\Filetype\FiletypeInterface;
 use Alaress\Image\Processor\Strategy\FactoryInterface;

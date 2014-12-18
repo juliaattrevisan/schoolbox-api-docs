@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Rewrite\Intervention\Filetype;
+namespace Alaress\Image\Implementation\Intervention\Filetype;
 
 use Alaress\Image\Filetype\FactoryInterface;
 

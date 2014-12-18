@@ -13,7 +13,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Intervention\Processor\Strategy;
+namespace Alaress\Image\Implementation\Intervention\Processor\Strategy;
 
 use Intervention\Image\Image;
 
