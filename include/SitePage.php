@@ -1177,7 +1177,7 @@ class SitePage extends Page
                 if (is_array($row) || $row instanceof Traversable) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
-                        if (is_scalar($value)) {
+                        if (is_scalar($value) || is_null($value)) {
                             $this->setVar($key, Scrub::text($value));
                             if (in_array($value, $selected)) {
                                 $this->setVar($key . '_SELECTED', 'selected="selected"');
@@ -1195,7 +1195,7 @@ class SitePage extends Page
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get' . ucfirst($property);
                         $value      = $row->$get_method();
-                        if (is_scalar($value)) {
+                        if (is_scalar($value) || is_null($value)) {
                             $this->setVar($template_var, Scrub::text($value));
                             if (in_array($value, $selected)) {
                                 $this->setVar($template_var . '_SELECTED', 'selected="selected"');
