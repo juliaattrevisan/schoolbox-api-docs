@@ -17,12 +17,7 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
-/* Section - sanitise template loading
- * and load corresponding data
- */
-$section = strtolower($this->arg[0]);
-
-$factory = new Factory($section);
+$factory = new Factory($this->arg[0]);
 $processor = $factory->produce();
 $processor->execute();
 
@@ -34,7 +29,7 @@ $nav = new AdminV2_Nav();
 $nav->parse($this, 'synchronise');
 
 $this->setVar(array(
-    'CONTENT' => $this->getDi()->get('templateEngine')->render("adminv2/synchronise/{$section}.twig", array(
+    'CONTENT' => $this->getDi()->get('templateEngine')->render("adminv2/synchronise/{$factory->getSection()}.twig", array(
         'nav' => array(
             'section' => $factory->getSection(),
         ),

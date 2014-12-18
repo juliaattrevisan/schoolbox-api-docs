@@ -26,7 +26,7 @@ class Factory {
      * @param $section
      */
     public function __construct($section) {
-        $this->setSection($section);
+        $this->setSection(strtolower($section));
     }
 
     /**
