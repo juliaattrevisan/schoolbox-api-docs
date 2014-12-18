@@ -42,7 +42,10 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
 
         // Get next few days of bookings
         // Get only bookings for the current user
-        $days      = max(1, $this->getConfig('days'));
+        $days = $this->getConfig('days');
+        if ($days <= 0) {
+            $days = 30;
+        }
         $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
