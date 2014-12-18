@@ -9,7 +9,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Portrait
+
+namespace Alaress\Image;
+
+class Portrait
 {
 
     /**
@@ -31,12 +34,12 @@ class Alaress_Image_Portrait
 
         /* Choose a caching method to use
          */
-        $cache = new Alaress_Image_Cache_Portrait($externalUserId, $key);
+        $cache = new \Alaress_Image_Cache_Portrait($externalUserId, $key);
         $cache->purgeOldTransformations();
 
         /* Process and stream image
          */
-        $this->imageProcessor = new Alaress_Image_Processor_Standard(
+        $this->imageProcessor = new \Alaress_Image_Processor_Standard(
             $cache,
             $transformations,
             new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),

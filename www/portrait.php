@@ -17,7 +17,7 @@ require_once '../include/Bootstrap.php';
 session_start();
 
 try {
-	$image = new Alaress_Image_Portrait(trim($_GET['userId']), $_GET['size'], new Alaress_Image_Transformation_Portrait());
+	$image = new \Alaress\Image\Portrait(trim($_GET['userId']), $_GET['size'], new Alaress_Image_Transformation_Portrait());
 	$image->stream();
 }
 catch (Exception_Schoolbox_AccessDenied $e) {
