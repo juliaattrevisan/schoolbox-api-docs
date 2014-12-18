@@ -8,7 +8,6 @@
  * @version     SVN: $Id$
  */
 
-use \Schoolbox\Collection;
 use Schoolbox\External\Normalise\Admin\Factory;
 
 $groupHandler = new Group();
