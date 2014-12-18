@@ -17,7 +17,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Crop extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Crop extends BaseStrategy {
 	private $coordinates = array();
 
 	/**

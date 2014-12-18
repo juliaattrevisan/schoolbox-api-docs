@@ -10,7 +10,10 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  */
-class RotateOrientation extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class RotateOrientation extends BaseStrategy {
 
     private $filePath = '';
 

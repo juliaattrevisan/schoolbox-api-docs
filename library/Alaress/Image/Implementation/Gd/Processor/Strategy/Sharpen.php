@@ -9,7 +9,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Sharpen extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Sharpen extends BaseStrategy {
 
 	/**
 	 * Manipulate image

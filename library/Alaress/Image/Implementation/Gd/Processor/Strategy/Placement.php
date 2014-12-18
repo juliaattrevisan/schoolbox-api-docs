@@ -13,7 +13,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Placement extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Placement extends BaseStrategy {
 
 	/* Positioning of the image within the canvas
 	 */

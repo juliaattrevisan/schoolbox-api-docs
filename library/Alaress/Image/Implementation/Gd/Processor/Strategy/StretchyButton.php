@@ -21,7 +21,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class StretchyButton extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class StretchyButton extends BaseStrategy {
 	private $leftImage = null;
 	private $middleImage = null;
 	private $rightImage = null;

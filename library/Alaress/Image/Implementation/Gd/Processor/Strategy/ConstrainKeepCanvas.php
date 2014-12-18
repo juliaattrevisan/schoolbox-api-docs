@@ -14,7 +14,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class ConstrainKeepCanvas extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class ConstrainKeepCanvas extends BaseStrategy {
 
 	/**
 	 * Background colours are used for deciding transparency in pngs

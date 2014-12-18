@@ -9,7 +9,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Original extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Original extends BaseStrategy {
 
 	/**
 	 * Manipulate image

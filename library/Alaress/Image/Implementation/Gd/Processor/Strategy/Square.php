@@ -10,7 +10,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Square extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Square extends BaseStrategy {
 
 	/**
 	 * Constructor

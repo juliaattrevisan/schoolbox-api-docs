@@ -10,7 +10,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Rectangle extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Rectangle extends BaseStrategy {
 
 	/**
 	 * Images smaller than the canvas maintain their dimensions and don't

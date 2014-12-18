@@ -12,7 +12,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Constrain extends Abstract implements Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+class Constrain extends BaseStrategy {
 
 	/**
 	 * Constructor
