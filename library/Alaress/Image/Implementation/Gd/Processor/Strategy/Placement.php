@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Placement
+ * Placement
  *
  * Place an image on a canvas at one of the nine cardinal locations. Defaults to 'topleft'
  *
@@ -13,7 +13,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Placement extends Abstract implements Interface {
 
 	/* Positioning of the image within the canvas
 	 */

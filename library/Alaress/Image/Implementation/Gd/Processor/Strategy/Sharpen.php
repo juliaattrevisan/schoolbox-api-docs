@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Sharpen
+ * Sharpen
  *
  * Applies a cheap convolution matrix to sharpen images post-resize
  *
@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Sharpen extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Sharpen extends Abstract implements Interface {
 
 	/**
 	 * Manipulate image

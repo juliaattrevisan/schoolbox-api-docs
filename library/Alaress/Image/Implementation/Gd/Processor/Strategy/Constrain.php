@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Constrain
+ * Constrain
  *
  * Constrain an image to fit within a specified width and height
  *
@@ -12,7 +12,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Constrain extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Constrain extends Abstract implements Interface {
 
 	/**
 	 * Constructor

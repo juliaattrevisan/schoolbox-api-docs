@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Original
+ * Original
  *
  * Returns original image in original sizing
  *
@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Original extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Original extends Abstract implements Interface {
 
 	/**
 	 * Manipulate image

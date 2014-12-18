@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_StretchyButton
+ * StretchyButton
  *
  * Integration of standalone StretchyButton implementation at tools.alaress-dev.com.au
  * Originally made for Tom to make progressclaim buttons faster.
@@ -21,7 +21,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_StretchyButton extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class StretchyButton extends Abstract implements Interface {
 	private $leftImage = null;
 	private $middleImage = null;
 	private $rightImage = null;

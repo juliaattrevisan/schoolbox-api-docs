@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Abstract
+ * Abstract
  *
  * Canvas abstract. Used when you need to specify new dimensions for an image.
  *
@@ -9,7 +9,12 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+
+namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
+
+use Alaress\Image\Processor\Strategy\StrategyInterface;
+
+abstract class BaseStrategy implements StrategyInterface {
 
 	/* Canvas image resource
 	 */

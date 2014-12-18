@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Crop
+ * Crop
  *
  * Crops out a rectangle from an image. The boundaries of the cropping is defined in percentages rather than
  * pixels, as this will cater for multiple images of various dimensions needing to be cropped in the same way.
@@ -17,7 +17,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Crop extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Crop extends Abstract implements Interface {
 	private $coordinates = array();
 
 	/**
