@@ -173,10 +173,10 @@ abstract class Synchronise_Base_Strategy
             $existing = $this->userExists($newUser);
             if ($existing) {
                 // If the current user exists in Schoolbox, update them
-                $this->verbose_filter->performUpdate();
                 if ($this->perform_update) {
                     $newUser['id'] = $existing['uid'];
                     if ($this->user_handler->update($newUser)) {
+                        $this->verbose_filter->performUpdate();
                         $this->verbose_filter->incrementUpdated();
                     } else {
                         $this->verbose_filter->outputSkipMessage(
@@ -192,9 +192,9 @@ abstract class Synchronise_Base_Strategy
             } else {
                 // Perform action; report what happened
                 if ($this->perform_update) {
-                    $this->verbose_filter->performCreation();
                     $user_id = $this->user_handler->create($newUser);
                     if ($user_id) {
+                        $this->verbose_filter->performCreation();
                         $this->verbose_filter->incrementCreated();
                     } else {
                         // User wasn't created - output a fail message
