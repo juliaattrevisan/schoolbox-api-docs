@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Alaress\Image\Rewrite\Imagine\Filetype;
+namespace Alaress\Image\Implementation\Imagine\Filetype;
 
 class Gif extends BaseFiletype
 {

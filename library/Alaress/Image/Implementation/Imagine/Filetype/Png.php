@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Filetype;
+namespace Alaress\Image\Implementation\Imagine\Filetype;
 
 class Png extends BaseFiletype
 {

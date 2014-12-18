@@ -11,7 +11,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
 use Imagine\Filter\Basic\Autorotate;
 use Imagine\Image\ImageInterface;

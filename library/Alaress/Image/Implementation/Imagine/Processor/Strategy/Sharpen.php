@@ -1,8 +1,8 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Original
+ * Alaress_Image_Processor_Strategy_Sharpen
  *
- * Returns original image in original sizing
+ * Applies a cheap convolution matrix to sharpen images post-resize
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -10,11 +10,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
 use Imagine\Image\ImageInterface;
 
-class Original extends BaseStrategy
+class Sharpen extends BaseStrategy
 {
     /**
      * {@inheritdoc}
@@ -23,6 +23,7 @@ class Original extends BaseStrategy
      */
     public function manipulate($image)
     {
+        $image->effects()->sharpen();
         return $image;
     }
 }

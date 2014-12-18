@@ -14,7 +14,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
 use Imagine\Filter\Advanced\Canvas;
 use Imagine\Image\Box;

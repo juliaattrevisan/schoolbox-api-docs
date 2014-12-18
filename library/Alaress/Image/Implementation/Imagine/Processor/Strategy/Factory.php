@@ -7,11 +7,11 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
 use Alaress\Image\Filetype\FiletypeInterface;
 use Alaress\Image\Processor\Strategy\FactoryInterface;
-use Alaress\Image\Rewrite\Imagine\Filetype\BaseFiletype;
+use Alaress\Image\Implementation\Imagine\Filetype\BaseFiletype;
 
 class Factory implements FactoryInterface
 {

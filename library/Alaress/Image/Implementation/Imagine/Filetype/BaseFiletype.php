@@ -8,7 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Filetype;
+namespace Alaress\Image\Implementation\Imagine\Filetype;
 
 use Alaress\Image\Filetype\FiletypeInterface;
 use Imagine\Image\ImageInterface;

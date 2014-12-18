@@ -24,8 +24,8 @@ try {
     $imageProcessor = new Alaress_Image_Processor_Freeform(
         new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
         $transform,
-        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
+        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
+        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
     );
 
     if (isset($transform_key)) {

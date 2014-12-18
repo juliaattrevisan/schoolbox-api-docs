@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Image\Rewrite\Imagine\Processor\Strategy;
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
 use Alaress\Image\Processor\Strategy\StrategyInterface;
 use Imagine\Image\BoxInterface;
