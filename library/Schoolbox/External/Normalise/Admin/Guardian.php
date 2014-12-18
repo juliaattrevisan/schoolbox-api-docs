@@ -45,7 +45,9 @@ class Guardian extends Base {
         $years = array();
 
         foreach ($this->getAllPeople() as $currentPeople) {
-            $years[$currentPeople->getYear()->getLevel()] = $currentPeople->getYear();
+            foreach ($currentPeople->getStudents() as $currentStudent) {
+                $years[$currentStudent->getYear()->getLevel()] = $currentStudent->getYear();
+            }
         }
 
         $this->setExternalYear(new Collection(array_values($years)));
@@ -55,8 +57,10 @@ class Guardian extends Base {
         $houses = array();
 
         foreach ($this->getAllPeople() as $currentPeople) {
-            if (strlen($currentPeople->getHouse()->getName())) {
-                $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+            foreach ($currentPeople->getStudents() as $currentStudent) {
+                if (strlen($currentStudent->getHouse()->getName())) {
+                    $houses[$currentStudent->getHouse()->getName()] = $currentStudent->getHouse();
+                }
             }
         }
 
