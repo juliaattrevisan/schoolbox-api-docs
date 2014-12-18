@@ -1,13 +1,16 @@
 <?php
 /**
- * Alaress_Image_Filetype_Gif
+ * Gif
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Filetype_Gif extends Alaress_Image_Filetype_Abstract {
+
+namespace Alaress\Image\Implementation\Gd\Filetype;
+
+class Gif extends BaseFiletype {
 
     /**
      * Create an image
