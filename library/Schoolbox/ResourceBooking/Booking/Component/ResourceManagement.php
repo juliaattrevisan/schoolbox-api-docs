@@ -19,7 +19,8 @@ use Twig_Environment;
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
 
-class ResourceManagement extends Component_Dashboard_ControllerAbstract {
+class ResourceManagement extends Component_Dashboard_ControllerAbstract
+{
 
     /**
      * @var Booking\Mapper
@@ -36,7 +37,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
      */
     protected $bookings;
 
-    public function execute() {
+    public function execute()
+    {
         $this->templateEngine = $this->sitepage->getDi()->get('templateEngine');
         $this->bookingMapper  = Booking\Mapper::getInstance();
 
@@ -46,7 +48,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         if ($days <= 0) {
             $days = 30;
         }
-        $startTime = strtotime("00:00",            $_SERVER['REQUEST_TIME']);
+        $startTime = strtotime("00:00", $_SERVER['REQUEST_TIME']);
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
@@ -86,7 +88,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         return true;
     }
 
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
 
         // Don't mess about with blocks, shove this into Twig
         if (!$this->loadTemplate($templateHandle, 'resourceManagement')) {
@@ -110,5 +113,4 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract {
         return true;
 
     }
-
 }
