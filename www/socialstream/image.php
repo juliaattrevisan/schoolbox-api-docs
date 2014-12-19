@@ -31,7 +31,7 @@ $cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 try {
     $processor = new \Alaress_Image_Processor_Standard(
         $cache,
-        new \Alaress_Image_Transformation_Storage(),
+        new \Alaress\Image\Transformation\Storage(),
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
         new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
     );

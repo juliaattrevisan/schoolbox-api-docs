@@ -45,13 +45,13 @@ $cache_key     = '';
 switch ($_GET['transform_type']) {
     case 'portrait':
         $path          = '/images/core/placeholder.png';
-        $transform     = new Alaress_Image_Transformation_Portrait();
+        $transform     = new \Alaress\Image\Transformation\Portrait();
         $transform_key = $_GET['transform'];
         $cache_key     = "portrait-$transform_key";
         break;
 
     case 'storage':
-        $transform     = new Alaress_Image_Transformation_Storage();
+        $transform     = new \Alaress\Image\Transformation\Storage();
         $transform_key = $_GET['transform'];
         $cache_key     = "storage-$transform_key";
         break;
@@ -59,7 +59,7 @@ switch ($_GET['transform_type']) {
     default:
         $width     = intval($_GET['width'])  ?: 100;
         $height    = intval($_GET['height']) ?: 100;
-        $transform = new Alaress_Image_Transformation_MyImage($width, $height);
+        $transform = new \Alaress\Image\Transformation\MyImage($width, $height);
         $cache_key = "{$width}x{$height}";
         break;
 }

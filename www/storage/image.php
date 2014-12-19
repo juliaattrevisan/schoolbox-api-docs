@@ -15,7 +15,11 @@ try {
 		$resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
 
 		if ($resource != false) {
-			$image = new Alaress\Image\Storage($resource, $_GET['size'], new Alaress_Image_Transformation_Storage());
+			$image = new Alaress\Image\Storage(
+                $resource,
+                $_GET['size'],
+                new \Alaress\Image\Transformation\Storage()
+            );
 			exit;
 		}
 	}
