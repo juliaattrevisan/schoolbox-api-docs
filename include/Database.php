@@ -173,12 +173,16 @@ class Database implements Serializable {
      * returned by the statement as a PDOStatement object.
      *
      * @param String $statement
+     * @param array  $args
      * @return PDOStatement
      */
-    public function query($statement) {
-
-        return $this->connection->query($statement);
-
+    public function query($statement, $args = null) {
+        if (empty($args)) {
+            return $this->connection->query($statement);
+        }
+        $stmt = $this->prepare($statement);
+        $stmt->execute($args);
+        return $stmt;
     }
 
     /**
