@@ -49,21 +49,25 @@ class PipeCollection {
 	public function registerPipe(Pipe $pipe) {
 		$socketKey = $pipe->getSocketKey();
 		$sessionId = $pipe->getSession();
+        $remember  = $pipe->getCookie('remember');
 
 		try {
-			if(!$sessionId) {
-				throw new SessionException("No session, no user.");
+			if(!($sessionId || $remember)) {
+				throw new SessionException("No session or remember-me token, no user.");
 			}
 
 			$this->pipesBySocketKey[$socketKey] = $pipe;
 			$this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
 			$this->log->debug("LINK       '$socketKey' -> SESSION '$sessionId'");
 
-			if($userId = $this->validator->findUserIdBySessionId($sessionId)) {
-				$pipe->setUserId($userId);
-				$this->pipesByUserId[$userId][$socketKey] = $pipe;
-				$this->log->debug("LINK       '$socketKey' -> USER    '$userId'");
-			}
+            // give preference to remember-me, since it lasts longer (and doesn't throw exceptions)
+            if (!$userId = $this->validator->findUserIdByRememberMe($remember)) {
+                $userId = $this->validator->findUserIdBySessionId($sessionId);
+            }
+
+            $pipe->setUserId($userId);
+            $this->pipesByUserId[$userId][$socketKey] = $pipe;
+            $this->log->debug("LINK       '$socketKey' -> USER    '$userId'");
 		}
 		catch(SessionException $e) {
 			$this->unregisterPipe($socketKey);
