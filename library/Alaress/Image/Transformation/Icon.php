@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\Realtime\Message\NSMapper;
 
 /**
  * 
@@ -9,7 +8,11 @@ use Schoolbox\Realtime\Message\NSMapper;
  * @version     SVN: $Id$
  */
 
-class Alaress_Image_Transformation_Icon extends Alaress_Image_Transformation_Abstract {
+namespace Alaress\Image\Transformation;
+
+use Schoolbox\Realtime\Message\NSMapper;
+
+class Icon extends Alaress_Image_Transformation_Abstract {
 
 	/**
 	 * Create the list of valid transforms

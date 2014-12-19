@@ -7,7 +7,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Transformation_Abstract {
+
+namespace Alaress\Image\Transformation;
+
+class Abstract {
 	protected $allTransformations = array();
 
 	/**
