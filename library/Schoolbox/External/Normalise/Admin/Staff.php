@@ -45,8 +45,8 @@ class Staff extends Base {
         $roles = array();
 
         foreach($this->getAllPeople() as $currentPeople) {
-            if (strlen($currentPeople->getMeta()->getType())) {
-                $roles[$currentPeople->getMeta()->getType()] = $currentPeople->getMeta();
+            if (strlen($currentPeople->getMeta()->getCategory()->getType())) {
+                $roles[$currentPeople->getMeta()->getCategory()->getType()] = $currentPeople->getMeta()->getCategory();
             }
         }
 

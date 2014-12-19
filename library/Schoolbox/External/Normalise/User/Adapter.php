@@ -1090,9 +1090,10 @@ class Adapter  implements \External_UserInterface {
 
         $staff = new Staff();
         $staff
-            ->setCode($currentResult['SchoolStaffCode'])
             ->getMeta()
                 ->setExtension($currentResult['StaffExtension'])
+                ->getCategory()
+                    ->setCode($currentResult['SchoolStaffCode'])
         ;
 
         $staff
@@ -1146,18 +1147,23 @@ class Adapter  implements \External_UserInterface {
 
                 $staff
                     ->setId($currentResult['StaffID'])
-                    ->setCode($currentResult['SchoolStaffCode'])
                     ->setTitle($currentResult['StaffTitle'])
                     ->setPreferredName($currentResult['StaffPreferredName'])
                     ->setLastname($currentResult['StaffSurname'])
                     ->getMeta()
-                        ->setType($currentResult['StaffCategoryType'])
                         ->setDepartment($currentResult['StaffDepartment'])
                         ->setExtension($currentResult['StaffExtension'])
                         ->getPosition()
                             ->setDescription($currentResult['JobPositionDescription'])
                             ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'y-m-d h:i:s'))
                             ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'y-m-d h:i:s'))
+                ;
+
+                $staff
+                    ->getMeta()
+                        ->getCategory()
+                            ->setCode($currentResult['SchoolStaffCode'])
+                            ->setType($currentResult['StaffCategoryType'])
                 ;
 
                 /* Phone
@@ -1217,8 +1223,13 @@ class Adapter  implements \External_UserInterface {
                     ->setPreferredName($currentResult['StaffPreferredName'])
                     ->setLastname($currentResult['StaffSurname'])
                     ->getMeta()
-                        ->setType($currentResult['StaffCategoryType'])
                         ->setDepartment($currentResult['StaffDepartment'])
+                ;
+
+                $staff
+                    ->getMeta()
+                        ->getCategory()
+                            ->setType($currentResult['StaffCategoryType'])
                 ;
 
                 /* Account

@@ -9,16 +9,16 @@
  */
 
 namespace Schoolbox\External\Normalise\User\Staff;
-
+use Schoolbox\External\Normalise\User\Staff\Category;
 
 class Meta {
 
     /**
-     * Category type (type of staff)
+     * An instance of Category
      *
-     * @var string
+     * @var Category
      */
-    private $type = '';
+    private $category = null;
 
     /**
      * Department name
@@ -74,6 +74,7 @@ class Meta {
      */
     protected function setup() {
         $this->setPosition(new Position());
+        $this->setCategory(new Category());
     }
 
     /* Getters/Setters
@@ -231,5 +232,27 @@ class Meta {
     public function getVoicemail()
     {
         return $this->voicemail;
+    }
+
+    /**
+     * Set category
+     *
+     * @param Category $category
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * Get category
+     *
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
     }
 }
