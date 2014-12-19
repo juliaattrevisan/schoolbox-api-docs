@@ -27,7 +27,7 @@ class Storage
 
         /* Choose a caching method to use
          */
-        $cache = new \Alaress_Image_Cache_Storage($resource, $key);
+        $cache = new Cache\Storage($resource, $key);
 
         /* Process and stream image
          */

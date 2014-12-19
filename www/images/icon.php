@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Image\Cache\Filesystem;
 use Alaress\Image\Processor\Freeform;
 
 require_once __DIR__.'/../../include/Bootstrap.php';
@@ -24,7 +25,7 @@ try {
     $cache_key = "$icon-$size";
 
     $imageProcessor = new Freeform(
-        new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
+        new Filesystem(WEB_root.$path, $cache_key),
         $transform,
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
         new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()

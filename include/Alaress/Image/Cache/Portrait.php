@@ -7,7 +7,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
+
+namespace Alaress\Image\Cache;
+
+class Portrait implements CacheInterface
+{
 
     /* The image to load
       */
@@ -57,13 +61,13 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
 
     /**
      * Constructor
-     *
      * Remembers what image you are trying to load from cache
      *
      * @param $externalUserId
      * @param $key
      */
-    public function __construct($externalUserId, $key) {
+    public function __construct($externalUserId, $key)
+    {
         $this->setExternalUserId($externalUserId);
         $this->setKey($key);
 
@@ -72,7 +76,7 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
         $this->setGroupHandler(new Group());
 
         $this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
-        $this->setCacheLocation(Cfg::get('stream_dir').'/portrait');
+        $this->setCacheLocation(Cfg::get('stream_dir') . '/portrait');
 
         $this->loadPortraitPath();
     }
@@ -85,7 +89,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *                                          permission to view portrait of
      *                                          this user
      */
-    private function loadPortraitPath() {
+    private function loadPortraitPath()
+    {
 
         /* If you are able to view this portrait, try finding image file
            * Otherwise use a placeholder image instead
@@ -97,12 +102,10 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
                 */
             if ($portraitPath) {
                 $this->setFilename($portraitPath);
-            }
-            else {
+            } else {
                 throw new Exception_Schoolbox_NotFound('Portrait not found');
             }
-        }
-        else {
+        } else {
             throw new Exception_Schoolbox_AccessDenied('Cannot view image');
         }
     }
@@ -110,7 +113,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
     /**
      * Purges transformations that are older than the portrait in $portraitPath.
      */
-    public function purgeOldTransformations() {
+    public function purgeOldTransformations()
+    {
         $portraitPath = $this->filename;
         if (!empty($portraitPath)) {
             $portraitAge  = filemtime($portraitPath);
@@ -129,7 +133,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return bool
      */
-    private function canViewImage() {
+    private function canViewImage()
+    {
 
         /* Staff members can always see all portraits
            */
@@ -184,13 +189,14 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      * @throws Exception_Schoolbox_NotFound if file isn't found
      * @return mixed
      */
-    public function load() {
+    public function load()
+    {
         if (file_exists($this->getFilename())) {
             $info = getimagesize($this->getFilename());
 
             $info['filepath'] = $this->getFilename();
             $info['filename'] = basename($this->getFilename());
-            $info['size'] = filesize($this->getFilename());
+            $info['size']     = filesize($this->getFilename());
 
             /* We do this step if we are using Filesystem Cache directly
              */
@@ -214,15 +220,14 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
             if (file_exists($this->getCachedFileLocation())) {
                 $this->setLoadedFromCache(true);
 
-                $info = getimagesize($this->getCachedFileLocation());
+                $info             = getimagesize($this->getCachedFileLocation());
                 $info['filepath'] = $this->getCachedFileLocation();
                 $info['filename'] = $cachedFilename;
-                $info['size'] = filesize($this->getCachedFileLocation());
+                $info['size']     = filesize($this->getCachedFileLocation());
             }
 
             return $this->standardise($info);
-        }
-        else {
+        } else {
             throw new Exception_Schoolbox_NotFound(sprintf('Could not read file "%s"', $this->getFilename()));
         }
     }
@@ -231,15 +236,17 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      * Standard temporary interface
      *
      * @param $imageArray
+     *
      * @return array
      */
-    public function standardise($imageArray) {
+    public function standardise($imageArray)
+    {
         return array(
-            'fileID' => $imageArray['filename'],
+            'fileID'   => $imageArray['filename'],
             'filepath' => $imageArray['filepath'],
             'filename' => $imageArray['filename'],
-            'mime' => $imageArray['mime'],
-            'size' => $imageArray['size'],
+            'mime'     => $imageArray['mime'],
+            'size'     => $imageArray['size'],
         );
     }
 
@@ -249,7 +256,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $loadedFromCache
      */
-    private function setLoadedFromCache($loadedFromCache) {
+    private function setLoadedFromCache($loadedFromCache)
+    {
         if ($loadedFromCache === false) {
             $this->loadedFromCache = $loadedFromCache;
         } else {
@@ -262,7 +270,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return bool
      */
-    public function isLoadedFromCache() {
+    public function isLoadedFromCache()
+    {
         return $this->loadedFromCache;
     }
 
@@ -274,7 +283,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $filename
      */
-    private function setFilename($filename) {
+    private function setFilename($filename)
+    {
         $this->filename = $filename;
     }
 
@@ -283,7 +293,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return null
      */
-    private function getFilename() {
+    private function getFilename()
+    {
         return $this->filename;
     }
 
@@ -292,7 +303,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $key
      */
-    private function setKey($key) {
+    private function setKey($key)
+    {
         $this->key = $key;
     }
 
@@ -301,7 +313,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return null
      */
-    public function getKey() {
+    public function getKey()
+    {
         return $this->key;
     }
 
@@ -310,7 +323,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $cacheLocation
      */
-    private function setCacheLocation($cacheLocation) {
+    private function setCacheLocation($cacheLocation)
+    {
         $this->cacheLocation = $cacheLocation;
     }
 
@@ -319,7 +333,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    private function getCacheLocation() {
+    private function getCacheLocation()
+    {
         return $this->cacheLocation;
     }
 
@@ -328,7 +343,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $cachedFileLocation
      */
-    private function setCachedFileLocation($cachedFileLocation) {
+    private function setCachedFileLocation($cachedFileLocation)
+    {
         $this->cachedFileLocation = $cachedFileLocation;
     }
 
@@ -337,7 +353,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    public function getCachedFileLocation() {
+    public function getCachedFileLocation()
+    {
         return $this->cachedFileLocation;
     }
 
@@ -346,7 +363,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $placeholder
      */
-    private function setPlaceholder($placeholder) {
+    private function setPlaceholder($placeholder)
+    {
         $this->placeholder = $placeholder;
     }
 
@@ -355,7 +373,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    private function getPlaceholder() {
+    private function getPlaceholder()
+    {
         return $this->placeholder;
     }
 
@@ -364,7 +383,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $groupHandler
      */
-    private function setGroupHandler($groupHandler) {
+    private function setGroupHandler($groupHandler)
+    {
         $this->groupHandler = $groupHandler;
     }
 
@@ -373,7 +393,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return null
      */
-    private function getGroupHandler() {
+    private function getGroupHandler()
+    {
         return $this->groupHandler;
     }
 
@@ -382,7 +403,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param External_User $externalHandler
      */
-    private function setExternalHandler($externalHandler) {
+    private function setExternalHandler($externalHandler)
+    {
         $this->externalHandler = $externalHandler;
     }
 
@@ -391,7 +413,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return External_User
      */
-    private function getExternalHandler() {
+    private function getExternalHandler()
+    {
         return $this->externalHandler;
     }
 
@@ -421,7 +444,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @return mixed
      */
-    private function getExternalUserId() {
+    private function getExternalUserId()
+    {
         return $this->externalUserId;
     }
 
@@ -430,7 +454,8 @@ class Alaress_Image_Cache_Portrait implements Alaress_Image_Cache_Interface {
      *
      * @param $externalUserId
      */
-    private function setExternalUserId($externalUserId) {
+    private function setExternalUserId($externalUserId)
+    {
         $this->externalUserId = $externalUserId;
     }
 }

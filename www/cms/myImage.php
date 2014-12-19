@@ -7,6 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Alaress\Image\Cache\MyImage;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Processor\Standard;
 
@@ -43,7 +44,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 	 */
     $key = $_GET['width'] . 'x' . $_GET['height'];
 
-    $cache = new Alaress_Image_Cache_MyImage($_GET['id'], $key);
+    $cache = new MyImage($_GET['id'], $key);
 
     /* Process and stream image
 	 */
@@ -66,7 +67,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
         SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 403);
     }
 
-    $cache = new Alaress_Image_Cache_MyImage($_GET['id'], $_GET['key']);
+    $cache = new MyImage($_GET['id'], $_GET['key']);
 
     /* Process and stream image
 	 */

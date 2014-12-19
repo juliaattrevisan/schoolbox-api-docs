@@ -1,0 +1,41 @@
+<?php
+/**
+ * Defines an interface for image caching.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Alaress\Image\Cache;
+
+interface CacheInterface
+{
+    /**
+     * Loads an image somehow.
+     *
+     * @return array
+     */
+    public function load();
+
+    /**
+     * Find out whether we loaded from cache or not
+     *
+     * @return bool
+     */
+    public function isLoadedFromCache();
+
+    /**
+     * Get cache key for this item.
+     *
+     * @return string
+     */
+    public function getKey();
+
+    /**
+     * Get cache file location.
+     *
+     * @return string
+     */
+    public function getCachedFileLocation();
+}

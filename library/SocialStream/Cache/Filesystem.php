@@ -11,7 +11,7 @@
  */
 namespace SocialStream\Cache;
 
-class Filesystem extends \Alaress_Image_Cache_Filesystem {
+class Filesystem extends \Alaress\Image\Cache\Filesystem {
 
 	/**
 	 * Constructor

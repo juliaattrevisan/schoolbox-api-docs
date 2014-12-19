@@ -1,246 +1,265 @@
 <?php
 /**
  * Alaress_Image_Cache_Menclone
- *
  * Load images from the cache in the Menclone manner
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Alaress_Image_Cache_Menclone implements Alaress_Image_Cache_Interface {
-	public $_table = 'file';
-	public $_index = 'fileID';
 
-	/* The image to load
-	 */
-	private $imageId = null;
+namespace Alaress\Image\Cache;
 
-	/* The $key is a way to uniquely associate a cached image with a particular
-	 * series of transformations applied to it. In this caching implementation,
-	 * it's the fileID concatenated with the name of the transformation applied.
-	 *
-	 * e.g. 51-Web.dat
-	 */
-	private $key = null;
+class Menclone implements CacheInterface
+{
+    public $_table = 'file';
+    public $_index = 'fileID';
 
-	/* This is where original images are stored
-	 */
-	private $originalsLocation = '../data/file';
+    /* The image to load
+     */
+    private $imageId = null;
 
-	/* This is where cached images are stored
-	 */
-	private $cacheLocation = '../cache/image';
+    /* The $key is a way to uniquely associate a cached image with a particular
+     * series of transformations applied to it. In this caching implementation,
+     * it's the fileID concatenated with the name of the transformation applied.
+     *
+     * e.g. 51-Web.dat
+     */
+    private $key = null;
 
-	/* The filepath for processed image output
-	 * Defaults to /tmp if it couldn't figure out where the file goes
-	 */
-	private $cachedFileLocation = '/tmp';
+    /* This is where original images are stored
+     */
+    private $originalsLocation = '../data/file';
 
-	/* Remember whether we loaded from the cached file. If it was loaded from the
-	 * cache, we can skip transformations as we assume they have been done in the past.
-	 * Otherwise we would be re-transforming an already-transformed image repeatedly
-	 */
-	private $loadedFromCache = false;
+    /* This is where cached images are stored
+     */
+    private $cacheLocation = '../cache/image';
 
-	/**
-	 * Constructor
-	 *
-	 * Remembers what image you are trying to load from cache
-	 *
-	 * @param $imageId
-	 * @param $key
-	 */
-	public function __construct($imageId, $key) {
+    /* The filepath for processed image output
+     * Defaults to /tmp if it couldn't figure out where the file goes
+     */
+    private $cachedFileLocation = '/tmp';
 
-		/* Do that Model stuff
-		 */
-		parent::__construct();
+    /* Remember whether we loaded from the cached file. If it was loaded from the
+     * cache, we can skip transformations as we assume they have been done in the past.
+     * Otherwise we would be re-transforming an already-transformed image repeatedly
+     */
+    private $loadedFromCache = false;
 
-		$this->setImageId($imageId);
-		$this->setKey($key);
-	}
+    /**
+     * Constructor
+     * Remembers what image you are trying to load from cache
+     *
+     * @param $imageId
+     * @param $key
+     */
+    public function __construct($imageId, $key)
+    {
 
-	/**
-	 * Load an image by an id
-	 *
-	 * @return mixed
-	 */
-	public function load() {
+        /* Do that Model stuff
+         */
+        parent::__construct();
 
-		/* If this particular transformation key existed at some point,
-		 * this is what it's name would be
-		 *
-		 * e.g. 51-Web.dat, 51-ChickenPox.dat, etc. where Web and ChickenPox
-		 * correspond to a series of transformations
-		 */
-		$cachedFilename = $this->getImageId() . '-' . $this->getKey() . '.dat';
+        $this->setImageId($imageId);
+        $this->setKey($key);
+    }
 
-		/* This is where you'd find it in the filesystem if it existed previously
-		 */
-		$this->setCachedFileLocation($this->getCacheLocation() . '/' . $cachedFilename);
+    /**
+     * Load an image by an id
+     *
+     * @return mixed
+     */
+    public function load()
+    {
 
-		/* If it exists in the cache, just use the Filesystem cache method instead
-		 * as it understands how to load directly from the filesystem
-		 */
-		if (file_exists($this->getCachedFileLocation())) {
-			$this->setLoadedFromCache(true);
+        /* If this particular transformation key existed at some point,
+         * this is what it's name would be
+         *
+         * e.g. 51-Web.dat, 51-ChickenPox.dat, etc. where Web and ChickenPox
+         * correspond to a series of transformations
+         */
+        $cachedFilename = $this->getImageId() . '-' . $this->getKey() . '.dat';
 
-			return $this->loadPreviouslyCachedFile($this->getCachedFileLocation());
-		}
+        /* This is where you'd find it in the filesystem if it existed previously
+         */
+        $this->setCachedFileLocation($this->getCacheLocation() . '/' . $cachedFilename);
 
-		$imageArray = $this->getByID($this->getImageId());
+        /* If it exists in the cache, just use the Filesystem cache method instead
+         * as it understands how to load directly from the filesystem
+         */
+        if (file_exists($this->getCachedFileLocation())) {
+            $this->setLoadedFromCache(true);
 
-		/* Otherwise continue with this cache implementation
-		 */
-		return $this->standardise($imageArray);
-	}
+            return $this->loadPreviouslyCachedFile($this->getCachedFileLocation());
+        }
 
-	/**
-	 * If it was found in the cache, load this one instead of trying to make a new one
-	 *
-	 * @param $cachedFileLocation
-	 * @return mixed
-	 */
-	private function loadPreviouslyCachedFile($cachedFileLocation) {
-		$alternateCache = new Alaress_Image_Cache_Filesystem($cachedFileLocation, $this->getKey());
+        $imageArray = $this->getByID($this->getImageId());
 
-		return $alternateCache->load();
-	}
+        /* Otherwise continue with this cache implementation
+         */
+        return $this->standardise($imageArray);
+    }
 
-	/**
-	 * Standard temporary interface
-	 *
-	 * @param $imageArray
-	 * @return array
-	 */
-	public function standardise($imageArray) {
-		return array(
-			'fileID' => $imageArray['fileID'],
-			'filepath' => $this->getOriginalsLocation() . '/' . $imageArray['fileID'] . '.dat',
-			'filename' => $imageArray['filename'],
-			'mime' => $imageArray['mime'],
-			'size' => $imageArray['size'],
-		);
-	}
+    /**
+     * If it was found in the cache, load this one instead of trying to make a new one
+     *
+     * @param $cachedFileLocation
+     *
+     * @return mixed
+     */
+    private function loadPreviouslyCachedFile($cachedFileLocation)
+    {
+        $alternateCache = new Filesystem($cachedFileLocation, $this->getKey());
 
-	/* Getters/Setters
-	 */
+        return $alternateCache->load();
+    }
 
-	/**
-	 * Set image id
-	 *
-	 * @param $imageId
-	 */
-	private function setImageId($imageId) {
-		$this->imageId = $imageId;
-	}
+    /**
+     * Standard temporary interface
+     *
+     * @param $imageArray
+     *
+     * @return array
+     */
+    public function standardise($imageArray)
+    {
+        return array(
+            'fileID'   => $imageArray['fileID'],
+            'filepath' => $this->getOriginalsLocation() . '/' . $imageArray['fileID'] . '.dat',
+            'filename' => $imageArray['filename'],
+            'mime'     => $imageArray['mime'],
+            'size'     => $imageArray['size'],
+        );
+    }
 
-	/**
-	 * Get image id
-	 *
-	 * @return null
-	 */
-	private function getImageId() {
-		return $this->imageId;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set key
-	 *
-	 * @param $key
-	 */
-	private function setKey($key) {
-		$this->key = $key;
-	}
+    /**
+     * Set image id
+     *
+     * @param $imageId
+     */
+    private function setImageId($imageId)
+    {
+        $this->imageId = $imageId;
+    }
 
-	/**
-	 * Get key
-	 *
-	 * @return null
-	 */
-	public function getKey() {
-		return $this->key;
-	}
+    /**
+     * Get image id
+     *
+     * @return null
+     */
+    private function getImageId()
+    {
+        return $this->imageId;
+    }
 
-	/**
-	 * Set cache location
-	 *
-	 * @param $cacheLocation
-	 */
-	private function setCacheLocation($cacheLocation) {
-		$this->cacheLocation = $cacheLocation;
-	}
+    /**
+     * Set key
+     *
+     * @param $key
+     */
+    private function setKey($key)
+    {
+        $this->key = $key;
+    }
 
-	/**
-	 * Get cache location
-	 *
-	 * @return string
-	 */
-	private function getCacheLocation() {
-		return $this->cacheLocation;
-	}
+    /**
+     * Get key
+     *
+     * @return null
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
 
-	/**
-	 * Set cached file location
-	 *
-	 * @param $cachedFileLocation
-	 */
-	private function setCachedFileLocation($cachedFileLocation) {
-		$this->cachedFileLocation = $cachedFileLocation;
-	}
+    /**
+     * Set cache location
+     *
+     * @param $cacheLocation
+     */
+    private function setCacheLocation($cacheLocation)
+    {
+        $this->cacheLocation = $cacheLocation;
+    }
 
-	/**
-	 * Get cached file location
-	 *
-	 * @return string
-	 */
-	public function getCachedFileLocation() {
-		return $this->cachedFileLocation;
-	}
+    /**
+     * Get cache location
+     *
+     * @return string
+     */
+    private function getCacheLocation()
+    {
+        return $this->cacheLocation;
+    }
 
-	/**
-	 * Set original image location
-	 *
-	 * @param $originalsLocation
-	 */
-	private function setOriginalsLocation($originalsLocation) {
-		$this->originalsLocation = $originalsLocation;
-	}
+    /**
+     * Set cached file location
+     *
+     * @param $cachedFileLocation
+     */
+    private function setCachedFileLocation($cachedFileLocation)
+    {
+        $this->cachedFileLocation = $cachedFileLocation;
+    }
 
-	/**
-	 * Get original image location
-	 *
-	 * @return string
-	 */
-	private function getOriginalsLocation() {
-		return $this->originalsLocation;
-	}
+    /**
+     * Get cached file location
+     *
+     * @return string
+     */
+    public function getCachedFileLocation()
+    {
+        return $this->cachedFileLocation;
+    }
 
-	/**
-	 * Set loaded from cache
-	 * Enforce boolean
-	 *
-	 * @param $loadedFromCache
-	 */
-	private function setLoadedFromCache($loadedFromCache) {
-		if ($loadedFromCache === false) {
-			$this->loadedFromCache = $loadedFromCache;
-		}
-		else {
-			$this->loadedFromCache = true;
-		}
-	}
+    /**
+     * Set original image location
+     *
+     * @param $originalsLocation
+     */
+    private function setOriginalsLocation($originalsLocation)
+    {
+        $this->originalsLocation = $originalsLocation;
+    }
 
-	/**
-	 * Find out whether we loaded from cache or not
-	 *
-	 * @return bool
-	 */
-	public function isLoadedFromCache() {
-		return $this->loadedFromCache;
-	}
+    /**
+     * Get original image location
+     *
+     * @return string
+     */
+    private function getOriginalsLocation()
+    {
+        return $this->originalsLocation;
+    }
+
+    /**
+     * Set loaded from cache
+     * Enforce boolean
+     *
+     * @param $loadedFromCache
+     */
+    private function setLoadedFromCache($loadedFromCache)
+    {
+        if ($loadedFromCache === false) {
+            $this->loadedFromCache = $loadedFromCache;
+        } else {
+            $this->loadedFromCache = true;
+        }
+    }
+
+    /**
+     * Find out whether we loaded from cache or not
+     *
+     * @return bool
+     */
+    public function isLoadedFromCache()
+    {
+        return $this->loadedFromCache;
+    }
 }
 
 

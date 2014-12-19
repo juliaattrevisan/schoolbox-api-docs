@@ -34,7 +34,7 @@ class Portrait
 
         /* Choose a caching method to use
          */
-        $cache = new \Alaress_Image_Cache_Portrait($externalUserId, $key);
+        $cache = new Cache\Portrait($externalUserId, $key);
         $cache->purgeOldTransformations();
 
         /* Process and stream image

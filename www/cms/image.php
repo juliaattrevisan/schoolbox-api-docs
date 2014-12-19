@@ -7,6 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Alaress\Image\Cache\Image;
 use Alaress\Image\Processor\Freeform;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
@@ -40,7 +41,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
  */
 $key = $_GET['width'] . 'x' . $_GET['height'];
 
-$cache = new Alaress_Image_Cache_Image($_GET['id'], $key);
+$cache = new Image($_GET['id'], $key);
 
 /* Process and stream image
  */

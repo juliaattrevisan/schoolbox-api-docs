@@ -1,7 +1,10 @@
 <?php
 
 
-class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
+namespace Alaress\Image\Cache;
+
+class Storage implements CacheInterface
+{
 
     /* The image to load
       */
@@ -43,19 +46,18 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
 
     /**
      * Constructor
-     *
      * Remembers what image you are trying to load from cache
      *
      * @param Schoolbox\Storage $resource
-     * @param string         $key
-     *
+     * @param string            $key
      */
-    public function __construct($resource, $key) {
+    public function __construct($resource, $key)
+    {
 
         $this->resource = $resource;
         $this->setImageId($resource->getId());
         $this->setKey($key);
-        $this->setCacheLocation(Cfg::get('stream_dir').'/storage');
+        $this->setCacheLocation(Cfg::get('stream_dir') . '/storage');
     }
 
     /**
@@ -63,7 +65,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return mixed
      */
-    public function load() {
+    public function load()
+    {
 
         /* If this particular transformation key existed at some point,
            * this is what it's name would be
@@ -95,10 +98,12 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      * If it was found in the cache, load this one instead of trying to make a new one
      *
      * @param $cachedFileLocation
+     *
      * @return mixed
      */
-    private function loadPreviouslyCachedFile($cachedFileLocation) {
-        $alternateCache = new Alaress_Image_Cache_Filesystem($cachedFileLocation, $this->getKey());
+    private function loadPreviouslyCachedFile($cachedFileLocation)
+    {
+        $alternateCache = new Filesystem($cachedFileLocation, $this->getKey());
 
         return $alternateCache->load();
     }
@@ -108,13 +113,14 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return array
      */
-    public function standardise() {
+    public function standardise()
+    {
         return array(
-            'fileID' => $this->resource->getId(),
+            'fileID'   => $this->resource->getId(),
             'filepath' => $this->resource->getFileLocation(),
             'filename' => $this->resource->getFilename(),
-            'mime' => $this->resource->getMimeType()->getMime(),
-            'size' => $this->resource->getFilesize(),
+            'mime'     => $this->resource->getMimeType()->getMime(),
+            'size'     => $this->resource->getFilesize(),
         );
 
     }
@@ -127,7 +133,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $imageId
      */
-    private function setImageId($imageId) {
+    private function setImageId($imageId)
+    {
         $this->imageId = $imageId;
     }
 
@@ -136,7 +143,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return null
      */
-    private function getImageId() {
+    private function getImageId()
+    {
         return $this->imageId;
     }
 
@@ -145,7 +153,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $key
      */
-    private function setKey($key) {
+    private function setKey($key)
+    {
         $this->key = $key;
     }
 
@@ -154,7 +163,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return null
      */
-    public function getKey() {
+    public function getKey()
+    {
         return $this->key;
     }
 
@@ -163,7 +173,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $cacheLocation
      */
-    private function setCacheLocation($cacheLocation) {
+    private function setCacheLocation($cacheLocation)
+    {
         $this->cacheLocation = $cacheLocation;
     }
 
@@ -172,7 +183,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    private function getCacheLocation() {
+    private function getCacheLocation()
+    {
         return $this->cacheLocation;
     }
 
@@ -181,7 +193,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $cachedFileLocation
      */
-    private function setCachedFileLocation($cachedFileLocation) {
+    private function setCachedFileLocation($cachedFileLocation)
+    {
         $this->cachedFileLocation = $cachedFileLocation;
     }
 
@@ -190,7 +203,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    public function getCachedFileLocation() {
+    public function getCachedFileLocation()
+    {
         return $this->cachedFileLocation;
     }
 
@@ -199,7 +213,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $originalsLocation
      */
-    private function setOriginalsLocation($originalsLocation) {
+    private function setOriginalsLocation($originalsLocation)
+    {
         $this->originalsLocation = $originalsLocation;
     }
 
@@ -208,7 +223,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return string
      */
-    private function getOriginalsLocation() {
+    private function getOriginalsLocation()
+    {
         return $this->originalsLocation;
     }
 
@@ -218,7 +234,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @param $loadedFromCache
      */
-    private function setLoadedFromCache($loadedFromCache) {
+    private function setLoadedFromCache($loadedFromCache)
+    {
         if ($loadedFromCache === false) {
             $this->loadedFromCache = $loadedFromCache;
         } else {
@@ -231,7 +248,8 @@ class Alaress_Image_Cache_Storage implements Alaress_Image_Cache_Interface {
      *
      * @return bool
      */
-    public function isLoadedFromCache() {
+    public function isLoadedFromCache()
+    {
         return $this->loadedFromCache;
     }
 }
