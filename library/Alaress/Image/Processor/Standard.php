@@ -7,14 +7,17 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
+
+namespace Alaress\Image\Processor;
+
+class Standard extends BaseProcessor
 {
     /**
      * Constructor
      *
-     * @param $cache
-     * @param $transformations
-     * @param \Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+     * @param                                                    $cache
+     * @param                                                    $transformations
+     * @param \Alaress\Image\Filetype\FactoryInterface           $filetypeFactory
      * @param \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
      */
     public function __construct(
@@ -31,7 +34,6 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Load an image, figure out how to render/manipulate it
-     *
      * Supports chained methods
      *
      * @return $this
@@ -58,11 +60,11 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
     /**
      * Select an image modification strategy, and supply it with any
      * desired arguments in an associative array
-     *
      * Supports chained methods
      *
-     * @param $strategy
+     * @param      $strategy
      * @param null $args
+     *
      * @return $this
      */
     private function loadProcessorStrategy($strategy, $args = null)
@@ -78,10 +80,8 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Delegate method
-     *
      * Use processor strategy to manipulate image resource and remember
      * the resultant image resource
-     *
      * Supports chained methods
      *
      * @return $this
@@ -155,14 +155,13 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Facade method
-     *
      * Combines loadProcessorStrategy() and manipulate() to support chained
      * methods in an easy-to-ready set of statements
-     *
      * Supports chained methods
      *
-     * @param $strategy
+     * @param      $strategy
      * @param null $args
+     *
      * @return $this
      */
     public function transform($strategy, $args = null)
@@ -175,7 +174,6 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Delegate method
-     *
      * Cache then stream the manipulated image
      */
     public function stream()
@@ -194,6 +192,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Saves the transformed image
+     *
      * @return $this
      */
     public function save()
@@ -204,6 +203,7 @@ class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract
 
     /**
      * Gets the filepath for processed image output
+     *
      * @return string
      */
     public function getCachedFileLocation()

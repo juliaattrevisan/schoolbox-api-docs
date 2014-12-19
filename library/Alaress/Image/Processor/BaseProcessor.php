@@ -2,12 +2,15 @@
 /**
  * Alaress_Image_Processor_Abstract
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Alaress_Image_Processor_Abstract
+
+namespace Alaress\Image\Processor;
+
+class BaseProcessor
 {
     protected $imageId = null;
 
@@ -23,8 +26,8 @@ class Alaress_Image_Processor_Abstract
     protected $processorFactory;
 
     /**
-    * @var Alaress_Image_Processor_Strategy_Interface
-    */
+     * @var Alaress_Image_Processor_Strategy_Interface
+     */
     protected $processorStrategy = null;
 
     /**
@@ -35,8 +38,8 @@ class Alaress_Image_Processor_Abstract
     protected $filetypeFactory;
 
     /**
-    * @var Alaress_Image_Filetype_Interface
-    */
+     * @var Alaress_Image_Filetype_Interface
+     */
     protected $filetypeStrategy = null;
 
     /* Image being manipulated
@@ -51,57 +54,57 @@ class Alaress_Image_Processor_Abstract
 	 */
 
     /**
-    * Path to a cached transformation
-    *
-    * @var string
-    */
+     * Path to a cached transformation
+     *
+     * @var string
+     */
     protected $filepath = '';
 
     /**
-    * Set image id
-    *
-    * @param $imageId
-    */
+     * Set image id
+     *
+     * @param $imageId
+     */
     protected function setImageId($imageId)
     {
         $this->imageId = $imageId;
     }
 
     /**
-    * Get image id
-    *
-    * @return mixed
-    */
+     * Get image id
+     *
+     * @return mixed
+     */
     protected function getImageId()
     {
         return $this->imageId;
     }
 
     /**
-    * Set processing strategy
-    *
-    * @param Alaress_Image_Filetype_Interface $filetypeStrategy
-    */
+     * Set processing strategy
+     *
+     * @param Alaress_Image_Filetype_Interface $filetypeStrategy
+     */
     protected function setFiletypeStrategy($filetypeStrategy)
     {
         $this->filetypeStrategy = $filetypeStrategy;
     }
 
     /**
-    * Get processing strategy
-    *
-    * @return Alaress_Image_Filetype_Interface
-    */
+     * Get processing strategy
+     *
+     * @return Alaress_Image_Filetype_Interface
+     */
     protected function getFiletypeStrategy()
     {
         return $this->filetypeStrategy;
     }
 
     /**
-    * Set processor strategy
-    *
-    * @param Alaress_Image_Processor_Strategy_Interface $processorStrategy
-    */
+     * Set processor strategy
+     *
+     * @param Alaress_Image_Processor_Strategy_Interface $processorStrategy
+     */
     protected function setProcessorStrategy($processorStrategy)
     {
         $this->processorStrategy = $processorStrategy;
@@ -127,10 +130,10 @@ class Alaress_Image_Processor_Abstract
     }
 
     /**
-    * Get processor strategy
-    *
-    * @return Alaress_Image_Processor_Strategy_Interface
-    */
+     * Get processor strategy
+     *
+     * @return Alaress_Image_Processor_Strategy_Interface
+     */
     protected function getProcessorStrategy()
     {
         return $this->processorStrategy;
@@ -156,80 +159,80 @@ class Alaress_Image_Processor_Abstract
     }
 
     /**
-    * Set image resource being manipulated
-    *
-    * @param $image
-    */
+     * Set image resource being manipulated
+     *
+     * @param $image
+     */
     protected function setImage($image)
     {
         $this->image = $image;
     }
 
     /**
-    * Get image resource being manipulated
-    *
-    * @return mixed
-    */
+     * Get image resource being manipulated
+     *
+     * @return mixed
+     */
     protected function getImage()
     {
         return $this->image;
     }
 
     /**
-    * Set cache
-    *
-    * @param $cache
-    */
+     * Set cache
+     *
+     * @param $cache
+     */
     protected function setCache($cache)
     {
         $this->cache = $cache;
     }
 
     /**
-    * Get cache
-    *
-    * @return Alaress_Image_Cache_Interface
-    */
+     * Get cache
+     *
+     * @return Alaress_Image_Cache_Interface
+     */
     protected function getCache()
     {
         return $this->cache;
     }
 
     /**
-    * Set transformations
-    *
-    * @param $transformations
-    */
+     * Set transformations
+     *
+     * @param $transformations
+     */
     protected function setTransformations($transformations)
     {
         $this->transformations = $transformations;
     }
 
     /**
-    * Get transformations
-    *
-    * @return array
-    */
+     * Get transformations
+     *
+     * @return array
+     */
     protected function getTransformations()
     {
         return $this->transformations;
     }
 
     /**
-    * Set filepath
-    *
-    * @param string $filepath
-    */
+     * Set filepath
+     *
+     * @param string $filepath
+     */
     protected function setFilepath($filepath)
     {
         $this->filepath = $filepath;
     }
 
     /**
-    * Get filepath
-    *
-    * @return string
-    */
+     * Get filepath
+     *
+     * @return string
+     */
     protected function getFilepath()
     {
         return $this->filepath;

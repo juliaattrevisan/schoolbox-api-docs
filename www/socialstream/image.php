@@ -29,7 +29,7 @@ $cache->init($post->getThumbnail());
 $cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 
 try {
-    $processor = new \Alaress_Image_Processor_Standard(
+    $processor = new \Alaress\Image\Processor\Standard(
         $cache,
         new \Alaress\Image\Transformation\Storage(),
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),

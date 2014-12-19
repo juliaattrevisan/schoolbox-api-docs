@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Image\Processor\Freeform;
+
 require_once __DIR__.'/../../include/Bootstrap.php';
 
 $path = '/images/core/icons/activity-icons-72x72px.png';
@@ -21,7 +23,7 @@ try {
     $transform_key = "Icon";
     $cache_key = "$icon-$size";
 
-    $imageProcessor = new Alaress_Image_Processor_Freeform(
+    $imageProcessor = new Freeform(
         new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
         $transform,
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),

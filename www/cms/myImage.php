@@ -7,6 +7,9 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Processor\Standard;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Preserve old checks
@@ -44,7 +47,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 
     /* Process and stream image
 	 */
-    $imageProcessor = new Alaress_Image_Processor_Freeform(
+    $imageProcessor = new Freeform(
         $cache,
         new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']),
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
@@ -67,7 +70,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 
     /* Process and stream image
 	 */
-    $imageProcessor = new Alaress_Image_Processor_Standard(
+    $imageProcessor = new Standard(
         $cache,
         new \Alaress\Image\Transformation\Storage(),
         new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),

@@ -7,6 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Alaress\Image\Processor\Freeform;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Preserve old checks
@@ -42,7 +44,7 @@ $cache = new Alaress_Image_Cache_Image($_GET['id'], $key);
 
 /* Process and stream image
  */
-$imageProcessor = new Alaress_Image_Processor_Freeform(
+$imageProcessor = new Freeform(
     $cache,
     new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']),
     new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),

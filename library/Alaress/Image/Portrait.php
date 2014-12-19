@@ -39,7 +39,7 @@ class Portrait
 
         /* Process and stream image
          */
-        $this->imageProcessor = new \Alaress_Image_Processor_Standard(
+        $this->imageProcessor = new Processor\Standard(
             $cache,
             $transformations,
             new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
