@@ -10,6 +10,13 @@
 
 namespace Alaress\Image\Cache;
 
+use Cfg;
+use Exception_Schoolbox_AccessDenied;
+use Exception_Schoolbox_NotFound;
+use External_User;
+use Group;
+use User;
+
 class Portrait implements CacheInterface
 {
 

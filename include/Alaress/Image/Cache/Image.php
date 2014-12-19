@@ -11,6 +11,7 @@
 
 namespace Alaress\Image\Cache;
 
+use Cfg;
 use DeprecatedModel;
 
 class Image extends DeprecatedModel implements CacheInterface
