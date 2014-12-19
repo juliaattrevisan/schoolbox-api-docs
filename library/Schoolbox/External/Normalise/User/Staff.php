@@ -21,13 +21,6 @@ class Staff extends Base {
      */
 
     /**
-     * Staff Code
-     *
-     * @var string
-     */
-    private $code = '';
-
-    /**
      * Staff metadata
      *
      * @var Meta
@@ -165,27 +158,5 @@ class Staff extends Base {
     public function getMeta()
     {
         return $this->meta;
-    }
-
-    /**
-     * Set code
-     *
-     * @param string $code
-     * @return $this
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-        return $this;
-    }
-
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
     }
 }
