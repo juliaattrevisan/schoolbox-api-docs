@@ -17,7 +17,7 @@ $size = isset($_GET['size']) ? $_GET['size'] : 64;
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $transform = new Alaress_Image_Transformation_Icon($icon, $size);
+    $transform = new \Alaress\Image\Transformation\Icon($icon, $size);
     $transform_key = "Icon";
     $cache_key = "$icon-$size";
 
