@@ -14,6 +14,7 @@ use Alaress\Async\AMQP\AMQPResponseHandlerInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
+use Monolog\Logger;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
@@ -251,6 +252,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		$self = $this;
         $log  = $this->log;
 
+        $formatted = json_decode($message->body, true);
+        $instance = Instance::jsonUnserialize($formatted['message']);
+
+        // if this is an alert, bypass transactionality
+        if ($instance->getNamespace() == 'ALERT') {
+            $decorator = new Decorator();
+            $decorator->appendInstance($instance);
+            $this->taskDispatcher->enqueue($pipe, 'alert', $decorator->renderAsSocketArray(true));
+            return true;
+        }
+
 		if(empty($this->pushTransactions[$userId])) {
 			$this->pushTransactions[$userId] = new Transaction($this->reactLoop,
 				function($timer) use ($self, $pipe, $userId, $log) {
@@ -271,8 +283,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 			);
 		}
 
-		$formatted = json_decode($message->body, true);
-		$instance = Instance::jsonUnserialize($formatted['message']);
 		$hash = sha1($formatted['message']);
 
 		$this->pushTransactions[$userId]->put($hash, $instance);
@@ -369,6 +379,15 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 					$this->sendToUser($userId, array($command => $markAsRead));
 				}
 				break;
+
+            // alert behaves like push + ack
+            case 'alert':
+                $this->sendToUser($userId, array($command => $data));
+                $release = false;
+                if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
+                    $subscription->acceptMessages(array_keys($data));
+                }
+                break;
 		}
 
         // release the socket if permissible

@@ -32,7 +32,9 @@ abstract class CronScheduler extends AbstractScheduler {
     public function handleResponse($trigger, $command, $data) {
         // and reschedule the trigger to go again
         $this->report($data);
-	    $this->log->info("Rescheduling trigger");
+	    $this->log->info(sprintf("Rescheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
+            array('char' => '+')
+        );
 	    $this->scheduleNotification($trigger);
     }
 

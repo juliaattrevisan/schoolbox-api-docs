@@ -13,22 +13,28 @@ namespace Alaress\Scheduler\Trigger;
 
 use Alaress\Scheduler\Event\EventInterface;
 use Cron\CronExpression;
+use Schoolbox\Realtime\WorkNotifier;
 
 abstract class RecurringTrigger extends AbstractTrigger {
 
     /** @var CronExpression */
     protected $cron;
 
+    /** @var WorkNotifier */
+    protected $notifier;
+
     /**
-     * @param string $what - the label describing this trigger
-     * @param string $when    - the timestamp at which this trigger should fire
-     * @param EventInterface $why   - the event that precipitated this trigger's existence
+     * @param string $what           - the label describing this trigger
+     * @param string $when           - the timestamp at which this trigger should fire
+     * @param EventInterface $why    - the event that precipitated this trigger's existence
+     * @param WorkNotifier $notifier - the notifier that will be invoked to process at the appointed time
      */
-    public function __construct($what, $when, $why) {
+    public function __construct($what, $when, $why, $notifier) {
         $this->label = $what;
         $this->timestamp = $when;
         $this->cron = CronExpression::factory($when);
         $this->event = $why;
+        $this->notifier = $notifier;
     }
 
     /**
@@ -39,5 +45,15 @@ abstract class RecurringTrigger extends AbstractTrigger {
     public function getTimestamp() {
         return $this->cron->getNextRunDate()->getTimestamp();
     }
+
+    /**
+     * Return an array of callables that are appropriate for this trigger
+     *
+     * @return callable[]
+     */
+    public function getCallbacks() {
+        return array(array($this->notifier, 'process'));
+    }
+
 
 } 

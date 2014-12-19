@@ -63,7 +63,19 @@ class AMQPHandler extends AbstractProcessingHandler {
 			$record['channel'] ?: 'system'
 		);
 
-		$this->connection->publish($record["formatted"], $routingKey);
+        $message = json_decode($record['message'], true);
+
+        $properties = array();
+
+        if (isset($message['meta']['ttl'])) {
+            $properties['expiration'] = $message['meta']['ttl'] * 1000;
+
+        } elseif ($message['namespace'] == 'ALERT') {
+            $properties['expiration'] = 30000; // 30 seconds
+
+        }
+
+		$this->connection->publish($record["formatted"], $routingKey, $properties);
 
 	}
 

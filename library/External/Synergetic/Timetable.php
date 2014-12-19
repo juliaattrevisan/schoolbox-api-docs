@@ -401,7 +401,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $timetable[$x]['code']        = $desc['ClassCode'];
                 $timetable[$x]['campus']      = $desc['ClassCampus'];
                 $timetable[$x]['room']        = $desc['Room'];
-                $timetable[$x]['staffID']     = $desc['StaffID'];
+                if (isset($desc['StaffID'])) {
+                    $timetable[$x]['staffID'] = $desc['StaffID'];
+                }
                 $desc                         = $this->getDatabase()->getNextArray();
 
                 //bad data in synergetic.. why..??

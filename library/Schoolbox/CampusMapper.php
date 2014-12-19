@@ -89,4 +89,34 @@ class CampusMapper extends Mapper {
 
 		return $collection;
 	}
+
+
+    /**
+     * @param Campus $campus
+     * @return Collection|User[]
+     */
+    public function findUsersInCampus(Campus $campus)
+    {
+        $uMap = UserMapper::getInstance();
+
+        $stmt = $this->database->prepare("
+            SELECT {$uMap->getColumnString('u')}
+            FROM userCampus c
+            RIGHT JOIN `user` u on c.uid = u.id
+            WHERE c.campus = :campus
+        ");
+
+        $stmt->execute(array(
+            'campus' => $campus->getId()
+        ));
+
+        $c = new Collection();
+
+        while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $c->add($uMap->hydrate($r, 'u'));
+        }
+
+        return $c;
+    }
+
 }

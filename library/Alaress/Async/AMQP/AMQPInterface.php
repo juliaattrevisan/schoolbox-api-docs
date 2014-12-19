@@ -145,10 +145,11 @@ interface AMQPInterface {
 	 *
 	 * @param $message
 	 * @param string $routingKey
+     * @param array  $properties
 	 * @param string $channelId
 	 * @return self
 	 */
-	public function publish($message, $routingKey, $channelId = null);
+	public function publish($message, $routingKey, $properties = array(), $channelId = null);
 
 
     /**
