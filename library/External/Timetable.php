@@ -65,7 +65,7 @@ class External_Timetable implements External_TimetableInterface {
 	 *                       next date.
 	 *
 	 * @throws InvalidArgumentException if $date or $campusId are invalid
-	 * @throws RangeException           if $day isn't found in ±30 days of $date
+	 * @throws RangeException           if $day isn't found in ±365 days of $date
 	 *
 	 * @return DateTime
 	 */
@@ -86,9 +86,9 @@ class External_Timetable implements External_TimetableInterface {
 		$isFound = false;
 		if ($day > 0) {
 			// Start at today, and get number of days
-			// Try for a month, that's long enough.
+			// Try for a year, that's long enough.
 			$i = 0;
-			while ($i++ < 30) {
+			while ($i++ < 365) {
 				$thisDayNumber = $this->getDayNumber($campusId, $thisDate->getTimestamp());
 				if ($thisDayNumber === false) {
 					throw new InvalidArgumentException('Invalid campus requested');

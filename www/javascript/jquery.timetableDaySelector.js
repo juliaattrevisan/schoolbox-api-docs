@@ -245,9 +245,9 @@
             self.buttons.prop('disabled', false).removeClass('disabled').show()
             self.triggerSelectDateEvent()
         })
-        .fail(function() {
+        .fail(function(data) {
             self.dateDisplay
-                .text('error')
+                .text(data.responseJSON.error)
                 .addClass('error')
             self.buttons.hide()
         })
