@@ -12,7 +12,7 @@
 
 namespace Alaress\Image\Transformation;
 
-class Portrait extends Alaress_Image_Transformation_Abstract {
+class Portrait extends BaseTransformation {
 
     protected $allTransformations = array(
         'square32' => array(

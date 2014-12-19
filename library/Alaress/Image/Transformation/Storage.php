@@ -12,7 +12,7 @@
 
 namespace Alaress\Image\Transformation;
 
-class Storage extends Alaress_Image_Transformation_Abstract {
+class Storage extends BaseTransformation {
 
     protected $allTransformations = array(
         'square32' => array(

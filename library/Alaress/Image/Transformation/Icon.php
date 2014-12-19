@@ -12,7 +12,7 @@ namespace Alaress\Image\Transformation;
 
 use Schoolbox\Realtime\Message\NSMapper;
 
-class Icon extends Alaress_Image_Transformation_Abstract {
+class Icon extends BaseTransformation {
 
 	/**
 	 * Create the list of valid transforms
