@@ -10,7 +10,9 @@
 
 namespace Alaress\Image\Transformation;
 
-class Abstract {
+use Exception_Schoolbox;
+
+class BaseTransformation {
 	protected $allTransformations = array();
 
 	/**

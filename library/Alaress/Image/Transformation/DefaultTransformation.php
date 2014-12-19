@@ -12,7 +12,7 @@
 
 namespace Alaress\Image\Transformation;
 
-class Default extends Alaress_Image_Transformation_Abstract {
+class DefaultTransformation extends BaseTransformation {
 
 	protected $allTransformations = array(
 
