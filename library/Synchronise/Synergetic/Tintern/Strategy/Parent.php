@@ -35,7 +35,12 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
      */
     public function setupUserDetails($currentUser) {
         $newUser = parent::setupUserDetails($currentUser);
-        $newUser['password'] = $this->getPassword($newUser);
+        // Under no circumstances clobber an existing user's password
+        if (!$this->userExists($newUser)) {
+            $newUser['password'] = $this->getPassword($newUser);
+        } else {
+            unset($newUser['password']);
+        }
         return $newUser;
     }
 
@@ -46,7 +51,12 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
      */
     public function setupSpouseDetails($currentUser) {
         $newUser = parent::setupSpouseDetails($currentUser);
-        $newUser['password'] = $this->getPassword($newUser);
+        // Under no circumstances clobber an existing user's password
+        if (!$this->userExists($newUser)) {
+            $newUser['password'] = $this->getPassword($newUser);
+        } else {
+            unset($newUser['password']);
+        }
         return $newUser;
     }
 
