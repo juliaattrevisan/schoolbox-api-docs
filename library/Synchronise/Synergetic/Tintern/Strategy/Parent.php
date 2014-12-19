@@ -38,6 +38,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
         // Under no circumstances clobber an existing user's password
         if (!$this->userExists($newUser)) {
             $newUser['password'] = $this->getPassword($newUser);
+        } else {
+            unset($newUser['password']);
         }
         return $newUser;
     }
@@ -52,6 +54,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
         // Under no circumstances clobber an existing user's password
         if (!$this->userExists($newUser)) {
             $newUser['password'] = $this->getPassword($newUser);
+        } else {
+            unset($newUser['password']);
         }
         return $newUser;
     }
