@@ -66,5 +66,20 @@ abstract class Component_Config_Abstract {
         return $this->is_shown_on_template;
     }
 
-    public abstract function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array());
+    /**
+     * Renders this configuration into a SitePage.
+     *
+     * @param SitePage                     $page        The SitePage to render into
+     * @param string                       $key
+     * @param string                       $keyblock
+     * @param mixed                        $configValue The value of this config
+     * @param Component_ControllerAbstract $component   The component this config is part of
+     */
+    abstract public function parse(
+        SitePage $page,
+        $key,
+        $keyblock,
+        $configValue,
+        Component_ControllerAbstract $component = null
+    );
 }
