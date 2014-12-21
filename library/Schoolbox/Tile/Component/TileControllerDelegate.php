@@ -49,7 +49,9 @@ class TileControllerDelegate
      */
     public function fetchLayout(Component_ControllerAbstract $controller)
     {
-        $layoutId = $controller->getConfig('layoutId');
+        // layoutId: the layout that was created when this component was
+        // tileSource: the layout chosen for an alternate source
+        $layoutId = $controller->getConfig('tileSource') ?: $controller->getConfig('layoutId');
 
         // empty layout by default
         $mapper = Layout\Mapper::getInstance();
