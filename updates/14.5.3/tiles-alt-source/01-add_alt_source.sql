@@ -6,7 +6,7 @@ INSERT INTO component_config_definition (
   label
 )
 VALUES (
-  (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Tile\Component\\HomepageTileController'),
+  (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Tile\\Component\\HomepageTileController'),
   'src',
   0,
   'Source'
