@@ -16,8 +16,11 @@ class Component_Config_Textbox extends Component_Config_Abstract {
 
 		/* Select a textbox from some other homepage
 		 */
-		if (is_numeric($allConfigs['src']['value']) && $allConfigs['src']['value']) {
-			$boxList = $handler->getAllByCategory($allConfigs['src']['value']);
+        $altSource = $component instanceof Component_ControllerAbstract
+            ? $component->getConfig('src')
+            : null;
+		if (is_numeric($altSource) && $altSource) {
+			$boxList = $handler->getAllByCategory($altSource);
 		}
 		else {
 

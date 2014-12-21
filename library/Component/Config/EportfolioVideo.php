@@ -11,10 +11,13 @@ class Component_Config_EportfolioVideo extends Component_Config_Abstract {
 
 		/* Sort order
 		 */
-		$sortConfig = array(
-			'sort' => $allConfigs['sort']['value'],
-			'sortdir' => $allConfigs['sortdir']['value']
-		);
+        $sortConfig = array();
+        if ($component instanceof Component_ControllerAbstract) {
+            $sortConfig = array(
+                'sort' => $component->getConfig('sort'),
+                'sortdir' => $component->getConfig('sortdir')
+            );
+        }
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
 		$allVideos = $videoMapper->findByEportfolioPage($page->arg[1], $sortConfig);
