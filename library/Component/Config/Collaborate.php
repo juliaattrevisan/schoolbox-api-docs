@@ -21,7 +21,7 @@ class Component_Config_Collaborate extends Component_Config_Abstract {
      * @param          $configValue
      * @param array    $allConfigs
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
 		if ($configValue == '1') {
 			$page->setVar(array(
 				'COMPONENT_CONFIG_COLLABORATE_SELECTED' => 'checked="checked"'

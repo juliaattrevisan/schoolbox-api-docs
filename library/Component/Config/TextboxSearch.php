@@ -8,7 +8,7 @@
  */
 class Component_Config_TextboxSearch extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
         $page->setVar('COMPONENT_TEXTBOX_ID', $configValue);
 
         $handler = new TextBox();

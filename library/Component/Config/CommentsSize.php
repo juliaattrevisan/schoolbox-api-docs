@@ -8,7 +8,7 @@
  */
 class Component_Config_CommentsSize extends Component_Config_Abstract {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'comments_sizes', 'comments_sizes_block');

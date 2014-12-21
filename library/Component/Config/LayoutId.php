@@ -9,7 +9,7 @@
 
 class Component_Config_LayoutId extends Component_Config_Abstract
 {
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array())
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
         // noop - this method just needs to exist
     }

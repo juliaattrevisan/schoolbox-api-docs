@@ -11,7 +11,7 @@ class Component_Config_Size extends Component_Config_Abstract {
     protected $max           = 10;
     protected $showAllOption = true;
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'sizes', 'sizes_block');

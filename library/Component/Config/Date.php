@@ -33,7 +33,7 @@ class Component_Config_Date extends Component_Config_Abstract {
         return $dateObject->format('Y-m-d');
     }
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
         if (!empty($configValue)) {
             $configValue = date('d/m/Y', strtotime($configValue));
         }
