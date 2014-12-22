@@ -20,14 +20,13 @@ class Component_Config_TileSource extends Component_Config_Abstract
         if ($component instanceof Component_ControllerAbstract) {
             $source = $component->getConfig('src') ?: $component->getInstance()->getId();
             /** @var Component_Instance[] $components */
-            $components = Component_InstanceMapper::getInstance()->findByContext('homepage', $source);
+            $components = Component_InstanceMapper::getInstance()->findByContextAndClass(
+                'homepage',
+                $source,
+                'Schoolbox\\Tile\\Component\\HomepageTileController'
+            );
             $page->setVar('tile_option_block', '');
             foreach ($components as $component) {
-                if ($component->getDefinition()->getClass()
-                    != 'Schoolbox\\Tile\\Component\\HomepageTileController'
-                ) {
-                    continue;
-                }
                 $configs = $component->getConfigArray();
                 $page->setVar(
                     array(
