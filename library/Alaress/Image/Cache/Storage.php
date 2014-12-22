@@ -3,6 +3,8 @@
 
 namespace Alaress\Image\Cache;
 
+use Cfg;
+
 class Storage implements CacheInterface
 {
 
