@@ -45,6 +45,13 @@ class Filesystem implements CacheInterface
     protected $loadedFromCache = false;
 
     /**
+     * Original image location
+     *
+     * @var string
+     */
+    protected $originalsLocation;
+
+    /**
      * Constructor
      * Remembers what image you are trying to load from cache
      *
@@ -146,7 +153,7 @@ class Filesystem implements CacheInterface
     /**
      * Set original image location
      *
-     * @param $originalsLocation
+     * @param string $originalsLocation
      */
     protected function setOriginalsLocation($originalsLocation)
     {
