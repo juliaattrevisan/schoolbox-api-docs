@@ -154,6 +154,7 @@ class AjaxFlot {
 
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
+                'FILE_ID' => $currentData['id'],
 				'FILE_FILENAME' => $currentData['name'],
 				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
 				'FILE_GROUPNAME' => $currentData['groupName'],

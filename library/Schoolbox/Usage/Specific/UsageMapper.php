@@ -349,6 +349,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			FROM
 			(
 				(SELECT
+				    id,
                     realname AS `name`,
                     'File' AS groupName,
                     file_size AS bytes,
@@ -360,6 +361,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				AND deleted = 0)
 				UNION
 				(SELECT
+				    '' AS id,
                     realname AS `name`,
                     'My File' AS groupName,
                     file_size AS bytes,
@@ -371,6 +373,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				AND deleted = 0)
 				UNION
 				(SELECT
+				    '' AS id,
                     filename AS `name`,
                     'Storage' AS groupName,
                     filesize AS bytes,
@@ -381,6 +384,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				WHERE `uploaded_by` = {$userId})
 				UNION
 				(SELECT
+				    '' AS id,
                     realname AS `name`,
                     'Submission' AS groupName,
                     filesize AS bytes,
@@ -391,6 +395,7 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				WHERE `owner` = {$userId})
 				UNION
 				(SELECT
+				    '' AS id,
                     filename AS `name`,
                     'Return' AS groupName,
                     filesize AS bytes,
