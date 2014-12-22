@@ -94,7 +94,10 @@ foreach( $componentCollection as $component ) {
         'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
     ));
 
-    $component->setup(array(), array());
+    $component->setup(
+        array(),
+        $component->getInstance()->getConfigArray()
+    );
     $component->parseConfigForTemplate();
 
     $this->parse("{$position}_block", $position, true);
