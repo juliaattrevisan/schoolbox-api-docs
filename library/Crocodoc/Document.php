@@ -11,157 +11,172 @@
 namespace Crocodoc;
 
 
-class Document {
+class Document
+{
 
-	/**
-	 * Contains API keys
-	 *
-	 * @var null
-	 */
-	private $authenticator = null;
+    /**
+     * Contains API keys
+     *
+     * @var null
+     */
+    private $authenticator = null;
 
-	/**
-	 * The url of the file to upload
-	 *
-	 * @var string
-	 */
-	private $url = '';
+    /**
+     * The url of the file to upload
+     *
+     * @var string
+     */
+    private $url = '';
 
-	/**
-	 * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
-	 *
-	 * @var null
-	 */
-	private $submission = null;
+    /**
+     * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
+     *
+     * @var null
+     */
+    private $submission = null;
 
-	/**
-	 * The url to upload to
-	 *
-	 * @var string
-	 */
-	private $uploadUrl = 'https://crocodoc.com/api/v2/document/upload';
+    /**
+     * The url to upload to
+     *
+     * @var string
+     */
+    private $uploadUrl = 'https://crocodoc.com/api/v2/document/upload';
 
-	/**
-	 * Constructor
-	 *
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
-	 */
-	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission) {
-		$this->setAuthenticator(new Authenticator());
-		$this->setSubmission($submission);
+    /**
+     * Constructor
+     *
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+     */
+    public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission)
+    {
+        $this->setAuthenticator(new Authenticator());
+        $this->setSubmission($submission);
 
-		/* Decide where to load the file from
-		 */
-		$source = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
-		$destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getFilename();
+        /* Decide where to load the file from
+         */
+        $source = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
+        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId(
+            ) . '_' . $this->getSubmission()->getFilename();
 
-		if (copy($source, $destination)) {
-			$this->setUrl($destination);
-		}
-	}
+        if (copy($source, $destination)) {
+            $this->setUrl($destination);
+        }
+    }
 
-	/**
-	 * Upload a file to crocodoc
-	 */
-	public function upload() {
-		$curl = new \Alaress_Curl_Url($this->getUploadUrl());
+    /**
+     * Upload a file to crocodoc
+     */
+    public function upload()
+    {
+        $curl = new \Alaress_Curl_Url($this->getUploadUrl());
 
-		$postfields = array(
-			'token' => $this->getAuthenticator()->getApiToken(),
-			'file' => '@' . $this->getUrl(),
-		);
+        $postfields = array(
+            'token' => $this->getAuthenticator()->getApiToken(),
+            'file' => '@' . $this->getUrl(),
+        );
 
-		$curl->addOptions(array(
-			CURLOPT_HTTPHEADER => array('Content-Type: multipart/form-data'),
-			CURLOPT_POST => 1,
-			CURLOPT_POSTFIELDS => $postfields,
-			CURLOPT_FOLLOWLOCATION => 1,
-		));
+        $curl->addOptions(
+            array(
+                CURLOPT_HTTPHEADER => array('Content-Type: multipart/form-data'),
+                CURLOPT_POST => 1,
+                CURLOPT_POSTFIELDS => $postfields,
+                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_TIMEOUT_MS => 15000,
+            )
+        );
 
-		$curl->exec();
+        $curl->exec();
 
-		/* Unlink copied file after uploading
-		 */
-		unlink($this->getUrl());
+        /* Unlink copied file after uploading
+         */
+        unlink($this->getUrl());
 
-		return array(
-			'result' => json_decode($curl->getResult()),
-			'errors' => $curl->getErrors()
-		);
-	}
+        return array(
+            'result' => json_decode($curl->getResult()),
+            'errors' => $curl->getErrors()
+        );
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set authenticator
-	 *
-	 * @param null $authenticator
-	 */
-	private function setAuthenticator($authenticator) {
-		$this->authenticator = $authenticator;
-	}
+    /**
+     * Set authenticator
+     *
+     * @param null $authenticator
+     */
+    private function setAuthenticator($authenticator)
+    {
+        $this->authenticator = $authenticator;
+    }
 
-	/**
-	 * Get authenticator
-	 *
-	 * @return null
-	 */
-	private function getAuthenticator() {
-		return $this->authenticator;
-	}
+    /**
+     * Get authenticator
+     *
+     * @return null
+     */
+    private function getAuthenticator()
+    {
+        return $this->authenticator;
+    }
 
-	/**
-	 * Set url
-	 *
-	 * @param string $url
-	 */
-	private function setUrl($url) {
-		$this->url = $url;
-	}
+    /**
+     * Set url
+     *
+     * @param string $url
+     */
+    private function setUrl($url)
+    {
+        $this->url = $url;
+    }
 
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	private function getUrl() {
-		return $this->url;
-	}
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    private function getUrl()
+    {
+        return $this->url;
+    }
 
-	/**
-	 * Set upload url
-	 *
-	 * @param string $uploadUrl
-	 */
-	private function setUploadUrl($uploadUrl) {
-		$this->uploadUrl = $uploadUrl;
-	}
+    /**
+     * Set upload url
+     *
+     * @param string $uploadUrl
+     */
+    private function setUploadUrl($uploadUrl)
+    {
+        $this->uploadUrl = $uploadUrl;
+    }
 
-	/**
-	 * Get upload url
-	 *
-	 * @return string
-	 */
-	private function getUploadUrl() {
-		return $this->uploadUrl;
-	}
+    /**
+     * Get upload url
+     *
+     * @return string
+     */
+    private function getUploadUrl()
+    {
+        return $this->uploadUrl;
+    }
 
-	/**
-	 * Set submission
-	 *
-	 * @param null $submission
-	 */
-	private function setSubmission($submission) {
-		$this->submission = $submission;
-	}
+    /**
+     * Set submission
+     *
+     * @param null $submission
+     */
+    private function setSubmission($submission)
+    {
+        $this->submission = $submission;
+    }
 
-	/**
-	 * Get submission
-	 *
-	 * @return null
-	 */
-	private function getSubmission() {
-		return $this->submission;
-	}
+    /**
+     * Get submission
+     *
+     * @return null
+     */
+    private function getSubmission()
+    {
+        return $this->submission;
+    }
 }
