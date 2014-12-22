@@ -10,6 +10,7 @@
 
 namespace Alaress\Image\Transformation;
 
+use InvalidArgumentException;
 use Schoolbox\Realtime\Message\NSMapper;
 
 class Icon extends BaseTransformation
@@ -18,7 +19,7 @@ class Icon extends BaseTransformation
     /**
     * Create the list of valid transforms
     */
-    function __construct($icon, $size = 72)
+    public function __construct($icon, $size = 72)
     {
 
         $validSizes = array(16,24,32,48,64,72);
