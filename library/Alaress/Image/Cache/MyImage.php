@@ -266,5 +266,3 @@ class MyImage extends DeprecatedModel implements CacheInterface
         return $this->loadedFromCache;
     }
 }
-
-

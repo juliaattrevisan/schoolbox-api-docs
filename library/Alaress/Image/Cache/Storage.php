@@ -4,6 +4,7 @@
 namespace Alaress\Image\Cache;
 
 use Cfg;
+use Schoolbox;
 
 class Storage implements CacheInterface
 {

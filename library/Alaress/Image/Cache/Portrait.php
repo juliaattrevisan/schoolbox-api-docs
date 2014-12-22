@@ -152,7 +152,8 @@ class Portrait implements CacheInterface
         // Get all users with a synergy ID, and test them against policy.
         /** @var \Schoolbox\User[] $userList */
         $userList = \Schoolbox\UserMapper::getInstance()->findByColumn(
-            'synergy_id', $this->getExternalUserId()
+            'synergy_id',
+            $this->getExternalUserId()
         );
         foreach ($userList as $user) {
             /* Everyone can always see their own pics
@@ -388,7 +389,7 @@ class Portrait implements CacheInterface
     /**
      * Set group handler
      *
-     * @param $groupHandler
+     * @param Group $groupHandler
      */
     private function setGroupHandler($groupHandler)
     {
@@ -398,7 +399,7 @@ class Portrait implements CacheInterface
     /**
      * Get group handler
      *
-     * @return null
+     * @return Group
      */
     private function getGroupHandler()
     {
