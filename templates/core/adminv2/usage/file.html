@@ -1,6 +1,13 @@
 <!-- BEGIN file -->
 <tr>
-	<td>{FILE_FILENAME}</td>
+    <!-- BEGIN file_storage -->
+	<td><a href="/storage/fetch.php?hash={FILE_HASH}">{FILE_FILENAME}</a></td>
+    <!-- END file_storage -->
+
+    <!-- BEGIN file_unlinked -->
+    <td>{FILE_FILENAME}</td>
+    <!-- END file_unlinked -->
+
 	<td>{FILE_BYTES}</td>
 	<td>{FILE_GROUPNAME}</td>
 	<td>{FILE_MIMETYPE}</td>

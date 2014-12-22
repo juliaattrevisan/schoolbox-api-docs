@@ -132,6 +132,13 @@ class AjaxFlot {
 		$page = new \SitePage();
 		$page->setFile('file_list', '/adminv2/usage/file.html');
 		$page->setBlock('file_list', 'file', 'file_block');
+        $page->setBlock('file', 'file_storage', 'file_storage_block');
+        $page->setBlock('file', 'file_unlinked', 'file_unlinked_block');
+
+        $page->setVar(array(
+            'file_storage_block' => '',
+            'file_unlinked_block' => '',
+        ));
 
 		/* Really? You should be passing the bytes as constructor arg
 		 */
@@ -145,7 +152,31 @@ class AjaxFlot {
 				'FILE_MIMETYPE' => $currentData['mime_type'],
 			));
 
+            /* Link Storage files
+             */
+            if ($currentData['groupName'] == 'Storage') {
+                $hash = $currentData['hash'];
+
+                $page->setVar(array(
+                    'FILE_HASH' => $hash,
+                ));
+
+                $page->parse('file_storage_block', 'file_storage');
+            }
+            /* None of the above
+             */
+            else {
+                $page->parse('file_unlinked_block', 'file_unlinked');
+            }
+
 			$page->parse('file_block', 'file', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $page->setVar(array(
+                'file_storage_block' => '',
+                'file_unlinked_block' => ''
+            ));
 		}
 
 		echo $page->template->_varVals['file_block'];

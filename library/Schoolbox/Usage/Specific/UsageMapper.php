@@ -348,25 +348,25 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			SELECT *
 			FROM
 			(
-				(SELECT realname AS `name`, 'File' AS groupName, file_size AS bytes, mime_type
+				(SELECT realname AS `name`, 'File' AS groupName, file_size AS bytes, mime_type, '' AS hash
 				FROM `file`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
 				UNION
-				(SELECT realname AS `name`, 'My File' AS groupName, file_size AS bytes, mime_type
+				(SELECT realname AS `name`, 'My File' AS groupName, file_size AS bytes, mime_type, '' AS hash
 				FROM `myFile`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
 				UNION
-				(SELECT filename AS `name`, 'Storage' AS groupName, filesize AS bytes, mime AS mime_type
+				(SELECT filename AS `name`, 'Storage' AS groupName, filesize AS bytes, mime AS mime_type, hash
 				FROM `storage`
 				WHERE `uploaded_by` = {$userId})
 				UNION
-				(SELECT realname AS `name`, 'Submission' AS groupName, filesize AS bytes, mime_type
+				(SELECT realname AS `name`, 'Submission' AS groupName, filesize AS bytes, mime_type, '' AS hash
 				FROM `student_submission`
 				WHERE `owner` = {$userId})
 				UNION
-				(SELECT filename AS `name`, 'Return' AS groupName, filesize AS bytes, mime_type
+				(SELECT filename AS `name`, 'Return' AS groupName, filesize AS bytes, mime_type, '' AS hash
 				FROM `submission_return`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
