@@ -28,7 +28,7 @@
 }
 
 
-/var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log /var/log/schoolboxdev/rerouted*log {
+/var/log/schoolboxdev/digestd*.log /var/log/schoolboxdev/scheduled*.log /var/log/schoolboxdev/socketd*.log /var/log/schoolboxdev/rerouted*.log /var/log/schoolboxdev/belld*.log {
 	daily
 	copytruncate
 	missingok

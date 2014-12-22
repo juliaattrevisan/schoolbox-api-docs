@@ -178,6 +178,10 @@ echo "$vag Install schoolbox-rerouted";
 cp -f /vagrant/tools/init/upstart-rerouted.conf /etc/init/schoolbox-rerouted.conf;
 cp -f /vagrant/tools/init/upstart-rerouted.override /etc/init/schoolbox-rerouted.override;
 
+echo "$vag Install schoolbox-belld";
+cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
+cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
+
 echo "$vag Ensure schoolbox-epl is of the required version";
 eplver='1.4.1-4';
 if [ "`dpkg -l schoolbox-epl | tail -n1 | awk {'print $3'}`" != "$eplver" ];
@@ -195,6 +199,7 @@ service schoolbox-scheduled restart > /dev/null 2>/dev/null &
 service schoolbox-socketd restart > /dev/null 2>/dev/null &
 service schoolbox-digestd restart > /dev/null 2>/dev/null &
 service schoolbox-rerouted restart > /dev/null 2>/dev/null &
+service schoolbox-belld restart > /dev/null 2>/dev/null &
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
