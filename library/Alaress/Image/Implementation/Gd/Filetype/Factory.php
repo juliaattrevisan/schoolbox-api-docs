@@ -17,7 +17,7 @@ class Factory implements FactoryInterface
      * Creates a filetype strategy.
      *
      * @param  array $imageArray
-     * @return \FiletypeInterface
+     * @return BaseFiletype
      * @throws \Exception_Schoolbox if image isn't recognised
      */
     public function build($imageArray)
