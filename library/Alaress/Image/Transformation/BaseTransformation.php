@@ -12,39 +12,43 @@ namespace Alaress\Image\Transformation;
 
 use Exception_Schoolbox;
 
-class BaseTransformation {
-	protected $allTransformations = array();
+class BaseTransformation
+{
+    protected $allTransformations = array();
 
-	/**
-	 * Get all transformations for a particular key
-	 *
-	 * @param  $key
-	 * @throws Exception_Schoolbox if transformation isn't found
-	 * @return array
-	 */
-	public function retrieve($key) {
-		if (array_key_exists($key, $this->getAllTransformations())) {
-			return $this->allTransformations[$key];
-		}
+    /**
+    * Get all transformations for a particular key
+    *
+    * @param  $key
+    * @throws Exception_Schoolbox if transformation isn't found
+    * @return array
+    */
+    public function retrieve($key)
+    {
+        if (array_key_exists($key, $this->getAllTransformations())) {
+            return $this->allTransformations[$key];
+        }
 
-		throw new Exception_Schoolbox('Could not load transformation list.');
-	}
+        throw new Exception_Schoolbox('Could not load transformation list.');
+    }
 
-	/**
-	 * Get all transformations
-	 *
-	 * @return array
-	 */
-	protected function getAllTransformations() {
-		return $this->allTransformations;
-	}
+    /**
+    * Get all transformations
+    *
+    * @return array
+    */
+    protected function getAllTransformations()
+    {
+        return $this->allTransformations;
+    }
 
-	/**
-	 * Get a list of transformation keys
-	 *
-	 * @return array
-	 */
-	public function getAllTransformationNames() {
-		return array_keys($this->getAllTransformations());
-	}
+    /**
+    * Get a list of transformation keys
+    *
+    * @return array
+    */
+    public function getAllTransformationNames()
+    {
+        return array_keys($this->getAllTransformations());
+    }
 }

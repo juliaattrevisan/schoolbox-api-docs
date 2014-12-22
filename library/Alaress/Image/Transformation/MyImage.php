@@ -12,38 +12,41 @@
 
 namespace Alaress\Image\Transformation;
 
-class MyImage extends BaseTransformation {
-	protected $allTransformations = array();
+class MyImage extends BaseTransformation
+{
+    protected $allTransformations = array();
 
-	/**
-	 * Accept arguments in transformation list
-	 *
-	 * @param $width
-	 * @param $height
-	 */
-	public function __construct($width, $height) {
-		$this->setAllTransformations(array(
-			'Constrain' => array(
-				array(
-					'method' => 'Constrain',
-					'args' => array(
-						'width' => $width,
-						'height' => $height,
-					)
-				),
-				array(
-					'method' => 'Sharpen'
-				),
-			),
-		));
-	}
+    /**
+    * Accept arguments in transformation list
+    *
+    * @param $width
+    * @param $height
+    */
+    public function __construct($width, $height)
+    {
+        $this->setAllTransformations(array(
+            'Constrain' => array(
+                array(
+                    'method' => 'Constrain',
+                    'args' => array(
+                        'width' => $width,
+                        'height' => $height,
+                    )
+                ),
+                array(
+                    'method' => 'Sharpen'
+                ),
+            ),
+        ));
+    }
 
-	/**
-	 * Dynamically construct a transformation list
-	 *
-	 * @param $allTransformations
-	 */
-	private function setAllTransformations($allTransformations) {
-		$this->allTransformations = $allTransformations;
-	}
+    /**
+    * Dynamically construct a transformation list
+    *
+    * @param $allTransformations
+    */
+    private function setAllTransformations($allTransformations)
+    {
+        $this->allTransformations = $allTransformations;
+    }
 }
