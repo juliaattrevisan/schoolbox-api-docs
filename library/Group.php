@@ -188,7 +188,9 @@ class Group extends DeprecatedModel
         $query = "SELECT name, id, userAccess.type accessType
 				  FROM (category, userGroups )
 				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
-				  WHERE cid = id AND userGroups.type = '$type'";
+				  WHERE cid = id
+				  AND category.deleted_at IS NULL
+				  AND userGroups.type = '$type'";
         return $this->db->getAll($query);
     }
 
@@ -211,7 +213,13 @@ class Group extends DeprecatedModel
 
     function groupList()
     {
-        $query = "SELECT name, id FROM category, userGroups WHERE cid = id ORDER BY name";
+        $query = "
+            SELECT name, id
+            FROM category, userGroups
+            WHERE cid = id
+            AND category.deleted_at IS NULL
+            ORDER BY name
+        ";
         return $this->db->getAll($query);
     }
 
@@ -598,8 +606,11 @@ class Group extends DeprecatedModel
     {
         //returns true on user being involved in group
         $query = "SELECT userAccess.type FROM userAccess, category
-			WHERE userAccess.service = '" . $this->_service . "' AND userAccess.uid = '$uid'
-			AND userAccess.sid = category.id AND category.id = '$cid'";
+			WHERE userAccess.service = '" . $this->_service . "'
+			AND userAccess.uid = '$uid'
+			AND userAccess.sid = category.id
+			AND category.deleted_at IS NULL
+			AND category.id = '$cid'";
         return $this->db->getOne($query);
     }
 
@@ -698,6 +709,7 @@ class Group extends DeprecatedModel
 			AND userAccess.sid = category.id
 			AND userAccess.service = '" . $this->_service . "'
 			AND userAccess.type >= '$accessType'
+			AND category.deleted_at IS NULL
 			$exclude_part
 			GROUP BY category.id
 			ORDER BY category.name
@@ -736,6 +748,7 @@ class Group extends DeprecatedModel
         LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
 		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
 		AND userAccess.type >= '$accessType'
+		AND category.deleted_at IS NULL
 		GROUP BY category.id
 		ORDER BY category.name";
 
