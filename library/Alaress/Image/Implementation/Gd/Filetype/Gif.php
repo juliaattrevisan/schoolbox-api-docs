@@ -10,7 +10,8 @@
 
 namespace Alaress\Image\Implementation\Gd\Filetype;
 
-class Gif extends BaseFiletype {
+class Gif extends BaseFiletype
+{
 
     /**
      * Create an image
@@ -18,7 +19,8 @@ class Gif extends BaseFiletype {
      * @param $filename
      * @return resource
      */
-    public function loadImageResource($filename) {
+    public function loadImageResource($filename)
+    {
         //
         // Sadly silence operator is needed for all imagecreatefrom* methods,
         // otherwise error output corrupts image output.
@@ -31,12 +33,14 @@ class Gif extends BaseFiletype {
      * @param $image
      * @param $filename
      */
-    public function save($image, $filename) {
+    public function save($image, $filename)
+    {
         imagegif($image, $filename);
     }
 
 
-    private function outputHeaders() {
+    private function outputHeaders()
+    {
         header('Cache-Control: max-age=10800, private');
         header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
         header('Pragma: private');
@@ -48,13 +52,15 @@ class Gif extends BaseFiletype {
      *
      * @param $image
      */
-    public function stream($image) {
+    public function stream($image)
+    {
         $this->outputHeaders();
         imagegif($image);
         exit;
     }
 
-    public function streamFile($filename) {
+    public function streamFile($filename)
+    {
         $this->outputHeaders();
         header('Content-length: ' . filesize($filename));
         header('Last-Modified: ' . date('r', filemtime($filename)));
@@ -67,8 +73,8 @@ class Gif extends BaseFiletype {
      *
      * @return bool Always true
      */
-    public function supportsAlphaChannel() {
+    public function supportsAlphaChannel()
+    {
         return true;
     }
-
 }

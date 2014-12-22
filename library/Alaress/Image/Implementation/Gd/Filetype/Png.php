@@ -10,7 +10,8 @@
 
 namespace Alaress\Image\Implementation\Gd\Filetype;
 
-class Png extends BaseFiletype {
+class Png extends BaseFiletype
+{
     protected $quality = 6;
 
     /**
@@ -19,7 +20,8 @@ class Png extends BaseFiletype {
      * @param $filename
      * @return resource
      */
-    public function loadImageResource($filename) {
+    public function loadImageResource($filename)
+    {
         return @imagecreatefrompng($filename);
     }
 
@@ -29,11 +31,13 @@ class Png extends BaseFiletype {
      * @param $image
      * @param $filename
      */
-    public function save($image, $filename) {
+    public function save($image, $filename)
+    {
         imagepng($image, $filename, $this->getQuality());
     }
 
-    private function outputHeaders() {
+    private function outputHeaders()
+    {
         header('Cache-Control: max-age=10800, private');
         header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
         header('Pragma: private');
@@ -45,13 +49,15 @@ class Png extends BaseFiletype {
      *
      * @param $image
      */
-    public function stream($image) {
+    public function stream($image)
+    {
         $this->outputHeaders();
         imagepng($image);
         exit;
     }
 
-    public function streamFile($filename) {
+    public function streamFile($filename)
+    {
         $this->outputHeaders();
         header('Content-length: ' . filesize($filename));
         header('Last-Modified: ' . date('r', filemtime($filename)));
@@ -64,7 +70,8 @@ class Png extends BaseFiletype {
      *
      * @param $quality
      */
-    private function setQuality($quality) {
+    private function setQuality($quality)
+    {
         $this->quality = $quality;
     }
 
@@ -73,7 +80,8 @@ class Png extends BaseFiletype {
      *
      * @return int
      */
-    private function getQuality() {
+    private function getQuality()
+    {
         return $this->quality;
     }
 
@@ -82,7 +90,8 @@ class Png extends BaseFiletype {
      *
      * @return bool Always true
      */
-    public function supportsAlphaChannel() {
+    public function supportsAlphaChannel()
+    {
         return true;
     }
 }

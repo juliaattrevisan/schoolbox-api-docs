@@ -10,7 +10,8 @@
 
 namespace Alaress\Image\Implementation\Gd\Filetype;
 
-class Jpg extends BaseFiletype {
+class Jpg extends BaseFiletype
+{
     private $quality = 90;
 
     /**
@@ -19,7 +20,8 @@ class Jpg extends BaseFiletype {
      * @param $filename
      * @return resource
      */
-    public function loadImageResource($filename) {
+    public function loadImageResource($filename)
+    {
         return @imagecreatefromjpeg($filename);
     }
 
@@ -29,12 +31,14 @@ class Jpg extends BaseFiletype {
      * @param $image
      * @param $filename
      */
-    public function save($image, $filename) {
+    public function save($image, $filename)
+    {
         imagejpeg($image, $filename, $this->getQuality());
     }
 
 
-    private function outputHeaders() {
+    private function outputHeaders()
+    {
         header('Cache-Control: max-age=10800, private');
         header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
         header('Pragma: private');
@@ -46,13 +50,15 @@ class Jpg extends BaseFiletype {
      *
      * @param $image
      */
-    public function stream($image) {
+    public function stream($image)
+    {
         $this->outputHeaders();
         imagejpeg($image);
         exit;
     }
 
-    public function streamFile($filename) {
+    public function streamFile($filename)
+    {
         $this->outputHeaders();
         header('Content-length: ' . filesize($filename));
         header('Last-Modified: ' . date('r', filemtime($filename)));
@@ -69,7 +75,8 @@ class Jpg extends BaseFiletype {
      *
      * @param $quality
      */
-    private function setQuality($quality) {
+    private function setQuality($quality)
+    {
         $this->quality = $quality;
     }
 
@@ -78,7 +85,8 @@ class Jpg extends BaseFiletype {
      *
      * @return int
      */
-    private function getQuality() {
+    private function getQuality()
+    {
         return $this->quality;
     }
 
@@ -87,7 +95,8 @@ class Jpg extends BaseFiletype {
      *
      * @return bool Always false
      */
-    public function supportsAlphaChannel() {
+    public function supportsAlphaChannel()
+    {
         return false;
     }
 }
