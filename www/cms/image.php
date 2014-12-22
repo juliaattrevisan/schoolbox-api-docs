@@ -16,23 +16,22 @@ session_start();
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
     $db = DeprecatedDatabase::getInstance();
 
-	$query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$db->smartQuote($_GET['id'])}";
-	$fileDir = Cfg::get('file_dir');
+    $query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$db->smartQuote($_GET['id'])}";
+    $fileDir = Cfg::get('file_dir');
 
-	$imageInfo = $db->getRow($query);
+    $imageInfo = $db->getRow($query);
 
-	/* See if you can view this image
+    /* See if you can view this image
 	 */
-	if (isset($imageInfo['category'])) {
-		$groupHandler = new Group();
+    if (isset($imageInfo['category'])) {
+        $groupHandler = new Group();
 
-		if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS) {
-			SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
-		}
-	}
-	else {
-		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
-	}
+        if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS) {
+            SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
+        }
+    } else {
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
+    }
 }
 
 /* Choose a caching method to use
@@ -50,11 +49,10 @@ $imageProcessor = new Alaress_Image_Processor_Freeform(
     new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
 );
 try {
-	$imageProcessor->load()->stream();
-}
-catch (Exception_Schoolbox_NotFound $e) {
-	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+    $imageProcessor->load()->stream();
+} catch (Exception_Schoolbox_NotFound $e) {
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 }
 catch (Exception $e) {
-	SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
 }

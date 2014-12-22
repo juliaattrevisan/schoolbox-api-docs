@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Portrait {
+class Alaress_Image_Portrait
+{
 
     /**
      * @var Alaress_Image_Processor_Abstract
@@ -25,7 +26,8 @@ class Alaress_Image_Portrait {
      * @param $key
      * @param $transformations
      */
-    public function __construct($externalUserId, $key, $transformations) {
+    public function __construct($externalUserId, $key, $transformations)
+    {
 
         /* Choose a caching method to use
          */
@@ -46,7 +48,8 @@ class Alaress_Image_Portrait {
     /**
      * Outputs the image
      */
-    public function stream() {
+    public function stream()
+    {
         $this->imageProcessor->stream();
     }
 
@@ -54,7 +57,8 @@ class Alaress_Image_Portrait {
      * Saves the image
      * @return string Location of saved image
      */
-    public function save() {
+    public function save()
+    {
         $this->imageProcessor->save();
         return $this->imageProcessor->getCachedFileLocation();
     }
@@ -63,7 +67,8 @@ class Alaress_Image_Portrait {
      * Sets the image processor
      * @param Alaress_Image_Processor_Abstract $imageProcessor
      */
-    private function setImageProcessor(Alaress_Image_Processor_Abstract $imageProcessor) {
+    private function setImageProcessor(Alaress_Image_Processor_Abstract $imageProcessor)
+    {
         $this->imageProcessor = $imageProcessor;
     }
 
@@ -71,8 +76,8 @@ class Alaress_Image_Portrait {
      * Gets the image processor
      * @return Alaress_Image_Processor_Abstract
      */
-    private function getImageProcessor() {
+    private function getImageProcessor()
+    {
         return $this->imageProcessor;
     }
-
 }

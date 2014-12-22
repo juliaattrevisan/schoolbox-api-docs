@@ -17,24 +17,23 @@ $size = isset($_GET['size']) ? $_GET['size'] : 64;
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-	$transform = new Alaress_Image_Transformation_Icon($icon, $size);
-	$transform_key = "Icon";
-	$cache_key = "$icon-$size";
+    $transform = new Alaress_Image_Transformation_Icon($icon, $size);
+    $transform_key = "Icon";
+    $cache_key = "$icon-$size";
 
-	$imageProcessor = new Alaress_Image_Processor_Freeform(
-		new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
-		$transform,
+    $imageProcessor = new Alaress_Image_Processor_Freeform(
+        new Alaress_Image_Cache_Filesystem(WEB_root.$path, $cache_key),
+        $transform,
         new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
         new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
-	);
+    );
 
-	if (isset($transform_key)) {
-		$imageProcessor->setTransformKey($transform_key);
-	}
+    if (isset($transform_key)) {
+        $imageProcessor->setTransformKey($transform_key);
+    }
 
-	$imageProcessor->load()->stream();
-}
-catch (Exception $e) {
+    $imageProcessor->load()->stream();
+} catch (Exception $e) {
 //	echo $e;
-	SitePage::redirectToBrokenImage();
+    SitePage::redirectToBrokenImage();
 }

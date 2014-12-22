@@ -29,13 +29,13 @@ $cache->init($post->getThumbnail());
 $cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 
 try {
-	$processor = new \Alaress_Image_Processor_Standard(
-        $cache,
-        new \Alaress_Image_Transformation_Storage(),
-        new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
-    );
-	$processor->load()->stream();
+    $processor = new \Alaress_Image_Processor_Standard(
+     $cache,
+     new \Alaress_Image_Transformation_Storage(),
+     new \Alaress\Image\Rewrite\Imagine\Filetype\Factory(),
+     new \Alaress\Image\Rewrite\Imagine\Processor\Strategy\Factory()
+ );
+    $processor->load()->stream();
 } catch (\Exception_Schoolbox $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }
