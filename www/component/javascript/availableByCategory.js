@@ -52,7 +52,7 @@ $j(function() {
 				/* Ajax url for getting a list of textboxes
 				 * available for a particular category
 				 */
-				url: '/textbox/ajax/availableByCategory.php',
+				url: '/component/ajax/availableByCategory.php',
 
 				/* A jquery-selected element where the <select>
 				 * element eventually gets put
