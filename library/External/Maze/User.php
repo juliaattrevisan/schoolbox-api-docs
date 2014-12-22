@@ -406,7 +406,7 @@ class External_Maze_User implements External_UserInterface {
 				SUBURB AS StudentContactSuburb,
 				POSTCODE AS StudentContactPostCode,
 				STATE AS StudentContactState,
-				'' AS StudentContactPhoneActual,
+				TELEPHONE AS StudentContactPhoneActual,
 				MMOBILE AS StudentContactMobilePhone,
 				MBUS_PHONE AS StudentContactOccupPhone,
 				'' AS StudentContactRelation,
@@ -415,7 +415,7 @@ class External_Maze_User implements External_UserInterface {
 				FNAME AS StudentContactSpousePreferred,
 				FSURNAME AS StudentContactSpouseSurname,
 				F_EMAIL AS StudentContactSpouseDefaultEmail,
-				'' AS StudentContactSpousePhoneActual,
+				TELEPHONE AS StudentContactSpousePhoneActual,
 				FMOBILE AS StudentContactSpouseMobilePhone,
 				FBUS_PHONE AS StudentContactSpouseOccupPhone,
 				'' AS StudentContactSpouseRelation
