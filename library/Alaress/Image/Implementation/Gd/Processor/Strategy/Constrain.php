@@ -7,10 +7,10 @@
  * The entire original image will be resized with aspect preserved, to fill the maximum amount
  * of space possible without having any of the original image cropped out.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -29,13 +29,13 @@ class Constrain extends BaseStrategy
         $this->setCanvasHeight($args['height']);
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
         $this->setCanvas($canvas);
 
         /* Apply background color
-		 */
+         */
         $this->applyBackgroundColor($args['bgcolor']);
     }
 
@@ -49,17 +49,17 @@ class Constrain extends BaseStrategy
     {
 
         /* Figure out resized dimensions
-		*/
+        */
         $dimensions = $this->boundingBox($image);
 
         /* If resultant dimensions are the same, just return
-		 * what you were provided instead of copying out again
-		 */
+         * what you were provided instead of copying out again
+         */
         if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
             return $image;
         } /* Resize the canvas to fit the new resized dimensions, so
-		 * you don't get excess canvas space
-		 */
+         * you don't get excess canvas space
+         */
         else {
             $resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
             $this->alphaFill($resizedCanvas);

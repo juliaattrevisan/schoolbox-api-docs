@@ -5,10 +5,10 @@
  * Constrain an image to fit within a specified width and height which is measured
  * from the center of the source image
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -44,13 +44,13 @@ class Rectangle extends BaseStrategy
         $this->setCanvasHeight($args['height']);
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
         $this->setCanvas($canvas);
 
         /* Apply background color
-		 */
+         */
         $this->setBgColors($args['bgcolor']);
         $this->applyBackgroundColor($args['bgcolor']);
 
@@ -67,7 +67,7 @@ class Rectangle extends BaseStrategy
     {
 
         /* Center of source image
-		 */
+         */
         $currentWidth = imagesx($image);
         $currentHeight = imagesy($image);
 
@@ -75,20 +75,20 @@ class Rectangle extends BaseStrategy
         $finalRatio = $this->getCanvasWidth() / $this->getCanvasHeight();
 
         /* Resize if image is larger than the canvas in either dimension
-		 * (or upscaling small images)
-		 */
+         * (or upscaling small images)
+         */
         if ($currentWidth > $this->getCanvasWidth()
             || $currentHeight > $this->getCanvasHeight()
             || $this->getSmallImageUpscales()
         ) {
             /* Landscape
-			 */
+             */
             if (($this->getCanvasWidth()/$this->getCanvasHeight()) >= 1) {
 /* Current image is more panoramic than final canvas -_-;
-				 */
+                 */
                 if ($currentRatio > $finalRatio) {
                     /* The edges that get lopped off
-					 */
+                     */
                     $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
 
                     $startX = $trim;
@@ -97,10 +97,10 @@ class Rectangle extends BaseStrategy
                     $endX = $currentWidth - 2*$trim;
                     $endY = $currentHeight;
                 } /* Canvas is more panoramic than current image -_-;
-				 */
+                 */
                 else {
                     /* The edges that get lopped off
-					 */
+                     */
                     $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
 
                     $startX = 0;
@@ -110,13 +110,13 @@ class Rectangle extends BaseStrategy
                     $endY = $currentHeight - 2*$trim;
                 }
             } /* Portrait
-			 */
+             */
             else {
 /* Canvas is taller than current image -_-;
-				 */
+                 */
                 if ($currentRatio > $finalRatio) {
                     /* The edges that get lopped off
-					 */
+                     */
                     $trim = abs(0.5 * ($currentHeight * ($finalRatio - $currentRatio)));
 
                     $startX = $trim;
@@ -125,10 +125,10 @@ class Rectangle extends BaseStrategy
                     $endX = $currentWidth - 2*$trim;
                     $endY = $currentHeight;
                 } /* Current image is taller than final canvas -_-;
-				 */
+                 */
                 else {
                     /* The edges that get lopped off
-					 */
+                     */
                     $trim = abs(0.5 * ($currentWidth/$finalRatio - $currentWidth/$currentRatio));
 
                     $startX = 0;
@@ -140,8 +140,8 @@ class Rectangle extends BaseStrategy
             }
 
             /* Resize the canvas to fit the new resized dimensions, so
-			 * you don't get excess canvas space
-			 */
+             * you don't get excess canvas space
+             */
             $this->alphaFill();
             imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $this->getCanvasWidth(), $this->getCanvasHeight(), $endX, $endY);
         } else {
@@ -156,7 +156,7 @@ class Rectangle extends BaseStrategy
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
     * Set smallImageUpscales

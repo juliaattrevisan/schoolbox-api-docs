@@ -5,10 +5,10 @@
  * Constrain an image to fit within a specified width and height which is measured
  * from the center of the source image
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -27,7 +27,7 @@ class Square extends BaseStrategy
         $this->setCanvasHeight($args['width']);
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
         $this->setCanvas($canvas);
@@ -43,7 +43,7 @@ class Square extends BaseStrategy
     {
 
         /* Center of source image
-		 */
+         */
         $currentWidth = imagesx($image);
         $currentHeight = imagesy($image);
 
@@ -51,8 +51,8 @@ class Square extends BaseStrategy
         $centerY = floor($currentHeight/2);
 
         /* Landscape
-		 * Constrain by width
-		 */
+         * Constrain by width
+         */
         if ($centerX > $centerY) {
             $ratio = $currentHeight / $this->getCanvasHeight();
 
@@ -62,7 +62,7 @@ class Square extends BaseStrategy
             $startX = ($currentWidth - $currentHeight)/2;
             $startY = 0;
         } /* Portrait
-		 */
+         */
         elseif ($centerX < $centerY) {
             $ratio = $currentWidth / $this->getCanvasWidth();
 
@@ -72,7 +72,7 @@ class Square extends BaseStrategy
             $startX = 0;
             $startY = ($currentHeight - $currentWidth)/2;
         } /* Square already
-		 */
+         */
         else {
             $resizedWidth = $this->getCanvasWidth();
             $resizedHeight = $this->getCanvasHeight();
@@ -84,8 +84,8 @@ class Square extends BaseStrategy
         $this->alphaFill();
 
         /* Resize the canvas to fit the new resized dimensions, so
-		 * you don't get excess canvas space
-		 */
+         * you don't get excess canvas space
+         */
         imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
 
         return $this->getCanvas();

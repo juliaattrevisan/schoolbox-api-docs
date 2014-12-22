@@ -4,10 +4,10 @@
  *
  * Canvas abstract. Used when you need to specify new dimensions for an image.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -18,7 +18,7 @@ abstract class BaseStrategy implements StrategyInterface
 {
 
     /* Canvas image resource
-	 */
+     */
     protected $canvas = null;
     protected $canvasWidth = 0;
     protected $canvasHeight = 0;
@@ -61,7 +61,7 @@ abstract class BaseStrategy implements StrategyInterface
     {
 
         /* Figure out resized dimensions
-		*/
+        */
         $currentWidth = imagesx($image);
         $currentHeight = imagesy($image);
 
@@ -69,7 +69,7 @@ abstract class BaseStrategy implements StrategyInterface
         $resizedHeight = $currentHeight;
 
         /* Constrain by width
-		 */
+         */
         if ($currentWidth > $this->getCanvasWidth()) {
             $ratio = $currentWidth / $this->getCanvasWidth();
 
@@ -78,7 +78,7 @@ abstract class BaseStrategy implements StrategyInterface
         }
 
         /* Constrain by height
-		 */
+         */
         if ($resizedHeight > $this->getCanvasHeight()) {
             $ratio = $resizedHeight / $this->getCanvasHeight();
 

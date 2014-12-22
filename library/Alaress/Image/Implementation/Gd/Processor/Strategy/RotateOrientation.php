@@ -6,9 +6,9 @@
  * This transformation makes sure that the image is rotated to the correct orientation
  * before any other transformations take place.
  *
- * @author	  James Leckie <james.leckie@alaress.com.au>
+ * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link        http://www.alaress.com.au/
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;

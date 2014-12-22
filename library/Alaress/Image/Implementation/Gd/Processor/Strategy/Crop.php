@@ -12,10 +12,10 @@
  *
  * The percentage conversion is done internally, so you can just put in values between 0 and 100
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -44,12 +44,12 @@ class Crop extends BaseStrategy
     {
 
         /* Figure out resized dimensions
-		 */
+         */
         $currentWidth = imagesx($image);
         $currentHeight = imagesy($image);
 
         /* Width of area to crop
-		 */
+         */
         $src_w = $currentWidth * ($this->getCoordinates('x1') - $this->getCoordinates('x0'));
         $src_h = $currentHeight * ($this->getCoordinates('y1') - $this->getCoordinates('y0'));
 
@@ -57,7 +57,7 @@ class Crop extends BaseStrategy
         $src_y = $currentHeight * $this->getCoordinates('y0');
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($src_w, $src_h);
 
         $this->alphaFill($canvas);
@@ -76,7 +76,7 @@ class Crop extends BaseStrategy
         $this->coordinates = $coordinates;
 
         /* Do conversion so we don't have to do it ourselves -_-
-		 */
+         */
         $this->coordinates['x0'] *= 0.01;
         $this->coordinates['y0'] *= 0.01;
         $this->coordinates['x1'] *= 0.01;

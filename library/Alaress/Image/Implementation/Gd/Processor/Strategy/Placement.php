@@ -8,10 +8,10 @@
  * left, middle, right
  * bottomleft, bottom, bottomright
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -20,7 +20,7 @@ class Placement extends BaseStrategy
 {
 
     /* Positioning of the image within the canvas
-	 */
+     */
     private $position = 'topleft';
 
     /**
@@ -42,13 +42,13 @@ class Placement extends BaseStrategy
         $this->setPosition($args['position']);
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
         $this->setCanvas($canvas);
 
         /* Apply background color
-		 */
+         */
         $this->setBgColors($args['bgcolor']);
         $this->applyBackgroundColor($args['bgcolor']);
     }
@@ -63,12 +63,12 @@ class Placement extends BaseStrategy
     {
 
         /* Figure out resized dimensions
-		*/
+        */
         $resizedWidth = imagesx($image);
         $resizedHeight = imagesy($image);
 
         /* Constrain to half canvas width and position where told
-		 */
+         */
         $positioning = $this->determinePositioning($resizedWidth, $resizedHeight);
 
         $bgColor = $this->getBgColors();
@@ -90,7 +90,7 @@ class Placement extends BaseStrategy
     {
 
         /* Top row
-		 */
+         */
         if ($this->getPosition() == 'topleft') {
             $dst_x = 0;
             $dst_y = 0;
@@ -101,7 +101,7 @@ class Placement extends BaseStrategy
             $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
             $dst_y = 0;
         } /* Middle row
-		 */
+         */
         elseif ($this->getPosition() == 'left') {
             $dst_x = 0;
             $dst_y = floor(($this->getCanvasHeight() - $resizedHeight)/2);
@@ -112,7 +112,7 @@ class Placement extends BaseStrategy
             $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
             $dst_y = floor(($this->getCanvasHeight() - $resizedHeight)/2);
         } /* Bottom row
-		 */
+         */
         elseif ($this->getPosition() == 'bottomleft') {
             $dst_x = 0;
             $dst_y = floor(($this->getCanvasHeight() - $resizedHeight));
@@ -123,7 +123,7 @@ class Placement extends BaseStrategy
             $dst_x = floor($this->getCanvasWidth() - $resizedWidth);
             $dst_y = floor(($this->getCanvasHeight() - $resizedHeight));
         } /* Default
-		 */
+         */
         else {
             $dst_x = 0;
             $dst_y = 0;
@@ -136,7 +136,7 @@ class Placement extends BaseStrategy
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
     * Set position

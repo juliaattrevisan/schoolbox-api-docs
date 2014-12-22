@@ -9,10 +9,10 @@
  *
  * If your canvas is larger than the resized image, the excess canvas space is kept
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
@@ -38,13 +38,13 @@ class ConstrainKeepCanvas extends BaseStrategy
         $this->setCanvasHeight($args['height']);
 
         /* Create canvas at specified dimensions
-		 */
+         */
         $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
         $this->setCanvas($canvas);
 
         /* Apply background color
-		 */
+         */
         $this->setBgColors($args['bgcolor']);
         $this->applyBackgroundColor($args['bgcolor']);
     }
@@ -61,7 +61,7 @@ class ConstrainKeepCanvas extends BaseStrategy
     {
 
         /* Figure out resized dimensions
-		*/
+        */
         $dimensions = $this->boundingBox($image);
 
         $bgColor = $this->getBgColors();
@@ -73,7 +73,7 @@ class ConstrainKeepCanvas extends BaseStrategy
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
     * Set bgcolours
