@@ -28,8 +28,24 @@ class User implements JsonSerializable
     private $year;
     private $schoolHouse;
     private $residentialHouse;
-    private $hash; //Deprecated: reset password hash
-    private $key; //RSS/VCAL export token
+
+    /**
+     * The hash value is actually a digest key and it will change
+     * with the username and password and should not be exposed
+     * publically as it is an actual security token for the purposes
+     * of webdav auth.
+     *
+     * @var string
+     */
+    private $hash = '';
+
+    /**
+     * Publicly available unique identifier, used in export functions
+     *
+     * @var string
+     */
+    private $key = '';
+
     private $role; //Users role within the system
     private $campusCollection; //Collection of campuses
     private $defaultCampus; //The users default campus

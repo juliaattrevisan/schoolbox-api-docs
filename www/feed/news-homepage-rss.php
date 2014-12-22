@@ -20,15 +20,15 @@ $params = parse_url($_SERVER['QUERY_STRING']);
 
 preg_match('/user=([a-zA-Z0-9]+)(&category=)?(\d*)/', $params['path'], $matches);
 
-$userHash = $matches[1];
+$userKey = $matches[1];
 $categoryId = $matches[3];
 
 /* Find all the bits
  */
-if (strlen($userHash)) {
+if (strlen($userKey)) {
     try {
         $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('hash', $userHash);
+        $user = $userMapper->findOneByColumn('key', $userKey);
     } catch (\Exception $e) {
         error(31);
     }
