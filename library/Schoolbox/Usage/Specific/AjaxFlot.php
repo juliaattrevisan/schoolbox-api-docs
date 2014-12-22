@@ -186,6 +186,8 @@ class AjaxFlot {
                 $page->parse('file_sbfs_block', 'file_sbfs');
                 $page->parse('has_category_block', 'has_category');
             }
+            /* Link MyFile
+             */
             else if ($currentData['groupName'] == 'My File') {
                 $page->parse('file_myfile_block', 'file_myfile');
                 $page->parse('no_category_block', 'no_category');
