@@ -20,21 +20,38 @@ $allElements = array();
  */
 if (is_numeric($_GET['categoryId'])) {
 	if ($groupHandler->getPermission($_GET['categoryId']) >= READ_ACCESS) {
-		$allTextboxes = $textboxHandler->getAllByCategory($_GET['categoryId']);
+        switch ($_GET['type']) {
+            case 'tileSource':
+                // Get all components that are a part of this page.
+                /** @var Component_Instance[] $components */
+                $components = Component_InstanceMapper::getInstance()->findByContextAndClass(
+                    'homepage',
+                    $_GET['categoryId'],
+                    'Schoolbox\\Tile\\Component\\HomepageTileController'
+                );
+                foreach ($components as $component) {
+                    $config        = $component->getConfigArray();
+                    $allElements[] = array(
+                        'name'  => $config['componentname']['value'],
+                        'value' => $component->getId(),
+                    );
+                }
+                break;
+            case 'textbox':
+            default:
+                $allTextboxes = $textboxHandler->getAllByCategory($_GET['categoryId']);
+                if (is_array($allTextboxes) && count($allTextboxes)) {
+                    foreach($allTextboxes as $currentTextbox) {
+                        $element = array(
+                            'name' => Scrub::text($currentTextbox['heading']),
+                            'value' => $currentTextbox['textBoxID'],
+                        );
 
-		if (is_array($allTextboxes) && count($allTextboxes)) {
-			foreach($allTextboxes as $currentTextbox) {
-				$element = array(
-					'name' => Scrub::text($currentTextbox['heading']),
-					'value' => $currentTextbox['textBoxID'],
-				);
-
-				$allElements[] = $element;
-			}
-		}
-
-		echo json_encode($allElements);
+                        $allElements[] = $element;
+                    }
+                }
+                break;
+        }
 	}
 }
-
-
+echo json_encode($allElements);
