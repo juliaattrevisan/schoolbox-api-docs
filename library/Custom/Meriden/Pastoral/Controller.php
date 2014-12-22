@@ -15,6 +15,16 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * @var Query
+     */
+    protected $database;
+
+    public function __construct(Query $database)
+    {
+        $this->setDatabase($database);
+    }
+
+    /**
      * Index for Meriden's pastoral page
      *
      * @param int  $year
@@ -51,5 +61,24 @@ class Controller extends Base
      */
     public function subject($year, User $student, $subject)
     {
+    }
+
+    /**
+     * @return Query
+     */
+    public function getDatabase()
+    {
+        return $this->database;
+    }
+
+    /**
+     * @param  Query $database
+     *
+     * @return $this
+     */
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+        return $this;
     }
 }
