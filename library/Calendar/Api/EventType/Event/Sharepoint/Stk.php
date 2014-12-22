@@ -171,9 +171,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      */
     protected function retrieveEventsBetweenTimespan($startTimestamp, $endTimestamp)
     {
-        $groupHandler = new Group();
-        $start        = new Alaress_Date_Format($startTimestamp, 'U');
-        $end          = new Alaress_Date_Format($endTimestamp, 'U');
+        $start = new Alaress_Date_Format($startTimestamp, 'U');
+        $end   = new Alaress_Date_Format($endTimestamp, 'U');
 
         $startDate = new DateTime($start->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
         $endDate   = new DateTime($end->getUsingFormat('Y-m-d\\TH:i:s\\Z'));
@@ -218,16 +217,16 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
                 $eventCampusID = $this->getCampusIdFromName((string)$attribs->ows_School);
 
                 /* Hide events based on role and type of event */
-                if ($groupHandler->isParent() && !in_array($eventTypeID, $this->parentAllowedTypes)) {
+                if ($this->getUser()->getRole()->isParent() && !in_array($eventTypeID, $this->parentAllowedTypes)) {
                     continue;
                 }
 
-                if ($groupHandler->isStudent() && !in_array($eventTypeID, $this->studentAllowedTypes)) {
+                if ($this->getUser()->getRole()->isStudent() && !in_array($eventTypeID, $this->studentAllowedTypes)) {
                     continue;
                 }
 
                 /* Hide events that are not in the users campus list */
-                if (!in_array($eventCampusID, $_SESSION['campus'])) {
+                if (!in_array($eventCampusID, $this->getUser()->getCampusCollection()->getColumnValues('id'))) {
                     continue;
                 }
 
