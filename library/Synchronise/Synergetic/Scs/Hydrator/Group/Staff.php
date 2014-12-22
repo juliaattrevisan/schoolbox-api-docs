@@ -26,16 +26,23 @@ class Synchronise_Synergetic_Scs_Hydrator_Group_Staff implements Synchronise_Bas
     public function getGroupIDFromUser($externalUser) {
         $year = $externalUser['StaffCategory'];
 
+        if($externalUser['StaffCampus'] == 'J') {
+            $teacherGroup = 21;
+        }
+        else {
+            $teacherGroup = 2;
+        }
+
 		switch($year) {
 			case 'ADMIN': return 6;
 			case 'GEN STAFF': return 6;
-			case 'CASU': return 2;
-			case 'TEACH': return 2;
-			case 'ASST': return 2;
-			case 'IMT': return 2;
-			case 'CON': return 2;
-			case 'CONT': return 2;
-			default: return 2;
+			case 'CASU': return $teacherGroup;
+			case 'TEACH': return $teacherGroup;
+			case 'ASST': return $teacherGroup;
+			case 'IMT': return $teacherGroup;
+			case 'CON': return $teacherGroup;
+			case 'CONT': return $teacherGroup;
+			default: return $teacherGroup;
         }
     }
 }
