@@ -47,7 +47,7 @@ if (is_numeric($_GET['id'])) {
 	/* If the file was never viewable on any eportfolio page and you aren't
 	 * the owner, get out
 	 */
-	if (!$isViewable && ($_SESSION['id'] != $file['owner'])) {
+	if (!$isViewable && ($_SESSION['user']->getId() != $file['owner']) && !$_SESSION['user']->isSuperuser()) {
 		error(5);
 	}
 
