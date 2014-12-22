@@ -27,8 +27,8 @@ if (is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 
 	// perfom diff
-	$diff = new Horde_Text_Diff('auto', array( explode("\n", $from['body']), explode("\n", $to['body']) ) );
-	$renderer = new Alaress_Text_Diff_Renderer_Inline();
+    $diff = new Caxy\HtmlDiff\HtmlDiff($from['body'], $to['body']);
+    $diff->build();
 
 	$modifiedDate = new Alaress_Date_Format($from['modified'], 'U');
 
@@ -39,7 +39,7 @@ if (is_numeric($this->arg[0])) {
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => Scrub::text($from['heading']),
             'SLUG'             => Scrub::text($from['slug']),
-			'DIFF'             => $renderer->render($diff),
+			'DIFF'             => $diff->getDifference(),
 			'MODIFIED'         => $modifiedDate->getLong(),
 			'AUTHOR'           => $userHandler->formatName($from),
 			'AUTHOR_ID'        => $from['authorID'],

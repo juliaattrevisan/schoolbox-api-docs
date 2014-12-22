@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c59b9245a5cbcc05e934fe89324a681e",
+    "hash": "83eb307d1b58fc3e8bdabe9101573532",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -384,6 +384,48 @@
                 "user agent"
             ],
             "time": "2014-07-26 13:44:22"
+        },
+        {
+            "name": "caxy/php-htmldiff",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/caxy/php-htmldiff.git",
+                "reference": "a2da731bceb50af036e30294d58e3546513f1d47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/a2da731bceb50af036e30294d58e3546513f1d47",
+                "reference": "a2da731bceb50af036e30294d58e3546513f1d47",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Caxy\\HtmlDiff": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Schroeder",
+                    "email": "jschroeder@caxy.com",
+                    "homepage": "http://www.caxy.com"
+                }
+            ],
+            "description": "A library for comparing two HTML files/snippets and highlighting the differences using simple HTML.",
+            "homepage": "https://github.com/caxy/php-htmldiff",
+            "keywords": [
+                "diff",
+                "html"
+            ],
+            "time": "2014-09-25 21:46:36"
         },
         {
             "name": "cboden/ratchet",
@@ -3999,6 +4041,7 @@
         "aura/web": 10,
         "aura/session": 10,
         "0x46616c6b/etherpad-lite-client": 20,
+        "caxy/php-htmldiff": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
     },
