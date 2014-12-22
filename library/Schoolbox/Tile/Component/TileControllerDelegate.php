@@ -51,7 +51,17 @@ class TileControllerDelegate
     {
         // layoutId: the layout that was created when this component was
         // tileSource: the layout chosen for an alternate source
-        $layoutId = $controller->getConfig('tileSource') ?: $controller->getConfig('layoutId');
+        $altSource = $controller->getConfig('tileSource');
+        $layoutId  = $controller->getConfig('layoutId');
+        if ($altSource) {
+            // Get this component, and get its layout ID
+            $altComponents = \Component_InstanceMapper::getInstance()->findByInstanceId($altSource);
+            if (isset($altComponents[$altSource])) {
+                $altComponent = $altComponents[$altSource];
+                $altConfig    = $altComponent->getConfigArray();
+                $layoutId     = $altConfig['layoutId']['value'];
+            }
+        }
 
         // empty layout by default
         $mapper = Layout\Mapper::getInstance();
