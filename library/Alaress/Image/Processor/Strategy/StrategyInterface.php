@@ -12,7 +12,10 @@ namespace Alaress\Image\Processor\Strategy;
 interface StrategyInterface
 {
     /**
-     * Manipulate image
+     * Manipulate image.
+     *
+     * Type of parameter and return depend upon implementation, it is however
+     * expected that they will return the same type.
      *
      * @param  mixed $image
      * @return mixed The manipulated image
