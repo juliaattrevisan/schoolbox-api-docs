@@ -16,7 +16,6 @@ td {
     font-family: Arial, sans-serif;
     font-size: 13px;
 }
-
 a {
     text-decoration: none;
     color: {{ colours.link }};
@@ -43,7 +42,7 @@ img {
 }
 
 .header {
-    background-color: {{ colours.banner_background }};
+    background-color: {{ colours.body_background }};
 }
 
 .header img {
@@ -71,7 +70,7 @@ tr.dark {
     line-height: 36px;
     font-weight: bold;
     font-size: 18px;
-    color: {{ colours.banner_background }};
+    color: {{ colours.black }};
     {#background: {{ colours.module_background }};#}
 }
 
@@ -79,7 +78,7 @@ tr.dark {
     background-color: {{ colours.submit_btn }};
     padding: 4px 8px 6px;
     text-decoration: none;
-    color: {{ colours.white }};
+    color: {{ colours.link }};
 }
 
 .content em {
@@ -87,7 +86,7 @@ tr.dark {
 }
 
 .footer p {
-    color: {{ colours.footer_links }};
+    color: {{ colours.white }};
     font-family: Arial, sans-serif;
     font-size: 11px;
     line-height: 18px;
@@ -96,7 +95,7 @@ tr.dark {
 }
 
 .footer a {
-    color: {{ colours.footer_links }};
+    color: {{ colours.white }};
     text-decoration: underline;
 }
 
@@ -108,20 +107,20 @@ tr.underline td, td.underline {
 {# module specifics #}
 .work-month, .work-day {
     text-align: center;
-    border: solid 2px {{ colours.banner_background }};
+    border: solid 2px {{ colours.black }};
 }
 .work-month {
     text-transform: uppercase;
     font-size: 12px;
-    background-color: {{ colours.banner_background }};
-    color: {{ colours.banner_color }};
+    background-color: {{ colours.black }};
+    color: {{ colours.white }};
     border-bottom: solid 1px #fff;
 }
 
 .work-day {
     font-size: 22px;
     line-height: 35px;
-    color: {{ colours.banner_background }};
+    color: {{ colours.link }};
     background-color: {{ colours.content_background }};
 }
 
