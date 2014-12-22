@@ -1,2 +1,4 @@
 {# Search for resource items in this category. #}
-<a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.id }}">{{ item.name }}</a>
+<a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.id }}"
+   class="{% if categoryId == item.id %}current{% endif %}"
+>{{ item.name }}</a>

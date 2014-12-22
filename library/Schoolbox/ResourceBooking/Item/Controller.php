@@ -90,6 +90,7 @@ class Controller extends Base {
                 'template' => '@resourceItem/browse.twig',
                 'data'     => array(
                     'list'         => $list,
+                    'categoryId'   => $catId,
                     'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
                     'search'       => $search,
                     'paginator'    => $this->paginator,
