@@ -138,11 +138,13 @@ class AjaxFlot {
         $page->setBlock('file', 'has_category', 'has_category_block');
         $page->setBlock('file', 'no_category', 'no_category_block');
 
+        $page->setBlock('file', 'file_myfile', 'file_myfile_block');
         $page->setBlock('file', 'file_unlinked', 'file_unlinked_block');
 
         $page->setVar(array(
             'file_storage_block' => '',
             'file_sbfs_block' => '',
+            'file_myfile_block' => '',
             'file_unlinked_block' => '',
             'has_category_block' => '',
             'no_category_block' => '',
@@ -176,16 +178,17 @@ class AjaxFlot {
             /* Link SBFS files
              */
             else if ($currentData['groupName'] == 'File') {
-                $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-                $category = $categoryMapper->findById($currentData['categoryId']);
-
                 $page->setVar(array(
-                    'FILE_CATEGORY_ID' => $category->getId(),
-                    'FILE_CATEGORY_NAME' => $category->getName()
+                    'FILE_CATEGORY_ID' => $currentData['categoryId'],
+                    'FILE_CATEGORY_NAME' => $currentData['categoryName']
                 ));
 
                 $page->parse('file_sbfs_block', 'file_sbfs');
                 $page->parse('has_category_block', 'has_category');
+            }
+            else if ($currentData['groupName'] == 'My File') {
+                $page->parse('file_myfile_block', 'file_myfile');
+                $page->parse('no_category_block', 'no_category');
             }
             /* None of the above
              */
@@ -201,6 +204,7 @@ class AjaxFlot {
             $page->setVar(array(
                 'file_storage_block' => '',
                 'file_sbfs_block' => '',
+                'file_myfile_block' => '',
                 'file_unlinked_block' => '',
                 'has_category_block' => '',
                 'no_category_block' => '',

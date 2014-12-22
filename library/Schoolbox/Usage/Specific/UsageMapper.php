@@ -349,25 +349,28 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			FROM
 			(
 				(SELECT
-				    id,
+				    file.id,
                     realname AS `name`,
                     'File' AS groupName,
                     file_size AS bytes,
                     mime_type,
                     '' AS hash,
-                    category AS categoryId
+                    category.id AS categoryId,
+                    category.name AS categoryName
 				FROM `file`
+				LEFT JOIN category ON file.category = category.id
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
 				UNION
 				(SELECT
-				    '' AS id,
+				    id,
                     realname AS `name`,
                     'My File' AS groupName,
                     file_size AS bytes,
                     mime_type,
                     '' AS hash,
-                    '' AS categoryId
+                    '' AS categoryId,
+                    '' AS categoryName
 				FROM `myFile`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
@@ -379,7 +382,8 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
                     filesize AS bytes,
                     mime AS mime_type,
                     hash,
-                    '' AS categoryId
+                    '' AS categoryId,
+                    '' AS categoryName
 				FROM `storage`
 				WHERE `uploaded_by` = {$userId})
 				UNION
@@ -390,7 +394,8 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
                     filesize AS bytes,
                     mime_type,
                     '' AS hash,
-                    '' AS categoryId
+                    '' AS categoryId,
+                    '' AS categoryName
 				FROM `student_submission`
 				WHERE `owner` = {$userId})
 				UNION
@@ -401,7 +406,8 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
                     filesize AS bytes,
                     mime_type,
                     '' AS hash,
-                    '' AS categoryId
+                    '' AS categoryId,
+                    '' AS categoryName
 				FROM `submission_return`
 				WHERE `owner` = {$userId}
 				AND deleted = 0)
