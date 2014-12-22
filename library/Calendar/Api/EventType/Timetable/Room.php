@@ -56,7 +56,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $categoryList     = array();
         $currentTimestamp = $startTimestamp;
         $dayNumberList    = array();
-        while ($currentTimestamp <= $endTimestamp) {
+        while ($currentTimestamp < $endTimestamp) {
             // Get the definition for this day only.
             foreach ($roomTimetable as $room) {
                 // What's the day number for the campus that has booked this room?
