@@ -18,33 +18,28 @@ class Component_Config_TileSource extends Component_Config_Abstract
         $page->setBlock('tile_select', 'tile_option', 'tile_option_block');
         $page->setVar('tile_select_block', '');
         if ($component instanceof Component_ControllerAbstract) {
-            $altSource = $component->getConfig('src');
-            if ($altSource) {
-                /** @var Component_Instance[] $components */
-                $components = Component_InstanceMapper::getInstance()->findByContext(
-                    'homepage',
-                    $altSource
-                );
-                $page->setVar('tile_option_block', '');
-                foreach ($components as $component) {
-                    if ($component->getDefinition()->getClass()
-                        != 'Schoolbox\\Tile\\Component\\HomepageTileController'
-                    ) {
-                        continue;
-                    }
-                    $configs = $component->getConfigArray();
-                    $page->setVar(
-                        array(
-                            'COMPONENT_CONFIG_TILESELECT_NAME'     => $configs['componentname']['value'],
-                            'COMPONENT_CONFIG_TILESELECT_VALUE'    => $component->getId(),
-                            'COMPONENT_CONFIG_TILESELECT_SELECTED' => $component->getId() == $configValue
-                                ? 'selected' : '',
-                        )
-                    );
-                    $page->parse('tile_option_block', 'tile_option', true);
+            $source = $component->getConfig('src') ?: $component->getInstance()->getId();
+            /** @var Component_Instance[] $components */
+            $components = Component_InstanceMapper::getInstance()->findByContext('homepage', $source);
+            $page->setVar('tile_option_block', '');
+            foreach ($components as $component) {
+                if ($component->getDefinition()->getClass()
+                    != 'Schoolbox\\Tile\\Component\\HomepageTileController'
+                ) {
+                    continue;
                 }
-                $page->parse('tile_select_block', 'tile_select');
+                $configs = $component->getConfigArray();
+                $page->setVar(
+                    array(
+                        'COMPONENT_CONFIG_TILESELECT_NAME'     => $configs['componentname']['value'],
+                        'COMPONENT_CONFIG_TILESELECT_VALUE'    => $component->getId(),
+                        'COMPONENT_CONFIG_TILESELECT_SELECTED' => $component->getId() == $configValue
+                            ? 'selected' : '',
+                    )
+                );
+                $page->parse('tile_option_block', 'tile_option', true);
             }
+            $page->parse('tile_select_block', 'tile_select');
         }
     }
 }
