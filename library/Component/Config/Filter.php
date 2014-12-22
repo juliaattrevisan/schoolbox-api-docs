@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Filter extends Component_Config_Abstract {
+class Component_Config_Filter extends Component_Config_Abstract
+{
 
     /**
      * Converts value from an array into a bitmask which represents the selected
@@ -16,7 +17,8 @@ class Component_Config_Filter extends Component_Config_Abstract {
      * @param  Component_ControllerAbstract $controller
      * @return int
      */
-    public function dehydrate($value, Component_ControllerAbstract $controller) {
+    public function dehydrate($value, Component_ControllerAbstract $controller)
+    {
         $return = 0;
         $fieldList = $controller->getFilterFields();
         if (is_array($fieldList)) {
@@ -28,11 +30,12 @@ class Component_Config_Filter extends Component_Config_Abstract {
         return $return;
     }
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
         $filter = array();
 
-        for($i = 0; $i < count($this->filterFields); $i++) {
+        for ($i = 0; $i < count($this->filterFields); $i++) {
             $j = $configValue % 2;
             $filter[$this->filterFields[$i]] = $j;
             $configValue = (int) $configValue / 2;
@@ -52,5 +55,4 @@ class Component_Config_Filter extends Component_Config_Abstract {
             $page->parse('filters_block', 'filters', true);
         }
     }
-
 }

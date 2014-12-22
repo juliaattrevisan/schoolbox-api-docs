@@ -4,7 +4,8 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Component_Config_Align extends Component_Config_Abstract {
+class Component_Config_Align extends Component_Config_Abstract
+{
 
     public function parse(
         SitePage $page,
@@ -28,5 +29,4 @@ class Component_Config_Align extends Component_Config_Abstract {
         }
 
     }
-
 }

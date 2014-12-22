@@ -11,7 +11,7 @@
 
 $group = new Group();
 
-if ( !$group->isSuperuser() ) {
+if (!$group->isSuperuser()) {
     error(19);
 }
 
@@ -29,7 +29,7 @@ $nav->parse($this, 'homepage');
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
 $homepageTemplateList = $homepageTemplateMapper->findAll();
 
-foreach($homepageTemplateList as $currentTemplate) {
+foreach ($homepageTemplateList as $currentTemplate) {
     $this->setVar(array(
             'template.id'   => $currentTemplate->getId(),
             'template.name' => $currentTemplate->getName()
@@ -46,7 +46,7 @@ $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnL
     'visible' => 'true',
 ));
 
-foreach($definitionCollection as $definition) {
+foreach ($definitionCollection as $definition) {
     /* @var $definition Component_Definition */
     $this->setVar(array(
         'definition.id'          => $definition->getId(),
@@ -78,13 +78,13 @@ $componentCollection = $componentFactory->buildComponentList($cid);
 
 $occupiedPositionList = array();
 
-foreach($componentCollection as $component) {
+foreach ($componentCollection as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_id = $component->getInstance()->getId();
     $position_no = $component->getInstance()->getPosition();
     $position    = "position_{$position_no}";
 
-    if(!$this->template->exists("{$position}_block")) {
+    if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
@@ -107,14 +107,14 @@ foreach($componentCollection as $component) {
 
     $this->parse("{$position}_block", $position, true);
 
-    if(!in_array($position_no, $occupiedPositionList)) {
+    if (!in_array($position_no, $occupiedPositionList)) {
         $occupiedPositionList[] = $position_no;
     }
 }
 
 $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
 
-foreach($emptyPositionList as $emptyPosition) {
+foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("position_{$emptyPosition}_block", '');
 }
 

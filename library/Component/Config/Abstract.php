@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Component_Config_Abstract {
+abstract class Component_Config_Abstract
+{
 
     protected $cat;
 
@@ -21,13 +22,14 @@ abstract class Component_Config_Abstract {
      */
     protected $is_shown_on_template = true;
 
-    public function __construct($category = array(), $fields = null) {
+    public function __construct($category = array(), $fields = null)
+    {
         $this->cat = $category;
 
-        if(isset($fields['sort'])) {
+        if (isset($fields['sort'])) {
             $this->sortFields = $fields['sort'];
         }
-        if(isset($fields['filter'])) {
+        if (isset($fields['filter'])) {
             $this->filterFields = $fields['filter'];
         }
     }
@@ -36,9 +38,10 @@ abstract class Component_Config_Abstract {
      * @param string $attr
      * @return mixed|bool
      */
-    protected function getCategory($attr = '') {
-        if($attr) {
-            if(isset($this->cat[$attr])) {
+    protected function getCategory($attr = '')
+    {
+        if ($attr) {
+            if (isset($this->cat[$attr])) {
                 return $this->cat[$attr];
             }
             return false;
@@ -53,7 +56,8 @@ abstract class Component_Config_Abstract {
      * @param  Component_ControllerAbstract $controller
      * @return mixed
      */
-    public function dehydrate($value, Component_ControllerAbstract $controller) {
+    public function dehydrate($value, Component_ControllerAbstract $controller)
+    {
         return $value;
     }
 
@@ -62,7 +66,8 @@ abstract class Component_Config_Abstract {
      *
      * @return bool
      */
-    public function isShownOnTemplate() {
+    public function isShownOnTemplate()
+    {
         return $this->is_shown_on_template;
     }
 

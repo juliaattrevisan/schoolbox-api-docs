@@ -10,7 +10,8 @@
  * @version     SVN: $Id$
  */
 
-class Component_Config_Collaborate extends Component_Config_Abstract {
+class Component_Config_Collaborate extends Component_Config_Abstract
+{
 
     /**
      * Parse out config options
@@ -21,16 +22,16 @@ class Component_Config_Collaborate extends Component_Config_Abstract {
      * @param          $configValue
      * @param array    $allConfigs
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
-		if ($configValue == '1') {
-			$page->setVar(array(
-				'COMPONENT_CONFIG_COLLABORATE_SELECTED' => 'checked="checked"'
-			));
-		}
-		else {
-			$page->setVar(array(
-				'COMPONENT_CONFIG_COLLABORATE_SELECTED' => ''
-			));
-		}
-	}
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
+        if ($configValue == '1') {
+            $page->setVar(array(
+                'COMPONENT_CONFIG_COLLABORATE_SELECTED' => 'checked="checked"'
+            ));
+        } else {
+            $page->setVar(array(
+                'COMPONENT_CONFIG_COLLABORATE_SELECTED' => ''
+            ));
+        }
+    }
 }

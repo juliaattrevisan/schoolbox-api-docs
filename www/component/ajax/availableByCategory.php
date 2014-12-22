@@ -19,7 +19,7 @@ $allElements = array();
 /* Check permissions
  */
 if (is_numeric($_GET['categoryId'])) {
-	if ($groupHandler->getPermission($_GET['categoryId']) >= READ_ACCESS) {
+    if ($groupHandler->getPermission($_GET['categoryId']) >= READ_ACCESS) {
         switch ($_GET['type']) {
             case 'tileSource':
                 // Get all components that are a part of this page.
@@ -41,7 +41,7 @@ if (is_numeric($_GET['categoryId'])) {
             default:
                 $allTextboxes = $textboxHandler->getAllByCategory($_GET['categoryId']);
                 if (is_array($allTextboxes) && count($allTextboxes)) {
-                    foreach($allTextboxes as $currentTextbox) {
+                    foreach ($allTextboxes as $currentTextbox) {
                         $element = array(
                             'name' => Scrub::text($currentTextbox['heading']),
                             'value' => $currentTextbox['textBoxID'],
@@ -52,6 +52,6 @@ if (is_numeric($_GET['categoryId'])) {
                 }
                 break;
         }
-	}
+    }
 }
 echo json_encode($allElements);

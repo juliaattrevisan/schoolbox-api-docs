@@ -5,11 +5,13 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-class Component_Config_Video extends Component_Config_Abstract {
+class Component_Config_Video extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
-		/* Sort order
+        /* Sort order
 		 */
         $sortConfig = array();
         $altSource  = null;
@@ -37,8 +39,7 @@ class Component_Config_Video extends Component_Config_Abstract {
 
                 $page->parse("video_select_block", "video_select", true);
             }
-        }
-        else {
+        } else {
             $page->setVar(array(
                 'COMPONENT_CONFIG_VIDSELECT_NAME'       => Scrub::text(' (none) '),
                 'COMPONENT_CONFIG_VIDSELECT_VALUE'      => '0',

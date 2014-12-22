@@ -6,26 +6,26 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Textbox extends Component_Config_Abstract {
+class Component_Config_Textbox extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
         $handler = new TextBox();
 
         // has an internal block for the select element
 
-		/* Select a textbox from some other homepage
+        /* Select a textbox from some other homepage
 		 */
         $altSource = $component instanceof Component_ControllerAbstract
             ? $component->getConfig('src')
             : null;
-		if (is_numeric($altSource) && $altSource) {
-			$boxList = $handler->getAllByCategory($altSource);
-		}
-		else {
-
-			$boxList = $handler->getAllByCategory($this->getCategory('id'));
-		}
+        if (is_numeric($altSource) && $altSource) {
+            $boxList = $handler->getAllByCategory($altSource);
+        } else {
+            $boxList = $handler->getAllByCategory($this->getCategory('id'));
+        }
 
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
         $page->setVar('textbox_select_block', '');
@@ -40,8 +40,7 @@ class Component_Config_Textbox extends Component_Config_Abstract {
 
                 $page->parse("textbox_select_block", "textbox_select", true);
             }
-        }
-        else {
+        } else {
             $page->setVar(array(
                 'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text(' (none) '),
                 'COMPONENT_CONFIG_BOXSELECT_VALUE'      => '0',
