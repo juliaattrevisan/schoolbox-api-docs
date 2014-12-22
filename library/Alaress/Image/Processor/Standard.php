@@ -10,21 +10,23 @@
 
 namespace Alaress\Image\Processor;
 
+use Alaress\Image\Filetype;
+
 class Standard extends BaseProcessor
 {
     /**
      * Constructor
      *
-     * @param                                                    $cache
-     * @param                                                    $transformations
-     * @param \Alaress\Image\Filetype\FactoryInterface           $filetypeFactory
-     * @param \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
+     * @param                           $cache
+     * @param                           $transformations
+     * @param Filetype\FactoryInterface $filetypeFactory
+     * @param Strategy\FactoryInterface $processorFactory
      */
     public function __construct(
         $cache,
         $transformations,
-        \Alaress\Image\Filetype\FactoryInterface $filetypeFactory,
-        \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
+        Filetype\FactoryInterface $filetypeFactory,
+        Strategy\FactoryInterface $processorFactory
     ) {
         $this->setCache($cache);
         $this->setTransformations($transformations);
