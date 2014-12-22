@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Cache_Filesystem
+ * Alaress\Image\Cache\Filesystem
  * Load images from some arbitrary path on the filesystem
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>

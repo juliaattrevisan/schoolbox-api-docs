@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Cache_MyImage
+ * Alaress\Image\Cache\Image
  * Load images from the cache in the Menclone manner
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>

@@ -1,5 +1,13 @@
 <?php
-
+/**
+ * Alaress\Image\Cache\Storage
+ * Loads images from the storage engine.
+ *
+ * @author      James Leckie <james.leckie@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 
 namespace Alaress\Image\Cache;
 
