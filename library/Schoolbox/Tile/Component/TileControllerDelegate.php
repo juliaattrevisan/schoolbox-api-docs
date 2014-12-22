@@ -113,9 +113,11 @@ class TileControllerDelegate
     {
         $controller->setVar(
             array(
-                'COMPONENT_CONTENT' => $content,
-                'header_block'      => '',
-                'buttons_block'     => '',
+                'header_block'               => '',
+                'buttons_block'              => '',
+                'COMPONENT_CONTENT'          => $content,
+                'TILE_COMPONENT_INSTANCE_ID' => $controller->getConfig('tileSource')
+                    ?: $controller->getInstance()->getId(),
             )
         );
         if ($permission >= UserAccess::ACCESS_WRITE) {
