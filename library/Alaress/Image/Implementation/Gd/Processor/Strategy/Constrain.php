@@ -15,55 +15,57 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class Constrain extends BaseStrategy {
+class Constrain extends BaseStrategy
+{
 
-	/**
-	 * Constructor
-	 *
-	 * @param $args
-	 */
-	public function __construct($args) {
-		$this->setCanvasWidth($args['width']);
-		$this->setCanvasHeight($args['height']);
+    /**
+    * Constructor
+    *
+    * @param $args
+    */
+    public function __construct($args)
+    {
+        $this->setCanvasWidth($args['width']);
+        $this->setCanvasHeight($args['height']);
 
-		/* Create canvas at specified dimensions
+        /* Create canvas at specified dimensions
 		 */
-		$canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
+        $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
-		$this->setCanvas($canvas);
+        $this->setCanvas($canvas);
 
-		/* Apply background color
+        /* Apply background color
 		 */
-		$this->applyBackgroundColor($args['bgcolor']);
-	}
+        $this->applyBackgroundColor($args['bgcolor']);
+    }
 
-	/**
-	 * Manipulate image
-	 *
-	 * @param $image
-	 * @return null
-	 */
-	public function manipulate($image) {
+    /**
+    * Manipulate image
+    *
+    * @param $image
+    * @return null
+    */
+    public function manipulate($image)
+    {
 
-		/* Figure out resized dimensions
+        /* Figure out resized dimensions
 		*/
-		$dimensions = $this->boundingBox($image);
+        $dimensions = $this->boundingBox($image);
 
-		/* If resultant dimensions are the same, just return
+        /* If resultant dimensions are the same, just return
 		 * what you were provided instead of copying out again
 		 */
-		if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
-			return $image;
-		}
-		/* Resize the canvas to fit the new resized dimensions, so
+        if (($dimensions['width'] == imagesx($image)) && ($dimensions['height'] == imagesy($image))) {
+            return $image;
+        } /* Resize the canvas to fit the new resized dimensions, so
 		 * you don't get excess canvas space
 		 */
-		else {
-			$resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
-			$this->alphaFill($resizedCanvas);
-			imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+        else {
+            $resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
+            $this->alphaFill($resizedCanvas);
+            imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
 
-			return $resizedCanvas;
-		}
-	}
+            return $resizedCanvas;
+        }
+    }
 }

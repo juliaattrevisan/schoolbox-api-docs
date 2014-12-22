@@ -12,27 +12,29 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class Sharpen extends BaseStrategy {
+class Sharpen extends BaseStrategy
+{
 
-	/**
-	 * Manipulate image
-	 *
-	 * @param $image
-	 * @return mixed
-	 */
-	public function manipulate($image) {
-		$sharpenMatrix = array (
-			array(-0.2, -1, -0.2),
-			array(-1, 15, -1),
-			array(-0.2, -1, -0.2)
-		);
+    /**
+    * Manipulate image
+    *
+    * @param $image
+    * @return mixed
+    */
+    public function manipulate($image)
+    {
+        $sharpenMatrix = array (
+            array(-0.2, -1, -0.2),
+            array(-1, 15, -1),
+            array(-0.2, -1, -0.2)
+        );
 
-		$divisor = array_sum(array_map('array_sum', $sharpenMatrix));
+        $divisor = array_sum(array_map('array_sum', $sharpenMatrix));
 
-		$offset = 0;
+        $offset = 0;
 
-		imageconvolution($image, $sharpenMatrix, $divisor, $offset);
+        imageconvolution($image, $sharpenMatrix, $divisor, $offset);
 
-		return $image;
-	}
+        return $image;
+    }
 }

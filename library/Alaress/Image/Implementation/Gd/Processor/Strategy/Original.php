@@ -12,15 +12,17 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class Original extends BaseStrategy {
+class Original extends BaseStrategy
+{
 
-	/**
-	 * Manipulate image
-	 *
-	 * @param $image
-	 * @return mixed
-	 */
-	public function manipulate($image) {
-		return $image;
-	}
+    /**
+    * Manipulate image
+    *
+    * @param $image
+    * @return mixed
+    */
+    public function manipulate($image)
+    {
+        return $image;
+    }
 }

@@ -13,7 +13,8 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class RotateOrientation extends BaseStrategy {
+class RotateOrientation extends BaseStrategy
+{
 
     private $filePath = '';
 
@@ -22,7 +23,8 @@ class RotateOrientation extends BaseStrategy {
      *
      * @param $args
      */
-    public function __construct($args) {
+    public function __construct($args)
+    {
         $this->filePath = $args['FilePath'];
     }
 
@@ -32,19 +34,20 @@ class RotateOrientation extends BaseStrategy {
      * @param $image
      * @return null
      */
-    public function manipulate($image) {
+    public function manipulate($image)
+    {
 
         $exif = @exif_read_data($this->filePath);
-        if(!empty($exif['Orientation'])) {
+        if (!empty($exif['Orientation'])) {
             switch($exif['Orientation']) {
                 case 8:
-                    $image = imagerotate($image,90,0);
+                    $image = imagerotate($image, 90, 0);
                     break;
                 case 3:
-                    $image = imagerotate($image,180,0);
+                    $image = imagerotate($image, 180, 0);
                     break;
                 case 6:
-                    $image = imagerotate($image,-90,0);
+                    $image = imagerotate($image, -90, 0);
                     break;
             }
         }

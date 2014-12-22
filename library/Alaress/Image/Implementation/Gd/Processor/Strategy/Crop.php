@@ -20,72 +20,77 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class Crop extends BaseStrategy {
-	private $coordinates = array();
+class Crop extends BaseStrategy
+{
+    private $coordinates = array();
 
-	/**
-	 * Constructor
-	 *
-	 * @param $args
-	 */
-	public function __construct($args) {
-		$this->setCoordinates($args['coordinates']);
-	}
+    /**
+    * Constructor
+    *
+    * @param $args
+    */
+    public function __construct($args)
+    {
+        $this->setCoordinates($args['coordinates']);
+    }
 
-	/**
-	 * Manipulate image
-	 *
-	 * @param $image
-	 * @return null
-	 */
-	public function manipulate($image) {
+    /**
+    * Manipulate image
+    *
+    * @param $image
+    * @return null
+    */
+    public function manipulate($image)
+    {
 
-		/* Figure out resized dimensions
+        /* Figure out resized dimensions
 		 */
-		$currentWidth = imagesx($image);
-		$currentHeight = imagesy($image);
+        $currentWidth = imagesx($image);
+        $currentHeight = imagesy($image);
 
-		/* Width of area to crop
+        /* Width of area to crop
 		 */
-		$src_w = $currentWidth * ($this->getCoordinates('x1') - $this->getCoordinates('x0'));
-		$src_h = $currentHeight * ($this->getCoordinates('y1') - $this->getCoordinates('y0'));
+        $src_w = $currentWidth * ($this->getCoordinates('x1') - $this->getCoordinates('x0'));
+        $src_h = $currentHeight * ($this->getCoordinates('y1') - $this->getCoordinates('y0'));
 
-		$src_x = $currentWidth * $this->getCoordinates('x0');
-		$src_y = $currentHeight * $this->getCoordinates('y0');
+        $src_x = $currentWidth * $this->getCoordinates('x0');
+        $src_y = $currentHeight * $this->getCoordinates('y0');
 
-		/* Create canvas at specified dimensions
+        /* Create canvas at specified dimensions
 		 */
-		$canvas = imagecreatetruecolor($src_w, $src_h);
+        $canvas = imagecreatetruecolor($src_w, $src_h);
 
-		$this->alphaFill($canvas);
-		imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
+        $this->alphaFill($canvas);
+        imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
 
-		return $canvas;
-	}
+        return $canvas;
+    }
 
-	/**
-	 * Set coordinates
-	 *
-	 * @param $coordinates
-	 */
-	private function setCoordinates($coordinates) {
-		$this->coordinates = $coordinates;
+    /**
+    * Set coordinates
+    *
+    * @param $coordinates
+    */
+    private function setCoordinates($coordinates)
+    {
+        $this->coordinates = $coordinates;
 
-		/* Do conversion so we don't have to do it ourselves -_-
+        /* Do conversion so we don't have to do it ourselves -_-
 		 */
-		$this->coordinates['x0'] *= 0.01;
-		$this->coordinates['y0'] *= 0.01;
-		$this->coordinates['x1'] *= 0.01;
-		$this->coordinates['y1'] *= 0.01;
-	}
+        $this->coordinates['x0'] *= 0.01;
+        $this->coordinates['y0'] *= 0.01;
+        $this->coordinates['x1'] *= 0.01;
+        $this->coordinates['y1'] *= 0.01;
+    }
 
-	/**
-	 * Get coordinates
-	 *
-	 * @param $key
-	 * @return array
-	 */
-	private function getCoordinates($key) {
-		return $this->coordinates[$key];
-	}
+    /**
+    * Get coordinates
+    *
+    * @param $key
+    * @return array
+    */
+    private function getCoordinates($key)
+    {
+        return $this->coordinates[$key];
+    }
 }

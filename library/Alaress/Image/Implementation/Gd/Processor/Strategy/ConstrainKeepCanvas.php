@@ -17,76 +17,81 @@
 
 namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
-class ConstrainKeepCanvas extends BaseStrategy {
+class ConstrainKeepCanvas extends BaseStrategy
+{
 
-	/**
-	 * Background colours are used for deciding transparency in pngs
-	 *
-	 * @var array
-	 */
-	private $bgColors = array();
+    /**
+    * Background colours are used for deciding transparency in pngs
+    *
+    * @var array
+    */
+    private $bgColors = array();
 
-	/**
-	 * Constructor
-	 *
-	 * @param $args
-	 */
-	public function __construct($args) {
-		$this->setCanvasWidth($args['width']);
-		$this->setCanvasHeight($args['height']);
+    /**
+    * Constructor
+    *
+    * @param $args
+    */
+    public function __construct($args)
+    {
+        $this->setCanvasWidth($args['width']);
+        $this->setCanvasHeight($args['height']);
 
-		/* Create canvas at specified dimensions
+        /* Create canvas at specified dimensions
 		 */
-		$canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
+        $canvas = imagecreatetruecolor($this->getCanvasWidth(), $this->getCanvasHeight());
 
-		$this->setCanvas($canvas);
+        $this->setCanvas($canvas);
 
-		/* Apply background color
+        /* Apply background color
 		 */
-		$this->setBgColors($args['bgcolor']);
-		$this->applyBackgroundColor($args['bgcolor']);
-	}
+        $this->setBgColors($args['bgcolor']);
+        $this->applyBackgroundColor($args['bgcolor']);
+    }
 
-	/**
-	 * Manipulate image
-	 *
-	 * Extended canvas backgrounds are always transparent
-	 *
-	 * @param $image
-	 * @return null
-	 */
-	public function manipulate($image) {
+    /**
+    * Manipulate image
+    *
+    * Extended canvas backgrounds are always transparent
+    *
+    * @param $image
+    * @return null
+    */
+    public function manipulate($image)
+    {
 
-		/* Figure out resized dimensions
+        /* Figure out resized dimensions
 		*/
-		$dimensions = $this->boundingBox($image);
+        $dimensions = $this->boundingBox($image);
 
-		$bgColor = $this->getBgColors();
+        $bgColor = $this->getBgColors();
 
-		$this->alphaFill();
-		imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
+        $this->alphaFill();
+        imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
 
-		return $this->getCanvas();
-	}
+        return $this->getCanvas();
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * Set bgcolours
-	 *
-	 * @param array $bgColors
-	 */
-	private function setBgColors($bgColors) {
-		$this->bgColors = $bgColors;
-	}
+    /**
+    * Set bgcolours
+    *
+    * @param array $bgColors
+    */
+    private function setBgColors($bgColors)
+    {
+        $this->bgColors = $bgColors;
+    }
 
-	/**
-	 * Get bgcolours
-	 *
-	 * @return array
-	 */
-	private function getBgColors() {
-		return $this->bgColors;
-	}
+    /**
+    * Get bgcolours
+    *
+    * @return array
+    */
+    private function getBgColors()
+    {
+        return $this->bgColors;
+    }
 }

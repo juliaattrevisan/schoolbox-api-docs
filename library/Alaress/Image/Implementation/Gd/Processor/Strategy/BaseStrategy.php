@@ -14,13 +14,14 @@ namespace Alaress\Image\Implementation\Gd\Processor\Strategy;
 
 use Alaress\Image\Processor\Strategy\StrategyInterface;
 
-abstract class BaseStrategy implements StrategyInterface {
+abstract class BaseStrategy implements StrategyInterface
+{
 
-	/* Canvas image resource
+    /* Canvas image resource
 	 */
-	protected $canvas = null;
-	protected $canvasWidth = 0;
-	protected $canvasHeight = 0;
+    protected $canvas = null;
+    protected $canvasWidth = 0;
+    protected $canvasHeight = 0;
 
     /**
      * Does this processor support alpha channel transformation?
@@ -29,120 +30,127 @@ abstract class BaseStrategy implements StrategyInterface {
      */
     protected $supports_alpha_channel;
 
-	/**
-	 * Specify a background colour for canvas if provided
-	 * otherwise use generic old white
-	 *
-	 * @param $bgColorArray
-	 * @return int
-	 */
-	protected function applyBackgroundColor($bgColorArray) {
-		if (is_array($bgColorArray)) {
-			$bgColor = imagecolorallocate($this->getCanvas(), $bgColorArray['red'], $bgColorArray['blue'], $bgColorArray['green']);
-		}
-		else {
-			$bgColor = imagecolorallocate($this->getCanvas(), 255, 255, 255);
-		}
+    /**
+    * Specify a background colour for canvas if provided
+    * otherwise use generic old white
+    *
+    * @param $bgColorArray
+    * @return int
+    */
+    protected function applyBackgroundColor($bgColorArray)
+    {
+        if (is_array($bgColorArray)) {
+            $bgColor = imagecolorallocate($this->getCanvas(), $bgColorArray['red'], $bgColorArray['blue'], $bgColorArray['green']);
+        } else {
+            $bgColor = imagecolorallocate($this->getCanvas(), 255, 255, 255);
+        }
 
-		imagefilledrectangle($this->getCanvas(), 0, 0, $this->getCanvasWidth(), $this->getCanvasHeight(), $bgColor);
-	}
+        imagefilledrectangle($this->getCanvas(), 0, 0, $this->getCanvasWidth(), $this->getCanvasHeight(), $bgColor);
+    }
 
-	/**
-	 * Figure out what the resultant dimensions of an image are
-	 * according to a bounding box
-	 *
-	 * If it can fit within the canvas, just return original size
-	 *
-	 * @param $image
-	 * @return array
-	 */
-	protected function boundingBox($image) {
+    /**
+    * Figure out what the resultant dimensions of an image are
+    * according to a bounding box
+    *
+    * If it can fit within the canvas, just return original size
+    *
+    * @param $image
+    * @return array
+    */
+    protected function boundingBox($image)
+    {
 
-		/* Figure out resized dimensions
+        /* Figure out resized dimensions
 		*/
-		$currentWidth = imagesx($image);
-		$currentHeight = imagesy($image);
+        $currentWidth = imagesx($image);
+        $currentHeight = imagesy($image);
 
-		$resizedWidth = $currentWidth;
-		$resizedHeight = $currentHeight;
+        $resizedWidth = $currentWidth;
+        $resizedHeight = $currentHeight;
 
-		/* Constrain by width
+        /* Constrain by width
 		 */
-		if ($currentWidth > $this->getCanvasWidth()) {
-			$ratio = $currentWidth / $this->getCanvasWidth();
+        if ($currentWidth > $this->getCanvasWidth()) {
+            $ratio = $currentWidth / $this->getCanvasWidth();
 
-			$resizedWidth = $currentWidth / $ratio;
-			$resizedHeight = $currentHeight / $ratio;
-		}
+            $resizedWidth = $currentWidth / $ratio;
+            $resizedHeight = $currentHeight / $ratio;
+        }
 
-		/* Constrain by height
+        /* Constrain by height
 		 */
-		if ($resizedHeight > $this->getCanvasHeight()) {
-			$ratio = $resizedHeight / $this->getCanvasHeight();
+        if ($resizedHeight > $this->getCanvasHeight()) {
+            $ratio = $resizedHeight / $this->getCanvasHeight();
 
-			$resizedWidth = $resizedWidth / $ratio;
-			$resizedHeight = $resizedHeight / $ratio;
-		}
+            $resizedWidth = $resizedWidth / $ratio;
+            $resizedHeight = $resizedHeight / $ratio;
+        }
 
-		return array(
-			'width' => $resizedWidth,
-			'height' => $resizedHeight,
-		);
-	}
+        return array(
+            'width' => $resizedWidth,
+            'height' => $resizedHeight,
+        );
+    }
 
-	/**
-	 * Set canvas image resource
-	 *
-	 * @param $canvas
-	 */
-	protected function setCanvas($canvas) {
-		$this->canvas = $canvas;
-	}
+    /**
+    * Set canvas image resource
+    *
+    * @param $canvas
+    */
+    protected function setCanvas($canvas)
+    {
+        $this->canvas = $canvas;
+    }
 
-	/**
-	 * Get canvas image resource
-	 *
-	 * @return null
-	 */
-	protected function getCanvas() {
-		return $this->canvas;
-	}
+    /**
+    * Get canvas image resource
+    *
+    * @return null
+    */
+    protected function getCanvas()
+    {
+        return $this->canvas;
+    }
 
-	/**
-	 * Set canvas height
-	 *
-	 * @param $canvasHeight
-	 */
-	protected function setCanvasHeight($canvasHeight) {
-		$this->canvasHeight = $canvasHeight;
-	}
+    /**
+    * Set canvas height
+    *
+    * @param $canvasHeight
+    */
+    protected function setCanvasHeight($canvasHeight)
+    {
+        $this->canvasHeight = $canvasHeight;
+    }
 
-	/**
-	 * Get canvas height
-	 *
-	 * @return int
-	 */
-	protected function getCanvasHeight() {
-		return $this->canvasHeight;
-	}
+    /**
+    * Get canvas height
+    *
+    * @return int
+    */
+    protected function getCanvasHeight()
+    {
+        return $this->canvasHeight;
+    }
 
-	/**
-	 * Set canvas width
-	 *
-	 * @param $canvasWidth
-	 */
-	protected function setCanvasWidth($canvasWidth) {
-		$this->canvasWidth = $canvasWidth;
-	}
+    /**
+    * Set canvas width
+    *
+    * @param $canvasWidth
+    */
+    protected function setCanvasWidth($canvasWidth)
+    {
+        $this->canvasWidth = $canvasWidth;
+    }
 
-	/**
-	 * Get canvas width
-	 *
-	 * @return int
-	 */
-	protected function getCanvasWidth() {
-		return $this->canvasWidth;
-	}
+    /**
+    * Get canvas width
+    *
+    * @return int
+    */
+    protected function getCanvasWidth()
+    {
+        return $this->canvasWidth;
+    }
 
     /**
      * Fills the given canvas with a blank alpha layer, so that alpha blending
@@ -155,7 +163,8 @@ abstract class BaseStrategy implements StrategyInterface {
      *
      * @return void
      */
-    protected function alphaFill($canvas = null) {
+    protected function alphaFill($canvas = null)
+    {
         if (!($this->getSupportsAlphaChannel())) {
             return;
         }
@@ -172,7 +181,8 @@ abstract class BaseStrategy implements StrategyInterface {
      * @param  bool  $supports_alpha_channel
      * @return $this
      */
-    public function setSupportsAlphaChannel($supports_alpha_channel) {
+    public function setSupportsAlphaChannel($supports_alpha_channel)
+    {
         $this->supports_alpha_channel = $supports_alpha_channel;
         return $this;
     }
@@ -180,7 +190,8 @@ abstract class BaseStrategy implements StrategyInterface {
     /**
      * @return bool
      */
-    public function getSupportsAlphaChannel() {
+    public function getSupportsAlphaChannel()
+    {
         return $this->supports_alpha_channel;
     }
 }
