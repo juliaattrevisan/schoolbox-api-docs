@@ -89,6 +89,8 @@ function Calendar(id, bubbleId, opts) {
                 else {
                     data.note = calEvent.title
                 }
+                // Normalize note and title
+                data.title = data.note;
 
                 // Format the date of this event
                 var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'

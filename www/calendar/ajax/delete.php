@@ -30,7 +30,7 @@ if(($sID = $calendarHandler->getSeriesID($event['id'])) != null) {
         foreach($series as $currentEvent) {
             $calendarHandler->delete($currentEvent['id']);
         }
-    } elseif($_POST['efficacy'] == 'self') {
+    } else {
         $calendarHandler->delete($event['id']);
     }
 }

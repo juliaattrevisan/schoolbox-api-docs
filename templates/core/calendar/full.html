@@ -361,10 +361,25 @@
 
         c.getForm('editTask').on('click', '.deleteTask', function(e) {
             var id = $(this).siblings('input[name=eventId]').val()
-            c.cdelete({eventId: id})
+            c.cdelete(
+                {eventId: id},
+                function() {
+                    // Remove this event from the calendar
+                    c.dom.fullCalendar(
+                        'removeEvents',
+                        function(thisEvent) {
+                            try {
+                                return thisEvent.data.meta.eventId == id;
+                            } catch (e) {
+                                return false;
+                            }
+                            return false;
+                        }
+                    );
+                }
+            );
             c.bubble.hide()
             e.preventDefault()
-            return false
         })
 
         // Dialog for use when clicking an item that is in a series
