@@ -16,7 +16,7 @@ class Portrait
 {
 
     /**
-     * @var Alaress_Image_Processor_Abstract
+     * @var Processor\Standard
      */
     protected $imageProcessor = null;
 
@@ -68,16 +68,16 @@ class Portrait
 
     /**
      * Sets the image processor
-     * @param Alaress_Image_Processor_Abstract $imageProcessor
+     * @param Processor\Standard $imageProcessor
      */
-    private function setImageProcessor(Alaress_Image_Processor_Abstract $imageProcessor)
+    private function setImageProcessor(Processor\Standard $imageProcessor)
     {
         $this->imageProcessor = $imageProcessor;
     }
 
     /**
      * Gets the image processor
-     * @return Alaress_Image_Processor_Abstract
+     * @return Processor\Standard
      */
     private function getImageProcessor()
     {

@@ -12,15 +12,18 @@
 
 namespace Alaress\Image;
 
+use Schoolbox;
+use Alaress\Image\Transformation;
+
 class Storage
 {
     /**
     * Consructor
     * Sets up the caching implementation, image processor and streams it
     *
-    * @param Schoolbox\Storage                        $resource
-    * @param string                                $key
-    * @param Alaress_Image_Transformation_Abstract $transformations
+    * @param Schoolbox\Storage                 $resource
+    * @param string                            $key
+    * @param Transformation\BaseTransformation $transformations
     */
     public function __construct($resource, $key, $transformations)
     {
