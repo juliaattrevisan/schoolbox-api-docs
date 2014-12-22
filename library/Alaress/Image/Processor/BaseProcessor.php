@@ -10,6 +10,10 @@
 
 namespace Alaress\Image\Processor;
 
+use Alaress\Image\Cache;
+use Alaress\Image\Filetype;
+use Alaress\Image\Transformation\BaseTransformation;
+
 class BaseProcessor
 {
     protected $imageId = null;
@@ -21,24 +25,24 @@ class BaseProcessor
     /**
      * A factory for building processors, replaces $processorStrategyPrefix.
      *
-     * @var \Alaress\Image\Processor\Strategy\FactoryInterface
+     * @var Strategy\FactoryInterface
      */
     protected $processorFactory;
 
     /**
-     * @var Alaress_Image_Processor_Strategy_Interface
+     * @var Strategy\StrategyInterface
      */
     protected $processorStrategy = null;
 
     /**
      * A factory for building file types, replaces $filetypeStrategyPrefix.
      *
-     * @var \Alaress\Image\Filetype\FactoryInterface
+     * @var Filetype\FactoryInterface
      */
     protected $filetypeFactory;
 
     /**
-     * @var Alaress_Image_Filetype_Interface
+     * @var Filetype\FiletypeInterface
      */
     protected $filetypeStrategy = null;
 
@@ -63,7 +67,7 @@ class BaseProcessor
     /**
      * Set image id
      *
-     * @param $imageId
+     * @param int $imageId
      */
     protected function setImageId($imageId)
     {
@@ -73,7 +77,7 @@ class BaseProcessor
     /**
      * Get image id
      *
-     * @return mixed
+     * @return int
      */
     protected function getImageId()
     {
@@ -83,7 +87,7 @@ class BaseProcessor
     /**
      * Set processing strategy
      *
-     * @param Alaress_Image_Filetype_Interface $filetypeStrategy
+     * @param Filetype\FiletypeInterface $filetypeStrategy
      */
     protected function setFiletypeStrategy($filetypeStrategy)
     {
@@ -93,7 +97,7 @@ class BaseProcessor
     /**
      * Get processing strategy
      *
-     * @return Alaress_Image_Filetype_Interface
+     * @return Filetype\FiletypeInterface
      */
     protected function getFiletypeStrategy()
     {
@@ -103,7 +107,7 @@ class BaseProcessor
     /**
      * Set processor strategy
      *
-     * @param Alaress_Image_Processor_Strategy_Interface $processorStrategy
+     * @param Strategy\StrategyInterface $processorStrategy
      */
     protected function setProcessorStrategy($processorStrategy)
     {
@@ -111,7 +115,7 @@ class BaseProcessor
     }
 
     /**
-     * @return \Alaress\Image\Filetype\FactoryInterface
+     * @return Filetype\FactoryInterface
      */
     public function getFiletypeFactory()
     {
@@ -119,7 +123,7 @@ class BaseProcessor
     }
 
     /**
-     * @param  \Alaress\Image\Filetype\FactoryInterface $filetypeFactory
+     * @param  Filetype\FactoryInterface $filetypeFactory
      *
      * @return $this
      */
@@ -132,7 +136,7 @@ class BaseProcessor
     /**
      * Get processor strategy
      *
-     * @return Alaress_Image_Processor_Strategy_Interface
+     * @return Strategy\StrategyInterface
      */
     protected function getProcessorStrategy()
     {
@@ -140,7 +144,7 @@ class BaseProcessor
     }
 
     /**
-     * @return \Alaress\Image\Processor\Strategy\FactoryInterface
+     * @return Strategy\FactoryInterface
      */
     public function getProcessorFactory()
     {
@@ -148,7 +152,7 @@ class BaseProcessor
     }
 
     /**
-     * @param  \Alaress\Image\Processor\Strategy\FactoryInterface $processorFactory
+     * @param  Strategy\FactoryInterface $processorFactory
      *
      * @return $this
      */
@@ -181,7 +185,7 @@ class BaseProcessor
     /**
      * Set cache
      *
-     * @param $cache
+     * @param Cache\CacheInterface $cache
      */
     protected function setCache($cache)
     {
@@ -191,7 +195,7 @@ class BaseProcessor
     /**
      * Get cache
      *
-     * @return Alaress_Image_Cache_Interface
+     * @return Cache\CacheInterface
      */
     protected function getCache()
     {
@@ -201,7 +205,7 @@ class BaseProcessor
     /**
      * Set transformations
      *
-     * @param $transformations
+     * @param BaseTransformation $transformations
      */
     protected function setTransformations($transformations)
     {
@@ -211,7 +215,7 @@ class BaseProcessor
     /**
      * Get transformations
      *
-     * @return array
+     * @return BaseTransformation
      */
     protected function getTransformations()
     {
