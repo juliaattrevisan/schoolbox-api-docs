@@ -1,0 +1,1 @@
+UPDATE config SET hidden='false' WHERE name='external_sync_data';
