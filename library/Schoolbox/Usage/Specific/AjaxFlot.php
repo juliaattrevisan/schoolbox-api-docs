@@ -132,6 +132,23 @@ class AjaxFlot {
 		$page = new \SitePage();
 		$page->setFile('file_list', '/adminv2/usage/file.html');
 		$page->setBlock('file_list', 'file', 'file_block');
+        $page->setBlock('file', 'file_storage', 'file_storage_block');
+
+        $page->setBlock('file', 'file_sbfs', 'file_sbfs_block');
+        $page->setBlock('file', 'has_category', 'has_category_block');
+        $page->setBlock('file', 'no_category', 'no_category_block');
+
+        $page->setBlock('file', 'file_myfile', 'file_myfile_block');
+        $page->setBlock('file', 'file_unlinked', 'file_unlinked_block');
+
+        $page->setVar(array(
+            'file_storage_block' => '',
+            'file_sbfs_block' => '',
+            'file_myfile_block' => '',
+            'file_unlinked_block' => '',
+            'has_category_block' => '',
+            'no_category_block' => '',
+        ));
 
 		/* Really? You should be passing the bytes as constructor arg
 		 */
@@ -139,13 +156,61 @@ class AjaxFlot {
 
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
+                'FILE_ID' => $currentData['id'],
 				'FILE_FILENAME' => $currentData['name'],
 				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
 				'FILE_GROUPNAME' => $currentData['groupName'],
 				'FILE_MIMETYPE' => $currentData['mime_type'],
 			));
 
+            /* Link Storage files
+             */
+            if ($currentData['groupName'] == 'Storage') {
+                $hash = $currentData['hash'];
+
+                $page->setVar(array(
+                    'FILE_HASH' => $hash,
+                ));
+
+                $page->parse('file_storage_block', 'file_storage');
+                $page->parse('no_category_block', 'no_category');
+            }
+            /* Link SBFS files
+             */
+            else if ($currentData['groupName'] == 'File') {
+                $page->setVar(array(
+                    'FILE_CATEGORY_ID' => $currentData['categoryId'],
+                    'FILE_CATEGORY_NAME' => $currentData['categoryName']
+                ));
+
+                $page->parse('file_sbfs_block', 'file_sbfs');
+                $page->parse('has_category_block', 'has_category');
+            }
+            /* Link MyFile
+             */
+            else if ($currentData['groupName'] == 'My File') {
+                $page->parse('file_myfile_block', 'file_myfile');
+                $page->parse('no_category_block', 'no_category');
+            }
+            /* None of the above
+             */
+            else {
+                $page->parse('file_unlinked_block', 'file_unlinked');
+                $page->parse('no_category_block', 'no_category');
+            }
+
 			$page->parse('file_block', 'file', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $page->setVar(array(
+                'file_storage_block' => '',
+                'file_sbfs_block' => '',
+                'file_myfile_block' => '',
+                'file_unlinked_block' => '',
+                'has_category_block' => '',
+                'no_category_block' => '',
+            ));
 		}
 
 		echo $page->template->_varVals['file_block'];
