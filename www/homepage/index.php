@@ -21,7 +21,7 @@ if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
         $category = $categoryMapper->findById($this->arg[0]);
     }
     catch (\Exception $e) {
-        error(18);
+        $this->pageNotFound();
     }
 
     /* If the category wasn't found, try searching for a category code with this
@@ -33,7 +33,7 @@ if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
         }
     }
     catch (\Exception $e) {
-        error(18);
+        $this->pageNotFound();
     }
 }
 /* If a prefixed argument is given, load category code directly
@@ -49,7 +49,7 @@ else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
         $category = $categoryMapper->findByCode(urldecode(urldecode($code)));
     }
     catch (\Exception $e) {
-        error(18);
+        $this->pageNotFound();
     }
 }
 /* When just an alphabetical category code provided
