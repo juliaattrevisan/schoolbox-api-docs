@@ -82,6 +82,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                 'EVENT_LOCATION' => Scrub::text($currentEvent->getLocation()),
                 'EVENT_CATEGORY_ID' => $currentEvent->getCategoryId(),
                 'EVENT_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
+                'event_location_block' => '',
                 'event_has_category_block' => '',
                 'event_buttons_block' => '',
                 'event_attendance_status_block' => '',
@@ -93,6 +94,10 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         );
         if ($currentEvent->getCategoryId() > 0) {
             $page->parse('event_has_category_block', 'event_has_category');
+        }
+
+        if($currentEvent->getLocation()) {
+            $page->parse('event_location_block', 'event_location');
         }
 
         /* Special datetime formatting for Submissions
