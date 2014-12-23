@@ -924,14 +924,16 @@ class External_Synergetic_User implements External_UserInterface
                 vStaff.StaffOccupEmail,
                 vStaff.StaffExtension,
                 vStaff.StaffCampusDescription,
+                vStaff.StaffCategory,
                 vStaff.StaffCategoryType,
-                Department.Description AS StaffDepartment,
+                vStaff.StaffDefaultMobilePhone,
+                vStaff.StaffVoiceMail,
+                StaffDepartmentDescription,
                 JobPositions.JobPositionDescription,
                 JobPositions.StaffJobPositionStartDate,
                 JobPositions.StaffJobPositionEndDate
             FROM SynergyOne.dbo.vStaff vStaff
             LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-            LEFT JOIN SynergyOne.dbo.luDepartment Department ON vStaff.StaffDepartment = Department.Code
             WHERE vStaff.ActiveFlag = 1
             AND StaffCategoryDescription != 'Staff on leave'
             $scWhere
@@ -939,7 +941,7 @@ class External_Synergetic_User implements External_UserInterface
             OR    JobPositions.StaffJobPositionStartDate IS NULL )
             AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
             OR    JobPositions.StaffJobPositionEndDate IS NULL )
-            ORDER BY StaffSurname
+            ORDER BY vStaff.StaffSurname
         ";
 
         return $this->getDatabase()->getAll($query);

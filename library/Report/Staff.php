@@ -91,6 +91,7 @@ class Report_Staff extends Report_Abstract
                                 'STAFF_DEPARTMENT' => $previousStaff['StaffDepartment'],
                                 'STAFF_CAMPUS'     => $previousStaff['StaffCampusDescription'],
                                 'STAFF_EXTENSION'  => $previousStaff['StaffExtension'],
+                                'STAFF_MOBILE'     => $previousStaff['StaffExtension'],
                                 'STAFF_PHONE'      => $previousStaff['StaffOccupPhone'],
                                 'STAFF_EMAIL'      => $previousStaff['StaffOccupEmail'],
                             )
