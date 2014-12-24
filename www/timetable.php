@@ -140,8 +140,10 @@ if (is_array($outputList)) {
             foreach ($timetable as $currentDay) {
                 if (is_array($currentDay['day']) && count($currentDay['day'])) {
                     foreach ($currentDay['day'] as $currentPeriod) {
-                        if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
-                            $classCount++;
+                        foreach($currentPeriod as $currentClass) {
+                            if (isset($currentClass['description']) && strlen($currentClass['description'])) {
+                                $classCount++;
+                            }
                         }
                     }
                 }
@@ -170,6 +172,13 @@ if (is_array($outputList)) {
                     $dayCount = 1;
                     //for each day
                     foreach ($row['day'] as $period) {
+
+                        // only output first period in sequence
+
+                        if(is_array($period[0])) {
+                            $period = $period[0];
+                        }
+
                         // only output header on first run through
                         if ($periodCount == 1) {
                             //output day header
