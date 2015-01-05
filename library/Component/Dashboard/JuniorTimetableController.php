@@ -121,6 +121,21 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $timetable[7]['periodNumber'] = '6';
         $timetable[7]['periodSequence'] = '1';
 
+        $prepend['periodName'] = 'Morning Shift';
+        $prepend['periodStart'] = '7:00am';
+        $prepend['periodEnd'] = '8:00am';
+        $prepend['periodNumber'] = '2';
+        $prepend['periodSequence'] = '2';
+
+        $prepend2['periodName'] = 'Morning Shift';
+        $prepend2['periodStart'] = '8:00am';
+        $prepend2['periodEnd'] = '8:10am';
+        $prepend2['periodNumber'] = '2';
+        $prepend2['periodSequence'] = '2';
+
+        array_unshift($timetable, $prepend2);
+        array_unshift($timetable, $prepend);
+
         /* Condense each class code. Due to Third Dimension I can't assume that
          * classes appear in each array index in the same place.
          */
@@ -130,6 +145,12 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
         for ($i = 0; $i < count($timetable); $i++) {
             $period = $timetable[$i];
+
+            /* Special cases for recess, lunch, etc which have no codes
+             */
+            if (!isset($period['code'])) {
+                $period['code'] = "_nonclass {$period['periodName']}";
+            }
 
             /* Initial condition
              */
@@ -142,13 +163,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             /* Condense
              */
             else {
-
-                /* Special cases for recess, lunch, etc which have no codes
-                 */
-                if (!isset($period['code'])) {
-                    $period['code'] = "_nonclass {$period['periodName']}";
-                }
-
                 if ($lastCode == $period['code']) {
                     $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
 
