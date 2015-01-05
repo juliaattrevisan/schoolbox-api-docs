@@ -80,7 +80,9 @@ class Query
                 )
             );
         }
-        return $this->getDatabase()->getAll(strtr($query, $params));
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
     }
 
     /**
@@ -116,7 +118,9 @@ class Query
             ':year'         => $this->getDatabase()->smartQuote($year),
             ':activityType' => $this->getDatabase()->smartQuote($activityType),
         );
-        return $this->getDatabase()->getAll(strtr($query, $params));
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
     }
 
     /**
