@@ -35,10 +35,7 @@ class Controller extends Base
         $attendance = $this->getDatabase()->getAllAttendances($year, $student);
         $activities = $this->getDatabase()->getAllActivities($year, $student);
         $tutors     = $this->getDatabase()->getAllTutors($year, $student);
-
-        // Year list:
-        // all students at which this student has been enrolled at this school.
-
+        $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
@@ -46,11 +43,7 @@ class Controller extends Base
                     'report' => array(
                         'year'     => array(
                             'current' => $year,
-                            'list'    => array(
-                                date('Y'),
-                                date('Y') + 1,
-                                date('Y') + 2,
-                            ),
+                            'levels'  => $yearLevels,
                         ),
                         'student'  => $student,
                         'studentExternal' => array(

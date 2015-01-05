@@ -15,10 +15,11 @@
         <form id="semesters">
             <a class="sem-back" href="#">&lsaquo;</a>
             <select id="semester">
-                {% for year in report.year.list %}
-                <option value="{{ year }}"
-                        label="{{ year }} eReport"
-                        >{{ year }} eReport</option>
+                {% for year in report.year.levels %}
+                <option value="{{ year.yr_study }}"
+                        label="{{ year.yr_study }} eReport"
+                        {% if year.yr_study == report.year.current %}selected{% endif %}
+                        >{{ year.yr_study }} eReport</option>
                 {% endfor %}
             </select>
             <a class="sem-fwd" href="#">&rsaquo;</a>
