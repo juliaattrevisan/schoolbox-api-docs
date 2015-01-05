@@ -2,6 +2,8 @@
 /**
  * Component_Dashboard_JuniorTimetableController
  *
+ * A custom component for Arden SB-6491
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -66,8 +68,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                         $processed = $this->condense($timetable);
 
                         $this->timetable[$campus_id] = $processed['condensed'];
-
-                        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->timetable);
                     }
                 }
             }
