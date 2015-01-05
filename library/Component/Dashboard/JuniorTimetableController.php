@@ -108,13 +108,12 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             if (!isset($period['code'])) {
                 $period['code'] = "_nonclass {$period['periodName']}";
             }
-            else {
-                /* Clear out the period name, beacuse they will now be combined
-                 * and individual headings no longer mean anything
-                 */
-                $period['periodName'] = '';
-            }
 
+            /* Clear out the period name, beacuse they will now be combined
+             * and individual headings no longer mean anything
+             */
+            $period['periodName'] = '';
+            
             /* Initial condition
              */
             if ($condensedClass === false) {
