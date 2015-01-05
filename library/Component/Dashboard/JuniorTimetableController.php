@@ -39,10 +39,134 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
         $this->setAllTimetables(new \Schoolbox\Collection());
 
+        /* Some temp data
+         */
+        $timetable = $this->tempdata();
+
+        $processed = $this->condense($timetable);
+
+        $this->getAllTimetables()->add($processed['condensed']);
+
+        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->getAllTimetables());
+
+        /* Actual
+         */
         $timetableHandler = new \External_Timetable();
 
-        /* Sample hardcoded data
+
+        // get current day and period.
+        // Don't output a timetable if it has the same code as another that has
+        // already been added.
+//        $checked_campus_list = array();
+//
+//        foreach ($_SESSION['campus'] as $campus_id) {
+//            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+//
+//            if ($campus instanceof Schoolbox\Campus) {
+//                $campus_code = $campus->getExtTimetableCode();
+//
+//                if (!isset($checked_campus_list[$campus_code])) {
+//                    $checked_campus_list[$campus_code] = true;
+//                    $day_number = $timetableHandler->getDayNumber($campus_id);
+//
+//                    if ($day_number) {
+//                        $timetable = $timetableHandler->getDayTimetable(
+//                            $_SESSION['user']->getExternalId(),
+//                            $_SESSION['user']->getId(),
+//                            $campus_id,
+//                            $day_number
+//                        );
+//                    }
+//                }
+//            }
+//        }
+
+        die();
+
+        return true;
+    }
+
+    /**
+     * Condense adjacent timetable periods
+     *
+     * @param $timetable
+     * @return array
+     */
+    private function condense($timetable) {
+
+        /* Condense each class code. Due to Third Dimension I can't assume that
+         * classes appear in each array index in the same place.
          */
+        $lastCode = false;
+
+        /* Condensation
+         */
+        $condensedClass = false;
+        $allCondensedClasses = array();
+
+        /* Event stack, for debugging
+         */
+        $stack = array();
+
+        for ($i = 0; $i < count($timetable); $i++) {
+            $period = $timetable[$i];
+
+            /* Special cases for recess, lunch, etc which have no codes
+             */
+            if (!isset($period['code'])) {
+                $period['code'] = "_nonclass {$period['periodName']}";
+            }
+
+            /* Initial condition
+             */
+            if ($condensedClass === false) {
+                $lastCode = $period['code'];
+                $condensedClass = $period;
+
+                $stack[] = "Initial condensed class is {$period['code']}<br>";
+            }
+            /* Condense
+             */
+            else {
+                if ($lastCode == $period['code']) {
+                    $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
+
+                    $condensedClass['periodEnd'] = $period['periodEnd'];
+                }
+                else {
+                    $stack[] = "Adding {$condensedClass['code']}<br>";
+
+                    $allCondensedClasses[] = $condensedClass;
+
+                    $condensedClass = $period;
+
+                    $stack[] = "Current condensed class is {$period['code']}<br>";
+
+                    /* If this is the last period in the timetable, add it. This can
+                     * occur if the last element in $timetable is a nonclass that
+                     * didn't match the one just added
+                     */
+                    if ($i == (count($timetable)-1)) {
+                        $allCondensedClasses[] = $condensedClass;
+
+                        $stack[] = "Adding {$condensedClass['code']}<br>";
+                    }
+                }
+            }
+
+            $lastCode = $period['code'];
+        }
+
+        return array(
+            'condensed' => $allCondensedClasses,
+            'stack' => $stack
+        );
+    }
+
+    /**
+     * Sample hardcoded data
+     */
+    private function tempdata() {
         $timetable[0]['periodName'] = 'The First Period of the Day';
         $timetable[0]['periodStart'] = '8:30am';
         $timetable[0]['periodEnd'] = '9:30am';
@@ -121,6 +245,8 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $timetable[7]['periodNumber'] = '6';
         $timetable[7]['periodSequence'] = '1';
 
+        /* Check an edge case
+         */
         $prepend['periodName'] = 'Morning Shift';
         $prepend['periodStart'] = '7:00am';
         $prepend['periodEnd'] = '8:00am';
@@ -136,98 +262,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         array_unshift($timetable, $prepend2);
         array_unshift($timetable, $prepend);
 
-        /* Condense each class code. Due to Third Dimension I can't assume that
-         * classes appear in each array index in the same place.
-         */
-        $lastCode = false;
-        $condensedClass = false;
-        $stack = array();
-
-        for ($i = 0; $i < count($timetable); $i++) {
-            $period = $timetable[$i];
-
-            /* Special cases for recess, lunch, etc which have no codes
-             */
-            if (!isset($period['code'])) {
-                $period['code'] = "_nonclass {$period['periodName']}";
-            }
-
-            /* Initial condition
-             */
-            if ($condensedClass === false) {
-                $lastCode = $period['code'];
-                $condensedClass = $period;
-
-                $stack[] = "Initial condensed class is {$period['code']}<br>";
-            }
-            /* Condense
-             */
-            else {
-                if ($lastCode == $period['code']) {
-                    $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
-
-                    $condensedClass['periodEnd'] = $period['periodEnd'];
-                }
-                else {
-                    $stack[] = "Adding {$condensedClass['code']}<br>";
-
-                    $this->getAllTimetables()->add($condensedClass);
-
-                    $condensedClass = $period;
-
-                    $stack[] = "Current condensed class is {$period['code']}<br>";
-
-                    /* If this is the last period in the timetable, add it. This can
-                     * occur if the last element in $timetable is a nonclass that
-                     * didn't match the one just added
-                     */
-                    if ($i == (count($timetable)-1)) {
-                        $this->getAllTimetables()->add($condensedClass);
-
-                        $stack[] = "Adding {$condensedClass['code']}<br>";
-                    }
-                }
-            }
-
-            $lastCode = $period['code'];
-        }
-
-        new \Alaress_ThreeProbe($timetable, $stack, $this->getAllTimetables());
-
-        die();
-
-        // get current day and period.
-        // Don't output a timetable if it has the same code as another that has
-        // already been added.
-//        $checked_campus_list = array();
-//
-//        foreach ($_SESSION['campus'] as $campus_id) {
-//            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-//
-//            if ($campus instanceof Schoolbox\Campus) {
-//                $campus_code = $campus->getExtTimetableCode();
-//
-//                if (!isset($checked_campus_list[$campus_code])) {
-//                    $checked_campus_list[$campus_code] = true;
-//                    $day_number = $timetableHandler->getDayNumber($campus_id);
-//
-//                    if ($day_number) {
-//                        $timetable = $timetableHandler->getDayTimetable(
-//                            $_SESSION['user']->getExternalId(),
-//                            $_SESSION['user']->getId(),
-//                            $campus_id,
-//                            $day_number
-//                        );
-//                    }
-//                }
-//            }
-//        }
-
-
-
-        $this->getAllTimetables()->reindex();
-
-        return true;
+        return $timetable;
     }
 
     /**
