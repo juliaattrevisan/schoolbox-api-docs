@@ -30,6 +30,8 @@ class Query
     }
 
     /**
+     * Base query for querying a student's absences.
+     *
      * @param int   $year
      * @param User  $student
      * @param array $absenceTypes
@@ -78,6 +80,42 @@ class Query
                 )
             );
         }
+        return $this->getDatabase()->getAll(strtr($query, $params));
+    }
+
+    /**
+     * Base query for querying a student's activities.
+     *
+     * @param int    $year
+     * @param User   $student
+     * @param string $activityType
+     *
+     * @return array
+     */
+    protected function queryActivities($year, User $student, $activityType)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        $query = "
+            SELECT DISTINCT
+                studecact.stud_code,
+                studecact.act_code,
+                ecactivity.act_desc,
+                ecactivity.act_type
+            FROM ecactivity, studecact
+            WHERE studecact.stud_code = :externalId
+            AND studecact.act_year = :year
+            AND studecact.act_code = ecactivity.act_code
+            AND ecactivity.act_type = :activityType
+            AND ecactivity.cmpy_code = '01'
+        ";
+        $params = array(
+            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
+            ':year'         => $this->getDatabase()->smartQuote($year),
+            ':activityType' => $this->getDatabase()->smartQuote($activityType),
+        );
         return $this->getDatabase()->getAll(strtr($query, $params));
     }
 
@@ -175,7 +213,7 @@ class Query
     }
 
     /**
-     * Gets results for getAbsenceCount(), getLateCount()
+     * Gets all attendance related counts.
      *
      * @param int  $year
      * @param User $student
@@ -189,6 +227,77 @@ class Query
             'late'          => $this->getLateCount($year, $student),
             'detentions'    => $this->getDetentionCount($year, $student),
             'endorsedLeave' => $this->getLeaveCount($year, $student),
+        );
+    }
+
+    /**
+     * Gets awards for the given student.
+     *
+     * @param      $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAwards($year, User $student)
+    {
+        return $this->queryActivities($year, $student, 'C');
+    }
+
+    /**
+     * Gets co-curricular activities for the given student.
+     *
+     * @param      $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getCocurricular($year, User $student)
+    {
+        return $this->queryActivities($year, $student, 'B');
+    }
+
+    /**
+     * Gets community service for the given student.
+     *
+     * @param      $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getService($year, User $student)
+    {
+        return $this->queryActivities($year, $student, 'O');
+    }
+
+    /**
+     * Gets positions of offices for the given student.
+     *
+     * @param      $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getPositions($year, User $student)
+    {
+        return $this->queryActivities($year, $student, 'A');
+    }
+
+    /**
+     * Gets all activities (awards, co-curricular, community service, positions
+     * of office).
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAllActivities($year, User $student)
+    {
+        return array(
+            'awards'       => $this->getAwards($year, $student),
+            'cocurricular' => $this->getCocurricular($year, $student),
+            'service'      => $this->getService($year, $student),
+            'positions'    => $this->getPositions($year, $student),
         );
     }
 

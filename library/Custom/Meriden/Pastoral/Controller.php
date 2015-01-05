@@ -33,6 +33,7 @@ class Controller extends Base
     public function index($year, User $student)
     {
         $attendance = $this->getDatabase()->getAttendance($year, $student);
+        $activities = $this->getDatabase()->getAllActivities($year, $student);
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
@@ -49,6 +50,7 @@ class Controller extends Base
                         'student'  => $student,
                         'studentExternal' => array(
                             'attendance' => $attendance,
+                            'activities' => $activities,
                         ),
                     )
                 ),

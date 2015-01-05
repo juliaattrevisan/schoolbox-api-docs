@@ -61,6 +61,10 @@
     <dt>Endorsed Leave</dt>
     <dd>{{ report.studentExternal.attendance.endorsedLeave }}</dd>
 
+    {##
+     # Athletics, Swimming, Camp, Uniform, Pastoral Services:
+     # All these are based off of assessments in the grade page.
+     #}
     <dt>Athletics Carnival</dt>
     <dd>{{ report.studentExternal.attendedAthletics ? "In Attendance" : "Absent" }}</dd>
 
@@ -79,23 +83,23 @@
 
 <dl>
     <dt>Awards and Prizes</dt>
-    {% for award in report.studentExternal.awards %}
-        <dd>{{ award.name }}</dd>
+    {% for award in report.studentExternal.activities.awards %}
+        <dd>{{ award.act_desc }}</dd>
     {% endfor %}
 
     <dt>Co-curricular Activities</dt>
-    {% for activity in report.studentExternal.activities %}
-        <dd>{{ activity.name }}</dd>
+    {% for activity in report.studentExternal.activities.cocurricular %}
+        <dd>{{ activity.act_desc }}</dd>
     {% endfor %}
 
     <dt>Community Service</dt>
-    {% for service in report.studentExternal.communityService %}
-        <dd>{{ service.name }}</dd>
+    {% for service in report.studentExternal.activities.service %}
+        <dd>{{ service.act_desc }}</dd>
     {% endfor %}
 
     <dt>Positions of Office</dt>
-    {% for position in report.studentExternal.positions %}
-        <dd>{{ position.name }}</dd>
+    {% for position in report.studentExternal.activities.positions %}
+        <dd>{{ position.act_desc }}</dd>
     {% endfor %}
 </dl>
 
