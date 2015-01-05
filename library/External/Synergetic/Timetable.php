@@ -533,7 +533,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             //for each day
             for ($y = 1; $y <= $dayCount; $y++) {
                 if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y) {
-                    $timetable[$x]['day'][$y][$seq]['periodOn']       = 1;
                     $timetable[$x]['day'][$y][$seq]['description']    = $desc['Description'];
                     $timetable[$x]['day'][$y][$seq]['code']           = $desc['ClassCode'];
                     $timetable[$x]['day'][$y][$seq]['campus']         = $desc['ClassCampus'];
@@ -557,7 +556,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     //}
 
                 } else {
-                    $timetable[$x]['day'][$y]['periodOn'] = 0;
+                    $timetable[$x]['day'][$y] = array();
                 }
 
             }
@@ -570,7 +569,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (is_array($timetable)) {
             usort($timetable, array($this, 'sortTimetable'));
         }
-        //print_R($timetable);
+        print_R($timetable);
         return $timetable;
 
     }

@@ -195,8 +195,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 			$dayNumber = $period['day'];
 
-			$periodListAdaption[$periodSequence]['day'][$dayNumber] = array( 'periodOn' => 1 );
-
 			foreach ( $classList as $i => $class ) {
 				if ( $class['period_id'] == $period['id'] ) {
 					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];

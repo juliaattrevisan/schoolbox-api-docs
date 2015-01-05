@@ -579,7 +579,6 @@ class External_Maze_Timetable implements External_TimetableInterface
              */
             for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
                 $timetable[$period]['day'][$day] = array(
-                    'periodOn' => '',
                     'description' => $allDayTimetables[$day][$period]['description'],
                     'code' => $allDayTimetables[$day][$period]['code'],
                     'room' => $allDayTimetables[$day][$period]['room'],

@@ -144,7 +144,7 @@ class API {
                         $class['today'] = '1';
                     }
 
-                    if (!$class['periodOn']) {
+                    if (count($class) == 0) {
                         continue;
                     }
 

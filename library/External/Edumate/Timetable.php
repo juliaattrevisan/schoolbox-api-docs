@@ -279,7 +279,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             for($j = 1; $j <= $dayCount; ++$j) {
                 // period has class for user
                 if(isset($classes[$code][$j])) {
-                    $timetable[$i]['day'][$j]['periodOn'] = 1;
                     $timetable[$i]['day'][$j]['description'] = $classes[$code][$j]['CLASS'];
                     $timetable[$i]['day'][$j]['code'] = $classes[$code][$j]['CODE'];
                     $timetable[$i]['day'][$j]['room'] = $classes[$code][$j]['ROOM'];
@@ -287,7 +286,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 }
                 // user has not class in this period
                 else {
-                    $timetable[$i]['day'][$j]['periodOn'] = 0;
+                    $timetable[$i]['day'][$j] = array();
                 }
             }
         }

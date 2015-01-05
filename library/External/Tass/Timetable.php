@@ -286,7 +286,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                     && $desc['prd_code'] == $timetable[$x]['periodNumber']
                     && $desc['day_code'] == $y
                 ) {
-                    $timetable[$x]['day'][$y]['periodOn']    = 1;
                     $timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
                     $timetable[$x]['day'][$y]['code']        =
                         trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
@@ -301,7 +300,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                     }
 
                 } else {
-                    $timetable[$x]['day'][$y]['periodOn'] = 0;
+                    $timetable[$x]['day'][$y] = array();
                 }
 
             }
