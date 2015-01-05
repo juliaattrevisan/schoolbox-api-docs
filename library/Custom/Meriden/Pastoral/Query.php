@@ -340,7 +340,7 @@ class Query
                 AND subtab.cmpy_code = studsub.cmpy_code
             WHERE studsub.stud_code = :externalId
             AND studsub.cmpy_code = '01'
-            AND studsub.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
             AND tchsub.year_num = :year
         ";
         $params = array(
