@@ -313,7 +313,7 @@ class Query
      *
      * @return array
      */
-    public function getTutors($year, User $student)
+    public function getAllTutors($year, User $student)
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
@@ -321,6 +321,7 @@ class Query
         }
         $query = "
             SELECT DISTINCT
+                teacher.tch_code,
                 teacher.tch_name
             FROM teacher
             INNER JOIN tchsub ON tchsub.tch_code = teacher.tch_code

@@ -34,6 +34,11 @@ class Controller extends Base
     {
         $attendance = $this->getDatabase()->getAllAttendances($year, $student);
         $activities = $this->getDatabase()->getAllActivities($year, $student);
+        $tutors     = $this->getDatabase()->getAllTutors($year, $student);
+
+        // Year list:
+        // all students at which this student has been enrolled at this school.
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
@@ -51,6 +56,7 @@ class Controller extends Base
                         'studentExternal' => array(
                             'attendance' => $attendance,
                             'activities' => $activities,
+                            'tutors'     => $tutors,
                         ),
                     )
                 ),
