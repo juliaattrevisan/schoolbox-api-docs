@@ -32,7 +32,7 @@ class Controller extends Base
      */
     public function index($year, User $student)
     {
-        $attendance = $this->getDatabase()->getAttendance($year, $student);
+        $attendance = $this->getDatabase()->getAllAttendances($year, $student);
         $activities = $this->getDatabase()->getAllActivities($year, $student);
         $this->getResponse()->content->set(
             array(

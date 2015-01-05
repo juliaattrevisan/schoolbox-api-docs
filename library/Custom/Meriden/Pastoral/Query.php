@@ -220,7 +220,7 @@ class Query
      *
      * @return array
      */
-    public function getAttendance($year, User $student)
+    public function getAllAttendances($year, User $student)
     {
         return array(
             'absent'        => $this->getAbsenceCount($year, $student),
