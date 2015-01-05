@@ -54,6 +54,15 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
          */
         $this->setAllTimetables(new \Schoolbox\Collection());
 
+        $this->generateTimetables();
+
+        return true;
+    }
+
+    /**
+     * Stack up a whole bunch of timetables for each campii
+     */
+    private function generateTimetables() {
         $timetableHandler = new \External_Timetable();
 
         // get current day and period.
@@ -88,8 +97,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 }
             }
         }
-
-        return true;
     }
 
     /**
