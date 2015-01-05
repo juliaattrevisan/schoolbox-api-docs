@@ -326,14 +326,14 @@ class Query
             FROM teacher
             INNER JOIN tchsub ON tchsub.tch_code = teacher.tch_code
             INNER JOIN studsub
-                ON studsub.sub_code = tchsub.sub_code AND studsub.class = tchsub.class
+                ON studsub.sub_code = tchsub.sub_code
+                AND studsub.class = tchsub.class
+                AND studsub.yr_study = tchsub.year_num
+                AND studsub.semester = tchsub.semester
             WHERE studsub.stud_code = :externalId
-            AND studsub.yr_study = :year
             AND studsub.cmpy_code = '01'
-            AND studsub.semester ='1'
             AND studsub.sub_code IN ('9994','9995','9996','9997','9998','9999')
             AND tchsub.year_num = :year
-            -- AND tchsub.semester = '1'
         ";
         $params = array(
             ':externalId'   => $this->getDatabase()->smartQuote($externalId),
