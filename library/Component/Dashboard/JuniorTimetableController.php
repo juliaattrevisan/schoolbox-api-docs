@@ -143,11 +143,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
                         $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
 
-                        /* Clear out the period name, beacuse they will now be combined
-                         * and individual headings no longer mean anything
-                         */
-                        $condensedClass['periodName'] = '';
-
                         $allCondensedClasses[] = $condensedClass;
                     }
 
@@ -163,11 +158,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                         if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
                             $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
 
-                            /* Clear out the period name, beacuse they will now be combined
-                             * and individual headings no longer mean anything
-                             */
-                            $condensedClass['periodName'] = '';
-
                             $allCondensedClasses[] = $condensedClass;
                         }
                     }
@@ -175,6 +165,13 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             }
 
             $lastCode = $period['code'];
+        }
+
+        /* Clear out the period name, beacuse they will now be combined
+         * and individual headings no longer mean anything
+         */
+        foreach ($allCondensedClasses as &$currentClass) {
+            $currentClass['periodName'] = '';
         }
 
         return array(
