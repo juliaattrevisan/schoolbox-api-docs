@@ -9,6 +9,8 @@
 
 namespace Custom\Meriden\Pastoral;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -27,6 +29,19 @@ class Module extends BaseModule
     {
         $router->addGet('customMeridenPastoral.index', $basePath.'/{year}/{id}');
         $router->addGet('customMeridenPastoral.subject', $basePath.'/{year}/{id}/{subjectCode}');
+    }
+
+    /**
+     * Only superusers may access this page for now.
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $authorizer->add(
+            '/^customMeridenPastoral\\.(?:index|subject)/',
+            new IsSuperuser()
+        );
     }
 
     /**
