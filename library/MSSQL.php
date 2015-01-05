@@ -494,6 +494,19 @@ class MSSQL {
 	}
 
 	/**
+	 * Escapes a value for safe usage in a query, and wraps in quotes so that
+	 * it can be interposed directly into a string.
+	 *
+	 * @param string $value The string to escape.
+	 *
+	 * @return string
+	 */
+	public function smartQuote($value)
+	{
+		return "'".$this->quote($value)."'";
+	}
+
+	/**
 	 * Check whether a db resource was spawned
 	 *
 	 * @return bool
