@@ -309,13 +309,6 @@ class External_Maze_Timetable implements External_TimetableInterface
                 'periodEnd' => $definition['end'][$index - 1],
                 'periodNumber' => $index,
                 'periodSequence' => 1,
-                'description' => '',
-                'code' => '',
-                'room' => '',
-                'staffID' => '',
-                'staffTitle' => '',
-                'staffFirstname' => '',
-                'staffSurname' => '',
             );
         }
 
@@ -347,8 +340,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         if (is_array($allRows) && count($allRows)) {
             foreach ($allRows as $currentRow) {
-                $finalTimetable[$currentRow['QROW'] - 1]['description'] = $currentRow['FULLNAME'];
-                $finalTimetable[$currentRow['QROW'] - 1]['code'] = $this->getHelper()->generateClassCode(
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['description'] = $currentRow['FULLNAME'];
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['code'] = $this->getHelper()->generateClassCode(
                     $currentRow['SUBJ'],
                     $currentRow['CLASS']
                 );
@@ -370,19 +363,15 @@ class External_Maze_Timetable implements External_TimetableInterface
 
                         /* Paste teacher in
                          */
-                        $finalTimetable[$currentRow['QROW'] - 1]['staffID'] = $externalUserId;
-                        $finalTimetable[$currentRow['QROW'] - 1]['staffTitle'] = $user->getTitle();
-                        $finalTimetable[$currentRow['QROW'] - 1]['staffFirstname'] = $user->getFirstname();
-                        $finalTimetable[$currentRow['QROW'] - 1]['staffSurname'] = $user->getLastname();
+                        $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffID'] = $externalUserId;
+                        $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffTitle'] = $user->getTitle();
+                        $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffFirstname'] = $user->getFirstname();
+                        $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffSurname'] = $user->getLastname();
                     } catch (Exception $e) {
                     }
                 }
 
-                /* Samuel, Samuel, Samuel...
-                 */
-                $finalTimetable[$currentRow['QROW'] - 1]['room'] = trim(
-                    "{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}"
-                );
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM'])." ".trim($currentRow['R2ROOM']);
             }
         }
 
@@ -413,13 +402,6 @@ class External_Maze_Timetable implements External_TimetableInterface
                 'periodEnd' => $definition['end'][$index - 1],
                 'periodNumber' => $index,
                 'periodSequence' => 1,
-                'description' => '',
-                'code' => '',
-                'room' => '',
-                'staffID' => '',
-                'staffTitle' => '',
-                'staffFirstname' => '',
-                'staffSurname' => '',
             );
         }
 
@@ -455,8 +437,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         if (is_array($allRows) && count($allRows)) {
             foreach ($allRows as $currentRow) {
-                $finalTimetable[$currentRow['QROW'] - 1]['description'] = $currentRow['FULLNAME'];
-                $finalTimetable[$currentRow['QROW'] - 1]['code'] = $this->getHelper()->generateClassCode(
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['description'] = $currentRow['FULLNAME'];
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['code'] = $this->getHelper()->generateClassCode(
                     $currentRow['SUBJ'],
                     $currentRow['CLASS']
                 );
@@ -482,20 +464,16 @@ class External_Maze_Timetable implements External_TimetableInterface
                          * so accept the first in the list
                          */
                         if (!strlen($finalTimetable[$currentRow['QROW'] - 1]['staffID'])) {
-                            $finalTimetable[$currentRow['QROW'] - 1]['staffID'] = $teacherKey;
-                            $finalTimetable[$currentRow['QROW'] - 1]['staffTitle'] = $user->getTitle();
-                            $finalTimetable[$currentRow['QROW'] - 1]['staffFirstname'] = $user->getFirstname();
-                            $finalTimetable[$currentRow['QROW'] - 1]['staffSurname'] = $user->getLastname();
+                            $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffID'] = $teacherKey;
+                            $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffTitle'] = $user->getTitle();
+                            $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffFirstname'] = $user->getFirstname();
+                            $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffSurname'] = $user->getLastname();
                         }
                     } catch (Exception $e) {
                     }
                 }
 
-                /* Samuel, Samuel, Samuel...
-                 */
-                $finalTimetable[$currentRow['QROW'] - 1]['room'] = trim(
-                    "{$currentRow['R1ROOM']} {$currentRow['R2ROOM']}"
-                );
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM'])." ".trim($currentRow['R2ROOM']);
             }
         }
 
@@ -578,14 +556,14 @@ class External_Maze_Timetable implements External_TimetableInterface
             /* Put in Day classes
              */
             for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
-                $timetable[$period]['day'][$day] = array(
-                    'description' => $allDayTimetables[$day][$period]['description'],
-                    'code' => $allDayTimetables[$day][$period]['code'],
-                    'room' => $allDayTimetables[$day][$period]['room'],
-                    'staffID' => $allDayTimetables[$day][$period]['staffID'],
-                    'staffFirstname' => $allDayTimetables[$day][$period]['staffFirstname'],
-                    'staffSurname' => $allDayTimetables[$day][$period]['staffSurname'],
-                    'staffTitle' => $allDayTimetables[$day][$period]['staffTitle'],
+                $timetable[$period]['day'][$day][0] = array(
+                    'description' => $allDayTimetables[$day][$period]['class'][0]['description'],
+                    'code' => $allDayTimetables[$day][$period]['class'][0]['code'],
+                    'room' => $allDayTimetables[$day][$period]['class'][0]['room'],
+                    'staffID' => $allDayTimetables[$day][$period]['class'][0]['staffID'],
+                    'staffFirstname' => $allDayTimetables[$day][$period]['class'][0]['staffFirstname'],
+                    'staffSurname' => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
+                    'staffTitle' => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
                 );
             }
         }
