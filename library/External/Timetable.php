@@ -123,6 +123,17 @@ class External_Timetable implements External_TimetableInterface {
 	/**
 	 * Returns a user's complete timetable
 	 *
+     * The structure of this data is as follows
+     * Array[]['periodName']
+     * Array[]['periodStart']
+     * Array[]['periodEnd']
+     * Array[]['periodNumber']
+     * Array[]['periodSequence']
+     * Array[]['day'][][]['description']
+     * Array[]['day'][][]['code']
+     * Array[]['day'][][]['campus']
+     * Array[]['day'][][]['description']
+     *
 	 * @param Integer $externalUserId
 	 * @param Integer $userId
 	 * @param Integer $campusId
@@ -134,6 +145,21 @@ class External_Timetable implements External_TimetableInterface {
 
 	/**
 	 * Returns a user's timetable for a particular day
+     *
+     * The structure of this data is as follows
+     * Array[]['periodName']
+     * Array[]['periodStart']
+     * Array[]['periodEnd']
+     * Array[]['periodNumber']
+     * Array[]['periodSequence']
+     * Array[]['class'][]['description']
+     * Array[]['class'][]['code']
+     * Array[]['class'][]['room']
+     * Array[]['class'][]['campus']
+     * Array[]['class'][]['staffID']
+     *
+     * Note that you can have multiple classes per period.
+     *
 	 *
 	 * @param Integer $externalUserId
 	 * @param Integer $userId
