@@ -24,8 +24,10 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
-     * No usages found
+     * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
+     * days definition.
      * @param Integer $campusId
+     * @param Integer $day
      * @return Array
      */
     function getTimetableDefinition($campusId, $day = 0)
@@ -37,7 +39,7 @@ class External_Timetable implements External_TimetableInterface
      * Calculates the current day number in the cycle
      *
      * @param Integer $campusId
-     * @param String $date
+     * @param String|Integer $date
      * @return Integer
      */
     function getDayNumber($campusId, $date = 0)
