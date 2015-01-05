@@ -217,16 +217,11 @@ class External_Tass_Timetable implements External_TimetableInterface
             $timetable[$x]['periodSequence'] = 1;
 
             if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
-                $timetable[$x]['description'] = $desc['sub_desc'];
-                $timetable[$x]['code']        =
+                $timetable[$x]['class'][0]['description'] = $desc['sub_desc'];
+                $timetable[$x]['class'][0]['code']        =
                     trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                $timetable[$x]['room']        = $desc['room_code'];
-                $desc                         = $this->getDatabase()->getNextArray();
-
-                //bad data in synergetic.. why..??
-                while ($desc['prd_code'] == $timetable[$x]['periodNumber'] && $desc != 0) {
-                    $desc = $this->getDatabase()->getNextArray();
-                }
+                $timetable[$x]['class'][0]['room']        = $desc['room_code'];
+                $desc = $this->getDatabase()->getNextArray();
             }
         }
 
@@ -286,18 +281,13 @@ class External_Tass_Timetable implements External_TimetableInterface
                     && $desc['prd_code'] == $timetable[$x]['periodNumber']
                     && $desc['day_code'] == $y
                 ) {
-                    $timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
-                    $timetable[$x]['day'][$y]['code']        =
+                    $timetable[$x]['day'][$y][0]['description'] = $desc['sub_desc'];
+                    $timetable[$x]['day'][$y][0]['code']        =
                         trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                    $timetable[$x]['day'][$y]['room']        = $desc['room_code'];
-                    $timetable[$x]['day'][$y]['staffCode']   = $desc['tch_code'];
+                    $timetable[$x]['day'][$y][0]['room']        = $desc['room_code'];
+                    $timetable[$x]['day'][$y][0]['staffCode']   = $desc['tch_code'];
 
                     $desc = $this->getDatabase()->getNextArray();
-
-                    //bad data in synergetic.. why..??
-                    while ($desc['day_code'] == $y && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
-                        $desc = $this->getDatabase()->getNextArray();
-                    }
 
                 } else {
                     $timetable[$x]['day'][$y] = array();
