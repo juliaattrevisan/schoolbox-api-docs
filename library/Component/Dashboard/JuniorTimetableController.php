@@ -260,6 +260,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         return $timetable;
     }
 
+    /* Getters/Setters
+     */
+    
     /**
      * Set allTimetables
      *
