@@ -107,7 +107,9 @@ class Query
                 ecactivity.act_desc,
                 ecactivity.act_type
             FROM ecactivity
-            INNER JOIN studecact ON studecact.act_code = ecactivity.act_code
+            INNER JOIN studecact
+                ON studecact.act_code = ecactivity.act_code
+                AND studecact.cmpy_code = ecactivity.cmpy_code
             WHERE studecact.stud_code = :externalId
             AND studecact.act_year = :year
             AND ecactivity.act_type = :activityType
@@ -324,12 +326,18 @@ class Query
                 teacher.tch_code,
                 teacher.tch_name
             FROM teacher
-            INNER JOIN tchsub ON tchsub.tch_code = teacher.tch_code
+            INNER JOIN tchsub
+                ON tchsub.tch_code = teacher.tch_code
+                AND tchsub.cmpy_code = teacher.cmpy_code
             INNER JOIN studsub
                 ON studsub.sub_code = tchsub.sub_code
                 AND studsub.class = tchsub.class
                 AND studsub.yr_study = tchsub.year_num
                 AND studsub.semester = tchsub.semester
+                AND studsub.cmpy_code = tchsub.cmpy_code
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
             WHERE studsub.stud_code = :externalId
             AND studsub.cmpy_code = '01'
             AND studsub.sub_code IN ('9994','9995','9996','9997','9998','9999')
