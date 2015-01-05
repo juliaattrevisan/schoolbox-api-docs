@@ -306,6 +306,45 @@ class Query
     }
 
     /**
+     * Gets all tutors this student may have had through the year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getTutors($year, User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        $query = "
+            SELECT DISTINCT
+                teacher.tch_name
+            FROM
+                teacher, studsub, subtab, tchsub
+            WHERE studsub.stud_code = :externalId
+            AND studsub.yr_study = :year
+            AND studsub.cmpy_code = '01'
+            AND studsub.semester ='1'
+            AND studsub.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND studsub.sub_code = tchsub.sub_code
+            AND studsub.class = tchsub.class
+            AND tchsub.tch_code = teacher.tch_code
+            AND tchsub.year_num = :year
+            -- AND tchsub.semester = '1'
+        ";
+        $params = array(
+            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
+            ':year'         => $this->getDatabase()->smartQuote($year),
+        );
+        return $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
+    }
+
+    /**
      * @return MSSQL
      */
     public function getDatabase()
