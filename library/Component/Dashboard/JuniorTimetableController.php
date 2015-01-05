@@ -218,29 +218,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 //                            $campus_id,
 //                            $day_number
 //                        );
-//
-//                        /* Temporarily clone classes
-//                         */
-//                        for ($i = 0; $i < count($timetable); $i++) {
-//                            if (isset($timetable[$i]['code'])) {
-//                                $timetable[$i]['code'] = 'CH123';
-//                            }
-//                        }
-//
-//                        /* Merge consecutive classes
-//                         */
-//                        $newClass = $timetable[0];
-//
-//                        for ($i = 1; $i < count($timetable); $i++) {
-//
-//
-//                        }
-//
-//                        new \Alaress_Probe($timetable);
-//
-//
-//
-//                        $this->getAllTimetables()->setOffset($campus_id, $timetable);
 //                    }
 //                }
 //            }
