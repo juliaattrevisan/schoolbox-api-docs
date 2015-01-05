@@ -197,10 +197,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 			foreach ( $classList as $i => $class ) {
 				if ( $class['period_id'] == $period['id'] ) {
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['staffCode'] = $class['synergy_id'];
+					$periodListAdaption[$periodSequence]['day'][$dayNumber][0]['description'] = $class['name'];
+					$periodListAdaption[$periodSequence]['day'][$dayNumber][0]['code'] = $class['code'];
+					$periodListAdaption[$periodSequence]['day'][$dayNumber][0]['room'] = $class['room'];
+					$periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}
@@ -240,10 +240,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 			foreach ( $classList as $i => $class ) {
 				if ( $class['period_id'] == $period['id'] ) {
-					$periodAdaption['description'] = $class['name'];
-					$periodAdaption['code'] = $class['code'];
-					$periodAdaption['room'] = '';
-					$periodAdaption['staffCode'] = $class['synergy_id'];
+					$periodAdaption['class'][0]['description'] = $class['name'];
+					$periodAdaption['class'][0]['code'] = $class['code'];
+					$periodAdaption['class'][0]['room'] = '';
+					$periodAdaption['class'][0]['staffCode'] = $class['synergy_id'];
 					unset($classList[$i]);
 				}
 			}
