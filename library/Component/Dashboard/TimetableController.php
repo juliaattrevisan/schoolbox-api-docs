@@ -112,9 +112,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             */
             if (is_array($timetable) && count($timetable)) {
                 foreach ($timetable as $currentPeriod) {
-                    if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
-                        $classCount++;
-                    }
+                    $classCount = count($currentPeriod['class']);
                 }
             }
 
@@ -132,8 +130,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $colourIndex = 0;
 
                 //for each period set result
-                $this->setVar("timetable_header_block", "");
-                $this->setVar("timetable_period_block", "");
+                $this->setVar('timetable_header_block', '');
+                $this->setVar('timetable_period_block', '');
 
                 foreach ($timetable as $period) {
                     if ($period['periodSequence'] == 1) {
@@ -167,62 +165,55 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         /* Display info only if it exists
                          * Otherwise empty cell
                          */
-                        if ($period['description']) {
-                            $this->setVar('PERIOD_DESC', $period['description']);
-                            $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
-                            $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
-                            $this->setVar('PERIOD_ROOM', $period['room']);
-                            $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
+                        if (count($period['class']) > 0) {
+                            foreach($period['class'] as $class) {
+                                $this->setVar('PERIOD_DESC', $class['description']);
+                                $this->setVar('PERIOD_URL', '/homepage/' . urlencode($class['code']));
+                                $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
+                                $this->setVar('PERIOD_ROOM', $class['room']);
+                                $this->setVar('PERIOD_URL', '/homepage/' . urlencode($class['code']));
 
-                            if ($current_period['PeriodNumber'] == $period['periodNumber']) {
-                                $this->setVar(
-                                    array(
-                                        'PERIOD_CLASS'    => 'current',
-                                        'PERIOD_TH_CLASS' => 'dayCurrent'
-                                    )
-                                );
-                            } else {
-                                $this->setVar(
-                                    array(
-                                        'PERIOD_CLASS'    => 'normal',
-                                        'PERIOD_TH_CLASS' => 'normal'
-                                    )
-                                );
-                            }
 
-                            /* Handle colour array */
-                            if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                                if (!($this->colourList->offsetExists($colourIndex))) {
-                                    $colourIndex = 0;
+                                /* Handle colour array */
+                                if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                                    if (!($this->colourList->offsetExists($colourIndex))) {
+                                        $colourIndex = 0;
+                                    }
+                                    $subjectColourMap[$class['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
+                                    ++$colourIndex;
                                 }
-                                $subjectColourMap[$period['code']] = $this->colourList->offsetGet($colourIndex)->getHexColour();
-                                ++$colourIndex;
-                            }
 
-                            $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$period['code']]));
+                                $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$class['code']]));
 
-                            $cat = $this->category->getByCode($period['code']);
-                            if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
-                                $this->parse('period_class_link_block', 'period_class_link');
-                            } else {
-                                $this->parse('period_class_block', 'period_class');
-                            }
+                                $cat = $this->category->getByCode($class['code']);
+                                if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
+                                    $this->parse('period_class_link_block', 'period_class_link');
+                                } else {
+                                    $this->parse('period_class_block', 'period_class');
+                                }
 
-                            // Link to Attendance Records
-                            if (strlen($period['code'])
-                                && Cfg::get('external_type') == 'synergetic'
-                                && Cfg::get('external_attendance')
-                                && $this->group->isStaff()
-                            ) {
-                                $this->setVar(
-                                    array(
-                                        'ATTENDANCE_CLASS_CODE'        => $period['campus'] ? $period['campus'] . '/' . $period['code'] : '0/' . $period['code'],
-                                        'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
-                                        'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                    )
-                                );
+                                // Link to Attendance Records
+                                if (strlen($class['code'])
+                                    && Cfg::get('external_type') == 'synergetic'
+                                    && Cfg::get('external_attendance')
+                                    && $this->group->isStaff()
+                                ) {
+                                    $this->setVar(
+                                        array(
+                                            'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
+                                            'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
+                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                        )
+                                    );
 
-                                $this->parse('has_attendances_block', 'has_attendances');
+                                    /* This appends the attendance link to the correct phplib class block depending on permissions above */
+                                    if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
+                                        $this->parse('period_class_link_block', 'has_attendances',true);
+                                    } else {
+                                        $this->parse('period_class_block', 'has_attendances',true);
+
+                                    }
+                                }
                             }
                         } else {
                             $this->setVar(

@@ -121,44 +121,47 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                     continue;
                 }
                 // Load events for this campus
-                foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
-                    if (isset($period['description'])) {
-                        $event = new Calendar_Event_Type_Day();
-                        $event->setAllday(false);
-                        $event->setLocation($period['room']);
-                        $event->setStartTime(
-                            new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U')
-                        );
-                        $event->setEndTime(
-                            new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
-                        );
-                        $event->setPublishDate(null);
-                        $event->setTitle($period['description']);
-                        $event->setCampusList($campusId);
-                        if ($period['staff'] instanceof Schoolbox\User) {
-                            $event->setAuthorId($period['staff']->getId());
-                            $event->setAuthorName($period['staff']->formatName());
-                        }
-                        if ($period['category'] instanceof Schoolbox\Resource\Category) {
-                            // Put this into a category
-                            $event->setCategoryId($period['category']->getId());
-                            $event->setCategoryName($period['category']->getName());
+                if(isset($dayTimetable[$dayNumber][$campusId])) {
+                    foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
 
-                            // Finagle a category collection for this event
-                            $eventCategory = new \Schoolbox\Calendar\Relation\Category();
-                            $eventCategory->setCategoryId($period['category']->getId());
-                            $event->setCategoryCollection(
-                                new Schoolbox\Collection(array($eventCategory))
+                        if (isset($period['description'])) {
+                            $event = new Calendar_Event_Type_Day();
+                            $event->setAllday(false);
+                            $event->setLocation($period['room']);
+                            $event->setStartTime(
+                                new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U')
                             );
-                            $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
-                        } else {
-                            // Make this up as a campus event if it has no category
-                            $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                            $event->setEndTime(
+                                new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
+                            );
+                            $event->setPublishDate(null);
+                            $event->setTitle($period['description']);
+                            $event->setCampusList($campusId);
+                            if ($period['staff'] instanceof Schoolbox\User) {
+                                $event->setAuthorId($period['staff']->getId());
+                                $event->setAuthorName($period['staff']->formatName());
+                            }
+                            if ($period['category'] instanceof Schoolbox\Resource\Category) {
+                                // Put this into a category
+                                $event->setCategoryId($period['category']->getId());
+                                $event->setCategoryName($period['category']->getName());
+
+                                // Finagle a category collection for this event
+                                $eventCategory = new \Schoolbox\Calendar\Relation\Category();
+                                $eventCategory->setCategoryId($period['category']->getId());
+                                $event->setCategoryCollection(
+                                    new Schoolbox\Collection(array($eventCategory))
+                                );
+                                $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
+                            } else {
+                                // Make this up as a campus event if it has no category
+                                $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                            }
+                            $event->setType($eventType);
+                            $event->setColour($period['color']);
+                            $event->setConnectorId($this->getConnectorId());
+                            $stack->add($event);
                         }
-                        $event->setType($eventType);
-                        $event->setColour($period['color']);
-                        $event->setConnectorId($this->getConnectorId());
-                        $stack->add($event);
                     }
                 }
             }
