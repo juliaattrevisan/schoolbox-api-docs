@@ -23,6 +23,7 @@
 @logo-width: 					280px;
 @logo-height: 					80px;
 @infopanel-height:				14px;
+@search-width:					253px;
 
 // Generic colors
 @body-background: 				#FFFFFF; // Body, but not the content area
@@ -40,7 +41,7 @@
 // Main banner & Search
 @banner-color:      			#3F3F3F;
 @banner-links:      			@link;
-@banner-height:     			110px;
+@banner-height:     			86px;
 @search-color:                  #003a6c;
 
 // Modules
@@ -50,10 +51,10 @@
 @notify-color:					@negative-color;
 
 // Refers to the left navigation
-@navigation-width:				161px;
+@navigation-width:				176px;
 @navigation-padding:			16px;
 @navigation-background:  		transparent;
-@navigation-color:  			#3F3F3F;
+@navigation-color:  			#002E52;
 @navigation-links:  			@link;
 @navigation-hover-background: 	#129BF7;
 @navigation-hover-color:  		#FFFFFF;
@@ -74,23 +75,106 @@
 @footer-links:					@footer-color;
 
 // Optional features
-@login-version: 				1;
+//@login-version: 				1;
 
 // =============================================================================
 // 3. Load core
 // =============================================================================
 @import "../core/core.less";
-@import "../core/legacy.less";
-@import "screen.less";
 // =============================================================================
-
-#nav li.parent > a span:after { content: none; }
-#nav h4{ padding: 0 0 0 9px; }
+ 
 .admin-nav li a {
   color: @footer-color;
   background: @dark;
   border: 1px solid @border-color;
 }
+
+body{ background: #ffffff url(/images/mggs/body-top.jpg) top left repeat-x; }
+#wrap {
+	background: url(/images/mggs/body-bottom.jpg) bottom left repeat-x;
+	min-height: 100%;
+	#wrap-inner {
+		background: url(/images/mggs/body-cross.png) -31px 100% no-repeat;
+		padding-bottom: 13px;
+	}
+}
+
+h2{ .border-radius(5px); }
+.btn{ .border-radius(3px); }
+
+#nav{
+	margin-left: 5px;
+
+	h4{ padding: 0 0 0 9px; }
+	li a:hover{ .border-radius(3px); }
+	ul ul{
+		border: 3px solid #e5edf5;
+		.border-radius(3px);
+	}
+}
+
+#header {
+    background: url(/images/mggs/header-cross.png) 303px 12px no-repeat;
+
+	.logo{
+		top: 6px;
+		left: 21px;
+	}
+
+	#search-button{
+		background: url("/images/core/icons/search.png") no-repeat 50% 50%;
+		right: 5px;
+	}
+
+	#search-field{
+		.border-radius(3px);
+	    color: #003a6c;
+		font-weight: bold;
+	    border: 1px solid #e3e3e3;
+	    -webkit-box-shadow: inset 0px 0px 5px 2px #e8eef0;
+	    box-shadow: inset 0px 0px 5px 2px #e8eef0;
+	}
+
+	#tabs {
+		top: 24px;
+		right: 16px;
+    	z-index: 1;
+    	position: relative;
+
+	    li {
+			float: right;
+			position: relative;
+	    	margin-right: 0;
+
+	    	a {
+	    		.gradient(#137fc8,#053a68);
+			    border-right: 1px solid #003a6c; 
+	    		border-left: 1px solid #1088d9;
+			    height: 30px;
+				padding: 0 12px;
+				font-size:12px;
+				line-height:31px;
+				&:hover{ .gradient(#1590e3,#055da9); }	
+			}
+			&.navthis a{ .gradient(#1590e3,#055da9); }
+		}
+		li:last-child a{
+			-moz-top-left-border-radius: 8px;
+			-webkit-top-left-border-radius: 8px;
+			border-top-left-radius: 8px;
+		}
+	}
+}
+
+#container {
+    border-top: 3px solid #f0b510;
+    .box-shadow(-2px, 0px, 5px, #e6e9ea);
+    .border-radius(7px 0px 0px 0px);
+	padding: 15px;
+	margin: 0 16px 0 182px;
+}
+
+#footer{ background: #e6f7fd; margin: 0; }
 
 // positioning overrides for notifications
 #infoPanel {
@@ -101,6 +185,7 @@
 		top: 4px;
 		background-image: url('/images/mggs/bell.png');
 		background-position: 4px -24px;
+		> a{ width: 15px !important; }
 		&[data-unread="0"] {
 			background-position: 4px 0;
 		}
@@ -130,7 +215,7 @@
 			width: 0;
 			height: 0;
 			bottom: -10px;
-			right: 30%;
+			right: 21px;
 			position: absolute;
 			border-left: 6px solid transparent;
 			border-right: 6px solid transparent;
@@ -174,16 +259,19 @@ body.login{
 		height: 100%;
 		position: fixed;
 		right: 0;
+		top: 0;
 		padding: 20px;
 		#content-inner{
-			background: url('/images/mggs/login-bg.png') center center no-repeat;
+			background: url('/images/mggs/login-bg.png') top left no-repeat;
 			width: 483px;
-			height: 405px;
+			height: 460px;
 			margin: 80px 0 0 0;
 			padding: 59px 48px 37px 131px;
 			box-sizing: border-box;
 		}
       	#loginForm{
+      		margin: 0 0 12px 0;
+      		fieldset{ padding: 0; }
 	        input[type="text"],
 	        input[type="password"]{
 	        	.placeholder(@link);
@@ -229,9 +317,219 @@ body.login{
   }
 }
 
+// Old stuff MGGS might need
+
+/*--------------------------------------
+    LIBRARY
+--------------------------------------*/
+.updates #galleryCycle{display:block;width: 100%; overflow:hidden}
+.updates #galleryCycle div{overflow:hidden}
+.updates #galleryCycle span{display:block}
+
+
+#nina, #morris{min-height:1px;}
+
+.library-boxes{width:100%; border-collapse:collapse;}
+.library-boxes td{border:16px solid #fff; border-top:0; border-left:0;}
+.library-boxes .resources{background:#f2e9f3 url(/images/mggs/library/nina-laptop.jpg) no-repeat;}
+.library-boxes .reading{background:#ebf7d9 url(/images/mggs/library/nina-book.jpg) no-repeat;}
+.library-boxes .updates{background:none;}
+.library-boxes .quick-facts{background:#deeef6 url(/images/mggs/library/nina-search.jpg) no-repeat;}
+.library-boxes .in-the-news{background:#f4f2db url(/images/mggs/library/nina-news.jpg) no-repeat;}
+.library-boxes .research-tools{background:#e5f3f0 url(/images/mggs/library/nina-config.jpg) no-repeat;}
+.library-boxes .click-view{background:#f6ebd0 url(/images/mggs/library/nina-play.jpg) no-repeat;}
+.library-boxes  td{padding:0; vertical-align:top; height:33%;}
+.library-boxes  tr{height:33%;}
+.library-boxes .library-box { min-height:170px; padding:16px;}
+.library-box ul li{ line-height:22px;}
+.library-box a{color:#3e8dfe; font-weight:bold;}
+.library-box{}
+.library-box h3, .updates h3{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
+.updates h3{margin-top:16px;}
+.library-header ul{float:left; margin-bottom:16px;}
+.library-header ul li{float:left; display:block;padding:0;}
+.library-header ul li a{line-height:30px; color:#fff; padding:0 11px; display:block; height:30px;-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;}
+.library-header ul li a:hover{background:#9aae4a;-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;  text-decoration:none;
+		  
+}
+.library-header{background:#798e39 url(/images/mggs/library/nina-painting.jpg) no-repeat; -moz-border-radius: 8px;  -webkit-border-radius: 8px;  border-radius: 8px; margin-bottom:15px;
+		  position:relative;
+}
+.library-header h1{line-height:normal;padding:20px 0 0 0; margin-bottom:20px;color:#fff; font-size:33px}
+.library-header h1 span{font-size:22px;}
+#library-search {position:relative;float:right; margin:20px 16px 0 0; background:#ffffff;-webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; float: right; clear:right; border:0; height:32px; z-index:500}
+#library-search-field { font-weight:bold; color:#959595; font-size:16px;max-width: 288px; padding: 0 12px;height:31px; line-height:31px; border:0; background:#ffffff;-webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px; font-family:Arial, Helvetica, sans-serif }
+#library-search-button { -webkit-border-radius:4px; text-indent:-999999em; border:0;-moz-border-radius:4px; border-radius:4px; float:right; margin:0;text-align:center; line-height:32px; height:33px;width:33px; position:absolute; top:0; right:0; background:url("/images/core/icons/search.png") no-repeat 50% 50%; padding:0;}
+#library-search-button:hover {  cursor:pointer;}
+.library-content{margin-left:144px;}
+
+
+
+/*--------------------------------------
+    MORRIS LIBRARY
+--------------------------------------*/
+#morris .library-left{float: left; width:66%;}
+#morris .library-right{float:right; width:33%;}
+#morris .left-column{float:left; width:49.5%;}
+#morris .left-column a.library-box{margin: 0 0 10px 0;}
+#morris .left-column.two{float:right}
+#morris .left-column.two a.library-box{margin-right:0;}
+
+#morris a.library-box strong{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
+#morris a.library-box{display:block; color:#255196; min-height:204px;}
+#morris a.library-box:hover{border-color:#e9bb1f;}
+#morris .library-header{background:#1790c6;}
+#morris .library-header h1{padding-left:21px;color:#fff;}
+#morris .library-header ul {margin-left:8px;}
+#morris .library-header ul li a{font-size:14px;padding:0 16px;background:#74bcdd; color:#255196; font-weight:bold; margin-right:11px;}
+#morris .library-header ul li a:hover{background:#4bc7ff; color:#fff;}
+#morris .library-header h1 span{font-style:italic; padding-left:48px;}
+#morris .library-box{border:2px solid #000;} 
+#morris .library-box{padding:11px 14px;}
+ 
+#morris .library-box.lets-read{background:#f2fff2 url(/images/mggs/library/morris-book.jpg) no-repeat; border-color:#05da00}
+#morris .library-box.finding-out{background:#eaf9ff url(/images/mggs/library/morris-globe.jpg) no-repeat; border-color:#00b6ff;}
+#morris .library-box.community, #morris .library-box.words, #morris .library-box.cybersmart{margin-right:0;}
+#morris .library-box.community, #morris .library-box.quotes, #morris .library-box.words{background:#f6f6f6; border-color:#ececec;}
+#morris .library-box.digital-citizenship{background:#fff1f1 url(/images/mggs/library/morris-children.jpg) no-repeat; border-color:#ff0000;}
+#morris .library-box.thinks-to-do{background:#fcf1ff url(/images/mggs/library/morris-idea.jpg) no-repeat; border-color:#d52bff;}
+#morris .library-box.cybersmart{background:#fffdec; border-color:#fff6d8;}
+
+#morris h3{color:#255196;}
+#morris h5{font-size:20px; font-weight:normal; line-height:22px; margin-bottom:4px;}
+#morris h6{color:#ff0000; line-height:22px; font-weight:bold; margin-bottom:4px;}
+#morris .quotes blockquote{color:#3c00ff; font-weight:bold; font-size:14px; line-height:22px;}
+#morris .quotes blockquote em{font-weight:normal; font-style:italic; color:#000;}
+#morris .quotes, #morris .words{min-height:inherit;}
+
+#morris .community {margin-bottom:16px; min-height:525px;}
+#morris h5{ margin-bottom:8px;}
+#morris .community h5{margin-top:36px; margin-bottom:8px;}
+#morris .quotes{margin-bottom:16px;}
+#morris .words p{color:#3c00ff; font-size:18px; margin-top:18px;}
+#morris .cybersmart{min-height:inherit;}
+#morris .cybersmart p{line-height:18px; margin-bottom:0;}
+
+.updates #galleryCycle div{position:absolute; left:0; top:0;}
+
+/*--------------------------------------
+    QUICKLINKS
+--------------------------------------*/
+.quicklinks{
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    padding: 30px 0 0 0;
+    height: 183px;
+    width: 100%;
+}
+
+.evi{
+    background: url('/images/mggs/evi.png') top left no-repeat;
+    display: block;
+    width: 160px;
+    height: 213px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.quicklinks-container{
+    background: #f2f6fa;
+    border: 1px solid #e5edf5;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin: 0 0 16px 62px;
+    position: relative;
+    height: 160px;
+    width: 100%;
+    padding-left: 32px;
+}
+
+.quicklinks-container ul{
+    margin: 15px 0 0 -20px;
+    position: relative;
+    z-index: 10;
+}
+
+.box .quicklinks-container li{
+    list-style: none;
+    padding: 0;
+    float: left;
+    width: 21%;
+}
+
+.quicklinks-container li a{
+    color: #002e52;
+    display: block;
+    float: left;
+    margin: 0 20px;
+    height: 0;
+    width: 88px;
+    text-align: center;
+    text-decoration: none;
+    padding-top: 79px;
+}
+
+.quicklinks-container li a:hover{
+    text-decoration: underline;
+}
+
+.quicklinks-container li a {
+    background: url('/images/mggs/quicklinks-icons.png') no-repeat;
+}
+
+.quicklinks-container li a.calendar{ background-position: 0 0; }
+.quicklinks-container li a.news{ background-position: 0 -89px; }
+.quicklinks-container li a.my-timetable{ background-position: 0 -176px; }
+.quicklinks-container li a.synergetic{ background-position: 0 -265px; }
+
+.quicklinks-container li a.eportfolio{ background-position: -91px 0; }
+.quicklinks-container li a.synergetic-parent-portal{ background-position: -177px 0; }
+.quicklinks-container li a.evi-parent-homepage{ background-position: -177px -89px; }
+
+
+/*--------------------------------------
+    AD SPACE
+--------------------------------------*/
+.ad-space {
+    background: #f2f6fa;
+    border: 1px solid #e5edf5;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    width: 100%;
+    overflow: auto;
+}
+
+.ad-space .content {
+    padding: 8px;
+}
+
+.ad-space-content {
+    float: left;
+}
+
+.ad-space-img {
+    float: left;
+    margin: 0 17px 8px 0 ;
+}
+
+.ad-space-content h3 {
+    color: #002e52;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 11px 0 7px 0;
+}
+
+.ad-space-content span.dates {
+    color: #002e52;
+    font-size: 12px;
+}
+
 @media screen and (max-width: 1024px) {
-	
-	#login-bg{ display: none; }
 
 	body.login{
 		min-width: 100%;
