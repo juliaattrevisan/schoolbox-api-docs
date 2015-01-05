@@ -65,20 +65,10 @@
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
      # All these are based off of assessments in the grade page.
      #}
-    <dt>Athletics Carnival</dt>
-    <dd>{{ report.studentExternal.assessment.athletics.grade }}</dd>
-
-    <dt>Swimming Carnival</dt>
-    <dd>{{ report.studentExternal.assessment.swimming }}</dd>
-
-    <dt>School Camp</dt>
-    <dd>{{ report.studentExternal.assessment.camp }}</dd>
-
-    <dt>Uniform</dt>
-    <dd>{{ report.studentExternal.assessment.uniform }}</dd>
-
-    <dt>Pastoral Activities Involvement</dt>
-    <dd>{{ report.studentExternal.assessment.pastoral }}</dd>
+    {% for assessment in report.studentExternal.assessments %}
+        <dt>{{ assessment.name }}</dt>
+        <dd>{{ assessment.grade }}</dd>
+    {% endfor %}
 </dl>
 
 <dl>
