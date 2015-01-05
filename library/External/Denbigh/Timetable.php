@@ -127,12 +127,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 				'periodSequence' => '1',
 				'day'            => array()
 			);
-
-			for ( $j = 1; $j <= $definition['dayCount'];  $j++ ) {
-				$periodList[$i]['day'][$j] = array(
-					'periodOn' => 0
-				);
-			}
 		}
 
 		/* Fill timetable */
@@ -171,8 +165,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 				$day = $lesson['day'];
 
 				if ( isset($periodList[$period]['day'][$day]) ) {
-					$periodList[$period]['day'][$day] = array(
-						'periodOn'    => 1,
+					$periodList[$period]['day'][$day][] = array(
 						'description' => $lesson['subjectName'],
 						'code'        => $lesson['classCode'],
 						'room'        => $lesson['room']
@@ -241,7 +234,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 				$period = $lesson['period'];
 
 				if ( isset($periodList[$period]) ) {
-					$periodList[$period] = array_merge($periodList[$period], array(
+					$periodList[$period]['class'][] = array_merge($periodList[$period], array(
 						'description' => $lesson['subjectName'],
 						'code'        => $lesson['classCode'],
 						'room'        => $lesson['room']
