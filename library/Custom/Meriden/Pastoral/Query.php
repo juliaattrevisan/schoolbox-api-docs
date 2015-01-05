@@ -78,7 +78,7 @@ class Query
                 )
             );
         }
-        return $this->getDatabase()->getAll($query);
+        return $this->getDatabase()->getAll(strtr($query, $params));
     }
 
     /**
