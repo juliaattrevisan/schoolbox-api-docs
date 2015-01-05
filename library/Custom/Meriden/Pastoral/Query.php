@@ -103,7 +103,7 @@ class Query
         );
         $count = 0;
         foreach ($resultSet as $row) {
-            switch ($row['absent_code']) {
+            switch ($row['absent_type']) {
                 case 'AFS':
                     $count += 1;
                     break;
