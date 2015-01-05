@@ -8,14 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_ControllerAbstract {
-
-    /**
-     * A collection of all the timetables
-     *
-     * @var Schoolbox\Collection
-     */
-    private $allTimetables = null;
+class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_TimetableController {
 
     /**
      * Entirely ignore classes which have no code
@@ -34,27 +27,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      * @return void
      */
     public function execute() {
-        return true;
-    }
-
-    /**
-     * Outputs HTML template defined by config variable 'template'
-     *
-     * @param String $templateHandle
-     * @return bool
-     */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'juniorTimetable')) {
-            return false;
-        }
-
-        $this->parseConfig();
-
-        /* Hook method
-         */
-        $this->setAllTimetables(new \Schoolbox\Collection());
-
         $this->generateTimetables();
+
+        $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
 
         return true;
     }
@@ -90,9 +65,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
                         $processed = $this->condense($timetable);
 
-                        $this->getAllTimetables()->add($processed['condensed']);
+                        $this->timetable[$campus_id] = $processed['condensed'];
 
-                        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->getAllTimetables());
+                        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->timetable);
                     }
                 }
             }
@@ -128,12 +103,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
              * $period = $timetable[$i]['class'][0];
              */
 
-            /* Exclude nonclasses
-             */
-            if ($this->getExcludeNonclasses() && !isset($period['code'])) {
-                continue;
-            }
-
             /* Special cases for recess, lunch, etc which have no codes
              */
             if (!isset($period['code'])) {
@@ -163,9 +132,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $condensedClass['periodEnd'] = $period['periodEnd'];
                 }
                 else {
-                    $stack[] = "Adding {$condensedClass['code']}<br>";
-
-                    $allCondensedClasses[] = $condensedClass;
+                    if (!$this->getExcludeNonclasses() || isset($period['code'])) {
+                        $stack[] = "Adding {$condensedClass['code']}<br>";
+                        $allCondensedClasses[] = $condensedClass;
+                    }
 
                     $condensedClass = $period;
 
@@ -176,9 +146,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                      * didn't match the one just added
                      */
                     if ($i == (count($timetable)-1)) {
-                        $allCondensedClasses[] = $condensedClass;
-
-                        $stack[] = "Adding {$condensedClass['code']}<br>";
+                        if (!$this->getExcludeNonclasses() || isset($period['code'])) {
+                            $allCondensedClasses[] = $condensedClass;
+                            $stack[] = "Adding {$condensedClass['code']}<br>";
+                        }
                     }
                 }
             }
@@ -296,25 +267,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
     /* Getters/Setters
      */
-
-    /**
-     * Set allTimetables
-     *
-     * @param \Schoolbox\Collection $allTimetables
-     */
-    private function setAllTimetables($allTimetables)
-    {
-        $this->allTimetables = $allTimetables;
-    }
-
-    /**
-     * Get allTimetables
-     * @return \Schoolbox\Collection
-     */
-    private function getAllTimetables()
-    {
-        return $this->allTimetables;
-    }
 
     /**
      * Set exclude non classes

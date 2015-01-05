@@ -15,12 +15,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     private $currentPeriod = array();
 
-    private $timetable = array();
+    protected $timetable = array();
 
     /**
      * @var Schoolbox\Collection
      */
-    private $colourList;
+    protected $colourList;
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable)
     {
