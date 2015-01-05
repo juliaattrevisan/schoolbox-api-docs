@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,84 +9,103 @@
 
 use Alaress\DebugBar\Instance as DebugBar;
 
-class External_Offline_User implements External_UserInterface {
+class External_Offline_User implements External_UserInterface
+{
 
-	public function getParent($externalUserId) {
-		// TODO: Implement getParent() method.
-	}
+    public function getParent($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getParentSync($externalUserId) {
-		// TODO: Implement getParentSync() method.
-	}
+    public function getParentSync($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getParentEmails($synergyIds) {
-		// TODO: Implement getParentEmails() method.
-	}
+    public function getParentEmails($synergyIds)
+    {
+        // Return nothing
+    }
 
-	public function getStudent($externalUserId) {
-		// TODO: Implement getStudent() method.
-	}
+    public function getStudent($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getStaff($externalUserId) {
-		// TODO: Implement getStaff() method.
-	}
+    public function getStaff($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
-		// TODO: Implement getStudentContactListExtended() method.
-	}
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+        // Return nothing
+    }
 
-	public function getStudentContactList($externalUserId) {
-		// TODO: Implement getStudentContactList() method.
-	}
+    public function getStudentContactList($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getCurrentSemester($externalUserId = null) {
-		// TODO: Implement getCurrentSemester() method.
-	}
+    public function getCurrentSemester($externalUserId = null)
+    {
+        // Return nothing
+    }
 
-	public function getSubjectList($externalUserId, $userId) {
-		return array();
-	}
+    public function getSubjectList($externalUserId, $userId)
+    {
+        return array();
+    }
 
-	public function getEnrolledStudents($externalUserId) {
-		// TODO: Implement getEnrolledStudents() method.
-	}
+    public function getEnrolledStudents($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getEmail($externalUserId) {
-		// TODO: Implement getEmail() method.
-	}
+    public function getEmail($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getPortrait($externalUserId) {
-		// TODO: Implement getPortrait() method.
-	}
+    public function getPortrait($externalUserId)
+    {
+        // Return nothing
+    }
 
-	public function getStudentUserAccountInfo() {
-		// TODO: Implement getStudentUserAccountInfo() method.
-	}
+    public function getStudentUserAccountInfo()
+    {
+        // Return nothing
+    }
 
-	public function getParentUserAccountInfo() {
-		// TODO: Implement getParentUserAccountInfo() method.
-	}
+    public function getParentUserAccountInfo()
+    {
+        // Return nothing
+    }
 
-	public function getStaffUserAccountInfo() {
-		// TODO: Implement getStaffUserAccountInfo() method.
-	}
+    public function getStaffUserAccountInfo()
+    {
+        // Return nothing
+    }
 
-	public function determineBoarderType($boarderValue) {
-		// TODO: Implement determineBoarderType() method.
-	}
+    public function determineBoarderType($boarderValue)
+    {
+        // Return nothing
+    }
 
-	public function getHousemasterByHouseId($houseID) {
-		// TODO: Implement getHousemasterByHouseId() method.
-	}
+    public function getHousemasterByHouseId($houseID)
+    {
+        // Return nothing
+    }
 
-	/**
-	 * Get contact list for staff directory
-	 *
-	 * @return array
-	 */
-	public function getStaffContactListExtended() {
-		// TODO: Implement getStaffContactListExtended() method.
-		return array();
-	}
+    /**
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended()
+    {
+        // Return nothing
+        return array();
+    }
 
 }

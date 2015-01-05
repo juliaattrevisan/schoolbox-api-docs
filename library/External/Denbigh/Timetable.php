@@ -1,83 +1,87 @@
 <?php
+
 /************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd  				*
-*                                                           *
-*	This file provides access to Denbigh timetable info	    *
-*                                                           *
-************************************************************/
+ *                                                           *
+ *        Copyright (c) 2013 Alaress Pty Ltd                *
+ *                                                           *
+ *    This file provides access to Denbigh timetable info        *
+ *                                                           *
+ ************************************************************/
+class External_Denbigh_Timetable implements External_TimetableInterface
+{
+    private $internalDatabase;
 
-class External_Denbigh_Timetable implements External_TimetableInterface {
-	private $internalDatabase;
+    private $externalDatabase;
 
-	private $externalDatabase;
+    private $group;
 
-	private $group;
+    public function __construct()
+    {
+        /* Set internal database */
+        $this->setInternalDatabase(Database::getInstance());
 
-	public function __construct () {
-		/* Set internal database */
-		$this->setInternalDatabase( Database::getInstance() );
+        /* Establish connection to external database */
+        $database = new Database();
 
-		/* Establish connection to external database */
-		$database = new Database();
+        $hostName = Config::get('external_db_host');
+        $databaseName = Config::get('external_db_db');
+        $username = Config::get('external_db_user');
+        $password = Config::get('external_db_passwd');
 
-		$hostName = Config::get('external_db_host');
-		$databaseName = Config::get('external_db_db');
-		$username = Config::get('external_db_user');
-		$password = Config::get('external_db_passwd');
+        $database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
 
-		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password, array('throw' => true));
+        $this->setExternalDatabase($database);
 
-		$this->setExternalDatabase($database);
+        $this->setGroup(new Group);
+    }
 
-		$this->setGroup( new Group );
-	}
+    public function getTimetableDefinition($campusId, $day = 0)
+    {
+        $statement = $this->getInternalDatabase()->prepare(
+            "
+                        SELECT tc.start, tc.reset, tc.finish, tc.offset,
+                            ty.title, ty.cycle_length, ty.day_length, ty.regular
+                        FROM timetable_campus tc
+                        LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+                        WHERE tc.campus_id = :campusId
+                            AND tc.start < NOW()
+                            AND tc.finish > NOW()
+                          "
+        );
 
-	public function getTimetableDefinition ($campusId, $day = 0) {
-        $statement = $this->getInternalDatabase()->prepare("
-			SELECT tc.start, tc.reset, tc.finish, tc.offset,
-				ty.title, ty.cycle_length, ty.day_length, ty.regular
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			WHERE tc.campus_id = :campusId
-			    AND tc.start < NOW()
-			    AND tc.finish > NOW()
-      		");
-
-        $statement->execute( array(':campusId' => $campusId) );
+        $statement->execute(array(':campusId' => $campusId));
 
         $definition = $statement->fetch(PDO::FETCH_ASSOC);
 
         /* Denbigh depends on a set day length */
-        if ( !empty($definition['cycle_length']) && !empty($definition['day_length']) ) {
+        if (!empty($definition['cycle_length']) && !empty($definition['day_length'])) {
             /* Adapt to spec */
             $definition['dayCount'] = $definition['cycle_length'];
             $definition['periodCount'] = $definition['day_length'];
 
             return $definition;
-        }
-        else {
+        } else {
             return false;
         }
-	}
+    }
 
-	public function getDayNumber ($campusId, $date = 0) {
-        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+    public function getDayNumber($campusId, $date = 0)
+    {
+        if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;
         }
 
-        if ( empty($date) ) {
+        if (empty($date)) {
             $date = time();
         }
 
-        if ( empty($definition['reset']) ) {
+        if (empty($definition['reset'])) {
             $start = strtotime($definition['start']);
-        }
-        else {
+        } else {
             $start = strtotime($definition['reset']);
         }
 
-        $days = ceil( ($date - $start) / (60 * 60 * 24) ) + 1;
+        $days = ceil(($date - $start) / (60 * 60 * 24)) + 1;
 
         /* Calculate the business days from the even weeks */
         $businessDays = 5 * floor($days / 7);
@@ -85,179 +89,194 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
         /* Handle the excess days */
         $excessDays = $days % 7;
 
-        for ( $i = 0; $i < $excessDays; $i++ ) {
+        for ($i = 0; $i < $excessDays; $i++) {
             $currentExcessDay = $date - (60 * 60 * 24 * $i);
 
             /* If its not Saturday or Sunday then increment the business days */
-            if ( date('N', $currentExcessDay) < 6 ) {
+            if (date('N', $currentExcessDay) < 6) {
                 $businessDays++;
             }
         }
 
-        if ( is_numeric($definition['offset']) ) {
+        if (is_numeric($definition['offset'])) {
             $businessDays += $definition['offset'];
         }
 
         $currentDay = $businessDays % $definition['cycle_length'];
 
-        if($currentDay == 0)
+        if ($currentDay == 0) {
             $currentDay = $definition['cycle_length'];
+        }
 
         return $currentDay;
-	}
+    }
 
-	public function getPeriodNumber ($campusId) {
-		return 0;
-	}
+    public function getPeriodNumber($campusId)
+    {
+        return 0;
+    }
 
-	public function getFullTimetable ($externalUserId, $userId, $campusId) {
-		/* Setup skeleton timetable */
-        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+    public function getFullTimetable($externalUserId, $userId, $campusId)
+    {
+        /* Setup skeleton timetable */
+        if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;
         }
 
-		$periodList = array();
+        $periodList = array();
 
-		for ( $i = 1; $i <= $definition['periodCount'];  $i++ ) {
-			$periodList[$i] = array(
-				'periodNumber'   => $i,
-				'periodName'     => "Period $i",
-				'periodStart'    => '',
-				'periodEnd'      => '',
-				'periodSequence' => '1',
-				'day'            => array()
-			);
-		}
+        for ($i = 1; $i <= $definition['periodCount']; $i++) {
+            $periodList[$i] = array(
+                'periodNumber'   => $i,
+                'periodName'     => "Period $i",
+                'periodStart'    => '',
+                'periodEnd'      => '',
+                'periodSequence' => '1',
+                'day'            => array()
+            );
+        }
 
-		/* Fill timetable */
-		if ( $this->getGroup()->isStaff($userId) ) {
-			$statement = $this->getExternalDatabase()->prepare("
-				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-				FROM People p
-				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
-				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = :externalUserId
-			");
-		}
-		else {
-			$statement = $this->getExternalDatabase()->prepare("
-				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-				FROM People p
-				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-				RIGHT JOIN Lessons l ON l.classCode = e.classCode
-				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = :externalUserId
-			");
-		}
+        /* Fill timetable */
+        if ($this->getGroup()->isStaff($userId)) {
+            $statement = $this->getExternalDatabase()->prepare(
+                "
+                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                            "
+            );
+        } else {
+            $statement = $this->getExternalDatabase()->prepare(
+                "
+                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                            "
+            );
+        }
 
-		$statement->bindParam(':externalUserId', $externalUserId, PDO::PARAM_INT);
-		$statement->execute();
+        $statement->bindParam(':externalUserId', $externalUserId, PDO::PARAM_INT);
+        $statement->execute();
 
-		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		if ( !empty($lessonList) ) {
-			foreach ( $lessonList as $lesson ) {
+        if (!empty($lessonList)) {
+            foreach ($lessonList as $lesson) {
 
-				$period = $lesson['period'];
-				$day = $lesson['day'];
+                $period = $lesson['period'];
+                $day = $lesson['day'];
 
-				if ( isset($periodList[$period]['day'][$day]) ) {
-					$periodList[$period]['day'][$day][] = array(
-						'description' => $lesson['subjectName'],
-						'code'        => $lesson['classCode'],
-						'room'        => $lesson['room']
-					);
-				}
-					
-			}
-		}
+                if (isset($periodList[$period]['day'][$day])) {
+                    $periodList[$period]['day'][$day][] = array(
+                        'description' => $lesson['subjectName'],
+                        'code'        => $lesson['classCode'],
+                        'room'        => $lesson['room']
+                    );
+                }
 
-		return $periodList;
-	}
+            }
+        }
 
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
-		/* Setup skeleton timetable */
-        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+        return $periodList;
+    }
+
+    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    {
+        /* Setup skeleton timetable */
+        if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;
         }
 
-		$periodList = array();
+        $periodList = array();
 
-		for ( $i = 1; $i <= $definition['periodCount'];  $i++ ) {
-			$periodList[$i] = array(
-				'periodNumber'   => $i,
-				'periodName'     => "Period $i",
-				'periodStart'    => '',
-				'periodEnd'      => '',
-				'periodSequence' => '1',
-			);
-		}
+        for ($i = 1; $i <= $definition['periodCount']; $i++) {
+            $periodList[$i] = array(
+                'periodNumber'   => $i,
+                'periodName'     => "Period $i",
+                'periodStart'    => '',
+                'periodEnd'      => '',
+                'periodSequence' => '1',
+            );
+        }
 
-		/* Fill timetable */
-		if ( $this->getGroup()->isStaff($userId) ) {
-			$statement = $this->getExternalDatabase()->prepare("
-				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-				FROM People p
-				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
-				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = :externalUserId
-					AND l.day = :dayNumber
-			");
-		}
-		else {
-			$statement = $this->getExternalDatabase()->prepare("
-				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-				FROM People p
-				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-				RIGHT JOIN Lessons l ON l.classCode = e.classCode
-				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = :externalUserId
-					AND l.day = :dayNumber
-			");
-		}
+        /* Fill timetable */
+        if ($this->getGroup()->isStaff($userId)) {
+            $statement = $this->getExternalDatabase()->prepare(
+                "
+                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                                    AND l.day = :dayNumber
+                            "
+            );
+        } else {
+            $statement = $this->getExternalDatabase()->prepare(
+                "
+                                SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+                                FROM People p
+                                RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+                                RIGHT JOIN Lessons l ON l.classCode = e.classCode
+                                RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                                RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                                WHERE p.denbighID = :externalUserId
+                                    AND l.day = :dayNumber
+                            "
+            );
+        }
 
-		$statement->bindParam(':externalUserId', $externalUserId);
-		$statement->bindParam(':dayNumber', $dayNumber, PDO::PARAM_INT);
-		$statement->execute();
+        $statement->bindParam(':externalUserId', $externalUserId);
+        $statement->bindParam(':dayNumber', $dayNumber, PDO::PARAM_INT);
+        $statement->execute();
 
-		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		if ( !empty($lessonList) ) {
-			foreach ( $lessonList as $lesson ) {
+        if (!empty($lessonList)) {
+            foreach ($lessonList as $lesson) {
 
-				$period = $lesson['period'];
+                $period = $lesson['period'];
 
-				if ( isset($periodList[$period]) ) {
-					$periodList[$period]['class'][] = array_merge($periodList[$period], array(
-						'description' => $lesson['subjectName'],
-						'code'        => $lesson['classCode'],
-						'room'        => $lesson['room']
-					));
-				}
+                if (isset($periodList[$period])) {
+                    $periodList[$period]['class'][] = array_merge(
+                        $periodList[$period], array(
+                            'description' => $lesson['subjectName'],
+                            'code'        => $lesson['classCode'],
+                            'room'        => $lesson['room']
+                        )
+                    );
+                }
 
-			}
-		}
+            }
+        }
 
-		return $periodList;
-	}
+        return $periodList;
+    }
 
-	public function getDaySubjects ($externalUserId, $dayNumber) {
+    public function getDaySubjects($externalUserId, $dayNumber)
+    {
 
-	}
+    }
 
-	public function getSubjectPeriod($classCode, $dayNumber) {
+    public function getSubjectPeriod($classCode, $dayNumber)
+    {
 
-	}
-	
-	public function getSubjectName($classCode) {
+    }
 
-	}
+    public function getSubjectName($classCode)
+    {
+
+    }
 
     /**
      * This method cannot be implemented for Denbigh, because its timetable
@@ -270,7 +289,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
      * @param  string $roomCode
      * @return array
      */
-    public function getRoomTimetable($roomCode) {
+    public function getRoomTimetable($roomCode)
+    {
         return array();
 //        // First: $this->getFullTimetable() and pinch its query
 //        // Second: join to whatever is in External_*_User->getStaff
@@ -337,49 +357,55 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
     }
 
     /**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setInternalDatabase (Database $internalDatabase) {
-		$this->internalDatabase = $internalDatabase;
-	}
+     * @param Database $database
+     * @return void
+     */
+    private function setInternalDatabase(Database $internalDatabase)
+    {
+        $this->internalDatabase = $internalDatabase;
+    }
 
-	/**
-	 * @return Database
-	 */
-	private function getInternalDatabase () {
-		return $this->internalDatabase;
-	}
-	
-	/**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setExternalDatabase (Database $externalDatabase) {
-		$this->externalDatabase = $externalDatabase;
-	}
+    /**
+     * @return Database
+     */
+    private function getInternalDatabase()
+    {
+        return $this->internalDatabase;
+    }
 
-	/**
-	 * @return Database
-	 */
-	private function getExternalDatabase () {
-		return $this->externalDatabase;
-	}
+    /**
+     * @param Database $database
+     * @return void
+     */
+    private function setExternalDatabase(Database $externalDatabase)
+    {
+        $this->externalDatabase = $externalDatabase;
+    }
 
-	/**
-	 * @param Group $group
-	 * @return void
-	 */
-	private function setGroup (Group $group) {
-		$this->group = $group;
-	}
+    /**
+     * @return Database
+     */
+    private function getExternalDatabase()
+    {
+        return $this->externalDatabase;
+    }
 
-	/**
-	 * @return Group
-	 */
-	private function getGroup () {
-		return $this->group;
-	}
+    /**
+     * @param Group $group
+     * @return void
+     */
+    private function setGroup(Group $group)
+    {
+        $this->group = $group;
+    }
+
+    /**
+     * @return Group
+     */
+    private function getGroup()
+    {
+        return $this->group;
+    }
 }
 
 ?>

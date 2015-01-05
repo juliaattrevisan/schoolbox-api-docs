@@ -209,7 +209,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
                     if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
                         return array(
-                            'PeriodNumber' => $i,
+                            'PeriodNumber'    => $i,
                             'PeriodNumberSeq' => 1,
                         );
                     }
@@ -220,7 +220,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         }
 
         return array(
-            'PeriodNumber' => 0,
+            'PeriodNumber'    => 0,
             'PeriodNumberSeq' => 0,
         );
     }
@@ -304,10 +304,10 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         foreach ($definition['number'] as $index) {
             $finalTimetable[$index - 1] = array(
-                'periodName' => $definition['desc'][$index - 1],
-                'periodStart' => $definition['start'][$index - 1],
-                'periodEnd' => $definition['end'][$index - 1],
-                'periodNumber' => $index,
+                'periodName'     => $definition['desc'][$index - 1],
+                'periodStart'    => $definition['start'][$index - 1],
+                'periodEnd'      => $definition['end'][$index - 1],
+                'periodNumber'   => $index,
                 'periodSequence' => 1,
             );
         }
@@ -371,7 +371,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                     }
                 }
 
-                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM'])." ".trim($currentRow['R2ROOM']);
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM']) . " " . trim($currentRow['R2ROOM']);
             }
         }
 
@@ -397,10 +397,10 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         foreach ($definition['number'] as $index) {
             $finalTimetable[$index - 1] = array(
-                'periodName' => $definition['desc'][$index - 1],
-                'periodStart' => $definition['start'][$index - 1],
-                'periodEnd' => $definition['end'][$index - 1],
-                'periodNumber' => $index,
+                'periodName'     => $definition['desc'][$index - 1],
+                'periodStart'    => $definition['start'][$index - 1],
+                'periodEnd'      => $definition['end'][$index - 1],
+                'periodNumber'   => $index,
                 'periodSequence' => 1,
             );
         }
@@ -473,7 +473,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                     }
                 }
 
-                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM'])." ".trim($currentRow['R2ROOM']);
+                $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['room'] = trim($currentRow['R1ROOM']) . " " . trim($currentRow['R2ROOM']);
             }
         }
 
@@ -506,7 +506,7 @@ class External_Maze_Timetable implements External_TimetableInterface
             foreach ($result as $currentResult) {
                 $processed[] = array(
                     'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
-                    'endTime' => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
+                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
                 );
             }
         }
@@ -557,13 +557,13 @@ class External_Maze_Timetable implements External_TimetableInterface
              */
             for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
                 $timetable[$period]['day'][$day][0] = array(
-                    'description' => $allDayTimetables[$day][$period]['class'][0]['description'],
-                    'code' => $allDayTimetables[$day][$period]['class'][0]['code'],
-                    'room' => $allDayTimetables[$day][$period]['class'][0]['room'],
-                    'staffID' => $allDayTimetables[$day][$period]['class'][0]['staffID'],
+                    'description'    => $allDayTimetables[$day][$period]['class'][0]['description'],
+                    'code'           => $allDayTimetables[$day][$period]['class'][0]['code'],
+                    'room'           => $allDayTimetables[$day][$period]['class'][0]['room'],
+                    'staffID'        => $allDayTimetables[$day][$period]['class'][0]['staffID'],
                     'staffFirstname' => $allDayTimetables[$day][$period]['class'][0]['staffFirstname'],
-                    'staffSurname' => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
-                    'staffTitle' => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
+                    'staffSurname'   => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
+                    'staffTitle'     => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
                 );
             }
         }
