@@ -10,12 +10,14 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\External\SubjectMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
@@ -41,6 +43,10 @@ class Module extends BaseModule
         $authorizer->add(
             '/^customMeridenPastoral\\.(?:index|subject)/',
             new IsSuperuser()
+        );
+        $authorizer->add(
+            '/^customMeridenPastoral\\.(?:index|subject)/',
+            new HasRole(Role::STAFF)
         );
     }
 
