@@ -321,6 +321,9 @@ class Query
         if (!$externalId) {
             return array();
         }
+        // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
+        // following code:
+        // {tchsub.year_num}-{tchsub.sub_code}-{tchsub.class}
         $query = "
             SELECT DISTINCT
                 teacher.tch_code,
