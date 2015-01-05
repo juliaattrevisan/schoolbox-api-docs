@@ -201,10 +201,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
             // if no class on this period, skip it
             if(isset($classes[$code])) {
-                $timetable[$i]['description'] = $classes[$code]['CLASS'];
-                $timetable[$i]['code'] = $classes[$code]['CODE'];
-                $timetable[$i]['room'] = $classes[$code]['ROOM'];
-                $timetable[$i]['staffID'] = $classes[$code]['STAFFID'];
+                $timetable[$i]['class'][0]['description'] = $classes[$code]['CLASS'];
+                $timetable[$i]['class'][0]['code'] = $classes[$code]['CODE'];
+                $timetable[$i]['class'][0]['room'] = $classes[$code]['ROOM'];
+                $timetable[$i]['class'][0]['staffID'] = $classes[$code]['STAFFID'];
             }
 
         }
@@ -279,10 +279,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             for($j = 1; $j <= $dayCount; ++$j) {
                 // period has class for user
                 if(isset($classes[$code][$j])) {
-                    $timetable[$i]['day'][$j]['description'] = $classes[$code][$j]['CLASS'];
-                    $timetable[$i]['day'][$j]['code'] = $classes[$code][$j]['CODE'];
-                    $timetable[$i]['day'][$j]['room'] = $classes[$code][$j]['ROOM'];
-                    $timetable[$i]['day'][$j]['staffID'] = $classes[$code][$j]['STAFFID'];
+                    $timetable[$i]['day'][$j][0]['description'] = $classes[$code][$j]['CLASS'];
+                    $timetable[$i]['day'][$j][0]['code'] = $classes[$code][$j]['CODE'];
+                    $timetable[$i]['day'][$j][0]['room'] = $classes[$code][$j]['ROOM'];
+                    $timetable[$i]['day'][$j][0]['staffID'] = $classes[$code][$j]['STAFFID'];
                 }
                 // user has not class in this period
                 else {
