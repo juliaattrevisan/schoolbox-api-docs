@@ -1,3 +1,14 @@
+<script type="text/javascript">
+    (function($){
+        $(function(){
+            // Jump menu for changing semester
+            $('#semester').on('change', function() {
+                window.location.href = this.value;
+            });
+        })
+    })(jQuery);
+</script>
+
 <h1>School Report - {{ report.year.current }}</h1>
 
 <div id="context">
@@ -13,13 +24,12 @@
     {# Selector - like the grades selector, but displays only years #}
     <div id="enrolment">
         <form id="semesters">
-            {# Previous semester link #}
             <a class="sem-back"
                {% if not report.year.previous %}disabled{% endif %}
                href="{{ routeLookup('customMeridenPastoral.index', {year: report.year.current-1, id: report.student.id}) }}">&lsaquo;</a>
             <select id="semester">
                 {% for year in report.year.levels %}
-                <option value="{{ year.yr_study }}"
+                <option value="{{ routeLookup('customMeridenPastoral.index', {year: year.yr_study, id: report.student.id}) }}"
                         label="{{ year.yr_study }} eReport"
                         {% if year.yr_study == report.year.current %}selected{% endif %}
                         >{{ year.yr_study }} eReport</option>
