@@ -37,6 +37,8 @@ class Controller extends Base
         $tutors     = $this->getDatabase()->getAllTutors($year, $student);
         $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
 
+//        new \Alaress_Probe($this->getDatabase()->getAllSubjectsForYear($year, $student));
+
         // Check previous and next year, disable if no year level group exists
         $previousYear = false;
         $nextYear     = false;
