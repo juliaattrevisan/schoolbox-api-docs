@@ -36,14 +36,30 @@ class Controller extends Base
         $activities = $this->getDatabase()->getAllActivities($year, $student);
         $tutors     = $this->getDatabase()->getAllTutors($year, $student);
         $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
+
+        // Check previous and next year, disable if no year level group exists
+        $previousYear = false;
+        $nextYear     = false;
+        foreach ($yearLevels as $level) {
+            $yearLevel = $level['yr_study'];
+            if ($yearLevel == ($year-1)) {
+                $previousYear = $yearLevel;
+            }
+            if ($yearLevel == ($year+1)) {
+                $nextYear = $yearLevel;
+            }
+        }
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
                 'data'     => array(
                     'report' => array(
                         'year'     => array(
-                            'current' => $year,
-                            'levels'  => $yearLevels,
+                            'current'  => $year,
+                            'previous' => $previousYear,
+                            'next'     => $nextYear,
+                            'levels'   => $yearLevels,
                         ),
                         'student'  => $student,
                         'studentExternal' => array(
