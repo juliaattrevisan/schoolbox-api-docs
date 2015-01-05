@@ -259,11 +259,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         /* If this class occurs in this period, append its details
                          */
                         if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
-                            $timetable[$x]['description'] = $currentClass['ClassDescription'];
-                            $timetable[$x]['code']        = $currentClass['ClassCode'];
-                            $timetable[$x]['room']        = $currentClass['ClassRoom'];
-                            $timetable[$x]['staffID']     = $externalUserId;
-                            $timetable[$x]['dayNumber']   = $currentClass['DayNumber'];
+                            $timetable[$x]['class'][0]['description'] = $currentClass['ClassDescription'];
+                            $timetable[$x]['class'][0]['code']        = $currentClass['ClassCode'];
+                            $timetable[$x]['class'][0]['room']        = $currentClass['ClassRoom'];
+                            $timetable[$x]['class'][0]['staffID']     = $externalUserId;
+                            $timetable[$x]['class'][0]['dayNumber']   = $currentClass['DayNumber'];
                             array_shift($allClasses);
                             break;
                         }
@@ -302,7 +302,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          */
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
             for ($day = 0; $day < $this->getCycleLength(); $day++) {
-                $timetable[$period]['day'][$day] = $allDayTimetables[$day][$period];
+                $timetable[$period]['day'][$day][0] = $allDayTimetables[$day][$period]['class'][0];
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
                  */
                 $start = substr($allDayTimetables[0][$period]['periodStart'], 0, 5);
