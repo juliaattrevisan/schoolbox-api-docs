@@ -16,12 +16,12 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      * Entirely ignore classes which have no code
      * such as recess, lunch, etc.
      *
-     * Change to false to include recess, lunch, etc
+     * Change to true to include recess, lunch, etc
      * once again
      *
      * @var bool
      */
-    private $includeNonclasses = true;
+    private $includeNonclasses = false;
 
     /**
      * Prepares data for the render function. Business logic.
