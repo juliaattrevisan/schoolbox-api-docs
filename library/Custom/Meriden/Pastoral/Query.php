@@ -54,16 +54,16 @@ class Query
             AND absent_date BETWEEN :yearStart AND :yearEnd
         ";
         $params = array(
-            ':externalId' => $this->getDatabase()->quote($externalId),
-            ':yearStart'  => $this->getDatabase()->quote($year . '-01-01'),
-            ':yearEnd'    => $this->getDatabase()->quote($year . '-12-31'),
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':yearStart'  => $this->getDatabase()->smartQuote($year . '-01-01'),
+            ':yearEnd'    => $this->getDatabase()->smartQuote($year . '-12-31'),
         );
         if (!empty($absenceTypes)) {
             $query .= ' AND absent_type IN (:absenceTypes) ';
             $params[':absenceTypes'] = implode(
                 ',',
                 array_map(
-                    array($this->getDatabase(), 'quote'),
+                    array($this->getDatabase(), 'smartQuote'),
                     $absenceTypes
                 )
             );
@@ -73,7 +73,7 @@ class Query
             $params[':reasonCodes'] = implode(
                 ',',
                 array_map(
-                    array($this->getDatabase(), 'quote'),
+                    array($this->getDatabase(), 'smartQuote'),
                     $reasonCodes
                 )
             );
