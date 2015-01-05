@@ -327,7 +327,8 @@ class Query
         $query = "
             SELECT DISTINCT
                 teacher.tch_code,
-                teacher.tch_name
+                teacher.tch_name,
+                tchsub.semester
             FROM teacher
             INNER JOIN tchsub
                 ON tchsub.tch_code = teacher.tch_code
@@ -345,6 +346,9 @@ class Query
             AND studsub.cmpy_code = '01'
             AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
             AND tchsub.year_num = :year
+            ORDER BY
+                tchsub.semester ASC,
+                teacher.tch_name ASC
         ";
         $params = array(
             ':externalId'   => $this->getDatabase()->smartQuote($externalId),

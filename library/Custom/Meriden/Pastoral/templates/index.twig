@@ -50,7 +50,7 @@
 
     <dt>Tutor</dt>
     {% for tutor in report.studentExternal.tutors %}
-        <dd>{{ tutor.tch_name }}</dd>
+        <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
     {% endfor %}
 
     <dt>Days Absent</dt>
