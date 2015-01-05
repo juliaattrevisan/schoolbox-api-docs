@@ -13,7 +13,8 @@
     {# Selector - like the grades selector, but displays only years #}
     <div id="enrolment">
         <form id="semesters">
-            <a class="sem-back" href="#">&lsaquo;</a>
+            {# Previous semester link #}
+            <a class="sem-back" href="{{ routeLookup('customMeridenPastoral.index', {year: report.year.current-1, id: report.student.id}) }}">&lsaquo;</a>
             <select id="semester">
                 {% for year in report.year.levels %}
                 <option value="{{ year.yr_study }}"
@@ -22,7 +23,7 @@
                         >{{ year.yr_study }} eReport</option>
                 {% endfor %}
             </select>
-            <a class="sem-fwd" href="#">&rsaquo;</a>
+            <a class="sem-fwd" href="{{ routeLookup('customMeridenPastoral.index', {year: report.year.current+1, id: report.student.id}) }}">&rsaquo;</a>
         </form>
         <form id="subjects" method="get">
             <span class="elbow">&#9492;</span>
