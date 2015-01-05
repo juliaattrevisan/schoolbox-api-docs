@@ -21,7 +21,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      *
      * @var bool
      */
-    private $excludeNonclasses = true;
+    private $includeNonclasses = true;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -40,6 +40,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      * Stack up a whole bunch of timetables for each campii
      */
     private function generateTimetables() {
+        $processed = $this->condense($this->tempdata());
+        $this->timetable[0] = $processed['condensed'];
+        new \Alaress_Probe($processed['condensed']);
+
         $timetableHandler = new \External_Timetable();
 
         // get current day and period.
@@ -47,31 +51,51 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         // already been added.
         $checked_campus_list = array();
 
-        foreach ($_SESSION['campus'] as $campus_id) {
-            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+//        foreach ($_SESSION['campus'] as $campus_id) {
+//            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+//
+//            if ($campus instanceof Schoolbox\Campus) {
+//                $campus_code = $campus->getExtTimetableCode();
+//
+//                if (!isset($checked_campus_list[$campus_code])) {
+//                    $checked_campus_list[$campus_code] = true;
+//                    $day_number = $timetableHandler->getDayNumber($campus_id);
+//
+//                    if ($day_number) {
+//                        $timetable = $timetableHandler->getDayTimetable(
+//                            $_SESSION['user']->getExternalId(),
+//                            $_SESSION['user']->getId(),
+//                            $campus_id,
+//                            $day_number
+//                        );
+//
+//                        $processed = $this->condense($timetable);
+//
+//                        $this->timetable[$campus_id] = $processed['condensed'];
+//                    }
+//                }
+//            }
+//        }
+    }
 
-            if ($campus instanceof Schoolbox\Campus) {
-                $campus_code = $campus->getExtTimetableCode();
+    /**
+     * Decide on a period code, for event stack
+     *
+     * @param $period
+     * @return string
+     */
+    private function getCode($period) {
 
-                if (!isset($checked_campus_list[$campus_code])) {
-                    $checked_campus_list[$campus_code] = true;
-                    $day_number = $timetableHandler->getDayNumber($campus_id);
-
-                    if ($day_number) {
-                        $timetable = $timetableHandler->getDayTimetable(
-                            $_SESSION['user']->getExternalId(),
-                            $_SESSION['user']->getId(),
-                            $campus_id,
-                            $day_number
-                        );
-
-                        $processed = $this->condense($timetable);
-
-                        $this->timetable[$campus_id] = $processed['condensed'];
-                    }
-                }
-            }
+        /* Special cases for recess, lunch, etc which have no codes
+         */
+        if (!isset($period['code'])) {
+            $code = "_nonclass {$period['periodName']}";
         }
+        else {
+            $code = $period['code'];
+        }
+
+        return $code;
     }
 
     /**
@@ -92,7 +116,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $condensedClass = false;
         $allCondensedClasses = array();
 
-        /* Event stack, for debugging
+        /* Event stack, for debugging/diagnosis
          */
         $stack = array();
 
@@ -103,24 +127,13 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
              * $period = $timetable[$i]['class'][0];
              */
 
-            /* Special cases for recess, lunch, etc which have no codes
-             */
-            if (!isset($period['code'])) {
-                $period['code'] = "_nonclass {$period['periodName']}";
-            }
-
-            /* Clear out the period name, beacuse they will now be combined
-             * and individual headings no longer mean anything
-             */
-            $period['periodName'] = '';
-            
             /* Initial condition
              */
             if ($condensedClass === false) {
                 $lastCode = $period['code'];
                 $condensedClass = $period;
 
-                $stack[] = "Initial condensed class is {$period['code']}<br>";
+                $stack[] = "Initial condensed class is {$this->getCode($period)}<br>";
             }
             /* Condense
              */
@@ -131,8 +144,14 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $condensedClass['periodEnd'] = $period['periodEnd'];
                 }
                 else {
-                    if (!$this->getExcludeNonclasses() || isset($period['code'])) {
-                        $stack[] = "Adding {$condensedClass['code']}<br>";
+                    if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
+                        $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+
+                        /* Clear out the period name, beacuse they will now be combined
+                         * and individual headings no longer mean anything
+                         */
+                        $condensedClass['periodName'] = '';
+
                         $allCondensedClasses[] = $condensedClass;
                     }
 
@@ -145,9 +164,16 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                      * didn't match the one just added
                      */
                     if ($i == (count($timetable)-1)) {
-                        if (!$this->getExcludeNonclasses() || isset($period['code'])) {
+                        if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
+                            $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+
+                            /* Clear out the period name, beacuse they will now be combined
+                             * and individual headings no longer mean anything
+                             */
+                            $condensedClass['periodName'] = '';
+
                             $allCondensedClasses[] = $condensedClass;
-                            $stack[] = "Adding {$condensedClass['code']}<br>";
+
                         }
                     }
                 }
@@ -156,6 +182,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             $lastCode = $period['code'];
         }
 
+        new \Alaress_ThreeProbe(array(), $stack, $allCondensedClasses);
         return array(
             'condensed' => $allCondensedClasses,
             'stack' => $stack
@@ -268,22 +295,22 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      */
 
     /**
-     * Set exclude non classes
+     * Set include non classes
      *
-     * @param boolean $excludeNonclasses
+     * @param boolean $includeNonclasses
      */
-    private function setExcludeNonclasses($excludeNonclasses)
+    private function setIncludeNonclasses($includeNonclasses)
     {
-        $this->excludeNonclasses = $excludeNonclasses;
+        $this->includeNonclasses = $includeNonclasses;
     }
 
     /**
-     * Get exclude non classes
+     * Get include non classes
      *
      * @return boolean
      */
-    private function getExcludeNonclasses()
+    private function getIncludeNonclasses()
     {
-        return $this->excludeNonclasses;
+        return $this->includeNonclasses;
     }
 }
