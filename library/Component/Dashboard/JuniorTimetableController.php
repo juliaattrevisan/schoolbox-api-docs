@@ -37,51 +37,44 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
         $this->parseConfig();
 
+        /* Hook method
+         */
         $this->setAllTimetables(new \Schoolbox\Collection());
 
-        /* Some temp data
-         */
-        $timetable = $this->tempdata();
-
-        $processed = $this->condense($timetable);
-
-        $this->getAllTimetables()->add($processed['condensed']);
-
-        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->getAllTimetables());
-
-        /* Actual
-         */
         $timetableHandler = new \External_Timetable();
-
 
         // get current day and period.
         // Don't output a timetable if it has the same code as another that has
         // already been added.
-//        $checked_campus_list = array();
-//
-//        foreach ($_SESSION['campus'] as $campus_id) {
-//            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-//
-//            if ($campus instanceof Schoolbox\Campus) {
-//                $campus_code = $campus->getExtTimetableCode();
-//
-//                if (!isset($checked_campus_list[$campus_code])) {
-//                    $checked_campus_list[$campus_code] = true;
-//                    $day_number = $timetableHandler->getDayNumber($campus_id);
-//
-//                    if ($day_number) {
-//                        $timetable = $timetableHandler->getDayTimetable(
-//                            $_SESSION['user']->getExternalId(),
-//                            $_SESSION['user']->getId(),
-//                            $campus_id,
-//                            $day_number
-//                        );
-//                    }
-//                }
-//            }
-//        }
+        $checked_campus_list = array();
 
-        die();
+        foreach ($_SESSION['campus'] as $campus_id) {
+            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+
+            if ($campus instanceof Schoolbox\Campus) {
+                $campus_code = $campus->getExtTimetableCode();
+
+                if (!isset($checked_campus_list[$campus_code])) {
+                    $checked_campus_list[$campus_code] = true;
+                    $day_number = $timetableHandler->getDayNumber($campus_id);
+
+                    if ($day_number) {
+                        $timetable = $timetableHandler->getDayTimetable(
+                            $_SESSION['user']->getExternalId(),
+                            $_SESSION['user']->getId(),
+                            $campus_id,
+                            $day_number
+                        );
+
+                        $processed = $this->condense($timetable);
+
+                        $this->getAllTimetables()->add($processed['condensed']);
+
+                        new \Alaress_ThreeProbe($timetable, $processed['stack'], $this->getAllTimetables());
+                    }
+                }
+            }
+        }
 
         return true;
     }
