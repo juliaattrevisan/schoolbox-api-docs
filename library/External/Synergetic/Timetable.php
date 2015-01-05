@@ -569,7 +569,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (is_array($timetable)) {
             usort($timetable, array($this, 'sortTimetable'));
         }
-        print_R($timetable);
         return $timetable;
 
     }

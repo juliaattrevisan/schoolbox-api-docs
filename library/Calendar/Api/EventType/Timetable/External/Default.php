@@ -57,44 +57,46 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             );
             foreach ($timetable as $periodDetail) {
                 foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
-                    // Build the day timetable detail.
-                    $period             = $periodDetail + $dayDetail;
-                    $period['staff']    = null;
-                    $period['category'] = null;
-                    try {
-                        if (!empty($period['staffID'])) {
-                            $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                                'synergy_id',
-                                $period['staffID']
-                            );
-                        }
-                    } catch (Exception $e) {
-                        // noop
-                    }
-                    try {
-                        if (!empty($period['code'])) {
-                            $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
-                                $period['code']
-                            );
-                        }
-                    } catch (Exception $e) {
-                        // noop
-                    }
-
-                    // And set the color map as well.
-                    if ($dayDetail['periodOn']) {
-                        // Set this into the color map
-                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
-                            // not enough colors: loop around to index 0.
-                            if (!$colorList->offsetExists($colorIndex)) {
-                                $colorIndex = 0;
+                    foreach($dayDetail as $classDetail) {
+                        // Build the day timetable detail.
+                        $period             = $periodDetail + $classDetail;
+                        $period['staff']    = null;
+                        $period['category'] = null;
+                        try {
+                            if (!empty($period['staffID'])) {
+                                $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                                    'synergy_id',
+                                    $period['staffID']
+                                );
                             }
-                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
-                            $colorIndex++;
+                        } catch (Exception $e) {
+                            // noop
                         }
-                        $period['color'] = $colorMap[$period['code']];
+                        try {
+                            if (!empty($period['code'])) {
+                                $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                                    $period['code']
+                                );
+                            }
+                        } catch (Exception $e) {
+                            // noop
+                        }
+
+                        // And set the color map as well.
+                        if (count($dayDetail) > 0) {
+                            // Set this into the color map
+                            if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+                                // not enough colors: loop around to index 0.
+                                if (!$colorList->offsetExists($colorIndex)) {
+                                    $colorIndex = 0;
+                                }
+                                $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                                $colorIndex++;
+                            }
+                            $period['color'] = $colorMap[$period['code']];
+                        }
+                        $dayTimetable[$dayNumber][$campusId][] = $period;
                     }
-                    $dayTimetable[$dayNumber][$campusId][] = $period;
                 }
             }
         }
