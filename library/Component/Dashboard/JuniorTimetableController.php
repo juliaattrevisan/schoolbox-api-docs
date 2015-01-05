@@ -21,7 +21,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      *
      * @var bool
      */
-    private $includeNonclasses = false;
+    private $includeNonclasses = true;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -40,10 +40,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      * Stack up a whole bunch of timetables for each campii
      */
     private function generateTimetables() {
-        $processed = $this->condense($this->tempdata());
-        $this->timetable[0] = $processed['condensed'];
-        new \Alaress_Probe($processed['condensed']);
-
         $timetableHandler = new \External_Timetable();
 
         // get current day and period.
@@ -51,31 +47,31 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         // already been added.
         $checked_campus_list = array();
 
-//        foreach ($_SESSION['campus'] as $campus_id) {
-//            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-//
-//            if ($campus instanceof Schoolbox\Campus) {
-//                $campus_code = $campus->getExtTimetableCode();
-//
-//                if (!isset($checked_campus_list[$campus_code])) {
-//                    $checked_campus_list[$campus_code] = true;
-//                    $day_number = $timetableHandler->getDayNumber($campus_id);
-//
-//                    if ($day_number) {
-//                        $timetable = $timetableHandler->getDayTimetable(
-//                            $_SESSION['user']->getExternalId(),
-//                            $_SESSION['user']->getId(),
-//                            $campus_id,
-//                            $day_number
-//                        );
-//
-//                        $processed = $this->condense($timetable);
-//
-//                        $this->timetable[$campus_id] = $processed['condensed'];
-//                    }
-//                }
-//            }
-//        }
+        foreach ($_SESSION['campus'] as $campus_id) {
+            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+
+            if ($campus instanceof Schoolbox\Campus) {
+                $campus_code = $campus->getExtTimetableCode();
+
+                if (!isset($checked_campus_list[$campus_code])) {
+                    $checked_campus_list[$campus_code] = true;
+                    $day_number = $timetableHandler->getDayNumber($campus_id);
+
+                    if ($day_number) {
+                        $timetable = $timetableHandler->getDayTimetable(
+                            $_SESSION['user']->getExternalId(),
+                            $_SESSION['user']->getId(),
+                            $campus_id,
+                            $day_number
+                        );
+
+                        $processed = $this->condense($timetable);
+
+                        $this->timetable[$campus_id] = $processed['condensed'];
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -173,7 +169,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                             $condensedClass['periodName'] = '';
 
                             $allCondensedClasses[] = $condensedClass;
-
                         }
                     }
                 }
@@ -182,7 +177,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             $lastCode = $period['code'];
         }
 
-        new \Alaress_ThreeProbe(array(), $stack, $allCondensedClasses);
         return array(
             'condensed' => $allCondensedClasses,
             'stack' => $stack
