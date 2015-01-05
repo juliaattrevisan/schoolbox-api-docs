@@ -11,6 +11,8 @@
 class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_ControllerAbstract {
 
     /**
+     * A collection of all the timetables
+     *
      * @var Schoolbox\Collection
      */
     private $allTimetables = null;
