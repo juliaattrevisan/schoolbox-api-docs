@@ -117,6 +117,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         for ($i = 0; $i < count($timetable); $i++) {
             $period = $timetable[$i];
 
+            /* Make a gigantic assumption
+             * $period = $timetable[$i]['class'][0];
+             */
+
             /* Exclude nonclasses
              */
             if ($this->getExcludeNonclasses() && !isset($period['code'])) {
