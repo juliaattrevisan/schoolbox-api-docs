@@ -106,10 +106,10 @@ class Query
                 studecact.act_code,
                 ecactivity.act_desc,
                 ecactivity.act_type
-            FROM ecactivity, studecact
+            FROM ecactivity
+            INNER JOIN studecact ON studecact.act_code = ecactivity.act_code
             WHERE studecact.stud_code = :externalId
             AND studecact.act_year = :year
-            AND studecact.act_code = ecactivity.act_code
             AND ecactivity.act_type = :activityType
             AND ecactivity.cmpy_code = '01'
         ";
@@ -322,16 +322,15 @@ class Query
         $query = "
             SELECT DISTINCT
                 teacher.tch_name
-            FROM
-                teacher, studsub, subtab, tchsub
+            FROM teacher
+            INNER JOIN tchsub ON tchsub.tch_code = teacher.tch_code
+            INNER JOIN studsub
+                ON studsub.sub_code = tchsub.sub_code AND studsub.class = tchsub.class
             WHERE studsub.stud_code = :externalId
             AND studsub.yr_study = :year
             AND studsub.cmpy_code = '01'
             AND studsub.semester ='1'
             AND studsub.sub_code IN ('9994','9995','9996','9997','9998','9999')
-            AND studsub.sub_code = tchsub.sub_code
-            AND studsub.class = tchsub.class
-            AND tchsub.tch_code = teacher.tch_code
             AND tchsub.year_num = :year
             -- AND tchsub.semester = '1'
         ";
