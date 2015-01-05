@@ -58,8 +58,11 @@
     <dt>Detentions</dt>
     <dd>{{ report.studentExternal.attendance.detentions }}</dd>
 
-    <dt>Endorsed Leave</dt>
-    <dd>{{ report.studentExternal.attendance.endorsedLeave }}</dd>
+    {# Don't show endorsed leave at all if there is none #}
+    {% if report.studentExternal.attendance.endorsedLeave %}
+        <dt>Endorsed Leave</dt>
+        <dd>{{ report.studentExternal.attendance.endorsedLeave }}</dd>
+    {% endif %}
 
     {##
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
