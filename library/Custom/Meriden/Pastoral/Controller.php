@@ -32,12 +32,7 @@ class Controller extends Base
      */
     public function index($year, User $student)
     {
-        $external = array(
-            'absent'        => $this->getDatabase()->getAbsenceCount($year, $student),
-            'late'          => $this->getDatabase()->getLateCount($year, $student),
-            'detentions'    => $this->getDatabase()->getDetentionCount($year, $student),
-            'endorsedLeave' => $this->getDatabase()->getLeaveCount($year, $student),
-        );
+        $attendance = $this->getDatabase()->getAttendance($year, $student);
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
@@ -52,7 +47,9 @@ class Controller extends Base
                             ),
                         ),
                         'student'  => $student,
-                        'studentExternal' => $external,
+                        'studentExternal' => array(
+                            'attendance' => $attendance,
+                        ),
                     )
                 ),
             )

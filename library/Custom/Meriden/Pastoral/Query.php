@@ -175,6 +175,24 @@ class Query
     }
 
     /**
+     * Gets results for getAbsenceCount(), getLateCount()
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAttendance($year, User $student)
+    {
+        return array(
+            'absent'        => $this->getAbsenceCount($year, $student),
+            'late'          => $this->getLateCount($year, $student),
+            'detentions'    => $this->getDetentionCount($year, $student),
+            'endorsedLeave' => $this->getLeaveCount($year, $student),
+        );
+    }
+
+    /**
      * @return MSSQL
      */
     public function getDatabase()
