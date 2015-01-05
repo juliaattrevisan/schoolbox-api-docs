@@ -18,6 +18,17 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     private $allTimetables = null;
 
     /**
+     * Entirely ignore classes which have no code
+     * such as recess, lunch, etc.
+     *
+     * Change to false to include recess, lunch, etc
+     * once again
+     *
+     * @var bool
+     */
+    private $excludeNonclasses = true;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -105,6 +116,12 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
         for ($i = 0; $i < count($timetable); $i++) {
             $period = $timetable[$i];
+
+            /* Exclude nonclasses
+             */
+            if ($this->getExcludeNonclasses() && !isset($period['code'])) {
+                continue;
+            }
 
             /* Special cases for recess, lunch, etc which have no codes
              */
@@ -286,5 +303,25 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     private function getAllTimetables()
     {
         return $this->allTimetables;
+    }
+
+    /**
+     * Set exclude non classes
+     *
+     * @param boolean $excludeNonclasses
+     */
+    private function setExcludeNonclasses($excludeNonclasses)
+    {
+        $this->excludeNonclasses = $excludeNonclasses;
+    }
+
+    /**
+     * Get exclude non classes
+     *
+     * @return boolean
+     */
+    private function getExcludeNonclasses()
+    {
+        return $this->excludeNonclasses;
     }
 }
