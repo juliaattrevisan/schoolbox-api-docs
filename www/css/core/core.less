@@ -2576,10 +2576,20 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
 }
 
 .student-subjects {
+	.subjects li{
+			padding: 0;
+			a{
+		    	display: block;
+		    	padding: 8px 16px;
+		    	&:hover{ background: lighten(@highlight-color,@lighten-value); }
+			}
+		}
     li {
         position: relative;
+
         &.image-height {
-            min-height: 53px;
+            min-height: 128px;
+            padding: 7px 0;
         }
         .student-name {
             display: block;
@@ -2587,13 +2597,14 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
             margin-left: 16px;
         }
         .student-details {
-            margin-left: 65px;
+            margin-left: 160px;
+            .btn{ float: left; margin: 8px 8px 0 0; }
         }
         .link-image {
             position: absolute;
             top: 7px;
-            left: 16px;
-
+            left: 0;
+			margin: 0 16px;
         }
     }
 }
