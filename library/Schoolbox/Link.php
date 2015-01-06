@@ -10,7 +10,8 @@
 
 namespace Schoolbox;
 
-class Link implements ISoftDeletable {
+class Link implements ISoftDeletable
+{
 
     /**
      * Identifier
@@ -87,7 +88,8 @@ class Link implements ISoftDeletable {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
     }
 
