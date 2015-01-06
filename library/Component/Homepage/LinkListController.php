@@ -10,9 +10,25 @@
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Group handler
+     * 
      * @var Group
      */
     private $groupHandler;
+
+    /**
+     * Link Mapper
+     *
+     * @var Schoolbox\LinkMapper
+     */
+    private $linkMapper = null;
+
+    /**
+     * Category Mapper
+     *
+     * @var Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
      * @var array
@@ -26,17 +42,17 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler = new Group();
-
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $this->setLinkMapper(new \Schoolbox\LinkMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         try {
             // remove any non-numeric values from the source config
-            $this->source = $categoryMapper->findById(
+            $this->source = $this->getCategoryMapper()->findById(
                 $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id')
             );
         }
         catch (\Exception $e) {
-            $this->source = $categoryMapper->findById($this->getContext('id'));
+            $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
         }
 
         $this->sortFields = array('Name', 'Date');
@@ -75,8 +91,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
 
-        $linkMapper = new \Schoolbox\LinkMapper();
-        $linkList = $linkMapper->findAllInCategory(
+        $linkList = $this->getLinkMapper()->findAllInCategory(
             $this->source, array(
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
@@ -135,5 +150,48 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         }
 
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set link mapper
+     *
+     * @param \Schoolbox\LinkMapper $linkMapper
+     */
+    private function setLinkMapper($linkMapper)
+    {
+        $this->linkMapper = $linkMapper;
+    }
+
+    /**
+     * Get link mapper
+     *
+     * @return \Schoolbox\LinkMapper
+     */
+    private function getLinkMapper()
+    {
+        return $this->linkMapper;
+    }
+
+    /**
+     * Set category mapper
+     *
+     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return \Schoolbox\Resource\CategoryMapper
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
