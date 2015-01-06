@@ -144,6 +144,19 @@ class LinkMapper extends Mapper
         $categoryMapper = $this->getJoinMapper('category');
         $userMapper     = $this->getJoinMapper('owner');
 
+        /* Special case misrepresentations in db
+         */
+        if ($options['sort'] == 'Date') {
+            $sort = 'submitted';
+        }
+        else {
+            $sort = 'description';
+        }
+
+        $sortDir = strtoupper($options['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+
+        $limit = (int)$options['size'];
+
         $query = "
             SELECT
             	{$this->getColumnString('l')},
@@ -154,7 +167,12 @@ class LinkMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('owner', 'l', 'o')}
             WHERE l.category = :categoryId
             AND l.deleted_at IS NULL
+            ORDER BY l.{$sort} {$sortDir}
 		";
+
+        if ($options['size']) {
+            $query .= "LIMIT {$limit}";
+        }
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':categoryId', $category->getId());
