@@ -61,11 +61,19 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 		// remove any non-numeric values from the source config
 		$categoryId = $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id');
 
-		$this->setSource($this->getCategoryMapper()->findById($categoryId));
+        try {
+            $category = $this->getCategoryMapper()->findById($categoryId);
+        }
+        catch (\Exception $e) {
+            if (!is_numeric($this->getContext('id'))) {
+                $category = new Category();
+            }
+            else {
+                $category = $this->getCategoryMapper()->findById($this->getContext('id'));
+            }
+        }
 
-		if ($this->getSource() === false) {
-			$this->setSource($this->getCategoryMapper()->findById($this->getContext('id')));
-		}
+        $this->setSource($category);
 	}
 
     /**
