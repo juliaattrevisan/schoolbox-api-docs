@@ -21,8 +21,7 @@ $task = null;
 try {
     // This should populate unit instance, task, component and all that too.
     $task = Task\InstanceMapper::getInstance()->findById($this->arg[0]);
-}
-catch (\Schoolbox\Mapper\Exception $e) {
+} catch (\Schoolbox\Mapper\Exception $e) {
     error(2);
 }
 
@@ -82,8 +81,7 @@ switch ($task->getType()) {
         if (strlen($link) > 0) {
             header('Location: '.$link);
             exit;
-        }
-        else {
+        } else {
             SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
         }
         break;
