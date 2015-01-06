@@ -34,7 +34,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Parent extends Synchronise_Base_Strate
             // username generation is common to all TASS syncs
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Username_Parent())
             // so is external ID
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExternalId_Parent())
+            ->addHydrator(new Synchronise_Tass_Hydrator_ExternalId_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator($unsetOnUpdate)
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
