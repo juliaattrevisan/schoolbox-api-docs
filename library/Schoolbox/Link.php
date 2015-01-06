@@ -82,6 +82,11 @@ class Link implements ISoftDeletable {
      */
     private $deletedAt;
 
+    /**
+     * Is this link soft deleted
+     *
+     * @return bool
+     */
     public function isDeleted() {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
     }

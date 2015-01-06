@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,7 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -33,10 +35,11 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      * Prepares data for the render function. Business logic.
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
-        $this->catHandler = new Category();
-        $this->linkHandler = new Link();
+        $this->catHandler   = new Category();
+        $this->linkHandler  = new Link();
 
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
@@ -45,9 +48,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
 
         $this->sortFields = array('Name', 'Date');
     }
@@ -57,29 +60,26 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'linkList')) {
             return false;
         }
 
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    // Set up component name
+        // Set up component name
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID' => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext(
-                    'id'
-                ) ? 'Local' : $this->source['name'],
-                'LINK_CATEGORY_ID' => $this->source['id'],
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                    'componentname'
-                ) : 'News',
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id') ? 'Local' : $this->source['name'],
+                'LINK_CATEGORY_ID'          => $this->source['id'],
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'News',
             )
         );
 
@@ -87,13 +87,25 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-        $linkList = $this->linkHandler->getAllInCategory(
-            $this->source['id'], array(
-	                                    'size' => $this->getConfig('size'),
-                                        'sort'  => $this->getConfig('sort'),
-                                        'sortdir' => $this->getConfig('sortdir'),
-                                       )
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($this->source['id']);
+
+        $linkMapper = new \Schoolbox\LinkMapper();
+        $linkList = $linkMapper->findAllInCategory(
+            $category, array(
+                'size'    => $this->getConfig('size'),
+                'sort'    => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+            )
         );
+
+//        $linkList = $this->linkHandler->getAllInCategory(
+//            $this->source['id'], array(
+//                'size'    => $this->getConfig('size'),
+//                'sort'    => $this->getConfig('sort'),
+//                'sortdir' => $this->getConfig('sortdir'),
+//            )
+//        );
 
         $this->setVar('link_block', '');
 
@@ -106,26 +118,26 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 $url = new Url($link['url']);
 
                 if ($url->isLocalUrl()) {
-                    $linkUrl = $url->getRelativeURL();
+                    $linkUrl    = $url->getRelativeURL();
                     $linkTarget = '';
                 } else {
-                    $linkUrl = $url->getBase64EncodedRedirect();
+                    $linkUrl    = $url->getBase64EncodedRedirect();
                     $linkTarget = 'external';
                 }
 
                 $date = new Alaress_Date_Format($link['submitted'], 'U');
 
                 $output = array(
-                    'LINK_ID' => $link['id'],
-                    'LINK_NAME' => Scrub::text($link['description']),
-                    'LINK_URL' => $linkUrl,
-                    'LINK_TARGET' => $linkTarget,
-                    'LINK_POSTED_BY' => $userHandler->formatName($link),
+                    'LINK_ID'           => $link['id'],
+                    'LINK_NAME'         => Scrub::text($link['description']),
+                    'LINK_URL'          => $linkUrl,
+                    'LINK_TARGET'       => $linkTarget,
+                    'LINK_POSTED_BY'    => $userHandler->formatName($link),
                     'LINK_POSTED_BY_ID' => $link['owner'],
-                    'LINK_POSTED_DATE' => $date->getShort(),
-                    'LINK_COMMENT' => nl2br(Scrub::text($link['comment'])),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN' => $link['hidden'] ? 'hidden' : '',
+                    'LINK_POSTED_DATE'  => $date->getShort(),
+                    'LINK_COMMENT'      => nl2br(Scrub::text($link['comment'])),
+                    'ON_OFF'            => ++$j % 2 ? '' : 'dark',
+                    'HIDDEN'            => $link['hidden'] ? 'hidden' : '',
                 );
 
                 $this->setVar($output);
