@@ -99,60 +99,44 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             )
         );
 
-//        $linkList = $this->linkHandler->getAllInCategory(
-//            $this->source['id'], array(
-//                'size'    => $this->getConfig('size'),
-//                'sort'    => $this->getConfig('sort'),
-//                'sortdir' => $this->getConfig('sortdir'),
-//            )
-//        );
-
         $this->setVar('link_block', '');
 
-        if (is_array($linkList)) {
-            $userHandler = new User();
+        $j = 0;
 
-            $j = 0;
+        foreach ($linkList as $link) {
+            $url = new Url($link->getUrl());
 
-            foreach ($linkList as $link) {
-                $url = new Url($link['url']);
-
-                if ($url->isLocalUrl()) {
-                    $linkUrl    = $url->getRelativeURL();
-                    $linkTarget = '';
-                } else {
-                    $linkUrl    = $url->getBase64EncodedRedirect();
-                    $linkTarget = 'external';
-                }
-
-                $date = new Alaress_Date_Format($link['submitted'], 'U');
-
-                $output = array(
-                    'LINK_ID'           => $link['id'],
-                    'LINK_NAME'         => Scrub::text($link['description']),
-                    'LINK_URL'          => $linkUrl,
-                    'LINK_TARGET'       => $linkTarget,
-                    'LINK_POSTED_BY'    => $userHandler->formatName($link),
-                    'LINK_POSTED_BY_ID' => $link['owner'],
-                    'LINK_POSTED_DATE'  => $date->getShort(),
-                    'LINK_COMMENT'      => nl2br(Scrub::text($link['comment'])),
-                    'ON_OFF'            => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'            => $link['hidden'] ? 'hidden' : '',
-                );
-
-                $this->setVar($output);
-
-                // Controls
-                if ($this->permission < WRITE_ACCESS) {
-                    $this->setVar('modify_link_block', '');
-                } else {
-                    $this->parse('modify_link_block', 'modify_link');
-                }
-
-                $this->parse("link_block", "link", true);
+            if ($url->isLocalUrl()) {
+                $linkUrl    = $url->getRelativeURL();
+                $linkTarget = '';
+            } else {
+                $linkUrl    = $url->getBase64EncodedRedirect();
+                $linkTarget = 'external';
             }
-        } else {
-            $this->setVar("link_block", "");
+
+            $output = array(
+                'LINK_ID'           => $link->getId(),
+                'LINK_NAME'         => Scrub::text($link->getDescription()),
+                'LINK_URL'          => $linkUrl,
+                'LINK_TARGET'       => $linkTarget,
+                'LINK_POSTED_BY'    => $link->getOwnerId()->formatName(),
+                'LINK_POSTED_BY_ID' => $link->getOwnerId()->getId(),
+                'LINK_POSTED_DATE'  => $link->getSubmittedAt()->getShort(),
+                'LINK_COMMENT'      => nl2br(Scrub::text($link->getComment())),
+                'ON_OFF'            => ++$j % 2 ? '' : 'dark',
+                'HIDDEN'            => $link->getHidden() ? 'hidden' : '',
+            );
+
+            $this->setVar($output);
+
+            // Controls
+            if ($this->permission < WRITE_ACCESS) {
+                $this->setVar('modify_link_block', '');
+            } else {
+                $this->parse('modify_link_block', 'modify_link');
+            }
+
+            $this->parse("link_block", "link", true);
         }
 
         //setup block for submission button
