@@ -163,7 +163,9 @@ if (is_numeric($_REQUEST['cid'])) {
             $cclass = $instance->getDefinition()->getClass();
             /** @var Component_ControllerAbstract $controller */
             $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-            $controller->execute();
+            // No need to execute at all just to set configuration,
+            // and doing so can break components that rely on context
+//            $controller->execute();
 
             /** @var Component_ConfigDefinition $confD */
             foreach ($configDefinitionCollection as $confD) {
