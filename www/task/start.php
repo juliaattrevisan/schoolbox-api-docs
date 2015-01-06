@@ -72,7 +72,7 @@ switch ($task->getType()) {
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
-        if ($group_handler->isStudent() && !$task->getRequiresConfirmation()) {
+        if (!$task->getRequiresConfirmation()) {
             Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
                 $task->getId(), $_SESSION['id']
             );
