@@ -50,8 +50,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->source = $this->getCategoryMapper()->findById(
                 $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id')
             );
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
         }
 
@@ -113,18 +112,20 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 $linkTarget = 'external';
             }
 
-            $this->setVar(array(
-                'LINK_ID'           => $currentLink->getId(),
-                'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                'LINK_URL'          => $linkUrl,
-                'LINK_TARGET'       => $linkTarget,
-                'LINK_POSTED_BY'    => $currentLink->getOwnerId()->formatName(),
-                'LINK_POSTED_BY_ID' => $currentLink->getOwnerId()->getId(),
-                'LINK_POSTED_DATE'  => $currentLink->getSubmittedAt()->getShort(),
-                'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                'ON_OFF'            => ++$j % 2 ? '' : 'dark',
-                'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
-            ));
+            $this->setVar(
+                array(
+                    'LINK_ID'           => $currentLink->getId(),
+                    'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
+                    'LINK_URL'          => $linkUrl,
+                    'LINK_TARGET'       => $linkTarget,
+                    'LINK_POSTED_BY'    => $currentLink->getOwnerId()->formatName(),
+                    'LINK_POSTED_BY_ID' => $currentLink->getOwnerId()->getId(),
+                    'LINK_POSTED_DATE'  => $currentLink->getSubmittedAt()->getShort(),
+                    'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
+                    'ON_OFF'            => ++$j % 2 ? '' : 'dark',
+                    'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
+                )
+            );
 
             // Controls
             if ($this->permission < WRITE_ACCESS) {
