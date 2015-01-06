@@ -9,27 +9,15 @@
  */
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Group
      */
     private $groupHandler;
 
     /**
-     * @var Category
-     */
-    private $catHandler;
-
-    /**
-     * @var Link
-     */
-    private $linkHandler;
-
-    /**
      * @var array
      */
     private $source;
-
 
     /**
      * Prepares data for the render function. Business logic.
@@ -38,18 +26,17 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->catHandler   = new Category();
-        $this->linkHandler  = new Link();
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
-        );
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        try {
+            // remove any non-numeric values from the source config
+            $this->source = $categoryMapper->findById(
+                $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id')
+            );
+        }
+        catch (\Exception $e) {
+            $this->source = $categoryMapper->findById($this->getContext('id'));
         }
 
         $this->sortFields = array('Name', 'Date');
@@ -76,9 +63,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id') ? 'Local' : $this->source['name'],
-                'LINK_CATEGORY_ID'          => $this->source['id'],
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id') ? 'Local' : $this->source->getName(),
+                'LINK_CATEGORY_ID'          => $this->source->getId(),
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'News',
             )
         );
@@ -87,12 +74,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($this->source['id']);
 
         $linkMapper = new \Schoolbox\LinkMapper();
         $linkList = $linkMapper->findAllInCategory(
-            $category, array(
+            $this->source, array(
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -140,7 +125,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         }
 
         //setup block for submission button
-        $this->setVar('LINK_CAT_ID', $this->source['id']);
+        $this->setVar('LINK_CAT_ID', $this->source->getId());
         $this->setBlock($templateHandle, "submit_link", "submit_link_block");
 
         if ($this->permission < WRITE_ACCESS) {
@@ -150,8 +135,5 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         }
 
         return true;
-
     }
-
-
 }
