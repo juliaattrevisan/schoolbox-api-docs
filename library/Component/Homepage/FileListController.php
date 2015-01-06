@@ -40,6 +40,22 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $source;
 
     /**
+     * Available filters for this component.
+     *
+     * @see Component_Config_Filter for how this data is passed in/out of the database
+     *
+     * @var array
+     */
+    protected $filterFields = array('document', 'audio', 'video', 'image', 'other');
+
+    /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -61,10 +77,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 	    if($this->source === false) {
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
-
-        // if you need to edit this array, see Component_Config_Filter for how this data is passed in/out of the database
-        $this->filterFields = array('document', 'audio', 'video', 'image', 'other');
-        $this->sortFields = array('name', 'date');
     }
 
     /**
