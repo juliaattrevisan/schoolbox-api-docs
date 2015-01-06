@@ -5,7 +5,6 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- *
  */
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
@@ -15,29 +14,29 @@ $id   = $_GET['id'];
 if (isset($_GET['hash'])) {
     // Old URL for brownhole videos: ?hash={brownholeHash}
     // If you get one of these, permanent redirect to the new one.
-    $params = $_GET;
+    $params         = $_GET;
     $params['type'] = 'storage';
     $params['id']   = $_GET['hash'];
     unset($params['hash']);
-    SitePage::localRedir('/cms/sendVideo.php?'.http_build_query($params), false, 301);
+    SitePage::localRedir('/cms/sendVideo.php?' . http_build_query($params), false, 301);
 }
 if (isset($type) && isset($id)) {
-    $page = new SitePage;
-    $groupHandler = new Group;
-    $fileHandler = new File;
+    $page             = new SitePage;
+    $groupHandler     = new Group;
+    $fileHandler      = new File;
     $videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
         $videoFactory = new \Schoolbox\Video\Factory\Video($type, $id);
-        $video = $videoFactory->produce();
+        $video        = $videoFactory->produce();
     } catch (Schoolbox\Mapper\Exception $e) {
-/* Video not found */
+        /* Video not found */
         exit;
     }
 
     /*Close session so streaming does not prevent other requests to session due to locking
-	 *http://konrness.com/php5/how-to-prevent-blocking-php-requests/
-	 */
+     *http://konrness.com/php5/how-to-prevent-blocking-php-requests/
+     */
     session_write_close();
 
     /* Prevent multibyte encoding as it might mess with video stream */
@@ -59,17 +58,18 @@ if (isset($type) && isset($id)) {
             /* Determine range of request for streaming protocol */
             if ($_SERVER['HTTP_RANGE']) {
                 $ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
-                $parts = explode('-', $ranges[0]);
+                $parts  = explode('-', $ranges[0]);
 
 
                 // Offset signifies where we should begin to read the file
                 $byteOffset = (int)$parts[0];
 
-                // Length is for how long we should read the file according to the browser, and can never go beyond the file size
+                // Length is for how long we should read the file according to the browser,
+                // and can never go beyond the file size
                 if (isset($parts[1]) && $parts[1] != '' && $parts[1] < $filesize) {
                     $byteLength = (int)$parts[1];
                 } else {
-                    $byteLength = $filesize-1;
+                    $byteLength = $filesize - 1;
                 }
 
                 if ($byteOffset > $byteLength) {
@@ -79,17 +79,18 @@ if (isset($type) && isset($id)) {
                 }
 
                 header('HTTP/1.1 206 Partial content');
-                header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $filesize));  // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
+                // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
+                header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $filesize));
             }
 
             /* Set initial basic headers */
-            header('Content-Type: '.$mimetype, true);
+            header('Content-Type: ' . $mimetype, true);
             header_remove('Cache-Control');
             header_remove('Pragma');
             header('Accept-Ranges: bytes', true);
 
             $byteRange = $byteLength - $byteOffset + 1;
-            header('Content-Length: '.$byteRange, true);
+            header('Content-Length: ' . $byteRange, true);
 
             if ($handle = fopen($filename, 'rb')) {
                 fseek($handle, $byteOffset, SEEK_SET);
