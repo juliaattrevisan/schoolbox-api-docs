@@ -45,7 +45,10 @@ if (isset($type) && isset($id)) {
     apache_setenv('no-gzip', 1);
 
     $filename = $video->getFileLocation();
-    $mimetype = $video->getFile()->getMimeType()->getMime();
+    // Get mimetype of encoded file, not from upload
+    $fileinfo = new finfo(FILEINFO_MIME_TYPE);
+    $mimetype = $fileinfo->file($filename);
+    unset($fileinfo);
 
     $fileHandler->logAction($id, 'access');
 
