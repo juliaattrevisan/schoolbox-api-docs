@@ -49,6 +49,7 @@ if (isset($type) && isset($id)) {
 	apache_setenv('no-gzip', 1);
 
 	$filename = $video->getFileLocation();
+	$mimetype = $video->getFile()->getMimeType()->getMime();
 
 	$fileHandler->logAction($id, 'access');
 
@@ -88,7 +89,7 @@ if (isset($type) && isset($id)) {
 			}
 
 			/* Set initial basic headers */
-			header('Content-Type: video/mp4', true);
+			header('Content-Type: '.$mimetype, true);
 			header_remove('Cache-Control');
 			header_remove('Pragma');
 			header('Accept-Ranges: bytes', true);
