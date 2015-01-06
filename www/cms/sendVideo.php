@@ -46,9 +46,21 @@ if (isset($type) && isset($id)) {
 
     $filename = $video->getFileLocation();
     // Get mimetype of encoded file, not from upload
-    $fileinfo = new finfo(FILEINFO_MIME_TYPE);
-    $mimetype = $fileinfo->file($filename);
-    unset($fileinfo);
+//    $fileinfo = new finfo(FILEINFO_MIME_TYPE);
+//    $mimetype = $fileinfo->file($filename);
+//    unset($fileinfo);
+    switch (pathinfo($filename, PATHINFO_EXTENSION)) {
+        case 'mp3':
+            $mimetype = 'audio/mp3';
+            break;
+        case 'mp4':
+            $mimetype = 'video/mp4';
+            break;
+        default:
+            // assume it wasn't encoded at all
+            $mimetype = $video->getFile()->getMimeType()->getMime();
+            break;
+    }
 
     $fileHandler->logAction($id, 'access');
 
