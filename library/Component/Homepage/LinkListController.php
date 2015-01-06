@@ -11,7 +11,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 {
     /**
      * Group handler
-     * 
+     *
      * @var Group
      */
     private $groupHandler;
@@ -90,8 +90,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-
-        $linkList = $this->getLinkMapper()->findAllInCategory(
+        $allLinks = $this->getLinkMapper()->findAllInCategory(
             $this->source, array(
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
@@ -103,8 +102,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $j = 0;
 
-        foreach ($linkList as $link) {
-            $url = new Url($link->getUrl());
+        foreach ($allLinks as $currentLink) {
+            $url = new Url($currentLink->getUrl());
 
             if ($url->isLocalUrl()) {
                 $linkUrl    = $url->getRelativeURL();
@@ -114,20 +113,18 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 $linkTarget = 'external';
             }
 
-            $output = array(
-                'LINK_ID'           => $link->getId(),
-                'LINK_NAME'         => Scrub::text($link->getDescription()),
+            $this->setVar(array(
+                'LINK_ID'           => $currentLink->getId(),
+                'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
                 'LINK_URL'          => $linkUrl,
                 'LINK_TARGET'       => $linkTarget,
-                'LINK_POSTED_BY'    => $link->getOwnerId()->formatName(),
-                'LINK_POSTED_BY_ID' => $link->getOwnerId()->getId(),
-                'LINK_POSTED_DATE'  => $link->getSubmittedAt()->getShort(),
-                'LINK_COMMENT'      => nl2br(Scrub::text($link->getComment())),
+                'LINK_POSTED_BY'    => $currentLink->getOwnerId()->formatName(),
+                'LINK_POSTED_BY_ID' => $currentLink->getOwnerId()->getId(),
+                'LINK_POSTED_DATE'  => $currentLink->getSubmittedAt()->getShort(),
+                'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
                 'ON_OFF'            => ++$j % 2 ? '' : 'dark',
-                'HIDDEN'            => $link->getHidden() ? 'hidden' : '',
-            );
-
-            $this->setVar($output);
+                'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
+            ));
 
             // Controls
             if ($this->permission < WRITE_ACCESS) {
