@@ -148,8 +148,7 @@ class LinkMapper extends Mapper
          */
         if ($options['sort'] == 'Date') {
             $sort = 'submitted';
-        }
-        else {
+        } else {
             $sort = 'description';
         }
 
