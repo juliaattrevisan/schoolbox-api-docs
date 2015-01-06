@@ -34,11 +34,12 @@ class Alaress_Image_Transformation_Portrait extends Alaress_Image_Transformation
                 'method' => 'Sharpen'
             ),
         ),
-        'square128' => array(
+        'constrain128' => array(
             array(
-                'method' => 'Square',
+                'method' => 'Constrain',
                 'args' => array(
                     'width' => 128,
+                    'height' => 400
                 )
             ),
             array(

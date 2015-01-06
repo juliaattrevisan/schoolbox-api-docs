@@ -2585,8 +2585,6 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
 			}
 		}
     li {
-        position: relative;
-
         &.image-height {
             min-height: 128px;
             padding: 7px 0;
@@ -2597,16 +2595,20 @@ html.lt-ie10 .component-resource-management .status-buttons .status-option .btn 
             margin-left: 16px;
         }
         .student-details {
-            margin-left: 160px;
-            .btn{ float: left; margin: 8px 8px 0 0; }
+            float: left;
+            width: 80%;
+            .btn{ margin: 8px 8px 0 0; }
         }
         .link-image {
-            position: absolute;
-            top: 7px;
-            left: 0;
+            float: left;
 			margin: 0 16px;
+			width: 15%;
         }
     }
+}
+.right .student-subjects .link-image,
+.right .student-subjects .student-details{
+	width: 100%;
 }
 
 h4.eventListing {
