@@ -42,13 +42,11 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : ''
         );
 
 	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+		    $this->source = array();
 	    }
     }
 
