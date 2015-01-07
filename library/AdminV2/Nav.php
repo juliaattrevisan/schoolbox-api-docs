@@ -27,6 +27,7 @@ class AdminV2_Nav
         'cleanup' => 'Cleanup',
         'usage' => 'Usage',
         'rollover' => 'Rollover',
+        'synchronise' => 'Synchronise',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')

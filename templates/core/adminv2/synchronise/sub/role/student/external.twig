@@ -1,0 +1,18 @@
+<h4>External Role</h4>
+<table class="table ruler">
+    <colgroup>
+        <col />
+    </colgroup>
+    <thead>
+    <tr>
+        <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in data.role.external %}
+        <tr>
+            <td>{{ i.getType() }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

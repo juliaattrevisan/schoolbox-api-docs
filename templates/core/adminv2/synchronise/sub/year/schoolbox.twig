@@ -1,0 +1,24 @@
+<h4>Schoolbox Year</h4>
+<table class="table ruler">
+    <colgroup>
+        <col width="75">
+        <col />
+        <col />
+    </colgroup>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in data.year.schoolbox %}
+        <tr>
+            <td>{{ i.getId() }}</td>
+            <td>{{ i.getName() }}</td>
+            <td>{{ i.getType() }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
