@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/textbox/javascript/availableByCategory.js"></script>
+<script type="text/javascript" src="/component/javascript/availableByCategory.js"></script>
 <script type="text/javascript">
   $(function () {
     /* Modal for URL homepage selection
@@ -19,13 +19,23 @@
           src.val(url);
           lbl.attr('href', url).html(filename);
 
-          var select = $('#src-{COMPONENT_HANDLE}').closest('form').find('div.textbox').find('select');
+          // Update a select box.
+          // How that's done depends on exactly what type it is: textbox or tile
+          var select = $('#src-{COMPONENT_HANDLE}').closest('form')
+                  .find('select[data-uses-source]');
 
-          if (select) {
-            src.availableByCategory({
-              categoryId: src.val().toString().replace('/homepage/', ''),
-              target: select
-            });
+          if (select.length) {
+              var categoryId = src.val().toString().replace('/homepage/', '');
+              select.each(function() {
+                  var element = $(this);
+                  src.availableByCategory({
+                      categoryId: categoryId,
+                      target: element,
+                      payload: {
+                          type: element.attr('name')
+                      }
+                  });
+              })
           }
         }
       });

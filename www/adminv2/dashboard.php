@@ -11,7 +11,7 @@
 
 $group = new Group();
 
-if ( !$group->isSuperuser() ) {
+if (!$group->isSuperuser()) {
     error(19);
 }
 
@@ -29,8 +29,8 @@ $nav->parse($this, 'dashboard');
 $userHandle = new User;
 $groupList = $userHandle->getGroupList();
 
-if ( is_array($groupList) ) {
-    foreach ( $groupList as $group ) {
+if (is_array($groupList)) {
+    foreach ($groupList as $group) {
         $this->setVar(array(
             'group.id'   => $group['id'],
             'group.name' => Scrub::text($group['name'])
@@ -48,7 +48,7 @@ $definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnL
     'visible' => 'true',
 ));
 
-foreach ( $definitionCollection as $definition ) {
+foreach ($definitionCollection as $definition) {
     /* @var $definition Component_Definition */
     $this->setVar(array(
         'definition.id'          => $definition->getId(),
@@ -74,13 +74,13 @@ $componentCollection = $componentFactory->buildComponentList($groupList[0]['id']
 
 $occupiedPositionList = array();
 
-foreach( $componentCollection as $component ) {
+foreach ($componentCollection as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_id = $component->getInstance()->getId();
     $position_no = $component->getInstance()->getPosition();
     $position    = "position_{$position_no}";
 
-    if ( !$this->template->exists("{$position}_block") ) {
+    if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
@@ -94,19 +94,22 @@ foreach( $componentCollection as $component ) {
         'component.definition.name' => Scrub::text($component->getInstance()->getDefinition()->getName()),
     ));
 
-    $component->setup(array(), array());
+    $component->setup(
+        array(),
+        $component->getInstance()->getConfigArray()
+    );
     $component->parseConfigForTemplate();
 
     $this->parse("{$position}_block", $position, true);
 
-    if ( !in_array($position_no, $occupiedPositionList) ) {
+    if (!in_array($position_no, $occupiedPositionList)) {
         $occupiedPositionList[] = $position_no;
     }
 }
 
 $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
 
-foreach ( $emptyPositionList as $emptyPosition ) {
+foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("position_{$emptyPosition}_block", '');
 }
 

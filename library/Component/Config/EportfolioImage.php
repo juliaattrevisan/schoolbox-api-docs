@@ -8,40 +8,40 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_EportfolioImage extends Component_Config_Abstract {
+class Component_Config_EportfolioImage extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-		$fileMapper = new \Schoolbox\MyFileMapper();
-		$allImages = $fileMapper->findAllImagesByUser($this->cat['uid']);
+        $fileMapper = new \Schoolbox\MyFileMapper();
+        $allImages = $fileMapper->findAllImagesByUser($this->cat['uid']);
 
-		$page->setVar('IMAGE_TITLE', 'Image');
+        $page->setVar('IMAGE_TITLE', 'Image');
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
                 $page->setVar(array(
-					'COMPONENT_CONFIG_FILE_ID' => $currentImage->getId(),
-					'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getDescription()
-				));
+                    'COMPONENT_CONFIG_FILE_ID' => $currentImage->getId(),
+                    'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getDescription()
+                ));
 
-				if ($currentImage->getId() == $configValue) {
-					$page->setVar(array(
-						'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
-						'IMAGE_TITLE' => $currentImage->getDescription()
-					));
-				}
-				else {
-					$page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
-				}
+                if ($currentImage->getId() == $configValue) {
+                    $page->setVar(array(
+                        'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
+                        'IMAGE_TITLE' => $currentImage->getDescription()
+                    ));
+                } else {
+                    $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
+                }
 
                 $page->parse('config_images_block', 'config_images', true);
             }
-        }
-		else {
+        } else {
             $page->setVar('COMPONENT_CONFIG_FILE_DESCRIPTION', '(none)');
             $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
             $page->parse('config_images_block', 'config_images', false);

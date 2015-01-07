@@ -9,8 +9,13 @@
 
 class Component_Config_LayoutId extends Component_Config_Abstract
 {
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array())
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        // noop - this method just needs to exist
+        // Which link gets displayed?
+        // If there's an alt source: show that, otherwise show the link for this item.
+        $page->setVar(
+            'TILE_COMPONENT_INSTANCE_ID',
+            $component->getConfig('tileSource') ?: $component->getInstance()->getId()
+        );
     }
 }

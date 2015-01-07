@@ -9,7 +9,8 @@
  *
  */
 
-abstract class Component_ControllerAbstract {
+abstract class Component_ControllerAbstract
+{
 
     /**
      * @var Component_Instance
@@ -60,14 +61,15 @@ abstract class Component_ControllerAbstract {
      */
     protected $filterFields = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param Component_Instance $instance
-	 * @param \Schoolbox\User $user
-	 * @param SitePage $sitepage
-	 */
-	public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
+    /**
+    * Constructor
+    *
+    * @param Component_Instance $instance
+    * @param \Schoolbox\User $user
+    * @param SitePage $sitepage
+    */
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    {
         $this->instance = $instance;
         $this->user = $user;
         $this->sitepage = $sitepage;
@@ -79,7 +81,8 @@ abstract class Component_ControllerAbstract {
      * Method to provide global config details to the component
      * @param array $config
      */
-    public function setup(array $context, array $config) {
+    public function setup(array $context, array $config)
+    {
         $this->context = $context;
         $this->config = $config;
     }
@@ -99,7 +102,8 @@ abstract class Component_ControllerAbstract {
      * @param string $templatePath
      * @return bool
      */
-    protected function loadTemplate($templateHandle, $templateName = '', $templatePath = '') {
+    protected function loadTemplate($templateHandle, $templateName = '', $templatePath = '')
+    {
         $templateFile = $this->getTemplate($templateName, $templatePath);
 
         if (!$this->sitepage->setFile($templateHandle, $templateFile)) {
@@ -117,7 +121,8 @@ abstract class Component_ControllerAbstract {
         return true;
     }
 
-    protected function getTemplate($templateName = '', $templatePath = '') {
+    protected function getTemplate($templateName = '', $templatePath = '')
+    {
         if (empty($templateName)) {
             /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
             $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())), 0, -10));
@@ -138,7 +143,8 @@ abstract class Component_ControllerAbstract {
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
 
         if (!$this->loadTemplate($templateHandle)) {
             return false;
@@ -177,7 +183,8 @@ abstract class Component_ControllerAbstract {
      * @param $varname
      * @return mixed
      */
-    public function getVar($varname) {
+    public function getVar($varname)
+    {
         return $this->sitepage->getVar($varname);
     }
 
@@ -185,7 +192,8 @@ abstract class Component_ControllerAbstract {
      * @param $var
      * @param string $value
      */
-    public function setVar($var, $value = '') {
+    public function setVar($var, $value = '')
+    {
         $this->sitepage->setVar($var, $value);
     }
 
@@ -193,7 +201,8 @@ abstract class Component_ControllerAbstract {
      * @param $handle
      * @param $file
      */
-    public function setFile($handle, $file) {
+    public function setFile($handle, $file)
+    {
         $this->sitepage->setFile($handle, $file);
     }
 
@@ -202,7 +211,8 @@ abstract class Component_ControllerAbstract {
      * @param $handle
      * @param string $name
      */
-    public function setBlock($parent, $handle, $name = '') {
+    public function setBlock($parent, $handle, $name = '')
+    {
         $this->sitepage->setBlock($parent, $handle, $name);
     }
 
@@ -211,11 +221,13 @@ abstract class Component_ControllerAbstract {
      * @param $handle
      * @param bool $append
      */
-    public function parse($target, $handle, $append = false) {
+    public function parse($target, $handle, $append = false)
+    {
         $this->sitepage->parse($target, $handle, $append);
     }
 
-    public function setJavascript($file) {
+    public function setJavascript($file)
+    {
         $this->sitepage->setJavascript($file);
     }
 
@@ -228,14 +240,16 @@ abstract class Component_ControllerAbstract {
      *
      * @return bool
      */
-    public function parseConfigForTemplate($targetHandle = 'CONFIGURATION') {
+    public function parseConfigForTemplate($targetHandle = 'CONFIGURATION')
+    {
         return $this->parseConfig($targetHandle, true);
     }
 
     /**
      * @return bool
      */
-    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false) {
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
 
         $page = $this->sitepage;
 
@@ -278,15 +292,12 @@ abstract class Component_ControllerAbstract {
         // otherwise use the regular one (_wrapper.html)
         if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
-        }
-		else if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
-
-			/* eportfolio uses a special version of le wrapier
+        } elseif (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
+/* eportfolio uses a special version of le wrapier
 			 */
-			$template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
-		}
-		else {
-			$template = 'component/config/_wrapper.html';
+            $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+        } else {
+            $template = 'component/config/_wrapper.html';
         }
         $page->setFile('configTpl', $template);
 
@@ -295,13 +306,12 @@ abstract class Component_ControllerAbstract {
         $page->setBlock('settings_panel', 'config_element', 'config_element_block');
         $page->setVar('config_element_block', '');
 
-	    // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
-	    $configCount = 0;
+        // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
+        $configCount = 0;
 
         if ($processConfig) {
             // every config key has a corresponding controller and template to be called
             foreach ($config as $key => $params) {
-
                 $page->setVar(
                     array(
                         'CONFIG_ELEMENT_LABEL' => $params['label'],
@@ -320,8 +330,8 @@ abstract class Component_ControllerAbstract {
                 // attempt to build a configuration instance from the key provided
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     if (!($is_for_template && !$conf->isShownOnTemplate())) {
-					    $this->parseConfigInstance($conf, $key, $page, $params, $config);
-	                    ++$configCount;
+                        $this->parseConfigInstance($conf, $key, $page, $params, $config);
+                        ++$configCount;
                     }
                 }
                 $page->setVar('CONFIG_ELEMENT_CONTENT', '');
@@ -329,7 +339,6 @@ abstract class Component_ControllerAbstract {
             $page->parse('settings_panel_block', 'settings_panel', false);
         } // don't process the config
         else {
-
         }
 
         // now clear things we don't want seen
@@ -349,30 +358,32 @@ abstract class Component_ControllerAbstract {
         return true;
     }
 
-	/**
-	 * Split this out so subclasses can determine which config elements get rendered
-	 *
-	 * @param Component_Config_Abstract $conf
-	 * @param string                    $key
-	 * @param SitePage                  $page
-	 * @param array                     $params
-	 * @param array                     $allConfigs All configurations for this component
-	 */
-	protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array()) {
-		$templateFile = "component/config/$key.html";
+    /**
+    * Split this out so subclasses can determine which config elements get rendered
+    *
+    * @param Component_Config_Abstract $conf
+    * @param string                    $key
+    * @param SitePage                  $page
+    * @param array                     $params
+    * @param array                     $allConfigs All configurations for this component
+    */
+    protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array())
+    {
+        $templateFile = "component/config/$key.html";
 
-		$page->setFile($key, $templateFile);
-		$conf->parse($page, $key, $key, Scrub::text($params['value']), $allConfigs);
-		$page->parse('CONFIG_ELEMENT_CONTENT', $key);
-		$page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
-		$page->parse('config_element_block', 'config_element', true);
+        $page->setFile($key, $templateFile);
+        $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
+        $page->parse('CONFIG_ELEMENT_CONTENT', $key);
+        $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
+        $page->parse('config_element_block', 'config_element', true);
     }
 
     /**
      * @param string $key
      * @return mixed
      */
-    protected function getContext($key = '') {
+    protected function getContext($key = '')
+    {
         if ($key) {
             return isset($this->context[$key]) ? $this->context[$key] : false;
         }
@@ -383,7 +394,8 @@ abstract class Component_ControllerAbstract {
      * @param string $key
      * @return mixed
      */
-    public function getConfig($key = '', $attr = 'value') {
+    public function getConfig($key = '', $attr = 'value')
+    {
         if ($key) {
             return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
         }
@@ -401,19 +413,23 @@ abstract class Component_ControllerAbstract {
      * @param $key
      * @return bool
      */
-    public function hasConfig($key) {
+    public function hasConfig($key)
+    {
         return isset($this->config[$key]) ? true : false;
     }
 
-    public function getSortFields() {
+    public function getSortFields()
+    {
         return $this->sortFields;
     }
 
-    public function getFilterFields() {
+    public function getFilterFields()
+    {
         return $this->filterFields;
     }
 
-    public function getPageTemplate() {
+    public function getPageTemplate()
+    {
         return $this->sitepage->template;
     }
 
@@ -424,14 +440,16 @@ abstract class Component_ControllerAbstract {
      *
      * @param \Component_Instance $instance
      */
-    public function setInstance($instance) {
+    public function setInstance($instance)
+    {
         $this->instance = $instance;
     }
 
     /**
      * @return \Component_Instance
      */
-    public function getInstance() {
+    public function getInstance()
+    {
         return $this->instance;
     }
 

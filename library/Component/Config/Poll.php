@@ -6,11 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Poll extends Component_Config_Abstract {
+class Component_Config_Poll extends Component_Config_Abstract
+{
 
-	protected $is_shown_on_template = false;
+    protected $is_shown_on_template = false;
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
         $pollHandler = new Poll();
 
@@ -23,15 +25,14 @@ class Component_Config_Poll extends Component_Config_Abstract {
         if (is_array($pollList)) {
             foreach ($pollList as $poll) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> TextFormatter::cutString(Scrub::text($poll['question']),30),
+                    'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> TextFormatter::cutString(Scrub::text($poll['question']), 30),
                     'COMPONENT_CONFIG_POLLSELECT_VALUE' 	=> $poll['pollID'],
                     'COMPONENT_CONFIG_POLLSELECT_SELECTED'	=> $poll['pollID'] == $configValue ? 'selected="selected"' : '',
                 ));
 
                 $page->parse("poll_select_block", "poll_select", true);
             }
-        }
-        else {
+        } else {
             $page->setVar(array(
                 'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> Scrub::text(' (none) '),
                 'COMPONENT_CONFIG_POLLSELECT_VALUE' 	=> '0',
@@ -42,5 +43,4 @@ class Component_Config_Poll extends Component_Config_Abstract {
         }
 
     }
-
 }

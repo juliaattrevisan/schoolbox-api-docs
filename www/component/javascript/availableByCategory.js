@@ -52,7 +52,7 @@ $j(function() {
 				/* Ajax url for getting a list of textboxes
 				 * available for a particular category
 				 */
-				url: '/textbox/ajax/availableByCategory.php',
+				url: '/component/ajax/availableByCategory.php',
 
 				/* A jquery-selected element where the <select>
 				 * element eventually gets put
@@ -65,9 +65,10 @@ $j(function() {
 
 			var merged = $j.extend(defaults, derived, options);
 
-			merged.payload = {
-				categoryId: parseInt(merged.categoryId)
-			}
+			merged.payload = $j.extend(
+				merged.payload,
+				{ categoryId: parseInt(merged.categoryId) }
+			);
 
 			return merged;
 		}
@@ -97,14 +98,12 @@ $j(function() {
 					var allOptions = '<option value="0" disabled="disabled"> (none) </option>';
 				}
 
-				var select = '<select name="textbox">' + allOptions + '</select>';
-
 				/* If the target exists, replace it - since Resource Browser
 				 * is shared by everything, if the textbox target doesn't exist,
 				 * just do nowt
 				 */
 				if (config.target.length) {
-					config.target.replaceWith(select);
+					config.target.empty().append(allOptions);
 				}
 			});
 		}

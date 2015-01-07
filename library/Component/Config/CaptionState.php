@@ -6,9 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_CaptionState extends Component_Config_Abstract {
+class Component_Config_CaptionState extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
         //
         // Anything other than "active" gets set to "inactive" directly
         if (!($configValue == 'Active')) {
@@ -18,7 +20,7 @@ class Component_Config_CaptionState extends Component_Config_Abstract {
         $page->setBlock($keyblock, 'caption_state', 'caption_state_block');
         $page->setVar('caption_state_block', '');
 
-        foreach(array('On' => 'Active', 'Off' => 'Inactive') as $k => $v) {
+        foreach (array('On' => 'Active', 'Off' => 'Inactive') as $k => $v) {
             $page->setVar('COMPONENT_CONFIG_CAPTION_STATE_NAME', $k);
             $page->setVar('COMPONENT_CONFIG_CAPTION_STATE_VALUE', $v);
             $page->setVar('COMPONENT_CONFIG_CAPTION_STATE_SELECTED', $v == $configValue ? ' selected="selected"' : '');
@@ -26,5 +28,4 @@ class Component_Config_CaptionState extends Component_Config_Abstract {
         }
 
     }
-
 }

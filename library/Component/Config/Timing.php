@@ -6,9 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Timing extends Component_Config_Abstract {
+class Component_Config_Timing extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
         // has an internal block for the select element
         $page->setBlock($keyblock, 'timings', 'timings_block');
@@ -22,5 +24,4 @@ class Component_Config_Timing extends Component_Config_Abstract {
         }
 
     }
-
 }

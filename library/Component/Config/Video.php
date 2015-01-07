@@ -5,19 +5,26 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-class Component_Config_Video extends Component_Config_Abstract {
+class Component_Config_Video extends Component_Config_Abstract
+{
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, $allConfigs = array()) {
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
 
-		/* Sort order
+        /* Sort order
 		 */
-		$sortConfig = array(
-			'sort' => $allConfigs['sort']['value'],
-			'sortdir' => $allConfigs['sortdir']['value']
-		);
+        $sortConfig = array();
+        $altSource  = null;
+        if ($component instanceof Component_ControllerAbstract) {
+            $sortConfig = array(
+                'sort' => $component->getConfig('sort'),
+                'sortdir' => $component->getConfig('sortdir')
+            );
+            $altSource = $component->getConfig('src');
+        }
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $vidList = $videoMapper->findByCategory($allConfigs['src']['value'] ?: $this->getCategory('id'), $sortConfig);
+        $vidList = $videoMapper->findByCategory($altSource ?: $this->getCategory('id'), $sortConfig);
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');
@@ -32,8 +39,7 @@ class Component_Config_Video extends Component_Config_Abstract {
 
                 $page->parse("video_select_block", "video_select", true);
             }
-        }
-        else {
+        } else {
             $page->setVar(array(
                 'COMPONENT_CONFIG_VIDSELECT_NAME'       => Scrub::text(' (none) '),
                 'COMPONENT_CONFIG_VIDSELECT_VALUE'      => '0',

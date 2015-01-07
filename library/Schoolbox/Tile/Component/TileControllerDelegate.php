@@ -49,7 +49,19 @@ class TileControllerDelegate
      */
     public function fetchLayout(Component_ControllerAbstract $controller)
     {
-        $layoutId = $controller->getConfig('layoutId');
+        // layoutId: the layout that was created when this component was
+        // tileSource: the layout chosen for an alternate source
+        $altSource = $controller->getConfig('tileSource');
+        $layoutId  = $controller->getConfig('layoutId');
+        if ($altSource) {
+            // Get this component, and get its layout ID
+            $altComponents = \Component_InstanceMapper::getInstance()->findByInstanceId($altSource);
+            if (isset($altComponents[$altSource])) {
+                $altComponent = $altComponents[$altSource];
+                $altConfig    = $altComponent->getConfigArray();
+                $layoutId     = $altConfig['layoutId']['value'];
+            }
+        }
 
         // empty layout by default
         $mapper = Layout\Mapper::getInstance();
@@ -101,9 +113,11 @@ class TileControllerDelegate
     {
         $controller->setVar(
             array(
-                'COMPONENT_CONTENT' => $content,
-                'header_block'      => '',
-                'buttons_block'     => '',
+                'header_block'               => '',
+                'buttons_block'              => '',
+                'COMPONENT_CONTENT'          => $content,
+                'TILE_COMPONENT_INSTANCE_ID' => $controller->getConfig('tileSource')
+                    ?: $controller->getInstance()->getId(),
             )
         );
         if ($permission >= UserAccess::ACCESS_WRITE) {
