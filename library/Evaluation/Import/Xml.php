@@ -82,9 +82,9 @@ class Evaluation_Import_Xml {
 		// allowresit (not allow_resit).
 		// if allowresit is true, or is not unspecified:
 		// max_attempts = 0 (unlimited), otherwise 1.
-		$max_attempts = Scrub::text($xml->maxattempts);
+		$max_attempts = (string)$xml->maxattempts;
 		if (strlen($max_attempts) === 0) {
-			$allow_resit = Scrub::text($xml->allowresit);
+			$allow_resit  = (string)$xml->allowresit;
 			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
 		}
 
@@ -101,7 +101,7 @@ class Evaluation_Import_Xml {
 
 		/* Remember the title, for the course builder
 		 */
-		$this->setTitle(html_entity_decode(Scrub::text($xml->title)));
+		$this->setTitle((string)$xml->title);
 
 		$assess_id = $this->getAssessHandler()->create(array(
 			'category_id' => $this->getCategoryId(),
@@ -142,8 +142,8 @@ class Evaluation_Import_Xml {
 			for ($j=0; $j < count($currentSection->question); $j++) {
 				$currentQuestion = $currentSection->question[$j];
 
-				$questionHandler = $this->getFactory()->createQuestionModel(Scrub::text($currentQuestion->typeid));
-				$answerHandler = $this->getFactory()->createAnswerModel(Scrub::text($currentQuestion->typeid));
+				$questionHandler = $this->getFactory()->createQuestionModel((string)$currentQuestion->typeid);
+				$answerHandler = $this->getFactory()->createAnswerModel((string)$currentQuestion->typeid);
 
 				/* Only json-encode if there are config elements
 				 *
