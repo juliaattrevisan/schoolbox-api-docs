@@ -93,7 +93,6 @@ class CategoryTreeBuilder
                 if ($codeString != '' && $codeString != $name) {
                     $name .= ' (' . $codeString . ')';
                 }
-                $name = TextFormatter::cutString($name, 32);
 
                 // Output something.
                 $output[] = array(
