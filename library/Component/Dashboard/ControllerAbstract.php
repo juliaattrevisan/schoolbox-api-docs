@@ -21,6 +21,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
                 $this->config[$k] = $v;
             }
         }
+
+        $this->hook();
     }
 
     protected function getTemplate ($templateName = '', $templatePath = '') {

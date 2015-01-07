@@ -29,6 +29,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 		/* Check primary key is being used correctly!
 		 */
 		$this->sitepage->setVar('ID', $context['uid']);
+
+        $this->hook();
 	}
 
     /**

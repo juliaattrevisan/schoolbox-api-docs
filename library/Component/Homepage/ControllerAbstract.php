@@ -20,6 +20,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
         $this->permission = min($g->getPermission($sourceId), $this->getMaximumPermission());
         $this->sitepage->setVar('ID', $context['id']);
+
+        $this->hook();
     }
 
     /**

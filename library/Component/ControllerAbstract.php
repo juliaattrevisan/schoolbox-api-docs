@@ -97,6 +97,13 @@ abstract class Component_ControllerAbstract
     abstract function execute();
 
     /**
+     * Hook method for components to perform their own dynamic
+     * setup() amendments
+     */
+    protected function hook() {
+    }
+
+    /**
      * @param $templateHandle
      * @param string $templateName
      * @param string $templatePath
