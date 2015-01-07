@@ -65,12 +65,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             $category = $this->getCategoryMapper()->findById($categoryId);
         }
         catch (\Exception $e) {
-            if (!is_numeric($this->getContext('id'))) {
-                $category = new Category();
-            }
-            else {
-                $category = $this->getCategoryMapper()->findById($this->getContext('id'));
-            }
+            $category = new \Schoolbox\Resource\Category();
         }
 
         $this->setSource($category);
