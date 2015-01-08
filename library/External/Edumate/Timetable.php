@@ -50,6 +50,25 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     protected $cycleLength = 5;
 
+
+    /**
+     * @return array
+     */
+    protected function getLabelMap()
+    {
+        return $this->labelMap;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function getTimeMap()
+    {
+        return $this->timeMap;
+    }
+
+
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
      *
@@ -63,11 +82,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $definition = array();
         $periodCount = 0;
 
-        $i = 0;
-        foreach ($this->labelMap as $shortName => $periodDetails) {
+        $timeMap = $this->getTimeMap();
+
+        foreach($this->getLabelMap() as $shortName => $periodDetails) {
             $definition['desc'][] = $periodDetails[0];
-            $definition['start'][] = $this->parseTime($this->timeMap[$shortName][0]);
-            $definition['end'][] = $this->parseTime($this->timeMap[$shortName][1]);
+            $definition['start'][] = $this->parseTime($timeMap[$shortName][0]);
+            $definition['end'][] = $this->parseTime($timeMap[$shortName][1]);
             $definition['number'][] = $shortName;
             $definition['sequence'][] = $periodDetails[1];
             ++$periodCount;
@@ -369,7 +389,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         // return the SEQUENCE of the period (if that is not what is expected, then this should be changed)
         $i = 0;
-        foreach ($this->labelMap as $periodCode => $periodDetails) {
+        foreach($this->getLabelMap() as $periodCode => $periodDetails) {
             ++$i;
             if ($class == $periodCode) {
                 return $i;
