@@ -10,4 +10,11 @@
 
 class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
     protected $graphTemplateFile = 'survey/answer/ranking/graph.html';
+
+    /**
+     * Setup
+     */
+    protected function setup() {
+        $this->setResponseHandler(new Assess_Response());
+    }
 } 
