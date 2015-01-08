@@ -56,7 +56,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getLabelMap()
     {
-        return $this->labelMap;
+        $stmt = $this->getDatabase()->query("
+            SELECT period, period_sequence
+            FROM db2inst1.schoolbox_timetable_definition
+        ");
+
+        $map = array();
+
+        while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            $map[/* ??? "number" */] = array($r['PERIOD'], $r['PERIOD_SEQUENCE']);
+        }
+
+        return $map;
     }
 
 
@@ -65,7 +76,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getTimeMap()
     {
-        return $this->timeMap;
+        $stmt = $this->getDatabase()->query("
+            SELECT start_time, end_time
+            FROM sb2inst1.schoolbox_timetable_definition
+        ");
+
+        $map = array();
+
+        while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            $map[/* ??? "number" */] = array($r['START_TIME'], $r['END_TIME']);
+        }
+
+        return $map;
     }
 
 
@@ -115,9 +137,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * Helper function to retrieve the length of the timetable cycle in edumate
      * @return int
      */
-    private function getCycleLength()
+    private function getCycleLength() 
     {
-        return $this->cycleLength;
+        return $this->getDatabase()->query("SELECT MAX(day_sequence) FROM db2inst.schoolbox_timetable.definition")->fetchColumn();
     }
 
     public function getDayNumber($campusId, $date = 0)
