@@ -37,7 +37,7 @@ class Pipe implements PipeInterface {
 	protected $userId;
 
 	/** @var string */
-	protected $sessionId;
+	protected $cookies;
 
 	/**
 	 * @param ConnectionInterface $conn
@@ -56,26 +56,34 @@ class Pipe implements PipeInterface {
 	}
 
 	/**
-	 * Returns the session id of this websocket, if it has one.
+	 * Returns the given cookie of this websocket, if present.
 	 *
+     * @param string $name
 	 * @return string
 	 */
-	public function getSession() {
+	public function getCookie($name)
+    {
 
 		// only do this once
-		if(!$this->sessionId) {
+		if (!$this->cookies) {
 			$cookieString = static::getHeader($this->socketConnection, 'cookie');
 
 			preg_match_all('`([A-Za-z]+)=([^;]+)`', $cookieString, $matches);
-
-			$cookies = array_combine($matches[1], $matches[2]);
-
-			if(isset($cookies[PipeManager::PHP_SESSION_PREFIX])) {
-				$this->sessionId = $cookies[PipeManager::PHP_SESSION_PREFIX];
-			}
+			$this->cookies = array_combine($matches[1], $matches[2]);
 		}
-		return $this->sessionId;
+
+		return isset($this->cookies[$name]) ? $this->cookies[$name] : '';
 	}
+
+    /**
+     * Returns the session id of this websocket, if it has one.
+     *
+     * @return string
+     */
+    public function getSession()
+    {
+        return $this->getCookie(PipeManager::PHP_SESSION_PREFIX);
+    }
 
 	/**
 	 * Returns the remote address of the connection of this pipe.

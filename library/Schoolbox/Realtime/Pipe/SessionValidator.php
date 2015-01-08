@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 
+use Database;
 use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
@@ -27,20 +28,52 @@ class SessionValidator {
     /** @var int */
     protected $length;
 
+    /** @var Database */
+    protected $database;
+
+    /** @var array */
+    protected $userIdCache = array();
 
     /**
-     * @param ClientInterface $redis
+     * @param ClientInterface  $redis
      * @param HandlerInterface $handler
-     * @param int $sessionLength
+     * @param int              $sessionLength
+     * @param Database         $database
      */
-    public function __construct(ClientInterface $redis, HandlerInterface $handler, $sessionLength) {
+    public function __construct(ClientInterface $redis, HandlerInterface $handler, $sessionLength, Database $database)
+    {
         $this->redis = $redis;
         $this->handler = $handler;
         $this->length = $sessionLength;
+        $this->database = $database;
     }
 
     /**
-     * Extracts a user by ID from a Redis session and returns the associated User object
+     * Extracts a user from a Redis remember-me and returns the associated username
+     *
+     * @param string $rememberMe
+     * @throws SessionException
+     * @return int
+     */
+    public function findUserIdByRememberMe($rememberMe)
+    {
+        // redis will unfortunately respond with the username, not the id -_-
+        $username = $this->findUser($rememberMe, 'remember-me token', '');
+
+        if (empty($this->userIdCache[$username])) {
+            // *sigh*
+            $id = (int)$this->database
+                            ->query("SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1", array($username))
+                            ->fetchColumn();
+
+            $this->userIdCache[$username] = $id;
+        }
+
+        return $this->userIdCache[$username];
+    }
+
+    /**
+     * Extracts a user from a Redis session and returns the associated ID
      *
      * @param string $sessionId
      * @throws SessionException
@@ -48,20 +81,9 @@ class SessionValidator {
      * @return int
      */
     public function findUserIdBySessionId($sessionId) {
-        if(!$sessionId) {
-            throw new SessionException("No sessionID provided on which to search.");
-        }
-
-        $redisCommand  = $this->redis->createCommand('get', array(PipeManager::REDIS_SESSION_PREFIX . $sessionId));
-        $redisResponse = $this->redis->executeCommand($redisCommand);
-
-        if (!$redisResponse) {
-            throw new SessionException("No session found for given session key.");
-        }
-
         try {
             // note that objects DO NOT correctly unserialize
-            $session = $this->handler->unserialize($redisResponse);
+            $session = $this->handler->unserialize($this->findUser($sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX));
 
             // check a user ID exists
             if (empty($session['id'])) {
@@ -78,6 +100,29 @@ class SessionValidator {
         } catch(UnexpectedValueException $e) {
             throw new SessionException("Could not decode session", 0, $e);
         }
+    }
+
+    /**
+     * @param string $token
+     * @param string $label
+     * @param string $prefix
+     * @return string
+     * @throws SessionException
+     */
+    protected function findUser($token, $label, $prefix)
+    {
+        if(!$token) {
+            throw new SessionException("No $label provided on which to search.");
+        }
+
+        $redisCommand  = $this->redis->createCommand('get', array($prefix . $token));
+        $redisResponse = $this->redis->executeCommand($redisCommand);
+
+        if (!$redisResponse) {
+            throw new SessionException("No session found for given $label.");
+        }
+
+        return $redisResponse;
     }
 
 } 

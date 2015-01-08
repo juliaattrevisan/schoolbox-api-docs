@@ -81,7 +81,7 @@ $kernel->run(
            $log->info(implode($delim, array("Using strategy:") + $stratBuilder->summarise()), array('char' => '+'));
 
            $conf             = $di->get('config');
-           $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'));
+           $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'), Database::getInstance());
 
            $stompFactory = new Factory($loop);
 
