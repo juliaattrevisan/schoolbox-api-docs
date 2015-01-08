@@ -297,20 +297,28 @@ class External_Tass_User implements External_UserInterface
     {
     }
 
+    /**
+     * Retrieves staff user account info for sync script.
+     *
+     * @return array
+     */
     public function getStaffUserAccountInfo()
     {
-
-        // Include Synergetic fields, and attempt to perform data normalisation
-        // using extra fields.
+        // For Meriden:
+        // * filter on t.curr_flg = Y
+        // * filter out non-teachers
         $query = "
             SELECT
-                t.tch_code AS StaffID,
+                t.emp_code AS StaffID,
                 '' AS NetworkLogin,
-                t.curr_flg AS ActiveFlag,
-                '' AS StaffTitle,
-                '' AS StaffPreferredName,
-                t.surname AS StaffSurname,
-                t.tch_name AS StaffFullName,
+                CASE
+                    WHEN (t.term_date) IS NULL THEN 0
+                    ELSE 1
+                END AS ActiveFlag,
+                t.salutation_flag AS StaffTitle,
+                t.prefer_name_text AS StaffPreferredName,
+                t.surname_text AS StaffSurname,
+                '' AS StaffFullName,
                 '' AS DefaultEmailCode,
                 '' AS OccupEmail,
                 t.e_mail AS Email,
@@ -319,11 +327,10 @@ class External_Tass_User implements External_UserInterface
                 '' AS StaffCategory,
                 td.tch_dept AS StaffDepartment,
                 *
-            FROM teacher AS t
-            JOIN tchdept AS td ON t.tch_code = td.tch_code
-            WHERE t.curr_flg = 'Y'
+            FROM tel_vw_telemf AS t
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
         ";
-
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
     }
