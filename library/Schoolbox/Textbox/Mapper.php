@@ -9,6 +9,7 @@
  */
 
 namespace Schoolbox\Textbox;
+
 use Schoolbox\Textbox\Model;
 use Schoolbox\Collection;
 
@@ -67,12 +68,14 @@ class Mapper extends \Schoolbox\Mapper
             )
         );
 
-        $this->hasJoin('category', array(
-            'multiple'  => false,
-            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
-            'this_key'  => 'categoryID',
-            'other_key' => 'id',
-        ));
+        $this->hasJoin(
+            'category', array(
+                'multiple'  => false,
+                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'this_key'  => 'categoryID',
+                'other_key' => 'id',
+            )
+        );
 
         $this->hasSoftDeleteDateField('deleted');
     }
@@ -83,7 +86,8 @@ class Mapper extends \Schoolbox\Mapper
      * @param Model $textbox
      * @return mixed
      */
-    public function findComponentUsage(Model $textbox) {
+    public function findComponentUsage(Model $textbox)
+    {
         $instanceMapper = new \Component_InstanceMapper();
 
         $query = "
