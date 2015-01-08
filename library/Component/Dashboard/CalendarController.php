@@ -148,6 +148,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 'EVENT_ID' => $currentEvent->getEventId(),
                 'EVENT_LEVEL' => '',
                 'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+                'modify_button_block' => '',
+                "has_category_block" => '',
+                "attendance_icon_block" => '',
+                "attendance_status_block" => '',
+                "attendance_request_button_block" => '',
+                "attendance_list_button_block" => '',
             );
             if ($currentEvent instanceof Calendar_Event_Type_Submission) {
                 $eventOutput['EVENT_ID']   = '';
