@@ -10,16 +10,16 @@ use Schoolbox\Collection;
 use Schoolbox\Textbox\Model;
 use Schoolbox\Textbox\Mapper;
 
-class Component_Config_TextboxSearch extends Component_Config_Abstract {
+class Component_Config_TextboxSearch extends Component_Config_Abstract
 {
     /**
      * Parse
      *
      * @param SitePage $page
-     * @param $key
-     * @param $keyblock
-     * @param $configValue
-     * @param array $allConfigs
+     * @param string $key
+     * @param string $keyblock
+     * @param mixed $configValue
+     * @param Component_ControllerAbstract $component
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
@@ -29,8 +29,7 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract {
             $textbox = $mapper->findById($configValue);
 
             $allUsages = $mapper->findComponentUsage($textbox);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $textbox = new Model();
 
             $allUsages = new Collection();
@@ -42,11 +41,13 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract {
          */
         $componentId = $allUsages->first()->getId();
 
-        $page->setVar(array(
-            'COMPONENT_TEXTBOX_ID' => $configValue,
-            'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
-            'VIEW_URL' => "/homepage/{$textbox->getCategoryId()->getId()}#component{$componentId}",
-            'EDIT_URL' => "/homepage/{$textbox->getCategoryId()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
-        ));
+        $page->setVar(
+            array(
+                'COMPONENT_TEXTBOX_ID'   => $configValue,
+                'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
+                'VIEW_URL'               => "/homepage/{$textbox->getCategoryId()->getId()}#component{$componentId}",
+                'EDIT_URL'               => "/homepage/{$textbox->getCategoryId()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
+            )
+        );
     }
 }
