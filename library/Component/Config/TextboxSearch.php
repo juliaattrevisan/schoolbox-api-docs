@@ -6,40 +6,47 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_TextboxSearch extends Component_Config_Abstract
-{
+use Schoolbox\Collection;
+use Schoolbox\Textbox\Model;
+use Schoolbox\Textbox\Mapper;
 
+class Component_Config_TextboxSearch extends Component_Config_Abstract {
+{
+    /**
+     * Parse
+     *
+     * @param SitePage $page
+     * @param $key
+     * @param $keyblock
+     * @param $configValue
+     * @param array $allConfigs
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $page->setVar('COMPONENT_TEXTBOX_ID', $configValue);
+        $mapper = new Mapper();
 
-        $handler = new TextBox();
+        try {
+            $textbox = $mapper->findById($configValue);
 
-        $textbox = $handler->getByID($configValue);
+            $allUsages = $mapper->findComponentUsage($textbox);
+        }
+        catch (\Exception $e) {
+            $textbox = new Model();
 
-        $query = "
-            SELECT *
-            FROM component_definition
-            INNER JOIN component_config_definition ON component_definition.id = component_config_definition.component_definition_id
-            INNER JOIN component_config_instance ON component_config_instance.component_config_definition_id = component_config_definition.id
-            INNER JOIN component_instance ON component_config_instance.component_instance_id = component_instance.id
-            WHERE class = 'Component_Homepage_TextBoxController'
-            AND `key` = 'textbox'
-            AND `identifier` = {$textbox['categoryID']}
-            AND `value` = {$textbox['textBoxID']}
-        ";
-
-        $allResults = $handler->db->getAll($query);
+            $allUsages = new Collection();
+            $allUsages->add(new \Component_instance());
+        }
 
         /* Because you can have multiple textbox components displaying the
          * same textbox, just pick the first one that uses the textbox
          */
-        $componentId = $allResults[0]['id'];
+        $componentId = $allUsages->first()->getId();
 
         $page->setVar(array(
-            'COMPONENT_TEXTBOX_NAME' => $textbox['heading'],
-            'VIEW_URL' => "/homepage/{$textbox['categoryID']}#component{$componentId}",
-            'EDIT_URL' => "/homepage/{$textbox['categoryID']}/textBoxModify/{$componentId}#component{$componentId}",
+            'COMPONENT_TEXTBOX_ID' => $configValue,
+            'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
+            'VIEW_URL' => "/homepage/{$textbox->getCategoryId()->getId()}#component{$componentId}",
+            'EDIT_URL' => "/homepage/{$textbox->getCategoryId()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
         ));
     }
 }
