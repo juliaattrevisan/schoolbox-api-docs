@@ -1,23 +1,24 @@
 <?php
 
 /**
- * 
+ *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- * 
+ *
  */
- 
-abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract {
+abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract
+{
 
-    public function setup(array $context, array $config) {
+    public function setup(array $context, array $config)
+    {
         // if you're able to see the component, you're in admin mode so full access is granted
         $this->permission = FULL_ACCESS;
 
         // roll the config specified into what we already have
-        if(count($config)) {
-            foreach($config as $k => $v) {
+        if (count($config)) {
+            foreach ($config as $k => $v) {
                 $this->config[$k] = $v;
             }
         }
@@ -25,9 +26,10 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         $this->hook();
     }
 
-    protected function getTemplate ($templateName = '', $templatePath = '') {
+    protected function getTemplate($templateName = '', $templatePath = '')
+    {
 
-        if ( empty($templatePath) ) {
+        if (empty($templatePath)) {
             $templatePath = "component/dashboard";
         }
 
