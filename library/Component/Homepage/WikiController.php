@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var array
@@ -35,7 +36,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
@@ -43,13 +45,13 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
     }
 
     /**
@@ -57,17 +59,18 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'wiki')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'wiki')) {
             return false;
         }
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    $this->setBlock($templateHandle, 'wiki_row', 'wiki_row_block');
+        $this->setBlock($templateHandle, 'wiki_row', 'wiki_row_block');
         $this->setBlock($templateHandle, 'submit_wiki', 'submit_wiki_block');
         $this->setBlock('wiki_row', 'compact_hide', 'compact_hide_block');
         $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
@@ -97,8 +100,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         // Controls such as Post News
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_wiki_block", "");
-        }
-        else {
+        } else {
             $this->parse("submit_wiki_block", "submit_wiki");
         }
 
@@ -119,10 +121,9 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
-                if($this->getConfig('compactMode')) {
+                if ($this->getConfig('compactMode')) {
                     $this->setVar('compact_hide_block', '');
-                }
-                else {
+                } else {
                     $this->parse('compact_hide_block', 'compact_hide');
                 }
 
@@ -141,5 +142,4 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         return true; // everything went according to plan
 
     }
-
 }
