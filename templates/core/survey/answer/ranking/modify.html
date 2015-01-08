@@ -47,7 +47,7 @@ var validator = $("#createQuestionForm").submit(function() {
 				/* Submit via POST and redirect to question creation screen upon done
 				 */
 				$.post(theForm.attr('action'), data, function(responseText) {
-					window.location = '/assess/question/create/' + data.section_id;
+					window.location = '/survey/question/create/' + data.section_id;
 				});
 			}
 			/* Editing from QuestionBank context
