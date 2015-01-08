@@ -185,6 +185,7 @@ $dueDate     = new Alaress_Date_Relative($submission->getDueDate(), 'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
 $submit_mapper      = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+/** @var Schoolbox\Assessment\ActivityCollection|Schoolbox\Assessment\Activity[] $submission_history */
 $submission_history = $submit_mapper->getHistory($userID, $this->arg[0]);
 if ($is_mark_shown) {
     $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
@@ -665,6 +666,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
 
     $this->setVar(
         array(
+            'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
             'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
             'RETURNED_WORK_FILE_ID'    => $return->getId(),
