@@ -91,6 +91,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $timetable_count++;
             }
         }
+
         if ($timetable_count === 0) {
             return false;
         }
@@ -112,7 +113,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             */
             if (is_array($timetable) && count($timetable)) {
                 foreach ($timetable as $currentPeriod) {
-                    $classCount = count($currentPeriod['class']);
+                    $classCount += count($currentPeriod['class']);
                 }
             }
 
@@ -134,6 +135,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $this->setVar('timetable_period_block', '');
 
                 foreach ($timetable as $period) {
+
                     if ($period['periodSequence'] == 1) {
                         $this->setVar('period_class_block', '');
                         $this->setVar('period_class_link_block', '');
@@ -187,9 +189,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $cat = $this->category->getByCode($class['code']);
                                 if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
-                                    $this->parse('period_class_link_block', 'period_class_link');
+                                    $this->parse('period_class_link_block', 'period_class_link',true);
                                 } else {
-                                    $this->parse('period_class_block', 'period_class');
+                                    $this->parse('period_class_block', 'period_class',true);
                                 }
 
                                 // Link to Attendance Records
