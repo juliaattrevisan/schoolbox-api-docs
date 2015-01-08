@@ -22,6 +22,10 @@ class Synchronise_Tass_Sheldon_Strategy_Student extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('StudentID', 'username', 's%s'))
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_Group_Student())
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_Campus_Student())
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_House_Student())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
