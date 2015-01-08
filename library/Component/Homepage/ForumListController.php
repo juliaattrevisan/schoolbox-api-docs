@@ -24,6 +24,13 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     private $source;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('Threads', 'Posts');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -43,8 +50,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 	    if($this->source === false) {
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
-
-        $this->sortFields = array('Threads', 'Posts');
     }
 
     /**

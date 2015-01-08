@@ -24,6 +24,13 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
     private $catHandler;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('Heading', 'Created', 'Modified');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -43,10 +50,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 	    if($this->source === false) {
 		    $this->source = $this->catHandler->getByID($this->getContext('id'));
 	    }
-
-        // specify the sorting fields this module uses
-        $this->sortFields = array('Heading', 'Created', 'Modified');
-
     }
 
     /**

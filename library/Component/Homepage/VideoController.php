@@ -26,15 +26,19 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     protected $source_category_id;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute()
     {
-        /* Sort order
-         */
-        $this->sortFields = array('name', 'date');
     }
 
     /**

@@ -20,6 +20,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
     protected $outputList;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -27,7 +34,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
     public function execute()
     {
         $this->allowedFileHandler = new AllowedFile();
-        $this->sortFields = array('name', 'date');
     }
 
     /**

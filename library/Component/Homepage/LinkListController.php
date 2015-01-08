@@ -36,6 +36,13 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $source;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('Name', 'Date');
+
+    /**
      * Prepares data for the render function. Business logic.
      * @return void
      */
@@ -53,8 +60,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         } catch (\Exception $e) {
             $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
         }
-
-        $this->sortFields = array('Name', 'Date');
     }
 
     /**

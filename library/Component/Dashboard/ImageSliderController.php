@@ -30,6 +30,13 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     private $source;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -49,8 +56,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         if ($this->source === false) {
             $this->source = array();
         }
-
-        $this->sortFields = array('name', 'date');
     }
 
     /**
