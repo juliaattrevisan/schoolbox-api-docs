@@ -245,7 +245,11 @@ abstract class Synchronise_Base_Strategy
     */
     protected function hasUsername($currentUser)
     {
-        return strlen(trim($currentUser['username'])) > 0;
+        if (isset($currentUser['username'])) {
+            return strlen(trim($currentUser['username'])) > 0;
+        }
+
+        return false;
     }
 
     /**

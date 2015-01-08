@@ -871,18 +871,110 @@ class External_Maze_User implements External_UserInterface {
 	 * Used in sync scripts
 	 */
 	public function getStudentUserAccountInfo() {
+		$query = "
+			SELECT
+				USER_NAME AS NetworkLogin,
+				NULL AS StudentTitle,
+				FIRST_NAME AS StudentPreferred,
+				SURNAME AS StudentSurname,
+				STKEY AS StudentID,
+				NULL AS StudentOccupEmail,
+				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				HOUSE AS StudentHouse,
+				BOARDER AS boarding_status,
+				CAMPUS AS campus
+			FROM ST
+			WHERE STATUS != 'LEFT'
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
 	 * Used in sync scripts
 	 */
 	public function getParentUserAccountInfo() {
+		$query = "
+			SELECT
+				DF.DFKEY AS DFKEY,
+				DF.DFKEY AS ID,
+				DF.FTITLE AS Title,
+				DF.FNAME AS Preferred,
+				DF.FSURNAME AS Surname,
+				DF.F_EMAIL AS Email,
+				(DF.DFKEY + '1') AS SpouseID,
+				DF.MTITLE AS SpouseTitle,
+				DF.MNAME AS SpousePreferred,
+				DF.MSURNAME AS SpouseSurname,
+				DF.M_EMAIL AS SpouseDefaultEmail,
+				ST.SCHOOL_YEAR
+			FROM ST
+			LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+		";
+
+		$allFamilies = $this->getDb()->getAll($query);
+
+		$families = array();
+
+		foreach($allFamilies as $currentFamily) {
+			$newFamily = $this->recombine($currentFamily);
+			$newFamily['ID'] = $currentFamily['ID'];
+
+			/* Change the key names with "StudentContact" as a prefix
+			 * due to different interfaces from the original scenario
+			 * recombine() was built for
+			 */
+			$allKeys = array_keys($newFamily);
+
+			$updatedFamily = array();
+
+			foreach($allKeys as $currentKey) {
+				if ($currentKey == 'ContactID') {
+					$key = 'Student' . $currentKey;
+					$updatedFamily[$key] = $currentFamily[$currentKey];
+				}
+				else {
+					$key = 'StudentContact' . $currentKey;
+					$updatedFamily[$key] = $newFamily[$currentKey];
+				}
+			}
+
+			$families[$currentFamily['DFKEY']] = $updatedFamily;
+		}
+
+		$data = array_values($families);
+
+		return $data;
 	}
 
 	/**
 	 * Used in sync scripts
+	 *
+	 * Staff members with a Finish date are ignored
+	 * Staff members with staff_type L (left/departed) are ignored
 	 */
 	public function getStaffUserAccountInfo() {
+		$query = "
+			SELECT
+				SFKEY AS StaffID,
+				USER_NAME AS NetworkLogin,
+				STAFF_TYPE AS ActiveFlag,
+				NULL AS StaffTitle,
+				FIRST_NAME AS StaffPreferredName,
+				SURNAME AS StaffSurname,
+				NULL AS DefaultEmailCode,
+				NULL AS OccupEmail,
+				SF_EMAIL AS Email,
+				CAMPUS AS StaffCampus,
+				NULL AS StaffCategoryType,
+				NULL AS StaffCategory,
+				NULL AS StaffDepartment
+			FROM SF
+			WHERE FINISH IS NULL
+			AND STAFF_TYPE != 'L'
+		";
+
+		return $this->getDb()->getAll($query);
 	}
 
 	/**
