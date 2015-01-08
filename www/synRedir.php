@@ -8,8 +8,10 @@ $groupHandler = new Group;
 $user = $userHandler->getByID($_SESSION['id']);
 
 /* Setup form variable */
-$form="Form1";
-$action=Cfg::get('external_portal').'login.aspx';
+$url = new \Zend\Uri\Uri(Cfg::get('external_portal'));
+$url->setPath('/login.aspx');
+$form   = "Form1";
+$action = $url->toString();
 
 $method="POST";
 
